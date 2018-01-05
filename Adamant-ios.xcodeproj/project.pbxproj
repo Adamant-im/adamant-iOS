@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		277464D6A8CD29063957345F /* Pods_Adamant_ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1311CE46EB635FFC95BFEF4 /* Pods_Adamant_ios.framework */; };
 		E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */; };
 		E913C8F41FFFA51D001A83F7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C8F31FFFA51D001A83F7 /* ViewController.swift */; };
 		E913C8F71FFFA51D001A83F7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E913C8F51FFFA51D001A83F7 /* Main.storyboard */; };
@@ -15,6 +16,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		871009461457F6B7B47D99C5 /* Pods-Adamant-ios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant-ios.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant-ios/Pods-Adamant-ios.debug.xcconfig"; sourceTree = "<group>"; };
+		D1311CE46EB635FFC95BFEF4 /* Pods_Adamant_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D283570A539D864115735AAA /* Pods-Adamant-ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant-ios.release.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant-ios/Pods-Adamant-ios.release.xcconfig"; sourceTree = "<group>"; };
 		E913C8EE1FFFA51D001A83F7 /* Adamant-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Adamant-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E913C8F31FFFA51D001A83F7 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -29,17 +33,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				277464D6A8CD29063957345F /* Pods_Adamant_ios.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		54F4E3CDA748B7F48C085503 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D1311CE46EB635FFC95BFEF4 /* Pods_Adamant_ios.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E59396A8E0053F21F768E69B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				871009461457F6B7B47D99C5 /* Pods-Adamant-ios.debug.xcconfig */,
+				D283570A539D864115735AAA /* Pods-Adamant-ios.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		E913C8E51FFFA51D001A83F7 = {
 			isa = PBXGroup;
 			children = (
 				E913C8F01FFFA51D001A83F7 /* Adamant-ios */,
 				E913C8EF1FFFA51D001A83F7 /* Products */,
+				E59396A8E0053F21F768E69B /* Pods */,
+				54F4E3CDA748B7F48C085503 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -71,9 +95,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant-ios" */;
 			buildPhases = (
+				E40A2E5936758D20792675C8 /* [CP] Check Pods Manifest.lock */,
 				E913C8EA1FFFA51D001A83F7 /* Sources */,
 				E913C8EB1FFFA51D001A83F7 /* Frameworks */,
 				E913C8EC1FFFA51D001A83F7 /* Resources */,
+				1C93FABD2FEB3E73F76872C8 /* [CP] Embed Pods Frameworks */,
+				9103110972E84A36FC64A689 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -130,6 +157,57 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1C93FABD2FEB3E73F76872C8 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Adamant-ios/Pods-Adamant-ios-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9103110972E84A36FC64A689 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Adamant-ios/Pods-Adamant-ios-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E40A2E5936758D20792675C8 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Adamant-ios-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E913C8EA1FFFA51D001A83F7 /* Sources */ = {
@@ -272,6 +350,7 @@
 		};
 		E913C9011FFFA51E001A83F7 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 871009461457F6B7B47D99C5 /* Pods-Adamant-ios.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -287,6 +366,7 @@
 		};
 		E913C9021FFFA51E001A83F7 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D283570A539D864115735AAA /* Pods-Adamant-ios.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
