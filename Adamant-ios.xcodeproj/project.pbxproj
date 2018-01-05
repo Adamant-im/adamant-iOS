@@ -20,6 +20,8 @@
 		E913C9131FFFAB19001A83F7 /* adamant-core.js in Resources */ = {isa = PBXBuildFile; fileRef = E913C9121FFFAB19001A83F7 /* adamant-core.js */; };
 		E913C9151FFFAB58001A83F7 /* utilites.js in Resources */ = {isa = PBXBuildFile; fileRef = E913C9141FFFAB58001A83F7 /* utilites.js */; };
 		E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */; };
+		E919479C2000102E001362F8 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E919479B2000102E001362F8 /* LoginViewController.swift */; };
+		E919479E20001048001362F8 /* Login.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E919479D20001048001362F8 /* Login.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +42,19 @@
 		E913C9121FFFAB19001A83F7 /* adamant-core.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adamant-core.js"; sourceTree = "<group>"; };
 		E913C9141FFFAB58001A83F7 /* utilites.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = utilites.js; sourceTree = "<group>"; };
 		E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAdamantCore.swift; sourceTree = "<group>"; };
+		E919479B2000102E001362F8 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		E919479D20001048001362F8 /* Login.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Login.storyboard; sourceTree = "<group>"; };
+		E919479F200010DC001362F8 /* Exo+2_400_italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo+2_400_italic.ttf"; sourceTree = "<group>"; };
+		E91947A0200010DC001362F8 /* Roboto_300_normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_300_normal.ttf; sourceTree = "<group>"; };
+		E91947A1200010DD001362F8 /* Roboto_400_italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_400_italic.ttf; sourceTree = "<group>"; };
+		E91947A2200010DD001362F8 /* Exo+2_700_normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo+2_700_normal.ttf"; sourceTree = "<group>"; };
+		E91947A3200010DD001362F8 /* Exo+2_100_normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo+2_100_normal.ttf"; sourceTree = "<group>"; };
+		E91947A4200010DE001362F8 /* Exo+2_300_normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo+2_300_normal.ttf"; sourceTree = "<group>"; };
+		E91947A5200010DE001362F8 /* Roboto_500_normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_500_normal.ttf; sourceTree = "<group>"; };
+		E91947A6200010DF001362F8 /* Roboto_400_normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_400_normal.ttf; sourceTree = "<group>"; };
+		E91947A7200010DF001362F8 /* Roboto_700_normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_700_normal.ttf; sourceTree = "<group>"; };
+		E91947A8200010DF001362F8 /* Exo+2_400_normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo+2_400_normal.ttf"; sourceTree = "<group>"; };
+		E91947A9200010E0001362F8 /* Exo+2_500_normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo+2_500_normal.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +107,7 @@
 		E913C8F01FFFA51D001A83F7 /* Adamant-ios */ = {
 			isa = PBXGroup;
 			children = (
+				E919479920000FFD001362F8 /* Stories */,
 				E913C9091FFFA95A001A83F7 /* Models */,
 				E913C9041FFFA8FE001A83F7 /* ServiceProtocols */,
 				E913C9061FFFA92E001A83F7 /* Services */,
@@ -143,10 +159,38 @@
 		E913C9111FFFAB05001A83F7 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
+				E91947A3200010DD001362F8 /* Exo+2_100_normal.ttf */,
+				E91947A4200010DE001362F8 /* Exo+2_300_normal.ttf */,
+				E919479F200010DC001362F8 /* Exo+2_400_italic.ttf */,
+				E91947A8200010DF001362F8 /* Exo+2_400_normal.ttf */,
+				E91947A9200010E0001362F8 /* Exo+2_500_normal.ttf */,
+				E91947A2200010DD001362F8 /* Exo+2_700_normal.ttf */,
+				E91947A0200010DC001362F8 /* Roboto_300_normal.ttf */,
+				E91947A1200010DD001362F8 /* Roboto_400_italic.ttf */,
+				E91947A6200010DF001362F8 /* Roboto_400_normal.ttf */,
+				E91947A5200010DE001362F8 /* Roboto_500_normal.ttf */,
+				E91947A7200010DF001362F8 /* Roboto_700_normal.ttf */,
 				E913C9121FFFAB19001A83F7 /* adamant-core.js */,
 				E913C9141FFFAB58001A83F7 /* utilites.js */,
 			);
 			path = Assets;
+			sourceTree = "<group>";
+		};
+		E919479920000FFD001362F8 /* Stories */ = {
+			isa = PBXGroup;
+			children = (
+				E919479A20001007001362F8 /* Login */,
+			);
+			path = Stories;
+			sourceTree = "<group>";
+		};
+		E919479A20001007001362F8 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				E919479D20001048001362F8 /* Login.storyboard */,
+				E919479B2000102E001362F8 /* LoginViewController.swift */,
+			);
+			path = Login;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -213,6 +257,7 @@
 			files = (
 				E913C8FC1FFFA51D001A83F7 /* LaunchScreen.storyboard in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
+				E919479E20001048001362F8 /* Login.storyboard in Resources */,
 				E913C9131FFFAB19001A83F7 /* adamant-core.js in Resources */,
 				E913C9151FFFAB58001A83F7 /* utilites.js in Resources */,
 				E913C8F71FFFA51D001A83F7 /* Main.storyboard in Resources */,
@@ -281,6 +326,7 @@
 				E913C90B1FFFA965001A83F7 /* AdamantHash.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */,
+				E919479C2000102E001362F8 /* LoginViewController.swift in Sources */,
 				E913C90F1FFFA9F6001A83F7 /* AdamantCoreError.swift in Sources */,
 				E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */,
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
