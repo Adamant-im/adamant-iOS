@@ -11,7 +11,7 @@ import SwinjectStoryboard
 
 class SwinjectedDialogService: DialogService {
 	func presentViewController(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
-		DispatchQueue.main.sync {
+		DispatchQueue.main.async {
 			if var topController = UIApplication.shared.keyWindow?.rootViewController {
 				while let presentedViewController = topController.presentedViewController {
 					topController = presentedViewController

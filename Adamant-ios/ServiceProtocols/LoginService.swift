@@ -25,5 +25,5 @@ protocol LoginService {
 	/// - Parameters:
 	///   - animated: Present modally with or without animation.
 	///   - authorizationFinished: callback. Success and error, if present.
-	func logoutAndPresentLoginStoryboard(animated: Bool, authorizationFinishedHandler: ((Bool, Error?) -> Void)?)
+	func logoutAndPresentLoginStoryboard(animated: Bool, authorizationFinishedHandler: (() -> Void)?)
 }

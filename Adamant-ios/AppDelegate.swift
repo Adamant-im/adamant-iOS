@@ -31,8 +31,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		container.registerAdamantLoginStory()
 		
 		// Present UI
-//		presentStoryboard("Login")
+		presentStoryboard("Main")
 		let loginService = container.resolve(LoginService.self)
+		
 		loginService?.logoutAndPresentLoginStoryboard(animated: false, authorizationFinishedHandler: nil)
 		
 		return true
