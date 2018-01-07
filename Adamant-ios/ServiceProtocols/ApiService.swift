@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol AdamantApi {
+protocol ApiService {
 	func getAccount(byPassphrase passphrase: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
 	func getAccount(byPublicKey publicKey: AdamantHash, completionHandler: @escaping (Account?, AdamantError?) -> Void)
 	

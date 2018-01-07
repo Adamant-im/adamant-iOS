@@ -9,7 +9,7 @@
 import Foundation
 import Alamofire
 
-class AdamantApiService: AdamantApi {
+class AdamantApiService: ApiService {
 	var adamantCore: AdamantCore!
 	
 	var serverUrl: String!
