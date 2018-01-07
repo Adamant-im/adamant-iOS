@@ -16,6 +16,11 @@ extension Container {
 		self.register(AdamantCore.self) { _ in try! JSAdamantCore(coreJsUrl: core, utilitiesJsUrl: utils) }
 		
 		self.register(ApiService.self) { r in AdamantApiService(adamantCore: r.resolve(AdamantCore.self)!) }.inObjectScope(.container)
-		self.register(LoginService.self) { r in AdamantLoginService(apiService: r.resolve(ApiService.self)!) }.inObjectScope(.container)
+		
+		self.register(LoginService.self) { r in
+			let api = r.resolve(ApiService.self)!
+			let dialog = r.resolve(DialogService.self)!
+			return AdamantLoginService(apiService: api, dialogService: dialog)
+		}.inObjectScope(.container)
 	}
 }

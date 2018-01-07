@@ -31,6 +31,7 @@
 		E9E7CD8F20026CD300DFC4DB /* SwinjectedDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* SwinjectedDialogService.swift */; };
 		E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */; };
 		E9E7CD932002740500DFC4DB /* AdamantLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD922002740500DFC4DB /* AdamantLoginService.swift */; };
+		E9E7CD952002812400DFC4DB /* LoginDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD942002812400DFC4DB /* LoginDependencies.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -73,6 +74,7 @@
 		E9E7CD8E20026CD300DFC4DB /* SwinjectedDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwinjectedDialogService.swift; sourceTree = "<group>"; };
 		E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwinjectDependencies.swift; sourceTree = "<group>"; };
 		E9E7CD922002740500DFC4DB /* AdamantLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantLoginService.swift; sourceTree = "<group>"; };
+		E9E7CD942002812400DFC4DB /* LoginDependencies.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginDependencies.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -215,6 +217,7 @@
 			isa = PBXGroup;
 			children = (
 				E919479D20001048001362F8 /* Login.storyboard */,
+				E9E7CD942002812400DFC4DB /* LoginDependencies.swift */,
 				E919479B2000102E001362F8 /* LoginViewController.swift */,
 			);
 			path = Login;
@@ -376,6 +379,7 @@
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */,
+				E9E7CD952002812400DFC4DB /* LoginDependencies.swift in Sources */,
 				E919479C2000102E001362F8 /* LoginViewController.swift in Sources */,
 				E91947B92000327C001362F8 /* AccountsResponse.swift in Sources */,
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,

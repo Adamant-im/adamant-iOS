@@ -28,6 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let container = SwinjectStoryboard.defaultContainer
 		Container.loggingFunction = nil // Logging currently not supported with SwinjectStoryboards.
 		container.registerAdamantServices(coreJsUrl: jsCore, utilitiesJsUrl: jsUtilites)
+		container.registerAdamantLoginStory()
 		
 		// Present UI
 //		presentStoryboard("Login")

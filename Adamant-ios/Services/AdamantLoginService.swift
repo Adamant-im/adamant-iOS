@@ -11,13 +11,15 @@ import Foundation
 class AdamantLoginService: LoginService {
 	// MARK: - Dependencies
 	let apiService: ApiService
+	let dialogService: DialogService
 	
 	// MARK: - Properties
 	var loggedAccount: Account?
 	
 	// MARK: - Initialization
-	init(apiService: ApiService) {
+	init(apiService: ApiService, dialogService: DialogService) {
 		self.apiService = apiService
+		self.dialogService = dialogService
 	}
 	
 	
