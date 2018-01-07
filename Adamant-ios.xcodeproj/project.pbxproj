@@ -138,8 +138,6 @@
 				E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */,
 				E913C8F31FFFA51D001A83F7 /* ViewController.swift */,
 				E913C8F51FFFA51D001A83F7 /* Main.storyboard */,
-				E913C8F81FFFA51D001A83F7 /* Assets.xcassets */,
-				E913C8FA1FFFA51D001A83F7 /* LaunchScreen.storyboard */,
 				E913C8FD1FFFA51E001A83F7 /* Info.plist */,
 			);
 			path = "Adamant-ios";
@@ -188,17 +186,9 @@
 		E913C9111FFFAB05001A83F7 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
-				E91947A3200010DD001362F8 /* Exo+2_100_normal.ttf */,
-				E91947A4200010DE001362F8 /* Exo+2_300_normal.ttf */,
-				E919479F200010DC001362F8 /* Exo+2_400_italic.ttf */,
-				E91947A8200010DF001362F8 /* Exo+2_400_normal.ttf */,
-				E91947A9200010E0001362F8 /* Exo+2_500_normal.ttf */,
-				E91947A2200010DD001362F8 /* Exo+2_700_normal.ttf */,
-				E91947A0200010DC001362F8 /* Roboto_300_normal.ttf */,
-				E91947A1200010DD001362F8 /* Roboto_400_italic.ttf */,
-				E91947A6200010DF001362F8 /* Roboto_400_normal.ttf */,
-				E91947A5200010DE001362F8 /* Roboto_500_normal.ttf */,
-				E91947A7200010DF001362F8 /* Roboto_700_normal.ttf */,
+				E9E7CDA42002A6EB00DFC4DB /* Fonts */,
+				E913C8FA1FFFA51D001A83F7 /* LaunchScreen.storyboard */,
+				E913C8F81FFFA51D001A83F7 /* Assets.xcassets */,
 				E913C9121FFFAB19001A83F7 /* adamant-core.js */,
 				E913C9141FFFAB58001A83F7 /* utilites.js */,
 			);
@@ -229,6 +219,24 @@
 				E91947B82000327C001362F8 /* AccountsResponse.swift */,
 			);
 			path = ServerResponses;
+			sourceTree = "<group>";
+		};
+		E9E7CDA42002A6EB00DFC4DB /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				E91947A3200010DD001362F8 /* Exo+2_100_normal.ttf */,
+				E91947A4200010DE001362F8 /* Exo+2_300_normal.ttf */,
+				E919479F200010DC001362F8 /* Exo+2_400_italic.ttf */,
+				E91947A8200010DF001362F8 /* Exo+2_400_normal.ttf */,
+				E91947A9200010E0001362F8 /* Exo+2_500_normal.ttf */,
+				E91947A2200010DD001362F8 /* Exo+2_700_normal.ttf */,
+				E91947A0200010DC001362F8 /* Roboto_300_normal.ttf */,
+				E91947A1200010DD001362F8 /* Roboto_400_italic.ttf */,
+				E91947A6200010DF001362F8 /* Roboto_400_normal.ttf */,
+				E91947A5200010DE001362F8 /* Roboto_500_normal.ttf */,
+				E91947A7200010DF001362F8 /* Roboto_700_normal.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
