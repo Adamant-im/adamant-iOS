@@ -1,6 +1,6 @@
 target 'Adamant-ios' do
   use_frameworks!
 
-  # Pods for Adamant-ios
-
+  # Network
+  pod 'Alamofire'
 end
