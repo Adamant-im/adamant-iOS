@@ -22,7 +22,7 @@
         <!--Login View Controller-->
         <scene sceneID="kEg-Ft-tgc">
             <objects>
-                <viewController id="jDW-6I-Kga" customClass="LoginViewController" customModule="Adamant_ios" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LoginViewController" id="jDW-6I-Kga" customClass="LoginViewController" customModule="Adamant_ios" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="ERy-6e-jpo">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

@@ -32,6 +32,9 @@
 		E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */; };
 		E9E7CD932002740500DFC4DB /* AdamantLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD922002740500DFC4DB /* AdamantLoginService.swift */; };
 		E9E7CD952002812400DFC4DB /* LoginDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD942002812400DFC4DB /* LoginDependencies.swift */; };
+		E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDAE2002B8A100DFC4DB /* Router.swift */; };
+		E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */; };
+		E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,6 +78,9 @@
 		E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwinjectDependencies.swift; sourceTree = "<group>"; };
 		E9E7CD922002740500DFC4DB /* AdamantLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantLoginService.swift; sourceTree = "<group>"; };
 		E9E7CD942002812400DFC4DB /* LoginDependencies.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginDependencies.swift; sourceTree = "<group>"; };
+		E9E7CDAE2002B8A100DFC4DB /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
+		E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRoutes.swift; sourceTree = "<group>"; };
+		E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectedRouter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,6 +156,7 @@
 				E91947AB20001A9A001362F8 /* ApiService.swift */,
 				E9E7CD8A20026B0600DFC4DB /* LoginService.swift */,
 				E9E7CD8C20026B6600DFC4DB /* DialogService.swift */,
+				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -161,6 +168,7 @@
 				E9E7CD922002740500DFC4DB /* AdamantLoginService.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
 				E9E7CD8E20026CD300DFC4DB /* SwinjectedDialogService.swift */,
+				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -198,6 +206,7 @@
 		E919479920000FFD001362F8 /* Stories */ = {
 			isa = PBXGroup;
 			children = (
+				E9E7CDA52002AE1C00DFC4DB /* Account */,
 				E919479A20001007001362F8 /* Login */,
 			);
 			path = Stories;
@@ -208,6 +217,7 @@
 			children = (
 				E919479D20001048001362F8 /* Login.storyboard */,
 				E9E7CD942002812400DFC4DB /* LoginDependencies.swift */,
+				E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */,
 				E919479B2000102E001362F8 /* LoginViewController.swift */,
 			);
 			path = Login;
@@ -383,7 +393,10 @@
 				E9E7CD932002740500DFC4DB /* AdamantLoginService.swift in Sources */,
 				E91947B420002809001362F8 /* Account.swift in Sources */,
 				E913C8F41FFFA51D001A83F7 /* ViewController.swift in Sources */,
+				E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */,
+				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
 				E913C90B1FFFA965001A83F7 /* AdamantHash.swift in Sources */,
+				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */,

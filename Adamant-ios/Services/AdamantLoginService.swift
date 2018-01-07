@@ -12,6 +12,8 @@ import UIKit
 class AdamantLoginService: LoginService {
 	private struct Constants {
 		static let loginStoryboard = "Login"
+		
+		private init() {}
 	}
 	
 	// MARK: - Dependencies
