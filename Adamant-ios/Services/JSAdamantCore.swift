@@ -41,20 +41,20 @@ class JSAdamantCore {
 			context.evaluateScript(core)
 			if let jsError = jsError {
 				context.exceptionHandler = nil
-				throw AdamantCoreError(message: "Error evaluating core JS: \(jsError)")
+				throw AdamantError(message: "Error evaluating core JS: \(jsError)")
 			}
 			
 			// Utilities
 			context.evaluateScript(utilities)
 			if let jsError = jsError {
 				context.exceptionHandler = nil
-				throw AdamantCoreError(message: "Error evaluating core JS: \(jsError)")
+				throw AdamantError(message: "Error evaluating core JS: \(jsError)")
 			}
 			
 			context.exceptionHandler = nil
 			self.context = context
 		} else {
-			throw AdamantCoreError(message: "Failed to create JSContext")
+			throw AdamantError(message: "Failed to create JSContext")
 		}
 	}
 	
@@ -62,7 +62,7 @@ class JSAdamantCore {
 		do {
 			return try String(contentsOf: url)
 		} catch {
-			throw AdamantCoreError(message: "Error reading contents of URL: \(url)", error: error)
+			throw AdamantError(message: "Error reading contents of URL: \(url)", error: error)
 		}
 	}
 }

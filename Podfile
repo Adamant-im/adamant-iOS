@@ -1,6 +1,10 @@
 target 'Adamant-ios' do
   use_frameworks!
 
-  # Pods for Adamant-ios
-
+  # Network
+  pod 'Alamofire'
+  
+  # Swinject DI
+  pod 'Swinject'
+  pod 'SwinjectStoryboard'
 end
