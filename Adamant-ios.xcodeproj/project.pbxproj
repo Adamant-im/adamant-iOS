@@ -26,6 +26,7 @@
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
 		E91947B420002809001362F8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B320002809001362F8 /* Account.swift */; };
 		E91947B92000327C001362F8 /* AccountsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B82000327C001362F8 /* AccountsResponse.swift */; };
+		E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +64,7 @@
 		E91947B12000246A001362F8 /* AdamantError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantError.swift; sourceTree = "<group>"; };
 		E91947B320002809001362F8 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		E91947B82000327C001362F8 /* AccountsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsResponse.swift; sourceTree = "<group>"; };
+		E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwinjectDependencies.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +125,7 @@
 				E913C9101FFFAA4B001A83F7 /* Helpers */,
 				E913C9111FFFAB05001A83F7 /* Assets */,
 				E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */,
+				E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */,
 				E913C8F31FFFA51D001A83F7 /* ViewController.swift */,
 				E913C8F51FFFA51D001A83F7 /* Main.storyboard */,
 				E913C8F81FFFA51D001A83F7 /* Assets.xcassets */,
@@ -146,6 +149,7 @@
 			children = (
 				E91947AF20002393001362F8 /* AdamantApiService.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
+				E9E7CD8E20026CD300DFC4DB /* SwinjectedDialogService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -295,10 +299,14 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Adamant-ios/Pods-Adamant-ios-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
+				"${BUILT_PRODUCTS_DIR}/SwinjectStoryboard/SwinjectStoryboard.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwinjectStoryboard.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -346,6 +354,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E91947B020002393001362F8 /* AdamantApiService.swift in Sources */,
+				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
 				E91947B420002809001362F8 /* Account.swift in Sources */,
 				E913C8F41FFFA51D001A83F7 /* ViewController.swift in Sources */,
 				E913C90B1FFFA965001A83F7 /* AdamantHash.swift in Sources */,

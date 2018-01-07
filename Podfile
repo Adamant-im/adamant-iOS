@@ -3,4 +3,8 @@ target 'Adamant-ios' do
 
   # Network
   pod 'Alamofire'
+  
+  # Swinject DI
+  pod 'Swinject'
+  pod 'SwinjectStoryboard'
 end
