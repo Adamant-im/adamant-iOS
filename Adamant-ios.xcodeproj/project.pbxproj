@@ -262,7 +262,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 0920;
 				LastUpgradeCheck = 0920;
-				ORGANIZATIONNAME = adamant;
+				ORGANIZATIONNAME = Adamant;
 				TargetAttributes = {
 					E913C8ED1FFFA51D001A83F7 = {
 						CreatedOnToolsVersion = 9.2;

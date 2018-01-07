@@ -1,9 +1,9 @@
 //
-//  Get.swift
+//  AccountsResponse.swift
 //  Adamant-ios
 //
-//  Created by Павел Анохов on 06.01.2018.
-//  Copyright © 2018 adamant. All rights reserved.
+//  Created by Anokhov Pavel on 06.01.2018.
+//  Copyright © 2018 Adamant. All rights reserved.
 //
 
 import Foundation
