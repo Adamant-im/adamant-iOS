@@ -18,13 +18,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 		
+		// Finding resources
+		guard let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js"),
+			let jsUtilites = Bundle.main.url(forResource: "utilites", withExtension: "js") else {
+			fatalError("Can't load system resources!")
+		}
+		
 		// Initiating Swinject
 		let container = SwinjectStoryboard.defaultContainer
 		Container.loggingFunction = nil // Logging currently not supported with SwinjectStoryboards.
-		container.registerAdamantServices()
+		container.registerAdamantServices(coreJsUrl: jsCore, utilitiesJsUrl: jsUtilites)
 		
 		// Present UI
-		presentStoryboard("Login")
+//		presentStoryboard("Login")
+		let loginService = container.resolve(LoginService.self)
+		loginService?.logoutAndPresentLoginStoryboard(animated: false, authorizationFinishedHandler: nil)
 		
 		return true
 	}

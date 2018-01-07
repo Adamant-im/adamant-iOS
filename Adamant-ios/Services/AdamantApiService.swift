@@ -10,10 +10,21 @@ import Foundation
 import Alamofire
 
 class AdamantApiService: ApiService {
-	var adamantCore: AdamantCore!
+	// MARK: - Dependencies
+	let adamantCore: AdamantCore
 	
+	// MARK: - Properties
 	var serverUrl: String!
 	
+	// MARK: - Initialization
+	init(adamantCore: AdamantCore) {
+		self.adamantCore = adamantCore
+	}
+}
+
+
+// MARK: - ApiService
+extension AdamantApiService {
 	func getAccount(byPassphrase passphrase: String, completionHandler: @escaping (Account?, AdamantError?) -> Void) {
 		getPublicKey(byPassphrase: passphrase) { (key, error) in
 			guard let key = key else {
@@ -26,6 +37,7 @@ class AdamantApiService: ApiService {
 	}
 	
 	func getAccount(byPublicKey publicKey: AdamantHash, completionHandler: @escaping (Account?, AdamantError?) -> Void) {
+		// TODO: make this flexible as fuck
 		let endpoint = "https://endless.adamant.im/api/accounts?publicKey=\(publicKey.hex)"
 		
 		sendRequest(url: endpoint) { (responseRaw: AccountsResponse?, error) in
@@ -46,7 +58,11 @@ class AdamantApiService: ApiService {
 		
 		completionHandler(keypair.publicKey, nil)
 	}
-	
+}
+
+
+// MARK: - Tools
+extension AdamantApiService {
 	private func sendRequest<T: Decodable>(url: URLConvertible,
 										   method: HTTPMethod = .get,
 										   parameters: Parameters? = nil,
