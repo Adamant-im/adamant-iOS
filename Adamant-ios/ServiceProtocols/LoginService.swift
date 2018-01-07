@@ -20,6 +20,13 @@ protocol LoginService {
 	/// Currently logged account. nil if not logged.
 	var loggedAccount: Account? { get }
 	
+	/// Login into Adamant using passphrase.
+	///
+	/// - Parameters:
+	///   - passphrase: Your unique passphrase
+	///   - loginCompletionHandler: Completion handler. Success, logged account if success, error if not.
+	func login(passphrase: String, loginCompletionHandler: ((Bool, Account?, Error?) -> Void)?)
+	
 	/// Logout, if logged in, present authorization viewControllers modally. After login or cancel will dismiss modal window and then call a callback.
 	///
 	/// - Parameters:

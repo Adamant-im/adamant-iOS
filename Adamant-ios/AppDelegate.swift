@@ -32,9 +32,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		// Present UI
 		presentStoryboard("Main")
-		let loginService = container.resolve(LoginService.self)
+		guard let loginService = container.resolve(LoginService.self) else {
+			fatalError("Failed to get LoginService")
+		}
 		
-		loginService?.logoutAndPresentLoginStoryboard(animated: false, authorizationFinishedHandler: nil)
+		loginService.logoutAndPresentLoginStoryboard(animated: false, authorizationFinishedHandler: nil)
+		NotificationCenter.default.addObserver(forName: .userHasLoggedIn, object: nil, queue: nil) { _ in
+			print("User logged in: \(loginService.loggedAccount!)!")
+		}
 		
 		return true
 	}

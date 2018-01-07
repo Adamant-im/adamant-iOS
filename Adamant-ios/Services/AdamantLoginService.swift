@@ -33,8 +33,28 @@ class AdamantLoginService: LoginService {
 	
 	// MARK: Login&Logout functions
 	
-	func login(passphrase: String) {
-		
+	func login(passphrase: String, loginCompletionHandler: ((Bool, Account?, Error?) -> Void)?) {
+		DispatchQueue.global(qos: .userInitiated).async {
+			self.apiService.getAccount(byPassphrase: passphrase) { (account, error) in
+				if let account = account {
+					self.loggedAccount = account
+					NotificationCenter.default.post(name: Notification.Name.userHasLoggedIn, object: account)
+					
+					if let vc = self.loginRootViewController {
+						vc.dismiss(animated: true, completion: nil)
+						self.loginRootViewController = nil
+					}
+					
+					if let callbacks = self.storyboardAuthorizationFinishedCallbacks {
+						for	aCallback in callbacks {
+							aCallback()
+						}
+						
+						self.storyboardAuthorizationFinishedCallbacks = nil
+					}
+				}
+			}
+		}
 	}
 	
 	func logout() {
