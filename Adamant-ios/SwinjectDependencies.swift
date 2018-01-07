@@ -12,6 +12,6 @@ import SwinjectStoryboard
 // MARK: Services
 extension Container {
 	func registerAdamantServices() {
-//		self.register(DialogService.self) { _ in SwinjectedDialogService() }.inObjectScope(.container)
+		self.register(DialogService.self) { _ in SwinjectedDialogService() }.inObjectScope(.container)
 	}
 }
