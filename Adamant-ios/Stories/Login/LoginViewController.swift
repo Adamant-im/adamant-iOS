@@ -22,6 +22,14 @@ class LoginViewController: UIViewController {
 		guard let passphrase = passphraseTextField?.text else {
 			return
 		}
+		
+		let api = AdamantApiService()
+		api.adamantCore = try! JSAdamantCore(coreJsUrl: Bundle.main.url(forResource: "adamant-core", withExtension: "js")!,
+										utilitiesJsUrl:  Bundle.main.url(forResource: "utilites", withExtension: "js")!)
+		
+		api.getAccount(byPassphrase: passphrase) { (account, error) in
+			
+		}
 	}
 	
 	@IBAction func createNewPassphrase(_ sender: Any) {
