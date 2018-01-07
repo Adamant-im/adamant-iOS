@@ -1,5 +1,5 @@
 
-# Created by https://www.gitignore.io/api/macos,xcode,cocoapods
+# Created by https://www.gitignore.io/api/macos,xcode,cocoapods,sublimetext
 
 ### CocoaPods ###
 ## CocoaPods GitIgnore Template
@@ -36,6 +36,38 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+### SublimeText ###
+# cache files for sublime text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+
+# workspace files are user-specific
+*.sublime-workspace
+
+# project files should be checked into the repository, unless a significant
+# proportion of contributors will probably not be using SublimeText
+# *.sublime-project
+
+# sftp configuration file
+sftp-config.json
+
+# Package control specific files
+Package Control.last-run
+Package Control.ca-list
+Package Control.ca-bundle
+Package Control.system-ca-bundle
+Package Control.cache/
+Package Control.ca-certs/
+Package Control.merged-ca-bundle
+Package Control.user-ca-bundle
+oscrypto-ca-bundle.crt
+bh_unicode_properties.cache
+
+# Sublime-github package stores a github token in this file
+# https://packagecontrol.io/packages/sublime-github
+GitHub.sublime-settings
+
 ### Xcode ###
 # Xcode
 #
@@ -68,4 +100,4 @@ xcuserdata/
 !*.xcworkspace/contents.xcworkspacedata
 /*.gcno
 
-# End of https://www.gitignore.io/api/macos,xcode,cocoapods
+# End of https://www.gitignore.io/api/macos,xcode,cocoapods,sublimetext
