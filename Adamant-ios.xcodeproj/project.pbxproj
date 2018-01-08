@@ -35,6 +35,11 @@
 		E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDAE2002B8A100DFC4DB /* Router.swift */; };
 		E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */; };
 		E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */; };
+		E9E7CDB72003994E00DFC4DB /* AdamantFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB62003994E00DFC4DB /* AdamantFormatters.swift */; };
+		E9E7CDBB2003AAA700DFC4DB /* RoundAvatarTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB92003AAA700DFC4DB /* RoundAvatarTableViewCell.swift */; };
+		E9E7CDBC2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */; };
+		E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */; };
+		E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -81,6 +86,11 @@
 		E9E7CDAE2002B8A100DFC4DB /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRoutes.swift; sourceTree = "<group>"; };
 		E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectedRouter.swift; sourceTree = "<group>"; };
+		E9E7CDB62003994E00DFC4DB /* AdamantFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantFormatters.swift; sourceTree = "<group>"; };
+		E9E7CDB92003AAA700DFC4DB /* RoundAvatarTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundAvatarTableViewCell.swift; sourceTree = "<group>"; };
+		E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RoundAvatarTableViewCell.xib; sourceTree = "<group>"; };
+		E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellFactory.swift; sourceTree = "<group>"; };
+		E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantCellFactory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +148,7 @@
 				E913C9091FFFA95A001A83F7 /* Models */,
 				E913C9041FFFA8FE001A83F7 /* ServiceProtocols */,
 				E913C9061FFFA92E001A83F7 /* Services */,
+				E9E7CDB82003AA8E00DFC4DB /* SharedCells */,
 				E913C9101FFFAA4B001A83F7 /* Helpers */,
 				E913C9111FFFAB05001A83F7 /* Assets */,
 				E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */,
@@ -154,9 +165,10 @@
 			children = (
 				E913C9071FFFA943001A83F7 /* AdamantCore.swift */,
 				E91947AB20001A9A001362F8 /* ApiService.swift */,
-				E9E7CD8A20026B0600DFC4DB /* LoginService.swift */,
 				E9E7CD8C20026B6600DFC4DB /* DialogService.swift */,
+				E9E7CD8A20026B0600DFC4DB /* LoginService.swift */,
 				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
+				E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -165,6 +177,7 @@
 			isa = PBXGroup;
 			children = (
 				E91947AF20002393001362F8 /* AdamantApiService.swift */,
+				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
 				E9E7CD922002740500DFC4DB /* AdamantLoginService.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
 				E9E7CD8E20026CD300DFC4DB /* SwinjectedDialogService.swift */,
@@ -250,6 +263,15 @@
 			path = Fonts;
 			sourceTree = "<group>";
 		};
+		E9E7CDB82003AA8E00DFC4DB /* SharedCells */ = {
+			isa = PBXGroup;
+			children = (
+				E9E7CDB92003AAA700DFC4DB /* RoundAvatarTableViewCell.swift */,
+				E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */,
+			);
+			path = SharedCells;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -313,6 +335,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E913C8FC1FFFA51D001A83F7 /* LaunchScreen.storyboard in Resources */,
+				E9E7CDBC2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
 				E919479E20001048001362F8 /* Login.storyboard in Resources */,
 				E913C9131FFFAB19001A83F7 /* adamant-core.js in Resources */,
@@ -398,16 +421,19 @@
 				E91947B420002809001362F8 /* Account.swift in Sources */,
 				E913C8F41FFFA51D001A83F7 /* ViewController.swift in Sources */,
 				E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */,
+				E9E7CDBB2003AAA700DFC4DB /* RoundAvatarTableViewCell.swift in Sources */,
 				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
 				E913C90B1FFFA965001A83F7 /* AdamantHash.swift in Sources */,
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
+				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */,
 				E9E7CD952002812400DFC4DB /* LoginDependencies.swift in Sources */,
 				E919479C2000102E001362F8 /* LoginViewController.swift in Sources */,
 				E91947B92000327C001362F8 /* AccountsResponse.swift in Sources */,
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,
+				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
 				E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */,
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
 			);
