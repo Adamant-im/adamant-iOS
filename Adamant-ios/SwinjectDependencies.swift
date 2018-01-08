@@ -17,10 +17,8 @@ extension Container {
 		self.register(Router.self) { _ in SwinjectedRouter() }.inObjectScope(.container)
 		self.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
 		self.register(ApiService.self) { r in AdamantApiService(adamantCore: r.resolve(AdamantCore.self)!) }.inObjectScope(.container)
-		self.register(LoginService.self) { r in
-			let api = r.resolve(ApiService.self)!
-			let dialog = r.resolve(DialogService.self)!
-			return AdamantLoginService(apiService: api, dialogService: dialog)
-		}.inObjectScope(.container)
+		self.register(LoginService.self) { r in AdamantLoginService(apiService: r.resolve(ApiService.self)!,
+																	dialogService: r.resolve(DialogService.self)!,
+																	router: r.resolve(Router.self)!) }.inObjectScope(.container)
 	}
 }

@@ -28,7 +28,7 @@
 		E91947B92000327C001362F8 /* AccountsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B82000327C001362F8 /* AccountsResponse.swift */; };
 		E9E7CD8B20026B0600DFC4DB /* LoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* LoginService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
-		E9E7CD8F20026CD300DFC4DB /* SwinjectedDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* SwinjectedDialogService.swift */; };
+		E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */; };
 		E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */; };
 		E9E7CD932002740500DFC4DB /* AdamantLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD922002740500DFC4DB /* AdamantLoginService.swift */; };
 		E9E7CD952002812400DFC4DB /* LoginDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD942002812400DFC4DB /* LoginDependencies.swift */; };
@@ -83,7 +83,7 @@
 		E91947B82000327C001362F8 /* AccountsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsResponse.swift; sourceTree = "<group>"; };
 		E9E7CD8A20026B0600DFC4DB /* LoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginService.swift; sourceTree = "<group>"; };
 		E9E7CD8C20026B6600DFC4DB /* DialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogService.swift; sourceTree = "<group>"; };
-		E9E7CD8E20026CD300DFC4DB /* SwinjectedDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwinjectedDialogService.swift; sourceTree = "<group>"; };
+		E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
 		E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwinjectDependencies.swift; sourceTree = "<group>"; };
 		E9E7CD922002740500DFC4DB /* AdamantLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantLoginService.swift; sourceTree = "<group>"; };
 		E9E7CD942002812400DFC4DB /* LoginDependencies.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginDependencies.swift; sourceTree = "<group>"; };
@@ -186,9 +186,9 @@
 			children = (
 				E91947AF20002393001362F8 /* AdamantApiService.swift */,
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
+				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
 				E9E7CD922002740500DFC4DB /* AdamantLoginService.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
-				E9E7CD8E20026CD300DFC4DB /* SwinjectedDialogService.swift */,
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
 			);
 			path = Services;
@@ -375,6 +375,7 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Adamant-ios/Pods-Adamant-ios-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/FTIndicator/FTIndicator.framework",
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
 				"${BUILT_PRODUCTS_DIR}/SwinjectStoryboard/SwinjectStoryboard.framework",
@@ -382,6 +383,7 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FTIndicator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwinjectStoryboard.framework",
@@ -431,7 +433,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E9E7CD8F20026CD300DFC4DB /* SwinjectedDialogService.swift in Sources */,
+				E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */,
 				E91947B020002393001362F8 /* AdamantApiService.swift in Sources */,
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
 				E9E7CDB72003994E00DFC4DB /* AdamantFormatters.swift in Sources */,

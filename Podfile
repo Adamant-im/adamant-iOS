@@ -10,4 +10,5 @@ target 'Adamant-ios' do
 
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars
+  pod 'FTIndicator' # Notifications
 end
