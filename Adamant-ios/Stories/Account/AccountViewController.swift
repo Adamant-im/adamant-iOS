@@ -11,6 +11,7 @@ import UIKit
 class AccountViewController: UIViewController {
 	// MARK: - Constants
 	private let cellIdentifier = "cell"
+	private let showTransactionsSegue = "showTransactions"
 	
 	private enum Rows: Int {
 		case accountNumber = 0, balance, sendTokens
@@ -20,6 +21,7 @@ class AccountViewController: UIViewController {
 	// MARK: - Dependencies
 	var loginService: LoginService!
 	var dialogService: DialogService!
+	
 	
 	// MARK: - IBOutlets
 	@IBOutlet weak var tableView: UITableView!
@@ -32,7 +34,7 @@ class AccountViewController: UIViewController {
 
 		tableView.delegate = self
 		tableView.dataSource = self
-		tableView.separatorInset = UIEdgeInsets.init(top: 0, left: 0, bottom: 0, right: 0)
+		tableView.separatorInset = UIEdgeInsets.init(top: 0, left: 80, bottom: 0, right: 0)
 		
 		NotificationCenter.default.addObserver(forName: .userHasLoggedIn, object: nil, queue: nil) { _ in
 			self.tableView.reloadData()
@@ -41,6 +43,19 @@ class AccountViewController: UIViewController {
 			self.tableView.reloadData()
 		}
     }
+	
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		if let indexPath = tableView.indexPathForSelectedRow {
+			tableView.deselectRow(at: indexPath, animated: animated)
+		}
+	}
+	
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		if let identifier = segue.identifier, identifier == showTransactionsSegue {
+			// TODO: pass account info
+		}
+	}
 	
 	deinit {
 		NotificationCenter.default.removeObserver(self)
@@ -66,7 +81,7 @@ extension AccountViewController: UITableViewDataSource {
 	}
 	
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-		return SharedCell.RoundAvatar.defaultRowHeight
+		return 80
 	}
 	
 	func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -119,8 +134,6 @@ extension AccountViewController: UITableViewDataSource {
 		
 		return cell
 	}
-	
-	
 }
 
 
@@ -158,8 +171,7 @@ extension AccountViewController: UITableViewDelegate {
 			present(alert, animated: true)
 			
 		case .balance:
-			tableView.deselectRow(at: indexPath, animated: true)
-			// TODO: goto transactions
+			performSegue(withIdentifier: showTransactionsSegue, sender: nil)
 			
 		case .sendTokens:
 			tableView.deselectRow(at: indexPath, animated: true)

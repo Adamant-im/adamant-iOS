@@ -14,5 +14,9 @@ extension Container {
 			c.loginService = r.resolve(LoginService.self)
 			c.dialogService = r.resolve(DialogService.self)
 		}
+		self.storyboardInitCompleted(TransactionsViewController.self) { (r, c) in
+			c.apiService = r.resolve(ApiService.self)
+			c.cellFactory = r.resolve(CellFactory.self)
+		}
 	}
 }

@@ -44,6 +44,7 @@
 		E9E7CDBC2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */; };
 		E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */; };
 		E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */; };
+		E9E7CDC22003F5A400DFC4DB /* TransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDC12003F5A400DFC4DB /* TransactionsViewController.swift */; };
 		E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */; };
 		E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */; };
 /* End PBXBuildFile section */
@@ -101,6 +102,7 @@
 		E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RoundAvatarTableViewCell.xib; sourceTree = "<group>"; };
 		E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellFactory.swift; sourceTree = "<group>"; };
 		E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantCellFactory.swift; sourceTree = "<group>"; };
+		E9E7CDC12003F5A400DFC4DB /* TransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsViewController.swift; sourceTree = "<group>"; };
 		E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTableViewCell.swift; sourceTree = "<group>"; };
 		E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransactionTableViewCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -282,6 +284,7 @@
 				E9E7CDA82002AF1E00DFC4DB /* AccountDependencies.swift */,
 				E9E7CDB02002B97B00DFC4DB /* AccountRoutes.swift */,
 				E9E7CDAA2002AFA500DFC4DB /* AccountViewController.swift */,
+				E9E7CDC12003F5A400DFC4DB /* TransactionsViewController.swift */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -449,6 +452,7 @@
 				E9E7CD932002740500DFC4DB /* AdamantLoginService.swift in Sources */,
 				E9E7CDAC2002AFA500DFC4DB /* AccountViewController.swift in Sources */,
 				E91947B420002809001362F8 /* Account.swift in Sources */,
+				E9E7CDC22003F5A400DFC4DB /* TransactionsViewController.swift in Sources */,
 				E913C8F41FFFA51D001A83F7 /* ViewController.swift in Sources */,
 				E9E7CDA92002AF1E00DFC4DB /* AccountDependencies.swift in Sources */,
 				E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */,
