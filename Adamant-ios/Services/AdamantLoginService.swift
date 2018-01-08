@@ -9,23 +9,27 @@
 import Foundation
 import UIKit
 
+private struct Constants {
+	static let loginStoryboard = "Login"
+	
+	private init() {}
+}
+
 class AdamantLoginService: LoginService {
-	private struct Constants {
-		static let loginStoryboard = "Login"
-		
-		private init() {}
-	}
 	
 	// MARK: - Dependencies
+	
 	let apiService: ApiService
 	let router: Router
 	let dialogService: DialogService
+	
 	
 	// MARK: - Properties
 	var loggedAccount: Account?
 	
 	private var loginViewController: UIViewController? = nil
 	private var storyboardAuthorizationFinishedCallbacks: [(() -> Void)]?
+	
 	
 	// MARK: - Initialization
 	init(apiService: ApiService, dialogService: DialogService, router: Router) {

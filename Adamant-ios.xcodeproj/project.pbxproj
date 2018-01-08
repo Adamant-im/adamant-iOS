@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		277464D6A8CD29063957345F /* Pods_Adamant_ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1311CE46EB635FFC95BFEF4 /* Pods_Adamant_ios.framework */; };
 		E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */; };
-		E913C8F41FFFA51D001A83F7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C8F31FFFA51D001A83F7 /* ViewController.swift */; };
 		E913C8F71FFFA51D001A83F7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E913C8F51FFFA51D001A83F7 /* Main.storyboard */; };
 		E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E913C8F81FFFA51D001A83F7 /* Assets.xcassets */; };
 		E913C8FC1FFFA51D001A83F7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E913C8FA1FFFA51D001A83F7 /* LaunchScreen.storyboard */; };
@@ -58,7 +57,6 @@
 		D283570A539D864115735AAA /* Pods-Adamant-ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant-ios.release.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant-ios/Pods-Adamant-ios.release.xcconfig"; sourceTree = "<group>"; };
 		E913C8EE1FFFA51D001A83F7 /* Adamant-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Adamant-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		E913C8F31FFFA51D001A83F7 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		E913C8F61FFFA51D001A83F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E913C8F81FFFA51D001A83F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E913C8FB1FFFA51D001A83F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -173,7 +171,6 @@
 				E913C9111FFFAB05001A83F7 /* Assets */,
 				E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */,
 				E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */,
-				E913C8F31FFFA51D001A83F7 /* ViewController.swift */,
 				E913C8F51FFFA51D001A83F7 /* Main.storyboard */,
 				E913C8FD1FFFA51E001A83F7 /* Info.plist */,
 			);
@@ -462,7 +459,6 @@
 				E9E7CDAC2002AFA500DFC4DB /* AccountViewController.swift in Sources */,
 				E91947B420002809001362F8 /* Account.swift in Sources */,
 				E9E7CDC22003F5A400DFC4DB /* TransactionsViewController.swift in Sources */,
-				E913C8F41FFFA51D001A83F7 /* ViewController.swift in Sources */,
 				E9E7CDA92002AF1E00DFC4DB /* AccountDependencies.swift in Sources */,
 				E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */,
 				E9E7CDBB2003AAA700DFC4DB /* RoundAvatarTableViewCell.swift in Sources */,

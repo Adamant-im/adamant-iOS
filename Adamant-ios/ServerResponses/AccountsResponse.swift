@@ -10,8 +10,8 @@ import Foundation
 
 struct AccountsResponse {
 	let success: Bool
-	let error: String?
 	let account: Account?
+	let error: String?
 }
 
 extension AccountsResponse: Decodable {

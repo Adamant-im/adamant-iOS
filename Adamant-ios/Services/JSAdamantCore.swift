@@ -9,16 +9,27 @@
 import Foundation
 import JavaScriptCore
 
+private struct JSFunctions {
+	struct CoreFunction {
+		static let createPassPhraseHash = CoreFunction("createPassPhraseHash")
+		static let makeKeypair = CoreFunction("makeKeypair")
+		
+		let key: String
+		private init(_ key: String) { self.key = key }
+	}
+	
+	struct UtilitesFunction {
+		static let convertToUInt8Array = UtilitesFunction("convertToUInt8Array")
+		
+		let key: String
+		private init(_ key: String) { self.key = key }
+	}
+	
+	private init() {}
+}
+
+
 class JSAdamantCore {
-	private enum CoreFunctions: String {
-		case createPassPhraseHash = "createPassPhraseHash"
-		case makeKeypair = "makeKeypair"
-	}
-	
-	private enum UtilitesFunctions: String {
-		case convertToUInt8Array = "convertToUInt8Array"
-	}
-	
 	private let context: JSContext
 	
 	
@@ -70,7 +81,7 @@ class JSAdamantCore {
 
 // MARK: - Working with JS runtime
 extension JSAdamantCore {
-	private func getCoreFunction(function key: CoreFunctions) -> JSValue? {
+	private func getCoreFunction(function key: JSFunctions.CoreFunction) -> JSValue? {
 		var jsError: JSValue? = nil
 		context.exceptionHandler = { context, value in
 			jsError = value
@@ -79,7 +90,7 @@ extension JSAdamantCore {
 		let function: JSValue?
 		if let core = context.objectForKeyedSubscript("adamant_core"),
 			let adamant = core.objectForKeyedSubscript("Adamant"),
-			let f = adamant.objectForKeyedSubscript(key.rawValue),
+			let f = adamant.objectForKeyedSubscript(key),
 			!f.isUndefined, jsError == nil {
 			function = f
 		} else {
@@ -90,14 +101,14 @@ extension JSAdamantCore {
 		return function
 	}
 	
-	private func getUtilitesFunction(function key: UtilitesFunctions) -> JSValue? {
+	private func getUtilitesFunction(function key: JSFunctions.UtilitesFunction) -> JSValue? {
 		var jsError: JSValue? = nil
 		context.exceptionHandler = { context, value in
 			jsError = value
 		}
 		
 		let function: JSValue?
-		if let f = context.objectForKeyedSubscript(key.rawValue),
+		if let f = context.objectForKeyedSubscript(key),
 			!f.isUndefined, jsError == nil {
 			function = f
 		} else {
