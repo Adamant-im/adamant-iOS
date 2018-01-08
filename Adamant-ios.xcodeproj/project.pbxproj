@@ -47,6 +47,9 @@
 		E9E7CDC22003F5A400DFC4DB /* TransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDC12003F5A400DFC4DB /* TransactionsViewController.swift */; };
 		E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */; };
 		E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */; };
+		E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDC920040CC200DFC4DB /* Transaction.swift */; };
+		E9E7CDCC20040FDC00DFC4DB /* TransactionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */; };
+		E9E7CDCE2004147700DFC4DB /* TransactionsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDCD2004147700DFC4DB /* TransactionsResponse.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -105,6 +108,9 @@
 		E9E7CDC12003F5A400DFC4DB /* TransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsViewController.swift; sourceTree = "<group>"; };
 		E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTableViewCell.swift; sourceTree = "<group>"; };
 		E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransactionTableViewCell.xib; sourceTree = "<group>"; };
+		E9E7CDC920040CC200DFC4DB /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
+		E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionType.swift; sourceTree = "<group>"; };
+		E9E7CDCD2004147700DFC4DB /* TransactionsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsResponse.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,6 +210,8 @@
 			isa = PBXGroup;
 			children = (
 				E91947B320002809001362F8 /* Account.swift */,
+				E9E7CDC920040CC200DFC4DB /* Transaction.swift */,
+				E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -255,6 +263,7 @@
 			isa = PBXGroup;
 			children = (
 				E91947B82000327C001362F8 /* AccountsResponse.swift */,
+				E9E7CDCD2004147700DFC4DB /* TransactionsResponse.swift */,
 			);
 			path = ServerResponses;
 			sourceTree = "<group>";
@@ -464,13 +473,16 @@
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
+				E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */,
 				E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */,
 				E9E7CD952002812400DFC4DB /* LoginDependencies.swift in Sources */,
+				E9E7CDCC20040FDC00DFC4DB /* TransactionType.swift in Sources */,
 				E919479C2000102E001362F8 /* LoginViewController.swift in Sources */,
 				E91947B92000327C001362F8 /* AccountsResponse.swift in Sources */,
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,
 				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
 				E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */,
+				E9E7CDCE2004147700DFC4DB /* TransactionsResponse.swift in Sources */,
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,
 			);

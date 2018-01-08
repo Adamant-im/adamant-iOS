@@ -9,21 +9,30 @@
 import Foundation
 import Alamofire
 
+private struct ApiCommands {
+	static let Accounts = "accounts"
+	static let Transactions = "transactions"
+	
+	private init() {}
+}
+
 class AdamantApiService: ApiService {
+	
 	// MARK: - Dependencies
 	let adamantCore: AdamantCore
 	
 	// MARK: - Properties
-	var serverUrl: String!
+	let apiUrl: URL
 	
 	// MARK: - Initialization
-	init(adamantCore: AdamantCore) {
+	init(apiUrl: URL, adamantCore: AdamantCore) {
+		self.apiUrl = apiUrl
 		self.adamantCore = adamantCore
 	}
 }
 
 
-// MARK: - ApiService
+// MARK: - Accounts
 extension AdamantApiService {
 	func getAccount(byPassphrase passphrase: String, completionHandler: @escaping (Account?, AdamantError?) -> Void) {
 		getPublicKey(byPassphrase: passphrase) { (key, error) in
@@ -37,12 +46,11 @@ extension AdamantApiService {
 	}
 	
 	func getAccount(byPublicKey publicKey: AdamantHash, completionHandler: @escaping (Account?, AdamantError?) -> Void) {
-		// TODO: make this flexible as fuck
-		let endpoint = "https://endless.adamant.im/api/accounts?publicKey=\(publicKey.hex)"
+		let endpoint = apiUrl.appendingPathComponent("\(ApiCommands.Accounts)?publicKey=\(publicKey.hex)")
 		
-		sendRequest(url: endpoint) { (responseRaw: AccountsResponse?, error) in
-			guard let response = responseRaw, response.success, let account = response.account else {
-				completionHandler(nil, AdamantError(message: responseRaw?.error ?? "Failed to get account", error: error))
+		sendRequest(url: endpoint) { (response: AccountsResponse?, error) in
+			guard let r = response, r.success, let account = r.account else {
+				completionHandler(nil, AdamantError(message: response?.error ?? "Failed to get account", error: error))
 				return
 			}
 			
@@ -57,6 +65,23 @@ extension AdamantApiService {
 		}
 		
 		completionHandler(keypair.publicKey, nil)
+	}
+}
+
+
+// MARK: - Transactions
+extension AdamantApiService {
+	func getTransactions(forAccount account: String, type: TransactionType, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void) {
+		let endpoint = apiUrl.appendingPathComponent("\(ApiCommands.Transactions)?inId=\(account)&and:type=\(type.rawValue)")
+		
+		sendRequest(url: endpoint) { (response: TransactionsResponse?, error) in
+			guard let r = response, r.success, let transactions = r.transactions else {
+				completionHandler(nil, AdamantError(message: response?.error ?? "Failed to get transactions", error: error))
+				return
+			}
+			
+			completionHandler(transactions, nil)
+		}
 	}
 }
 

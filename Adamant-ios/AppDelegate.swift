@@ -10,13 +10,15 @@ import UIKit
 import Swinject
 import SwinjectStoryboard
 
+private struct Constants {
+	static let mainStoryboard = "Main"
+	static let apiUrl = URL(string: "https://endless.adamant.im/api/")!
+	
+	private init() {}
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-	private struct Constants {
-		static let mainStoryboard = "Main"
-		
-		private init() {}
-	}
 	
 	var window: UIWindow?
 
@@ -33,7 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// Initiating Swinject
 		let container = SwinjectStoryboard.defaultContainer
 		Container.loggingFunction = nil // Logging currently not supported with SwinjectStoryboards.
-		container.registerAdamantServices(coreJsUrl: jsCore, utilitiesJsUrl: jsUtilites)
+		container.registerAdamantServices(apiUrl: Constants.apiUrl, coreJsUrl: jsCore, utilitiesJsUrl: jsUtilites)
 		container.registerAdamantLoginStory()
 		container.registerAdamantAccountStory()
 		
