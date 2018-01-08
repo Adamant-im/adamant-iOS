@@ -44,6 +44,8 @@
 		E9E7CDBC2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */; };
 		E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */; };
 		E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */; };
+		E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */; };
+		E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -99,6 +101,8 @@
 		E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RoundAvatarTableViewCell.xib; sourceTree = "<group>"; };
 		E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellFactory.swift; sourceTree = "<group>"; };
 		E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantCellFactory.swift; sourceTree = "<group>"; };
+		E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTableViewCell.swift; sourceTree = "<group>"; };
+		E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransactionTableViewCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -287,6 +291,8 @@
 			children = (
 				E9E7CDB92003AAA700DFC4DB /* RoundAvatarTableViewCell.swift */,
 				E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */,
+				E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */,
+				E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */,
 			);
 			path = SharedCells;
 			sourceTree = "<group>";
@@ -357,6 +363,7 @@
 				E9E7CDBC2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
 				E919479E20001048001362F8 /* Login.storyboard in Resources */,
+				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
 				E913C9131FFFAB19001A83F7 /* adamant-core.js in Resources */,
 				E913C9151FFFAB58001A83F7 /* utilites.js in Resources */,
 				E913C8F71FFFA51D001A83F7 /* Main.storyboard in Resources */,
@@ -448,6 +455,7 @@
 				E9E7CDBB2003AAA700DFC4DB /* RoundAvatarTableViewCell.swift in Sources */,
 				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
 				E913C90B1FFFA965001A83F7 /* AdamantHash.swift in Sources */,
+				E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */,
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
