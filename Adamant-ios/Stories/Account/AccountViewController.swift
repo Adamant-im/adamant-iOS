@@ -19,6 +19,7 @@ class AccountViewController: UIViewController {
 	
 	// MARK: - Dependencies
 	var loginService: LoginService!
+	var dialogService: DialogService!
 	
 	// MARK: - IBOutlets
 	@IBOutlet weak var tableView: UITableView!
@@ -133,8 +134,28 @@ extension AccountViewController: UITableViewDelegate {
 		switch row {
 		case .accountNumber:
 			tableView.deselectRow(at: indexPath, animated: true)
-			// TODO: Open share menu
-			// TODO: show notification
+			
+			guard let address = self.loginService.loggedAccount?.address else {
+				return
+			}
+			
+			let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+			
+			alert.addAction(UIAlertAction(title: "Copy To Pasteboard", style: .default, handler: { _ in
+				UIPasteboard.general.string = address
+				self.dialogService.showToastMessage("Address copied to pasteboard!")
+			}))
+			
+			alert.addAction(UIAlertAction(title: "Share", style: .default, handler: { _ in
+				let vc = UIActivityViewController(activityItems: [address], applicationActivities: nil)
+				self.present(vc, animated: true)
+			}))
+			
+			alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+				alert.dismiss(animated: true)
+			}))
+			
+			present(alert, animated: true)
 			
 		case .balance:
 			tableView.deselectRow(at: indexPath, animated: true)
