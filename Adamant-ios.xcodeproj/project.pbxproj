@@ -187,6 +187,7 @@
 				E91947B12000246A001362F8 /* AdamantError.swift */,
 				E913C90A1FFFA965001A83F7 /* AdamantHash.swift */,
 				E913C90C1FFFA99B001A83F7 /* Keypair.swift */,
+				E9E7CDB62003994E00DFC4DB /* AdamantFormatters.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -331,12 +332,14 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Adamant-ios/Pods-Adamant-ios-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
 				"${BUILT_PRODUCTS_DIR}/SwinjectStoryboard/SwinjectStoryboard.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwinjectStoryboard.framework",
 			);
@@ -388,6 +391,7 @@
 				E9E7CD8F20026CD300DFC4DB /* SwinjectedDialogService.swift in Sources */,
 				E91947B020002393001362F8 /* AdamantApiService.swift in Sources */,
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
+				E9E7CDB72003994E00DFC4DB /* AdamantFormatters.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
 				E9E7CD8B20026B0600DFC4DB /* LoginService.swift in Sources */,
 				E9E7CD932002740500DFC4DB /* AdamantLoginService.swift in Sources */,

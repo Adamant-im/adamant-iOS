@@ -7,4 +7,7 @@ target 'Adamant-ios' do
   # Swinject DI
   pod 'Swinject'
   pod 'SwinjectStoryboard'
+
+  # UI
+  pod 'FreakingSimpleRoundImageView' # Round avatars
 end
