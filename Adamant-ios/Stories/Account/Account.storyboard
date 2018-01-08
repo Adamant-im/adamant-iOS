@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="J2r-BW-spr">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Account-->
+        <scene sceneID="opH-LR-g0a">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="J2r-BW-spr" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Account" id="OLR-zA-lhu"/>
+                    <toolbarItems/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="QrB-Mv-s6O">
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="90W-SP-DzU" kind="relationship" relationship="rootViewController" id="rAz-zT-7ch"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Cm8-ed-9WW" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="108.8" y="-104.34782608695653"/>
+        </scene>
+        <!--Account-->
+        <scene sceneID="qF9-Bu-tl7">
+            <objects>
+                <viewController id="90W-SP-DzU" customClass="AccountViewController" customModule="Adamant_ios" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Y10-sx-gaY">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="VuM-O9-pxN">
+                                <rect key="frame" x="0.0" y="64" width="375" height="554"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="Pxj-p2-oVj" firstAttribute="trailing" secondItem="VuM-O9-pxN" secondAttribute="trailing" id="IwA-pq-SNi"/>
+                            <constraint firstItem="VuM-O9-pxN" firstAttribute="top" secondItem="Pxj-p2-oVj" secondAttribute="top" id="VDH-W7-g1z"/>
+                            <constraint firstItem="Pxj-p2-oVj" firstAttribute="bottom" secondItem="VuM-O9-pxN" secondAttribute="bottom" id="VFN-XX-kjJ"/>
+                            <constraint firstItem="VuM-O9-pxN" firstAttribute="leading" secondItem="Pxj-p2-oVj" secondAttribute="leading" id="fR7-Mk-C8r"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Pxj-p2-oVj"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Account" id="dte-Ko-zLE"/>
+                    <connections>
+                        <outlet property="tableView" destination="VuM-O9-pxN" id="Aqd-at-0j1"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="9We-Pr-rsa" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1014" y="-105"/>
+        </scene>
+    </scenes>
+    <color key="tintColor" name="Gray_main"/>
+</document>

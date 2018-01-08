@@ -12,6 +12,12 @@ import SwinjectStoryboard
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
+	private struct Constants {
+		static let mainStoryboard = "Main"
+		
+		private init() {}
+	}
+	
 	var window: UIWindow?
 
 	// MARK: - Lifecycle
@@ -29,9 +35,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		Container.loggingFunction = nil // Logging currently not supported with SwinjectStoryboards.
 		container.registerAdamantServices(coreJsUrl: jsCore, utilitiesJsUrl: jsUtilites)
 		container.registerAdamantLoginStory()
+		container.registerAdamantAccountStory()
 		
-		// Present UI
-		presentStoryboard("Main")
+		// Prepare UI
+		self.window = UIWindow(frame: UIScreen.main.bounds)
+		self.window!.rootViewController = SwinjectStoryboard.create(name: Constants.mainStoryboard, bundle: nil).instantiateInitialViewController()
+		self.window!.makeKeyAndVisible()
+		
+		guard let router = container.resolve(Router.self) else {
+			fatalError("Failed to get Router")
+		}
+		
+		if let tabbar = self.window!.rootViewController as? UITabBarController {
+			let vc = router.get(story: .Account).instantiateInitialViewController()!
+			tabbar.setViewControllers([vc], animated: false)
+		}
+
+// Initiate login
+		
 		guard let loginService = container.resolve(LoginService.self) else {
 			fatalError("Failed to get LoginService")
 		}
@@ -42,13 +63,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		return true
-	}
-	
-	private func presentStoryboard(_ storyboardName: String) {
-		self.window = UIWindow(frame: UIScreen.main.bounds)
-		
-		let storyboard = SwinjectStoryboard.create(name: storyboardName, bundle: nil)
-		self.window!.rootViewController = storyboard.instantiateInitialViewController()
-		self.window!.makeKeyAndVisible()
 	}
 }
