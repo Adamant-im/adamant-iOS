@@ -60,6 +60,9 @@ class AdamantLoginService: LoginService {
 						
 						self.storyboardAuthorizationFinishedCallbacks = nil
 					}
+					loginCompletionHandler?(true, account, error)
+				} else {
+					loginCompletionHandler?(false, nil, error)
 				}
 			}
 		}

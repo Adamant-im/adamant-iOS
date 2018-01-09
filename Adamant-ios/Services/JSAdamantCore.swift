@@ -81,42 +81,42 @@ class JSAdamantCore {
 
 // MARK: - Working with JS runtime
 extension JSAdamantCore {
-	private func getCoreFunction(function key: JSFunctions.CoreFunction) -> JSValue? {
+	private func getCoreFunction(function: JSFunctions.CoreFunction) -> JSValue? {
 		var jsError: JSValue? = nil
 		context.exceptionHandler = { context, value in
 			jsError = value
 		}
 		
-		let function: JSValue?
+		let jsFunc: JSValue?
 		if let core = context.objectForKeyedSubscript("adamant_core"),
 			let adamant = core.objectForKeyedSubscript("Adamant"),
-			let f = adamant.objectForKeyedSubscript(key),
+			let f = adamant.objectForKeyedSubscript(function.key),
 			!f.isUndefined, jsError == nil {
-			function = f
+			jsFunc = f
 		} else {
-			function = nil
+			jsFunc = nil
 		}
 		
 		context.exceptionHandler = nil
-		return function
+		return jsFunc
 	}
 	
-	private func getUtilitesFunction(function key: JSFunctions.UtilitesFunction) -> JSValue? {
+	private func getUtilitesFunction(function: JSFunctions.UtilitesFunction) -> JSValue? {
 		var jsError: JSValue? = nil
 		context.exceptionHandler = { context, value in
 			jsError = value
 		}
 		
-		let function: JSValue?
-		if let f = context.objectForKeyedSubscript(key),
+		let jsFunc: JSValue?
+		if let f = context.objectForKeyedSubscript(function.key),
 			!f.isUndefined, jsError == nil {
-			function = f
+			jsFunc = f
 		} else {
-			function = nil
+			jsFunc = nil
 		}
 		
 		context.exceptionHandler = nil
-		return function
+		return jsFunc
 	}
 }
 

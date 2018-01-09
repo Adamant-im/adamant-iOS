@@ -58,8 +58,8 @@ extension Transaction: Decodable {
 		self.senderId = try container.decode(String.self, forKey: .senderId)
 		self.recipientId = try container.decode(String.self, forKey: .recipientId)
 		self.recipientPublicKey = try container.decode(String.self, forKey: .recipientPublicKey)
-		self.amount = UInt(try container.decode(String.self, forKey: .amount))!
-		self.fee = UInt(try container.decode(String.self, forKey: .fee))!
+		self.amount = try container.decode(UInt.self, forKey: .amount)
+		self.fee = try container.decode(UInt.self, forKey: .fee)
 		self.signature = try container.decode(String.self, forKey: .signature)
 		self.confirmations = try container.decode(UInt.self, forKey: .confirmations)
 	}

@@ -46,7 +46,9 @@ class TransactionTableViewCell: UITableViewCell {
 		}
 	}
 	
+	
 	// MARK: - Initializers
+	
 	override func awakeFromNib() {
 		transactionType = .income
 		avatarImageView?.image = transactionType.image
