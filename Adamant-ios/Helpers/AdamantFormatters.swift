@@ -9,13 +9,13 @@
 import Foundation
 
 class AdamantFormatters {
-	private static let balanceShift: Double = 100_000_000.0
-	private static let currencyCode = "ADM"
+	static let currencyShift: Double = 0.00_000_001
+	static let currencyCode = "ADM"
 	
 	private init() { }
 	
 	static func format(balance: Int64) -> String {
-		return "\(Double(balance) / balanceShift) \(currencyCode)"
+		return "\(Double(balance) * currencyShift) \(currencyCode)"
 	}
 	
 	// TODO: replace description to 'pain is the ass' emoji, when Apple will add one is iOS 12

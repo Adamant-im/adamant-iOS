@@ -61,6 +61,7 @@
 		E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A6200010DF001362F8 /* Roboto_400_normal.ttf */; };
 		E9EC341E200524CA00C0E546 /* Roboto_500_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A5200010DE001362F8 /* Roboto_500_normal.ttf */; };
 		E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A7200010DF001362F8 /* Roboto_700_normal.ttf */; };
+		E9EC342120052ABB00C0E546 /* TransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC342020052ABB00C0E546 /* TransferViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -122,6 +123,7 @@
 		E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionType.swift; sourceTree = "<group>"; };
 		E9E7CDCD2004147700DFC4DB /* TransactionsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsResponse.swift; sourceTree = "<group>"; };
 		E9EC34132005178500C0E546 /* TransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewController.swift; sourceTree = "<group>"; };
+		E9EC342020052ABB00C0E546 /* TransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -305,6 +307,7 @@
 				E9E7CDAA2002AFA500DFC4DB /* AccountViewController.swift */,
 				E9E7CDC12003F5A400DFC4DB /* TransactionsViewController.swift */,
 				E9EC34132005178500C0E546 /* TransactionDetailsViewController.swift */,
+				E9EC342020052ABB00C0E546 /* TransferViewController.swift */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -507,6 +510,7 @@
 				E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */,
 				E9E7CDCE2004147700DFC4DB /* TransactionsResponse.swift in Sources */,
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
+				E9EC342120052ABB00C0E546 /* TransferViewController.swift in Sources */,
 				E9EC34142005178500C0E546 /* TransactionDetailsViewController.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,
 			);

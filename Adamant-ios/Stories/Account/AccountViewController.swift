@@ -12,6 +12,7 @@ class AccountViewController: UIViewController {
 	// MARK: - Constants
 	private let cellIdentifier = "cell"
 	private let showTransactionsSegue = "showTransactions"
+	private let showTransferSegue = "showTransfer"
 	
 	private enum Rows: Int {
 		case accountNumber = 0, balance, sendTokens
@@ -52,9 +53,23 @@ class AccountViewController: UIViewController {
 	}
 	
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-		if let identifier = segue.identifier, identifier == showTransactionsSegue,
-			let account = loginService.loggedAccount?.address, let vc = segue.destination as? TransactionsViewController {
-			vc.account = account
+		guard let identifier = segue.identifier else {
+			return
+		}
+		
+		switch identifier {
+		case showTransactionsSegue:
+			if let account = loginService.loggedAccount?.address, let vc = segue.destination as? TransactionsViewController {
+				vc.account = account
+			}
+			
+		case showTransferSegue:
+			if let account = loginService.loggedAccount, let vc = segue.destination as? TransferViewController {
+				vc.account = account
+			}
+			
+		default:
+			return
 		}
 	}
 	
@@ -175,8 +190,7 @@ extension AccountViewController: UITableViewDelegate {
 			performSegue(withIdentifier: showTransactionsSegue, sender: nil)
 			
 		case .sendTokens:
-			tableView.deselectRow(at: indexPath, animated: true)
-			// TODO: goto send tokens
+			performSegue(withIdentifier: showTransferSegue, sender: nil)
 		}
 	}
 }

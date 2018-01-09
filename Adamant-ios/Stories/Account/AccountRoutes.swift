@@ -16,4 +16,5 @@ extension AdamantScene {
 	static let AccountDetails = AdamantScene(story: .Account, identifier: "AccountViewController")
 	static let TransactionsList = AdamantScene(story: .Account, identifier: "TransactionsViewController")
 	static let TransactionDetails = AdamantScene(story: .Account, identifier: "TransactionDetailsViewController")
+	static let Transfer = AdamantScene(story: .Account, identifier: "TransferViewController")
 }

@@ -59,11 +59,39 @@
                     <connections>
                         <outlet property="tableView" destination="VuM-O9-pxN" id="Aqd-at-0j1"/>
                         <segue destination="K1w-Gj-Lub" kind="show" identifier="showTransactions" id="gZa-0o-9Ef"/>
+                        <segue destination="JVp-ln-T6U" kind="show" identifier="showTransfer" id="WCt-K8-Oaf"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9We-Pr-rsa" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1014" y="-105"/>
+        </scene>
+        <!--Send Tokens-->
+        <scene sceneID="hoC-kh-2Jv">
+            <objects>
+                <viewController storyboardIdentifier="transferViewController" id="JVp-ln-T6U" customClass="TransferViewController" customModule="Adamant_ios" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8F2-54-eUU">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <viewLayoutGuide key="safeArea" id="ieA-Rt-Vlh"/>
+                    </view>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="Send Tokens" id="qwn-Er-hr0">
+                        <barButtonItem key="rightBarButtonItem" title="Send" id="EEV-td-OPY">
+                            <connections>
+                                <action selector="sendFunds:" destination="JVp-ln-T6U" id="WDX-cH-Ncw"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="sendButton" destination="EEV-td-OPY" id="dvp-J5-zsi"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gxa-Ga-37H" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2241" y="-528"/>
         </scene>
         <!--Transactions-->
         <scene sceneID="Eaz-z7-XZu">
@@ -95,7 +123,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rV4-SR-kbN" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1930" y="-106"/>
+            <point key="canvasLocation" x="2241" y="317"/>
         </scene>
         <!--Transaction-->
         <scene sceneID="wgR-dG-cNr">
@@ -126,7 +154,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ETv-VR-Jiq" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2850" y="-107"/>
+            <point key="canvasLocation" x="3161" y="317"/>
         </scene>
     </scenes>
     <color key="tintColor" name="Gray_main"/>
