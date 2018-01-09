@@ -12,7 +12,7 @@ import SwinjectStoryboard
 
 private struct Constants {
 	static let mainStoryboard = "Main"
-	static let apiUrl = URL(string: "https://endless.adamant.im/api/")!
+	static let apiUrl = URL(string: "https://endless.adamant.im")!
 	
 	private init() {}
 }

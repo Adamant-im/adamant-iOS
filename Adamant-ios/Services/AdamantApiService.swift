@@ -9,11 +9,14 @@
 import Foundation
 import Alamofire
 
-private struct ApiCommands {
-	static let Accounts = "accounts"
-	static let Transactions = "transactions"
+private struct ApiCommand {
+	static let Accounts = ApiCommand("/api/accounts")
+	static let Transactions = ApiCommand("/api/transactions")
 	
-	private init() {}
+	let path: String
+	private init(_ path: String) {
+		self.path = path
+	}
 }
 
 class AdamantApiService: ApiService {
@@ -28,6 +31,17 @@ class AdamantApiService: ApiService {
 	init(apiUrl: URL, adamantCore: AdamantCore) {
 		self.apiUrl = apiUrl
 		self.adamantCore = adamantCore
+	}
+	
+	private func buildUrl(command: ApiCommand, queryItems: [URLQueryItem]?) throws -> URL {
+		guard var components = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false) else {
+			throw AdamantError(message: "Internal API error: Can't parse API URL: \(apiUrl)")
+		}
+		
+		components.path = command.path
+		components.queryItems = queryItems
+		
+		return try components.asURL()
 	}
 }
 
@@ -46,7 +60,13 @@ extension AdamantApiService {
 	}
 	
 	func getAccount(byPublicKey publicKey: AdamantHash, completionHandler: @escaping (Account?, AdamantError?) -> Void) {
-		let endpoint = apiUrl.appendingPathComponent("\(ApiCommands.Accounts)?publicKey=\(publicKey.hex)")
+		let endpoint: URL
+		do {
+			endpoint = try buildUrl(command: ApiCommand.Accounts, queryItems: [URLQueryItem(name: "publicKey", value: publicKey.hex)])
+		} catch {
+			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
+			return
+		}
 		
 		sendRequest(url: endpoint) { (response: AccountsResponse?, error) in
 			guard let r = response, r.success, let account = r.account else {
@@ -72,7 +92,14 @@ extension AdamantApiService {
 // MARK: - Transactions
 extension AdamantApiService {
 	func getTransactions(forAccount account: String, type: TransactionType, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void) {
-		let endpoint = apiUrl.appendingPathComponent("\(ApiCommands.Transactions)?inId=\(account)&and:type=\(type.rawValue)")
+		let endpoint: URL
+		do {
+			endpoint = try buildUrl(command: ApiCommand.Transactions, queryItems: [URLQueryItem(name: "inId", value: account),
+																				   URLQueryItem(name: "and:type", value: String(type.rawValue))])
+		} catch {
+			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
+			return
+		}
 		
 		sendRequest(url: endpoint) { (response: TransactionsResponse?, error) in
 			guard let r = response, r.success, let transactions = r.transactions else {
