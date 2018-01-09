@@ -20,6 +20,9 @@ class TransactionsViewController: UIViewController {
 	private var updatingTransactions: Bool = false
 	
 	
+	let transactionDetailsSegue = "showTransactionDetails"
+	
+	
 	// MARK: - IBOutlets
 	@IBOutlet weak var tableView: UITableView!
 	
@@ -42,6 +45,14 @@ class TransactionsViewController: UIViewController {
 		super.viewWillAppear(animated)
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
+		}
+	}
+	
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		if segue.identifier == transactionDetailsSegue,
+			let vc = segue.destination as? TransactionDetailsViewController,
+			let transaction = sender as? Transaction{
+			vc.transaction = transaction
 		}
 	}
 }
@@ -126,7 +137,10 @@ extension TransactionsViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 extension TransactionsViewController: UITableViewDelegate {
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		// TODO: go on transaction screen
-		tableView.deselectRow(at: indexPath, animated: true)
+		guard let transaction = transactions?[indexPath.row] else {
+			return
+		}
+		
+		performSegue(withIdentifier: transactionDetailsSegue, sender: transaction)
 	}
 }

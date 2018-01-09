@@ -49,6 +49,7 @@
 		E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDC920040CC200DFC4DB /* Transaction.swift */; };
 		E9E7CDCC20040FDC00DFC4DB /* TransactionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */; };
 		E9E7CDCE2004147700DFC4DB /* TransactionsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDCD2004147700DFC4DB /* TransactionsResponse.swift */; };
+		E9EC34142005178500C0E546 /* TransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC34132005178500C0E546 /* TransactionDetailsViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -109,6 +110,7 @@
 		E9E7CDC920040CC200DFC4DB /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionType.swift; sourceTree = "<group>"; };
 		E9E7CDCD2004147700DFC4DB /* TransactionsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsResponse.swift; sourceTree = "<group>"; };
+		E9EC34132005178500C0E546 /* TransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -291,6 +293,7 @@
 				E9E7CDB02002B97B00DFC4DB /* AccountRoutes.swift */,
 				E9E7CDAA2002AFA500DFC4DB /* AccountViewController.swift */,
 				E9E7CDC12003F5A400DFC4DB /* TransactionsViewController.swift */,
+				E9EC34132005178500C0E546 /* TransactionDetailsViewController.swift */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -480,6 +483,7 @@
 				E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */,
 				E9E7CDCE2004147700DFC4DB /* TransactionsResponse.swift in Sources */,
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
+				E9EC34142005178500C0E546 /* TransactionDetailsViewController.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

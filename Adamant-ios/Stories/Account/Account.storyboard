@@ -20,6 +20,9 @@
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="QrB-Mv-s6O">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <textAttributes key="titleTextAttributes">
+                            <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="17"/>
+                        </textAttributes>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
@@ -87,11 +90,43 @@
                     <navigationItem key="navigationItem" title="Transactions" id="63z-aT-Hem"/>
                     <connections>
                         <outlet property="tableView" destination="xjx-2z-huq" id="x0v-qj-xgS"/>
+                        <segue destination="uX6-ce-CYX" kind="show" identifier="showTransactionDetails" id="HmG-QV-DAo"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rV4-SR-kbN" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1930" y="-106"/>
+        </scene>
+        <!--Transaction-->
+        <scene sceneID="wgR-dG-cNr">
+            <objects>
+                <viewController storyboardIdentifier="TransactionDetailsViewController" id="uX6-ce-CYX" customClass="TransactionDetailsViewController" customModule="Adamant_ios" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="gxo-8g-E9u">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="aIV-87-HHO">
+                                <rect key="frame" x="0.0" y="64" width="375" height="554"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="aIV-87-HHO" firstAttribute="top" secondItem="P63-lI-hGY" secondAttribute="top" id="290-d6-D9q"/>
+                            <constraint firstItem="P63-lI-hGY" firstAttribute="trailing" secondItem="aIV-87-HHO" secondAttribute="trailing" id="Okc-kE-TlQ"/>
+                            <constraint firstItem="P63-lI-hGY" firstAttribute="bottom" secondItem="aIV-87-HHO" secondAttribute="bottom" id="oVH-tT-a00"/>
+                            <constraint firstItem="aIV-87-HHO" firstAttribute="leading" secondItem="P63-lI-hGY" secondAttribute="leading" id="wL0-Ea-6HT"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="P63-lI-hGY"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Transaction" id="FG4-t0-tQk"/>
+                    <connections>
+                        <outlet property="tableView" destination="aIV-87-HHO" id="wFS-zS-SqG"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ETv-VR-Jiq" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2850" y="-107"/>
         </scene>
     </scenes>
     <color key="tintColor" name="Gray_main"/>
