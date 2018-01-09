@@ -1,5 +1,6 @@
 PODS:
   - Alamofire (4.6.0)
+  - Eureka (4.0.1)
   - FreakingSimpleRoundImageView (1.0.0)
   - FTIndicator (1.2.6):
     - FTIndicator/FTNotificationIndicator (= 1.2.6)
@@ -14,6 +15,7 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire
+  - Eureka
   - FreakingSimpleRoundImageView
   - FTIndicator
   - Swinject
@@ -21,11 +23,12 @@ DEPENDENCIES:
 
 SPEC CHECKSUMS:
   Alamofire: f41a599bd63041760b26d393ec1069d9d7b917f4
+  Eureka: c8bd5cc07143b6f66268c208d28a246c99b41955
   FreakingSimpleRoundImageView: aa7879307e21922d4a25923ef858539ec6ec8c05
   FTIndicator: d2a7c204341b7b0165b6dbeb5bf6979c6d7d4bb7
   Swinject: afea49fd95f392b41171669f165842879c48fad6
   SwinjectStoryboard: 92e75763c3299cdf627bef98a5180dc894864336
 
-PODFILE CHECKSUM: c187183e3065a87c0dffe0320d32ed684cc63a1c
+PODFILE CHECKSUM: 5468a249588027807f0e8efe8405c2defd8f535c
 
 COCOAPODS: 1.3.1
