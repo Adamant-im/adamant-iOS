@@ -50,6 +50,17 @@
 		E9E7CDCC20040FDC00DFC4DB /* TransactionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */; };
 		E9E7CDCE2004147700DFC4DB /* TransactionsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDCD2004147700DFC4DB /* TransactionsResponse.swift */; };
 		E9EC34142005178500C0E546 /* TransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC34132005178500C0E546 /* TransactionDetailsViewController.swift */; };
+		E9EC3415200524CA00C0E546 /* Exo+2_100_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A3200010DD001362F8 /* Exo+2_100_normal.ttf */; };
+		E9EC3416200524CA00C0E546 /* Exo+2_300_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A4200010DE001362F8 /* Exo+2_300_normal.ttf */; };
+		E9EC3417200524CA00C0E546 /* Exo+2_400_italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E919479F200010DC001362F8 /* Exo+2_400_italic.ttf */; };
+		E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A8200010DF001362F8 /* Exo+2_400_normal.ttf */; };
+		E9EC3419200524CA00C0E546 /* Exo+2_500_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A9200010E0001362F8 /* Exo+2_500_normal.ttf */; };
+		E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A2200010DD001362F8 /* Exo+2_700_normal.ttf */; };
+		E9EC341B200524CA00C0E546 /* Roboto_300_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A0200010DC001362F8 /* Roboto_300_normal.ttf */; };
+		E9EC341C200524CA00C0E546 /* Roboto_400_italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A1200010DD001362F8 /* Roboto_400_italic.ttf */; };
+		E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A6200010DF001362F8 /* Roboto_400_normal.ttf */; };
+		E9EC341E200524CA00C0E546 /* Roboto_500_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A5200010DE001362F8 /* Roboto_500_normal.ttf */; };
+		E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A7200010DF001362F8 /* Roboto_700_normal.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -371,14 +382,25 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9EC341B200524CA00C0E546 /* Roboto_300_normal.ttf in Resources */,
 				E913C8FC1FFFA51D001A83F7 /* LaunchScreen.storyboard in Resources */,
 				E9E7CDBC2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
+				E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */,
 				E919479E20001048001362F8 /* Login.storyboard in Resources */,
 				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
+				E9EC3417200524CA00C0E546 /* Exo+2_400_italic.ttf in Resources */,
+				E9EC341E200524CA00C0E546 /* Roboto_500_normal.ttf in Resources */,
 				E913C9131FFFAB19001A83F7 /* adamant-core.js in Resources */,
+				E9EC3419200524CA00C0E546 /* Exo+2_500_normal.ttf in Resources */,
+				E9EC3416200524CA00C0E546 /* Exo+2_300_normal.ttf in Resources */,
 				E913C9151FFFAB58001A83F7 /* utilites.js in Resources */,
+				E9EC341C200524CA00C0E546 /* Roboto_400_italic.ttf in Resources */,
+				E9EC3415200524CA00C0E546 /* Exo+2_100_normal.ttf in Resources */,
+				E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */,
 				E913C8F71FFFA51D001A83F7 /* Main.storyboard in Resources */,
+				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
+				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
 				E9E7CDA72002AECA00DFC4DB /* Account.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

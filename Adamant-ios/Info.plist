@@ -2,6 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Exo+2_100_normal.ttf</string>
+		<string>Exo+2_300_normal.ttf</string>
+		<string>Exo+2_400_normal.ttf</string>
+		<string>Exo+2_400_italic.ttf</string>
+		<string>Exo+2_500_normal.ttf</string>
+		<string>Exo+2_700_normal.ttf</string>
+		<string>Roboto_300_normal.ttf</string>
+		<string>Roboto_400_normal.ttf</string>
+		<string>Roboto_400_italic.ttf</string>
+		<string>Roboto_500_normal.ttf</string>
+		<string>Roboto_700_normal.ttf</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
