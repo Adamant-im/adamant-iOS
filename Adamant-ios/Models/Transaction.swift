@@ -13,7 +13,7 @@ struct Transaction {
 	let height: UInt
 	let blockId: UInt
 	let type: TransactionType
-	let timestamp: UInt
+	let date: Date	// instead of raw magic timestamp
 	let senderPublicKey: String
 	let senderId: String
 	let recipientId: String
@@ -22,7 +22,7 @@ struct Transaction {
 	let fee: UInt
 	let signature: String
 	let confirmations: UInt
-
+	
 	// let signatures: [Any]
 	// let asset: Any?
 }
@@ -53,7 +53,6 @@ extension Transaction: Decodable {
 		self.height = try container.decode(UInt.self, forKey: .height)
 		self.blockId = UInt(try container.decode(String.self, forKey: .blockId))!
 		self.type = try container.decode(TransactionType.self, forKey: .type)
-		self.timestamp = try container.decode(UInt.self, forKey: .timestamp)
 		self.senderPublicKey = try container.decode(String.self, forKey: .senderPublicKey)
 		self.senderId = try container.decode(String.self, forKey: .senderId)
 		self.recipientId = try container.decode(String.self, forKey: .recipientId)
@@ -62,6 +61,9 @@ extension Transaction: Decodable {
 		self.fee = try container.decode(UInt.self, forKey: .fee)
 		self.signature = try container.decode(String.self, forKey: .signature)
 		self.confirmations = try container.decode(UInt.self, forKey: .confirmations)
+		
+		let timestamp = try container.decode(TimeInterval.self, forKey: .timestamp)
+		self.date = AdamantFormatters.decodeAdamantDate(timestamp: timestamp)
 	}
 }
 

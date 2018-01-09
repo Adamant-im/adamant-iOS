@@ -52,8 +52,9 @@ class AccountViewController: UIViewController {
 	}
 	
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-		if let identifier = segue.identifier, identifier == showTransactionsSegue {
-			// TODO: pass account info
+		if let identifier = segue.identifier, identifier == showTransactionsSegue,
+			let account = loginService.loggedAccount?.address, let vc = segue.destination as? TransactionsViewController {
+			vc.account = account
 		}
 	}
 	

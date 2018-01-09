@@ -9,10 +9,16 @@
 import UIKit
 
 class TransactionsViewController: UIViewController {
-
 	// MARK: - Dependencies
 	var cellFactory: CellFactory!
 	var apiService: ApiService!
+	
+	
+	// MARK: - Properties
+	var account: String?
+	private(set) var transactions: [Transaction]?
+	private var updatingTransactions: Bool = false
+	
 	
 	// MARK: - IBOutlets
 	@IBOutlet weak var tableView: UITableView!
@@ -26,12 +32,43 @@ class TransactionsViewController: UIViewController {
 		tableView.register(cellFactory.nib(for: .TransactionCell), forCellReuseIdentifier: SharedCell.TransactionCell.cellIdentifier)
 		tableView.dataSource = self
 		tableView.delegate = self
+		
+		if account != nil {
+			reloadTransactions()
+		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
+		}
+	}
+}
+
+
+// MARK: - Recieving data
+extension TransactionsViewController {
+	func reloadTransactions() {
+		guard !updatingTransactions else {
+			return
+		}
+		
+		transactions = nil
+		
+		guard let account = account else {
+			tableView.reloadData()
+			return
+		}
+		
+		updatingTransactions = true
+		
+		apiService.getTransactions(forAccount: account, type: .send) { (transactions, error) in
+			// TODO: Display error messages
+			
+			self.transactions = transactions
+			self.tableView.reloadData()
+			self.updatingTransactions = false
 		}
 	}
 }
@@ -44,8 +81,11 @@ extension TransactionsViewController: UITableViewDataSource {
 	}
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		// TODO: Get data
-		return 0
+		if let transactions = transactions {
+			return transactions.count
+		} else {
+			return 0
+		}
 	}
 	
 	func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -57,13 +97,26 @@ extension TransactionsViewController: UITableViewDataSource {
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		guard let cell = tableView.dequeueReusableCell(withIdentifier: SharedCell.TransactionCell.cellIdentifier, for: indexPath) as? TransactionTableViewCell else {
-			let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
-			cell.textLabel!.text = "failed to get cell"
-			return cell
+		guard let account = account, let transaction = transactions?[indexPath.row] else {
+			// TODO: Display & Log error
+			return UITableViewCell(style: .default, reuseIdentifier: "cell")
 		}
 		
-		// TODO: Configure cell
+		guard let cell = tableView.dequeueReusableCell(withIdentifier: SharedCell.TransactionCell.cellIdentifier, for: indexPath) as? TransactionTableViewCell else {
+			// TODO: Display & Log error
+			return UITableViewCell(style: .default, reuseIdentifier: "cell")
+		}
+		
+		if account == transaction.senderId {
+			cell.transactionType = .outcome
+			cell.accountLabel.text = transaction.recipientId
+		} else {
+			cell.transactionType = .income
+			cell.accountLabel.text = transaction.senderId
+		}
+		
+		cell.ammountLabel.text = AdamantFormatters.format(balance: Int64(Int(transaction.amount)))
+		cell.dateLabel.text = DateFormatter.localizedString(from: transaction.date, dateStyle: .short, timeStyle: .medium)
 		
 		return cell
 	}
@@ -72,5 +125,8 @@ extension TransactionsViewController: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 extension TransactionsViewController: UITableViewDelegate {
-	
+	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		// TODO: go on transaction screen
+		tableView.deselectRow(at: indexPath, animated: true)
+	}
 }
