@@ -34,7 +34,9 @@ class AdamantFormatters {
 	
 	static func validateAdamantAddress(address: String) -> Bool {
 		if let regex = try? NSRegularExpression(pattern: addressRegex, options: []) {
-			return true
+			let matches = regex.matches(in: address, options: [], range: NSRange(location: 0, length: address.count))
+			
+			return matches.count == 1
 		} else {
 			print("Wrong address regex: \(addressRegex)")
 			return false

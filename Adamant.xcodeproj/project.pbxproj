@@ -62,7 +62,18 @@
 		E9EC341E200524CA00C0E546 /* Roboto_500_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A5200010DE001362F8 /* Roboto_500_normal.ttf */; };
 		E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A7200010DF001362F8 /* Roboto_700_normal.ttf */; };
 		E9EC342120052ABB00C0E546 /* TransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC342020052ABB00C0E546 /* TransferViewController.swift */; };
+		E9EC344720066D4A00C0E546 /* AddressValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E9EC344920066D4A00C0E546 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E913C8E61FFFA51D001A83F7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E913C8ED1FFFA51D001A83F7;
+			remoteInfo = Adamant;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		871009461457F6B7B47D99C5 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
@@ -125,6 +136,9 @@
 		E9E7CDCD2004147700DFC4DB /* TransactionsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsResponse.swift; sourceTree = "<group>"; };
 		E9EC34132005178500C0E546 /* TransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewController.swift; sourceTree = "<group>"; };
 		E9EC342020052ABB00C0E546 /* TransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewController.swift; sourceTree = "<group>"; };
+		E9EC344420066D4A00C0E546 /* AdamantTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AdamantTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressValidationTests.swift; sourceTree = "<group>"; };
+		E9EC344820066D4A00C0E546 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +147,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9EC344120066D4A00C0E546 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -161,6 +182,7 @@
 			isa = PBXGroup;
 			children = (
 				E913C8F01FFFA51D001A83F7 /* Adamant */,
+				E9EC344520066D4A00C0E546 /* AdamantTests */,
 				E913C8EF1FFFA51D001A83F7 /* Products */,
 				E59396A8E0053F21F768E69B /* Pods */,
 				54F4E3CDA748B7F48C085503 /* Frameworks */,
@@ -171,6 +193,7 @@
 			isa = PBXGroup;
 			children = (
 				E913C8EE1FFFA51D001A83F7 /* Adamant.app */,
+				E9EC344420066D4A00C0E546 /* AdamantTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -325,6 +348,15 @@
 			path = SharedCells;
 			sourceTree = "<group>";
 		};
+		E9EC344520066D4A00C0E546 /* AdamantTests */ = {
+			isa = PBXGroup;
+			children = (
+				E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */,
+				E9EC344820066D4A00C0E546 /* Info.plist */,
+			);
+			path = AdamantTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -348,6 +380,24 @@
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
 			productType = "com.apple.product-type.application";
 		};
+		E9EC344320066D4A00C0E546 /* AdamantTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E9EC344B20066D4A00C0E546 /* Build configuration list for PBXNativeTarget "AdamantTests" */;
+			buildPhases = (
+				E9EC344020066D4A00C0E546 /* Sources */,
+				E9EC344120066D4A00C0E546 /* Frameworks */,
+				E9EC344220066D4A00C0E546 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E9EC344A20066D4A00C0E546 /* PBXTargetDependency */,
+			);
+			name = AdamantTests;
+			productName = AdamantTests;
+			productReference = E9EC344420066D4A00C0E546 /* AdamantTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -361,6 +411,11 @@
 					E913C8ED1FFFA51D001A83F7 = {
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
+					};
+					E9EC344320066D4A00C0E546 = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+						TestTargetID = E913C8ED1FFFA51D001A83F7;
 					};
 				};
 			};
@@ -378,6 +433,7 @@
 			projectRoot = "";
 			targets = (
 				E913C8ED1FFFA51D001A83F7 /* Adamant */,
+				E9EC344320066D4A00C0E546 /* AdamantTests */,
 			);
 		};
 /* End PBXProject section */
@@ -407,6 +463,13 @@
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
 				E9E7CDA72002AECA00DFC4DB /* Account.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9EC344220066D4A00C0E546 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -518,7 +581,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E9EC344020066D4A00C0E546 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E9EC344720066D4A00C0E546 /* AddressValidationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E9EC344A20066D4A00C0E546 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E913C8ED1FFFA51D001A83F7 /* Adamant */;
+			targetProxy = E9EC344920066D4A00C0E546 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		E913C8F51FFFA51D001A83F7 /* Main.storyboard */ = {
@@ -679,6 +758,38 @@
 			};
 			name = Release;
 		};
+		E9EC344C20066D4A00C0E546 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 37KJUUCTM4;
+				INFOPLIST_FILE = AdamantTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = im.adamant.AdamantTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Adamant.app/Adamant";
+			};
+			name = Debug;
+		};
+		E9EC344D20066D4A00C0E546 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 37KJUUCTM4;
+				INFOPLIST_FILE = AdamantTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = im.adamant.AdamantTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Adamant.app/Adamant";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -696,6 +807,15 @@
 			buildConfigurations = (
 				E913C9011FFFA51E001A83F7 /* Debug */,
 				E913C9021FFFA51E001A83F7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E9EC344B20066D4A00C0E546 /* Build configuration list for PBXNativeTarget "AdamantTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E9EC344C20066D4A00C0E546 /* Debug */,
+				E9EC344D20066D4A00C0E546 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
