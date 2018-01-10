@@ -11,6 +11,7 @@ import Foundation
 class AdamantFormatters {
 	static let currencyShift: Double = 0.00_000_001
 	static let currencyCode = "ADM"
+	static let addressRegex = "^U([0-9]{6,})$"
 	
 	private init() { }
 	
@@ -29,5 +30,14 @@ class AdamantFormatters {
 	static func decodeAdamantDate(timestamp: TimeInterval) -> Date {
 		let interval = magicAdamantTimeInterval
 		return Date(timeIntervalSince1970: timestamp + interval)
+	}
+	
+	static func validateAdamantAddress(address: String) -> Bool {
+		if let regex = try? NSRegularExpression(pattern: addressRegex, options: []) {
+			return true
+		} else {
+			print("Wrong address regex: \(addressRegex)")
+			return false
+		}
 	}
 }

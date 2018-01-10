@@ -15,4 +15,6 @@ protocol ApiService {
 	func getPublicKey(byPassphrase passphrase: String, completionHandler: @escaping (AdamantHash?, AdamantError?) -> Void)
 	
 	func getTransactions(forAccount: String, type: TransactionType, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void)
+	
+//	func transferMoney
 }

@@ -20,18 +20,18 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Adamant_Logo_big" translatesAutoresizingMaskIntoConstraints="NO" id="QFi-yD-WfI">
-                                <rect key="frame" x="75.5" y="231.5" width="225" height="225"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Adamant_Logo" translatesAutoresizingMaskIntoConstraints="NO" id="Tte-Yg-uSj">
+                                <rect key="frame" x="75" y="231" width="225" height="225"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="QFi-yD-WfI" secondAttribute="height" multiplier="1:1" id="1aK-Eg-xSX"/>
+                                    <constraint firstAttribute="width" secondItem="Tte-Yg-uSj" secondAttribute="height" multiplier="1:1" id="o2N-vd-Hdc"/>
                                 </constraints>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="QFi-yD-WfI" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="Aj7-Tp-RFa"/>
-                            <constraint firstItem="QFi-yD-WfI" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" multiplier="0.6" id="VhX-8V-nXU"/>
-                            <constraint firstItem="QFi-yD-WfI" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="mGW-pQ-edp"/>
+                            <constraint firstItem="Tte-Yg-uSj" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="ZIP-t2-Exv"/>
+                            <constraint firstItem="Tte-Yg-uSj" firstAttribute="width" secondItem="6Tk-OE-BBY" secondAttribute="width" multiplier="0.6" id="hL5-t8-v0f"/>
+                            <constraint firstItem="Tte-Yg-uSj" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="oeh-vQ-KXY"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
@@ -42,6 +42,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Adamant_Logo_big" width="1024" height="1024"/>
+        <image name="Adamant_Logo" width="1024" height="1024"/>
     </resources>
 </document>

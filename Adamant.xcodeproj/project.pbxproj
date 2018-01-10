@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		277464D6A8CD29063957345F /* Pods_Adamant_ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1311CE46EB635FFC95BFEF4 /* Pods_Adamant_ios.framework */; };
+		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
 		E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */; };
 		E913C8F71FFFA51D001A83F7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E913C8F51FFFA51D001A83F7 /* Main.storyboard */; };
 		E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E913C8F81FFFA51D001A83F7 /* Assets.xcassets */; };
@@ -65,10 +65,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		871009461457F6B7B47D99C5 /* Pods-Adamant-ios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant-ios.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant-ios/Pods-Adamant-ios.debug.xcconfig"; sourceTree = "<group>"; };
+		871009461457F6B7B47D99C5 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
+		C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1311CE46EB635FFC95BFEF4 /* Pods_Adamant_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D283570A539D864115735AAA /* Pods-Adamant-ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant-ios.release.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant-ios/Pods-Adamant-ios.release.xcconfig"; sourceTree = "<group>"; };
-		E913C8EE1FFFA51D001A83F7 /* Adamant-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Adamant-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D283570A539D864115735AAA /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
+		E913C8EE1FFFA51D001A83F7 /* Adamant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Adamant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E913C8F61FFFA51D001A83F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E913C8F81FFFA51D001A83F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -131,7 +132,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				277464D6A8CD29063957345F /* Pods_Adamant_ios.framework in Frameworks */,
+				4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,6 +143,7 @@
 			isa = PBXGroup;
 			children = (
 				D1311CE46EB635FFC95BFEF4 /* Pods_Adamant_ios.framework */,
+				C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -149,8 +151,8 @@
 		E59396A8E0053F21F768E69B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				871009461457F6B7B47D99C5 /* Pods-Adamant-ios.debug.xcconfig */,
-				D283570A539D864115735AAA /* Pods-Adamant-ios.release.xcconfig */,
+				871009461457F6B7B47D99C5 /* Pods-Adamant.debug.xcconfig */,
+				D283570A539D864115735AAA /* Pods-Adamant.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -158,7 +160,7 @@
 		E913C8E51FFFA51D001A83F7 = {
 			isa = PBXGroup;
 			children = (
-				E913C8F01FFFA51D001A83F7 /* Adamant-ios */,
+				E913C8F01FFFA51D001A83F7 /* Adamant */,
 				E913C8EF1FFFA51D001A83F7 /* Products */,
 				E59396A8E0053F21F768E69B /* Pods */,
 				54F4E3CDA748B7F48C085503 /* Frameworks */,
@@ -168,12 +170,12 @@
 		E913C8EF1FFFA51D001A83F7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E913C8EE1FFFA51D001A83F7 /* Adamant-ios.app */,
+				E913C8EE1FFFA51D001A83F7 /* Adamant.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		E913C8F01FFFA51D001A83F7 /* Adamant-ios */ = {
+		E913C8F01FFFA51D001A83F7 /* Adamant */ = {
 			isa = PBXGroup;
 			children = (
 				E91947B72000326B001362F8 /* ServerResponses */,
@@ -189,7 +191,7 @@
 				E913C8F51FFFA51D001A83F7 /* Main.storyboard */,
 				E913C8FD1FFFA51E001A83F7 /* Info.plist */,
 			);
-			path = "Adamant-ios";
+			path = Adamant;
 			sourceTree = "<group>";
 		};
 		E913C9041FFFA8FE001A83F7 /* ServiceProtocols */ = {
@@ -326,9 +328,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E913C8ED1FFFA51D001A83F7 /* Adamant-ios */ = {
+		E913C8ED1FFFA51D001A83F7 /* Adamant */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant-ios" */;
+			buildConfigurationList = E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant" */;
 			buildPhases = (
 				E40A2E5936758D20792675C8 /* [CP] Check Pods Manifest.lock */,
 				E913C8EA1FFFA51D001A83F7 /* Sources */,
@@ -341,9 +343,9 @@
 			);
 			dependencies = (
 			);
-			name = "Adamant-ios";
-			productName = "Adamant-ios";
-			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant-ios.app */;
+			name = Adamant;
+			productName = Adamant;
+			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -362,7 +364,7 @@
 					};
 				};
 			};
-			buildConfigurationList = E913C8E91FFFA51D001A83F7 /* Build configuration list for PBXProject "Adamant-ios" */;
+			buildConfigurationList = E913C8E91FFFA51D001A83F7 /* Build configuration list for PBXProject "Adamant" */;
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -375,7 +377,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E913C8ED1FFFA51D001A83F7 /* Adamant-ios */,
+				E913C8ED1FFFA51D001A83F7 /* Adamant */,
 			);
 		};
 /* End PBXProject section */
@@ -417,7 +419,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Adamant-ios/Pods-Adamant-ios-frameworks.sh",
+				"${SRCROOT}/Pods/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
 				"${BUILT_PRODUCTS_DIR}/FTIndicator/FTIndicator.framework",
@@ -436,7 +438,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Adamant-ios/Pods-Adamant-ios-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		9103110972E84A36FC64A689 /* [CP] Copy Pods Resources */ = {
@@ -451,7 +453,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Adamant-ios/Pods-Adamant-ios-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Adamant/Pods-Adamant-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E40A2E5936758D20792675C8 /* [CP] Check Pods Manifest.lock */ = {
@@ -465,7 +467,7 @@
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Adamant-ios-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-Adamant-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -647,14 +649,14 @@
 		};
 		E913C9011FFFA51E001A83F7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 871009461457F6B7B47D99C5 /* Pods-Adamant-ios.debug.xcconfig */;
+			baseConfigurationReference = 871009461457F6B7B47D99C5 /* Pods-Adamant.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 37KJUUCTM4;
-				INFOPLIST_FILE = "Adamant-ios/Info.plist";
+				INFOPLIST_FILE = Adamant/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.Adamant-ios";
+				PRODUCT_BUNDLE_IDENTIFIER = im.adamant.Adamant;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -663,14 +665,14 @@
 		};
 		E913C9021FFFA51E001A83F7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D283570A539D864115735AAA /* Pods-Adamant-ios.release.xcconfig */;
+			baseConfigurationReference = D283570A539D864115735AAA /* Pods-Adamant.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 37KJUUCTM4;
-				INFOPLIST_FILE = "Adamant-ios/Info.plist";
+				INFOPLIST_FILE = Adamant/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.Adamant-ios";
+				PRODUCT_BUNDLE_IDENTIFIER = im.adamant.Adamant;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -680,7 +682,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E913C8E91FFFA51D001A83F7 /* Build configuration list for PBXProject "Adamant-ios" */ = {
+		E913C8E91FFFA51D001A83F7 /* Build configuration list for PBXProject "Adamant" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E913C8FE1FFFA51E001A83F7 /* Debug */,
@@ -689,7 +691,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant-ios" */ = {
+		E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E913C9011FFFA51E001A83F7 /* Debug */,

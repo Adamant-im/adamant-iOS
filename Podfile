@@ -1,4 +1,4 @@
-target 'Adamant-ios' do
+target 'Adamant' do
   use_frameworks!
 
   # Network

@@ -65,6 +65,9 @@ class TransferViewController: FormViewController {
 		<<< TextRow() { r in
 			r.title = "Address"
 			r.placeholder = "of the reciever"
+//			r.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
+//				
+//			}))
 		}
 		<<< DecimalRow() {
 			$0.title = "Amount"
