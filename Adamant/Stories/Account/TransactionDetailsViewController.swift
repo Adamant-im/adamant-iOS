@@ -76,13 +76,8 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 			cell = c
 		} else {
 			cell = UITableViewCell(style: .value1, reuseIdentifier: "cell")
-			if let gray = UIColor(named: "Gray_main") {
-				cell.textLabel?.textColor = gray
-			}
-			
-			if let gray = UIColor(named: "Gray_secondary") {
-				cell.detailTextLabel?.textColor = gray
-			}
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.detailTextLabel?.textColor = UIColor.adamantSecondary
 			
 			if let font = UIFont(name: "Exo 2", size: 17) {
 				cell.textLabel?.font = font

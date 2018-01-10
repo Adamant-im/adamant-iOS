@@ -44,7 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		self.window!.rootViewController = SwinjectStoryboard.create(name: Constants.mainStoryboard, bundle: nil).instantiateInitialViewController()
 		self.window!.makeKeyAndVisible()
 		
-		self.window?.tintColor = UIColor(named: "Gray_main")
+		self.window?.tintColor = UIColor.adamantPrimary
 		
 		guard let router = container.resolve(Router.self) else {
 			fatalError("Failed to get Router")

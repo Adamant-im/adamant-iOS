@@ -104,14 +104,13 @@ class TransferViewController: FormViewController {
 		
 		// MARK: - UI
 		
-		if let font = UIFont(name: "Exo 2", size: 17),
-			let color = UIColor(named: "Gray_main") {
-			navigationAccessoryView.tintColor = color
+		if let font = UIFont(name: "Exo 2", size: 17) {
+			navigationAccessoryView.tintColor = UIColor.adamantPrimary
 
 			for row in form.allRows {
 				row.baseCell?.textLabel?.font = font
-				row.baseCell?.textLabel?.textColor = color
-				row.baseCell?.tintColor = color
+				row.baseCell?.textLabel?.textColor = UIColor.adamantPrimary
+				row.baseCell?.tintColor = UIColor.adamantPrimary
 				
 				// TODO: Not working. Somehow font get's dropped at runtime.
 //				if let cell = row.baseCell as? TextFieldCell {

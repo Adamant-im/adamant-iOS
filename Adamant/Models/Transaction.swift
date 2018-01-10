@@ -13,7 +13,8 @@ struct Transaction {
 	let height: UInt
 	let blockId: UInt
 	let type: TransactionType
-	let date: Date	// instead of raw magic timestamp
+	let timestamp: UInt
+	let date: Date	// Calculated from timeinterval
 	let senderPublicKey: String
 	let senderId: String
 	let recipientId: String
@@ -62,8 +63,8 @@ extension Transaction: Decodable {
 		self.signature = try container.decode(String.self, forKey: .signature)
 		self.confirmations = try container.decode(UInt.self, forKey: .confirmations)
 		
-		let timestamp = try container.decode(TimeInterval.self, forKey: .timestamp)
-		self.date = AdamantFormatters.decodeAdamantDate(timestamp: timestamp)
+		self.timestamp = try container.decode(UInt.self, forKey: .timestamp)
+		self.date = AdamantFormatters.decodeAdamantDate(timestamp: TimeInterval(self.timestamp))
 	}
 }
 

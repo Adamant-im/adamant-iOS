@@ -122,11 +122,8 @@ extension AccountViewController: UITableViewDataSource {
 			cell.textLabel?.font = UIFont(name: "Exo 2", size: 17)
 			cell.detailTextLabel?.font = UIFont(name: "Exo 2", size: 12)
 			
-			if let main = UIColor(named: "Gray_main"),
-				let details = UIColor(named: "Gray_secondary") {
-				cell.textLabel?.textColor = main
-				cell.detailTextLabel?.textColor = details
-			}
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.detailTextLabel?.textColor = UIColor.adamantSecondary
 		}
 		
 		switch row {
@@ -172,7 +169,7 @@ extension AccountViewController: UITableViewDelegate {
 			
 			alert.addAction(UIAlertAction(title: "Copy To Pasteboard", style: .default, handler: { _ in
 				UIPasteboard.general.string = address
-				self.dialogService.showToastMessage("Address copied to pasteboard!")
+				self.dialogService.showToastMessage("\(address)\nCopied To Pasteboard!")
 			}))
 			
 			alert.addAction(UIAlertAction(title: "Share", style: .default, handler: { _ in
@@ -180,9 +177,7 @@ extension AccountViewController: UITableViewDelegate {
 				self.present(vc, animated: true)
 			}))
 			
-			alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
-				alert.dismiss(animated: true)
-			}))
+			alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
 			
 			present(alert, animated: true)
 			
