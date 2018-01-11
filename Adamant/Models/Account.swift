@@ -10,12 +10,12 @@ import Foundation
 
 struct Account {
 	let address: String
-	var unconfirmedBalance: Int64
-	var balance: Int64
-	let publicKey: AdamantHash
+	var unconfirmedBalance: UInt
+	var balance: UInt
+	let publicKey: String
 	let unconfirmedSignature: Int
 	let secondSignature: Int
-	let secondPublicKey: AdamantHash?
+	let secondPublicKey: String?
 }
 
 extension Account: Decodable {
@@ -33,17 +33,14 @@ extension Account: Decodable {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		
 		self.address = try container.decode(String.self, forKey: .address)
-		self.unconfirmedBalance = Int64(try container.decode(String.self, forKey: .unconfirmedBalance))!
-		self.balance = Int64(try container.decode(String.self, forKey: .balance))!
+		self.unconfirmedBalance = UInt(try container.decode(String.self, forKey: .unconfirmedBalance))!
+		self.balance = UInt(try container.decode(String.self, forKey: .balance))!
 		self.unconfirmedSignature = try container.decode(Int.self, forKey: .unconfirmedSignature)
 		
-		let publicKey = try container.decode(String.self, forKey: .publicKey)
-		self.publicKey = AdamantHash(hex: publicKey)
+		self.publicKey = try container.decode(String.self, forKey: .publicKey)
 		
-		self.secondSignature = 0
-		self.secondPublicKey = nil
-//		self.secondSignature = try container.decode(Int.self, forKey: .secondSignature)
-//		self.secondPublicKey = try? container.decode(String.self, forKey: .secondPublicKey)
+		self.secondSignature = try container.decode(Int.self, forKey: .secondSignature)
+		self.secondPublicKey = try? container.decode(String.self, forKey: .secondPublicKey)
 	}
 }
 

@@ -62,10 +62,10 @@ extension AdamantApiService {
 		}
 	}
 	
-	func getAccount(byPublicKey publicKey: AdamantHash, completionHandler: @escaping (Account?, AdamantError?) -> Void) {
+	func getAccount(byPublicKey publicKey: String, completionHandler: @escaping (Account?, AdamantError?) -> Void) {
 		let endpoint: URL
 		do {
-			endpoint = try buildUrl(command: ApiCommand.Accounts, queryItems: [URLQueryItem(name: "publicKey", value: publicKey.hex)])
+			endpoint = try buildUrl(command: ApiCommand.Accounts, queryItems: [URLQueryItem(name: "publicKey", value: publicKey)])
 		} catch {
 			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
 			return
@@ -81,7 +81,7 @@ extension AdamantApiService {
 		}
 	}
 	
-	func getPublicKey(byPassphrase passphrase: String, completionHandler: @escaping (AdamantHash?, AdamantError?) -> Void) {
+	func getPublicKey(byPassphrase passphrase: String, completionHandler: @escaping (String?, AdamantError?) -> Void) {
 		guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase) else {
 			completionHandler(nil, AdamantError(message: "Can't create keypair for passphrase: \(passphrase)"))
 			return
@@ -143,7 +143,7 @@ extension AdamantApiService {
 			"amount": amount,
 			"recipientId": recipient,
 			"senderId": sender,
-			"publicKey": keypair.publicKey.hex
+			"publicKey": keypair.publicKey
 		]
 		let headersContentTypeJson: HTTPHeaders = [
 			"Content-Type": "application/json"
@@ -167,7 +167,7 @@ extension AdamantApiService {
 				let transaction: [String: Encodable] = [
 					"type": TransactionType.send.rawValue,
 					"amount": amount,
-					"senderPublicKey": keypair.publicKey.hex,
+					"senderPublicKey": keypair.publicKey,
 					"requesterPublicKey": nt.requesterPublicKey,
 					"timestamp": nt.timestamp,
 					"recipientId": recipient,

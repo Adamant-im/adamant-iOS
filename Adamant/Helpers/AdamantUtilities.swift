@@ -74,3 +74,19 @@ extension AdamantUtilities {
 		return components.date!.timeIntervalSince1970
 	}()
 }
+
+// MARK: Hex
+extension AdamantUtilities {
+	static func getHexString(from bytes: [UInt8]) -> String {
+		if bytes.count > 0 {
+			return Data(bytes: bytes).reduce("") {$0 + String(format: "%02x", $1)}
+		} else {
+			return ""
+		}
+	}
+	
+	static func getBytes(from hex: String) -> [UInt8] {
+		let hexa = Array(hex)
+		return stride(from: 0, to: hex.count, by: 2).flatMap { UInt8(String(hexa[$0..<$0.advanced(by: 2)]), radix: 16) }
+	}
+}

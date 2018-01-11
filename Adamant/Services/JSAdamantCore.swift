@@ -124,7 +124,7 @@ extension JSAdamantCore {
 
 // MARK: - Hash converters
 extension JSAdamantCore {
-	private func convertToJsHash(_ hash: AdamantHash) -> JSValue? {
+	private func convertToJsHash(_ hash: [UInt8]) -> JSValue? {
 		guard let converter = getUtilitesFunction(function: .convertToUInt8Array) else {
 			return nil
 		}
@@ -134,7 +134,7 @@ extension JSAdamantCore {
 			jsError = value
 		}
 		
-		let jsHash = converter.call(withArguments: [hash.bytes])
+		let jsHash = converter.call(withArguments: [hash])
 		context.exceptionHandler = nil
 		
 		if jsError == nil {
@@ -144,20 +144,16 @@ extension JSAdamantCore {
 		}
 	}
 	
-	private func convertFromJsHash(_ jsHash: JSValue) -> AdamantHash? {
-		if let bytes = jsHash.toArray() as? [UInt8] {
-			return AdamantHash(bytes: bytes)
-		} else {
-			return nil
-		}
+	private func convertFromJsHash(_ jsHash: JSValue) -> [UInt8]? {
+		return jsHash.toArray() as? [UInt8]
 	}
 }
 
 
 // MARK: - AdamantCore
 extension JSAdamantCore: AdamantCore {
-	func createKeypairFor(hash: AdamantHash) -> Keypair? {
-		guard hash.bytes.count > 0 else {
+	func createKeypairFor(rawHash: [UInt8]) -> Keypair? {
+		guard rawHash.count > 0 else {
 			return nil
 		}
 		
@@ -165,12 +161,12 @@ extension JSAdamantCore: AdamantCore {
 			return nil
 		}
 		
-		if let jsHash = convertToJsHash(hash),
+		if let jsHash = convertToJsHash(rawHash),
 			let keypairRaw = function.call(withArguments: [jsHash]),
 			keypairRaw.hasProperty("publicKey") && keypairRaw.hasProperty("privateKey"),
-			let publicKey = self.convertFromJsHash(keypairRaw.forProperty("publicKey")),
-			let privateKey = self.convertFromJsHash(keypairRaw.forProperty("privateKey")) {
-			let keypair = Keypair(publicKey: publicKey, privateKey: privateKey)
+			let publicKeyHash = self.convertFromJsHash(keypairRaw.forProperty("publicKey")),
+			let privateKeyHash = self.convertFromJsHash(keypairRaw.forProperty("privateKey")) {
+			let keypair = Keypair(publicKey: AdamantUtilities.getHexString(from: publicKeyHash), privateKey: AdamantUtilities.getHexString(from: privateKeyHash))
 			return keypair
 		} else {
 			return nil
@@ -178,14 +174,14 @@ extension JSAdamantCore: AdamantCore {
 	}
 	
 	func createKeypairFor(passphrase: String) -> Keypair? {
-		guard let hash = createHashFor(passphrase: passphrase), hash.bytes.count > 0 else {
+		guard let hash = createHashFor(passphrase: passphrase), hash.count > 0 else {
 			return nil
 		}
 		
-		return createKeypairFor(hash: hash)
+		return createKeypairFor(rawHash: AdamantUtilities.getBytes(from: hash))
 	}
 	
-	func createHashFor(passphrase: String) -> AdamantHash? {
+	func createHashFor(passphrase: String) -> String? {
 		guard let function = getCoreFunction(function: .createPassPhraseHash) else {
 			return nil
 		}
@@ -195,10 +191,11 @@ extension JSAdamantCore: AdamantCore {
 			jsError = exc
 		}
 		
-		let hash: AdamantHash?
+		let hash: String?
 		if let jsHash = function.call(withArguments: [passphrase]),
-			!jsHash.isUndefined, jsError == nil {
-			hash = convertFromJsHash(jsHash)
+			!jsHash.isUndefined, jsError == nil,
+			let hashRaw = convertFromJsHash(jsHash) {
+			hash = AdamantUtilities.getHexString(from: hashRaw)
 		} else {
 			hash = nil
 		}

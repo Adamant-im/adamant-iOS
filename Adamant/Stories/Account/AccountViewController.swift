@@ -134,7 +134,7 @@ extension AccountViewController: UITableViewDataSource {
 			
 		case .balance:
 			cell.textLabel?.text = "Your balance"
-			cell.detailTextLabel?.text = AdamantUtilities.format(balance: UInt(account.balance))
+			cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
 			cell.imageView?.image = #imageLiteral(resourceName: "wallet")
 			break
 			
