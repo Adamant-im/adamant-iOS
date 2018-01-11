@@ -9,18 +9,20 @@
 import Foundation
 import Alamofire
 
-private struct ApiCommand {
-	static let Accounts = ApiCommand("/api/accounts")
-	static let GetPublicKey = ApiCommand("/api/accounts/getPublicKey")
-	static let Transactions = ApiCommand("/api/transactions")
-	static let NormalizeTransaction = ApiCommand("/api/transactions/normalize")
-	static let ProcessTransaction = ApiCommand("/api/transactions/process")
+
+private struct ApiCommands {
+	static let Accounts = (
+		root: "/api/accounts",
+		getPublicKey: "/api/accounts/getPublicKey"
+	)
 	
-	let path: String
-	private init(_ path: String) {
-		self.path = path
-	}
+	static let Transactions = (
+		root: "/api/transactions",
+		normalizeTransaction: "/api/transactions/normalize",
+		processTransaction: "/api/transactions/process"
+	)
 }
+
 
 class AdamantApiService: ApiService {
 	
@@ -36,12 +38,12 @@ class AdamantApiService: ApiService {
 		self.adamantCore = adamantCore
 	}
 	
-	private func buildUrl(command: ApiCommand, queryItems: [URLQueryItem]?) throws -> URL {
+	private func buildUrl(path: String, queryItems: [URLQueryItem]?) throws -> URL {
 		guard var components = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false) else {
 			throw AdamantError(message: "Internal API error: Can't parse API URL: \(apiUrl)")
 		}
 		
-		components.path = command.path
+		components.path = path
 		components.queryItems = queryItems
 		
 		return try components.asURL()
@@ -65,7 +67,7 @@ extension AdamantApiService {
 	func getAccount(byPublicKey publicKey: String, completionHandler: @escaping (Account?, AdamantError?) -> Void) {
 		let endpoint: URL
 		do {
-			endpoint = try buildUrl(command: ApiCommand.Accounts, queryItems: [URLQueryItem(name: "publicKey", value: publicKey)])
+			endpoint = try buildUrl(path: ApiCommands.Accounts.root, queryItems: [URLQueryItem(name: "publicKey", value: publicKey)])
 		} catch {
 			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
 			return
@@ -93,7 +95,7 @@ extension AdamantApiService {
 	func getPublicKey(byAddress address: String, completionHandler: @escaping (String?, AdamantError?) -> Void) {
 		let endpoint: URL
 		do {
-			endpoint = try buildUrl(command: ApiCommand.GetPublicKey, queryItems: [URLQueryItem(name: "account", value: address)])
+			endpoint = try buildUrl(path: ApiCommands.Accounts.getPublicKey, queryItems: [URLQueryItem(name: "account", value: address)])
 		} catch {
 			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
 			return
@@ -116,7 +118,7 @@ extension AdamantApiService {
 	func getTransactions(forAccount account: String, type: TransactionType, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void) {
 		let endpoint: URL
 		do {
-			endpoint = try buildUrl(command: ApiCommand.Transactions, queryItems: [URLQueryItem(name: "inId", value: account),
+			endpoint = try buildUrl(path: ApiCommands.Transactions.root, queryItems: [URLQueryItem(name: "inId", value: account),
 																				   URLQueryItem(name: "and:type", value: String(type.rawValue))])
 		} catch {
 			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
@@ -150,8 +152,8 @@ extension AdamantApiService {
 		]
 		
 		do {
-			let normalizeEndpoint = try buildUrl(command: ApiCommand.NormalizeTransaction, queryItems: nil)
-			let processEndpoin = try buildUrl(command: ApiCommand.ProcessTransaction, queryItems: nil)
+			let normalizeEndpoint = try buildUrl(path: ApiCommands.Transactions.normalizeTransaction, queryItems: nil)
+			let processEndpoin = try buildUrl(path: ApiCommands.Transactions.processTransaction, queryItems: nil)
 			
 			sendRequest(url: normalizeEndpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headersContentTypeJson, completionHandler: { (response: ServerModelResponse<NormalizedTransaction>?, error) in
 				guard let r = response, r.success, let nt = r.model else {
