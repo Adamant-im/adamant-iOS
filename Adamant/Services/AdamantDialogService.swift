@@ -10,7 +10,6 @@ import UIKit
 import FTIndicator
 
 class SwinjectedDialogService: DialogService {
-	
 	// Configure notifications
 	init() {
 		FTIndicator.setIndicatorStyle(.dark)
@@ -29,8 +28,28 @@ class SwinjectedDialogService: DialogService {
 			}
 		}
 	}
-	
+}
+
+
+// MARK: - Toast
+extension SwinjectedDialogService {
 	func showToastMessage(_ message: String) {
 		FTIndicator.showToastMessage(message)
+	}
+}
+
+
+// MARK: - Indicators
+extension SwinjectedDialogService {
+	func showProgress(withMessage message: String, userInteractionEnable enabled: Bool) {
+		FTIndicator.showProgress(withMessage: message, userInteractionEnable: enabled)
+	}
+	
+	func showSuccess(withMessage message: String) {
+		FTIndicator.showSuccess(withMessage: message)
+	}
+	
+	func showError(withMessage message: String) {
+		showError(withMessage: message)
 	}
 }

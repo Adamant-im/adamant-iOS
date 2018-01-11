@@ -12,6 +12,14 @@ protocol DialogService {
 	/// Present view controller modally
 	func presentViewController(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
 	
+	
+	// MARK: - Toast messages
 	/// Show pop-up message
 	func showToastMessage(_ message: String)
+	
+	
+	// MARK: - Indicators
+	func showProgress(withMessage: String, userInteractionEnable: Bool)
+	func showSuccess(withMessage: String)
+	func showError(withMessage: String)
 }

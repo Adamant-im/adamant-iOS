@@ -8,11 +8,12 @@
 
 import UIKit
 import Eureka
-import FTIndicator
 
 class TransferViewController: FormViewController {
 	private struct Row {
+		static let Balance = Row("balance")
 		static let Amount = Row("amount")
+		static let MaxToTransfer = Row("max")
 		static let Recipient = Row("recipient")
 		static let Fee = Row("fee")
 		static let Total = Row("total")
@@ -28,7 +29,9 @@ class TransferViewController: FormViewController {
 	// MARK: - Dependencies
 	var apiService: ApiService!
 	var loginService: LoginService!
+	var dialogService: DialogService!
 	
+	private(set) var maxToTransfer: Double = 0.0
 	
 	// MARK: - Properties
 	let defaultFee = 0.5
@@ -46,24 +49,35 @@ class TransferViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
+		let numberFormatter = NumberFormatter()
+		numberFormatter.locale = Locale.current
+		numberFormatter.numberStyle = .decimal
+		numberFormatter.minimumFractionDigits = 0
+		numberFormatter.maximumFractionDigits = 8
+		
 		// MARK: - Wallet section
 		if let account = account {
+			sendButton.isEnabled = maxToTransfer > 0.0
 			let balance = Double(account.balance) * AdamantFormatters.currencyShift
-			let toTransfer = balance - defaultFee > 0 ? balance - defaultFee : 0.0
-			
-			sendButton.isEnabled = toTransfer > 0.0
+			maxToTransfer = balance - defaultFee > 0 ? balance - defaultFee : 0.0
 			
 			form +++ Section("Your wallet")
 			<<< DecimalRow() {
 				$0.title = "Balance"
 				$0.value = balance
+				$0.tag = Row.Balance.tag
 				$0.disabled = true
+				$0.formatter = numberFormatter
 			}
 			<<< DecimalRow() {
 				$0.title = "Max to transfer"
-				$0.value = toTransfer
+				$0.value = maxToTransfer
+				$0.tag = Row.MaxToTransfer.tag
 				$0.disabled = true
+				$0.formatter = numberFormatter
 			}
+		} else {
+			sendButton.isEnabled = false
 		}
 		
 		// MARK: - Transfer section
@@ -89,33 +103,39 @@ class TransferViewController: FormViewController {
 			$0.title = "Amount"
 			$0.placeholder = "to send"
 			$0.tag = Row.Amount.tag
-		}.onChange(amountChanged)
+			$0.formatter = numberFormatter
+//			$0.add(rule: RuleSmallerOrEqualThan<Double>(max: maxToTransfer))
+//			$0.validationOptions = .validatesOnChange
+			}.onChange(amountChanged)
 		<<< DecimalRow() {
 			$0.title = "Transaction fee"
 			$0.value = defaultFee
 			$0.tag = Row.Fee.tag
 			$0.disabled = true
+			$0.formatter = numberFormatter
 		}
 		<<< DecimalRow() {
 			$0.title = "Amount including fee"
 			$0.value = nil
 			$0.tag = Row.Total.tag
 			$0.disabled = true
+			$0.formatter = numberFormatter
 		}
 		<<< ButtonRow() {
 			$0.title = "Send funds"
 			$0.tag = Row.SendButton.tag
-			$0.disabled = Condition.function([Row.Amount.tag], { [weak self] form -> Bool in
-				guard let balance = self?.account?.balance,
-					let fee = self?.defaultFee,
-					let row: DecimalRow = form.rowBy(tag: Row.Amount.tag),
-					let amount = row.value else {
+			$0.disabled = Condition.function([Row.Total.tag], { [weak self] form -> Bool in
+				guard let row: DecimalRow = form.rowBy(tag: Row.Total.tag),
+					let total = row.value,
+					let maxToTransfer = self?.maxToTransfer else {
 					return true
 				}
-				
-				return amount + fee > (Double(balance) * AdamantFormatters.currencyShift)
+
+				return total > maxToTransfer
 			})
-		}
+			}.onCellSelection({ [weak self] (cell, row) in
+				self?.sendFunds(row)
+			})
 		
 		
 		// MARK: - UI
@@ -161,8 +181,10 @@ class TransferViewController: FormViewController {
 		if let totalAmount = totalAmount {
 			let isValid = totalAmount > 0.0 && totalAmount < (Double(account.balance) * AdamantFormatters.currencyShift )
 			sendButton.isEnabled = isValid
+			row.cell.titleLabel?.textColor = isValid ? .black : .red
 		} else {
 			sendButton.isEnabled = false
+			row.cell.titleLabel?.textColor = .black
 		}
 	}
 	
@@ -170,37 +192,50 @@ class TransferViewController: FormViewController {
 	// MARK: - IBActions
 	
 	@IBAction func sendFunds(_ sender: Any) {
+		guard let dialogService = self.dialogService, let apiService = self.apiService else {
+			fatalError("Dependecies fatal error")
+		}
+		
 		guard let account = loginService.loggedAccount, let keypair = loginService.keypair else {
 			return
 		}
 		
 		guard let recipientRow = form.rowBy(tag: Row.Recipient.tag) as? TextRow,
 			let recipient = recipientRow.value,
-			AdamantFormatters.validateAdamantAddress(address: recipient),
 			let totalRow = form.rowBy(tag: Row.Total.tag) as? DecimalRow,
 			let amount = totalRow.value else {
+			return
+		}
+		
+		guard AdamantFormatters.validateAdamantAddress(address: recipient) else {
+			dialogService.showError(withMessage: "Enter valid recipient address")
+			return
+		}
+		
+		guard amount <= maxToTransfer else {
+			dialogService.showError(withMessage: "You don't have that kind of money")
 			return
 		}
 		
 		let alert = UIAlertController(title: "Send \(amount) \(AdamantFormatters.currencyCode) to \(recipient)?", message: "You can't undo this action.", preferredStyle: .alert)
 		let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
 		let sendAction = UIAlertAction(title: "Send", style: .default, handler: { _ in
-			FTIndicator.showProgress(withMessage: "Processing transaction...", userInteractionEnable: false)
+			dialogService.showProgress(withMessage: "Processing transaction...", userInteractionEnable: false)
 			
 			// Check if address is valid
-			self.apiService.getPublicKey(byAddress: recipient, completionHandler: { (key, error) in
+			apiService.getPublicKey(byAddress: recipient, completionHandler: { (key, error) in
 				guard key != nil else {
-					FTIndicator.showError(withMessage: "Account not found: \(recipient)")
+					dialogService.showError(withMessage: "Account not found: \(recipient)")
 					return
 				}
 				
-				self.apiService.transferFunds(sender: account.address, recipient: recipient, amount: AdamantFormatters.from(double: amount), keypair: keypair, completionHandler: { [weak self] (success, error) in
+				apiService.transferFunds(sender: account.address, recipient: recipient, amount: AdamantFormatters.from(double: amount), keypair: keypair, completionHandler: { [weak self] (success, error) in
 					if success {
-						FTIndicator.showSuccess(withMessage: "Funds sended!")
+						dialogService.showSuccess(withMessage: "Funds sended!")
 						// TODO: goto transactions scene
 						self?.dismiss(animated: true, completion: nil)
 					} else {
-						FTIndicator.showError(withMessage: error?.message ?? "Failed. Try later.")
+						dialogService.showError(withMessage: error?.message ?? "Failed. Try later.")
 					}
 				})
 			})
