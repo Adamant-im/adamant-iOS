@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>classNames</key>
+	<dict>
+		<key>JSAdamantCoreTests</key>
+		<dict>
+			<key>testPerformanceHashForPassphrase()</key>
+			<dict>
+				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
+				<dict>
+					<key>baselineAverage</key>
+					<real>2.0892</real>
+					<key>baselineIntegrationDisplayName</key>
+					<string>11 янв. 2018 г., 22:15:09</string>
+				</dict>
+			</dict>
+			<key>testPerformanceKeypairForPassphrase()</key>
+			<dict>
+				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
+				<dict>
+					<key>baselineAverage</key>
+					<real>2.0834</real>
+					<key>baselineIntegrationDisplayName</key>
+					<string>11 янв. 2018 г., 22:15:09</string>
+				</dict>
+			</dict>
+			<key>testPerformanceSignTransaction()</key>
+			<dict>
+				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
+				<dict>
+					<key>baselineAverage</key>
+					<real>0.059843</real>
+					<key>baselineIntegrationDisplayName</key>
+					<string>11 янв. 2018 г., 22:15:09</string>
+				</dict>
+			</dict>
+		</dict>
+	</dict>
+</dict>
+</plist>
