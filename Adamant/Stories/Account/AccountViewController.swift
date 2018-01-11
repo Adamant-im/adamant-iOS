@@ -119,8 +119,8 @@ extension AccountViewController: UITableViewDataSource {
 		} else {
 			cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
 			cell.accessoryType = .disclosureIndicator
-			cell.textLabel?.font = UIFont(name: "Exo 2", size: 17)
-			cell.detailTextLabel?.font = UIFont(name: "Exo 2", size: 12)
+			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+			cell.detailTextLabel?.font = UIFont.adamantPrimary(size: 12)
 			
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 			cell.detailTextLabel?.textColor = UIColor.adamantSecondary

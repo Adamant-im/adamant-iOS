@@ -133,21 +133,18 @@ class TransferViewController: FormViewController {
 		
 		
 		// MARK: - UI
+		navigationAccessoryView.tintColor = UIColor.adamantPrimary
 		
-		if let font = UIFont(name: "Exo 2", size: 17) {
-			navigationAccessoryView.tintColor = UIColor.adamantPrimary
-
-			for row in form.allRows {
-				row.baseCell?.textLabel?.font = font
-				row.baseCell?.textLabel?.textColor = UIColor.adamantPrimary
-				row.baseCell?.tintColor = UIColor.adamantPrimary
-				
-				// TODO: Not working. Somehow font get's dropped at runtime.
-//				if let cell = row.baseCell as? TextFieldCell {
-//					cell.textField.font = font
-//					cell.textField.textColor = color
-//				}
-			}
+		for row in form.allRows {
+			row.baseCell?.textLabel?.font = UIFont.adamantPrimary(size: 17)
+			row.baseCell?.textLabel?.textColor = UIColor.adamantPrimary
+			row.baseCell?.tintColor = UIColor.adamantPrimary
+			
+			// TODO: Not working. Somehow font get's dropped at runtime.
+			//				if let cell = row.baseCell as? TextFieldCell {
+			//					cell.textField.font = font
+			//					cell.textField.textColor = color
+			//				}
 		}
 		
 		let button: ButtonRow? = form.rowBy(tag: Row.SendButton.tag)

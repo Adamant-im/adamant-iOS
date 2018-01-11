@@ -23,7 +23,7 @@
 		E91947B020002393001362F8 /* AdamantApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AF20002393001362F8 /* AdamantApiService.swift */; };
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
 		E91947B420002809001362F8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B320002809001362F8 /* Account.swift */; };
-		E95F856520067A030070534A /* UIColor+globalColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856420067A030070534A /* UIColor+globalColors.swift */; };
+		E95F856520067A030070534A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856420067A030070534A /* GlobalConstants.swift */; };
 		E95F85692006AB9D0070534A /* NormalizedTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85682006AB9D0070534A /* NormalizedTransaction.swift */; };
 		E95F856B200789450070534A /* JSModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856A200789450070534A /* JSModels.swift */; };
 		E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856E2007B61D0070534A /* GetPublicKeyResponse.swift */; };
@@ -113,7 +113,7 @@
 		E91947AF20002393001362F8 /* AdamantApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantApiService.swift; sourceTree = "<group>"; };
 		E91947B12000246A001362F8 /* AdamantError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantError.swift; sourceTree = "<group>"; };
 		E91947B320002809001362F8 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
-		E95F856420067A030070534A /* UIColor+globalColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+globalColors.swift"; sourceTree = "<group>"; };
+		E95F856420067A030070534A /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		E95F85682006AB9D0070534A /* NormalizedTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalizedTransaction.swift; sourceTree = "<group>"; };
 		E95F856A200789450070534A /* JSModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSModels.swift; sourceTree = "<group>"; };
 		E95F856E2007B61D0070534A /* GetPublicKeyResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPublicKeyResponse.swift; sourceTree = "<group>"; };
@@ -211,7 +211,6 @@
 		E913C8F01FFFA51D001A83F7 /* Adamant */ = {
 			isa = PBXGroup;
 			children = (
-				E95F8563200679ED0070534A /* Extensions */,
 				E91947B72000326B001362F8 /* ServerResponses */,
 				E919479920000FFD001362F8 /* Stories */,
 				E913C9091FFFA95A001A83F7 /* Models */,
@@ -270,6 +269,7 @@
 			children = (
 				E91947B12000246A001362F8 /* AdamantError.swift */,
 				E9E7CDB62003994E00DFC4DB /* AdamantUtilities.swift */,
+				E95F856420067A030070534A /* GlobalConstants.swift */,
 				E95F856A200789450070534A /* JSModels.swift */,
 				E913C90C1FFFA99B001A83F7 /* Keypair.swift */,
 			);
@@ -315,14 +315,6 @@
 				E95F856E2007B61D0070534A /* GetPublicKeyResponse.swift */,
 			);
 			path = ServerResponses;
-			sourceTree = "<group>";
-		};
-		E95F8563200679ED0070534A /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				E95F856420067A030070534A /* UIColor+globalColors.swift */,
-			);
-			path = Extensions;
 			sourceTree = "<group>";
 		};
 		E9E7CDA42002A6EB00DFC4DB /* Fonts */ = {
@@ -597,7 +589,7 @@
 				E95F857A2007F0260070534A /* ServerResponse.swift in Sources */,
 				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
 				E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */,
-				E95F856520067A030070534A /* UIColor+globalColors.swift in Sources */,
+				E95F856520067A030070534A /* GlobalConstants.swift in Sources */,
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
 				E9EC342120052ABB00C0E546 /* TransferViewController.swift in Sources */,
 				E9EC34142005178500C0E546 /* TransactionDetailsViewController.swift in Sources */,
