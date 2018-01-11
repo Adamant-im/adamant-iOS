@@ -42,7 +42,7 @@ struct Transaction {
 		self.signature = signature
 		self.confirmations = confirmations
 		
-		self.date = AdamantFormatters.decodeAdamantDate(timestamp: TimeInterval(self.timestamp))
+		self.date = AdamantUtilities.decodeAdamantDate(timestamp: TimeInterval(self.timestamp))
 	}
 }
 
@@ -82,7 +82,7 @@ extension Transaction: Decodable {
 		self.signature = try container.decode(String.self, forKey: .signature)
 		self.confirmations = try container.decode(UInt.self, forKey: .confirmations)
 		
-		self.date = AdamantFormatters.decodeAdamantDate(timestamp: TimeInterval(self.timestamp))
+		self.date = AdamantUtilities.decodeAdamantDate(timestamp: TimeInterval(self.timestamp))
 	}
 }
 

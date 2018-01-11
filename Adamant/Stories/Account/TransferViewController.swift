@@ -49,16 +49,10 @@ class TransferViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
-		let numberFormatter = NumberFormatter()
-		numberFormatter.locale = Locale.current
-		numberFormatter.numberStyle = .decimal
-		numberFormatter.minimumFractionDigits = 0
-		numberFormatter.maximumFractionDigits = 8
-		
 		// MARK: - Wallet section
 		if let account = account {
 			sendButton.isEnabled = maxToTransfer > 0.0
-			let balance = Double(account.balance) * AdamantFormatters.currencyShift
+			let balance = Double(account.balance) * AdamantUtilities.currencyShift
 			maxToTransfer = balance - defaultFee > 0 ? balance - defaultFee : 0.0
 			
 			form +++ Section("Your wallet")
@@ -67,14 +61,14 @@ class TransferViewController: FormViewController {
 				$0.value = balance
 				$0.tag = Row.Balance.tag
 				$0.disabled = true
-				$0.formatter = numberFormatter
+				$0.formatter = AdamantUtilities.currencyFormatter
 			}
 			<<< DecimalRow() {
 				$0.title = "Max to transfer"
 				$0.value = maxToTransfer
 				$0.tag = Row.MaxToTransfer.tag
 				$0.disabled = true
-				$0.formatter = numberFormatter
+				$0.formatter = AdamantUtilities.currencyFormatter
 			}
 		} else {
 			sendButton.isEnabled = false
@@ -89,7 +83,7 @@ class TransferViewController: FormViewController {
 			$0.tag = Row.Recipient.tag
 			$0.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
 				if let value = value?.uppercased(),
-					AdamantFormatters.validateAdamantAddress(address: value) {
+					AdamantUtilities.validateAdamantAddress(address: value) {
 					return nil
 				} else {
 					return ValidationError(msg: "Incorrect address")
@@ -103,7 +97,7 @@ class TransferViewController: FormViewController {
 			$0.title = "Amount"
 			$0.placeholder = "to send"
 			$0.tag = Row.Amount.tag
-			$0.formatter = numberFormatter
+			$0.formatter = AdamantUtilities.currencyFormatter
 //			$0.add(rule: RuleSmallerOrEqualThan<Double>(max: maxToTransfer))
 //			$0.validationOptions = .validatesOnChange
 			}.onChange(amountChanged)
@@ -112,14 +106,14 @@ class TransferViewController: FormViewController {
 			$0.value = defaultFee
 			$0.tag = Row.Fee.tag
 			$0.disabled = true
-			$0.formatter = numberFormatter
+			$0.formatter = AdamantUtilities.currencyFormatter
 		}
 		<<< DecimalRow() {
 			$0.title = "Amount including fee"
 			$0.value = nil
 			$0.tag = Row.Total.tag
 			$0.disabled = true
-			$0.formatter = numberFormatter
+			$0.formatter = AdamantUtilities.currencyFormatter
 		}
 		<<< ButtonRow() {
 			$0.title = "Send funds"
@@ -179,7 +173,7 @@ class TransferViewController: FormViewController {
 		totalRow.evaluateDisabled()
 		
 		if let totalAmount = totalAmount {
-			let isValid = totalAmount > 0.0 && totalAmount < (Double(account.balance) * AdamantFormatters.currencyShift )
+			let isValid = totalAmount > 0.0 && totalAmount < (Double(account.balance) * AdamantUtilities.currencyShift )
 			sendButton.isEnabled = isValid
 			row.cell.titleLabel?.textColor = isValid ? .black : .red
 		} else {
@@ -207,7 +201,7 @@ class TransferViewController: FormViewController {
 			return
 		}
 		
-		guard AdamantFormatters.validateAdamantAddress(address: recipient) else {
+		guard AdamantUtilities.validateAdamantAddress(address: recipient) else {
 			dialogService.showError(withMessage: "Enter valid recipient address")
 			return
 		}
@@ -217,7 +211,7 @@ class TransferViewController: FormViewController {
 			return
 		}
 		
-		let alert = UIAlertController(title: "Send \(amount) \(AdamantFormatters.currencyCode) to \(recipient)?", message: "You can't undo this action.", preferredStyle: .alert)
+		let alert = UIAlertController(title: "Send \(amount) \(AdamantUtilities.currencyCode) to \(recipient)?", message: "You can't undo this action.", preferredStyle: .alert)
 		let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
 		let sendAction = UIAlertAction(title: "Send", style: .default, handler: { _ in
 			dialogService.showProgress(withMessage: "Processing transaction...", userInteractionEnable: false)
@@ -229,7 +223,7 @@ class TransferViewController: FormViewController {
 					return
 				}
 				
-				apiService.transferFunds(sender: account.address, recipient: recipient, amount: AdamantFormatters.from(double: amount), keypair: keypair, completionHandler: { [weak self] (success, error) in
+				apiService.transferFunds(sender: account.address, recipient: recipient, amount: AdamantUtilities.from(double: amount), keypair: keypair, completionHandler: { [weak self] (success, error) in
 					if success {
 						dialogService.showSuccess(withMessage: "Funds sended!")
 						// TODO: goto transactions scene

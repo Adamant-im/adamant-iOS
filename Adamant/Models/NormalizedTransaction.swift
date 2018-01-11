@@ -17,7 +17,7 @@ struct NormalizedTransaction {
 	let recipientId: String
 	
 	var date: Date {
-		return AdamantFormatters.decodeAdamantDate(timestamp: TimeInterval(timestamp))
+		return AdamantUtilities.decodeAdamantDate(timestamp: TimeInterval(timestamp))
 	}
 }
 

@@ -31,6 +31,7 @@
 		E95F856B200789450070534A /* JSModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856A200789450070534A /* JSModels.swift */; };
 		E95F856D2007A91A0070534A /* ProcessTransactionResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856C2007A91A0070534A /* ProcessTransactionResponse.swift */; };
 		E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856E2007B61D0070534A /* GetPublicKeyResponse.swift */; };
+		E95F85712007D98D0070534A /* CurrencyFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85702007D98D0070534A /* CurrencyFormatterTests.swift */; };
 		E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* AccountService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
 		E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */; };
@@ -44,7 +45,7 @@
 		E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB02002B97B00DFC4DB /* AccountRoutes.swift */; };
 		E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */; };
 		E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */; };
-		E9E7CDB72003994E00DFC4DB /* AdamantFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB62003994E00DFC4DB /* AdamantFormatters.swift */; };
+		E9E7CDB72003994E00DFC4DB /* AdamantUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB62003994E00DFC4DB /* AdamantUtilities.swift */; };
 		E9E7CDBB2003AAA700DFC4DB /* RoundAvatarTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB92003AAA700DFC4DB /* RoundAvatarTableViewCell.swift */; };
 		E9E7CDBC2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */; };
 		E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */; };
@@ -122,6 +123,7 @@
 		E95F856A200789450070534A /* JSModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSModels.swift; sourceTree = "<group>"; };
 		E95F856C2007A91A0070534A /* ProcessTransactionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessTransactionResponse.swift; sourceTree = "<group>"; };
 		E95F856E2007B61D0070534A /* GetPublicKeyResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPublicKeyResponse.swift; sourceTree = "<group>"; };
+		E95F85702007D98D0070534A /* CurrencyFormatterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyFormatterTests.swift; sourceTree = "<group>"; };
 		E9E7CD8A20026B0600DFC4DB /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 		E9E7CD8C20026B6600DFC4DB /* DialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogService.swift; sourceTree = "<group>"; };
 		E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
@@ -135,7 +137,7 @@
 		E9E7CDB02002B97B00DFC4DB /* AccountRoutes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountRoutes.swift; sourceTree = "<group>"; };
 		E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRoutes.swift; sourceTree = "<group>"; };
 		E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectedRouter.swift; sourceTree = "<group>"; };
-		E9E7CDB62003994E00DFC4DB /* AdamantFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantFormatters.swift; sourceTree = "<group>"; };
+		E9E7CDB62003994E00DFC4DB /* AdamantUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantUtilities.swift; sourceTree = "<group>"; };
 		E9E7CDB92003AAA700DFC4DB /* RoundAvatarTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundAvatarTableViewCell.swift; sourceTree = "<group>"; };
 		E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RoundAvatarTableViewCell.xib; sourceTree = "<group>"; };
 		E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellFactory.swift; sourceTree = "<group>"; };
@@ -273,7 +275,7 @@
 				E91947B12000246A001362F8 /* AdamantError.swift */,
 				E913C90A1FFFA965001A83F7 /* AdamantHash.swift */,
 				E913C90C1FFFA99B001A83F7 /* Keypair.swift */,
-				E9E7CDB62003994E00DFC4DB /* AdamantFormatters.swift */,
+				E9E7CDB62003994E00DFC4DB /* AdamantUtilities.swift */,
 				E95F856A200789450070534A /* JSModels.swift */,
 			);
 			path = Helpers;
@@ -378,6 +380,7 @@
 			isa = PBXGroup;
 			children = (
 				E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */,
+				E95F85702007D98D0070534A /* CurrencyFormatterTests.swift */,
 				E9EC344820066D4A00C0E546 /* Info.plist */,
 			);
 			path = AdamantTests;
@@ -573,7 +576,7 @@
 				E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */,
 				E91947B020002393001362F8 /* AdamantApiService.swift in Sources */,
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
-				E9E7CDB72003994E00DFC4DB /* AdamantFormatters.swift in Sources */,
+				E9E7CDB72003994E00DFC4DB /* AdamantUtilities.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */,
@@ -618,6 +621,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9EC344720066D4A00C0E546 /* AddressValidationTests.swift in Sources */,
+				E95F85712007D98D0070534A /* CurrencyFormatterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

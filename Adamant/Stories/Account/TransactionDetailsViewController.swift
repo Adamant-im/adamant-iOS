@@ -88,7 +88,7 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 		switch row {
 		case .amount:
 			cell.textLabel?.text = "Amount"
-			cell.detailTextLabel?.text = AdamantFormatters.format(balance: Int64(transaction.amount))
+			cell.detailTextLabel?.text = AdamantUtilities.format(balance: transaction.amount)
 			
 		case .date:
 			cell.textLabel?.text = "Date"
@@ -100,7 +100,7 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 			
 		case .fee:
 			cell.textLabel?.text = "Fee"
-			cell.detailTextLabel?.text = AdamantFormatters.format(balance: Int64(transaction.fee))
+			cell.detailTextLabel?.text = AdamantUtilities.format(balance: transaction.fee)
 			
 		case .transactionNumber:
 			cell.textLabel?.text = "Transaction #"

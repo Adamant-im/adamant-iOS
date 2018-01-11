@@ -1,5 +1,5 @@
 //
-//  AdamantFormatters.swift
+//  AdamantUtilities.swift
 //  Adamant-ios
 //
 //  Created by Anokhov Pavel on 08.01.2018.
@@ -8,18 +8,30 @@
 
 import Foundation
 
-class AdamantFormatters {
+class AdamantUtilities {
 	private init() { }
 }
 
 
 // MARK: - Currency
-extension AdamantFormatters {
+extension AdamantUtilities {
 	static let currencyShift: Double = 0.00_000_001
 	static let currencyCode = "ADM"
 	
-	static func format(balance: Int64) -> String {
-		return "\(Double(balance) * currencyShift) \(currencyCode)"
+	static var currencyFormatter: NumberFormatter = {
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .decimal
+		formatter.roundingMode = .floor
+		formatter.positiveFormat = "#.######## \(currencyCode)"
+		return formatter
+	}()
+	
+	static func format(balance: UInt) -> String {
+		return currencyFormatter.string(from: NSNumber(value: from(int: balance)))!
+	}
+	
+	static func format(balance: Double) -> String {
+		return currencyFormatter.string(from: NSNumber(value: balance))!
 	}
 	
 	static func from(double: Double) -> UInt {
@@ -33,7 +45,7 @@ extension AdamantFormatters {
 
 
 // MARK: - Address
-extension AdamantFormatters {
+extension AdamantUtilities {
 	static let addressRegex = "^U([0-9]{6,})$"
 	
 	static func validateAdamantAddress(address: String) -> Bool {
@@ -51,7 +63,7 @@ extension AdamantFormatters {
 
 
 // MARK: - Dates
-extension AdamantFormatters {
+extension AdamantUtilities {
 	static func decodeAdamantDate(timestamp: TimeInterval) -> Date {
 		return Date(timeIntervalSince1970: timestamp + magicAdamantTimeInterval)
 	}
