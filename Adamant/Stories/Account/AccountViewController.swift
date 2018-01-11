@@ -20,7 +20,7 @@ class AccountViewController: UIViewController {
 	
 	
 	// MARK: - Dependencies
-	var loginService: LoginService!
+	var loginService: AccountService!
 	var dialogService: DialogService!
 	
 	

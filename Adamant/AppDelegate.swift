@@ -57,7 +57,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 // Initiate login
 		
-		guard let loginService = container.resolve(LoginService.self) else {
+		guard let loginService = container.resolve(AccountService.self) else {
 			fatalError("Failed to get LoginService")
 		}
 		

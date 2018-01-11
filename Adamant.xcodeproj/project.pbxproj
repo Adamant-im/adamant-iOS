@@ -31,11 +31,11 @@
 		E95F856B200789450070534A /* JSModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856A200789450070534A /* JSModels.swift */; };
 		E95F856D2007A91A0070534A /* ProcessTransactionResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856C2007A91A0070534A /* ProcessTransactionResponse.swift */; };
 		E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856E2007B61D0070534A /* GetPublicKeyResponse.swift */; };
-		E9E7CD8B20026B0600DFC4DB /* LoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* LoginService.swift */; };
+		E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* AccountService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
 		E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */; };
 		E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */; };
-		E9E7CD932002740500DFC4DB /* AdamantLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD922002740500DFC4DB /* AdamantLoginService.swift */; };
+		E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */; };
 		E9E7CD952002812400DFC4DB /* LoginDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD942002812400DFC4DB /* LoginDependencies.swift */; };
 		E9E7CDA72002AECA00DFC4DB /* Account.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9E7CDA62002AECA00DFC4DB /* Account.storyboard */; };
 		E9E7CDA92002AF1E00DFC4DB /* AccountDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDA82002AF1E00DFC4DB /* AccountDependencies.swift */; };
@@ -122,11 +122,11 @@
 		E95F856A200789450070534A /* JSModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSModels.swift; sourceTree = "<group>"; };
 		E95F856C2007A91A0070534A /* ProcessTransactionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessTransactionResponse.swift; sourceTree = "<group>"; };
 		E95F856E2007B61D0070534A /* GetPublicKeyResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPublicKeyResponse.swift; sourceTree = "<group>"; };
-		E9E7CD8A20026B0600DFC4DB /* LoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginService.swift; sourceTree = "<group>"; };
+		E9E7CD8A20026B0600DFC4DB /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 		E9E7CD8C20026B6600DFC4DB /* DialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogService.swift; sourceTree = "<group>"; };
 		E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
 		E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwinjectDependencies.swift; sourceTree = "<group>"; };
-		E9E7CD922002740500DFC4DB /* AdamantLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantLoginService.swift; sourceTree = "<group>"; };
+		E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAccountService.swift; sourceTree = "<group>"; };
 		E9E7CD942002812400DFC4DB /* LoginDependencies.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginDependencies.swift; sourceTree = "<group>"; };
 		E9E7CDA62002AECA00DFC4DB /* Account.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Account.storyboard; sourceTree = "<group>"; };
 		E9E7CDA82002AF1E00DFC4DB /* AccountDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDependencies.swift; sourceTree = "<group>"; };
@@ -236,7 +236,7 @@
 				E913C9071FFFA943001A83F7 /* AdamantCore.swift */,
 				E91947AB20001A9A001362F8 /* ApiService.swift */,
 				E9E7CD8C20026B6600DFC4DB /* DialogService.swift */,
-				E9E7CD8A20026B0600DFC4DB /* LoginService.swift */,
+				E9E7CD8A20026B0600DFC4DB /* AccountService.swift */,
 				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
 				E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */,
 			);
@@ -249,7 +249,7 @@
 				E91947AF20002393001362F8 /* AdamantApiService.swift */,
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
-				E9E7CD922002740500DFC4DB /* AdamantLoginService.swift */,
+				E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
 			);
@@ -575,8 +575,8 @@
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
 				E9E7CDB72003994E00DFC4DB /* AdamantFormatters.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
-				E9E7CD8B20026B0600DFC4DB /* LoginService.swift in Sources */,
-				E9E7CD932002740500DFC4DB /* AdamantLoginService.swift in Sources */,
+				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
+				E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */,
 				E9E7CDAC2002AFA500DFC4DB /* AccountViewController.swift in Sources */,
 				E91947B420002809001362F8 /* Account.swift in Sources */,
 				E95F85672006932C0070534A /* NormalizeTransactionResponse.swift in Sources */,

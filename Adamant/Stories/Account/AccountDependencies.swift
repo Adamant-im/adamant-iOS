@@ -11,7 +11,7 @@ import Swinject
 extension Container {
 	func registerAdamantAccountStory() {
 		self.storyboardInitCompleted(AccountViewController.self) { r, c in
-			c.loginService = r.resolve(LoginService.self)
+			c.loginService = r.resolve(AccountService.self)
 			c.dialogService = r.resolve(DialogService.self)
 		}
 		self.storyboardInitCompleted(TransactionsViewController.self) { (r, c) in
@@ -20,7 +20,7 @@ extension Container {
 		}
 		self.storyboardInitCompleted(TransferViewController.self) { (r, c) in
 			c.apiService = r.resolve(ApiService.self)
-			c.loginService = r.resolve(LoginService.self)
+			c.loginService = r.resolve(AccountService.self)
 		}
 	}
 }

@@ -1,5 +1,5 @@
 //
-//  LoginService.swift
+//  AccountService.swift
 //  Adamant-ios
 //
 //  Created by Anokhov Pavel on 07.01.2018.
@@ -16,7 +16,7 @@ extension Notification.Name {
 	static let userHasLoggedIn = Notification.Name("adamantUserHasLoggedInNotification")
 }
 
-protocol LoginService {
+protocol AccountService {
 	/// Currently logged account. nil if not logged.
 	var loggedAccount: Account? { get }
 	

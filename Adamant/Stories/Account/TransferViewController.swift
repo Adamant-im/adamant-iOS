@@ -28,7 +28,7 @@ class TransferViewController: FormViewController {
 	
 	// MARK: - Dependencies
 	var apiService: ApiService!
-	var loginService: LoginService!
+	var loginService: AccountService!
 	var dialogService: DialogService!
 	
 	private(set) var maxToTransfer: Double = 0.0
