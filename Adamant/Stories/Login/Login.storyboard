@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="jDW-6I-Kga">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Exo+2_300_normal.ttf">
+            <string>Exo2-Light</string>
+        </array>
+        <array key="Exo+2_400_normal.ttf">
+            <string>Exo2-Regular</string>
+        </array>
+    </customFonts>
+    <scenes>
+        <!--Login View Controller-->
+        <scene sceneID="kEg-Ft-tgc">
+            <objects>
+                <viewController storyboardIdentifier="LoginViewController" id="jDW-6I-Kga" customClass="LoginViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="ERy-6e-jpo">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="passphrase" textAlignment="natural" adjustsFontSizeToFit="NO" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="buP-on-jpl">
+                                <rect key="frame" x="19" y="120" width="337.5" height="30"/>
+                                <color key="textColor" red="0.29016393419999997" green="0.29021853209999998" blue="0.29015672209999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="17"/>
+                                <textInputTraits key="textInputTraits" returnKeyType="go"/>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lYa-cG-QWZ">
+                                <rect key="frame" x="168" y="158" width="38" height="30"/>
+                                <state key="normal" title="Login"/>
+                                <connections>
+                                    <action selector="login:" destination="jDW-6I-Kga" eventType="touchUpInside" id="Het-ic-0co"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SNw-tm-hwr">
+                                <rect key="frame" x="148" y="208" width="78" height="30"/>
+                                <state key="normal" title="Create new"/>
+                                <connections>
+                                    <action selector="createNewPassphrase:" destination="jDW-6I-Kga" eventType="touchUpInside" id="c8Y-dS-Co6"/>
+                                </connections>
+                            </button>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="upset regret observe kitten toilet buyer derive trouble plastic fragile taxi bulk" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="nEc-gU-r4K">
+                                <rect key="frame" x="18.5" y="246" width="337.5" height="63"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="63" id="5zz-YS-Uz8"/>
+                                </constraints>
+                                <color key="textColor" red="0.29016393419999997" green="0.29021853209999998" blue="0.29015672209999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <fontDescription key="fontDescription" name="Exo2-Light" family="Exo 2 Light" pointSize="17"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="buP-on-jpl" firstAttribute="centerX" secondItem="lgD-7z-zMG" secondAttribute="centerX" id="DtC-GL-u5D"/>
+                            <constraint firstItem="SNw-tm-hwr" firstAttribute="centerX" secondItem="lYa-cG-QWZ" secondAttribute="centerX" id="EPI-yu-RUD"/>
+                            <constraint firstItem="nEc-gU-r4K" firstAttribute="width" secondItem="ERy-6e-jpo" secondAttribute="width" multiplier="0.9" id="Je7-VQ-Qgd"/>
+                            <constraint firstItem="buP-on-jpl" firstAttribute="width" secondItem="ERy-6e-jpo" secondAttribute="width" multiplier="0.9" id="Ns0-qG-wKs"/>
+                            <constraint firstItem="nEc-gU-r4K" firstAttribute="centerX" secondItem="SNw-tm-hwr" secondAttribute="centerX" id="RCy-1J-xAS"/>
+                            <constraint firstItem="buP-on-jpl" firstAttribute="top" secondItem="lgD-7z-zMG" secondAttribute="top" constant="100" id="UBc-1L-mVr"/>
+                            <constraint firstItem="SNw-tm-hwr" firstAttribute="top" secondItem="lYa-cG-QWZ" secondAttribute="bottom" constant="20" id="Y1f-E5-GJR"/>
+                            <constraint firstItem="lYa-cG-QWZ" firstAttribute="top" secondItem="buP-on-jpl" secondAttribute="bottom" constant="8" id="cXf-m2-uCL"/>
+                            <constraint firstItem="lYa-cG-QWZ" firstAttribute="centerX" secondItem="buP-on-jpl" secondAttribute="centerX" id="d29-Ws-4hI"/>
+                            <constraint firstItem="nEc-gU-r4K" firstAttribute="top" secondItem="SNw-tm-hwr" secondAttribute="bottom" constant="8" id="xSU-Zs-zGM"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="lgD-7z-zMG"/>
+                    </view>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="newPassphraseTextArea" destination="nEc-gU-r4K" id="nI5-Zj-pHB"/>
+                        <outlet property="passphraseTextField" destination="buP-on-jpl" id="xfh-Ey-OKF"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="TEG-32-JJV" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="112.8" y="63.418290854572717"/>
+        </scene>
+    </scenes>
+</document>

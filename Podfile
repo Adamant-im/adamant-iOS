@@ -1,4 +1,4 @@
-target 'Adamant-ios' do
+target 'Adamant' do
   use_frameworks!
 
   # Network
@@ -7,4 +7,9 @@ target 'Adamant-ios' do
   # Swinject DI
   pod 'Swinject'
   pod 'SwinjectStoryboard'
+
+  # UI
+  pod 'FreakingSimpleRoundImageView' # Round avatars
+  pod 'FTIndicator' # Notifications
+  pod 'Eureka' # Forms
 end
