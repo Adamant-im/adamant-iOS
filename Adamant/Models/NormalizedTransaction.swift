@@ -43,6 +43,10 @@ extension NormalizedTransaction: Decodable {
 	}
 }
 
+extension NormalizedTransaction: WrappableModel {
+	static let ModelKey = "transaction"
+}
+
 // MARK: - JSON
 /*
 {

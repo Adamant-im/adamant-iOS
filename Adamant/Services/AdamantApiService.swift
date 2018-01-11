@@ -71,8 +71,8 @@ extension AdamantApiService {
 			return
 		}
 		
-		sendRequest(url: endpoint) { (response: AccountsResponse?, error) in
-			guard let r = response, r.success, let account = r.account else {
+		sendRequest(url: endpoint) { (response: ServerModelResponse<Account>?, error) in
+			guard let r = response, r.success, let account = r.model else {
 				completionHandler(nil, AdamantError(message: response?.error ?? "Failed to get account", error: error))
 				return
 			}
@@ -123,8 +123,8 @@ extension AdamantApiService {
 			return
 		}
 		
-		sendRequest(url: endpoint) { (response: TransactionsResponse?, error) in
-			guard let r = response, r.success, let transactions = r.transactions else {
+		sendRequest(url: endpoint) { (response: ServerCollectionResponse<Transaction>?, error) in
+			guard let r = response, r.success, let transactions = r.collection else {
 				completionHandler(nil, AdamantError(message: response?.error ?? "Failed to get transactions", error: error))
 				return
 			}
@@ -153,8 +153,8 @@ extension AdamantApiService {
 			let normalizeEndpoint = try buildUrl(command: ApiCommand.NormalizeTransaction, queryItems: nil)
 			let processEndpoin = try buildUrl(command: ApiCommand.ProcessTransaction, queryItems: nil)
 			
-			sendRequest(url: normalizeEndpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headersContentTypeJson, completionHandler: { (response: NormalizeTransactionResponse?, error) in
-				guard let r = response, r.success, let nt = r.normalizedTransaction else {
+			sendRequest(url: normalizeEndpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headersContentTypeJson, completionHandler: { (response: ServerModelResponse<NormalizedTransaction>?, error) in
+				guard let r = response, r.success, let nt = r.model else {
 					completionHandler(false, AdamantError(message: response?.error ?? "Failed to send transactions", error: error))
 					return
 				}
@@ -179,7 +179,7 @@ extension AdamantApiService {
 					"transaction": transaction
 				]
 				
-				self.sendRequest(url: processEndpoin, method: .post, parameters: request, encoding: JSONEncoding.default, headers: headersContentTypeJson, completionHandler: { (response: ProcessTransactionResponse?, error) in
+				self.sendRequest(url: processEndpoin, method: .post, parameters: request, encoding: JSONEncoding.default, headers: headersContentTypeJson, completionHandler: { (response: ServerResponse?, error) in
 					guard let r = response, r.success else {
 						completionHandler(false, AdamantError(message: response?.error ?? "Failed to process transaction", error: error))
 						return

@@ -44,6 +44,10 @@ extension Account: Decodable {
 	}
 }
 
+extension Account: WrappableModel {
+	static let ModelKey = "account"
+}
+
 // MARK: - JSON
 /*
 {

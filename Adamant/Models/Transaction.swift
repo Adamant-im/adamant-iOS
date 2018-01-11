@@ -86,6 +86,13 @@ extension Transaction: Decodable {
 	}
 }
 
+extension Transaction: WrappableCollection {
+	static let CollectionKey = "transactions"
+}
+
+//extension Array where Transaction {
+//	static let Key = "transactions"
+//}
 
 // MARK: - JSON
 /*
