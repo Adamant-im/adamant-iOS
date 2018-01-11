@@ -16,5 +16,5 @@ protocol ApiService {
 	
 	func getTransactions(forAccount: String, type: TransactionType, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void)
 	
-//	func transferMoney
+	func transferFunds(sender: String, recipient: String, amount: UInt, keypair: Keypair, completionHandler: @escaping (Bool, AdamantError?) -> Void)
 }

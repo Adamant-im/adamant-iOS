@@ -12,6 +12,7 @@ import Eureka
 class TransferViewController: FormViewController {
 	private struct Row {
 		static let Amount = Row("amount")
+		static let Reciever = Row("reciever")
 		static let Fee = Row("fee")
 		static let Total = Row("total")
 		static let SendButton = Row("send")
@@ -62,13 +63,22 @@ class TransferViewController: FormViewController {
 		// MARK: - Transfer section
 		form +++ Section("transfer info")
 		
-		<<< TextRow() { r in
-			r.title = "Address"
-			r.placeholder = "of the reciever"
-//			r.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
-//				
-//			}))
-		}
+		<<< TextRow() {
+			$0.title = "Address"
+			$0.placeholder = "of the reciever"
+			$0.tag = Row.Reciever.tag
+			$0.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
+				if let value = value?.uppercased(),
+					AdamantFormatters.validateAdamantAddress(address: value) {
+					return nil
+				} else {
+					return ValidationError(msg: "Incorrect address")
+				}
+			}))
+			$0.validationOptions = .validatesOnBlur
+		}.cellUpdate({ (cell, row) in
+			cell.titleLabel?.textColor = row.isValid ? .black : .red
+		})
 		<<< DecimalRow() {
 			$0.title = "Amount"
 			$0.placeholder = "to send"
@@ -154,5 +164,21 @@ class TransferViewController: FormViewController {
 	// MARK: - IBActions
 	
 	@IBAction func sendFunds(_ sender: Any) {
+		guard let recieverRow = form.rowBy(tag: Row.Reciever.tag) as? TextRow,
+			let reciever = recieverRow.value,
+			AdamantFormatters.validateAdamantAddress(address: reciever),
+			let totalRow = form.rowBy(tag: Row.Total.tag) as? DecimalRow,
+			let amount = totalRow.value else {
+			return
+		}
+		
+		let alert = UIAlertController(title: "Send \(amount) \(AdamantFormatters.currencyCode) to \(reciever)?", message: "You can't undo this action.", preferredStyle: .alert)
+		let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+		// TODO: handler
+		let sendAction = UIAlertAction(title: "Send", style: .default, handler: nil)
+		alert.addAction(cancelAction)
+		alert.addAction(sendAction)
+		
+		present(alert, animated: true, completion: nil)
 	}
 }

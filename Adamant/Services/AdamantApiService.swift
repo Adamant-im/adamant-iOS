@@ -12,6 +12,7 @@ import Alamofire
 private struct ApiCommand {
 	static let Accounts = ApiCommand("/api/accounts")
 	static let Transactions = ApiCommand("/api/transactions")
+	static let NormalizeTransaction = ApiCommand("/api/transactions/normalize")
 	
 	let path: String
 	private init(_ path: String) {
@@ -108,6 +109,42 @@ extension AdamantApiService {
 			}
 			
 			completionHandler(transactions, nil)
+		}
+	}
+}
+
+
+// MAKR: - Transfers
+extension AdamantApiService {
+	func transferFunds(sender: String, recipient: String, amount: UInt, keypair: Keypair, completionHandler: @escaping (Bool, AdamantError?) -> Void) {
+		let parameters: [String : Any] = [
+			"type": TransactionType.send.rawValue,
+			"amount": amount,
+			"recipientId": recipient,
+			"senderId": sender,
+			"publicKey": keypair.publicKey.hex
+		]
+		let headers: HTTPHeaders = [
+			"Content-Type": "application/json"
+		]
+		
+		do {
+			let endpoint = try buildUrl(command: ApiCommand.NormalizeTransaction, queryItems: nil)
+			
+			sendRequest(url: endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers, completionHandler: { (response: NormalizeTransactionResponse?, error) in
+				guard let r = response, r.success, let transaction = r.normalizedTransaction else {
+					completionHandler(false, AdamantError(message: response?.error ?? "Failed to send transactions", error: error))
+					return
+				}
+				
+				let signature = self.adamantCore.sign(transaction: transaction, senderId: sender, keypair: keypair)
+				// TODO: process transaction
+				
+				
+				completionHandler(true, nil)
+			})
+		} catch {
+			completionHandler(false, AdamantError(message: "Failed to send request", error: error))
 		}
 	}
 }

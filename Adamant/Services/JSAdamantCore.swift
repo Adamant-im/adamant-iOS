@@ -13,6 +13,7 @@ private struct JSFunctions {
 	struct CoreFunction {
 		static let createPassPhraseHash = CoreFunction("createPassPhraseHash")
 		static let makeKeypair = CoreFunction("makeKeypair")
+		static let transactionSign = CoreFunction("transactionSign")
 		
 		let key: String
 		private init(_ key: String) { self.key = key }
@@ -204,5 +205,32 @@ extension JSAdamantCore: AdamantCore {
 		
 		context.exceptionHandler = nil
 		return hash
+	}
+	
+	func sign(transaction t: NormalizedTransaction, senderId: String, keypair: Keypair) -> String? {
+		guard let function = getCoreFunction(function: .transactionSign), !function.isUndefined else {
+			return nil
+		}
+		
+		let jsTransaction = JSTransaction(id: 0, height: 0, blockId: 0, type: t.type.rawValue, timestamp: t.timestamp, senderPublicKey: t.senderPublicKey, senderId: senderId, recipientId: t.recipientId, recipientPublicKey: t.requesterPublicKey, amount: t.amount, fee: 0, signature: "", confirmations: 0)
+		let jsKeypair = JSKeypair(keypair: keypair)
+		
+		var jsError: JSValue? = nil
+		context.exceptionHandler = { ctx, exc in
+			print(exc!)
+			jsError = exc
+		}
+		
+		let signature: String?
+		if let jsSignature = function.call(withArguments: [jsTransaction, jsKeypair]),
+			!jsSignature.isUndefined, jsError == nil {
+			signature = jsSignature.toString()
+		} else {
+			signature = nil
+			print(jsError)
+		}
+		
+		context.exceptionHandler = nil
+		return signature
 	}
 }

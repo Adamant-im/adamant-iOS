@@ -42404,8 +42404,8 @@ class Adamant {
   }
 
   static transactionSign (trs, keypair) {
-    var hash = this.getHash(trs)
-    return this.sign(hash, keypair).toString('hex')
+    var hash = Adamant.getHash(trs)
+    return Adamant.sign(hash, keypair).toString('hex')
   }
 
   static chatGetBytes (trs) {
