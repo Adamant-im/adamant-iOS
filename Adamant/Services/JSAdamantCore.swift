@@ -227,7 +227,6 @@ extension JSAdamantCore: AdamantCore {
 			signature = jsSignature.toString()
 		} else {
 			signature = nil
-			print(jsError)
 		}
 		
 		context.exceptionHandler = nil

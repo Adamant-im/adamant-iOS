@@ -18,5 +18,9 @@ extension Container {
 			c.apiService = r.resolve(ApiService.self)
 			c.cellFactory = r.resolve(CellFactory.self)
 		}
+		self.storyboardInitCompleted(TransferViewController.self) { (r, c) in
+			c.apiService = r.resolve(ApiService.self)
+			c.loginService = r.resolve(LoginService.self)
+		}
 	}
 }

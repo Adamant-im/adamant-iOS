@@ -8,11 +8,12 @@
 
 import UIKit
 import Eureka
+import FTIndicator
 
 class TransferViewController: FormViewController {
 	private struct Row {
 		static let Amount = Row("amount")
-		static let Reciever = Row("reciever")
+		static let Recipient = Row("recipient")
 		static let Fee = Row("fee")
 		static let Total = Row("total")
 		static let SendButton = Row("send")
@@ -24,7 +25,12 @@ class TransferViewController: FormViewController {
 	}
 	
 	
-	// MAKR: - Properties
+	// MARK: - Dependencies
+	var apiService: ApiService!
+	var loginService: LoginService!
+	
+	
+	// MARK: - Properties
 	let defaultFee = 0.5
 	var account: Account?
 	
@@ -65,8 +71,8 @@ class TransferViewController: FormViewController {
 		
 		<<< TextRow() {
 			$0.title = "Address"
-			$0.placeholder = "of the reciever"
-			$0.tag = Row.Reciever.tag
+			$0.placeholder = "of the recipient"
+			$0.tag = Row.Recipient.tag
 			$0.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
 				if let value = value?.uppercased(),
 					AdamantFormatters.validateAdamantAddress(address: value) {
@@ -164,18 +170,42 @@ class TransferViewController: FormViewController {
 	// MARK: - IBActions
 	
 	@IBAction func sendFunds(_ sender: Any) {
-		guard let recieverRow = form.rowBy(tag: Row.Reciever.tag) as? TextRow,
-			let reciever = recieverRow.value,
-			AdamantFormatters.validateAdamantAddress(address: reciever),
+		guard let account = loginService.loggedAccount, let keypair = loginService.keypair else {
+			return
+		}
+		
+		guard let recipientRow = form.rowBy(tag: Row.Recipient.tag) as? TextRow,
+			let recipient = recipientRow.value,
+			AdamantFormatters.validateAdamantAddress(address: recipient),
 			let totalRow = form.rowBy(tag: Row.Total.tag) as? DecimalRow,
 			let amount = totalRow.value else {
 			return
 		}
 		
-		let alert = UIAlertController(title: "Send \(amount) \(AdamantFormatters.currencyCode) to \(reciever)?", message: "You can't undo this action.", preferredStyle: .alert)
+		let alert = UIAlertController(title: "Send \(amount) \(AdamantFormatters.currencyCode) to \(recipient)?", message: "You can't undo this action.", preferredStyle: .alert)
 		let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-		// TODO: handler
-		let sendAction = UIAlertAction(title: "Send", style: .default, handler: nil)
+		let sendAction = UIAlertAction(title: "Send", style: .default, handler: { _ in
+			FTIndicator.showProgress(withMessage: "Processing transaction...", userInteractionEnable: false)
+			
+			// Check if address is valid
+			self.apiService.getPublicKey(byAddress: recipient, completionHandler: { (key, error) in
+				guard key != nil else {
+					FTIndicator.showError(withMessage: "Account not found: \(recipient)")
+					return
+				}
+				
+				self.apiService.transferFunds(sender: account.address, recipient: recipient, amount: AdamantFormatters.from(double: amount), keypair: keypair, completionHandler: { [weak self] (success, error) in
+					if success {
+						FTIndicator.showSuccess(withMessage: "Funds sended!")
+						// TODO: goto transactions scene
+						self?.dismiss(animated: true, completion: nil)
+					} else {
+						FTIndicator.showError(withMessage: error?.message ?? "Failed. Try later.")
+					}
+				})
+			})
+		})
+		
 		alert.addAction(cancelAction)
 		alert.addAction(sendAction)
 		

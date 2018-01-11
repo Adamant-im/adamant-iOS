@@ -11,8 +11,10 @@ import Alamofire
 
 private struct ApiCommand {
 	static let Accounts = ApiCommand("/api/accounts")
+	static let GetPublicKey = ApiCommand("/api/accounts/getPublicKey")
 	static let Transactions = ApiCommand("/api/transactions")
 	static let NormalizeTransaction = ApiCommand("/api/transactions/normalize")
+	static let ProcessTransaction = ApiCommand("/api/transactions/process")
 	
 	let path: String
 	private init(_ path: String) {
@@ -87,6 +89,25 @@ extension AdamantApiService {
 		
 		completionHandler(keypair.publicKey, nil)
 	}
+	
+	func getPublicKey(byAddress address: String, completionHandler: @escaping (String?, AdamantError?) -> Void) {
+		let endpoint: URL
+		do {
+			endpoint = try buildUrl(command: ApiCommand.GetPublicKey, queryItems: [URLQueryItem(name: "account", value: address)])
+		} catch {
+			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
+			return
+		}
+		
+		sendRequest(url: endpoint) { (response: GetPublicKeyResponse?, error) in
+			guard let r = response, r.success, let key = r.publicKey else {
+				completionHandler(nil, AdamantError(message: response?.error ?? "Can't get publickey", error: error))
+				return
+			}
+			
+			completionHandler(key, nil)
+		}
+	}
 }
 
 
@@ -124,24 +145,48 @@ extension AdamantApiService {
 			"senderId": sender,
 			"publicKey": keypair.publicKey.hex
 		]
-		let headers: HTTPHeaders = [
+		let headersContentTypeJson: HTTPHeaders = [
 			"Content-Type": "application/json"
 		]
 		
 		do {
-			let endpoint = try buildUrl(command: ApiCommand.NormalizeTransaction, queryItems: nil)
+			let normalizeEndpoint = try buildUrl(command: ApiCommand.NormalizeTransaction, queryItems: nil)
+			let processEndpoin = try buildUrl(command: ApiCommand.ProcessTransaction, queryItems: nil)
 			
-			sendRequest(url: endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers, completionHandler: { (response: NormalizeTransactionResponse?, error) in
-				guard let r = response, r.success, let transaction = r.normalizedTransaction else {
+			sendRequest(url: normalizeEndpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headersContentTypeJson, completionHandler: { (response: NormalizeTransactionResponse?, error) in
+				guard let r = response, r.success, let nt = r.normalizedTransaction else {
 					completionHandler(false, AdamantError(message: response?.error ?? "Failed to send transactions", error: error))
 					return
 				}
 				
-				let signature = self.adamantCore.sign(transaction: transaction, senderId: sender, keypair: keypair)
-				// TODO: process transaction
+				guard let signature = self.adamantCore.sign(transaction: nt, senderId: sender, keypair: keypair) else {
+					completionHandler(false, AdamantError(message: "Failed to sign transaction"))
+					return
+				}
 				
+				let transaction: [String: Encodable] = [
+					"type": TransactionType.send.rawValue,
+					"amount": amount,
+					"senderPublicKey": keypair.publicKey.hex,
+					"requesterPublicKey": nt.requesterPublicKey,
+					"timestamp": nt.timestamp,
+					"recipientId": recipient,
+					"senderId": sender,
+					"signature": signature
+				]
 				
-				completionHandler(true, nil)
+				let request: [String: Encodable] = [
+					"transaction": transaction
+				]
+				
+				self.sendRequest(url: processEndpoin, method: .post, parameters: request, encoding: JSONEncoding.default, headers: headersContentTypeJson, completionHandler: { (response: ProcessTransactionResponse?, error) in
+					guard let r = response, r.success else {
+						completionHandler(false, AdamantError(message: response?.error ?? "Failed to process transaction", error: error))
+						return
+					}
+					
+					completionHandler(true, nil)
+				})
 			})
 		} catch {
 			completionHandler(false, AdamantError(message: "Failed to send request", error: error))

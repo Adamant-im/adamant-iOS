@@ -20,20 +20,23 @@ class AdamantLoginService: LoginService {
 	// MARK: - Dependencies
 	
 	let apiService: ApiService
+	let core: AdamantCore
 	let router: Router
 	let dialogService: DialogService
 	
 	
 	// MARK: - Properties
-	var loggedAccount: Account?
+	private(set) var loggedAccount: Account?
+	private(set) var keypair: Keypair?
 	
 	private var loginViewController: UIViewController? = nil
 	private var storyboardAuthorizationFinishedCallbacks: [(() -> Void)]?
 	
 	
 	// MARK: - Initialization
-	init(apiService: ApiService, dialogService: DialogService, router: Router) {
+	init(apiService: ApiService, adamantCore: AdamantCore, dialogService: DialogService, router: Router) {
 		self.apiService = apiService
+		self.core = adamantCore
 		self.dialogService = dialogService
 		self.router = router
 	}
@@ -46,6 +49,8 @@ class AdamantLoginService: LoginService {
 			self.apiService.getAccount(byPassphrase: passphrase) { (account, error) in
 				if let account = account {
 					self.loggedAccount = account
+					self.keypair = self.core.createKeypairFor(passphrase: passphrase)
+					
 					NotificationCenter.default.post(name: Notification.Name.userHasLoggedIn, object: account)
 					
 					if let vc = self.loginViewController {
@@ -69,9 +74,12 @@ class AdamantLoginService: LoginService {
 	}
 	
 	func logout() {
-		if loggedAccount != nil {
+		let wasLogged = loggedAccount != nil
+		loggedAccount = nil
+		keypair = nil
+		
+		if wasLogged {
 			NotificationCenter.default.post(name: Notification.Name.userHasLoggedOut, object: nil)
-			loggedAccount = nil
 		}
 	}
 }

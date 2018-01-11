@@ -20,6 +20,9 @@ protocol LoginService {
 	/// Currently logged account. nil if not logged.
 	var loggedAccount: Account? { get }
 	
+	/// Keypair of logged account
+	var keypair: Keypair? { get }
+	
 	/// Login into Adamant using passphrase.
 	///
 	/// - Parameters:

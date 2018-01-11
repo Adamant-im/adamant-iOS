@@ -18,6 +18,7 @@ extension Container {
 		self.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
 		self.register(ApiService.self) { r in AdamantApiService(apiUrl: apiUrl, adamantCore: r.resolve(AdamantCore.self)!) }.inObjectScope(.container)
 		self.register(LoginService.self) { r in AdamantLoginService(apiService: r.resolve(ApiService.self)!,
+																	adamantCore: r.resolve(AdamantCore.self)! ,
 																	dialogService: r.resolve(DialogService.self)!,
 																	router: r.resolve(Router.self)!) }.inObjectScope(.container)
 	}

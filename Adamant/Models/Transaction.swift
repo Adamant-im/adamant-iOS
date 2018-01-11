@@ -26,6 +26,24 @@ struct Transaction {
 	
 	// let signatures: [Any]
 	// let asset: Any?
+
+	init(id: UInt, height: UInt, blockId: UInt, type: TransactionType, timestamp: UInt, senderPublicKey: String, senderId: String, recipientId: String, recipientPublicKey: String, amount: UInt, fee: UInt, signature: String, confirmations: UInt) {
+		self.id = id
+		self.height = height
+		self.blockId = blockId
+		self.type = type
+		self.timestamp = timestamp
+		self.senderPublicKey = senderPublicKey
+		self.senderId = senderId
+		self.recipientId = recipientId
+		self.recipientPublicKey = recipientPublicKey
+		self.amount = amount
+		self.fee = fee
+		self.signature = signature
+		self.confirmations = confirmations
+		
+		self.date = AdamantFormatters.decodeAdamantDate(timestamp: TimeInterval(self.timestamp))
+	}
 }
 
 extension Transaction: Decodable {
@@ -54,6 +72,7 @@ extension Transaction: Decodable {
 		self.height = try container.decode(UInt.self, forKey: .height)
 		self.blockId = UInt(try container.decode(String.self, forKey: .blockId))!
 		self.type = try container.decode(TransactionType.self, forKey: .type)
+		self.timestamp = try container.decode(UInt.self, forKey: .timestamp)
 		self.senderPublicKey = try container.decode(String.self, forKey: .senderPublicKey)
 		self.senderId = try container.decode(String.self, forKey: .senderId)
 		self.recipientId = try container.decode(String.self, forKey: .recipientId)
@@ -63,7 +82,6 @@ extension Transaction: Decodable {
 		self.signature = try container.decode(String.self, forKey: .signature)
 		self.confirmations = try container.decode(UInt.self, forKey: .confirmations)
 		
-		self.timestamp = try container.decode(UInt.self, forKey: .timestamp)
 		self.date = AdamantFormatters.decodeAdamantDate(timestamp: TimeInterval(self.timestamp))
 	}
 }
