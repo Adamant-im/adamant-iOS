@@ -9,6 +9,6 @@
 import Foundation
 
 struct Keypair {
-	let publicKey: AdamantHash
-	let privateKey: AdamantHash
+	let publicKey: String
+	let privateKey: String
 }

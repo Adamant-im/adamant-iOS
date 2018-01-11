@@ -20,7 +20,7 @@ class AccountViewController: UIViewController {
 	
 	
 	// MARK: - Dependencies
-	var loginService: LoginService!
+	var loginService: AccountService!
 	var dialogService: DialogService!
 	
 	
@@ -119,8 +119,8 @@ extension AccountViewController: UITableViewDataSource {
 		} else {
 			cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
 			cell.accessoryType = .disclosureIndicator
-			cell.textLabel?.font = UIFont(name: "Exo 2", size: 17)
-			cell.detailTextLabel?.font = UIFont(name: "Exo 2", size: 12)
+			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+			cell.detailTextLabel?.font = UIFont.adamantPrimary(size: 12)
 			
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 			cell.detailTextLabel?.textColor = UIColor.adamantSecondary
@@ -134,7 +134,7 @@ extension AccountViewController: UITableViewDataSource {
 			
 		case .balance:
 			cell.textLabel?.text = "Your balance"
-			cell.detailTextLabel?.text = AdamantFormatters.format(balance: account.balance)
+			cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
 			cell.imageView?.image = #imageLiteral(resourceName: "wallet")
 			break
 			

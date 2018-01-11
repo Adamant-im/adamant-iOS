@@ -8,23 +8,16 @@
 
 import Foundation
 
-struct GetPublicKeyResponse {
-	let success: Bool
-	let error: String?
+class GetPublicKeyResponse: ServerResponse {
 	let publicKey: String?
-}
-
-extension GetPublicKeyResponse: Decodable {
-	enum CodingKeys: String, CodingKey {
-		case success, error, publicKey
-	}
 	
-	init(from decoder: Decoder) throws {
+	required init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let success = try container.decode(Bool.self, forKey: .success)
+		let error = try? container.decode(String.self, forKey: .error)
+		self.publicKey = try? container.decode(String.self, forKey: CodingKeys.init(stringValue: "publicKey")!)
 		
-		self.success = try container.decode(Bool.self, forKey: .success)
-		self.error = try? container.decode(String.self, forKey: .error)
-		self.publicKey = try? container.decode(String.self, forKey: .publicKey)
+		super.init(success: success, error: error)
 	}
 }
 

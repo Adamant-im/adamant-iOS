@@ -79,16 +79,15 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 			cell.detailTextLabel?.textColor = UIColor.adamantSecondary
 			
-			if let font = UIFont(name: "Exo 2", size: 17) {
-				cell.textLabel?.font = font
-				cell.detailTextLabel?.font = font
-			}
+			let font = UIFont.adamantPrimary(size: 17)
+			cell.textLabel?.font = font
+			cell.detailTextLabel?.font = font
 		}
 		
 		switch row {
 		case .amount:
 			cell.textLabel?.text = "Amount"
-			cell.detailTextLabel?.text = AdamantFormatters.format(balance: Int64(transaction.amount))
+			cell.detailTextLabel?.text = AdamantUtilities.format(balance: transaction.amount)
 			
 		case .date:
 			cell.textLabel?.text = "Date"
@@ -100,7 +99,7 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 			
 		case .fee:
 			cell.textLabel?.text = "Fee"
-			cell.detailTextLabel?.text = AdamantFormatters.format(balance: Int64(transaction.fee))
+			cell.detailTextLabel?.text = AdamantUtilities.format(balance: transaction.fee)
 			
 		case .transactionNumber:
 			cell.textLabel?.text = "Transaction #"

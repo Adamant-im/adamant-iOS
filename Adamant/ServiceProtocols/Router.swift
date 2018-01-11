@@ -45,7 +45,6 @@ struct AdamantScene: Equatable, Hashable {
 }
 
 
-
 // MARK: - Adamant Router
 protocol Router {
 	func get(story: AdamantStory) -> UIStoryboard

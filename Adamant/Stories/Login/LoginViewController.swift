@@ -10,7 +10,7 @@ import UIKit
 
 class LoginViewController: UIViewController {
 	// MARK: - Dependencies
-	var loginService: LoginService?
+	var loginService: AccountService!
 	
 	
 	// MARK: - IBOutlets
@@ -32,7 +32,7 @@ class LoginViewController: UIViewController {
 			return
 		}
 		
-		loginService?.login(passphrase: passphrase, loginCompletionHandler: nil)
+		loginService.login(passphrase: passphrase, loginCompletionHandler: nil)
 	}
 	
 	@IBAction func createNewPassphrase(_ sender: Any) {

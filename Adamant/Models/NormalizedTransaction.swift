@@ -17,7 +17,7 @@ struct NormalizedTransaction {
 	let recipientId: String
 	
 	var date: Date {
-		return AdamantFormatters.decodeAdamantDate(timestamp: TimeInterval(timestamp))
+		return AdamantUtilities.decodeAdamantDate(timestamp: TimeInterval(timestamp))
 	}
 }
 
@@ -41,6 +41,10 @@ extension NormalizedTransaction: Decodable {
 		self.timestamp = try container.decode(UInt.self, forKey: .timestamp)
 		self.recipientId = try container.decode(String.self, forKey: .recipientId)
 	}
+}
+
+extension NormalizedTransaction: WrappableModel {
+	static let ModelKey = "transaction"
 }
 
 // MARK: - JSON

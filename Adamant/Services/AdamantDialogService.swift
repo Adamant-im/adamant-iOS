@@ -1,5 +1,5 @@
 //
-//  SimpleDialogService.swift
+//  AdamantDialogService.swift
 //  Adamant-ios
 //
 //  Created by Anokhov Pavel on 07.01.2018.
@@ -9,7 +9,7 @@
 import UIKit
 import FTIndicator
 
-class SwinjectedDialogService: DialogService {
+class AdamantDialogService: DialogService {
 	// Configure notifications
 	init() {
 		FTIndicator.setIndicatorStyle(.dark)
@@ -32,7 +32,7 @@ class SwinjectedDialogService: DialogService {
 
 
 // MARK: - Toast
-extension SwinjectedDialogService {
+extension AdamantDialogService {
 	func showToastMessage(_ message: String) {
 		FTIndicator.showToastMessage(message)
 	}
@@ -40,7 +40,7 @@ extension SwinjectedDialogService {
 
 
 // MARK: - Indicators
-extension SwinjectedDialogService {
+extension AdamantDialogService {
 	func showProgress(withMessage message: String, userInteractionEnable enabled: Bool) {
 		FTIndicator.showProgress(withMessage: message, userInteractionEnable: enabled)
 	}

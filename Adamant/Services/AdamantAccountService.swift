@@ -1,5 +1,5 @@
 //
-//  AdamantLoginService.swift
+//  AdamantAccountService.swift
 //  Adamant-ios
 //
 //  Created by Anokhov Pavel on 07.01.2018.
@@ -15,7 +15,7 @@ private struct Constants {
 	private init() {}
 }
 
-class AdamantLoginService: LoginService {
+class AdamantAccountService: AccountService {
 	
 	// MARK: - Dependencies
 	
@@ -86,7 +86,7 @@ class AdamantLoginService: LoginService {
 
 
 // MARK: - LoginService
-extension AdamantLoginService {
+extension AdamantAccountService {
 	func logoutAndPresentLoginStoryboard(animated: Bool, authorizationFinishedHandler: (() -> Void)?) {
 		logout()
 		

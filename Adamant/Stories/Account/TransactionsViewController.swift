@@ -126,7 +126,7 @@ extension TransactionsViewController: UITableViewDataSource {
 			cell.accountLabel.text = transaction.senderId
 		}
 		
-		cell.ammountLabel.text = AdamantFormatters.format(balance: Int64(Int(transaction.amount)))
+		cell.ammountLabel.text = AdamantUtilities.format(balance: transaction.amount)
 		cell.dateLabel.text = DateFormatter.localizedString(from: transaction.date, dateStyle: .short, timeStyle: .medium)
 		
 		return cell

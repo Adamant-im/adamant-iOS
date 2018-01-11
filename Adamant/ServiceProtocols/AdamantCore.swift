@@ -9,9 +9,8 @@
 import Foundation
 
 protocol AdamantCore {
-	func createHashFor(passphrase: String) -> AdamantHash?
+	func createHashFor(passphrase: String) -> String?
 	
-	func createKeypairFor(hash: AdamantHash) -> Keypair?
 	func createKeypairFor(passphrase: String) -> Keypair?
 	
 	func sign(transaction: NormalizedTransaction, senderId: String, keypair: Keypair) -> String?

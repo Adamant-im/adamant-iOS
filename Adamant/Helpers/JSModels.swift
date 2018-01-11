@@ -40,8 +40,8 @@ import JavaScriptCore
 	}
 	
 	init(keypair: Keypair) {
-		self.publicKey = keypair.publicKey.hex
-		self.privateKey = keypair.privateKey.hex
+		self.publicKey = keypair.publicKey
+		self.privateKey = keypair.privateKey
 	}
 }
 
