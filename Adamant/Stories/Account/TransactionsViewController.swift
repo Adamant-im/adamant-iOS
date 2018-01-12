@@ -86,7 +86,7 @@ extension TransactionsViewController {
 
 
 // MARK: - UITableViewDataSource
-extension TransactionsViewController: UITableViewDataSource {
+extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate {
 	func numberOfSections(in tableView: UITableView) -> Int {
 		return 1
 	}
@@ -107,6 +107,18 @@ extension TransactionsViewController: UITableViewDataSource {
 		return SharedCell.TransactionCell.defaultRowHeight
 	}
 	
+	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		guard let transaction = transactions?[indexPath.row] else {
+			return
+		}
+		
+		performSegue(withIdentifier: transactionDetailsSegue, sender: transaction)
+	}
+}
+
+
+// MARK: - UITableView Cells
+extension TransactionsViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		guard let account = account, let transaction = transactions?[indexPath.row] else {
 			// TODO: Display & Log error
@@ -130,17 +142,5 @@ extension TransactionsViewController: UITableViewDataSource {
 		cell.dateLabel.text = DateFormatter.localizedString(from: transaction.date, dateStyle: .short, timeStyle: .medium)
 		
 		return cell
-	}
-}
-
-
-// MARK: - UITableViewDelegate
-extension TransactionsViewController: UITableViewDelegate {
-	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		guard let transaction = transactions?[indexPath.row] else {
-			return
-		}
-		
-		performSegue(withIdentifier: transactionDetailsSegue, sender: transaction)
 	}
 }

@@ -36,7 +36,7 @@ class ChatsListViewController: UIViewController {
 
 
 
-// MARK: - UITableView Delegate & Datasource
+// MARK: - UITableView
 extension ChatsListViewController: UITableViewDelegate, UITableViewDataSource {
 	func numberOfSections(in tableView: UITableView) -> Int {
 		return 2
@@ -62,7 +62,11 @@ extension ChatsListViewController: UITableViewDelegate, UITableViewDataSource {
 	func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
 		return UIView()
 	}
-	
+}
+
+
+// MARK: - UITableView Cells
+extension ChatsListViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		if indexPath.section == 0 {
 			let cell: UITableViewCell

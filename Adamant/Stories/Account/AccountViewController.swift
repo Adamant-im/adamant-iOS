@@ -79,11 +79,8 @@ class AccountViewController: UIViewController {
 }
 
 
-// MARK: - UITableViewDataSource
-extension AccountViewController: UITableViewDataSource {
-	
-	// MARK: Configuring TableView
-	
+// MARK: - UITableView
+extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 	func numberOfSections(in tableView: UITableView) -> Int {
 		return 1
 	}
@@ -104,13 +101,51 @@ extension AccountViewController: UITableViewDataSource {
 		return UIView()
 	}
 	
-	
-	// MARK: Cells
-	
+	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		guard let row = Rows(rawValue: indexPath.row) else {
+			return
+		}
+		
+		switch row {
+		case .accountNumber:
+			tableView.deselectRow(at: indexPath, animated: true)
+			
+			guard let address = self.loginService.loggedAccount?.address else {
+				return
+			}
+			
+			let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+			
+			alert.addAction(UIAlertAction(title: "Copy To Pasteboard", style: .default, handler: { _ in
+				UIPasteboard.general.string = address
+				self.dialogService.showToastMessage("\(address)\nCopied To Pasteboard!")
+			}))
+			
+			alert.addAction(UIAlertAction(title: "Share", style: .default, handler: { _ in
+				let vc = UIActivityViewController(activityItems: [address], applicationActivities: nil)
+				self.present(vc, animated: true)
+			}))
+			
+			alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+			
+			present(alert, animated: true)
+			
+		case .balance:
+			performSegue(withIdentifier: showTransactionsSegue, sender: nil)
+			
+		case .sendTokens:
+			performSegue(withIdentifier: showTransferSegue, sender: nil)
+		}
+	}
+}
+
+
+// MARK: - UITableView Cells
+extension AccountViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		guard let account = loginService.loggedAccount,
 			let row = Rows(rawValue: indexPath.row) else {
-			return UITableViewCell(style: .default, reuseIdentifier: nil)
+				return UITableViewCell(style: .default, reuseIdentifier: nil)
 		}
 		
 		let cell: UITableViewCell
@@ -148,46 +183,5 @@ extension AccountViewController: UITableViewDataSource {
 		}
 		
 		return cell
-	}
-}
-
-
-// MARK: - UITableViewDelegate
-extension AccountViewController: UITableViewDelegate {
-	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		guard let row = Rows(rawValue: indexPath.row) else {
-			return
-		}
-		
-		switch row {
-		case .accountNumber:
-			tableView.deselectRow(at: indexPath, animated: true)
-			
-			guard let address = self.loginService.loggedAccount?.address else {
-				return
-			}
-			
-			let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-			
-			alert.addAction(UIAlertAction(title: "Copy To Pasteboard", style: .default, handler: { _ in
-				UIPasteboard.general.string = address
-				self.dialogService.showToastMessage("\(address)\nCopied To Pasteboard!")
-			}))
-			
-			alert.addAction(UIAlertAction(title: "Share", style: .default, handler: { _ in
-				let vc = UIActivityViewController(activityItems: [address], applicationActivities: nil)
-				self.present(vc, animated: true)
-			}))
-			
-			alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-			
-			present(alert, animated: true)
-			
-		case .balance:
-			performSegue(withIdentifier: showTransactionsSegue, sender: nil)
-			
-		case .sendTokens:
-			performSegue(withIdentifier: showTransferSegue, sender: nil)
-		}
 	}
 }
