@@ -21,6 +21,11 @@ private struct ApiCommands {
 		normalizeTransaction: "/api/transactions/normalize",
 		processTransaction: "/api/transactions/process"
 	)
+	
+	static let Chats = (
+		root: "/api/chats",
+		get: "chats/get"
+	)
 }
 
 
@@ -157,7 +162,7 @@ extension AdamantApiService {
 			
 			sendRequest(url: normalizeEndpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headersContentTypeJson, completionHandler: { (response: ServerModelResponse<NormalizedTransaction>?, error) in
 				guard let r = response, r.success, let nt = r.model else {
-					completionHandler(false, AdamantError(message: response?.error ?? "Failed to send transactions", error: error))
+					completionHandler(false, AdamantError(message: response?.error ?? "Failed to get transactions", error: error))
 					return
 				}
 				
@@ -192,6 +197,33 @@ extension AdamantApiService {
 			})
 		} catch {
 			completionHandler(false, AdamantError(message: "Failed to send request", error: error))
+		}
+	}
+}
+
+
+// MARK: - Chats
+extension AdamantApiService {
+	func getChatTransactions(account: String, height: Int?, offset: Int?, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void) {
+		var queryItems: [URLQueryItem] = [URLQueryItem(name: "isIn", value: account)]
+		if let height = height { queryItems.append(URLQueryItem(name: "fromHeight", value: String(height))) }
+		if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
+		
+		let endpoint: URL
+		do {
+			endpoint = try buildUrl(path: ApiCommands.Chats.get, queryItems: queryItems)
+		} catch {
+			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
+			return
+		}
+		
+		sendRequest(url: endpoint) { (response: ServerCollectionResponse<Transaction>?, error) in
+			guard let r = response, r.success, let collection = r.collection else {
+				completionHandler(nil, AdamantError(message: response?.error ?? "Failed to get transactions", error: error))
+				return
+			}
+			
+			completionHandler(collection, nil)
 		}
 	}
 }
