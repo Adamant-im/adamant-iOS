@@ -10,17 +10,33 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Chats-->
         <scene sceneID="fBA-xt-PKp">
             <objects>
-                <viewController id="OUL-cc-7Ir" sceneMemberID="viewController">
+                <viewController id="OUL-cc-7Ir" customClass="ChatsListViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="AbA-To-g4Z">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="WH1-1S-RjN">
+                                <rect key="frame" x="0.0" y="64" width="375" height="554"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </tableView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="uia-6D-pQF" firstAttribute="trailing" secondItem="WH1-1S-RjN" secondAttribute="trailing" id="IEe-6x-6QD"/>
+                            <constraint firstItem="WH1-1S-RjN" firstAttribute="top" secondItem="uia-6D-pQF" secondAttribute="top" id="ULH-wX-zLl"/>
+                            <constraint firstItem="uia-6D-pQF" firstAttribute="bottom" secondItem="WH1-1S-RjN" secondAttribute="bottom" id="UoO-oD-t9x"/>
+                            <constraint firstItem="WH1-1S-RjN" firstAttribute="leading" secondItem="uia-6D-pQF" secondAttribute="leading" id="p0b-UM-blx"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="uia-6D-pQF"/>
                     </view>
-                    <navigationItem key="navigationItem" id="J48-ka-NdE"/>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="Chats" id="NNn-vk-aSk"/>
+                    <connections>
+                        <outlet property="tableView" destination="WH1-1S-RjN" id="Wzz-x2-fKA"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="LsD-PY-ggg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

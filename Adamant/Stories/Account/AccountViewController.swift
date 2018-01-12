@@ -124,6 +124,8 @@ extension AccountViewController: UITableViewDataSource {
 			
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 			cell.detailTextLabel?.textColor = UIColor.adamantSecondary
+			
+			cell.imageView?.tintColor = UIColor.adamantChatIcons
 		}
 		
 		switch row {

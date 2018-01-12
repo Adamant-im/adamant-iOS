@@ -11,6 +11,7 @@ import UIKit
 extension UIColor {
 	static let adamantPrimary = UIColor(named: "Gray_main")!
 	static let adamantSecondary = UIColor(named: "Gray_secondary")!
+	static let adamantChatIcons = UIColor(named: "Icons")
 }
 
 extension UIFont {

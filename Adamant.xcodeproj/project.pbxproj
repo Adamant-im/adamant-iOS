@@ -34,6 +34,7 @@
 		E95F857D2008C8CB0070534A /* Chats.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E95F857C2008C8CB0070534A /* Chats.storyboard */; };
 		E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F857E2008C8D60070534A /* ChatsRoutes.swift */; };
 		E95F85812008C8D70070534A /* ChatsDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F857F2008C8D70070534A /* ChatsDependencies.swift */; };
+		E95F85852008CB3A0070534A /* ChatsListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85842008CB3A0070534A /* ChatsListViewController.swift */; };
 		E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* AccountService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
 		E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */; };
@@ -127,6 +128,7 @@
 		E95F857C2008C8CB0070534A /* Chats.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Chats.storyboard; sourceTree = "<group>"; };
 		E95F857E2008C8D60070534A /* ChatsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsRoutes.swift; sourceTree = "<group>"; };
 		E95F857F2008C8D70070534A /* ChatsDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsDependencies.swift; sourceTree = "<group>"; };
+		E95F85842008CB3A0070534A /* ChatsListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsListViewController.swift; sourceTree = "<group>"; };
 		E9E7CD8A20026B0600DFC4DB /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 		E9E7CD8C20026B6600DFC4DB /* DialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogService.swift; sourceTree = "<group>"; };
 		E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
@@ -330,6 +332,7 @@
 				E95F857C2008C8CB0070534A /* Chats.storyboard */,
 				E95F857F2008C8D70070534A /* ChatsDependencies.swift */,
 				E95F857E2008C8D60070534A /* ChatsRoutes.swift */,
+				E95F85842008CB3A0070534A /* ChatsListViewController.swift */,
 			);
 			path = Chats;
 			sourceTree = "<group>";
@@ -604,6 +607,7 @@
 				E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */,
 				E9E7CD952002812400DFC4DB /* LoginDependencies.swift in Sources */,
 				E9E7CDCC20040FDC00DFC4DB /* TransactionType.swift in Sources */,
+				E95F85852008CB3A0070534A /* ChatsListViewController.swift in Sources */,
 				E919479C2000102E001362F8 /* LoginViewController.swift in Sources */,
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,
 				E95F857A2007F0260070534A /* ServerResponse.swift in Sources */,
