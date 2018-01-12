@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Account {
+struct Account: Codable {
 	let address: String
 	var unconfirmedBalance: UInt
 	var balance: UInt
@@ -16,32 +16,6 @@ struct Account {
 	let unconfirmedSignature: Int
 	let secondSignature: Int
 	let secondPublicKey: String?
-}
-
-extension Account: Decodable {
-	enum CodingKeys: String, CodingKey {
-		case address
-		case unconfirmedBalance
-		case balance
-		case publicKey
-		case unconfirmedSignature
-		case secondSignature
-		case secondPublicKey
-	}
-	
-	init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		
-		self.address = try container.decode(String.self, forKey: .address)
-		self.unconfirmedBalance = UInt(try container.decode(String.self, forKey: .unconfirmedBalance))!
-		self.balance = UInt(try container.decode(String.self, forKey: .balance))!
-		self.unconfirmedSignature = try container.decode(Int.self, forKey: .unconfirmedSignature)
-		
-		self.publicKey = try container.decode(String.self, forKey: .publicKey)
-		
-		self.secondSignature = try container.decode(Int.self, forKey: .secondSignature)
-		self.secondPublicKey = try? container.decode(String.self, forKey: .secondPublicKey)
-	}
 }
 
 extension Account: WrappableModel {

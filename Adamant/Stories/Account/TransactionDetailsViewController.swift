@@ -99,7 +99,11 @@ extension TransactionDetailsViewController {
 			
 		case .confirmations:
 			cell.textLabel?.text = "Confirmations"
-			cell.detailTextLabel?.text = String(transaction.confirmations)
+			if let confirmations = transaction.confirmations {
+				cell.detailTextLabel?.text = String(confirmations)
+			} else {
+				cell.detailTextLabel?.text = "0"
+			}
 			
 		case .fee:
 			cell.textLabel?.text = "Fee"
