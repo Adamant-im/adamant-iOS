@@ -36,8 +36,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let container = SwinjectStoryboard.defaultContainer
 		Container.loggingFunction = nil // Logging currently not supported with SwinjectStoryboards.
 		container.registerAdamantServices(apiUrl: Constants.apiUrl, coreJsUrl: jsCore, utilitiesJsUrl: jsUtilites)
-		container.registerAdamantLoginStory()
 		container.registerAdamantAccountStory()
+		container.registerAdamantLoginStory()
+		container.registerAdamantChatsStory()
 		
 		// Prepare UI
 		self.window = UIWindow(frame: UIScreen.main.bounds)
@@ -51,8 +52,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		if let tabbar = self.window!.rootViewController as? UITabBarController {
-			let vc = router.get(story: .Account).instantiateInitialViewController()!
-			tabbar.setViewControllers([vc], animated: false)
+			let account = router.get(story: .Account).instantiateInitialViewController()!
+			let chats = router.get(story: .Chats).instantiateInitialViewController()!
+			
+			tabbar.setViewControllers([account, chats], animated: false)
 		}
 
 // Initiate login

@@ -31,6 +31,9 @@
 		E95F85752007E4790070534A /* HexAndBytesUtilitiesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85742007E4790070534A /* HexAndBytesUtilitiesTest.swift */; };
 		E95F85772007E8EC0070534A /* JSAdamantCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85762007E8EC0070534A /* JSAdamantCoreTests.swift */; };
 		E95F857A2007F0260070534A /* ServerResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85792007F0260070534A /* ServerResponse.swift */; };
+		E95F857D2008C8CB0070534A /* Chats.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E95F857C2008C8CB0070534A /* Chats.storyboard */; };
+		E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F857E2008C8D60070534A /* ChatsRoutes.swift */; };
+		E95F85812008C8D70070534A /* ChatsDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F857F2008C8D70070534A /* ChatsDependencies.swift */; };
 		E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* AccountService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
 		E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */; };
@@ -121,6 +124,9 @@
 		E95F85742007E4790070534A /* HexAndBytesUtilitiesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexAndBytesUtilitiesTest.swift; sourceTree = "<group>"; };
 		E95F85762007E8EC0070534A /* JSAdamantCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAdamantCoreTests.swift; sourceTree = "<group>"; };
 		E95F85792007F0260070534A /* ServerResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerResponse.swift; sourceTree = "<group>"; };
+		E95F857C2008C8CB0070534A /* Chats.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Chats.storyboard; sourceTree = "<group>"; };
+		E95F857E2008C8D60070534A /* ChatsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsRoutes.swift; sourceTree = "<group>"; };
+		E95F857F2008C8D70070534A /* ChatsDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsDependencies.swift; sourceTree = "<group>"; };
 		E9E7CD8A20026B0600DFC4DB /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 		E9E7CD8C20026B6600DFC4DB /* DialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogService.swift; sourceTree = "<group>"; };
 		E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
@@ -292,6 +298,7 @@
 			isa = PBXGroup;
 			children = (
 				E9E7CDA52002AE1C00DFC4DB /* Account */,
+				E95F857B2008C8B20070534A /* Chats */,
 				E919479A20001007001362F8 /* Login */,
 			);
 			path = Stories;
@@ -315,6 +322,16 @@
 				E95F856E2007B61D0070534A /* GetPublicKeyResponse.swift */,
 			);
 			path = ServerResponses;
+			sourceTree = "<group>";
+		};
+		E95F857B2008C8B20070534A /* Chats */ = {
+			isa = PBXGroup;
+			children = (
+				E95F857C2008C8CB0070534A /* Chats.storyboard */,
+				E95F857F2008C8D70070534A /* ChatsDependencies.swift */,
+				E95F857E2008C8D60070534A /* ChatsRoutes.swift */,
+			);
+			path = Chats;
 			sourceTree = "<group>";
 		};
 		E9E7CDA42002A6EB00DFC4DB /* Fonts */ = {
@@ -476,6 +493,7 @@
 				E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */,
 				E913C8F71FFFA51D001A83F7 /* Main.storyboard in Resources */,
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
+				E95F857D2008C8CB0070534A /* Chats.storyboard in Resources */,
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
 				E9E7CDA72002AECA00DFC4DB /* Account.storyboard in Resources */,
 			);
@@ -567,6 +585,7 @@
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */,
 				E9E7CDAC2002AFA500DFC4DB /* AccountViewController.swift in Sources */,
+				E95F85812008C8D70070534A /* ChatsDependencies.swift in Sources */,
 				E91947B420002809001362F8 /* Account.swift in Sources */,
 				E9E7CDC22003F5A400DFC4DB /* TransactionsViewController.swift in Sources */,
 				E9E7CDA92002AF1E00DFC4DB /* AccountDependencies.swift in Sources */,
@@ -577,6 +596,7 @@
 				E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */,
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
+				E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */,
