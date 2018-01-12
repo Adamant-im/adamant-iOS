@@ -14,7 +14,7 @@
         <scene sceneID="opH-LR-g0a">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="J2r-BW-spr" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Wallet" id="OLR-zA-lhu"/>
+                    <tabBarItem key="tabBarItem" title="Wallet" image="wallet_tab" id="OLR-zA-lhu"/>
                     <toolbarItems/>
                     <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="QrB-Mv-s6O">
@@ -36,7 +36,7 @@
         <!--Account-->
         <scene sceneID="qF9-Bu-tl7">
             <objects>
-                <viewController id="90W-SP-DzU" customClass="AccountViewController" customModule="Adamant_ios" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="90W-SP-DzU" customClass="AccountViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Y10-sx-gaY">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -69,7 +69,7 @@
         <!--Send Tokens-->
         <scene sceneID="hoC-kh-2Jv">
             <objects>
-                <viewController storyboardIdentifier="transferViewController" id="JVp-ln-T6U" customClass="TransferViewController" customModule="Adamant_ios" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="transferViewController" id="JVp-ln-T6U" customClass="TransferViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8F2-54-eUU">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -96,7 +96,7 @@
         <!--Transactions-->
         <scene sceneID="Eaz-z7-XZu">
             <objects>
-                <viewController storyboardIdentifier="TransactionsViewController" id="K1w-Gj-Lub" customClass="TransactionsViewController" customModule="Adamant_ios" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="TransactionsViewController" id="K1w-Gj-Lub" customClass="TransactionsViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="MeQ-ie-hbT">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -128,7 +128,7 @@
         <!--Transaction-->
         <scene sceneID="wgR-dG-cNr">
             <objects>
-                <viewController storyboardIdentifier="TransactionDetailsViewController" id="uX6-ce-CYX" customClass="TransactionDetailsViewController" customModule="Adamant_ios" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="TransactionDetailsViewController" id="uX6-ce-CYX" customClass="TransactionDetailsViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="gxo-8g-E9u">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -157,4 +157,7 @@
             <point key="canvasLocation" x="3161" y="317"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="wallet_tab" width="25" height="24"/>
+    </resources>
 </document>
