@@ -13,12 +13,14 @@ class ChatsListViewController: UIViewController {
 	// MARK: - Dependencies
 	var accountService: AccountService!
 	var chatProvider: ChatDataProvider!
+	var cellFactory: CellFactory!
 	
 	// MARK: - IBOutlet
 	@IBOutlet weak var tableView: UITableView!
 	
 	// MARK: - Properties
 	var chatsController: NSFetchedResultsController<Chatroom>!
+	let chatCell = SharedCell.ChatCell.cellIdentifier
 	
 	// MARK: - Lifecycle
     override func viewDidLoad() {
@@ -36,6 +38,8 @@ class ChatsListViewController: UIViewController {
 		
 		chatsController = chatProvider.getChatroomsController()
 		chatsController.delegate = self
+		
+		tableView.register(cellFactory.nib(for: SharedCell.ChatCell), forCellReuseIdentifier: chatCell)
 		tableView.reloadData()
 	}
 }
@@ -98,15 +102,15 @@ extension ChatsListViewController {
 				fatalError()
 			}
 			
-			let cell: UITableViewCell
-			if let c = tableView.dequeueReusableCell(withIdentifier: "chat") {
-				cell = c
-			} else {
-				cell = UITableViewCell(style: .default, reuseIdentifier: "chat")
-				cell.imageView?.tintColor = UIColor.adamantChatIcons
-			}
+			let cell: ChatTableViewCell = tableView.dequeueReusableCell(withIdentifier: chatCell, for: indexPath) as! ChatTableViewCell
 			
-			cell.textLabel?.text = chat.id
+			cell.accountLabel.text = chat.id
+			cell.lastMessageLabel.text = chat.lastTransaction?.message
+			if let date = chat.lastTransaction?.date as Date? {
+				cell.dateLabel.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
+			} else {
+				cell.dateLabel.text = nil
+			}
 			
 			return cell
 			

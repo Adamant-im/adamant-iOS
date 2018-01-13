@@ -135,14 +135,11 @@ extension CoreDataChatProvider {
 				}
 				chatroom.addToTransactions(chatTransactions as NSSet)
 				
-				let newest = chatTransactions.sorted(by: { (left, right) -> Bool in
-					return left.date!.compare(right.date! as Date) == ComparisonResult.orderedDescending
-				}).first
+				let newest = chatTransactions.sorted{ ($0.date! as Date).compare($1.date! as Date) == .orderedDescending }.first
 				
 				if let last = chatroom.lastTransaction {
-					if let lastDate = last.date as Date?,
-						let newestDate = newest?.date as Date?,
-						lastDate.compare(newestDate) == ComparisonResult.orderedAscending {
+					if let newest = newest,
+						(last.date! as Date).compare(newest.date! as Date) == .orderedAscending {
 						chatroom.lastTransaction = newest
 					}
 				} else {

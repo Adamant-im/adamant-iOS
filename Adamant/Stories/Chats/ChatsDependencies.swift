@@ -13,6 +13,7 @@ extension Container {
 		self.storyboardInitCompleted(ChatsListViewController.self) { r, c in
 			c.accountService = r.resolve(AccountService.self)
 			c.chatProvider = r.resolve(ChatDataProvider.self)
+			c.cellFactory = r.resolve(CellFactory.self)
 		}
 	}
 }

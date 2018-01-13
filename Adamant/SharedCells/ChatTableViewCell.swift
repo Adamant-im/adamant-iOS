@@ -8,6 +8,12 @@
 
 import UIKit
 
+extension SharedCell {
+	static let ChatCell = SharedCell(cellIdentifier: "chatCell",
+									 xibName: "ChatTableViewCell",
+									 rowHeight: 76)
+}
+
 class ChatTableViewCell: UITableViewCell {
 	// MARK: - IBOutlets
 	@IBOutlet weak var avatarImageView: UIImageView!
@@ -27,9 +33,4 @@ class ChatTableViewCell: UITableViewCell {
 			}
 		}
 	}
-	
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-    }
 }
