@@ -10,6 +10,9 @@ import Swinject
 
 extension Container {
 	func registerAdamantChatsStory() {
-		
+		self.storyboardInitCompleted(ChatsListViewController.self) { r, c in
+			c.accountService = r.resolve(AccountService.self)
+			c.chatProvider = r.resolve(ChatDataProvider.self)
+		}
 	}
 }

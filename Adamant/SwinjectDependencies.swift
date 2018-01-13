@@ -11,7 +11,7 @@ import SwinjectStoryboard
 
 // MARK: Services
 extension Container {
-	func registerAdamantServices(apiUrl: URL, coreJsUrl core: URL, utilitiesJsUrl utils: URL) {
+	func registerAdamantServices(apiUrl: URL, coreJsUrl core: URL, utilitiesJsUrl utils: URL, managedObjectModel model: URL) {
 		self.register(AdamantCore.self) { _ in try! JSAdamantCore(coreJsUrl: core, utilitiesJsUrl: utils) }
 		self.register(DialogService.self) { _ in AdamantDialogService() }.inObjectScope(.container)
 		self.register(Router.self) { _ in SwinjectedRouter() }.inObjectScope(.container)
@@ -21,5 +21,13 @@ extension Container {
 																	adamantCore: r.resolve(AdamantCore.self)! ,
 																	dialogService: r.resolve(DialogService.self)!,
 																	router: r.resolve(Router.self)!) }.inObjectScope(.container)
+		
+		// Chat provider
+		self.register(ChatDataProvider.self) { r  in
+			let provider = CoreDataChatProvider(managedObjectModel: model)
+			provider.accountService = r.resolve(AccountService.self)
+			provider.apiService = r.resolve(ApiService.self)
+			return provider
+		}
 	}
 }
