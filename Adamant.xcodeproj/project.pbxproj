@@ -38,6 +38,20 @@
 		E95F85872008FDBF0070534A /* Chat.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85862008FDBF0070534A /* Chat.swift */; };
 		E95F8589200900B10070534A /* ChatType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F8588200900B10070534A /* ChatType.swift */; };
 		E95F858B200931410070534A /* TransactionAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F858A200931410070534A /* TransactionAsset.swift */; };
+		E95F858E20093F940070534A /* ChatProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F858D20093F940070534A /* ChatProvider.swift */; };
+		E95F859120093FB30070534A /* CoreDataChatProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F859020093FB30070534A /* CoreDataChatProvider.swift */; };
+		E95F85AD200952AF0070534A /* ChatTransaction+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85A9200952AF0070534A /* ChatTransaction+CoreDataClass.swift */; };
+		E95F85AE200952AF0070534A /* ChatTransaction+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85AA200952AF0070534A /* ChatTransaction+CoreDataProperties.swift */; };
+		E95F85AF200952AF0070534A /* Chatroom+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85AB200952AF0070534A /* Chatroom+CoreDataClass.swift */; };
+		E95F85B0200952AF0070534A /* Chatroom+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85AC200952AF0070534A /* Chatroom+CoreDataProperties.swift */; };
+		E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E95F85B1200954D00070534A /* ChatModels.xcdatamodeld */; };
+		E95F85B7200A4D8F0070534A /* TestTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85B6200A4D8F0070534A /* TestTools.swift */; };
+		E95F85BA200A4DC90070534A /* TransactionSend.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85B9200A4DC90070534A /* TransactionSend.json */; };
+		E95F85BC200A4E670070534A /* ParsingModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85BB200A4E670070534A /* ParsingModelsTests.swift */; };
+		E95F85BE200A503A0070534A /* TransactionChat.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85BD200A503A0070534A /* TransactionChat.json */; };
+		E95F85C0200A51BB0070534A /* Account.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85BF200A51BB0070534A /* Account.json */; };
+		E95F85C2200A53E90070534A /* NormalizedTransaction.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C1200A53E90070534A /* NormalizedTransaction.json */; };
+		E95F85C4200A540B0070534A /* Chat.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C3200A540B0070534A /* Chat.json */; };
 		E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* AccountService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
 		E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */; };
@@ -346,6 +360,19 @@
 			path = Chats;
 			sourceTree = "<group>";
 		};
+		E95F85B8200A4D9C0070534A /* Parsing */ = {
+			isa = PBXGroup;
+			children = (
+				E95F85BB200A4E670070534A /* ParsingModelsTests.swift */,
+				E95F85BF200A51BB0070534A /* Account.json */,
+				E95F85C3200A540B0070534A /* Chat.json */,
+				E95F85C1200A53E90070534A /* NormalizedTransaction.json */,
+				E95F85BD200A503A0070534A /* TransactionChat.json */,
+				E95F85B9200A4DC90070534A /* TransactionSend.json */,
+			);
+			path = Parsing;
+			sourceTree = "<group>";
+		};
 		E9E7CDA42002A6EB00DFC4DB /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
@@ -392,11 +419,13 @@
 		E9EC344520066D4A00C0E546 /* AdamantTests */ = {
 			isa = PBXGroup;
 			children = (
+				E95F85B8200A4D9C0070534A /* Parsing */,
 				E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */,
 				E95F85702007D98D0070534A /* CurrencyFormatterTests.swift */,
 				E95F85742007E4790070534A /* HexAndBytesUtilitiesTest.swift */,
 				E95F85762007E8EC0070534A /* JSAdamantCoreTests.swift */,
 				E9EC344820066D4A00C0E546 /* Info.plist */,
+				E95F85B6200A4D8F0070534A /* TestTools.swift */,
 			);
 			path = AdamantTests;
 			sourceTree = "<group>";
@@ -515,6 +544,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E95F85C0200A51BB0070534A /* Account.json in Resources */,
+				E95F85C2200A53E90070534A /* NormalizedTransaction.json in Resources */,
+				E95F85BE200A503A0070534A /* TransactionChat.json in Resources */,
+				E95F85C4200A540B0070534A /* Chat.json in Resources */,
+				E95F85BA200A4DC90070534A /* TransactionSend.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -639,6 +673,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9EC344720066D4A00C0E546 /* AddressValidationTests.swift in Sources */,
+				E95F85B7200A4D8F0070534A /* TestTools.swift in Sources */,
+				E95F85BC200A4E670070534A /* ParsingModelsTests.swift in Sources */,
 				E95F85752007E4790070534A /* HexAndBytesUtilitiesTest.swift in Sources */,
 				E95F85772007E8EC0070534A /* JSAdamantCoreTests.swift in Sources */,
 				E95F85712007D98D0070534A /* CurrencyFormatterTests.swift in Sources */,

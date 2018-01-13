@@ -1,0 +1,13 @@
+{
+	"address": "U2279741505997340299",
+	"unconfirmedBalance": "34500000",
+	"balance": "34500000",
+	"publicKey": "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f",
+	"unconfirmedSignature": 0,
+	"secondSignature": 0,
+	"secondPublicKey": null,
+	"multisignatures": [
+	],
+	"u_multisignatures": [
+	]
+}

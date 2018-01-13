@@ -48,7 +48,8 @@ class JSAdamantCoreTests: XCTestCase {
 												senderPublicKey: "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f",
 												requesterPublicKey: nil,
 												timestamp: 11325525,
-												recipientId: "U48484848484848484848484")
+												recipientId: "U48484848484848484848484",
+												asset: TransactionAsset(chat: nil))
 		let senderId = "U2279741505997340299"
 		let keypair = Keypair(publicKey: "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f",
 							  privateKey: "9001490b166816af75a15a3e2b0174bfe3be3dfaa63147b4f780ed3ab90ffeab8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f")
@@ -84,7 +85,8 @@ class JSAdamantCoreTests: XCTestCase {
 												senderPublicKey: "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f",
 												requesterPublicKey: nil,
 												timestamp: 11325525,
-												recipientId: "U48484848484848484848484")
+												recipientId: "U48484848484848484848484",
+												asset: TransactionAsset(chat: nil))
 		let senderId = "U2279741505997340299"
 		let keypair = Keypair(publicKey: "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f",
 							  privateKey: "9001490b166816af75a15a3e2b0174bfe3be3dfaa63147b4f780ed3ab90ffeab8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f")

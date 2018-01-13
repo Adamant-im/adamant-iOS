@@ -8,17 +8,42 @@
 
 import Foundation
 
-struct NormalizedTransaction: Codable {
+struct NormalizedTransaction {
 	let type: TransactionType
 	let amount: UInt
 	let senderPublicKey: String
 	let requesterPublicKey: String?
 	let timestamp: UInt
 	let recipientId: String
+	let asset: TransactionAsset
 	
-	lazy var date: Date = {
+	var date: Date {
 		return AdamantUtilities.decodeAdamantDate(timestamp: TimeInterval(timestamp))
-	}()
+	}
+}
+
+extension NormalizedTransaction: Decodable {
+	enum CodingKeys: String, CodingKey {
+		case type
+		case amount
+		case senderPublicKey
+		case requesterPublicKey
+		case timestamp
+		case recipientId
+		case asset
+	}
+	
+	init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		
+		self.type = try container.decode(TransactionType.self, forKey: .type)
+		self.amount = try container.decode(UInt.self, forKey: .amount)
+		self.senderPublicKey = try container.decode(String.self, forKey: .senderPublicKey)
+		self.requesterPublicKey = try? container.decode(String.self, forKey: .requesterPublicKey)
+		self.timestamp = try container.decode(UInt.self, forKey: .timestamp)
+		self.recipientId = try container.decode(String.self, forKey: .recipientId)
+		self.asset = try container.decode(TransactionAsset.self, forKey: .asset)
+	}
 }
 
 extension NormalizedTransaction: WrappableModel {
