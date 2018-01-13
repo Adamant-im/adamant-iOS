@@ -52,6 +52,8 @@
 		E95F85C0200A51BB0070534A /* Account.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85BF200A51BB0070534A /* Account.json */; };
 		E95F85C2200A53E90070534A /* NormalizedTransaction.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C1200A53E90070534A /* NormalizedTransaction.json */; };
 		E95F85C4200A540B0070534A /* Chat.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C3200A540B0070534A /* Chat.json */; };
+		E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85C5200A9B070070534A /* ChatTableViewCell.swift */; };
+		E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C6200A9B070070534A /* ChatTableViewCell.xib */; };
 		E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* AccountService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
 		E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */; };
@@ -149,6 +151,15 @@
 		E95F85862008FDBF0070534A /* Chat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chat.swift; sourceTree = "<group>"; };
 		E95F8588200900B10070534A /* ChatType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatType.swift; sourceTree = "<group>"; };
 		E95F858A200931410070534A /* TransactionAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAsset.swift; sourceTree = "<group>"; };
+		E95F85B6200A4D8F0070534A /* TestTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTools.swift; sourceTree = "<group>"; };
+		E95F85B9200A4DC90070534A /* TransactionSend.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = TransactionSend.json; sourceTree = "<group>"; };
+		E95F85BB200A4E670070534A /* ParsingModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsingModelsTests.swift; sourceTree = "<group>"; };
+		E95F85BD200A503A0070534A /* TransactionChat.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = TransactionChat.json; sourceTree = "<group>"; };
+		E95F85BF200A51BB0070534A /* Account.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Account.json; sourceTree = "<group>"; };
+		E95F85C1200A53E90070534A /* NormalizedTransaction.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = NormalizedTransaction.json; sourceTree = "<group>"; };
+		E95F85C3200A540B0070534A /* Chat.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Chat.json; sourceTree = "<group>"; };
+		E95F85C5200A9B070070534A /* ChatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
+		E95F85C6200A9B070070534A /* ChatTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatTableViewCell.xib; sourceTree = "<group>"; };
 		E9E7CD8A20026B0600DFC4DB /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 		E9E7CD8C20026B6600DFC4DB /* DialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogService.swift; sourceTree = "<group>"; };
 		E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
@@ -239,18 +250,19 @@
 		E913C8F01FFFA51D001A83F7 /* Adamant */ = {
 			isa = PBXGroup;
 			children = (
-				E91947B72000326B001362F8 /* ServerResponses */,
-				E919479920000FFD001362F8 /* Stories */,
+				E95F859220094B8E0070534A /* CoreData */,
+				E913C9101FFFAA4B001A83F7 /* Helpers */,
 				E913C9091FFFA95A001A83F7 /* Models */,
+				E91947B72000326B001362F8 /* ServerResponses */,
 				E913C9041FFFA8FE001A83F7 /* ServiceProtocols */,
 				E913C9061FFFA92E001A83F7 /* Services */,
 				E9E7CDB82003AA8E00DFC4DB /* SharedCells */,
-				E913C9101FFFAA4B001A83F7 /* Helpers */,
+				E919479920000FFD001362F8 /* Stories */,
 				E913C9111FFFAB05001A83F7 /* Assets */,
 				E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */,
 				E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */,
-				E913C8F51FFFA51D001A83F7 /* Main.storyboard */,
 				E913C8FD1FFFA51E001A83F7 /* Info.plist */,
+				E913C8F51FFFA51D001A83F7 /* Main.storyboard */,
 			);
 			path = Adamant;
 			sourceTree = "<group>";
