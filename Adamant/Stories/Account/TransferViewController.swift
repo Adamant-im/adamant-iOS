@@ -28,7 +28,7 @@ class TransferViewController: FormViewController {
 	
 	// MARK: - Dependencies
 	var apiService: ApiService!
-	var loginService: AccountService!
+	var accountService: AccountService!
 	var dialogService: DialogService!
 	
 	private(set) var maxToTransfer: Double = 0.0
@@ -187,7 +187,7 @@ class TransferViewController: FormViewController {
 			fatalError("Dependecies fatal error")
 		}
 		
-		guard let account = loginService.loggedAccount, let keypair = loginService.keypair else {
+		guard let account = accountService.loggedAccount, let keypair = accountService.keypair else {
 			return
 		}
 		

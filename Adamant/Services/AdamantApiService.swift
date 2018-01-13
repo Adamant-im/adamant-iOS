@@ -24,7 +24,7 @@ private struct ApiCommands {
 	
 	static let Chats = (
 		root: "/api/chats",
-		get: "chats/get"
+		get: "/api/chats/get"
 	)
 }
 

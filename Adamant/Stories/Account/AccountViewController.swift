@@ -20,7 +20,7 @@ class AccountViewController: UIViewController {
 	
 	
 	// MARK: - Dependencies
-	var loginService: AccountService!
+	var accountService: AccountService!
 	var dialogService: DialogService!
 	
 	
@@ -37,10 +37,10 @@ class AccountViewController: UIViewController {
 		tableView.dataSource = self
 		tableView.separatorInset = UIEdgeInsets.init(top: 0, left: 80, bottom: 0, right: 0)
 		
-		NotificationCenter.default.addObserver(forName: .userHasLoggedIn, object: nil, queue: nil) { _ in
+		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: nil) { _ in
 			self.tableView.reloadData()
 		}
-		NotificationCenter.default.addObserver(forName: .userHasLoggedOut, object: nil, queue: nil) { _ in
+		NotificationCenter.default.addObserver(forName: .adamantUserLoggedOut, object: nil, queue: nil) { _ in
 			self.tableView.reloadData()
 		}
     }
@@ -59,12 +59,12 @@ class AccountViewController: UIViewController {
 		
 		switch identifier {
 		case showTransactionsSegue:
-			if let account = loginService.loggedAccount?.address, let vc = segue.destination as? TransactionsViewController {
+			if let account = accountService.loggedAccount?.address, let vc = segue.destination as? TransactionsViewController {
 				vc.account = account
 			}
 			
 		case showTransferSegue:
-			if let account = loginService.loggedAccount, let vc = segue.destination as? TransferViewController {
+			if let account = accountService.loggedAccount, let vc = segue.destination as? TransferViewController {
 				vc.account = account
 			}
 			
@@ -86,7 +86,7 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 	}
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		if loginService.loggedAccount != nil {
+		if accountService.loggedAccount != nil {
 			return 3
 		} else {
 			return 0
@@ -110,7 +110,7 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 		case .accountNumber:
 			tableView.deselectRow(at: indexPath, animated: true)
 			
-			guard let address = self.loginService.loggedAccount?.address else {
+			guard let address = self.accountService.loggedAccount?.address else {
 				return
 			}
 			
@@ -143,7 +143,7 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 // MARK: - UITableView Cells
 extension AccountViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		guard let account = loginService.loggedAccount,
+		guard let account = accountService.loggedAccount,
 			let row = Rows(rawValue: indexPath.row) else {
 				return UITableViewCell(style: .default, reuseIdentifier: nil)
 		}

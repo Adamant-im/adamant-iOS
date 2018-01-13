@@ -85,7 +85,7 @@ class AdamantAccountService: AccountService {
 }
 
 
-// MARK: - LoginService
+// MARK: - AccountService
 extension AdamantAccountService {
 	func logoutAndPresentLoginStoryboard(animated: Bool, authorizationFinishedHandler: (() -> Void)?) {
 		logout()
