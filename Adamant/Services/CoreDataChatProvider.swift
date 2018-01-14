@@ -166,11 +166,12 @@ extension CoreDataChatProvider {
 			t.message = decodedMessage
 			
 			let chatWith = outgoingMessage ? transaction.recipientId : transaction.senderId
-			if var chatroom = chatrooms[chatWith] {
-				chatroom.insert(t)
-			} else {
-				chatrooms[chatWith] = [t]
+			
+			if chatrooms[chatWith] == nil {
+				chatrooms[chatWith] = Set<ChatTransaction>()
 			}
+			
+			chatrooms[chatWith]!.insert(t)
 		}
 		
 		for (chatId, chatTransactions) in chatrooms {
