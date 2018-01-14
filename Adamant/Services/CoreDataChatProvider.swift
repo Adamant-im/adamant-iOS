@@ -28,6 +28,9 @@ class CoreDataChatProvider {
 		return NSEntityDescription.entity(forEntityName: Chatroom.entityName, in: context)!
 	}()
 	
+	// MARK: - Properties
+	private var publicKeys = [String:String]()
+	
 	// MARK: - Init
 	init(managedObjectModel modelUrl: URL) {
 		model = NSManagedObjectModel(contentsOf: modelUrl)!
@@ -103,6 +106,47 @@ extension CoreDataChatProvider {
 		}
 		var chatrooms = [String: Set<ChatTransaction>]()
 		
+		var keysNeeded = [String]()
+		
+		for transaction in trs {
+			let isOutgoingMessage = transaction.senderId == acc
+			let otherAcc = isOutgoingMessage ? transaction.recipientId : transaction.senderId
+			
+			if !keysNeeded.contains(otherAcc) && publicKeys[otherAcc] == nil {
+				keysNeeded.append(otherAcc)
+			}
+		}
+		
+		if keysNeeded.count > 0 {
+			var newKeys = [String:String]()
+			let group = DispatchGroup()
+			
+			for address in keysNeeded {
+				group.enter()
+				DispatchQueue.global(qos: .userInitiated).async {
+					self.apiService.getPublicKey(byAddress: address, completionHandler: { (publicKey, error) in
+						if let key = publicKey {
+							newKeys[address] = key
+						} else {
+							// TODO: Notify about error
+							var message = "Can't get public key for account: \(address)."
+							if let error = error {
+								message += "Error: \(error)"
+							}
+							print(message)
+						}
+						group.leave()
+					})
+				}
+			}
+			
+			group.wait()
+			
+			for (address, key) in newKeys {
+				publicKeys[address] = key
+			}
+		}
+		
 		for transaction in trs {
 			guard let chat = transaction.asset.chat else {
 				continue
@@ -114,10 +158,13 @@ extension CoreDataChatProvider {
 			t.sender = transaction.senderId
 			t.type = Int16(chat.type.rawValue)
 			
-			let decodedMessage = adamantCore.decodeMessage(senderKeyHex: transaction.senderPublicKey, privateKeyHex: privateKey, rawMessage: chat.message, rawNonce: chat.ownMessage)
+			let outgoingMessage = transaction.senderId == acc
+			let publicKey = outgoingMessage ? (publicKeys[transaction.recipientId] ?? "") : transaction.senderPublicKey
+			
+			let decodedMessage = adamantCore.decodeMessage(senderKeyHex: publicKey, privateKeyHex: privateKey, rawMessage: chat.message, rawNonce: chat.ownMessage)
 			t.message = decodedMessage
 			
-			let chatWith = transaction.recipientId == acc ? transaction.senderId : transaction.recipientId
+			let chatWith = outgoingMessage ? transaction.recipientId : transaction.senderId
 			if var chatroom = chatrooms[chatWith] {
 				chatroom.insert(t)
 			} else {

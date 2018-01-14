@@ -102,7 +102,7 @@ extension AdamantApiService {
 	func getPublicKey(byAddress address: String, completionHandler: @escaping (String?, AdamantError?) -> Void) {
 		let endpoint: URL
 		do {
-			endpoint = try buildUrl(path: ApiCommands.Accounts.getPublicKey, queryItems: [URLQueryItem(name: "account", value: address)])
+			endpoint = try buildUrl(path: ApiCommands.Accounts.getPublicKey, queryItems: [URLQueryItem(name: "address", value: address)])
 		} catch {
 			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
 			return
