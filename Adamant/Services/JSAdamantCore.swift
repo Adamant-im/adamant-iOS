@@ -14,6 +14,7 @@ private struct JSFunctions {
 		static let createPassPhraseHash = CoreFunction("createPassPhraseHash")
 		static let makeKeypair = CoreFunction("makeKeypair")
 		static let transactionSign = CoreFunction("transactionSign")
+		static let decodeMessage = CoreFunction("decodeMessage")
 		
 		let key: String
 		private init(_ key: String) { self.key = key }
@@ -228,5 +229,38 @@ extension JSAdamantCore: AdamantCore {
 		
 		context.exceptionHandler = nil
 		return signature
+	}
+	
+	func decodeMessage(senderKeyHex: String, privateKeyHex: String, rawMessage: String, rawNonce: String) -> String? {
+		guard let function = getCoreFunction(function: .decodeMessage), !function.isUndefined else {
+			return nil
+		}
+		
+		guard let message = convertToJsHash(AdamantUtilities.getBytes(from: rawMessage)),
+			let nonce = convertToJsHash(AdamantUtilities.getBytes(from: rawNonce)),
+			let senderKey = convertToJsHash(AdamantUtilities.getBytes(from: senderKeyHex)),
+			let privateKey = convertToJsHash(AdamantUtilities.getBytes(from: privateKeyHex))
+		else {
+				return nil
+		}
+		
+		var jsError: JSValue? = nil
+		context.exceptionHandler = { ctx, exc in
+			print(exc!)
+			jsError = exc
+		}
+		
+		let decodedMessage: String?
+		if let jsMessage = function.call(withArguments: [message, nonce, senderKey, privateKey]),
+			!jsMessage.isUndefined,
+			jsError == nil,
+			let m = jsMessage.toString() {
+			decodedMessage = m
+		} else {
+			decodedMessage = nil
+		}
+		
+		context.exceptionHandler = nil
+		return decodedMessage
 	}
 }

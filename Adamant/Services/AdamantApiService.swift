@@ -26,6 +26,8 @@ private struct ApiCommands {
 		root: "/api/chats",
 		get: "/api/chats/get"
 	)
+	
+	private init() {}
 }
 
 

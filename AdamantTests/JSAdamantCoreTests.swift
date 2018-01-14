@@ -60,6 +60,18 @@ class JSAdamantCoreTests: XCTestCase {
 		XCTAssertEqual(signature, freshSignature)
 	}
 	
+	func testDecodeMessage() {
+		let senderPublicKey = "9f895a201fd92cc60ef02d2117d53f00dc2981903cb64b2f214777269b882209"
+		let privateKey = "9001490b166816af75a15a3e2b0174bfe3be3dfaa63147b4f780ed3ab90ffeab8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f"
+		let message = "9ce16097f637ad448478fb9a7f8585389bafaef2"
+		let ownMessage = "6326ffe732912eb7dbe141a56300685e5c0f45cfbf409807"
+		let decodedMessage = "Wha!"
+		
+		let freshMessage = core.decodeMessage(senderKeyHex: senderPublicKey, privateKeyHex: privateKey, rawMessage: message, rawNonce: ownMessage)
+		
+		XCTAssertEqual(freshMessage, decodedMessage)
+	}
+	
 	
 	// MARK: - Performance
 	

@@ -27,6 +27,7 @@ extension Container {
 			let provider = CoreDataChatProvider(managedObjectModel: model)
 			provider.accountService = r.resolve(AccountService.self)
 			provider.apiService = r.resolve(ApiService.self)
+			provider.adamantCore = r.resolve(AdamantCore.self)
 			return provider
 		}
 	}

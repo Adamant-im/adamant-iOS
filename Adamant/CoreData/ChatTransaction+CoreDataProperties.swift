@@ -19,7 +19,6 @@ extension ChatTransaction {
 
     @NSManaged public var date: NSDate?
     @NSManaged public var message: String?
-    @NSManaged public var ownMessage: String?
     @NSManaged public var receiver: String?
     @NSManaged public var sender: String?
     @NSManaged public var type: Int16

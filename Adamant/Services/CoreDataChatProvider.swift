@@ -13,6 +13,7 @@ class CoreDataChatProvider {
 	// MARK: - Dependencies
 	var accountService: AccountService!
 	var apiService: ApiService!
+	var adamantCore: AdamantCore!
 	
 	// MARK: - CoreData
 	let model: NSManagedObjectModel
@@ -82,7 +83,9 @@ extension CoreDataChatProvider {
 				return
 			}
 			
-			self.loadChatTransactions(transactions, currentAccount: account)
+			DispatchQueue.global(qos: .userInitiated).async {
+				self.loadChatTransactions(transactions, currentAccount: account)
+			}
 			
 			if transactions.count == 100 {
 				let newOffset = offset != nil ? offset : 0 + 100
@@ -95,6 +98,9 @@ extension CoreDataChatProvider {
 	}
 	
 	private func loadChatTransactions(_ trs: [Transaction], currentAccount acc: String) {
+		guard let privateKey = accountService.keypair?.privateKey else {
+			return
+		}
 		var chatrooms = [String: Set<ChatTransaction>]()
 		
 		for transaction in trs {
@@ -108,9 +114,8 @@ extension CoreDataChatProvider {
 			t.sender = transaction.senderId
 			t.type = Int16(chat.type.rawValue)
 			
-			// TODO: Decode message
-			t.message = chat.message
-			t.ownMessage = chat.ownMessage
+			let decodedMessage = adamantCore.decodeMessage(senderKeyHex: transaction.senderPublicKey, privateKeyHex: privateKey, rawMessage: chat.message, rawNonce: chat.ownMessage)
+			t.message = decodedMessage
 			
 			let chatWith = transaction.recipientId == acc ? transaction.senderId : transaction.recipientId
 			if var chatroom = chatrooms[chatWith] {
