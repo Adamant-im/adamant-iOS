@@ -142,6 +142,7 @@ extension CoreDataChatProvider {
 			
 			group.wait()
 			
+			// TODO: Make this threadsafe.
 			for (address, key) in newKeys {
 				publicKeys[address] = key
 			}

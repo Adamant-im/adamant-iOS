@@ -98,19 +98,10 @@ extension ChatsListViewController {
 			return cell
 		
 		case 1:
-			guard let chat = chatsController.fetchedObjects?[indexPath.row] else {
-				fatalError()
-			}
-			
+			let chat = chatsController.object(at: IndexPath(row: indexPath.row, section: 0))
 			let cell: ChatTableViewCell = tableView.dequeueReusableCell(withIdentifier: chatCell, for: indexPath) as! ChatTableViewCell
 			
-			cell.accountLabel.text = chat.id
-			cell.lastMessageLabel.text = chat.lastTransaction?.message
-			if let date = chat.lastTransaction?.date as Date? {
-				cell.dateLabel.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
-			} else {
-				cell.dateLabel.text = nil
-			}
+			configureCell(cell, for: chat)
 			
 			return cell
 			
@@ -120,10 +111,54 @@ extension ChatsListViewController {
 		
 		return UITableViewCell(style: .subtitle, reuseIdentifier: "chat")
 	}
+	
+	private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
+		cell.accountLabel.text = chatroom.id
+		cell.lastMessageLabel.text = chatroom.lastTransaction?.message
+		if let date = chatroom.lastTransaction?.date as Date? {
+			cell.dateLabel.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
+		} else {
+			cell.dateLabel.text = nil
+		}
+	}
 }
 
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension ChatsListViewController: NSFetchedResultsControllerDelegate {
+	func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+		tableView.beginUpdates()
+	}
 	
+	func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+		tableView.endUpdates()
+	}
+	
+	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+
+		switch type {
+		case .insert:
+			if let newIndexPath = newIndexPath {
+				tableView.insertRows(at: [IndexPath(row: newIndexPath.row, section: 1)], with: .automatic)
+			}
+			
+		case .delete:
+			if let indexPath = indexPath {
+				tableView.deleteRows(at: [IndexPath(row: indexPath.row, section: 1)], with: .automatic)
+			}
+			
+		case .update:
+			if let indexPath = indexPath,
+				let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: 1)) as? ChatTableViewCell,
+				let chatroom = controller.object(at: indexPath) as? Chatroom {
+				configureCell(cell, for: chatroom)
+			}
+			
+		case .move:
+			if let indexPath = indexPath, let newIndexPath = newIndexPath {
+				tableView.moveRow(at: IndexPath(row: indexPath.row, section: 1),
+								  to: IndexPath(row: newIndexPath.row, section: 1))
+			}
+		}
+	}
 }
