@@ -28,6 +28,12 @@ class ChatsListViewController: UIViewController {
 		
 		tableView.dataSource = self
 		tableView.delegate = self
+		tableView.register(cellFactory.nib(for: SharedCell.ChatCell), forCellReuseIdentifier: chatCell)
+		
+		chatsController = chatProvider.getChatroomsController()
+		chatsController.delegate = self
+		
+		tableView.reloadData()
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -35,12 +41,6 @@ class ChatsListViewController: UIViewController {
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
-		
-		chatsController = chatProvider.getChatroomsController()
-		chatsController.delegate = self
-		
-		tableView.register(cellFactory.nib(for: SharedCell.ChatCell), forCellReuseIdentifier: chatCell)
-		tableView.reloadData()
 	}
 }
 
