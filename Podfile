@@ -12,4 +12,5 @@ target 'Adamant' do
   pod 'FreakingSimpleRoundImageView' # Round avatars
   pod 'FTIndicator' # Notifications
   pod 'Eureka' # Forms
+  pod 'MessageKit' # Chat UI
 end
