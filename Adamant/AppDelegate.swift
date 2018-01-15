@@ -67,9 +67,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		accountService.logoutAndPresentLoginStoryboard(animated: false, authorizationFinishedHandler: nil)
-		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: nil) { _ in
-			print("User logged in: \(accountService.loggedAccount!)!")
-		}
 		
 		return true
 	}

@@ -22,6 +22,7 @@
 		E91947B020002393001362F8 /* AdamantApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AF20002393001362F8 /* AdamantApiService.swift */; };
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
 		E91947B420002809001362F8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B320002809001362F8 /* Account.swift */; };
+		E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EFE12200D1156000BB482 /* ChatViewController.swift */; };
 		E95F856520067A030070534A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856420067A030070534A /* GlobalConstants.swift */; };
 		E95F85692006AB9D0070534A /* NormalizedTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85682006AB9D0070534A /* NormalizedTransaction.swift */; };
 		E95F856B200789450070534A /* JSModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856A200789450070534A /* JSModels.swift */; };
@@ -135,6 +136,7 @@
 		E91947AF20002393001362F8 /* AdamantApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantApiService.swift; sourceTree = "<group>"; };
 		E91947B12000246A001362F8 /* AdamantError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantError.swift; sourceTree = "<group>"; };
 		E91947B320002809001362F8 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
+		E93EFE12200D1156000BB482 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		E95F856420067A030070534A /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		E95F85682006AB9D0070534A /* NormalizedTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalizedTransaction.swift; sourceTree = "<group>"; };
 		E95F856A200789450070534A /* JSModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSModels.swift; sourceTree = "<group>"; };
@@ -377,6 +379,7 @@
 				E95F857F2008C8D70070534A /* ChatsDependencies.swift */,
 				E95F857E2008C8D60070534A /* ChatsRoutes.swift */,
 				E95F85842008CB3A0070534A /* ChatsListViewController.swift */,
+				E93EFE12200D1156000BB482 /* ChatViewController.swift */,
 			);
 			path = Chats;
 			sourceTree = "<group>";
@@ -689,6 +692,7 @@
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */,
 				E95F85AF200952AF0070534A /* Chatroom+CoreDataClass.swift in Sources */,
+				E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */,
