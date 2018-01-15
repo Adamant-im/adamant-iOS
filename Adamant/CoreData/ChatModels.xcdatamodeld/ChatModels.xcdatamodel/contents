@@ -8,14 +8,15 @@
     <entity name="ChatTransaction" representedClassName="ChatTransaction" syncable="YES">
         <attribute name="date" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="message" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="receiver" attributeType="String" syncable="YES"/>
-        <attribute name="sender" attributeType="String" syncable="YES"/>
+        <attribute name="recipientId" attributeType="String" syncable="YES"/>
+        <attribute name="senderId" attributeType="String" syncable="YES"/>
+        <attribute name="transactionId" attributeType="String" syncable="YES"/>
         <attribute name="type" attributeType="Integer 16" minValueString="0" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="chatroom" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="transactions" inverseEntity="Chatroom" syncable="YES"/>
         <relationship name="lastIn" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="lastTransaction" inverseEntity="Chatroom" syncable="YES"/>
     </entity>
     <elements>
         <element name="Chatroom" positionX="-45" positionY="0" width="128" height="90"/>
-        <element name="ChatTransaction" positionX="-18" positionY="27" width="128" height="150"/>
+        <element name="ChatTransaction" positionX="-18" positionY="27" width="128" height="165"/>
     </elements>
 </model>

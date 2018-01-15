@@ -14,4 +14,5 @@ protocol ChatDataProvider {
 	func reset()
 	
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>?
+	func getChatController(for: Chatroom) -> NSFetchedResultsController<ChatTransaction>?
 }

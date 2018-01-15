@@ -13,4 +13,6 @@ import CoreData
 @objc(ChatTransaction)
 public class ChatTransaction: NSManagedObject {
 	static let entityName = "ChatTransaction"
+	
+	var isOutgoing: Bool = false
 }

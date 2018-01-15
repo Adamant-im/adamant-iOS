@@ -72,6 +72,22 @@ extension CoreDataChatProvider: ChatDataProvider {
 			try controller.performFetch()
 			return controller
 		} catch {
+			print("Error fetching request: \(error)")
+			return nil
+		}
+	}
+	
+	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>? {
+		let request: NSFetchRequest<ChatTransaction> = NSFetchRequest(entityName: ChatTransaction.entityName)
+		request.predicate = NSPredicate(format: "chatroom = %@", chatroom)
+		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
+		
+		do {
+			try controller.performFetch()
+			return controller
+		} catch {
+			print("Error fetching request: \(error)")
 			return nil
 		}
 	}
@@ -155,17 +171,18 @@ extension CoreDataChatProvider {
 			
 			let t = ChatTransaction(entity: chatTransactionEntity, insertInto: context)
 			t.date = transaction.date as NSDate
-			t.receiver = transaction.recipientId
-			t.sender = transaction.senderId
+			t.recipientId = transaction.recipientId
+			t.senderId = transaction.senderId
+			t.transactionId = String(transaction.id)
 			t.type = Int16(chat.type.rawValue)
 			
-			let outgoingMessage = transaction.senderId == acc
-			let publicKey = outgoingMessage ? (publicKeys[transaction.recipientId] ?? "") : transaction.senderPublicKey
+			t.isOutgoing = transaction.senderId == acc
+			let publicKey = t.isOutgoing ? (publicKeys[transaction.recipientId] ?? "") : transaction.senderPublicKey
 			
 			let decodedMessage = adamantCore.decodeMessage(senderKeyHex: publicKey, privateKeyHex: privateKey, rawMessage: chat.message, rawNonce: chat.ownMessage)
 			t.message = decodedMessage
 			
-			let chatWith = outgoingMessage ? transaction.recipientId : transaction.senderId
+			let chatWith = t.isOutgoing ? transaction.recipientId : transaction.senderId
 			
 			if chatrooms[chatWith] == nil {
 				chatrooms[chatWith] = Set<ChatTransaction>()
