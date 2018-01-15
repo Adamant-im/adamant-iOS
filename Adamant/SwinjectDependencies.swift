@@ -29,6 +29,6 @@ extension Container {
 			provider.apiService = r.resolve(ApiService.self)
 			provider.adamantCore = r.resolve(AdamantCore.self)
 			return provider
-		}
+		}.inObjectScope(.container)
 	}
 }
