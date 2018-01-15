@@ -15,6 +15,7 @@ struct NormalizedTransaction {
 	let requesterPublicKey: String?
 	let timestamp: UInt
 	let recipientId: String
+	let asset: TransactionAsset
 	
 	var date: Date {
 		return AdamantUtilities.decodeAdamantDate(timestamp: TimeInterval(timestamp))
@@ -29,6 +30,7 @@ extension NormalizedTransaction: Decodable {
 		case requesterPublicKey
 		case timestamp
 		case recipientId
+		case asset
 	}
 	
 	init(from decoder: Decoder) throws {
@@ -40,6 +42,7 @@ extension NormalizedTransaction: Decodable {
 		self.requesterPublicKey = try? container.decode(String.self, forKey: .requesterPublicKey)
 		self.timestamp = try container.decode(UInt.self, forKey: .timestamp)
 		self.recipientId = try container.decode(String.self, forKey: .recipientId)
+		self.asset = try container.decode(TransactionAsset.self, forKey: .asset)
 	}
 }
 

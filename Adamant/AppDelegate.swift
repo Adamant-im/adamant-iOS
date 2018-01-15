@@ -13,6 +13,7 @@ import SwinjectStoryboard
 private struct Constants {
 	static let mainStoryboard = "Main"
 	static let apiUrl = URL(string: "https://endless.adamant.im")!
+	static let chatModels = "ChatModels"
 	
 	private init() {}
 }
@@ -26,18 +27,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 		
-		// Finding resources
+		// Getting resources
 		guard let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js"),
-			let jsUtilites = Bundle.main.url(forResource: "utilites", withExtension: "js") else {
+			let jsUtilites = Bundle.main.url(forResource: "utilites", withExtension: "js"),
+			let modelUrl = Bundle.main.url(forResource: Constants.chatModels, withExtension: "momd") else {
 			fatalError("Can't load system resources!")
 		}
 		
 		// Initiating Swinject
 		let container = SwinjectStoryboard.defaultContainer
 		Container.loggingFunction = nil // Logging currently not supported with SwinjectStoryboards.
-		container.registerAdamantServices(apiUrl: Constants.apiUrl, coreJsUrl: jsCore, utilitiesJsUrl: jsUtilites)
-		container.registerAdamantLoginStory()
+		container.registerAdamantServices(apiUrl: Constants.apiUrl, coreJsUrl: jsCore, utilitiesJsUrl: jsUtilites, managedObjectModel: modelUrl)
 		container.registerAdamantAccountStory()
+		container.registerAdamantLoginStory()
+		container.registerAdamantChatsStory()
 		
 		// Prepare UI
 		self.window = UIWindow(frame: UIScreen.main.bounds)
@@ -51,19 +54,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		if let tabbar = self.window!.rootViewController as? UITabBarController {
-			let vc = router.get(story: .Account).instantiateInitialViewController()!
-			tabbar.setViewControllers([vc], animated: false)
+			let account = router.get(story: .Account).instantiateInitialViewController()!
+			let chats = router.get(story: .Chats).instantiateInitialViewController()!
+			
+			tabbar.setViewControllers([account, chats], animated: false)
 		}
 
 // Initiate login
 		
-		guard let loginService = container.resolve(AccountService.self) else {
-			fatalError("Failed to get LoginService")
+		guard let accountService = container.resolve(AccountService.self) else {
+			fatalError("Failed to get AccountService")
 		}
 		
-		loginService.logoutAndPresentLoginStoryboard(animated: false, authorizationFinishedHandler: nil)
-		NotificationCenter.default.addObserver(forName: .userHasLoggedIn, object: nil, queue: nil) { _ in
-			print("User logged in: \(loginService.loggedAccount!)!")
+		accountService.logoutAndPresentLoginStoryboard(animated: false, authorizationFinishedHandler: nil)
+		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: nil) { _ in
+			print("User logged in: \(accountService.loggedAccount!)!")
 		}
 		
 		return true

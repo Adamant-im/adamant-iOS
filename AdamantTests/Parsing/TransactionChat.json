@@ -1,0 +1,26 @@
+{
+	"id": "16214962152767034408",
+	"height": 857385,
+	"blockId": "11054360802486546958",
+	"type": 8,
+	"timestamp": 11138999,
+	"senderPublicKey": "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f",
+	"requesterPublicKey": null,
+	"senderId": "U2279741505997340299",
+	"recipientId": "U15423595369615486571",
+	"recipientPublicKey": null,
+	"amount": 0,
+	"fee": 500000,
+	"signature": "7c58921d29beb5fbc7886053d81b37d8495db53848ebe04a8847f06dbcb810d8d675ea6501b1fe9b5ce7fbf9d7660a09895ac915dc82e6e8878fd0e919538c0e",
+	"signSignature": null,
+	"signatures": [
+	],
+	"confirmations": null,
+	"asset": {
+		"chat": {
+			"message": "e2d7cde88920914cd58f2ab86bca799052d385fe92976b41b59c4267",
+			"own_message": "898e0bd7d8008fb0396195a911d19a24a7234d2e2a00cdf9",
+			"type": 0
+		}
+	}
+}

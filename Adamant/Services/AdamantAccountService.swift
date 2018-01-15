@@ -51,7 +51,7 @@ class AdamantAccountService: AccountService {
 					self.loggedAccount = account
 					self.keypair = self.core.createKeypairFor(passphrase: passphrase)
 					
-					NotificationCenter.default.post(name: Notification.Name.userHasLoggedIn, object: account)
+					NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: account)
 					
 					if let vc = self.loginViewController {
 						vc.dismiss(animated: true, completion: nil)
@@ -79,13 +79,13 @@ class AdamantAccountService: AccountService {
 		keypair = nil
 		
 		if wasLogged {
-			NotificationCenter.default.post(name: Notification.Name.userHasLoggedOut, object: nil)
+			NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedOut, object: nil)
 		}
 	}
 }
 
 
-// MARK: - LoginService
+// MARK: - AccountService
 extension AdamantAccountService {
 	func logoutAndPresentLoginStoryboard(animated: Bool, authorizationFinishedHandler: (() -> Void)?) {
 		logout()

@@ -61,7 +61,7 @@ var adamant_core =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 112);
+/******/ 	return __webpack_require__(__webpack_require__.s = 113);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -79,8 +79,8 @@ var adamant_core =
 
 
 
-var base64 = __webpack_require__(113)
-var ieee754 = __webpack_require__(114)
+var base64 = __webpack_require__(114)
+var ieee754 = __webpack_require__(115)
 var isArray = __webpack_require__(72)
 
 exports.Buffer = Buffer
@@ -19099,7 +19099,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 
 var buffer = __webpack_require__(0);
-var assert = __webpack_require__(47);
+var assert = __webpack_require__(48);
 
 var js = __webpack_require__(7);
 var $ = __webpack_require__(4);
@@ -22812,8 +22812,8 @@ var elliptic = exports;
 
 elliptic.version = __webpack_require__(164).version;
 elliptic.utils = __webpack_require__(165);
-elliptic.rand = __webpack_require__(91);
-elliptic.curve = __webpack_require__(45);
+elliptic.rand = __webpack_require__(92);
+elliptic.curve = __webpack_require__(46);
 elliptic.curves = __webpack_require__(170);
 
 // Protocols
@@ -23038,7 +23038,7 @@ module.exports = BN;
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 
-var crypto = __webpack_require__(40);
+var crypto = __webpack_require__(41);
 var BufferUtil = __webpack_require__(5);
 var $ = __webpack_require__(4);
 
@@ -23561,7 +23561,7 @@ module.exports = Signature;
 /* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(107);
+module.exports = __webpack_require__(108);
 
 module.exports.Interpreter = __webpack_require__(213);
 
@@ -24123,7 +24123,7 @@ PublicKey.prototype._classifyArgs = function(data, extra) {
  * @private
  */
 PublicKey._isPrivateKey = function(param) {
-  var PrivateKey = __webpack_require__(48);
+  var PrivateKey = __webpack_require__(49);
   return param instanceof PrivateKey;
 };
 
@@ -24425,7 +24425,7 @@ module.exports = PublicKey;
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 
 var bufferUtil = __webpack_require__(5);
-var assert = __webpack_require__(47);
+var assert = __webpack_require__(48);
 
 var BufferWriter = function BufferWriter(obj) {
   if (!(this instanceof BufferWriter))
@@ -24581,7 +24581,7 @@ module.exports = BufferWriter;
 /***/ (function(module, exports, __webpack_require__) {
 
 var Buffer = __webpack_require__(3).Buffer
-var Transform = __webpack_require__(41).Transform
+var Transform = __webpack_require__(42).Transform
 var StringDecoder = __webpack_require__(60).StringDecoder
 var inherits = __webpack_require__(1)
 
@@ -24903,7 +24903,7 @@ var BufferReader = __webpack_require__(21);
 var BufferWriter = __webpack_require__(19);
 var BN = __webpack_require__(9);
 var Hash = __webpack_require__(10);
-var ECDSA = __webpack_require__(105);
+var ECDSA = __webpack_require__(106);
 var $ = __webpack_require__(4);
 var _ = __webpack_require__(2);
 
@@ -25241,7 +25241,7 @@ module.exports = Output;
 
 /*<replacement>*/
 
-var processNextTick = __webpack_require__(42);
+var processNextTick = __webpack_require__(43);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -25260,7 +25260,7 @@ var util = __webpack_require__(31);
 util.inherits = __webpack_require__(1);
 /*</replacement>*/
 
-var Readable = __webpack_require__(73);
+var Readable = __webpack_require__(74);
 var Writable = __webpack_require__(59);
 
 util.inherits(Duplex, Readable);
@@ -26713,7 +26713,7 @@ asn1.bignum = __webpack_require__(6);
 
 asn1.define = __webpack_require__(186).define;
 asn1.base = __webpack_require__(35);
-asn1.constants = __webpack_require__(97);
+asn1.constants = __webpack_require__(98);
 asn1.decoders = __webpack_require__(192);
 asn1.encoders = __webpack_require__(194);
 
@@ -26725,8 +26725,8 @@ asn1.encoders = __webpack_require__(194);
 var base = exports;
 
 base.Reporter = __webpack_require__(189).Reporter;
-base.DecoderBuffer = __webpack_require__(96).DecoderBuffer;
-base.EncoderBuffer = __webpack_require__(96).EncoderBuffer;
+base.DecoderBuffer = __webpack_require__(97).DecoderBuffer;
+base.EncoderBuffer = __webpack_require__(97).EncoderBuffer;
 base.Node = __webpack_require__(190);
 
 
@@ -26738,7 +26738,7 @@ base.Node = __webpack_require__(190);
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 
 var _ = __webpack_require__(2);
-var Base58 = __webpack_require__(49);
+var Base58 = __webpack_require__(50);
 var buffer = __webpack_require__(0);
 var sha256sha256 = __webpack_require__(10).sha256sha256;
 
@@ -27164,2073 +27164,6 @@ module.exports = TransactionSignature;
 
 /***/ }),
 /* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.randomBytes = exports.rng = exports.pseudoRandomBytes = exports.prng = __webpack_require__(28)
-exports.createHash = exports.Hash = __webpack_require__(30)
-exports.createHmac = exports.Hmac = __webpack_require__(78)
-
-var algos = __webpack_require__(136)
-var algoKeys = Object.keys(algos)
-var hashes = ['sha1', 'sha224', 'sha256', 'sha384', 'sha512', 'md5', 'rmd160'].concat(algoKeys)
-exports.getHashes = function () {
-  return hashes
-}
-
-var p = __webpack_require__(80)
-exports.pbkdf2 = p.pbkdf2
-exports.pbkdf2Sync = p.pbkdf2Sync
-
-var aes = __webpack_require__(138)
-
-exports.Cipher = aes.Cipher
-exports.createCipher = aes.createCipher
-exports.Cipheriv = aes.Cipheriv
-exports.createCipheriv = aes.createCipheriv
-exports.Decipher = aes.Decipher
-exports.createDecipher = aes.createDecipher
-exports.Decipheriv = aes.Decipheriv
-exports.createDecipheriv = aes.createDecipheriv
-exports.getCiphers = aes.getCiphers
-exports.listCiphers = aes.listCiphers
-
-var dh = __webpack_require__(157)
-
-exports.DiffieHellmanGroup = dh.DiffieHellmanGroup
-exports.createDiffieHellmanGroup = dh.createDiffieHellmanGroup
-exports.getDiffieHellman = dh.getDiffieHellman
-exports.createDiffieHellman = dh.createDiffieHellman
-exports.DiffieHellman = dh.DiffieHellman
-
-var sign = __webpack_require__(162)
-
-exports.createSign = sign.createSign
-exports.Sign = sign.Sign
-exports.createVerify = sign.createVerify
-exports.Verify = sign.Verify
-
-exports.createECDH = __webpack_require__(200)
-
-var publicEncrypt = __webpack_require__(201)
-
-exports.publicEncrypt = publicEncrypt.publicEncrypt
-exports.privateEncrypt = publicEncrypt.privateEncrypt
-exports.publicDecrypt = publicEncrypt.publicDecrypt
-exports.privateDecrypt = publicEncrypt.privateDecrypt
-
-// the least I can do is make error messages for the rest of the node.js/crypto api.
-// ;[
-//   'createCredentials'
-// ].forEach(function (name) {
-//   exports[name] = function () {
-//     throw new Error([
-//       'sorry, ' + name + ' is not implemented yet',
-//       'we accept pull requests',
-//       'https://github.com/crypto-browserify/crypto-browserify'
-//     ].join('\n'))
-//   }
-// })
-
-var rf = __webpack_require__(204)
-
-exports.randomFill = rf.randomFill
-exports.randomFillSync = rf.randomFillSync
-
-exports.createCredentials = function () {
-  throw new Error([
-    'sorry, createCredentials is not implemented yet',
-    'we accept pull requests',
-    'https://github.com/crypto-browserify/crypto-browserify'
-  ].join('\n'))
-}
-
-exports.constants = {
-  'DH_CHECK_P_NOT_SAFE_PRIME': 2,
-  'DH_CHECK_P_NOT_PRIME': 1,
-  'DH_UNABLE_TO_CHECK_GENERATOR': 4,
-  'DH_NOT_SUITABLE_GENERATOR': 8,
-  'NPN_ENABLED': 1,
-  'ALPN_ENABLED': 1,
-  'RSA_PKCS1_PADDING': 1,
-  'RSA_SSLV23_PADDING': 2,
-  'RSA_NO_PADDING': 3,
-  'RSA_PKCS1_OAEP_PADDING': 4,
-  'RSA_X931_PADDING': 5,
-  'RSA_PKCS1_PSS_PADDING': 6,
-  'POINT_CONVERSION_COMPRESSED': 2,
-  'POINT_CONVERSION_UNCOMPRESSED': 4,
-  'POINT_CONVERSION_HYBRID': 6
-}
-
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-module.exports = Stream;
-
-var EE = __webpack_require__(57).EventEmitter;
-var inherits = __webpack_require__(1);
-
-inherits(Stream, EE);
-Stream.Readable = __webpack_require__(58);
-Stream.Writable = __webpack_require__(127);
-Stream.Duplex = __webpack_require__(128);
-Stream.Transform = __webpack_require__(129);
-Stream.PassThrough = __webpack_require__(130);
-
-// Backwards-compat with node 0.4.x
-Stream.Stream = Stream;
-
-
-
-// old-style streams.  Note that the pipe method (the only relevant
-// part of this class) is overridden in the Readable class.
-
-function Stream() {
-  EE.call(this);
-}
-
-Stream.prototype.pipe = function(dest, options) {
-  var source = this;
-
-  function ondata(chunk) {
-    if (dest.writable) {
-      if (false === dest.write(chunk) && source.pause) {
-        source.pause();
-      }
-    }
-  }
-
-  source.on('data', ondata);
-
-  function ondrain() {
-    if (source.readable && source.resume) {
-      source.resume();
-    }
-  }
-
-  dest.on('drain', ondrain);
-
-  // If the 'end' option is not supplied, dest.end() will be called when
-  // source gets the 'end' or 'close' events.  Only dest.end() once.
-  if (!dest._isStdio && (!options || options.end !== false)) {
-    source.on('end', onend);
-    source.on('close', onclose);
-  }
-
-  var didOnEnd = false;
-  function onend() {
-    if (didOnEnd) return;
-    didOnEnd = true;
-
-    dest.end();
-  }
-
-
-  function onclose() {
-    if (didOnEnd) return;
-    didOnEnd = true;
-
-    if (typeof dest.destroy === 'function') dest.destroy();
-  }
-
-  // don't leave dangling pipes when there are errors.
-  function onerror(er) {
-    cleanup();
-    if (EE.listenerCount(this, 'error') === 0) {
-      throw er; // Unhandled stream error in pipe.
-    }
-  }
-
-  source.on('error', onerror);
-  dest.on('error', onerror);
-
-  // remove all the event listeners that were added.
-  function cleanup() {
-    source.removeListener('data', ondata);
-    dest.removeListener('drain', ondrain);
-
-    source.removeListener('end', onend);
-    source.removeListener('close', onclose);
-
-    source.removeListener('error', onerror);
-    dest.removeListener('error', onerror);
-
-    source.removeListener('end', cleanup);
-    source.removeListener('close', cleanup);
-
-    dest.removeListener('close', cleanup);
-  }
-
-  source.on('end', cleanup);
-  source.on('close', cleanup);
-
-  dest.on('close', cleanup);
-
-  dest.emit('pipe', source);
-
-  // Allow for unix-like usage: A.pipe(B).pipe(C)
-  return dest;
-};
-
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {
-
-if (!process.version ||
-    process.version.indexOf('v0.') === 0 ||
-    process.version.indexOf('v1.') === 0 && process.version.indexOf('v1.8.') !== 0) {
-  module.exports = nextTick;
-} else {
-  module.exports = process.nextTick;
-}
-
-function nextTick(fn, arg1, arg2, arg3) {
-  if (typeof fn !== 'function') {
-    throw new TypeError('"callback" argument must be a function');
-  }
-  var len = arguments.length;
-  var args, i;
-  switch (len) {
-  case 0:
-  case 1:
-    return process.nextTick(fn);
-  case 2:
-    return process.nextTick(function afterTickOne() {
-      fn.call(null, arg1);
-    });
-  case 3:
-    return process.nextTick(function afterTickTwo() {
-      fn.call(null, arg1, arg2);
-    });
-  case 4:
-    return process.nextTick(function afterTickThree() {
-      fn.call(null, arg1, arg2, arg3);
-    });
-  default:
-    args = new Array(len - 1);
-    i = 0;
-    while (i < args.length) {
-      args[i++] = arguments[i];
-    }
-    return process.nextTick(function afterTick() {
-      fn.apply(null, args);
-    });
-  }
-}
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var Buffer = __webpack_require__(3).Buffer
-var MD5 = __webpack_require__(139)
-
-/* eslint-disable camelcase */
-function EVP_BytesToKey (password, salt, keyBits, ivLen) {
-  if (!Buffer.isBuffer(password)) password = Buffer.from(password, 'binary')
-  if (salt) {
-    if (!Buffer.isBuffer(salt)) salt = Buffer.from(salt, 'binary')
-    if (salt.length !== 8) throw new RangeError('salt should be Buffer with 8 byte length')
-  }
-
-  var keyLen = keyBits / 8
-  var key = Buffer.alloc(keyLen)
-  var iv = Buffer.alloc(ivLen || 0)
-  var tmp = Buffer.alloc(0)
-
-  while (keyLen > 0 || ivLen > 0) {
-    var hash = new MD5()
-    hash.update(tmp)
-    hash.update(password)
-    if (salt) hash.update(salt)
-    tmp = hash.digest()
-
-    var used = 0
-
-    if (keyLen > 0) {
-      var keyStart = key.length - keyLen
-      used = Math.min(keyLen, tmp.length)
-      tmp.copy(key, keyStart, 0, used)
-      keyLen -= used
-    }
-
-    if (used < tmp.length && ivLen > 0) {
-      var ivStart = iv.length - ivLen
-      var length = Math.min(ivLen, tmp.length - used)
-      tmp.copy(iv, ivStart, used, used + length)
-      ivLen -= length
-    }
-  }
-
-  tmp.fill(0)
-  return { key: key, iv: iv }
-}
-
-module.exports = EVP_BytesToKey
-
-
-/***/ }),
-/* 44 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// based on the aes implimentation in triple sec
-// https://github.com/keybase/triplesec
-// which is in turn based on the one from crypto-js
-// https://code.google.com/p/crypto-js/
-
-var Buffer = __webpack_require__(3).Buffer
-
-function asUInt32Array (buf) {
-  if (!Buffer.isBuffer(buf)) buf = Buffer.from(buf)
-
-  var len = (buf.length / 4) | 0
-  var out = new Array(len)
-
-  for (var i = 0; i < len; i++) {
-    out[i] = buf.readUInt32BE(i * 4)
-  }
-
-  return out
-}
-
-function scrubVec (v) {
-  for (var i = 0; i < v.length; v++) {
-    v[i] = 0
-  }
-}
-
-function cryptBlock (M, keySchedule, SUB_MIX, SBOX, nRounds) {
-  var SUB_MIX0 = SUB_MIX[0]
-  var SUB_MIX1 = SUB_MIX[1]
-  var SUB_MIX2 = SUB_MIX[2]
-  var SUB_MIX3 = SUB_MIX[3]
-
-  var s0 = M[0] ^ keySchedule[0]
-  var s1 = M[1] ^ keySchedule[1]
-  var s2 = M[2] ^ keySchedule[2]
-  var s3 = M[3] ^ keySchedule[3]
-  var t0, t1, t2, t3
-  var ksRow = 4
-
-  for (var round = 1; round < nRounds; round++) {
-    t0 = SUB_MIX0[s0 >>> 24] ^ SUB_MIX1[(s1 >>> 16) & 0xff] ^ SUB_MIX2[(s2 >>> 8) & 0xff] ^ SUB_MIX3[s3 & 0xff] ^ keySchedule[ksRow++]
-    t1 = SUB_MIX0[s1 >>> 24] ^ SUB_MIX1[(s2 >>> 16) & 0xff] ^ SUB_MIX2[(s3 >>> 8) & 0xff] ^ SUB_MIX3[s0 & 0xff] ^ keySchedule[ksRow++]
-    t2 = SUB_MIX0[s2 >>> 24] ^ SUB_MIX1[(s3 >>> 16) & 0xff] ^ SUB_MIX2[(s0 >>> 8) & 0xff] ^ SUB_MIX3[s1 & 0xff] ^ keySchedule[ksRow++]
-    t3 = SUB_MIX0[s3 >>> 24] ^ SUB_MIX1[(s0 >>> 16) & 0xff] ^ SUB_MIX2[(s1 >>> 8) & 0xff] ^ SUB_MIX3[s2 & 0xff] ^ keySchedule[ksRow++]
-    s0 = t0
-    s1 = t1
-    s2 = t2
-    s3 = t3
-  }
-
-  t0 = ((SBOX[s0 >>> 24] << 24) | (SBOX[(s1 >>> 16) & 0xff] << 16) | (SBOX[(s2 >>> 8) & 0xff] << 8) | SBOX[s3 & 0xff]) ^ keySchedule[ksRow++]
-  t1 = ((SBOX[s1 >>> 24] << 24) | (SBOX[(s2 >>> 16) & 0xff] << 16) | (SBOX[(s3 >>> 8) & 0xff] << 8) | SBOX[s0 & 0xff]) ^ keySchedule[ksRow++]
-  t2 = ((SBOX[s2 >>> 24] << 24) | (SBOX[(s3 >>> 16) & 0xff] << 16) | (SBOX[(s0 >>> 8) & 0xff] << 8) | SBOX[s1 & 0xff]) ^ keySchedule[ksRow++]
-  t3 = ((SBOX[s3 >>> 24] << 24) | (SBOX[(s0 >>> 16) & 0xff] << 16) | (SBOX[(s1 >>> 8) & 0xff] << 8) | SBOX[s2 & 0xff]) ^ keySchedule[ksRow++]
-  t0 = t0 >>> 0
-  t1 = t1 >>> 0
-  t2 = t2 >>> 0
-  t3 = t3 >>> 0
-
-  return [t0, t1, t2, t3]
-}
-
-// AES constants
-var RCON = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36]
-var G = (function () {
-  // Compute double table
-  var d = new Array(256)
-  for (var j = 0; j < 256; j++) {
-    if (j < 128) {
-      d[j] = j << 1
-    } else {
-      d[j] = (j << 1) ^ 0x11b
-    }
-  }
-
-  var SBOX = []
-  var INV_SBOX = []
-  var SUB_MIX = [[], [], [], []]
-  var INV_SUB_MIX = [[], [], [], []]
-
-  // Walk GF(2^8)
-  var x = 0
-  var xi = 0
-  for (var i = 0; i < 256; ++i) {
-    // Compute sbox
-    var sx = xi ^ (xi << 1) ^ (xi << 2) ^ (xi << 3) ^ (xi << 4)
-    sx = (sx >>> 8) ^ (sx & 0xff) ^ 0x63
-    SBOX[x] = sx
-    INV_SBOX[sx] = x
-
-    // Compute multiplication
-    var x2 = d[x]
-    var x4 = d[x2]
-    var x8 = d[x4]
-
-    // Compute sub bytes, mix columns tables
-    var t = (d[sx] * 0x101) ^ (sx * 0x1010100)
-    SUB_MIX[0][x] = (t << 24) | (t >>> 8)
-    SUB_MIX[1][x] = (t << 16) | (t >>> 16)
-    SUB_MIX[2][x] = (t << 8) | (t >>> 24)
-    SUB_MIX[3][x] = t
-
-    // Compute inv sub bytes, inv mix columns tables
-    t = (x8 * 0x1010101) ^ (x4 * 0x10001) ^ (x2 * 0x101) ^ (x * 0x1010100)
-    INV_SUB_MIX[0][sx] = (t << 24) | (t >>> 8)
-    INV_SUB_MIX[1][sx] = (t << 16) | (t >>> 16)
-    INV_SUB_MIX[2][sx] = (t << 8) | (t >>> 24)
-    INV_SUB_MIX[3][sx] = t
-
-    if (x === 0) {
-      x = xi = 1
-    } else {
-      x = x2 ^ d[d[d[x8 ^ x2]]]
-      xi ^= d[d[xi]]
-    }
-  }
-
-  return {
-    SBOX: SBOX,
-    INV_SBOX: INV_SBOX,
-    SUB_MIX: SUB_MIX,
-    INV_SUB_MIX: INV_SUB_MIX
-  }
-})()
-
-function AES (key) {
-  this._key = asUInt32Array(key)
-  this._reset()
-}
-
-AES.blockSize = 4 * 4
-AES.keySize = 256 / 8
-AES.prototype.blockSize = AES.blockSize
-AES.prototype.keySize = AES.keySize
-AES.prototype._reset = function () {
-  var keyWords = this._key
-  var keySize = keyWords.length
-  var nRounds = keySize + 6
-  var ksRows = (nRounds + 1) * 4
-
-  var keySchedule = []
-  for (var k = 0; k < keySize; k++) {
-    keySchedule[k] = keyWords[k]
-  }
-
-  for (k = keySize; k < ksRows; k++) {
-    var t = keySchedule[k - 1]
-
-    if (k % keySize === 0) {
-      t = (t << 8) | (t >>> 24)
-      t =
-        (G.SBOX[t >>> 24] << 24) |
-        (G.SBOX[(t >>> 16) & 0xff] << 16) |
-        (G.SBOX[(t >>> 8) & 0xff] << 8) |
-        (G.SBOX[t & 0xff])
-
-      t ^= RCON[(k / keySize) | 0] << 24
-    } else if (keySize > 6 && k % keySize === 4) {
-      t =
-        (G.SBOX[t >>> 24] << 24) |
-        (G.SBOX[(t >>> 16) & 0xff] << 16) |
-        (G.SBOX[(t >>> 8) & 0xff] << 8) |
-        (G.SBOX[t & 0xff])
-    }
-
-    keySchedule[k] = keySchedule[k - keySize] ^ t
-  }
-
-  var invKeySchedule = []
-  for (var ik = 0; ik < ksRows; ik++) {
-    var ksR = ksRows - ik
-    var tt = keySchedule[ksR - (ik % 4 ? 0 : 4)]
-
-    if (ik < 4 || ksR <= 4) {
-      invKeySchedule[ik] = tt
-    } else {
-      invKeySchedule[ik] =
-        G.INV_SUB_MIX[0][G.SBOX[tt >>> 24]] ^
-        G.INV_SUB_MIX[1][G.SBOX[(tt >>> 16) & 0xff]] ^
-        G.INV_SUB_MIX[2][G.SBOX[(tt >>> 8) & 0xff]] ^
-        G.INV_SUB_MIX[3][G.SBOX[tt & 0xff]]
-    }
-  }
-
-  this._nRounds = nRounds
-  this._keySchedule = keySchedule
-  this._invKeySchedule = invKeySchedule
-}
-
-AES.prototype.encryptBlockRaw = function (M) {
-  M = asUInt32Array(M)
-  return cryptBlock(M, this._keySchedule, G.SUB_MIX, G.SBOX, this._nRounds)
-}
-
-AES.prototype.encryptBlock = function (M) {
-  var out = this.encryptBlockRaw(M)
-  var buf = Buffer.allocUnsafe(16)
-  buf.writeUInt32BE(out[0], 0)
-  buf.writeUInt32BE(out[1], 4)
-  buf.writeUInt32BE(out[2], 8)
-  buf.writeUInt32BE(out[3], 12)
-  return buf
-}
-
-AES.prototype.decryptBlock = function (M) {
-  M = asUInt32Array(M)
-
-  // swap
-  var m1 = M[1]
-  M[1] = M[3]
-  M[3] = m1
-
-  var out = cryptBlock(M, this._invKeySchedule, G.INV_SUB_MIX, G.INV_SBOX, this._nRounds)
-  var buf = Buffer.allocUnsafe(16)
-  buf.writeUInt32BE(out[0], 0)
-  buf.writeUInt32BE(out[3], 4)
-  buf.writeUInt32BE(out[2], 8)
-  buf.writeUInt32BE(out[1], 12)
-  return buf
-}
-
-AES.prototype.scrub = function () {
-  scrubVec(this._keySchedule)
-  scrubVec(this._invKeySchedule)
-  scrubVec(this._key)
-}
-
-module.exports.AES = AES
-
-
-/***/ }),
-/* 45 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var curve = exports;
-
-curve.base = __webpack_require__(166);
-curve.short = __webpack_require__(167);
-curve.mont = __webpack_require__(168);
-curve.edwards = __webpack_require__(169);
-
-
-/***/ }),
-/* 46 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(Buffer) {var asn1 = __webpack_require__(185)
-var aesid = __webpack_require__(197)
-var fixProc = __webpack_require__(198)
-var ciphers = __webpack_require__(62)
-var compat = __webpack_require__(80)
-module.exports = parseKeys
-
-function parseKeys (buffer) {
-  var password
-  if (typeof buffer === 'object' && !Buffer.isBuffer(buffer)) {
-    password = buffer.passphrase
-    buffer = buffer.key
-  }
-  if (typeof buffer === 'string') {
-    buffer = new Buffer(buffer)
-  }
-
-  var stripped = fixProc(buffer, password)
-
-  var type = stripped.tag
-  var data = stripped.data
-  var subtype, ndata
-  switch (type) {
-    case 'CERTIFICATE':
-      ndata = asn1.certificate.decode(data, 'der').tbsCertificate.subjectPublicKeyInfo
-      // falls through
-    case 'PUBLIC KEY':
-      if (!ndata) {
-        ndata = asn1.PublicKey.decode(data, 'der')
-      }
-      subtype = ndata.algorithm.algorithm.join('.')
-      switch (subtype) {
-        case '1.2.840.113549.1.1.1':
-          return asn1.RSAPublicKey.decode(ndata.subjectPublicKey.data, 'der')
-        case '1.2.840.10045.2.1':
-          ndata.subjectPrivateKey = ndata.subjectPublicKey
-          return {
-            type: 'ec',
-            data: ndata
-          }
-        case '1.2.840.10040.4.1':
-          ndata.algorithm.params.pub_key = asn1.DSAparam.decode(ndata.subjectPublicKey.data, 'der')
-          return {
-            type: 'dsa',
-            data: ndata.algorithm.params
-          }
-        default: throw new Error('unknown key id ' + subtype)
-      }
-      throw new Error('unknown key type ' + type)
-    case 'ENCRYPTED PRIVATE KEY':
-      data = asn1.EncryptedPrivateKey.decode(data, 'der')
-      data = decrypt(data, password)
-      // falls through
-    case 'PRIVATE KEY':
-      ndata = asn1.PrivateKey.decode(data, 'der')
-      subtype = ndata.algorithm.algorithm.join('.')
-      switch (subtype) {
-        case '1.2.840.113549.1.1.1':
-          return asn1.RSAPrivateKey.decode(ndata.subjectPrivateKey, 'der')
-        case '1.2.840.10045.2.1':
-          return {
-            curve: ndata.algorithm.curve,
-            privateKey: asn1.ECPrivateKey.decode(ndata.subjectPrivateKey, 'der').privateKey
-          }
-        case '1.2.840.10040.4.1':
-          ndata.algorithm.params.priv_key = asn1.DSAparam.decode(ndata.subjectPrivateKey, 'der')
-          return {
-            type: 'dsa',
-            params: ndata.algorithm.params
-          }
-        default: throw new Error('unknown key id ' + subtype)
-      }
-      throw new Error('unknown key type ' + type)
-    case 'RSA PUBLIC KEY':
-      return asn1.RSAPublicKey.decode(data, 'der')
-    case 'RSA PRIVATE KEY':
-      return asn1.RSAPrivateKey.decode(data, 'der')
-    case 'DSA PRIVATE KEY':
-      return {
-        type: 'dsa',
-        params: asn1.DSAPrivateKey.decode(data, 'der')
-      }
-    case 'EC PRIVATE KEY':
-      data = asn1.ECPrivateKey.decode(data, 'der')
-      return {
-        curve: data.parameters.value,
-        privateKey: data.privateKey
-      }
-    default: throw new Error('unknown key type ' + type)
-  }
-}
-parseKeys.signature = asn1.signature
-function decrypt (data, password) {
-  var salt = data.algorithm.decrypt.kde.kdeparams.salt
-  var iters = parseInt(data.algorithm.decrypt.kde.kdeparams.iters.toString(), 10)
-  var algo = aesid[data.algorithm.decrypt.cipher.algo.join('.')]
-  var iv = data.algorithm.decrypt.cipher.iv
-  var cipherText = data.subjectPrivateKey
-  var keylen = parseInt(algo.split('-')[1], 10) / 8
-  var key = compat.pbkdf2Sync(password, salt, iters, keylen)
-  var cipher = ciphers.createDecipheriv(algo, key, iv)
-  var out = []
-  out.push(cipher.update(cipherText))
-  out.push(cipher.final())
-  return Buffer.concat(out)
-}
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 47 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
-
-// compare and isBuffer taken from https://github.com/feross/buffer/blob/680e9e5e488f22aac27599a57dc844a6315928dd/index.js
-// original notice:
-
-/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * @license  MIT
- */
-function compare(a, b) {
-  if (a === b) {
-    return 0;
-  }
-
-  var x = a.length;
-  var y = b.length;
-
-  for (var i = 0, len = Math.min(x, y); i < len; ++i) {
-    if (a[i] !== b[i]) {
-      x = a[i];
-      y = b[i];
-      break;
-    }
-  }
-
-  if (x < y) {
-    return -1;
-  }
-  if (y < x) {
-    return 1;
-  }
-  return 0;
-}
-function isBuffer(b) {
-  if (global.Buffer && typeof global.Buffer.isBuffer === 'function') {
-    return global.Buffer.isBuffer(b);
-  }
-  return !!(b != null && b._isBuffer);
-}
-
-// based on node assert, original notice:
-
-// http://wiki.commonjs.org/wiki/Unit_Testing/1.0
-//
-// THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
-//
-// Originally from narwhal.js (http://narwhaljs.org)
-// Copyright (c) 2009 Thomas Robinson <280north.com>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the 'Software'), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-var util = __webpack_require__(209);
-var hasOwn = Object.prototype.hasOwnProperty;
-var pSlice = Array.prototype.slice;
-var functionsHaveNames = (function () {
-  return function foo() {}.name === 'foo';
-}());
-function pToString (obj) {
-  return Object.prototype.toString.call(obj);
-}
-function isView(arrbuf) {
-  if (isBuffer(arrbuf)) {
-    return false;
-  }
-  if (typeof global.ArrayBuffer !== 'function') {
-    return false;
-  }
-  if (typeof ArrayBuffer.isView === 'function') {
-    return ArrayBuffer.isView(arrbuf);
-  }
-  if (!arrbuf) {
-    return false;
-  }
-  if (arrbuf instanceof DataView) {
-    return true;
-  }
-  if (arrbuf.buffer && arrbuf.buffer instanceof ArrayBuffer) {
-    return true;
-  }
-  return false;
-}
-// 1. The assert module provides functions that throw
-// AssertionError's when particular conditions are not met. The
-// assert module must conform to the following interface.
-
-var assert = module.exports = ok;
-
-// 2. The AssertionError is defined in assert.
-// new assert.AssertionError({ message: message,
-//                             actual: actual,
-//                             expected: expected })
-
-var regex = /\s*function\s+([^\(\s]*)\s*/;
-// based on https://github.com/ljharb/function.prototype.name/blob/adeeeec8bfcc6068b187d7d9fb3d5bb1d3a30899/implementation.js
-function getName(func) {
-  if (!util.isFunction(func)) {
-    return;
-  }
-  if (functionsHaveNames) {
-    return func.name;
-  }
-  var str = func.toString();
-  var match = str.match(regex);
-  return match && match[1];
-}
-assert.AssertionError = function AssertionError(options) {
-  this.name = 'AssertionError';
-  this.actual = options.actual;
-  this.expected = options.expected;
-  this.operator = options.operator;
-  if (options.message) {
-    this.message = options.message;
-    this.generatedMessage = false;
-  } else {
-    this.message = getMessage(this);
-    this.generatedMessage = true;
-  }
-  var stackStartFunction = options.stackStartFunction || fail;
-  if (Error.captureStackTrace) {
-    Error.captureStackTrace(this, stackStartFunction);
-  } else {
-    // non v8 browsers so we can have a stacktrace
-    var err = new Error();
-    if (err.stack) {
-      var out = err.stack;
-
-      // try to strip useless frames
-      var fn_name = getName(stackStartFunction);
-      var idx = out.indexOf('\n' + fn_name);
-      if (idx >= 0) {
-        // once we have located the function frame
-        // we need to strip out everything before it (and its line)
-        var next_line = out.indexOf('\n', idx + 1);
-        out = out.substring(next_line + 1);
-      }
-
-      this.stack = out;
-    }
-  }
-};
-
-// assert.AssertionError instanceof Error
-util.inherits(assert.AssertionError, Error);
-
-function truncate(s, n) {
-  if (typeof s === 'string') {
-    return s.length < n ? s : s.slice(0, n);
-  } else {
-    return s;
-  }
-}
-function inspect(something) {
-  if (functionsHaveNames || !util.isFunction(something)) {
-    return util.inspect(something);
-  }
-  var rawname = getName(something);
-  var name = rawname ? ': ' + rawname : '';
-  return '[Function' +  name + ']';
-}
-function getMessage(self) {
-  return truncate(inspect(self.actual), 128) + ' ' +
-         self.operator + ' ' +
-         truncate(inspect(self.expected), 128);
-}
-
-// At present only the three keys mentioned above are used and
-// understood by the spec. Implementations or sub modules can pass
-// other keys to the AssertionError's constructor - they will be
-// ignored.
-
-// 3. All of the following functions must throw an AssertionError
-// when a corresponding condition is not met, with a message that
-// may be undefined if not provided.  All assertion methods provide
-// both the actual and expected values to the assertion error for
-// display purposes.
-
-function fail(actual, expected, message, operator, stackStartFunction) {
-  throw new assert.AssertionError({
-    message: message,
-    actual: actual,
-    expected: expected,
-    operator: operator,
-    stackStartFunction: stackStartFunction
-  });
-}
-
-// EXTENSION! allows for well behaved errors defined elsewhere.
-assert.fail = fail;
-
-// 4. Pure assertion tests whether a value is truthy, as determined
-// by !!guard.
-// assert.ok(guard, message_opt);
-// This statement is equivalent to assert.equal(true, !!guard,
-// message_opt);. To test strictly for the value true, use
-// assert.strictEqual(true, guard, message_opt);.
-
-function ok(value, message) {
-  if (!value) fail(value, true, message, '==', assert.ok);
-}
-assert.ok = ok;
-
-// 5. The equality assertion tests shallow, coercive equality with
-// ==.
-// assert.equal(actual, expected, message_opt);
-
-assert.equal = function equal(actual, expected, message) {
-  if (actual != expected) fail(actual, expected, message, '==', assert.equal);
-};
-
-// 6. The non-equality assertion tests for whether two objects are not equal
-// with != assert.notEqual(actual, expected, message_opt);
-
-assert.notEqual = function notEqual(actual, expected, message) {
-  if (actual == expected) {
-    fail(actual, expected, message, '!=', assert.notEqual);
-  }
-};
-
-// 7. The equivalence assertion tests a deep equality relation.
-// assert.deepEqual(actual, expected, message_opt);
-
-assert.deepEqual = function deepEqual(actual, expected, message) {
-  if (!_deepEqual(actual, expected, false)) {
-    fail(actual, expected, message, 'deepEqual', assert.deepEqual);
-  }
-};
-
-assert.deepStrictEqual = function deepStrictEqual(actual, expected, message) {
-  if (!_deepEqual(actual, expected, true)) {
-    fail(actual, expected, message, 'deepStrictEqual', assert.deepStrictEqual);
-  }
-};
-
-function _deepEqual(actual, expected, strict, memos) {
-  // 7.1. All identical values are equivalent, as determined by ===.
-  if (actual === expected) {
-    return true;
-  } else if (isBuffer(actual) && isBuffer(expected)) {
-    return compare(actual, expected) === 0;
-
-  // 7.2. If the expected value is a Date object, the actual value is
-  // equivalent if it is also a Date object that refers to the same time.
-  } else if (util.isDate(actual) && util.isDate(expected)) {
-    return actual.getTime() === expected.getTime();
-
-  // 7.3 If the expected value is a RegExp object, the actual value is
-  // equivalent if it is also a RegExp object with the same source and
-  // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
-  } else if (util.isRegExp(actual) && util.isRegExp(expected)) {
-    return actual.source === expected.source &&
-           actual.global === expected.global &&
-           actual.multiline === expected.multiline &&
-           actual.lastIndex === expected.lastIndex &&
-           actual.ignoreCase === expected.ignoreCase;
-
-  // 7.4. Other pairs that do not both pass typeof value == 'object',
-  // equivalence is determined by ==.
-  } else if ((actual === null || typeof actual !== 'object') &&
-             (expected === null || typeof expected !== 'object')) {
-    return strict ? actual === expected : actual == expected;
-
-  // If both values are instances of typed arrays, wrap their underlying
-  // ArrayBuffers in a Buffer each to increase performance
-  // This optimization requires the arrays to have the same type as checked by
-  // Object.prototype.toString (aka pToString). Never perform binary
-  // comparisons for Float*Arrays, though, since e.g. +0 === -0 but their
-  // bit patterns are not identical.
-  } else if (isView(actual) && isView(expected) &&
-             pToString(actual) === pToString(expected) &&
-             !(actual instanceof Float32Array ||
-               actual instanceof Float64Array)) {
-    return compare(new Uint8Array(actual.buffer),
-                   new Uint8Array(expected.buffer)) === 0;
-
-  // 7.5 For all other Object pairs, including Array objects, equivalence is
-  // determined by having the same number of owned properties (as verified
-  // with Object.prototype.hasOwnProperty.call), the same set of keys
-  // (although not necessarily the same order), equivalent values for every
-  // corresponding key, and an identical 'prototype' property. Note: this
-  // accounts for both named and indexed properties on Arrays.
-  } else if (isBuffer(actual) !== isBuffer(expected)) {
-    return false;
-  } else {
-    memos = memos || {actual: [], expected: []};
-
-    var actualIndex = memos.actual.indexOf(actual);
-    if (actualIndex !== -1) {
-      if (actualIndex === memos.expected.indexOf(expected)) {
-        return true;
-      }
-    }
-
-    memos.actual.push(actual);
-    memos.expected.push(expected);
-
-    return objEquiv(actual, expected, strict, memos);
-  }
-}
-
-function isArguments(object) {
-  return Object.prototype.toString.call(object) == '[object Arguments]';
-}
-
-function objEquiv(a, b, strict, actualVisitedObjects) {
-  if (a === null || a === undefined || b === null || b === undefined)
-    return false;
-  // if one is a primitive, the other must be same
-  if (util.isPrimitive(a) || util.isPrimitive(b))
-    return a === b;
-  if (strict && Object.getPrototypeOf(a) !== Object.getPrototypeOf(b))
-    return false;
-  var aIsArgs = isArguments(a);
-  var bIsArgs = isArguments(b);
-  if ((aIsArgs && !bIsArgs) || (!aIsArgs && bIsArgs))
-    return false;
-  if (aIsArgs) {
-    a = pSlice.call(a);
-    b = pSlice.call(b);
-    return _deepEqual(a, b, strict);
-  }
-  var ka = objectKeys(a);
-  var kb = objectKeys(b);
-  var key, i;
-  // having the same number of owned properties (keys incorporates
-  // hasOwnProperty)
-  if (ka.length !== kb.length)
-    return false;
-  //the same set of keys (although not necessarily the same order),
-  ka.sort();
-  kb.sort();
-  //~~~cheap key test
-  for (i = ka.length - 1; i >= 0; i--) {
-    if (ka[i] !== kb[i])
-      return false;
-  }
-  //equivalent values for every corresponding key, and
-  //~~~possibly expensive deep test
-  for (i = ka.length - 1; i >= 0; i--) {
-    key = ka[i];
-    if (!_deepEqual(a[key], b[key], strict, actualVisitedObjects))
-      return false;
-  }
-  return true;
-}
-
-// 8. The non-equivalence assertion tests for any deep inequality.
-// assert.notDeepEqual(actual, expected, message_opt);
-
-assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
-  if (_deepEqual(actual, expected, false)) {
-    fail(actual, expected, message, 'notDeepEqual', assert.notDeepEqual);
-  }
-};
-
-assert.notDeepStrictEqual = notDeepStrictEqual;
-function notDeepStrictEqual(actual, expected, message) {
-  if (_deepEqual(actual, expected, true)) {
-    fail(actual, expected, message, 'notDeepStrictEqual', notDeepStrictEqual);
-  }
-}
-
-
-// 9. The strict equality assertion tests strict equality, as determined by ===.
-// assert.strictEqual(actual, expected, message_opt);
-
-assert.strictEqual = function strictEqual(actual, expected, message) {
-  if (actual !== expected) {
-    fail(actual, expected, message, '===', assert.strictEqual);
-  }
-};
-
-// 10. The strict non-equality assertion tests for strict inequality, as
-// determined by !==.  assert.notStrictEqual(actual, expected, message_opt);
-
-assert.notStrictEqual = function notStrictEqual(actual, expected, message) {
-  if (actual === expected) {
-    fail(actual, expected, message, '!==', assert.notStrictEqual);
-  }
-};
-
-function expectedException(actual, expected) {
-  if (!actual || !expected) {
-    return false;
-  }
-
-  if (Object.prototype.toString.call(expected) == '[object RegExp]') {
-    return expected.test(actual);
-  }
-
-  try {
-    if (actual instanceof expected) {
-      return true;
-    }
-  } catch (e) {
-    // Ignore.  The instanceof check doesn't work for arrow functions.
-  }
-
-  if (Error.isPrototypeOf(expected)) {
-    return false;
-  }
-
-  return expected.call({}, actual) === true;
-}
-
-function _tryBlock(block) {
-  var error;
-  try {
-    block();
-  } catch (e) {
-    error = e;
-  }
-  return error;
-}
-
-function _throws(shouldThrow, block, expected, message) {
-  var actual;
-
-  if (typeof block !== 'function') {
-    throw new TypeError('"block" argument must be a function');
-  }
-
-  if (typeof expected === 'string') {
-    message = expected;
-    expected = null;
-  }
-
-  actual = _tryBlock(block);
-
-  message = (expected && expected.name ? ' (' + expected.name + ').' : '.') +
-            (message ? ' ' + message : '.');
-
-  if (shouldThrow && !actual) {
-    fail(actual, expected, 'Missing expected exception' + message);
-  }
-
-  var userProvidedMessage = typeof message === 'string';
-  var isUnwantedException = !shouldThrow && util.isError(actual);
-  var isUnexpectedException = !shouldThrow && actual && !expected;
-
-  if ((isUnwantedException &&
-      userProvidedMessage &&
-      expectedException(actual, expected)) ||
-      isUnexpectedException) {
-    fail(actual, expected, 'Got unwanted exception' + message);
-  }
-
-  if ((shouldThrow && actual && expected &&
-      !expectedException(actual, expected)) || (!shouldThrow && actual)) {
-    throw actual;
-  }
-}
-
-// 11. Expected to throw an error:
-// assert.throws(block, Error_opt, message_opt);
-
-assert.throws = function(block, /*optional*/error, /*optional*/message) {
-  _throws(true, block, error, message);
-};
-
-// EXTENSION! This is annoying to write outside this module.
-assert.doesNotThrow = function(block, /*optional*/error, /*optional*/message) {
-  _throws(false, block, error, message);
-};
-
-assert.ifError = function(err) { if (err) throw err; };
-
-var objectKeys = Object.keys || function (obj) {
-  var keys = [];
-  for (var key in obj) {
-    if (hasOwn.call(obj, key)) keys.push(key);
-  }
-  return keys;
-};
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
-
-/***/ }),
-/* 48 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer) {
-
-var _ = __webpack_require__(2);
-var Address = __webpack_require__(26);
-var Base58Check = __webpack_require__(36);
-var BN = __webpack_require__(9);
-var JSUtil = __webpack_require__(7);
-var Networks = __webpack_require__(25);
-var Point = __webpack_require__(29);
-var PublicKey = __webpack_require__(18);
-var Random = __webpack_require__(51);
-var $ = __webpack_require__(4);
-
-/**
- * Instantiate a PrivateKey from a BN, Buffer and WIF.
- *
- * @example
- * ```javascript
- * // generate a new random key
- * var key = PrivateKey();
- *
- * // get the associated address
- * var address = key.toAddress();
- *
- * // encode into wallet export format
- * var exported = key.toWIF();
- *
- * // instantiate from the exported (and saved) private key
- * var imported = PrivateKey.fromWIF(exported);
- * ```
- *
- * @param {string} data - The encoded data in various formats
- * @param {Network|string=} network - a {@link Network} object, or a string with the network name
- * @returns {PrivateKey} A new valid instance of an PrivateKey
- * @constructor
- */
-function PrivateKey(data, network) {
-  /* jshint maxstatements: 20 */
-  /* jshint maxcomplexity: 8 */
-
-  if (!(this instanceof PrivateKey)) {
-    return new PrivateKey(data, network);
-  }
-  if (data instanceof PrivateKey) {
-    return data;
-  }
-
-  var info = this._classifyArguments(data, network);
-
-  // validation
-  if (!info.bn || info.bn.cmp(new BN(0)) === 0){
-    throw new TypeError('Number can not be equal to zero, undefined, null or false');
-  }
-  if (!info.bn.lt(Point.getN())) {
-    throw new TypeError('Number must be less than N');
-  }
-  if (typeof(info.network) === 'undefined') {
-    throw new TypeError('Must specify the network ("livenet" or "testnet")');
-  }
-
-  JSUtil.defineImmutable(this, {
-    bn: info.bn,
-    compressed: info.compressed,
-    network: info.network
-  });
-
-  Object.defineProperty(this, 'publicKey', {
-    configurable: false,
-    enumerable: true,
-    get: this.toPublicKey.bind(this)
-  });
-
-  return this;
-
-};
-
-/**
- * Internal helper to instantiate PrivateKey internal `info` object from
- * different kinds of arguments passed to the constructor.
- *
- * @param {*} data
- * @param {Network|string=} network - a {@link Network} object, or a string with the network name
- * @return {Object}
- */
-PrivateKey.prototype._classifyArguments = function(data, network) {
-  /* jshint maxcomplexity: 10 */
-  var info = {
-    compressed: true,
-    network: network ? Networks.get(network) : Networks.defaultNetwork
-  };
-
-  // detect type of data
-  if (_.isUndefined(data) || _.isNull(data)){
-    info.bn = PrivateKey._getRandomBN();
-  } else if (data instanceof BN) {
-    info.bn = data;
-  } else if (data instanceof Buffer || data instanceof Uint8Array) {
-    info = PrivateKey._transformBuffer(data, network);
-  } else if (data.bn && data.network){
-    info = PrivateKey._transformObject(data);
-  } else if (!network && Networks.get(data)) {
-    info.bn = PrivateKey._getRandomBN();
-    info.network = Networks.get(data);
-  } else if (typeof(data) === 'string'){
-    if (JSUtil.isHexa(data)) {
-      info.bn = new BN(new Buffer(data, 'hex'));
-    } else {
-      info = PrivateKey._transformWIF(data, network);
-    }
-  } else {
-    throw new TypeError('First argument is an unrecognized data type.');
-  }
-  return info;
-};
-
-/**
- * Internal function to get a random Big Number (BN)
- *
- * @returns {BN} A new randomly generated BN
- * @private
- */
-PrivateKey._getRandomBN = function(){
-  var condition;
-  var bn;
-  do {
-    var privbuf = Random.getRandomBuffer(32);
-    bn = BN.fromBuffer(privbuf);
-    condition = bn.lt(Point.getN());
-  } while (!condition);
-  return bn;
-};
-
-/**
- * Internal function to transform a WIF Buffer into a private key
- *
- * @param {Buffer} buf - An WIF string
- * @param {Network|string=} network - a {@link Network} object, or a string with the network name
- * @returns {Object} An object with keys: bn, network and compressed
- * @private
- */
-PrivateKey._transformBuffer = function(buf, network) {
-
-  var info = {};
-
-  if (buf.length === 32) {
-    return PrivateKey._transformBNBuffer(buf, network);
-  }
-
-  info.network = Networks.get(buf[0], 'privatekey');
-
-  if (!info.network) {
-    throw new Error('Invalid network');
-  }
-
-  if (network && info.network !== Networks.get(network)) {
-    throw new TypeError('Private key network mismatch');
-  }
-
-  if (buf.length === 1 + 32 + 1 && buf[1 + 32 + 1 - 1] === 1) {
-    info.compressed = true;
-  } else if (buf.length === 1 + 32) {
-    info.compressed = false;
-  } else {
-    throw new Error('Length of buffer must be 33 (uncompressed) or 34 (compressed)');
-  }
-
-  info.bn = BN.fromBuffer(buf.slice(1, 32 + 1));
-
-  return info;
-};
-
-/**
- * Internal function to transform a BN buffer into a private key
- *
- * @param {Buffer} buf
- * @param {Network|string=} network - a {@link Network} object, or a string with the network name
- * @returns {object} an Object with keys: bn, network, and compressed
- * @private
- */
-PrivateKey._transformBNBuffer = function(buf, network) {
-  var info = {};
-  info.network = Networks.get(network) || Networks.defaultNetwork;
-  info.bn = BN.fromBuffer(buf);
-  info.compressed = false;
-  return info;
-};
-
-/**
- * Internal function to transform a WIF string into a private key
- *
- * @param {string} buf - An WIF string
- * @returns {Object} An object with keys: bn, network and compressed
- * @private
- */
-PrivateKey._transformWIF = function(str, network) {
-  return PrivateKey._transformBuffer(Base58Check.decode(str), network);
-};
-
-/**
- * Instantiate a PrivateKey from a Buffer with the DER or WIF representation
- *
- * @param {Buffer} arg
- * @param {Network} network
- * @return {PrivateKey}
- */
-PrivateKey.fromBuffer = function(arg, network) {
-  return new PrivateKey(arg, network);
-};
-
-/**
- * Internal function to transform a JSON string on plain object into a private key
- * return this.
- *
- * @param {string} json - A JSON string or plain object
- * @returns {Object} An object with keys: bn, network and compressed
- * @private
- */
-PrivateKey._transformObject = function(json) {
-  var bn = new BN(json.bn, 'hex');
-  var network = Networks.get(json.network);
-  return {
-    bn: bn,
-    network: network,
-    compressed: json.compressed
-  };
-};
-
-/**
- * Instantiate a PrivateKey from a WIF string
- *
- * @param {string} str - The WIF encoded private key string
- * @returns {PrivateKey} A new valid instance of PrivateKey
- */
-PrivateKey.fromString = PrivateKey.fromWIF = function(str) {
-  $.checkArgument(_.isString(str), 'First argument is expected to be a string.');
-  return new PrivateKey(str);
-};
-
-/**
- * Instantiate a PrivateKey from a plain JavaScript object
- *
- * @param {Object} obj - The output from privateKey.toObject()
- */
-PrivateKey.fromObject = function(obj) {
-  $.checkArgument(_.isObject(obj), 'First argument is expected to be an object.');
-  return new PrivateKey(obj);
-};
-
-/**
- * Instantiate a PrivateKey from random bytes
- *
- * @param {string=} network - Either "livenet" or "testnet"
- * @returns {PrivateKey} A new valid instance of PrivateKey
- */
-PrivateKey.fromRandom = function(network) {
-  var bn = PrivateKey._getRandomBN();
-  return new PrivateKey(bn, network);
-};
-
-/**
- * Check if there would be any errors when initializing a PrivateKey
- *
- * @param {string} data - The encoded data in various formats
- * @param {string=} network - Either "livenet" or "testnet"
- * @returns {null|Error} An error if exists
- */
-
-PrivateKey.getValidationError = function(data, network) {
-  var error;
-  try {
-    /* jshint nonew: false */
-    new PrivateKey(data, network);
-  } catch (e) {
-    error = e;
-  }
-  return error;
-};
-
-/**
- * Check if the parameters are valid
- *
- * @param {string} data - The encoded data in various formats
- * @param {string=} network - Either "livenet" or "testnet"
- * @returns {Boolean} If the private key is would be valid
- */
-PrivateKey.isValid = function(data, network){
-  if (!data) {
-    return false;
-  }
-  return !PrivateKey.getValidationError(data, network);
-};
-
-/**
- * Will output the PrivateKey encoded as hex string
- *
- * @returns {string}
- */
-PrivateKey.prototype.toString = function() {
-  return this.toBuffer().toString('hex');
-};
-
-/**
- * Will output the PrivateKey to a WIF string
- *
- * @returns {string} A WIP representation of the private key
- */
-PrivateKey.prototype.toWIF = function() {
-  var network = this.network;
-  var compressed = this.compressed;
-
-  var buf;
-  if (compressed) {
-    buf = Buffer.concat([new Buffer([network.privatekey]),
-                         this.bn.toBuffer({size: 32}),
-                         new Buffer([0x01])]);
-  } else {
-    buf = Buffer.concat([new Buffer([network.privatekey]),
-                         this.bn.toBuffer({size: 32})]);
-  }
-
-  return Base58Check.encode(buf);
-};
-
-/**
- * Will return the private key as a BN instance
- *
- * @returns {BN} A BN instance of the private key
- */
-PrivateKey.prototype.toBigNumber = function(){
-  return this.bn;
-};
-
-/**
- * Will return the private key as a BN buffer
- *
- * @returns {Buffer} A buffer of the private key
- */
-PrivateKey.prototype.toBuffer = function(){
-  // TODO: use `return this.bn.toBuffer({ size: 32 })` in v1.0.0
-  return this.bn.toBuffer();
-};
-
-/**
- * WARNING: This method will not be officially supported until v1.0.0.
- *
- *
- * Will return the private key as a BN buffer without leading zero padding
- *
- * @returns {Buffer} A buffer of the private key
- */
-PrivateKey.prototype.toBufferNoPadding = function() {
-  return this.bn.toBuffer();
-};
-
-/**
- * Will return the corresponding public key
- *
- * @returns {PublicKey} A public key generated from the private key
- */
-PrivateKey.prototype.toPublicKey = function(){
-  if (!this._pubkey) {
-    this._pubkey = PublicKey.fromPrivateKey(this);
-  }
-  return this._pubkey;
-};
-
-/**
- * Will return an address for the private key
- * @param {Network=} network - optional parameter specifying
- * the desired network for the address
- *
- * @returns {Address} An address generated from the private key
- */
-PrivateKey.prototype.toAddress = function(network) {
-  var pubkey = this.toPublicKey();
-  return Address.fromPublicKey(pubkey, network || this.network);
-};
-
-/**
- * @returns {Object} A plain object representation
- */
-PrivateKey.prototype.toObject = PrivateKey.prototype.toJSON = function toObject() {
-  return {
-    bn: this.bn.toString('hex'),
-    compressed: this.compressed,
-    network: this.network.toString()
-  };
-};
-
-/**
- * Will return a string formatted for the console
- *
- * @returns {string} Private key
- */
-PrivateKey.prototype.inspect = function() {
-  var uncompressed = !this.compressed ? ', uncompressed' : '';
-  return '<PrivateKey: ' + this.toString() + ', network: ' + this.network + uncompressed + '>';
-};
-
-module.exports = PrivateKey;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 49 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer) {
-
-var _ = __webpack_require__(2);
-var bs58 = __webpack_require__(106);
-var buffer = __webpack_require__(0);
-
-var ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'.split('');
-
-var Base58 = function Base58(obj) {
-  /* jshint maxcomplexity: 8 */
-  if (!(this instanceof Base58)) {
-    return new Base58(obj);
-  }
-  if (Buffer.isBuffer(obj)) {
-    var buf = obj;
-    this.fromBuffer(buf);
-  } else if (typeof obj === 'string') {
-    var str = obj;
-    this.fromString(str);
-  } else if (obj) {
-    this.set(obj);
-  }
-};
-
-Base58.validCharacters = function validCharacters(chars) {
-  if (buffer.Buffer.isBuffer(chars)) {
-    chars = chars.toString();
-  }
-  return _.every(_.map(chars, function(char) { return _.includes(ALPHABET, char); }));
-};
-
-Base58.prototype.set = function(obj) {
-  this.buf = obj.buf || this.buf || undefined;
-  return this;
-};
-
-Base58.encode = function(buf) {
-  if (!buffer.Buffer.isBuffer(buf)) {
-    throw new Error('Input should be a buffer');
-  }
-  return bs58.encode(buf);
-};
-
-Base58.decode = function(str) {
-  if (typeof str !== 'string') {
-    throw new Error('Input should be a string');
-  }
-  return new Buffer(bs58.decode(str));
-};
-
-Base58.prototype.fromBuffer = function(buf) {
-  this.buf = buf;
-  return this;
-};
-
-Base58.prototype.fromString = function(str) {
-  var buf = Base58.decode(str);
-  this.buf = buf;
-  return this;
-};
-
-Base58.prototype.toBuffer = function() {
-  return this.buf;
-};
-
-Base58.prototype.toString = function() {
-  return Base58.encode(this.buf);
-};
-
-module.exports = Base58;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 50 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(69);
-
-module.exports.Input = __webpack_require__(70);
-module.exports.Output = __webpack_require__(23);
-module.exports.UnspentOutput = __webpack_require__(108);
-module.exports.Signature = __webpack_require__(39);
-module.exports.Sighash = __webpack_require__(22);
-
-
-/***/ }),
-/* 51 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process, Buffer) {
-
-function Random() {
-}
-
-/* secure random bytes that sometimes throws an error due to lack of entropy */
-Random.getRandomBuffer = function(size) {
-  if (process.browser)
-    return Random.getRandomBufferBrowser(size);
-  else
-    return Random.getRandomBufferNode(size);
-};
-
-Random.getRandomBufferNode = function(size) {
-  var crypto = __webpack_require__(40);
-  return crypto.randomBytes(size);
-};
-
-Random.getRandomBufferBrowser = function(size) {
-  if (!window.crypto && !window.msCrypto)
-    throw new Error('window.crypto not available');
-
-  if (window.crypto && window.crypto.getRandomValues)
-    var crypto = window.crypto;
-  else if (window.msCrypto && window.msCrypto.getRandomValues) //internet explorer
-    var crypto = window.msCrypto;
-  else
-    throw new Error('window.crypto.getRandomValues not available');
-
-  var bbuf = new Uint8Array(size);
-  crypto.getRandomValues(bbuf);
-  var buf = new Buffer(bbuf);
-
-  return buf;
-};
-
-/* insecure random bytes, but it never fails */
-Random.getPseudoRandomBuffer = function(size) {
-  var b32 = 0x100000000;
-  var b = new Buffer(size);
-  var r;
-
-  for (var i = 0; i <= size; i++) {
-    var j = Math.floor(i / 4);
-    var k = i - j * 4;
-    if (k === 0) {
-      r = Math.random() * b32;
-      b[i] = r & 0xff;
-    } else {
-      b[i] = (r = r >>> 8) & 0xff;
-    }
-  }
-
-  return b;
-};
-
-module.exports = Random;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16), __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 52 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer) {
-
-var _ = __webpack_require__(2);
-var BN = __webpack_require__(9);
-var BufferUtil = __webpack_require__(5);
-var BufferReader = __webpack_require__(21);
-var BufferWriter = __webpack_require__(19);
-var Hash = __webpack_require__(10);
-var JSUtil = __webpack_require__(7);
-var $ = __webpack_require__(4);
-
-var GENESIS_BITS = 0x1d00ffff;
-
-/**
- * Instantiate a BlockHeader from a Buffer, JSON object, or Object with
- * the properties of the BlockHeader
- *
- * @param {*} - A Buffer, JSON string, or Object
- * @returns {BlockHeader} - An instance of block header
- * @constructor
- */
-var BlockHeader = function BlockHeader(arg) {
-  if (!(this instanceof BlockHeader)) {
-    return new BlockHeader(arg);
-  }
-  var info = BlockHeader._from(arg);
-  this.version = info.version;
-  this.prevHash = info.prevHash;
-  this.merkleRoot = info.merkleRoot;
-  this.time = info.time;
-  this.timestamp = info.time;
-  this.bits = info.bits;
-  this.nonce = info.nonce;
-
-  if (info.hash) {
-    $.checkState(
-      this.hash === info.hash,
-      'Argument object hash property does not match block hash.'
-    );
-  }
-
-  return this;
-};
-
-/**
- * @param {*} - A Buffer, JSON string or Object
- * @returns {Object} - An object representing block header data
- * @throws {TypeError} - If the argument was not recognized
- * @private
- */
-BlockHeader._from = function _from(arg) {
-  var info = {};
-  if (BufferUtil.isBuffer(arg)) {
-    info = BlockHeader._fromBufferReader(BufferReader(arg));
-  } else if (_.isObject(arg)) {
-    info = BlockHeader._fromObject(arg);
-  } else {
-    throw new TypeError('Unrecognized argument for BlockHeader');
-  }
-  return info;
-};
-
-/**
- * @param {Object} - A JSON string
- * @returns {Object} - An object representing block header data
- * @private
- */
-BlockHeader._fromObject = function _fromObject(data) {
-  $.checkArgument(data, 'data is required');
-  var prevHash = data.prevHash;
-  var merkleRoot = data.merkleRoot;
-  if (_.isString(data.prevHash)) {
-    prevHash = BufferUtil.reverse(new Buffer(data.prevHash, 'hex'));
-  }
-  if (_.isString(data.merkleRoot)) {
-    merkleRoot = BufferUtil.reverse(new Buffer(data.merkleRoot, 'hex'));
-  }
-  var info = {
-    hash: data.hash,
-    version: data.version,
-    prevHash: prevHash,
-    merkleRoot: merkleRoot,
-    time: data.time,
-    timestamp: data.time,
-    bits: data.bits,
-    nonce: data.nonce
-  };
-  return info;
-};
-
-/**
- * @param {Object} - A plain JavaScript object
- * @returns {BlockHeader} - An instance of block header
- */
-BlockHeader.fromObject = function fromObject(obj) {
-  var info = BlockHeader._fromObject(obj);
-  return new BlockHeader(info);
-};
-
-/**
- * @param {Binary} - Raw block binary data or buffer
- * @returns {BlockHeader} - An instance of block header
- */
-BlockHeader.fromRawBlock = function fromRawBlock(data) {
-  if (!BufferUtil.isBuffer(data)) {
-    data = new Buffer(data, 'binary');
-  }
-  var br = BufferReader(data);
-  br.pos = BlockHeader.Constants.START_OF_HEADER;
-  var info = BlockHeader._fromBufferReader(br);
-  return new BlockHeader(info);
-};
-
-/**
- * @param {Buffer} - A buffer of the block header
- * @returns {BlockHeader} - An instance of block header
- */
-BlockHeader.fromBuffer = function fromBuffer(buf) {
-  var info = BlockHeader._fromBufferReader(BufferReader(buf));
-  return new BlockHeader(info);
-};
-
-/**
- * @param {string} - A hex encoded buffer of the block header
- * @returns {BlockHeader} - An instance of block header
- */
-BlockHeader.fromString = function fromString(str) {
-  var buf = new Buffer(str, 'hex');
-  return BlockHeader.fromBuffer(buf);
-};
-
-/**
- * @param {BufferReader} - A BufferReader of the block header
- * @returns {Object} - An object representing block header data
- * @private
- */
-BlockHeader._fromBufferReader = function _fromBufferReader(br) {
-  var info = {};
-  info.version = br.readInt32LE();
-  info.prevHash = br.read(32);
-  info.merkleRoot = br.read(32);
-  info.time = br.readUInt32LE();
-  info.bits = br.readUInt32LE();
-  info.nonce = br.readUInt32LE();
-  return info;
-};
-
-/**
- * @param {BufferReader} - A BufferReader of the block header
- * @returns {BlockHeader} - An instance of block header
- */
-BlockHeader.fromBufferReader = function fromBufferReader(br) {
-  var info = BlockHeader._fromBufferReader(br);
-  return new BlockHeader(info);
-};
-
-/**
- * @returns {Object} - A plain object of the BlockHeader
- */
-BlockHeader.prototype.toObject = BlockHeader.prototype.toJSON = function toObject() {
-  return {
-    hash: this.hash,
-    version: this.version,
-    prevHash: BufferUtil.reverse(this.prevHash).toString('hex'),
-    merkleRoot: BufferUtil.reverse(this.merkleRoot).toString('hex'),
-    time: this.time,
-    bits: this.bits,
-    nonce: this.nonce
-  };
-};
-
-/**
- * @returns {Buffer} - A Buffer of the BlockHeader
- */
-BlockHeader.prototype.toBuffer = function toBuffer() {
-  return this.toBufferWriter().concat();
-};
-
-/**
- * @returns {string} - A hex encoded string of the BlockHeader
- */
-BlockHeader.prototype.toString = function toString() {
-  return this.toBuffer().toString('hex');
-};
-
-/**
- * @param {BufferWriter} - An existing instance BufferWriter
- * @returns {BufferWriter} - An instance of BufferWriter representation of the BlockHeader
- */
-BlockHeader.prototype.toBufferWriter = function toBufferWriter(bw) {
-  if (!bw) {
-    bw = new BufferWriter();
-  }
-  bw.writeInt32LE(this.version);
-  bw.write(this.prevHash);
-  bw.write(this.merkleRoot);
-  bw.writeUInt32LE(this.time);
-  bw.writeUInt32LE(this.bits);
-  bw.writeUInt32LE(this.nonce);
-  return bw;
-};
-
-/**
- * Returns the target difficulty for this block
- * @param {Number} bits
- * @returns {BN} An instance of BN with the decoded difficulty bits
- */
-BlockHeader.prototype.getTargetDifficulty = function getTargetDifficulty(bits) {
-  bits = bits || this.bits;
-
-  var target = new BN(bits & 0xffffff);
-  var mov = 8 * ((bits >>> 24) - 3);
-  while (mov-- > 0) {
-    target = target.mul(new BN(2));
-  }
-  return target;
-};
-
-/**
- * @link https://en.bitcoin.it/wiki/Difficulty
- * @return {Number}
- */
-BlockHeader.prototype.getDifficulty = function getDifficulty() {
-  var difficulty1TargetBN = this.getTargetDifficulty(GENESIS_BITS).mul(new BN(Math.pow(10, 8)));
-  var currentTargetBN = this.getTargetDifficulty();
-
-  var difficultyString = difficulty1TargetBN.div(currentTargetBN).toString(10);
-  var decimalPos = difficultyString.length - 8;
-  difficultyString = difficultyString.slice(0, decimalPos) + '.' + difficultyString.slice(decimalPos);
-
-  return parseFloat(difficultyString);
-};
-
-/**
- * @returns {Buffer} - The little endian hash buffer of the header
- */
-BlockHeader.prototype._getHash = function hash() {
-  var buf = this.toBuffer();
-  return Hash.sha256sha256(buf);
-};
-
-var idProperty = {
-  configurable: false,
-  enumerable: true,
-  /**
-   * @returns {string} - The big endian hash buffer of the header
-   */
-  get: function() {
-    if (!this._id) {
-      this._id = BufferReader(this._getHash()).readReverse().toString('hex');
-    }
-    return this._id;
-  },
-  set: _.noop
-};
-Object.defineProperty(BlockHeader.prototype, 'id', idProperty);
-Object.defineProperty(BlockHeader.prototype, 'hash', idProperty);
-
-/**
- * @returns {Boolean} - If timestamp is not too far in the future
- */
-BlockHeader.prototype.validTimestamp = function validTimestamp() {
-  var currentTime = Math.round(new Date().getTime() / 1000);
-  if (this.time > currentTime + BlockHeader.Constants.MAX_TIME_OFFSET) {
-    return false;
-  }
-  return true;
-};
-
-/**
- * @returns {Boolean} - If the proof-of-work hash satisfies the target difficulty
- */
-BlockHeader.prototype.validProofOfWork = function validProofOfWork() {
-  var pow = new BN(this.id, 'hex');
-  var target = this.getTargetDifficulty();
-
-  if (pow.cmp(target) > 0) {
-    return false;
-  }
-  return true;
-};
-
-/**
- * @returns {string} - A string formatted for the console
- */
-BlockHeader.prototype.inspect = function inspect() {
-  return '<BlockHeader ' + this.id + '>';
-};
-
-BlockHeader.Constants = {
-  START_OF_HEADER: 8, // Start buffer position in raw block data
-  MAX_TIME_OFFSET: 2 * 60 * 60, // The max a timestamp can be in the future
-  LARGEST_HASH: new BN('10000000000000000000000000000000000000000000000000000000000000000', 'hex')
-};
-
-module.exports = BlockHeader;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function(nacl) {
@@ -31609,7 +29542,7 @@ nacl.setPRNG = function(fn) {
     });
   } else if (true) {
     // Node.js.
-    crypto = __webpack_require__(116);
+    crypto = __webpack_require__(117);
     if (crypto && crypto.randomBytes) {
       nacl.setPRNG(function(x, n) {
         var i, v = crypto.randomBytes(n);
@@ -31622,6 +29555,2073 @@ nacl.setPRNG = function(fn) {
 
 })(typeof module !== 'undefined' && module.exports ? module.exports : (self.nacl = self.nacl || {}));
 
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.randomBytes = exports.rng = exports.pseudoRandomBytes = exports.prng = __webpack_require__(28)
+exports.createHash = exports.Hash = __webpack_require__(30)
+exports.createHmac = exports.Hmac = __webpack_require__(79)
+
+var algos = __webpack_require__(136)
+var algoKeys = Object.keys(algos)
+var hashes = ['sha1', 'sha224', 'sha256', 'sha384', 'sha512', 'md5', 'rmd160'].concat(algoKeys)
+exports.getHashes = function () {
+  return hashes
+}
+
+var p = __webpack_require__(81)
+exports.pbkdf2 = p.pbkdf2
+exports.pbkdf2Sync = p.pbkdf2Sync
+
+var aes = __webpack_require__(138)
+
+exports.Cipher = aes.Cipher
+exports.createCipher = aes.createCipher
+exports.Cipheriv = aes.Cipheriv
+exports.createCipheriv = aes.createCipheriv
+exports.Decipher = aes.Decipher
+exports.createDecipher = aes.createDecipher
+exports.Decipheriv = aes.Decipheriv
+exports.createDecipheriv = aes.createDecipheriv
+exports.getCiphers = aes.getCiphers
+exports.listCiphers = aes.listCiphers
+
+var dh = __webpack_require__(157)
+
+exports.DiffieHellmanGroup = dh.DiffieHellmanGroup
+exports.createDiffieHellmanGroup = dh.createDiffieHellmanGroup
+exports.getDiffieHellman = dh.getDiffieHellman
+exports.createDiffieHellman = dh.createDiffieHellman
+exports.DiffieHellman = dh.DiffieHellman
+
+var sign = __webpack_require__(162)
+
+exports.createSign = sign.createSign
+exports.Sign = sign.Sign
+exports.createVerify = sign.createVerify
+exports.Verify = sign.Verify
+
+exports.createECDH = __webpack_require__(200)
+
+var publicEncrypt = __webpack_require__(201)
+
+exports.publicEncrypt = publicEncrypt.publicEncrypt
+exports.privateEncrypt = publicEncrypt.privateEncrypt
+exports.publicDecrypt = publicEncrypt.publicDecrypt
+exports.privateDecrypt = publicEncrypt.privateDecrypt
+
+// the least I can do is make error messages for the rest of the node.js/crypto api.
+// ;[
+//   'createCredentials'
+// ].forEach(function (name) {
+//   exports[name] = function () {
+//     throw new Error([
+//       'sorry, ' + name + ' is not implemented yet',
+//       'we accept pull requests',
+//       'https://github.com/crypto-browserify/crypto-browserify'
+//     ].join('\n'))
+//   }
+// })
+
+var rf = __webpack_require__(204)
+
+exports.randomFill = rf.randomFill
+exports.randomFillSync = rf.randomFillSync
+
+exports.createCredentials = function () {
+  throw new Error([
+    'sorry, createCredentials is not implemented yet',
+    'we accept pull requests',
+    'https://github.com/crypto-browserify/crypto-browserify'
+  ].join('\n'))
+}
+
+exports.constants = {
+  'DH_CHECK_P_NOT_SAFE_PRIME': 2,
+  'DH_CHECK_P_NOT_PRIME': 1,
+  'DH_UNABLE_TO_CHECK_GENERATOR': 4,
+  'DH_NOT_SUITABLE_GENERATOR': 8,
+  'NPN_ENABLED': 1,
+  'ALPN_ENABLED': 1,
+  'RSA_PKCS1_PADDING': 1,
+  'RSA_SSLV23_PADDING': 2,
+  'RSA_NO_PADDING': 3,
+  'RSA_PKCS1_OAEP_PADDING': 4,
+  'RSA_X931_PADDING': 5,
+  'RSA_PKCS1_PSS_PADDING': 6,
+  'POINT_CONVERSION_COMPRESSED': 2,
+  'POINT_CONVERSION_UNCOMPRESSED': 4,
+  'POINT_CONVERSION_HYBRID': 6
+}
+
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+module.exports = Stream;
+
+var EE = __webpack_require__(57).EventEmitter;
+var inherits = __webpack_require__(1);
+
+inherits(Stream, EE);
+Stream.Readable = __webpack_require__(58);
+Stream.Writable = __webpack_require__(127);
+Stream.Duplex = __webpack_require__(128);
+Stream.Transform = __webpack_require__(129);
+Stream.PassThrough = __webpack_require__(130);
+
+// Backwards-compat with node 0.4.x
+Stream.Stream = Stream;
+
+
+
+// old-style streams.  Note that the pipe method (the only relevant
+// part of this class) is overridden in the Readable class.
+
+function Stream() {
+  EE.call(this);
+}
+
+Stream.prototype.pipe = function(dest, options) {
+  var source = this;
+
+  function ondata(chunk) {
+    if (dest.writable) {
+      if (false === dest.write(chunk) && source.pause) {
+        source.pause();
+      }
+    }
+  }
+
+  source.on('data', ondata);
+
+  function ondrain() {
+    if (source.readable && source.resume) {
+      source.resume();
+    }
+  }
+
+  dest.on('drain', ondrain);
+
+  // If the 'end' option is not supplied, dest.end() will be called when
+  // source gets the 'end' or 'close' events.  Only dest.end() once.
+  if (!dest._isStdio && (!options || options.end !== false)) {
+    source.on('end', onend);
+    source.on('close', onclose);
+  }
+
+  var didOnEnd = false;
+  function onend() {
+    if (didOnEnd) return;
+    didOnEnd = true;
+
+    dest.end();
+  }
+
+
+  function onclose() {
+    if (didOnEnd) return;
+    didOnEnd = true;
+
+    if (typeof dest.destroy === 'function') dest.destroy();
+  }
+
+  // don't leave dangling pipes when there are errors.
+  function onerror(er) {
+    cleanup();
+    if (EE.listenerCount(this, 'error') === 0) {
+      throw er; // Unhandled stream error in pipe.
+    }
+  }
+
+  source.on('error', onerror);
+  dest.on('error', onerror);
+
+  // remove all the event listeners that were added.
+  function cleanup() {
+    source.removeListener('data', ondata);
+    dest.removeListener('drain', ondrain);
+
+    source.removeListener('end', onend);
+    source.removeListener('close', onclose);
+
+    source.removeListener('error', onerror);
+    dest.removeListener('error', onerror);
+
+    source.removeListener('end', cleanup);
+    source.removeListener('close', cleanup);
+
+    dest.removeListener('close', cleanup);
+  }
+
+  source.on('end', cleanup);
+  source.on('close', cleanup);
+
+  dest.on('close', cleanup);
+
+  dest.emit('pipe', source);
+
+  // Allow for unix-like usage: A.pipe(B).pipe(C)
+  return dest;
+};
+
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+if (!process.version ||
+    process.version.indexOf('v0.') === 0 ||
+    process.version.indexOf('v1.') === 0 && process.version.indexOf('v1.8.') !== 0) {
+  module.exports = nextTick;
+} else {
+  module.exports = process.nextTick;
+}
+
+function nextTick(fn, arg1, arg2, arg3) {
+  if (typeof fn !== 'function') {
+    throw new TypeError('"callback" argument must be a function');
+  }
+  var len = arguments.length;
+  var args, i;
+  switch (len) {
+  case 0:
+  case 1:
+    return process.nextTick(fn);
+  case 2:
+    return process.nextTick(function afterTickOne() {
+      fn.call(null, arg1);
+    });
+  case 3:
+    return process.nextTick(function afterTickTwo() {
+      fn.call(null, arg1, arg2);
+    });
+  case 4:
+    return process.nextTick(function afterTickThree() {
+      fn.call(null, arg1, arg2, arg3);
+    });
+  default:
+    args = new Array(len - 1);
+    i = 0;
+    while (i < args.length) {
+      args[i++] = arguments[i];
+    }
+    return process.nextTick(function afterTick() {
+      fn.apply(null, args);
+    });
+  }
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Buffer = __webpack_require__(3).Buffer
+var MD5 = __webpack_require__(139)
+
+/* eslint-disable camelcase */
+function EVP_BytesToKey (password, salt, keyBits, ivLen) {
+  if (!Buffer.isBuffer(password)) password = Buffer.from(password, 'binary')
+  if (salt) {
+    if (!Buffer.isBuffer(salt)) salt = Buffer.from(salt, 'binary')
+    if (salt.length !== 8) throw new RangeError('salt should be Buffer with 8 byte length')
+  }
+
+  var keyLen = keyBits / 8
+  var key = Buffer.alloc(keyLen)
+  var iv = Buffer.alloc(ivLen || 0)
+  var tmp = Buffer.alloc(0)
+
+  while (keyLen > 0 || ivLen > 0) {
+    var hash = new MD5()
+    hash.update(tmp)
+    hash.update(password)
+    if (salt) hash.update(salt)
+    tmp = hash.digest()
+
+    var used = 0
+
+    if (keyLen > 0) {
+      var keyStart = key.length - keyLen
+      used = Math.min(keyLen, tmp.length)
+      tmp.copy(key, keyStart, 0, used)
+      keyLen -= used
+    }
+
+    if (used < tmp.length && ivLen > 0) {
+      var ivStart = iv.length - ivLen
+      var length = Math.min(ivLen, tmp.length - used)
+      tmp.copy(iv, ivStart, used, used + length)
+      ivLen -= length
+    }
+  }
+
+  tmp.fill(0)
+  return { key: key, iv: iv }
+}
+
+module.exports = EVP_BytesToKey
+
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// based on the aes implimentation in triple sec
+// https://github.com/keybase/triplesec
+// which is in turn based on the one from crypto-js
+// https://code.google.com/p/crypto-js/
+
+var Buffer = __webpack_require__(3).Buffer
+
+function asUInt32Array (buf) {
+  if (!Buffer.isBuffer(buf)) buf = Buffer.from(buf)
+
+  var len = (buf.length / 4) | 0
+  var out = new Array(len)
+
+  for (var i = 0; i < len; i++) {
+    out[i] = buf.readUInt32BE(i * 4)
+  }
+
+  return out
+}
+
+function scrubVec (v) {
+  for (var i = 0; i < v.length; v++) {
+    v[i] = 0
+  }
+}
+
+function cryptBlock (M, keySchedule, SUB_MIX, SBOX, nRounds) {
+  var SUB_MIX0 = SUB_MIX[0]
+  var SUB_MIX1 = SUB_MIX[1]
+  var SUB_MIX2 = SUB_MIX[2]
+  var SUB_MIX3 = SUB_MIX[3]
+
+  var s0 = M[0] ^ keySchedule[0]
+  var s1 = M[1] ^ keySchedule[1]
+  var s2 = M[2] ^ keySchedule[2]
+  var s3 = M[3] ^ keySchedule[3]
+  var t0, t1, t2, t3
+  var ksRow = 4
+
+  for (var round = 1; round < nRounds; round++) {
+    t0 = SUB_MIX0[s0 >>> 24] ^ SUB_MIX1[(s1 >>> 16) & 0xff] ^ SUB_MIX2[(s2 >>> 8) & 0xff] ^ SUB_MIX3[s3 & 0xff] ^ keySchedule[ksRow++]
+    t1 = SUB_MIX0[s1 >>> 24] ^ SUB_MIX1[(s2 >>> 16) & 0xff] ^ SUB_MIX2[(s3 >>> 8) & 0xff] ^ SUB_MIX3[s0 & 0xff] ^ keySchedule[ksRow++]
+    t2 = SUB_MIX0[s2 >>> 24] ^ SUB_MIX1[(s3 >>> 16) & 0xff] ^ SUB_MIX2[(s0 >>> 8) & 0xff] ^ SUB_MIX3[s1 & 0xff] ^ keySchedule[ksRow++]
+    t3 = SUB_MIX0[s3 >>> 24] ^ SUB_MIX1[(s0 >>> 16) & 0xff] ^ SUB_MIX2[(s1 >>> 8) & 0xff] ^ SUB_MIX3[s2 & 0xff] ^ keySchedule[ksRow++]
+    s0 = t0
+    s1 = t1
+    s2 = t2
+    s3 = t3
+  }
+
+  t0 = ((SBOX[s0 >>> 24] << 24) | (SBOX[(s1 >>> 16) & 0xff] << 16) | (SBOX[(s2 >>> 8) & 0xff] << 8) | SBOX[s3 & 0xff]) ^ keySchedule[ksRow++]
+  t1 = ((SBOX[s1 >>> 24] << 24) | (SBOX[(s2 >>> 16) & 0xff] << 16) | (SBOX[(s3 >>> 8) & 0xff] << 8) | SBOX[s0 & 0xff]) ^ keySchedule[ksRow++]
+  t2 = ((SBOX[s2 >>> 24] << 24) | (SBOX[(s3 >>> 16) & 0xff] << 16) | (SBOX[(s0 >>> 8) & 0xff] << 8) | SBOX[s1 & 0xff]) ^ keySchedule[ksRow++]
+  t3 = ((SBOX[s3 >>> 24] << 24) | (SBOX[(s0 >>> 16) & 0xff] << 16) | (SBOX[(s1 >>> 8) & 0xff] << 8) | SBOX[s2 & 0xff]) ^ keySchedule[ksRow++]
+  t0 = t0 >>> 0
+  t1 = t1 >>> 0
+  t2 = t2 >>> 0
+  t3 = t3 >>> 0
+
+  return [t0, t1, t2, t3]
+}
+
+// AES constants
+var RCON = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36]
+var G = (function () {
+  // Compute double table
+  var d = new Array(256)
+  for (var j = 0; j < 256; j++) {
+    if (j < 128) {
+      d[j] = j << 1
+    } else {
+      d[j] = (j << 1) ^ 0x11b
+    }
+  }
+
+  var SBOX = []
+  var INV_SBOX = []
+  var SUB_MIX = [[], [], [], []]
+  var INV_SUB_MIX = [[], [], [], []]
+
+  // Walk GF(2^8)
+  var x = 0
+  var xi = 0
+  for (var i = 0; i < 256; ++i) {
+    // Compute sbox
+    var sx = xi ^ (xi << 1) ^ (xi << 2) ^ (xi << 3) ^ (xi << 4)
+    sx = (sx >>> 8) ^ (sx & 0xff) ^ 0x63
+    SBOX[x] = sx
+    INV_SBOX[sx] = x
+
+    // Compute multiplication
+    var x2 = d[x]
+    var x4 = d[x2]
+    var x8 = d[x4]
+
+    // Compute sub bytes, mix columns tables
+    var t = (d[sx] * 0x101) ^ (sx * 0x1010100)
+    SUB_MIX[0][x] = (t << 24) | (t >>> 8)
+    SUB_MIX[1][x] = (t << 16) | (t >>> 16)
+    SUB_MIX[2][x] = (t << 8) | (t >>> 24)
+    SUB_MIX[3][x] = t
+
+    // Compute inv sub bytes, inv mix columns tables
+    t = (x8 * 0x1010101) ^ (x4 * 0x10001) ^ (x2 * 0x101) ^ (x * 0x1010100)
+    INV_SUB_MIX[0][sx] = (t << 24) | (t >>> 8)
+    INV_SUB_MIX[1][sx] = (t << 16) | (t >>> 16)
+    INV_SUB_MIX[2][sx] = (t << 8) | (t >>> 24)
+    INV_SUB_MIX[3][sx] = t
+
+    if (x === 0) {
+      x = xi = 1
+    } else {
+      x = x2 ^ d[d[d[x8 ^ x2]]]
+      xi ^= d[d[xi]]
+    }
+  }
+
+  return {
+    SBOX: SBOX,
+    INV_SBOX: INV_SBOX,
+    SUB_MIX: SUB_MIX,
+    INV_SUB_MIX: INV_SUB_MIX
+  }
+})()
+
+function AES (key) {
+  this._key = asUInt32Array(key)
+  this._reset()
+}
+
+AES.blockSize = 4 * 4
+AES.keySize = 256 / 8
+AES.prototype.blockSize = AES.blockSize
+AES.prototype.keySize = AES.keySize
+AES.prototype._reset = function () {
+  var keyWords = this._key
+  var keySize = keyWords.length
+  var nRounds = keySize + 6
+  var ksRows = (nRounds + 1) * 4
+
+  var keySchedule = []
+  for (var k = 0; k < keySize; k++) {
+    keySchedule[k] = keyWords[k]
+  }
+
+  for (k = keySize; k < ksRows; k++) {
+    var t = keySchedule[k - 1]
+
+    if (k % keySize === 0) {
+      t = (t << 8) | (t >>> 24)
+      t =
+        (G.SBOX[t >>> 24] << 24) |
+        (G.SBOX[(t >>> 16) & 0xff] << 16) |
+        (G.SBOX[(t >>> 8) & 0xff] << 8) |
+        (G.SBOX[t & 0xff])
+
+      t ^= RCON[(k / keySize) | 0] << 24
+    } else if (keySize > 6 && k % keySize === 4) {
+      t =
+        (G.SBOX[t >>> 24] << 24) |
+        (G.SBOX[(t >>> 16) & 0xff] << 16) |
+        (G.SBOX[(t >>> 8) & 0xff] << 8) |
+        (G.SBOX[t & 0xff])
+    }
+
+    keySchedule[k] = keySchedule[k - keySize] ^ t
+  }
+
+  var invKeySchedule = []
+  for (var ik = 0; ik < ksRows; ik++) {
+    var ksR = ksRows - ik
+    var tt = keySchedule[ksR - (ik % 4 ? 0 : 4)]
+
+    if (ik < 4 || ksR <= 4) {
+      invKeySchedule[ik] = tt
+    } else {
+      invKeySchedule[ik] =
+        G.INV_SUB_MIX[0][G.SBOX[tt >>> 24]] ^
+        G.INV_SUB_MIX[1][G.SBOX[(tt >>> 16) & 0xff]] ^
+        G.INV_SUB_MIX[2][G.SBOX[(tt >>> 8) & 0xff]] ^
+        G.INV_SUB_MIX[3][G.SBOX[tt & 0xff]]
+    }
+  }
+
+  this._nRounds = nRounds
+  this._keySchedule = keySchedule
+  this._invKeySchedule = invKeySchedule
+}
+
+AES.prototype.encryptBlockRaw = function (M) {
+  M = asUInt32Array(M)
+  return cryptBlock(M, this._keySchedule, G.SUB_MIX, G.SBOX, this._nRounds)
+}
+
+AES.prototype.encryptBlock = function (M) {
+  var out = this.encryptBlockRaw(M)
+  var buf = Buffer.allocUnsafe(16)
+  buf.writeUInt32BE(out[0], 0)
+  buf.writeUInt32BE(out[1], 4)
+  buf.writeUInt32BE(out[2], 8)
+  buf.writeUInt32BE(out[3], 12)
+  return buf
+}
+
+AES.prototype.decryptBlock = function (M) {
+  M = asUInt32Array(M)
+
+  // swap
+  var m1 = M[1]
+  M[1] = M[3]
+  M[3] = m1
+
+  var out = cryptBlock(M, this._invKeySchedule, G.INV_SUB_MIX, G.INV_SBOX, this._nRounds)
+  var buf = Buffer.allocUnsafe(16)
+  buf.writeUInt32BE(out[0], 0)
+  buf.writeUInt32BE(out[3], 4)
+  buf.writeUInt32BE(out[2], 8)
+  buf.writeUInt32BE(out[1], 12)
+  return buf
+}
+
+AES.prototype.scrub = function () {
+  scrubVec(this._keySchedule)
+  scrubVec(this._invKeySchedule)
+  scrubVec(this._key)
+}
+
+module.exports.AES = AES
+
+
+/***/ }),
+/* 46 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var curve = exports;
+
+curve.base = __webpack_require__(166);
+curve.short = __webpack_require__(167);
+curve.mont = __webpack_require__(168);
+curve.edwards = __webpack_require__(169);
+
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(Buffer) {var asn1 = __webpack_require__(185)
+var aesid = __webpack_require__(197)
+var fixProc = __webpack_require__(198)
+var ciphers = __webpack_require__(62)
+var compat = __webpack_require__(81)
+module.exports = parseKeys
+
+function parseKeys (buffer) {
+  var password
+  if (typeof buffer === 'object' && !Buffer.isBuffer(buffer)) {
+    password = buffer.passphrase
+    buffer = buffer.key
+  }
+  if (typeof buffer === 'string') {
+    buffer = new Buffer(buffer)
+  }
+
+  var stripped = fixProc(buffer, password)
+
+  var type = stripped.tag
+  var data = stripped.data
+  var subtype, ndata
+  switch (type) {
+    case 'CERTIFICATE':
+      ndata = asn1.certificate.decode(data, 'der').tbsCertificate.subjectPublicKeyInfo
+      // falls through
+    case 'PUBLIC KEY':
+      if (!ndata) {
+        ndata = asn1.PublicKey.decode(data, 'der')
+      }
+      subtype = ndata.algorithm.algorithm.join('.')
+      switch (subtype) {
+        case '1.2.840.113549.1.1.1':
+          return asn1.RSAPublicKey.decode(ndata.subjectPublicKey.data, 'der')
+        case '1.2.840.10045.2.1':
+          ndata.subjectPrivateKey = ndata.subjectPublicKey
+          return {
+            type: 'ec',
+            data: ndata
+          }
+        case '1.2.840.10040.4.1':
+          ndata.algorithm.params.pub_key = asn1.DSAparam.decode(ndata.subjectPublicKey.data, 'der')
+          return {
+            type: 'dsa',
+            data: ndata.algorithm.params
+          }
+        default: throw new Error('unknown key id ' + subtype)
+      }
+      throw new Error('unknown key type ' + type)
+    case 'ENCRYPTED PRIVATE KEY':
+      data = asn1.EncryptedPrivateKey.decode(data, 'der')
+      data = decrypt(data, password)
+      // falls through
+    case 'PRIVATE KEY':
+      ndata = asn1.PrivateKey.decode(data, 'der')
+      subtype = ndata.algorithm.algorithm.join('.')
+      switch (subtype) {
+        case '1.2.840.113549.1.1.1':
+          return asn1.RSAPrivateKey.decode(ndata.subjectPrivateKey, 'der')
+        case '1.2.840.10045.2.1':
+          return {
+            curve: ndata.algorithm.curve,
+            privateKey: asn1.ECPrivateKey.decode(ndata.subjectPrivateKey, 'der').privateKey
+          }
+        case '1.2.840.10040.4.1':
+          ndata.algorithm.params.priv_key = asn1.DSAparam.decode(ndata.subjectPrivateKey, 'der')
+          return {
+            type: 'dsa',
+            params: ndata.algorithm.params
+          }
+        default: throw new Error('unknown key id ' + subtype)
+      }
+      throw new Error('unknown key type ' + type)
+    case 'RSA PUBLIC KEY':
+      return asn1.RSAPublicKey.decode(data, 'der')
+    case 'RSA PRIVATE KEY':
+      return asn1.RSAPrivateKey.decode(data, 'der')
+    case 'DSA PRIVATE KEY':
+      return {
+        type: 'dsa',
+        params: asn1.DSAPrivateKey.decode(data, 'der')
+      }
+    case 'EC PRIVATE KEY':
+      data = asn1.ECPrivateKey.decode(data, 'der')
+      return {
+        curve: data.parameters.value,
+        privateKey: data.privateKey
+      }
+    default: throw new Error('unknown key type ' + type)
+  }
+}
+parseKeys.signature = asn1.signature
+function decrypt (data, password) {
+  var salt = data.algorithm.decrypt.kde.kdeparams.salt
+  var iters = parseInt(data.algorithm.decrypt.kde.kdeparams.iters.toString(), 10)
+  var algo = aesid[data.algorithm.decrypt.cipher.algo.join('.')]
+  var iv = data.algorithm.decrypt.cipher.iv
+  var cipherText = data.subjectPrivateKey
+  var keylen = parseInt(algo.split('-')[1], 10) / 8
+  var key = compat.pbkdf2Sync(password, salt, iters, keylen)
+  var cipher = ciphers.createDecipheriv(algo, key, iv)
+  var out = []
+  out.push(cipher.update(cipherText))
+  out.push(cipher.final())
+  return Buffer.concat(out)
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 48 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+// compare and isBuffer taken from https://github.com/feross/buffer/blob/680e9e5e488f22aac27599a57dc844a6315928dd/index.js
+// original notice:
+
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
+ */
+function compare(a, b) {
+  if (a === b) {
+    return 0;
+  }
+
+  var x = a.length;
+  var y = b.length;
+
+  for (var i = 0, len = Math.min(x, y); i < len; ++i) {
+    if (a[i] !== b[i]) {
+      x = a[i];
+      y = b[i];
+      break;
+    }
+  }
+
+  if (x < y) {
+    return -1;
+  }
+  if (y < x) {
+    return 1;
+  }
+  return 0;
+}
+function isBuffer(b) {
+  if (global.Buffer && typeof global.Buffer.isBuffer === 'function') {
+    return global.Buffer.isBuffer(b);
+  }
+  return !!(b != null && b._isBuffer);
+}
+
+// based on node assert, original notice:
+
+// http://wiki.commonjs.org/wiki/Unit_Testing/1.0
+//
+// THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
+//
+// Originally from narwhal.js (http://narwhaljs.org)
+// Copyright (c) 2009 Thomas Robinson <280north.com>
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the 'Software'), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var util = __webpack_require__(209);
+var hasOwn = Object.prototype.hasOwnProperty;
+var pSlice = Array.prototype.slice;
+var functionsHaveNames = (function () {
+  return function foo() {}.name === 'foo';
+}());
+function pToString (obj) {
+  return Object.prototype.toString.call(obj);
+}
+function isView(arrbuf) {
+  if (isBuffer(arrbuf)) {
+    return false;
+  }
+  if (typeof global.ArrayBuffer !== 'function') {
+    return false;
+  }
+  if (typeof ArrayBuffer.isView === 'function') {
+    return ArrayBuffer.isView(arrbuf);
+  }
+  if (!arrbuf) {
+    return false;
+  }
+  if (arrbuf instanceof DataView) {
+    return true;
+  }
+  if (arrbuf.buffer && arrbuf.buffer instanceof ArrayBuffer) {
+    return true;
+  }
+  return false;
+}
+// 1. The assert module provides functions that throw
+// AssertionError's when particular conditions are not met. The
+// assert module must conform to the following interface.
+
+var assert = module.exports = ok;
+
+// 2. The AssertionError is defined in assert.
+// new assert.AssertionError({ message: message,
+//                             actual: actual,
+//                             expected: expected })
+
+var regex = /\s*function\s+([^\(\s]*)\s*/;
+// based on https://github.com/ljharb/function.prototype.name/blob/adeeeec8bfcc6068b187d7d9fb3d5bb1d3a30899/implementation.js
+function getName(func) {
+  if (!util.isFunction(func)) {
+    return;
+  }
+  if (functionsHaveNames) {
+    return func.name;
+  }
+  var str = func.toString();
+  var match = str.match(regex);
+  return match && match[1];
+}
+assert.AssertionError = function AssertionError(options) {
+  this.name = 'AssertionError';
+  this.actual = options.actual;
+  this.expected = options.expected;
+  this.operator = options.operator;
+  if (options.message) {
+    this.message = options.message;
+    this.generatedMessage = false;
+  } else {
+    this.message = getMessage(this);
+    this.generatedMessage = true;
+  }
+  var stackStartFunction = options.stackStartFunction || fail;
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(this, stackStartFunction);
+  } else {
+    // non v8 browsers so we can have a stacktrace
+    var err = new Error();
+    if (err.stack) {
+      var out = err.stack;
+
+      // try to strip useless frames
+      var fn_name = getName(stackStartFunction);
+      var idx = out.indexOf('\n' + fn_name);
+      if (idx >= 0) {
+        // once we have located the function frame
+        // we need to strip out everything before it (and its line)
+        var next_line = out.indexOf('\n', idx + 1);
+        out = out.substring(next_line + 1);
+      }
+
+      this.stack = out;
+    }
+  }
+};
+
+// assert.AssertionError instanceof Error
+util.inherits(assert.AssertionError, Error);
+
+function truncate(s, n) {
+  if (typeof s === 'string') {
+    return s.length < n ? s : s.slice(0, n);
+  } else {
+    return s;
+  }
+}
+function inspect(something) {
+  if (functionsHaveNames || !util.isFunction(something)) {
+    return util.inspect(something);
+  }
+  var rawname = getName(something);
+  var name = rawname ? ': ' + rawname : '';
+  return '[Function' +  name + ']';
+}
+function getMessage(self) {
+  return truncate(inspect(self.actual), 128) + ' ' +
+         self.operator + ' ' +
+         truncate(inspect(self.expected), 128);
+}
+
+// At present only the three keys mentioned above are used and
+// understood by the spec. Implementations or sub modules can pass
+// other keys to the AssertionError's constructor - they will be
+// ignored.
+
+// 3. All of the following functions must throw an AssertionError
+// when a corresponding condition is not met, with a message that
+// may be undefined if not provided.  All assertion methods provide
+// both the actual and expected values to the assertion error for
+// display purposes.
+
+function fail(actual, expected, message, operator, stackStartFunction) {
+  throw new assert.AssertionError({
+    message: message,
+    actual: actual,
+    expected: expected,
+    operator: operator,
+    stackStartFunction: stackStartFunction
+  });
+}
+
+// EXTENSION! allows for well behaved errors defined elsewhere.
+assert.fail = fail;
+
+// 4. Pure assertion tests whether a value is truthy, as determined
+// by !!guard.
+// assert.ok(guard, message_opt);
+// This statement is equivalent to assert.equal(true, !!guard,
+// message_opt);. To test strictly for the value true, use
+// assert.strictEqual(true, guard, message_opt);.
+
+function ok(value, message) {
+  if (!value) fail(value, true, message, '==', assert.ok);
+}
+assert.ok = ok;
+
+// 5. The equality assertion tests shallow, coercive equality with
+// ==.
+// assert.equal(actual, expected, message_opt);
+
+assert.equal = function equal(actual, expected, message) {
+  if (actual != expected) fail(actual, expected, message, '==', assert.equal);
+};
+
+// 6. The non-equality assertion tests for whether two objects are not equal
+// with != assert.notEqual(actual, expected, message_opt);
+
+assert.notEqual = function notEqual(actual, expected, message) {
+  if (actual == expected) {
+    fail(actual, expected, message, '!=', assert.notEqual);
+  }
+};
+
+// 7. The equivalence assertion tests a deep equality relation.
+// assert.deepEqual(actual, expected, message_opt);
+
+assert.deepEqual = function deepEqual(actual, expected, message) {
+  if (!_deepEqual(actual, expected, false)) {
+    fail(actual, expected, message, 'deepEqual', assert.deepEqual);
+  }
+};
+
+assert.deepStrictEqual = function deepStrictEqual(actual, expected, message) {
+  if (!_deepEqual(actual, expected, true)) {
+    fail(actual, expected, message, 'deepStrictEqual', assert.deepStrictEqual);
+  }
+};
+
+function _deepEqual(actual, expected, strict, memos) {
+  // 7.1. All identical values are equivalent, as determined by ===.
+  if (actual === expected) {
+    return true;
+  } else if (isBuffer(actual) && isBuffer(expected)) {
+    return compare(actual, expected) === 0;
+
+  // 7.2. If the expected value is a Date object, the actual value is
+  // equivalent if it is also a Date object that refers to the same time.
+  } else if (util.isDate(actual) && util.isDate(expected)) {
+    return actual.getTime() === expected.getTime();
+
+  // 7.3 If the expected value is a RegExp object, the actual value is
+  // equivalent if it is also a RegExp object with the same source and
+  // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
+  } else if (util.isRegExp(actual) && util.isRegExp(expected)) {
+    return actual.source === expected.source &&
+           actual.global === expected.global &&
+           actual.multiline === expected.multiline &&
+           actual.lastIndex === expected.lastIndex &&
+           actual.ignoreCase === expected.ignoreCase;
+
+  // 7.4. Other pairs that do not both pass typeof value == 'object',
+  // equivalence is determined by ==.
+  } else if ((actual === null || typeof actual !== 'object') &&
+             (expected === null || typeof expected !== 'object')) {
+    return strict ? actual === expected : actual == expected;
+
+  // If both values are instances of typed arrays, wrap their underlying
+  // ArrayBuffers in a Buffer each to increase performance
+  // This optimization requires the arrays to have the same type as checked by
+  // Object.prototype.toString (aka pToString). Never perform binary
+  // comparisons for Float*Arrays, though, since e.g. +0 === -0 but their
+  // bit patterns are not identical.
+  } else if (isView(actual) && isView(expected) &&
+             pToString(actual) === pToString(expected) &&
+             !(actual instanceof Float32Array ||
+               actual instanceof Float64Array)) {
+    return compare(new Uint8Array(actual.buffer),
+                   new Uint8Array(expected.buffer)) === 0;
+
+  // 7.5 For all other Object pairs, including Array objects, equivalence is
+  // determined by having the same number of owned properties (as verified
+  // with Object.prototype.hasOwnProperty.call), the same set of keys
+  // (although not necessarily the same order), equivalent values for every
+  // corresponding key, and an identical 'prototype' property. Note: this
+  // accounts for both named and indexed properties on Arrays.
+  } else if (isBuffer(actual) !== isBuffer(expected)) {
+    return false;
+  } else {
+    memos = memos || {actual: [], expected: []};
+
+    var actualIndex = memos.actual.indexOf(actual);
+    if (actualIndex !== -1) {
+      if (actualIndex === memos.expected.indexOf(expected)) {
+        return true;
+      }
+    }
+
+    memos.actual.push(actual);
+    memos.expected.push(expected);
+
+    return objEquiv(actual, expected, strict, memos);
+  }
+}
+
+function isArguments(object) {
+  return Object.prototype.toString.call(object) == '[object Arguments]';
+}
+
+function objEquiv(a, b, strict, actualVisitedObjects) {
+  if (a === null || a === undefined || b === null || b === undefined)
+    return false;
+  // if one is a primitive, the other must be same
+  if (util.isPrimitive(a) || util.isPrimitive(b))
+    return a === b;
+  if (strict && Object.getPrototypeOf(a) !== Object.getPrototypeOf(b))
+    return false;
+  var aIsArgs = isArguments(a);
+  var bIsArgs = isArguments(b);
+  if ((aIsArgs && !bIsArgs) || (!aIsArgs && bIsArgs))
+    return false;
+  if (aIsArgs) {
+    a = pSlice.call(a);
+    b = pSlice.call(b);
+    return _deepEqual(a, b, strict);
+  }
+  var ka = objectKeys(a);
+  var kb = objectKeys(b);
+  var key, i;
+  // having the same number of owned properties (keys incorporates
+  // hasOwnProperty)
+  if (ka.length !== kb.length)
+    return false;
+  //the same set of keys (although not necessarily the same order),
+  ka.sort();
+  kb.sort();
+  //~~~cheap key test
+  for (i = ka.length - 1; i >= 0; i--) {
+    if (ka[i] !== kb[i])
+      return false;
+  }
+  //equivalent values for every corresponding key, and
+  //~~~possibly expensive deep test
+  for (i = ka.length - 1; i >= 0; i--) {
+    key = ka[i];
+    if (!_deepEqual(a[key], b[key], strict, actualVisitedObjects))
+      return false;
+  }
+  return true;
+}
+
+// 8. The non-equivalence assertion tests for any deep inequality.
+// assert.notDeepEqual(actual, expected, message_opt);
+
+assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
+  if (_deepEqual(actual, expected, false)) {
+    fail(actual, expected, message, 'notDeepEqual', assert.notDeepEqual);
+  }
+};
+
+assert.notDeepStrictEqual = notDeepStrictEqual;
+function notDeepStrictEqual(actual, expected, message) {
+  if (_deepEqual(actual, expected, true)) {
+    fail(actual, expected, message, 'notDeepStrictEqual', notDeepStrictEqual);
+  }
+}
+
+
+// 9. The strict equality assertion tests strict equality, as determined by ===.
+// assert.strictEqual(actual, expected, message_opt);
+
+assert.strictEqual = function strictEqual(actual, expected, message) {
+  if (actual !== expected) {
+    fail(actual, expected, message, '===', assert.strictEqual);
+  }
+};
+
+// 10. The strict non-equality assertion tests for strict inequality, as
+// determined by !==.  assert.notStrictEqual(actual, expected, message_opt);
+
+assert.notStrictEqual = function notStrictEqual(actual, expected, message) {
+  if (actual === expected) {
+    fail(actual, expected, message, '!==', assert.notStrictEqual);
+  }
+};
+
+function expectedException(actual, expected) {
+  if (!actual || !expected) {
+    return false;
+  }
+
+  if (Object.prototype.toString.call(expected) == '[object RegExp]') {
+    return expected.test(actual);
+  }
+
+  try {
+    if (actual instanceof expected) {
+      return true;
+    }
+  } catch (e) {
+    // Ignore.  The instanceof check doesn't work for arrow functions.
+  }
+
+  if (Error.isPrototypeOf(expected)) {
+    return false;
+  }
+
+  return expected.call({}, actual) === true;
+}
+
+function _tryBlock(block) {
+  var error;
+  try {
+    block();
+  } catch (e) {
+    error = e;
+  }
+  return error;
+}
+
+function _throws(shouldThrow, block, expected, message) {
+  var actual;
+
+  if (typeof block !== 'function') {
+    throw new TypeError('"block" argument must be a function');
+  }
+
+  if (typeof expected === 'string') {
+    message = expected;
+    expected = null;
+  }
+
+  actual = _tryBlock(block);
+
+  message = (expected && expected.name ? ' (' + expected.name + ').' : '.') +
+            (message ? ' ' + message : '.');
+
+  if (shouldThrow && !actual) {
+    fail(actual, expected, 'Missing expected exception' + message);
+  }
+
+  var userProvidedMessage = typeof message === 'string';
+  var isUnwantedException = !shouldThrow && util.isError(actual);
+  var isUnexpectedException = !shouldThrow && actual && !expected;
+
+  if ((isUnwantedException &&
+      userProvidedMessage &&
+      expectedException(actual, expected)) ||
+      isUnexpectedException) {
+    fail(actual, expected, 'Got unwanted exception' + message);
+  }
+
+  if ((shouldThrow && actual && expected &&
+      !expectedException(actual, expected)) || (!shouldThrow && actual)) {
+    throw actual;
+  }
+}
+
+// 11. Expected to throw an error:
+// assert.throws(block, Error_opt, message_opt);
+
+assert.throws = function(block, /*optional*/error, /*optional*/message) {
+  _throws(true, block, error, message);
+};
+
+// EXTENSION! This is annoying to write outside this module.
+assert.doesNotThrow = function(block, /*optional*/error, /*optional*/message) {
+  _throws(false, block, error, message);
+};
+
+assert.ifError = function(err) { if (err) throw err; };
+
+var objectKeys = Object.keys || function (obj) {
+  var keys = [];
+  for (var key in obj) {
+    if (hasOwn.call(obj, key)) keys.push(key);
+  }
+  return keys;
+};
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+
+/***/ }),
+/* 49 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+
+var _ = __webpack_require__(2);
+var Address = __webpack_require__(26);
+var Base58Check = __webpack_require__(36);
+var BN = __webpack_require__(9);
+var JSUtil = __webpack_require__(7);
+var Networks = __webpack_require__(25);
+var Point = __webpack_require__(29);
+var PublicKey = __webpack_require__(18);
+var Random = __webpack_require__(52);
+var $ = __webpack_require__(4);
+
+/**
+ * Instantiate a PrivateKey from a BN, Buffer and WIF.
+ *
+ * @example
+ * ```javascript
+ * // generate a new random key
+ * var key = PrivateKey();
+ *
+ * // get the associated address
+ * var address = key.toAddress();
+ *
+ * // encode into wallet export format
+ * var exported = key.toWIF();
+ *
+ * // instantiate from the exported (and saved) private key
+ * var imported = PrivateKey.fromWIF(exported);
+ * ```
+ *
+ * @param {string} data - The encoded data in various formats
+ * @param {Network|string=} network - a {@link Network} object, or a string with the network name
+ * @returns {PrivateKey} A new valid instance of an PrivateKey
+ * @constructor
+ */
+function PrivateKey(data, network) {
+  /* jshint maxstatements: 20 */
+  /* jshint maxcomplexity: 8 */
+
+  if (!(this instanceof PrivateKey)) {
+    return new PrivateKey(data, network);
+  }
+  if (data instanceof PrivateKey) {
+    return data;
+  }
+
+  var info = this._classifyArguments(data, network);
+
+  // validation
+  if (!info.bn || info.bn.cmp(new BN(0)) === 0){
+    throw new TypeError('Number can not be equal to zero, undefined, null or false');
+  }
+  if (!info.bn.lt(Point.getN())) {
+    throw new TypeError('Number must be less than N');
+  }
+  if (typeof(info.network) === 'undefined') {
+    throw new TypeError('Must specify the network ("livenet" or "testnet")');
+  }
+
+  JSUtil.defineImmutable(this, {
+    bn: info.bn,
+    compressed: info.compressed,
+    network: info.network
+  });
+
+  Object.defineProperty(this, 'publicKey', {
+    configurable: false,
+    enumerable: true,
+    get: this.toPublicKey.bind(this)
+  });
+
+  return this;
+
+};
+
+/**
+ * Internal helper to instantiate PrivateKey internal `info` object from
+ * different kinds of arguments passed to the constructor.
+ *
+ * @param {*} data
+ * @param {Network|string=} network - a {@link Network} object, or a string with the network name
+ * @return {Object}
+ */
+PrivateKey.prototype._classifyArguments = function(data, network) {
+  /* jshint maxcomplexity: 10 */
+  var info = {
+    compressed: true,
+    network: network ? Networks.get(network) : Networks.defaultNetwork
+  };
+
+  // detect type of data
+  if (_.isUndefined(data) || _.isNull(data)){
+    info.bn = PrivateKey._getRandomBN();
+  } else if (data instanceof BN) {
+    info.bn = data;
+  } else if (data instanceof Buffer || data instanceof Uint8Array) {
+    info = PrivateKey._transformBuffer(data, network);
+  } else if (data.bn && data.network){
+    info = PrivateKey._transformObject(data);
+  } else if (!network && Networks.get(data)) {
+    info.bn = PrivateKey._getRandomBN();
+    info.network = Networks.get(data);
+  } else if (typeof(data) === 'string'){
+    if (JSUtil.isHexa(data)) {
+      info.bn = new BN(new Buffer(data, 'hex'));
+    } else {
+      info = PrivateKey._transformWIF(data, network);
+    }
+  } else {
+    throw new TypeError('First argument is an unrecognized data type.');
+  }
+  return info;
+};
+
+/**
+ * Internal function to get a random Big Number (BN)
+ *
+ * @returns {BN} A new randomly generated BN
+ * @private
+ */
+PrivateKey._getRandomBN = function(){
+  var condition;
+  var bn;
+  do {
+    var privbuf = Random.getRandomBuffer(32);
+    bn = BN.fromBuffer(privbuf);
+    condition = bn.lt(Point.getN());
+  } while (!condition);
+  return bn;
+};
+
+/**
+ * Internal function to transform a WIF Buffer into a private key
+ *
+ * @param {Buffer} buf - An WIF string
+ * @param {Network|string=} network - a {@link Network} object, or a string with the network name
+ * @returns {Object} An object with keys: bn, network and compressed
+ * @private
+ */
+PrivateKey._transformBuffer = function(buf, network) {
+
+  var info = {};
+
+  if (buf.length === 32) {
+    return PrivateKey._transformBNBuffer(buf, network);
+  }
+
+  info.network = Networks.get(buf[0], 'privatekey');
+
+  if (!info.network) {
+    throw new Error('Invalid network');
+  }
+
+  if (network && info.network !== Networks.get(network)) {
+    throw new TypeError('Private key network mismatch');
+  }
+
+  if (buf.length === 1 + 32 + 1 && buf[1 + 32 + 1 - 1] === 1) {
+    info.compressed = true;
+  } else if (buf.length === 1 + 32) {
+    info.compressed = false;
+  } else {
+    throw new Error('Length of buffer must be 33 (uncompressed) or 34 (compressed)');
+  }
+
+  info.bn = BN.fromBuffer(buf.slice(1, 32 + 1));
+
+  return info;
+};
+
+/**
+ * Internal function to transform a BN buffer into a private key
+ *
+ * @param {Buffer} buf
+ * @param {Network|string=} network - a {@link Network} object, or a string with the network name
+ * @returns {object} an Object with keys: bn, network, and compressed
+ * @private
+ */
+PrivateKey._transformBNBuffer = function(buf, network) {
+  var info = {};
+  info.network = Networks.get(network) || Networks.defaultNetwork;
+  info.bn = BN.fromBuffer(buf);
+  info.compressed = false;
+  return info;
+};
+
+/**
+ * Internal function to transform a WIF string into a private key
+ *
+ * @param {string} buf - An WIF string
+ * @returns {Object} An object with keys: bn, network and compressed
+ * @private
+ */
+PrivateKey._transformWIF = function(str, network) {
+  return PrivateKey._transformBuffer(Base58Check.decode(str), network);
+};
+
+/**
+ * Instantiate a PrivateKey from a Buffer with the DER or WIF representation
+ *
+ * @param {Buffer} arg
+ * @param {Network} network
+ * @return {PrivateKey}
+ */
+PrivateKey.fromBuffer = function(arg, network) {
+  return new PrivateKey(arg, network);
+};
+
+/**
+ * Internal function to transform a JSON string on plain object into a private key
+ * return this.
+ *
+ * @param {string} json - A JSON string or plain object
+ * @returns {Object} An object with keys: bn, network and compressed
+ * @private
+ */
+PrivateKey._transformObject = function(json) {
+  var bn = new BN(json.bn, 'hex');
+  var network = Networks.get(json.network);
+  return {
+    bn: bn,
+    network: network,
+    compressed: json.compressed
+  };
+};
+
+/**
+ * Instantiate a PrivateKey from a WIF string
+ *
+ * @param {string} str - The WIF encoded private key string
+ * @returns {PrivateKey} A new valid instance of PrivateKey
+ */
+PrivateKey.fromString = PrivateKey.fromWIF = function(str) {
+  $.checkArgument(_.isString(str), 'First argument is expected to be a string.');
+  return new PrivateKey(str);
+};
+
+/**
+ * Instantiate a PrivateKey from a plain JavaScript object
+ *
+ * @param {Object} obj - The output from privateKey.toObject()
+ */
+PrivateKey.fromObject = function(obj) {
+  $.checkArgument(_.isObject(obj), 'First argument is expected to be an object.');
+  return new PrivateKey(obj);
+};
+
+/**
+ * Instantiate a PrivateKey from random bytes
+ *
+ * @param {string=} network - Either "livenet" or "testnet"
+ * @returns {PrivateKey} A new valid instance of PrivateKey
+ */
+PrivateKey.fromRandom = function(network) {
+  var bn = PrivateKey._getRandomBN();
+  return new PrivateKey(bn, network);
+};
+
+/**
+ * Check if there would be any errors when initializing a PrivateKey
+ *
+ * @param {string} data - The encoded data in various formats
+ * @param {string=} network - Either "livenet" or "testnet"
+ * @returns {null|Error} An error if exists
+ */
+
+PrivateKey.getValidationError = function(data, network) {
+  var error;
+  try {
+    /* jshint nonew: false */
+    new PrivateKey(data, network);
+  } catch (e) {
+    error = e;
+  }
+  return error;
+};
+
+/**
+ * Check if the parameters are valid
+ *
+ * @param {string} data - The encoded data in various formats
+ * @param {string=} network - Either "livenet" or "testnet"
+ * @returns {Boolean} If the private key is would be valid
+ */
+PrivateKey.isValid = function(data, network){
+  if (!data) {
+    return false;
+  }
+  return !PrivateKey.getValidationError(data, network);
+};
+
+/**
+ * Will output the PrivateKey encoded as hex string
+ *
+ * @returns {string}
+ */
+PrivateKey.prototype.toString = function() {
+  return this.toBuffer().toString('hex');
+};
+
+/**
+ * Will output the PrivateKey to a WIF string
+ *
+ * @returns {string} A WIP representation of the private key
+ */
+PrivateKey.prototype.toWIF = function() {
+  var network = this.network;
+  var compressed = this.compressed;
+
+  var buf;
+  if (compressed) {
+    buf = Buffer.concat([new Buffer([network.privatekey]),
+                         this.bn.toBuffer({size: 32}),
+                         new Buffer([0x01])]);
+  } else {
+    buf = Buffer.concat([new Buffer([network.privatekey]),
+                         this.bn.toBuffer({size: 32})]);
+  }
+
+  return Base58Check.encode(buf);
+};
+
+/**
+ * Will return the private key as a BN instance
+ *
+ * @returns {BN} A BN instance of the private key
+ */
+PrivateKey.prototype.toBigNumber = function(){
+  return this.bn;
+};
+
+/**
+ * Will return the private key as a BN buffer
+ *
+ * @returns {Buffer} A buffer of the private key
+ */
+PrivateKey.prototype.toBuffer = function(){
+  // TODO: use `return this.bn.toBuffer({ size: 32 })` in v1.0.0
+  return this.bn.toBuffer();
+};
+
+/**
+ * WARNING: This method will not be officially supported until v1.0.0.
+ *
+ *
+ * Will return the private key as a BN buffer without leading zero padding
+ *
+ * @returns {Buffer} A buffer of the private key
+ */
+PrivateKey.prototype.toBufferNoPadding = function() {
+  return this.bn.toBuffer();
+};
+
+/**
+ * Will return the corresponding public key
+ *
+ * @returns {PublicKey} A public key generated from the private key
+ */
+PrivateKey.prototype.toPublicKey = function(){
+  if (!this._pubkey) {
+    this._pubkey = PublicKey.fromPrivateKey(this);
+  }
+  return this._pubkey;
+};
+
+/**
+ * Will return an address for the private key
+ * @param {Network=} network - optional parameter specifying
+ * the desired network for the address
+ *
+ * @returns {Address} An address generated from the private key
+ */
+PrivateKey.prototype.toAddress = function(network) {
+  var pubkey = this.toPublicKey();
+  return Address.fromPublicKey(pubkey, network || this.network);
+};
+
+/**
+ * @returns {Object} A plain object representation
+ */
+PrivateKey.prototype.toObject = PrivateKey.prototype.toJSON = function toObject() {
+  return {
+    bn: this.bn.toString('hex'),
+    compressed: this.compressed,
+    network: this.network.toString()
+  };
+};
+
+/**
+ * Will return a string formatted for the console
+ *
+ * @returns {string} Private key
+ */
+PrivateKey.prototype.inspect = function() {
+  var uncompressed = !this.compressed ? ', uncompressed' : '';
+  return '<PrivateKey: ' + this.toString() + ', network: ' + this.network + uncompressed + '>';
+};
+
+module.exports = PrivateKey;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 50 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+
+var _ = __webpack_require__(2);
+var bs58 = __webpack_require__(107);
+var buffer = __webpack_require__(0);
+
+var ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'.split('');
+
+var Base58 = function Base58(obj) {
+  /* jshint maxcomplexity: 8 */
+  if (!(this instanceof Base58)) {
+    return new Base58(obj);
+  }
+  if (Buffer.isBuffer(obj)) {
+    var buf = obj;
+    this.fromBuffer(buf);
+  } else if (typeof obj === 'string') {
+    var str = obj;
+    this.fromString(str);
+  } else if (obj) {
+    this.set(obj);
+  }
+};
+
+Base58.validCharacters = function validCharacters(chars) {
+  if (buffer.Buffer.isBuffer(chars)) {
+    chars = chars.toString();
+  }
+  return _.every(_.map(chars, function(char) { return _.includes(ALPHABET, char); }));
+};
+
+Base58.prototype.set = function(obj) {
+  this.buf = obj.buf || this.buf || undefined;
+  return this;
+};
+
+Base58.encode = function(buf) {
+  if (!buffer.Buffer.isBuffer(buf)) {
+    throw new Error('Input should be a buffer');
+  }
+  return bs58.encode(buf);
+};
+
+Base58.decode = function(str) {
+  if (typeof str !== 'string') {
+    throw new Error('Input should be a string');
+  }
+  return new Buffer(bs58.decode(str));
+};
+
+Base58.prototype.fromBuffer = function(buf) {
+  this.buf = buf;
+  return this;
+};
+
+Base58.prototype.fromString = function(str) {
+  var buf = Base58.decode(str);
+  this.buf = buf;
+  return this;
+};
+
+Base58.prototype.toBuffer = function() {
+  return this.buf;
+};
+
+Base58.prototype.toString = function() {
+  return Base58.encode(this.buf);
+};
+
+module.exports = Base58;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 51 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(69);
+
+module.exports.Input = __webpack_require__(70);
+module.exports.Output = __webpack_require__(23);
+module.exports.UnspentOutput = __webpack_require__(109);
+module.exports.Signature = __webpack_require__(39);
+module.exports.Sighash = __webpack_require__(22);
+
+
+/***/ }),
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process, Buffer) {
+
+function Random() {
+}
+
+/* secure random bytes that sometimes throws an error due to lack of entropy */
+Random.getRandomBuffer = function(size) {
+  if (process.browser)
+    return Random.getRandomBufferBrowser(size);
+  else
+    return Random.getRandomBufferNode(size);
+};
+
+Random.getRandomBufferNode = function(size) {
+  var crypto = __webpack_require__(41);
+  return crypto.randomBytes(size);
+};
+
+Random.getRandomBufferBrowser = function(size) {
+  if (!window.crypto && !window.msCrypto)
+    throw new Error('window.crypto not available');
+
+  if (window.crypto && window.crypto.getRandomValues)
+    var crypto = window.crypto;
+  else if (window.msCrypto && window.msCrypto.getRandomValues) //internet explorer
+    var crypto = window.msCrypto;
+  else
+    throw new Error('window.crypto.getRandomValues not available');
+
+  var bbuf = new Uint8Array(size);
+  crypto.getRandomValues(bbuf);
+  var buf = new Buffer(bbuf);
+
+  return buf;
+};
+
+/* insecure random bytes, but it never fails */
+Random.getPseudoRandomBuffer = function(size) {
+  var b32 = 0x100000000;
+  var b = new Buffer(size);
+  var r;
+
+  for (var i = 0; i <= size; i++) {
+    var j = Math.floor(i / 4);
+    var k = i - j * 4;
+    if (k === 0) {
+      r = Math.random() * b32;
+      b[i] = r & 0xff;
+    } else {
+      b[i] = (r = r >>> 8) & 0xff;
+    }
+  }
+
+  return b;
+};
+
+module.exports = Random;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16), __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 53 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+
+var _ = __webpack_require__(2);
+var BN = __webpack_require__(9);
+var BufferUtil = __webpack_require__(5);
+var BufferReader = __webpack_require__(21);
+var BufferWriter = __webpack_require__(19);
+var Hash = __webpack_require__(10);
+var JSUtil = __webpack_require__(7);
+var $ = __webpack_require__(4);
+
+var GENESIS_BITS = 0x1d00ffff;
+
+/**
+ * Instantiate a BlockHeader from a Buffer, JSON object, or Object with
+ * the properties of the BlockHeader
+ *
+ * @param {*} - A Buffer, JSON string, or Object
+ * @returns {BlockHeader} - An instance of block header
+ * @constructor
+ */
+var BlockHeader = function BlockHeader(arg) {
+  if (!(this instanceof BlockHeader)) {
+    return new BlockHeader(arg);
+  }
+  var info = BlockHeader._from(arg);
+  this.version = info.version;
+  this.prevHash = info.prevHash;
+  this.merkleRoot = info.merkleRoot;
+  this.time = info.time;
+  this.timestamp = info.time;
+  this.bits = info.bits;
+  this.nonce = info.nonce;
+
+  if (info.hash) {
+    $.checkState(
+      this.hash === info.hash,
+      'Argument object hash property does not match block hash.'
+    );
+  }
+
+  return this;
+};
+
+/**
+ * @param {*} - A Buffer, JSON string or Object
+ * @returns {Object} - An object representing block header data
+ * @throws {TypeError} - If the argument was not recognized
+ * @private
+ */
+BlockHeader._from = function _from(arg) {
+  var info = {};
+  if (BufferUtil.isBuffer(arg)) {
+    info = BlockHeader._fromBufferReader(BufferReader(arg));
+  } else if (_.isObject(arg)) {
+    info = BlockHeader._fromObject(arg);
+  } else {
+    throw new TypeError('Unrecognized argument for BlockHeader');
+  }
+  return info;
+};
+
+/**
+ * @param {Object} - A JSON string
+ * @returns {Object} - An object representing block header data
+ * @private
+ */
+BlockHeader._fromObject = function _fromObject(data) {
+  $.checkArgument(data, 'data is required');
+  var prevHash = data.prevHash;
+  var merkleRoot = data.merkleRoot;
+  if (_.isString(data.prevHash)) {
+    prevHash = BufferUtil.reverse(new Buffer(data.prevHash, 'hex'));
+  }
+  if (_.isString(data.merkleRoot)) {
+    merkleRoot = BufferUtil.reverse(new Buffer(data.merkleRoot, 'hex'));
+  }
+  var info = {
+    hash: data.hash,
+    version: data.version,
+    prevHash: prevHash,
+    merkleRoot: merkleRoot,
+    time: data.time,
+    timestamp: data.time,
+    bits: data.bits,
+    nonce: data.nonce
+  };
+  return info;
+};
+
+/**
+ * @param {Object} - A plain JavaScript object
+ * @returns {BlockHeader} - An instance of block header
+ */
+BlockHeader.fromObject = function fromObject(obj) {
+  var info = BlockHeader._fromObject(obj);
+  return new BlockHeader(info);
+};
+
+/**
+ * @param {Binary} - Raw block binary data or buffer
+ * @returns {BlockHeader} - An instance of block header
+ */
+BlockHeader.fromRawBlock = function fromRawBlock(data) {
+  if (!BufferUtil.isBuffer(data)) {
+    data = new Buffer(data, 'binary');
+  }
+  var br = BufferReader(data);
+  br.pos = BlockHeader.Constants.START_OF_HEADER;
+  var info = BlockHeader._fromBufferReader(br);
+  return new BlockHeader(info);
+};
+
+/**
+ * @param {Buffer} - A buffer of the block header
+ * @returns {BlockHeader} - An instance of block header
+ */
+BlockHeader.fromBuffer = function fromBuffer(buf) {
+  var info = BlockHeader._fromBufferReader(BufferReader(buf));
+  return new BlockHeader(info);
+};
+
+/**
+ * @param {string} - A hex encoded buffer of the block header
+ * @returns {BlockHeader} - An instance of block header
+ */
+BlockHeader.fromString = function fromString(str) {
+  var buf = new Buffer(str, 'hex');
+  return BlockHeader.fromBuffer(buf);
+};
+
+/**
+ * @param {BufferReader} - A BufferReader of the block header
+ * @returns {Object} - An object representing block header data
+ * @private
+ */
+BlockHeader._fromBufferReader = function _fromBufferReader(br) {
+  var info = {};
+  info.version = br.readInt32LE();
+  info.prevHash = br.read(32);
+  info.merkleRoot = br.read(32);
+  info.time = br.readUInt32LE();
+  info.bits = br.readUInt32LE();
+  info.nonce = br.readUInt32LE();
+  return info;
+};
+
+/**
+ * @param {BufferReader} - A BufferReader of the block header
+ * @returns {BlockHeader} - An instance of block header
+ */
+BlockHeader.fromBufferReader = function fromBufferReader(br) {
+  var info = BlockHeader._fromBufferReader(br);
+  return new BlockHeader(info);
+};
+
+/**
+ * @returns {Object} - A plain object of the BlockHeader
+ */
+BlockHeader.prototype.toObject = BlockHeader.prototype.toJSON = function toObject() {
+  return {
+    hash: this.hash,
+    version: this.version,
+    prevHash: BufferUtil.reverse(this.prevHash).toString('hex'),
+    merkleRoot: BufferUtil.reverse(this.merkleRoot).toString('hex'),
+    time: this.time,
+    bits: this.bits,
+    nonce: this.nonce
+  };
+};
+
+/**
+ * @returns {Buffer} - A Buffer of the BlockHeader
+ */
+BlockHeader.prototype.toBuffer = function toBuffer() {
+  return this.toBufferWriter().concat();
+};
+
+/**
+ * @returns {string} - A hex encoded string of the BlockHeader
+ */
+BlockHeader.prototype.toString = function toString() {
+  return this.toBuffer().toString('hex');
+};
+
+/**
+ * @param {BufferWriter} - An existing instance BufferWriter
+ * @returns {BufferWriter} - An instance of BufferWriter representation of the BlockHeader
+ */
+BlockHeader.prototype.toBufferWriter = function toBufferWriter(bw) {
+  if (!bw) {
+    bw = new BufferWriter();
+  }
+  bw.writeInt32LE(this.version);
+  bw.write(this.prevHash);
+  bw.write(this.merkleRoot);
+  bw.writeUInt32LE(this.time);
+  bw.writeUInt32LE(this.bits);
+  bw.writeUInt32LE(this.nonce);
+  return bw;
+};
+
+/**
+ * Returns the target difficulty for this block
+ * @param {Number} bits
+ * @returns {BN} An instance of BN with the decoded difficulty bits
+ */
+BlockHeader.prototype.getTargetDifficulty = function getTargetDifficulty(bits) {
+  bits = bits || this.bits;
+
+  var target = new BN(bits & 0xffffff);
+  var mov = 8 * ((bits >>> 24) - 3);
+  while (mov-- > 0) {
+    target = target.mul(new BN(2));
+  }
+  return target;
+};
+
+/**
+ * @link https://en.bitcoin.it/wiki/Difficulty
+ * @return {Number}
+ */
+BlockHeader.prototype.getDifficulty = function getDifficulty() {
+  var difficulty1TargetBN = this.getTargetDifficulty(GENESIS_BITS).mul(new BN(Math.pow(10, 8)));
+  var currentTargetBN = this.getTargetDifficulty();
+
+  var difficultyString = difficulty1TargetBN.div(currentTargetBN).toString(10);
+  var decimalPos = difficultyString.length - 8;
+  difficultyString = difficultyString.slice(0, decimalPos) + '.' + difficultyString.slice(decimalPos);
+
+  return parseFloat(difficultyString);
+};
+
+/**
+ * @returns {Buffer} - The little endian hash buffer of the header
+ */
+BlockHeader.prototype._getHash = function hash() {
+  var buf = this.toBuffer();
+  return Hash.sha256sha256(buf);
+};
+
+var idProperty = {
+  configurable: false,
+  enumerable: true,
+  /**
+   * @returns {string} - The big endian hash buffer of the header
+   */
+  get: function() {
+    if (!this._id) {
+      this._id = BufferReader(this._getHash()).readReverse().toString('hex');
+    }
+    return this._id;
+  },
+  set: _.noop
+};
+Object.defineProperty(BlockHeader.prototype, 'id', idProperty);
+Object.defineProperty(BlockHeader.prototype, 'hash', idProperty);
+
+/**
+ * @returns {Boolean} - If timestamp is not too far in the future
+ */
+BlockHeader.prototype.validTimestamp = function validTimestamp() {
+  var currentTime = Math.round(new Date().getTime() / 1000);
+  if (this.time > currentTime + BlockHeader.Constants.MAX_TIME_OFFSET) {
+    return false;
+  }
+  return true;
+};
+
+/**
+ * @returns {Boolean} - If the proof-of-work hash satisfies the target difficulty
+ */
+BlockHeader.prototype.validProofOfWork = function validProofOfWork() {
+  var pow = new BN(this.id, 'hex');
+  var target = this.getTargetDifficulty();
+
+  if (pow.cmp(target) > 0) {
+    return false;
+  }
+  return true;
+};
+
+/**
+ * @returns {string} - A string formatted for the console
+ */
+BlockHeader.prototype.inspect = function inspect() {
+  return '<BlockHeader ' + this.id + '>';
+};
+
+BlockHeader.Constants = {
+  START_OF_HEADER: 8, // Start buffer position in raw block data
+  MAX_TIME_OFFSET: 2 * 60 * 60, // The max a timestamp can be in the future
+  LARGEST_HASH: new BN('10000000000000000000000000000000000000000000000000000000000000000', 'hex')
+};
+
+module.exports = BlockHeader;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
 /* 54 */
@@ -32533,12 +32533,12 @@ function isUndefined(arg) {
 /* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(73);
+exports = module.exports = __webpack_require__(74);
 exports.Stream = exports;
 exports.Readable = exports;
 exports.Writable = __webpack_require__(59);
 exports.Duplex = __webpack_require__(24);
-exports.Transform = __webpack_require__(76);
+exports.Transform = __webpack_require__(77);
 exports.PassThrough = __webpack_require__(126);
 
 
@@ -32576,7 +32576,7 @@ exports.PassThrough = __webpack_require__(126);
 
 /*<replacement>*/
 
-var processNextTick = __webpack_require__(42);
+var processNextTick = __webpack_require__(43);
 /*</replacement>*/
 
 module.exports = Writable;
@@ -32624,7 +32624,7 @@ var internalUtil = {
 /*</replacement>*/
 
 /*<replacement>*/
-var Stream = __webpack_require__(74);
+var Stream = __webpack_require__(75);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -32638,7 +32638,7 @@ function _isUint8Array(obj) {
 }
 /*</replacement>*/
 
-var destroyImpl = __webpack_require__(75);
+var destroyImpl = __webpack_require__(76);
 
 util.inherits(Writable, Stream);
 
@@ -33509,7 +33509,7 @@ exports.sha1 = __webpack_require__(132)
 exports.sha224 = __webpack_require__(133)
 exports.sha256 = __webpack_require__(54)
 exports.sha384 = __webpack_require__(134)
-exports.sha512 = __webpack_require__(77)
+exports.sha512 = __webpack_require__(78)
 
 
 /***/ }),
@@ -33518,7 +33518,7 @@ exports.sha512 = __webpack_require__(77)
 
 var ciphers = __webpack_require__(141)
 var deciphers = __webpack_require__(149)
-var modes = __webpack_require__(86)
+var modes = __webpack_require__(87)
 
 function getCiphers () {
   return Object.keys(modes)
@@ -33542,11 +33542,11 @@ var modeModules = {
   CFB8: __webpack_require__(145),
   CFB1: __webpack_require__(146),
   OFB: __webpack_require__(147),
-  CTR: __webpack_require__(84),
-  GCM: __webpack_require__(84)
+  CTR: __webpack_require__(85),
+  GCM: __webpack_require__(85)
 }
 
-var modes = __webpack_require__(86)
+var modes = __webpack_require__(87)
 
 for (var key in modes) {
   modes[key].module = modeModules[modes[key].mode]
@@ -33943,7 +33943,7 @@ var Signature = __webpack_require__(14);
 var Sighash = __webpack_require__(22);
 
 var Address = __webpack_require__(26);
-var UnspentOutput = __webpack_require__(108);
+var UnspentOutput = __webpack_require__(109);
 var Input = __webpack_require__(70);
 var PublicKeyHashInput = Input.PublicKeyHash;
 var PublicKeyInput = Input.PublicKey;
@@ -33951,7 +33951,7 @@ var MultiSigScriptHashInput = Input.MultiSigScriptHash;
 var MultiSigInput = Input.MultiSig;
 var Output = __webpack_require__(23);
 var Script = __webpack_require__(15);
-var PrivateKey = __webpack_require__(48);
+var PrivateKey = __webpack_require__(49);
 var BN = __webpack_require__(9);
 
 /**
@@ -35431,6 +35431,178 @@ module.exports = Array.isArray || function (arr) {
 /* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
+/*
+ * ed2curve: convert Ed25519 signing key pair into Curve25519
+ * key pair suitable for Diffie-Hellman key exchange.
+ *
+ * Written by Dmitry Chestnykh in 2014. Public domain.
+ */
+/* jshint newcap: false */
+(function(root, f) {
+  'use strict';
+  if (typeof module !== 'undefined' && module.exports) module.exports = f(__webpack_require__(40));
+  else root.ed2curve = f(root.nacl);
+}(this, function(nacl) {
+  'use strict';
+  if (!nacl) throw new Error('tweetnacl not loaded');
+
+  // -- Operations copied from TweetNaCl.js. --
+
+  var gf = function(init) {
+    var i, r = new Float64Array(16);
+    if (init) for (i = 0; i < init.length; i++) r[i] = init[i];
+    return r;
+  };
+
+  var gf1 = gf([1]);
+
+  function car25519(o) {
+    var c;
+    var i;
+    for (i = 0; i < 16; i++) {
+      o[i] += 65536;
+      c = Math.floor(o[i] / 65536);
+      o[(i+1)*(i<15?1:0)] += c - 1 + 37 * (c-1) * (i===15?1:0);
+      o[i] -= (c * 65536);
+    }
+  }
+
+  function sel25519(p, q, b) {
+    var t, c = ~(b-1);
+    for (var i = 0; i < 16; i++) {
+      t = c & (p[i] ^ q[i]);
+      p[i] ^= t;
+      q[i] ^= t;
+    }
+  }
+
+  function unpack25519(o, n) {
+    var i;
+    for (i = 0; i < 16; i++) o[i] = n[2*i] + (n[2*i+1] << 8);
+    o[15] &= 0x7fff;
+  }
+
+  // addition
+  function A(o, a, b) {
+    var i;
+    for (i = 0; i < 16; i++) o[i] = (a[i] + b[i])|0;
+  }
+
+  // subtraction
+  function Z(o, a, b) {
+    var i;
+    for (i = 0; i < 16; i++) o[i] = (a[i] - b[i])|0;
+  }
+
+  // multiplication
+  function M(o, a, b) {
+    var i, j, t = new Float64Array(31);
+    for (i = 0; i < 31; i++) t[i] = 0;
+    for (i = 0; i < 16; i++) {
+      for (j = 0; j < 16; j++) {
+        t[i+j] += a[i] * b[j];
+      }
+    }
+    for (i = 0; i < 15; i++) {
+      t[i] += 38 * t[i+16];
+    }
+    for (i = 0; i < 16; i++) o[i] = t[i];
+    car25519(o);
+    car25519(o);
+  }
+
+  // squaring
+  function S(o, a) {
+    M(o, a, a);
+  }
+
+  // inversion
+  function inv25519(o, i) {
+    var c = gf();
+    var a;
+    for (a = 0; a < 16; a++) c[a] = i[a];
+    for (a = 253; a >= 0; a--) {
+      S(c, c);
+      if(a !== 2 && a !== 4) M(c, c, i);
+    }
+    for (a = 0; a < 16; a++) o[a] = c[a];
+  }
+
+  function pack25519(o, n) {
+    var i, j, b;
+    var m = gf(), t = gf();
+    for (i = 0; i < 16; i++) t[i] = n[i];
+    car25519(t);
+    car25519(t);
+    car25519(t);
+    for (j = 0; j < 2; j++) {
+      m[0] = t[0] - 0xffed;
+      for (i = 1; i < 15; i++) {
+        m[i] = t[i] - 0xffff - ((m[i-1]>>16) & 1);
+        m[i-1] &= 0xffff;
+      }
+      m[15] = t[15] - 0x7fff - ((m[14]>>16) & 1);
+      b = (m[15]>>16) & 1;
+      m[14] &= 0xffff;
+      sel25519(t, m, 1-b);
+    }
+    for (i = 0; i < 16; i++) {
+      o[2*i] = t[i] & 0xff;
+      o[2*i+1] = t[i]>>8;
+    }
+  }
+
+  // ----
+
+  // Converts Ed25519 public key to Curve25519 public key.
+  // montgomeryX = (edwardsY + 1)*inverse(1 - edwardsY) mod p
+  function convertPublicKey(pk) {
+    var z = new Uint8Array(32),
+        y = gf(), a = gf(), b = gf();
+
+    unpack25519(y, pk);
+
+    A(a, gf1, y);
+    Z(b, gf1, y);
+    inv25519(b, b);
+    M(a, a, b);
+
+    pack25519(z, a);
+    return z;
+  }
+
+  // Converts Ed25519 secret key to Curve25519 secret key.
+  function convertSecretKey(sk) {
+    var d = new Uint8Array(64), o = new Uint8Array(32), i;
+    nacl.lowlevel.crypto_hash(d, sk, 32);
+    d[0] &= 248;
+    d[31] &= 127;
+    d[31] |= 64;
+    for (i = 0; i < 32; i++) o[i] = d[i];
+    for (i = 0; i < 64; i++) d[i] = 0;
+    return o;
+  }
+
+  function convertKeyPair(edKeyPair) {
+    return {
+      publicKey: convertPublicKey(edKeyPair.publicKey),
+      secretKey: convertSecretKey(edKeyPair.secretKey)
+    };
+  }
+
+  return {
+    convertPublicKey: convertPublicKey,
+    convertSecretKey: convertSecretKey,
+    convertKeyPair: convertKeyPair,
+  };
+
+}));
+
+
+/***/ }),
+/* 74 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
 //
@@ -35457,7 +35629,7 @@ module.exports = Array.isArray || function (arr) {
 
 /*<replacement>*/
 
-var processNextTick = __webpack_require__(42);
+var processNextTick = __webpack_require__(43);
 /*</replacement>*/
 
 module.exports = Readable;
@@ -35481,7 +35653,7 @@ var EElistenerCount = function (emitter, type) {
 /*</replacement>*/
 
 /*<replacement>*/
-var Stream = __webpack_require__(74);
+var Stream = __webpack_require__(75);
 /*</replacement>*/
 
 // TODO(bmeurer): Change this back to const once hole checks are
@@ -35513,7 +35685,7 @@ if (debugUtil && debugUtil.debuglog) {
 /*</replacement>*/
 
 var BufferList = __webpack_require__(122);
-var destroyImpl = __webpack_require__(75);
+var destroyImpl = __webpack_require__(76);
 var StringDecoder;
 
 util.inherits(Readable, Stream);
@@ -36442,14 +36614,14 @@ function indexOf(xs, x) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11), __webpack_require__(16)))
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(57).EventEmitter;
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36457,7 +36629,7 @@ module.exports = __webpack_require__(57).EventEmitter;
 
 /*<replacement>*/
 
-var processNextTick = __webpack_require__(42);
+var processNextTick = __webpack_require__(43);
 /*</replacement>*/
 
 // undocumented cb() API, needed for core, not for public API
@@ -36527,7 +36699,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36747,7 +36919,7 @@ function done(stream, er, data) {
 }
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var inherits = __webpack_require__(1)
@@ -37013,7 +37185,7 @@ module.exports = Sha512
 
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37082,23 +37254,23 @@ module.exports = function createHmac (alg, key) {
 
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ (function(module, exports) {
 
 module.exports = {"sha224WithRSAEncryption":{"sign":"rsa","hash":"sha224","id":"302d300d06096086480165030402040500041c"},"RSA-SHA224":{"sign":"ecdsa/rsa","hash":"sha224","id":"302d300d06096086480165030402040500041c"},"sha256WithRSAEncryption":{"sign":"rsa","hash":"sha256","id":"3031300d060960864801650304020105000420"},"RSA-SHA256":{"sign":"ecdsa/rsa","hash":"sha256","id":"3031300d060960864801650304020105000420"},"sha384WithRSAEncryption":{"sign":"rsa","hash":"sha384","id":"3041300d060960864801650304020205000430"},"RSA-SHA384":{"sign":"ecdsa/rsa","hash":"sha384","id":"3041300d060960864801650304020205000430"},"sha512WithRSAEncryption":{"sign":"rsa","hash":"sha512","id":"3051300d060960864801650304020305000440"},"RSA-SHA512":{"sign":"ecdsa/rsa","hash":"sha512","id":"3051300d060960864801650304020305000440"},"RSA-SHA1":{"sign":"rsa","hash":"sha1","id":"3021300906052b0e03021a05000414"},"ecdsa-with-SHA1":{"sign":"ecdsa","hash":"sha1","id":""},"sha256":{"sign":"ecdsa","hash":"sha256","id":""},"sha224":{"sign":"ecdsa","hash":"sha224","id":""},"sha384":{"sign":"ecdsa","hash":"sha384","id":""},"sha512":{"sign":"ecdsa","hash":"sha512","id":""},"DSA-SHA":{"sign":"dsa","hash":"sha1","id":""},"DSA-SHA1":{"sign":"dsa","hash":"sha1","id":""},"DSA":{"sign":"dsa","hash":"sha1","id":""},"DSA-WITH-SHA224":{"sign":"dsa","hash":"sha224","id":""},"DSA-SHA224":{"sign":"dsa","hash":"sha224","id":""},"DSA-WITH-SHA256":{"sign":"dsa","hash":"sha256","id":""},"DSA-SHA256":{"sign":"dsa","hash":"sha256","id":""},"DSA-WITH-SHA384":{"sign":"dsa","hash":"sha384","id":""},"DSA-SHA384":{"sign":"dsa","hash":"sha384","id":""},"DSA-WITH-SHA512":{"sign":"dsa","hash":"sha512","id":""},"DSA-SHA512":{"sign":"dsa","hash":"sha512","id":""},"DSA-RIPEMD160":{"sign":"dsa","hash":"rmd160","id":""},"ripemd160WithRSA":{"sign":"rsa","hash":"rmd160","id":"3021300906052b2403020105000414"},"RSA-RIPEMD160":{"sign":"rsa","hash":"rmd160","id":"3021300906052b2403020105000414"},"md5WithRSAEncryption":{"sign":"rsa","hash":"md5","id":"3020300c06082a864886f70d020505000410"},"RSA-MD5":{"sign":"rsa","hash":"md5","id":"3020300c06082a864886f70d020505000410"}}
 
 /***/ }),
-/* 80 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 exports.pbkdf2 = __webpack_require__(137)
 
-exports.pbkdf2Sync = __webpack_require__(83)
+exports.pbkdf2Sync = __webpack_require__(84)
 
 
 /***/ }),
-/* 81 */
+/* 82 */
 /***/ (function(module, exports) {
 
 var MAX_ALLOC = Math.pow(2, 30) - 1 // default in iojs
@@ -37122,7 +37294,7 @@ module.exports = function (iterations, keylen) {
 
 
 /***/ }),
-/* 82 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {var defaultEncoding
@@ -37139,15 +37311,15 @@ module.exports = defaultEncoding
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
 
 /***/ }),
-/* 83 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var md5 = __webpack_require__(55)
 var rmd160 = __webpack_require__(56)
 var sha = __webpack_require__(61)
 
-var checkParameters = __webpack_require__(81)
-var defaultEncoding = __webpack_require__(82)
+var checkParameters = __webpack_require__(82)
+var defaultEncoding = __webpack_require__(83)
 var Buffer = __webpack_require__(3).Buffer
 var ZEROS = Buffer.alloc(128)
 var sizes = {
@@ -37246,12 +37418,12 @@ module.exports = pbkdf2
 
 
 /***/ }),
-/* 84 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var xor = __webpack_require__(32)
 var Buffer = __webpack_require__(3).Buffer
-var incr32 = __webpack_require__(85)
+var incr32 = __webpack_require__(86)
 
 function getBlock (self) {
   var out = self._cipher.encryptBlockRaw(self._prev)
@@ -37282,7 +37454,7 @@ exports.encrypt = function (self, chunk) {
 
 
 /***/ }),
-/* 85 */
+/* 86 */
 /***/ (function(module, exports) {
 
 function incr32 (iv) {
@@ -37303,22 +37475,22 @@ module.exports = incr32
 
 
 /***/ }),
-/* 86 */
+/* 87 */
 /***/ (function(module, exports) {
 
 module.exports = {"aes-128-ecb":{"cipher":"AES","key":128,"iv":0,"mode":"ECB","type":"block"},"aes-192-ecb":{"cipher":"AES","key":192,"iv":0,"mode":"ECB","type":"block"},"aes-256-ecb":{"cipher":"AES","key":256,"iv":0,"mode":"ECB","type":"block"},"aes-128-cbc":{"cipher":"AES","key":128,"iv":16,"mode":"CBC","type":"block"},"aes-192-cbc":{"cipher":"AES","key":192,"iv":16,"mode":"CBC","type":"block"},"aes-256-cbc":{"cipher":"AES","key":256,"iv":16,"mode":"CBC","type":"block"},"aes128":{"cipher":"AES","key":128,"iv":16,"mode":"CBC","type":"block"},"aes192":{"cipher":"AES","key":192,"iv":16,"mode":"CBC","type":"block"},"aes256":{"cipher":"AES","key":256,"iv":16,"mode":"CBC","type":"block"},"aes-128-cfb":{"cipher":"AES","key":128,"iv":16,"mode":"CFB","type":"stream"},"aes-192-cfb":{"cipher":"AES","key":192,"iv":16,"mode":"CFB","type":"stream"},"aes-256-cfb":{"cipher":"AES","key":256,"iv":16,"mode":"CFB","type":"stream"},"aes-128-cfb8":{"cipher":"AES","key":128,"iv":16,"mode":"CFB8","type":"stream"},"aes-192-cfb8":{"cipher":"AES","key":192,"iv":16,"mode":"CFB8","type":"stream"},"aes-256-cfb8":{"cipher":"AES","key":256,"iv":16,"mode":"CFB8","type":"stream"},"aes-128-cfb1":{"cipher":"AES","key":128,"iv":16,"mode":"CFB1","type":"stream"},"aes-192-cfb1":{"cipher":"AES","key":192,"iv":16,"mode":"CFB1","type":"stream"},"aes-256-cfb1":{"cipher":"AES","key":256,"iv":16,"mode":"CFB1","type":"stream"},"aes-128-ofb":{"cipher":"AES","key":128,"iv":16,"mode":"OFB","type":"stream"},"aes-192-ofb":{"cipher":"AES","key":192,"iv":16,"mode":"OFB","type":"stream"},"aes-256-ofb":{"cipher":"AES","key":256,"iv":16,"mode":"OFB","type":"stream"},"aes-128-ctr":{"cipher":"AES","key":128,"iv":16,"mode":"CTR","type":"stream"},"aes-192-ctr":{"cipher":"AES","key":192,"iv":16,"mode":"CTR","type":"stream"},"aes-256-ctr":{"cipher":"AES","key":256,"iv":16,"mode":"CTR","type":"stream"},"aes-128-gcm":{"cipher":"AES","key":128,"iv":12,"mode":"GCM","type":"auth"},"aes-192-gcm":{"cipher":"AES","key":192,"iv":12,"mode":"GCM","type":"auth"},"aes-256-gcm":{"cipher":"AES","key":256,"iv":12,"mode":"GCM","type":"auth"}}
 
 /***/ }),
-/* 87 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var aes = __webpack_require__(44)
+var aes = __webpack_require__(45)
 var Buffer = __webpack_require__(3).Buffer
 var Transform = __webpack_require__(20)
 var inherits = __webpack_require__(1)
 var GHASH = __webpack_require__(148)
 var xor = __webpack_require__(32)
-var incr32 = __webpack_require__(85)
+var incr32 = __webpack_require__(86)
 
 function xorTest (a, b) {
   var out = 0
@@ -37432,10 +37604,10 @@ module.exports = StreamCipher
 
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var aes = __webpack_require__(44)
+var aes = __webpack_require__(45)
 var Buffer = __webpack_require__(3).Buffer
 var Transform = __webpack_require__(20)
 var inherits = __webpack_require__(1)
@@ -37465,7 +37637,7 @@ module.exports = StreamCipher
 
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var randomBytes = __webpack_require__(28);
@@ -37474,7 +37646,7 @@ findPrime.simpleSieve = simpleSieve;
 findPrime.fermatTest = fermatTest;
 var BN = __webpack_require__(6);
 var TWENTYFOUR = new BN(24);
-var MillerRabin = __webpack_require__(90);
+var MillerRabin = __webpack_require__(91);
 var millerRabin = new MillerRabin();
 var ONE = new BN(1);
 var TWO = new BN(2);
@@ -37576,11 +37748,11 @@ function findPrime(bits, gen) {
 
 
 /***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var bn = __webpack_require__(6);
-var brorand = __webpack_require__(91);
+var brorand = __webpack_require__(92);
 
 function MillerRabin(rand) {
   this.rand = rand || new brorand.Rand();
@@ -37697,7 +37869,7 @@ MillerRabin.prototype.getDivisor = function getDivisor(n, k) {
 
 
 /***/ }),
-/* 91 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var r;
@@ -37768,7 +37940,7 @@ if (typeof self === 'object') {
 
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37833,7 +38005,7 @@ utils.encode = function encode(arr, enc) {
 
 
 /***/ }),
-/* 93 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37889,7 +38061,7 @@ exports.g1_256 = g1_256;
 
 
 /***/ }),
-/* 94 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37897,7 +38069,7 @@ exports.g1_256 = g1_256;
 
 var utils = __webpack_require__(17);
 var common = __webpack_require__(33);
-var shaCommon = __webpack_require__(93);
+var shaCommon = __webpack_require__(94);
 var assert = __webpack_require__(12);
 
 var sum32 = utils.sum32;
@@ -38001,7 +38173,7 @@ SHA256.prototype._digest = function digest(enc) {
 
 
 /***/ }),
-/* 95 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38338,7 +38510,7 @@ function g1_512_lo(xh, xl) {
 
 
 /***/ }),
-/* 96 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var inherits = __webpack_require__(1);
@@ -38460,7 +38632,7 @@ EncoderBuffer.prototype.join = function join(out, offset) {
 
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var constants = exports;
@@ -38485,7 +38657,7 @@ constants.der = __webpack_require__(191);
 
 
 /***/ }),
-/* 98 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var inherits = __webpack_require__(1);
@@ -38815,7 +38987,7 @@ function derDecodeLen(buf, primitive, fail) {
 
 
 /***/ }),
-/* 99 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var inherits = __webpack_require__(1);
@@ -39116,13 +39288,13 @@ function encodeTag(tag, primitive, cls, reporter) {
 
 
 /***/ }),
-/* 100 */
+/* 101 */
 /***/ (function(module, exports) {
 
 module.exports = {"1.3.132.0.10":"secp256k1","1.3.132.0.33":"p224","1.2.840.10045.3.1.1":"p192","1.2.840.10045.3.1.7":"p256","1.3.132.0.34":"p384","1.3.132.0.35":"p521"}
 
 /***/ }),
-/* 101 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var createHash = __webpack_require__(30);
@@ -39144,7 +39316,7 @@ function i2ops(c) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 102 */
+/* 103 */
 /***/ (function(module, exports) {
 
 module.exports = function xor(a, b) {
@@ -39157,7 +39329,7 @@ module.exports = function xor(a, b) {
 };
 
 /***/ }),
-/* 103 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var bn = __webpack_require__(6);
@@ -39173,7 +39345,7 @@ module.exports = withPublic;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 104 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39197,15 +39369,15 @@ global._bitcore = bitcore.version;
 // crypto
 bitcore.crypto = {};
 bitcore.crypto.BN = __webpack_require__(9);
-bitcore.crypto.ECDSA = __webpack_require__(105);
+bitcore.crypto.ECDSA = __webpack_require__(106);
 bitcore.crypto.Hash = __webpack_require__(10);
-bitcore.crypto.Random = __webpack_require__(51);
+bitcore.crypto.Random = __webpack_require__(52);
 bitcore.crypto.Point = __webpack_require__(29);
 bitcore.crypto.Signature = __webpack_require__(14);
 
 // encoding
 bitcore.encoding = {};
-bitcore.encoding.Base58 = __webpack_require__(49);
+bitcore.encoding.Base58 = __webpack_require__(50);
 bitcore.encoding.Base58Check = __webpack_require__(36);
 bitcore.encoding.BufferReader = __webpack_require__(21);
 bitcore.encoding.BufferWriter = __webpack_require__(19);
@@ -39223,23 +39395,23 @@ bitcore.errors = __webpack_require__(13);
 // main bitcoin library
 bitcore.Address = __webpack_require__(26);
 bitcore.Block = __webpack_require__(220);
-bitcore.MerkleBlock = __webpack_require__(109);
-bitcore.BlockHeader = __webpack_require__(52);
-bitcore.HDPrivateKey = __webpack_require__(110);
-bitcore.HDPublicKey = __webpack_require__(111);
+bitcore.MerkleBlock = __webpack_require__(110);
+bitcore.BlockHeader = __webpack_require__(53);
+bitcore.HDPrivateKey = __webpack_require__(111);
+bitcore.HDPublicKey = __webpack_require__(112);
 bitcore.Networks = __webpack_require__(25);
 bitcore.Opcode = __webpack_require__(68);
-bitcore.PrivateKey = __webpack_require__(48);
+bitcore.PrivateKey = __webpack_require__(49);
 bitcore.PublicKey = __webpack_require__(18);
 bitcore.Script = __webpack_require__(15);
-bitcore.Transaction = __webpack_require__(50);
+bitcore.Transaction = __webpack_require__(51);
 bitcore.URI = __webpack_require__(222);
 bitcore.Unit = __webpack_require__(71);
 
 // dependencies, subject to change
 bitcore.deps = {};
 bitcore.deps.bnjs = __webpack_require__(6);
-bitcore.deps.bs58 = __webpack_require__(106);
+bitcore.deps.bs58 = __webpack_require__(107);
 bitcore.deps.Buffer = Buffer;
 bitcore.deps.elliptic = __webpack_require__(8);
 bitcore.deps._ = __webpack_require__(2);
@@ -39250,7 +39422,7 @@ bitcore.Transaction.sighash = __webpack_require__(22);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11), __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 105 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39260,7 +39432,7 @@ var BN = __webpack_require__(9);
 var Point = __webpack_require__(29);
 var Signature = __webpack_require__(14);
 var PublicKey = __webpack_require__(18);
-var Random = __webpack_require__(51);
+var Random = __webpack_require__(52);
 var Hash = __webpack_require__(10);
 var BufferUtil = __webpack_require__(5);
 var _ = __webpack_require__(2);
@@ -39554,7 +39726,7 @@ module.exports = ECDSA;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 106 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var basex = __webpack_require__(212)
@@ -39564,7 +39736,7 @@ module.exports = basex(ALPHABET)
 
 
 /***/ }),
-/* 107 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40672,7 +40844,7 @@ module.exports = Script;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 108 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40779,20 +40951,20 @@ module.exports = UnspentOutput;
 
 
 /***/ }),
-/* 109 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 
 var _ = __webpack_require__(2);
-var BlockHeader = __webpack_require__(52);
+var BlockHeader = __webpack_require__(53);
 var BufferUtil = __webpack_require__(5);
 var BufferReader = __webpack_require__(21);
 var BufferWriter = __webpack_require__(19);
 var Hash = __webpack_require__(10);
 var JSUtil = __webpack_require__(7);
-var Transaction = __webpack_require__(50);
+var Transaction = __webpack_require__(51);
 var errors = __webpack_require__(13);
 var $ = __webpack_require__(4);
 
@@ -41100,26 +41272,26 @@ module.exports = MerkleBlock;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 110 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 
 
-var assert = __webpack_require__(47);
+var assert = __webpack_require__(48);
 var buffer = __webpack_require__(0);
 var _ = __webpack_require__(2);
 var $ = __webpack_require__(4);
 
 var BN = __webpack_require__(9);
-var Base58 = __webpack_require__(49);
+var Base58 = __webpack_require__(50);
 var Base58Check = __webpack_require__(36);
 var Hash = __webpack_require__(10);
 var Network = __webpack_require__(25);
 var Point = __webpack_require__(29);
-var PrivateKey = __webpack_require__(48);
-var Random = __webpack_require__(51);
+var PrivateKey = __webpack_require__(49);
+var Random = __webpack_require__(52);
 
 var errors = __webpack_require__(13);
 var hdErrors = errors.HDPrivateKey;
@@ -41539,7 +41711,7 @@ HDPrivateKey.fromSeed = function(hexa, network) {
 
 HDPrivateKey.prototype._calcHDPublicKey = function() {
   if (!this._hdPublicKey) {
-    var HDPublicKey = __webpack_require__(111);
+    var HDPublicKey = __webpack_require__(112);
     this._hdPublicKey = new HDPublicKey(this);
   }
 };
@@ -41754,7 +41926,7 @@ module.exports = HDPrivateKey;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 111 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41764,10 +41936,10 @@ var _ = __webpack_require__(2);
 var $ = __webpack_require__(4);
 
 var BN = __webpack_require__(9);
-var Base58 = __webpack_require__(49);
+var Base58 = __webpack_require__(50);
 var Base58Check = __webpack_require__(36);
 var Hash = __webpack_require__(10);
-var HDPrivateKey = __webpack_require__(110);
+var HDPrivateKey = __webpack_require__(111);
 var Network = __webpack_require__(25);
 var Point = __webpack_require__(29);
 var PublicKey = __webpack_require__(18);
@@ -41775,7 +41947,7 @@ var PublicKey = __webpack_require__(18);
 var bitcoreErrors = __webpack_require__(13);
 var errors = bitcoreErrors;
 var hdErrors = bitcoreErrors.HDPublicKey;
-var assert = __webpack_require__(47);
+var assert = __webpack_require__(48);
 
 var JSUtil = __webpack_require__(7);
 var BufferUtil = __webpack_require__(5);
@@ -42258,7 +42430,7 @@ module.exports = HDPublicKey;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 112 */
+/* 113 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -42266,12 +42438,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* WEBPACK VAR INJECTION */(function(Buffer) {/* eslint-disable no-redeclare */
 
 
-var sodium = __webpack_require__(115)
-var crypto = __webpack_require__(40)
+var sodium = __webpack_require__(116)
+var crypto = __webpack_require__(41)
 var Mnemonic = __webpack_require__(205)
 var bignum = __webpack_require__(239)
 var ByteBuffer = __webpack_require__(241)
 
+/* Decoding messages */
+var nacl = __webpack_require__(40)
+var ed2curve = __webpack_require__(73)
+var stablelib = __webpack_require__(243)
 
 class Adamant {
   /**
@@ -42452,6 +42628,20 @@ class Adamant {
   static verify (hash, signatureBuffer, publicKeyBuffer) {
     return sodium.crypto_sign_verify_detached(signatureBuffer, hash, publicKeyBuffer)
   }
+
+  /**
+   * Decode chat message
+  */
+  static decodeMessage (msg, nonce, senderPublicKey, privateKey) {
+    var DHPublicKey = ed2curve.convertPublicKey(senderPublicKey)
+    var DHSecretKey  = ed2curve.convertSecretKey(privateKey)
+    
+    var decrypted = nacl.box.open(msg, nonce, DHPublicKey, DHSecretKey)
+    if (!decrypted) {
+      return ''
+    }
+    return stablelib.decode(decrypted)
+  }
 }
 /* harmony export (immutable) */ __webpack_exports__["Adamant"] = Adamant;
 
@@ -42459,7 +42649,7 @@ class Adamant {
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 113 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42580,7 +42770,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 114 */
+/* 115 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -42670,13 +42860,13 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 115 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {
-var tweetnacl = __webpack_require__(53)
+var tweetnacl = __webpack_require__(40)
 var Sha256 = __webpack_require__(54)
-var ed2curve = __webpack_require__(117)
+var ed2curve = __webpack_require__(73)
 var auth = __webpack_require__(118)
 
 exports.crypto_hash_sha256 = function (msg) {
@@ -42779,182 +42969,10 @@ exports.randombytes = function (buf) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 116 */
+/* 117 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
-
-/***/ }),
-/* 117 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
- * ed2curve: convert Ed25519 signing key pair into Curve25519
- * key pair suitable for Diffie-Hellman key exchange.
- *
- * Written by Dmitry Chestnykh in 2014. Public domain.
- */
-/* jshint newcap: false */
-(function(root, f) {
-  'use strict';
-  if (typeof module !== 'undefined' && module.exports) module.exports = f(__webpack_require__(53));
-  else root.ed2curve = f(root.nacl);
-}(this, function(nacl) {
-  'use strict';
-  if (!nacl) throw new Error('tweetnacl not loaded');
-
-  // -- Operations copied from TweetNaCl.js. --
-
-  var gf = function(init) {
-    var i, r = new Float64Array(16);
-    if (init) for (i = 0; i < init.length; i++) r[i] = init[i];
-    return r;
-  };
-
-  var gf1 = gf([1]);
-
-  function car25519(o) {
-    var c;
-    var i;
-    for (i = 0; i < 16; i++) {
-      o[i] += 65536;
-      c = Math.floor(o[i] / 65536);
-      o[(i+1)*(i<15?1:0)] += c - 1 + 37 * (c-1) * (i===15?1:0);
-      o[i] -= (c * 65536);
-    }
-  }
-
-  function sel25519(p, q, b) {
-    var t, c = ~(b-1);
-    for (var i = 0; i < 16; i++) {
-      t = c & (p[i] ^ q[i]);
-      p[i] ^= t;
-      q[i] ^= t;
-    }
-  }
-
-  function unpack25519(o, n) {
-    var i;
-    for (i = 0; i < 16; i++) o[i] = n[2*i] + (n[2*i+1] << 8);
-    o[15] &= 0x7fff;
-  }
-
-  // addition
-  function A(o, a, b) {
-    var i;
-    for (i = 0; i < 16; i++) o[i] = (a[i] + b[i])|0;
-  }
-
-  // subtraction
-  function Z(o, a, b) {
-    var i;
-    for (i = 0; i < 16; i++) o[i] = (a[i] - b[i])|0;
-  }
-
-  // multiplication
-  function M(o, a, b) {
-    var i, j, t = new Float64Array(31);
-    for (i = 0; i < 31; i++) t[i] = 0;
-    for (i = 0; i < 16; i++) {
-      for (j = 0; j < 16; j++) {
-        t[i+j] += a[i] * b[j];
-      }
-    }
-    for (i = 0; i < 15; i++) {
-      t[i] += 38 * t[i+16];
-    }
-    for (i = 0; i < 16; i++) o[i] = t[i];
-    car25519(o);
-    car25519(o);
-  }
-
-  // squaring
-  function S(o, a) {
-    M(o, a, a);
-  }
-
-  // inversion
-  function inv25519(o, i) {
-    var c = gf();
-    var a;
-    for (a = 0; a < 16; a++) c[a] = i[a];
-    for (a = 253; a >= 0; a--) {
-      S(c, c);
-      if(a !== 2 && a !== 4) M(c, c, i);
-    }
-    for (a = 0; a < 16; a++) o[a] = c[a];
-  }
-
-  function pack25519(o, n) {
-    var i, j, b;
-    var m = gf(), t = gf();
-    for (i = 0; i < 16; i++) t[i] = n[i];
-    car25519(t);
-    car25519(t);
-    car25519(t);
-    for (j = 0; j < 2; j++) {
-      m[0] = t[0] - 0xffed;
-      for (i = 1; i < 15; i++) {
-        m[i] = t[i] - 0xffff - ((m[i-1]>>16) & 1);
-        m[i-1] &= 0xffff;
-      }
-      m[15] = t[15] - 0x7fff - ((m[14]>>16) & 1);
-      b = (m[15]>>16) & 1;
-      m[14] &= 0xffff;
-      sel25519(t, m, 1-b);
-    }
-    for (i = 0; i < 16; i++) {
-      o[2*i] = t[i] & 0xff;
-      o[2*i+1] = t[i]>>8;
-    }
-  }
-
-  // ----
-
-  // Converts Ed25519 public key to Curve25519 public key.
-  // montgomeryX = (edwardsY + 1)*inverse(1 - edwardsY) mod p
-  function convertPublicKey(pk) {
-    var z = new Uint8Array(32),
-        y = gf(), a = gf(), b = gf();
-
-    unpack25519(y, pk);
-
-    A(a, gf1, y);
-    Z(b, gf1, y);
-    inv25519(b, b);
-    M(a, a, b);
-
-    pack25519(z, a);
-    return z;
-  }
-
-  // Converts Ed25519 secret key to Curve25519 secret key.
-  function convertSecretKey(sk) {
-    var d = new Uint8Array(64), o = new Uint8Array(32), i;
-    nacl.lowlevel.crypto_hash(d, sk, 32);
-    d[0] &= 248;
-    d[31] &= 127;
-    d[31] |= 64;
-    for (i = 0; i < 32; i++) o[i] = d[i];
-    for (i = 0; i < 64; i++) d[i] = 0;
-    return o;
-  }
-
-  function convertKeyPair(edKeyPair) {
-    return {
-      publicKey: convertPublicKey(edKeyPair.publicKey),
-      secretKey: convertSecretKey(edKeyPair.secretKey)
-    };
-  }
-
-  return {
-    convertPublicKey: convertPublicKey,
-    convertSecretKey: convertSecretKey,
-    convertKeyPair: convertKeyPair,
-  };
-
-}));
-
 
 /***/ }),
 /* 118 */
@@ -42962,7 +42980,7 @@ exports.randombytes = function (buf) {
 
 (function(root, f) {
   'use strict';
-  if (typeof module !== 'undefined' && module.exports) module.exports = f(__webpack_require__(53));
+  if (typeof module !== 'undefined' && module.exports) module.exports = f(__webpack_require__(40));
   else root.nacl.auth = f(root.nacl);
 
 }(this, function(nacl) {
@@ -43053,7 +43071,7 @@ module.exports = function hash (buf, fn) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Buffer) {
-var Transform = __webpack_require__(41).Transform
+var Transform = __webpack_require__(42).Transform
 var inherits = __webpack_require__(1)
 
 function HashBase (blockSize) {
@@ -43584,7 +43602,7 @@ function config (name) {
 
 module.exports = PassThrough;
 
-var Transform = __webpack_require__(76);
+var Transform = __webpack_require__(77);
 
 /*<replacement>*/
 var util = __webpack_require__(31);
@@ -43900,7 +43918,7 @@ module.exports = Sha224
 /***/ (function(module, exports, __webpack_require__) {
 
 var inherits = __webpack_require__(1)
-var SHA512 = __webpack_require__(77)
+var SHA512 = __webpack_require__(78)
 var Hash = __webpack_require__(27)
 var Buffer = __webpack_require__(3).Buffer
 
@@ -44015,16 +44033,16 @@ module.exports = Hmac
 /* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(79)
+module.exports = __webpack_require__(80)
 
 
 /***/ }),
 /* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global, process) {var checkParameters = __webpack_require__(81)
-var defaultEncoding = __webpack_require__(82)
-var sync = __webpack_require__(83)
+/* WEBPACK VAR INJECTION */(function(global, process) {var checkParameters = __webpack_require__(82)
+var defaultEncoding = __webpack_require__(83)
+var sync = __webpack_require__(84)
 var Buffer = __webpack_require__(3).Buffer
 
 var ZERO_BUF
@@ -44127,7 +44145,7 @@ module.exports = function (password, salt, iterations, keylen, digest, callback)
 /* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ebtk = __webpack_require__(43)
+var ebtk = __webpack_require__(44)
 var aes = __webpack_require__(62)
 var DES = __webpack_require__(150)
 var desModes = __webpack_require__(156)
@@ -44362,7 +44380,7 @@ module.exports = MD5
 "use strict";
 
 var Buffer = __webpack_require__(3).Buffer
-var Transform = __webpack_require__(41).Transform
+var Transform = __webpack_require__(42).Transform
 var inherits = __webpack_require__(1)
 
 function throwIfNotStringOrBuffer (val, prefix) {
@@ -44462,12 +44480,12 @@ module.exports = HashBase
 /***/ (function(module, exports, __webpack_require__) {
 
 var MODES = __webpack_require__(63)
-var AuthCipher = __webpack_require__(87)
+var AuthCipher = __webpack_require__(88)
 var Buffer = __webpack_require__(3).Buffer
-var StreamCipher = __webpack_require__(88)
+var StreamCipher = __webpack_require__(89)
 var Transform = __webpack_require__(20)
-var aes = __webpack_require__(44)
-var ebtk = __webpack_require__(43)
+var aes = __webpack_require__(45)
+var ebtk = __webpack_require__(44)
 var inherits = __webpack_require__(1)
 
 function Cipher (mode, key, iv) {
@@ -44853,13 +44871,13 @@ module.exports = GHASH
 /* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var AuthCipher = __webpack_require__(87)
+var AuthCipher = __webpack_require__(88)
 var Buffer = __webpack_require__(3).Buffer
 var MODES = __webpack_require__(63)
-var StreamCipher = __webpack_require__(88)
+var StreamCipher = __webpack_require__(89)
 var Transform = __webpack_require__(20)
-var aes = __webpack_require__(44)
-var ebtk = __webpack_require__(43)
+var aes = __webpack_require__(45)
+var ebtk = __webpack_require__(44)
 var inherits = __webpack_require__(1)
 
 function Decipher (mode, key, iv) {
@@ -45755,7 +45773,7 @@ exports['des-ede'] = {
 /* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var generatePrime = __webpack_require__(89)
+/* WEBPACK VAR INJECTION */(function(Buffer) {var generatePrime = __webpack_require__(90)
 var primes = __webpack_require__(160)
 
 var DH = __webpack_require__(161)
@@ -45823,14 +45841,14 @@ module.exports = {"modp1":{"gen":"02","prime":"ffffffffffffffffc90fdaa22168c234c
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var BN = __webpack_require__(6);
-var MillerRabin = __webpack_require__(90);
+var MillerRabin = __webpack_require__(91);
 var millerRabin = new MillerRabin();
 var TWENTYFOUR = new BN(24);
 var ELEVEN = new BN(11);
 var TEN = new BN(10);
 var THREE = new BN(3);
 var SEVEN = new BN(7);
-var primes = __webpack_require__(89);
+var primes = __webpack_require__(90);
 var randomBytes = __webpack_require__(28);
 module.exports = DH;
 
@@ -45994,12 +46012,12 @@ function formatReturnValue(bn, enc) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var createHash = __webpack_require__(30)
-var stream = __webpack_require__(41)
+var stream = __webpack_require__(42)
 var inherits = __webpack_require__(1)
 var sign = __webpack_require__(163)
 var verify = __webpack_require__(199)
 
-var algorithms = __webpack_require__(79)
+var algorithms = __webpack_require__(80)
 Object.keys(algorithms).forEach(function (key) {
   algorithms[key].id = new Buffer(algorithms[key].id, 'hex')
   algorithms[key.toLowerCase()] = algorithms[key]
@@ -46092,12 +46110,12 @@ module.exports = {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {// much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
-var createHmac = __webpack_require__(78)
+var createHmac = __webpack_require__(79)
 var crt = __webpack_require__(66)
 var EC = __webpack_require__(8).ec
 var BN = __webpack_require__(6)
-var parseKeys = __webpack_require__(46)
-var curves = __webpack_require__(100)
+var parseKeys = __webpack_require__(47)
+var curves = __webpack_require__(101)
 
 function sign (hash, key, hashType, signType, tag) {
   var priv = parseKeys(key)
@@ -46255,7 +46273,7 @@ module.exports = {"_from":"elliptic@^6.0.0","_id":"elliptic@6.4.0","_inBundle":f
 var utils = exports;
 var BN = __webpack_require__(6);
 var minAssert = __webpack_require__(12);
-var minUtils = __webpack_require__(92);
+var minUtils = __webpack_require__(93);
 
 utils.assert = minAssert;
 utils.toArray = minUtils.toArray;
@@ -46761,7 +46779,7 @@ BasePoint.prototype.dblp = function dblp(k) {
 "use strict";
 
 
-var curve = __webpack_require__(45);
+var curve = __webpack_require__(46);
 var elliptic = __webpack_require__(8);
 var BN = __webpack_require__(6);
 var inherits = __webpack_require__(1);
@@ -47706,7 +47724,7 @@ JPoint.prototype.isInfinity = function isInfinity() {
 "use strict";
 
 
-var curve = __webpack_require__(45);
+var curve = __webpack_require__(46);
 var BN = __webpack_require__(6);
 var inherits = __webpack_require__(1);
 var Base = curve.base;
@@ -47893,7 +47911,7 @@ Point.prototype.getX = function getX() {
 "use strict";
 
 
-var curve = __webpack_require__(45);
+var curve = __webpack_require__(46);
 var elliptic = __webpack_require__(8);
 var BN = __webpack_require__(6);
 var inherits = __webpack_require__(1);
@@ -48547,9 +48565,9 @@ defineCurve('secp256k1', {
 
 exports.sha1 = __webpack_require__(172);
 exports.sha224 = __webpack_require__(173);
-exports.sha256 = __webpack_require__(94);
+exports.sha256 = __webpack_require__(95);
 exports.sha384 = __webpack_require__(174);
-exports.sha512 = __webpack_require__(95);
+exports.sha512 = __webpack_require__(96);
 
 
 /***/ }),
@@ -48561,7 +48579,7 @@ exports.sha512 = __webpack_require__(95);
 
 var utils = __webpack_require__(17);
 var common = __webpack_require__(33);
-var shaCommon = __webpack_require__(93);
+var shaCommon = __webpack_require__(94);
 
 var rotl32 = utils.rotl32;
 var sum32 = utils.sum32;
@@ -48641,7 +48659,7 @@ SHA1.prototype._digest = function digest(enc) {
 
 
 var utils = __webpack_require__(17);
-var SHA256 = __webpack_require__(94);
+var SHA256 = __webpack_require__(95);
 
 function SHA224() {
   if (!(this instanceof SHA224))
@@ -48679,7 +48697,7 @@ SHA224.prototype._digest = function digest(enc) {
 
 var utils = __webpack_require__(17);
 
-var SHA512 = __webpack_require__(95);
+var SHA512 = __webpack_require__(96);
 
 function SHA384() {
   if (!(this instanceof SHA384))
@@ -49960,7 +49978,7 @@ EC.prototype.getKeyRecoveryParam = function(e, signature, Q, enc) {
 
 
 var hash = __webpack_require__(67);
-var utils = __webpack_require__(92);
+var utils = __webpack_require__(93);
 var assert = __webpack_require__(12);
 
 function HmacDRBG(options) {
@@ -51767,7 +51785,7 @@ Node.prototype._isPrintstr = function isPrintstr(str) {
 /* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var constants = __webpack_require__(97);
+var constants = __webpack_require__(98);
 
 exports.tagClass = {
   0: 'universal',
@@ -51817,7 +51835,7 @@ exports.tagByName = constants._reverse(exports.tag);
 
 var decoders = exports;
 
-decoders.der = __webpack_require__(98);
+decoders.der = __webpack_require__(99);
 decoders.pem = __webpack_require__(193);
 
 
@@ -51828,7 +51846,7 @@ decoders.pem = __webpack_require__(193);
 var inherits = __webpack_require__(1);
 var Buffer = __webpack_require__(0).Buffer;
 
-var DERDecoder = __webpack_require__(98);
+var DERDecoder = __webpack_require__(99);
 
 function PEMDecoder(entity) {
   DERDecoder.call(this, entity);
@@ -51882,7 +51900,7 @@ PEMDecoder.prototype.decode = function decode(data, options) {
 
 var encoders = exports;
 
-encoders.der = __webpack_require__(99);
+encoders.der = __webpack_require__(100);
 encoders.pem = __webpack_require__(195);
 
 
@@ -51892,7 +51910,7 @@ encoders.pem = __webpack_require__(195);
 
 var inherits = __webpack_require__(1);
 
-var DEREncoder = __webpack_require__(99);
+var DEREncoder = __webpack_require__(100);
 
 function PEMEncoder(entity) {
   DEREncoder.call(this, entity);
@@ -52022,7 +52040,7 @@ module.exports = {"2.16.840.1.101.3.4.1.1":"aes-128-ecb","2.16.840.1.101.3.4.1.2
 var findProc = /Proc-Type: 4,ENCRYPTED\n\r?DEK-Info: AES-((?:128)|(?:192)|(?:256))-CBC,([0-9A-H]+)\n\r?\n\r?([0-9A-z\n\r\+\/\=]+)\n\r?/m
 var startRegex = /^-----BEGIN ((?:.* KEY)|CERTIFICATE)-----\n/m
 var fullRegex = /^-----BEGIN ((?:.* KEY)|CERTIFICATE)-----\n\r?([0-9A-z\n\r\+\/\=]+)\n\r?-----END \1-----$/m
-var evp = __webpack_require__(43)
+var evp = __webpack_require__(44)
 var ciphers = __webpack_require__(62)
 module.exports = function (okey, password) {
   var key = okey.toString()
@@ -52058,8 +52076,8 @@ module.exports = function (okey, password) {
 /* WEBPACK VAR INJECTION */(function(Buffer) {// much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
 var BN = __webpack_require__(6)
 var EC = __webpack_require__(8).ec
-var parseKeys = __webpack_require__(46)
-var curves = __webpack_require__(100)
+var parseKeys = __webpack_require__(47)
+var curves = __webpack_require__(101)
 
 function verify (sig, hash, key, signType, tag) {
   var pub = parseKeys(key)
@@ -52289,13 +52307,13 @@ exports.publicDecrypt = function publicDecrypt(key, buf) {
 /* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var parseKeys = __webpack_require__(46);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var parseKeys = __webpack_require__(47);
 var randomBytes = __webpack_require__(28);
 var createHash = __webpack_require__(30);
-var mgf = __webpack_require__(101);
-var xor = __webpack_require__(102);
+var mgf = __webpack_require__(102);
+var xor = __webpack_require__(103);
 var bn = __webpack_require__(6);
-var withPublic = __webpack_require__(103);
+var withPublic = __webpack_require__(104);
 var crt = __webpack_require__(66);
 
 var constants = {
@@ -52390,13 +52408,13 @@ function nonZero(len, crypto) {
 /* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(Buffer) {var parseKeys = __webpack_require__(46);
-var mgf = __webpack_require__(101);
-var xor = __webpack_require__(102);
+/* WEBPACK VAR INJECTION */(function(Buffer) {var parseKeys = __webpack_require__(47);
+var mgf = __webpack_require__(102);
+var xor = __webpack_require__(103);
 var bn = __webpack_require__(6);
 var crt = __webpack_require__(66);
 var createHash = __webpack_require__(30);
-var withPublic = __webpack_require__(103);
+var withPublic = __webpack_require__(104);
 module.exports = function privateDecrypt(private_key, enc, reverse) {
   var padding;
   if (private_key.padding) {
@@ -52630,7 +52648,7 @@ module.exports = __webpack_require__(206);
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 
-var bitcore = __webpack_require__(104);
+var bitcore = __webpack_require__(105);
 var BN = bitcore.crypto.BN;
 var unorm = __webpack_require__(229);
 var _ = bitcore.deps._;
@@ -53865,7 +53883,7 @@ module.exports = function base (ALPHABET) {
 
 var _ = __webpack_require__(2);
 
-var Script = __webpack_require__(107);
+var Script = __webpack_require__(108);
 var Opcode = __webpack_require__(68);
 var BN = __webpack_require__(9);
 var Hash = __webpack_require__(10);
@@ -53908,7 +53926,7 @@ var Interpreter = function Interpreter(obj) {
  * Translated from bitcoind's VerifyScript
  */
 Interpreter.prototype.verify = function(scriptSig, scriptPubkey, tx, nin, flags) {
-  var Transaction = __webpack_require__(50);
+  var Transaction = __webpack_require__(51);
   if (_.isUndefined(tx)) {
     tx = new Transaction();
   }
@@ -55835,8 +55853,8 @@ module.exports = Varint;
 
 module.exports = __webpack_require__(221);
 
-module.exports.BlockHeader = __webpack_require__(52);
-module.exports.MerkleBlock = __webpack_require__(109);
+module.exports.BlockHeader = __webpack_require__(53);
+module.exports.MerkleBlock = __webpack_require__(110);
 
 
 /***/ }),
@@ -55847,13 +55865,13 @@ module.exports.MerkleBlock = __webpack_require__(109);
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 
 var _ = __webpack_require__(2);
-var BlockHeader = __webpack_require__(52);
+var BlockHeader = __webpack_require__(53);
 var BN = __webpack_require__(9);
 var BufferUtil = __webpack_require__(5);
 var BufferReader = __webpack_require__(21);
 var BufferWriter = __webpack_require__(19);
 var Hash = __webpack_require__(10);
-var Transaction = __webpack_require__(50);
+var Transaction = __webpack_require__(51);
 var $ = __webpack_require__(4);
 
 /**
@@ -58308,7 +58326,7 @@ UChar.udata={
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 
-var crypto = __webpack_require__(40);
+var crypto = __webpack_require__(41);
 
 /**
  * PDKBF2
@@ -58402,7 +58420,7 @@ var spec = {
   }]
 };
 
-module.exports = __webpack_require__(104).errors.extend(spec);
+module.exports = __webpack_require__(105).errors.extend(spec);
 
 
 /***/ }),
@@ -66328,6 +66346,158 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     return Long;
 });
 
+
+/***/ }),
+/* 243 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// Copyright (C) 2016 Dmitry Chestnykh
+// MIT License. See LICENSE file for details.
+Object.defineProperty(exports, "__esModule", { value: true });
+var INVALID_UTF16 = "utf8: invalid string";
+var INVALID_UTF8 = "utf8: invalid source encoding";
+/**
+ * Encodes the given string into UTF-8 byte array.
+ * Throws if the source string has invalid UTF-16 encoding.
+ */
+function encode(s) {
+    // Calculate result length and allocate output array.
+    // encodedLength() also validates string and throws errors,
+    // so we don't need repeat validation here.
+    var arr = new Uint8Array(encodedLength(s));
+    var pos = 0;
+    for (var i = 0; i < s.length; i++) {
+        var c = s.charCodeAt(i);
+        if (c < 0x80) {
+            arr[pos++] = c;
+        }
+        else if (c < 0x800) {
+            arr[pos++] = 0xc0 | c >> 6;
+            arr[pos++] = 0x80 | c & 0x3f;
+        }
+        else if (c < 0xd800) {
+            arr[pos++] = 0xe0 | c >> 12;
+            arr[pos++] = 0x80 | (c >> 6) & 0x3f;
+            arr[pos++] = 0x80 | c & 0x3f;
+        }
+        else {
+            i++; // get one more character
+            c = (c & 0x3ff) << 10;
+            c |= s.charCodeAt(i) & 0x3ff;
+            c += 0x10000;
+            arr[pos++] = 0xf0 | c >> 18;
+            arr[pos++] = 0x80 | (c >> 12) & 0x3f;
+            arr[pos++] = 0x80 | (c >> 6) & 0x3f;
+            arr[pos++] = 0x80 | c & 0x3f;
+        }
+    }
+    return arr;
+}
+exports.encode = encode;
+/**
+ * Returns the number of bytes required to encode the given string into UTF-8.
+ * Throws if the source string has invalid UTF-16 encoding.
+ */
+function encodedLength(s) {
+    var result = 0;
+    for (var i = 0; i < s.length; i++) {
+        var c = s.charCodeAt(i);
+        if (c < 0x80) {
+            result += 1;
+        }
+        else if (c < 0x800) {
+            result += 2;
+        }
+        else if (c < 0xd800) {
+            result += 3;
+        }
+        else if (c <= 0xdfff) {
+            if (i >= s.length - 1) {
+                throw new Error(INVALID_UTF16);
+            }
+            i++; // "eat" next character
+            result += 4;
+        }
+        else {
+            throw new Error(INVALID_UTF16);
+        }
+    }
+    return result;
+}
+exports.encodedLength = encodedLength;
+/**
+ * Decodes the given byte array from UTF-8 into a string.
+ * Throws if encoding is invalid.
+ */
+function decode(arr) {
+    var chars = [];
+    for (var i = 0; i < arr.length; i++) {
+        var b = arr[i];
+        if (b & 0x80) {
+            var min = void 0;
+            if (b < 0xe0) {
+                // Need 1 more byte.
+                if (i >= arr.length) {
+                    throw new Error(INVALID_UTF8);
+                }
+                var n1 = arr[++i];
+                if ((n1 & 0xc0) !== 0x80) {
+                    throw new Error(INVALID_UTF8);
+                }
+                b = (b & 0x1f) << 6 | (n1 & 0x3f);
+                min = 0x80;
+            }
+            else if (b < 0xf0) {
+                // Need 2 more bytes.
+                if (i >= arr.length - 1) {
+                    throw new Error(INVALID_UTF8);
+                }
+                var n1 = arr[++i];
+                var n2 = arr[++i];
+                if ((n1 & 0xc0) !== 0x80 || (n2 & 0xc0) !== 0x80) {
+                    throw new Error(INVALID_UTF8);
+                }
+                b = (b & 0x0f) << 12 | (n1 & 0x3f) << 6 | (n2 & 0x3f);
+                min = 0x800;
+            }
+            else if (b < 0xf8) {
+                // Need 3 more bytes.
+                if (i >= arr.length - 2) {
+                    throw new Error(INVALID_UTF8);
+                }
+                var n1 = arr[++i];
+                var n2 = arr[++i];
+                var n3 = arr[++i];
+                if ((n1 & 0xc0) !== 0x80 || (n2 & 0xc0) !== 0x80 || (n3 & 0xc0) !== 0x80) {
+                    throw new Error(INVALID_UTF8);
+                }
+                b = (b & 0x0f) << 18 | (n1 & 0x3f) << 12 | (n2 & 0x3f) << 6 | (n3 & 0x3f);
+                min = 0x10000;
+            }
+            else {
+                throw new Error(INVALID_UTF8);
+            }
+            if (b < min || (b >= 0xd800 && b <= 0xdfff)) {
+                throw new Error(INVALID_UTF8);
+            }
+            if (b >= 0x10000) {
+                // Surrogate pair.
+                if (b > 0x10ffff) {
+                    throw new Error(INVALID_UTF8);
+                }
+                b -= 0x10000;
+                chars.push(String.fromCharCode(0xd800 | (b >> 10)));
+                b = 0xdc00 | (b & 0x3ff);
+            }
+        }
+        chars.push(String.fromCharCode(b));
+    }
+    return chars.join("");
+}
+exports.decode = decode;
+//# sourceMappingURL=utf8.js.map
 
 /***/ })
 /******/ ]);

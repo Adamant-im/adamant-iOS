@@ -14,36 +14,20 @@ struct Transaction {
 	let blockId: UInt
 	let type: TransactionType
 	let timestamp: UInt
-	let date: Date	// Calculated from timeinterval
 	let senderPublicKey: String
 	let senderId: String
+	let requesterPublicKey: String?
 	let recipientId: String
-	let recipientPublicKey: String
+	let recipientPublicKey: String?
 	let amount: UInt
 	let fee: UInt
 	let signature: String
+	let signSignature: String?
 	let confirmations: UInt
+	let signatures: [String]
+	let asset: TransactionAsset
 	
-	// let signatures: [Any]
-	// let asset: Any?
-
-	init(id: UInt, height: UInt, blockId: UInt, type: TransactionType, timestamp: UInt, senderPublicKey: String, senderId: String, recipientId: String, recipientPublicKey: String, amount: UInt, fee: UInt, signature: String, confirmations: UInt) {
-		self.id = id
-		self.height = height
-		self.blockId = blockId
-		self.type = type
-		self.timestamp = timestamp
-		self.senderPublicKey = senderPublicKey
-		self.senderId = senderId
-		self.recipientId = recipientId
-		self.recipientPublicKey = recipientPublicKey
-		self.amount = amount
-		self.fee = fee
-		self.signature = signature
-		self.confirmations = confirmations
-		
-		self.date = AdamantUtilities.decodeAdamantDate(timestamp: TimeInterval(self.timestamp))
-	}
+	let date: Date // Calculated from timestamp
 }
 
 extension Transaction: Decodable {
@@ -55,11 +39,13 @@ extension Transaction: Decodable {
 		case timestamp
 		case senderPublicKey
 		case senderId
+		case requesterPublicKey
 		case recipientId
 		case recipientPublicKey
 		case amount
 		case fee
 		case signature
+		case signSignature
 		case confirmations
 		case signatures
 		case asset
@@ -76,12 +62,16 @@ extension Transaction: Decodable {
 		self.senderPublicKey = try container.decode(String.self, forKey: .senderPublicKey)
 		self.senderId = try container.decode(String.self, forKey: .senderId)
 		self.recipientId = try container.decode(String.self, forKey: .recipientId)
-		self.recipientPublicKey = try container.decode(String.self, forKey: .recipientPublicKey)
+		self.recipientPublicKey = try? container.decode(String.self, forKey: .recipientPublicKey)
 		self.amount = try container.decode(UInt.self, forKey: .amount)
 		self.fee = try container.decode(UInt.self, forKey: .fee)
 		self.signature = try container.decode(String.self, forKey: .signature)
-		self.confirmations = try container.decode(UInt.self, forKey: .confirmations)
-		
+		self.confirmations = (try? container.decode(UInt.self, forKey: .confirmations)) ?? 0
+		self.requesterPublicKey = try? container.decode(String.self, forKey: .requesterPublicKey)
+		self.signSignature = try? container.decode(String.self, forKey: .signSignature)
+		self.signatures = try container.decode([String].self, forKey: .signatures)
+		self.asset = try container.decode(TransactionAsset.self, forKey: .asset)
+
 		self.date = AdamantUtilities.decodeAdamantDate(timestamp: TimeInterval(self.timestamp))
 	}
 }
@@ -90,12 +80,9 @@ extension Transaction: WrappableCollection {
 	static let CollectionKey = "transactions"
 }
 
-//extension Array where Transaction {
-//	static let Key = "transactions"
-//}
 
 // MARK: - JSON
-/*
+/* Fund transfers
 {
 	"id": "",
 	"height": 0,
@@ -113,6 +100,35 @@ extension Transaction: WrappableCollection {
 	],
 	"confirmations": 0,
 	"asset": {
+	}
+}
+*/
+
+/* Chat messages
+{
+	"id": "",
+	"height": 0,
+	"blockId": "",
+	"type": 8,
+	"timestamp": 0,
+	"senderPublicKey": "",
+	"requesterPublicKey": null,
+	"senderId": "",
+	"recipientId": "",
+	"recipientPublicKey": null,
+	"amount": 0,
+	"fee": 500000,
+	"signature": "",
+	"signSignature": null,
+	"signatures": [
+	],
+	"confirmations": null,
+	"asset": {
+		"chat": {
+			"message": "",
+			"own_message": "",
+			"type": 0
+		}
 	}
 }
 */

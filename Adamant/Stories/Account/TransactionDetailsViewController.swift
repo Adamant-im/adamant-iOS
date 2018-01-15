@@ -43,7 +43,7 @@ class TransactionDetailsViewController: UIViewController {
 }
 
 
-// MARK: - UITableViewDataSource
+// MARK: - UITableView
 extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDelegate {
 	func numberOfSections(in tableView: UITableView) -> Int {
 		return 1
@@ -64,7 +64,11 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 		return 50
 	}
-	
+}
+
+
+// MARK: - UITableView Cells
+extension TransactionDetailsViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		guard let transaction = transaction, let row = Row(rawValue: indexPath.row) else {
 			// TODO: Display & Log error

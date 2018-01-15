@@ -20,7 +20,7 @@ class AccountViewController: UIViewController {
 	
 	
 	// MARK: - Dependencies
-	var loginService: AccountService!
+	var accountService: AccountService!
 	var dialogService: DialogService!
 	
 	
@@ -37,10 +37,10 @@ class AccountViewController: UIViewController {
 		tableView.dataSource = self
 		tableView.separatorInset = UIEdgeInsets.init(top: 0, left: 80, bottom: 0, right: 0)
 		
-		NotificationCenter.default.addObserver(forName: .userHasLoggedIn, object: nil, queue: nil) { _ in
+		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: nil) { _ in
 			self.tableView.reloadData()
 		}
-		NotificationCenter.default.addObserver(forName: .userHasLoggedOut, object: nil, queue: nil) { _ in
+		NotificationCenter.default.addObserver(forName: .adamantUserLoggedOut, object: nil, queue: nil) { _ in
 			self.tableView.reloadData()
 		}
     }
@@ -59,12 +59,12 @@ class AccountViewController: UIViewController {
 		
 		switch identifier {
 		case showTransactionsSegue:
-			if let account = loginService.loggedAccount?.address, let vc = segue.destination as? TransactionsViewController {
+			if let account = accountService.loggedAccount?.address, let vc = segue.destination as? TransactionsViewController {
 				vc.account = account
 			}
 			
 		case showTransferSegue:
-			if let account = loginService.loggedAccount, let vc = segue.destination as? TransferViewController {
+			if let account = accountService.loggedAccount, let vc = segue.destination as? TransferViewController {
 				vc.account = account
 			}
 			
@@ -79,17 +79,14 @@ class AccountViewController: UIViewController {
 }
 
 
-// MARK: - UITableViewDataSource
-extension AccountViewController: UITableViewDataSource {
-	
-	// MARK: Configuring TableView
-	
+// MARK: - UITableView
+extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 	func numberOfSections(in tableView: UITableView) -> Int {
 		return 1
 	}
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		if loginService.loggedAccount != nil {
+		if accountService.loggedAccount != nil {
 			return 3
 		} else {
 			return 0
@@ -104,54 +101,6 @@ extension AccountViewController: UITableViewDataSource {
 		return UIView()
 	}
 	
-	
-	// MARK: Cells
-	
-	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		guard let account = loginService.loggedAccount,
-			let row = Rows(rawValue: indexPath.row) else {
-			return UITableViewCell(style: .default, reuseIdentifier: nil)
-		}
-		
-		let cell: UITableViewCell
-		if let c = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
-			cell = c
-		} else {
-			cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
-			cell.accessoryType = .disclosureIndicator
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-			cell.detailTextLabel?.font = UIFont.adamantPrimary(size: 12)
-			
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-			cell.detailTextLabel?.textColor = UIColor.adamantSecondary
-		}
-		
-		switch row {
-		case .accountNumber:
-			cell.textLabel?.text = "Your address"
-			cell.detailTextLabel?.text = account.address
-			cell.imageView?.image = #imageLiteral(resourceName: "account")
-			
-		case .balance:
-			cell.textLabel?.text = "Your balance"
-			cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
-			cell.imageView?.image = #imageLiteral(resourceName: "wallet")
-			break
-			
-		case .sendTokens:
-			cell.textLabel?.text = "Send tokens"
-			cell.detailTextLabel?.text = nil
-			cell.imageView?.image = #imageLiteral(resourceName: "send")
-			break
-		}
-		
-		return cell
-	}
-}
-
-
-// MARK: - UITableViewDelegate
-extension AccountViewController: UITableViewDelegate {
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		guard let row = Rows(rawValue: indexPath.row) else {
 			return
@@ -161,7 +110,7 @@ extension AccountViewController: UITableViewDelegate {
 		case .accountNumber:
 			tableView.deselectRow(at: indexPath, animated: true)
 			
-			guard let address = self.loginService.loggedAccount?.address else {
+			guard let address = self.accountService.loggedAccount?.address else {
 				return
 			}
 			
@@ -187,5 +136,52 @@ extension AccountViewController: UITableViewDelegate {
 		case .sendTokens:
 			performSegue(withIdentifier: showTransferSegue, sender: nil)
 		}
+	}
+}
+
+
+// MARK: - UITableView Cells
+extension AccountViewController {
+	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		guard let account = accountService.loggedAccount,
+			let row = Rows(rawValue: indexPath.row) else {
+				return UITableViewCell(style: .default, reuseIdentifier: nil)
+		}
+		
+		let cell: UITableViewCell
+		if let c = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
+			cell = c
+		} else {
+			cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
+			cell.accessoryType = .disclosureIndicator
+			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+			cell.detailTextLabel?.font = UIFont.adamantPrimary(size: 12)
+			
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.detailTextLabel?.textColor = UIColor.adamantSecondary
+			
+			cell.imageView?.tintColor = UIColor.adamantChatIcons
+		}
+		
+		switch row {
+		case .accountNumber:
+			cell.textLabel?.text = "Your address"
+			cell.detailTextLabel?.text = account.address
+			cell.imageView?.image = #imageLiteral(resourceName: "account")
+			
+		case .balance:
+			cell.textLabel?.text = "Your balance"
+			cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
+			cell.imageView?.image = #imageLiteral(resourceName: "wallet")
+			break
+			
+		case .sendTokens:
+			cell.textLabel?.text = "Send tokens"
+			cell.detailTextLabel?.text = nil
+			cell.imageView?.image = #imageLiteral(resourceName: "send")
+			break
+		}
+		
+		return cell
 	}
 }

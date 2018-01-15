@@ -16,6 +16,8 @@ struct Account {
 	let unconfirmedSignature: Int
 	let secondSignature: Int
 	let secondPublicKey: String?
+	let multisignatures: [String]?
+	let uMultisignatures: [String]?
 }
 
 extension Account: Decodable {
@@ -27,6 +29,8 @@ extension Account: Decodable {
 		case unconfirmedSignature
 		case secondSignature
 		case secondPublicKey
+		case multisignatures
+		case uMultisignatures = "u_multisignatures"
 	}
 	
 	init(from decoder: Decoder) throws {
@@ -36,11 +40,11 @@ extension Account: Decodable {
 		self.unconfirmedBalance = UInt(try container.decode(String.self, forKey: .unconfirmedBalance))!
 		self.balance = UInt(try container.decode(String.self, forKey: .balance))!
 		self.unconfirmedSignature = try container.decode(Int.self, forKey: .unconfirmedSignature)
-		
 		self.publicKey = try container.decode(String.self, forKey: .publicKey)
-		
 		self.secondSignature = try container.decode(Int.self, forKey: .secondSignature)
 		self.secondPublicKey = try? container.decode(String.self, forKey: .secondPublicKey)
+		self.multisignatures = try? container.decode([String].self, forKey: .multisignatures)
+		self.uMultisignatures = try? container.decode([String].self, forKey: .uMultisignatures)
 	}
 }
 
