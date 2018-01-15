@@ -53,7 +53,9 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <viewLayoutGuide key="safeArea" id="A2d-Mp-E0v"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Title" id="xWb-Sy-t8W"/>
+                    <navigationItem key="navigationItem" title="Title" id="O75-R6-nGz">
+                        <barButtonItem key="rightBarButtonItem" title="•••" style="plain" id="v2Z-hT-nNQ"/>
+                    </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="V4A-mw-8Ee" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

@@ -51,8 +51,11 @@ class ChatsListViewController: UIViewController {
 		
 		switch identifier {
 		case showChatSegue:
-			if let chatroom = sender as? Chatroom, let vc = segue.destination as? ChatViewController {
+			if let chatroom = sender as? Chatroom, let vc = segue.destination as? ChatViewController,
+				let account = accountService.loggedAccount {
+				vc.hidesBottomBarWhenPushed = true
 				vc.chatroom = chatroom
+				vc.account = account
 			}
 			
 		default:
