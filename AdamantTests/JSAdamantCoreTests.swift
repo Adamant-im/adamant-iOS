@@ -15,12 +15,11 @@ class JSAdamantCoreTests: XCTestCase {
     override func setUp() {
         super.setUp()
 		
-		guard let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js"),
-			let jsUtilites = Bundle.main.url(forResource: "utilites", withExtension: "js") else {
+		guard let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js") else {
 				fatalError("Can't load system resources!")
 		}
 		
-        core = try! JSAdamantCore(coreJsUrl: jsCore, utilitiesJsUrl: jsUtilites)
+        core = try! JSAdamantCore(coreJsUrl: jsCore)
     }
 	
     

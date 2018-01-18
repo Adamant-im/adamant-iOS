@@ -21,13 +21,6 @@ private struct JSFunctions {
 		private init(_ key: String) { self.key = key }
 	}
 	
-	struct UtilitesFunction {
-		static let convertToUInt8Array = UtilitesFunction("convertToUInt8Array")
-		
-		let key: String
-		private init(_ key: String) { self.key = key }
-	}
-	
 	private init() {}
 }
 
@@ -37,9 +30,8 @@ class JSAdamantCore : AdamantCore {
 	private let context: JSContext
 	
 	// TODO: background thread
-	init(coreJsUrl core: URL, utilitiesJsUrl utils: URL) throws {
+	init(coreJsUrl core: URL) throws {
 		let core = try JSAdamantCore.readStringFrom(url: core)
-		let utilities = try JSAdamantCore.readStringFrom(url: utils)
 		
 		let context = JSContext()
 		
@@ -71,12 +63,6 @@ class JSAdamantCore : AdamantCore {
 			
 			// Core
 			context.evaluateScript(core)
-			if let jsError = jsError {
-				throw AdamantError(message: "Error evaluating core JS: \(jsError)")
-			}
-			
-			// Utilities
-			context.evaluateScript(utilities)
 			if let jsError = jsError {
 				throw AdamantError(message: "Error evaluating core JS: \(jsError)")
 			}
@@ -120,49 +106,29 @@ extension JSAdamantCore {
 		context.exceptionHandler = nil
 		return jsFunc
 	}
-	
-	private func getUtilitesFunction(function: JSFunctions.UtilitesFunction) -> JSValue? {
-		var jsError: JSValue? = nil
-		context.exceptionHandler = { context, value in
-			print("JSError: \(String(describing: value?.toString()))")
-			jsError = value
-		}
-		
-		let jsFunc: JSValue?
-		if let f = context.objectForKeyedSubscript(function.key),
-			!f.isUndefined, jsError == nil {
-			jsFunc = f
-		} else {
-			jsFunc = nil
-		}
-		
-		context.exceptionHandler = nil
-		return jsFunc
-	}
 }
 
 
 // MARK: - Hash converters
 extension JSAdamantCore {
-	private func convertToJsHash(_ hash: [UInt8]) -> JSValue? {
-		guard let converter = getUtilitesFunction(function: .convertToUInt8Array) else {
-			return nil
+	private func convertToJsHash(_ hash: [UInt8]) -> JSValue {
+		let count = hash.count
+		if count == 0 {
+			return JSValue(newArrayIn: context)
 		}
 		
-		var jsError: JSValue? = nil
-		context.exceptionHandler = { context, value in
-			print("JSError: \(String(describing: value?.toString()))")
-			jsError = value
-		}
+		let contextRef = context.jsGlobalContextRef
+		let jsArray = JSObjectMakeTypedArray(contextRef, kJSTypedArrayTypeUint8Array, count, nil)!
+		let jsBuffer = JSObjectGetTypedArrayBuffer(contextRef, jsArray, nil)!
+		let jsBytes = JSObjectGetArrayBufferBytesPtr(contextRef, jsBuffer, nil)!
 		
-		let jsHash = converter.call(withArguments: [hash])
-		context.exceptionHandler = nil
+		let typedPointer = jsBytes.bindMemory(to: UInt8.self, capacity: count)
 		
-		if jsError == nil {
-			return jsHash
-		} else {
-			return nil
-		}
+		let buffer = UnsafeMutableBufferPointer.init(start: typedPointer, count: count)
+		let data = Data(bytes: hash)
+		_ = data.copyBytes(to: buffer)
+		
+		return JSValue(jsValueRef: jsArray, in: context)
 	}
 	
 	private func convertFromJsHash(_ jsHash: JSValue) -> [UInt8]? {
@@ -182,8 +148,9 @@ extension JSAdamantCore {
 			return nil
 		}
 		
-		if let jsHash = convertToJsHash(rawHash),
-			let keypairRaw = function.call(withArguments: [jsHash]),
+		let jsHash = convertToJsHash(rawHash)
+		
+		if let keypairRaw = function.call(withArguments: [jsHash]),
 			keypairRaw.hasProperty("publicKey") && keypairRaw.hasProperty("privateKey"),
 			let publicKeyHash = self.convertFromJsHash(keypairRaw.forProperty("publicKey")),
 			let privateKeyHash = self.convertFromJsHash(keypairRaw.forProperty("privateKey")) {
@@ -290,13 +257,10 @@ extension JSAdamantCore {
 			return nil
 		}
 		
-		guard let message = convertToJsHash(AdamantUtilities.getBytes(from: rawMessage)),
-			let nonce = convertToJsHash(AdamantUtilities.getBytes(from: rawNonce)),
-			let senderKey = convertToJsHash(AdamantUtilities.getBytes(from: senderKeyHex)),
-			let privateKey = convertToJsHash(AdamantUtilities.getBytes(from: privateKeyHex))
-			else {
-				return nil
-		}
+		let message = convertToJsHash(AdamantUtilities.getBytes(from: rawMessage))
+		let nonce = convertToJsHash(AdamantUtilities.getBytes(from: rawNonce))
+		let senderKey = convertToJsHash(AdamantUtilities.getBytes(from: senderKeyHex))
+		let privateKey = convertToJsHash(AdamantUtilities.getBytes(from: privateKeyHex))
 		
 		var jsError: JSValue? = nil
 		context.exceptionHandler = { ctx, exc in

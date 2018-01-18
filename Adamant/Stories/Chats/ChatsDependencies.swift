@@ -18,7 +18,6 @@ extension Container {
 		
 		self.storyboardInitCompleted(ChatViewController.self) { r, c in
 			c.chatProvider = r.resolve(ChatDataProvider.self)
-			c.adamantCore = r.resolve(AdamantCore.self)
 		}
 	}
 }

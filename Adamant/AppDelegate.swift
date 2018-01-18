@@ -29,7 +29,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		// Getting resources
 		guard let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js"),
-			let jsUtilites = Bundle.main.url(forResource: "utilites", withExtension: "js"),
 			let modelUrl = Bundle.main.url(forResource: Constants.chatModels, withExtension: "momd") else {
 			fatalError("Can't load system resources!")
 		}
@@ -37,7 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// Initiating Swinject
 		let container = SwinjectStoryboard.defaultContainer
 		Container.loggingFunction = nil // Logging currently not supported with SwinjectStoryboards.
-		container.registerAdamantServices(apiUrl: Constants.apiUrl, coreJsUrl: jsCore, utilitiesJsUrl: jsUtilites, managedObjectModel: modelUrl)
+		container.registerAdamantServices(apiUrl: Constants.apiUrl, coreJsUrl: jsCore, managedObjectModel: modelUrl)
 		container.registerAdamantAccountStory()
 		container.registerAdamantLoginStory()
 		container.registerAdamantChatsStory()
