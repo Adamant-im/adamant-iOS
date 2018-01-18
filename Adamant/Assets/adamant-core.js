@@ -42641,18 +42641,6 @@ class Adamant {
 
     var encrypted = nacl.box(plainText, nonce, DHPublicKey, DHSecretKey)
 
-
-    console.log('msg: ' + msg)
-    console.log('plainText: ' + plainText)
-    console.log('recipientPublicKey: ' + recipientPublicKey)
-    console.log('keypair.privateKey: ' + senderPrivateKey)
-    console.log('DHPublicKey: ' + DHPublicKey)
-    console.log('DHSecretKey: ' + DHSecretKey)
-    console.log('encrypted: ' + encrypted)
-    console.log('messageHex: ' + Adamant.bytesToHex(encrypted))
-    console.log('own_messageHex: ' + Adamant.bytesToHex(nonce))
-
-
     return {
       message: Adamant.bytesToHex(encrypted),
       own_message: Adamant.bytesToHex(nonce)

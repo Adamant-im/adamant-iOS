@@ -71,7 +71,7 @@ class JSAdamantCoreTests: XCTestCase {
 			return
 		}
 		
-		guard let decoded = core.decodeMessage(rawMessage: encoded.message, rawNonce: encoded.ownMessage, senderPublicKey: aPublicKey, privateKey: bPrivateKey) else {
+		guard let decoded = core.decodeMessage(rawMessage: encoded.message, rawNonce: encoded.nonce, senderPublicKey: aPublicKey, privateKey: bPrivateKey) else {
 			XCTFail()
 			return
 		}
@@ -83,10 +83,10 @@ class JSAdamantCoreTests: XCTestCase {
 		let publicKey = "9f895a201fd92cc60ef02d2117d53f00dc2981903cb64b2f214777269b882209"
 		let privateKey = "9001490b166816af75a15a3e2b0174bfe3be3dfaa63147b4f780ed3ab90ffeab8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f"
 		let message = "09af1ce7e5ed484ddca3c6d1410cbf4f793ea19210e7"
-		let ownMessage = "31caaee2d35dcbd8b614e9d6bf6095393cb5baed259e7e37"
+		let nonce = "31caaee2d35dcbd8b614e9d6bf6095393cb5baed259e7e37"
 		let decodedMessage = "common"
 		
-		let freshMessage = core.decodeMessage(rawMessage: message, rawNonce: ownMessage, senderPublicKey: publicKey, privateKey: privateKey)
+		let freshMessage = core.decodeMessage(rawMessage: message, rawNonce: nonce, senderPublicKey: publicKey, privateKey: privateKey)
 		
 		XCTAssertEqual(freshMessage, decodedMessage)
 	}

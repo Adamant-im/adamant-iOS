@@ -25,4 +25,5 @@ protocol ApiService {
 	
 	// MARK: - Chats
 	func getChatTransactions(account: String, height: Int?, offset: Int?, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void)
+	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completionHandler: @escaping (Bool, AdamantError?) -> Void)
 }

@@ -202,12 +202,33 @@ extension JSAdamantCore {
 			return nil
 		}
 		
-		let jsTransaction = JSTransaction(id: 0, height: 0, blockId: 0, type: t.type.rawValue, timestamp: t.timestamp, senderPublicKey: t.senderPublicKey, senderId: senderId, recipientId: t.recipientId, recipientPublicKey: t.requesterPublicKey, amount: t.amount, fee: 0, signature: "", confirmations: 0)
+		let asset: JSAsset
+		if let chat = t.asset.chat {
+			asset = JSAsset(chat: JSChat(type: chat.type.rawValue, message: chat.message, own_message: chat.ownMessage))
+		} else {
+			asset = JSAsset(chat: nil)
+		}
+		
+		let jsTransaction = JSTransaction(id: 0,
+										  height: 0,
+										  blockId: 0,
+										  type: t.type.rawValue,
+										  timestamp: t.timestamp,
+										  senderPublicKey: t.senderPublicKey,
+										  senderId: senderId,
+										  recipientId: t.recipientId,
+										  recipientPublicKey: t.requesterPublicKey,
+										  amount: t.amount,
+										  fee: 0,
+										  signature: "",
+										  confirmations: 0,
+										  asset: asset)
+		
 		let jsKeypair = JSKeypair(keypair: keypair)
 		
 		var jsError: JSValue? = nil
 		context.exceptionHandler = { ctx, exc in
-			print(exc!)
+			print("JSError: \(String(describing: exc?.toString()))")
 			jsError = exc
 		}
 		
@@ -227,14 +248,14 @@ extension JSAdamantCore {
 
 // MARK: - Messages
 extension JSAdamantCore {
-	func encodeMessage(_ message: String, recipientPublicKey publicKey: String, privateKey privateKeyHex: String) -> (message: String, ownMessage: String)? {
+	func encodeMessage(_ message: String, recipientPublicKey publicKey: String, privateKey privateKeyHex: String) -> (message: String, nonce: String)? {
 		guard let function = getCoreFunction(function: .encodeMessage) else {
 			return nil
 		}
 		
 		var jsError: JSValue? = nil
 		context.exceptionHandler = { ctx, exc in
-			print(exc!)
+			print("JSError: \(String(describing: exc?.toString()))")
 			jsError = exc
 		}
 		
@@ -243,7 +264,7 @@ extension JSAdamantCore {
 		if let jsMessage = function.call(withArguments: [message, publicKey, privateKey]),
 			jsError == nil, !jsMessage.isUndefined,
 			let m = jsMessage.forProperty("message").toString(), let o = jsMessage.forProperty("own_message").toString() {
-			encodedMessage = (message: m, ownMessage: o)
+			encodedMessage = (message: m, nonce: o)
 		} else {
 			encodedMessage = nil
 		}
@@ -264,7 +285,7 @@ extension JSAdamantCore {
 		
 		var jsError: JSValue? = nil
 		context.exceptionHandler = { ctx, exc in
-			print(exc!)
+			print("JSError: \(String(describing: exc?.toString()))")
 			jsError = exc
 		}
 		
