@@ -54,10 +54,10 @@
 		E95F85C4200A540B0070534A /* Chat.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C3200A540B0070534A /* Chat.json */; };
 		E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85C5200A9B070070534A /* ChatTableViewCell.swift */; };
 		E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C6200A9B070070534A /* ChatTableViewCell.xib */; };
-		E95F85CC200B845C0070534A /* adamant-core.js in Resources */ = {isa = PBXBuildFile; fileRef = E95F85CB200B845B0070534A /* adamant-core.js */; };
 		E9C51ECB200E2AA100385EB7 /* FeeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51ECA200E2AA100385EB7 /* FeeCalculator.swift */; };
 		E9C51ECD200E2BF900385EB7 /* HardFeeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51ECC200E2BF900385EB7 /* HardFeeCalculator.swift */; };
 		E9C51ECF200E2D1100385EB7 /* HardFeeCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51ECE200E2D1100385EB7 /* HardFeeCalculatorTests.swift */; };
+		E9C51EEB20110B2500385EB7 /* adamant-core.js in Resources */ = {isa = PBXBuildFile; fileRef = E9C51EEA20110B2400385EB7 /* adamant-core.js */; };
 		E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* AccountService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
 		E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */; };
@@ -171,10 +171,10 @@
 		E95F85C3200A540B0070534A /* Chat.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Chat.json; sourceTree = "<group>"; };
 		E95F85C5200A9B070070534A /* ChatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
 		E95F85C6200A9B070070534A /* ChatTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatTableViewCell.xib; sourceTree = "<group>"; };
-		E95F85CB200B845B0070534A /* adamant-core.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adamant-core.js"; sourceTree = "<group>"; };
 		E9C51ECA200E2AA100385EB7 /* FeeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeeCalculator.swift; sourceTree = "<group>"; };
 		E9C51ECC200E2BF900385EB7 /* HardFeeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardFeeCalculator.swift; sourceTree = "<group>"; };
 		E9C51ECE200E2D1100385EB7 /* HardFeeCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardFeeCalculatorTests.swift; sourceTree = "<group>"; };
+		E9C51EEA20110B2400385EB7 /* adamant-core.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adamant-core.js"; sourceTree = "<group>"; };
 		E9E7CD8A20026B0600DFC4DB /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 		E9E7CD8C20026B6600DFC4DB /* DialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogService.swift; sourceTree = "<group>"; };
 		E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
@@ -344,7 +344,7 @@
 				E9E7CDA42002A6EB00DFC4DB /* Fonts */,
 				E913C8FA1FFFA51D001A83F7 /* LaunchScreen.storyboard */,
 				E913C8F81FFFA51D001A83F7 /* Assets.xcassets */,
-				E95F85CB200B845B0070534A /* adamant-core.js */,
+				E9C51EEA20110B2400385EB7 /* adamant-core.js */,
 				E913C9141FFFAB58001A83F7 /* utilites.js */,
 			);
 			path = Assets;
@@ -573,7 +573,7 @@
 				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
 				E9EC3417200524CA00C0E546 /* Exo+2_400_italic.ttf in Resources */,
 				E9EC341E200524CA00C0E546 /* Roboto_500_normal.ttf in Resources */,
-				E95F85CC200B845C0070534A /* adamant-core.js in Resources */,
+				E9C51EEB20110B2500385EB7 /* adamant-core.js in Resources */,
 				E9EC3419200524CA00C0E546 /* Exo+2_500_normal.ttf in Resources */,
 				E9EC3416200524CA00C0E546 /* Exo+2_300_normal.ttf in Resources */,
 				E913C9151FFFAB58001A83F7 /* utilites.js in Resources */,

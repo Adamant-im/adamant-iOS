@@ -28,7 +28,7 @@ class JSAdamantCoreTests: XCTestCase {
         let passphrase = "process gospel angry height between flat always clock suit refuse shove verb"
 		let hash = "9001490b166816af75a15a3e2b0174bfe3be3dfaa63147b4f780ed3ab90ffeab"
 		
-		let freshHash = core.createHashFor(passphrase: passphrase)!
+		let freshHash = core.createHashFor(passphrase: passphrase)
 		XCTAssertEqual(hash, freshHash)
     }
 	
@@ -37,9 +37,9 @@ class JSAdamantCoreTests: XCTestCase {
 		let publicKey = "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f"
 		let privateKey =  "9001490b166816af75a15a3e2b0174bfe3be3dfaa63147b4f780ed3ab90ffeab8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f"
 		
-		let freshKeypair = core.createKeypairFor(passphrase: passphrase)!
-		XCTAssertEqual(publicKey, freshKeypair.publicKey)
-		XCTAssertEqual(privateKey, freshKeypair.privateKey)
+		let freshKeypair = core.createKeypairFor(passphrase: passphrase)
+		XCTAssertEqual(publicKey, freshKeypair?.publicKey)
+		XCTAssertEqual(privateKey, freshKeypair?.privateKey)
 	}
 	
 	func testSignTransaction() {
@@ -60,14 +60,34 @@ class JSAdamantCoreTests: XCTestCase {
 		XCTAssertEqual(signature, freshSignature)
 	}
 	
-	func testDecodeMessage() {
-		let senderPublicKey = "9f895a201fd92cc60ef02d2117d53f00dc2981903cb64b2f214777269b882209"
-		let privateKey = "9001490b166816af75a15a3e2b0174bfe3be3dfaa63147b4f780ed3ab90ffeab8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f"
-		let message = "9ce16097f637ad448478fb9a7f8585389bafaef2"
-		let ownMessage = "6326ffe732912eb7dbe141a56300685e5c0f45cfbf409807"
-		let decodedMessage = "Wha!"
+	func testEncodeMessage() {
+		let message = "common"
+		let aPublicKey = "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f"
+		let aPrivateKey = "9001490b166816af75a15a3e2b0174bfe3be3dfaa63147b4f780ed3ab90ffeab8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f"
+		let bPublicKey = "9f895a201fd92cc60ef02d2117d53f00dc2981903cb64b2f214777269b882209"
+		let bPrivateKey = "e91ee8e6a23ac5ff9452a15a3fbd14098dc2c6a5abf6b12464b09eb033580b6d9f895a201fd92cc60ef02d2117d53f00dc2981903cb64b2f214777269b882209"
 		
-		let freshMessage = core.decodeMessage(senderKeyHex: senderPublicKey, privateKeyHex: privateKey, rawMessage: message, rawNonce: ownMessage)
+		guard let encoded = core.encodeMessage(message, recipientPublicKey: bPublicKey, privateKey: aPrivateKey) else {
+			XCTFail()
+			return
+		}
+		
+		guard let decoded = core.decodeMessage(rawMessage: encoded.message, rawNonce: encoded.ownMessage, senderPublicKey: aPublicKey, privateKey: bPrivateKey) else {
+			XCTFail()
+			return
+		}
+		
+		XCTAssertEqual(message, decoded)
+	}
+	
+	func testDecodeMessage() {
+		let publicKey = "9f895a201fd92cc60ef02d2117d53f00dc2981903cb64b2f214777269b882209"
+		let privateKey = "9001490b166816af75a15a3e2b0174bfe3be3dfaa63147b4f780ed3ab90ffeab8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f"
+		let message = "09af1ce7e5ed484ddca3c6d1410cbf4f793ea19210e7"
+		let ownMessage = "31caaee2d35dcbd8b614e9d6bf6095393cb5baed259e7e37"
+		let decodedMessage = "common"
+		
+		let freshMessage = core.decodeMessage(rawMessage: message, rawNonce: ownMessage, senderPublicKey: publicKey, privateKey: privateKey)
 		
 		XCTAssertEqual(freshMessage, decodedMessage)
 	}

@@ -26217,7 +26217,7 @@ module.exports = Hash
 /* WEBPACK VAR INJECTION */(function(global, process) {
 
 function oldBrowser () {
-  throw new Error('secure random number generation not supported by this browser\nuse chrome, FireFox or Internet Explorer 11')
+  throw new Error('Secure random number generation is not supported by this browser.\nUse Chrome, Firefox or Internet Explorer 11')
 }
 
 var Buffer = __webpack_require__(3).Buffer
@@ -29542,14 +29542,14 @@ nacl.setPRNG = function(fn) {
     });
   } else if (true) {
     // Node.js.
-    crypto = __webpack_require__(117);
-    if (crypto && crypto.randomBytes) {
+    // crypto = __webpack_require__(117);
+    // if (crypto && crypto.randomBytes) {
       nacl.setPRNG(function(x, n) {
-        var i, v = crypto.randomBytes(n);
+        var i, v = _randombytes(n) //crypto.randomBytes(n);
         for (i = 0; i < n; i++) x[i] = v[i];
         cleanup(v);
       });
-    }
+    // }
   }
 })();
 
@@ -42630,17 +42630,62 @@ class Adamant {
   }
 
   /**
+   * Encode chat message
+  */
+  static encodeMessage (msg, recipientPublicKey, senderPrivateKey) {
+    var nonce = Buffer.allocUnsafe(24)
+    sodium.randombytes(nonce)
+    var plainText = Buffer.from(msg)
+    var DHPublicKey = ed2curve.convertPublicKey(new Uint8Array(Adamant.hexToBytes(recipientPublicKey)))
+    var DHSecretKey = ed2curve.convertSecretKey(senderPrivateKey)
+
+    var encrypted = nacl.box(plainText, nonce, DHPublicKey, DHSecretKey)
+
+
+    console.log('msg: ' + msg)
+    console.log('plainText: ' + plainText)
+    console.log('recipientPublicKey: ' + recipientPublicKey)
+    console.log('keypair.privateKey: ' + senderPrivateKey)
+    console.log('DHPublicKey: ' + DHPublicKey)
+    console.log('DHSecretKey: ' + DHSecretKey)
+    console.log('encrypted: ' + encrypted)
+    console.log('messageHex: ' + Adamant.bytesToHex(encrypted))
+    console.log('own_messageHex: ' + Adamant.bytesToHex(nonce))
+
+
+    return {
+      message: Adamant.bytesToHex(encrypted),
+      own_message: Adamant.bytesToHex(nonce)
+    }
+  }
+
+  /**
    * Decode chat message
   */
-  static decodeMessage (msg, nonce, senderPublicKey, privateKey) {
+  static decodeMessage (msg, nonce, senderPublicKey, senderPrivateKey) {
     var DHPublicKey = ed2curve.convertPublicKey(senderPublicKey)
-    var DHSecretKey  = ed2curve.convertSecretKey(privateKey)
+    var DHSecretKey  = ed2curve.convertSecretKey(senderPrivateKey)
     
     var decrypted = nacl.box.open(msg, nonce, DHPublicKey, DHSecretKey)
     if (!decrypted) {
       return ''
     }
     return stablelib.decode(decrypted)
+  }
+
+  static hexToBytes (hex) {
+    for (var bytes = [], c = 0; c < hex.length; c += 2) {
+      bytes.push(parseInt(hex.substr(c, 2), 16))
+    }
+    return bytes
+  }
+
+  static bytesToHex (bytes) {
+    for (var hex = [], i = 0; i < bytes.length; i++) {
+      hex.push((bytes[i] >>> 4).toString(16))
+      hex.push((bytes[i] & 0xF).toString(16))
+    }
+    return hex.join('')
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["Adamant"] = Adamant;
