@@ -14,14 +14,8 @@ private struct JSFunctions {
 		static let createPassPhraseHash = CoreFunction("createPassPhraseHash")
 		static let makeKeypair = CoreFunction("makeKeypair")
 		static let transactionSign = CoreFunction("transactionSign")
+		static let encodeMessage = CoreFunction("encodeMessage")
 		static let decodeMessage = CoreFunction("decodeMessage")
-		
-		let key: String
-		private init(_ key: String) { self.key = key }
-	}
-	
-	struct UtilitesFunction {
-		static let convertToUInt8Array = UtilitesFunction("convertToUInt8Array")
 		
 		let key: String
 		private init(_ key: String) { self.key = key }
@@ -31,36 +25,45 @@ private struct JSFunctions {
 }
 
 
-class JSAdamantCore {
+// MARK: - AdamantCore
+class JSAdamantCore : AdamantCore {
 	private let context: JSContext
 	
-	
 	// TODO: background thread
-	init(coreJsUrl core: URL, utilitiesJsUrl utils: URL) throws {
+	init(coreJsUrl core: URL) throws {
 		let core = try JSAdamantCore.readStringFrom(url: core)
-		let utilities = try JSAdamantCore.readStringFrom(url: utils)
 		
 		let context = JSContext()
 		
 		if let context = context {
 			var jsError: JSValue? = nil
 			context.exceptionHandler = { context, value in
+				print("JSError: \(String(describing: value?.toString()))")
 				jsError = value
 			}
 			
-			// TODO: Integrate js logger
+			// Logger
+			context.evaluateScript("var console = { log: function(message) { _consoleLog(message) } }")
+			let consoleLog: @convention(block) (String) -> Void = { message in
+				print("JSCore: " + message)
+			}
+			context.setObject(unsafeBitCast(consoleLog, to: AnyObject.self), forKeyedSubscript: "_consoleLog" as (NSCopying & NSObjectProtocol)!)
+			
+			// Crypto magic. Because Webpack strips out PRNG.
+			let crypto: @convention(block) (Int) -> JSValue = { count in
+				let contextRef = context.jsGlobalContextRef
+				let array = JSObjectMakeTypedArray(contextRef, kJSTypedArrayTypeUint8Array, count, nil)!
+				let buffer = JSObjectGetTypedArrayBuffer(contextRef, array, nil)!
+				let bytes = JSObjectGetArrayBufferBytesPtr(contextRef, buffer, nil)!
+				_ = SecRandomCopyBytes(kSecRandomDefault, count, bytes)
+
+				return JSValue(jsValueRef: array, in: context)
+			}
+			context.setObject(unsafeBitCast(crypto, to: AnyObject.self), forKeyedSubscript: "_randombytes" as NSCopying & NSObjectProtocol)
 			
 			// Core
 			context.evaluateScript(core)
 			if let jsError = jsError {
-				context.exceptionHandler = nil
-				throw AdamantError(message: "Error evaluating core JS: \(jsError)")
-			}
-			
-			// Utilities
-			context.evaluateScript(utilities)
-			if let jsError = jsError {
-				context.exceptionHandler = nil
 				throw AdamantError(message: "Error evaluating core JS: \(jsError)")
 			}
 			
@@ -86,6 +89,7 @@ extension JSAdamantCore {
 	private func getCoreFunction(function: JSFunctions.CoreFunction) -> JSValue? {
 		var jsError: JSValue? = nil
 		context.exceptionHandler = { context, value in
+			print("JSError: \(String(describing: value?.toString()))")
 			jsError = value
 		}
 		
@@ -102,47 +106,29 @@ extension JSAdamantCore {
 		context.exceptionHandler = nil
 		return jsFunc
 	}
-	
-	private func getUtilitesFunction(function: JSFunctions.UtilitesFunction) -> JSValue? {
-		var jsError: JSValue? = nil
-		context.exceptionHandler = { context, value in
-			jsError = value
-		}
-		
-		let jsFunc: JSValue?
-		if let f = context.objectForKeyedSubscript(function.key),
-			!f.isUndefined, jsError == nil {
-			jsFunc = f
-		} else {
-			jsFunc = nil
-		}
-		
-		context.exceptionHandler = nil
-		return jsFunc
-	}
 }
 
 
 // MARK: - Hash converters
 extension JSAdamantCore {
-	private func convertToJsHash(_ hash: [UInt8]) -> JSValue? {
-		guard let converter = getUtilitesFunction(function: .convertToUInt8Array) else {
-			return nil
+	private func convertToJsHash(_ hash: [UInt8]) -> JSValue {
+		let count = hash.count
+		if count == 0 {
+			return JSValue(newArrayIn: context)
 		}
 		
-		var jsError: JSValue? = nil
-		context.exceptionHandler = { context, value in
-			jsError = value
-		}
+		let contextRef = context.jsGlobalContextRef
+		let jsArray = JSObjectMakeTypedArray(contextRef, kJSTypedArrayTypeUint8Array, count, nil)!
+		let jsBuffer = JSObjectGetTypedArrayBuffer(contextRef, jsArray, nil)!
+		let jsBytes = JSObjectGetArrayBufferBytesPtr(contextRef, jsBuffer, nil)!
 		
-		let jsHash = converter.call(withArguments: [hash])
-		context.exceptionHandler = nil
+		let typedPointer = jsBytes.bindMemory(to: UInt8.self, capacity: count)
 		
-		if jsError == nil {
-			return jsHash
-		} else {
-			return nil
-		}
+		let buffer = UnsafeMutableBufferPointer.init(start: typedPointer, count: count)
+		let data = Data(bytes: hash)
+		_ = data.copyBytes(to: buffer)
+		
+		return JSValue(jsValueRef: jsArray, in: context)
 	}
 	
 	private func convertFromJsHash(_ jsHash: JSValue) -> [UInt8]? {
@@ -151,8 +137,8 @@ extension JSAdamantCore {
 }
 
 
-// MARK: - AdamantCore
-extension JSAdamantCore: AdamantCore {
+// MARK: - Keys
+extension JSAdamantCore {
 	func createKeypairFor(rawHash: [UInt8]) -> Keypair? {
 		guard rawHash.count > 0 else {
 			return nil
@@ -162,8 +148,9 @@ extension JSAdamantCore: AdamantCore {
 			return nil
 		}
 		
-		if let jsHash = convertToJsHash(rawHash),
-			let keypairRaw = function.call(withArguments: [jsHash]),
+		let jsHash = convertToJsHash(rawHash)
+		
+		if let keypairRaw = function.call(withArguments: [jsHash]),
 			keypairRaw.hasProperty("publicKey") && keypairRaw.hasProperty("privateKey"),
 			let publicKeyHash = self.convertFromJsHash(keypairRaw.forProperty("publicKey")),
 			let privateKeyHash = self.convertFromJsHash(keypairRaw.forProperty("privateKey")) {
@@ -204,18 +191,44 @@ extension JSAdamantCore: AdamantCore {
 		context.exceptionHandler = nil
 		return hash
 	}
-	
+}
+
+
+
+// MARK: - Transactions
+extension JSAdamantCore {
 	func sign(transaction t: NormalizedTransaction, senderId: String, keypair: Keypair) -> String? {
-		guard let function = getCoreFunction(function: .transactionSign), !function.isUndefined else {
+		guard let function = getCoreFunction(function: .transactionSign) else {
 			return nil
 		}
 		
-		let jsTransaction = JSTransaction(id: 0, height: 0, blockId: 0, type: t.type.rawValue, timestamp: t.timestamp, senderPublicKey: t.senderPublicKey, senderId: senderId, recipientId: t.recipientId, recipientPublicKey: t.requesterPublicKey, amount: t.amount, fee: 0, signature: "", confirmations: 0)
+		let asset: JSAsset
+		if let chat = t.asset.chat {
+			asset = JSAsset(chat: JSChat(type: chat.type.rawValue, message: chat.message, own_message: chat.ownMessage))
+		} else {
+			asset = JSAsset(chat: nil)
+		}
+		
+		let jsTransaction = JSTransaction(id: 0,
+										  height: 0,
+										  blockId: 0,
+										  type: t.type.rawValue,
+										  timestamp: t.timestamp,
+										  senderPublicKey: t.senderPublicKey,
+										  senderId: senderId,
+										  recipientId: t.recipientId,
+										  recipientPublicKey: t.requesterPublicKey,
+										  amount: t.amount,
+										  fee: 0,
+										  signature: "",
+										  confirmations: 0,
+										  asset: asset)
+		
 		let jsKeypair = JSKeypair(keypair: keypair)
 		
 		var jsError: JSValue? = nil
 		context.exceptionHandler = { ctx, exc in
-			print(exc!)
+			print("JSError: \(String(describing: exc?.toString()))")
 			jsError = exc
 		}
 		
@@ -230,23 +243,49 @@ extension JSAdamantCore: AdamantCore {
 		context.exceptionHandler = nil
 		return signature
 	}
-	
-	func decodeMessage(senderKeyHex: String, privateKeyHex: String, rawMessage: String, rawNonce: String) -> String? {
-		guard let function = getCoreFunction(function: .decodeMessage), !function.isUndefined else {
+}
+
+
+// MARK: - Messages
+extension JSAdamantCore {
+	func encodeMessage(_ message: String, recipientPublicKey publicKey: String, privateKey privateKeyHex: String) -> (message: String, nonce: String)? {
+		guard let function = getCoreFunction(function: .encodeMessage) else {
 			return nil
-		}
-		
-		guard let message = convertToJsHash(AdamantUtilities.getBytes(from: rawMessage)),
-			let nonce = convertToJsHash(AdamantUtilities.getBytes(from: rawNonce)),
-			let senderKey = convertToJsHash(AdamantUtilities.getBytes(from: senderKeyHex)),
-			let privateKey = convertToJsHash(AdamantUtilities.getBytes(from: privateKeyHex))
-		else {
-				return nil
 		}
 		
 		var jsError: JSValue? = nil
 		context.exceptionHandler = { ctx, exc in
-			print(exc!)
+			print("JSError: \(String(describing: exc?.toString()))")
+			jsError = exc
+		}
+		
+		let privateKey = AdamantUtilities.getBytes(from: privateKeyHex)
+		let encodedMessage: (String, String)?
+		if let jsMessage = function.call(withArguments: [message, publicKey, privateKey]),
+			jsError == nil, !jsMessage.isUndefined,
+			let m = jsMessage.forProperty("message").toString(), let o = jsMessage.forProperty("own_message").toString() {
+			encodedMessage = (message: m, nonce: o)
+		} else {
+			encodedMessage = nil
+		}
+		
+		context.exceptionHandler = nil
+		return encodedMessage
+	}
+	
+	func decodeMessage(rawMessage: String, rawNonce: String, senderPublicKey senderKeyHex: String, privateKey privateKeyHex: String) -> String? {
+		guard let function = getCoreFunction(function: .decodeMessage) else {
+			return nil
+		}
+		
+		let message = convertToJsHash(AdamantUtilities.getBytes(from: rawMessage))
+		let nonce = convertToJsHash(AdamantUtilities.getBytes(from: rawNonce))
+		let senderKey = convertToJsHash(AdamantUtilities.getBytes(from: senderKeyHex))
+		let privateKey = convertToJsHash(AdamantUtilities.getBytes(from: privateKeyHex))
+		
+		var jsError: JSValue? = nil
+		context.exceptionHandler = { ctx, exc in
+			print("JSError: \(String(describing: exc?.toString()))")
 			jsError = exc
 		}
 		

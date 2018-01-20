@@ -18,7 +18,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="WH1-1S-RjN">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="WH1-1S-RjN">
                                 <rect key="frame" x="0.0" y="64" width="375" height="554"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
@@ -36,11 +36,30 @@
                     <navigationItem key="navigationItem" title="Chats" id="NNn-vk-aSk"/>
                     <connections>
                         <outlet property="tableView" destination="WH1-1S-RjN" id="Wzz-x2-fKA"/>
+                        <segue destination="XfZ-FH-baE" kind="show" identifier="showChat" id="b4f-gG-PLz"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="LsD-PY-ggg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="929" y="42"/>
+        </scene>
+        <!--Title-->
+        <scene sceneID="w1v-2h-ifS">
+            <objects>
+                <viewController id="XfZ-FH-baE" customClass="ChatViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="hQ1-UL-XtJ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <viewLayoutGuide key="safeArea" id="A2d-Mp-E0v"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Title" id="O75-R6-nGz">
+                        <barButtonItem key="rightBarButtonItem" title="•••" id="v2Z-hT-nNQ"/>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="V4A-mw-8Ee" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1836" y="42"/>
         </scene>
         <!--Chats-->
         <scene sceneID="xXv-1r-BTU">

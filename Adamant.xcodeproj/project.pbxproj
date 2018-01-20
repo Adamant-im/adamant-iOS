@@ -14,7 +14,6 @@
 		E913C8FC1FFFA51D001A83F7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E913C8FA1FFFA51D001A83F7 /* LaunchScreen.storyboard */; };
 		E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9071FFFA943001A83F7 /* AdamantCore.swift */; };
 		E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C90C1FFFA99B001A83F7 /* Keypair.swift */; };
-		E913C9151FFFAB58001A83F7 /* utilites.js in Resources */ = {isa = PBXBuildFile; fileRef = E913C9141FFFAB58001A83F7 /* utilites.js */; };
 		E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */; };
 		E919479C2000102E001362F8 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E919479B2000102E001362F8 /* LoginViewController.swift */; };
 		E919479E20001048001362F8 /* Login.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E919479D20001048001362F8 /* Login.storyboard */; };
@@ -22,6 +21,7 @@
 		E91947B020002393001362F8 /* AdamantApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AF20002393001362F8 /* AdamantApiService.swift */; };
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
 		E91947B420002809001362F8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B320002809001362F8 /* Account.swift */; };
+		E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EFE12200D1156000BB482 /* ChatViewController.swift */; };
 		E95F856520067A030070534A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856420067A030070534A /* GlobalConstants.swift */; };
 		E95F85692006AB9D0070534A /* NormalizedTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85682006AB9D0070534A /* NormalizedTransaction.swift */; };
 		E95F856B200789450070534A /* JSModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856A200789450070534A /* JSModels.swift */; };
@@ -53,7 +53,11 @@
 		E95F85C4200A540B0070534A /* Chat.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C3200A540B0070534A /* Chat.json */; };
 		E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85C5200A9B070070534A /* ChatTableViewCell.swift */; };
 		E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C6200A9B070070534A /* ChatTableViewCell.xib */; };
-		E95F85CC200B845C0070534A /* adamant-core.js in Resources */ = {isa = PBXBuildFile; fileRef = E95F85CB200B845B0070534A /* adamant-core.js */; };
+		E9C51ECB200E2AA100385EB7 /* FeeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51ECA200E2AA100385EB7 /* FeeCalculator.swift */; };
+		E9C51ECD200E2BF900385EB7 /* HardFeeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51ECC200E2BF900385EB7 /* HardFeeCalculator.swift */; };
+		E9C51ECF200E2D1100385EB7 /* HardFeeCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51ECE200E2D1100385EB7 /* HardFeeCalculatorTests.swift */; };
+		E9C51EED2011416E00385EB7 /* adamant-core.js in Resources */ = {isa = PBXBuildFile; fileRef = E9C51EEC2011416E00385EB7 /* adamant-core.js */; };
+		E9C51EEF20139DC600385EB7 /* ProcessTransactionResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51EEE20139DC600385EB7 /* ProcessTransactionResponse.swift */; };
 		E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* AccountService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
 		E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */; };
@@ -116,7 +120,6 @@
 		E913C8FD1FFFA51E001A83F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E913C9071FFFA943001A83F7 /* AdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCore.swift; sourceTree = "<group>"; };
 		E913C90C1FFFA99B001A83F7 /* Keypair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keypair.swift; sourceTree = "<group>"; };
-		E913C9141FFFAB58001A83F7 /* utilites.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = utilites.js; sourceTree = "<group>"; };
 		E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAdamantCore.swift; sourceTree = "<group>"; };
 		E919479B2000102E001362F8 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		E919479D20001048001362F8 /* Login.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Login.storyboard; sourceTree = "<group>"; };
@@ -135,6 +138,7 @@
 		E91947AF20002393001362F8 /* AdamantApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantApiService.swift; sourceTree = "<group>"; };
 		E91947B12000246A001362F8 /* AdamantError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantError.swift; sourceTree = "<group>"; };
 		E91947B320002809001362F8 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
+		E93EFE12200D1156000BB482 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		E95F856420067A030070534A /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		E95F85682006AB9D0070534A /* NormalizedTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalizedTransaction.swift; sourceTree = "<group>"; };
 		E95F856A200789450070534A /* JSModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSModels.swift; sourceTree = "<group>"; };
@@ -166,7 +170,11 @@
 		E95F85C3200A540B0070534A /* Chat.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Chat.json; sourceTree = "<group>"; };
 		E95F85C5200A9B070070534A /* ChatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
 		E95F85C6200A9B070070534A /* ChatTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatTableViewCell.xib; sourceTree = "<group>"; };
-		E95F85CB200B845B0070534A /* adamant-core.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adamant-core.js"; sourceTree = "<group>"; };
+		E9C51ECA200E2AA100385EB7 /* FeeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeeCalculator.swift; sourceTree = "<group>"; };
+		E9C51ECC200E2BF900385EB7 /* HardFeeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardFeeCalculator.swift; sourceTree = "<group>"; };
+		E9C51ECE200E2D1100385EB7 /* HardFeeCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardFeeCalculatorTests.swift; sourceTree = "<group>"; };
+		E9C51EEC2011416E00385EB7 /* adamant-core.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adamant-core.js"; sourceTree = "<group>"; };
+		E9C51EEE20139DC600385EB7 /* ProcessTransactionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessTransactionResponse.swift; sourceTree = "<group>"; };
 		E9E7CD8A20026B0600DFC4DB /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 		E9E7CD8C20026B6600DFC4DB /* DialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogService.swift; sourceTree = "<group>"; };
 		E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
@@ -284,6 +292,7 @@
 				E95F858D20093F940070534A /* ChatDataProvider.swift */,
 				E9E7CD8C20026B6600DFC4DB /* DialogService.swift */,
 				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
+				E9C51ECA200E2AA100385EB7 /* FeeCalculator.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -295,9 +304,10 @@
 				E91947AF20002393001362F8 /* AdamantApiService.swift */,
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
+				E95F859020093FB30070534A /* CoreDataChatProvider.swift */,
+				E9C51ECC200E2BF900385EB7 /* HardFeeCalculator.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
-				E95F859020093FB30070534A /* CoreDataChatProvider.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -334,8 +344,7 @@
 				E9E7CDA42002A6EB00DFC4DB /* Fonts */,
 				E913C8FA1FFFA51D001A83F7 /* LaunchScreen.storyboard */,
 				E913C8F81FFFA51D001A83F7 /* Assets.xcassets */,
-				E95F85CB200B845B0070534A /* adamant-core.js */,
-				E913C9141FFFAB58001A83F7 /* utilites.js */,
+				E9C51EEC2011416E00385EB7 /* adamant-core.js */,
 			);
 			path = Assets;
 			sourceTree = "<group>";
@@ -365,6 +374,7 @@
 			isa = PBXGroup;
 			children = (
 				E95F85792007F0260070534A /* ServerResponse.swift */,
+				E9C51EEE20139DC600385EB7 /* ProcessTransactionResponse.swift */,
 				E95F856E2007B61D0070534A /* GetPublicKeyResponse.swift */,
 			);
 			path = ServerResponses;
@@ -377,6 +387,7 @@
 				E95F857F2008C8D70070534A /* ChatsDependencies.swift */,
 				E95F857E2008C8D60070534A /* ChatsRoutes.swift */,
 				E95F85842008CB3A0070534A /* ChatsListViewController.swift */,
+				E93EFE12200D1156000BB482 /* ChatViewController.swift */,
 			);
 			path = Chats;
 			sourceTree = "<group>";
@@ -457,10 +468,11 @@
 				E95F85B8200A4D9C0070534A /* Parsing */,
 				E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */,
 				E95F85702007D98D0070534A /* CurrencyFormatterTests.swift */,
+				E9C51ECE200E2D1100385EB7 /* HardFeeCalculatorTests.swift */,
 				E95F85742007E4790070534A /* HexAndBytesUtilitiesTest.swift */,
 				E95F85762007E8EC0070534A /* JSAdamantCoreTests.swift */,
-				E9EC344820066D4A00C0E546 /* Info.plist */,
 				E95F85B6200A4D8F0070534A /* TestTools.swift */,
+				E9EC344820066D4A00C0E546 /* Info.plist */,
 			);
 			path = AdamantTests;
 			sourceTree = "<group>";
@@ -558,13 +570,12 @@
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
 				E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */,
 				E919479E20001048001362F8 /* Login.storyboard in Resources */,
+				E9C51EED2011416E00385EB7 /* adamant-core.js in Resources */,
 				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
 				E9EC3417200524CA00C0E546 /* Exo+2_400_italic.ttf in Resources */,
 				E9EC341E200524CA00C0E546 /* Roboto_500_normal.ttf in Resources */,
-				E95F85CC200B845C0070534A /* adamant-core.js in Resources */,
 				E9EC3419200524CA00C0E546 /* Exo+2_500_normal.ttf in Resources */,
 				E9EC3416200524CA00C0E546 /* Exo+2_300_normal.ttf in Resources */,
-				E913C9151FFFAB58001A83F7 /* utilites.js in Resources */,
 				E9EC341C200524CA00C0E546 /* Roboto_400_italic.ttf in Resources */,
 				E9EC3415200524CA00C0E546 /* Exo+2_100_normal.ttf in Resources */,
 				E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */,
@@ -602,6 +613,7 @@
 				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
 				"${BUILT_PRODUCTS_DIR}/FTIndicator/FTIndicator.framework",
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
+				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
 				"${BUILT_PRODUCTS_DIR}/SwinjectStoryboard/SwinjectStoryboard.framework",
 			);
@@ -611,6 +623,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Eureka.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FTIndicator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwinjectStoryboard.framework",
 			);
@@ -667,6 +680,7 @@
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */,
+				E9C51ECB200E2AA100385EB7 /* FeeCalculator.swift in Sources */,
 				E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */,
 				E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */,
 				E95F858E20093F940070534A /* ChatDataProvider.swift in Sources */,
@@ -682,12 +696,15 @@
 				E9E7CDBB2003AAA700DFC4DB /* RoundAvatarTableViewCell.swift in Sources */,
 				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
 				E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */,
+				E9C51ECD200E2BF900385EB7 /* HardFeeCalculator.swift in Sources */,
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E95F85B0200952AF0070534A /* Chatroom+CoreDataProperties.swift in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */,
 				E95F85AF200952AF0070534A /* Chatroom+CoreDataClass.swift in Sources */,
+				E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
+				E9C51EEF20139DC600385EB7 /* ProcessTransactionResponse.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */,
 				E95F85692006AB9D0070534A /* NormalizedTransaction.swift in Sources */,
@@ -716,6 +733,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9C51ECF200E2D1100385EB7 /* HardFeeCalculatorTests.swift in Sources */,
 				E9EC344720066D4A00C0E546 /* AddressValidationTests.swift in Sources */,
 				E95F85B7200A4D8F0070534A /* TestTools.swift in Sources */,
 				E95F85BC200A4E670070534A /* ParsingModelsTests.swift in Sources */,

@@ -17,5 +17,6 @@ protocol AdamantCore {
 	func sign(transaction: NormalizedTransaction, senderId: String, keypair: Keypair) -> String?
 	
 	// MARK: - Encoding messages
-	func decodeMessage(senderKeyHex: String, privateKeyHex: String, rawMessage: String, rawNonce: String) -> String?
+	func encodeMessage(_ message: String, recipientPublicKey: String, privateKey: String) -> (message: String, nonce: String)?
+	func decodeMessage(rawMessage: String, rawNonce: String, senderPublicKey: String, privateKey: String) -> String?
 }

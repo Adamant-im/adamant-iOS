@@ -19,6 +19,7 @@ class ChatsListViewController: UIViewController {
 	@IBOutlet weak var tableView: UITableView!
 	
 	// MARK: - Properties
+	let showChatSegue = "showChat"
 	var chatsController: NSFetchedResultsController<Chatroom>!
 	let chatCell = SharedCell.ChatCell.cellIdentifier
 	
@@ -28,6 +29,12 @@ class ChatsListViewController: UIViewController {
 		
 		tableView.dataSource = self
 		tableView.delegate = self
+		tableView.register(cellFactory.nib(for: SharedCell.ChatCell), forCellReuseIdentifier: chatCell)
+		
+		chatsController = chatProvider.getChatroomsController()
+		chatsController.delegate = self
+		
+		tableView.reloadData()
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -35,12 +42,31 @@ class ChatsListViewController: UIViewController {
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
+	}
+	
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		guard let identifier = segue.identifier else {
+			return
+		}
 		
-		chatsController = chatProvider.getChatroomsController()
-		chatsController.delegate = self
-		
-		tableView.register(cellFactory.nib(for: SharedCell.ChatCell), forCellReuseIdentifier: chatCell)
-		tableView.reloadData()
+		switch identifier {
+		case showChatSegue:
+			if let chatroom = sender as? Chatroom, let vc = segue.destination as? ChatViewController,
+				let account = accountService.loggedAccount {
+				vc.hidesBottomBarWhenPushed = true
+				vc.chatroom = chatroom
+				vc.account = account
+			}
+			
+		default:
+			return
+		}
+	}
+}
+
+private extension IndexPath {
+	func with(secion s: Int) -> IndexPath {
+		return IndexPath(row: self.row, section: s)
 	}
 }
 
@@ -76,6 +102,17 @@ extension ChatsListViewController: UITableViewDelegate, UITableViewDataSource {
 	func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
 		return UIView()
 	}
+	
+	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		switch indexPath.section {
+		case 1:
+			let chatroom = chatsController.object(at: indexPath.with(secion: 0))
+			performSegue(withIdentifier: showChatSegue, sender: chatroom)
+			
+		default:
+			tableView.deselectRow(at: indexPath, animated: true)
+		}
+	}
 }
 
 
@@ -98,7 +135,7 @@ extension ChatsListViewController {
 			return cell
 		
 		case 1:
-			let chat = chatsController.object(at: IndexPath(row: indexPath.row, section: 0))
+			let chat = chatsController.object(at: indexPath.with(secion: 0))
 			let cell: ChatTableViewCell = tableView.dequeueReusableCell(withIdentifier: chatCell, for: indexPath) as! ChatTableViewCell
 			
 			configureCell(cell, for: chat)
@@ -139,25 +176,25 @@ extension ChatsListViewController: NSFetchedResultsControllerDelegate {
 		switch type {
 		case .insert:
 			if let newIndexPath = newIndexPath {
-				tableView.insertRows(at: [IndexPath(row: newIndexPath.row, section: 1)], with: .automatic)
+				tableView.insertRows(at: [newIndexPath.with(secion: 1)], with: .automatic)
 			}
 			
 		case .delete:
 			if let indexPath = indexPath {
-				tableView.deleteRows(at: [IndexPath(row: indexPath.row, section: 1)], with: .automatic)
+				tableView.deleteRows(at: [indexPath.with(secion: 1)], with: .automatic)
 			}
 			
 		case .update:
 			if let indexPath = indexPath,
-				let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: 1)) as? ChatTableViewCell,
+				let cell = tableView.cellForRow(at: indexPath.with(secion: 1)) as? ChatTableViewCell,
 				let chatroom = controller.object(at: indexPath) as? Chatroom {
 				configureCell(cell, for: chatroom)
 			}
 			
 		case .move:
 			if let indexPath = indexPath, let newIndexPath = newIndexPath {
-				tableView.moveRow(at: IndexPath(row: indexPath.row, section: 1),
-								  to: IndexPath(row: newIndexPath.row, section: 1))
+				tableView.moveRow(at: indexPath.with(secion: 1),
+								  to: newIndexPath.with(secion: 1))
 			}
 		}
 	}

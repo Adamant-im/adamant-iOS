@@ -10,7 +10,7 @@ import Foundation
 
 struct Transaction {
 	let id: UInt
-	let height: UInt
+	let height: Int
 	let blockId: UInt
 	let type: TransactionType
 	let timestamp: UInt
@@ -55,7 +55,7 @@ extension Transaction: Decodable {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		
 		self.id = UInt(try container.decode(String.self, forKey: .id))!
-		self.height = try container.decode(UInt.self, forKey: .height)
+		self.height = try container.decode(Int.self, forKey: .height)
 		self.blockId = UInt(try container.decode(String.self, forKey: .blockId))!
 		self.type = try container.decode(TransactionType.self, forKey: .type)
 		self.timestamp = try container.decode(UInt.self, forKey: .timestamp)
@@ -74,6 +74,10 @@ extension Transaction: Decodable {
 
 		self.date = AdamantUtilities.decodeAdamantDate(timestamp: TimeInterval(self.timestamp))
 	}
+}
+
+extension Transaction: WrappableModel {
+	static let ModelKey = "transaction"
 }
 
 extension Transaction: WrappableCollection {

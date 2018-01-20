@@ -10,10 +10,10 @@ import Foundation
 
 extension Notification.Name {
 	/// Raised, when user has logged out.
-	static let adamantUserLoggedOut = Notification.Name("adamantUserHasLoggedOutNotification")
+	static let adamantUserLoggedOut = Notification.Name("adamantUserHasLoggedOut")
 	
 	/// Raised, when user has successfully logged in.
-	static let adamantUserLoggedIn = Notification.Name("adamantUserHasLoggedInNotification")
+	static let adamantUserLoggedIn = Notification.Name("adamantUserHasLoggedIn")
 }
 
 protocol AccountService {
