@@ -73,7 +73,7 @@ import JavaScriptCore
 
 @objc protocol JSTransactionProtocol: JSExport {
 	var id: UInt { get set }
-	var height: UInt { get set }
+	var height: Int { get set }
 	var blockId: UInt { get set }
 	var type: Int { get set }
 	var timestamp: UInt { get set }
@@ -90,7 +90,7 @@ import JavaScriptCore
 
 @objc class JSTransaction: NSObject, JSTransactionProtocol {
 	dynamic var id: UInt
-	dynamic var height: UInt
+	dynamic var height: Int
 	dynamic var blockId: UInt
 	dynamic var type: Int
 	dynamic var timestamp: UInt
@@ -104,7 +104,7 @@ import JavaScriptCore
 	dynamic var confirmations: UInt
 	dynamic var asset: JSAsset
 
-	init(id: UInt, height: UInt, blockId: UInt, type: Int, timestamp: UInt, senderPublicKey: String?, senderId: String?, recipientId: String?, recipientPublicKey: String?, amount: UInt, fee: UInt, signature: String?, confirmations: UInt, asset: JSAsset) {
+	init(id: UInt, height: Int, blockId: UInt, type: Int, timestamp: UInt, senderPublicKey: String?, senderId: String?, recipientId: String?, recipientPublicKey: String?, amount: UInt, fee: UInt, signature: String?, confirmations: UInt, asset: JSAsset) {
 		self.id = id
 		self.height = height
 		self.blockId = blockId
