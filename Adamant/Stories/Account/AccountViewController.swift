@@ -50,6 +50,10 @@ class AccountViewController: UIViewController {
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantAccountDataUpdated, object: nil, queue: nil) { _ in
+			self.refreshBalanceCell()
+		}
 	}
 	
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -59,12 +63,12 @@ class AccountViewController: UIViewController {
 		
 		switch identifier {
 		case showTransactionsSegue:
-			if let account = accountService.loggedAccount?.address, let vc = segue.destination as? TransactionsViewController {
+			if let account = accountService.account?.address, let vc = segue.destination as? TransactionsViewController {
 				vc.account = account
 			}
 			
 		case showTransferSegue:
-			if let account = accountService.loggedAccount, let vc = segue.destination as? TransferViewController {
+			if let account = accountService.account, let vc = segue.destination as? TransferViewController {
 				vc.account = account
 			}
 			
@@ -86,7 +90,7 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 	}
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		if accountService.loggedAccount != nil {
+		if accountService.account != nil {
 			return 3
 		} else {
 			return 0
@@ -110,7 +114,7 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 		case .accountNumber:
 			tableView.deselectRow(at: indexPath, animated: true)
 			
-			guard let address = self.accountService.loggedAccount?.address else {
+			guard let address = self.accountService.account?.address else {
 				return
 			}
 			
@@ -143,7 +147,7 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 // MARK: - UITableView Cells
 extension AccountViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		guard let account = accountService.loggedAccount,
+		guard let account = accountService.account,
 			let row = Rows(rawValue: indexPath.row) else {
 				return UITableViewCell(style: .default, reuseIdentifier: nil)
 		}
@@ -183,5 +187,16 @@ extension AccountViewController {
 		}
 		
 		return cell
+	}
+	
+	private func refreshBalanceCell() {
+		guard let account = accountService.account,
+			let cell = tableView.cellForRow(at: IndexPath(row: Rows.balance.rawValue, section: 0)) else {
+			return
+		}
+		
+		DispatchQueue.main.async {
+			cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
+		}
 	}
 }

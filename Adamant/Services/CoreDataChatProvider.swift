@@ -25,7 +25,7 @@ class CoreDataChatProvider {
 	
 	// MARK: - Properties
 	private(set) var status: ProviderStatus = .disabled
-	var autoupdatePeriod: TimeInterval = 3.0
+	var autoupdateInterval: TimeInterval = 3.0
 	
 	var autoupdate: Bool = true {
 		didSet {
@@ -43,6 +43,7 @@ class CoreDataChatProvider {
 	private var publicKeys = [String:String]()
 	private var lastTransactionHeight: Int = 0
 	
+	private let updatingDispatchGroup = DispatchGroup()
 	
 	// MARK: - Init
 	init(managedObjectModel modelUrl: URL) {
@@ -74,14 +75,23 @@ class CoreDataChatProvider {
 	}
 	
 	func start() {
-		timer = Timer(timeInterval: autoupdatePeriod, repeats: true, block: { _ in
-			self.updateChats()
+		if !autoupdate { autoupdate = true }
+		
+		timer = Timer(timeInterval: autoupdateInterval, repeats: true, block: { _ in
+			let timeout = DispatchTime.now() + DispatchTimeInterval.milliseconds(self.autoupdateInterval > 1 ? Int((self.autoupdateInterval - 1.0) * 1000) : 0)
+			if self.updatingDispatchGroup.wait(timeout: timeout) == .success {
+				self.updateChats()
+			} else {
+				
+			}
 		})
 		RunLoop.current.add(timer!, forMode: .commonModes)
 		timer!.fire()
 	}
 	
 	func stop() {
+		if autoupdate { autoupdate = false }
+		
 		timer?.invalidate()
 		timer = nil
 	}
@@ -97,13 +107,16 @@ extension CoreDataChatProvider: ChatDataProvider {
 		status = .updating
 		context.reset()
 		
-		guard let account = accountService.loggedAccount else {
+		guard let account = accountService.account else {
 			return
 		}
 		
-		_ = getTransactions(account: account.address, height: nil, offset: nil)
-		
-		status = .upToDate
+		DispatchQueue.global(qos: .userInitiated).async {
+			let reloadDispatchGroup = DispatchGroup()
+			_ = self.getTransactions(account: account.address, height: nil, offset: nil, dispatchGroup: reloadDispatchGroup)
+			reloadDispatchGroup.wait()
+			self.status = .upToDate
+		}
 	}
 	
 	/// Get new messages
@@ -123,21 +136,27 @@ extension CoreDataChatProvider: ChatDataProvider {
 		case .upToDate: break
 		}
 		
-		guard let account = accountService.loggedAccount else {
+		guard let account = accountService.account else {
 			return
 		}
 		
-		let newMessages = getTransactions(account: account.address, height: lastTransactionHeight, offset: nil)
-		if newMessages > 0 {
-			NotificationCenter.default.post(name: .adamantChatProviderNewTransactions, object: nil)
-		}
+		status = .updating
 		
-		status = .upToDate
+		DispatchQueue.global(qos: .userInitiated).async {
+			let newMessages = self.getTransactions(account: account.address, height: self.lastTransactionHeight, offset: nil, dispatchGroup: self.updatingDispatchGroup)
+			self.updatingDispatchGroup.wait()
+			
+			if newMessages > 0 {
+				NotificationCenter.default.post(name: .adamantChatProviderNewTransactions, object: nil)
+			}
+			
+			self.status = .upToDate
+		}
 	}
 	
 	/// Drop everything
 	func reset() {
-		terminateTransactionProcessing()
+		stop()
 		context.reset()
 		status = .disabled
 	}
@@ -188,7 +207,7 @@ extension CoreDataChatProvider: ChatDataProvider {
 // MARK: - Sending messages
 extension CoreDataChatProvider {
 	func sendTextMessage(recipientId: String, text: String) {
-		guard isValidMessage(text: text), let account = accountService.loggedAccount, let keypair = accountService.keypair else {
+		guard isValidMessage(text: text), let account = accountService.account, let keypair = accountService.keypair else {
 			return
 		}
 		
@@ -286,18 +305,23 @@ extension CoreDataChatProvider {
 	///   - height: last message height
 	///   - offset: offset, if greater than 100
 	/// - Returns: ammount of new messages was added
-	private func getTransactions(account: String, height: Int?, offset: Int?) -> Int {
+	private func getTransactions(account: String, height: Int?, offset: Int?, dispatchGroup: DispatchGroup? = nil) -> Int {
 		var newMessages = 0
+		
+		// Enter 1
+		dispatchGroup?.enter()
 		
 		apiService.getChatTransactions(account: account, height: height, offset: offset) { (transactions, error) in
 			guard let transactions = transactions else {
 				return
 			}
 			
-			
+			// Enter 2
+			dispatchGroup?.enter()
 			DispatchQueue.global(qos: .userInitiated).async {
 				let new = self.loadChatTransactions(transactions, currentAccount: account)
-				
+				// Leave 2
+				dispatchGroup?.leave()
 				// TODO: Threadsafe
 				newMessages += new
 			}
@@ -313,6 +337,9 @@ extension CoreDataChatProvider {
 				// TODO: Threadsafe
 				newMessages += self.getTransactions(account: account, height: height, offset: newOffset)
 			}
+			
+			// Leave 1
+			dispatchGroup?.leave()
 		}
 		
 		return newMessages

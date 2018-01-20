@@ -39,7 +39,7 @@ protocol ChatDataProvider {
 	var autoupdate: Bool { get set }
 	
 	/// Default = 3 seconds
-	var autoupdatePeriod: TimeInterval { get set }
+	var autoupdateInterval: TimeInterval { get set }
 	
 	// MARK: - Getting chats and messages
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>?
