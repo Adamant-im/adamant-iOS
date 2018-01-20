@@ -15,21 +15,34 @@ class CoreDataChatProvider {
 	var apiService: ApiService!
 	var adamantCore: AdamantCore!
 	
+	
 	// MARK: - CoreData
 	let model: NSManagedObjectModel
 	let coordinator: NSPersistentStoreCoordinator
 	let context: NSManagedObjectContext
 	
-	lazy var chatTransactionEntity = {
-		return NSEntityDescription.entity(forEntityName: ChatTransaction.entityName, in: context)!
-	}()
-	
-	lazy var chatroomEntity = {
-		return NSEntityDescription.entity(forEntityName: Chatroom.entityName, in: context)!
-	}()
+	var unconfirmedTransactions: [UInt:ChatTransaction] = [:]
 	
 	// MARK: - Properties
+	private(set) var status: ProviderStatus = .disabled
+	var autoupdatePeriod: TimeInterval = 3.0
+	
+	var autoupdate: Bool = true {
+		didSet {
+			if autoupdate {
+				start()
+			} else {
+				stop()
+			}
+		}
+	}
+	
+	/// Amount of maximum transactions returned by API by default
+	private static let apiTransactions = 100
+	private var timer: Timer?
 	private var publicKeys = [String:String]()
+	private var lastTransactionHeight: Int = 0
+	
 	
 	// MARK: - Init
 	init(managedObjectModel modelUrl: URL) {
@@ -41,26 +54,92 @@ class CoreDataChatProvider {
 		context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
 		context.persistentStoreCoordinator = coordinator
 		
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { _ in self.reloadChats() }
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { _ in self.context.reset() }
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { _ in
+			if self.autoupdate {
+				self.start()
+			} else {
+				self.reloadChats()
+			}
+		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { _ in
+			self.stop()
+			self.context.reset()
+		}
+	}
+	
+	deinit {
+		stop()
+		terminateTransactionProcessing()
+	}
+	
+	func start() {
+		timer = Timer(timeInterval: autoupdatePeriod, repeats: true, block: { _ in
+			self.updateChats()
+		})
+		RunLoop.current.add(timer!, forMode: .commonModes)
+		timer!.fire()
+	}
+	
+	func stop() {
+		timer?.invalidate()
+		timer = nil
 	}
 }
 
 
 // MARK: - ChatProvider
 extension CoreDataChatProvider: ChatDataProvider {
+	
+	/// Reload all messages
 	func reloadChats() {
+		terminateTransactionProcessing()
+		status = .updating
 		context.reset()
 		
 		guard let account = accountService.loggedAccount else {
 			return
 		}
 		
-		getTransactions(account: account.address, height: nil, offset: nil)
+		_ = getTransactions(account: account.address, height: nil, offset: nil)
+		
+		status = .upToDate
 	}
 	
+	/// Get new messages
+	func updateChats() {
+		switch status {
+		// If not initiated - reload
+		case .disabled:
+			reloadChats()
+			return
+			
+		// If updating - do nothing
+		case .updating:
+			return
+			
+		// Do Update
+		case .errorSyncing: break
+		case .upToDate: break
+		}
+		
+		guard let account = accountService.loggedAccount else {
+			return
+		}
+		
+		let newMessages = getTransactions(account: account.address, height: lastTransactionHeight, offset: nil)
+		if newMessages > 0 {
+			NotificationCenter.default.post(name: .adamantChatProviderNewTransactions, object: nil)
+		}
+		
+		status = .upToDate
+	}
+	
+	/// Drop everything
 	func reset() {
+		terminateTransactionProcessing()
 		context.reset()
+		status = .disabled
 	}
 	
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>? {
@@ -91,41 +170,174 @@ extension CoreDataChatProvider: ChatDataProvider {
 			return nil
 		}
 	}
+	
+	func isValidMessage(text: String) -> Bool {
+		if text.count == 0 {
+			return false
+		}
+		
+		if Double(text.count) * 1.5 > 20000.0 {
+			return false
+		}
+		
+		return true
+	}
+}
+
+
+// MARK: - Sending messages
+extension CoreDataChatProvider {
+	func sendTextMessage(recipientId: String, text: String) {
+		guard isValidMessage(text: text), let account = accountService.loggedAccount, let keypair = accountService.keypair else {
+			return
+		}
+		
+		// MARK: 1: Get key
+		let recipientPublicKey: String
+		if let key = publicKeys[recipientId] {
+			recipientPublicKey = key
+		} else {
+			let group = DispatchGroup()
+			group.enter()
+			
+			var key: String?
+			var error: AdamantError?
+			apiService.getPublicKey(byAddress: recipientId, completionHandler: { (publicKey, err) in
+				key = publicKey
+				error = err
+				group.leave()
+			})
+			
+			group.wait()
+			
+			if let key = key {
+				recipientPublicKey = key
+				publicKeys[recipientId] = key
+			} else {
+				// TODO: Display error
+				let error = error?.message ?? "Unknown error"
+				print("Failed to send message: \(error)")
+				return
+			}
+		}
+		
+		// MARK: 2: Cretae object
+		let transaction = ChatTransaction(entity: ChatTransaction.entity(), insertInto: context)
+		transaction.date = Date() as NSDate
+		transaction.recipientId = recipientId
+		transaction.senderId = account.address
+		transaction.type = Int16(ChatType.message.rawValue)
+		transaction.isOutgoing = true
+		transaction.message = text
+		transaction.transactionId = UUID().uuidString // TODO:
+		
+		let chatroom: Chatroom
+		if let ch = getChatroomsController()?.fetchedObjects?.first(where: { $0.id == recipientId }) {
+			chatroom = ch
+		} else {
+			chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
+		}
+		
+		chatroom.addToTransactions(transaction)
+		chatroom.lastTransaction = transaction
+		
+		// MARK: 2.5: Encode message
+		guard let encodedMessage = adamantCore.encodeMessage(text, recipientPublicKey: recipientPublicKey, privateKey: keypair.privateKey) else {
+			// TODO: Show error
+			fatalError()
+		}
+		
+		// MARK: 3: Send
+		apiService.sendMessage(senderId: account.address, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { (id, error) in
+			guard let id = id else {
+				// TODO: Show error, mark message as failed instead of deleting it
+				self.context.delete(transaction)
+				return
+			}
+			
+			transaction.transactionId = String(id)
+			// TODO: Threadsafe
+			self.unconfirmedTransactions[id] = transaction
+			
+			// MARK: 4: Verify manually, if autoupdate is off
+			if !self.autoupdate {
+				self.apiService.getTransaction(id: id, completionHandler: { (t, error) in
+					guard let t = t else {
+						// TODO: Show error, mark message as failed instead of deleting it
+						self.context.delete(transaction)
+						return
+					}
+					
+					self.confirmTransaction(transaction, id: id, height: t.height)
+				})
+			}
+		}
+	}
 }
 
 
 // MARK: - Processing Data
 extension CoreDataChatProvider {
-	private func getTransactions(account: String, height: Int?, offset: Int?) {
+	
+	/// Get new transactions
+	///
+	/// - Parameters:
+	///   - account: for account
+	///   - height: last message height
+	///   - offset: offset, if greater than 100
+	/// - Returns: ammount of new messages was added
+	private func getTransactions(account: String, height: Int?, offset: Int?) -> Int {
+		var newMessages = 0
+		
 		apiService.getChatTransactions(account: account, height: height, offset: offset) { (transactions, error) in
 			guard let transactions = transactions else {
 				return
 			}
 			
+			
 			DispatchQueue.global(qos: .userInitiated).async {
-				self.loadChatTransactions(transactions, currentAccount: account)
+				let new = self.loadChatTransactions(transactions, currentAccount: account)
+				
+				// TODO: Threadsafe
+				newMessages += new
 			}
 			
-			if transactions.count == 100 {
-				let newOffset = offset != nil ? offset : 0 + 100
+			if transactions.count == CoreDataChatProvider.apiTransactions {
+				let newOffset: Int
+				if let offset = offset {
+					newOffset = offset + CoreDataChatProvider.apiTransactions
+				} else {
+					newOffset = CoreDataChatProvider.apiTransactions
+				}
 				
-				self.getTransactions(account: account, height: height, offset: newOffset)
-			} else {
-				// TODO: Notification
+				// TODO: Threadsafe
+				newMessages += self.getTransactions(account: account, height: height, offset: newOffset)
 			}
 		}
+		
+		return newMessages
 	}
 	
-	private func loadChatTransactions(_ trs: [Transaction], currentAccount acc: String) {
+	
+	/// Load raw blockchain chat transactions, parse them, and add to CoreData
+	///
+	/// - Parameters:
+	///   - trs: transactions
+	///   - account: current account
+	/// - Returns: new transactions added
+	private func loadChatTransactions(_ trs: [Transaction], currentAccount account: String) -> Int {
 		guard let privateKey = accountService.keypair?.privateKey else {
-			return
+			return 0
 		}
-		var chatrooms = [String: Set<ChatTransaction>]()
 		
+		var chatrooms = [String: Set<ChatTransaction>]()
+		var newTransactions = 0
+		
+		// MARK: 1: Gather publicKeys
 		var keysNeeded = [String]()
 		
 		for transaction in trs {
-			let isOutgoingMessage = transaction.senderId == acc
+			let isOutgoingMessage = transaction.senderId == account
 			let otherAcc = isOutgoingMessage ? transaction.recipientId : transaction.senderId
 			
 			if !keysNeeded.contains(otherAcc) && publicKeys[otherAcc] == nil {
@@ -164,33 +376,35 @@ extension CoreDataChatProvider {
 			}
 		}
 		
+		// MARK: 2: Process transactions
 		for transaction in trs {
-			guard let chat = transaction.asset.chat else {
+			
+			// Confirm and skip unconfirmed transactions
+			// TODO: Make this threadsafe
+			if let unconfirmed = unconfirmedTransactions[transaction.id] {
+				confirmTransaction(unconfirmed, id: transaction.id, height: transaction.height)
 				continue
 			}
 			
-			let t = ChatTransaction(entity: chatTransactionEntity, insertInto: context)
-			t.date = transaction.date as NSDate
-			t.recipientId = transaction.recipientId
-			t.senderId = transaction.senderId
-			t.transactionId = String(transaction.id)
-			t.type = Int16(chat.type.rawValue)
-			
-			t.isOutgoing = transaction.senderId == acc
-			let publicKey = t.isOutgoing ? (publicKeys[transaction.recipientId] ?? "") : transaction.senderPublicKey
-			
-			let decodedMessage = adamantCore.decodeMessage(senderKeyHex: publicKey, privateKeyHex: privateKey, rawMessage: chat.message, rawNonce: chat.ownMessage)
-			t.message = decodedMessage
-			
-			let chatWith = t.isOutgoing ? transaction.recipientId : transaction.senderId
-			
-			if chatrooms[chatWith] == nil {
-				chatrooms[chatWith] = Set<ChatTransaction>()
+			if let chatTransaction = chatTransaction(from: transaction, currentAddress: account, privateKey: privateKey) {
+				newTransactions += 1
+				
+				// TODO: Make this threadsafe
+				if lastTransactionHeight < transaction.height {
+					lastTransactionHeight = transaction.height
+				}
+				
+				let partner = chatTransaction.isOutgoing ? transaction.recipientId : transaction.senderId
+				
+				if chatrooms[partner] == nil {
+					chatrooms[partner] = Set<ChatTransaction>()
+				}
+				
+				chatrooms[partner]!.insert(chatTransaction)
 			}
-			
-			chatrooms[chatWith]!.insert(t)
 		}
 		
+		// MARK: 3: Process chatrooms
 		for (chatId, chatTransactions) in chatrooms {
 			let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
 			request.predicate = NSPredicate(format: "%K = %@", "id", chatId)
@@ -201,7 +415,7 @@ extension CoreDataChatProvider {
 				if let ch = result.first {
 					chatroom = ch
 				} else {
-					chatroom = Chatroom(entity: chatroomEntity, insertInto: context)
+					chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
 					chatroom.id = chatId
 				}
 				chatroom.addToTransactions(chatTransactions as NSSet)
@@ -221,5 +435,52 @@ extension CoreDataChatProvider {
 				continue
 			}
 		}
+		
+		return newTransactions
+	}
+	
+	
+	/// Parse raw transaction into ChatTransaction
+	private func chatTransaction(from transaction: Transaction, currentAddress: String, privateKey: String) -> ChatTransaction? {
+		guard let chat = transaction.asset.chat else {
+			return nil
+		}
+		
+		let chatTransaction = ChatTransaction(entity: ChatTransaction.entity(), insertInto: context)
+		chatTransaction.date = transaction.date as NSDate
+		chatTransaction.recipientId = transaction.recipientId
+		chatTransaction.senderId = transaction.senderId
+		chatTransaction.transactionId = String(transaction.id)
+		chatTransaction.type = Int16(chat.type.rawValue)
+		chatTransaction.height = Int64(transaction.height)
+		chatTransaction.isConfirmed = true
+		
+		chatTransaction.isOutgoing = transaction.senderId == currentAddress
+		let publicKey = chatTransaction.isOutgoing ? (publicKeys[transaction.recipientId] ?? "") : transaction.senderPublicKey
+		
+		let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)
+		chatTransaction.message = decodedMessage
+		
+		return chatTransaction
+	}
+	
+	private func confirmTransaction(_ transaction: ChatTransaction, id: UInt, height: Int) {
+		if transaction.isConfirmed {
+			return
+		}
+		
+		transaction.isConfirmed = true
+		self.unconfirmedTransactions.removeValue(forKey: id)
+		
+		if self.lastTransactionHeight < transaction.height {
+			self.lastTransactionHeight = Int(transaction.height)
+		}
+		
+		transaction.height = Int64(height)
+	}
+	
+	
+	private func terminateTransactionProcessing() {
+		// TODO: Not implemented
 	}
 }

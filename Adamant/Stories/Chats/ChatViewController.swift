@@ -13,7 +13,6 @@ import CoreData
 class ChatViewController: MessagesViewController {
 	// MARK: - Dependencies
 	var chatProvider: ChatDataProvider!
-	var adamantCore: AdamantCore!
 	
 	// MARK: - Properties
 	var account: Account?
@@ -38,14 +37,44 @@ class ChatViewController: MessagesViewController {
 		
 		self.navigationItem.title = chatroom.id
 		chatController = controller
+		chatController.delegate = self
 		
 		messagesCollectionView.messagesDataSource = self
 		messagesCollectionView.messagesDisplayDelegate = self
 		messagesCollectionView.messagesLayoutDelegate = self
+		messageInputBar.delegate = self
 		
 		maintainPositionOnKeyboardFrameChanged = true
 		messageInputBar.sendButton.tintColor = UIColor.adamantPrimary
     }
+}
+
+
+// MARK: - NSFetchedResultsControllerDelegate
+extension ChatViewController: NSFetchedResultsControllerDelegate {
+	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+		switch type {
+		case .insert:
+			if let section = newIndexPath?.row {
+				messagesCollectionView.insertSections([section])
+				messagesCollectionView.scrollToBottom(animated: true)
+			}
+			
+		case .delete:
+			if let section = indexPath?.row {
+				messagesCollectionView.deleteSections([section])
+			}
+			
+		case .move:
+			if let section = indexPath?.row, let newSection = newIndexPath?.row {
+				messagesCollectionView.moveSection(section, toSection: newSection)
+			}
+			
+		case .update:
+			// TODO: update
+			return
+		}
+	}
 }
 
 
@@ -117,6 +146,20 @@ extension ChatViewController: MessagesLayoutDelegate {
 	
 	func avatarSize(for: MessageType, at: IndexPath, in: MessagesCollectionView) -> CGSize {
 		return .zero
+	}
+}
+
+
+// MARK: - MessageInputBarDelegate
+extension ChatViewController: MessageInputBarDelegate {
+	func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
+		guard text.count > 0, let partner = chatroom?.id else {
+			// TODO show warning
+			return
+		}
+		
+		chatProvider.sendTextMessage(recipientId: partner, text: text)
+		inputBar.inputTextView.text = String()
 	}
 }
 
