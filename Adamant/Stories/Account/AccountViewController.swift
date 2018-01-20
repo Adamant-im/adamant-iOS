@@ -50,6 +50,10 @@ class AccountViewController: UIViewController {
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantAccountDataUpdated, object: nil, queue: nil) { _ in
+			self.refreshBalanceCell()
+		}
 	}
 	
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -183,5 +187,16 @@ extension AccountViewController {
 		}
 		
 		return cell
+	}
+	
+	private func refreshBalanceCell() {
+		guard let account = accountService.loggedAccount,
+			let cell = tableView.cellForRow(at: IndexPath(row: Rows.balance.rawValue, section: 0)) else {
+			return
+		}
+		
+		DispatchQueue.main.async {
+			cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
+		}
 	}
 }

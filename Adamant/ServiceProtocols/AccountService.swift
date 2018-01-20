@@ -14,14 +14,38 @@ extension Notification.Name {
 	
 	/// Raised, when user has successfully logged in.
 	static let adamantUserLoggedIn = Notification.Name("adamantUserHasLoggedIn")
+	
+	static let adamantAccountDataUpdated = Notification.Name("adamantAccountDataUpdated")
+}
+
+enum AccountStatus {
+	case notLogged, isLoggingIn, loggedIn
 }
 
 protocol AccountService {
+	
+	// MARK: - Status
+	
+	var status: AccountStatus { get }
+	var autoupdate: Bool { get set }
+	/// Default = 5 seconds
+	var autoupdateInterval: TimeInterval { get set }
+	
+	// MARK: - Personal information
+	
 	/// Currently logged account. nil if not logged.
 	var loggedAccount: Account? { get }
 	
 	/// Keypair of logged account
 	var keypair: Keypair? { get }
+	
+	
+	// MARK: - Update functions
+	
+	func updateAccountData()
+	
+	
+	// MARK: - Login functions
 	
 	/// Login into Adamant using passphrase.
 	///
