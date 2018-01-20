@@ -9,12 +9,13 @@
 import Foundation
 
 extension Notification.Name {
-	/// Raised, when user has logged out.
+	/// Raised when user has logged out.
 	static let adamantUserLoggedOut = Notification.Name("adamantUserHasLoggedOut")
 	
-	/// Raised, when user has successfully logged in.
+	/// Raised when user has successfully logged in.
 	static let adamantUserLoggedIn = Notification.Name("adamantUserHasLoggedIn")
 	
+	// Raised on account info (balance) updated.
 	static let adamantAccountDataUpdated = Notification.Name("adamantAccountDataUpdated")
 }
 
@@ -31,10 +32,11 @@ protocol AccountService {
 	/// Default = 5 seconds
 	var autoupdateInterval: TimeInterval { get set }
 	
+	
 	// MARK: - Personal information
 	
 	/// Currently logged account. nil if not logged.
-	var loggedAccount: Account? { get }
+	var account: Account? { get }
 	
 	/// Keypair of logged account
 	var keypair: Keypair? { get }
@@ -54,7 +56,7 @@ protocol AccountService {
 	///   - loginCompletionHandler: Completion handler. Success, logged account if success, error if not.
 	func login(passphrase: String, loginCompletionHandler: ((Bool, Account?, Error?) -> Void)?)
 	
-	/// Logout, if logged in, present authorization viewControllers modally. After login or cancel will dismiss modal window and then call a callback.
+	/// Logout (if logged in) and present authorization viewControllers modally. After login or cancel will dismiss modal window and then call a callback.
 	///
 	/// - Parameters:
 	///   - animated: Present modally with or without animation.

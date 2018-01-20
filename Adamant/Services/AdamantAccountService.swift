@@ -39,7 +39,7 @@ class AdamantAccountService: AccountService {
 	}
 	
 	private(set) var status: AccountStatus = .notLogged
-	private(set) var loggedAccount: Account?
+	private(set) var account: Account?
 	private(set) var keypair: Keypair?
 	
 	private var loginViewController: UIViewController? = nil
@@ -83,7 +83,7 @@ extension AdamantAccountService {
 		DispatchQueue.global(qos: .userInitiated).async {
 			self.apiService.getAccount(byPassphrase: passphrase) { (account, error) in
 				if let account = account {
-					self.loggedAccount = account
+					self.account = account
 					self.keypair = self.core.createKeypairFor(passphrase: passphrase)
 					
 					NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: account)
@@ -119,8 +119,8 @@ extension AdamantAccountService {
 			stop()
 		}
 		
-		let wasLogged = loggedAccount != nil
-		loggedAccount = nil
+		let wasLogged = account != nil
+		account = nil
 		keypair = nil
 		status = .notLogged
 		
@@ -158,7 +158,7 @@ extension AdamantAccountService {
 	}
 	
 	func updateAccountData() {
-		guard let loggedAccount = loggedAccount else {
+		guard let loggedAccount = account else {
 			stop()
 			return
 		}
@@ -176,7 +176,7 @@ extension AdamantAccountService {
 			if loggedAccount.balance != account.balance { hasChanges = true }
 			
 			if hasChanges {
-				self.loggedAccount = account
+				self.account = account
 				NotificationCenter.default.post(name: Notification.Name.adamantAccountDataUpdated, object: account)
 			}
 			

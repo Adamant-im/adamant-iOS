@@ -187,7 +187,7 @@ class TransferViewController: FormViewController {
 			fatalError("Dependecies fatal error")
 		}
 		
-		guard let account = accountService.loggedAccount, let keypair = accountService.keypair else {
+		guard let account = accountService.account, let keypair = accountService.keypair else {
 			return
 		}
 		

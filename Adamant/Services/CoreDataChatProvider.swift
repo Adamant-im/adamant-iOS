@@ -107,7 +107,7 @@ extension CoreDataChatProvider: ChatDataProvider {
 		status = .updating
 		context.reset()
 		
-		guard let account = accountService.loggedAccount else {
+		guard let account = accountService.account else {
 			return
 		}
 		
@@ -136,7 +136,7 @@ extension CoreDataChatProvider: ChatDataProvider {
 		case .upToDate: break
 		}
 		
-		guard let account = accountService.loggedAccount else {
+		guard let account = accountService.account else {
 			return
 		}
 		
@@ -207,7 +207,7 @@ extension CoreDataChatProvider: ChatDataProvider {
 // MARK: - Sending messages
 extension CoreDataChatProvider {
 	func sendTextMessage(recipientId: String, text: String) {
-		guard isValidMessage(text: text), let account = accountService.loggedAccount, let keypair = accountService.keypair else {
+		guard isValidMessage(text: text), let account = accountService.account, let keypair = accountService.keypair else {
 			return
 		}
 		
