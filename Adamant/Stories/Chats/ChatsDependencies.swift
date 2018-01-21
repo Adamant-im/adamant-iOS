@@ -20,6 +20,7 @@ extension Container {
 		
 		self.storyboardInitCompleted(ChatViewController.self) { r, c in
 			c.chatProvider = r.resolve(ChatDataProvider.self)
+			c.feeCalculator = r.resolve(FeeCalculator.self)
 		}
 	}
 }

@@ -27,7 +27,7 @@ extension AdamantUtilities {
 	}()
 	
 	static func format(balance: UInt) -> String {
-		return currencyFormatter.string(from: NSNumber(value: from(int: balance)))!
+		return currencyFormatter.string(from: NSNumber(value: from(uInt: balance)))!
 	}
 	
 	static func format(balance: Double) -> String {
@@ -38,15 +38,15 @@ extension AdamantUtilities {
 		return UInt(double / currencyShift)
 	}
 	
-	static func from(int: UInt) -> Double{
-		return Double(int) * currencyShift
+	static func from(uInt: UInt) -> Double {
+		return Double(uInt) * currencyShift
 	}
 }
 
 
 // MARK: - Address
 extension AdamantUtilities {
-	static let addressRegex = "^U([0-9]{6,})$"
+	static let addressRegex = "^U([0-9]{6,20})$"
 	
 	static func validateAdamantAddress(address: String) -> Bool {
 		if let regex = try? NSRegularExpression(pattern: addressRegex, options: []) {

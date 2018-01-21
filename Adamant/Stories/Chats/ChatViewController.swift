@@ -18,6 +18,7 @@ protocol ChatViewControllerDelegate: class {
 class ChatViewController: MessagesViewController {
 	// MARK: - Dependencies
 	var chatProvider: ChatDataProvider!
+	var feeCalculator: FeeCalculator!
 	
 	// MARK: - Properties
 	weak var delegate: ChatViewControllerDelegate?
@@ -31,6 +32,13 @@ class ChatViewController: MessagesViewController {
 	}
 	
 	private(set) var chatController: NSFetchedResultsController<ChatTransaction>!
+	
+	// MARK: Fee label
+	private var feeIsVisible: Bool = false
+	private var feeTimer: Timer?
+	private var feeLabel: InputBarButtonItem?
+	private var prevFee: UInt = 0
+	
 	
 	// MARK: - Lifecycle
     override func viewDidLoad() {
@@ -71,6 +79,17 @@ class ChatViewController: MessagesViewController {
 		messageInputBar.inputTextView.layer.masksToBounds = true
 		messageInputBar.inputTextView.scrollIndicatorInsets = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
 		
+		messageInputBar.setStackViewItems([], forStack: .right, animated: false)
+		messageInputBar.setRightStackViewWidthConstant(to: 0, animated: false)
+		
+		let feeLabel = InputBarButtonItem()
+		self.feeLabel = feeLabel
+		feeLabel.isEnabled = false
+		feeLabel.titleLabel?.font = UIFont.adamantPrimary(size: 12)
+		feeLabel.alpha = 0
+		feeLabel.isHidden = true
+		
+		messageInputBar.setStackViewItems([feeLabel, .flexibleSpace, messageInputBar.sendButton], forStack: .bottom, animated: false)
 		messageInputBar.sendButton.configure {
 			$0.setTitleColor(UIColor.adamantPrimary, for: .normal)
 			$0.setTitleColor(UIColor.adamantSecondary, for: .highlighted)
@@ -78,6 +97,7 @@ class ChatViewController: MessagesViewController {
 		
 		if let delegate = delegate, let address = chatroom.id, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
 			messageInputBar.inputTextView.text = message
+			setEstimatedFee(feeCalculator.estimatedFeeFor(message: message))
 		}
     }
 	
@@ -94,6 +114,57 @@ class ChatViewController: MessagesViewController {
 		
 		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.id {
 			delegate.preserveMessage(message, forAddress: address)
+		}
+	}
+}
+
+
+
+// MARK: - EstimatedFee label
+extension ChatViewController {
+	private func setEstimatedFee(_ fee: UInt) {
+		if prevFee != fee && fee > 0 {
+			guard let feeLabel = feeLabel else {
+				return
+			}
+			
+			let text = "Estimated fee: \(AdamantUtilities.from(uInt: fee))"
+			prevFee = fee
+			
+			DispatchQueue.main.async {
+				feeLabel.title = text
+				feeLabel.setSize(CGSize(width: feeLabel.titleLabel!.intrinsicContentSize.width, height: 20), animated: false)
+			}
+		}
+		
+		if !feeIsVisible && fee > 0 {
+			feeIsVisible = true
+			feeTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { [weak self] _ in
+				DispatchQueue.main.async {
+					self?.feeLabel?.isHidden = false
+					UIView.animate(withDuration: 0.3, animations: {
+						self?.feeLabel?.alpha = 1
+					})
+					
+					self?.feeTimer = nil
+				}
+			}
+		} else if feeIsVisible && fee <= 0 {
+			feeIsVisible = false
+			
+			if let feeTimer = feeTimer, feeTimer.isValid {
+				feeTimer.invalidate()
+			}
+			
+			DispatchQueue.main.async {
+				UIView.animate(withDuration: 0.3, animations: {
+					self.feeLabel?.alpha = 0
+				}, completion: { _ in
+					self.feeLabel?.isHidden = true
+				})
+			}
+			
+			feeTimer = nil
 		}
 	}
 }
@@ -211,6 +282,15 @@ extension ChatViewController: MessageInputBarDelegate {
 			self.chatProvider.sendTextMessage(recipientId: partner, text: text)
 		}
 		inputBar.inputTextView.text = String()
+	}
+	
+	func messageInputBar(_ inputBar: MessageInputBar, textViewTextDidChangeTo text: String) {
+		if text.count > 0 {
+			let fee = feeCalculator.estimatedFeeFor(message: text)
+			setEstimatedFee(fee)
+		} else {
+			setEstimatedFee(0)
+		}
 	}
 }
 

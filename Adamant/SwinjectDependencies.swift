@@ -22,6 +22,9 @@ extension Container {
 																	dialogService: r.resolve(DialogService.self)!,
 																	router: r.resolve(Router.self)!) }.inObjectScope(.container)
 		
+		// Fee calculator
+		self.register(FeeCalculator.self) { _ in HardFeeCalculator() }
+		
 		// Chat provider
 		self.register(ChatDataProvider.self) { r  in
 			let provider = CoreDataChatProvider(managedObjectModel: model)
