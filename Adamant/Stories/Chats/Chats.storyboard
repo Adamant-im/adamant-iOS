@@ -6,9 +6,16 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
+    <customFonts key="customFonts">
+        <array key="Exo+2_400_normal.ttf">
+            <string>Exo2-Regular</string>
+        </array>
+    </customFonts>
     <scenes>
         <!--Chats-->
         <scene sceneID="fBA-xt-PKp">
@@ -18,7 +25,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="WH1-1S-RjN">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="WH1-1S-RjN">
                                 <rect key="frame" x="0.0" y="64" width="375" height="554"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
@@ -33,7 +40,14 @@
                         <viewLayoutGuide key="safeArea" id="uia-6D-pQF"/>
                     </view>
                     <toolbarItems/>
-                    <navigationItem key="navigationItem" title="Chats" id="NNn-vk-aSk"/>
+                    <navigationItem key="navigationItem" title="Chats" id="NNn-vk-aSk">
+                        <barButtonItem key="rightBarButtonItem" systemItem="compose" id="BzY-Qb-qKU">
+                            <connections>
+                                <action selector="newChat:" destination="OUL-cc-7Ir" id="mDR-Mc-5Ed"/>
+                                <segue destination="2iy-Sd-uBb" kind="presentation" identifier="newChat" id="UCF-rN-vny"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="tableView" destination="WH1-1S-RjN" id="Wzz-x2-fKA"/>
                         <segue destination="XfZ-FH-baE" kind="show" identifier="showChat" id="b4f-gG-PLz"/>
@@ -46,7 +60,7 @@
         <!--Title-->
         <scene sceneID="w1v-2h-ifS">
             <objects>
-                <viewController id="XfZ-FH-baE" customClass="ChatViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ChatViewController" id="XfZ-FH-baE" customClass="ChatViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="hQ1-UL-XtJ">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -59,12 +73,65 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="V4A-mw-8Ee" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1836" y="42"/>
+            <point key="canvasLocation" x="3562" y="42"/>
+        </scene>
+        <!--New Chat-->
+        <scene sceneID="0RF-My-YHM">
+            <objects>
+                <viewController id="iOk-O1-NqA" customClass="NewChatViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="CX3-T3-N4o">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="U" placeholder="Address" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Wiv-l3-PSM">
+                                <rect key="frame" x="154" y="163" width="67.5" height="21"/>
+                                <color key="textColor" name="Gray_main"/>
+                                <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="17"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters" autocorrectionType="no" spellCheckingType="no" keyboardType="numberPad" returnKeyType="done"/>
+                            </textField>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please specify recipient address" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5gE-HW-nft">
+                                <rect key="frame" x="63.5" y="192" width="248" height="20.5"/>
+                                <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="17"/>
+                                <color key="textColor" name="Gray_secondary"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="5gE-HW-nft" firstAttribute="width" relation="lessThanOrEqual" secondItem="CX3-T3-N4o" secondAttribute="width" multiplier="0.8" id="6CJ-QC-uvu"/>
+                            <constraint firstItem="5gE-HW-nft" firstAttribute="centerX" secondItem="ivN-27-jJw" secondAttribute="centerX" id="8RZ-W5-3xN"/>
+                            <constraint firstItem="Wiv-l3-PSM" firstAttribute="centerX" secondItem="ivN-27-jJw" secondAttribute="centerX" id="NGg-ty-RNE"/>
+                            <constraint firstItem="5gE-HW-nft" firstAttribute="top" secondItem="Wiv-l3-PSM" secondAttribute="bottom" constant="8" id="ZIB-G4-OXU"/>
+                            <constraint firstItem="Wiv-l3-PSM" firstAttribute="width" relation="lessThanOrEqual" secondItem="CX3-T3-N4o" secondAttribute="width" multiplier="0.9" id="buJ-nV-ppL"/>
+                            <constraint firstItem="Wiv-l3-PSM" firstAttribute="top" secondItem="ivN-27-jJw" secondAttribute="top" constant="99" id="kUo-1O-5hS"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="ivN-27-jJw"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="New Chat" id="f6F-Qv-PzZ">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="BHs-09-Puk">
+                            <connections>
+                                <action selector="cancel:" destination="iOk-O1-NqA" id="cFH-Yk-oOb"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="4jz-kX-Crt">
+                            <connections>
+                                <action selector="done:" destination="iOk-O1-NqA" id="LtT-nB-UF8"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="accountTextField" destination="Wiv-l3-PSM" id="wpG-hK-laZ"/>
+                        <outlet property="messageLabel" destination="5gE-HW-nft" id="nvx-hN-93h"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qnw-77-t2H" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2717.5999999999999" y="-437.63118440779613"/>
         </scene>
         <!--Chats-->
         <scene sceneID="xXv-1r-BTU">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="ViM-L3-Aab" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="ChatsListViewController" automaticallyAdjustsScrollViewInsets="NO" id="ViM-L3-Aab" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Chats" image="chats_tab" id="Kcp-hK-Mxk"/>
                     <toolbarItems/>
                     <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
@@ -81,8 +148,32 @@
             </objects>
             <point key="canvasLocation" x="-6" y="42"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="1Ry-TA-Aph">
+            <objects>
+                <navigationController storyboardIdentifier="NewChatViewController" automaticallyAdjustsScrollViewInsets="NO" id="2iy-Sd-uBb" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="JHF-Ke-FSm">
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="iOk-O1-NqA" kind="relationship" relationship="rootViewController" id="qhG-fZ-N6u"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="UFg-Ym-dnp" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1924" y="-438"/>
+        </scene>
     </scenes>
     <resources>
         <image name="chats_tab" width="23" height="23"/>
+        <namedColor name="Gray_main">
+            <color red="0.29019607843137257" green="0.29019607843137257" blue="0.29019607843137257" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Gray_secondary">
+            <color red="0.47843137254901963" green="0.47843137254901963" blue="0.47843137254901963" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
     </resources>
 </document>

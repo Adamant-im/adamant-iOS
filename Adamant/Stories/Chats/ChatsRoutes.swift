@@ -13,5 +13,7 @@ extension AdamantStory {
 }
 
 extension AdamantScene {
-	
+	static let ChatsList = AdamantScene(story: .Chats, identifier: "ChatsListViewController")
+	static let Chat = AdamantScene(story: .Chats, identifier: "ChatViewController")
+	static let NewChat = AdamantScene(story: .Chats, identifier: "NewChatViewController")
 }
