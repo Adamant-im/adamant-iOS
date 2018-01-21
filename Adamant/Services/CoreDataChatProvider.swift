@@ -161,6 +161,32 @@ extension CoreDataChatProvider: ChatDataProvider {
 		status = .disabled
 	}
 	
+	func isValidMessage(text: String) -> Bool {
+		if text.count == 0 {
+			return false
+		}
+		
+		if Double(text.count) * 1.5 > 20000.0 {
+			return false
+		}
+		
+		return true
+	}
+}
+
+
+// MARK: - Chats
+extension CoreDataChatProvider {
+	func newChatroom(with address: String) -> Chatroom {
+		if let chatroom = getChatroomsController()?.fetchedObjects?.first(where: {$0.id == address}) {
+			return chatroom
+		}
+		
+		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
+		chatroom.id = address
+		return chatroom
+	}
+	
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>? {
 		let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
 		request.sortDescriptors = [NSSortDescriptor(key: "lastTransaction.date", ascending: false)]
@@ -188,18 +214,6 @@ extension CoreDataChatProvider: ChatDataProvider {
 			print("Error fetching request: \(error)")
 			return nil
 		}
-	}
-	
-	func isValidMessage(text: String) -> Bool {
-		if text.count == 0 {
-			return false
-		}
-		
-		if Double(text.count) * 1.5 > 20000.0 {
-			return false
-		}
-		
-		return true
 	}
 }
 

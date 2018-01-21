@@ -42,6 +42,7 @@ protocol ChatDataProvider {
 	var autoupdateInterval: TimeInterval { get set }
 	
 	// MARK: - Getting chats and messages
+	func newChatroom(with address: String) -> Chatroom
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>?
 	func getChatController(for: Chatroom) -> NSFetchedResultsController<ChatTransaction>?
 	
