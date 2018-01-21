@@ -2,7 +2,7 @@
 //  Chatroom+CoreDataProperties.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 13.01.2018.
+//  Created by Anokhov Pavel on 21.01.2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 //
@@ -18,8 +18,9 @@ extension Chatroom {
     }
 
     @NSManaged public var id: String?
-    @NSManaged public var transactions: NSSet?
+    @NSManaged public var updatedAt: NSDate?
     @NSManaged public var lastTransaction: ChatTransaction?
+    @NSManaged public var transactions: NSSet?
 
 }
 

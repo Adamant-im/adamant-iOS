@@ -58,6 +58,7 @@
 		E9C51ECF200E2D1100385EB7 /* HardFeeCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51ECE200E2D1100385EB7 /* HardFeeCalculatorTests.swift */; };
 		E9C51EED2011416E00385EB7 /* adamant-core.js in Resources */ = {isa = PBXBuildFile; fileRef = E9C51EEC2011416E00385EB7 /* adamant-core.js */; };
 		E9C51EEF20139DC600385EB7 /* ProcessTransactionResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51EEE20139DC600385EB7 /* ProcessTransactionResponse.swift */; };
+		E9C51EF12013F18000385EB7 /* NewChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51EF02013F18000385EB7 /* NewChatViewController.swift */; };
 		E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* AccountService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
 		E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */; };
@@ -175,6 +176,7 @@
 		E9C51ECE200E2D1100385EB7 /* HardFeeCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardFeeCalculatorTests.swift; sourceTree = "<group>"; };
 		E9C51EEC2011416E00385EB7 /* adamant-core.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adamant-core.js"; sourceTree = "<group>"; };
 		E9C51EEE20139DC600385EB7 /* ProcessTransactionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessTransactionResponse.swift; sourceTree = "<group>"; };
+		E9C51EF02013F18000385EB7 /* NewChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewChatViewController.swift; sourceTree = "<group>"; };
 		E9E7CD8A20026B0600DFC4DB /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 		E9E7CD8C20026B6600DFC4DB /* DialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogService.swift; sourceTree = "<group>"; };
 		E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
@@ -388,6 +390,7 @@
 				E95F857E2008C8D60070534A /* ChatsRoutes.swift */,
 				E95F85842008CB3A0070534A /* ChatsListViewController.swift */,
 				E93EFE12200D1156000BB482 /* ChatViewController.swift */,
+				E9C51EF02013F18000385EB7 /* NewChatViewController.swift */,
 			);
 			path = Chats;
 			sourceTree = "<group>";
@@ -716,6 +719,7 @@
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,
 				E95F857A2007F0260070534A /* ServerResponse.swift in Sources */,
 				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
+				E9C51EF12013F18000385EB7 /* NewChatViewController.swift in Sources */,
 				E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */,
 				E95F856520067A030070534A /* GlobalConstants.swift in Sources */,
 				E95F859120093FB30070534A /* CoreDataChatProvider.swift in Sources */,
