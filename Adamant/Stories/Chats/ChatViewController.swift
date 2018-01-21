@@ -41,6 +41,9 @@ class ChatViewController: MessagesViewController {
 			return
 		}
 		
+		
+		// MARK: Initial configuration
+		
 		self.navigationItem.title = chatroom.id
 		chatController = controller
 		chatController.delegate = self
@@ -48,9 +51,25 @@ class ChatViewController: MessagesViewController {
 		messagesCollectionView.messagesDataSource = self
 		messagesCollectionView.messagesDisplayDelegate = self
 		messagesCollectionView.messagesLayoutDelegate = self
+		maintainPositionOnKeyboardFrameChanged = true
+		
+		
+		// MARK: InputBar configuration
+		
 		messageInputBar.delegate = self
 		
-		maintainPositionOnKeyboardFrameChanged = true
+		let bordersColor = UIColor(red: 200/255, green: 200/255, blue: 200/255, alpha: 1)
+		let size: CGFloat = 6.0
+		
+		messageInputBar.separatorLine.backgroundColor = bordersColor
+		messageInputBar.inputTextView.placeholderTextColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1)
+		messageInputBar.inputTextView.textContainerInset = UIEdgeInsets(top: size, left: size*2, bottom: size, right: size*2)
+		messageInputBar.inputTextView.placeholderLabelInsets = UIEdgeInsets(top: size, left: size*2+4, bottom: size, right: size*2+4)
+		messageInputBar.inputTextView.layer.borderColor = bordersColor.cgColor
+		messageInputBar.inputTextView.layer.borderWidth = 1.0
+		messageInputBar.inputTextView.layer.cornerRadius = size*2
+		messageInputBar.inputTextView.layer.masksToBounds = true
+		messageInputBar.inputTextView.scrollIndicatorInsets = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
 		
 		messageInputBar.sendButton.configure {
 			$0.setTitleColor(UIColor.adamantPrimary, for: .normal)
