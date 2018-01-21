@@ -232,15 +232,20 @@ extension CoreDataChatProvider {
 			recipientPublicKey = key
 		} else {
 			let group = DispatchGroup()
-			group.enter()
 			
+			// Enter 1
+			group.enter()
 			var key: String?
 			var error: AdamantError?
-			apiService.getPublicKey(byAddress: recipientId, completionHandler: { (publicKey, err) in
-				key = publicKey
-				error = err
-				group.leave()
-			})
+			DispatchQueue.global(qos: .userInitiated).async {
+				self.apiService.getPublicKey(byAddress: recipientId, completionHandler: { (publicKey, err) in
+					key = publicKey
+					error = err
+					
+					// Exit 1
+					group.leave()
+				})
+			}
 			
 			group.wait()
 			

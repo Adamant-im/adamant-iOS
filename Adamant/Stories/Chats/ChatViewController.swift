@@ -10,11 +10,17 @@ import UIKit
 import MessageKit
 import CoreData
 
+protocol ChatViewControllerDelegate: class {
+	func preserveMessage(_ message: String, forAddress address: String)
+	func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String?
+}
+
 class ChatViewController: MessagesViewController {
 	// MARK: - Dependencies
 	var chatProvider: ChatDataProvider!
 	
 	// MARK: - Properties
+	weak var delegate: ChatViewControllerDelegate?
 	var account: Account?
 	var chatroom: Chatroom?
 	var dateFormatter: DateFormatter {
@@ -45,8 +51,32 @@ class ChatViewController: MessagesViewController {
 		messageInputBar.delegate = self
 		
 		maintainPositionOnKeyboardFrameChanged = true
-		messageInputBar.sendButton.tintColor = UIColor.adamantPrimary
+		
+		messageInputBar.sendButton.configure {
+			$0.setTitleColor(UIColor.adamantPrimary, for: .normal)
+			$0.setTitleColor(UIColor.adamantSecondary, for: .highlighted)
+		}
+		
+		if let delegate = delegate, let address = chatroom.id, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
+			messageInputBar.inputTextView.text = message
+		}
     }
+	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		
+		if let count = chatController.fetchedObjects?.count, count == 0 {
+			messageInputBar.inputTextView.becomeFirstResponder()
+		}
+	}
+	
+	override func viewWillDisappear(_ animated: Bool) {
+		super.viewWillDisappear(animated)
+		
+		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.id {
+			delegate.preserveMessage(message, forAddress: address)
+		}
+	}
 }
 
 
@@ -158,7 +188,9 @@ extension ChatViewController: MessageInputBarDelegate {
 			return
 		}
 		
-		chatProvider.sendTextMessage(recipientId: partner, text: text)
+		DispatchQueue.global(qos: .userInitiated).async {
+			self.chatProvider.sendTextMessage(recipientId: partner, text: text)
+		}
 		inputBar.inputTextView.text = String()
 	}
 }
