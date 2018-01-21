@@ -11,7 +11,7 @@ import UIKit
 extension SharedCell {
 	static let ChatCell = SharedCell(cellIdentifier: "chatCell",
 									 xibName: "ChatTableViewCell",
-									 rowHeight: 76)
+									 rowHeight: 74)
 }
 
 class ChatTableViewCell: UITableViewCell {

@@ -184,12 +184,13 @@ extension CoreDataChatProvider {
 		
 		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
 		chatroom.id = address
+		chatroom.updatedAt = NSDate()
 		return chatroom
 	}
 	
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>? {
 		let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
-		request.sortDescriptors = [NSSortDescriptor(key: "lastTransaction.date", ascending: false)]
+		request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false)]
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
 		
 		do {
@@ -273,6 +274,7 @@ extension CoreDataChatProvider {
 		
 		chatroom.addToTransactions(transaction)
 		chatroom.lastTransaction = transaction
+		chatroom.updatedAt = transaction.date
 		
 		// MARK: 2.5: Encode message
 		guard let encodedMessage = adamantCore.encodeMessage(text, recipientPublicKey: recipientPublicKey, privateKey: keypair.privateKey) else {
@@ -461,15 +463,16 @@ extension CoreDataChatProvider {
 				}
 				chatroom.addToTransactions(chatTransactions as NSSet)
 				
-				let newest = chatTransactions.sorted{ ($0.date! as Date).compare($1.date! as Date) == .orderedDescending }.first
-				
-				if let last = chatroom.lastTransaction {
-					if let newest = newest,
-						(last.date! as Date).compare(newest.date! as Date) == .orderedAscending {
+				if let newest = chatTransactions.sorted(by: { ($0.date! as Date).compare($1.date! as Date) == .orderedDescending }).first {
+					if let last = chatroom.lastTransaction {
+						if (last.date! as Date).compare(newest.date! as Date) == .orderedAscending {
+							chatroom.lastTransaction = newest
+							chatroom.updatedAt = newest.date
+						}
+					} else {
 						chatroom.lastTransaction = newest
+						chatroom.updatedAt = newest.date
 					}
-				} else {
-					chatroom.lastTransaction = newest
 				}
 			} catch {
 				print(error)
