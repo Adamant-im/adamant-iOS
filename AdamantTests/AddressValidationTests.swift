@@ -12,7 +12,7 @@ import XCTest
 class AddressValidationTests: XCTestCase {
 	
     func testValidAddress() {
-		let address = "U1234567891234567899"
+		let address = "U1234567890123456"
 		XCTAssertTrue(AdamantUtilities.validateAdamantAddress(address: address))
     }
 	
