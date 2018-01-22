@@ -41,6 +41,12 @@ class JSAdamantCoreTests: XCTestCase {
 		XCTAssertEqual(privateKey, freshKeypair?.privateKey)
 	}
 	
+	func testGeneratePassphrase() {
+		let passphrase = core.generateNewPassphrase()
+		
+		XCTAssert(passphrase.split(separator: " ").count == 12)
+	}
+	
 	func testSignTransaction() {
 		let transaction = NormalizedTransaction(type: TransactionType.send,
 												amount: 50000000,

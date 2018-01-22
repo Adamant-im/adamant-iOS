@@ -16,6 +16,7 @@ private struct JSFunctions {
 		static let transactionSign = CoreFunction("transactionSign")
 		static let encodeMessage = CoreFunction("encodeMessage")
 		static let decodeMessage = CoreFunction("decodeMessage")
+		static let generatePassphrase = CoreFunction("generatePassphrase")
 		
 		let key: String
 		private init(_ key: String) { self.key = key }
@@ -182,6 +183,29 @@ extension JSAdamantCore {
 		
 		context.exceptionHandler = nil
 		return hash
+	}
+	
+	func generateNewPassphrase() -> String {
+		guard let function = getCoreFunction(function: .generatePassphrase) else {
+			fatalError("Can't get generatePassphrase function")
+		}
+		
+		var jsError: JSValue? = nil
+		context.exceptionHandler = { ctx, exc in
+			print("JSError: \(String(describing: exc?.toString()))")
+			jsError = exc
+		}
+		
+		let passphrase: String
+		if let jsPassphrase = function.call(withArguments: []), !jsPassphrase.isUndefined,
+			jsError == nil, let p = jsPassphrase.toString() {
+			passphrase = p
+		} else {
+			fatalError("Can't generate new passphrase: \(String(describing: jsError))")
+		}
+		
+		context.exceptionHandler = nil
+		return passphrase
 	}
 }
 

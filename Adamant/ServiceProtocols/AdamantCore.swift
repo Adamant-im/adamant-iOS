@@ -12,6 +12,7 @@ protocol AdamantCore {
 	// MARK: - Keys
 	func createHashFor(passphrase: String) -> String?
 	func createKeypairFor(passphrase: String) -> Keypair?
+	func generateNewPassphrase() -> String
 	
 	// MARK: - Signing transactions
 	func sign(transaction: NormalizedTransaction, senderId: String, keypair: Keypair) -> String?

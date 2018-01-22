@@ -23725,7 +23725,7 @@ Item.prototype.run = function () {
     this.fun.apply(null, this.array);
 };
 process.title = 'browser';
-process.browser = true;
+process.browser = false;
 process.env = {};
 process.argv = [];
 process.version = ''; // empty string to avoid regexp issues
@@ -29542,14 +29542,11 @@ nacl.setPRNG = function(fn) {
     });
   } else if (true) {
     // Node.js.
-    // crypto = __webpack_require__(117);
-    // if (crypto && crypto.randomBytes) {
       nacl.setPRNG(function(x, n) {
         var i, v = _randombytes(n) //crypto.randomBytes(n);
         for (i = 0; i < n; i++) x[i] = v[i];
         cleanup(v);
       });
-    // }
   }
 })();
 
@@ -31273,8 +31270,8 @@ Random.getRandomBuffer = function(size) {
 };
 
 Random.getRandomBufferNode = function(size) {
-  var crypto = __webpack_require__(41);
-  return crypto.randomBytes(size);
+  // var crypto = __webpack_require__(41);
+  return _randombytes(size);// crypto.randomBytes(size);
 };
 
 Random.getRandomBufferBrowser = function(size) {
@@ -42675,6 +42672,10 @@ class Adamant {
     }
     return hex.join('')
   }
+
+  static generatePassphrase () {
+    return new Mnemonic(Mnemonic.Words.ENGLISH).toString()
+  }
 }
 /* harmony export (immutable) */ __webpack_exports__["Adamant"] = Adamant;
 
@@ -52726,7 +52727,6 @@ var Mnemonic = function(data, wordlist) {
     data = null;
   }
 
-
   // handle data overloading
   var ent, phrase, seed;
   if (Buffer.isBuffer(data)) {
@@ -52740,18 +52740,15 @@ var Mnemonic = function(data, wordlist) {
   }
   ent = ent || 128;
 
-
   // check and detect wordlist
   wordlist = wordlist || Mnemonic._getDictionary(phrase);
   if (phrase && !wordlist) {
     throw new errors.UnknownWordlist(phrase);
   }
   wordlist = wordlist || Mnemonic.Words.ENGLISH;
-
   if (seed) {
     phrase = Mnemonic._entropy2mnemonic(seed, wordlist);
   }
-
 
   // validate phrase and ent
   if (phrase && !Mnemonic.isValid(phrase, wordlist)) {
@@ -52760,14 +52757,11 @@ var Mnemonic = function(data, wordlist) {
   if (ent % 32 !== 0 || ent < 128) {
     throw new bitcore.errors.InvalidArgument('ENT', 'Values must be ENT > 128 and ENT % 32 == 0');
   }
-
   phrase = phrase || Mnemonic._mnemonic(ent, wordlist);
-
   Object.defineProperty(this, 'wordlist', {
     configurable: false,
     value: wordlist
   });
-
   Object.defineProperty(this, 'phrase', {
     configurable: false,
     value: phrase
