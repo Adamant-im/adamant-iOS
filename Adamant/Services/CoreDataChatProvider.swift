@@ -10,20 +10,26 @@ import Foundation
 import CoreData
 
 class CoreDataChatProvider {
+	
 	// MARK: - Dependencies
+	
 	var accountService: AccountService!
 	var apiService: ApiService!
 	var adamantCore: AdamantCore!
+	var contactsService: ContactsService!
 	
 	
 	// MARK: - CoreData
+	
 	let model: NSManagedObjectModel
 	let coordinator: NSPersistentStoreCoordinator
 	let context: NSManagedObjectContext
 	
 	var unconfirmedTransactions: [UInt:ChatTransaction] = [:]
 	
+	
 	// MARK: - Properties
+	
 	private(set) var status: ProviderStatus = .disabled
 	var autoupdateInterval: TimeInterval = 3.0
 	
@@ -45,7 +51,9 @@ class CoreDataChatProvider {
 	
 	private let updatingDispatchGroup = DispatchGroup()
 	
-	// MARK: - Init
+	
+	// MARK: - Lifecycle
+	
 	init(managedObjectModel modelUrl: URL) {
 		model = NSManagedObjectModel(contentsOf: modelUrl)!
 		coordinator = NSPersistentStoreCoordinator(managedObjectModel: model)
@@ -73,6 +81,9 @@ class CoreDataChatProvider {
 		stop()
 		terminateTransactionProcessing()
 	}
+	
+	
+	// MARK: - Autoupdate timers
 	
 	func start() {
 		if !autoupdate { autoupdate = true }
@@ -182,9 +193,18 @@ extension CoreDataChatProvider {
 			return chatroom
 		}
 		
+		return createChatroom(id: address)
+	}
+	
+	private func createChatroom(id: String) -> Chatroom {
 		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
-		chatroom.id = address
+		chatroom.id = id
 		chatroom.updatedAt = NSDate()
+		
+		if let title = contactsService.nameFor(address: id) {
+			chatroom.title = title
+		}
+		
 		return chatroom
 	}
 	
@@ -268,14 +288,9 @@ extension CoreDataChatProvider {
 		transaction.type = Int16(ChatType.message.rawValue)
 		transaction.isOutgoing = true
 		transaction.message = text
-		transaction.transactionId = UUID().uuidString // TODO:
+		transaction.transactionId = UUID().uuidString
 		
-		let chatroom: Chatroom
-		if let ch = getChatroomsController()?.fetchedObjects?.first(where: { $0.id == recipientId }) {
-			chatroom = ch
-		} else {
-			chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
-		}
+		let chatroom = newChatroom(with: recipientId)
 		
 		chatroom.addToTransactions(transaction)
 		chatroom.lastTransaction = transaction
@@ -463,8 +478,7 @@ extension CoreDataChatProvider {
 				if let ch = result.first {
 					chatroom = ch
 				} else {
-					chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
-					chatroom.id = chatId
+					chatroom = createChatroom(id: chatId)
 				}
 				chatroom.addToTransactions(chatTransactions as NSSet)
 				
@@ -508,7 +522,13 @@ extension CoreDataChatProvider {
 		let publicKey = chatTransaction.isOutgoing ? (publicKeys[transaction.recipientId] ?? "") : transaction.senderPublicKey
 		
 		let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)
-		chatTransaction.message = decodedMessage
+		
+		if let decodedMessage = decodedMessage,
+			let translatedMessage = contactsService.translated(message: decodedMessage, from: transaction.senderId) {
+			chatTransaction.message = translatedMessage
+		} else {
+			chatTransaction.message = decodedMessage
+		}
 		
 		return chatTransaction
 	}
@@ -526,7 +546,6 @@ extension CoreDataChatProvider {
 			self.lastTransactionHeight = height
 		}
 	}
-	
 	
 	private func terminateTransactionProcessing() {
 		// TODO: Not implemented

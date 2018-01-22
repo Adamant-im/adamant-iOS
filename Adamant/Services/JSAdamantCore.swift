@@ -31,7 +31,7 @@ class JSAdamantCore : AdamantCore {
 	
 	// TODO: background thread
 	init(coreJsUrl core: URL) throws {
-		let core = try JSAdamantCore.readStringFrom(url: core)
+		let core = try String(contentsOf: core)
 		
 		let context = JSContext()
 		
@@ -71,14 +71,6 @@ class JSAdamantCore : AdamantCore {
 			self.context = context
 		} else {
 			throw AdamantError(message: "Failed to create JSContext")
-		}
-	}
-	
-	private static func readStringFrom(url: URL) throws -> String {
-		do {
-			return try String(contentsOf: url)
-		} catch {
-			throw AdamantError(message: "Error reading contents of URL: \(url)", error: error)
 		}
 	}
 }

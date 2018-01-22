@@ -2,6 +2,7 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="13772" systemVersion="17C205" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Chatroom" representedClassName="Chatroom" syncable="YES">
         <attribute name="id" attributeType="String" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <relationship name="lastTransaction" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ChatTransaction" inverseName="lastIn" inverseEntity="ChatTransaction" syncable="YES"/>
         <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ChatTransaction" inverseName="chatroom" inverseEntity="ChatTransaction" syncable="YES"/>
@@ -19,7 +20,7 @@
         <relationship name="lastIn" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="lastTransaction" inverseEntity="Chatroom" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Chatroom" positionX="-45" positionY="0" width="128" height="105"/>
+        <element name="Chatroom" positionX="-45" positionY="0" width="128" height="120"/>
         <element name="ChatTransaction" positionX="-18" positionY="27" width="128" height="195"/>
     </elements>
 </model>
