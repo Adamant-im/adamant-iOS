@@ -519,13 +519,12 @@ extension CoreDataChatProvider {
 		}
 		
 		transaction.isConfirmed = true
+		transaction.height = Int64(height)
 		self.unconfirmedTransactions.removeValue(forKey: id)
 		
-		if self.lastTransactionHeight < transaction.height {
-			self.lastTransactionHeight = Int(transaction.height)
+		if self.lastTransactionHeight < height {
+			self.lastTransactionHeight = height
 		}
-		
-		transaction.height = Int64(height)
 	}
 	
 	
