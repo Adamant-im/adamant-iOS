@@ -52,7 +52,12 @@ class ChatViewController: MessagesViewController {
 		
 		// MARK: Initial configuration
 		
-		self.navigationItem.title = chatroom.id
+		if let title = chatroom.title {
+			self.navigationItem.title = title
+		} else {
+			self.navigationItem.title = chatroom.id
+		}
+		
 		chatController = controller
 		chatController.delegate = self
 		

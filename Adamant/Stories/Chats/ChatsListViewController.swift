@@ -119,7 +119,12 @@ extension ChatsListViewController {
 	}
 	
 	private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
-		cell.accountLabel.text = chatroom.id
+		if let title = chatroom.title {
+			cell.accountLabel.text = title
+		} else {
+			cell.accountLabel.text = chatroom.id
+		}
+		
 		cell.lastMessageLabel.text = chatroom.lastTransaction?.message
 		if let date = chatroom.updatedAt as Date? {
 			cell.dateLabel.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
