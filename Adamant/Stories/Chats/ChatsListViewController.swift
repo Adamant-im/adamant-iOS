@@ -147,27 +147,29 @@ extension ChatsListViewController: NSFetchedResultsControllerDelegate {
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 
-		switch type {
-		case .insert:
-			if let newIndexPath = newIndexPath {
-				tableView.insertRows(at: [newIndexPath], with: .automatic)
-			}
-			
-		case .delete:
-			if let indexPath = indexPath {
-				tableView.deleteRows(at: [indexPath], with: .automatic)
-			}
-			
-		case .update:
-			if let indexPath = indexPath,
-				let cell = tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
-				let chatroom = controller.object(at: indexPath) as? Chatroom {
-				configureCell(cell, for: chatroom)
-			}
-			
-		case .move:
-			if let indexPath = indexPath, let newIndexPath = newIndexPath {
-				tableView.moveRow(at: indexPath, to: newIndexPath)
+		DispatchQueue.main.async {
+			switch type {
+			case .insert:
+				if let newIndexPath = newIndexPath {
+					self.tableView.insertRows(at: [newIndexPath], with: .automatic)
+				}
+				
+			case .delete:
+				if let indexPath = indexPath {
+					self.tableView.deleteRows(at: [indexPath], with: .automatic)
+				}
+				
+			case .update:
+				if let indexPath = indexPath,
+					let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
+					let chatroom = controller.object(at: indexPath) as? Chatroom {
+					self.configureCell(cell, for: chatroom)
+				}
+				
+			case .move:
+				if let indexPath = indexPath, let newIndexPath = newIndexPath {
+					self.tableView.moveRow(at: indexPath, to: newIndexPath)
+				}
 			}
 		}
 	}
