@@ -46,17 +46,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		self.window = UIWindow(frame: UIScreen.main.bounds)
 		self.window!.rootViewController = SwinjectStoryboard.create(name: Constants.mainStoryboard, bundle: nil).instantiateInitialViewController()
 		self.window!.makeKeyAndVisible()
-		
-		self.window?.tintColor = UIColor.adamantPrimary
-		
+
+		self.window!.tintColor = UIColor.adamantPrimary
+
 		guard let router = container.resolve(Router.self) else {
 			fatalError("Failed to get Router")
 		}
-		
+
 		if let tabbar = self.window!.rootViewController as? UITabBarController {
 			let account = router.get(story: .Account).instantiateInitialViewController()!
 			let chats = router.get(story: .Chats).instantiateInitialViewController()!
-			
+
 			tabbar.setViewControllers([account, chats], animated: false)
 		}
 

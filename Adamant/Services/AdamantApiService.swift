@@ -13,7 +13,8 @@ import Alamofire
 private struct ApiCommands {
 	static let Accounts = (
 		root: "/api/accounts",
-		getPublicKey: "/api/accounts/getPublicKey"
+		getPublicKey: "/api/accounts/getPublicKey",
+		newAccount: "/api/accounts/new"
 	)
 	
 	static let Transactions = (
@@ -48,7 +49,7 @@ class AdamantApiService: ApiService {
 		self.adamantCore = adamantCore
 	}
 	
-	private func buildUrl(path: String, queryItems: [URLQueryItem]?) throws -> URL {
+	private func buildUrl(path: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
 		guard var components = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false) else {
 			throw AdamantError(message: "Internal API error: Can't parse API URL: \(apiUrl)")
 		}
@@ -63,6 +64,32 @@ class AdamantApiService: ApiService {
 
 // MARK: - Accounts
 extension AdamantApiService {
+	func newAccount(byPublicKey publicKey: String, completionHandler: @escaping (Account?, AdamantError?) -> Void) {
+		let endpoint: URL
+		do {
+			endpoint = try buildUrl(path: ApiCommands.Accounts.newAccount)
+		} catch {
+			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
+			return
+		}
+		
+		let params = [
+			"publicKey": publicKey
+		]
+		let headers: HTTPHeaders = [
+			"Content-Type": "application/json"
+		]
+		
+		sendRequest(url: endpoint, method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers, completionHandler: { (response: ServerModelResponse<Account>?, error) in
+			guard let r = response, r.success, let account = r.model else {
+				completionHandler(nil, AdamantError(message: response?.error ?? "Failed to create account", error: error))
+				return
+			}
+			
+			completionHandler(account, nil)
+		})
+	}
+	
 	func getAccount(byPassphrase passphrase: String, completionHandler: @escaping (Account?, AdamantError?) -> Void) {
 		getPublicKey(byPassphrase: passphrase) { (key, error) in
 			guard let key = key else {
@@ -92,7 +119,11 @@ extension AdamantApiService {
 			completionHandler(account, nil)
 		}
 	}
-	
+}
+
+
+// MARK: - Keys
+extension AdamantApiService {
 	func getPublicKey(byPassphrase passphrase: String, completionHandler: @escaping (String?, AdamantError?) -> Void) {
 		guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase) else {
 			completionHandler(nil, AdamantError(message: "Can't create keypair for passphrase: \(passphrase)"))
@@ -169,22 +200,22 @@ extension AdamantApiService {
 // MAKR: - Transfers
 extension AdamantApiService {
 	func transferFunds(sender: String, recipient: String, amount: UInt, keypair: Keypair, completionHandler: @escaping (Bool, AdamantError?) -> Void) {
-		let parameters: [String : Any] = [
+		let params: [String : Any] = [
 			"type": TransactionType.send.rawValue,
 			"amount": amount,
 			"recipientId": recipient,
 			"senderId": sender,
 			"publicKey": keypair.publicKey
 		]
-		let headersContentTypeJson: HTTPHeaders = [
+		let headers: HTTPHeaders = [
 			"Content-Type": "application/json"
 		]
 		
 		do {
-			let normalizeEndpoint = try buildUrl(path: ApiCommands.Transactions.normalizeTransaction, queryItems: nil)
-			let processEndpoin = try buildUrl(path: ApiCommands.Transactions.processTransaction, queryItems: nil)
+			let normalizeEndpoint = try buildUrl(path: ApiCommands.Transactions.normalizeTransaction)
+			let processEndpoin = try buildUrl(path: ApiCommands.Transactions.processTransaction)
 			
-			sendRequest(url: normalizeEndpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headersContentTypeJson, completionHandler: { (response: ServerModelResponse<NormalizedTransaction>?, error) in
+			sendRequest(url: normalizeEndpoint, method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers, completionHandler: { (response: ServerModelResponse<NormalizedTransaction>?, error) in
 				guard let r = response, r.success, let nt = r.model else {
 					completionHandler(false, AdamantError(message: response?.error ?? "Failed to get transactions", error: error))
 					return
@@ -206,11 +237,11 @@ extension AdamantApiService {
 					"signature": signature
 				]
 				
-				let request: [String: Any] = [
+				let params: [String: Any] = [
 					"transaction": transaction
 				]
 				
-				self.sendRequest(url: processEndpoin, method: .post, parameters: request, encoding: JSONEncoding.default, headers: headersContentTypeJson, completionHandler: { (response: ServerResponse?, error) in
+				self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers, completionHandler: { (response: ServerResponse?, error) in
 					guard let r = response, r.success else {
 						completionHandler(false, AdamantError(message: response?.error ?? "Failed to process transaction", error: error))
 						return
@@ -252,7 +283,7 @@ extension AdamantApiService {
 	}
 	
 	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completionHandler: @escaping (UInt?, AdamantError?) -> Void) {
-		let parameters: [String : Any] = [
+		let params: [String : Any] = [
 			"type": TransactionType.chatMessage.rawValue,
 			"senderId": senderId,
 			"recipientId": recipientId,
@@ -266,10 +297,10 @@ extension AdamantApiService {
 		]
 		
 		do {
-			let normalizeEndpoint = try buildUrl(path: ApiCommands.Chats.normalizeTransaction, queryItems: nil)
-			let processEndpoin = try buildUrl(path: ApiCommands.Chats.processTransaction, queryItems: nil)
+			let normalizeEndpoint = try buildUrl(path: ApiCommands.Chats.normalizeTransaction)
+			let processEndpoin = try buildUrl(path: ApiCommands.Chats.processTransaction)
 			
-			sendRequest(url: normalizeEndpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers) { (response: ServerModelResponse<NormalizedTransaction>?, error) in
+			sendRequest(url: normalizeEndpoint, method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers) { (response: ServerModelResponse<NormalizedTransaction>?, error) in
 				guard let r = response, r.success, let nt = r.model else {
 					completionHandler(nil, AdamantError(message: response?.error ?? "Failed to get normalized transaction", error: error))
 					return
@@ -298,11 +329,11 @@ extension AdamantApiService {
 					]
 				]
 				
-				let request: [String: Any] = [
+				let params: [String: Any] = [
 					"transaction": transaction
 				]
 				
-				self.sendRequest(url: processEndpoin, method: .post, parameters: request, encoding: JSONEncoding.default, headers: headers) { (r: ProcessTransactionResponse?, error) in
+				self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers) { (r: ProcessTransactionResponse?, error) in
 					guard let response = r, response.success, let transactionId = response.transactionId else {
 						completionHandler(nil, AdamantError(message: r?.error ?? "Failed to process transaction", error: error))
 						return

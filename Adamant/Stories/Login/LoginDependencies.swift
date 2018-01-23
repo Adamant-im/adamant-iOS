@@ -12,7 +12,6 @@ extension Container {
 	func registerAdamantLoginStory() {
 		self.storyboardInitCompleted(LoginViewController.self) { r, c in
 			c.accountService = r.resolve(AccountService.self)
-			c.apiService = r.resolve(ApiService.self)
 			c.adamantCore = r.resolve(AdamantCore.self)
 			c.dialogService = r.resolve(DialogService.self)
 		}

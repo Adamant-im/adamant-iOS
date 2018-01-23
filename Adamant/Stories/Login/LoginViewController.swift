@@ -14,7 +14,6 @@ class LoginViewController: UIViewController {
 	// MARK: - Dependencies
 	
 	var accountService: AccountService!
-	var apiService: ApiService!
 	var adamantCore: AdamantCore!
 	var dialogService: DialogService!
 	
@@ -57,7 +56,7 @@ class LoginViewController: UIViewController {
 		}
 		
 		let loginRow = TableRow<ButtonTableViewCell>(item: "Login")
-		loginRow.on(.click) { _ in print("go login") }
+		loginRow.on(.click) { [weak self] options in self?.login() }
 		
 		let loginSection = TableSection(headerTitle: "Login", footerTitle: nil, rows: [passphraseRow, loginRow])
 		tableDirector.append(section: loginSection)
@@ -163,6 +162,23 @@ class LoginViewController: UIViewController {
 		alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
 		
 		present(alert, animated: true)
+	}
+	
+	
+	// MARK: Login
+	func login() {
+		guard let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? TextViewTableViewCell,
+			var passphrase = cell.textView.text else {
+				return
+		}
+		
+		passphrase = passphrase.lowercased()
+		
+		if generatedPassphrases.contains(passphrase) {
+			accountService.createAccount(with: passphrase, completionHandler: nil)
+		} else {
+			accountService.login(with: passphrase, completionHandler: nil)
+		}
 	}
 }
 
