@@ -10,6 +10,9 @@ import UIKit
 import Eureka
 
 class TransferViewController: FormViewController {
+	
+	// MARK: - Rows
+	
 	private struct Row {
 		static let Balance = Row("balance")
 		static let Amount = Row("amount")
@@ -27,13 +30,16 @@ class TransferViewController: FormViewController {
 	
 	
 	// MARK: - Dependencies
+	
 	var apiService: ApiService!
 	var accountService: AccountService!
 	var dialogService: DialogService!
 	
 	private(set) var maxToTransfer: Double = 0.0
 	
+	
 	// MARK: - Properties
+	
 	let defaultFee = 0.5
 	var account: Account?
 	
@@ -41,6 +47,7 @@ class TransferViewController: FormViewController {
 	
 	
 	// MARK: - IBOutlets
+	
 	@IBOutlet weak var sendButton: UIBarButtonItem!
 	
 	

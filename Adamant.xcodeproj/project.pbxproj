@@ -56,6 +56,13 @@
 		E95F85C4200A540B0070534A /* Chat.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C3200A540B0070534A /* Chat.json */; };
 		E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85C5200A9B070070534A /* ChatTableViewCell.swift */; };
 		E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C6200A9B070070534A /* ChatTableViewCell.xib */; };
+		E9B6CC48201753D000486EA1 /* Header.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9B6CC47201753D000486EA1 /* Header.xib */; };
+		E9B6CC51201763FE00486EA1 /* ButtonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B6CC4F201763FE00486EA1 /* ButtonTableViewCell.swift */; };
+		E9B6CC52201763FE00486EA1 /* ButtonTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9B6CC50201763FE00486EA1 /* ButtonTableViewCell.xib */; };
+		E9B6CC5520176F3300486EA1 /* TextViewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B6CC5320176F3300486EA1 /* TextViewTableViewCell.swift */; };
+		E9B6CC5620176F3300486EA1 /* TextViewTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9B6CC5420176F3300486EA1 /* TextViewTableViewCell.xib */; };
+		E9B6CC5F201793D800486EA1 /* MultilineLableTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B6CC5D201793D800486EA1 /* MultilineLableTableViewCell.swift */; };
+		E9B6CC60201793D800486EA1 /* MultilineLableTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9B6CC5E201793D800486EA1 /* MultilineLableTableViewCell.xib */; };
 		E9C51ECB200E2AA100385EB7 /* FeeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51ECA200E2AA100385EB7 /* FeeCalculator.swift */; };
 		E9C51ECD200E2BF900385EB7 /* HardFeeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51ECC200E2BF900385EB7 /* HardFeeCalculator.swift */; };
 		E9C51ECF200E2D1100385EB7 /* HardFeeCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51ECE200E2D1100385EB7 /* HardFeeCalculatorTests.swift */; };
@@ -177,6 +184,13 @@
 		E95F85C3200A540B0070534A /* Chat.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Chat.json; sourceTree = "<group>"; };
 		E95F85C5200A9B070070534A /* ChatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
 		E95F85C6200A9B070070534A /* ChatTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatTableViewCell.xib; sourceTree = "<group>"; };
+		E9B6CC47201753D000486EA1 /* Header.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Header.xib; sourceTree = "<group>"; };
+		E9B6CC4F201763FE00486EA1 /* ButtonTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTableViewCell.swift; sourceTree = "<group>"; };
+		E9B6CC50201763FE00486EA1 /* ButtonTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ButtonTableViewCell.xib; sourceTree = "<group>"; };
+		E9B6CC5320176F3300486EA1 /* TextViewTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewTableViewCell.swift; sourceTree = "<group>"; };
+		E9B6CC5420176F3300486EA1 /* TextViewTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextViewTableViewCell.xib; sourceTree = "<group>"; };
+		E9B6CC5D201793D800486EA1 /* MultilineLableTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineLableTableViewCell.swift; sourceTree = "<group>"; };
+		E9B6CC5E201793D800486EA1 /* MultilineLableTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MultilineLableTableViewCell.xib; sourceTree = "<group>"; };
 		E9C51ECA200E2AA100385EB7 /* FeeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeeCalculator.swift; sourceTree = "<group>"; };
 		E9C51ECC200E2BF900385EB7 /* HardFeeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardFeeCalculator.swift; sourceTree = "<group>"; };
 		E9C51ECE200E2D1100385EB7 /* HardFeeCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardFeeCalculatorTests.swift; sourceTree = "<group>"; };
@@ -377,6 +391,7 @@
 				E9E7CD942002812400DFC4DB /* LoginDependencies.swift */,
 				E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */,
 				E919479B2000102E001362F8 /* LoginViewController.swift */,
+				E9B6CC47201753D000486EA1 /* Header.xib */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -470,6 +485,12 @@
 				E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */,
 				E95F85C5200A9B070070534A /* ChatTableViewCell.swift */,
 				E95F85C6200A9B070070534A /* ChatTableViewCell.xib */,
+				E9B6CC4F201763FE00486EA1 /* ButtonTableViewCell.swift */,
+				E9B6CC50201763FE00486EA1 /* ButtonTableViewCell.xib */,
+				E9B6CC5320176F3300486EA1 /* TextViewTableViewCell.swift */,
+				E9B6CC5420176F3300486EA1 /* TextViewTableViewCell.xib */,
+				E9B6CC5D201793D800486EA1 /* MultilineLableTableViewCell.swift */,
+				E9B6CC5E201793D800486EA1 /* MultilineLableTableViewCell.xib */,
 			);
 			path = SharedCells;
 			sourceTree = "<group>";
@@ -577,10 +598,12 @@
 			files = (
 				E9EC341B200524CA00C0E546 /* Roboto_300_normal.ttf in Resources */,
 				E913C8FC1FFFA51D001A83F7 /* LaunchScreen.storyboard in Resources */,
+				E9B6CC48201753D000486EA1 /* Header.xib in Resources */,
 				E9E7CDBC2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib in Resources */,
 				E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
 				E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */,
+				E9B6CC52201763FE00486EA1 /* ButtonTableViewCell.xib in Resources */,
 				E919479E20001048001362F8 /* Login.storyboard in Resources */,
 				E9C51EED2011416E00385EB7 /* adamant-core.js in Resources */,
 				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
@@ -589,6 +612,8 @@
 				E9EC3419200524CA00C0E546 /* Exo+2_500_normal.ttf in Resources */,
 				E9EC3416200524CA00C0E546 /* Exo+2_300_normal.ttf in Resources */,
 				E9EC341C200524CA00C0E546 /* Roboto_400_italic.ttf in Resources */,
+				E9B6CC60201793D800486EA1 /* MultilineLableTableViewCell.xib in Resources */,
+				E9B6CC5620176F3300486EA1 /* TextViewTableViewCell.xib in Resources */,
 				E9EC3415200524CA00C0E546 /* Exo+2_100_normal.ttf in Resources */,
 				E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */,
 				E913C8F71FFFA51D001A83F7 /* Main.storyboard in Resources */,
@@ -626,9 +651,11 @@
 				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
 				"${BUILT_PRODUCTS_DIR}/FTIndicator/FTIndicator.framework",
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
+				"${BUILT_PRODUCTS_DIR}/GrowingTextView/GrowingTextView.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
 				"${BUILT_PRODUCTS_DIR}/SwinjectStoryboard/SwinjectStoryboard.framework",
+				"${BUILT_PRODUCTS_DIR}/TableKit/TableKit.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -636,9 +663,11 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Eureka.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FTIndicator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GrowingTextView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwinjectStoryboard.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TableKit.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -691,6 +720,7 @@
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
 				E9E7CDB72003994E00DFC4DB /* AdamantUtilities.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
+				E9B6CC5F201793D800486EA1 /* MultilineLableTableViewCell.swift in Sources */,
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */,
 				E93580DB20160BC10057FC2E /* ContactsService.swift in Sources */,
@@ -704,6 +734,7 @@
 				E91947B420002809001362F8 /* Account.swift in Sources */,
 				E9E7CDC22003F5A400DFC4DB /* TransactionsViewController.swift in Sources */,
 				E9E7CDA92002AF1E00DFC4DB /* AccountDependencies.swift in Sources */,
+				E9B6CC51201763FE00486EA1 /* ButtonTableViewCell.swift in Sources */,
 				E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */,
 				E95F85872008FDBF0070534A /* Chat.swift in Sources */,
 				E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */,
@@ -719,6 +750,7 @@
 				E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
 				E9C51EEF20139DC600385EB7 /* ProcessTransactionResponse.swift in Sources */,
+				E9B6CC5520176F3300486EA1 /* TextViewTableViewCell.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */,
 				E95F85692006AB9D0070534A /* NormalizedTransaction.swift in Sources */,

@@ -10,7 +10,10 @@ target 'Adamant' do
 
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars
-  pod 'FTIndicator' # Notifications
+  pod 'FTIndicator' # Notifications and activity indicator
   pod 'Eureka' # Forms
   pod 'MessageKit' # Chat UI
+  pod 'GrowingTextView' # Passphrase text view
+  pod 'TableKit' # Declarative TableView
+
 end

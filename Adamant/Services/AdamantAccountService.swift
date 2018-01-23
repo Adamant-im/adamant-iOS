@@ -64,10 +64,52 @@ class AdamantAccountService: AccountService {
 
 // MARK: - Login&Logout functions
 extension AdamantAccountService {
-	func login(passphrase: String, loginCompletionHandler: ((Bool, Account?, Error?) -> Void)?) {
+	func createAccount(with passphrase: String, completionHandler: ((Account?, Error?) -> Void)?) {
 		switch status {
 		// Is logging in, return
 		case .isLoggingIn:
+			completionHandler?(nil, AdamantError(message: "Service is busy"))
+			return
+			
+		// Logout first
+		case .loggedIn:
+			logout(stopAutoupdate: false)
+			
+		// Go login
+		case .notLogged:
+			break
+		}
+		
+		status = .isLoggingIn
+		guard let publicKey = core.createKeypairFor(passphrase: passphrase)?.publicKey else {
+			completionHandler?(nil, AdamantError(message: "Can't create key for passphrase"))
+			return
+		}
+		
+		DispatchQueue.global(qos: .userInitiated).async {
+			self.apiService.getAccount(byPublicKey: publicKey, completionHandler: { (account, error) in
+				if account != nil {
+					self.login(with: passphrase, completionHandler: completionHandler)
+				}
+				
+				self.apiService.newAccount(byPublicKey: publicKey, completionHandler: { (account, error) in
+					if let account = account {
+						self.setLoggedInWith(account: account, passphrase: passphrase)
+						completionHandler?(account, error)
+					} else {
+						self.status = .notLogged
+						completionHandler?(nil, error)
+					}
+				})
+			})
+		}
+	}
+	
+	func login(with passphrase: String, completionHandler: ((Account?, Error?) -> Void)?) {
+		switch status {
+		// Is logging in, return
+		case .isLoggingIn:
+			completionHandler?(nil, AdamantError(message: "Service is busy"))
 			return
 			
 		// Logout first
@@ -83,32 +125,11 @@ extension AdamantAccountService {
 		DispatchQueue.global(qos: .userInitiated).async {
 			self.apiService.getAccount(byPassphrase: passphrase) { (account, error) in
 				if let account = account {
-					self.account = account
-					self.keypair = self.core.createKeypairFor(passphrase: passphrase)
-					
-					NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: account)
-					
-					if let vc = self.loginViewController {
-						vc.dismiss(animated: true, completion: nil)
-						self.loginViewController = nil
-					}
-					
-					if let callbacks = self.storyboardAuthorizationFinishedCallbacks {
-						for	aCallback in callbacks {
-							aCallback()
-						}
-						
-						self.storyboardAuthorizationFinishedCallbacks = nil
-					}
-					
-					self.status = .loggedIn
-					if self.autoupdate {
-						self.start()
-					}
-					loginCompletionHandler?(true, account, error)
+					self.setLoggedInWith(account: account, passphrase: passphrase)
+					completionHandler?(account, error)
 				} else {
 					self.status = .notLogged
-					loginCompletionHandler?(false, nil, error)
+					completionHandler?(nil, error)
 				}
 			}
 		}
@@ -126,6 +147,31 @@ extension AdamantAccountService {
 		
 		if wasLogged {
 			NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedOut, object: nil)
+		}
+	}
+	
+	private func setLoggedInWith(account: Account, passphrase: String) {
+		self.account = account
+		self.keypair = self.core.createKeypairFor(passphrase: passphrase)
+		
+		NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: account)
+		
+		if let vc = self.loginViewController {
+			vc.dismiss(animated: true, completion: nil)
+			self.loginViewController = nil
+		}
+		
+		if let callbacks = self.storyboardAuthorizationFinishedCallbacks {
+			for	aCallback in callbacks {
+				aCallback()
+			}
+			
+			self.storyboardAuthorizationFinishedCallbacks = nil
+		}
+		
+		self.status = .loggedIn
+		if self.autoupdate {
+			self.start()
 		}
 	}
 }
