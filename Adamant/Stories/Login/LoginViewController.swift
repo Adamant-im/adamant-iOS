@@ -48,11 +48,10 @@ class LoginViewController: UIViewController {
 				cell.textView.font = UIFont.adamantPrimary(size: 17)
 				cell.textView.textAlignment = .center
 				cell.textView.textColor = UIColor.adamantPrimary
+				cell.textView.returnKeyType = .done
+				cell.textView.delegate = self
 				cell.delegate = self
 			}
-		}.on(.willDisplay) { options in
-			options.cell?.placeHolder = "Passphrase"
-			options.cell?.layoutIfNeeded()
 		}
 		
 		let loginRow = TableRow<ButtonTableViewCell>(item: "Login")
@@ -183,10 +182,23 @@ class LoginViewController: UIViewController {
 }
 
 
+// MARK: - Passphrase cell delegates
 extension LoginViewController: TextViewTableViewCellDelegate {
 	func cellDidChangeHeight(_ textView: TextViewTableViewCell, height: CGFloat) {
 		tableView.beginUpdates()
 		tableView.endUpdates()
+	}
+}
+
+extension LoginViewController: UITextViewDelegate {
+	func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+		if (text == "\n") {
+			textView.resignFirstResponder()
+			login()
+			return false
+		} else {
+			return true
+		}
 	}
 }
 

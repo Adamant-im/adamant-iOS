@@ -45,6 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// Prepare UI
 		self.window = UIWindow(frame: UIScreen.main.bounds)
 		self.window!.rootViewController = SwinjectStoryboard.create(name: Constants.mainStoryboard, bundle: nil).instantiateInitialViewController()
+		self.window!.rootViewController?.view.backgroundColor = .white
 		self.window!.makeKeyAndVisible()
 
 		self.window!.tintColor = UIColor.adamantPrimary
