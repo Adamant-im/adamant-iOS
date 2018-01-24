@@ -24,7 +24,13 @@ private struct AdamantResources {
 extension Container {
 	func registerAdamantServices() {
 		// MARK: AdamantCore
-		self.register(AdamantCore.self) { _ in try! JSAdamantCore(coreJsUrl: AdamantResources.jsCore) }.inObjectScope(.container)
+		self.register(AdamantCore.self) { _ in
+			let core = JSAdamantCore()
+			core.loadJs(from: AdamantResources.jsCore, queue: DispatchQueue.global(qos: .background)) { result in
+				if case .error(let e) = result { fatalError(e.localizedDescription) }
+			}
+			return core
+		}.inObjectScope(.container)
 		
 		// MARK: DialogService
 		self.register(DialogService.self) { _ in AdamantDialogService() }.inObjectScope(.container)
