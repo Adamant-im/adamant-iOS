@@ -79,23 +79,21 @@ extension AdamantAccountService {
 			return
 		}
 		
-		DispatchQueue.global(qos: .userInitiated).async {
-			self.apiService.getAccount(byPublicKey: publicKey, completionHandler: { (account, error) in
-				if account != nil {
-					self.login(with: passphrase, completionHandler: completionHandler)
+		self.apiService.getAccount(byPublicKey: publicKey, completionHandler: { (account, error) in
+			if account != nil {
+				self.login(with: passphrase, completionHandler: completionHandler)
+			}
+			
+			self.apiService.newAccount(byPublicKey: publicKey, completionHandler: { (account, error) in
+				if let account = account {
+					self.setLoggedInWith(account: account, passphrase: passphrase)
+					completionHandler?(account, error)
+				} else {
+					self.status = .notLogged
+					completionHandler?(nil, error)
 				}
-				
-				self.apiService.newAccount(byPublicKey: publicKey, completionHandler: { (account, error) in
-					if let account = account {
-						self.setLoggedInWith(account: account, passphrase: passphrase)
-						completionHandler?(account, error)
-					} else {
-						self.status = .notLogged
-						completionHandler?(nil, error)
-					}
-				})
 			})
-		}
+		})
 	}
 	
 	func login(with passphrase: String, completionHandler: ((Account?, Error?) -> Void)?) {
@@ -143,13 +141,15 @@ extension AdamantAccountService {
 	
 	private func setLoggedInWith(account: Account, passphrase: String) {
 		self.account = account
-		self.keypair = self.core.createKeypairFor(passphrase: passphrase)
+		keypair = adamantCore.createKeypairFor(passphrase: passphrase)
 		
 		NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: account)
 		
-		if let vc = self.loginViewController {
-			vc.dismiss(animated: true, completion: nil)
-			self.loginViewController = nil
+		if let vc = loginViewController {
+			DispatchQueue.main.async {
+				vc.dismiss(animated: true, completion: nil)
+			}
+			loginViewController = nil
 		}
 		
 		if let callbacks = self.storyboardAuthorizationFinishedCallbacks {
@@ -229,7 +229,7 @@ extension AdamantAccountService {
 	func logoutAndPresentLoginStoryboard(animated: Bool, authorizationFinishedHandler: (() -> Void)?) {
 		logout(stopAutoupdate: false)
 		
-		if let _ = loginViewController {	// Already presenting view controller. We will add you to a list, and call you back later. Maybe.
+		if loginViewController != nil {	// Already presenting view controller. We will add you to a list, and call you back later. Maybe.
 			if let aCallback = authorizationFinishedHandler {
 				if var callbacks = storyboardAuthorizationFinishedCallbacks {
 					callbacks.append(aCallback)
@@ -243,7 +243,7 @@ extension AdamantAccountService {
 			}
 			
 			loginViewController = vc
-			dialogService.presentViewController(vc, animated: animated, completion: nil)
+			dialogService.presentModallyViewController(vc, animated: animated, completion: nil)
 			
 			if let callback = authorizationFinishedHandler {
 				storyboardAuthorizationFinishedCallbacks = [callback]

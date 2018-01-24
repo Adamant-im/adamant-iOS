@@ -147,29 +147,27 @@ extension ChatsListViewController: NSFetchedResultsControllerDelegate {
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 
-		DispatchQueue.main.async {
-			switch type {
-			case .insert:
-				if let newIndexPath = newIndexPath {
-					self.tableView.insertRows(at: [newIndexPath], with: .automatic)
-				}
-				
-			case .delete:
-				if let indexPath = indexPath {
-					self.tableView.deleteRows(at: [indexPath], with: .automatic)
-				}
-				
-			case .update:
-				if let indexPath = indexPath,
-					let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
-					let chatroom = controller.object(at: indexPath) as? Chatroom {
-					self.configureCell(cell, for: chatroom)
-				}
-				
-			case .move:
-				if let indexPath = indexPath, let newIndexPath = newIndexPath {
-					self.tableView.moveRow(at: indexPath, to: newIndexPath)
-				}
+		switch type {
+		case .insert:
+			if let newIndexPath = newIndexPath {
+				self.tableView.insertRows(at: [newIndexPath], with: .automatic)
+			}
+			
+		case .delete:
+			if let indexPath = indexPath {
+				self.tableView.deleteRows(at: [indexPath], with: .automatic)
+			}
+			
+		case .update:
+			if let indexPath = indexPath,
+				let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
+				let chatroom = controller.object(at: indexPath) as? Chatroom {
+				self.configureCell(cell, for: chatroom)
+			}
+			
+		case .move:
+			if let indexPath = indexPath, let newIndexPath = newIndexPath {
+				self.tableView.moveRow(at: indexPath, to: newIndexPath)
 			}
 		}
 	}
@@ -216,6 +214,7 @@ extension ChatsListViewController: NewChatViewControllerDelegate {
 				}
 			}
 			
+			// Select row after awhile
 			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(1)) {
 				if let indexPath = self.chatsController.indexPath(forObject: chatroom) {
 					self.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
