@@ -9,15 +9,6 @@
 import Foundation
 
 extension AdamantApiService {
-	func getPublicKey(byPassphrase passphrase: String, completionHandler: @escaping (String?, AdamantError?) -> Void) {
-		guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase) else {
-			completionHandler(nil, AdamantError(message: "Can't create keypair for passphrase: \(passphrase)"))
-			return
-		}
-		
-		completionHandler(keypair.publicKey, nil)
-	}
-	
 	func getPublicKey(byAddress address: String, completionHandler: @escaping (String?, AdamantError?) -> Void) {
 		let endpoint: URL
 		do {

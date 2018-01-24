@@ -48,14 +48,12 @@ extension AdamantApiService {
 	
 	/// Get existing account by passphrase.
 	func getAccount(byPassphrase passphrase: String, completionHandler: @escaping (Account?, AdamantError?) -> Void) {
-		getPublicKey(byPassphrase: passphrase) { (key, error) in
-			guard let key = key else {
-				completionHandler(nil, AdamantError(message: "Can't get account by passphrase: \(passphrase)", error: error))
-				return
-			}
-			
-			self.getAccount(byPublicKey: key, completionHandler: completionHandler)
+		guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase) else {
+			completionHandler(nil, AdamantError(message: "Can't get account by passphrase: \(passphrase)"))
+			return
 		}
+		
+		getAccount(byPublicKey: keypair.publicKey, completionHandler: completionHandler)
 	}
 	
 	/// Get existing account by publicKey

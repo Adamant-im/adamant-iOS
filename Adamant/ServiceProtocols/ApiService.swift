@@ -10,6 +10,7 @@ import Foundation
 
 protocol ApiService {
 	
+	/// Default is async queue with .utilities priority.
 	var defaultResponseDispatchQueue: DispatchQueue { get set }
 	
 	// MARK: - Accounts
@@ -22,7 +23,6 @@ protocol ApiService {
 	// MARK: - Keys
 	
 	func getPublicKey(byAddress address: String, completionHandler: @escaping (String?, AdamantError?) -> Void)
-	func getPublicKey(byPassphrase passphrase: String, completionHandler: @escaping (String?, AdamantError?) -> Void)
 	
 	
 	// MARK: - Transactions
