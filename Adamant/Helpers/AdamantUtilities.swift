@@ -44,22 +44,45 @@ extension AdamantUtilities {
 }
 
 
-// MARK: - Address
+// MARK: - Validating Addresses and Passphrases
 extension AdamantUtilities {
 	static let addressRegex = "^U([0-9]{6,20})$"
+	static let passphraseRegex = "^([a-z]* ){11}([a-z]*)$"
 	
+	
+	/// Rules are simple:
+	///
+	/// - Leading uppercase U
+	/// - From 6 to 20 numbers
+	/// - No leading or trailing whitespaces
 	static func validateAdamantAddress(address: String) -> Bool {
-		if let regex = try? NSRegularExpression(pattern: addressRegex, options: []) {
-			let matches = regex.matches(in: address, options: [], range: NSRange(location: 0, length: address.count))
+		return validate(string: address, with: addressRegex)
+	}
+	
+	
+	/// Rules are simple:
+	///
+	/// - No leading and/or trailing whitespaces
+	/// - No UPPERCASE letters
+	/// - No numbers
+	/// - No -$%èçïäł- caracters
+	/// - 12 words, splitted by a single whitespace
+	/// - a-z
+	static func validateAdamantPassphrase(passphrase: String) -> Bool {
+		return validate(string: passphrase, with: passphraseRegex)
+	}
+	
+	private static func validate(string: String, with regex: String) -> Bool {
+		if let regex = try? NSRegularExpression(pattern: regex, options: []) {
+			let matches = regex.matches(in: string, options: [], range: NSRange(location: 0, length: string.count))
 			
 			return matches.count == 1
 		} else {
-			print("Wrong address regex: \(addressRegex)")
+			print("Wrong passphrase regex: \(regex)")
 			return false
 		}
 	}
 }
-
 
 
 // MARK: - Dates
@@ -74,6 +97,7 @@ extension AdamantUtilities {
 		return components.date!.timeIntervalSince1970
 	}()
 }
+
 
 // MARK: Hex
 extension AdamantUtilities {

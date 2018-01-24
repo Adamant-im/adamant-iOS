@@ -155,6 +155,20 @@ class LoginViewController: UIViewController {
 		
 		alert.addAction(UIAlertAction(title: "Save", style: .default, handler: { _ in
 			let vc = UIActivityViewController(activityItems: [passphrase], applicationActivities: nil)
+			vc.excludedActivityTypes = [.postToFacebook,
+										.postToTwitter,
+										.postToWeibo,
+										.message,
+										.mail,
+										.assignToContact,
+										.saveToCameraRoll,
+										.addToReadingList,
+										.postToFlickr,
+										.postToVimeo,
+										.postToTencentWeibo,
+										.airDrop,
+										.openInIBooks,
+										.markupAsPDF]	// All of them
 			self.present(vc, animated: true)
 		}))
 		

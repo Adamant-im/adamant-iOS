@@ -147,7 +147,8 @@ extension JSAdamantCore {
 			keypairRaw.hasProperty("publicKey") && keypairRaw.hasProperty("privateKey"),
 			let publicKeyHash = self.convertFromJsHash(keypairRaw.forProperty("publicKey")),
 			let privateKeyHash = self.convertFromJsHash(keypairRaw.forProperty("privateKey")) {
-			let keypair = Keypair(publicKey: AdamantUtilities.getHexString(from: publicKeyHash), privateKey: AdamantUtilities.getHexString(from: privateKeyHash))
+			let keypair = Keypair(publicKey: AdamantUtilities.getHexString(from: publicKeyHash),
+								  privateKey: AdamantUtilities.getHexString(from: privateKeyHash))
 			return keypair
 		} else {
 			return nil
