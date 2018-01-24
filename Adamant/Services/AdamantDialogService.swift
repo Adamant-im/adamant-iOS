@@ -14,19 +14,31 @@ class AdamantDialogService: DialogService {
 	init() {
 		FTIndicator.setIndicatorStyle(.dark)
 	}
-	
-	func presentViewController(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
-		DispatchQueue.main.async {
-			if var topController = UIApplication.shared.keyWindow?.rootViewController {
-				while let presentedViewController = topController.presentedViewController {
-					topController = presentedViewController
-				}
-				
-				topController.present(viewController, animated: animated, completion: completion)
-			} else {
-				print("DialogService: Can't get root view controller!")
+}
+
+
+// MARK: - Modal dialogs
+extension AdamantDialogService {
+	func presentModallyViewController(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
+		if Thread.isMainThread {
+			AdamantDialogService.getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
+		} else {
+			DispatchQueue.main.async {
+				AdamantDialogService.getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
 			}
 		}
+	}
+	
+	private static func getTopmostViewController() -> UIViewController? {
+		if var topController = UIApplication.shared.keyWindow?.rootViewController {
+			while let presentedViewController = topController.presentedViewController {
+				topController = presentedViewController
+			}
+			
+			return topController
+		}
+		
+		return nil
 	}
 }
 

@@ -10,7 +10,7 @@ import UIKit
 
 protocol DialogService {
 	/// Present view controller modally
-	func presentViewController(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
+	func presentModallyViewController(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
 	
 	
 	// MARK: - Toast messages
