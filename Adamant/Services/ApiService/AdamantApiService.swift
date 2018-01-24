@@ -23,7 +23,7 @@ class AdamantApiService: ApiService {
 	
 	// MARK: - Dependencies
 	
-	let adamantCore: AdamantCore
+	var adamantCore: AdamantCore!
 	
 	
 	// MARK: - Properties
@@ -34,9 +34,8 @@ class AdamantApiService: ApiService {
 	
 	// MARK: - Initialization
 	
-	init(apiUrl: URL, adamantCore: AdamantCore) {
+	init(apiUrl: URL) {
 		self.apiUrl = apiUrl
-		self.adamantCore = adamantCore
 	}
 	
 	

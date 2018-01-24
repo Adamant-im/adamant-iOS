@@ -17,15 +17,15 @@ private struct Constants {
 
 class AdamantAccountService: AccountService {
 	
-	// MARK: - Dependencies
+	// MARK: Dependencies
 	
-	let apiService: ApiService
-	let core: AdamantCore
-	let router: Router
-	let dialogService: DialogService
+	var apiService: ApiService!
+	var adamantCore: AdamantCore!
+	var router: Router!
+	var dialogService: DialogService!
 	
 	
-	// MARK: - Properties
+	// MARK: Properties
 	var autoupdateInterval: TimeInterval = 3.0
 	
 	var autoupdate: Bool = true {
@@ -48,14 +48,7 @@ class AdamantAccountService: AccountService {
 	
 	private let updatingDispatchGroup = DispatchGroup()
 	
-	// MARK: - Initialization
-	init(apiService: ApiService, adamantCore: AdamantCore, dialogService: DialogService, router: Router) {
-		self.apiService = apiService
-		self.core = adamantCore
-		self.dialogService = dialogService
-		self.router = router
-	}
-	
+	// MARK: Lifecycle
 	deinit {
 		stop()
 	}
@@ -81,7 +74,7 @@ extension AdamantAccountService {
 		}
 		
 		status = .isLoggingIn
-		guard let publicKey = core.createKeypairFor(passphrase: passphrase)?.publicKey else {
+		guard let publicKey = adamantCore.createKeypairFor(passphrase: passphrase)?.publicKey else {
 			completionHandler?(nil, AdamantError(message: "Can't create key for passphrase"))
 			return
 		}
@@ -122,15 +115,13 @@ extension AdamantAccountService {
 		}
 		
 		status = .isLoggingIn
-		DispatchQueue.global(qos: .userInitiated).async {
-			self.apiService.getAccount(byPassphrase: passphrase) { (account, error) in
-				if let account = account {
-					self.setLoggedInWith(account: account, passphrase: passphrase)
-					completionHandler?(account, error)
-				} else {
-					self.status = .notLogged
-					completionHandler?(nil, error)
-				}
+		self.apiService.getAccount(byPassphrase: passphrase) { (account, error) in
+			if let account = account {
+				self.setLoggedInWith(account: account, passphrase: passphrase)
+				completionHandler?(account, error)
+			} else {
+				self.status = .notLogged
+				completionHandler?(nil, error)
 			}
 		}
 	}

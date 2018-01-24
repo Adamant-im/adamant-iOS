@@ -9,28 +9,58 @@
 import Swinject
 import SwinjectStoryboard
 
-// MARK: Services
+// MARK: - Resources
+private struct AdamantResources {
+	// Storyboard
+	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
+	static let api = URL(string: "https://endless.adamant.im")!
+	static let coreDataModel = Bundle.main.url(forResource: "ChatModels", withExtension: "momd")!
+	static let knownContacts = Bundle.main.url(forResource: "knownContacts", withExtension: "json")!
+	
+	private init() {}
+}
+
+// MARK: - Services
 extension Container {
-	func registerAdamantServices(apiUrl: URL, coreJsUrl core: URL, managedObjectModel model: URL, knownContacts: URL) {
-		self.register(AdamantCore.self) { _ in try! JSAdamantCore(coreJsUrl: core) }
+	func registerAdamantServices() {
+		// MARK: AdamantCore
+		self.register(AdamantCore.self) { _ in try! JSAdamantCore(coreJsUrl: AdamantResources.jsCore) }.inObjectScope(.container)
+		
+		// MARK: DialogService
 		self.register(DialogService.self) { _ in AdamantDialogService() }.inObjectScope(.container)
+		
+		// MARK: Router
 		self.register(Router.self) { _ in SwinjectedRouter() }.inObjectScope(.container)
+		
+		// MARK: CellFactory
 		self.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
-		self.register(ApiService.self) { r in AdamantApiService(apiUrl: apiUrl, adamantCore: r.resolve(AdamantCore.self)!) }.inObjectScope(.container)
-		self.register(AccountService.self) { r in AdamantAccountService(apiService: r.resolve(ApiService.self)!,
-																	adamantCore: r.resolve(AdamantCore.self)! ,
-																	dialogService: r.resolve(DialogService.self)!,
-																	router: r.resolve(Router.self)!) }.inObjectScope(.container)
 		
-		// ContactsService
-		self.register(ContactsService.self) { _ in try! KnownContactsService(contactsJsonUrl: knownContacts) }
+		// MARK: ApiService
+		self.register(ApiService.self) { r in
+			let service = AdamantApiService(apiUrl: AdamantResources.api)
+			service.adamantCore = r.resolve(AdamantCore.self)!
+			return service
+		}.inObjectScope(.container)
 		
-		// Fee calculator
-		self.register(FeeCalculator.self) { _ in HardFeeCalculator() }
+		// MARK: AccountService
+		self.register(AccountService.self) { r in
+			let service = AdamantAccountService()
+			service.apiService = r.resolve(ApiService.self)!
+			service.adamantCore = r.resolve(AdamantCore.self)!
+			service.dialogService = r.resolve(DialogService.self)!
+			service.router = r.resolve(Router.self)!
+			return service
+		}.inObjectScope(.container)
 		
-		// Chat provider
+		// MARK: ContactsService
+		self.register(ContactsService.self) { _ in try! KnownContactsService(contactsJsonUrl: AdamantResources.knownContacts) }.inObjectScope(.container)
+		
+		// MARK: Fee calculator
+		self.register(FeeCalculator.self) { _ in HardFeeCalculator() }.inObjectScope(.container)
+		
+		// MARK: Chat provider
 		self.register(ChatDataProvider.self) { r  in
-			let provider = CoreDataChatProvider(managedObjectModel: model)
+			let provider = CoreDataChatProvider(managedObjectModel: AdamantResources.coreDataModel)
 			provider.accountService = r.resolve(AccountService.self)
 			provider.apiService = r.resolve(ApiService.self)
 			provider.adamantCore = r.resolve(AdamantCore.self)
