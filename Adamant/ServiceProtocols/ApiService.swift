@@ -10,6 +10,8 @@ import Foundation
 
 protocol ApiService {
 	
+	var defaultResponseDispatchQueue: DispatchQueue { get set }
+	
 	// MARK: - Accounts
 	
 	func newAccount(byPublicKey publicKey: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)

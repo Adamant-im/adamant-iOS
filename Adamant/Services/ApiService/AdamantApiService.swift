@@ -29,6 +29,7 @@ class AdamantApiService: ApiService {
 	// MARK: - Properties
 	
 	let apiUrl: URL
+	var defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility, attributes: [.concurrent])
 	
 	
 	// MARK: - Initialization
@@ -66,7 +67,8 @@ class AdamantApiService: ApiService {
 			encoding = JSONEncoding.default
 		}
 		
-		Alamofire.request(url, method: method, parameters: parameters, encoding: encoding, headers: headers).response { response in
+		Alamofire.request(url, method: method, parameters: parameters, encoding: encoding, headers: headers)
+			.response(queue: defaultResponseDispatchQueue, completionHandler: { response in
 			guard let data = response.data else {
 				completionHandler(nil, response.error)
 				return
@@ -78,6 +80,6 @@ class AdamantApiService: ApiService {
 			} catch {
 				completionHandler(nil, AdamantError(message: "Error parsing server response", error: error))
 			}
-		}
+		})
 	}
 }
