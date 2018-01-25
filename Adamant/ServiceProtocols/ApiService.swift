@@ -10,6 +10,9 @@ import Foundation
 
 protocol ApiService {
 	
+	/// Default is async queue with .utilities priority.
+	var defaultResponseDispatchQueue: DispatchQueue { get set }
+	
 	// MARK: - Accounts
 	
 	func newAccount(byPublicKey publicKey: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
@@ -20,7 +23,6 @@ protocol ApiService {
 	// MARK: - Keys
 	
 	func getPublicKey(byAddress address: String, completionHandler: @escaping (String?, AdamantError?) -> Void)
-	func getPublicKey(byPassphrase passphrase: String, completionHandler: @escaping (String?, AdamantError?) -> Void)
 	
 	
 	// MARK: - Transactions
@@ -36,6 +38,11 @@ protocol ApiService {
 	
 	// MARK: - Chats
 	
+	/// Get chat transactions (type 8)
+	///
+	/// - Parameters:
+	///   - account: Transactions for specified account
+	///   - height: From this height. Minimal value is 1.
 	func getChatTransactions(account: String, height: Int?, offset: Int?, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void)
 	
 	/// Send text message

@@ -31,7 +31,7 @@ class ChatViewController: MessagesViewController {
 		return formatter
 	}
 	
-	private(set) var chatController: NSFetchedResultsController<ChatTransaction>!
+	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
 	
 	// MARK: Fee label
 	private var feeIsVisible: Bool = false
@@ -44,13 +44,12 @@ class ChatViewController: MessagesViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
-		guard let chatroom = chatroom, let controller = chatProvider.getChatController(for: chatroom) else {
+		guard let chatroom = chatroom else {
 			print("Failed to get chat controller")
 			return
 		}
 		
-		
-		// MARK: Initial configuration
+		// MARK: 1. Initial configuration
 		
 		if let title = chatroom.title {
 			self.navigationItem.title = title
@@ -58,16 +57,29 @@ class ChatViewController: MessagesViewController {
 			self.navigationItem.title = chatroom.id
 		}
 		
-		chatController = controller
-		chatController.delegate = self
-		
 		messagesCollectionView.messagesDataSource = self
 		messagesCollectionView.messagesDisplayDelegate = self
 		messagesCollectionView.messagesLayoutDelegate = self
 		maintainPositionOnKeyboardFrameChanged = true
 		
+		DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+			guard let controller = self?.chatProvider.getChatController(for: chatroom) else {
+				return
+			}
+
+			controller.delegate = self
+			self?.chatController = controller
+
+			if let collection = self?.messagesCollectionView {
+				DispatchQueue.main.async {
+					collection.reloadData()
+					collection.scrollToBottom(animated: true)
+				}
+			}
+		}
 		
-		// MARK: InputBar configuration
+		
+		// MARK: 2. InputBar configuration
 		
 		messageInputBar.delegate = self
 		
@@ -106,16 +118,8 @@ class ChatViewController: MessagesViewController {
 		}
     }
 	
-	override func viewDidAppear(_ animated: Bool) {
-		super.viewDidAppear(animated)
-		
-		if let count = chatController.fetchedObjects?.count, count == 0 {
-			messageInputBar.inputTextView.becomeFirstResponder()
-		}
-	}
-	
-	override func viewWillDisappear(_ animated: Bool) {
-		super.viewWillDisappear(animated)
+	override func viewDidDisappear(_ animated: Bool) {
+		super.viewDidDisappear(animated)
 		
 		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.id {
 			delegate.preserveMessage(message, forAddress: address)
@@ -136,10 +140,8 @@ extension ChatViewController {
 			let text = "Estimated fee: \(AdamantUtilities.from(uInt: fee))"
 			prevFee = fee
 			
-			DispatchQueue.main.async {
-				feeLabel.title = text
-				feeLabel.setSize(CGSize(width: feeLabel.titleLabel!.intrinsicContentSize.width, height: 20), animated: false)
-			}
+			feeLabel.title = text
+			feeLabel.setSize(CGSize(width: feeLabel.titleLabel!.intrinsicContentSize.width, height: 20), animated: false)
 		}
 		
 		if !feeIsVisible && fee > 0 {
@@ -161,13 +163,11 @@ extension ChatViewController {
 				feeTimer.invalidate()
 			}
 			
-			DispatchQueue.main.async {
-				UIView.animate(withDuration: 0.3, animations: {
-					self.feeLabel?.alpha = 0
-				}, completion: { _ in
-					self.feeLabel?.isHidden = true
-				})
-			}
+			UIView.animate(withDuration: 0.3, animations: {
+				self.feeLabel?.alpha = 0
+			}, completion: { _ in
+				self.feeLabel?.isHidden = true
+			})
 			
 			feeTimer = nil
 		}
@@ -213,11 +213,16 @@ extension ChatViewController: MessagesDataSource {
 	}
 	
 	func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
-		 return chatController.object(at: IndexPath(row: indexPath.section, section: 0))
+		guard let message = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) else {
+			// TODO: something
+			fatalError("What?")
+		}
+		
+		return message
 	}
 	
 	func numberOfMessages(in messagesCollectionView: MessagesCollectionView) -> Int {
-		if let objects = chatController.fetchedObjects {
+		if let objects = chatController?.fetchedObjects {
 			return objects.count
 		} else {
 			return 0

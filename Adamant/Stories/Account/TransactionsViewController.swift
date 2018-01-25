@@ -78,8 +78,11 @@ extension TransactionsViewController {
 			// TODO: Display error messages
 			
 			self.transactions = transactions
-			self.tableView.reloadData()
 			self.updatingTransactions = false
+			
+			DispatchQueue.main.async {
+				self.tableView.reloadData()
+			}
 		}
 	}
 }

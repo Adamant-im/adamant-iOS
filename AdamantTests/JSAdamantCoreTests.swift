@@ -19,7 +19,14 @@ class JSAdamantCoreTests: XCTestCase {
 				fatalError("Can't load system resources!")
 		}
 		
-        core = try! JSAdamantCore(coreJsUrl: jsCore)
+        let core = JSAdamantCore()
+		core.loadJs(from: jsCore, queue: DispatchQueue.global(qos: .utility)) { (result) in
+			if case .error = result {
+				fatalError()
+			}
+		}
+		
+		self.core = core
     }
 	
     

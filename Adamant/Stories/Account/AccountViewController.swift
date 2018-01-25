@@ -37,10 +37,10 @@ class AccountViewController: UIViewController {
 		tableView.dataSource = self
 		tableView.separatorInset = UIEdgeInsets.init(top: 0, left: 80, bottom: 0, right: 0)
 		
-		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: nil) { _ in
+		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { _ in
 			self.tableView.reloadData()
 		}
-		NotificationCenter.default.addObserver(forName: .adamantUserLoggedOut, object: nil, queue: nil) { _ in
+		NotificationCenter.default.addObserver(forName: .adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { _ in
 			self.tableView.reloadData()
 		}
     }
@@ -51,7 +51,7 @@ class AccountViewController: UIViewController {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
 		
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantAccountDataUpdated, object: nil, queue: nil) { _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantAccountDataUpdated, object: nil, queue: OperationQueue.main) { _ in
 			self.refreshBalanceCell()
 		}
 	}
@@ -195,8 +195,6 @@ extension AccountViewController {
 			return
 		}
 		
-		DispatchQueue.main.async {
-			cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
-		}
+		cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
 	}
 }

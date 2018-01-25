@@ -228,12 +228,15 @@ class TransferViewController: FormViewController {
 				}
 				
 				apiService.transferFunds(sender: account.address, recipient: recipient, amount: AdamantUtilities.from(double: amount), keypair: keypair, completionHandler: { [weak self] (success, error) in
-					if success {
-						dialogService.showSuccess(withMessage: "Funds sended!")
-						// TODO: goto transactions scene
-						self?.dismiss(animated: true, completion: nil)
-					} else {
-						dialogService.showError(withMessage: error?.message ?? "Failed. Try later.")
+					
+					DispatchQueue.main.async {
+						if success {
+							dialogService.showSuccess(withMessage: "Funds sended!")
+							// TODO: goto transactions scene
+							self?.dismiss(animated: true, completion: nil)
+						} else {
+							dialogService.showError(withMessage: error?.message ?? "Failed. Try later.")
+						}
 					}
 				})
 			})

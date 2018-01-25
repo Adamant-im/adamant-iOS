@@ -47,10 +47,13 @@ class CoreDataChatProvider {
 	private static let apiTransactions = 100
 	private var timer: Timer?
 	private var publicKeys = [String:String]()
-	private var lastTransactionHeight: Int = 0
+	// Minimum is 1.
+	private var lastTransactionHeight: Int = 1
 	
+	
+	// Threading
 	private let updatingDispatchGroup = DispatchGroup()
-	
+	private let processingQueue = DispatchQueue(label: "com.adamant.processingChat", qos: .utility, attributes: [])
 	
 	// MARK: - Lifecycle
 	
@@ -89,15 +92,16 @@ class CoreDataChatProvider {
 		if !autoupdate { autoupdate = true }
 		
 		timer = Timer(timeInterval: autoupdateInterval, repeats: true, block: { _ in
-			let timeout = DispatchTime.now() + DispatchTimeInterval.milliseconds(self.autoupdateInterval > 1 ? Int((self.autoupdateInterval - 1.0) * 1000) : 0)
-			if self.updatingDispatchGroup.wait(timeout: timeout) == .success {
-				self.updateChats()
-			} else {
-				
-			}
+			self.updateChats()
 		})
-		RunLoop.current.add(timer!, forMode: .commonModes)
-		timer!.fire()
+		
+		DispatchQueue.main.async {
+			guard let timer = self.timer else {
+				return
+			}
+			RunLoop.current.add(timer, forMode: .commonModes)
+			timer.fire()
+		}
 	}
 	
 	func stop() {
@@ -122,10 +126,9 @@ extension CoreDataChatProvider: ChatDataProvider {
 			return
 		}
 		
-		DispatchQueue.global(qos: .userInitiated).async {
-			let reloadDispatchGroup = DispatchGroup()
-			_ = self.getTransactions(account: account.address, height: nil, offset: nil, dispatchGroup: reloadDispatchGroup)
-			reloadDispatchGroup.wait()
+		let reloadDispatchGroup = DispatchGroup()
+		_ = self.getTransactions(account: account.address, height: nil, offset: nil, dispatchGroup: reloadDispatchGroup)
+		reloadDispatchGroup.notify(queue: DispatchQueue.global(qos: .utility)) {
 			self.status = .upToDate
 		}
 	}
@@ -153,15 +156,11 @@ extension CoreDataChatProvider: ChatDataProvider {
 		
 		status = .updating
 		
-		DispatchQueue.global(qos: .userInitiated).async {
-			let newMessages = self.getTransactions(account: account.address, height: self.lastTransactionHeight, offset: nil, dispatchGroup: self.updatingDispatchGroup)
-			self.updatingDispatchGroup.wait()
-			
-			if newMessages > 0 {
-				NotificationCenter.default.post(name: .adamantChatProviderNewTransactions, object: nil)
-			}
-			
+		_ = self.getTransactions(account: account.address, height: self.lastTransactionHeight, offset: nil, dispatchGroup: self.updatingDispatchGroup)
+		
+		updatingDispatchGroup.notify(queue: DispatchQueue.global(qos: .utility)) {
 			self.status = .upToDate
+			NotificationCenter.default.post(name: .adamantChatProviderNewTransactions, object: nil)
 		}
 	}
 	
@@ -257,15 +256,14 @@ extension CoreDataChatProvider {
 			group.enter()
 			var key: String?
 			var error: AdamantError?
-			DispatchQueue.global(qos: .userInitiated).async {
-				self.apiService.getPublicKey(byAddress: recipientId, completionHandler: { (publicKey, err) in
-					key = publicKey
-					error = err
-					
+			self.apiService.getPublicKey(byAddress: recipientId, completionHandler: { (publicKey, err) in
+				defer {
 					// Exit 1
 					group.leave()
-				})
-			}
+				}
+				key = publicKey
+				error = err
+			})
 			
 			group.wait()
 			
@@ -338,28 +336,32 @@ extension CoreDataChatProvider {
 	///
 	/// - Parameters:
 	///   - account: for account
-	///   - height: last message height
+	///   - height: last message height. Minimum == 1 !!!
 	///   - offset: offset, if greater than 100
 	/// - Returns: ammount of new messages was added
-	private func getTransactions(account: String, height: Int?, offset: Int?, dispatchGroup: DispatchGroup? = nil) -> Int {
-		var newMessages = 0
-		
+	private func getTransactions(account: String, height: Int?, offset: Int?, dispatchGroup: DispatchGroup) {
 		// Enter 1
-		dispatchGroup?.enter()
+		dispatchGroup.enter()
 		
 		apiService.getChatTransactions(account: account, height: height, offset: offset) { (transactions, error) in
+			defer {
+				// Leave 1
+				dispatchGroup.leave()
+			}
+			
 			guard let transactions = transactions else {
 				return
 			}
 			
 			// Enter 2
-			dispatchGroup?.enter()
-			DispatchQueue.global(qos: .userInitiated).async {
-				let new = self.loadChatTransactions(transactions, currentAccount: account)
-				// Leave 2
-				dispatchGroup?.leave()
-				// TODO: Threadsafe
-				newMessages += new
+			dispatchGroup.enter()
+			self.processingQueue.async {
+				defer {
+					// Leave 2
+					dispatchGroup.leave()
+				}
+				
+				_ = self.loadChatTransactions(transactions, currentAccount: account)
 			}
 			
 			if transactions.count == CoreDataChatProvider.apiTransactions {
@@ -370,17 +372,10 @@ extension CoreDataChatProvider {
 					newOffset = CoreDataChatProvider.apiTransactions
 				}
 				
-				// TODO: Threadsafe
-				newMessages += self.getTransactions(account: account, height: height, offset: newOffset)
+				self.getTransactions(account: account, height: height, offset: newOffset, dispatchGroup: dispatchGroup)
 			}
-			
-			// Leave 1
-			dispatchGroup?.leave()
 		}
-		
-		return newMessages
 	}
-	
 	
 	/// Load raw blockchain chat transactions, parse them, and add to CoreData
 	///
@@ -414,21 +409,21 @@ extension CoreDataChatProvider {
 			
 			for address in keysNeeded {
 				group.enter()
-				DispatchQueue.global(qos: .userInitiated).async {
-					self.apiService.getPublicKey(byAddress: address, completionHandler: { (publicKey, error) in
-						if let key = publicKey {
-							newKeys[address] = key
-						} else {
-							// TODO: Notify about error
-							var message = "Can't get public key for account: \(address)."
-							if let error = error {
-								message += "Error: \(error)"
-							}
-							print(message)
-						}
+				self.apiService.getPublicKey(byAddress: address, completionHandler: { (publicKey, error) in
+					defer {
 						group.leave()
-					})
-				}
+					}
+					if let key = publicKey {
+						newKeys[address] = key
+					} else {
+						// TODO: Notify about error
+						var message = "Can't get public key for account: \(address)."
+						if let error = error {
+							message += "Error: \(error)"
+						}
+						print(message)
+					}
+				})
 			}
 			
 			group.wait()
@@ -480,6 +475,7 @@ extension CoreDataChatProvider {
 				} else {
 					chatroom = createChatroom(id: chatId)
 				}
+				
 				chatroom.addToTransactions(chatTransactions as NSSet)
 				
 				if let newest = chatTransactions.sorted(by: { ($0.date! as Date).compare($1.date! as Date) == .orderedDescending }).first {
