@@ -38,6 +38,11 @@ protocol ApiService {
 	
 	// MARK: - Chats
 	
+	/// Get chat transactions (type 8)
+	///
+	/// - Parameters:
+	///   - account: Transactions for specified account
+	///   - height: From this height. Minimal value is 1.
 	func getChatTransactions(account: String, height: Int?, offset: Int?, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void)
 	
 	/// Send text message
