@@ -27,7 +27,6 @@ class AdamantAccountService: AccountService {
 	
 	// MARK: Properties
 	var autoupdateInterval: TimeInterval = 3.0
-	
 	var autoupdate: Bool = true {
 		didSet {
 			if autoupdate {
@@ -38,6 +37,8 @@ class AdamantAccountService: AccountService {
 		}
 	}
 	
+	private(set) var updating = false
+	
 	private(set) var status: AccountStatus = .notLogged
 	private(set) var account: Account?
 	private(set) var keypair: Keypair?
@@ -45,8 +46,6 @@ class AdamantAccountService: AccountService {
 	private var loginViewController: UIViewController? = nil
 	private var storyboardAuthorizationFinishedCallbacks: [(() -> Void)]?
 	private var timer: Timer?
-	
-	private let updatingDispatchGroup = DispatchGroup()
 	
 	// MARK: Lifecycle
 	deinit {
@@ -178,13 +177,17 @@ extension AdamantAccountService {
 		}
 		
 		timer = Timer(timeInterval: autoupdateInterval, repeats: true, block: { _ in
-			let timeout = DispatchTime.now() + DispatchTimeInterval.milliseconds(self.autoupdateInterval > 1 ? Int((self.autoupdateInterval - 1.0) * 1000) : 0)
-			if self.updatingDispatchGroup.wait(timeout: timeout) == .success {
+			if !self.updating {
 				self.updateAccountData()
 			}
 		})
-		RunLoop.current.add(timer!, forMode: .commonModes)
-		timer!.fire()
+		DispatchQueue.main.async {
+			guard let timer = self.timer else {
+				return
+			}
+			RunLoop.current.add(timer, forMode: .commonModes)
+			timer.fire()
+		}
 	}
 	
 	func stop() {
@@ -195,16 +198,20 @@ extension AdamantAccountService {
 	}
 	
 	func updateAccountData() {
+		guard !updating else {
+			return
+		}
+		
+		updating = true
+		
 		guard let loggedAccount = account else {
 			stop()
 			return
 		}
 		
-		// Enter 1
-		updatingDispatchGroup.enter()
 		apiService.getAccount(byPublicKey: loggedAccount.publicKey) { (account, error) in
 			guard let account = account else {
-				// TODO: Show error
+				print("Error update account: \(String(describing: error))")
 				return
 			}
 			
@@ -217,8 +224,7 @@ extension AdamantAccountService {
 				NotificationCenter.default.post(name: Notification.Name.adamantAccountDataUpdated, object: account)
 			}
 			
-			// Exit 1
-			self.updatingDispatchGroup.leave()
+			self.updating = false
 		}
 	}
 }

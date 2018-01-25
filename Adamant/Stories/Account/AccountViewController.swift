@@ -195,8 +195,6 @@ extension AccountViewController {
 			return
 		}
 		
-		DispatchQueue.main.async {
-			cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
-		}
+		cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
 	}
 }
