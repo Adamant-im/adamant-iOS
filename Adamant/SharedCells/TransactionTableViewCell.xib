@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Exo+2_300_normal.ttf">
+            <string>Exo2-Light</string>
+        </array>
+        <array key="Exo+2_400_normal.ttf">
+            <string>Exo2-Regular</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="86" id="KGk-i7-Jjw" customClass="TransactionTableViewCell" customModule="Adamant_ios" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="86"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="85.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="income" translatesAutoresizingMaskIntoConstraints="NO" id="448-mx-6O4">
+                        <rect key="frame" x="16" y="19" width="48" height="48"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="48" id="auR-TF-3o7"/>
+                            <constraint firstAttribute="height" constant="48" id="puJ-tH-dxq"/>
+                        </constraints>
+                    </imageView>
+                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="SXp-rd-UrY">
+                        <rect key="frame" x="80" y="10.5" width="214" height="65"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="U00000000000000000000" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2lX-Ur-HbP">
+                                <rect key="frame" x="0.0" y="0.0" width="214" height="20.5"/>
+                                <fontDescription key="fontDescription" name="Exo2-Light" family="Exo 2 Light" pointSize="17"/>
+                                <color key="textColor" name="Gray_main"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100500.0003 ADM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2PE-tm-CaZ">
+                                <rect key="frame" x="0.0" y="23.5" width="214" height="20.5"/>
+                                <fontDescription key="fontDescription" name="Exo2-Light" family="Exo 2 Light" pointSize="17"/>
+                                <color key="textColor" name="Gray_main"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="01.01.2018, 23:59:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tj3-KB-8BU">
+                                <rect key="frame" x="0.0" y="47" width="214" height="18"/>
+                                <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="15"/>
+                                <color key="textColor" name="Gray_secondary"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                    </stackView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="448-mx-6O4" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="9xw-o2-lSS"/>
+                    <constraint firstItem="SXp-rd-UrY" firstAttribute="centerY" secondItem="448-mx-6O4" secondAttribute="centerY" id="auy-HH-S7h"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="SXp-rd-UrY" secondAttribute="trailing" constant="16" id="dQy-dl-LJ8"/>
+                    <constraint firstItem="SXp-rd-UrY" firstAttribute="leading" secondItem="448-mx-6O4" secondAttribute="trailing" constant="16" id="fUG-ct-kzU"/>
+                    <constraint firstItem="448-mx-6O4" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="wtM-F1-gcf"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <inset key="separatorInset" minX="80" minY="0.0" maxX="0.0" maxY="0.0"/>
+            <connections>
+                <outlet property="accountLabel" destination="2lX-Ur-HbP" id="x5u-4k-a5Y"/>
+                <outlet property="ammountLabel" destination="2PE-tm-CaZ" id="SJH-IZ-6mf"/>
+                <outlet property="avatarImageView" destination="448-mx-6O4" id="Ugh-36-rmZ"/>
+                <outlet property="dateLabel" destination="tj3-KB-8BU" id="0Gz-76-jR8"/>
+            </connections>
+            <point key="canvasLocation" x="34" y="114"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="income" width="27" height="27"/>
+        <namedColor name="Gray_main">
+            <color red="0.29019607843137257" green="0.29019607843137257" blue="0.29019607843137257" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Gray_secondary">
+            <color red="0.47843137254901963" green="0.47843137254901963" blue="0.47843137254901963" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

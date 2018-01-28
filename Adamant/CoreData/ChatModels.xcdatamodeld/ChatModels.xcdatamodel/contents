@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="13772" systemVersion="17C205" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Chatroom" representedClassName="Chatroom" syncable="YES">
+        <attribute name="id" attributeType="String" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="lastTransaction" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ChatTransaction" inverseName="lastIn" inverseEntity="ChatTransaction" syncable="YES"/>
+        <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ChatTransaction" inverseName="chatroom" inverseEntity="ChatTransaction" syncable="YES"/>
+    </entity>
+    <entity name="ChatTransaction" representedClassName="ChatTransaction" syncable="YES">
+        <attribute name="date" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="height" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isConfirmed" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="message" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="recipientId" attributeType="String" syncable="YES"/>
+        <attribute name="senderId" attributeType="String" syncable="YES"/>
+        <attribute name="transactionId" attributeType="String" syncable="YES"/>
+        <attribute name="type" attributeType="Integer 16" minValueString="0" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="chatroom" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="transactions" inverseEntity="Chatroom" syncable="YES"/>
+        <relationship name="lastIn" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="lastTransaction" inverseEntity="Chatroom" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Chatroom" positionX="-45" positionY="0" width="128" height="120"/>
+        <element name="ChatTransaction" positionX="-18" positionY="27" width="128" height="195"/>
+    </elements>
+</model>

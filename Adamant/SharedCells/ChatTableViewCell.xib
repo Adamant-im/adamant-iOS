@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Exo+2_300_normal.ttf">
+            <string>Exo2-Light</string>
+        </array>
+        <array key="Exo+2_400_normal.ttf">
+            <string>Exo2-Regular</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="74" id="KGk-i7-Jjw" customClass="ChatTableViewCell" customModule="Adamant" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="74"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="375" height="73.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Chat" translatesAutoresizingMaskIntoConstraints="NO" id="aVv-ww-kYa" customClass="RoundImageView" customModule="FreakingSimpleRoundImageView">
+                        <rect key="frame" x="14" y="14" width="45" height="45"/>
+                        <color key="tintColor" name="Icons"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="45" id="TUg-9Q-Uxu"/>
+                            <constraint firstAttribute="height" constant="45" id="rLx-nq-QVw"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="500" text="U12599860833263738480" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SiC-bM-ZsH">
+                        <rect key="frame" x="69" y="9" width="204" height="20"/>
+                        <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="17"/>
+                        <color key="textColor" name="Gray_main"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C7l-tD-ej1">
+                        <rect key="frame" x="69" y="31" width="294.5" height="18"/>
+                        <string key="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
+                        <fontDescription key="fontDescription" name="Exo2-Light" family="Exo 2 Light" pointSize="15"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Today, 20:24" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PP8-Tp-mvQ">
+                        <rect key="frame" x="294.5" y="53" width="68.5" height="14.5"/>
+                        <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="12"/>
+                        <color key="textColor" name="Gray_secondary"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="C7l-tD-ej1" secondAttribute="bottom" constant="8" id="0SK-AT-azY"/>
+                    <constraint firstItem="aVv-ww-kYa" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="1fI-md-PMc"/>
+                    <constraint firstItem="SiC-bM-ZsH" firstAttribute="leading" secondItem="aVv-ww-kYa" secondAttribute="trailing" constant="10" id="6my-Hp-uyp"/>
+                    <constraint firstItem="C7l-tD-ej1" firstAttribute="top" secondItem="SiC-bM-ZsH" secondAttribute="bottom" constant="2" id="9ey-Qv-1He"/>
+                    <constraint firstItem="C7l-tD-ej1" firstAttribute="leading" secondItem="SiC-bM-ZsH" secondAttribute="leading" id="GgP-A8-aEU"/>
+                    <constraint firstItem="C7l-tD-ej1" firstAttribute="trailing" secondItem="PP8-Tp-mvQ" secondAttribute="trailing" id="cKX-oK-8dF"/>
+                    <constraint firstAttribute="trailing" secondItem="PP8-Tp-mvQ" secondAttribute="trailing" constant="12" id="dX6-xD-7WY"/>
+                    <constraint firstAttribute="bottom" secondItem="PP8-Tp-mvQ" secondAttribute="bottom" constant="6" id="gB7-zA-C3o"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="SiC-bM-ZsH" secondAttribute="trailing" constant="10" id="ma1-IT-KW3"/>
+                    <constraint firstItem="aVv-ww-kYa" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="14" id="xpk-tG-FaG"/>
+                    <constraint firstItem="SiC-bM-ZsH" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="9" id="zNL-XP-X54"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <inset key="separatorInset" minX="69" minY="0.0" maxX="0.0" maxY="0.0"/>
+            <connections>
+                <outlet property="accountLabel" destination="SiC-bM-ZsH" id="HPE-pt-X6B"/>
+                <outlet property="avatarImageView" destination="aVv-ww-kYa" id="LHB-x4-hC2"/>
+                <outlet property="dateLabel" destination="PP8-Tp-mvQ" id="R6V-ec-1km"/>
+                <outlet property="lastMessageLabel" destination="C7l-tD-ej1" id="BrB-Hs-i7K"/>
+            </connections>
+            <point key="canvasLocation" x="49.5" y="70"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="Chat" width="48" height="48"/>
+        <namedColor name="Gray_main">
+            <color red="0.29019607843137257" green="0.29019607843137257" blue="0.29019607843137257" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Gray_secondary">
+            <color red="0.47843137254901963" green="0.47843137254901963" blue="0.47843137254901963" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Icons">
+            <color red="0.61960784313725492" green="0.61960784313725492" blue="0.61960784313725492" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>
