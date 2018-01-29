@@ -48,6 +48,11 @@ extension Container {
 			return service
 		}.inObjectScope(.container)
 		
+		// MARK: CoreData
+		self.register(CoreDataStack.self) { _ in
+			try! InMemoryCoreDataStack(modelUrl: AdamantResources.coreDataModel)
+		}.inObjectScope(.container)
+		
 		// MARK: AccountService
 		self.register(AccountService.self) { r in
 			let service = AdamantAccountService()

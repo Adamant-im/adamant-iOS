@@ -56,6 +56,8 @@
 		E95F85C4200A540B0070534A /* Chat.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C3200A540B0070534A /* Chat.json */; };
 		E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85C5200A9B070070534A /* ChatTableViewCell.swift */; };
 		E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C6200A9B070070534A /* ChatTableViewCell.xib */; };
+		E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722065201F42BB004F2AAD /* CoreDataStack.swift */; };
+		E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */; };
 		E9B6CC48201753D000486EA1 /* Header.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9B6CC47201753D000486EA1 /* Header.xib */; };
 		E9B6CC51201763FE00486EA1 /* ButtonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B6CC4F201763FE00486EA1 /* ButtonTableViewCell.swift */; };
 		E9B6CC52201763FE00486EA1 /* ButtonTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9B6CC50201763FE00486EA1 /* ButtonTableViewCell.xib */; };
@@ -190,6 +192,8 @@
 		E95F85C3200A540B0070534A /* Chat.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Chat.json; sourceTree = "<group>"; };
 		E95F85C5200A9B070070534A /* ChatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
 		E95F85C6200A9B070070534A /* ChatTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatTableViewCell.xib; sourceTree = "<group>"; };
+		E9722065201F42BB004F2AAD /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InMemoryCoreDataStack.swift; sourceTree = "<group>"; };
 		E9B6CC47201753D000486EA1 /* Header.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Header.xib; sourceTree = "<group>"; };
 		E9B6CC4F201763FE00486EA1 /* ButtonTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTableViewCell.swift; sourceTree = "<group>"; };
 		E9B6CC50201763FE00486EA1 /* ButtonTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ButtonTableViewCell.xib; sourceTree = "<group>"; };
@@ -281,9 +285,9 @@
 			children = (
 				E913C8F01FFFA51D001A83F7 /* Adamant */,
 				E9EC344520066D4A00C0E546 /* AdamantTests */,
-				E913C8EF1FFFA51D001A83F7 /* Products */,
-				E59396A8E0053F21F768E69B /* Pods */,
 				54F4E3CDA748B7F48C085503 /* Frameworks */,
+				E59396A8E0053F21F768E69B /* Pods */,
+				E913C8EF1FFFA51D001A83F7 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -325,6 +329,7 @@
 				E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */,
 				E95F858D20093F940070534A /* ChatDataProvider.swift */,
 				E93580DA20160BC10057FC2E /* ContactsService.swift */,
+				E9722065201F42BB004F2AAD /* CoreDataStack.swift */,
 				E9E7CD8C20026B6600DFC4DB /* DialogService.swift */,
 				E9C51ECA200E2AA100385EB7 /* FeeCalculator.swift */,
 				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
@@ -341,6 +346,7 @@
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
 				E95F859020093FB30070534A /* CoreDataChatProvider.swift */,
 				E9C51ECC200E2BF900385EB7 /* HardFeeCalculator.swift */,
+				E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
 				E93580DC20160BD30057FC2E /* KnownContactsService.swift */,
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
@@ -778,6 +784,7 @@
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
 				E9CAE8D42018AC1800345E76 /* AdamantApi+Keys.swift in Sources */,
 				E9C51EEF20139DC600385EB7 /* ProcessTransactionResponse.swift in Sources */,
+				E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */,
 				E9B6CC5520176F3300486EA1 /* TextViewTableViewCell.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */,
@@ -792,6 +799,7 @@
 				E95F857A2007F0260070534A /* ServerResponse.swift in Sources */,
 				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
 				E9CAE8D62018AC5300345E76 /* AdamantApi+Transactions.swift in Sources */,
+				E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */,
 				E9C51EF12013F18000385EB7 /* NewChatViewController.swift in Sources */,
 				E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */,
 				E95F856520067A030070534A /* GlobalConstants.swift in Sources */,
