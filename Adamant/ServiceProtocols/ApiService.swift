@@ -18,6 +18,7 @@ protocol ApiService {
 	func newAccount(byPublicKey publicKey: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
 	func getAccount(byPassphrase passphrase: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
 	func getAccount(byPublicKey publicKey: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
+	func getAccount(byAddress address: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
 	
 	
 	// MARK: - Keys
