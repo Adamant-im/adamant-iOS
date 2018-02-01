@@ -56,7 +56,7 @@ class AdamantAccountService: AccountService {
 
 // MARK: - Login&Logout functions
 extension AdamantAccountService {
-	func createAccount(with passphrase: String, completionHandler: ((Account?, Error?) -> Void)?) {
+	func createAccount(with passphrase: String, completionHandler: ((Account?, AdamantError?) -> Void)?) {
 		switch status {
 		// Is logging in, return
 		case .isLoggingIn:
@@ -95,7 +95,7 @@ extension AdamantAccountService {
 		})
 	}
 	
-	func login(with passphrase: String, completionHandler: ((Account?, Error?) -> Void)?) {
+	func login(with passphrase: String, completionHandler: ((Account?, AdamantError?) -> Void)?) {
 		switch status {
 		// Is logging in, return
 		case .isLoggingIn:
