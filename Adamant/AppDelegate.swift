@@ -43,8 +43,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		if let tabbar = self.window!.rootViewController as? UITabBarController {
 			let account = router.get(story: .Account).instantiateInitialViewController()!
 			let chats = router.get(story: .Chats).instantiateInitialViewController()!
+			let settings = router.get(story: .Settings).instantiateInitialViewController()!
 
-			tabbar.setViewControllers([account, chats], animated: false)
+			tabbar.setViewControllers([account, chats, settings], animated: false)
 		}
 
 		
