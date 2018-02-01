@@ -119,6 +119,8 @@ extension ChatsListViewController {
 	}
 	
 	private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
+		cell.accessoryType = .disclosureIndicator
+		
 		if let title = chatroom.title {
 			cell.accountLabel.text = title
 		} else {
