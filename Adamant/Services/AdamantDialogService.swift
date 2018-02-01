@@ -62,6 +62,6 @@ extension AdamantDialogService {
 	}
 	
 	func showError(withMessage message: String) {
-		showError(withMessage: message)
+		FTIndicator.showError(withMessage: message)
 	}
 }
