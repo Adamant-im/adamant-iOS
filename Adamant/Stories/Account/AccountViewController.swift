@@ -148,10 +148,12 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 			}
 			
 			let alert = UIAlertController(title: "Logout from \(address)?", message: nil, preferredStyle: .alert)
-			let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-			let logout = UIAlertAction(title: "Logout", style: .default, handler: { _ in
+			let cancel = UIAlertAction(title: "Cancel", style: .cancel) { _ in
+				self.tableView.deselectRow(at: indexPath, animated: true)
+			}
+			let logout = UIAlertAction(title: "Logout", style: .default) { _ in
 				self.accountService.logoutAndPresentLoginStoryboard(animated: true, authorizationFinishedHandler: nil)
-			})
+			}
 			
 			alert.addAction(cancel)
 			alert.addAction(logout)
