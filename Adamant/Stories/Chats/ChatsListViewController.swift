@@ -24,7 +24,7 @@ class ChatsListViewController: UIViewController {
 	// MARK: - Properties
 	let showChatSegue = "showChat"
 	let newChatSegue = "newChat"
-	var chatsController: NSFetchedResultsController<Chatroom>!
+	var chatsController: NSFetchedResultsController<Chatroom>?
 	let chatCell = SharedCell.ChatCell.cellIdentifier
 	private var preservedMessagess = [String:String]()
 	
@@ -37,10 +37,28 @@ class ChatsListViewController: UIViewController {
 		tableView.register(cellFactory.nib(for: SharedCell.ChatCell), forCellReuseIdentifier: chatCell)
 		
 		chatsController = chatProvider.getChatroomsController()
-		chatsController.delegate = self
+		chatsController?.delegate = self
 		
 		tableView.reloadData()
+		
+		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			guard let controller = self?.chatProvider.getChatroomsController() else {
+				return
+			}
+			
+			controller.delegate = self
+			self?.chatsController = controller
+			self?.tableView.reloadData()
+		}
+		NotificationCenter.default.addObserver(forName: .adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			self?.chatsController = nil
+			self?.tableView.reloadData()
+		}
     }
+	
+	deinit {
+		NotificationCenter.default.removeObserver(self)
+	}
 	
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
@@ -85,7 +103,7 @@ class ChatsListViewController: UIViewController {
 // MARK: - UITableView
 extension ChatsListViewController: UITableViewDelegate, UITableViewDataSource {
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		if let f = chatsController.fetchedObjects {
+		if let f = chatsController?.fetchedObjects {
 			return f.count
 		} else {
 			return 0
@@ -101,8 +119,9 @@ extension ChatsListViewController: UITableViewDelegate, UITableViewDataSource {
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		let chatroom = chatsController.object(at: indexPath)
-		performSegue(withIdentifier: showChatSegue, sender: chatroom)
+		if let chatroom = chatsController?.object(at: indexPath) {
+			performSegue(withIdentifier: showChatSegue, sender: chatroom)
+		}
 	}
 }
 
@@ -110,10 +129,11 @@ extension ChatsListViewController: UITableViewDelegate, UITableViewDataSource {
 // MARK: - UITableView Cells
 extension ChatsListViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let chat = chatsController.object(at: indexPath)
 		let cell: ChatTableViewCell = tableView.dequeueReusableCell(withIdentifier: chatCell, for: indexPath) as! ChatTableViewCell
 		
-		configureCell(cell, for: chat)
+		if let chat = chatsController?.object(at: indexPath) {
+			configureCell(cell, for: chat)
+		}
 		
 		return cell
 	}
@@ -217,9 +237,9 @@ extension ChatsListViewController: NewChatViewControllerDelegate {
 			}
 			
 			// Select row after awhile
-			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(1)) {
-				if let indexPath = self.chatsController.indexPath(forObject: chatroom) {
-					self.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(1)) { [weak self] in
+				if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
+					self?.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
 				}
 			}
 		}
