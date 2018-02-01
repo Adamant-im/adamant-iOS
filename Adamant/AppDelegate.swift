@@ -55,6 +55,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		accountService.logoutAndPresentLoginStoryboard(animated: false, authorizationFinishedHandler: nil)
 		
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			guard let tbc = self?.window?.rootViewController as? UITabBarController, let vcs = tbc.viewControllers else {
+				return
+			}
+			
+			for case let nav as UINavigationController in vcs {
+				nav.popToRootViewController(animated: false)
+			}
+		}
+		
 		return true
 	}
 }
