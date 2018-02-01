@@ -15,7 +15,9 @@ class AccountViewController: UIViewController {
 	private let showTransferSegue = "showTransfer"
 	
 	private enum Rows: Int {
-		case accountNumber = 0, balance, sendTokens
+		case accountNumber = 0, balance, sendTokens, logout
+		
+		static let count = 4
 	}
 	
 	
@@ -91,7 +93,7 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		if accountService.account != nil {
-			return 3
+			return Rows.count
 		} else {
 			return 0
 		}
@@ -139,6 +141,21 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 			
 		case .sendTokens:
 			performSegue(withIdentifier: showTransferSegue, sender: nil)
+			
+		case .logout:
+			guard let address = accountService.account?.address else {
+				return
+			}
+			
+			let alert = UIAlertController(title: "Logout from \(address)?", message: nil, preferredStyle: .alert)
+			let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+			let logout = UIAlertAction(title: "Logout", style: .default, handler: { _ in
+				self.accountService.logoutAndPresentLoginStoryboard(animated: true, authorizationFinishedHandler: nil)
+			})
+			
+			alert.addAction(cancel)
+			alert.addAction(logout)
+			present(alert, animated: true, completion: nil)
 		}
 	}
 }
@@ -177,13 +194,16 @@ extension AccountViewController {
 			cell.textLabel?.text = "Your balance"
 			cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
 			cell.imageView?.image = #imageLiteral(resourceName: "wallet")
-			break
 			
 		case .sendTokens:
 			cell.textLabel?.text = "Send tokens"
 			cell.detailTextLabel?.text = nil
 			cell.imageView?.image = #imageLiteral(resourceName: "send")
-			break
+			
+		case .logout:
+			cell.textLabel?.text = "Logout"
+			cell.detailTextLabel?.text = nil
+			cell.imageView?.image = #imageLiteral(resourceName: "logout")
 		}
 		
 		return cell
