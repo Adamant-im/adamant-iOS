@@ -984,7 +984,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 871009461457F6B7B47D99C5 /* Pods-Adamant.debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_2;
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = ADM.Dev;
@@ -1003,7 +1003,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D283570A539D864115735AAA /* Pods-Adamant.release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_2;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
@@ -1082,7 +1082,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 903AC078A8A55175A05E42D4 /* Pods-Adamant.testing.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_2;
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = ADAMANT;
