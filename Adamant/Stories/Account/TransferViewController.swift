@@ -201,7 +201,9 @@ class TransferViewController: FormViewController {
 		guard let recipientRow = form.rowBy(tag: Row.Recipient.tag) as? TextRow,
 			let recipient = recipientRow.value,
 			let totalRow = form.rowBy(tag: Row.Total.tag) as? DecimalRow,
-			let amount = totalRow.value else {
+			let amountRow = form.rowBy(tag: Row.Amount.tag) as? DecimalRow,
+			let totalAmount = totalRow.value,
+			let amount = amountRow.value else {
 			return
 		}
 		
@@ -210,7 +212,7 @@ class TransferViewController: FormViewController {
 			return
 		}
 		
-		guard amount <= maxToTransfer else {
+		guard totalAmount <= maxToTransfer else {
 			dialogService.showError(withMessage: "You don't have that kind of money")
 			return
 		}
@@ -232,8 +234,14 @@ class TransferViewController: FormViewController {
 					DispatchQueue.main.async {
 						if success {
 							dialogService.showSuccess(withMessage: "Funds sended!")
-							// TODO: goto transactions scene
-							self?.dismiss(animated: true, completion: nil)
+							
+							self?.accountService.updateAccountData()
+							
+							if let nav = self?.navigationController {
+								nav.popViewController(animated: true)
+							} else {
+								self?.dismiss(animated: true, completion: nil)
+							}
 						} else {
 							dialogService.showError(withMessage: error?.message ?? "Failed. Try later.")
 						}
