@@ -126,10 +126,19 @@ extension CoreDataChatProvider: ChatDataProvider {
 			return
 		}
 		
+		let backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+		backgroundContext.parent = context
+		
 		let reloadDispatchGroup = DispatchGroup()
-		_ = self.getTransactions(account: account.address, height: nil, offset: nil, dispatchGroup: reloadDispatchGroup)
+		_ = self.getTransactions(account: account.address, height: nil, offset: nil, dispatchGroup: reloadDispatchGroup, context: backgroundContext)
 		reloadDispatchGroup.notify(queue: DispatchQueue.global(qos: .utility)) {
 			self.status = .upToDate
+			
+			do {
+				try backgroundContext.save()
+			} catch {
+				print("Something happened: \(String(describing: error))")
+			}
 		}
 	}
 	
@@ -156,11 +165,20 @@ extension CoreDataChatProvider: ChatDataProvider {
 		
 		status = .updating
 		
-		_ = self.getTransactions(account: account.address, height: self.lastTransactionHeight, offset: nil, dispatchGroup: self.updatingDispatchGroup)
+		let backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+		backgroundContext.parent = context
+		
+		_ = self.getTransactions(account: account.address, height: self.lastTransactionHeight, offset: nil, dispatchGroup: self.updatingDispatchGroup, context: backgroundContext)
 		
 		updatingDispatchGroup.notify(queue: DispatchQueue.global(qos: .utility)) {
 			self.status = .upToDate
-			NotificationCenter.default.post(name: .adamantChatProviderNewTransactions, object: nil)
+			
+			do {
+				try backgroundContext.save()
+				NotificationCenter.default.post(name: .adamantChatProviderNewTransactions, object: nil)
+			} catch {
+				print("Something happened: \(String(describing: error))")
+			}
 		}
 	}
 	
@@ -192,10 +210,10 @@ extension CoreDataChatProvider {
 			return chatroom
 		}
 		
-		return createChatroom(id: address)
+		return createChatroom(id: address, context: context)
 	}
 	
-	private func createChatroom(id: String) -> Chatroom {
+	private func createChatroom(id: String, context: NSManagedObjectContext) -> Chatroom {
 		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
 		chatroom.id = id
 		chatroom.updatedAt = NSDate()
@@ -339,7 +357,7 @@ extension CoreDataChatProvider {
 	///   - height: last message height. Minimum == 1 !!!
 	///   - offset: offset, if greater than 100
 	/// - Returns: ammount of new messages was added
-	private func getTransactions(account: String, height: Int?, offset: Int?, dispatchGroup: DispatchGroup) {
+	private func getTransactions(account: String, height: Int?, offset: Int?, dispatchGroup: DispatchGroup, context: NSManagedObjectContext) {
 		// Enter 1
 		dispatchGroup.enter()
 		
@@ -361,7 +379,7 @@ extension CoreDataChatProvider {
 					dispatchGroup.leave()
 				}
 				
-				_ = self.loadChatTransactions(transactions, currentAccount: account)
+				_ = self.loadChatTransactions(transactions, currentAccount: account, context: context)
 			}
 			
 			if transactions.count == CoreDataChatProvider.apiTransactions {
@@ -372,7 +390,7 @@ extension CoreDataChatProvider {
 					newOffset = CoreDataChatProvider.apiTransactions
 				}
 				
-				self.getTransactions(account: account, height: height, offset: newOffset, dispatchGroup: dispatchGroup)
+				self.getTransactions(account: account, height: height, offset: newOffset, dispatchGroup: dispatchGroup, context: context)
 			}
 		}
 	}
@@ -383,7 +401,7 @@ extension CoreDataChatProvider {
 	///   - trs: transactions
 	///   - account: current account
 	/// - Returns: new transactions added
-	private func loadChatTransactions(_ trs: [Transaction], currentAccount account: String) -> Int {
+	private func loadChatTransactions(_ trs: [Transaction], currentAccount account: String, context: NSManagedObjectContext) -> Int {
 		guard let privateKey = accountService.keypair?.privateKey else {
 			return 0
 		}
@@ -444,7 +462,7 @@ extension CoreDataChatProvider {
 				continue
 			}
 			
-			if let chatTransaction = chatTransaction(from: transaction, currentAddress: account, privateKey: privateKey) {
+			if let chatTransaction = chatTransaction(from: transaction, currentAddress: account, privateKey: privateKey, context: context) {
 				newTransactions += 1
 				
 				// TODO: Make this threadsafe
@@ -473,7 +491,7 @@ extension CoreDataChatProvider {
 				if let ch = result.first {
 					chatroom = ch
 				} else {
-					chatroom = createChatroom(id: chatId)
+					chatroom = createChatroom(id: chatId, context: context)
 				}
 				
 				chatroom.addToTransactions(chatTransactions as NSSet)
@@ -500,7 +518,7 @@ extension CoreDataChatProvider {
 	
 	
 	/// Parse raw transaction into ChatTransaction
-	private func chatTransaction(from transaction: Transaction, currentAddress: String, privateKey: String) -> ChatTransaction? {
+	private func chatTransaction(from transaction: Transaction, currentAddress: String, privateKey: String, context: NSManagedObjectContext) -> ChatTransaction? {
 		guard let chat = transaction.asset.chat else {
 			return nil
 		}

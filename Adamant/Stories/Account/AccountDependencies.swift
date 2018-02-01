@@ -21,6 +21,7 @@ extension Container {
 		self.storyboardInitCompleted(TransferViewController.self) { (r, c) in
 			c.apiService = r.resolve(ApiService.self)
 			c.accountService = r.resolve(AccountService.self)
+			c.dialogService = r.resolve(DialogService.self)
 		}
 	}
 }

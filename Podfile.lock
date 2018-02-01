@@ -10,7 +10,7 @@ PODS:
   - FTIndicator/FTProgressIndicator (1.2.6)
   - FTIndicator/FTToastIndicator (1.2.6)
   - GrowingTextView (0.5.4)
-  - MessageKit (0.13.0)
+  - MessageKit (0.13.1)
   - Swinject (2.1.1)
   - SwinjectStoryboard (1.1.2):
     - Swinject (~> 2.1)
@@ -33,7 +33,7 @@ SPEC CHECKSUMS:
   FreakingSimpleRoundImageView: aa7879307e21922d4a25923ef858539ec6ec8c05
   FTIndicator: d2a7c204341b7b0165b6dbeb5bf6979c6d7d4bb7
   GrowingTextView: 0615429affef558cbbb610aa6f9baf19b027fdbe
-  MessageKit: 41c7e6dcb8f528413d00a0abebea7811cfa194c0
+  MessageKit: fc74d71d9b05385138d47b3a4b7beef5c687daf1
   Swinject: afea49fd95f392b41171669f165842879c48fad6
   SwinjectStoryboard: 92e75763c3299cdf627bef98a5180dc894864336
   TableKit: 42d4dff2944f273cdeec2ef6352064eb6a9a355b

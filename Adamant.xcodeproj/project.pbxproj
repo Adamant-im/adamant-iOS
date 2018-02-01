@@ -25,6 +25,7 @@
 		E93580DB20160BC10057FC2E /* ContactsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93580DA20160BC10057FC2E /* ContactsService.swift */; };
 		E93580DD20160BD30057FC2E /* KnownContactsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93580DC20160BD30057FC2E /* KnownContactsService.swift */; };
 		E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EFE12200D1156000BB482 /* ChatViewController.swift */; };
+		E948E03B20235E2300975D6B /* SettingsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E948E03A20235E2300975D6B /* SettingsRoutes.swift */; };
 		E95F856520067A030070534A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856420067A030070534A /* GlobalConstants.swift */; };
 		E95F85692006AB9D0070534A /* NormalizedTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85682006AB9D0070534A /* NormalizedTransaction.swift */; };
 		E95F856B200789450070534A /* JSModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F856A200789450070534A /* JSModels.swift */; };
@@ -56,6 +57,8 @@
 		E95F85C4200A540B0070534A /* Chat.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C3200A540B0070534A /* Chat.json */; };
 		E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85C5200A9B070070534A /* ChatTableViewCell.swift */; };
 		E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C6200A9B070070534A /* ChatTableViewCell.xib */; };
+		E982F69A20235B1300566AC7 /* Settings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E982F69920235B1300566AC7 /* Settings.storyboard */; };
+		E982F69C20235B4D00566AC7 /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E982F69B20235B4D00566AC7 /* SettingsTableViewController.swift */; };
 		E9B6CC48201753D000486EA1 /* Header.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9B6CC47201753D000486EA1 /* Header.xib */; };
 		E9B6CC51201763FE00486EA1 /* ButtonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B6CC4F201763FE00486EA1 /* ButtonTableViewCell.swift */; };
 		E9B6CC52201763FE00486EA1 /* ButtonTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9B6CC50201763FE00486EA1 /* ButtonTableViewCell.xib */; };
@@ -159,6 +162,7 @@
 		E93580DA20160BC10057FC2E /* ContactsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsService.swift; sourceTree = "<group>"; };
 		E93580DC20160BD30057FC2E /* KnownContactsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnownContactsService.swift; sourceTree = "<group>"; };
 		E93EFE12200D1156000BB482 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		E948E03A20235E2300975D6B /* SettingsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRoutes.swift; sourceTree = "<group>"; };
 		E95F856420067A030070534A /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		E95F85682006AB9D0070534A /* NormalizedTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalizedTransaction.swift; sourceTree = "<group>"; };
 		E95F856A200789450070534A /* JSModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSModels.swift; sourceTree = "<group>"; };
@@ -190,6 +194,8 @@
 		E95F85C3200A540B0070534A /* Chat.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Chat.json; sourceTree = "<group>"; };
 		E95F85C5200A9B070070534A /* ChatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
 		E95F85C6200A9B070070534A /* ChatTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatTableViewCell.xib; sourceTree = "<group>"; };
+		E982F69920235B1300566AC7 /* Settings.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Settings.storyboard; sourceTree = "<group>"; };
+		E982F69B20235B4D00566AC7 /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
 		E9B6CC47201753D000486EA1 /* Header.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Header.xib; sourceTree = "<group>"; };
 		E9B6CC4F201763FE00486EA1 /* ButtonTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTableViewCell.swift; sourceTree = "<group>"; };
 		E9B6CC50201763FE00486EA1 /* ButtonTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ButtonTableViewCell.xib; sourceTree = "<group>"; };
@@ -392,6 +398,7 @@
 				E9E7CDA52002AE1C00DFC4DB /* Account */,
 				E95F857B2008C8B20070534A /* Chats */,
 				E919479A20001007001362F8 /* Login */,
+				E982F69820235AF000566AC7 /* Settings */,
 			);
 			path = Stories;
 			sourceTree = "<group>";
@@ -454,6 +461,16 @@
 				E95F85B9200A4DC90070534A /* TransactionSend.json */,
 			);
 			path = Parsing;
+			sourceTree = "<group>";
+		};
+		E982F69820235AF000566AC7 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				E982F69920235B1300566AC7 /* Settings.storyboard */,
+				E948E03A20235E2300975D6B /* SettingsRoutes.swift */,
+				E982F69B20235B4D00566AC7 /* SettingsTableViewController.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		E9CAE8D02018AA5000345E76 /* ApiService */ = {
@@ -636,6 +653,7 @@
 				E9EC341E200524CA00C0E546 /* Roboto_500_normal.ttf in Resources */,
 				E9EC3419200524CA00C0E546 /* Exo+2_500_normal.ttf in Resources */,
 				E9EC3416200524CA00C0E546 /* Exo+2_300_normal.ttf in Resources */,
+				E982F69A20235B1300566AC7 /* Settings.storyboard in Resources */,
 				E9EC341C200524CA00C0E546 /* Roboto_400_italic.ttf in Resources */,
 				E9B6CC60201793D800486EA1 /* MultilineLableTableViewCell.xib in Resources */,
 				E9B6CC5620176F3300486EA1 /* TextViewTableViewCell.xib in Resources */,
@@ -753,6 +771,7 @@
 				E93580DB20160BC10057FC2E /* ContactsService.swift in Sources */,
 				E9C51ECB200E2AA100385EB7 /* FeeCalculator.swift in Sources */,
 				E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */,
+				E982F69C20235B4D00566AC7 /* SettingsTableViewController.swift in Sources */,
 				E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */,
 				E95F858E20093F940070534A /* ChatDataProvider.swift in Sources */,
 				E95F858B200931410070534A /* TransactionAsset.swift in Sources */,
@@ -783,6 +802,7 @@
 				E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */,
 				E95F85692006AB9D0070534A /* NormalizedTransaction.swift in Sources */,
 				E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */,
+				E948E03B20235E2300975D6B /* SettingsRoutes.swift in Sources */,
 				E9CAE8D82018ACA700345E76 /* AdamantApi+Transfers.swift in Sources */,
 				E9E7CD952002812400DFC4DB /* LoginDependencies.swift in Sources */,
 				E9E7CDCC20040FDC00DFC4DB /* TransactionType.swift in Sources */,
