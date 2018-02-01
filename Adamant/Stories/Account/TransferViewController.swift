@@ -126,13 +126,13 @@ class TransferViewController: FormViewController {
 			$0.title = "Send funds"
 			$0.tag = Row.SendButton.tag
 			$0.disabled = Condition.function([Row.Total.tag], { [weak self] form -> Bool in
-				guard let row: DecimalRow = form.rowBy(tag: Row.Total.tag),
-					let total = row.value,
+				guard let row: DecimalRow = form.rowBy(tag: Row.Amount.tag),
+					let amount = row.value,
 					let maxToTransfer = self?.maxToTransfer else {
 					return true
 				}
 
-				return total > maxToTransfer
+				return amount > maxToTransfer
 			})
 			}.onCellSelection({ [weak self] (cell, row) in
 				self?.sendFunds(row)
@@ -200,9 +200,7 @@ class TransferViewController: FormViewController {
 		
 		guard let recipientRow = form.rowBy(tag: Row.Recipient.tag) as? TextRow,
 			let recipient = recipientRow.value,
-			let totalRow = form.rowBy(tag: Row.Total.tag) as? DecimalRow,
 			let amountRow = form.rowBy(tag: Row.Amount.tag) as? DecimalRow,
-			let totalAmount = totalRow.value,
 			let amount = amountRow.value else {
 			return
 		}
@@ -212,7 +210,7 @@ class TransferViewController: FormViewController {
 			return
 		}
 		
-		guard totalAmount <= maxToTransfer else {
+		guard amount <= maxToTransfer else {
 			dialogService.showError(withMessage: "You don't have that kind of money")
 			return
 		}
