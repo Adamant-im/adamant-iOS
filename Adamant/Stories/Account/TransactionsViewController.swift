@@ -75,10 +75,15 @@ extension TransactionsViewController {
 		updatingTransactions = true
 		
 		apiService.getTransactions(forAccount: account, type: .send) { (transactions, error) in
-			// TODO: Display error messages
+			defer {
+				self.updatingTransactions = false
+			}
 			
-			self.transactions = transactions
-			self.updatingTransactions = false
+			guard let transactions = transactions else {
+				return
+			}
+			
+			self.transactions = transactions.sorted(by: { $0.date.compare($1.date) == .orderedDescending })
 			
 			DispatchQueue.main.async {
 				self.tableView.reloadData()
