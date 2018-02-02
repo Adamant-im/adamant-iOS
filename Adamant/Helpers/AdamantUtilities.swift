@@ -52,6 +52,13 @@ extension AdamantUtilities {
 	static func from(uInt: UInt) -> Double {
 		return Double(uInt) * currencyShift
 	}
+	
+	static func validateAmount(amount: Double) -> Bool {
+		if amount < currencyShift {
+			return false
+		}
+		return true
+	}
 }
 
 
