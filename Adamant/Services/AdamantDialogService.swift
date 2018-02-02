@@ -57,11 +57,21 @@ extension AdamantDialogService {
 		FTIndicator.showProgress(withMessage: message, userInteractionEnable: enabled)
 	}
 	
+	func dismissProgress() {
+		if Thread.isMainThread {
+			FTIndicator.dismissProgress()
+		} else {
+			DispatchQueue.main.async {
+				FTIndicator.dismissProgress()
+			}
+		}
+	}
+	
 	func showSuccess(withMessage message: String) {
 		FTIndicator.showSuccess(withMessage: message)
 	}
 	
 	func showError(withMessage message: String) {
-		showError(withMessage: message)
+		FTIndicator.showError(withMessage: message)
 	}
 }

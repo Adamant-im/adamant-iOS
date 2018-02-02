@@ -185,12 +185,34 @@ class LoginViewController: UIViewController {
 				return
 		}
 		
+		guard passphrase.count > 0 else {
+			dialogService.showToastMessage("Enter your passphrase!")
+			return
+		}
+		
 		passphrase = passphrase.lowercased()
 		
-		if generatedPassphrases.contains(passphrase) {
-			accountService.createAccount(with: passphrase, completionHandler: nil)
-		} else {
-			accountService.login(with: passphrase, completionHandler: nil)
+		dialogService.showProgress(withMessage: "Logging into ADAMANT", userInteractionEnable: false)
+		
+		// Dialog service currently presenting progress async. So if AccountService fails instantly, progress will be presented AFTER fail.
+		DispatchQueue.global(qos: .utility).async {
+			if self.generatedPassphrases.contains(passphrase) {
+				self.accountService.createAccount(with: passphrase) { (_, error) in
+					if let error = error {
+						self.dialogService.showError(withMessage: error.message)
+					} else {
+						self.dialogService.dismissProgress()
+					}
+				}
+			} else {
+				self.accountService.login(with: passphrase) { (_, error) in
+					if let error = error {
+						self.dialogService.showError(withMessage: error.message)
+					} else {
+						self.dialogService.dismissProgress()
+					}
+				}
+			}
 		}
 	}
 }
