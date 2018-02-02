@@ -128,6 +128,8 @@ class TransferViewController: FormViewController {
 			$0.disabled = Condition.function([Row.Total.tag], { [weak self] form -> Bool in
 				guard let row: DecimalRow = form.rowBy(tag: Row.Amount.tag),
 					let amount = row.value,
+					amount > 0,
+					AdamantUtilities.validateAmount(amount: amount),
 					let maxToTransfer = self?.maxToTransfer else {
 					return true
 				}
@@ -166,20 +168,28 @@ class TransferViewController: FormViewController {
 			return
 		}
 		
-		if let amount = row.value {
-			totalAmount = amount + defaultFee
-			totalRow.evaluateDisabled()
-		} else {
+		guard let amount = row.value else {
 			totalAmount = nil
+			sendButton.isEnabled = false
+			row.cell.titleLabel?.textColor = .black
+			return
 		}
+		
+		totalAmount = amount + defaultFee
+		totalRow.evaluateDisabled()
 		
 		totalRow.value = totalAmount
 		totalRow.evaluateDisabled()
 		
 		if let totalAmount = totalAmount {
-			let isValid = totalAmount > 0.0 && totalAmount < (Double(account.balance) * AdamantUtilities.currencyShift )
-			sendButton.isEnabled = isValid
-			row.cell.titleLabel?.textColor = isValid ? .black : .red
+			if amount > 0, AdamantUtilities.validateAmount(amount: amount),
+				totalAmount > 0.0 && totalAmount < (Double(account.balance) * AdamantUtilities.currencyShift) {
+				sendButton.isEnabled = true
+				row.cell.titleLabel?.textColor = .black
+			} else {
+				sendButton.isEnabled = false
+				row.cell.titleLabel?.textColor = .red
+			}
 		} else {
 			sendButton.isEnabled = false
 			row.cell.titleLabel?.textColor = .black
@@ -202,6 +212,11 @@ class TransferViewController: FormViewController {
 			let recipient = recipientRow.value,
 			let amountRow = form.rowBy(tag: Row.Amount.tag) as? DecimalRow,
 			let amount = amountRow.value else {
+			return
+		}
+		
+		guard amount > 0, AdamantUtilities.validateAmount(amount: amount) else {
+			dialogService.showError(withMessage: "You should send more money")
 			return
 		}
 		

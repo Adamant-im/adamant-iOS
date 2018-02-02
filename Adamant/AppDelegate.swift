@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 		
-		// MARK: Initiating Swinject
+		// MARK: 1. Initiating Swinject
 		let container = SwinjectStoryboard.defaultContainer
 		Container.loggingFunction = nil // Logging currently not supported with SwinjectStoryboards.
 		container.registerAdamantServices()
@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		container.registerAdamantChatsStory()
 		
 		
-		// MARK: Prepare UI
+		// MARK: 2. Prepare UI
 		self.window = UIWindow(frame: UIScreen.main.bounds)
 		self.window!.rootViewController = SwinjectStoryboard.create(name: "Main", bundle: nil).instantiateInitialViewController()
 		self.window!.rootViewController?.view.backgroundColor = .white
@@ -49,7 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 
 		
-		// MARK: Initiate login
+		// MARK: 3. Initiate login
 		guard let accountService = container.resolve(AccountService.self) else {
 			fatalError("Failed to get AccountService")
 		}
