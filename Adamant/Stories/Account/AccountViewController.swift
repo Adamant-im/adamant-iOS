@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SafariServices
 
 class AccountViewController: UIViewController {
 	// MARK: - Constants
@@ -14,10 +15,16 @@ class AccountViewController: UIViewController {
 	private let showTransactionsSegue = "showTransactions"
 	private let showTransferSegue = "showTransfer"
 	
-	private enum Rows: Int {
-		case accountNumber = 0, balance, sendTokens, logout
+	private enum Sections: Int {
+		case account = 0, wallet, actions
 		
-		static let count = 4
+		static let total = 3
+	}
+	
+	private enum WalletRows: Int {
+		case balance, sendTokens, invest
+		
+		static let total = 3
 	}
 	
 	
@@ -37,7 +44,6 @@ class AccountViewController: UIViewController {
 
 		tableView.delegate = self
 		tableView.dataSource = self
-		tableView.separatorInset = UIEdgeInsets.init(top: 0, left: 80, bottom: 0, right: 0)
 		
 		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { _ in
 			self.tableView.reloadData()
@@ -88,19 +94,23 @@ class AccountViewController: UIViewController {
 // MARK: - UITableView
 extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 	func numberOfSections(in tableView: UITableView) -> Int {
-		return 1
+		return Sections.total
 	}
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		if accountService.account != nil {
-			return Rows.count
+		if accountService.account != nil, let sect = Sections(rawValue: section) {
+			switch sect {
+			case .account: return 1
+			case .wallet: return WalletRows.total
+			case .actions: return 1
+			}
 		} else {
 			return 0
 		}
 	}
 	
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-		return 80
+		return 65
 	}
 	
 	func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -108,12 +118,12 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		guard let row = Rows(rawValue: indexPath.row) else {
+		guard let section = Sections(rawValue: indexPath.section) else {
 			return
 		}
 		
-		switch row {
-		case .accountNumber:
+		switch section {
+		case .account:
 			tableView.deselectRow(at: indexPath, animated: true)
 			
 			guard let address = self.accountService.account?.address else {
@@ -136,13 +146,32 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 			
 			present(alert, animated: true)
 			
-		case .balance:
-			performSegue(withIdentifier: showTransactionsSegue, sender: nil)
+		case .wallet:
+			guard let row = WalletRows(rawValue: indexPath.row) else {
+				return
+				
+			}
 			
-		case .sendTokens:
-			performSegue(withIdentifier: showTransferSegue, sender: nil)
+			switch row {
+			case .balance:
+				performSegue(withIdentifier: showTransactionsSegue, sender: nil)
+				
+			case .sendTokens:
+				performSegue(withIdentifier: showTransferSegue, sender: nil)
+				
+			case .invest:
+				guard let address = accountService.account?.address,
+					let url = URL(string: "https://adamant.im/ico/?wallet=\(address)") else {
+					return
+				}
+				
+				let safari = SFSafariViewController(url: url)
+				safari.preferredControlTintColor = UIColor.adamantPrimary
+				present(safari, animated: true, completion: nil)
+				return
+			}
 			
-		case .logout:
+		case .actions:
 			guard let address = accountService.account?.address else {
 				return
 			}
@@ -167,7 +196,7 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 extension AccountViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		guard let account = accountService.account,
-			let row = Rows(rawValue: indexPath.row) else {
+			let section = Sections(rawValue: indexPath.section) else {
 				return UITableViewCell(style: .default, reuseIdentifier: nil)
 		}
 		
@@ -175,45 +204,74 @@ extension AccountViewController {
 		if let c = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
 			cell = c
 		} else {
-			cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
+			cell = UITableViewCell(style: .value1, reuseIdentifier: cellIdentifier)
 			cell.accessoryType = .disclosureIndicator
 			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-			cell.detailTextLabel?.font = UIFont.adamantPrimary(size: 12)
+			cell.detailTextLabel?.font = UIFont.adamantPrimary(size: 17)
 			
 			cell.textLabel?.textColor = UIColor.adamantPrimary
-			cell.detailTextLabel?.textColor = UIColor.adamantSecondary
+			cell.detailTextLabel?.textColor = UIColor.adamantPrimary
 			
 			cell.imageView?.tintColor = UIColor.adamantChatIcons
 		}
 		
-		switch row {
-		case .accountNumber:
-			cell.textLabel?.text = "Your address"
-			cell.detailTextLabel?.text = account.address
+		switch section {
+		case .account:
+			cell.textLabel?.text = account.address
+			cell.detailTextLabel?.text = nil
 			cell.imageView?.image = #imageLiteral(resourceName: "account")
 			
-		case .balance:
-			cell.textLabel?.text = "Your balance"
-			cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
-			cell.imageView?.image = #imageLiteral(resourceName: "wallet")
+		case .wallet:
+			guard let row = WalletRows(rawValue: indexPath.row) else {
+				break
+			}
 			
-		case .sendTokens:
-			cell.textLabel?.text = "Send tokens"
-			cell.detailTextLabel?.text = nil
-			cell.imageView?.image = #imageLiteral(resourceName: "send")
+			switch row {
+			case .balance:
+				cell.textLabel?.text = "Balance"
+				cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
+				cell.imageView?.image = nil
+				
+			case .sendTokens:
+				cell.textLabel?.text = "Send Tokens"
+				cell.detailTextLabel?.text = nil
+				cell.imageView?.image = nil
+				
+			case .invest:
+				cell.textLabel?.text = "Invest in ICO"
+				cell.detailTextLabel?.text = nil
+				cell.imageView?.image = nil
+			}
 			
-		case .logout:
+		case .actions:
 			cell.textLabel?.text = "Logout"
 			cell.detailTextLabel?.text = nil
-			cell.imageView?.image = #imageLiteral(resourceName: "logout")
+			cell.imageView?.image = nil
 		}
 		
 		return cell
 	}
 	
+	func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+		guard let sect = Sections(rawValue: section) else {
+			return nil
+		}
+		
+		switch sect {
+		case .account:
+			return "Account"
+			
+		case .wallet:
+			return "Wallet"
+			
+		case .actions:
+			return "Actions"
+		}
+	}
+	
 	private func refreshBalanceCell() {
 		guard let account = accountService.account,
-			let cell = tableView.cellForRow(at: IndexPath(row: Rows.balance.rawValue, section: 0)) else {
+			let cell = tableView.cellForRow(at: IndexPath(row: WalletRows.balance.rawValue, section: Sections.wallet.rawValue)) else {
 			return
 		}
 		
