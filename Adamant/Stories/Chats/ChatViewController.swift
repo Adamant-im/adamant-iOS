@@ -54,7 +54,7 @@ class ChatViewController: MessagesViewController {
 		if let title = chatroom.title {
 			self.navigationItem.title = title
 		} else {
-			self.navigationItem.title = chatroom.id
+			self.navigationItem.title = chatroom.partner?.address
 		}
 		
 		messagesCollectionView.messagesDataSource = self
@@ -112,7 +112,7 @@ class ChatViewController: MessagesViewController {
 			$0.setTitleColor(UIColor.adamantSecondary, for: .highlighted)
 		}
 		
-		if let delegate = delegate, let address = chatroom.id, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
+		if let delegate = delegate, let address = chatroom.identity, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
 			messageInputBar.inputTextView.text = message
 			setEstimatedFee(feeCalculator.estimatedFeeFor(message: message))
 		}
@@ -121,7 +121,7 @@ class ChatViewController: MessagesViewController {
 	override func viewDidDisappear(_ animated: Bool) {
 		super.viewDidDisappear(animated)
 		
-		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.id {
+		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.identity {
 			delegate.preserveMessage(message, forAddress: address)
 		}
 	}
@@ -283,7 +283,7 @@ extension ChatViewController: MessagesLayoutDelegate {
 // MARK: - MessageInputBarDelegate
 extension ChatViewController: MessageInputBarDelegate {
 	func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
-		guard text.count > 0, let partner = chatroom?.id else {
+		guard text.count > 0, let partner = chatroom?.partner?.address else {
 			// TODO show warning
 			return
 		}
