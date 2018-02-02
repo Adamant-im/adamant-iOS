@@ -38,6 +38,15 @@ class LoginViewController: UIViewController {
 			tableView.tableHeaderView = header
 		}
 		
+		if let footer = UINib(nibName: "Footer", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
+			if let label = footer.viewWithTag(555) as? UILabel {
+				label.text = AdamantUtilities.applicationVersion
+				tableView.tableFooterView = footer
+			}
+		}
+		
+		view.backgroundColor = tableView.backgroundColor
+		
 		
 		// MARK: Login section
 		
