@@ -74,7 +74,7 @@ extension TransactionsViewController {
 		
 		updatingTransactions = true
 		
-		apiService.getTransactions(forAccount: account, type: .send) { (transactions, error) in
+		apiService.getTransactions(forAccount: account, type: .send, fromHeight: nil) { (transactions, error) in
 			defer {
 				self.updatingTransactions = false
 			}

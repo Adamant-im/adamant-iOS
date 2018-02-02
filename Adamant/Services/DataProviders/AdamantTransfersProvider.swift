@@ -45,7 +45,7 @@ extension AdamantTransfersProvider {
 			return
 		}
 		
-		apiService.getTransactions(forAccount: address, type: .send) { (transactions, error) in
+		apiService.getTransactions(forAccount: address, type: .send, fromHeight: nil) { (transactions, error) in
 			guard let transactions = transactions else {
 				self.status = .failedToUpdate(error!)
 				NotificationCenter.default.post(name: Notification.Name.adamantTransfersServiceStatusChanged, object: self.status)

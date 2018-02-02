@@ -29,7 +29,7 @@ protocol ApiService {
 	// MARK: - Transactions
 	
 	func getTransaction(id: UInt, completionHandler: @escaping (Transaction?, AdamantError?) -> Void)
-	func getTransactions(forAccount: String, type: TransactionType, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void)
+	func getTransactions(forAccount: String, type: TransactionType, fromHeight: UInt, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void)
 	
 	
 	// MARK: - Funds
