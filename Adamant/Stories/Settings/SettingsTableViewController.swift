@@ -11,15 +11,6 @@ import UIKit
 class SettingsTableViewController: UITableViewController {
 	
 	let identifier = "cell"
-	lazy var applicationVersion: String = {
-		if let infoDictionary = Bundle.main.infoDictionary,
-			let version = infoDictionary["CFBundleShortVersionString"] as? String,
-			let build = infoDictionary["CFBundleVersion"] as? String {
-			return "\(version) (\(build))"
-		}
-		
-		return ""
-	}()
 	
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,7 +40,7 @@ class SettingsTableViewController: UITableViewController {
 		}
 		
 		cell.textLabel?.text = "Version"
-		cell.detailTextLabel?.text = applicationVersion
+		cell.detailTextLabel?.text = AdamantUtilities.applicationVersion
 		
         return cell
     }
@@ -58,7 +49,7 @@ class SettingsTableViewController: UITableViewController {
 		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 		
 		alert.addAction(UIAlertAction(title: "Copy To Pasteboard", style: .default) { _ in
-			UIPasteboard.general.string = self.applicationVersion
+			UIPasteboard.general.string = AdamantUtilities.applicationVersion
 			tableView.deselectRow(at: indexPath, animated: true)
 		})
 		

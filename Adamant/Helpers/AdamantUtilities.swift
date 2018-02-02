@@ -9,6 +9,17 @@
 import Foundation
 
 class AdamantUtilities {
+	// MARK: Application version
+	static var applicationVersion: String = {
+		if let infoDictionary = Bundle.main.infoDictionary,
+			let version = infoDictionary["CFBundleShortVersionString"] as? String,
+			let build = infoDictionary["CFBundleVersion"] as? String {
+			return "\(version) (\(build))"
+		}
+		
+		return ""
+	}()
+	
 	private init() { }
 }
 
@@ -99,7 +110,7 @@ extension AdamantUtilities {
 }
 
 
-// MARK: Hex
+// MARK: - Hex
 extension AdamantUtilities {
 	static func getHexString(from bytes: [UInt8]) -> String {
 		if bytes.count > 0 {
