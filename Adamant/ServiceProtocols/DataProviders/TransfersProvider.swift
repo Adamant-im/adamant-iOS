@@ -21,12 +21,26 @@ enum TransfersProviderResult {
 }
 
 extension Notification.Name {
-	
-	/// Notification object: amount of new transactions (Int)
+	/// userInfo contains 'newTransactions' element. See AdamantUserInfoKey.TransfersProvider
 	static let adamantTransfersServiceNewTransactions = Notification.Name("adamantTransfersServiceNewTransactions")
 	
-	/// Notification object: new DataProvider.Status
-	static let adamantTransfersServiceStatusChanged = Notification.Name("adamantTransfersServiceStatusChanged")
+	/// userInfo contains newState element. See AdamantUserInfoKey.TransfersProvider
+	static let adamantTransfersServiceStateChanged = Notification.Name("adamantTransfersServiceStateChanged")
+}
+
+extension AdamantUserInfoKey {
+	struct TransfersProvider {
+		/// New provider state
+		static let newState = "transfersNewState"
+		
+		/// Previous provider state, if avaible
+		static let prevState = "transfersPrevState"
+		
+		// New received transactions
+		static let newTransactions = "transfersNewTransactions"
+		
+		private init() {}
+	}
 }
 
 protocol TransfersProvider: DataProvider {

@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum Status {
+enum State {
 	case empty
 	case updating
 	case upToDate
@@ -16,7 +16,7 @@ enum Status {
 }
 
 protocol DataProvider {
-	var status: Status { get }
+	var state: State { get }
 	
 	func reload()
 	func update()
@@ -25,10 +25,10 @@ protocol DataProvider {
 
 
 // MARK: - Status Equatable
-extension Status: Equatable {
+extension State: Equatable {
 	
 	/// Simple equatable function. Does not checks associated values.
-	static func ==(lhs: Status, rhs: Status) -> Bool {
+	static func ==(lhs: State, rhs: State) -> Bool {
 		switch (lhs, rhs) {
 		case (.empty, .empty): return true
 		case (.updating, .updating): return true

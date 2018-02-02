@@ -142,7 +142,7 @@ extension AdamantAccountService {
 		self.account = account
 		keypair = adamantCore.createKeypairFor(passphrase: passphrase)
 		
-		NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: account)
+		NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: nil)
 		
 		if let vc = loginViewController {
 			DispatchQueue.main.async {
@@ -221,7 +221,7 @@ extension AdamantAccountService {
 			
 			if hasChanges {
 				self.account = account
-				NotificationCenter.default.post(name: Notification.Name.adamantAccountDataUpdated, object: account)
+				NotificationCenter.default.post(name: Notification.Name.adamantAccountDataUpdated, object: nil)
 			}
 			
 			self.updating = false
