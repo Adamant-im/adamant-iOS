@@ -206,19 +206,19 @@ extension CoreDataChatProvider: ChatDataProvider {
 // MARK: - Chats
 extension CoreDataChatProvider {
 	func newChatroom(with address: String) -> Chatroom {
-		if let chatroom = getChatroomsController()?.fetchedObjects?.first(where: {$0.id == address}) {
+		if let chatroom = getChatroomsController()?.fetchedObjects?.first(where: {$0.partner?.address == address}) {
 			return chatroom
 		}
 		
-		return createChatroom(id: address, context: context)
+		return createChatroom(address: address, context: context)
 	}
 	
-	private func createChatroom(id: String, context: NSManagedObjectContext) -> Chatroom {
+	private func createChatroom(address: String, context: NSManagedObjectContext) -> Chatroom {
 		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
-		chatroom.id = id
+//		chatroom.address = id
 		chatroom.updatedAt = NSDate()
 		
-		if let title = contactsService.nameFor(address: id) {
+		if let title = contactsService.nameFor(address: address) {
 			chatroom.title = title
 		}
 		
@@ -491,7 +491,7 @@ extension CoreDataChatProvider {
 				if let ch = result.first {
 					chatroom = ch
 				} else {
-					chatroom = createChatroom(id: chatId, context: context)
+					chatroom = createChatroom(address: chatId, context: context)
 				}
 				
 				chatroom.addToTransactions(chatTransactions as NSSet)

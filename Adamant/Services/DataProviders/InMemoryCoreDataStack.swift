@@ -22,5 +22,6 @@ class InMemoryCoreDataStack: CoreDataStack {
 		
 		container = NSPersistentContainer(name: "Adamant", managedObjectModel: model)
 		container.persistentStoreDescriptions = [description]
+		container.loadPersistentStores { (_, _) in }
 	}
 }
