@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SafariServices
 
 class TransactionDetailsViewController: UIViewController {
 	private enum Row: Int {
@@ -25,6 +26,7 @@ class TransactionDetailsViewController: UIViewController {
 	
 	// MARK: - Dependencies
 	var dialogService: DialogService!
+	var exportTools: ExportTools!
 	
 	// MARK: - Properties
 	var transaction: Transaction?
@@ -32,6 +34,7 @@ class TransactionDetailsViewController: UIViewController {
 	
 	// MARK: - IBOutlets
 	@IBOutlet weak var tableView: UITableView!
+	@IBOutlet weak var shareButton: UIBarButtonItem!
 	
 	override func viewDidLoad() {
 		tableView.dataSource = self
@@ -51,6 +54,30 @@ class TransactionDetailsViewController: UIViewController {
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
+	}
+	
+	@IBAction func share(_ sender: Any) {
+		guard let transaction = transaction, let url = explorerUrl else {
+			return
+		}
+		
+		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+		alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+		
+		// URL
+		alert.addAction(UIAlertAction(title: "URL", style: .default) { _ in
+			let alert = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+			self.present(alert, animated: true, completion: nil)
+		})
+		
+		// Description
+		alert.addAction(UIAlertAction(title: "Summary", style: .default, handler: { _ in
+			let text = self.exportTools.summaryFor(transaction: transaction, url: url)
+			let alert = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+			self.present(alert, animated: true, completion: nil)
+		}))
+		
+		present(alert, animated: true, completion: nil)
 	}
 }
 
