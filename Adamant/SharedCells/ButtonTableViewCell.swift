@@ -17,6 +17,11 @@ extension SharedCell {
 
 class ButtonTableViewCell: UITableViewCell {
 	@IBOutlet weak var buttonLabel: UILabel!
+	
+	override func awakeFromNib() {
+		super.awakeFromNib()
+		buttonLabel.textColor = UIColor.adamantPrimary
+	}
 }
 
 extension ButtonTableViewCell: ConfigurableCell {
