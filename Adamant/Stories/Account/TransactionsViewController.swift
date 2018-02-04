@@ -138,6 +138,11 @@ extension TransactionsViewController {
 			return UITableViewCell(style: .default, reuseIdentifier: "cell")
 		}
 		
+		cell.accountLabel.tintColor = UIColor.adamantPrimary
+		cell.ammountLabel.tintColor = UIColor.adamantPrimary
+		cell.dateLabel.tintColor = UIColor.adamantSecondary
+		cell.avatarImageView.tintColor = UIColor.adamantPrimary
+		
 		if account == transaction.senderId {
 			cell.transactionType = .outcome
 			cell.accountLabel.text = transaction.recipientId

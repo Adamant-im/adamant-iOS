@@ -36,16 +36,19 @@ class LoginViewController: UIViewController {
 		tableDirector = TableDirector(tableView: tableView)
 		if let header = UINib(nibName: "Header", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
 			tableView.tableHeaderView = header
+			
+			if let label = header.viewWithTag(888) as? UILabel {
+				label.textColor = UIColor.adamantPrimary
+			}
 		}
 		
 		if let footer = UINib(nibName: "Footer", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
 			if let label = footer.viewWithTag(555) as? UILabel {
 				label.text = AdamantUtilities.applicationVersion
+				label.textColor = UIColor.adamantPrimary
 				tableView.tableFooterView = footer
 			}
 		}
-		
-		view.backgroundColor = tableView.backgroundColor
 		
 		
 		// MARK: Login section
@@ -162,22 +165,28 @@ class LoginViewController: UIViewController {
 			self.dialogService.showToastMessage("Copied To Pasteboard!")
 		}))
 		
+		// Exclude all sharing activities
+		var excluded: [UIActivityType] = [.postToFacebook,
+										 .postToTwitter,
+										 .postToWeibo,
+										 .message,
+										 .mail,
+										 .assignToContact,
+										 .saveToCameraRoll,
+										 .addToReadingList,
+										 .postToFlickr,
+										 .postToVimeo,
+										 .postToTencentWeibo,
+										 .airDrop,
+										 .openInIBooks]
+		
+		if #available(iOS 11.0, *) {
+			excluded.append(.markupAsPDF)
+		}
+		
 		alert.addAction(UIAlertAction(title: "Save", style: .default, handler: { _ in
 			let vc = UIActivityViewController(activityItems: [passphrase], applicationActivities: nil)
-			vc.excludedActivityTypes = [.postToFacebook,
-										.postToTwitter,
-										.postToWeibo,
-										.message,
-										.mail,
-										.assignToContact,
-										.saveToCameraRoll,
-										.addToReadingList,
-										.postToFlickr,
-										.postToVimeo,
-										.postToTencentWeibo,
-										.airDrop,
-										.openInIBooks,
-										.markupAsPDF]	// All of them
+			vc.excludedActivityTypes = excluded
 			self.present(vc, animated: true)
 		}))
 		

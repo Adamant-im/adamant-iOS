@@ -27,6 +27,8 @@ class NewChatViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		messageLabel.isHidden = true
+		messageLabel.textColor = UIColor.adamantSecondary
+		accountTextField.textColor = UIColor.adamantPrimary
 		accountTextField.delegate = self
 		accountTextField.text = ""
 		accountTextField.becomeFirstResponder()
