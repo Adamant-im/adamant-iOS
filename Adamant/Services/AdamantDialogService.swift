@@ -75,3 +75,25 @@ extension AdamantDialogService {
 		FTIndicator.showError(withMessage: message)
 	}
 }
+
+
+// MAKR: - Activity controllers
+extension AdamantDialogService {
+	func presentCopyOrShareAlert(for string: String, animated: Bool, completion: (() -> Void)?) {
+		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+		
+		alert.addAction(UIAlertAction(title: "Copy To Pasteboard", style: .default, handler: { _ in
+			UIPasteboard.general.string = string
+			self.showToastMessage("\(string)\nCopied To Pasteboard!")
+		}))
+		
+		alert.addAction(UIAlertAction(title: "Share", style: .default, handler: { _ in
+			let vc = UIActivityViewController(activityItems: [string], applicationActivities: nil)
+			self.presentModallyViewController(vc, animated: true, completion: completion)
+		}))
+		
+		alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+		
+		presentModallyViewController(alert, animated: animated, completion: completion)
+	}
+}

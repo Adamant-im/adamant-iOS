@@ -23,4 +23,7 @@ protocol DialogService {
 	func dismissProgress()
 	func showSuccess(withMessage: String)
 	func showError(withMessage: String)
+	
+	// MARK: - ActivityControllers
+	func presentCopyOrShareAlert(for string: String, animated: Bool, completion: (() -> Void)?)
 }
