@@ -8,6 +8,11 @@
 
 import UIKit
 
+enum ShareType {
+	case copyToPasteboard
+	case share
+}
+
 protocol DialogService {
 	/// Present view controller modally
 	func presentModallyViewController(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
@@ -23,4 +28,7 @@ protocol DialogService {
 	func dismissProgress()
 	func showSuccess(withMessage: String)
 	func showError(withMessage: String)
+	
+	// MARK: - ActivityControllers
+	func presentShareAlertFor(string: String, types: [ShareType], animated: Bool, completion: (() -> Void)?)
 }

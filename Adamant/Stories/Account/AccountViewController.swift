@@ -130,21 +130,7 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 				return
 			}
 			
-			let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-			
-			alert.addAction(UIAlertAction(title: "Copy To Pasteboard", style: .default, handler: { _ in
-				UIPasteboard.general.string = address
-				self.dialogService.showToastMessage("\(address)\nCopied To Pasteboard!")
-			}))
-			
-			alert.addAction(UIAlertAction(title: "Share", style: .default, handler: { _ in
-				let vc = UIActivityViewController(activityItems: [address], applicationActivities: nil)
-				self.present(vc, animated: true)
-			}))
-			
-			alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-			
-			present(alert, animated: true)
+			dialogService.presentShareAlertFor(string: address, types: [.copyToPasteboard, .share], animated: true, completion: nil)
 			
 		case .wallet:
 			guard let row = WalletRows(rawValue: indexPath.row) else {
