@@ -130,7 +130,7 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 				return
 			}
 			
-			dialogService.presentCopyOrShareAlert(for: address, animated: true, completion: nil)
+			dialogService.presentShareAlertFor(string: address, types: [.copyToPasteboard, .share], animated: true, completion: nil)
 			
 		case .wallet:
 			guard let row = WalletRows(rawValue: indexPath.row) else {
