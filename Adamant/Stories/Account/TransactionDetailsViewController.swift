@@ -10,24 +10,25 @@ import UIKit
 
 class TransactionDetailsViewController: UIViewController {
 	private enum Row: Int {
-		case amount = 0
-		case date
-		case confirmations
-		case fee
-		case transactionNumber
+		case transactionNumber = 0
 		case from
 		case to
+		case date
+		case amount
+		case fee
+		case confirmations
+		case block
+		case openInExplorer
 		
-		static let total = 7
+		static let total = 9
 	}
 	
 	// MARK: - Dependencies
-	var apiService: ApiService!
-	
+	var dialogService: DialogService!
 	
 	// MARK: - Properties
 	var transaction: Transaction?
-	
+	var explorerUrl: URL!
 	
 	// MARK: - IBOutlets
 	@IBOutlet weak var tableView: UITableView!
@@ -36,8 +37,19 @@ class TransactionDetailsViewController: UIViewController {
 		tableView.dataSource = self
 		tableView.delegate = self
 		
-		if transaction != nil {
+		if let transaction = transaction {
 			tableView.reloadData()
+			
+			explorerUrl = URL(string: "https://explorer.adamant.im/tx/\(transaction.id)")
+		} else {
+			self.navigationItem.rightBarButtonItems = nil
+		}
+	}
+	
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		if let indexPath = tableView.indexPathForSelectedRow {
+			tableView.deselectRow(at: indexPath, animated: animated)
 		}
 	}
 }
@@ -64,6 +76,57 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 		return 50
 	}
+	
+	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		if indexPath.row == Row.openInExplorer.rawValue,
+			let url = explorerUrl {
+			let safari = SFSafariViewController(url: url)
+			safari.preferredControlTintColor = UIColor.adamantPrimary
+			present(safari, animated: true, completion: nil)
+			return
+		}
+		
+		guard let cell = tableView.cellForRow(at: indexPath),
+			let row = Row(rawValue: indexPath.row),
+			let details = cell.detailTextLabel?.text else {
+			tableView.deselectRow(at: indexPath, animated: true)
+			return
+		}
+		
+		let payload: String
+		switch row {
+		case .amount:
+			payload = "Amount: \(details)"
+			
+		case .date:
+			payload = "Date: \(details)"
+			
+		case .confirmations:
+			payload = "Confirmations: \(details)"
+			
+		case .fee:
+			payload = "Fee: \(details)"
+			
+		case .transactionNumber:
+			payload = "Id: \(details)"
+			
+		case .from:
+			payload = "Sender: \(details)"
+			
+		case .to:
+			payload = "Recipient: \(details)"
+			
+		case .block:
+			payload = "Block Id: \(details)"
+			
+		case .openInExplorer:
+			payload = ""
+		}
+		
+		dialogService.presentCopyOrShareAlert(for: payload, animated: true) {
+			tableView.deselectRow(at: indexPath, animated: true)
+		}
+	}
 }
 
 
@@ -78,6 +141,7 @@ extension TransactionDetailsViewController {
 		var cell: UITableViewCell
 		if let c = tableView.dequeueReusableCell(withIdentifier: "cell") {
 			cell = c
+			cell.accessoryType = .none
 		} else {
 			cell = UITableViewCell(style: .value1, reuseIdentifier: "cell")
 			cell.textLabel?.textColor = UIColor.adamantPrimary
@@ -116,6 +180,15 @@ extension TransactionDetailsViewController {
 		case .to:
 			cell.textLabel?.text = "To"
 			cell.detailTextLabel?.text = transaction.recipientId
+			
+		case .block:
+			cell.textLabel?.text = "Block"
+			cell.detailTextLabel?.text = String(transaction.blockId)
+			
+		case .openInExplorer:
+			cell.textLabel?.text = "Open in Blockchain Explorer"
+			cell.detailTextLabel?.text = nil
+			cell.accessoryType = .disclosureIndicator
 		}
 		
 		return cell
