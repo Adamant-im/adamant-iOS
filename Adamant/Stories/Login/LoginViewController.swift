@@ -50,8 +50,6 @@ class LoginViewController: UIViewController {
 			}
 		}
 		
-		view.backgroundColor = tableView.backgroundColor
-		
 		
 		// MARK: Login section
 		
