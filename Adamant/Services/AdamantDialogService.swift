@@ -53,7 +53,7 @@ extension AdamantDialogService {
 
 // MARK: - Indicators
 extension AdamantDialogService {
-	func showProgress(withMessage message: String, userInteractionEnable enabled: Bool) {
+	func showProgress(withMessage message: String?, userInteractionEnable enabled: Bool) {
 		FTIndicator.showProgress(withMessage: message, userInteractionEnable: enabled)
 	}
 	

@@ -6,7 +6,6 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
-        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -56,6 +55,67 @@
             </objects>
             <point key="canvasLocation" x="929" y="42"/>
         </scene>
+        <!--New Chat-->
+        <scene sceneID="a5b-NZ-CDn">
+            <objects>
+                <tableViewController id="rtY-9H-j9D" customClass="NewChatViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="static" style="grouped" separatorStyle="default" rowHeight="44" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="Dqc-T8-MFZ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <sections>
+                            <tableViewSection headerTitle="Recipient Address" id="plW-LM-q5E">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="ps8-Sh-jNJ">
+                                        <rect key="frame" x="0.0" y="55.5" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ps8-Sh-jNJ" id="4wM-bh-sVe">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="asdfasdf" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="aW0-JI-mqg">
+                                                    <rect key="frame" x="12" y="0.0" width="351" height="43.5"/>
+                                                    <nil key="textColor"/>
+                                                    <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="17"/>
+                                                    <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters" autocorrectionType="no" returnKeyType="next"/>
+                                                </textField>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="aW0-JI-mqg" firstAttribute="leading" secondItem="4wM-bh-sVe" secondAttribute="leading" constant="12" id="M6m-Be-YSv"/>
+                                                <constraint firstAttribute="trailing" secondItem="aW0-JI-mqg" secondAttribute="trailing" constant="12" id="ZhD-tf-2yi"/>
+                                                <constraint firstItem="aW0-JI-mqg" firstAttribute="top" secondItem="4wM-bh-sVe" secondAttribute="top" id="hVY-LB-bjt"/>
+                                                <constraint firstAttribute="bottom" secondItem="aW0-JI-mqg" secondAttribute="bottom" id="sP1-tl-6bi"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="rtY-9H-j9D" id="8Aw-Wx-xyr"/>
+                            <outlet property="delegate" destination="rtY-9H-j9D" id="TIu-JZ-flg"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="New Chat" id="5N6-IX-Nxi">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="GfW-fU-09V">
+                            <connections>
+                                <action selector="cancel:" destination="rtY-9H-j9D" id="cKx-Kc-go6"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="c8k-iq-Jzo">
+                            <connections>
+                                <action selector="done:" destination="rtY-9H-j9D" id="x9S-3m-NZb"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="accountTextField" destination="aW0-JI-mqg" id="FWg-OE-jBb"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="caQ-hu-1yy" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2751" y="-439"/>
+        </scene>
         <!--Title-->
         <scene sceneID="w1v-2h-ifS">
             <objects>
@@ -73,59 +133,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="V4A-mw-8Ee" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3562" y="42"/>
-        </scene>
-        <!--New Chat-->
-        <scene sceneID="0RF-My-YHM">
-            <objects>
-                <viewController id="iOk-O1-NqA" customClass="NewChatViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="CX3-T3-N4o">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="U" placeholder="Address" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Wiv-l3-PSM">
-                                <rect key="frame" x="154.5" y="163" width="67" height="21"/>
-                                <nil key="textColor"/>
-                                <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="17"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters" autocorrectionType="no" spellCheckingType="no" returnKeyType="done"/>
-                            </textField>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please specify recipient address" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5gE-HW-nft">
-                                <rect key="frame" x="63.5" y="192" width="248" height="20"/>
-                                <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="17"/>
-                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstItem="5gE-HW-nft" firstAttribute="width" relation="lessThanOrEqual" secondItem="CX3-T3-N4o" secondAttribute="width" multiplier="0.8" id="6CJ-QC-uvu"/>
-                            <constraint firstItem="5gE-HW-nft" firstAttribute="centerX" secondItem="ivN-27-jJw" secondAttribute="centerX" id="8RZ-W5-3xN"/>
-                            <constraint firstItem="Wiv-l3-PSM" firstAttribute="centerX" secondItem="ivN-27-jJw" secondAttribute="centerX" id="NGg-ty-RNE"/>
-                            <constraint firstItem="5gE-HW-nft" firstAttribute="top" secondItem="Wiv-l3-PSM" secondAttribute="bottom" constant="8" id="ZIB-G4-OXU"/>
-                            <constraint firstItem="Wiv-l3-PSM" firstAttribute="width" relation="lessThanOrEqual" secondItem="CX3-T3-N4o" secondAttribute="width" multiplier="0.9" id="buJ-nV-ppL"/>
-                            <constraint firstItem="Wiv-l3-PSM" firstAttribute="top" secondItem="ivN-27-jJw" secondAttribute="top" constant="99" id="kUo-1O-5hS"/>
-                        </constraints>
-                        <viewLayoutGuide key="safeArea" id="ivN-27-jJw"/>
-                    </view>
-                    <navigationItem key="navigationItem" title="New Chat" id="f6F-Qv-PzZ">
-                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="BHs-09-Puk">
-                            <connections>
-                                <action selector="cancel:" destination="iOk-O1-NqA" id="cFH-Yk-oOb"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="4jz-kX-Crt">
-                            <connections>
-                                <action selector="done:" destination="iOk-O1-NqA" id="LtT-nB-UF8"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
-                    <connections>
-                        <outlet property="accountTextField" destination="Wiv-l3-PSM" id="wpG-hK-laZ"/>
-                        <outlet property="messageLabel" destination="5gE-HW-nft" id="nvx-hN-93h"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="qnw-77-t2H" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2717.5999999999999" y="-437.63118440779613"/>
         </scene>
         <!--Chats-->
         <scene sceneID="xXv-1r-BTU">
@@ -158,7 +165,7 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="iOk-O1-NqA" kind="relationship" relationship="rootViewController" id="qhG-fZ-N6u"/>
+                        <segue destination="rtY-9H-j9D" kind="relationship" relationship="rootViewController" id="7TF-Vb-G9a"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UFg-Ym-dnp" userLabel="First Responder" sceneMemberID="firstResponder"/>

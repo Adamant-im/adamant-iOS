@@ -24,7 +24,7 @@ protocol DialogService {
 	
 	
 	// MARK: - Indicators
-	func showProgress(withMessage: String, userInteractionEnable: Bool)
+	func showProgress(withMessage: String?, userInteractionEnable: Bool)
 	func dismissProgress()
 	func showSuccess(withMessage: String)
 	func showError(withMessage: String)
