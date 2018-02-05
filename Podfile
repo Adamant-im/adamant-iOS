@@ -1,3 +1,6 @@
+
+platform :ios, '10.0'
+
 target 'Adamant' do
   use_frameworks!
 
