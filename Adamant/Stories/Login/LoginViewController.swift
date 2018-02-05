@@ -122,7 +122,7 @@ class LoginViewController: UIViewController {
 			let index = IndexPath(row: 2, section: 1)
 			tableView.selectRow(at: index, animated: false, scrollPosition: .none)
 			tableView.deselectRow(at: index, animated: true)
-			tableView.scrollToRow(at: index, at: .top, animated: true)
+			tableView.scrollToRow(at: index, at: .none, animated: true)
 		} else {
 			let newPassphraseRow = createPassphraseRow(passphrase: passphrase)
 			

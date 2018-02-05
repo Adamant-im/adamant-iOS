@@ -58,7 +58,7 @@ class NewChatViewController: UITableViewController {
 			return
 		}
 		
-		dialogService.showProgress(withMessage: nil, userInteractionEnable: true)
+		dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
 		
 		apiService.getPublicKey(byAddress: address) { (publicKey, error) in
 			if publicKey != nil {
