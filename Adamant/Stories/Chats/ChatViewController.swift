@@ -112,7 +112,7 @@ class ChatViewController: MessagesViewController {
 			$0.setTitleColor(UIColor.adamantSecondary, for: .highlighted)
 		}
 		
-		if let delegate = delegate, let address = chatroom.identity, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
+		if let delegate = delegate, let address = chatroom.partnerAddress, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
 			messageInputBar.inputTextView.text = message
 			setEstimatedFee(feeCalculator.estimatedFeeFor(message: message))
 		}
@@ -121,7 +121,7 @@ class ChatViewController: MessagesViewController {
 	override func viewDidDisappear(_ animated: Bool) {
 		super.viewDidDisappear(animated)
 		
-		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.identity {
+		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.partnerAddress {
 			delegate.preserveMessage(message, forAddress: address)
 		}
 	}

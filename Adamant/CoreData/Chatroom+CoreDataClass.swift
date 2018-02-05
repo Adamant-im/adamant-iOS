@@ -13,9 +13,4 @@ import CoreData
 @objc(Chatroom)
 public class Chatroom: NSManagedObject {
 	static let entityName = "Chatroom"
-	
-	/// returns title if not nil, otherwise partner's address
-	var identity: String? {
-		return self.title ?? self.partner?.address
-	}
 }

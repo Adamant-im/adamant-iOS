@@ -22,5 +22,10 @@ extension Container {
 			c.chatProvider = r.resolve(ChatDataProvider.self)
 			c.feeCalculator = r.resolve(FeeCalculator.self)
 		}
+		
+		self.storyboardInitCompleted(NewChatViewController.self) { r, c in
+			c.dialogService = r.resolve(DialogService.self)
+			c.apiService = r.resolve(ApiService.self)
+		}
 	}
 }

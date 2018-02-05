@@ -166,17 +166,20 @@ extension AdamantAccountService {
 	}
 }
 
+
 // MARK: - Update
 extension AdamantAccountService {
-	func start() {
-		if !autoupdate { autoupdate = true }
-		
-		if status != .loggedIn {
-			stop()
-			return
+	private func start() {
+		if let timer = timer {
+			timer.invalidate()
+			self.timer = nil
 		}
 		
 		timer = Timer(timeInterval: autoupdateInterval, repeats: true, block: { _ in
+			if self.status != .loggedIn {
+				return
+			}
+			
 			if !self.updating {
 				self.updateAccountData()
 			}
@@ -190,9 +193,7 @@ extension AdamantAccountService {
 		}
 	}
 	
-	func stop() {
-		if autoupdate { autoupdate = false }
-		
+	private func stop() {
 		timer?.invalidate()
 		timer = nil
 	}

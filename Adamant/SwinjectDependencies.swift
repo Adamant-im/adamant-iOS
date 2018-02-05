@@ -64,6 +64,9 @@ extension Container {
 		// MARK: Fee calculator
 		self.register(FeeCalculator.self) { _ in HardFeeCalculator() }.inObjectScope(.container)
 		
+		// MARK: Export tools
+		self.register(ExportTools.self) { _ in AdamantExportTools() }
+		
 		// MARK: Chat provider
 		self.register(ChatDataProvider.self) { r  in
 			let provider = CoreDataChatProvider(managedObjectModel: AdamantResources.coreDataModel)

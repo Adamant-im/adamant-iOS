@@ -23,5 +23,9 @@ extension Container {
 			c.accountService = r.resolve(AccountService.self)
 			c.dialogService = r.resolve(DialogService.self)
 		}
+		self.storyboardInitCompleted(TransactionDetailsViewController.self) { (r, c) in
+			c.dialogService = r.resolve(DialogService.self)
+			c.exportTools = r.resolve(ExportTools.self)
+		}
 	}
 }

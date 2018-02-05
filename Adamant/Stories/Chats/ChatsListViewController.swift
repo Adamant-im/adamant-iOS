@@ -139,10 +139,19 @@ extension ChatsListViewController {
 	}
 	
 	private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
-        cell.accessoryType = .disclosureIndicator
-		cell.accountLabel.text = chatroom.identity
+		cell.accessoryType = .disclosureIndicator
+		
+		cell.accountLabel.textColor = UIColor.adamantPrimary
+		cell.dateLabel.textColor = UIColor.adamantSecondary
+		cell.avatarImageView.tintColor = UIColor.adamantChatIcons
+		
+		if let title = chatroom.title {
+			cell.accountLabel.text = title
+		} else {
+			cell.accountLabel.text = chatroom.partnerAddress
+		}
+		
 		cell.lastMessageLabel.text = chatroom.lastTransaction?.message
-        
 		if let date = chatroom.updatedAt as Date? {
 			cell.dateLabel.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
 		} else {
