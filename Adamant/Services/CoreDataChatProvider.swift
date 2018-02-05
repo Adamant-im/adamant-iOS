@@ -75,8 +75,7 @@ class CoreDataChatProvider {
 		}
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { _ in
-			self.stop()
-			self.context.reset()
+			self.reset()
 		}
 	}
 	
@@ -88,8 +87,11 @@ class CoreDataChatProvider {
 	
 	// MARK: - Autoupdate timers
 	
-	func start() {
-		if !autoupdate { autoupdate = true }
+	private func start() {
+		if let timer = timer {
+			timer.invalidate()
+			self.timer = nil
+		}
 		
 		timer = Timer(timeInterval: autoupdateInterval, repeats: true, block: { _ in
 			self.updateChats()
@@ -104,9 +106,7 @@ class CoreDataChatProvider {
 		}
 	}
 	
-	func stop() {
-		if autoupdate { autoupdate = false }
-		
+	private func stop() {
 		timer?.invalidate()
 		timer = nil
 	}
@@ -185,6 +185,7 @@ extension CoreDataChatProvider: ChatDataProvider {
 	/// Drop everything
 	func reset() {
 		stop()
+		lastTransactionHeight = 1
 		context.reset()
 		status = .disabled
 	}

@@ -53,7 +53,7 @@ extension AdamantDialogService {
 
 // MARK: - Indicators
 extension AdamantDialogService {
-	func showProgress(withMessage message: String, userInteractionEnable enabled: Bool) {
+	func showProgress(withMessage message: String?, userInteractionEnable enabled: Bool) {
 		FTIndicator.showProgress(withMessage: message, userInteractionEnable: enabled)
 	}
 	
@@ -73,5 +73,33 @@ extension AdamantDialogService {
 	
 	func showError(withMessage message: String) {
 		FTIndicator.showError(withMessage: message)
+	}
+}
+
+
+// MAKR: - Activity controllers
+extension AdamantDialogService {
+	func presentShareAlertFor(string: String, types: [ShareType], animated: Bool, completion: (() -> Void)?) {
+		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+		
+		for type in types {
+			switch type {
+			case .copyToPasteboard:
+				alert.addAction(UIAlertAction(title: "Copy To Pasteboard", style: .default, handler: { _ in
+					UIPasteboard.general.string = string
+					self.showToastMessage("\(string)\nCopied To Pasteboard!")
+				}))
+				
+			case .share:
+				alert.addAction(UIAlertAction(title: "Share", style: .default, handler: { _ in
+					let vc = UIActivityViewController(activityItems: [string], applicationActivities: nil)
+					self.presentModallyViewController(vc, animated: true, completion: completion)
+				}))
+			}
+		}
+		
+		alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+		
+		presentModallyViewController(alert, animated: animated, completion: completion)
 	}
 }

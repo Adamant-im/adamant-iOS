@@ -26,6 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		container.registerAdamantAccountStory()
 		container.registerAdamantLoginStory()
 		container.registerAdamantChatsStory()
+		container.registerAdamantSettingsStory()
 		
 		
 		// MARK: 2. Prepare UI

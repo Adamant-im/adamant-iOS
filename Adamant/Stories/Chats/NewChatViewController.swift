@@ -12,12 +12,14 @@ protocol NewChatViewControllerDelegate: class {
 	func newChatController(_ controller: NewChatViewController, didSelectedAddress address: String)
 }
 
-class NewChatViewController: UIViewController {
+class NewChatViewController: UITableViewController {
+	// MARK: - Dependencies
+	var dialogService: DialogService!
+	var apiService: ApiService!
+	
 	
 	// MARK: - Properties
-	
 	@IBOutlet weak var accountTextField: UITextField!
-	@IBOutlet weak var messageLabel: UILabel!
 	
 	weak var delegate: NewChatViewControllerDelegate?
 	
@@ -26,7 +28,7 @@ class NewChatViewController: UIViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
-		messageLabel.isHidden = true
+		accountTextField.textColor = UIColor.adamantPrimary
 		accountTextField.delegate = self
 		accountTextField.text = ""
 		accountTextField.becomeFirstResponder()
@@ -42,8 +44,7 @@ class NewChatViewController: UIViewController {
 	
 	@IBAction func done(_ sender: Any) {
 		guard let nums = accountTextField.text, nums.count > 1 else {
-			messageLabel.text = "Please specify valid recipient address"
-			messageLabel.isHidden = false
+			dialogService.showToastMessage("Please specify valid recipient address")
 			return
 		}
 		
@@ -53,12 +54,32 @@ class NewChatViewController: UIViewController {
 		}
 		
 		if !AdamantUtilities.validateAdamantAddress(address: address) {
-			messageLabel.text = "Please specify valid recipient address"
-			messageLabel.isHidden = false
+			dialogService.showToastMessage("Please specify valid recipient address")
 			return
 		}
 		
-		delegate?.newChatController(self, didSelectedAddress: address)
+		dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+		
+		apiService.getPublicKey(byAddress: address) { (publicKey, error) in
+			if publicKey != nil {
+				DispatchQueue.main.async {
+					self.delegate?.newChatController(self, didSelectedAddress: address)
+					self.dialogService.dismissProgress()
+				}
+			}
+			
+			else if let error = error {
+				DispatchQueue.main.async {
+					self.dialogService.showError(withMessage: error.message)
+				}
+			}
+			
+			else {
+				DispatchQueue.main.async {
+					self.dialogService.showError(withMessage: "Address \(address) not found")
+				}
+			}
+		}
 	}
 	
 	@IBAction func cancel(_ sender: Any) {
@@ -72,10 +93,5 @@ extension NewChatViewController: UITextFieldDelegate {
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
 		done(textField)
 		return false
-	}
-	
-	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-		messageLabel.isHidden = true
-		return true
 	}
 }
