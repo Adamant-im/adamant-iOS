@@ -2,7 +2,7 @@
 //  CoreDataAccount+CoreDataProperties.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 29.01.2018.
+//  Created by Anokhov Pavel on 07.02.2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 //
@@ -19,8 +19,8 @@ extension CoreDataAccount {
 
     @NSManaged public var address: String?
     @NSManaged public var publicKey: String?
-    @NSManaged public var transfers: NSSet?
     @NSManaged public var chatroom: Chatroom?
+    @NSManaged public var transfers: NSSet?
 
 }
 
