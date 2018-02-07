@@ -27,6 +27,7 @@ class AdamantChatsProvider: ChatsProvider {
 	private let processingQueue = DispatchQueue(label: "im.adamant.processing.chat", qos: .utility, attributes: [.concurrent])
 	private let unconfirmedsSemaphore = DispatchSemaphore(value: 1)
 	private let chatroomsSemaphore = DispatchSemaphore(value: 1)
+	private let highSemaphore = DispatchSemaphore(value: 1)
 	
 	// MARK: Tools
 	private func setState(_ state: State, previous prevState: State, notify: Bool = true) {
@@ -66,13 +67,8 @@ extension AdamantChatsProvider {
 	
 	func update() {
 		// MARK: 1. Check state
-		switch state {
-		case .updating:
+		if state == .updating {
 			return
-			
-		case .empty: break
-		case .upToDate: break
-		case .failedToUpdate(_): break
 		}
 		
 		// MARK: 2. Prepare
@@ -92,7 +88,7 @@ extension AdamantChatsProvider {
 		// MARK: 4. Check
 		processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) {
 			switch self.state {
-			case .failedToUpdate(_):
+			case .failedToUpdate(_): // Processing function
 				break
 				
 			default:
@@ -297,7 +293,7 @@ extension AdamantChatsProvider {
 		
 		// MARK: 3. Process Transactions, group them by partner
 		var partnersChats = [String: Set<ChatTransaction>]()
-		var lastHeight: Int64 = 0
+		var height: Int64 = 0
 		
 		for transaction in chatTransactions {
 			unconfirmedsSemaphore.wait()
@@ -316,8 +312,8 @@ extension AdamantChatsProvider {
 			}
 			
 			if let chatTransaction = chatTransaction(from: transaction, isOutgoing: isOutgoing, publicKey: publicKey, privateKey: privateKey, context: privateContext) {
-				if lastHeight < chatTransaction.height {
-					lastHeight = chatTransaction.height
+				if height < chatTransaction.height {
+					height = chatTransaction.height
 				}
 				
 				if let partner = chatTransaction.isOutgoing ? chatTransaction.recipientId : chatTransaction.senderId {
@@ -330,13 +326,23 @@ extension AdamantChatsProvider {
 			}
 		}
 		
-		
 		// MARK: 4. Process chatrooms
 		processChatrooms(partnersChats, privateContext: privateContext)	// This one too large, so i carved it out as a function.
 		
 		// MARK: 5. Save!
 		do {
 			try privateContext.save()
+			
+			let h = Int(height)
+			highSemaphore.wait()
+			if let lastHeight = lastHeight {
+				if lastHeight < h {
+					self.lastHeight = h
+				}
+			} else {
+				lastHeight = h
+			}
+			highSemaphore.signal()
 		} catch {
 			print(error)
 		}

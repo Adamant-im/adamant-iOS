@@ -16,7 +16,9 @@ class AdamantAccountsProvider: AccountsProvider {
 	
 	// MARK: Threading
 	private let queue = DispatchQueue(label: "im.adamant.accounts.getAccount", qos: .utility, attributes: [.concurrent])
-	private let semaphore = DispatchSemaphore(value: 1)
+	
+	private var requestGroups = [String:DispatchGroup]()
+	private let groupsSemaphore = DispatchSemaphore(value: 1)
 	
 	private func getAccount(byPredicate predicate: NSPredicate, context: NSManagedObjectContext? = nil) -> CoreDataAccount? {
 		let request = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
@@ -36,19 +38,34 @@ extension AdamantAccountsProvider {
 	///   - address: address of an account
 	///   - completionHandler: returns Account created in viewContext
 	func getAccount(byAddress address: String, completionHandler: @escaping (AccountsProviderResult) -> Void) {
-		// Go background, to not to hang threads (especially main) on semaphores
+		// Go background, to not to hang threads (especially main) on semaphores and dispatch groups
 		queue.async {
-			self.semaphore.wait() // Enter
+			self.groupsSemaphore.wait()
 			
+			// If there is already request for a this address, wait
+			if let group = self.requestGroups[address] {
+				self.groupsSemaphore.signal()
+				group.wait()
+				self.groupsSemaphore.wait()
+			}
+			
+			// Check if there is an account, that we are looking for
 			if let account = self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
-				self.semaphore.signal() // Exit in case of success
+				self.groupsSemaphore.signal()
 				completionHandler(.success(account))
 				return
 			}
 			
+			// No, we need to get one from server.
+			let group = DispatchGroup()
+			self.requestGroups[address] = group
+			group.enter()
+			self.groupsSemaphore.signal()
+			
 			self.apiService.getAccount(byAddress: address) { (account, error) in
 				defer {
-					self.semaphore.signal() // Exit in case of API call
+					self.requestGroups.removeValue(forKey: address)
+					group.leave()
 				}
 				
 				if let error = error {
@@ -74,18 +91,35 @@ extension AdamantAccountsProvider {
 	///   - publicKey: publicKey of an account
 	///   - completionHandler: returns Account created in viewContext
 	func getAccount(byPublicKey publicKey: String, completionHandler: @escaping (AccountsProviderResult) -> Void) {
-		// Go background, to not to hang threads (especially main) on semaphores
+		// Go background, to not to hang threads (especially main) on semaphores and dispatch groups
 		queue.async {
-			self.semaphore.wait() // Enter
+			self.groupsSemaphore.wait()
 			
+			// If there is already request for a this address, wait
+			if let group = self.requestGroups[publicKey] {
+				self.groupsSemaphore.signal()
+				group.wait()
+				self.groupsSemaphore.wait()
+			}
+			
+			
+			// Check account
 			if let account = self.getAccount(byPredicate: NSPredicate(format: "publicKey == %@", publicKey)) {
+				self.groupsSemaphore.signal()
 				completionHandler(.success(account))
 				return
 			}
 			
+			// Not found, maybe on server?
+			let group = DispatchGroup()
+			self.requestGroups[publicKey] = group
+			group.enter()
+			self.groupsSemaphore.signal()
+			
 			self.apiService.getAccount(byPublicKey: publicKey) { (account, error) in
 				defer {
-					self.semaphore.signal() // Exit in case of API call
+					self.requestGroups.removeValue(forKey: publicKey)
+					group.leave()
 				}
 				
 				if let error = error {

@@ -79,11 +79,12 @@ extension Container {
 		
 		
 		// MARK: - Data Providers
-		// MARK: CoreData
+		// MARK: CoreData Stack
 		self.register(CoreDataStack.self) { _ in
 			try! InMemoryCoreDataStack(modelUrl: AdamantResources.coreDataModel)
 		}.inObjectScope(.container)
 		
+		// MARK: Accounts
 		self.register(AccountsProvider.self) { r in
 			let provider = AdamantAccountsProvider()
 			provider.stack = r.resolve(CoreDataStack.self)
@@ -91,6 +92,7 @@ extension Container {
 			return provider
 		}.inObjectScope(.container)
 		
+		// MARK: Transfers
 		self.register(TransfersProvider.self) { r in
 			let provider = AdamantTransfersProvider()
 			provider.apiService = r.resolve(ApiService.self)
@@ -99,5 +101,17 @@ extension Container {
 			provider.accountsProvider = r.resolve(AccountsProvider.self)
 			return provider
 		}.inObjectScope(.container)
+		
+		// MARK: Chats
+		self.register(ChatsProvider.self) { r in
+			let provider = AdamantChatsProvider()
+			provider.accountService = r.resolve(AccountService.self)
+			provider.apiService = r.resolve(ApiService.self)
+			provider.stack = r.resolve(CoreDataStack.self)
+			provider.adamantCore = r.resolve(AdamantCore.self)
+			provider.contactsService = r.resolve(ContactsService.self)
+			provider.accountsProvider = r.resolve(AccountsProvider.self)
+			return provider
+		}
 	}
 }
