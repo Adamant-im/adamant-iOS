@@ -16,20 +16,20 @@ class AdamantTransfersProvider: TransfersProvider {
 	var accountService: AccountService!
 	var accountsProvider: AccountsProvider!
 	
-	
 	// MARK: Properties
 	private(set) var state: State = .empty
 	private var lastHeight: UInt?
 	private let processingQueue = DispatchQueue(label: "im.Adamant.processing.transfers", qos: .utility, attributes: [.concurrent])
 	
+	// MARK: Tools
 	private func postNotification(_ name: Notification.Name, userInfo: [AnyHashable : Any]? = nil) {
 		NotificationCenter.default.post(name: name, object: nil, userInfo: userInfo)
 	}
 	
-	private func setNew(state: State, was prevState: State, withNotification: Bool = true) {
+	private func setState(_ state: State, previous prevState: State, notify: Bool = true) {
 		self.state = state
 		
-		if withNotification {
+		if notify {
 			switch prevState {
 			case .failedToUpdate(_):
 				NotificationCenter.default.post(name: .adamantTransfersServiceStateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
@@ -63,18 +63,18 @@ extension AdamantTransfersProvider {
 		state = .updating
 		
 		guard let address = accountService.account?.address else {
-			self.setNew(state: .failedToUpdate(TransfersProviderError.notLogged), was: prevState)
+			self.setState(.failedToUpdate(TransfersProviderError.notLogged), previous: prevState)
 			return
 		}
 		
 		apiService.getTransactions(forAccount: address, type: .send, fromHeight: lastHeight) { (transactions, error) in
 			guard let transactions = transactions else {
-				self.setNew(state: .failedToUpdate(error!), was: prevState)
+				self.setState(.failedToUpdate(error!), previous: prevState)
 				return
 			}
 			
 			guard transactions.count > 0 else {
-				self.setNew(state: .upToDate, was: prevState)
+				self.setState(.upToDate, previous: prevState)
 				return
 			}
 			
@@ -82,16 +82,16 @@ extension AdamantTransfersProvider {
 				self.processRawTransactions(transactions, currentAddress: address) { result in
 					switch result {
 					case .success(let total):
-						self.setNew(state: .upToDate, was: prevState)
+						self.setState(.upToDate, previous: prevState)
 						if total > 0 {
 							self.postNotification(.adamantTransfersServiceNewTransactions, userInfo: [AdamantUserInfoKey.TransfersProvider.newTransactions: total])
 						}
 						
 					case .error(let error):
-						self.setNew(state: .failedToUpdate(error), was: prevState)
+						self.setState(.failedToUpdate(error), previous: prevState)
 						
 					case .accountNotFound(let key):
-						self.setNew(state: .failedToUpdate(TransfersProviderError.accountNotFound(key)), was: prevState)
+						self.setState(.failedToUpdate(TransfersProviderError.accountNotFound(key)), previous: prevState)
 					}
 				}
 			}
@@ -104,7 +104,7 @@ extension AdamantTransfersProvider {
 	
 	private func reset(notify: Bool) {
 		let prevState = self.state
-		setNew(state: .updating, was: prevState, withNotification: false)
+		setState(.updating, previous: prevState, notify: false)
 		lastHeight = nil
 		
 		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
@@ -117,7 +117,7 @@ extension AdamantTransfersProvider {
 			}
 		}
 		
-		setNew(state: .empty, was: prevState, withNotification: notify)
+		setState(.empty, previous: prevState, notify: notify)
 	}
 }
 

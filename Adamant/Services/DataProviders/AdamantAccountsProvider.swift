@@ -14,7 +14,11 @@ class AdamantAccountsProvider: AccountsProvider {
 	var stack: CoreDataStack!
 	var apiService: ApiService!
 	
-	func getAccount(byPredicate predicate: NSPredicate, context: NSManagedObjectContext? = nil) -> CoreDataAccount? {
+	// MARK: Threading
+	private let queue = DispatchQueue(label: "im.adamant.accounts.getAccount", qos: .utility, attributes: [.concurrent])
+	private let semaphore = DispatchSemaphore(value: 1)
+	
+	private func getAccount(byPredicate predicate: NSPredicate, context: NSManagedObjectContext? = nil) -> CoreDataAccount? {
 		let request = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
 		request.fetchLimit = 1
 		request.predicate = predicate
@@ -32,24 +36,34 @@ extension AdamantAccountsProvider {
 	///   - address: address of an account
 	///   - completionHandler: returns Account created in viewContext
 	func getAccount(byAddress address: String, completionHandler: @escaping (AccountsProviderResult) -> Void) {
-		if let account = getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
-			completionHandler(.success(account))
-			return
-		}
-		
-		apiService.getAccount(byAddress: address) { (account, error) in
-			if let error = error {
-				completionHandler(.serverError(error))
+		// Go background, to not to hang threads (especially main) on semaphores
+		queue.async {
+			self.semaphore.wait() // Enter
+			
+			if let account = self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
+				self.semaphore.signal() // Exit in case of success
+				completionHandler(.success(account))
 				return
 			}
 			
-			guard let account = account else {
-				completionHandler(.notFound)
-				return
+			self.apiService.getAccount(byAddress: address) { (account, error) in
+				defer {
+					self.semaphore.signal() // Exit in case of API call
+				}
+				
+				if let error = error {
+					completionHandler(.serverError(error))
+					return
+				}
+				
+				guard let account = account else {
+					completionHandler(.notFound)
+					return
+				}
+				
+				let coreAccount = self.createCoreDataAccount(from: account)
+				completionHandler(.success(coreAccount))
 			}
-			
-			let coreAccount = self.createCoreDataAccount(from: account)
-			completionHandler(.success(coreAccount))
 		}
 	}
 	
@@ -60,24 +74,33 @@ extension AdamantAccountsProvider {
 	///   - publicKey: publicKey of an account
 	///   - completionHandler: returns Account created in viewContext
 	func getAccount(byPublicKey publicKey: String, completionHandler: @escaping (AccountsProviderResult) -> Void) {
-		if let account = getAccount(byPredicate: NSPredicate(format: "publicKey == %@", publicKey)) {
-			completionHandler(.success(account))
-			return
-		}
-		
-		apiService.getAccount(byPublicKey: publicKey) { (account, error) in
-			if let error = error {
-				completionHandler(.serverError(error))
+		// Go background, to not to hang threads (especially main) on semaphores
+		queue.async {
+			self.semaphore.wait() // Enter
+			
+			if let account = self.getAccount(byPredicate: NSPredicate(format: "publicKey == %@", publicKey)) {
+				completionHandler(.success(account))
 				return
 			}
 			
-			guard let account = account else {
-				completionHandler(.notFound)
-				return
+			self.apiService.getAccount(byPublicKey: publicKey) { (account, error) in
+				defer {
+					self.semaphore.signal() // Exit in case of API call
+				}
+				
+				if let error = error {
+					completionHandler(.serverError(error))
+					return
+				}
+				
+				guard let account = account else {
+					completionHandler(.notFound)
+					return
+				}
+				
+				let coreAccount = self.createCoreDataAccount(from: account)
+				completionHandler(.success(coreAccount))
 			}
-			
-			let coreAccount = self.createCoreDataAccount(from: account)
-			completionHandler(.success(coreAccount))
 		}
 	}
 	
