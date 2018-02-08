@@ -29,6 +29,21 @@ class AdamantChatsProvider: ChatsProvider {
 	private let chatroomsSemaphore = DispatchSemaphore(value: 1)
 	private let highSemaphore = DispatchSemaphore(value: 1)
 	
+	// MARK: Lifecycle
+	init() {
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { _ in
+			self.update()
+		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { _ in
+			self.reset()
+		}
+	}
+	
+	deinit {
+		NotificationCenter.default.removeObserver(self)
+	}
+	
 	// MARK: Tools
 	private func setState(_ state: State, previous prevState: State, notify: Bool = true) {
 		self.state = state
@@ -102,14 +117,22 @@ extension AdamantChatsProvider {
 // MARK: - Sending messages {
 extension AdamantChatsProvider {
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
-		guard self.isValidMessage(message) else {
-			completion(.error(.messageNotValid(message)))
+		switch validateMessage(message) {
+		case .isValid:
+			break
+			
+		case .empty:
+			completion(.error(.messageNotValid(.empty)))
+			return
+			
+		case .tooLong:
+			completion(.error(.messageNotValid(.tooLong)))
 			return
 		}
 		
 		DispatchQueue.global(qos: .utility).async {
 			switch message {
-			case .Text(let text):
+			case .text(let text):
 				self.sendTextMessage(text: text, recipientId: recipientId, completion: completion)
 			}
 		}
@@ -531,18 +554,18 @@ extension AdamantChatsProvider {
 extension AdamantChatsProvider {
 	
 	/// Check if message is valid for sending
-	func isValidMessage(_ message: AdamantMessage) -> Bool {
+	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult {
 		switch message {
-		case .Text(let text):
+		case .text(let text):
 			if text.count == 0 {
-				return false
+				return .empty
 			}
 			
 			if Double(text.count) * 1.5 > 20000.0 {
-				return false
+				return .tooLong
 			}
 			
-			return true
+			return .isValid
 		}
 	}
 	

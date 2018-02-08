@@ -16,16 +16,22 @@ enum ChatsProviderResult {
 
 enum ChatsProviderError: Error {
 	case notLogged
-	case messageNotValid(AdamantMessage)
+	case messageNotValid(ValidateMessageResult)
 	case serverError(Error)
 	case accountNotFound(String)
 	case dependencyError(String)
 	case internalError(Error)
 }
 
+enum ValidateMessageResult {
+	case isValid
+	case empty
+	case tooLong
+}
+
 /// Available message types
 enum AdamantMessage {
-	case Text(String)
+	case text(String)
 }
 
 extension Notification.Name {
@@ -46,5 +52,5 @@ protocol ChatsProvider: DataProvider {
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
 	
 	// MARK: - Tools
-	func isValidMessage(_ message: AdamantMessage) -> Bool
+	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
 }
