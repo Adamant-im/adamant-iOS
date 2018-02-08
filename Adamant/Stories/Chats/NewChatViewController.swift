@@ -9,13 +9,14 @@
 import UIKit
 
 protocol NewChatViewControllerDelegate: class {
-	func newChatController(_ controller: NewChatViewController, didSelectedAddress address: String)
+	func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount)
 }
 
 class NewChatViewController: UITableViewController {
 	// MARK: - Dependencies
 	var dialogService: DialogService!
-	var apiService: ApiService!
+	var accountService: AccountService!
+	var accountsProvider: AccountsProvider!
 	
 	
 	// MARK: - Properties
@@ -53,31 +54,32 @@ class NewChatViewController: UITableViewController {
 			address = "U\(address)"
 		}
 		
-		if !AdamantUtilities.validateAdamantAddress(address: address) {
+		guard AdamantUtilities.validateAdamantAddress(address: address) else {
 			dialogService.showToastMessage("Please specify valid recipient address")
+			return
+		}
+		
+		if let loggedAccount = accountService.account, loggedAccount.address != address {
+			dialogService.showToastMessage("You don't need encrypted anonymous chat to talk to yourself.")
 			return
 		}
 		
 		dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
 		
-		apiService.getPublicKey(byAddress: address) { (publicKey, error) in
-			if publicKey != nil {
+		accountsProvider.getAccount(byAddress: address) { result in
+			switch result {
+			case .success(let account):
 				DispatchQueue.main.async {
-					self.delegate?.newChatController(self, didSelectedAddress: address)
+					self.delegate?.newChatController(self, didSelectAccount: account)
 					self.dialogService.dismissProgress()
 				}
-			}
-			
-			else if let error = error {
-				DispatchQueue.main.async {
-					self.dialogService.showError(withMessage: error.message)
-				}
-			}
-			
-			else {
-				DispatchQueue.main.async {
-					self.dialogService.showError(withMessage: "Address \(address) not found")
-				}
+				
+			case .notFound:
+				self.dialogService.showError(withMessage: "Address \(address) not found")
+				
+			case .serverError(let error):
+				// TODO: message
+				self.dialogService.showError(withMessage: String(describing: error))
 			}
 		}
 	}

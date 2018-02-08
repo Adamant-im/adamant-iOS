@@ -17,7 +17,8 @@ protocol ChatViewControllerDelegate: class {
 
 class ChatViewController: MessagesViewController {
 	// MARK: - Dependencies
-	var chatProvider: ChatDataProvider!
+	var chatsProvider: ChatsProvider!
+	var dialogService: DialogService!
 	var feeCalculator: FeeCalculator!
 	
 	// MARK: - Properties
@@ -63,7 +64,7 @@ class ChatViewController: MessagesViewController {
 		maintainPositionOnKeyboardFrameChanged = true
 		
 		DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-			guard let controller = self?.chatProvider.getChatController(for: chatroom) else {
+			guard let controller = self?.chatsProvider.getChatController(for: chatroom) else {
 				return
 			}
 
@@ -283,13 +284,55 @@ extension ChatViewController: MessagesLayoutDelegate {
 // MARK: - MessageInputBarDelegate
 extension ChatViewController: MessageInputBarDelegate {
 	func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
+		let message = AdamantMessage.text(text)
+		switch chatsProvider.validateMessage(message) {
+		case .isValid:
+			break
+			
+		case .empty:
+			return
+			
+		case .tooLong:
+			dialogService.showToastMessage("Message is too long!")
+			return
+		}
+		
 		guard text.count > 0, let partner = chatroom?.partner?.address else {
 			// TODO show warning
 			return
 		}
 		
 		DispatchQueue.global(qos: .userInitiated).async {
-			self.chatProvider.sendTextMessage(recipientId: partner, text: text)
+			self.chatsProvider.sendMessage(.text(text), recipientId: partner, completion: { result in
+				switch result {
+				case .success: break
+					
+				case .error(let error):
+					let message: String
+					switch error {
+					case .accountNotFound(let account): message = "Internal error: \(account) not found."
+					case .dependencyError(let error): message = "Internal dependency error: \(error)."
+					case .internalError(let error): message = "Internal error: \(error)"
+					case .notLogged: message = "Internal error: User not logged."
+					case .serverError(let error): message = "Remote server error: \(error)"
+					case .messageNotValid(let problem):
+						switch problem {
+						case .tooLong:
+							message = "Message is too long!"
+							
+						case .empty:
+							message = "Message cannot be empty."
+							
+						case .isValid:
+							message = ""
+						}
+					}
+					
+					// TODO: Log this
+					self.dialogService.showToastMessage(message)
+				}
+				
+			})
 		}
 		inputBar.inputTextView.text = String()
 	}

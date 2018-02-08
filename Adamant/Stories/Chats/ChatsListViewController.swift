@@ -12,10 +12,11 @@ import CoreData
 class ChatsListViewController: UIViewController {
 	// MARK: - Dependencies
 	var accountService: AccountService!
-	var chatProvider: ChatDataProvider!
+	var chatsProvider: ChatsProvider!
 	var cellFactory: CellFactory!
 	var apiService: ApiService!
 	var router: Router!
+	var accountsProvider: AccountsProvider!
 	
 	// MARK: - IBOutlet
 	@IBOutlet weak var tableView: UITableView!
@@ -36,13 +37,13 @@ class ChatsListViewController: UIViewController {
 		tableView.delegate = self
 		tableView.register(cellFactory.nib(for: SharedCell.ChatCell), forCellReuseIdentifier: chatCell)
 		
-		chatsController = chatProvider.getChatroomsController()
+		chatsController = chatsProvider.getChatroomsController()
 		chatsController?.delegate = self
 		
 		tableView.reloadData()
 		
 		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			guard let controller = self?.chatProvider.getChatroomsController() else {
+			guard let controller = self?.chatsProvider.getChatroomsController() else {
 				return
 			}
 			
@@ -74,9 +75,8 @@ class ChatsListViewController: UIViewController {
 		
 		switch identifier {
 		case showChatSegue:
-			if let chatroom = sender as? Chatroom, let vc = segue.destination as? ChatViewController,
-				let account = accountService.account {
-				prepareChatViewController(vc, account: account, chatroom: chatroom)
+			if let chatroom = sender as? Chatroom, let vc = segue.destination as? ChatViewController {
+				prepareChatViewController(vc, chatroom: chatroom)
 			}
 			
 		case newChatSegue:
@@ -91,10 +91,13 @@ class ChatsListViewController: UIViewController {
 		}
 	}
 	
-	private func prepareChatViewController(_ vc: ChatViewController, account: Account, chatroom: Chatroom) {
+	private func prepareChatViewController(_ vc: ChatViewController, chatroom: Chatroom) {
+		if let account = accountService.account {
+			vc.account = account
+		}
+		
 		vc.hidesBottomBarWhenPushed = true
 		vc.chatroom = chatroom
-		vc.account = account
 		vc.delegate = self
 	}
 }
@@ -202,49 +205,35 @@ extension ChatsListViewController: NSFetchedResultsControllerDelegate {
 
 // MARK: - NewChatViewControllerDelegate
 extension ChatsListViewController: NewChatViewControllerDelegate {
-	func newChatController(_ controller: NewChatViewController, didSelectedAddress address: String) {
-		guard AdamantUtilities.validateAdamantAddress(address: address),
-			let account = accountService.account else {
-			// TODO: Show error
-			return
+	func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount) {
+		let chatroom = self.chatsProvider.chatroomWith(account)
+		
+		DispatchQueue.main.async {
+			if let vc = self.router.get(scene: .Chat) as? ChatViewController {
+				self.prepareChatViewController(vc, chatroom: chatroom)
+				self.navigationController?.pushViewController(vc, animated: false)
+				
+				let nvc: UIViewController
+				if let nav = controller.navigationController {
+					nvc = nav
+				} else {
+					nvc = controller
+				}
+				
+				nvc.dismiss(animated: true) {
+					vc.becomeFirstResponder()
+					
+					if let count = vc.chatroom?.transactions?.count, count == 0 {
+						vc.messageInputBar.inputTextView.becomeFirstResponder()
+					}
+				}
+			}
 		}
 		
-		// TODO: Show progress
-		apiService.getPublicKey(byAddress: address) { (publicKey, error) in
-			guard publicKey != nil else {
-				// TODO: Show error
-				return
-			}
-			
-			let chatroom = self.chatProvider.newChatroom(with: address)
-			
-			DispatchQueue.main.async {
-				if let vc = self.router.get(scene: .Chat) as? ChatViewController {
-					self.prepareChatViewController(vc, account: account, chatroom: chatroom)
-					self.navigationController?.pushViewController(vc, animated: false)
-					
-					let nvc: UIViewController
-					if let nav = controller.navigationController {
-						nvc = nav
-					} else {
-						nvc = controller
-					}
-					
-					nvc.dismiss(animated: true) {
-						vc.becomeFirstResponder()
-						
-						if let count = vc.chatroom?.transactions?.count, count == 0 {
-							vc.messageInputBar.inputTextView.becomeFirstResponder()
-						}
-					}
-				}
-			}
-			
-			// Select row after awhile
-			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(1)) { [weak self] in
-				if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
-					self?.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
-				}
+		// Select row after awhile
+		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(1)) { [weak self] in
+			if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
+				self?.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
 			}
 		}
 	}
