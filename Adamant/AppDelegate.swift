@@ -57,6 +57,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		accountService.logoutAndPresentLoginStoryboard(animated: false, authorizationFinishedHandler: nil)
 		
+		
+		// MARK: 4. On logout, pop all navigators to root.
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			guard let tbc = self?.window?.rootViewController as? UITabBarController, let vcs = tbc.viewControllers else {
 				return

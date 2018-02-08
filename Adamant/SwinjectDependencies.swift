@@ -102,6 +102,6 @@ extension Container {
 			provider.contactsService = r.resolve(ContactsService.self)
 			provider.accountsProvider = r.resolve(AccountsProvider.self)
 			return provider
-		}
+		}.inObjectScope(.container)
 	}
 }
