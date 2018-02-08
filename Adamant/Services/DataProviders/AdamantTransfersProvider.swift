@@ -19,15 +19,20 @@ class AdamantTransfersProvider: TransfersProvider {
 	// MARK: Properties
 	private(set) var state: State = .empty
 	private var lastHeight: UInt?
+	
 	private let processingQueue = DispatchQueue(label: "im.Adamant.processing.transfers", qos: .utility, attributes: [.concurrent])
+	private let stateSemaphore = DispatchSemaphore(value: 1)
 	
 	// MARK: Tools
 	private func postNotification(_ name: Notification.Name, userInfo: [AnyHashable : Any]? = nil) {
 		NotificationCenter.default.post(name: name, object: nil, userInfo: userInfo)
 	}
 	
+	/// Free stateSemaphore before calling this method, or you will deadlock.
 	private func setState(_ state: State, previous prevState: State, notify: Bool = true) {
+		stateSemaphore.wait()
 		self.state = state
+		stateSemaphore.signal()
 		
 		if notify {
 			switch prevState {
@@ -55,12 +60,14 @@ extension AdamantTransfersProvider {
 	}
 	
 	func update() {
+		stateSemaphore.wait()
 		if state == .updating {
 			return
 		}
 		
 		let prevState = state
 		state = .updating
+		stateSemaphore.signal()
 		
 		guard let address = accountService.account?.address else {
 			self.setState(.failedToUpdate(TransfersProviderError.notLogged), previous: prevState)

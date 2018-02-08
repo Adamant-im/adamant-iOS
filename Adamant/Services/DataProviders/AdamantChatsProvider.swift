@@ -28,6 +28,7 @@ class AdamantChatsProvider: ChatsProvider {
 	private let unconfirmedsSemaphore = DispatchSemaphore(value: 1)
 	private let chatroomsSemaphore = DispatchSemaphore(value: 1)
 	private let highSemaphore = DispatchSemaphore(value: 1)
+	private let stateSemaphore = DispatchSemaphore(value: 1)
 	
 	// MARK: Lifecycle
 	init() {
@@ -45,8 +46,11 @@ class AdamantChatsProvider: ChatsProvider {
 	}
 	
 	// MARK: Tools
+	/// Free stateSemaphore before calling this method, or you will deadlock.
 	private func setState(_ state: State, previous prevState: State, notify: Bool = true) {
+		stateSemaphore.wait()
 		self.state = state
+		stateSemaphore.signal()
 		
 		if notify {
 			switch prevState {
@@ -81,6 +85,7 @@ extension AdamantChatsProvider {
 	}
 	
 	func update() {
+		stateSemaphore.wait()
 		// MARK: 1. Check state
 		if state == .updating {
 			return
@@ -90,11 +95,13 @@ extension AdamantChatsProvider {
 		let prevState = state
 		
 		guard let address = accountService.account?.address else {
+			stateSemaphore.signal()
 			setState(.failedToUpdate(ChatsProviderError.notLogged), previous: prevState)
 			return
 		}
 		
 		state = .updating
+		stateSemaphore.signal()
 		
 		// MARK: 3. Get transactions
 		let processingGroup = DispatchGroup()
