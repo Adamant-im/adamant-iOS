@@ -81,7 +81,23 @@ extension AdamantChatsProvider {
 	}
 	
 	private func reset(notify: Bool) {
+		let prevState = self.state
+		setState(.updating, previous: prevState, notify: false) // Block update calls
 		lastHeight = nil
+		
+		let chatrooms = NSFetchRequest<Chatroom>(entityName: Chatroom.entityName)
+		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+		context.parent = stack.container.viewContext
+		
+		if let results = try? context.fetch(chatrooms) {
+			for obj in results {
+				context.delete(obj)
+			}
+			
+			try? context.save()
+		}
+		
+		setState(.empty, previous: prevState, notify: notify)
 	}
 	
 	func update() {

@@ -115,13 +115,15 @@ extension AdamantTransfersProvider {
 		lastHeight = nil
 		
 		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
-		if let result = try? stack.container.viewContext.fetch(request) {
-			if result.count > 0 {
-				for obj in result {
-					stack.container.viewContext.delete(obj)
-				}
-				try? stack.container.viewContext.save()
+		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+		context.parent = stack.container.viewContext
+		
+		if let result = try? context.fetch(request) {
+			for obj in result {
+				context.delete(obj)
 			}
+			
+			try? context.save()
 		}
 		
 		setState(.empty, previous: prevState, notify: notify)
