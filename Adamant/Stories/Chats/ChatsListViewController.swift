@@ -151,7 +151,7 @@ extension ChatsListViewController {
 		if let title = chatroom.title {
 			cell.accountLabel.text = title
 		} else {
-			cell.accountLabel.text = chatroom.partnerAddress
+			cell.accountLabel.text = chatroom.partner?.address
 		}
 		
 		cell.lastMessageLabel.text = chatroom.lastTransaction?.message

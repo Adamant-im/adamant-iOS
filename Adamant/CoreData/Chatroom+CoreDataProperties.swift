@@ -17,7 +17,6 @@ extension Chatroom {
         return NSFetchRequest<Chatroom>(entityName: "Chatroom")
     }
 
-    @NSManaged public var partnerAddress: String?
     @NSManaged public var title: String?
     @NSManaged public var updatedAt: NSDate?
     @NSManaged public var lastTransaction: ChatTransaction?

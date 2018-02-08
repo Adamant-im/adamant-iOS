@@ -294,15 +294,23 @@ extension AdamantChatsProvider {
 	private func chatroomWith(_ account: CoreDataAccount, context: NSManagedObjectContext) -> Chatroom {
 		let request = NSFetchRequest<Chatroom>(entityName: Chatroom.entityName)
 		request.fetchLimit = 1
-		request.predicate = NSPredicate(format: "partner", account)
+		request.predicate = NSPredicate(format: "partner = %@", account)
 		
 		if let chatroom = (try? context.fetch(request))?.first {
 			return chatroom
 		}
 		
 		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
-		chatroom.partner = account
-		chatroom.partnerAddress = account.address
+		
+		if chatroom.managedObjectContext == account.managedObjectContext {
+			chatroom.partner = account
+		} else if let acc = chatroom.managedObjectContext?.object(with: account.objectID) as? CoreDataAccount {
+			chatroom.partner = acc
+		} else {
+			// You are too deep, partner.
+			fatalError("Not implemented")
+		}
+		
 		return chatroom
 	}
 }
@@ -401,7 +409,6 @@ extension AdamantChatsProvider {
 		// MARK: 2.5 Get accounts, that we did not found.
 		if partners.count != partnerAddresses.count {
 			let notFound = partnerAddresses.subtracting(partners.keys)
-			var objectIds = [String:NSManagedObjectID]()
 			let semaphore = DispatchSemaphore(value: 1)
 			let keysGroup = DispatchGroup()
 			for address in notFound {
@@ -414,19 +421,13 @@ extension AdamantChatsProvider {
 					
 					if case let .success(account) = result {
 						semaphore.wait()
-						objectIds[address] = account.objectID
+						partners[address] = account
 						semaphore.signal()
 					}
 				}
 			}
 			
 			keysGroup.wait()
-			
-			for (address, id) in objectIds {
-				if let account = privateContext.object(with: id) as? CoreDataAccount {
-					partners[address] = account
-				}
-			}
 		}
 		
 		if partners.count != partnerAddresses.count {
@@ -436,7 +437,7 @@ extension AdamantChatsProvider {
 		
 		
 		// MARK: 3. Process Transactions, group them by partner
-		var partnersChats = [String: Set<ChatTransaction>]()
+		var partnersChats = [CoreDataAccount: Set<ChatTransaction>]()
 		var height: Int64 = 0
 		
 		for transaction in chatTransactions {
@@ -460,12 +461,13 @@ extension AdamantChatsProvider {
 					height = chatTransaction.height
 				}
 				
-				if let partner = chatTransaction.isOutgoing ? chatTransaction.recipientId : chatTransaction.senderId {
-					if partnersChats[partner] == nil {
-						partnersChats[partner] = Set<ChatTransaction>()
+				if let partnerId = chatTransaction.isOutgoing ? chatTransaction.recipientId : chatTransaction.senderId,
+					let partnerAcc = partners[partnerId] {
+					if partnersChats[partnerAcc] == nil {
+						partnersChats[partnerAcc] = Set<ChatTransaction>()
 					}
 					
-					partnersChats[partner]!.insert(chatTransaction)
+					partnersChats[partnerAcc]!.insert(chatTransaction)
 				}
 			}
 		}
@@ -496,35 +498,35 @@ extension AdamantChatsProvider {
 
 // MARK: - Processing transactions
 extension AdamantChatsProvider {
-	private func processChatrooms(_ chats: [String:Set<ChatTransaction>], privateContext: NSManagedObjectContext) {
-		for (address, chatTransactions) in chats {
-			let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
-			request.predicate = NSPredicate(format: "partnerAddress = %@", address)
-			request.fetchLimit = 1
-			
+	private func processChatrooms(_ chats: [CoreDataAccount:Set<ChatTransaction>], privateContext: NSManagedObjectContext) {
+		for (account, chatTransactions) in chats {
 			// Only one thread should try to search or create chatroom to avoid situations, where two threads will create two chatrooms with one address.
 			chatroomsSemaphore.wait()
+			
 			let chatroom: Chatroom
-			
-			let fetchedChatrooms: [Chatroom]
-			do {
-				fetchedChatrooms = try privateContext.fetch(request)
-			} catch {
-				print(error)
-				return
-			}
-			
-			if let result = fetchedChatrooms.first {
-				chatroom = result
+			if let chrm = account.chatroom {
+				if chrm.managedObjectContext == privateContext {
+					chatroom = chrm
+				} else {
+					chatroom = privateContext.object(with: chrm.objectID) as! Chatroom
+				}
 			} else {
-				var id: NSManagedObjectID! = nil
+				let viewContextAccount: CoreDataAccount
+				if account.managedObjectContext == stack.container.viewContext {
+					viewContextAccount = account
+				} else if let c = stack.container.viewContext.object(with: account.objectID) as? CoreDataAccount {
+					viewContextAccount = c
+				} else {
+					fatalError("What?")
+				}
 				
+				var id: NSManagedObjectID! = nil
 				if Thread.isMainThread { // avoid deadlocks. Whatever.
-					let chrm = createChatroom(address: address, context: stack.container.viewContext)
+					let chrm = createChatroom(with: viewContextAccount, context: stack.container.viewContext)
 					id = chrm.objectID
 				} else {
 					DispatchQueue.main.sync {
-						let chrm = createChatroom(address: address, context: stack.container.viewContext)
+						let chrm = createChatroom(with: viewContextAccount, context: stack.container.viewContext)
 						id = chrm.objectID
 					}
 				}
@@ -537,9 +539,10 @@ extension AdamantChatsProvider {
 				}
 			}
 			
-			chatroomsSemaphore.signal()
-			
+			// Better do this threadsafet
 			chatroom.addToTransactions(chatTransactions as NSSet)
+			
+			chatroomsSemaphore.signal()
 			
 			if let newest = chatTransactions.sorted(by: { ($0.date! as Date).compare($1.date! as Date) == .orderedDescending }).first {
 				if let last = chatroom.lastTransaction {
@@ -639,12 +642,12 @@ extension AdamantChatsProvider {
 	///   - address: chatroom with
 	///   - context: Context to insert chatroom into
 	/// - Returns: Chatroom
-	private func createChatroom(address: String, context: NSManagedObjectContext) -> Chatroom {
+	private func createChatroom(with account: CoreDataAccount, context: NSManagedObjectContext) -> Chatroom {
 		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
-		chatroom.partnerAddress = address
+		chatroom.partner = account
 		chatroom.updatedAt = NSDate()
 		
-		if let title = contactsService.nameFor(address: address) {
+		if let address = account.address, let title = contactsService.nameFor(address: address) {
 			chatroom.title = title
 		}
 		
