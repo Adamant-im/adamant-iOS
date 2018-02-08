@@ -88,12 +88,126 @@ extension AdamantChatsProvider {
 		// MARK: 4. Check
 		processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) {
 			switch self.state {
-			case .failedToUpdate(_): // Processing function
+			case .failedToUpdate(_): // Processing failed
 				break
 				
 			default:
 				self.setState(.upToDate, previous: prevState)
 			}
+		}
+	}
+}
+
+
+// MARK: - Sending messages {
+extension AdamantChatsProvider {
+	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+		guard self.isValidMessage(message) else {
+			completion(.error(.messageNotValid(message)))
+			return
+		}
+		
+		DispatchQueue.global(qos: .utility).async {
+			switch message {
+			case .Text(let text):
+				self.sendTextMessage(text: text, recipientId: recipientId, completion: completion)
+			}
+		}
+	}
+	
+	private func sendTextMessage(text: String, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+		guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+			completion(.error(.notLogged))
+			return
+		}
+		
+		// MARK: 0. Prepare
+		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+		privateContext.parent = stack.container.viewContext
+		
+		
+		// MARK: 1. Get recipient key
+		let accountsGroup = DispatchGroup()
+		accountsGroup.enter()
+		var objectIdRaw: NSManagedObjectID? = nil
+		accountsProvider.getAccount(byAddress: recipientId) { result in
+			defer {
+				accountsGroup.leave()
+			}
+			
+			switch result {
+			case .notFound:
+				completion(.error(.accountNotFound(recipientId)))
+				
+			case .serverError(let error):
+				completion(.error(.serverError(error)))
+				
+			case .success(let account):
+				objectIdRaw = account.objectID
+			}
+		}
+		
+		accountsGroup.wait()
+		guard let objectId = objectIdRaw,
+			let recipientAccount = privateContext.object(with: objectId) as? CoreDataAccount,
+			let recipientPublicKey = recipientAccount.publicKey else {
+			completion(.error(.accountNotFound(recipientId)))
+			return
+		}
+		
+		
+		// MARK: 2. Encode message
+		guard let encodedMessage = adamantCore.encodeMessage(text, recipientPublicKey: recipientPublicKey, privateKey: keypair.privateKey) else {
+			completion(.error(.dependencyError("Failed to encode message")))
+			return
+		}
+		
+		
+		// MARK: 3. Create chat transaction
+		let transaction = ChatTransaction(entity: ChatTransaction.entity(), insertInto: privateContext)
+		transaction.date = Date() as NSDate
+		transaction.recipientId = recipientId
+		transaction.senderId = loggedAccount.address
+		transaction.type = Int16(ChatType.message.rawValue)
+		transaction.isOutgoing = true
+		transaction.message = text
+		transaction.transactionId = UUID().uuidString
+		
+		
+		// MARK: 4. Save unconfirmed transaction
+		do {
+			try privateContext.save()
+		} catch {
+			completion(.error(.internalError(error)))
+			return
+		}
+		
+		
+		// MARK: 5. Send
+		apiService.sendMessage(senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { (id, error) in
+			guard let id = id else {
+				if let error = error {
+					completion(.error(.serverError(error)))
+				} else {
+					// TODO:
+					fatalError()
+				}
+				return
+			}
+			
+			self.unconfirmedsSemaphore.wait()
+			
+			transaction.transactionId = String(id)
+			self.unconfirmedTransactions[id] = transaction
+			
+			do {
+				try privateContext.save()
+				completion(.success)
+			} catch {
+				completion(.error(.internalError(error)))
+			}
+			
+			self.unconfirmedsSemaphore.signal()
 		}
 	}
 }
@@ -415,6 +529,22 @@ extension AdamantChatsProvider {
 
 // MARK: - Tools
 extension AdamantChatsProvider {
+	
+	/// Check if message is valid for sending
+	func isValidMessage(_ message: AdamantMessage) -> Bool {
+		switch message {
+		case .Text(let text):
+			if text.count == 0 {
+				return false
+			}
+			
+			if Double(text.count) * 1.5 > 20000.0 {
+				return false
+			}
+			
+			return true
+		}
+	}
 	
 	/// Parse raw transaction into CoreData chat transaction
 	///

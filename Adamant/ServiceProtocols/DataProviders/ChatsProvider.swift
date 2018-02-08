@@ -9,10 +9,23 @@
 import Foundation
 import CoreData
 
+enum ChatsProviderResult {
+	case success
+	case error(ChatsProviderError)
+}
+
 enum ChatsProviderError: Error {
 	case notLogged
+	case messageNotValid(AdamantMessage)
 	case serverError(Error)
 	case accountNotFound(String)
+	case dependencyError(String)
+	case internalError(Error)
+}
+
+/// Available message types
+enum AdamantMessage {
+	case Text(String)
 }
 
 extension Notification.Name {
@@ -21,9 +34,17 @@ extension Notification.Name {
 }
 
 protocol ChatsProvider: DataProvider {
+	// MARK: - Getting chats and messages
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>?
 	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>?
 	
 	/// Returns asociated with account chatroom, or create new, in viewContext
 	func chatroomWith(_ account: CoreDataAccount) -> Chatroom
+	
+	
+	// MARK: - Sending messages
+	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
+	
+	// MARK: - Tools
+	func isValidMessage(_ message: AdamantMessage) -> Bool
 }
