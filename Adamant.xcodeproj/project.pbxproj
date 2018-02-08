@@ -48,8 +48,6 @@
 		E95F85872008FDBF0070534A /* Chat.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85862008FDBF0070534A /* Chat.swift */; };
 		E95F8589200900B10070534A /* ChatType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F8588200900B10070534A /* ChatType.swift */; };
 		E95F858B200931410070534A /* TransactionAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F858A200931410070534A /* TransactionAsset.swift */; };
-		E95F858E20093F940070534A /* ChatDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F858D20093F940070534A /* ChatDataProvider.swift */; };
-		E95F859120093FB30070534A /* CoreDataChatProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F859020093FB30070534A /* CoreDataChatProvider.swift */; };
 		E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E95F85B1200954D00070534A /* ChatModels.xcdatamodeld */; };
 		E95F85B7200A4D8F0070534A /* TestTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85B6200A4D8F0070534A /* TestTools.swift */; };
 		E95F85BA200A4DC90070534A /* TransactionSend.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85B9200A4DC90070534A /* TransactionSend.json */; };
@@ -205,8 +203,6 @@
 		E95F85862008FDBF0070534A /* Chat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chat.swift; sourceTree = "<group>"; };
 		E95F8588200900B10070534A /* ChatType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatType.swift; sourceTree = "<group>"; };
 		E95F858A200931410070534A /* TransactionAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAsset.swift; sourceTree = "<group>"; };
-		E95F858D20093F940070534A /* ChatDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDataProvider.swift; sourceTree = "<group>"; };
-		E95F859020093FB30070534A /* CoreDataChatProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataChatProvider.swift; sourceTree = "<group>"; };
 		E95F85B2200954D00070534A /* ChatModels.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ChatModels.xcdatamodel; sourceTree = "<group>"; };
 		E95F85B6200A4D8F0070534A /* TestTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTools.swift; sourceTree = "<group>"; };
 		E95F85B9200A4DC90070534A /* TransactionSend.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = TransactionSend.json; sourceTree = "<group>"; };
@@ -370,7 +366,6 @@
 				E913C9071FFFA943001A83F7 /* AdamantCore.swift */,
 				E91947AB20001A9A001362F8 /* ApiService.swift */,
 				E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */,
-				E95F858D20093F940070534A /* ChatDataProvider.swift */,
 				E93580DA20160BC10057FC2E /* ContactsService.swift */,
 				E9E7CD8C20026B6600DFC4DB /* DialogService.swift */,
 				E948E0492027673400975D6B /* ExportTools.swift */,
@@ -388,11 +383,11 @@
 				E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */,
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
+				E948E04B2027679300975D6B /* AdamantExportTools.swift */,
 				E9C51ECC200E2BF900385EB7 /* HardFeeCalculator.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
 				E93580DC20160BD30057FC2E /* KnownContactsService.swift */,
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
-				E948E04B2027679300975D6B /* AdamantExportTools.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -529,10 +524,10 @@
 			isa = PBXGroup;
 			children = (
 				E9B3D399201F90570019EB36 /* AccountsProvider.swift */,
+				E93B0D732028B21400126346 /* ChatsProvider.swift */,
 				E9722065201F42BB004F2AAD /* CoreDataStack.swift */,
 				E9B3D39D201F99F40019EB36 /* DataProvider.swift */,
 				E972206A201F44CA004F2AAD /* TransfersProvider.swift */,
-				E93B0D732028B21400126346 /* ChatsProvider.swift */,
 			);
 			path = DataProviders;
 			sourceTree = "<group>";
@@ -544,7 +539,6 @@
 				E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */,
 				E9B3D3A8202082450019EB36 /* AdamantTransfersProvider.swift */,
 				E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */,
-				E95F859020093FB30070534A /* CoreDataChatProvider.swift */,
 			);
 			path = DataProviders;
 			sourceTree = "<group>";
@@ -853,7 +847,6 @@
 				E982F69C20235B4D00566AC7 /* SettingsTableViewController.swift in Sources */,
 				E9CE778E202B9DC2009CF70D /* TransferTransaction+CoreDataProperties.swift in Sources */,
 				E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */,
-				E95F858E20093F940070534A /* ChatDataProvider.swift in Sources */,
 				E95F858B200931410070534A /* TransactionAsset.swift in Sources */,
 				E9E7CDAC2002AFA500DFC4DB /* AccountViewController.swift in Sources */,
 				E95F85812008C8D70070534A /* ChatsDependencies.swift in Sources */,
@@ -908,7 +901,6 @@
 				E9C51EF12013F18000385EB7 /* NewChatViewController.swift in Sources */,
 				E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */,
 				E95F856520067A030070534A /* GlobalConstants.swift in Sources */,
-				E95F859120093FB30070534A /* CoreDataChatProvider.swift in Sources */,
 				E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */,
 				E95F8589200900B10070534A /* ChatType.swift in Sources */,
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,

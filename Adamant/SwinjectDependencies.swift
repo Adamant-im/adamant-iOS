@@ -67,16 +67,6 @@ extension Container {
 		// MARK: Export tools
 		self.register(ExportTools.self) { _ in AdamantExportTools() }
 		
-		// MARK: Chat provider
-		self.register(ChatDataProvider.self) { r  in
-			let provider = CoreDataChatProvider(managedObjectModel: AdamantResources.coreDataModel)
-			provider.accountService = r.resolve(AccountService.self)
-			provider.apiService = r.resolve(ApiService.self)
-			provider.adamantCore = r.resolve(AdamantCore.self)
-			provider.contactsService = r.resolve(ContactsService.self)
-			return provider
-		}.inObjectScope(.container)
-		
 		
 		// MARK: - Data Providers
 		// MARK: CoreData Stack
