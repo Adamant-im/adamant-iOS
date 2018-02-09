@@ -23,5 +23,9 @@ class InMemoryCoreDataStack: CoreDataStack {
 		container = NSPersistentContainer(name: "Adamant", managedObjectModel: model)
 		container.persistentStoreDescriptions = [description]
 		container.loadPersistentStores { (_, _) in }
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			self?.container.viewContext.reset()
+		}
 	}
 }
