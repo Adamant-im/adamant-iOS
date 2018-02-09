@@ -123,10 +123,9 @@ extension AdamantChatsProvider {
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = self.stack.container.viewContext
 		let processingGroup = DispatchGroup()
-		let contextManipulatingGroup = DispatchGroup()
-		let contextSavingGroup = DispatchGroup()
-		let chatroomsSemaphore = DispatchSemaphore(value: 1)
-		getTransactions(address: address, height: lastHeight, offset: nil, dispatchGroup: processingGroup, contextManipulatingGroup: contextManipulatingGroup, contextSavingGroup: contextSavingGroup, chatroomsSemaphore: chatroomsSemaphore, context: privateContext)
+		let cms = DispatchSemaphore(value: 1)
+		
+		getTransactions(address: address, height: lastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
 		
 		// MARK: 4. Check
 		processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) {
@@ -347,14 +346,7 @@ extension AdamantChatsProvider {
 	///   - height: last message height. Minimum == 1 !!!
 	///   - offset: offset, if greater than 100
 	/// - Returns: ammount of new messages was added
-	private func getTransactions(address: String,
-								 height: Int?,
-								 offset: Int?,
-								 dispatchGroup: DispatchGroup,
-								 contextManipulatingGroup cmg: DispatchGroup,
-								 contextSavingGroup csg: DispatchGroup,
-								 chatroomsSemaphore cSem: DispatchSemaphore,
-								 context: NSManagedObjectContext) {
+	private func getTransactions(address: String, height: Int?, offset: Int?, dispatchGroup: DispatchGroup, context: NSManagedObjectContext, contextMutatingSemaphore cms: DispatchSemaphore) {
 		// Enter 1
 		dispatchGroup.enter()
 		
@@ -383,10 +375,8 @@ extension AdamantChatsProvider {
 				}
 				
 				self.process(chatTransactions: transactions,
-							 contextManipulatingGroup: cmg,
-							 contextSavingGroup: csg,
-							 chatroomsSemaphore: cSem,
-							 context: context)
+							 context: context,
+							 contextMutatingSemaphore: cms)
 			}
 			
 			// MARK: 4. Get more transactions
@@ -398,16 +388,12 @@ extension AdamantChatsProvider {
 					newOffset = self.apiTransactions
 				}
 				
-				self.getTransactions(address: address, height: height, offset: newOffset, dispatchGroup: dispatchGroup, contextManipulatingGroup: cmg, contextSavingGroup: csg, chatroomsSemaphore: cSem, context: context)
+				self.getTransactions(address: address, height: height, offset: newOffset, dispatchGroup: dispatchGroup, context: context, contextMutatingSemaphore: cms)
 			}
 		}
 	}
 	
-	private func process(chatTransactions: [Transaction],
-						 contextManipulatingGroup: DispatchGroup,
-						 contextSavingGroup: DispatchGroup,
-						 chatroomsSemaphore: DispatchSemaphore,
-						 context: NSManagedObjectContext) {
+	private func process(chatTransactions: [Transaction], context: NSManagedObjectContext, contextMutatingSemaphore: DispatchSemaphore) {
 		guard let currentAddress = accountService.account?.address, let privateKey = accountService.keypair?.privateKey else {
 			// TODO: Log error
 			return
@@ -490,21 +476,22 @@ extension AdamantChatsProvider {
 		
 		// MARK: 3. Process Chatrooms and Transactions
 		var height: Int64 = 0
+		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+		privateContext.parent = context
 		
 		for (account, transactions) in partners {
 			// We can't save whole context while we are mass creating ChatTransactions.
-			contextSavingGroup.wait()
-			contextManipulatingGroup.enter()
-			
 			// MARK: 3.1 Chatrooms
-			chatroomsSemaphore.wait()
+			contextMutatingSemaphore.wait()
 			let chatroom: Chatroom
 			if let chrm = account.chatroom {
 				chatroom = chrm
 			} else {
 				chatroom = createChatroom(with: account, context: context)
 			}
-			chatroomsSemaphore.signal()
+			contextMutatingSemaphore.signal()
+			
+			let privateChatroom = privateContext.object(with: chatroom.objectID) as! Chatroom
 			
 			// MARK: 3.2 Transactions
 			var chats = Set<ChatTransaction>()
@@ -529,7 +516,7 @@ extension AdamantChatsProvider {
 					publicKey = trs.transaction.senderPublicKey
 				}
 				
-				if let chatTransaction = chatTransaction(from: trs.transaction, isOutgoing: trs.isOut, publicKey: publicKey, privateKey: privateKey, context: context) {
+				if let chatTransaction = chatTransaction(from: trs.transaction, isOutgoing: trs.isOut, publicKey: publicKey, privateKey: privateKey, context: privateContext) {
 					if height < chatTransaction.height {
 						height = chatTransaction.height
 					}
@@ -538,41 +525,51 @@ extension AdamantChatsProvider {
 				}
 			}
 			
-			chatroomsSemaphore.wait()
-			chatroom.addToTransactions(chats as NSSet)
-			
-			// MARK: 3.3 Find newest transaction
-			let request = NSFetchRequest<ChatTransaction>(entityName: ChatTransaction.entityName)
-			request.predicate = NSPredicate(format: "chatroom = %@", chatroom)
-			request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
-			
-			if let newest = (try? context.fetch(request))?.last {
-				if let last = chatroom.lastTransaction {
-					if (last.date! as Date).compare(newest.date! as Date) == .orderedAscending {
-						chatroom.lastTransaction = newest
-						chatroom.updatedAt = newest.date
-					}
-				} else {
-					chatroom.lastTransaction = newest
-					chatroom.updatedAt = newest.date
-				}
-			}
-			chatroomsSemaphore.signal()
-			
-			// Leave Save Group
-			contextManipulatingGroup.leave()
+			privateChatroom.addToTransactions(chats as NSSet)
 		}
 		
 		
-		// MARK: 4. Save!
+		// MARK: 4. Set newest transactions
 		do {
 			defer {
-				contextSavingGroup.leave()
+				contextMutatingSemaphore.signal()
 			}
 			
-			// First, we enter into Saving group. Don't try to wait Saving group after entering into Manipulating group, or you will break your computer.
-			contextSavingGroup.enter()
-			contextManipulatingGroup.wait()
+			contextMutatingSemaphore.wait()
+			
+			try privateContext.save()
+			
+			for chatroom in partners.keys.flatMap({$0.chatroom}) {
+				let request = NSFetchRequest<ChatTransaction>(entityName: ChatTransaction.entityName)
+				request.predicate = NSPredicate(format: "chatroom = %@", chatroom)
+				request.fetchLimit = 1
+				request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+				
+				if let newest = (try? context.fetch(request))?.first {
+					if let last = chatroom.lastTransaction {
+						if (last.date! as Date).compare(newest.date! as Date) == .orderedAscending {
+							chatroom.lastTransaction = newest
+							chatroom.updatedAt = newest.date
+						}
+					} else {
+						chatroom.lastTransaction = newest
+						chatroom.updatedAt = newest.date
+					}
+				}
+			}
+		} catch {
+			print(error)
+			return
+		}
+		
+		
+		// MARK: 5. Save!
+		do {
+			defer {
+				contextMutatingSemaphore.signal()
+			}
+			
+			contextMutatingSemaphore.wait()
 			
 			try context.save()
 			

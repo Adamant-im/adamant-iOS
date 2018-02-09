@@ -64,7 +64,9 @@ extension AdamantAccountsProvider {
 			
 			self.apiService.getAccount(byAddress: address) { (account, error) in
 				defer {
+					self.groupsSemaphore.wait()
 					self.requestGroups.removeValue(forKey: address)
+					self.groupsSemaphore.signal()
 					group.leave()
 				}
 				
@@ -118,7 +120,9 @@ extension AdamantAccountsProvider {
 			
 			self.apiService.getAccount(byPublicKey: publicKey) { (account, error) in
 				defer {
+					self.groupsSemaphore.wait()
 					self.requestGroups.removeValue(forKey: publicKey)
+					self.groupsSemaphore.signal()
 					group.leave()
 				}
 				
