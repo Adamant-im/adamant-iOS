@@ -33,6 +33,7 @@ class ChatViewController: MessagesViewController {
 	}
 	
 	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
+	private var controllerChanges: [NSFetchedResultsChangeType:[(indexPath: IndexPath?, newIndexPath: IndexPath?)]] = [:]
 	
 	// MARK: Fee label
 	private var feeIsVisible: Bool = false
@@ -178,27 +179,48 @@ extension ChatViewController {
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension ChatViewController: NSFetchedResultsControllerDelegate {
+	func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+		controllerChanges.removeAll()
+	}
+	
+	func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+		performBatchChanges(controllerChanges)
+	}
+	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-		switch type {
-		case .insert:
-			if let section = newIndexPath?.row {
-				messagesCollectionView.insertSections([section])
-				messagesCollectionView.scrollToBottom(animated: true)
+		if controllerChanges[type] == nil {
+			controllerChanges[type] = [(IndexPath?, IndexPath?)]()
+		}
+		controllerChanges[type]!.append((indexPath, newIndexPath))
+	}
+	
+	private func performBatchChanges(_ changes: [NSFetchedResultsChangeType:[(indexPath: IndexPath?, newIndexPath: IndexPath?)]]) {
+		for (type, change) in changes {
+			switch type {
+			case .insert:
+				let sections = IndexSet(change.flatMap({$0.newIndexPath?.row}))
+				if sections.count > 0 {
+					messagesCollectionView.insertSections(sections)
+					messagesCollectionView.scrollToBottom(animated: true)
+				}
+				
+			case .delete:
+				let sections = IndexSet(change.flatMap({$0.indexPath?.row}))
+				if sections.count > 0 {
+					messagesCollectionView.deleteSections(sections)
+				}
+				
+			case .move:
+				for paths in change {
+					if let section = paths.indexPath?.row, let newSection = paths.newIndexPath?.row {
+						messagesCollectionView.moveSection(section, toSection: newSection)
+					}
+				}
+				
+			case .update:
+				// TODO: update
+				return
 			}
-			
-		case .delete:
-			if let section = indexPath?.row {
-				messagesCollectionView.deleteSections([section])
-			}
-			
-		case .move:
-			if let section = indexPath?.row, let newSection = newIndexPath?.row {
-				messagesCollectionView.moveSection(section, toSection: newSection)
-			}
-			
-		case .update:
-			// TODO: update
-			return
 		}
 	}
 }
