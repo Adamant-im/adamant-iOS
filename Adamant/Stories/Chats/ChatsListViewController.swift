@@ -132,13 +132,13 @@ extension ChatsListViewController: UITableViewDelegate, UITableViewDataSource {
 // MARK: - UITableView Cells
 extension ChatsListViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell: ChatTableViewCell = tableView.dequeueReusableCell(withIdentifier: chatCell, for: indexPath) as! ChatTableViewCell
-		
-		if let chat = chatsController?.object(at: indexPath) {
-			configureCell(cell, for: chat)
+		return tableView.dequeueReusableCell(withIdentifier: chatCell, for: indexPath)
+	}
+	
+	func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+		if let chatCell = cell as? ChatTableViewCell, let chat = chatsController?.object(at: indexPath) {
+			configureCell(chatCell, for: chat)
 		}
-		
-		return cell
 	}
 	
 	private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
@@ -190,13 +190,14 @@ extension ChatsListViewController: NSFetchedResultsControllerDelegate {
 		case .update:
 			if let indexPath = indexPath,
 				let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
-				let chatroom = controller.object(at: indexPath) as? Chatroom {
+				let chatroom = anObject as? Chatroom {
 				self.configureCell(cell, for: chatroom)
 			}
 			
 		case .move:
 			if let indexPath = indexPath, let newIndexPath = newIndexPath {
-				self.tableView.moveRow(at: indexPath, to: newIndexPath)
+				self.tableView.insertRows(at: [newIndexPath], with: .automatic)
+				self.tableView.deleteRows(at: [indexPath], with: .automatic)
 			}
 		}
 	}
