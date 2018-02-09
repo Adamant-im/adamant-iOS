@@ -101,9 +101,14 @@ extension AdamantChatsProvider {
 	}
 	
 	func update() {
+		if state == .updating {
+			return
+		}
+		
 		stateSemaphore.wait()
 		// MARK: 1. Check state
 		if state == .updating {
+			stateSemaphore.signal()
 			return
 		}
 		
@@ -572,20 +577,21 @@ extension AdamantChatsProvider {
 			contextMutatingSemaphore.wait()
 			
 			try context.save()
-			
-			let h = Int(height)
-			highSemaphore.wait()
-			if let lastHeight = lastHeight {
-				if lastHeight < h {
-					self.lastHeight = h
-				}
-			} else {
-				lastHeight = h
-			}
-			highSemaphore.signal()
 		} catch {
 			print(error)
 		}
+		
+		// MARK 6. Last message height
+		let h = Int(height)
+		highSemaphore.wait()
+		if let lastHeight = lastHeight {
+			if lastHeight < h {
+				self.lastHeight = h
+			}
+		} else {
+			lastHeight = h
+		}
+		highSemaphore.signal()
 	}
 }
 
