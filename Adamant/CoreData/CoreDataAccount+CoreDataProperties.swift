@@ -18,9 +18,10 @@ extension CoreDataAccount {
     }
 
     @NSManaged public var address: String?
+    @NSManaged public var knownMessages: [String:String]?
     @NSManaged public var name: String?
     @NSManaged public var publicKey: String?
-    @NSManaged public var knownMessages: [String:String]?
+    @NSManaged public var avatar: String?
     @NSManaged public var chatroom: Chatroom?
     @NSManaged public var transfers: NSSet?
 

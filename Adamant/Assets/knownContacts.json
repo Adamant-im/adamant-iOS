@@ -2,6 +2,7 @@
 	{
 		"address": "U15423595369615486571",
 		"name": "ADAMANT Bounty Wallet",
+		"avatar": "avatar_bots",
 		"messages": [
 			{
 				"key": "chats.welcome_message",
@@ -12,6 +13,7 @@
 	{
 		"address": "U7047165086065693428",
 		"name": "ADAMANT ICO",
+		"avatar": "avatar_bots",
 		"messages": [
 			{
 				"key": "chats.preico_message",

@@ -13,6 +13,7 @@ class AdamantAccountsProvider: AccountsProvider {
 	struct KnownContact: Codable {
 		let address: String
 		let name: String
+		let avatar: String?
 		let messages: [KnownMessage]?
 	}
 	
@@ -191,6 +192,7 @@ extension AdamantAccountsProvider {
 		
 		if let acc = knownContacts[account.address] {
 			coreAccount.name = acc.name
+			coreAccount.avatar = acc.avatar
 			if let messages = acc.messages {
 				coreAccount.knownMessages = messages.reduce(into: [String:String](), { (result, message) in
 					result[message.key] = message.message
