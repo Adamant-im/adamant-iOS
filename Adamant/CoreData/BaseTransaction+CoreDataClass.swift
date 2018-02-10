@@ -1,5 +1,5 @@
 //
-//  ChatTransaction+CoreDataClass.swift
+//  BaseTransaction+CoreDataClass.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 07.02.2018.
@@ -10,7 +10,7 @@
 import Foundation
 import CoreData
 
-@objc(ChatTransaction)
-public class ChatTransaction: BaseTransaction {
-	static let entityName = "ChatTransaction"
+@objc(BaseTransaction)
+public class BaseTransaction: NSManagedObject {
+
 }

@@ -58,22 +58,45 @@ extension Container {
 			return service
 		}.inObjectScope(.container)
 		
-		// MARK: ContactsService
-		self.register(ContactsService.self) { _ in try! KnownContactsService(contactsJsonUrl: AdamantResources.knownContacts) }.inObjectScope(.container)
-		
 		// MARK: Fee calculator
 		self.register(FeeCalculator.self) { _ in HardFeeCalculator() }.inObjectScope(.container)
 		
 		// MARK: Export tools
 		self.register(ExportTools.self) { _ in AdamantExportTools() }
 		
-		// MARK: Chat provider
-		self.register(ChatDataProvider.self) { r  in
-			let provider = CoreDataChatProvider(managedObjectModel: AdamantResources.coreDataModel)
+		
+		// MARK: - Data Providers
+		// MARK: CoreData Stack
+		self.register(CoreDataStack.self) { _ in
+			try! InMemoryCoreDataStack(modelUrl: AdamantResources.coreDataModel)
+		}.inObjectScope(.container)
+		
+		// MARK: Accounts
+		self.register(AccountsProvider.self) { r in
+			let provider = try! AdamantAccountsProvider(contactsJsonUrl: AdamantResources.knownContacts)
+			provider.stack = r.resolve(CoreDataStack.self)
+			provider.apiService = r.resolve(ApiService.self)
+			return provider
+		}.inObjectScope(.container)
+		
+		// MARK: Transfers
+		self.register(TransfersProvider.self) { r in
+			let provider = AdamantTransfersProvider()
+			provider.apiService = r.resolve(ApiService.self)
+			provider.stack = r.resolve(CoreDataStack.self)
+			provider.accountService = r.resolve(AccountService.self)
+			provider.accountsProvider = r.resolve(AccountsProvider.self)
+			return provider
+		}.inObjectScope(.container)
+		
+		// MARK: Chats
+		self.register(ChatsProvider.self) { r in
+			let provider = AdamantChatsProvider()
 			provider.accountService = r.resolve(AccountService.self)
 			provider.apiService = r.resolve(ApiService.self)
+			provider.stack = r.resolve(CoreDataStack.self)
 			provider.adamantCore = r.resolve(AdamantCore.self)
-			provider.contactsService = r.resolve(ContactsService.self)
+			provider.accountsProvider = r.resolve(AccountsProvider.self)
 			return provider
 		}.inObjectScope(.container)
 	}
