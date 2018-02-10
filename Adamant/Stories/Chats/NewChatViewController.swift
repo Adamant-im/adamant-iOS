@@ -23,7 +23,8 @@ class NewChatViewController: UITableViewController {
 	@IBOutlet weak var accountTextField: UITextField!
 	
 	weak var delegate: NewChatViewControllerDelegate?
-	
+	var addressFormatter = NumberFormatter()
+	let invalidCharacters = CharacterSet(charactersIn: "U0123456789").inverted
 	
 	// MARK: - Lifecycle
 	
@@ -32,6 +33,19 @@ class NewChatViewController: UITableViewController {
 		accountTextField.textColor = UIColor.adamantPrimary
 		accountTextField.delegate = self
 		accountTextField.text = ""
+		
+		let prefix = UILabel()
+		prefix.text = "U"
+		prefix.textColor = UIColor.adamantPrimary
+		prefix.font = accountTextField.font
+		prefix.sizeToFit()
+		let view = UIView()
+		view.addSubview(prefix)
+		view.frame = prefix.frame
+		prefix.frame = prefix.frame.offsetBy(dx: 0, dy: -1)
+		accountTextField.leftView = view
+		accountTextField.leftViewMode = .always
+		
 		accountTextField.becomeFirstResponder()
     }
 	
@@ -43,7 +57,7 @@ class NewChatViewController: UITableViewController {
 	
 	// MARK: - IBActions
 	
-	@IBAction func done(_ sender: Any) {
+	@IBAction func done(_ sender: UITextField) {
 		guard let nums = accountTextField.text, nums.count > 1 else {
 			dialogService.showToastMessage("Please specify valid recipient address")
 			return
@@ -92,6 +106,10 @@ class NewChatViewController: UITableViewController {
 
 // MARK: - UITextFieldDelegate
 extension NewChatViewController: UITextFieldDelegate {
+	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+		return string.rangeOfCharacter(from: invalidCharacters, options: [], range: string.startIndex ..< string.endIndex) == nil
+	}
+	
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
 		done(textField)
 		return false
