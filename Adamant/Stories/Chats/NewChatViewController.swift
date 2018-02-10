@@ -107,7 +107,22 @@ class NewChatViewController: UITableViewController {
 // MARK: - UITextFieldDelegate
 extension NewChatViewController: UITextFieldDelegate {
 	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-		return string.rangeOfCharacter(from: invalidCharacters, options: [], range: string.startIndex ..< string.endIndex) == nil
+		if string.rangeOfCharacter(from: invalidCharacters, options: [], range: string.startIndex ..< string.endIndex) == nil {
+			if string.contains("U") {
+				let cleaned = string.replacingOccurrences(of: "U", with: "")
+				if let selectedRange = textField.selectedTextRange {
+					textField.replace(selectedRange, withText: cleaned)
+				} else {
+					textField.text = cleaned
+				}
+				
+				return false
+			}
+			
+			return true
+		} else {
+			return false
+		}
 	}
 	
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
