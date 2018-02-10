@@ -18,6 +18,7 @@ protocol ApiService {
 	func newAccount(byPublicKey publicKey: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
 	func getAccount(byPassphrase passphrase: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
 	func getAccount(byPublicKey publicKey: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
+	func getAccount(byAddress address: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
 	
 	
 	// MARK: - Keys
@@ -28,7 +29,7 @@ protocol ApiService {
 	// MARK: - Transactions
 	
 	func getTransaction(id: UInt, completionHandler: @escaping (Transaction?, AdamantError?) -> Void)
-	func getTransactions(forAccount: String, type: TransactionType, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void)
+	func getTransactions(forAccount: String, type: TransactionType, fromHeight: UInt?, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void)
 	
 	
 	// MARK: - Funds

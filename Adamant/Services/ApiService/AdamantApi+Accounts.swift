@@ -75,4 +75,23 @@ extension AdamantApiService {
 			completionHandler(account, nil)
 		}
 	}
+	
+	func getAccount(byAddress address: String, completionHandler: @escaping (Account?, AdamantError?) -> Void) {
+		let endpoint: URL
+		do {
+			endpoint = try buildUrl(path: ApiCommands.Accounts.root, queryItems: [URLQueryItem(name: "address", value: address)])
+		} catch {
+			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
+			return
+		}
+		
+		sendRequest(url: endpoint) { (response: ServerModelResponse<Account>?, error) in
+			guard let r = response, r.success, let account = r.model else {
+				completionHandler(nil, AdamantError(message: response?.error ?? "Failed to get account", error: error))
+				return
+			}
+			
+			completionHandler(account, nil)
+		}
+	}
 }

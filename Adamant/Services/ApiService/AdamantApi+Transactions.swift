@@ -37,11 +37,17 @@ extension AdamantApiService {
 		}
 	}
 	
-	func getTransactions(forAccount account: String, type: TransactionType, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void) {
+	func getTransactions(forAccount account: String, type: TransactionType, fromHeight: UInt?, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void) {
+		var queryItems = [URLQueryItem(name: "inId", value: account),
+						  URLQueryItem(name: "and:type", value: String(type.rawValue))]
+		
+		if let fromHeight = fromHeight, fromHeight > 0 {
+			queryItems.append(URLQueryItem(name: "and:fromHeight", value: String(fromHeight)))
+		}
+		
 		let endpoint: URL
 		do {
-			endpoint = try buildUrl(path: ApiCommands.Transactions.root, queryItems: [URLQueryItem(name: "inId", value: account),
-																					  URLQueryItem(name: "and:type", value: String(type.rawValue))])
+			endpoint = try buildUrl(path: ApiCommands.Transactions.root, queryItems: queryItems)
 		} catch {
 			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
 			return
