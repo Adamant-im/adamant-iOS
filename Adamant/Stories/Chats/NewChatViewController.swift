@@ -59,7 +59,7 @@ class NewChatViewController: UITableViewController {
 			return
 		}
 		
-		if let loggedAccount = accountService.account, loggedAccount.address != address {
+		if let loggedAccount = accountService.account, loggedAccount.address == address {
 			dialogService.showToastMessage("You don't need encrypted anonymous chat to talk to yourself.")
 			return
 		}
