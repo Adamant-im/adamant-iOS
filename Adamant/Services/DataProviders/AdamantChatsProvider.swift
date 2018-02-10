@@ -273,6 +273,17 @@ extension AdamantChatsProvider {
 			// Update ID with recieved, add to unconfirmed transactions.
 			transaction.transactionId = String(id)
 			
+			if let lastTransaction = chatroom.lastTransaction {
+				if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
+					dateA.compare(dateB) == ComparisonResult.orderedAscending {
+					chatroom.lastTransaction = transaction
+					chatroom.updatedAt = transaction.date
+				}
+			} else {
+				chatroom.lastTransaction = transaction
+				chatroom.updatedAt = transaction.date
+			}
+			
 			// If we will save transaction from privateContext, we will hold strong reference to whole context, and we won't ever save it.
 			self.unconfirmedsSemaphore.wait()
 			DispatchQueue.main.sync {
