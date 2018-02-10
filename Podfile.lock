@@ -1,7 +1,7 @@
 PODS:
   - Alamofire (4.6.0)
   - Eureka (4.0.1)
-  - FreakingSimpleRoundImageView (1.0.0)
+  - FreakingSimpleRoundImageView (1.0.1)
   - FTIndicator (1.2.6):
     - FTIndicator/FTNotificationIndicator (= 1.2.6)
     - FTIndicator/FTProgressIndicator (= 1.2.6)
@@ -30,7 +30,7 @@ DEPENDENCIES:
 SPEC CHECKSUMS:
   Alamofire: f41a599bd63041760b26d393ec1069d9d7b917f4
   Eureka: c8bd5cc07143b6f66268c208d28a246c99b41955
-  FreakingSimpleRoundImageView: aa7879307e21922d4a25923ef858539ec6ec8c05
+  FreakingSimpleRoundImageView: ae69d35a7bb7870411d0348b62969415be4031f0
   FTIndicator: d2a7c204341b7b0165b6dbeb5bf6979c6d7d4bb7
   GrowingTextView: 0615429affef558cbbb610aa6f9baf19b027fdbe
   MessageKit: fc74d71d9b05385138d47b3a4b7beef5c687daf1

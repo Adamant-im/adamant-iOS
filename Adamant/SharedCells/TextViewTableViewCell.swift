@@ -27,7 +27,7 @@ class TextViewTableViewCell: UITableViewCell {
 	var placeHolder: String? {
 		set {
 			if let tv = textView as? GrowingTextView {
-				tv.placeHolder = placeHolder
+				tv.placeHolder = newValue
 			}
 		}
 		get {
