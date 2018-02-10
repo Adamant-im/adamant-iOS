@@ -53,10 +53,12 @@ class ChatViewController: MessagesViewController {
 		
 		// MARK: 1. Initial configuration
 		
-		if let title = chatroom.title {
-			self.navigationItem.title = title
-		} else {
-			self.navigationItem.title = chatroom.partner?.address
+		if let partner = chatroom.partner {
+			if let name = partner.name {
+				self.navigationItem.title = name
+			} else {
+				self.navigationItem.title = partner.address
+			}
 		}
 		
 		messagesCollectionView.messagesDataSource = self

@@ -10,9 +10,36 @@ import Foundation
 import CoreData
 
 class AdamantAccountsProvider: AccountsProvider {
+	struct KnownContact: Codable {
+		let address: String
+		let name: String
+		let messages: [KnownMessage]?
+	}
+	
+	struct KnownMessage: Codable {
+		let key: String
+		let message: String
+	}
+	
 	// MARK: Dependencies
 	var stack: CoreDataStack!
 	var apiService: ApiService!
+	
+	
+	// MARK: Properties
+	private let knownContacts: [String:KnownContact]
+	
+	
+	// MARK: Lifecycle
+	init(contactsJsonUrl url: URL) throws {
+		let raw = try Data(contentsOf: url)
+		let knownContacts = try JSONDecoder().decode([KnownContact].self, from: raw)
+		
+		self.knownContacts = knownContacts.reduce(into: [String:KnownContact](), { (result, contact) in
+			result[contact.address] = contact
+		})
+	}
+	
 	
 	// MARK: Threading
 	private let queue = DispatchQueue(label: "im.adamant.accounts.getAccount", qos: .utility, attributes: [.concurrent])
@@ -145,17 +172,30 @@ extension AdamantAccountsProvider {
 	private func createCoreDataAccount(from account: Account) -> CoreDataAccount {
 		let coreAccount: CoreDataAccount
 		if Thread.isMainThread {
-			coreAccount = CoreDataAccount(entity: CoreDataAccount.entity(), insertInto: stack.container.viewContext)
-			coreAccount.address = account.address
-			coreAccount.publicKey = account.publicKey
+			coreAccount = createCoreDataAccount(from: account, context: stack.container.viewContext)
 		} else {
 			var acc: CoreDataAccount!
 			DispatchQueue.main.sync {
-				acc = CoreDataAccount(entity: CoreDataAccount.entity(), insertInto: stack.container.viewContext)
-				acc.address = account.address
-				acc.publicKey = account.publicKey
+				acc = createCoreDataAccount(from: account, context: stack.container.viewContext)
 			}
 			coreAccount = acc
+		}
+		
+		return coreAccount
+	}
+	
+	private func createCoreDataAccount(from account: Account, context: NSManagedObjectContext) -> CoreDataAccount {
+		let coreAccount = CoreDataAccount(entity: CoreDataAccount.entity(), insertInto: context)
+		coreAccount.address = account.address
+		coreAccount.publicKey = account.publicKey
+		
+		if let acc = knownContacts[account.address] {
+			coreAccount.name = acc.name
+			if let messages = acc.messages {
+				coreAccount.knownMessages = messages.reduce(into: [String:String](), { (result, message) in
+					result[message.key] = message.message
+				})
+			}
 		}
 		
 		return coreAccount

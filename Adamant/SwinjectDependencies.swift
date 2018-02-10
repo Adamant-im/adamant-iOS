@@ -58,9 +58,6 @@ extension Container {
 			return service
 		}.inObjectScope(.container)
 		
-		// MARK: ContactsService
-		self.register(ContactsService.self) { _ in try! KnownContactsService(contactsJsonUrl: AdamantResources.knownContacts) }.inObjectScope(.container)
-		
 		// MARK: Fee calculator
 		self.register(FeeCalculator.self) { _ in HardFeeCalculator() }.inObjectScope(.container)
 		
@@ -76,7 +73,7 @@ extension Container {
 		
 		// MARK: Accounts
 		self.register(AccountsProvider.self) { r in
-			let provider = AdamantAccountsProvider()
+			let provider = try! AdamantAccountsProvider(contactsJsonUrl: AdamantResources.knownContacts)
 			provider.stack = r.resolve(CoreDataStack.self)
 			provider.apiService = r.resolve(ApiService.self)
 			return provider
@@ -99,7 +96,6 @@ extension Container {
 			provider.apiService = r.resolve(ApiService.self)
 			provider.stack = r.resolve(CoreDataStack.self)
 			provider.adamantCore = r.resolve(AdamantCore.self)
-			provider.contactsService = r.resolve(ContactsService.self)
 			provider.accountsProvider = r.resolve(AccountsProvider.self)
 			return provider
 		}.inObjectScope(.container)

@@ -15,7 +15,6 @@ class AdamantChatsProvider: ChatsProvider {
 	var apiService: ApiService!
 	var stack: CoreDataStack!
 	var adamantCore: AdamantCore!
-	var contactsService: ContactsService!
 	var accountsProvider: AccountsProvider!
 	
 	// MARK: Properties
@@ -552,6 +551,13 @@ extension AdamantChatsProvider {
 						height = chatTransaction.height
 					}
 					
+					if !trs.isOut,
+						let preset = account.knownMessages,
+						let message = chatTransaction.message,
+						let translatedMessage = preset.first(where: {message.range(of: $0.key) != nil}) {
+						chatTransaction.message = translatedMessage.value
+					}
+					
 					chats.insert(chatTransaction)
 				}
 			}
@@ -664,12 +670,7 @@ extension AdamantChatsProvider {
 		chatTransaction.isConfirmed = true
 		chatTransaction.isOutgoing = isOutgoing
 		
-		let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)
-		
-		if let decodedMessage = decodedMessage,
-			let translatedMessage = contactsService.translated(message: decodedMessage, from: transaction.senderId) {
-			chatTransaction.message = translatedMessage
-		} else {
+		if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey) {
 			chatTransaction.message = decodedMessage
 		}
 		
@@ -708,10 +709,6 @@ extension AdamantChatsProvider {
 		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
 		chatroom.partner = account
 		chatroom.updatedAt = NSDate()
-		
-		if let address = account.address, let title = contactsService.nameFor(address: address) {
-			chatroom.title = title
-		}
 		
 		return chatroom
 	}

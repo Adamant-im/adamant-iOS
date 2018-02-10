@@ -13,6 +13,4 @@ import CoreData
 @objc(TransferTransaction)
 public class TransferTransaction: BaseTransaction {
 	static let entityName = "TransferTransaction"
-	
-	var isOutgoing: Bool = false
 }

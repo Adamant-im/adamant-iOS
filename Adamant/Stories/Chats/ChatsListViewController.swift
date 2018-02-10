@@ -148,10 +148,12 @@ extension ChatsListViewController {
 		cell.dateLabel.textColor = UIColor.adamantSecondary
 		cell.avatarImageView.tintColor = UIColor.adamantChatIcons
 		
-		if let title = chatroom.title {
-			cell.accountLabel.text = title
-		} else {
-			cell.accountLabel.text = chatroom.partner?.address
+		if let partner = chatroom.partner {
+			if let name = partner.name {
+				cell.accountLabel.text = name
+			} else {
+				cell.accountLabel.text = partner.address
+			}
 		}
 		
 		cell.lastMessageLabel.text = chatroom.lastTransaction?.message

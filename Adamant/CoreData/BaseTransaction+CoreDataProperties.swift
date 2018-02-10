@@ -2,7 +2,7 @@
 //  BaseTransaction+CoreDataProperties.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 07.02.2018.
+//  Created by Anokhov Pavel on 10.02.2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 //
@@ -25,5 +25,6 @@ extension BaseTransaction {
     @NSManaged public var senderId: String?
     @NSManaged public var transactionId: String?
     @NSManaged public var type: Int16
+    @NSManaged public var isOutgoing: Bool
 
 }
