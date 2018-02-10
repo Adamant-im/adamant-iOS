@@ -25,6 +25,7 @@ class AdamantChatsProvider: ChatsProvider {
 	private var unconfirmedTransactions: [UInt:ChatTransaction] = [:]
 	
 	private let processingQueue = DispatchQueue(label: "im.adamant.processing.chat", qos: .utility, attributes: [.concurrent])
+	private let sendingQueue = DispatchQueue(label: "im.adamant.sending.chat", qos: .utility, attributes: [.concurrent])
 	private let unconfirmedsSemaphore = DispatchSemaphore(value: 1)
 	private let highSemaphore = DispatchSemaphore(value: 1)
 	private let stateSemaphore = DispatchSemaphore(value: 1)
@@ -149,6 +150,11 @@ extension AdamantChatsProvider {
 // MARK: - Sending messages {
 extension AdamantChatsProvider {
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+		guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+			completion(.error(.notLogged))
+			return
+		}
+		
 		switch validateMessage(message) {
 		case .isValid:
 			break
@@ -162,29 +168,24 @@ extension AdamantChatsProvider {
 			return
 		}
 		
-		DispatchQueue.global(qos: .utility).async {
+		sendingQueue.async {
 			switch message {
 			case .text(let text):
-				self.sendTextMessage(text: text, recipientId: recipientId, completion: completion)
+				self.sendTextMessage(text: text, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, completion: completion)
 			}
 		}
 	}
 	
-	private func sendTextMessage(text: String, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
-		guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
-			completion(.error(.notLogged))
-			return
-		}
-		
+	private func sendTextMessage(text: String, senderId: String, recipientId: String, keypair: Keypair, completion: @escaping (ChatsProviderResult) -> Void) {
 		// MARK: 0. Prepare
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = stack.container.viewContext
 		
 		
-		// MARK: 1. Get recipient key
+		// MARK: 1. Get recipient account
 		let accountsGroup = DispatchGroup()
 		accountsGroup.enter()
-		var objectIdRaw: NSManagedObjectID? = nil
+		var accountViewContext: CoreDataAccount? = nil
 		accountsProvider.getAccount(byAddress: recipientId) { result in
 			defer {
 				accountsGroup.leave()
@@ -198,14 +199,13 @@ extension AdamantChatsProvider {
 				completion(.error(.serverError(error)))
 				
 			case .success(let account):
-				objectIdRaw = account.objectID
+				accountViewContext = account
 			}
 		}
 		
 		accountsGroup.wait()
-		guard let objectId = objectIdRaw,
-			let recipientAccount = privateContext.object(with: objectId) as? CoreDataAccount,
-			let recipientPublicKey = recipientAccount.publicKey else {
+		
+		guard let account = accountViewContext, let recipientPublicKey = account.publicKey else {
 			completion(.error(.accountNotFound(recipientId)))
 			return
 		}
@@ -218,18 +218,39 @@ extension AdamantChatsProvider {
 		}
 		
 		
-		// MARK: 3. Create chat transaction
+		// MARK 3. Get or Create Chatroom
+		let chatroom: Chatroom
+		if let room = account.chatroom {
+			chatroom = privateContext.object(with: room.objectID) as! Chatroom
+		} else {
+			if Thread.isMainThread {
+				let chrm = createChatroom(with: account, context: stack.container.viewContext)
+				chatroom = privateContext.object(with: chrm.objectID) as! Chatroom
+			} else {
+				var chrmId: NSManagedObjectID? = nil
+				DispatchQueue.main.sync {
+					let chrm = createChatroom(with: account, context: stack.container.viewContext)
+					chrmId = chrm.objectID
+				}
+				chatroom = privateContext.object(with: chrmId!) as! Chatroom
+			}
+		}
+		
+		
+		// MARK: 4. Create chat transaction
 		let transaction = ChatTransaction(entity: ChatTransaction.entity(), insertInto: privateContext)
 		transaction.date = Date() as NSDate
 		transaction.recipientId = recipientId
-		transaction.senderId = loggedAccount.address
+		transaction.senderId = senderId
 		transaction.type = Int16(ChatType.message.rawValue)
 		transaction.isOutgoing = true
 		transaction.message = text
 		transaction.transactionId = UUID().uuidString
 		
+		chatroom.addToTransactions(transaction)
 		
-		// MARK: 4. Save unconfirmed transaction
+		
+		// MARK: 5. Save unconfirmed transaction
 		do {
 			try privateContext.save()
 		} catch {
@@ -237,23 +258,28 @@ extension AdamantChatsProvider {
 			return
 		}
 		
-		
-		// MARK: 5. Send
-		apiService.sendMessage(senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { (id, error) in
+		// MARK: 6. Send
+		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { (id, error) in
 			guard let id = id else {
 				if let error = error {
+					privateContext.delete(transaction)
+					try? privateContext.save()
 					completion(.error(.serverError(error)))
 				} else {
-					// TODO:
 					fatalError()
 				}
 				return
 			}
 			
-			self.unconfirmedsSemaphore.wait()
-			
+			// Update ID with recieved, add to unconfirmed transactions.
 			transaction.transactionId = String(id)
-			self.unconfirmedTransactions[id] = transaction
+			
+			// If we will save transaction from privateContext, we will hold strong reference to whole context, and we won't ever save it.
+			self.unconfirmedsSemaphore.wait()
+			DispatchQueue.main.sync {
+				self.unconfirmedTransactions[id] = self.stack.container.viewContext.object(with: transaction.objectID) as? ChatTransaction
+			}
+			self.unconfirmedsSemaphore.signal()
 			
 			do {
 				try privateContext.save()
@@ -261,8 +287,6 @@ extension AdamantChatsProvider {
 			} catch {
 				completion(.error(.internalError(error)))
 			}
-			
-			self.unconfirmedsSemaphore.signal()
 		}
 	}
 }
@@ -510,9 +534,11 @@ extension AdamantChatsProvider {
 						height = h
 					}
 					
+					unconfirmedsSemaphore.signal()
 					continue
+				} else {
+					unconfirmedsSemaphore.signal()
 				}
-				unconfirmedsSemaphore.signal()
 				
 				let publicKey: String
 				if trs.isOut {
