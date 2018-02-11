@@ -53,7 +53,17 @@ class AdamantAccountsProvider: AccountsProvider {
 		request.fetchLimit = 1
 		request.predicate = predicate
 		
-		return (try? (context ?? stack.container.viewContext).fetch(request))?.first
+		var acc: CoreDataAccount? = nil
+		
+		if Thread.isMainThread {
+			acc = (try? (context ?? stack.container.viewContext).fetch(request))?.first
+		} else {
+			DispatchQueue.main.sync {
+				acc = (try? (context ?? stack.container.viewContext).fetch(request))?.first
+			}
+		}
+		
+		return acc
 	}
 }
 

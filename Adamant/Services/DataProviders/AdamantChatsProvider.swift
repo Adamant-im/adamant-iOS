@@ -115,7 +115,7 @@ extension AdamantChatsProvider {
 		// MARK: 2. Prepare
 		let prevState = state
 		
-		guard let address = accountService.account?.address else {
+		guard let address = accountService.account?.address, let privateKey = accountService.keypair?.privateKey else {
 			stateSemaphore.signal()
 			setState(.failedToUpdate(ChatsProviderError.notLogged), previous: prevState)
 			return
@@ -130,7 +130,7 @@ extension AdamantChatsProvider {
 		let processingGroup = DispatchGroup()
 		let cms = DispatchSemaphore(value: 1)
 		
-		getTransactions(address: address, height: lastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
+		getTransactions(senderId: address, privateKey: privateKey, height: lastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
 		
 		// MARK: 4. Check
 		processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) {
@@ -383,12 +383,18 @@ extension AdamantChatsProvider {
 	///   - height: last message height. Minimum == 1 !!!
 	///   - offset: offset, if greater than 100
 	/// - Returns: ammount of new messages was added
-	private func getTransactions(address: String, height: Int?, offset: Int?, dispatchGroup: DispatchGroup, context: NSManagedObjectContext, contextMutatingSemaphore cms: DispatchSemaphore) {
+	private func getTransactions(senderId: String,
+								 privateKey: String,
+								 height: Int?,
+								 offset: Int?,
+								 dispatchGroup: DispatchGroup,
+								 context: NSManagedObjectContext,
+								 contextMutatingSemaphore cms: DispatchSemaphore) {
 		// Enter 1
 		dispatchGroup.enter()
 		
 		// MARK: 1. Get new transactions
-		apiService.getChatTransactions(account: address, height: height, offset: offset) { result in
+		apiService.getChatTransactions(account: senderId, height: height, offset: offset) { result in
 			defer {
 				// Leave 1
 				dispatchGroup.leave()
@@ -396,6 +402,10 @@ extension AdamantChatsProvider {
 			
 			switch result {
 			case .success(let transactions):
+				if transactions.count == 0 {
+					return
+				}
+				
 				// MARK: 2. Process transactions in background
 				// Enter 2
 				dispatchGroup.enter()
@@ -406,6 +416,8 @@ extension AdamantChatsProvider {
 					}
 					
 					self.process(chatTransactions: transactions,
+								 senderId: senderId,
+								 privateKey: privateKey,
 								 context: context,
 								 contextMutatingSemaphore: cms)
 				}
@@ -419,7 +431,7 @@ extension AdamantChatsProvider {
 						newOffset = self.apiTransactions
 					}
 					
-					self.getTransactions(address: address, height: height, offset: newOffset, dispatchGroup: dispatchGroup, context: context, contextMutatingSemaphore: cms)
+					self.getTransactions(senderId: senderId, privateKey: privateKey, height: height, offset: newOffset, dispatchGroup: dispatchGroup, context: context, contextMutatingSemaphore: cms)
 				}
 				
 			case .failure(let error):
@@ -428,12 +440,7 @@ extension AdamantChatsProvider {
 		}
 	}
 	
-	private func process(chatTransactions: [Transaction], context: NSManagedObjectContext, contextMutatingSemaphore: DispatchSemaphore) {
-		guard let currentAddress = accountService.account?.address, let privateKey = accountService.keypair?.privateKey else {
-			// TODO: Log error
-			return
-		}
-		
+	private func process(chatTransactions: [Transaction], senderId: String, privateKey: String, context: NSManagedObjectContext, contextMutatingSemaphore: DispatchSemaphore) {
 		struct DirectionalTransaction {
 			let transaction: Transaction
 			let isOut: Bool
@@ -443,7 +450,7 @@ extension AdamantChatsProvider {
 		var grouppedTransactions = [String:[DirectionalTransaction]]()
 		
 		for transaction in chatTransactions {
-			let isOut = transaction.senderId == currentAddress
+			let isOut = transaction.senderId == senderId
 			let partner = isOut ? transaction.recipientId : transaction.senderId
 			
 			if grouppedTransactions[partner] == nil {
