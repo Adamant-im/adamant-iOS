@@ -338,7 +338,7 @@ extension ChatViewController: MessageInputBarDelegate {
 					case .dependencyError(let error): message = "Internal dependency error: \(error)."
 					case .internalError(let error): message = "Internal error: \(error)"
 					case .notLogged: message = "Internal error: User not logged."
-					case .serverError(let error): message = "Remote server error: \(error)"
+					case .serverError(let error): message = "Server error: \(error)"
 					case .messageNotValid(let problem):
 						switch problem {
 						case .tooLong:

@@ -89,7 +89,7 @@ class AdamantApiService: ApiService {
 		}
 		
 		Alamofire.request(url, method: method, parameters: parameters, encoding: encoding, headers: headers)
-			.responseData { response in
+			.responseData(queue: defaultResponseDispatchQueue) { response in
 				switch response.result {
 				case .success(let data):
 					do {

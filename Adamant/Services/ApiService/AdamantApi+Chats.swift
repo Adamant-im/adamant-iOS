@@ -71,8 +71,8 @@ extension AdamantApiService {
 		let processEndpoin: URL
 		
 		do {
-			normalizeEndpoint = try buildUrl(path: ApiCommands.Transactions.normalizeTransaction)
-			processEndpoin = try buildUrl(path: ApiCommands.Transactions.processTransaction)
+			normalizeEndpoint = try buildUrl(path: ApiCommands.Chats.normalizeTransaction)
+			processEndpoin = try buildUrl(path: ApiCommands.Chats.processTransaction)
 		} catch {
 			let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
 			completion(.failure(err))
