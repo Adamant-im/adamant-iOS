@@ -20,6 +20,28 @@ class AdamantApiService: ApiService {
 		case url, json
 	}
 	
+	struct InternalError: Equatable, Hashable {
+		static let endpointBuildFailed = InternalError("Failed to build endpoint url")
+		static let signTransactionFailed = InternalError("Failed to sign transaction")
+		
+		let message: String
+		
+		private init(_ message: String) {
+			self.message = message
+		}
+		
+		func apiServiceErrorWith(error: Error?) -> ApiServiceError {
+			return .internalError(message: message, error: error)
+		}
+		
+		static func ==(lhs: InternalError, rhs: InternalError) -> Bool {
+			return lhs.message == rhs.message
+		}
+		
+		var hashValue: Int {
+			return message.hashValue &* 121212
+		}
+	}
 	
 	// MARK: - Dependencies
 	
@@ -53,11 +75,11 @@ class AdamantApiService: ApiService {
 	}
 	
 	func sendRequest<T: Decodable>(url: URLConvertible,
-										   method: HTTPMethod = .get,
-										   parameters: [String:Any]? = nil,
-										   encoding enc: Encoding = .url,
-										   headers: [String:String]? = nil,
-										   completionHandler: @escaping (T?, Error?) -> Void) {
+								   method: HTTPMethod = .get,
+								   parameters: [String:Any]? = nil,
+								   encoding enc: Encoding = .url,
+								   headers: [String:String]? = nil,
+								   completion: @escaping (ApiServiceResult<T>) -> Void) {
 		let encoding: ParameterEncoding
 		switch enc {
 		case .url:
@@ -67,18 +89,33 @@ class AdamantApiService: ApiService {
 		}
 		
 		Alamofire.request(url, method: method, parameters: parameters, encoding: encoding, headers: headers)
-			.response(queue: defaultResponseDispatchQueue, completionHandler: { response in
-			guard let data = response.data else {
-				completionHandler(nil, response.error)
-				return
-			}
+			.responseData(queue: defaultResponseDispatchQueue) { response in
+				switch response.result {
+				case .success(let data):
+					do {
+						let model: T = try JSONDecoder().decode(T.self, from: data)
+						completion(.success(model))
+					} catch {
+						completion(.failure(.internalError(message: "Error parsing response", error: error)))
+					}
+					
+				case .failure(let error):
+					completion(.failure(.networkError(error: error)))
+				}
+		}
+	}
+	
+	static func translateServerError(_ error: String?) -> ApiServiceError {
+		guard let error = error else {
+			return .internalError(message: "Unknown", error: nil)
+		}
+		
+		switch error {
+		case "Account not found":
+			return .accountNotFound
 			
-			do {
-				let response: T = try JSONDecoder().decode(T.self, from: data)
-				completionHandler(response, nil)
-			} catch {
-				completionHandler(nil, AdamantError(message: "Error parsing server response", error: error))
-			}
-		})
+		default:
+			return .serverError(error: error)
+		}
 	}
 }

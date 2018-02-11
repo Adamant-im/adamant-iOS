@@ -17,6 +17,7 @@ extension Container {
 		self.storyboardInitCompleted(TransactionsViewController.self) { (r, c) in
 			c.apiService = r.resolve(ApiService.self)
 			c.cellFactory = r.resolve(CellFactory.self)
+			c.dialogService = r.resolve(DialogService.self)
 		}
 		self.storyboardInitCompleted(TransferViewController.self) { (r, c) in
 			c.apiService = r.resolve(ApiService.self)

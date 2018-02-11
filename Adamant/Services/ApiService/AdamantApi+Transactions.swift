@@ -18,26 +18,33 @@ extension AdamantApiService.ApiCommands {
 }
 
 extension AdamantApiService {
-	func getTransaction(id: UInt, completionHandler: @escaping (Transaction?, AdamantError?) -> Void) {
+	func getTransaction(id: UInt, completion: @escaping (ApiServiceResult<Transaction>) -> Void) {
 		let endpoint: URL
 		do {
 			endpoint = try buildUrl(path: ApiCommands.Transactions.getTransaction, queryItems: [URLQueryItem(name: "id", value: String(id))])
 		} catch {
-			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
+			let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+			completion(.failure(err))
 			return
 		}
 		
-		sendRequest(url: endpoint) { (response: ServerModelResponse<Transaction>?, error) in
-			guard let r = response, r.success, let transaction = r.model else {
-				completionHandler(nil, AdamantError(message: response?.error ?? "Failed to get transaction", error: error))
-				return
+		sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerModelResponse<Transaction>>) in
+			switch serverResponse {
+			case .success(let response):
+				if let model = response.model {
+					completion(.success(model))
+				} else {
+					let error = AdamantApiService.translateServerError(response.error)
+					completion(.failure(error))
+				}
+				
+			case .failure(let error):
+				completion(.failure(.networkError(error: error)))
 			}
-			
-			completionHandler(transaction, nil)
 		}
 	}
 	
-	func getTransactions(forAccount account: String, type: TransactionType, fromHeight: UInt?, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void) {
+	func getTransactions(forAccount account: String, type: TransactionType, fromHeight: UInt?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
 		var queryItems = [URLQueryItem(name: "inId", value: account),
 						  URLQueryItem(name: "and:type", value: String(type.rawValue))]
 		
@@ -49,17 +56,24 @@ extension AdamantApiService {
 		do {
 			endpoint = try buildUrl(path: ApiCommands.Transactions.root, queryItems: queryItems)
 		} catch {
-			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
+			let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+			completion(.failure(err))
 			return
 		}
 		
-		sendRequest(url: endpoint) { (response: ServerCollectionResponse<Transaction>?, error) in
-			guard let r = response, r.success, let transactions = r.collection else {
-				completionHandler(nil, AdamantError(message: response?.error ?? "Failed to get transactions", error: error))
-				return
+		sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
+			switch serverResponse {
+			case .success(let response):
+				if let collection = response.collection {
+					completion(.success(collection))
+				} else {
+					let error = AdamantApiService.translateServerError(response.error)
+					completion(.failure(error))
+				}
+				
+			case .failure(let error):
+				completion(.failure(.networkError(error: error)))
 			}
-			
-			completionHandler(transactions, nil)
 		}
 	}
 }

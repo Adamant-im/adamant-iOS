@@ -45,7 +45,7 @@ class JSAdamantCore : AdamantCore {
 	private var loadingGroup: DispatchGroup?
 	
 	/// Load JSCore
-	func loadJs(from url: URL, queue: DispatchQueue, completionHandler: @escaping (Result) -> Void) {
+	func loadJs(from url: URL, queue: DispatchQueue, completion: @escaping (Result) -> Void) {
 		let loadingGroup = DispatchGroup()
 		self.loadingGroup = loadingGroup
 		loadingGroup.enter()
@@ -101,9 +101,9 @@ class JSAdamantCore : AdamantCore {
 				// MARK: 7. Cleanup
 				context.exceptionHandler = nil
 				self.context = context
-				completionHandler(.success)
+				completion(.success)
 			} catch {
-				completionHandler(.error(error: error))
+				completion(.error(error: error))
 			}
 		}
 	}

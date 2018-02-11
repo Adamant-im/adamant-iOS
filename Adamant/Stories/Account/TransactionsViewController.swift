@@ -12,13 +12,13 @@ class TransactionsViewController: UIViewController {
 	// MARK: - Dependencies
 	var cellFactory: CellFactory!
 	var apiService: ApiService!
+	var dialogService: DialogService!
 	
 	
 	// MARK: - Properties
 	var account: String?
 	private(set) var transactions: [Transaction]?
 	private var updatingTransactions: Bool = false
-	
 	
 	let transactionDetailsSegue = "showTransactionDetails"
 	
@@ -74,16 +74,19 @@ extension TransactionsViewController {
 		
 		updatingTransactions = true
 		
-		apiService.getTransactions(forAccount: account, type: .send, fromHeight: nil) { (transactions, error) in
+		apiService.getTransactions(forAccount: account, type: .send, fromHeight: nil) { response in
 			defer {
 				self.updatingTransactions = false
 			}
 			
-			guard let transactions = transactions else {
-				return
+			switch response {
+			case .success(let transactions):
+				self.transactions = transactions.sorted(by: { $0.date.compare($1.date) == .orderedDescending })
+				
+			case .failure(let error):
+				self.transactions = nil
+				self.dialogService.showToastMessage(String(describing: error))
 			}
-			
-			self.transactions = transactions.sorted(by: { $0.date.compare($1.date) == .orderedDescending })
 			
 			DispatchQueue.main.async {
 				self.tableView.reloadData()

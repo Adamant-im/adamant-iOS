@@ -64,8 +64,8 @@ extension AdamantAccountsProvider {
 	///
 	/// - Parameters:
 	///   - address: address of an account
-	///   - completionHandler: returns Account created in viewContext
-	func getAccount(byAddress address: String, completionHandler: @escaping (AccountsProviderResult) -> Void) {
+	///   - completion: returns Account created in viewContext
+	func getAccount(byAddress address: String, completion: @escaping (AccountsProviderResult) -> Void) {
 		// Go background, to not to hang threads (especially main) on semaphores and dispatch groups
 		queue.async {
 			self.groupsSemaphore.wait()
@@ -80,7 +80,7 @@ extension AdamantAccountsProvider {
 			// Check if there is an account, that we are looking for
 			if let account = self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
 				self.groupsSemaphore.signal()
-				completionHandler(.success(account))
+				completion(.success(account))
 				return
 			}
 			
@@ -90,7 +90,7 @@ extension AdamantAccountsProvider {
 			group.enter()
 			self.groupsSemaphore.signal()
 			
-			self.apiService.getAccount(byAddress: address) { (account, error) in
+			self.apiService.getAccount(byAddress: address) { result in
 				defer {
 					self.groupsSemaphore.wait()
 					self.requestGroups.removeValue(forKey: address)
@@ -98,18 +98,20 @@ extension AdamantAccountsProvider {
 					group.leave()
 				}
 				
-				if let error = error {
-					completionHandler(.serverError(error))
-					return
+				switch result {
+				case .success(let account):
+					let coreAccount = self.createCoreDataAccount(from: account)
+					completion(.success(coreAccount))
+					
+				case .failure(let error):
+					switch error {
+					case .accountNotFound:
+						completion(.notFound)
+						
+					default:
+						completion(.serverError(error))
+					}
 				}
-				
-				guard let account = account else {
-					completionHandler(.notFound)
-					return
-				}
-				
-				let coreAccount = self.createCoreDataAccount(from: account)
-				completionHandler(.success(coreAccount))
 			}
 		}
 	}
@@ -119,8 +121,8 @@ extension AdamantAccountsProvider {
 	///
 	/// - Parameters:
 	///   - publicKey: publicKey of an account
-	///   - completionHandler: returns Account created in viewContext
-	func getAccount(byPublicKey publicKey: String, completionHandler: @escaping (AccountsProviderResult) -> Void) {
+	///   - completion: returns Account created in viewContext
+	func getAccount(byPublicKey publicKey: String, completion: @escaping (AccountsProviderResult) -> Void) {
 		// Go background, to not to hang threads (especially main) on semaphores and dispatch groups
 		queue.async {
 			self.groupsSemaphore.wait()
@@ -136,7 +138,7 @@ extension AdamantAccountsProvider {
 			// Check account
 			if let account = self.getAccount(byPredicate: NSPredicate(format: "publicKey == %@", publicKey)) {
 				self.groupsSemaphore.signal()
-				completionHandler(.success(account))
+				completion(.success(account))
 				return
 			}
 			
@@ -146,7 +148,7 @@ extension AdamantAccountsProvider {
 			group.enter()
 			self.groupsSemaphore.signal()
 			
-			self.apiService.getAccount(byPublicKey: publicKey) { (account, error) in
+			self.apiService.getAccount(byPublicKey: publicKey) { result in
 				defer {
 					self.groupsSemaphore.wait()
 					self.requestGroups.removeValue(forKey: publicKey)
@@ -154,18 +156,20 @@ extension AdamantAccountsProvider {
 					group.leave()
 				}
 				
-				if let error = error {
-					completionHandler(.serverError(error))
-					return
+				switch result {
+				case .success(let account):
+					let coreAccount = self.createCoreDataAccount(from: account)
+					completion(.success(coreAccount))
+					
+				case .failure(let error):
+					switch error {
+					case .accountNotFound:
+						completion(.notFound)
+						
+					default:
+						completion(.serverError(error))
+					}
 				}
-				
-				guard let account = account else {
-					completionHandler(.notFound)
-					return
-				}
-				
-				let coreAccount = self.createCoreDataAccount(from: account)
-				completionHandler(.success(coreAccount))
 			}
 		}
 	}

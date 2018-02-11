@@ -18,30 +18,41 @@ extension AdamantApiService.ApiCommands {
 }
 
 extension AdamantApiService {
-	func getChatTransactions(account: String, height: Int?, offset: Int?, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void) {
+	func getChatTransactions(account: String, height: Int?, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
+		// MARK: 1. Prepare params
 		var queryItems: [URLQueryItem] = [URLQueryItem(name: "isIn", value: account)]
 		if let height = height, height > 0 { queryItems.append(URLQueryItem(name: "fromHeight", value: String(height))) }
 		if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
 		
+		// MARK: 2. Build endpoint
 		let endpoint: URL
 		do {
 			endpoint = try buildUrl(path: ApiCommands.Chats.get, queryItems: queryItems)
 		} catch {
-			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
+			let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+			completion(.failure(err))
 			return
 		}
 		
-		sendRequest(url: endpoint) { (response: ServerCollectionResponse<Transaction>?, error) in
-			guard let r = response, r.success, let collection = r.collection else {
-				completionHandler(nil, AdamantError(message: response?.error ?? "Failed to get transactions", error: error))
-				return
+		// MARK: 3. Send
+		sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
+			switch serverResponse {
+			case .success(let response):
+				if let collection = response.collection {
+					completion(.success(collection))
+				} else {
+					let error = AdamantApiService.translateServerError(response.error)
+					completion(.failure(error))
+				}
+				
+			case .failure(let error):
+				completion(.failure(.networkError(error: error)))
 			}
-			
-			completionHandler(collection, nil)
 		}
 	}
 	
-	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completionHandler: @escaping (UInt?, AdamantError?) -> Void) {
+	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completion: @escaping (ApiServiceResult<UInt>) -> Void) {
+		// MARK: 1. Prepare params
 		let params: [String : Any] = [
 			"type": TransactionType.chatMessage.rawValue,
 			"senderId": senderId,
@@ -55,28 +66,44 @@ extension AdamantApiService {
 			"Content-Type": "application/json"
 		]
 		
+		// MARK: 2. Build Endpoints
+		let normalizeEndpoint: URL
+		let processEndpoin: URL
+		
 		do {
-			let normalizeEndpoint = try buildUrl(path: ApiCommands.Chats.normalizeTransaction)
-			let processEndpoin = try buildUrl(path: ApiCommands.Chats.processTransaction)
-			
-			sendRequest(url: normalizeEndpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (response: ServerModelResponse<NormalizedTransaction>?, error) in
-				guard let r = response, r.success, let nt = r.model else {
-					completionHandler(nil, AdamantError(message: response?.error ?? "Failed to get normalized transaction", error: error))
+			normalizeEndpoint = try buildUrl(path: ApiCommands.Chats.normalizeTransaction)
+			processEndpoin = try buildUrl(path: ApiCommands.Chats.processTransaction)
+		} catch {
+			let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+			completion(.failure(err))
+			return
+		}
+		
+		// MARK: 3. Normalize transaction
+		sendRequest(url: normalizeEndpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerModelResponse<NormalizedTransaction>>) in
+			switch serverResponse {
+			case .success(let response):
+				// MARK: 4.1. Check server errors.
+				guard let normalizedTransaction = response.model else {
+					let error = AdamantApiService.translateServerError(response.error)
+					completion(.failure(error))
 					return
 				}
 				
-				guard let signature = self.adamantCore.sign(transaction: nt, senderId: senderId, keypair: keypair) else {
-					completionHandler(nil, AdamantError(message: "Failed to sign transaction"))
+				// MARK: 4.2. Sign normalized transaction
+				guard let signature = self.adamantCore.sign(transaction: normalizedTransaction, senderId: senderId, keypair: keypair) else {
+					completion(.failure(InternalError.signTransactionFailed.apiServiceErrorWith(error: nil)))
 					return
 				}
 				
+				// MARK: 4.3. Create transaction
 				let transaction: [String: Any] = [
-					"type": nt.type.rawValue,
-					"amount": nt.amount,
-					"senderPublicKey": nt.senderPublicKey,
-					"requesterPublicKey": nt.requesterPublicKey ?? NSNull(),
-					"timestamp": nt.timestamp,
-					"recipientId": nt.recipientId,
+					"type": normalizedTransaction.type.rawValue,
+					"amount": normalizedTransaction.amount,
+					"senderPublicKey": normalizedTransaction.senderPublicKey,
+					"requesterPublicKey": normalizedTransaction.requesterPublicKey ?? NSNull(),
+					"timestamp": normalizedTransaction.timestamp,
+					"recipientId": normalizedTransaction.recipientId,
 					"senderId": senderId,
 					"signature": signature,
 					"asset": [
@@ -92,17 +119,26 @@ extension AdamantApiService {
 					"transaction": transaction
 				]
 				
-				self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: .json, headers: headers) { (r: ProcessTransactionResponse?, error) in
-					guard let response = r, response.success, let transactionId = response.transactionId else {
-						completionHandler(nil, AdamantError(message: r?.error ?? "Failed to process transaction", error: error))
-						return
+				// MARK: 5. Send
+				self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ProcessTransactionResponse>) in
+					switch serverResponse {
+					case .success(let response):
+						if let id = response.transactionId {
+							completion(.success(id))
+						} else {
+							let error = AdamantApiService.translateServerError(response.error)
+							completion(.failure(error))
+						}
+						
+					case .failure(let error):
+						completion(.failure(.networkError(error: error)))
 					}
-					
-					completionHandler(transactionId, nil)
 				}
+				
+				
+			case .failure(let error):
+				completion(.failure(.networkError(error: error)))
 			}
-		} catch {
-			completionHandler(nil, AdamantError(message: "Failed to send request", error: error))
 		}
 	}
 }
