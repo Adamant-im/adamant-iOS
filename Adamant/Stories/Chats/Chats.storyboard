@@ -127,7 +127,11 @@
                         <viewLayoutGuide key="safeArea" id="A2d-Mp-E0v"/>
                     </view>
                     <navigationItem key="navigationItem" title="Title" id="O75-R6-nGz">
-                        <barButtonItem key="rightBarButtonItem" title="•••" id="v2Z-hT-nNQ"/>
+                        <barButtonItem key="rightBarButtonItem" title="•••" id="v2Z-hT-nNQ">
+                            <connections>
+                                <action selector="properties:" destination="XfZ-FH-baE" id="HJU-bd-xWw"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="V4A-mw-8Ee" userLabel="First Responder" sceneMemberID="firstResponder"/>

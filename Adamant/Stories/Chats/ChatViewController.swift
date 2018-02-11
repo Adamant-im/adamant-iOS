@@ -129,6 +129,12 @@ class ChatViewController: MessagesViewController {
 			delegate.preserveMessage(message, forAddress: address)
 		}
 	}
+	
+	@IBAction func properties(_ sender: Any) {
+		if let address = chatroom?.partner?.address {
+			dialogService.presentShareAlertFor(string: address, types: [.copyToPasteboard, .share], animated: true, completion: nil)
+		}
+	}
 }
 
 
