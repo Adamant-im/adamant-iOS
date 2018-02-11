@@ -37,7 +37,7 @@ extension AdamantApiService {
 			"Content-Type": "application/json"
 		]
 		
-		sendRequest(url: endpoint, method: .post, parameters: params, encoding: .json, headers: headers, completion: { (serverResponse: ApiServiceResult<ServerModelResponse<Account>>) in
+		sendRequest(url: endpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerModelResponse<Account>>) in
 			switch serverResponse {
 			case .success(let response):
 				if let model = response.model {
@@ -50,7 +50,7 @@ extension AdamantApiService {
 			case .failure(let error):
 				completion(.failure(.networkError(error: error)))
 			}
-		})
+		}
 	}
 	
 	/// Get existing account by passphrase.

@@ -41,13 +41,13 @@ protocol ApiService {
 	
 	// MARK: - Transactions
 	
-	func getTransaction(id: UInt, completionHandler: @escaping (Transaction?, AdamantError?) -> Void)
-	func getTransactions(forAccount: String, type: TransactionType, fromHeight: UInt?, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void)
+	func getTransaction(id: UInt, completion: @escaping (ApiServiceResult<Transaction>) -> Void)
+	func getTransactions(forAccount: String, type: TransactionType, fromHeight: UInt?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
 	
 	
 	// MARK: - Funds
 	
-	func transferFunds(sender: String, recipient: String, amount: UInt, keypair: Keypair, completionHandler: @escaping (Bool, AdamantError?) -> Void)
+	func transferFunds(sender: String, recipient: String, amount: UInt, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void)
 	
 	
 	// MARK: - Chats

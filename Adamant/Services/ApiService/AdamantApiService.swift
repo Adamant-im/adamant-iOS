@@ -22,6 +22,7 @@ class AdamantApiService: ApiService {
 	
 	struct InternalErrors {
 		static let endpointBuildFailed = InternalErrors("Failed to build endpoint url")
+		static let signTransactionFailed = InternalErrors("Failed to sign transaction")
 		
 		let message: String
 		

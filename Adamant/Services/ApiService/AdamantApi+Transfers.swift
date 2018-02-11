@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdamantApiService {
-	func transferFunds(sender: String, recipient: String, amount: UInt, keypair: Keypair, completionHandler: @escaping (Bool, AdamantError?) -> Void) {
+	func transferFunds(sender: String, recipient: String, amount: UInt, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void) {
 		let params: [String : Any] = [
 			"type": TransactionType.send.rawValue,
 			"amount": amount,
@@ -21,18 +21,29 @@ extension AdamantApiService {
 			"Content-Type": "application/json"
 		]
 		
+		let normalizeEndpoint: URL
+		let processEndpoin: URL
+		
 		do {
-			let normalizeEndpoint = try buildUrl(path: ApiCommands.Transactions.normalizeTransaction)
-			let processEndpoin = try buildUrl(path: ApiCommands.Transactions.processTransaction)
-			
-			sendRequest(url: normalizeEndpoint, method: .post, parameters: params, encoding: .json, headers: headers, completionHandler: { (response: ServerModelResponse<NormalizedTransaction>?, error) in
-				guard let r = response, r.success, let nt = r.model else {
-					completionHandler(false, AdamantError(message: response?.error ?? "Failed to get transactions", error: error))
+			normalizeEndpoint = try buildUrl(path: ApiCommands.Transactions.normalizeTransaction)
+			processEndpoin = try buildUrl(path: ApiCommands.Transactions.processTransaction)
+		} catch {
+			let err = InternalErrors.endpointBuildFailed.apiServiceErrorWith(error: error)
+			completion(.failure(err))
+			return
+		}
+		
+		sendRequest(url: normalizeEndpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerModelResponse<NormalizedTransaction>>) in
+			switch serverResponse {
+			case .success(let response):
+				guard let model = response.model else {
+					let error = AdamantApiService.translateServerError(response.error)
+					completion(.failure(error))
 					return
 				}
 				
-				guard let signature = self.adamantCore.sign(transaction: nt, senderId: sender, keypair: keypair) else {
-					completionHandler(false, AdamantError(message: "Failed to sign transaction"))
+				guard let signature = self.adamantCore.sign(transaction: model, senderId: sender, keypair: keypair) else {
+					completion(.failure(InternalErrors.signTransactionFailed.apiServiceErrorWith(error: nil)))
 					return
 				}
 				
@@ -40,8 +51,8 @@ extension AdamantApiService {
 					"type": TransactionType.send.rawValue,
 					"amount": amount,
 					"senderPublicKey": keypair.publicKey,
-					"requesterPublicKey": nt.requesterPublicKey ?? NSNull(),
-					"timestamp": nt.timestamp,
+					"requesterPublicKey": model.requesterPublicKey ?? NSNull(),
+					"timestamp": model.timestamp,
 					"recipientId": recipient,
 					"senderId": sender,
 					"signature": signature
@@ -51,17 +62,19 @@ extension AdamantApiService {
 					"transaction": transaction
 				]
 				
-				self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: .json, headers: headers, completionHandler: { (response: ServerResponse?, error) in
-					guard let r = response, r.success else {
-						completionHandler(false, AdamantError(message: response?.error ?? "Failed to process transaction", error: error))
-						return
+				self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: .json, headers: headers) { (response: ApiServiceResult<ServerResponse>) in
+					switch response {
+					case .success(_):
+						completion(.success(true))
+						
+					case .failure(let error):
+						completion(.failure(error))
 					}
-					
-					completionHandler(true, nil)
-				})
-			})
-		} catch {
-			completionHandler(false, AdamantError(message: "Failed to send request", error: error))
+				}
+				
+			case .failure(let error):
+				completion(.failure(.networkError(error: error)))
+			}
 		}
 	}
 }
