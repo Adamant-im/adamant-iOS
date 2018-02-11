@@ -12,13 +12,10 @@ import TableKit
 class LoginViewController: UIViewController {
 	
 	// MARK: - Dependencies
-	
 	var accountService: AccountService!
 	var adamantCore: AdamantCore!
 	var dialogService: DialogService!
 	
-	
-	// MARK: - Rows
 	
 	// MARK: - Properties
 	@IBOutlet var tableView: UITableView!

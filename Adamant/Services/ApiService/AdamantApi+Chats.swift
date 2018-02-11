@@ -29,7 +29,7 @@ extension AdamantApiService {
 		do {
 			endpoint = try buildUrl(path: ApiCommands.Chats.get, queryItems: queryItems)
 		} catch {
-			let err = InternalErrors.endpointBuildFailed.apiServiceErrorWith(error: error)
+			let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
 			completion(.failure(err))
 			return
 		}
@@ -74,7 +74,7 @@ extension AdamantApiService {
 			normalizeEndpoint = try buildUrl(path: ApiCommands.Transactions.normalizeTransaction)
 			processEndpoin = try buildUrl(path: ApiCommands.Transactions.processTransaction)
 		} catch {
-			let err = InternalErrors.endpointBuildFailed.apiServiceErrorWith(error: error)
+			let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
 			completion(.failure(err))
 			return
 		}
@@ -92,7 +92,7 @@ extension AdamantApiService {
 				
 				// MARK: 4.2. Sign normalized transaction
 				guard let signature = self.adamantCore.sign(transaction: normalizedTransaction, senderId: senderId, keypair: keypair) else {
-					completion(.failure(InternalErrors.signTransactionFailed.apiServiceErrorWith(error: nil)))
+					completion(.failure(InternalError.signTransactionFailed.apiServiceErrorWith(error: nil)))
 					return
 				}
 				

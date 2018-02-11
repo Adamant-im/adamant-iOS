@@ -90,7 +90,7 @@ extension AdamantAccountsProvider {
 			group.enter()
 			self.groupsSemaphore.signal()
 			
-			self.apiService.getAccount(byAddress: address) { (account, error) in
+			self.apiService.getAccount(byAddress: address) { result in
 				defer {
 					self.groupsSemaphore.wait()
 					self.requestGroups.removeValue(forKey: address)
@@ -98,18 +98,20 @@ extension AdamantAccountsProvider {
 					group.leave()
 				}
 				
-				if let error = error {
-					completionHandler(.serverError(error))
-					return
+				switch result {
+				case .success(let account):
+					let coreAccount = self.createCoreDataAccount(from: account)
+					completionHandler(.success(coreAccount))
+					
+				case .failure(let error):
+					switch error {
+					case .accountNotFound:
+						completionHandler(.notFound)
+						
+					default:
+						completionHandler(.serverError(error))
+					}
 				}
-				
-				guard let account = account else {
-					completionHandler(.notFound)
-					return
-				}
-				
-				let coreAccount = self.createCoreDataAccount(from: account)
-				completionHandler(.success(coreAccount))
 			}
 		}
 	}
@@ -146,7 +148,7 @@ extension AdamantAccountsProvider {
 			group.enter()
 			self.groupsSemaphore.signal()
 			
-			self.apiService.getAccount(byPublicKey: publicKey) { (account, error) in
+			self.apiService.getAccount(byPublicKey: publicKey) { result in
 				defer {
 					self.groupsSemaphore.wait()
 					self.requestGroups.removeValue(forKey: publicKey)
@@ -154,18 +156,20 @@ extension AdamantAccountsProvider {
 					group.leave()
 				}
 				
-				if let error = error {
-					completionHandler(.serverError(error))
-					return
+				switch result {
+				case .success(let account):
+					let coreAccount = self.createCoreDataAccount(from: account)
+					completionHandler(.success(coreAccount))
+					
+				case .failure(let error):
+					switch error {
+					case .accountNotFound:
+						completionHandler(.notFound)
+						
+					default:
+						completionHandler(.serverError(error))
+					}
 				}
-				
-				guard let account = account else {
-					completionHandler(.notFound)
-					return
-				}
-				
-				let coreAccount = self.createCoreDataAccount(from: account)
-				completionHandler(.success(coreAccount))
 			}
 		}
 	}

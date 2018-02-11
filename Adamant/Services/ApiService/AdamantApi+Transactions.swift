@@ -23,7 +23,7 @@ extension AdamantApiService {
 		do {
 			endpoint = try buildUrl(path: ApiCommands.Transactions.getTransaction, queryItems: [URLQueryItem(name: "id", value: String(id))])
 		} catch {
-			let err = InternalErrors.endpointBuildFailed.apiServiceErrorWith(error: error)
+			let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
 			completion(.failure(err))
 			return
 		}
@@ -56,7 +56,7 @@ extension AdamantApiService {
 		do {
 			endpoint = try buildUrl(path: ApiCommands.Transactions.root, queryItems: queryItems)
 		} catch {
-			let err = InternalErrors.endpointBuildFailed.apiServiceErrorWith(error: error)
+			let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
 			completion(.failure(err))
 			return
 		}

@@ -258,44 +258,42 @@ extension AdamantChatsProvider {
 		}
 		
 		// MARK: 6. Send
-		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { (id, error) in
-			guard let id = id else {
-				if let error = error {
-					privateContext.delete(transaction)
-					try? privateContext.save()
-					completion(.error(.serverError(error)))
+		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { result in
+			switch result {
+			case .success(let id):
+				// Update ID with recieved, add to unconfirmed transactions.
+				transaction.transactionId = String(id)
+				
+				if let lastTransaction = chatroom.lastTransaction {
+					if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
+						dateA.compare(dateB) == ComparisonResult.orderedAscending {
+						chatroom.lastTransaction = transaction
+						chatroom.updatedAt = transaction.date
+					}
 				} else {
-					fatalError()
-				}
-				return
-			}
-			
-			// Update ID with recieved, add to unconfirmed transactions.
-			transaction.transactionId = String(id)
-			
-			if let lastTransaction = chatroom.lastTransaction {
-				if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
-					dateA.compare(dateB) == ComparisonResult.orderedAscending {
 					chatroom.lastTransaction = transaction
 					chatroom.updatedAt = transaction.date
 				}
-			} else {
-				chatroom.lastTransaction = transaction
-				chatroom.updatedAt = transaction.date
-			}
-			
-			// If we will save transaction from privateContext, we will hold strong reference to whole context, and we won't ever save it.
-			self.unconfirmedsSemaphore.wait()
-			DispatchQueue.main.sync {
-				self.unconfirmedTransactions[id] = self.stack.container.viewContext.object(with: transaction.objectID) as? ChatTransaction
-			}
-			self.unconfirmedsSemaphore.signal()
-			
-			do {
-				try privateContext.save()
-				completion(.success)
-			} catch {
-				completion(.error(.internalError(error)))
+				
+				// If we will save transaction from privateContext, we will hold strong reference to whole context, and we won't ever save it.
+				self.unconfirmedsSemaphore.wait()
+				DispatchQueue.main.sync {
+					self.unconfirmedTransactions[id] = self.stack.container.viewContext.object(with: transaction.objectID) as? ChatTransaction
+				}
+				self.unconfirmedsSemaphore.signal()
+				
+				do {
+					try privateContext.save()
+					completion(.success)
+				} catch {
+					completion(.error(.internalError(error)))
+				}
+				
+				
+			case .failure(let error):
+				privateContext.delete(transaction)
+				try? privateContext.save()
+				completion(.error(.serverError(error)))
 			}
 		}
 	}
@@ -390,44 +388,42 @@ extension AdamantChatsProvider {
 		dispatchGroup.enter()
 		
 		// MARK: 1. Get new transactions
-		apiService.getChatTransactions(account: address, height: height, offset: offset) { (transactions, error) in
+		apiService.getChatTransactions(account: address, height: height, offset: offset) { result in
 			defer {
 				// Leave 1
 				dispatchGroup.leave()
 			}
 			
-			// MARK: 2. Check for errors
-			guard let transactions = transactions else {
-				if let error = error {
-					self.setState(.failedToUpdate(error), previous: .updating)
-				}
-				return
-			}
-			
-			// MARK: 3. Process transactions in background
-			// Enter 2
-			dispatchGroup.enter()
-			self.processingQueue.async {
-				defer {
-					// Leave 2
-					dispatchGroup.leave()
-				}
-				
-				self.process(chatTransactions: transactions,
-							 context: context,
-							 contextMutatingSemaphore: cms)
-			}
-			
-			// MARK: 4. Get more transactions
-			if transactions.count == self.apiTransactions {
-				let newOffset: Int
-				if let offset = offset {
-					newOffset = offset + self.apiTransactions
-				} else {
-					newOffset = self.apiTransactions
+			switch result {
+			case .success(let transactions):
+				// MARK: 2. Process transactions in background
+				// Enter 2
+				dispatchGroup.enter()
+				self.processingQueue.async {
+					defer {
+						// Leave 2
+						dispatchGroup.leave()
+					}
+					
+					self.process(chatTransactions: transactions,
+								 context: context,
+								 contextMutatingSemaphore: cms)
 				}
 				
-				self.getTransactions(address: address, height: height, offset: newOffset, dispatchGroup: dispatchGroup, context: context, contextMutatingSemaphore: cms)
+				// MARK: 4. Get more transactions
+				if transactions.count == self.apiTransactions {
+					let newOffset: Int
+					if let offset = offset {
+						newOffset = offset + self.apiTransactions
+					} else {
+						newOffset = self.apiTransactions
+					}
+					
+					self.getTransactions(address: address, height: height, offset: newOffset, dispatchGroup: dispatchGroup, context: context, contextMutatingSemaphore: cms)
+				}
+				
+			case .failure(let error):
+				self.setState(.failedToUpdate(error), previous: .updating)
 			}
 		}
 	}

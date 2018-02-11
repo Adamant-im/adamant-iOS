@@ -14,9 +14,7 @@ extension Container {
 			c.accountService = r.resolve(AccountService.self)
 			c.chatsProvider = r.resolve(ChatsProvider.self)
 			c.cellFactory = r.resolve(CellFactory.self)
-			c.apiService = r.resolve(ApiService.self)
 			c.router = r.resolve(Router.self)
-			c.accountsProvider = r.resolve(AccountsProvider.self)
 		}
 		
 		self.storyboardInitCompleted(ChatViewController.self) { r, c in

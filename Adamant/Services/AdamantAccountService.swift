@@ -78,21 +78,25 @@ extension AdamantAccountService {
 			return
 		}
 		
-		self.apiService.getAccount(byPublicKey: publicKey, completionHandler: { (account, error) in
-			if account != nil {
+		self.apiService.getAccount(byPublicKey: publicKey) { result in
+			switch result {
+			case .success(_):
 				self.login(with: passphrase, completionHandler: completionHandler)
-			}
-			
-			self.apiService.newAccount(byPublicKey: publicKey, completionHandler: { (account, error) in
-				if let account = account {
-					self.setLoggedInWith(account: account, passphrase: passphrase)
-					completionHandler?(account, error)
-				} else {
-					self.status = .notLogged
-					completionHandler?(nil, error)
+				
+			case .failure(_):
+				self.apiService.newAccount(byPublicKey: publicKey) { result in
+					switch result {
+					case .success(let account):
+						self.setLoggedInWith(account: account, passphrase: passphrase)
+						completionHandler?(account, nil)
+						
+					case .failure(let error):
+						self.status = .notLogged
+						completionHandler?(nil, AdamantError(message: String(describing: error), error: error))
+					}
 				}
-			})
-		})
+			}
+		}
 	}
 	
 	func login(with passphrase: String, completionHandler: ((Account?, AdamantError?) -> Void)?) {
@@ -112,13 +116,15 @@ extension AdamantAccountService {
 		}
 		
 		status = .isLoggingIn
-		self.apiService.getAccount(byPassphrase: passphrase) { (account, error) in
-			if let account = account {
+		self.apiService.getAccount(byPassphrase: passphrase) { result in
+			switch result {
+			case .success(let account):
 				self.setLoggedInWith(account: account, passphrase: passphrase)
-				completionHandler?(account, error)
-			} else {
+				completionHandler?(account, nil)
+				
+			case .failure(let error):
 				self.status = .notLogged
-				completionHandler?(nil, error)
+				completionHandler?(nil, AdamantError(message: String(describing: error), error: error))
 			}
 		}
 	}
@@ -210,22 +216,23 @@ extension AdamantAccountService {
 			return
 		}
 		
-		apiService.getAccount(byPublicKey: loggedAccount.publicKey) { (account, error) in
-			guard let account = account else {
+		apiService.getAccount(byPublicKey: loggedAccount.publicKey) { result in
+			switch result {
+			case .success(let account):
+				var hasChanges = false
+				
+				if loggedAccount.balance != account.balance { hasChanges = true }
+				
+				if hasChanges {
+					self.account = account
+					NotificationCenter.default.post(name: Notification.Name.adamantAccountDataUpdated, object: nil)
+				}
+				
+				self.updating = false
+				
+			case .failure(let error):
 				print("Error update account: \(String(describing: error))")
-				return
 			}
-			
-			var hasChanges = false
-			
-			if loggedAccount.balance != account.balance { hasChanges = true }
-			
-			if hasChanges {
-				self.account = account
-				NotificationCenter.default.post(name: Notification.Name.adamantAccountDataUpdated, object: nil)
-			}
-			
-			self.updating = false
 		}
 	}
 }

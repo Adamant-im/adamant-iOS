@@ -236,31 +236,35 @@ class TransferViewController: FormViewController {
 			dialogService.showProgress(withMessage: "Processing transaction...", userInteractionEnable: false)
 			
 			// Check if address is valid
-			apiService.getPublicKey(byAddress: recipient, completionHandler: { (key, error) in
-				guard key != nil else {
-					dialogService.showError(withMessage: "Account not found: \(recipient)")
-					return
-				}
-				
-				apiService.transferFunds(sender: account.address, recipient: recipient, amount: AdamantUtilities.from(double: amount), keypair: keypair, completionHandler: { [weak self] (success, error) in
-					
-					DispatchQueue.main.async {
-						if success {
-							dialogService.showSuccess(withMessage: "Funds sended!")
-							
-							self?.accountService.updateAccountData()
-							
-							if let nav = self?.navigationController {
-								nav.popViewController(animated: true)
-							} else {
-								self?.dismiss(animated: true, completion: nil)
+			apiService.getPublicKey(byAddress: recipient) { result in
+				switch result {
+				case .success(_):
+					apiService.transferFunds(sender: account.address, recipient: recipient, amount: AdamantUtilities.from(double: amount), keypair: keypair) { [weak self] result in
+						switch result {
+						case .success(_):
+							DispatchQueue.main.async {
+								dialogService.showSuccess(withMessage: "Funds sended!")
+								
+								self?.accountService.updateAccountData()
+								
+								if let nav = self?.navigationController {
+									nav.popViewController(animated: true)
+								} else {
+									self?.dismiss(animated: true, completion: nil)
+								}
 							}
-						} else {
-							dialogService.showError(withMessage: error?.message ?? "Failed. Try later.")
+							
+						case .failure(let error):
+							dialogService.showError(withMessage: String(describing: error))
 						}
+						
 					}
-				})
-			})
+					
+					
+				case .failure(_):
+					dialogService.showError(withMessage: "Account not found: \(recipient)")
+				}
+			}
 		})
 		
 		alert.addAction(cancelAction)

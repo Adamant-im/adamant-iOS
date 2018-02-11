@@ -14,9 +14,7 @@ class ChatsListViewController: UIViewController {
 	var accountService: AccountService!
 	var chatsProvider: ChatsProvider!
 	var cellFactory: CellFactory!
-	var apiService: ApiService!
 	var router: Router!
-	var accountsProvider: AccountsProvider!
 	
 	// MARK: - IBOutlet
 	@IBOutlet weak var tableView: UITableView!

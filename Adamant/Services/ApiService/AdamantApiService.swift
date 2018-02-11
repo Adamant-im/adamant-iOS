@@ -20,9 +20,9 @@ class AdamantApiService: ApiService {
 		case url, json
 	}
 	
-	struct InternalErrors {
-		static let endpointBuildFailed = InternalErrors("Failed to build endpoint url")
-		static let signTransactionFailed = InternalErrors("Failed to sign transaction")
+	struct InternalError: Equatable, Hashable {
+		static let endpointBuildFailed = InternalError("Failed to build endpoint url")
+		static let signTransactionFailed = InternalError("Failed to sign transaction")
 		
 		let message: String
 		
@@ -32,6 +32,14 @@ class AdamantApiService: ApiService {
 		
 		func apiServiceErrorWith(error: Error?) -> ApiServiceError {
 			return .internalError(message: message, error: error)
+		}
+		
+		static func ==(lhs: InternalError, rhs: InternalError) -> Bool {
+			return lhs.message == rhs.message
+		}
+		
+		var hashValue: Int {
+			return message.hashValue &* 121212
 		}
 	}
 	

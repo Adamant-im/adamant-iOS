@@ -15,7 +15,7 @@ extension AdamantApiService {
 		do {
 			endpoint = try buildUrl(path: ApiCommands.Accounts.getPublicKey, queryItems: [URLQueryItem(name: "address", value: address)])
 		} catch {
-			let err = InternalErrors.endpointBuildFailed.apiServiceErrorWith(error: error)
+			let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
 			completion(.failure(err))
 			return
 		}

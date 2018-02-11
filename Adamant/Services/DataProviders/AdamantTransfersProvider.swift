@@ -74,33 +74,34 @@ extension AdamantTransfersProvider {
 			return
 		}
 		
-		apiService.getTransactions(forAccount: address, type: .send, fromHeight: lastHeight) { (transactions, error) in
-			guard let transactions = transactions else {
-				self.setState(.failedToUpdate(error!), previous: prevState)
-				return
-			}
-			
-			guard transactions.count > 0 else {
-				self.setState(.upToDate, previous: prevState)
-				return
-			}
-			
-			self.processingQueue.async {
-				self.processRawTransactions(transactions, currentAddress: address) { result in
-					switch result {
-					case .success(let total):
-						self.setState(.upToDate, previous: prevState)
-						if total > 0 {
-							self.postNotification(.adamantTransfersServiceNewTransactions, userInfo: [AdamantUserInfoKey.TransfersProvider.newTransactions: total])
+		apiService.getTransactions(forAccount: address, type: .send, fromHeight: lastHeight) { result in
+			switch result {
+			case .success(let transactions):
+				guard transactions.count > 0 else {
+					self.setState(.upToDate, previous: prevState)
+					return
+				}
+				
+				self.processingQueue.async {
+					self.processRawTransactions(transactions, currentAddress: address) { result in
+						switch result {
+						case .success(let total):
+							self.setState(.upToDate, previous: prevState)
+							if total > 0 {
+								self.postNotification(.adamantTransfersServiceNewTransactions, userInfo: [AdamantUserInfoKey.TransfersProvider.newTransactions: total])
+							}
+							
+						case .error(let error):
+							self.setState(.failedToUpdate(error), previous: prevState)
+							
+						case .accountNotFound(let key):
+							self.setState(.failedToUpdate(TransfersProviderError.accountNotFound(key)), previous: prevState)
 						}
-						
-					case .error(let error):
-						self.setState(.failedToUpdate(error), previous: prevState)
-						
-					case .accountNotFound(let key):
-						self.setState(.failedToUpdate(TransfersProviderError.accountNotFound(key)), previous: prevState)
 					}
 				}
+				
+			case .failure(let error):
+				self.setState(.failedToUpdate(error), previous: prevState)
 			}
 		}
 	}
@@ -147,11 +148,13 @@ extension AdamantTransfersProvider {
 			return
 		}
 		
-		apiService.transferFunds(sender: senderAddress, recipient: recipient, amount: (amount as NSDecimalNumber).uintValue, keypair: keypair) { (success, error) in
-			if success {
+		apiService.transferFunds(sender: senderAddress, recipient: recipient, amount: (amount as NSDecimalNumber).uintValue, keypair: keypair) { result in
+			switch result {
+			case .success(_):
 				completionHandler(.success)
-			} else {
-				completionHandler(.error(.serverError(error!)))
+				
+			case .failure(let error):
+				completionHandler(.error(.serverError(error)))
 			}
 		}
 	}
