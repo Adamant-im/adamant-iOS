@@ -8,6 +8,19 @@
 
 import Foundation
 
+enum ApiServiceResult<T> {
+	case success(T)
+	case failure(ApiServiceError)
+}
+
+enum ApiServiceError: Error {
+	case notLogged
+	case accountNotFound
+	case serverError(error: String)
+	case internalError(message: String, error: Error?)
+	case networkError(error: Error)
+}
+
 protocol ApiService {
 	
 	/// Default is async queue with .utilities priority.
@@ -15,10 +28,10 @@ protocol ApiService {
 	
 	// MARK: - Accounts
 	
-	func newAccount(byPublicKey publicKey: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
-	func getAccount(byPassphrase passphrase: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
-	func getAccount(byPublicKey publicKey: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
-	func getAccount(byAddress address: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
+	func newAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<Account>) -> Void)
+	func getAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<Account>) -> Void)
+	func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<Account>) -> Void)
+	func getAccount(byAddress address: String, completion: @escaping (ApiServiceResult<Account>) -> Void)
 	
 	
 	// MARK: - Keys
