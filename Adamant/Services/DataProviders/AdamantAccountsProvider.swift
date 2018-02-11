@@ -64,8 +64,8 @@ extension AdamantAccountsProvider {
 	///
 	/// - Parameters:
 	///   - address: address of an account
-	///   - completionHandler: returns Account created in viewContext
-	func getAccount(byAddress address: String, completionHandler: @escaping (AccountsProviderResult) -> Void) {
+	///   - completion: returns Account created in viewContext
+	func getAccount(byAddress address: String, completion: @escaping (AccountsProviderResult) -> Void) {
 		// Go background, to not to hang threads (especially main) on semaphores and dispatch groups
 		queue.async {
 			self.groupsSemaphore.wait()
@@ -80,7 +80,7 @@ extension AdamantAccountsProvider {
 			// Check if there is an account, that we are looking for
 			if let account = self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
 				self.groupsSemaphore.signal()
-				completionHandler(.success(account))
+				completion(.success(account))
 				return
 			}
 			
@@ -101,15 +101,15 @@ extension AdamantAccountsProvider {
 				switch result {
 				case .success(let account):
 					let coreAccount = self.createCoreDataAccount(from: account)
-					completionHandler(.success(coreAccount))
+					completion(.success(coreAccount))
 					
 				case .failure(let error):
 					switch error {
 					case .accountNotFound:
-						completionHandler(.notFound)
+						completion(.notFound)
 						
 					default:
-						completionHandler(.serverError(error))
+						completion(.serverError(error))
 					}
 				}
 			}
@@ -121,8 +121,8 @@ extension AdamantAccountsProvider {
 	///
 	/// - Parameters:
 	///   - publicKey: publicKey of an account
-	///   - completionHandler: returns Account created in viewContext
-	func getAccount(byPublicKey publicKey: String, completionHandler: @escaping (AccountsProviderResult) -> Void) {
+	///   - completion: returns Account created in viewContext
+	func getAccount(byPublicKey publicKey: String, completion: @escaping (AccountsProviderResult) -> Void) {
 		// Go background, to not to hang threads (especially main) on semaphores and dispatch groups
 		queue.async {
 			self.groupsSemaphore.wait()
@@ -138,7 +138,7 @@ extension AdamantAccountsProvider {
 			// Check account
 			if let account = self.getAccount(byPredicate: NSPredicate(format: "publicKey == %@", publicKey)) {
 				self.groupsSemaphore.signal()
-				completionHandler(.success(account))
+				completion(.success(account))
 				return
 			}
 			
@@ -159,15 +159,15 @@ extension AdamantAccountsProvider {
 				switch result {
 				case .success(let account):
 					let coreAccount = self.createCoreDataAccount(from: account)
-					completionHandler(.success(coreAccount))
+					completion(.success(coreAccount))
 					
 				case .failure(let error):
 					switch error {
 					case .accountNotFound:
-						completionHandler(.notFound)
+						completion(.notFound)
 						
 					default:
-						completionHandler(.serverError(error))
+						completion(.serverError(error))
 					}
 				}
 			}

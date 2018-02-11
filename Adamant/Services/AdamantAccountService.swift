@@ -56,11 +56,11 @@ class AdamantAccountService: AccountService {
 
 // MARK: - Login&Logout functions
 extension AdamantAccountService {
-	func createAccount(with passphrase: String, completionHandler: ((Account?, AdamantError?) -> Void)?) {
+	func createAccount(with passphrase: String, completion: ((Account?, AdamantError?) -> Void)?) {
 		switch status {
 		// Is logging in, return
 		case .isLoggingIn:
-			completionHandler?(nil, AdamantError(message: "Service is busy"))
+			completion?(nil, AdamantError(message: "Service is busy"))
 			return
 			
 		// Logout first
@@ -74,36 +74,36 @@ extension AdamantAccountService {
 		
 		status = .isLoggingIn
 		guard let publicKey = adamantCore.createKeypairFor(passphrase: passphrase)?.publicKey else {
-			completionHandler?(nil, AdamantError(message: "Can't create key for passphrase"))
+			completion?(nil, AdamantError(message: "Can't create key for passphrase"))
 			return
 		}
 		
 		self.apiService.getAccount(byPublicKey: publicKey) { result in
 			switch result {
 			case .success(_):
-				self.login(with: passphrase, completionHandler: completionHandler)
+				self.login(with: passphrase, completion: completion)
 				
 			case .failure(_):
 				self.apiService.newAccount(byPublicKey: publicKey) { result in
 					switch result {
 					case .success(let account):
 						self.setLoggedInWith(account: account, passphrase: passphrase)
-						completionHandler?(account, nil)
+						completion?(account, nil)
 						
 					case .failure(let error):
 						self.status = .notLogged
-						completionHandler?(nil, AdamantError(message: String(describing: error), error: error))
+						completion?(nil, AdamantError(message: String(describing: error), error: error))
 					}
 				}
 			}
 		}
 	}
 	
-	func login(with passphrase: String, completionHandler: ((Account?, AdamantError?) -> Void)?) {
+	func login(with passphrase: String, completion: ((Account?, AdamantError?) -> Void)?) {
 		switch status {
 		// Is logging in, return
 		case .isLoggingIn:
-			completionHandler?(nil, AdamantError(message: "Service is busy"))
+			completion?(nil, AdamantError(message: "Service is busy"))
 			return
 			
 		// Logout first
@@ -120,11 +120,11 @@ extension AdamantAccountService {
 			switch result {
 			case .success(let account):
 				self.setLoggedInWith(account: account, passphrase: passphrase)
-				completionHandler?(account, nil)
+				completion?(account, nil)
 				
 			case .failure(let error):
 				self.status = .notLogged
-				completionHandler?(nil, AdamantError(message: String(describing: error), error: error))
+				completion?(nil, AdamantError(message: String(describing: error), error: error))
 			}
 		}
 	}

@@ -142,19 +142,19 @@ extension AdamantTransfersProvider {
 		return controller
 	}
 	
-	func transferFunds(toAddress recipient: String, amount: Decimal, completionHandler: @escaping (TransfersProviderResult) -> Void) {
+	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void) {
 		guard let senderAddress = accountService.account?.address, let keypair = accountService.keypair else {
-			completionHandler(.error(.notLogged))
+			completion(.error(.notLogged))
 			return
 		}
 		
 		apiService.transferFunds(sender: senderAddress, recipient: recipient, amount: (amount as NSDecimalNumber).uintValue, keypair: keypair) { result in
 			switch result {
 			case .success(_):
-				completionHandler(.success)
+				completion(.success)
 				
 			case .failure(let error):
-				completionHandler(.error(.serverError(error)))
+				completion(.error(.serverError(error)))
 			}
 		}
 	}
@@ -169,10 +169,10 @@ extension AdamantTransfersProvider {
 		case error(Error)
 	}
 	
-	private func processRawTransactions(_ transactions: [Transaction], currentAddress address: String, completionHandler: @escaping (ProcessingResult) -> Void) {
+	private func processRawTransactions(_ transactions: [Transaction], currentAddress address: String, completion: @escaping (ProcessingResult) -> Void) {
 		// MARK: 0. Transactions?
 		guard transactions.count > 0 else {
-			completionHandler(.success(new: 0))
+			completion(.success(new: 0))
 			return
 		}
 		
@@ -193,7 +193,7 @@ extension AdamantTransfersProvider {
 		var errors: [ProcessingResult] = []
 		for key in partnersKeys {
 			partnersGroup.enter()
-			accountsProvider.getAccount(byPublicKey: key, completionHandler: { result in
+			accountsProvider.getAccount(byPublicKey: key, completion: { result in
 				defer {
 					partnersGroup.leave()
 				}
@@ -215,7 +215,7 @@ extension AdamantTransfersProvider {
 		
 		// MARK: 2.5. If we have any errors - drop processing.
 		if let err = errors.first {
-			completionHandler(err)
+			completion(err)
 			return
 		}
 		
@@ -278,12 +278,12 @@ extension AdamantTransfersProvider {
 		if context.hasChanges {
 			do {
 				try context.save()
-				completionHandler(.success(new: totalTransactions))
+				completion(.success(new: totalTransactions))
 			} catch {
-				completionHandler(.error(error))
+				completion(.error(error))
 			}
 		} else {
-			completionHandler(.success(new: 0))
+			completion(.success(new: 0))
 		}
 	}
 }

@@ -60,6 +60,6 @@ protocol ApiService {
 	func getChatTransactions(account: String, height: Int?, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
 	
 	/// Send text message
-	///   - completionHandler: Contains processed transactionId, if success, or AdamantError, if fails.
+	///   - completion: Contains processed transactionId, if success, or AdamantError, if fails.
 	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completion: @escaping (ApiServiceResult<UInt>) -> Void)
 }
