@@ -9,22 +9,29 @@
 import Foundation
 
 extension AdamantApiService {
-	func getPublicKey(byAddress address: String, completionHandler: @escaping (String?, AdamantError?) -> Void) {
+	func getPublicKey(byAddress address: String, completion: @escaping (ApiServiceResult<String>) -> Void) {
 		let endpoint: URL
 		do {
 			endpoint = try buildUrl(path: ApiCommands.Accounts.getPublicKey, queryItems: [URLQueryItem(name: "address", value: address)])
 		} catch {
-			completionHandler(nil, AdamantError(message: "Failed to build endpoint url", error: error))
+			let err = InternalErrors.endpointBuildFailed.apiServiceErrorWith(error: error)
+			completion(.failure(err))
 			return
 		}
 		
-		sendRequest(url: endpoint) { (response: GetPublicKeyResponse?, error) in
-			guard let r = response, r.success, let key = r.publicKey else {
-				completionHandler(nil, AdamantError(message: response?.error ?? "Can't get publickey", error: error))
-				return
+		sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<GetPublicKeyResponse>) in
+			switch serverResponse {
+			case .success(let response):
+				if let publicKey = response.publicKey {
+					completion(.success(model))
+				} else {
+					let error = AdamantApiService.translateServerError(response.error)
+					completion(.failure(error))
+				}
+				
+			case .failure(let error):
+				completion(.failure(.networkError(error: error)))
 			}
-			
-			completionHandler(key, nil)
 		}
 	}
 }

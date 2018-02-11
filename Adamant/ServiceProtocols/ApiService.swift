@@ -36,7 +36,7 @@ protocol ApiService {
 	
 	// MARK: - Keys
 	
-	func getPublicKey(byAddress address: String, completionHandler: @escaping (String?, AdamantError?) -> Void)
+	func getPublicKey(byAddress address: String, completion: @escaping (ApiServiceResult<String>) -> Void)
 	
 	
 	// MARK: - Transactions
