@@ -85,20 +85,20 @@ extension AdamantDialogService {
 		for type in types {
 			switch type {
 			case .copyToPasteboard:
-				alert.addAction(UIAlertAction(title: "Copy To Pasteboard", style: .default, handler: { _ in
+				alert.addAction(UIAlertAction(title: NSLocalizedString("alert.copy_to_pasteboard", comment: "Shared alert menu item: Copy to pasteboard."), style: .default, handler: { _ in
 					UIPasteboard.general.string = string
-					self.showToastMessage("\(string)\nCopied To Pasteboard!")
+					self.showToastMessage("\(string)\n\(NSLocalizedString("alert.copied_to_pasteboard", comment: "Shared alert menu item: notification about copying items to pasteboard."))")
 				}))
 				
 			case .share:
-				alert.addAction(UIAlertAction(title: "Share", style: .default, handler: { _ in
+				alert.addAction(UIAlertAction(title: NSLocalizedString("alert.share", comment: "Shared button for displaying iOS 'Share' menu. Used anywhere."), style: .default, handler: { _ in
 					let vc = UIActivityViewController(activityItems: [string], applicationActivities: nil)
 					self.presentModallyViewController(vc, animated: true, completion: completion)
 				}))
 			}
 		}
 		
-		alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+		alert.addAction(UIAlertAction(title: NSLocalizedString("alert.cancel", comment: "Shared button for 'Cancel' action. Used anywhere."), style: .cancel, handler: nil))
 		
 		presentModallyViewController(alert, animated: animated, completion: completion)
 	}

@@ -9,6 +9,30 @@
 import UIKit
 import SafariServices
 
+
+// MARK: - Localization
+extension String.adamantLocalized {
+	struct account {
+		static let rowBalance = NSLocalizedString("account.rows.Balance", comment: "Wallet page: Balance row title")
+		static let rowSendTokens = NSLocalizedString("account.rows.Send-Tokens", comment: "Wallet page: 'Send tokens' button")
+		static let rowInvest = NSLocalizedString("account.rows.Invest-in-ICO", comment: "Wallet page: 'Invest in ICO' button")
+		static let rowLogout = NSLocalizedString("Logout", comment: "Wallet page: 'Logout' button")
+		
+		static let sectionAccount = NSLocalizedString("account.sections.Account", comment: "Wallet page: Account section title.")
+		static let sectionWallet = NSLocalizedString("account.sections.Wallet", comment: "Wallet page: Wallet section title")
+		static let sectionActions = NSLocalizedString("account.sections.Actions", comment: "Wallet page: Actions section title")
+		
+		private init() { }
+	}
+}
+
+fileprivate extension String.adamantLocalized.alert {
+	static let logoutMessageFormat = NSLocalizedString("account.alert.logout-message-format", comment: "Confirm logout alert: 'Confirm logout from %@' message format")
+	static let logoutButton = NSLocalizedString("account.alert.logout", comment: "Confirm logout alert: Logout (Ok) button")
+}
+
+
+// MARK: -
 class AccountViewController: UIViewController {
 	// MARK: - Constants
 	private let cellIdentifier = "cell"
@@ -162,11 +186,11 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 				return
 			}
 			
-			let alert = UIAlertController(title: "Logout from \(address)?", message: nil, preferredStyle: .alert)
-			let cancel = UIAlertAction(title: "Cancel", style: .cancel) { _ in
+			let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.logoutMessageFormat, address), message: nil, preferredStyle: .alert)
+			let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { _ in
 				self.tableView.deselectRow(at: indexPath, animated: true)
 			}
-			let logout = UIAlertAction(title: "Logout", style: .default) { _ in
+			let logout = UIAlertAction(title: String.adamantLocalized.alert.logoutButton, style: .default) { _ in
 				self.accountService.logoutAndPresentLoginStoryboard(animated: true, authorizationFinishedHandler: nil)
 			}
 			
@@ -214,23 +238,23 @@ extension AccountViewController {
 			
 			switch row {
 			case .balance:
-				cell.textLabel?.text = "Balance"
+				cell.textLabel?.text = String.adamantLocalized.account.rowBalance
 				cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
 				cell.imageView?.image = nil
 				
 			case .sendTokens:
-				cell.textLabel?.text = "Send Tokens"
+				cell.textLabel?.text = String.adamantLocalized.account.rowSendTokens
 				cell.detailTextLabel?.text = nil
 				cell.imageView?.image = nil
 				
 			case .invest:
-				cell.textLabel?.text = "Invest in ICO"
+				cell.textLabel?.text = String.adamantLocalized.account.rowInvest
 				cell.detailTextLabel?.text = nil
 				cell.imageView?.image = nil
 			}
 			
 		case .actions:
-			cell.textLabel?.text = "Logout"
+			cell.textLabel?.text = String.adamantLocalized.account.rowLogout
 			cell.detailTextLabel?.text = nil
 			cell.imageView?.image = nil
 		}
@@ -245,13 +269,13 @@ extension AccountViewController {
 		
 		switch sect {
 		case .account:
-			return "Account"
+			return String.adamantLocalized.account.sectionAccount
 			
 		case .wallet:
-			return "Wallet"
+			return String.adamantLocalized.account.sectionWallet
 			
 		case .actions:
-			return "Actions"
+			return String.adamantLocalized.account.sectionActions
 		}
 	}
 	

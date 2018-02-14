@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
 		E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */; };
-		E913C8F71FFFA51D001A83F7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E913C8F51FFFA51D001A83F7 /* Main.storyboard */; };
 		E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E913C8F81FFFA51D001A83F7 /* Assets.xcassets */; };
 		E913C8FC1FFFA51D001A83F7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E913C8FA1FFFA51D001A83F7 /* LaunchScreen.storyboard */; };
 		E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9071FFFA943001A83F7 /* AdamantCore.swift */; };
@@ -21,10 +20,12 @@
 		E91947B020002393001362F8 /* AdamantApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AF20002393001362F8 /* AdamantApiService.swift */; };
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
 		E91947B420002809001362F8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B320002809001362F8 /* Account.swift */; };
+		E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9256F5E2034C21100DE86E9 /* String+localized.swift */; };
 		E93580D9201607DA0057FC2E /* knownContacts.json in Resources */ = {isa = PBXBuildFile; fileRef = E93580D8201607DA0057FC2E /* knownContacts.json */; };
 		E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D732028B21400126346 /* ChatsProvider.swift */; };
 		E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */; };
 		E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EFE12200D1156000BB482 /* ChatViewController.swift */; };
+		E9452A4C20344834005BA34C /* Account.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9452A4E20344834005BA34C /* Account.storyboard */; };
 		E948E03B20235E2300975D6B /* SettingsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E948E03A20235E2300975D6B /* SettingsRoutes.swift */; };
 		E948E0462024DAE800975D6B /* AdamantUserInfoKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = E948E0452024DAE800975D6B /* AdamantUserInfoKeys.swift */; };
 		E948E0482024F02700975D6B /* Footer.xib in Resources */ = {isa = PBXBuildFile; fileRef = E948E0472024F02700975D6B /* Footer.xib */; };
@@ -100,7 +101,6 @@
 		E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */; };
 		E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */; };
 		E9E7CD952002812400DFC4DB /* LoginDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD942002812400DFC4DB /* LoginDependencies.swift */; };
-		E9E7CDA72002AECA00DFC4DB /* Account.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9E7CDA62002AECA00DFC4DB /* Account.storyboard */; };
 		E9E7CDA92002AF1E00DFC4DB /* AccountDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDA82002AF1E00DFC4DB /* AccountDependencies.swift */; };
 		E9E7CDAC2002AFA500DFC4DB /* AccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDAA2002AFA500DFC4DB /* AccountViewController.swift */; };
 		E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDAE2002B8A100DFC4DB /* Router.swift */; };
@@ -151,7 +151,6 @@
 		D283570A539D864115735AAA /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
 		E913C8EE1FFFA51D001A83F7 /* Adamant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Adamant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		E913C8F61FFFA51D001A83F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E913C8F81FFFA51D001A83F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E913C8FB1FFFA51D001A83F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E913C8FD1FFFA51E001A83F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -175,10 +174,12 @@
 		E91947AF20002393001362F8 /* AdamantApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantApiService.swift; sourceTree = "<group>"; };
 		E91947B12000246A001362F8 /* AdamantError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantError.swift; sourceTree = "<group>"; };
 		E91947B320002809001362F8 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
+		E9256F5E2034C21100DE86E9 /* String+localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+localized.swift"; sourceTree = "<group>"; };
 		E93580D8201607DA0057FC2E /* knownContacts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = knownContacts.json; sourceTree = "<group>"; };
 		E93B0D732028B21400126346 /* ChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsProvider.swift; sourceTree = "<group>"; };
 		E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantChatsProvider.swift; sourceTree = "<group>"; };
 		E93EFE12200D1156000BB482 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		E9452A4D20344834005BA34C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Account.storyboard; sourceTree = "<group>"; };
 		E948E03A20235E2300975D6B /* SettingsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRoutes.swift; sourceTree = "<group>"; };
 		E948E0452024DAE800975D6B /* AdamantUserInfoKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantUserInfoKeys.swift; sourceTree = "<group>"; };
 		E948E0472024F02700975D6B /* Footer.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Footer.xib; sourceTree = "<group>"; };
@@ -254,7 +255,6 @@
 		E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwinjectDependencies.swift; sourceTree = "<group>"; };
 		E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAccountService.swift; sourceTree = "<group>"; };
 		E9E7CD942002812400DFC4DB /* LoginDependencies.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginDependencies.swift; sourceTree = "<group>"; };
-		E9E7CDA62002AECA00DFC4DB /* Account.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Account.storyboard; sourceTree = "<group>"; };
 		E9E7CDA82002AF1E00DFC4DB /* AccountDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDependencies.swift; sourceTree = "<group>"; };
 		E9E7CDAA2002AFA500DFC4DB /* AccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewController.swift; sourceTree = "<group>"; };
 		E9E7CDAE2002B8A100DFC4DB /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
@@ -351,7 +351,6 @@
 				E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */,
 				E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */,
 				E913C8FD1FFFA51E001A83F7 /* Info.plist */,
-				E913C8F51FFFA51D001A83F7 /* Main.storyboard */,
 			);
 			path = Adamant;
 			sourceTree = "<group>";
@@ -412,6 +411,7 @@
 				E95F856A200789450070534A /* JSModels.swift */,
 				E913C90C1FFFA99B001A83F7 /* Keypair.swift */,
 				E948E0452024DAE800975D6B /* AdamantUserInfoKeys.swift */,
+				E9256F5E2034C21100DE86E9 /* String+localized.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -574,7 +574,7 @@
 		E9E7CDA52002AE1C00DFC4DB /* Account */ = {
 			isa = PBXGroup;
 			children = (
-				E9E7CDA62002AECA00DFC4DB /* Account.storyboard */,
+				E9452A4E20344834005BA34C /* Account.storyboard */,
 				E9E7CDA82002AF1E00DFC4DB /* AccountDependencies.swift */,
 				E9E7CDB02002B97B00DFC4DB /* AccountRoutes.swift */,
 				E9E7CDAA2002AFA500DFC4DB /* AccountViewController.swift */,
@@ -726,13 +726,12 @@
 				E9B6CC5620176F3300486EA1 /* TextViewTableViewCell.xib in Resources */,
 				E9EC3415200524CA00C0E546 /* Exo+2_100_normal.ttf in Resources */,
 				E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */,
-				E913C8F71FFFA51D001A83F7 /* Main.storyboard in Resources */,
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
 				E95F857D2008C8CB0070534A /* Chats.storyboard in Resources */,
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
 				E93580D9201607DA0057FC2E /* knownContacts.json in Resources */,
 				E948E0482024F02700975D6B /* Footer.xib in Resources */,
-				E9E7CDA72002AECA00DFC4DB /* Account.storyboard in Resources */,
+				E9452A4C20344834005BA34C /* Account.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -825,6 +824,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */,
 				E9CAE8D22018AA7700345E76 /* AdamantApi+Accounts.swift in Sources */,
 				E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */,
 				E9CE778A202B9DC2009CF70D /* ChatTransaction+CoreDataProperties.swift in Sources */,
@@ -936,20 +936,20 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		E913C8F51FFFA51D001A83F7 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				E913C8F61FFFA51D001A83F7 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		E913C8FA1FFFA51D001A83F7 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				E913C8FB1FFFA51D001A83F7 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		E9452A4E20344834005BA34C /* Account.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E9452A4D20344834005BA34C /* Base */,
+			);
+			name = Account.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
