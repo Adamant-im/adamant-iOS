@@ -10,6 +10,28 @@ import UIKit
 
 class SettingsTableViewController: UITableViewController {
 	
+	private enum Section: Int {
+		case applicationInfo
+		
+		var localized: String {
+			switch self {
+			case .applicationInfo:
+				return NSLocalizedString("settings.section.application-info", comment: "Application Info section")
+			}
+		}
+	}
+	
+	private enum Row {
+		case version
+		
+		var localized: String {
+			switch self {
+			case .version:
+				return NSLocalizedString("settings.row.application-version", comment: "Version")
+			}
+		}
+	}
+	
 	// MARK: Dependencies
 	var dialogService: DialogService!
 	
@@ -36,7 +58,7 @@ extension SettingsTableViewController {
 	}
 	
 	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		return "Application info"
+		return Section(rawValue: section)?.localized
 	}
 	
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -47,7 +69,7 @@ extension SettingsTableViewController {
 			cell = UITableViewCell(style: .value1, reuseIdentifier: identifier)
 		}
 		
-		cell.textLabel?.text = "Version"
+		cell.textLabel?.text = Row.version.localized
 		cell.detailTextLabel?.text = AdamantUtilities.applicationVersion
 		
 		return cell
