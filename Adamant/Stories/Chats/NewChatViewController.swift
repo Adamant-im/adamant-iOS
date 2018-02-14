@@ -8,10 +8,29 @@
 
 import UIKit
 
+// MARK: - Localization
+extension String.adamantLocalized {
+	struct newChat {
+		static let addressPlaceholder = NSLocalizedString("newChat.address-placeholder", comment: "Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
+		
+		static let specifyValidAddressMessage = NSLocalizedString("newChat.specify-valid-address-message", comment: "Please specify valid recipient address")
+		static let loggedUserAddressMessage = NSLocalizedString("newChat.logged-user-address-message", comment: "Notify user that he can't start chat with himself")
+		
+		static let addressNotFoundFormat = NSLocalizedString("newChat.address-not-found-format", comment: "Address %@ not found")
+		static let serverErrorFormat = NSLocalizedString("chat.server-error-format", comment: "Remote server error: %@")
+		
+		private init() { }
+	}
+}
+
+
+// MARK: - Delegate
 protocol NewChatViewControllerDelegate: class {
 	func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount)
 }
 
+
+// MARK: -
 class NewChatViewController: UITableViewController {
 	// MARK: - Dependencies
 	var dialogService: DialogService!
@@ -33,6 +52,7 @@ class NewChatViewController: UITableViewController {
 		accountTextField.textColor = UIColor.adamantPrimary
 		accountTextField.delegate = self
 		accountTextField.text = ""
+		accountTextField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
 		
 		let prefix = UILabel()
 		prefix.text = "U"
@@ -59,7 +79,7 @@ class NewChatViewController: UITableViewController {
 	
 	@IBAction func done(_ sender: UITextField) {
 		guard let nums = accountTextField.text, nums.count > 1 else {
-			dialogService.showToastMessage("Please specify valid recipient address")
+			dialogService.showToastMessage(String.adamantLocalized.newChat.specifyValidAddressMessage)
 			return
 		}
 		
@@ -69,12 +89,12 @@ class NewChatViewController: UITableViewController {
 		}
 		
 		guard AdamantUtilities.validateAdamantAddress(address: address) else {
-			dialogService.showToastMessage("Please specify valid recipient address")
+			dialogService.showToastMessage(String.adamantLocalized.newChat.specifyValidAddressMessage)
 			return
 		}
 		
 		if let loggedAccount = accountService.account, loggedAccount.address == address {
-			dialogService.showToastMessage("You don't need encrypted anonymous chat to talk to yourself.")
+			dialogService.showToastMessage(String.adamantLocalized.newChat.loggedUserAddressMessage)
 			return
 		}
 		
@@ -89,10 +109,9 @@ class NewChatViewController: UITableViewController {
 				}
 				
 			case .notFound:
-				self.dialogService.showError(withMessage: "Address \(address) not found")
+				self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.addressNotFoundFormat, address))
 				
 			case .serverError(let error):
-				// TODO: message
 				self.dialogService.showError(withMessage: String(describing: error))
 			}
 		}
