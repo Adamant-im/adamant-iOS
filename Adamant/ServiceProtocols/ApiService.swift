@@ -19,6 +19,28 @@ enum ApiServiceError: Error {
 	case serverError(error: String)
 	case internalError(message: String, error: Error?)
 	case networkError(error: Error)
+	
+	var localized: String {
+		switch self {
+		case .notLogged:
+			return NSLocalizedString("apiService.errors.user-not-logged", comment: "User not logged")
+			
+		case .accountNotFound:
+			return NSLocalizedString("apiService.errors.account-not-found-format", comment: "Account not found: %@")
+			
+		case .serverError(error: let error):
+			return String.localizedStringWithFormat(NSLocalizedString("apiService.errors.remote-server-error-format", comment: "Remote server error: %@"), error)
+			
+		case .internalError(_, let error as ApiServiceError):
+			return String.localizedStringWithFormat(NSLocalizedString("apiService.errors.internal-error-format", comment: "Internal error: %@"), error.localized)
+			
+		case .internalError(_, let error):
+			return String.localizedStringWithFormat(NSLocalizedString("apiService.errors.internal-error-format", comment: "Internal error: %@"), String(describing: error))
+			
+		case .networkError(error: _):
+			return NSLocalizedString("apiService.errors.connection-failed", comment: "No connection message")
+		}
+	}
 }
 
 protocol ApiService {
