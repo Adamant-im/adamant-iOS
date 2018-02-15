@@ -20,26 +20,30 @@ class AdamantApiService: ApiService {
 		case url, json
 	}
 	
-	struct InternalError: Equatable, Hashable {
-		static let endpointBuildFailed = InternalError("Failed to build endpoint url")
-		static let signTransactionFailed = InternalError("Failed to sign transaction")
-		
-		let message: String
-		
-		private init(_ message: String) {
-			self.message = message
-		}
+	enum InternalError: Error {
+		case endpointBuildFailed
+		case signTransactionFailed
+		case parsingFailed
+		case unknownError
 		
 		func apiServiceErrorWith(error: Error?) -> ApiServiceError {
-			return .internalError(message: message, error: error)
+			return .internalError(message: self.localized, error: error)
 		}
 		
-		static func ==(lhs: InternalError, rhs: InternalError) -> Bool {
-			return lhs.message == rhs.message
-		}
-		
-		var hashValue: Int {
-			return message.hashValue &* 121212
+		var localized: String {
+			switch self {
+			case .endpointBuildFailed:
+				return NSLocalizedString("apiService.endpoint-failed", comment: "Failed to build endpoint url")
+				
+			case .signTransactionFailed:
+				return NSLocalizedString("apiService.failed-signing", comment: "Failed to sign transaction")
+				
+			case .parsingFailed:
+				return NSLocalizedString("apiService.parsing-failed", comment: "Error parsing response")
+				
+			case .unknownError:
+				return NSLocalizedString("apiService.unknown-error", comment: "Unknown error")
+			}
 		}
 	}
 	
@@ -65,7 +69,7 @@ class AdamantApiService: ApiService {
 	
 	func buildUrl(path: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
 		guard var components = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false) else {
-			throw AdamantError(message: "Internal API error: Can't parse API URL: \(apiUrl)")
+			fatalError("Parsing API URL failed: \(apiUrl)")
 		}
 		
 		components.path = path
@@ -96,7 +100,7 @@ class AdamantApiService: ApiService {
 						let model: T = try JSONDecoder().decode(T.self, from: data)
 						completion(.success(model))
 					} catch {
-						completion(.failure(.internalError(message: "Error parsing response", error: error)))
+						completion(.failure(InternalError.parsingFailed.apiServiceErrorWith(error: error)))
 					}
 					
 				case .failure(let error):
@@ -107,7 +111,7 @@ class AdamantApiService: ApiService {
 	
 	static func translateServerError(_ error: String?) -> ApiServiceError {
 		guard let error = error else {
-			return .internalError(message: "Unknown", error: nil)
+			return InternalError.unknownError.apiServiceErrorWith(error: nil)
 		}
 		
 		switch error {
