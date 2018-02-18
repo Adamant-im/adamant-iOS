@@ -53,15 +53,15 @@ protocol AccountService {
 	///
 	/// - Parameters:
 	///   - passphrase: Your new unique passphrase
-	///   - completionHandler: New logged account, if success, error if not.
-	func createAccount(with passphrase: String, completionHandler: ((Account?, AdamantError?) -> Void)?)
+	///   - completion: New logged account, if success, error if not.
+	func createAccount(with passphrase: String, completion: ((Account?, AdamantError?) -> Void)?)
 	
 	/// Login into Adamant using passphrase.
 	///
 	/// - Parameters:
 	///   - passphrase: Your unique passphrase
-	///   - loginCompletionHandler: Logged account if success, error if not.
-	func login(with passphrase: String, completionHandler: ((Account?, AdamantError?) -> Void)?)
+	///   - logincompletion: Logged account if success, error if not.
+	func login(with passphrase: String, completion: ((Account?, AdamantError?) -> Void)?)
 	
 	/// Logout (if logged in) and present authorization viewControllers modally. After login or cancel will dismiss modal window and then call a callback.
 	///

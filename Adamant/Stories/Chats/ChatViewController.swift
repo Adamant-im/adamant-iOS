@@ -118,7 +118,7 @@ class ChatViewController: MessagesViewController {
 		
 		if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
 			messageInputBar.inputTextView.text = message
-			setEstimatedFee(feeCalculator.estimatedFeeFor(message: message))
+			setEstimatedFee(feeCalculator.estimatedFeeFor(message: AdamantMessage.text(message)))
 		}
     }
 	
@@ -127,6 +127,12 @@ class ChatViewController: MessagesViewController {
 		
 		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.partner?.address {
 			delegate.preserveMessage(message, forAddress: address)
+		}
+	}
+	
+	@IBAction func properties(_ sender: Any) {
+		if let address = chatroom?.partner?.address {
+			dialogService.presentShareAlertFor(string: address, types: [.copyToPasteboard, .share], animated: true, completion: nil)
 		}
 	}
 }
@@ -338,7 +344,11 @@ extension ChatViewController: MessageInputBarDelegate {
 					case .dependencyError(let error): message = "Internal dependency error: \(error)."
 					case .internalError(let error): message = "Internal error: \(error)"
 					case .notLogged: message = "Internal error: User not logged."
-					case .serverError(let error): message = "Remote server error: \(error)"
+					case .serverError(let error): message = "Server error: \(error)"
+						
+					case .notEnoughtMoneyToSend:
+						message = "Not enough money to send a message."
+						
 					case .messageNotValid(let problem):
 						switch problem {
 						case .tooLong:
@@ -363,7 +373,7 @@ extension ChatViewController: MessageInputBarDelegate {
 	
 	func messageInputBar(_ inputBar: MessageInputBar, textViewTextDidChangeTo text: String) {
 		if text.count > 0 {
-			let fee = feeCalculator.estimatedFeeFor(message: text)
+			let fee = feeCalculator.estimatedFeeFor(message: .text(text))
 			setEstimatedFee(fee)
 		} else {
 			setEstimatedFee(0)

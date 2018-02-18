@@ -16,6 +16,7 @@ class AdamantChatsProvider: ChatsProvider {
 	var stack: CoreDataStack!
 	var adamantCore: AdamantCore!
 	var accountsProvider: AccountsProvider!
+	var feeCalculator: FeeCalculator!
 	
 	// MARK: Properties
 	private(set) var state: State = .empty
@@ -115,7 +116,7 @@ extension AdamantChatsProvider {
 		// MARK: 2. Prepare
 		let prevState = state
 		
-		guard let address = accountService.account?.address else {
+		guard let address = accountService.account?.address, let privateKey = accountService.keypair?.privateKey else {
 			stateSemaphore.signal()
 			setState(.failedToUpdate(ChatsProviderError.notLogged), previous: prevState)
 			return
@@ -130,7 +131,7 @@ extension AdamantChatsProvider {
 		let processingGroup = DispatchGroup()
 		let cms = DispatchSemaphore(value: 1)
 		
-		getTransactions(address: address, height: lastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
+		getTransactions(senderId: address, privateKey: privateKey, height: lastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
 		
 		// MARK: 4. Check
 		processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) {
@@ -151,6 +152,11 @@ extension AdamantChatsProvider {
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
 		guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
 			completion(.error(.notLogged))
+			return
+		}
+		
+		guard loggedAccount.balance >= feeCalculator.estimatedFeeFor(message: message) else {
+			completion(.error(.notEnoughtMoneyToSend))
 			return
 		}
 		
@@ -258,44 +264,42 @@ extension AdamantChatsProvider {
 		}
 		
 		// MARK: 6. Send
-		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { (id, error) in
-			guard let id = id else {
-				if let error = error {
-					privateContext.delete(transaction)
-					try? privateContext.save()
-					completion(.error(.serverError(error)))
+		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { result in
+			switch result {
+			case .success(let id):
+				// Update ID with recieved, add to unconfirmed transactions.
+				transaction.transactionId = String(id)
+				
+				if let lastTransaction = chatroom.lastTransaction {
+					if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
+						dateA.compare(dateB) == ComparisonResult.orderedAscending {
+						chatroom.lastTransaction = transaction
+						chatroom.updatedAt = transaction.date
+					}
 				} else {
-					fatalError()
-				}
-				return
-			}
-			
-			// Update ID with recieved, add to unconfirmed transactions.
-			transaction.transactionId = String(id)
-			
-			if let lastTransaction = chatroom.lastTransaction {
-				if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
-					dateA.compare(dateB) == ComparisonResult.orderedAscending {
 					chatroom.lastTransaction = transaction
 					chatroom.updatedAt = transaction.date
 				}
-			} else {
-				chatroom.lastTransaction = transaction
-				chatroom.updatedAt = transaction.date
-			}
-			
-			// If we will save transaction from privateContext, we will hold strong reference to whole context, and we won't ever save it.
-			self.unconfirmedsSemaphore.wait()
-			DispatchQueue.main.sync {
-				self.unconfirmedTransactions[id] = self.stack.container.viewContext.object(with: transaction.objectID) as? ChatTransaction
-			}
-			self.unconfirmedsSemaphore.signal()
-			
-			do {
-				try privateContext.save()
-				completion(.success)
-			} catch {
-				completion(.error(.internalError(error)))
+				
+				// If we will save transaction from privateContext, we will hold strong reference to whole context, and we won't ever save it.
+				self.unconfirmedsSemaphore.wait()
+				DispatchQueue.main.sync {
+					self.unconfirmedTransactions[id] = self.stack.container.viewContext.object(with: transaction.objectID) as? ChatTransaction
+				}
+				self.unconfirmedsSemaphore.signal()
+				
+				do {
+					try privateContext.save()
+					completion(.success)
+				} catch {
+					completion(.error(.internalError(error)))
+				}
+				
+				
+			case .failure(let error):
+				privateContext.delete(transaction)
+				try? privateContext.save()
+				completion(.error(.serverError(error)))
 			}
 		}
 	}
@@ -385,59 +389,64 @@ extension AdamantChatsProvider {
 	///   - height: last message height. Minimum == 1 !!!
 	///   - offset: offset, if greater than 100
 	/// - Returns: ammount of new messages was added
-	private func getTransactions(address: String, height: Int?, offset: Int?, dispatchGroup: DispatchGroup, context: NSManagedObjectContext, contextMutatingSemaphore cms: DispatchSemaphore) {
+	private func getTransactions(senderId: String,
+								 privateKey: String,
+								 height: Int?,
+								 offset: Int?,
+								 dispatchGroup: DispatchGroup,
+								 context: NSManagedObjectContext,
+								 contextMutatingSemaphore cms: DispatchSemaphore) {
 		// Enter 1
 		dispatchGroup.enter()
 		
 		// MARK: 1. Get new transactions
-		apiService.getChatTransactions(account: address, height: height, offset: offset) { (transactions, error) in
+		apiService.getChatTransactions(account: senderId, height: height, offset: offset) { result in
 			defer {
 				// Leave 1
 				dispatchGroup.leave()
 			}
 			
-			// MARK: 2. Check for errors
-			guard let transactions = transactions else {
-				if let error = error {
-					self.setState(.failedToUpdate(error), previous: .updating)
-				}
-				return
-			}
-			
-			// MARK: 3. Process transactions in background
-			// Enter 2
-			dispatchGroup.enter()
-			self.processingQueue.async {
-				defer {
-					// Leave 2
-					dispatchGroup.leave()
+			switch result {
+			case .success(let transactions):
+				if transactions.count == 0 {
+					return
 				}
 				
-				self.process(chatTransactions: transactions,
-							 context: context,
-							 contextMutatingSemaphore: cms)
-			}
-			
-			// MARK: 4. Get more transactions
-			if transactions.count == self.apiTransactions {
-				let newOffset: Int
-				if let offset = offset {
-					newOffset = offset + self.apiTransactions
-				} else {
-					newOffset = self.apiTransactions
+				// MARK: 2. Process transactions in background
+				// Enter 2
+				dispatchGroup.enter()
+				self.processingQueue.async {
+					defer {
+						// Leave 2
+						dispatchGroup.leave()
+					}
+					
+					self.process(chatTransactions: transactions,
+								 senderId: senderId,
+								 privateKey: privateKey,
+								 context: context,
+								 contextMutatingSemaphore: cms)
 				}
 				
-				self.getTransactions(address: address, height: height, offset: newOffset, dispatchGroup: dispatchGroup, context: context, contextMutatingSemaphore: cms)
+				// MARK: 4. Get more transactions
+				if transactions.count == self.apiTransactions {
+					let newOffset: Int
+					if let offset = offset {
+						newOffset = offset + self.apiTransactions
+					} else {
+						newOffset = self.apiTransactions
+					}
+					
+					self.getTransactions(senderId: senderId, privateKey: privateKey, height: height, offset: newOffset, dispatchGroup: dispatchGroup, context: context, contextMutatingSemaphore: cms)
+				}
+				
+			case .failure(let error):
+				self.setState(.failedToUpdate(error), previous: .updating)
 			}
 		}
 	}
 	
-	private func process(chatTransactions: [Transaction], context: NSManagedObjectContext, contextMutatingSemaphore: DispatchSemaphore) {
-		guard let currentAddress = accountService.account?.address, let privateKey = accountService.keypair?.privateKey else {
-			// TODO: Log error
-			return
-		}
-		
+	private func process(chatTransactions: [Transaction], senderId: String, privateKey: String, context: NSManagedObjectContext, contextMutatingSemaphore: DispatchSemaphore) {
 		struct DirectionalTransaction {
 			let transaction: Transaction
 			let isOut: Bool
@@ -447,7 +456,7 @@ extension AdamantChatsProvider {
 		var grouppedTransactions = [String:[DirectionalTransaction]]()
 		
 		for transaction in chatTransactions {
-			let isOut = transaction.senderId == currentAddress
+			let isOut = transaction.senderId == senderId
 			let partner = isOut ? transaction.recipientId : transaction.senderId
 			
 			if grouppedTransactions[partner] == nil {

@@ -14,9 +14,7 @@ class ChatsListViewController: UIViewController {
 	var accountService: AccountService!
 	var chatsProvider: ChatsProvider!
 	var cellFactory: CellFactory!
-	var apiService: ApiService!
 	var router: Router!
-	var accountsProvider: AccountsProvider!
 	
 	// MARK: - IBOutlet
 	@IBOutlet weak var tableView: UITableView!
@@ -132,7 +130,15 @@ extension ChatsListViewController: UITableViewDelegate, UITableViewDataSource {
 // MARK: - UITableView Cells
 extension ChatsListViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		return tableView.dequeueReusableCell(withIdentifier: chatCell, for: indexPath)
+		let cell = tableView.dequeueReusableCell(withIdentifier: chatCell, for: indexPath) as! ChatTableViewCell
+		
+		cell.accessoryType = .disclosureIndicator
+		cell.accountLabel.textColor = UIColor.adamantPrimary
+		cell.dateLabel.textColor = UIColor.adamantSecondary
+		cell.avatarImageView.tintColor = UIColor.adamantChatIcons
+		cell.borderColor = UIColor.adamantPrimary
+		
+		return cell
 	}
 	
 	func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -142,17 +148,20 @@ extension ChatsListViewController {
 	}
 	
 	private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
-		cell.accessoryType = .disclosureIndicator
-		
-		cell.accountLabel.textColor = UIColor.adamantPrimary
-		cell.dateLabel.textColor = UIColor.adamantSecondary
-		cell.avatarImageView.tintColor = UIColor.adamantChatIcons
 		
 		if let partner = chatroom.partner {
 			if let name = partner.name {
 				cell.accountLabel.text = name
 			} else {
 				cell.accountLabel.text = partner.address
+			}
+			
+			if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
+				cell.avatarImage = avatar
+				cell.borderWidth = 1
+			} else {
+				cell.avatarImage = nil
+				cell.borderWidth = 0
 			}
 		}
 		

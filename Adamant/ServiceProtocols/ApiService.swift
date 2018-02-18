@@ -8,6 +8,19 @@
 
 import Foundation
 
+enum ApiServiceResult<T> {
+	case success(T)
+	case failure(ApiServiceError)
+}
+
+enum ApiServiceError: Error {
+	case notLogged
+	case accountNotFound
+	case serverError(error: String)
+	case internalError(message: String, error: Error?)
+	case networkError(error: Error)
+}
+
 protocol ApiService {
 	
 	/// Default is async queue with .utilities priority.
@@ -15,26 +28,26 @@ protocol ApiService {
 	
 	// MARK: - Accounts
 	
-	func newAccount(byPublicKey publicKey: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
-	func getAccount(byPassphrase passphrase: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
-	func getAccount(byPublicKey publicKey: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
-	func getAccount(byAddress address: String, completionHandler: @escaping (Account?, AdamantError?) -> Void)
+	func newAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<Account>) -> Void)
+	func getAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<Account>) -> Void)
+	func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<Account>) -> Void)
+	func getAccount(byAddress address: String, completion: @escaping (ApiServiceResult<Account>) -> Void)
 	
 	
 	// MARK: - Keys
 	
-	func getPublicKey(byAddress address: String, completionHandler: @escaping (String?, AdamantError?) -> Void)
+	func getPublicKey(byAddress address: String, completion: @escaping (ApiServiceResult<String>) -> Void)
 	
 	
 	// MARK: - Transactions
 	
-	func getTransaction(id: UInt, completionHandler: @escaping (Transaction?, AdamantError?) -> Void)
-	func getTransactions(forAccount: String, type: TransactionType, fromHeight: UInt?, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void)
+	func getTransaction(id: UInt, completion: @escaping (ApiServiceResult<Transaction>) -> Void)
+	func getTransactions(forAccount: String, type: TransactionType, fromHeight: UInt?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
 	
 	
 	// MARK: - Funds
 	
-	func transferFunds(sender: String, recipient: String, amount: UInt, keypair: Keypair, completionHandler: @escaping (Bool, AdamantError?) -> Void)
+	func transferFunds(sender: String, recipient: String, amount: UInt, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void)
 	
 	
 	// MARK: - Chats
@@ -44,9 +57,9 @@ protocol ApiService {
 	/// - Parameters:
 	///   - account: Transactions for specified account
 	///   - height: From this height. Minimal value is 1.
-	func getChatTransactions(account: String, height: Int?, offset: Int?, completionHandler: @escaping ([Transaction]?, AdamantError?) -> Void)
+	func getChatTransactions(account: String, height: Int?, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
 	
 	/// Send text message
-	///   - completionHandler: Contains processed transactionId, if success, or AdamantError, if fails.
-	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completionHandler: @escaping (UInt?, AdamantError?) -> Void)
+	///   - completion: Contains processed transactionId, if success, or AdamantError, if fails.
+	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completion: @escaping (ApiServiceResult<UInt>) -> Void)
 }

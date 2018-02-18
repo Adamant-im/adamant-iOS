@@ -56,11 +56,11 @@ class AdamantAccountService: AccountService {
 
 // MARK: - Login&Logout functions
 extension AdamantAccountService {
-	func createAccount(with passphrase: String, completionHandler: ((Account?, AdamantError?) -> Void)?) {
+	func createAccount(with passphrase: String, completion: ((Account?, AdamantError?) -> Void)?) {
 		switch status {
 		// Is logging in, return
 		case .isLoggingIn:
-			completionHandler?(nil, AdamantError(message: "Service is busy"))
+			completion?(nil, AdamantError(message: "Service is busy"))
 			return
 			
 		// Logout first
@@ -74,32 +74,36 @@ extension AdamantAccountService {
 		
 		status = .isLoggingIn
 		guard let publicKey = adamantCore.createKeypairFor(passphrase: passphrase)?.publicKey else {
-			completionHandler?(nil, AdamantError(message: "Can't create key for passphrase"))
+			completion?(nil, AdamantError(message: "Can't create key for passphrase"))
 			return
 		}
 		
-		self.apiService.getAccount(byPublicKey: publicKey, completionHandler: { (account, error) in
-			if account != nil {
-				self.login(with: passphrase, completionHandler: completionHandler)
-			}
-			
-			self.apiService.newAccount(byPublicKey: publicKey, completionHandler: { (account, error) in
-				if let account = account {
-					self.setLoggedInWith(account: account, passphrase: passphrase)
-					completionHandler?(account, error)
-				} else {
-					self.status = .notLogged
-					completionHandler?(nil, error)
+		self.apiService.getAccount(byPublicKey: publicKey) { result in
+			switch result {
+			case .success(_):
+				self.login(with: passphrase, completion: completion)
+				
+			case .failure(_):
+				self.apiService.newAccount(byPublicKey: publicKey) { result in
+					switch result {
+					case .success(let account):
+						self.setLoggedInWith(account: account, passphrase: passphrase)
+						completion?(account, nil)
+						
+					case .failure(let error):
+						self.status = .notLogged
+						completion?(nil, AdamantError(message: String(describing: error), error: error))
+					}
 				}
-			})
-		})
+			}
+		}
 	}
 	
-	func login(with passphrase: String, completionHandler: ((Account?, AdamantError?) -> Void)?) {
+	func login(with passphrase: String, completion: ((Account?, AdamantError?) -> Void)?) {
 		switch status {
 		// Is logging in, return
 		case .isLoggingIn:
-			completionHandler?(nil, AdamantError(message: "Service is busy"))
+			completion?(nil, AdamantError(message: "Service is busy"))
 			return
 			
 		// Logout first
@@ -112,13 +116,15 @@ extension AdamantAccountService {
 		}
 		
 		status = .isLoggingIn
-		self.apiService.getAccount(byPassphrase: passphrase) { (account, error) in
-			if let account = account {
+		self.apiService.getAccount(byPassphrase: passphrase) { result in
+			switch result {
+			case .success(let account):
 				self.setLoggedInWith(account: account, passphrase: passphrase)
-				completionHandler?(account, error)
-			} else {
+				completion?(account, nil)
+				
+			case .failure(let error):
 				self.status = .notLogged
-				completionHandler?(nil, error)
+				completion?(nil, AdamantError(message: String(describing: error), error: error))
 			}
 		}
 	}
@@ -210,22 +216,23 @@ extension AdamantAccountService {
 			return
 		}
 		
-		apiService.getAccount(byPublicKey: loggedAccount.publicKey) { (account, error) in
-			guard let account = account else {
+		apiService.getAccount(byPublicKey: loggedAccount.publicKey) { result in
+			switch result {
+			case .success(let account):
+				var hasChanges = false
+				
+				if loggedAccount.balance != account.balance { hasChanges = true }
+				
+				if hasChanges {
+					self.account = account
+					NotificationCenter.default.post(name: Notification.Name.adamantAccountDataUpdated, object: nil)
+				}
+				
+				self.updating = false
+				
+			case .failure(let error):
 				print("Error update account: \(String(describing: error))")
-				return
 			}
-			
-			var hasChanges = false
-			
-			if loggedAccount.balance != account.balance { hasChanges = true }
-			
-			if hasChanges {
-				self.account = account
-				NotificationCenter.default.post(name: Notification.Name.adamantAccountDataUpdated, object: nil)
-			}
-			
-			self.updating = false
 		}
 	}
 }
