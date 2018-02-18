@@ -13,22 +13,22 @@ import SafariServices
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct account {
-		static let rowBalance = NSLocalizedString("account.rows.Balance", comment: "Wallet page: Balance row title")
-		static let rowSendTokens = NSLocalizedString("account.rows.Send-Tokens", comment: "Wallet page: 'Send tokens' button")
-		static let rowInvest = NSLocalizedString("account.rows.Invest-in-ICO", comment: "Wallet page: 'Invest in ICO' button")
+		static let rowBalance = NSLocalizedString("Balance", comment: "Wallet page: Balance row title")
+		static let rowSendTokens = NSLocalizedString("Send Tokens", comment: "Wallet page: 'Send tokens' button")
+		static let rowInvest = NSLocalizedString("Invest in ICO", comment: "Wallet page: 'Invest in ICO' button")
 		static let rowLogout = NSLocalizedString("Logout", comment: "Wallet page: 'Logout' button")
 		
-		static let sectionAccount = NSLocalizedString("account.sections.Account", comment: "Wallet page: Account section title.")
-		static let sectionWallet = NSLocalizedString("account.sections.Wallet", comment: "Wallet page: Wallet section title")
-		static let sectionActions = NSLocalizedString("account.sections.Actions", comment: "Wallet page: Actions section title")
+		static let sectionAccount = NSLocalizedString("Account", comment: "Wallet page: Account section title.")
+		static let sectionWallet = NSLocalizedString("Wallet", comment: "Wallet page: Wallet section title")
+		static let sectionActions = NSLocalizedString("Actions", comment: "Wallet page: Actions section title")
 		
 		private init() { }
 	}
 }
 
 fileprivate extension String.adamantLocalized.alert {
-	static let logoutMessageFormat = NSLocalizedString("account.alert.logout-message-format", comment: "Confirm logout alert: 'Confirm logout from %@' message format")
-	static let logoutButton = NSLocalizedString("account.alert.logout", comment: "Confirm logout alert: Logout (Ok) button")
+	static let logoutMessageFormat = NSLocalizedString("Logout from %@?", comment: "Confirm logout alert")
+	static let logoutButton = NSLocalizedString("Logout", comment: "Confirm logout alert: Logout (Ok) button")
 }
 
 

@@ -13,10 +13,10 @@ import TableKit
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct login {
-		static let passphrasePlaceholder = NSLocalizedString("login.passphrase-placeholder", comment: "Login: Passphrase placeholder")
-		static let loggingInProgressMessage = NSLocalizedString("login.loggin-in-progress-message", comment: "Login: notify user that we a logging in.")
+		static let passphrasePlaceholder = NSLocalizedString("passphrase", comment: "Login: Passphrase placeholder")
+		static let loggingInProgressMessage = NSLocalizedString("Logging in", comment: "Login: notify user that we a logging in.")
 		
-		static let emptyPassphraseAlert = NSLocalizedString("login.empty-passphrase-alert", comment: "Login: notify user that he is trying to login without a passphrase")
+		static let emptyPassphraseAlert = NSLocalizedString("Enter a passphrase!", comment: "Login: notify user that he is trying to login without a passphrase")
 		
 		private init() {}
 	}
@@ -33,10 +33,10 @@ class LoginViewController: UIViewController {
 		var localized: String {
 			switch self {
 			case .passphrase:
-				return NSLocalizedString("login.section.login-with-passphrase", comment: "Login sections: login with existing passphrase.")
+				return NSLocalizedString("Login", comment: "Login sections: login with existing passphrase section")
 				
 			case .newAccount:
-				return NSLocalizedString("login.section.new-account", comment: "Login sections: Create new account")
+				return NSLocalizedString("New account", comment: "Login sections: Create new account section")
 			}
 		}
 	}
@@ -50,16 +50,16 @@ class LoginViewController: UIViewController {
 		var localized: String {
 			switch self {
 			case .loginButton:
-				return NSLocalizedString("login.row.login-with-passphrase-button", comment: "Login: login with passphrase button")
+				return NSLocalizedString("Login", comment: "Login button")
 				
 			case .saveYourPassphraseAlert:
-				return NSLocalizedString("login.save-your-passphrase-alert", comment: "Login: security alert: Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it.")
+				return NSLocalizedString("Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it", comment: "Login: security alert, notify user that he must save his new passphrase")
 				
 			case .generateNewPassphraseButton:
-				return NSLocalizedString("login.row.generate-new-passphrase-button", comment: "Login: generate new passphrase button")
+				return NSLocalizedString("Generate new passphrase", comment: "Login: generate new passphrase button")
 				
 			case .tapToSaveHint:
-				return NSLocalizedString("login.row.tap-to-save-hint", comment: "Login: Tap to save")
+				return NSLocalizedString("Tap to save", comment: "Login: a small hint for a user, that he can tap on passphrase to save it")
 			}
 		}
 	}

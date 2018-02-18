@@ -13,14 +13,14 @@ import CoreData
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct chat {
-		static let estimatedFeeFormat = NSLocalizedString("chat.estimated-fee", comment: "Estimated fee: %f")
+		static let estimatedFeeFormat = NSLocalizedString("Estimated fee: %f", comment: "Chat input bar: Estimated fee.")
 		
-		static let messageIsEmpty = NSLocalizedString("chat.message-is-empty", comment: "Notify user that message cannot be empty")
-		static let messageTooLong = NSLocalizedString("chat.message-too-long", comment: "Message is too long")
-		static let notEnoughMoney = NSLocalizedString("chat.not-enough", comment: "You don't have enough money to send a message.")
+		static let messageIsEmpty = NSLocalizedString("Message is empty", comment: "Notify user that message cannot be empty")
+		static let messageTooLong = NSLocalizedString("Message is too long", comment: "Message is too long")
+		static let notEnoughMoney = NSLocalizedString("You don't have enough money to send a message", comment: "Notify user that he doesn't have money to pay a message fee")
 		
-		static let internalErrorFormat = NSLocalizedString("chat.internal-error-format", comment: "Internal error: %@")
-		static let serverErrorFormat = NSLocalizedString("chat.server-error-format", comment: "Remote server error: %@")
+		static let internalErrorFormat = NSLocalizedString("Internal error: %@. You should report this bug.", comment: "Notify user about bad internal error. Usually this should be reported as a bug.")
+		static let serverErrorFormat = NSLocalizedString("Remote server error: %@", comment: "Notify user about server error.")
 		
 		private init() { }
 	}

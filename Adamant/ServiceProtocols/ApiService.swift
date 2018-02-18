@@ -23,22 +23,26 @@ enum ApiServiceError: Error {
 	var localized: String {
 		switch self {
 		case .notLogged:
-			return NSLocalizedString("apiService.errors.user-not-logged", comment: "User not logged")
+			return NSLocalizedString("User not logged", comment: "User not logged error")
 			
 		case .accountNotFound:
-			return NSLocalizedString("apiService.errors.account-not-found-format", comment: "Account not found: %@")
+			return NSLocalizedString("Account not found: %@", comment: "Account not found error, appending account info.")
 			
 		case .serverError(error: let error):
-			return String.localizedStringWithFormat(NSLocalizedString("apiService.errors.remote-server-error-format", comment: "Remote server error: %@"), error)
-			
-		case .internalError(_, let error as ApiServiceError):
-			return String.localizedStringWithFormat(NSLocalizedString("apiService.errors.internal-error-format", comment: "Internal error: %@"), error.localized)
+			return String.localizedStringWithFormat(NSLocalizedString("Remote Server error: %@", comment: "Remote server returned an error"), error)
 			
 		case .internalError(_, let error):
-			return String.localizedStringWithFormat(NSLocalizedString("apiService.errors.internal-error-format", comment: "Internal error: %@"), String(describing: error))
+			let message: String
+			if let apiError = error as? ApiServiceError {
+				message = apiError.localized
+			} else {
+				message = String(describing: error)
+			}
+			
+			return String.localizedStringWithFormat(NSLocalizedString("Internal error: %@", comment: "Internal application error"), message)
 			
 		case .networkError(error: _):
-			return NSLocalizedString("apiService.errors.connection-failed", comment: "No connection message")
+			return NSLocalizedString("No connection", comment: "No connection message. Generally bad network.")
 		}
 	}
 }

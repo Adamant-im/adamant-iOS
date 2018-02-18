@@ -11,13 +11,13 @@ import UIKit
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct newChat {
-		static let addressPlaceholder = NSLocalizedString("newChat.address-placeholder", comment: "Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
+		static let addressPlaceholder = NSLocalizedString("", comment: "Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
 		
-		static let specifyValidAddressMessage = NSLocalizedString("newChat.specify-valid-address-message", comment: "Please specify valid recipient address")
-		static let loggedUserAddressMessage = NSLocalizedString("newChat.logged-user-address-message", comment: "Notify user that he can't start chat with himself")
+		static let specifyValidAddressMessage = NSLocalizedString("Please specify valid recipient address", comment: "Notify user that he entered invalid address")
+		static let loggedUserAddressMessage = NSLocalizedString("You don't need an encrypted anonymous chat to talk to yourself", comment: "Notify user that he can't start chat with himself")
 		
-		static let addressNotFoundFormat = NSLocalizedString("newChat.address-not-found-format", comment: "Address %@ not found")
-		static let serverErrorFormat = NSLocalizedString("chat.server-error-format", comment: "Remote server error: %@")
+		static let addressNotFoundFormat = NSLocalizedString("Address %@ not found", comment: "Notify user that specified address (%@) not found")
+		static let serverErrorFormat = NSLocalizedString("%@", comment: "Remote server returned an error.")
 		
 		private init() { }
 	}
@@ -112,7 +112,7 @@ class NewChatViewController: UITableViewController {
 				self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.addressNotFoundFormat, address))
 				
 			case .serverError(let error):
-				self.dialogService.showError(withMessage: String(describing: error))
+				self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.serverErrorFormat, String(describing: error)))
 			}
 		}
 	}

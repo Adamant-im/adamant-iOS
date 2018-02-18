@@ -16,7 +16,7 @@ class SettingsTableViewController: UITableViewController {
 		var localized: String {
 			switch self {
 			case .applicationInfo:
-				return NSLocalizedString("settings.section.application-info", comment: "Application Info section")
+				return NSLocalizedString("Application info", comment: "Config: Application Info section")
 			}
 		}
 	}
@@ -27,7 +27,7 @@ class SettingsTableViewController: UITableViewController {
 		var localized: String {
 			switch self {
 			case .version:
-				return NSLocalizedString("settings.row.application-version", comment: "Version")
+				return NSLocalizedString("Application version", comment: "Config: Version row")
 			}
 		}
 	}
