@@ -73,7 +73,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="asdfasdf" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="aW0-JI-mqg">
+                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="aW0-JI-mqg">
                                                     <rect key="frame" x="12" y="0.0" width="351" height="44"/>
                                                     <nil key="textColor"/>
                                                     <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="17"/>
@@ -116,7 +116,7 @@
             </objects>
             <point key="canvasLocation" x="2751" y="-439"/>
         </scene>
-        <!--Title-->
+        <!--Chat View Controller-->
         <scene sceneID="w1v-2h-ifS">
             <objects>
                 <viewController storyboardIdentifier="ChatViewController" id="XfZ-FH-baE" customClass="ChatViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
@@ -126,7 +126,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <viewLayoutGuide key="safeArea" id="A2d-Mp-E0v"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Title" id="O75-R6-nGz">
+                    <navigationItem key="navigationItem" id="O75-R6-nGz">
                         <barButtonItem key="rightBarButtonItem" title="•••" id="v2Z-hT-nNQ">
                             <connections>
                                 <action selector="properties:" destination="XfZ-FH-baE" id="HJU-bd-xWw"/>

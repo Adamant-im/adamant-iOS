@@ -1,0 +1,196 @@
+/* Product name */
+"ADAMANT" = "АДАМАНТ";
+
+/* Wallet page: Account section title. */
+"Account" = "Аккаунт";
+
+/* ApiService: Account not found error, appending account info. */
+"Account not found: %@" = "Аккаунт не найден: %@";
+
+/* Wallet page: Actions section title */
+"Actions" = "Действия";
+
+/* Transfer: recipient address */
+"Address" = "Адрес";
+
+/* New chat: Notify user that specified address (%@) not found */
+"Address %@ not found" = "Адрес %@ не найден";
+
+/* Transfer: Address not found error */
+"Address not found" = "Такой адрес не найден";
+
+/* Transaction details: amount row.
+   Transfer: amount of adamant to transfer. */
+"Amount" = "Количество";
+
+/* Config: Application Info section */
+"Application info" = "Приложение";
+
+/* Transfer: logged user balance.
+   Wallet page: Balance row title */
+"Balance" = "Баланс";
+
+/* Transaction details: Block id row. */
+"Block" = "Блок";
+
+/* Shared alert 'Cancel' button. Used anywhere */
+"Cancel" = "Отмена";
+
+/* Transaction details: confirmations row. */
+"Confirmations" = "Подтверждений";
+
+/* Shared alert notification: message about item copied to pasteboard. */
+"Copied to Pasteboard" = "Скопировано!";
+
+/* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
+"Copy to Pasteboard" = "Копировать";
+
+/* Transaction details: date row. */
+"Date" = "Дата";
+
+/* Login: notify user that he is trying to login without a passphrase */
+"Enter a passphrase!" = "Введите пароль";
+
+/* Chat: input bar: Estimated fee. */
+"Estimated fee: %f" = "Ориентировочная комиссия: %f";
+
+/* Transaction details: fee row. */
+"Fee" = "Комиссия";
+
+/* Transaction details: sender row. */
+"From" = "Отправитель";
+
+/* Transfer: Tokens transfered successfully message */
+"Funds sended!" = "Токены переведены!";
+
+/* Login: generate new passphrase button */
+"Generate new passphrase" = "Создать новый";
+
+/* Transaction details: Id row. */
+"Id" = "Номер";
+
+/* Wallet page: 'Invest in ICO' button */
+"Invest in ICO" = "Инвестировать в ICO";
+
+/* Login: notify user that we a logging in. */
+"Logging in" = "Входим...";
+
+/* Login: Login button
+   Login: login with existing passphrase section */
+"Login" = "Вход";
+
+/* Wallet page: 'Logout' button
+   Wallet page: Confirm logout alert: Logout (Ok) button */
+"Logout" = "Выход";
+
+/* Wallet page: Confirm logout alert */
+"Logout from %@?" = "Выйти из %@?";
+
+/* Transfer: maximum amount to transfer: available account money substracting transfer fee. */
+"Max to transfer" = "Доступно для перевода";
+
+/* Chat: Notify user that message cannot be empty */
+"Message is empty" = "Сообщение пусто!";
+
+/* Chat: Message is too long */
+"Message is too long" = "Сообщение слишком длинное";
+
+/* Login: Create new account section */
+"New account" = "Новый аккаунт";
+
+/* ApiService: No connection message. Generally bad network. */
+"No connection" = "Нет соединения с интернетом";
+
+/* Login: No network error. */
+"No connection with The Internet" = "Нет соединения с сетью";
+
+/* Shared alert 'Ok' button. Used anywhere */
+"Ok" = "Ок";
+
+/* Transaction details: 'Open transaction in explorer' row. */
+"Open in Explorer" = "Открыть в Explorer";
+
+/* Transfer: Address validation error */
+"Please enter a valid recipient address" = "Введите корректный адрес получателя";
+
+/* New chat: Notify user that he did enter invalid address */
+"Please specify valid recipient address" = "Неверный адрес";
+
+/* Shared alert 'Save' button. Used anywhere */
+"Save" = "Сохранить";
+
+/* Login: security alert, notify user that he must save his new passphrase */
+"Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it" = "Это пароль для нового Кошелька и Мессенджера. Сохраните его! Для входа в Кошелек не нужно логина, только этот пароль. Восстановление пароля невозможно.";
+
+/* Transfer: Confirm transfer alert: Send tokens button */
+"Send" = "Отправить";
+
+/* Transfer: Confirm transfer X tokens to Y message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
+"Send %1$@ to %2$@?" = "Отправить %1$@ получателю %2$@?";
+
+/* Transfer: Send button */
+"Send Funds" = "Отправить токены";
+
+/* Wallet page: 'Send tokens' button */
+"Send Tokens" = "Отправить токены";
+
+/* Transfer: Processing message */
+"Sending funds..." = "Отправляем токены...";
+
+/* Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu. */
+"Share" = "Поделиться";
+
+/* Export transaction: 'Share transaction summary' button */
+"Summary" = "Сводка";
+
+/* Login: a small hint for a user, that he can tap on passphrase to save it */
+"Tap to save" = "Нажмите для сохранения";
+
+/* Transaction details: recipient row. */
+"To" = "Получатель";
+
+/* Transfer: total amount of transaction: money to transfer adding fee */
+"Total" = "Итого";
+
+/* Transfer: transfer fee */
+"Transaction fee" = "Комиссия";
+
+/* Transfer: 'Transfer info' section */
+"Transfer Info" = "Перевод";
+
+/* Unknown internal error */
+"Unknown error" = "Неизвестная ошибка";
+
+/* Config: Version row */
+"Version" = "Версия";
+
+/* Wallet page: Wallet section title */
+"Wallet" = "Кошелёк";
+
+/* Login: user typed in wrong passphrase. */
+"Wrong passphrase!" = "Неправильный пароль";
+
+/* Chat: Notify user that he doesn't have money to pay a message fee */
+"You don't have enough money to send a message" = "Недостаточно токенов для отправки сообщения";
+
+/* Transfer: Amount is hiegher that user's total money notification */
+"You don't have that much money" = "У вас нет столько токенов";
+
+/* New chat: Notify user that he can't start chat with himself */
+"You don't need an encrypted anonymous chat to talk to yourself" = "Вам не нужен анонимный чат, чтобы говорить с самим собой";
+
+/* Transfer: Amount is zero, or even negative notification */
+"You should send more money" = "Нужно отправить больше токенов";
+
+/* Transfer: 'Your wallet' section */
+"Your wallet" = "Ваш кошелёк";
+
+/* Transfer: recipient address placeholder */
+"of the recipient" = "получателя";
+
+/* Login: Passphrase placeholder */
+"passphrase" = "Пароль";
+
+/* Transfer: transfer amount placeholder */
+"to send" = "для перевода";
+

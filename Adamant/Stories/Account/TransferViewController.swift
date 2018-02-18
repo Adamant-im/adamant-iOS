@@ -9,22 +9,79 @@
 import UIKit
 import Eureka
 
+
+// MARK: - Localization
+extension String.adamantLocalized {
+	struct transfer {
+		static let addressPlaceholder = NSLocalizedString("of the recipient", comment: "Transfer: recipient address placeholder")
+		static let amountPlaceholder = NSLocalizedString("to send", comment: "Transfer: transfer amount placeholder")
+		
+		static let addressValidationError = NSLocalizedString("Please enter a valid recipient address", comment: "Transfer: Address validation error")
+		static let amountZeroError = NSLocalizedString("You should send more money", comment: "Transfer: Amount is zero, or even negative notification")
+		static let amountTooHigh = NSLocalizedString("You don't have that much money", comment: "Transfer: Amount is hiegher that user's total money notification")
+		static let accountNotFound = NSLocalizedString("Address not found", comment: "Transfer: Address not found error")
+		
+		static let transferProcessingMessage = NSLocalizedString("Sending funds...", comment: "Transfer: Processing message")
+		static let transferSuccess = NSLocalizedString("Funds sended!", comment: "Transfer: Tokens transfered successfully message")
+		
+		private init() { }
+	}
+}
+
+fileprivate extension String.adamantLocalized.alert {
+	static let confirmSendMessageFormat = NSLocalizedString("Send %1$@ to %2$@?", comment: "Transfer: Confirm transfer X tokens to Y message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'.")
+	static let send = NSLocalizedString("Send", comment: "Transfer: Confirm transfer alert: Send tokens button")
+}
+
+
+// MARK: -
 class TransferViewController: FormViewController {
 	
 	// MARK: - Rows
 	
-	private struct Row {
-		static let Balance = Row("balance")
-		static let Amount = Row("amount")
-		static let MaxToTransfer = Row("max")
-		static let Recipient = Row("recipient")
-		static let Fee = Row("fee")
-		static let Total = Row("total")
-		static let SendButton = Row("send")
+	private enum Row {
+		case balance
+		case amount
+		case maxToTransfer
+		case address
+		case fee
+		case total
+		case sendButton
 		
-		let tag: String
-		private init(_ tag: String) {
-			self.tag = tag
+		var tag: String {
+			switch self {
+			case .balance: return "balance"
+			case .amount: return "amount"
+			case .maxToTransfer: return "max"
+			case .address: return "recipient"
+			case .fee: return "fee"
+			case .total: return "total"
+			case .sendButton: return "send"
+			}
+		}
+		
+		var localized: String {
+			switch self {
+			case .balance: return NSLocalizedString("Balance", comment: "Transfer: logged user balance.")
+			case .amount: return NSLocalizedString("Amount", comment: "Transfer: amount of adamant to transfer.")
+			case .maxToTransfer: return NSLocalizedString("Max to transfer", comment: "Transfer: maximum amount to transfer: available account money substracting transfer fee.")
+			case .address: return NSLocalizedString("Address", comment: "Transfer: recipient address")
+			case .fee: return NSLocalizedString("Transaction fee", comment: "Transfer: transfer fee")
+			case .total: return NSLocalizedString("Total", comment: "Transfer: total amount of transaction: money to transfer adding fee")
+			case .sendButton: return NSLocalizedString("Send Funds", comment: "Transfer: Send button")
+			}
+		}
+	}
+	
+	private enum Sections {
+		case wallet
+		case transferInfo
+		
+		var localized: String {
+			switch self {
+			case .wallet: return NSLocalizedString("Your wallet", comment: "Transfer: 'Your wallet' section")
+			case .transferInfo: return NSLocalizedString("Transfer Info", comment: "Transfer: 'Transfer info' section")
+			}
 		}
 	}
 	
@@ -62,18 +119,18 @@ class TransferViewController: FormViewController {
 			let balance = Double(account.balance) * AdamantUtilities.currencyShift
 			maxToTransfer = balance - defaultFee > 0 ? balance - defaultFee : 0.0
 			
-			form +++ Section("Your wallet")
+			form +++ Section(Sections.wallet.localized)
 			<<< DecimalRow() {
-				$0.title = "Balance"
+				$0.title = Row.balance.localized
 				$0.value = balance
-				$0.tag = Row.Balance.tag
+				$0.tag = Row.balance.tag
 				$0.disabled = true
 				$0.formatter = AdamantUtilities.currencyFormatter
 			}
 			<<< DecimalRow() {
-				$0.title = "Max to transfer"
+				$0.title = Row.maxToTransfer.localized
 				$0.value = maxToTransfer
-				$0.tag = Row.MaxToTransfer.tag
+				$0.tag = Row.maxToTransfer.tag
 				$0.disabled = true
 				$0.formatter = AdamantUtilities.currencyFormatter
 			}
@@ -82,18 +139,18 @@ class TransferViewController: FormViewController {
 		}
 		
 		// MARK: - Transfer section
-		form +++ Section("transfer info")
+		form +++ Section(Sections.transferInfo.localized)
 		
 		<<< TextRow() {
-			$0.title = "Address"
-			$0.placeholder = "of the recipient"
-			$0.tag = Row.Recipient.tag
+			$0.title = Row.address.localized
+			$0.placeholder = String.adamantLocalized.transfer.addressPlaceholder
+			$0.tag = Row.address.tag
 			$0.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
 				if let value = value?.uppercased(),
 					AdamantUtilities.validateAdamantAddress(address: value) {
 					return nil
 				} else {
-					return ValidationError(msg: "Incorrect address")
+					return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
 				}
 			}))
 			$0.validationOptions = .validatesOnBlur
@@ -101,32 +158,32 @@ class TransferViewController: FormViewController {
 			cell.titleLabel?.textColor = row.isValid ? .black : .red
 		})
 		<<< DecimalRow() {
-			$0.title = "Amount"
-			$0.placeholder = "to send"
-			$0.tag = Row.Amount.tag
+			$0.title = Row.amount.localized
+			$0.placeholder = String.adamantLocalized.transfer.amountPlaceholder
+			$0.tag = Row.amount.tag
 			$0.formatter = AdamantUtilities.currencyFormatter
 //			$0.add(rule: RuleSmallerOrEqualThan<Double>(max: maxToTransfer))
 //			$0.validationOptions = .validatesOnChange
 			}.onChange(amountChanged)
 		<<< DecimalRow() {
-			$0.title = "Transaction fee"
+			$0.title = Row.fee.localized
 			$0.value = defaultFee
-			$0.tag = Row.Fee.tag
+			$0.tag = Row.fee.tag
 			$0.disabled = true
 			$0.formatter = AdamantUtilities.currencyFormatter
 		}
 		<<< DecimalRow() {
-			$0.title = "Amount including fee"
+			$0.title = Row.total.localized
 			$0.value = nil
-			$0.tag = Row.Total.tag
+			$0.tag = Row.total.tag
 			$0.disabled = true
 			$0.formatter = AdamantUtilities.currencyFormatter
 		}
 		<<< ButtonRow() {
-			$0.title = "Send funds"
-			$0.tag = Row.SendButton.tag
-			$0.disabled = Condition.function([Row.Total.tag], { [weak self] form -> Bool in
-				guard let row: DecimalRow = form.rowBy(tag: Row.Amount.tag),
+			$0.title = Row.sendButton.localized
+			$0.tag = Row.sendButton.tag
+			$0.disabled = Condition.function([Row.total.tag], { [weak self] form -> Bool in
+				guard let row: DecimalRow = form.rowBy(tag: Row.amount.tag),
 					let amount = row.value,
 					amount > 0,
 					AdamantUtilities.validateAmount(amount: amount),
@@ -156,7 +213,7 @@ class TransferViewController: FormViewController {
 			//				}
 		}
 		
-		let button: ButtonRow? = form.rowBy(tag: Row.SendButton.tag)
+		let button: ButtonRow? = form.rowBy(tag: Row.sendButton.tag)
 		button?.evaluateDisabled()
     }
 	
@@ -164,7 +221,7 @@ class TransferViewController: FormViewController {
 	// MARK: - Form Events
 	
 	private func amountChanged(row: DecimalRow) {
-		guard let totalRow: DecimalRow = form.rowBy(tag: Row.Total.tag), let account = account else {
+		guard let totalRow: DecimalRow = form.rowBy(tag: Row.total.tag), let account = account else {
 			return
 		}
 		
@@ -208,32 +265,32 @@ class TransferViewController: FormViewController {
 			return
 		}
 		
-		guard let recipientRow = form.rowBy(tag: Row.Recipient.tag) as? TextRow,
+		guard let recipientRow = form.rowBy(tag: Row.address.tag) as? TextRow,
 			let recipient = recipientRow.value,
-			let amountRow = form.rowBy(tag: Row.Amount.tag) as? DecimalRow,
+			let amountRow = form.rowBy(tag: Row.amount.tag) as? DecimalRow,
 			let amount = amountRow.value else {
 			return
 		}
 		
 		guard amount > 0, AdamantUtilities.validateAmount(amount: amount) else {
-			dialogService.showError(withMessage: "You should send more money")
+			dialogService.showError(withMessage: String.adamantLocalized.transfer.amountZeroError)
 			return
 		}
 		
 		guard AdamantUtilities.validateAdamantAddress(address: recipient) else {
-			dialogService.showError(withMessage: "Enter valid recipient address")
+			dialogService.showError(withMessage: String.adamantLocalized.transfer.addressValidationError)
 			return
 		}
 		
 		guard amount <= maxToTransfer else {
-			dialogService.showError(withMessage: "You don't have that kind of money")
+			dialogService.showError(withMessage: String.adamantLocalized.transfer.amountTooHigh)
 			return
 		}
 		
-		let alert = UIAlertController(title: "Send \(amount) \(AdamantUtilities.currencyCode) to \(recipient)?", message: "You can't undo this action.", preferredStyle: .alert)
-		let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-		let sendAction = UIAlertAction(title: "Send", style: .default, handler: { _ in
-			dialogService.showProgress(withMessage: "Processing transaction...", userInteractionEnable: false)
+		let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.confirmSendMessageFormat, "\(amount) \(AdamantUtilities.currencyCode)", recipient), message: "You can't undo this action.", preferredStyle: .alert)
+		let cancelAction = UIAlertAction(title: String.adamantLocalized.alert.cancel , style: .cancel, handler: nil)
+		let sendAction = UIAlertAction(title: String.adamantLocalized.alert.send, style: .default, handler: { _ in
+			dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
 			
 			// Check if address is valid
 			apiService.getPublicKey(byAddress: recipient) { result in
@@ -243,7 +300,7 @@ class TransferViewController: FormViewController {
 						switch result {
 						case .success(_):
 							DispatchQueue.main.async {
-								dialogService.showSuccess(withMessage: "Funds sended!")
+								dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
 								
 								self?.accountService.updateAccountData()
 								
@@ -262,7 +319,7 @@ class TransferViewController: FormViewController {
 					
 					
 				case .failure(_):
-					dialogService.showError(withMessage: "Account not found: \(recipient)")
+					dialogService.showError(withMessage: String.adamantLocalized.transfer.accountNotFound)
 				}
 			}
 		})

@@ -9,7 +9,63 @@
 import UIKit
 import TableKit
 
+
+// MARK: - Localization
+extension String.adamantLocalized {
+	struct login {
+		static let passphrasePlaceholder = NSLocalizedString("passphrase", comment: "Login: Passphrase placeholder")
+		static let loggingInProgressMessage = NSLocalizedString("Logging in", comment: "Login: notify user that we a logging in.")
+		
+		static let wrongPassphraseError = NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase.")
+		static let noNetworkError = NSLocalizedString("No connection with The Internet", comment: "Login: No network error.")
+		
+		static let emptyPassphraseAlert = NSLocalizedString("Enter a passphrase!", comment: "Login: notify user that he is trying to login without a passphrase")
+		
+		private init() {}
+	}
+}
+
+
+// MARK: -
 class LoginViewController: UIViewController {
+	
+	enum Sections {
+		case passphrase
+		case newAccount
+		
+		var localized: String {
+			switch self {
+			case .passphrase:
+				return NSLocalizedString("Login", comment: "Login: login with existing passphrase section")
+				
+			case .newAccount:
+				return NSLocalizedString("New account", comment: "Login: Create new account section")
+			}
+		}
+	}
+	
+	enum Rows {
+		case loginButton
+		case saveYourPassphraseAlert
+		case generateNewPassphraseButton
+		case tapToSaveHint
+		
+		var localized: String {
+			switch self {
+			case .loginButton:
+				return NSLocalizedString("Login", comment: "Login: Login button")
+				
+			case .saveYourPassphraseAlert:
+				return NSLocalizedString("Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it", comment: "Login: security alert, notify user that he must save his new passphrase")
+				
+			case .generateNewPassphraseButton:
+				return NSLocalizedString("Generate new passphrase", comment: "Login: generate new passphrase button")
+				
+			case .tapToSaveHint:
+				return NSLocalizedString("Tap to save", comment: "Login: a small hint for a user, that he can tap on passphrase to save it")
+			}
+		}
+	}
 	
 	// MARK: - Dependencies
 	var accountService: AccountService!
@@ -31,15 +87,16 @@ class LoginViewController: UIViewController {
 		
 		// MARK: TableView configuration
 		tableDirector = TableDirector(tableView: tableView)
-		if let header = UINib(nibName: "Header", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
+		if let header = UINib(nibName: "LoginHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
 			tableView.tableHeaderView = header
 			
 			if let label = header.viewWithTag(888) as? UILabel {
+				label.text = String.adamantLocalized.shared.productName
 				label.textColor = UIColor.adamantPrimary
 			}
 		}
 		
-		if let footer = UINib(nibName: "Footer", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
+		if let footer = UINib(nibName: "LoginFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
 			if let label = footer.viewWithTag(555) as? UILabel {
 				label.text = AdamantUtilities.applicationVersion
 				label.textColor = UIColor.adamantPrimary
@@ -53,7 +110,7 @@ class LoginViewController: UIViewController {
 		let passphraseRow = TableRow<TextViewTableViewCell>(item: "")
 		passphraseRow.on(.configure) { (options) in
 			if let cell = options.cell {
-				cell.placeHolder = "Passphrase"
+				cell.placeHolder = String.adamantLocalized.login.passphrasePlaceholder
 				cell.textView.font = UIFont.adamantPrimary(size: 17)
 				cell.textView.textAlignment = .center
 				cell.textView.textColor = UIColor.adamantPrimary
@@ -63,19 +120,19 @@ class LoginViewController: UIViewController {
 			}
 		}
 		
-		let loginRow = TableRow<ButtonTableViewCell>(item: "Login")
+		let loginRow = TableRow<ButtonTableViewCell>(item: Rows.loginButton.localized)
 		loginRow.on(.click) { [weak self] options in self?.login() }
 		
-		let loginSection = TableSection(headerTitle: "Login", footerTitle: nil, rows: [passphraseRow, loginRow])
+		let loginSection = TableSection(headerTitle: Sections.passphrase.localized, footerTitle: nil, rows: [passphraseRow, loginRow])
 		tableDirector.append(section: loginSection)
 		
 		
 		// MARK: NewPassphrase section
 		
-		let generateRow = TableRow<ButtonTableViewCell>(item: "Generate new Passphrase")
+		let generateRow = TableRow<ButtonTableViewCell>(item: Rows.generateNewPassphraseButton.localized)
 		generateRow.on(TableRowActionType.click) { [weak self] _ in self?.generateNewPassphrase() }
 		
-		let newAccSection = TableSection(headerTitle: "New Account", footerTitle: nil, rows: [generateRow])
+		let newAccSection = TableSection(headerTitle: Sections.newAccount.localized, footerTitle: nil, rows: [generateRow])
 		tableDirector.append(section: newAccSection)
 		
 		
@@ -94,8 +151,8 @@ class LoginViewController: UIViewController {
 		if !newPassphraseRowsIsVisible {
 			newPassphraseRowsIsVisible = true
 			
-			let warningRow = TableRow<MultilineLableTableViewCell>(item: "Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it.")
-			warningRow.on(.shouldHighlight, handler: { _ -> Bool in
+			let alertRow = TableRow<MultilineLableTableViewCell>(item: Rows.saveYourPassphraseAlert.localized)
+			alertRow.on(.shouldHighlight, handler: { _ -> Bool in
 				return false
 			}).on(.configure, handler: { options in
 				if let label = options.cell?.multilineLabel {
@@ -112,7 +169,7 @@ class LoginViewController: UIViewController {
 				tableView.deselectRow(at: indexPath, animated: false)
 			}
 			
-			self.tableDirector.sections[1].insert(rows: [warningRow, newPassphraseRow], at: 0)
+			self.tableDirector.sections[1].insert(rows: [alertRow, newPassphraseRow], at: 0)
 			self.tableView.insertRows(at: [IndexPath(row: 0, section: 1), IndexPath(row: 1, section: 1)], with: .automatic)
 			
 			// Hack for a broken deselect animation
@@ -140,7 +197,7 @@ class LoginViewController: UIViewController {
 			if let label = options.cell?.detailsMultilineLabel {
 				label.font = UIFont.adamantPrimary(size: 12)
 				label.textColor = UIColor.adamantSecondary
-				label.text = "Tap to save"
+				label.text = Rows.tapToSaveHint.localized
 				label.textAlignment = .center
 			}
 		}
@@ -157,9 +214,9 @@ class LoginViewController: UIViewController {
 		
 		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 		
-		alert.addAction(UIAlertAction(title: "Copy To Pasteboard", style: .default, handler: { _ in
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.copyToPasteboard, style: .default, handler: { _ in
 			UIPasteboard.general.string = passphrase
-			self.dialogService.showToastMessage("Copied To Pasteboard!")
+			self.dialogService.showToastMessage(String.adamantLocalized.alert.copiedToPasteboardNotification)
 		}))
 		
 		// Exclude all sharing activities
@@ -181,13 +238,13 @@ class LoginViewController: UIViewController {
 			excluded.append(.markupAsPDF)
 		}
 		
-		alert.addAction(UIAlertAction(title: "Save", style: .default, handler: { _ in
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.save, style: .default, handler: { _ in
 			let vc = UIActivityViewController(activityItems: [passphrase], applicationActivities: nil)
 			vc.excludedActivityTypes = excluded
 			self.present(vc, animated: true)
 		}))
 		
-		alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
 		
 		present(alert, animated: true)
 	}
@@ -201,13 +258,13 @@ class LoginViewController: UIViewController {
 		}
 		
 		guard passphrase.count > 0 else {
-			dialogService.showToastMessage("Enter your passphrase!")
+			dialogService.showToastMessage(String.adamantLocalized.login.emptyPassphraseAlert)
 			return
 		}
 		
 		passphrase = passphrase.lowercased()
 		
-		dialogService.showProgress(withMessage: "Logging into ADAMANT", userInteractionEnable: false)
+		dialogService.showProgress(withMessage: String.adamantLocalized.login.loggingInProgressMessage, userInteractionEnable: false)
 		
 		// Dialog service currently presenting progress async. So if AccountService fails instantly, progress will be presented AFTER fail.
 		DispatchQueue.global(qos: .utility).async {
@@ -222,6 +279,21 @@ class LoginViewController: UIViewController {
 			} else {
 				self.accountService.login(with: passphrase) { (_, error) in
 					if let error = error {
+						if let internalError = error.internalError as? ApiServiceError {
+							switch internalError {
+							case .accountNotFound:
+								self.dialogService.showError(withMessage: String.adamantLocalized.login.wrongPassphraseError)
+								return
+								
+							case .networkError(error: _):
+								self.dialogService.showError(withMessage: String.adamantLocalized.login.noNetworkError)
+								return
+								
+							default:
+								break
+							}
+						}
+						
 						self.dialogService.showError(withMessage: error.message)
 					} else {
 						self.dialogService.dismissProgress()

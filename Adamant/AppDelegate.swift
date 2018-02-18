@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		// MARK: 2. Prepare UI
 		self.window = UIWindow(frame: UIScreen.main.bounds)
-		self.window!.rootViewController = SwinjectStoryboard.create(name: "Main", bundle: nil).instantiateInitialViewController()
+		self.window!.rootViewController = UITabBarController()
 		self.window!.rootViewController?.view.backgroundColor = .white
 		self.window!.makeKeyAndVisible()
 

@@ -9,8 +9,17 @@
 import UIKit
 import SafariServices
 
+
+// MARK: - Localization
+extension String.adamantLocalized.alert {
+	static let exportUrlButton = NSLocalizedString("URL", comment: "Export transaction: 'Share transaction URL' button")
+	static let exportSummaryButton = NSLocalizedString("Summary", comment: "Export transaction: 'Share transaction summary' button")
+}
+
+
+// MARK: - 
 class TransactionDetailsViewController: UIViewController {
-	private enum Row: Int {
+	fileprivate enum Row: Int {
 		case transactionNumber = 0
 		case from
 		case to
@@ -22,6 +31,20 @@ class TransactionDetailsViewController: UIViewController {
 		case openInExplorer
 		
 		static let total = 9
+		
+		var localized: String {
+			switch self {
+			case .transactionNumber: return NSLocalizedString("Id", comment: "Transaction details: Id row.")
+			case .from: return NSLocalizedString("From", comment: "Transaction details: sender row.")
+			case .to: return NSLocalizedString("To", comment: "Transaction details: recipient row.")
+			case .date: return NSLocalizedString("Date", comment: "Transaction details: date row.")
+			case .amount: return NSLocalizedString("Amount", comment: "Transaction details: amount row.")
+			case .fee: return NSLocalizedString("Fee", comment: "Transaction details: fee row.")
+			case .confirmations: return NSLocalizedString("Confirmations", comment: "Transaction details: confirmations row.")
+			case .block: return NSLocalizedString("Block", comment: "Transaction details: Block id row.")
+			case .openInExplorer: return NSLocalizedString("Open in Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
+			}
+		}
 	}
 	
 	// MARK: - Dependencies
@@ -29,6 +52,7 @@ class TransactionDetailsViewController: UIViewController {
 	var exportTools: ExportTools!
 	
 	// MARK: - Properties
+	private let cellIdentifier = "cell"
 	var transaction: Transaction?
 	var explorerUrl: URL!
 	
@@ -62,16 +86,16 @@ class TransactionDetailsViewController: UIViewController {
 		}
 		
 		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-		alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
 		
 		// URL
-		alert.addAction(UIAlertAction(title: "URL", style: .default) { _ in
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportUrlButton, style: .default) { _ in
 			let alert = UIActivityViewController(activityItems: [url], applicationActivities: nil)
 			self.present(alert, animated: true, completion: nil)
 		})
 		
 		// Description
-		alert.addAction(UIAlertAction(title: "Summary", style: .default, handler: { _ in
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportSummaryButton, style: .default, handler: { _ in
 			let text = self.exportTools.summaryFor(transaction: transaction, url: url)
 			let alert = UIActivityViewController(activityItems: [text], applicationActivities: nil)
 			self.present(alert, animated: true, completion: nil)
@@ -123,28 +147,28 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 		let payload: String
 		switch row {
 		case .amount:
-			payload = "Amount: \(details)"
+			payload = "\(row.localized): \(details)"
 			
 		case .date:
-			payload = "Date: \(details)"
+			payload = "\(row.localized): \(details)"
 			
 		case .confirmations:
-			payload = "Confirmations: \(details)"
+			payload = "\(row.localized): \(details)"
 			
 		case .fee:
-			payload = "Fee: \(details)"
+			payload = "\(row.localized): \(details)"
 			
 		case .transactionNumber:
-			payload = "Id: \(details)"
+			payload = "\(row.localized): \(details)"
 			
 		case .from:
-			payload = "Sender: \(details)"
+			payload = "\(row.localized): \(details)"
 			
 		case .to:
-			payload = "Recipient: \(details)"
+			payload = "\(row.localized): \(details)"
 			
 		case .block:
-			payload = "Block Id: \(details)"
+			payload = "\(row.localized): \(details)"
 			
 		case .openInExplorer:
 			payload = ""
@@ -162,15 +186,15 @@ extension TransactionDetailsViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		guard let transaction = transaction, let row = Row(rawValue: indexPath.row) else {
 			// TODO: Display & Log error
-			return UITableViewCell(style: .default, reuseIdentifier: "cell")
+			return UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
 		}
 		
 		var cell: UITableViewCell
-		if let c = tableView.dequeueReusableCell(withIdentifier: "cell") {
+		if let c = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
 			cell = c
 			cell.accessoryType = .none
 		} else {
-			cell = UITableViewCell(style: .value1, reuseIdentifier: "cell")
+			cell = UITableViewCell(style: .value1, reuseIdentifier: cellIdentifier)
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 			cell.detailTextLabel?.textColor = UIColor.adamantSecondary
 			
@@ -179,41 +203,34 @@ extension TransactionDetailsViewController {
 			cell.detailTextLabel?.font = font
 		}
 		
+		cell.textLabel?.text = row.localized
+		
 		switch row {
 		case .amount:
-			cell.textLabel?.text = "Amount"
 			cell.detailTextLabel?.text = AdamantUtilities.format(balance: transaction.amount)
 			
 		case .date:
-			cell.textLabel?.text = "Date"
 			cell.detailTextLabel?.text = DateFormatter.localizedString(from: transaction.date, dateStyle: .short, timeStyle: .medium)
 			
 		case .confirmations:
-			cell.textLabel?.text = "Confirmations"
 			cell.detailTextLabel?.text = String(transaction.confirmations)
 			
 		case .fee:
-			cell.textLabel?.text = "Fee"
 			cell.detailTextLabel?.text = AdamantUtilities.format(balance: transaction.fee)
 			
 		case .transactionNumber:
-			cell.textLabel?.text = "Transaction #"
 			cell.detailTextLabel?.text = String(transaction.id)
 			
 		case .from:
-			cell.textLabel?.text = "From"
 			cell.detailTextLabel?.text = transaction.senderId
 			
 		case .to:
-			cell.textLabel?.text = "To"
 			cell.detailTextLabel?.text = transaction.recipientId
 			
 		case .block:
-			cell.textLabel?.text = "Block"
 			cell.detailTextLabel?.text = String(transaction.blockId)
 			
 		case .openInExplorer:
-			cell.textLabel?.text = "Open in Blockchain Explorer"
 			cell.detailTextLabel?.text = nil
 			cell.accessoryType = .disclosureIndicator
 		}

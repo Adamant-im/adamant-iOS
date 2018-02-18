@@ -64,9 +64,10 @@ extension AdamantUtilities {
 
 // MARK: - Validating Addresses and Passphrases
 extension AdamantUtilities {
-	static let addressRegex = "^U([0-9]{6,20})$"
-	static let passphraseRegex = "^([a-z]* ){11}([a-z]*)$"
-	
+	static let addressRegexString = "^U([0-9]{6,20})$"
+	static let passphraseRegexString = "^([a-z]* ){11}([a-z]*)$"
+	static let passphraseRegex = try! NSRegularExpression(pattern: passphraseRegexString, options: [])
+	static let addressRegex = try! NSRegularExpression(pattern: addressRegexString, options: [])
 	
 	/// Rules are simple:
 	///
@@ -90,15 +91,10 @@ extension AdamantUtilities {
 		return validate(string: passphrase, with: passphraseRegex)
 	}
 	
-	private static func validate(string: String, with regex: String) -> Bool {
-		if let regex = try? NSRegularExpression(pattern: regex, options: []) {
-			let matches = regex.matches(in: string, options: [], range: NSRange(location: 0, length: string.count))
-			
-			return matches.count == 1
-		} else {
-			print("Wrong passphrase regex: \(regex)")
-			return false
-		}
+	private static func validate(string: String, with regex: NSRegularExpression) -> Bool {
+		let matches = passphraseRegex.matches(in: string, options: [], range: NSRange(location: 0, length: string.count))
+		
+		return matches.count == 1
 	}
 }
 

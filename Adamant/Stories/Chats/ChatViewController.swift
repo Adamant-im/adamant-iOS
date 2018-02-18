@@ -10,11 +10,31 @@ import UIKit
 import MessageKit
 import CoreData
 
+// MARK: - Localization
+extension String.adamantLocalized {
+	struct chat {
+		static let estimatedFeeFormat = NSLocalizedString("Estimated fee: %f", comment: "Chat: input bar: Estimated fee.")
+		
+		static let messageIsEmpty = NSLocalizedString("Message is empty", comment: "Chat: Notify user that message cannot be empty")
+		static let messageTooLong = NSLocalizedString("Message is too long", comment: "Chat: Message is too long")
+		static let notEnoughMoney = NSLocalizedString("You don't have enough money to send a message", comment: "Chat: Notify user that he doesn't have money to pay a message fee")
+		
+		static let internalErrorFormat = NSLocalizedString("Internal error: %@. You should report this bug.", comment: "Chat: Notify user about bad internal error. Usually this should be reported as a bug.")
+		static let serverErrorFormat = NSLocalizedString("Remote server error: %@", comment: "Chat: Notify user about server error.")
+		
+		private init() { }
+	}
+}
+
+
+// MARK: - Delegate
 protocol ChatViewControllerDelegate: class {
 	func preserveMessage(_ message: String, forAddress address: String)
 	func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String?
 }
 
+
+// MARK: -
 class ChatViewController: MessagesViewController {
 	// MARK: - Dependencies
 	var chatsProvider: ChatsProvider!
@@ -147,7 +167,7 @@ extension ChatViewController {
 				return
 			}
 			
-			let text = "Estimated fee: \(AdamantUtilities.from(uInt: fee))"
+			let text = String.localizedStringWithFormat(String.adamantLocalized.chat.estimatedFeeFormat, AdamantUtilities.from(uInt: fee))
 			prevFee = fee
 			
 			feeLabel.title = text
@@ -323,7 +343,7 @@ extension ChatViewController: MessageInputBarDelegate {
 			return
 			
 		case .tooLong:
-			dialogService.showToastMessage("Message is too long!")
+			dialogService.showToastMessage(String.adamantLocalized.chat.messageTooLong)
 			return
 		}
 		
@@ -340,22 +360,27 @@ extension ChatViewController: MessageInputBarDelegate {
 				case .error(let error):
 					let message: String
 					switch error {
-					case .accountNotFound(let account): message = "Internal error: \(account) not found."
-					case .dependencyError(let error): message = "Internal dependency error: \(error)."
-					case .internalError(let error): message = "Internal error: \(error)"
-					case .notLogged: message = "Internal error: User not logged."
-					case .serverError(let error): message = "Server error: \(error)"
-						
+					case .accountNotFound(let account):
+						message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "Account not found: \(account)")
+					case .dependencyError(let error):
+						message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error)
+					case .internalError(let error):
+						message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, String(describing: error))
+					case .notLogged:
+						message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "User not logged")
+					case .serverError(let error):
+						message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, String(describing: error))
+
 					case .notEnoughtMoneyToSend:
-						message = "Not enough money to send a message."
-						
+						message = String.adamantLocalized.chat.notEnoughMoney
+				
 					case .messageNotValid(let problem):
 						switch problem {
 						case .tooLong:
-							message = "Message is too long!"
+							message = String.adamantLocalized.chat.messageTooLong
 							
 						case .empty:
-							message = "Message cannot be empty."
+							message = String.adamantLocalized.chat.messageIsEmpty
 							
 						case .isValid:
 							message = ""
