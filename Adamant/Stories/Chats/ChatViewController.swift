@@ -118,7 +118,7 @@ class ChatViewController: MessagesViewController {
 		
 		if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
 			messageInputBar.inputTextView.text = message
-			setEstimatedFee(feeCalculator.estimatedFeeFor(message: message))
+			setEstimatedFee(feeCalculator.estimatedFeeFor(message: AdamantMessage.text(message)))
 		}
     }
 	
@@ -345,6 +345,10 @@ extension ChatViewController: MessageInputBarDelegate {
 					case .internalError(let error): message = "Internal error: \(error)"
 					case .notLogged: message = "Internal error: User not logged."
 					case .serverError(let error): message = "Server error: \(error)"
+						
+					case .notEnoughtMoneyToSend:
+						message = "Not enough money to send a message."
+						
 					case .messageNotValid(let problem):
 						switch problem {
 						case .tooLong:
@@ -369,7 +373,7 @@ extension ChatViewController: MessageInputBarDelegate {
 	
 	func messageInputBar(_ inputBar: MessageInputBar, textViewTextDidChangeTo text: String) {
 		if text.count > 0 {
-			let fee = feeCalculator.estimatedFeeFor(message: text)
+			let fee = feeCalculator.estimatedFeeFor(message: .text(text))
 			setEstimatedFee(fee)
 		} else {
 			setEstimatedFee(0)

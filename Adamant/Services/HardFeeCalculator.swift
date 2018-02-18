@@ -9,13 +9,14 @@
 import Foundation
 
 class HardFeeCalculator: FeeCalculator {
-	func estimatedFeeFor(message: String) -> UInt {
-		return AdamantUtilities.from(double: ceil(Double(message.count) / 255.0) * 0.005)
+	func estimatedFeeFor(message: AdamantMessage) -> UInt {
+		switch message {
+		case .text(let text):
+			return AdamantUtilities.from(double: ceil(Double(text.count) / 255.0) * 0.001)
+		}
 	}
 	
 	func estimatedFeeFor(transfer: UInt) -> UInt {
 		return AdamantUtilities.from(double: 0.5)
 	}
-	
-	
 }

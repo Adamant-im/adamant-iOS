@@ -16,6 +16,7 @@ class AdamantChatsProvider: ChatsProvider {
 	var stack: CoreDataStack!
 	var adamantCore: AdamantCore!
 	var accountsProvider: AccountsProvider!
+	var feeCalculator: FeeCalculator!
 	
 	// MARK: Properties
 	private(set) var state: State = .empty
@@ -151,6 +152,11 @@ extension AdamantChatsProvider {
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
 		guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
 			completion(.error(.notLogged))
+			return
+		}
+		
+		guard loggedAccount.balance >= feeCalculator.estimatedFeeFor(message: message) else {
+			completion(.error(.notEnoughtMoneyToSend))
 			return
 		}
 		
