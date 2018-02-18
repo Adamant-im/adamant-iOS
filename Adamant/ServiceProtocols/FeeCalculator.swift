@@ -9,6 +9,6 @@
 import Foundation
 
 protocol FeeCalculator {
-	func estimatedFeeFor(message: String) -> UInt
+	func estimatedFeeFor(message: AdamantMessage) -> UInt
 	func estimatedFeeFor(transfer: UInt) -> UInt
 }
