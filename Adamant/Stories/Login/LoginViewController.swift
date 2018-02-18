@@ -16,6 +16,9 @@ extension String.adamantLocalized {
 		static let passphrasePlaceholder = NSLocalizedString("passphrase", comment: "Login: Passphrase placeholder")
 		static let loggingInProgressMessage = NSLocalizedString("Logging in", comment: "Login: notify user that we a logging in.")
 		
+		static let wrongPassphraseError = NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase.")
+		static let noNetworkError = NSLocalizedString("No connection with The Internet", comment: "Login: No network error.")
+		
 		static let emptyPassphraseAlert = NSLocalizedString("Enter a passphrase!", comment: "Login: notify user that he is trying to login without a passphrase")
 		
 		private init() {}
@@ -33,10 +36,10 @@ class LoginViewController: UIViewController {
 		var localized: String {
 			switch self {
 			case .passphrase:
-				return NSLocalizedString("Login", comment: "Login sections: login with existing passphrase section")
+				return NSLocalizedString("Login", comment: "Login: login with existing passphrase section")
 				
 			case .newAccount:
-				return NSLocalizedString("New account", comment: "Login sections: Create new account section")
+				return NSLocalizedString("New account", comment: "Login: Create new account section")
 			}
 		}
 	}
@@ -50,7 +53,7 @@ class LoginViewController: UIViewController {
 		var localized: String {
 			switch self {
 			case .loginButton:
-				return NSLocalizedString("Login", comment: "Login button")
+				return NSLocalizedString("Login", comment: "Login: Login button")
 				
 			case .saveYourPassphraseAlert:
 				return NSLocalizedString("Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it", comment: "Login: security alert, notify user that he must save his new passphrase")
@@ -276,6 +279,21 @@ class LoginViewController: UIViewController {
 			} else {
 				self.accountService.login(with: passphrase) { (_, error) in
 					if let error = error {
+						if let internalError = error.internalError as? ApiServiceError {
+							switch internalError {
+							case .accountNotFound:
+								self.dialogService.showError(withMessage: String.adamantLocalized.login.wrongPassphraseError)
+								return
+								
+							case .networkError(error: _):
+								self.dialogService.showError(withMessage: String.adamantLocalized.login.noNetworkError)
+								return
+								
+							default:
+								break
+							}
+						}
+						
 						self.dialogService.showError(withMessage: error.message)
 					} else {
 						self.dialogService.dismissProgress()

@@ -34,15 +34,15 @@ class TransactionDetailsViewController: UIViewController {
 		
 		var localized: String {
 			switch self {
-			case .transactionNumber: return NSLocalizedString("Transaction #", comment: "Transaction Id row.")
-			case .from: return NSLocalizedString("From", comment: "Transaction sender row.")
-			case .to: return NSLocalizedString("To", comment: "Transaction recipient row.")
-			case .date: return NSLocalizedString("Date", comment: "Transaction date row.")
-			case .amount: return NSLocalizedString("Amount", comment: "Transaction amount row.")
-			case .fee: return NSLocalizedString("Fee", comment: "Transaction fee row.")
-			case .confirmations: return NSLocalizedString("Confirmations", comment: "Transaction confirmations row.")
-			case .block: return NSLocalizedString("Block", comment: "Transaction Block id row.")
-			case .openInExplorer: return NSLocalizedString("Open in Explorer", comment: "'Open transaction in explorer' row.")
+			case .transactionNumber: return NSLocalizedString("Id", comment: "Transaction details: Id row.")
+			case .from: return NSLocalizedString("From", comment: "Transaction details: sender row.")
+			case .to: return NSLocalizedString("To", comment: "Transaction details: recipient row.")
+			case .date: return NSLocalizedString("Date", comment: "Transaction details: date row.")
+			case .amount: return NSLocalizedString("Amount", comment: "Transaction details: amount row.")
+			case .fee: return NSLocalizedString("Fee", comment: "Transaction details: fee row.")
+			case .confirmations: return NSLocalizedString("Confirmations", comment: "Transaction details: confirmations row.")
+			case .block: return NSLocalizedString("Block", comment: "Transaction details: Block id row.")
+			case .openInExplorer: return NSLocalizedString("Open in Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
 			}
 		}
 	}

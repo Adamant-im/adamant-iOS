@@ -11,13 +11,13 @@ import UIKit
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct newChat {
-		static let addressPlaceholder = NSLocalizedString("", comment: "Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
+		static let addressPlaceholder = NSLocalizedString("", comment: "New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
 		
-		static let specifyValidAddressMessage = NSLocalizedString("Please specify valid recipient address", comment: "Notify user that he entered invalid address")
-		static let loggedUserAddressMessage = NSLocalizedString("You don't need an encrypted anonymous chat to talk to yourself", comment: "Notify user that he can't start chat with himself")
+		static let specifyValidAddressMessage = NSLocalizedString("Please specify valid recipient address", comment: "New chat: Notify user that he did enter invalid address")
+		static let loggedUserAddressMessage = NSLocalizedString("You don't need an encrypted anonymous chat to talk to yourself", comment: "New chat: Notify user that he can't start chat with himself")
 		
-		static let addressNotFoundFormat = NSLocalizedString("Address %@ not found", comment: "Notify user that specified address (%@) not found")
-		static let serverErrorFormat = NSLocalizedString("%@", comment: "Remote server returned an error.")
+		static let addressNotFoundFormat = NSLocalizedString("Address %@ not found", comment: "New chat: Notify user that specified address (%@) not found")
+		static let serverErrorFormat = NSLocalizedString("%@", comment: "New chat: Remote server returned an error.")
 		
 		private init() { }
 	}

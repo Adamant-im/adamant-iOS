@@ -11,7 +11,7 @@ import Foundation
 extension String {
 	public struct adamantLocalized {
 		struct shared {
-			static let productName = NSLocalizedString("Adamant", comment: "Product name")
+			static let productName = NSLocalizedString("ADAMANT", comment: "Product name")
 			
 			private init() {}
 		}

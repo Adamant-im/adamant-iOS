@@ -13,14 +13,14 @@ import CoreData
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct chat {
-		static let estimatedFeeFormat = NSLocalizedString("Estimated fee: %f", comment: "Chat input bar: Estimated fee.")
+		static let estimatedFeeFormat = NSLocalizedString("Estimated fee: %f", comment: "Chat: input bar: Estimated fee.")
 		
-		static let messageIsEmpty = NSLocalizedString("Message is empty", comment: "Notify user that message cannot be empty")
-		static let messageTooLong = NSLocalizedString("Message is too long", comment: "Message is too long")
-		static let notEnoughMoney = NSLocalizedString("You don't have enough money to send a message", comment: "Notify user that he doesn't have money to pay a message fee")
+		static let messageIsEmpty = NSLocalizedString("Message is empty", comment: "Chat: Notify user that message cannot be empty")
+		static let messageTooLong = NSLocalizedString("Message is too long", comment: "Chat: Message is too long")
+		static let notEnoughMoney = NSLocalizedString("You don't have enough money to send a message", comment: "Chat: Notify user that he doesn't have money to pay a message fee")
 		
-		static let internalErrorFormat = NSLocalizedString("Internal error: %@. You should report this bug.", comment: "Notify user about bad internal error. Usually this should be reported as a bug.")
-		static let serverErrorFormat = NSLocalizedString("Remote server error: %@", comment: "Notify user about server error.")
+		static let internalErrorFormat = NSLocalizedString("Internal error: %@. You should report this bug.", comment: "Chat: Notify user about bad internal error. Usually this should be reported as a bug.")
+		static let serverErrorFormat = NSLocalizedString("Remote server error: %@", comment: "Chat: Notify user about server error.")
 		
 		private init() { }
 	}

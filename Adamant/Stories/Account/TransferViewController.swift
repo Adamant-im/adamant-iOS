@@ -13,24 +13,24 @@ import Eureka
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct transfer {
-		static let addressPlaceholder = NSLocalizedString("of the recipient", comment: "Transfer row: recipient address placeholder")
-		static let amountPlaceholder = NSLocalizedString("to send", comment: "Transfer row: transfer amount placeholder")
+		static let addressPlaceholder = NSLocalizedString("of the recipient", comment: "Transfer: recipient address placeholder")
+		static let amountPlaceholder = NSLocalizedString("to send", comment: "Transfer: transfer amount placeholder")
 		
-		static let addressValidationError = NSLocalizedString("Please enter a valid recipient address", comment: "Address validation error")
-		static let amountZeroError = NSLocalizedString("You should send more money", comment: "Amount is zero, or even negative")
-		static let amountTooHigh = NSLocalizedString("You don't have that much money", comment: "Amount is hiegher that user's total money")
-		static let accountNotFound = NSLocalizedString("Account not found", comment: "Transfer error: Account not found")
+		static let addressValidationError = NSLocalizedString("Please enter a valid recipient address", comment: "Transfer: Address validation error")
+		static let amountZeroError = NSLocalizedString("You should send more money", comment: "Transfer: Amount is zero, or even negative notification")
+		static let amountTooHigh = NSLocalizedString("You don't have that much money", comment: "Transfer: Amount is hiegher that user's total money notification")
+		static let accountNotFound = NSLocalizedString("Address not found", comment: "Transfer: Address not found error")
 		
-		static let transferProcessingMessage = NSLocalizedString("Sending funds...", comment: "Transfer processing message")
-		static let transferSuccess = NSLocalizedString("Funds sended!", comment: "Tokens transfered successfully message")
+		static let transferProcessingMessage = NSLocalizedString("Sending funds...", comment: "Transfer: Processing message")
+		static let transferSuccess = NSLocalizedString("Funds sended!", comment: "Transfer: Tokens transfered successfully message")
 		
 		private init() { }
 	}
 }
 
 fileprivate extension String.adamantLocalized.alert {
-	static let confirmSendMessageFormat = NSLocalizedString("Send %1$@ to %2$@?", comment: "Confirm transfer X tokens to Y message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'.")
-	static let send = NSLocalizedString("Send", comment: "Confirm transfer alert: Send tokens button")
+	static let confirmSendMessageFormat = NSLocalizedString("Send %1$@ to %2$@?", comment: "Transfer: Confirm transfer X tokens to Y message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'.")
+	static let send = NSLocalizedString("Send", comment: "Transfer: Confirm transfer alert: Send tokens button")
 }
 
 
@@ -62,13 +62,13 @@ class TransferViewController: FormViewController {
 		
 		var localized: String {
 			switch self {
-			case .balance: return NSLocalizedString("Balance", comment: "Transfer row: logged user balance.")
-			case .amount: return NSLocalizedString("Amount", comment: "Transfer row: amount of adamant to transfer.")
-			case .maxToTransfer: return NSLocalizedString("Max to transfer", comment: "Transfer row: maximum amount to transfer: available account money substracting transfer fee.")
-			case .address: return NSLocalizedString("Address", comment: "Transfer row: recipient address")
-			case .fee: return NSLocalizedString("Transaction fee", comment: "Transfer row: transfer fee")
-			case .total: return NSLocalizedString("Total", comment: "Transfer row: total amount of transaction: money to transfer adding fee")
-			case .sendButton: return NSLocalizedString("Send Funds", comment: "Transfer row: Send button")
+			case .balance: return NSLocalizedString("Balance", comment: "Transfer: logged user balance.")
+			case .amount: return NSLocalizedString("Amount", comment: "Transfer: amount of adamant to transfer.")
+			case .maxToTransfer: return NSLocalizedString("Max to transfer", comment: "Transfer: maximum amount to transfer: available account money substracting transfer fee.")
+			case .address: return NSLocalizedString("Address", comment: "Transfer: recipient address")
+			case .fee: return NSLocalizedString("Transaction fee", comment: "Transfer: transfer fee")
+			case .total: return NSLocalizedString("Total", comment: "Transfer: total amount of transaction: money to transfer adding fee")
+			case .sendButton: return NSLocalizedString("Send Funds", comment: "Transfer: Send button")
 			}
 		}
 	}
@@ -79,8 +79,8 @@ class TransferViewController: FormViewController {
 		
 		var localized: String {
 			switch self {
-			case .wallet: return NSLocalizedString("Your wallet", comment: "Transfer section: 'Your wallet' section")
-			case .transferInfo: return NSLocalizedString("Transfer Info", comment: "Transfer section: 'Transfer info' section")
+			case .wallet: return NSLocalizedString("Your wallet", comment: "Transfer: 'Your wallet' section")
+			case .transferInfo: return NSLocalizedString("Transfer Info", comment: "Transfer: 'Transfer info' section")
 			}
 		}
 	}

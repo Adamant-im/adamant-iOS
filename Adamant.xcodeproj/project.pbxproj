@@ -10,7 +10,6 @@
 		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
 		E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */; };
 		E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E913C8F81FFFA51D001A83F7 /* Assets.xcassets */; };
-		E913C8FC1FFFA51D001A83F7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E913C8FA1FFFA51D001A83F7 /* LaunchScreen.storyboard */; };
 		E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9071FFFA943001A83F7 /* AdamantCore.swift */; };
 		E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C90C1FFFA99B001A83F7 /* Keypair.swift */; };
 		E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */; };
@@ -24,6 +23,9 @@
 		E9256F632034E7DE00DE86E9 /* Settings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9256F652034E7DE00DE86E9 /* Settings.storyboard */; };
 		E9256F692034E98700DE86E9 /* Login.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9256F6B2034E98700DE86E9 /* Login.storyboard */; };
 		E9256F6D20357B1700DE86E9 /* LoginHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9256F6C20357B1700DE86E9 /* LoginHeader.xib */; };
+		E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */; };
+		E9256F792039B29A00DE86E9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9256F7B2039B29A00DE86E9 /* Localizable.strings */; };
+		E9256F7E2039B29D00DE86E9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9256F802039B29D00DE86E9 /* InfoPlist.strings */; };
 		E93580D9201607DA0057FC2E /* knownContacts.json in Resources */ = {isa = PBXBuildFile; fileRef = E93580D8201607DA0057FC2E /* knownContacts.json */; };
 		E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D732028B21400126346 /* ChatsProvider.swift */; };
 		E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */; };
@@ -152,7 +154,6 @@
 		E913C8EE1FFFA51D001A83F7 /* Adamant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Adamant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E913C8F81FFFA51D001A83F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		E913C8FB1FFFA51D001A83F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E913C8FD1FFFA51E001A83F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E913C9071FFFA943001A83F7 /* AdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCore.swift; sourceTree = "<group>"; };
 		E913C90C1FFFA99B001A83F7 /* Keypair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keypair.swift; sourceTree = "<group>"; };
@@ -178,6 +179,13 @@
 		E9256F642034E7DE00DE86E9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Settings.storyboard; sourceTree = "<group>"; };
 		E9256F6A2034E98700DE86E9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Login.storyboard; sourceTree = "<group>"; };
 		E9256F6C20357B1700DE86E9 /* LoginHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoginHeader.xib; sourceTree = "<group>"; };
+		E9256F6E2039A7E800DE86E9 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Account.strings; sourceTree = "<group>"; };
+		E9256F6F2039A7E900DE86E9 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Chats.strings; sourceTree = "<group>"; };
+		E9256F702039A7E900DE86E9 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Login.strings; sourceTree = "<group>"; };
+		E9256F712039A7E900DE86E9 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Settings.strings; sourceTree = "<group>"; };
+		E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		E9256F7A2039B29A00DE86E9 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		E9256F7F2039B29D00DE86E9 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E93580D8201607DA0057FC2E /* knownContacts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = knownContacts.json; sourceTree = "<group>"; };
 		E93B0D732028B21400126346 /* ChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsProvider.swift; sourceTree = "<group>"; };
 		E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantChatsProvider.swift; sourceTree = "<group>"; };
@@ -420,8 +428,10 @@
 			isa = PBXGroup;
 			children = (
 				E9E7CDA42002A6EB00DFC4DB /* Fonts */,
-				E913C8FA1FFFA51D001A83F7 /* LaunchScreen.storyboard */,
 				E913C8F81FFFA51D001A83F7 /* Assets.xcassets */,
+				E9256F802039B29D00DE86E9 /* InfoPlist.strings */,
+				E9256F7B2039B29A00DE86E9 /* Localizable.strings */,
+				E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */,
 				E9C51EEC2011416E00385EB7 /* adamant-core.js */,
 				E93580D8201607DA0057FC2E /* knownContacts.json */,
 			);
@@ -705,8 +715,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */,
 				E9EC341B200524CA00C0E546 /* Roboto_300_normal.ttf in Resources */,
-				E913C8FC1FFFA51D001A83F7 /* LaunchScreen.storyboard in Resources */,
 				E9E7CDBC2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib in Resources */,
 				E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
@@ -718,10 +728,12 @@
 				E9EC3417200524CA00C0E546 /* Exo+2_400_italic.ttf in Resources */,
 				E9EC341E200524CA00C0E546 /* Roboto_500_normal.ttf in Resources */,
 				E9EC3419200524CA00C0E546 /* Exo+2_500_normal.ttf in Resources */,
+				E9256F7E2039B29D00DE86E9 /* InfoPlist.strings in Resources */,
 				E9256F6D20357B1700DE86E9 /* LoginHeader.xib in Resources */,
 				E9EC3416200524CA00C0E546 /* Exo+2_300_normal.ttf in Resources */,
 				E9256F632034E7DE00DE86E9 /* Settings.storyboard in Resources */,
 				E9EC341C200524CA00C0E546 /* Roboto_400_italic.ttf in Resources */,
+				E9256F792039B29A00DE86E9 /* Localizable.strings in Resources */,
 				E9B6CC60201793D800486EA1 /* MultilineLableTableViewCell.xib in Resources */,
 				E9B6CC5620176F3300486EA1 /* TextViewTableViewCell.xib in Resources */,
 				E9EC3415200524CA00C0E546 /* Exo+2_100_normal.ttf in Resources */,
@@ -936,18 +948,11 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		E913C8FA1FFFA51D001A83F7 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				E913C8FB1FFFA51D001A83F7 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
 		E9256F622034E0E100DE86E9 /* Chats.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				E9256F612034E0E100DE86E9 /* Base */,
+				E9256F6F2039A7E900DE86E9 /* ru */,
 			);
 			name = Chats.storyboard;
 			sourceTree = "<group>";
@@ -956,6 +961,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				E9256F642034E7DE00DE86E9 /* Base */,
+				E9256F712039A7E900DE86E9 /* ru */,
 			);
 			name = Settings.storyboard;
 			sourceTree = "<group>";
@@ -964,14 +970,32 @@
 			isa = PBXVariantGroup;
 			children = (
 				E9256F6A2034E98700DE86E9 /* Base */,
+				E9256F702039A7E900DE86E9 /* ru */,
 			);
 			name = Login.storyboard;
+			sourceTree = "<group>";
+		};
+		E9256F7B2039B29A00DE86E9 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E9256F7A2039B29A00DE86E9 /* ru */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		E9256F802039B29D00DE86E9 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E9256F7F2039B29D00DE86E9 /* ru */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 		E9452A4E20344834005BA34C /* Account.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				E9452A4D20344834005BA34C /* Base */,
+				E9256F6E2039A7E800DE86E9 /* ru */,
 			);
 			name = Account.storyboard;
 			sourceTree = "<group>";
@@ -983,6 +1007,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1041,6 +1066,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1134,6 +1160,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
