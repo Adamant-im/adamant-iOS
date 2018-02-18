@@ -17,6 +17,7 @@ enum ChatsProviderResult {
 enum ChatsProviderError: Error {
 	case notLogged
 	case messageNotValid(ValidateMessageResult)
+	case notEnoughtMoneyToSend
 	case serverError(Error)
 	case accountNotFound(String)
 	case dependencyError(String)
