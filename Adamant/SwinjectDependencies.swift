@@ -97,6 +97,7 @@ extension Container {
 			provider.stack = r.resolve(CoreDataStack.self)
 			provider.adamantCore = r.resolve(AdamantCore.self)
 			provider.accountsProvider = r.resolve(AccountsProvider.self)
+			provider.feeCalculator = r.resolve(FeeCalculator.self)
 			return provider
 		}.inObjectScope(.container)
 	}
