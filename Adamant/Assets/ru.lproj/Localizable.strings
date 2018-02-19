@@ -52,7 +52,7 @@
 "Enter a passphrase!" = "Введите пароль";
 
 /* Chat: input bar: Estimated fee. */
-"Estimated fee: %f" = "Ориентировочная комиссия: %f";
+"Estimated fee: %@" = "Ориентировочная комиссия: %@";
 
 /* Transaction details: fee row. */
 "Fee" = "Комиссия";
