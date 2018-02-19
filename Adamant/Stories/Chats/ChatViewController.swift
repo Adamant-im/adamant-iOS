@@ -13,7 +13,7 @@ import CoreData
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct chat {
-		static let estimatedFeeFormat = NSLocalizedString("Estimated fee: %f", comment: "Chat: input bar: Estimated fee.")
+		static let estimatedFeeFormat = NSLocalizedString("Estimated fee: %@", comment: "Chat: input bar: Estimated fee.")
 		
 		static let messageIsEmpty = NSLocalizedString("Message is empty", comment: "Chat: Notify user that message cannot be empty")
 		static let messageTooLong = NSLocalizedString("Message is too long", comment: "Chat: Message is too long")
@@ -167,7 +167,7 @@ extension ChatViewController {
 				return
 			}
 			
-			let text = String.localizedStringWithFormat(String.adamantLocalized.chat.estimatedFeeFormat, AdamantUtilities.from(uInt: fee))
+			let text = String.localizedStringWithFormat(String.adamantLocalized.chat.estimatedFeeFormat, AdamantUtilities.format(balance: fee))
 			prevFee = fee
 			
 			feeLabel.title = text
