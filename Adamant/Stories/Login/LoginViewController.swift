@@ -8,6 +8,8 @@
 
 import UIKit
 import TableKit
+import QRCodeReader
+import AVFoundation
 
 
 // MARK: - Localization
@@ -17,7 +19,11 @@ extension String.adamantLocalized {
 		static let loggingInProgressMessage = NSLocalizedString("Logging in", comment: "Login: notify user that we a logging in.")
 		
 		static let wrongPassphraseError = NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase.")
+		static let wrongQrError = NSLocalizedString("QR code does not contains a valid passphrase.", comment: "Login: Notify user that scanned QR doesn't contains passphrase.")
 		static let noNetworkError = NSLocalizedString("No connection with The Internet", comment: "Login: No network error.")
+		
+		static let cameraNotAuthorized = NSLocalizedString("You need to authorize Adamant to use device's Camera", comment: "Login: Notify user, that he disabled camera in settings, and need to authorize application.")
+		static let cameraNotSupported = NSLocalizedString("QR codes reading not supported by the current device", comment: "Login: Notify user that device not supported by QR reader")
 		
 		static let emptyPassphraseAlert = NSLocalizedString("Enter a passphrase!", comment: "Login: notify user that he is trying to login without a passphrase")
 		
@@ -46,6 +52,7 @@ class LoginViewController: UIViewController {
 	
 	enum Rows {
 		case loginButton
+		case loginWithQr
 		case saveYourPassphraseAlert
 		case generateNewPassphraseButton
 		case tapToSaveHint
@@ -54,6 +61,9 @@ class LoginViewController: UIViewController {
 			switch self {
 			case .loginButton:
 				return NSLocalizedString("Login", comment: "Login: Login button")
+				
+			case .loginWithQr:
+				return NSLocalizedString("QR", comment: "Login: Login with QR button.")
 				
 			case .saveYourPassphraseAlert:
 				return NSLocalizedString("Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it", comment: "Login: security alert, notify user that he must save his new passphrase")
@@ -123,7 +133,10 @@ class LoginViewController: UIViewController {
 		let loginRow = TableRow<ButtonTableViewCell>(item: Rows.loginButton.localized)
 		loginRow.on(.click) { [weak self] options in self?.login() }
 		
-		let loginSection = TableSection(headerTitle: Sections.passphrase.localized, footerTitle: nil, rows: [passphraseRow, loginRow])
+		let loginWithQrRow = TableRow<ButtonTableViewCell>(item: Rows.loginWithQr.localized)
+		loginWithQrRow.on(.click) { [weak self] _ in self?.loginWithQr() }
+		
+		let loginSection = TableSection(headerTitle: Sections.passphrase.localized, footerTitle: nil, rows: [passphraseRow, loginRow, loginWithQrRow])
 		tableDirector.append(section: loginSection)
 		
 		
@@ -249,12 +262,26 @@ class LoginViewController: UIViewController {
 		present(alert, animated: true)
 	}
 	
-	
-	// MARK: Login
+	lazy var qrReader: QRCodeReaderViewController = {
+		let builder = QRCodeReaderViewControllerBuilder {
+			$0.reader = QRCodeReader(metadataObjectTypes: [.qr ], captureDevicePosition: .back)
+			$0.cancelButtonTitle = String.adamantLocalized.alert.cancel
+			$0.showSwitchCameraButton = false
+		}
+		
+		let vc = QRCodeReaderViewController(builder: builder)
+		vc.delegate = self
+		return vc
+	}()
+}
+
+
+// MARK: Login
+extension LoginViewController {
 	func login() {
 		guard let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? TextViewTableViewCell,
-			var passphrase = cell.textView.text else {
-				return
+			let passphrase = cell.textView.text else {
+			return
 		}
 		
 		guard passphrase.count > 0 else {
@@ -262,8 +289,46 @@ class LoginViewController: UIViewController {
 			return
 		}
 		
-		passphrase = passphrase.lowercased()
-		
+		loginWith(passphrase: passphrase.lowercased())
+	}
+	
+	func loginWithQr() {
+		switch AVCaptureDevice.authorizationStatus(for: .video) {
+		case .authorized:
+			present(qrReader, animated: true, completion: nil)
+			
+		case .notDetermined:
+			AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
+				if granted, let qrReader = self?.qrReader {
+					self?.present(qrReader, animated: true, completion: nil)
+				} else {
+					return
+				}
+			}
+			
+		case .restricted:
+			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
+			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+			present(alert, animated: true, completion: nil)
+			
+		case .denied:
+			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized, preferredStyle: .alert)
+			
+			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
+				DispatchQueue.main.async {
+					if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
+						UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+					}
+				}
+			})
+			
+			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+			
+			present(alert, animated: true, completion: nil)
+		}
+	}
+	
+	private func loginWith(passphrase: String) {
 		dialogService.showProgress(withMessage: String.adamantLocalized.login.loggingInProgressMessage, userInteractionEnable: false)
 		
 		// Dialog service currently presenting progress async. So if AccountService fails instantly, progress will be presented AFTER fail.
@@ -300,6 +365,57 @@ class LoginViewController: UIViewController {
 					}
 				}
 			}
+		}
+	}
+}
+
+
+// MARK: - QR
+extension LoginViewController: QRCodeReaderViewControllerDelegate {
+	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
+		guard AdamantUtilities.validateAdamantPassphrase(passphrase: result.value) else {
+			dialogService.showError(withMessage: String.adamantLocalized.login.wrongQrError)
+			return
+		}
+		
+		reader.stopScanning()
+		reader.dismiss(animated: true, completion: nil)
+		loginWith(passphrase: result.value)
+	}
+	
+	func readerDidCancel(_ reader: QRCodeReaderViewController) {
+		reader.dismiss(animated: true, completion: nil)
+	}
+	
+	private func checkCameraPermissions() -> Bool {
+		
+		
+		do {
+			return try QRCodeReader.supportsMetadataObjectTypes()
+		} catch let error as NSError {
+			let alert: UIAlertController
+			
+			switch error.code {
+			case -11852:
+				alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized, preferredStyle: .alert)
+				
+				alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default, handler: { (_) in
+					DispatchQueue.main.async {
+						if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
+							UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+						}
+					}
+				}))
+				
+				alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+			default:
+				alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
+				alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+			}
+			
+			present(alert, animated: true, completion: nil)
+			
+			return false
 		}
 	}
 }

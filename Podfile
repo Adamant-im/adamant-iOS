@@ -21,5 +21,6 @@ target 'Adamant' do
 
   # QR
   pod "EFQRCode" # QR generator
+  pod "QRCodeReader.swift" # QR reader
   
 end

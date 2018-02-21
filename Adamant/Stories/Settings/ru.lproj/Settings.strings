@@ -4,3 +4,6 @@
 /* Class = "UITabBarItem"; title = "Settings"; ObjectID = "Igt-Ig-iLK"; */
 "Igt-Ig-iLK.title" = "Настройки";
 
+/* Class = "UINavigationItem"; title = "QR Generator"; ObjectID = "YBG-RB-W62"; */
+"YBG-RB-W62.title" = "QR-пароль";
+
