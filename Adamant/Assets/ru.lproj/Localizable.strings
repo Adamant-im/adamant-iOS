@@ -48,8 +48,17 @@
 /* Transaction details: date row. */
 "Date" = "Дата";
 
+/* Shared alert Done message. Used anywhere */
+"Done" = "Готово";
+
 /* Login: notify user that he is trying to login without a passphrase */
 "Enter a passphrase!" = "Введите пароль";
+
+/* QRGenerator: user typed in wrong invalid */
+"Enter correct passphrase" = "Введите корректный пароль";
+
+/* Shared alert 'Error' title. Used anywhere */
+"Error" = "Ошибка";
 
 /* Chat: input bar: Estimated fee. */
 "Estimated fee: %@" = "Ориентировочная комиссия: %@";
@@ -62,6 +71,12 @@
 
 /* Transfer: Tokens transfered successfully message */
 "Funds sended!" = "Токены переведены!";
+
+/* QRGenerator: Generate QR for passphrase button */
+"Generate QR" = "Создать QR-код";
+
+/* Config: Generate QR with passphrase row */
+"Generate QR with passphrase" = "Создать QR-код с паролем";
 
 /* Login: generate new passphrase button */
 "Generate new passphrase" = "Создать новый";
@@ -116,6 +131,15 @@
 /* New chat: Notify user that he did enter invalid address */
 "Please specify valid recipient address" = "Неверный адрес";
 
+/* Login: Login with QR button. */
+"QR" = "Войти с QR-кодом";
+
+/* Login: Notify user that scanned QR doesn't contains passphrase. */
+"QR code does not contains a valid passphrase." = "QR код не содержит пароля";
+
+/* Login: Notify user that device not supported by QR reader */
+"QR codes reading not supported by the current device" = "На этом устройстве не поддерживается чтение QR кодов";
+
 /* Shared alert 'Save' button. Used anywhere */
 "Save" = "Сохранить";
 
@@ -137,13 +161,17 @@
 /* Transfer: Processing message */
 "Sending funds..." = "Отправляем токены...";
 
+/* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
+"Settings" = "Настройки";
+
 /* Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu. */
 "Share" = "Поделиться";
 
 /* Export transaction: 'Share transaction summary' button */
 "Summary" = "Сводка";
 
-/* Login: a small hint for a user, that he can tap on passphrase to save it */
+/* Login: a small hint for a user, that he can tap on passphrase to save it
+   QRGenerator: small 'Tap to save' tooltip under generated QR */
 "Tap to save" = "Нажмите для сохранения";
 
 /* Transaction details: recipient row. */
@@ -179,6 +207,9 @@
 /* New chat: Notify user that he can't start chat with himself */
 "You don't need an encrypted anonymous chat to talk to yourself" = "Вам не нужен анонимный чат, чтобы говорить с самим собой";
 
+/* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
+"You need to authorize Adamant to use device's Camera" = "Для чтения QR кодов необходимо разрешить доступ к камере";
+
 /* Transfer: Amount is zero, or even negative notification */
 "You should send more money" = "Нужно отправить больше токенов";
 
@@ -188,7 +219,8 @@
 /* Transfer: recipient address placeholder */
 "of the recipient" = "получателя";
 
-/* Login: Passphrase placeholder */
+/* Login: Passphrase placeholder
+   QRGenerator: Passphrase textview placeholder */
 "passphrase" = "Пароль";
 
 /* Transfer: transfer amount placeholder */

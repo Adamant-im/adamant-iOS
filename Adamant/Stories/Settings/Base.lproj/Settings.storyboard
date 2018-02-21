@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -24,10 +25,29 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Settings" id="5B3-Cj-ROC"/>
                     <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <segue destination="Yyl-26-rXj" kind="show" identifier="passphraseToQR" id="U3u-iH-6HQ"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jIR-kB-j8c" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="770" y="187"/>
+        </scene>
+        <!--QR Passphrase-->
+        <scene sceneID="6jB-Q1-Uzg">
+            <objects>
+                <viewController storyboardIdentifier="QRGeneratorViewController" id="Yyl-26-rXj" customClass="QRGeneratorViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Jx3-Eh-Vsj">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <viewLayoutGuide key="safeArea" id="FB1-Mp-xiI"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="QR Passphrase" id="YBG-RB-W62"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ihr-d1-6Fc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1559" y="187"/>
         </scene>
         <!--Settings-->
         <scene sceneID="Kmc-K6-OBi">

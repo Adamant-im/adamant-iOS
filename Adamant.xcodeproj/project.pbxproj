@@ -66,6 +66,11 @@
 		E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */; };
 		E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E972206A201F44CA004F2AAD /* TransfersProvider.swift */; };
 		E982F69C20235B4D00566AC7 /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E982F69B20235B4D00566AC7 /* SettingsTableViewController.swift */; };
+		E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */; };
+		E9942B82203C142B00C163AF /* QRTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B81203C142B00C163AF /* QRTool.swift */; };
+		E9942B84203CBFCE00C163AF /* AdamantQRTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B83203CBFCE00C163AF /* AdamantQRTool.swift */; };
+		E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B86203D9E5100C163AF /* EurekaQRRow.swift */; };
+		E9942B89203D9ECA00C163AF /* QrCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9942B88203D9ECA00C163AF /* QrCell.xib */; };
 		E9B3D39A201F90570019EB36 /* AccountsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D399201F90570019EB36 /* AccountsProvider.swift */; };
 		E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D39D201F99F40019EB36 /* DataProvider.swift */; };
 		E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D3A0201FA26B0019EB36 /* AdamantAccountsProvider.swift */; };
@@ -133,6 +138,7 @@
 		E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A7200010DF001362F8 /* Roboto_700_normal.ttf */; };
 		E9EC342120052ABB00C0E546 /* TransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC342020052ABB00C0E546 /* TransferViewController.swift */; };
 		E9EC344720066D4A00C0E546 /* AddressValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */; };
+		E9FAE5DA203DBFEF008D3A6B /* Comparable+Clamped.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FAE5D9203DBFEF008D3A6B /* Comparable+Clamped.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -226,6 +232,11 @@
 		E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InMemoryCoreDataStack.swift; sourceTree = "<group>"; };
 		E972206A201F44CA004F2AAD /* TransfersProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransfersProvider.swift; sourceTree = "<group>"; };
 		E982F69B20235B4D00566AC7 /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
+		E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRGeneratorViewController.swift; sourceTree = "<group>"; };
+		E9942B81203C142B00C163AF /* QRTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRTool.swift; sourceTree = "<group>"; };
+		E9942B83203CBFCE00C163AF /* AdamantQRTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantQRTool.swift; sourceTree = "<group>"; };
+		E9942B86203D9E5100C163AF /* EurekaQRRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EurekaQRRow.swift; sourceTree = "<group>"; };
+		E9942B88203D9ECA00C163AF /* QrCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = QrCell.xib; sourceTree = "<group>"; };
 		E9B3D399201F90570019EB36 /* AccountsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsProvider.swift; sourceTree = "<group>"; };
 		E9B3D39D201F99F40019EB36 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 		E9B3D3A0201FA26B0019EB36 /* AdamantAccountsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAccountsProvider.swift; sourceTree = "<group>"; };
@@ -284,6 +295,7 @@
 		E9EC344420066D4A00C0E546 /* AdamantTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AdamantTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressValidationTests.swift; sourceTree = "<group>"; };
 		E9EC344820066D4A00C0E546 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E9FAE5D9203DBFEF008D3A6B /* Comparable+Clamped.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Comparable+Clamped.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -375,6 +387,7 @@
 				E948E0492027673400975D6B /* ExportTools.swift */,
 				E9C51ECA200E2AA100385EB7 /* FeeCalculator.swift */,
 				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
+				E9942B81203C142B00C163AF /* QRTool.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -388,6 +401,7 @@
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
 				E948E04B2027679300975D6B /* AdamantExportTools.swift */,
+				E9942B83203CBFCE00C163AF /* AdamantQRTool.swift */,
 				E9C51ECC200E2BF900385EB7 /* HardFeeCalculator.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
@@ -414,11 +428,12 @@
 			isa = PBXGroup;
 			children = (
 				E91947B12000246A001362F8 /* AdamantError.swift */,
+				E948E0452024DAE800975D6B /* AdamantUserInfoKeys.swift */,
 				E9E7CDB62003994E00DFC4DB /* AdamantUtilities.swift */,
+				E9FAE5D9203DBFEF008D3A6B /* Comparable+Clamped.swift */,
 				E95F856420067A030070534A /* GlobalConstants.swift */,
 				E95F856A200789450070534A /* JSModels.swift */,
 				E913C90C1FFFA99B001A83F7 /* Keypair.swift */,
-				E948E0452024DAE800975D6B /* AdamantUserInfoKeys.swift */,
 				E9256F5E2034C21100DE86E9 /* String+localized.swift */,
 			);
 			path = Helpers;
@@ -523,6 +538,9 @@
 				E948E04D20278D5600975D6B /* SettingsDependencies.swift */,
 				E948E03A20235E2300975D6B /* SettingsRoutes.swift */,
 				E982F69B20235B4D00566AC7 /* SettingsTableViewController.swift */,
+				E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */,
+				E9942B86203D9E5100C163AF /* EurekaQRRow.swift */,
+				E9942B88203D9ECA00C163AF /* QrCell.xib */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -723,6 +741,7 @@
 				E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */,
 				E9B6CC52201763FE00486EA1 /* ButtonTableViewCell.xib in Resources */,
 				E9256F692034E98700DE86E9 /* Login.storyboard in Resources */,
+				E9942B89203D9ECA00C163AF /* QrCell.xib in Resources */,
 				E9C51EED2011416E00385EB7 /* adamant-core.js in Resources */,
 				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
 				E9EC3417200524CA00C0E546 /* Exo+2_400_italic.ttf in Resources */,
@@ -770,11 +789,13 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/EFQRCode/EFQRCode.framework",
 				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
 				"${BUILT_PRODUCTS_DIR}/FTIndicator/FTIndicator.framework",
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
 				"${BUILT_PRODUCTS_DIR}/GrowingTextView/GrowingTextView.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
+				"${BUILT_PRODUCTS_DIR}/QRCodeReader.swift/QRCodeReader.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
 				"${BUILT_PRODUCTS_DIR}/SwinjectStoryboard/SwinjectStoryboard.framework",
 				"${BUILT_PRODUCTS_DIR}/TableKit/TableKit.framework",
@@ -782,11 +803,13 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/EFQRCode.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Eureka.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FTIndicator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GrowingTextView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCodeReader.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwinjectStoryboard.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TableKit.framework",
@@ -838,12 +861,14 @@
 			files = (
 				E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */,
 				E9CAE8D22018AA7700345E76 /* AdamantApi+Accounts.swift in Sources */,
+				E9942B84203CBFCE00C163AF /* AdamantQRTool.swift in Sources */,
 				E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */,
 				E9CE778A202B9DC2009CF70D /* ChatTransaction+CoreDataProperties.swift in Sources */,
 				E9CAE8DA2018ACD300345E76 /* AdamantApi+Chats.swift in Sources */,
 				E91947B020002393001362F8 /* AdamantApiService.swift in Sources */,
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
 				E9E7CDB72003994E00DFC4DB /* AdamantUtilities.swift in Sources */,
+				E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */,
 				E948E0462024DAE800975D6B /* AdamantUserInfoKeys.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
 				E9B6CC5F201793D800486EA1 /* MultilineLableTableViewCell.swift in Sources */,
@@ -865,6 +890,7 @@
 				E9CE7785202B9DC2009CF70D /* Chatroom+CoreDataClass.swift in Sources */,
 				E9CE7786202B9DC2009CF70D /* Chatroom+CoreDataProperties.swift in Sources */,
 				E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */,
+				E9942B82203C142B00C163AF /* QRTool.swift in Sources */,
 				E9CE7787202B9DC2009CF70D /* BaseTransaction+CoreDataClass.swift in Sources */,
 				E95F85872008FDBF0070534A /* Chat.swift in Sources */,
 				E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */,
@@ -877,6 +903,7 @@
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */,
+				E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */,
 				E948E04A2027673400975D6B /* ExportTools.swift in Sources */,
 				E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */,
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
@@ -899,6 +926,7 @@
 				E919479C2000102E001362F8 /* LoginViewController.swift in Sources */,
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,
 				E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */,
+				E9FAE5DA203DBFEF008D3A6B /* Comparable+Clamped.swift in Sources */,
 				E95F857A2007F0260070534A /* ServerResponse.swift in Sources */,
 				E9CE778B202B9DC2009CF70D /* CoreDataAccount+CoreDataClass.swift in Sources */,
 				E9CE7789202B9DC2009CF70D /* ChatTransaction+CoreDataClass.swift in Sources */,
@@ -1052,7 +1080,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = ADAMANT;
@@ -1105,7 +1133,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = ADAMANT;
 				SDKROOT = iphoneos;
@@ -1205,7 +1233,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = ADAMANT;

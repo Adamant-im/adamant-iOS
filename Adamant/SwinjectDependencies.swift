@@ -64,6 +64,7 @@ extension Container {
 		// MARK: Export tools
 		self.register(ExportTools.self) { _ in AdamantExportTools() }
 		
+		self.register(QRTool.self) { _ in AdamantQRTool() }
 		
 		// MARK: - Data Providers
 		// MARK: CoreData Stack
