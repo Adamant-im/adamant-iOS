@@ -1,5 +1,6 @@
 PODS:
   - Alamofire (4.6.0)
+  - EFQRCode (4.2.1)
   - Eureka (4.0.1)
   - FreakingSimpleRoundImageView (1.0.1)
   - FTIndicator (1.2.6):
@@ -18,6 +19,7 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire
+  - EFQRCode
   - Eureka
   - FreakingSimpleRoundImageView
   - FTIndicator
@@ -29,6 +31,7 @@ DEPENDENCIES:
 
 SPEC CHECKSUMS:
   Alamofire: f41a599bd63041760b26d393ec1069d9d7b917f4
+  EFQRCode: f3fd67049faa07adb575495c05d72a34e407a940
   Eureka: c8bd5cc07143b6f66268c208d28a246c99b41955
   FreakingSimpleRoundImageView: ae69d35a7bb7870411d0348b62969415be4031f0
   FTIndicator: d2a7c204341b7b0165b6dbeb5bf6979c6d7d4bb7
@@ -38,6 +41,6 @@ SPEC CHECKSUMS:
   SwinjectStoryboard: 92e75763c3299cdf627bef98a5180dc894864336
   TableKit: 42d4dff2944f273cdeec2ef6352064eb6a9a355b
 
-PODFILE CHECKSUM: 3ca79b4ab8ae4b720a9eedb00b04edbdf6690362
+PODFILE CHECKSUM: 1ecfa64de8cff508b733890ea6ca9ee3271d0915
 
 COCOAPODS: 1.4.0

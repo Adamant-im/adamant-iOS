@@ -66,6 +66,8 @@
 		E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */; };
 		E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E972206A201F44CA004F2AAD /* TransfersProvider.swift */; };
 		E982F69C20235B4D00566AC7 /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E982F69B20235B4D00566AC7 /* SettingsTableViewController.swift */; };
+		E9942B82203C142B00C163AF /* QRTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B81203C142B00C163AF /* QRTool.swift */; };
+		E9942B84203CBFCE00C163AF /* AdamantQRTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B83203CBFCE00C163AF /* AdamantQRTool.swift */; };
 		E9B3D39A201F90570019EB36 /* AccountsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D399201F90570019EB36 /* AccountsProvider.swift */; };
 		E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D39D201F99F40019EB36 /* DataProvider.swift */; };
 		E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D3A0201FA26B0019EB36 /* AdamantAccountsProvider.swift */; };
@@ -226,6 +228,8 @@
 		E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InMemoryCoreDataStack.swift; sourceTree = "<group>"; };
 		E972206A201F44CA004F2AAD /* TransfersProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransfersProvider.swift; sourceTree = "<group>"; };
 		E982F69B20235B4D00566AC7 /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
+		E9942B81203C142B00C163AF /* QRTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRTool.swift; sourceTree = "<group>"; };
+		E9942B83203CBFCE00C163AF /* AdamantQRTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantQRTool.swift; sourceTree = "<group>"; };
 		E9B3D399201F90570019EB36 /* AccountsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsProvider.swift; sourceTree = "<group>"; };
 		E9B3D39D201F99F40019EB36 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 		E9B3D3A0201FA26B0019EB36 /* AdamantAccountsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAccountsProvider.swift; sourceTree = "<group>"; };
@@ -375,6 +379,7 @@
 				E948E0492027673400975D6B /* ExportTools.swift */,
 				E9C51ECA200E2AA100385EB7 /* FeeCalculator.swift */,
 				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
+				E9942B81203C142B00C163AF /* QRTool.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -388,6 +393,7 @@
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
 				E948E04B2027679300975D6B /* AdamantExportTools.swift */,
+				E9942B83203CBFCE00C163AF /* AdamantQRTool.swift */,
 				E9C51ECC200E2BF900385EB7 /* HardFeeCalculator.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
@@ -770,6 +776,7 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/EFQRCode/EFQRCode.framework",
 				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
 				"${BUILT_PRODUCTS_DIR}/FTIndicator/FTIndicator.framework",
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
@@ -782,6 +789,7 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/EFQRCode.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Eureka.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FTIndicator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
@@ -838,6 +846,7 @@
 			files = (
 				E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */,
 				E9CAE8D22018AA7700345E76 /* AdamantApi+Accounts.swift in Sources */,
+				E9942B84203CBFCE00C163AF /* AdamantQRTool.swift in Sources */,
 				E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */,
 				E9CE778A202B9DC2009CF70D /* ChatTransaction+CoreDataProperties.swift in Sources */,
 				E9CAE8DA2018ACD300345E76 /* AdamantApi+Chats.swift in Sources */,
@@ -865,6 +874,7 @@
 				E9CE7785202B9DC2009CF70D /* Chatroom+CoreDataClass.swift in Sources */,
 				E9CE7786202B9DC2009CF70D /* Chatroom+CoreDataProperties.swift in Sources */,
 				E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */,
+				E9942B82203C142B00C163AF /* QRTool.swift in Sources */,
 				E9CE7787202B9DC2009CF70D /* BaseTransaction+CoreDataClass.swift in Sources */,
 				E95F85872008FDBF0070534A /* Chat.swift in Sources */,
 				E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */,
@@ -1052,7 +1062,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = ADAMANT;
@@ -1105,7 +1115,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = ADAMANT;
 				SDKROOT = iphoneos;
@@ -1205,7 +1215,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = ADAMANT;

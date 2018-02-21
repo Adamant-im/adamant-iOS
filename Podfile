@@ -19,4 +19,7 @@ target 'Adamant' do
   pod 'GrowingTextView' # Passphrase text view
   pod 'TableKit' # Declarative TableView
 
+  # QR
+  pod "EFQRCode" # QR generator
+  
 end
