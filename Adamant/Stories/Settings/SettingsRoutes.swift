@@ -14,4 +14,5 @@ extension AdamantStory {
 
 extension AdamantScene {
 	static let SettingsPage = AdamantScene(story: .Settings, identifier: "SettingsTableViewController")
+	static let QRGenerator = AdamantScene(story: .Settings, identifier: "QRGeneratorViewController")
 }
