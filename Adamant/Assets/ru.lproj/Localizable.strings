@@ -189,6 +189,9 @@
 /* Unknown internal error */
 "Unknown error" = "Неизвестная ошибка";
 
+/* Config: Utilities section */
+"Utilities" = "Утилиты";
+
 /* Config: Version row */
 "Version" = "Версия";
 
