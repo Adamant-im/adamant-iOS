@@ -14,7 +14,7 @@ import Photos
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct qrGenerator {
-		static let tapToSaveTooltip = NSLocalizedString("Tap to save", comment: "QRGenerator: small 'Tap to save' tooltip under generated QR")
+		static let tapToSaveTip = NSLocalizedString("Tap to save", comment: "QRGenerator: small 'Tap to save' tooltip under generated QR")
 		static let passphrasePlaceholder = NSLocalizedString("passphrase", comment: "QRGenerator: Passphrase textview placeholder")
 		static let generateButton = NSLocalizedString("Generate QR", comment: "QRGenerator: Generate QR for passphrase button")
 		
@@ -67,8 +67,9 @@ class QRGeneratorViewController: FormViewController {
 		form +++ Section() { $0.tag = Sections.qr.tag }
 		<<< QrRow() {
 			$0.tag = Rows.qr.tag
-			let width = $0.cell.bounds.width
-			$0.cell.height = {width}
+			$0.cell.tapToSaveLabel.font = UIFont.adamantPrimary(size: 14)
+			$0.cell.tapToSaveLabel.textColor = UIColor.adamantSecondary
+			$0.cell.tapToSaveLabel.text = String.adamantLocalized.qrGenerator.tapToSaveTip
 		}.onCellSelection({ [weak self] (cell, row) in
 			if let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow {
 				tableView.deselectRow(at: indexPath, animated: true)

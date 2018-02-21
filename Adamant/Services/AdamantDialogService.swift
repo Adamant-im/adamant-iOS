@@ -12,7 +12,7 @@ import FTIndicator
 class AdamantDialogService: DialogService {
 	// Configure notifications
 	init() {
-		FTIndicator.setIndicatorStyle(.dark)
+		FTIndicator.setIndicatorStyle(.extraLight)
 	}
 }
 
