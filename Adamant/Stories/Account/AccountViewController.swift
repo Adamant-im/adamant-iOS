@@ -46,9 +46,9 @@ class AccountViewController: UIViewController {
 	}
 	
 	private enum WalletRows: Int {
-		case balance, sendTokens, invest
+		case balance, /*sendTokens, */ invest
 		
-		static let total = 3
+		static let total = 2
 	}
 	
 	
@@ -166,8 +166,8 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 			case .balance:
 				performSegue(withIdentifier: showTransactionsSegue, sender: nil)
 				
-			case .sendTokens:
-				performSegue(withIdentifier: showTransferSegue, sender: nil)
+//			case .sendTokens:
+//				performSegue(withIdentifier: showTransferSegue, sender: nil)
 				
 			case .invest:
 				guard let address = accountService.account?.address,
@@ -242,10 +242,10 @@ extension AccountViewController {
 				cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
 				cell.imageView?.image = nil
 				
-			case .sendTokens:
-				cell.textLabel?.text = String.adamantLocalized.account.rowSendTokens
-				cell.detailTextLabel?.text = nil
-				cell.imageView?.image = nil
+//			case .sendTokens:
+//				cell.textLabel?.text = String.adamantLocalized.account.rowSendTokens
+//				cell.detailTextLabel?.text = nil
+//				cell.imageView?.image = nil
 				
 			case .invest:
 				cell.textLabel?.text = String.adamantLocalized.account.rowInvest
