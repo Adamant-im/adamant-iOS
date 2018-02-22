@@ -16,10 +16,10 @@ import AVFoundation
 extension String.adamantLocalized {
 	struct login {
 		static let passphrasePlaceholder = NSLocalizedString("passphrase", comment: "Login: Passphrase placeholder")
-		static let loggingInProgressMessage = NSLocalizedString("Logging in", comment: "Login: notify user that we a logging in.")
+		static let loggingInProgressMessage = NSLocalizedString("Logging in", comment: "Login: notify user that we a logging in")
 		
-		static let wrongPassphraseError = NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase.")
-		static let wrongQrError = NSLocalizedString("QR code does not contains a valid passphrase.", comment: "Login: Notify user that scanned QR doesn't contains passphrase.")
+		static let wrongPassphraseError = NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase")
+		static let wrongQrError = NSLocalizedString("QR code does not contains a valid passphrase", comment: "Login: Notify user that scanned QR doesn't contains a passphrase.")
 		static let noNetworkError = NSLocalizedString("No connection with The Internet", comment: "Login: No network error.")
 		
 		static let cameraNotAuthorized = NSLocalizedString("You need to authorize Adamant to use device's Camera", comment: "Login: Notify user, that he disabled camera in settings, and need to authorize application.")
@@ -345,48 +345,18 @@ extension LoginViewController: QRCodeReaderViewControllerDelegate {
 	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
 		guard AdamantUtilities.validateAdamantPassphrase(passphrase: result.value) else {
 			dialogService.showError(withMessage: String.adamantLocalized.login.wrongQrError)
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+				reader.startScanning()
+			}
 			return
 		}
 		
-		reader.stopScanning()
 		reader.dismiss(animated: true, completion: nil)
 		loginWith(passphrase: result.value)
 	}
 	
 	func readerDidCancel(_ reader: QRCodeReaderViewController) {
 		reader.dismiss(animated: true, completion: nil)
-	}
-	
-	private func checkCameraPermissions() -> Bool {
-		
-		
-		do {
-			return try QRCodeReader.supportsMetadataObjectTypes()
-		} catch let error as NSError {
-			let alert: UIAlertController
-			
-			switch error.code {
-			case -11852:
-				alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized, preferredStyle: .alert)
-				
-				alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default, handler: { (_) in
-					DispatchQueue.main.async {
-						if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
-							UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
-						}
-					}
-				}))
-				
-				alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-			default:
-				alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
-				alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
-			}
-			
-			present(alert, animated: true, completion: nil)
-			
-			return false
-		}
 	}
 }
 
