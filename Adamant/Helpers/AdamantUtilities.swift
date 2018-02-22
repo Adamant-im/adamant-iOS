@@ -92,7 +92,7 @@ extension AdamantUtilities {
 	}
 	
 	private static func validate(string: String, with regex: NSRegularExpression) -> Bool {
-		let matches = passphraseRegex.matches(in: string, options: [], range: NSRange(location: 0, length: string.count))
+		let matches = regex.matches(in: string, options: [], range: NSRange(location: 0, length: string.count))
 		
 		return matches.count == 1
 	}
