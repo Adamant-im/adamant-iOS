@@ -100,7 +100,7 @@ extension AdamantDialogService {
 					self?.presentModallyViewController(vc, animated: true, completion: completion)
 				})
 				
-			case .generateQr:
+			case .generateQr(let sharingTip):
 				alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
 					guard let qrTool = self?.qrTool else {
 						fatalError("Failed to initialize QRTool")
@@ -110,6 +110,7 @@ extension AdamantDialogService {
 					case .success(let qr):
 						let vc = ShareQrViewController(nibName: "ShareQrViewController", bundle: nil)
 						vc.qrCode = qr
+						vc.sharingTip = sharingTip
 						vc.excludedActivityTypes = excludedActivityTypes
 						self?.presentModallyViewController(vc, animated: true, completion: completion)
 						

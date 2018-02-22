@@ -22,7 +22,7 @@ public class QrCell: Cell<UIImage>, CellType {
 				bottomConstrain.constant = 0
 				tipLabel.isHidden = true
 			} else {
-				bottomConstrain.constant = 30
+				bottomConstrain.constant = 33
 				tipLabel.isHidden = false
 			}
 		}

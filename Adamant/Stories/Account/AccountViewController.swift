@@ -154,8 +154,8 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 				return
 			}
 			
-			dialogService.presentShareAlertFor(string: address,
-											   types: [.copyToPasteboard, .share],
+			dialogService.presentShareAlertFor(string: "adm:\(address)",
+				types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
 											   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 											   animated: true,
 											   completion: nil)

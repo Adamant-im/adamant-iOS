@@ -11,7 +11,7 @@ import UIKit
 enum ShareType {
 	case copyToPasteboard
 	case share
-	case generateQr
+	case generateQr(sharingTip: String?)
 	
 	var localized: String {
 		switch self {

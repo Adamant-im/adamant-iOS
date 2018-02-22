@@ -226,7 +226,7 @@ class LoginViewController: UIViewController {
 		}
 		
 		dialogService.presentShareAlertFor(string: passphrase,
-										   types: [.copyToPasteboard, .share, .generateQr],
+										   types: [.copyToPasteboard, .share, .generateQr(sharingTip: nil)],
 										   excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
 										   animated: true,
 										   completion: nil)

@@ -46,6 +46,22 @@ class ShareQrViewController: FormViewController {
 		}
 	}
 	
+	var sharingTip: String? {
+		didSet {
+			if let row: QrRow = form.rowBy(tag: Rows.qr.tag) {
+				if let tip = sharingTip {
+					row.cell.tipLabelIsHidden = false
+					row.cell.tipLabel.text = tip
+				} else {
+					row.cell.tipLabelIsHidden = true
+				}
+				row.updateCell()
+				tableView.beginUpdates()
+				tableView.endUpdates()
+			}
+		}
+	}
+	
 	var excludedActivityTypes: [UIActivityType]?
 	
 	// MARK: - Lifecycle
@@ -57,8 +73,19 @@ class ShareQrViewController: FormViewController {
 		<<< QrRow() {
 			$0.value = qrCode
 			$0.tag = Rows.qr.tag
-			$0.cell.tipLabelIsHidden = true
-		}
+			$0.cell.selectionStyle = .none
+			
+			if let sharingTip = sharingTip {
+				$0.cell.tipLabel.text = sharingTip
+			} else {
+				$0.cell.tipLabelIsHidden = true
+			}
+			}.cellSetup({ (cell, row) in
+				cell.tipLabel.font = UIFont.adamantPrimary(size: 17)
+				cell.tipLabel.textColor = UIColor.adamantPrimary
+			}).cellUpdate({ (cell, row) in
+				cell.tipLabel.textColor = UIColor.adamantPrimary
+			})
 		
 		// MARK: Buttons
 		+++ Section()

@@ -12,11 +12,11 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="405" id="S7r-Tz-Adq" customClass="QrCell" customModule="Adamant" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="375" height="405"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="408" id="S7r-Tz-Adq" customClass="QrCell" customModule="Adamant" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="408"/>
             <autoresizingMask key="autoresizingMask"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="S7r-Tz-Adq" id="HLh-xg-SCg">
-                <rect key="frame" x="0.0" y="0.0" width="375" height="404.5"/>
+                <rect key="frame" x="0.0" y="0.0" width="375" height="407.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="sXd-S8-zR5">
@@ -36,9 +36,11 @@
                     <constraint firstItem="e4D-pZ-uK9" firstAttribute="top" secondItem="sXd-S8-zR5" secondAttribute="bottom" constant="6" id="3R0-l3-sxl"/>
                     <constraint firstItem="sXd-S8-zR5" firstAttribute="leading" secondItem="HLh-xg-SCg" secondAttribute="leading" id="K78-WT-bvg"/>
                     <constraint firstItem="e4D-pZ-uK9" firstAttribute="centerX" secondItem="HLh-xg-SCg" secondAttribute="centerX" id="S8q-Tt-zp9"/>
-                    <constraint firstAttribute="bottom" secondItem="sXd-S8-zR5" secondAttribute="bottom" constant="30" id="WNm-QN-ZL0"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="e4D-pZ-uK9" secondAttribute="trailing" constant="8" id="TUa-L7-GW3"/>
+                    <constraint firstAttribute="bottom" secondItem="sXd-S8-zR5" secondAttribute="bottom" constant="33" id="WNm-QN-ZL0"/>
                     <constraint firstAttribute="trailing" secondItem="sXd-S8-zR5" secondAttribute="trailing" id="lz1-E9-XMm"/>
                     <constraint firstItem="sXd-S8-zR5" firstAttribute="top" secondItem="HLh-xg-SCg" secondAttribute="top" id="mwG-yu-k40"/>
+                    <constraint firstItem="e4D-pZ-uK9" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="HLh-xg-SCg" secondAttribute="leading" constant="8" id="vln-np-1ZJ"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
