@@ -142,15 +142,17 @@ extension QRGeneratorViewController {
 			return
 		}
 		
-		switch qrTool.generateQrFrom(passphrase: passphrase) {
+		guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
+			dialogService.showError(withMessage: String.adamantLocalized.qrGenerator.wrongPassphraseError)
+			return
+		}
+		
+		switch qrTool.generateQrFrom(string: passphrase) {
 		case .success(let qr):
 			setQr(image: qr)
 			
 		case .failure(let error):
 			dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.qrGenerator.internalError, String(describing: error)))
-			
-		case .invalidFormat:
-			dialogService.showError(withMessage: String.adamantLocalized.qrGenerator.wrongPassphraseError)
 		}
 	}
 	
