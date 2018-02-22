@@ -22,9 +22,9 @@ class HardFeeCalculatorTests: XCTestCase {
 	func testShortMessageFee() {
 		let calculator = HardFeeCalculator()
 		let message = "A quick brown fox bought bitcoins in 2009. Good for you, mr fox. You quick brown mother fucker."
-		let estimatedFee: UInt = 500000
+		let estimatedFee: UInt = 100000
 		
-		let calculatedFee = calculator.estimatedFeeFor(message: message)
+		let calculatedFee = calculator.estimatedFeeFor(message: AdamantMessage.text(message))
 		XCTAssertEqual(estimatedFee, calculatedFee)
 	}
 	
@@ -36,9 +36,9 @@ The olfactory system is reduced, suggesting that the sperm whale has a poor sens
 By contrast, the auditory system is enlarged.
 The pyramidal tract is poorly developed, reflecting the reduction of its limbs.
 """
-		let estimatedFee: UInt = 1000000
+		let estimatedFee: UInt = 200000
 		
-		let calculatedFee = calculator.estimatedFeeFor(message: message)
+		let calculatedFee = calculator.estimatedFeeFor(message: AdamantMessage.text(message))
 		XCTAssertEqual(estimatedFee, calculatedFee)
 	}
 	
@@ -92,9 +92,9 @@ I'll tell you when
 Mastodon / The Hunter / All The Heavy Lifting
 Brann Timothy Dailor / Troy Jayson Sanders / William Breen Kelliher / William Brent Hinds
 """
-		let estimatedFee: UInt = 2000000
+		let estimatedFee: UInt = 400000
 		
-		let calculatedFee = calculator.estimatedFeeFor(message: message)
+		let calculatedFee = calculator.estimatedFeeFor(message: AdamantMessage.text(message))
 		XCTAssertEqual(estimatedFee, calculatedFee)
 	}
 }
