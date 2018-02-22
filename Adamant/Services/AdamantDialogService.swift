@@ -79,21 +79,23 @@ extension AdamantDialogService {
 
 // MAKR: - Activity controllers
 extension AdamantDialogService {
-	func presentShareAlertFor(string: String, types: [ShareType], animated: Bool, completion: (() -> Void)?) {
+	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, completion: (() -> Void)?) {
 		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 		
 		for type in types {
 			switch type {
 			case .copyToPasteboard:
-				alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.copyToPasteboard, style: .default) { _ in
+				alert.addAction(UIAlertAction(title: type.localized , style: .default) { [weak self] _ in
 					UIPasteboard.general.string = string
-					self.showToastMessage(String.adamantLocalized.alert.copiedToPasteboardNotification)
+					self?.showToastMessage(String.adamantLocalized.alert.copiedToPasteboardNotification)
 				})
 				
 			case .share:
-				alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.share, style: .default) { _ in
+				alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
 					let vc = UIActivityViewController(activityItems: [string], applicationActivities: nil)
-					self.presentModallyViewController(vc, animated: true, completion: completion)
+					vc.excludedActivityTypes = excludedActivityTypes
+					self?.presentModallyViewController(vc, animated: true, completion: completion)
+				})
 				})
 			}
 		}

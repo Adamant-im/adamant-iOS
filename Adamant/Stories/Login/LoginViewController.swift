@@ -225,41 +225,11 @@ class LoginViewController: UIViewController {
 			return
 		}
 		
-		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-		
-		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.copyToPasteboard, style: .default, handler: { _ in
-			UIPasteboard.general.string = passphrase
-			self.dialogService.showToastMessage(String.adamantLocalized.alert.copiedToPasteboardNotification)
-		}))
-		
-		// Exclude all sharing activities
-		var excluded: [UIActivityType] = [.postToFacebook,
-										 .postToTwitter,
-										 .postToWeibo,
-										 .message,
-										 .mail,
-										 .assignToContact,
-										 .saveToCameraRoll,
-										 .addToReadingList,
-										 .postToFlickr,
-										 .postToVimeo,
-										 .postToTencentWeibo,
-										 .airDrop,
-										 .openInIBooks]
-		
-		if #available(iOS 11.0, *) {
-			excluded.append(.markupAsPDF)
-		}
-		
-		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.save, style: .default, handler: { _ in
-			let vc = UIActivityViewController(activityItems: [passphrase], applicationActivities: nil)
-			vc.excludedActivityTypes = excluded
-			self.present(vc, animated: true)
-		}))
-		
-		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-		
-		present(alert, animated: true)
+		dialogService.presentShareAlertFor(string: passphrase,
+										   types: [.copyToPasteboard, .share, .generateQr],
+										   excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
+										   animated: true,
+										   completion: nil)
 	}
 	
 	lazy var qrReader: QRCodeReaderViewController = {
