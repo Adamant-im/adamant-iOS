@@ -23,6 +23,7 @@ private struct AdamantResources {
 // MARK: - Services
 extension Container {
 	func registerAdamantServices() {
+		// MARK: - Standalone services
 		// MARK: AdamantCore
 		self.register(AdamantCore.self) { _ in
 			let core = JSAdamantCore()
@@ -32,8 +33,8 @@ extension Container {
 			return core
 		}.inObjectScope(.container)
 		
-		// MARK: DialogService
-		self.register(DialogService.self) { _ in AdamantDialogService() }.inObjectScope(.container)
+		// MARK: QR Tool
+		self.register(QRTool.self) { _ in AdamantQRTool() }.inObjectScope(.container)
 		
 		// MARK: Router
 		self.register(Router.self) { _ in SwinjectedRouter() }.inObjectScope(.container)
@@ -41,10 +42,25 @@ extension Container {
 		// MARK: CellFactory
 		self.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
 		
+		// MARK: Fee calculator
+		self.register(FeeCalculator.self) { _ in HardFeeCalculator() }.inObjectScope(.container)
+		
+		// MARK: Export tools
+		self.register(ExportTools.self) { _ in AdamantExportTools() }.inObjectScope(.container)
+		
+		
+		// MARK: - Services with dependencies
 		// MARK: ApiService
 		self.register(ApiService.self) { r in
 			let service = AdamantApiService(apiUrl: AdamantResources.api)
 			service.adamantCore = r.resolve(AdamantCore.self)!
+			return service
+		}.inObjectScope(.container)
+		
+		// MARK: DialogService
+		self.register(DialogService.self) { r in
+			let service = AdamantDialogService()
+			service.qrTool = r.resolve(QRTool.self)
 			return service
 		}.inObjectScope(.container)
 		
@@ -58,13 +74,6 @@ extension Container {
 			return service
 		}.inObjectScope(.container)
 		
-		// MARK: Fee calculator
-		self.register(FeeCalculator.self) { _ in HardFeeCalculator() }.inObjectScope(.container)
-		
-		// MARK: Export tools
-		self.register(ExportTools.self) { _ in AdamantExportTools() }
-		
-		self.register(QRTool.self) { _ in AdamantQRTool() }
 		
 		// MARK: - Data Providers
 		// MARK: CoreData Stack

@@ -26,7 +26,7 @@
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e4D-pZ-uK9">
-                        <rect key="frame" x="173" y="381" width="28" height="13"/>
+                        <rect key="frame" x="173" y="381" width="28" height="20.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -36,16 +36,17 @@
                     <constraint firstItem="e4D-pZ-uK9" firstAttribute="top" secondItem="sXd-S8-zR5" secondAttribute="bottom" constant="6" id="3R0-l3-sxl"/>
                     <constraint firstItem="sXd-S8-zR5" firstAttribute="leading" secondItem="HLh-xg-SCg" secondAttribute="leading" id="K78-WT-bvg"/>
                     <constraint firstItem="e4D-pZ-uK9" firstAttribute="centerX" secondItem="HLh-xg-SCg" secondAttribute="centerX" id="S8q-Tt-zp9"/>
-                    <constraint firstAttribute="bottom" secondItem="e4D-pZ-uK9" secondAttribute="bottom" constant="10" id="iX4-14-7BV"/>
+                    <constraint firstAttribute="bottom" secondItem="sXd-S8-zR5" secondAttribute="bottom" constant="30" id="WNm-QN-ZL0"/>
                     <constraint firstAttribute="trailing" secondItem="sXd-S8-zR5" secondAttribute="trailing" id="lz1-E9-XMm"/>
                     <constraint firstItem="sXd-S8-zR5" firstAttribute="top" secondItem="HLh-xg-SCg" secondAttribute="top" id="mwG-yu-k40"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
+                <outlet property="bottomConstrain" destination="WNm-QN-ZL0" id="m87-WS-n5x"/>
                 <outlet property="qrImageView" destination="sXd-S8-zR5" id="WR8-aE-C1g"/>
-                <outlet property="tapToSaveLabel" destination="e4D-pZ-uK9" id="uqe-Up-Dmw"/>
+                <outlet property="tipLabel" destination="e4D-pZ-uK9" id="6Nr-k7-Xyv"/>
             </connections>
-            <point key="canvasLocation" x="19.5" y="-165.5"/>
+            <point key="canvasLocation" x="18.5" y="-156.5"/>
         </tableViewCell>
     </objects>
 </document>

@@ -11,6 +11,7 @@ import UIKit
 enum ShareType {
 	case copyToPasteboard
 	case share
+	case generateQr
 	
 	var localized: String {
 		switch self {
@@ -29,6 +30,7 @@ enum ShareType {
 extension String.adamantLocalized.alert {
 	static let copyToPasteboard = NSLocalizedString("Copy to Pasteboard", comment: "Shared alert 'Copy' button. Used anywhere. Used for copy-paste info.")
 	static let share = NSLocalizedString("Share", comment: "Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu.")
+	static let generateQr = NSLocalizedString("Generate QR Code", comment: "Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere.")
 }
 
 enum ShareContentType {

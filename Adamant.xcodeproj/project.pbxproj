@@ -139,6 +139,8 @@
 		E9EC342120052ABB00C0E546 /* TransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC342020052ABB00C0E546 /* TransferViewController.swift */; };
 		E9EC344720066D4A00C0E546 /* AddressValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */; };
 		E9FAE5DA203DBFEF008D3A6B /* Comparable+Clamped.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FAE5D9203DBFEF008D3A6B /* Comparable+Clamped.swift */; };
+		E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */; };
+		E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -296,6 +298,8 @@
 		E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressValidationTests.swift; sourceTree = "<group>"; };
 		E9EC344820066D4A00C0E546 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E9FAE5D9203DBFEF008D3A6B /* Comparable+Clamped.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Comparable+Clamped.swift"; sourceTree = "<group>"; };
+		E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareQrViewController.swift; sourceTree = "<group>"; };
+		E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShareQrViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -456,6 +460,7 @@
 		E919479920000FFD001362F8 /* Stories */ = {
 			isa = PBXGroup;
 			children = (
+				E9FAE5DB203ECD41008D3A6B /* Shared */,
 				E9E7CDA52002AE1C00DFC4DB /* Account */,
 				E95F857B2008C8B20070534A /* Chats */,
 				E919479A20001007001362F8 /* Login */,
@@ -539,8 +544,6 @@
 				E948E03A20235E2300975D6B /* SettingsRoutes.swift */,
 				E982F69B20235B4D00566AC7 /* SettingsTableViewController.swift */,
 				E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */,
-				E9942B86203D9E5100C163AF /* EurekaQRRow.swift */,
-				E9942B88203D9ECA00C163AF /* QrCell.xib */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -628,6 +631,8 @@
 				E9B6CC5420176F3300486EA1 /* TextViewTableViewCell.xib */,
 				E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */,
 				E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */,
+				E9942B86203D9E5100C163AF /* EurekaQRRow.swift */,
+				E9942B88203D9ECA00C163AF /* QrCell.xib */,
 			);
 			path = SharedCells;
 			sourceTree = "<group>";
@@ -645,6 +650,15 @@
 				E9EC344820066D4A00C0E546 /* Info.plist */,
 			);
 			path = AdamantTests;
+			sourceTree = "<group>";
+		};
+		E9FAE5DB203ECD41008D3A6B /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */,
+				E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -763,6 +777,7 @@
 				E93580D9201607DA0057FC2E /* knownContacts.json in Resources */,
 				E948E0482024F02700975D6B /* LoginFooter.xib in Resources */,
 				E9452A4C20344834005BA34C /* Account.storyboard in Resources */,
+				E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -878,6 +893,7 @@
 				E9C51ECB200E2AA100385EB7 /* FeeCalculator.swift in Sources */,
 				E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */,
 				E982F69C20235B4D00566AC7 /* SettingsTableViewController.swift in Sources */,
+				E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */,
 				E9CE778E202B9DC2009CF70D /* TransferTransaction+CoreDataProperties.swift in Sources */,
 				E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */,
 				E95F858B200931410070534A /* TransactionAsset.swift in Sources */,

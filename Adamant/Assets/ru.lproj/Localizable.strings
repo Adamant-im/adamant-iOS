@@ -72,8 +72,8 @@
 /* Transfer: Tokens transfered successfully message */
 "Funds sended!" = "Токены переведены!";
 
-/* QRGenerator: Generate QR for passphrase button */
-"Generate QR" = "Создать QR-код";
+/* Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere. */
+"Generate QR Code" = "Создать QR-код";
 
 /* Config: Generate QR with passphrase row */
 "Generate QR with passphrase" = "Создать QR-код с паролем";
