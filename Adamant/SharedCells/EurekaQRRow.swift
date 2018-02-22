@@ -13,7 +13,20 @@ import Eureka
 // The cell is defined using a .xib, so we can set outlets :)
 public class QrCell: Cell<UIImage>, CellType {
 	@IBOutlet weak var qrImageView: UIImageView!
-	@IBOutlet weak var tapToSaveLabel: UILabel!
+	@IBOutlet weak var tipLabel: UILabel!
+	@IBOutlet weak var bottomConstrain: NSLayoutConstraint!
+	
+	var tipLabelIsHidden: Bool = false {
+		didSet {
+			if tipLabelIsHidden {
+				bottomConstrain.constant = 0
+				tipLabel.isHidden = true
+			} else {
+				bottomConstrain.constant = 33
+				tipLabel.isHidden = false
+			}
+		}
+	}
 	
 	public override func update() {
 		qrImageView.image = row.value

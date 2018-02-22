@@ -365,6 +365,7 @@ extension AdamantChatsProvider {
 		}
 		
 		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
+		chatroom.updatedAt = Date() as NSDate
 		
 		if chatroom.managedObjectContext == account.managedObjectContext {
 			chatroom.partner = account

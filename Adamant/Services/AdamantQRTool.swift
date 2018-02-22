@@ -10,17 +10,13 @@ import Foundation
 import EFQRCode
 
 class AdamantQRTool: QRTool {
-	func generateQrFrom(passphrase: String) -> QRToolGenerateResult {
-		guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
-			return .invalidFormat
-		}
-		
-		if let qr = EFQRCode.generate(content: passphrase) {
+	func generateQrFrom(string: String) -> QRToolGenerateResult {
+		if let qr = EFQRCode.generate(content: string) {
 			let image = UIImage(cgImage: qr)
 			return .success(image)
 		}
 		
-		return .failure(error: AdamantError(message: "Failed to generate QR from: \(passphrase)"))
+		return .failure(error: AdamantError(message: "Failed to generate QR from: \(string)"))
 	}
 	
 	func readQR(_ qr: UIImage) -> QRToolDecodeResult {
@@ -30,9 +26,7 @@ class AdamantQRTool: QRTool {
 		}
 		
 		if let result = EFQRCode.recognize(image: image)?.first {
-			if AdamantUtilities.validateAdamantPassphrase(passphrase: result) {
-				return .passphrase(result)
-			}
+			return .success(result)
 		}
 		
 		return .none

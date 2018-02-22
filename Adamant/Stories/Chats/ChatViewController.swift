@@ -13,7 +13,9 @@ import CoreData
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct chat {
-		static let estimatedFeeFormat = NSLocalizedString("Estimated fee: %@", comment: "Chat: input bar: Estimated fee.")
+		static let sendButton = NSLocalizedString("Send", comment: "Chat: Send message button")
+		static let messageInputPlaceholder = NSLocalizedString("New message", comment: "Chat: message input placeholder")
+		static let estimatedFeeFormat = NSLocalizedString("Estimated fee: %@", comment: "Chat: input bar: Estimated fee")
 		
 		static let messageIsEmpty = NSLocalizedString("Message is empty", comment: "Chat: Notify user that message cannot be empty")
 		static let messageTooLong = NSLocalizedString("Message is too long", comment: "Chat: Message is too long")
@@ -110,6 +112,7 @@ class ChatViewController: MessagesViewController {
 		let bordersColor = UIColor(red: 200/255, green: 200/255, blue: 200/255, alpha: 1)
 		let size: CGFloat = 6.0
 		
+		messageInputBar.inputTextView.placeholder = String.adamantLocalized.chat.messageInputPlaceholder
 		messageInputBar.separatorLine.backgroundColor = bordersColor
 		messageInputBar.inputTextView.placeholderTextColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1)
 		messageInputBar.inputTextView.textContainerInset = UIEdgeInsets(top: size, left: size*2, bottom: size, right: size*2)
@@ -134,6 +137,7 @@ class ChatViewController: MessagesViewController {
 		messageInputBar.sendButton.configure {
 			$0.setTitleColor(UIColor.adamantPrimary, for: .normal)
 			$0.setTitleColor(UIColor.adamantSecondary, for: .highlighted)
+			$0.title = String.adamantLocalized.chat.sendButton
 		}
 		
 		if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
@@ -152,7 +156,11 @@ class ChatViewController: MessagesViewController {
 	
 	@IBAction func properties(_ sender: Any) {
 		if let address = chatroom?.partner?.address {
-			dialogService.presentShareAlertFor(string: address, types: [.copyToPasteboard, .share], animated: true, completion: nil)
+			dialogService.presentShareAlertFor(string: "adm:\(address)",
+				types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+											   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+											   animated: true,
+											   completion: nil)
 		}
 	}
 }

@@ -60,7 +60,7 @@
 /* Shared alert 'Error' title. Used anywhere */
 "Error" = "Ошибка";
 
-/* Chat: input bar: Estimated fee. */
+/* Chat: input bar: Estimated fee */
 "Estimated fee: %@" = "Ориентировочная комиссия: %@";
 
 /* Transaction details: fee row. */
@@ -72,8 +72,8 @@
 /* Transfer: Tokens transfered successfully message */
 "Funds sended!" = "Токены переведены!";
 
-/* QRGenerator: Generate QR for passphrase button */
-"Generate QR" = "Создать QR-код";
+/* Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere. */
+"Generate QR Code" = "Создать QR-код";
 
 /* Config: Generate QR with passphrase row */
 "Generate QR with passphrase" = "Создать QR-код с паролем";
@@ -87,7 +87,7 @@
 /* Wallet page: 'Invest in ICO' button */
 "Invest in ICO" = "Инвестировать в ICO";
 
-/* Login: notify user that we a logging in. */
+/* Login: notify user that we a logging in */
 "Logging in" = "Входим...";
 
 /* Login: Login button
@@ -113,6 +113,9 @@
 /* Login: Create new account section */
 "New account" = "Новый аккаунт";
 
+/* Chat: message input placeholder */
+"New message" = "Новое сообщение";
+
 /* ApiService: No connection message. Generally bad network. */
 "No connection" = "Нет соединения с интернетом";
 
@@ -134,8 +137,11 @@
 /* Login: Login with QR button. */
 "QR" = "Войти с QR-кодом";
 
+/* New Chat: Notify user that scanned QR doesn't contains an address */
+"QR code does not contains a valid adamant address" = "QR код не содержит адреса";
+
 /* Login: Notify user that scanned QR doesn't contains passphrase. */
-"QR code does not contains a valid passphrase." = "QR код не содержит пароля";
+"QR code does not contains a valid passphrase" = "QR код не содержит пароля";
 
 /* Login: Notify user that device not supported by QR reader */
 "QR codes reading not supported by the current device" = "На этом устройстве не поддерживается чтение QR кодов";
@@ -146,7 +152,11 @@
 /* Login: security alert, notify user that he must save his new passphrase */
 "Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it" = "Это пароль для нового Кошелька и Мессенджера. Сохраните его! Для входа в Кошелек не нужно логина, только этот пароль. Восстановление пароля невозможно.";
 
-/* Transfer: Confirm transfer alert: Send tokens button */
+/* New chat: Scan QR with address button */
+"Scan QR" = "Сканировать QR код";
+
+/* Transfer: Confirm transfer alert: Send tokens button
+   Chat: Send message button */
 "Send" = "Отправить";
 
 /* Transfer: Confirm transfer X tokens to Y message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
@@ -198,7 +208,7 @@
 /* Wallet page: Wallet section title */
 "Wallet" = "Кошелёк";
 
-/* Login: user typed in wrong passphrase. */
+/* Login: user typed in wrong passphrase */
 "Wrong passphrase!" = "Неправильный пароль";
 
 /* Chat: Notify user that he doesn't have money to pay a message fee */

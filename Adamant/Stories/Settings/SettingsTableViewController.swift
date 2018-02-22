@@ -126,7 +126,10 @@ extension SettingsTableViewController {
 			performSegue(withIdentifier: qrGeneratorSegue, sender: nil)
 			
 		case .applicationInfo:
-			dialogService.presentShareAlertFor(string: AdamantUtilities.applicationVersion, types: [.copyToPasteboard], animated: true) {
+			dialogService.presentShareAlertFor(string: AdamantUtilities.applicationVersion,
+											   types: [.copyToPasteboard],
+											   excludedActivityTypes: nil,
+											   animated: true) {
 				tableView.deselectRow(at: indexPath, animated: true)
 			}
 		}

@@ -9,11 +9,6 @@
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <customFonts key="customFonts">
-        <array key="Exo+2_400_normal.ttf">
-            <string>Exo2-Regular</string>
-        </array>
-    </customFonts>
     <scenes>
         <!--Chats-->
         <scene sceneID="fBA-xt-PKp">
@@ -56,65 +51,31 @@
             <point key="canvasLocation" x="929" y="42"/>
         </scene>
         <!--New Chat-->
-        <scene sceneID="a5b-NZ-CDn">
+        <scene sceneID="UCr-mN-04p">
             <objects>
-                <tableViewController id="rtY-9H-j9D" customClass="NewChatViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" dataMode="static" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="44" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="Dqc-T8-MFZ">
+                <viewController id="ruG-0T-nfO" customClass="NewChatViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="vrD-Yy-PPZ">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                        <sections>
-                            <tableViewSection headerTitle="Recipient Address" id="plW-LM-q5E">
-                                <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="ps8-Sh-jNJ">
-                                        <rect key="frame" x="0.0" y="55.5" width="375" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ps8-Sh-jNJ" id="4wM-bh-sVe">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="aW0-JI-mqg">
-                                                    <rect key="frame" x="12" y="0.0" width="351" height="44"/>
-                                                    <nil key="textColor"/>
-                                                    <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="17"/>
-                                                    <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters" autocorrectionType="no" keyboardType="numberPad" returnKeyType="next"/>
-                                                </textField>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="aW0-JI-mqg" firstAttribute="leading" secondItem="4wM-bh-sVe" secondAttribute="leading" constant="12" id="M6m-Be-YSv"/>
-                                                <constraint firstAttribute="trailing" secondItem="aW0-JI-mqg" secondAttribute="trailing" constant="12" id="ZhD-tf-2yi"/>
-                                                <constraint firstItem="aW0-JI-mqg" firstAttribute="top" secondItem="4wM-bh-sVe" secondAttribute="top" id="hVY-LB-bjt"/>
-                                                <constraint firstAttribute="bottom" secondItem="aW0-JI-mqg" secondAttribute="bottom" id="sP1-tl-6bi"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                </cells>
-                            </tableViewSection>
-                        </sections>
-                        <connections>
-                            <outlet property="dataSource" destination="rtY-9H-j9D" id="8Aw-Wx-xyr"/>
-                            <outlet property="delegate" destination="rtY-9H-j9D" id="TIu-JZ-flg"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="New Chat" id="5N6-IX-Nxi">
-                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="GfW-fU-09V">
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <viewLayoutGuide key="safeArea" id="rK6-fr-s0Z"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="New Chat" id="R9S-0N-t3f">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="ujl-x3-pvk">
                             <connections>
-                                <action selector="cancel:" destination="rtY-9H-j9D" id="cKx-Kc-go6"/>
+                                <action selector="cancel:" destination="ruG-0T-nfO" id="McR-Jl-uAY"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="c8k-iq-Jzo">
+                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="64v-bG-Y6n">
                             <connections>
-                                <action selector="done:" destination="rtY-9H-j9D" id="x9S-3m-NZb"/>
+                                <action selector="done:" destination="ruG-0T-nfO" id="dI7-Jp-ZJH"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <connections>
-                        <outlet property="accountTextField" destination="aW0-JI-mqg" id="FWg-OE-jBb"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="caQ-hu-1yy" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vqN-G9-dG3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2751" y="-439"/>
+            <point key="canvasLocation" x="2780" y="-439"/>
         </scene>
         <!--Chat View Controller-->
         <scene sceneID="w1v-2h-ifS">
@@ -169,7 +130,7 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="rtY-9H-j9D" kind="relationship" relationship="rootViewController" id="7TF-Vb-G9a"/>
+                        <segue destination="ruG-0T-nfO" kind="relationship" relationship="rootViewController" id="cOT-dh-Mqb"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UFg-Ym-dnp" userLabel="First Responder" sceneMemberID="firstResponder"/>

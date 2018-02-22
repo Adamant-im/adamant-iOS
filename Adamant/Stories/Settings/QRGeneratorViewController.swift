@@ -16,7 +16,6 @@ extension String.adamantLocalized {
 	struct qrGenerator {
 		static let tapToSaveTip = NSLocalizedString("Tap to save", comment: "QRGenerator: small 'Tap to save' tooltip under generated QR")
 		static let passphrasePlaceholder = NSLocalizedString("passphrase", comment: "QRGenerator: Passphrase textview placeholder")
-		static let generateButton = NSLocalizedString("Generate QR", comment: "QRGenerator: Generate QR for passphrase button")
 		
 		static let wrongPassphraseError = NSLocalizedString("Enter correct passphrase", comment: "QRGenerator: user typed in wrong invalid")
 		static let internalError = NSLocalizedString("Internal error: %@", comment: "QRGenerator: Bad Internal generator error message format")
@@ -63,13 +62,16 @@ class QRGeneratorViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
+		self.tableView.showsVerticalScrollIndicator = false
+		self.tableView.showsHorizontalScrollIndicator = false
+		
 		// MARK: QR section
 		form +++ Section() { $0.tag = Sections.qr.tag }
 		<<< QrRow() {
 			$0.tag = Rows.qr.tag
-			$0.cell.tapToSaveLabel.font = UIFont.adamantPrimary(size: 14)
-			$0.cell.tapToSaveLabel.textColor = UIColor.adamantSecondary
-			$0.cell.tapToSaveLabel.text = String.adamantLocalized.qrGenerator.tapToSaveTip
+			$0.cell.tipLabel.font = UIFont.adamantPrimary(size: 14)
+			$0.cell.tipLabel.textColor = UIColor.adamantSecondary
+			$0.cell.tipLabel.text = String.adamantLocalized.qrGenerator.tapToSaveTip
 		}.onCellSelection({ [weak self] (cell, row) in
 			if let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow {
 				tableView.deselectRow(at: indexPath, animated: true)
@@ -80,6 +82,7 @@ class QRGeneratorViewController: FormViewController {
 			}
 			
 			let vc = UIActivityViewController(activityItems: [qr], applicationActivities: nil)
+			vc.excludedActivityTypes = ShareContentType.passphrase.excludedActivityTypes
 			vc.completionWithItemsHandler = { (_, completed: Bool, _, error: Error?) in
 				if completed {
 					self?.dialogService.showToastMessage(String.adamantLocalized.alert.done)
@@ -110,7 +113,7 @@ class QRGeneratorViewController: FormViewController {
 		})
 		
 		<<< ButtonRow() {
-			$0.title = String.adamantLocalized.qrGenerator.generateButton
+			$0.title = String.adamantLocalized.alert.generateQr
 			$0.tag = Rows.generateButton.tag
 		}.onCellSelection({ [weak self] (cell, row) in
 			self?.generateQr()
@@ -142,15 +145,17 @@ extension QRGeneratorViewController {
 			return
 		}
 		
-		switch qrTool.generateQrFrom(passphrase: passphrase) {
+		guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
+			dialogService.showError(withMessage: String.adamantLocalized.qrGenerator.wrongPassphraseError)
+			return
+		}
+		
+		switch qrTool.generateQrFrom(string: passphrase) {
 		case .success(let qr):
 			setQr(image: qr)
 			
 		case .failure(let error):
 			dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.qrGenerator.internalError, String(describing: error)))
-			
-		case .invalidFormat:
-			dialogService.showError(withMessage: String.adamantLocalized.qrGenerator.wrongPassphraseError)
 		}
 	}
 	

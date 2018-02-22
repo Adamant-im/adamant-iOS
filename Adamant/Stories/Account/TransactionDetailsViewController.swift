@@ -174,7 +174,10 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 			payload = ""
 		}
 		
-		dialogService.presentShareAlertFor(string: payload, types: [.copyToPasteboard, .share], animated: true) {
+		dialogService.presentShareAlertFor(string: payload,
+										   types: [.copyToPasteboard, .share],
+										   excludedActivityTypes: nil,
+										   animated: true) {
 			tableView.deselectRow(at: indexPath, animated: true)
 		}
 	}
