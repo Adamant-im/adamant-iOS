@@ -112,6 +112,8 @@ extension SettingsTableViewController {
 			cell.detailTextLabel?.text = AdamantUtilities.applicationVersion
 		}
 		
+		cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+		cell.textLabel?.textColor = UIColor.adamantPrimary
 		
 		return cell
 	}
