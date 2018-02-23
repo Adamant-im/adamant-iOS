@@ -148,7 +148,6 @@ extension ChatsListViewController {
 	}
 	
 	private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
-		
 		if let partner = chatroom.partner {
 			if let name = partner.name {
 				cell.accountLabel.text = name
@@ -158,6 +157,7 @@ extension ChatsListViewController {
 			
 			if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
 				cell.avatarImage = avatar
+				cell.avatarImageView.tintColor = UIColor.adamantPrimary
 				cell.borderWidth = 1
 			} else {
 				cell.avatarImage = nil

@@ -10,9 +10,6 @@ import UIKit
 import FTIndicator
 
 class AdamantDialogService: DialogService {
-	// MARK: Dependencies
-	var qrTool: QRTool!
-	
 	// Configure notifications
 	init() {
 		FTIndicator.setIndicatorStyle(.extraLight)
@@ -102,11 +99,7 @@ extension AdamantDialogService {
 				
 			case .generateQr(let sharingTip):
 				alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-					guard let qrTool = self?.qrTool else {
-						fatalError("Failed to initialize QRTool")
-					}
-					
-					switch qrTool.generateQrFrom(string: string) {
+					switch AdamantQRTools.generateQrFrom(string: string) {
 					case .success(let qr):
 						let vc = ShareQrViewController(nibName: "ShareQrViewController", bundle: nil)
 						vc.qrCode = qr

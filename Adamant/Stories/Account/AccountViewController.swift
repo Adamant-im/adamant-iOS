@@ -134,7 +134,12 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 	}
 	
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-		return 65
+		
+		if indexPath.section == 0 && indexPath.row == 0 {
+			return 65
+		}
+		
+		return 44.5
 	}
 	
 	func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -154,7 +159,9 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 				return
 			}
 			
-			dialogService.presentShareAlertFor(string: "adm:\(address)",
+			let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+			
+			dialogService.presentShareAlertFor(string: encodedAddress,
 				types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
 											   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 											   animated: true,

@@ -27,21 +27,21 @@
                 <rect key="frame" x="0.0" y="0.0" width="375" height="73.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Chat" translatesAutoresizingMaskIntoConstraints="NO" id="aVv-ww-kYa" customClass="RoundImageView" customModule="FreakingSimpleRoundImageView">
-                        <rect key="frame" x="14" y="14" width="45" height="45"/>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Chat" translatesAutoresizingMaskIntoConstraints="NO" id="aVv-ww-kYa" customClass="RoundImageView" customModule="FreakingSimpleRoundImageView">
+                        <rect key="frame" x="14" y="11.5" width="50" height="50"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="45" id="TUg-9Q-Uxu"/>
-                            <constraint firstAttribute="height" constant="45" id="rLx-nq-QVw"/>
+                            <constraint firstAttribute="width" constant="50" id="TUg-9Q-Uxu"/>
+                            <constraint firstAttribute="height" constant="50" id="rLx-nq-QVw"/>
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="500" text="U12599860833263738480" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SiC-bM-ZsH">
-                        <rect key="frame" x="69" y="9" width="204" height="20"/>
+                        <rect key="frame" x="74" y="9" width="204" height="20"/>
                         <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C7l-tD-ej1">
-                        <rect key="frame" x="69" y="31" width="294.5" height="18"/>
+                        <rect key="frame" x="74" y="31" width="289.5" height="18"/>
                         <string key="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
                         <fontDescription key="fontDescription" name="Exo2-Light" family="Exo 2 Light" pointSize="15"/>
                         <nil key="textColor"/>

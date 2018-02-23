@@ -7,15 +7,20 @@
     },
     {
       "idiom" : "universal",
+      "filename" : "avatar_bots@2x.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
+      "filename" : "avatar_bots@3x.png",
       "scale" : "3x"
     }
   ],
   "info" : {
     "version" : 1,
     "author" : "xcode"
+  },
+  "properties" : {
+    "template-rendering-intent" : "template"
   }
 }
