@@ -194,7 +194,7 @@ class NewChatViewController: FormViewController {
 	}
 	
 	// MARK: - Other
-	func startNewChat(with address: String) {
+	func startNewChat(with address: String, name: String? = nil) {
 		guard AdamantUtilities.validateAdamantAddress(address: address) else {
 			dialogService.showToastMessage(String.adamantLocalized.newChat.specifyValidAddressMessage)
 			return
@@ -211,6 +211,11 @@ class NewChatViewController: FormViewController {
 			switch result {
 			case .success(let account):
 				DispatchQueue.main.async {
+					if account.name == nil {
+						account.name = name
+						try? account.managedObjectContext?.save()
+					}
+					
 					self.delegate?.newChatController(self, didSelectAccount: account)
 					self.dialogService.dismissProgress()
 				}
@@ -229,7 +234,7 @@ class NewChatViewController: FormViewController {
 // MARK: - QR
 extension NewChatViewController: QRCodeReaderViewControllerDelegate {
 	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-		guard result.value.starts(with: "adm:") else {
+		guard let uri = AdamantUriTools.decode(uri: result.value) else {
 			dialogService.showError(withMessage: String.adamantLocalized.newChat.wrongQrError)
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
 				reader.startScanning()
@@ -237,19 +242,25 @@ extension NewChatViewController: QRCodeReaderViewControllerDelegate {
 			return
 		}
 		
-		let raw = result.value
-		let address = String(raw[raw.index(raw.startIndex, offsetBy: 4)...])
-		
-		guard AdamantUtilities.validateAdamantAddress(address: address) else {
+		switch uri {
+		case .address(address: let addr, params: let params):
+			if let params = params?.first {
+				switch params {
+				case .label(label: let label):
+					startNewChat(with: addr, name: label)
+				}
+			} else {
+				startNewChat(with: addr)
+			}
+			
+			reader.dismiss(animated: true, completion: nil)
+			
+		default:
 			dialogService.showError(withMessage: String.adamantLocalized.newChat.wrongQrError)
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
 				reader.startScanning()
 			}
-			return
 		}
-		
-		reader.dismiss(animated: true, completion: nil)
-		startNewChat(with: address)
 	}
 	
 	func readerDidCancel(_ reader: QRCodeReaderViewController) {

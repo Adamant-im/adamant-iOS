@@ -49,7 +49,6 @@ class TransactionDetailsViewController: UIViewController {
 	
 	// MARK: - Dependencies
 	var dialogService: DialogService!
-	var exportTools: ExportTools!
 	
 	// MARK: - Properties
 	private let cellIdentifier = "cell"
@@ -89,16 +88,16 @@ class TransactionDetailsViewController: UIViewController {
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
 		
 		// URL
-		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportUrlButton, style: .default) { _ in
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportUrlButton, style: .default) { [weak self] _ in
 			let alert = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-			self.present(alert, animated: true, completion: nil)
+			self?.present(alert, animated: true, completion: nil)
 		})
 		
 		// Description
-		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportSummaryButton, style: .default, handler: { _ in
-			let text = self.exportTools.summaryFor(transaction: transaction, url: url)
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportSummaryButton, style: .default, handler: { [weak self] _ in
+			let text = AdamantExportTools.summaryFor(transaction: transaction, url: url)
 			let alert = UIActivityViewController(activityItems: [text], applicationActivities: nil)
-			self.present(alert, animated: true, completion: nil)
+			self?.present(alert, animated: true, completion: nil)
 		}))
 		
 		present(alert, animated: true, completion: nil)

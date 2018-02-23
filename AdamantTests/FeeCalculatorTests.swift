@@ -1,5 +1,5 @@
 //
-//  HardFeeCalculatorTests.swift
+//  FeeCalculatorTests.swift
 //  AdamantTests
 //
 //  Created by Anokhov Pavel on 16.01.2018.
@@ -11,25 +11,22 @@ import XCTest
 
 class HardFeeCalculatorTests: XCTestCase {
     func testTransferFee() {
-		let calculator = HardFeeCalculator()
 		let amountToTransfer: UInt = 50000000000000000
 		let estimatedFee: UInt = 50000000
 		
-		let calculatedFee = calculator.estimatedFeeFor(transfer: amountToTransfer)
+		let calculatedFee = AdamantFeeCalculator.estimatedFeeFor(transfer: amountToTransfer)
 		XCTAssertEqual(estimatedFee, calculatedFee)
     }
 	
 	func testShortMessageFee() {
-		let calculator = HardFeeCalculator()
 		let message = "A quick brown fox bought bitcoins in 2009. Good for you, mr fox. You quick brown mother fucker."
 		let estimatedFee: UInt = 100000
 		
-		let calculatedFee = calculator.estimatedFeeFor(message: AdamantMessage.text(message))
+		let calculatedFee = AdamantFeeCalculator.estimatedFeeFor(message: AdamantMessage.text(message))
 		XCTAssertEqual(estimatedFee, calculatedFee)
 	}
 	
 	func testLongMessageFee() {
-		let calculator = HardFeeCalculator()
 		let message = """
 The sperm whale's cerebrum is the largest in all mammalia, both in absolute and relative terms.
 The olfactory system is reduced, suggesting that the sperm whale has a poor sense of taste and smell.
@@ -38,12 +35,11 @@ The pyramidal tract is poorly developed, reflecting the reduction of its limbs.
 """
 		let estimatedFee: UInt = 200000
 		
-		let calculatedFee = calculator.estimatedFeeFor(message: AdamantMessage.text(message))
+		let calculatedFee = AdamantFeeCalculator.estimatedFeeFor(message: AdamantMessage.text(message))
 		XCTAssertEqual(estimatedFee, calculatedFee)
 	}
 	
 	func testVeryLongMessageFee() {
-		let calculator = HardFeeCalculator()
 		let message = """
 Lift you up again
 Give you to the trees
@@ -94,7 +90,7 @@ Brann Timothy Dailor / Troy Jayson Sanders / William Breen Kelliher / William Br
 """
 		let estimatedFee: UInt = 400000
 		
-		let calculatedFee = calculator.estimatedFeeFor(message: AdamantMessage.text(message))
+		let calculatedFee = AdamantFeeCalculator.estimatedFeeFor(message: AdamantMessage.text(message))
 		XCTAssertEqual(estimatedFee, calculatedFee)
 	}
 }

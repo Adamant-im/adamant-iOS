@@ -32,20 +32,14 @@ extension Container {
 			return core
 		}.inObjectScope(.container)
 		
-		// MARK: QR Tool
-		self.register(QRTool.self) { _ in AdamantQRTool() }.inObjectScope(.container)
-		
 		// MARK: Router
 		self.register(Router.self) { _ in SwinjectedRouter() }.inObjectScope(.container)
 		
 		// MARK: CellFactory
 		self.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
 		
-		// MARK: Fee calculator
-		self.register(FeeCalculator.self) { _ in HardFeeCalculator() }.inObjectScope(.container)
-		
-		// MARK: Export tools
-		self.register(ExportTools.self) { _ in AdamantExportTools() }.inObjectScope(.container)
+		// MARK: DialogService
+		self.register(DialogService.self) { r in AdamantDialogService() }.inObjectScope(.container)
 		
 		
 		// MARK: - Services with dependencies
@@ -53,13 +47,6 @@ extension Container {
 		self.register(ApiService.self) { r in
 			let service = AdamantApiService(apiUrl: AdamantResources.api)
 			service.adamantCore = r.resolve(AdamantCore.self)!
-			return service
-		}.inObjectScope(.container)
-		
-		// MARK: DialogService
-		self.register(DialogService.self) { r in
-			let service = AdamantDialogService()
-			service.qrTool = r.resolve(QRTool.self)
 			return service
 		}.inObjectScope(.container)
 		
@@ -106,7 +93,6 @@ extension Container {
 			provider.stack = r.resolve(CoreDataStack.self)
 			provider.adamantCore = r.resolve(AdamantCore.self)
 			provider.accountsProvider = r.resolve(AccountsProvider.self)
-			provider.feeCalculator = r.resolve(FeeCalculator.self)
 			return provider
 		}.inObjectScope(.container)
 	}

@@ -41,7 +41,6 @@ class ChatViewController: MessagesViewController {
 	// MARK: - Dependencies
 	var chatsProvider: ChatsProvider!
 	var dialogService: DialogService!
-	var feeCalculator: FeeCalculator!
 	
 	// MARK: - Properties
 	weak var delegate: ChatViewControllerDelegate?
@@ -142,7 +141,7 @@ class ChatViewController: MessagesViewController {
 		
 		if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
 			messageInputBar.inputTextView.text = message
-			setEstimatedFee(feeCalculator.estimatedFeeFor(message: AdamantMessage.text(message)))
+			setEstimatedFee(AdamantFeeCalculator.estimatedFeeFor(message: AdamantMessage.text(message)))
 		}
     }
 	
@@ -156,7 +155,9 @@ class ChatViewController: MessagesViewController {
 	
 	@IBAction func properties(_ sender: Any) {
 		if let address = chatroom?.partner?.address {
-			dialogService.presentShareAlertFor(string: "adm:\(address)",
+			let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+			
+			dialogService.presentShareAlertFor(string: encodedAddress,
 				types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
 											   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 											   animated: true,
@@ -406,7 +407,7 @@ extension ChatViewController: MessageInputBarDelegate {
 	
 	func messageInputBar(_ inputBar: MessageInputBar, textViewTextDidChangeTo text: String) {
 		if text.count > 0 {
-			let fee = feeCalculator.estimatedFeeFor(message: .text(text))
+			let fee = AdamantFeeCalculator.estimatedFeeFor(message: .text(text))
 			setEstimatedFee(fee)
 		} else {
 			setEstimatedFee(0)

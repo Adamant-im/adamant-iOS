@@ -16,7 +16,6 @@ extension Container {
 		
 		self.storyboardInitCompleted(QRGeneratorViewController.self) { r, c in
 			c.dialogService = r.resolve(DialogService.self)
-			c.qrTool = r.resolve(QRTool.self)
 		}
 	}
 }

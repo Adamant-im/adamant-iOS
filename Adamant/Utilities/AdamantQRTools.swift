@@ -1,5 +1,5 @@
 //
-//  AdamantQRTool.swift
+//  AdamantQRTools.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 20.02.2018.
@@ -9,8 +9,19 @@
 import Foundation
 import EFQRCode
 
-class AdamantQRTool: QRTool {
-	func generateQrFrom(string: String) -> QRToolGenerateResult {
+enum QRToolGenerateResult {
+	case success(UIImage)
+	case failure(error: Error)
+}
+
+enum QRToolDecodeResult {
+	case success(String)
+	case none
+	case failure(error: Error)
+}
+
+class AdamantQRTools {
+	static func generateQrFrom(string: String) -> QRToolGenerateResult {
 		if let qr = EFQRCode.generate(content: string) {
 			let image = UIImage(cgImage: qr)
 			return .success(image)
@@ -19,7 +30,7 @@ class AdamantQRTool: QRTool {
 		return .failure(error: AdamantError(message: "Failed to generate QR from: \(string)"))
 	}
 	
-	func readQR(_ qr: UIImage) -> QRToolDecodeResult {
+	static func readQR(_ qr: UIImage) -> QRToolDecodeResult {
 		guard let image = qr.cgImage else {
 			print("Failed to get image?")
 			return .none
@@ -31,4 +42,6 @@ class AdamantQRTool: QRTool {
 		
 		return .none
 	}
+	
+	private init() {}
 }

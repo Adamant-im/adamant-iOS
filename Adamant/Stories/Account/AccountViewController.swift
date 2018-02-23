@@ -154,7 +154,9 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 				return
 			}
 			
-			dialogService.presentShareAlertFor(string: "adm:\(address)",
+			let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+			
+			dialogService.presentShareAlertFor(string: encodedAddress,
 				types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
 											   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 											   animated: true,

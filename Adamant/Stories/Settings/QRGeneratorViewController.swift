@@ -29,7 +29,6 @@ class QRGeneratorViewController: FormViewController {
 	
 	// MARK: Dependencies
 	var dialogService: DialogService!
-	var qrTool: QRTool!
 	
 	private enum Rows {
 		case qr
@@ -145,12 +144,9 @@ extension QRGeneratorViewController {
 			return
 		}
 		
-		guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
-			dialogService.showError(withMessage: String.adamantLocalized.qrGenerator.wrongPassphraseError)
-			return
-		}
+		let encodedPassphrase = AdamantUriTools.encode(request: AdamantUri.passphrase(passphrase: passphrase))
 		
-		switch qrTool.generateQrFrom(string: passphrase) {
+		switch AdamantQRTools.generateQrFrom(string: encodedPassphrase) {
 		case .success(let qr):
 			setQr(image: qr)
 			
