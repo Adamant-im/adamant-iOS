@@ -1,14 +1,11 @@
-/* Class = "UINavigationItem"; title = "New Chat"; ObjectID = "R9S-0N-t3f"; */
-"R9S-0N-t3f.title" = "Новый чат";
-
 /* Class = "UITabBarItem"; title = "Chats"; ObjectID = "Kcp-hK-Mxk"; */
 "Kcp-hK-Mxk.title" = "Чаты";
 
 /* Class = "UINavigationItem"; title = "Chats"; ObjectID = "NNn-vk-aSk"; */
 "NNn-vk-aSk.title" = "Чаты";
 
-/* Class = "UITableViewSection"; headerTitle = "Recipient Address"; ObjectID = "plW-LM-q5E"; */
-"plW-LM-q5E.headerTitle" = "Адрес получателя";
+/* Class = "UINavigationItem"; title = "New Chat"; ObjectID = "R9S-0N-t3f"; */
+"R9S-0N-t3f.title" = "Новый чат";
 
 /* Class = "UIBarButtonItem"; title = "•••"; ObjectID = "v2Z-hT-nNQ"; */
 "v2Z-hT-nNQ.title" = "•••";

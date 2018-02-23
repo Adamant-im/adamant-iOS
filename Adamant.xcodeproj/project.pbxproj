@@ -26,7 +26,6 @@
 		E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */; };
 		E9256F792039B29A00DE86E9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9256F7B2039B29A00DE86E9 /* Localizable.strings */; };
 		E9256F7E2039B29D00DE86E9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9256F802039B29D00DE86E9 /* InfoPlist.strings */; };
-		E93580D9201607DA0057FC2E /* knownContacts.json in Resources */ = {isa = PBXBuildFile; fileRef = E93580D8201607DA0057FC2E /* knownContacts.json */; };
 		E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D732028B21400126346 /* ChatsProvider.swift */; };
 		E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */; };
 		E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EFE12200D1156000BB482 /* ChatViewController.swift */; };
@@ -195,7 +194,6 @@
 		E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E9256F7A2039B29A00DE86E9 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E9256F7F2039B29D00DE86E9 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		E93580D8201607DA0057FC2E /* knownContacts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = knownContacts.json; sourceTree = "<group>"; };
 		E93B0D732028B21400126346 /* ChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsProvider.swift; sourceTree = "<group>"; };
 		E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantChatsProvider.swift; sourceTree = "<group>"; };
 		E93EFE12200D1156000BB482 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
@@ -454,7 +452,6 @@
 				E9256F7B2039B29A00DE86E9 /* Localizable.strings */,
 				E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */,
 				E9C51EEC2011416E00385EB7 /* adamant-core.js */,
-				E93580D8201607DA0057FC2E /* knownContacts.json */,
 			);
 			path = Assets;
 			sourceTree = "<group>";
@@ -777,7 +774,6 @@
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
 				E9256F602034E0E100DE86E9 /* Chats.storyboard in Resources */,
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
-				E93580D9201607DA0057FC2E /* knownContacts.json in Resources */,
 				E948E0482024F02700975D6B /* LoginFooter.xib in Resources */,
 				E9452A4C20344834005BA34C /* Account.storyboard in Resources */,
 				E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */,

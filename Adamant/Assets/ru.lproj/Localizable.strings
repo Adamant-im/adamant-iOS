@@ -1,3 +1,6 @@
+/* New chat: Remote server returned an error. */
+"%@" = "%@";
+
 /* Product name */
 "ADAMANT" = "АДАМАНТ";
 
@@ -140,7 +143,7 @@
 /* New Chat: Notify user that scanned QR doesn't contains an address */
 "QR code does not contains a valid adamant address" = "QR код не содержит адреса";
 
-/* Login: Notify user that scanned QR doesn't contains passphrase. */
+/* Login: Notify user that scanned QR doesn't contains a passphrase. */
 "QR code does not contains a valid passphrase" = "QR код не содержит пароля";
 
 /* Login: Notify user that device not supported by QR reader */
@@ -155,8 +158,8 @@
 /* New chat: Scan QR with address button */
 "Scan QR" = "Сканировать QR код";
 
-/* Transfer: Confirm transfer alert: Send tokens button
-   Chat: Send message button */
+/* Chat: Send message button
+   Transfer: Confirm transfer alert: Send tokens button */
 "Send" = "Отправить";
 
 /* Transfer: Confirm transfer X tokens to Y message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
@@ -196,6 +199,9 @@
 /* Transfer: 'Transfer info' section */
 "Transfer Info" = "Перевод";
 
+/* Export transaction: 'Share transaction URL' button */
+"URL" = "URL";
+
 /* Unknown internal error */
 "Unknown error" = "Неизвестная ошибка";
 
@@ -208,6 +214,9 @@
 /* Wallet page: Wallet section title */
 "Wallet" = "Кошелёк";
 
+/* Known contacts: Adamant welcome message */
+"Welcome to ADAMANT, the most secure and anonymous messenger. You are credited with bounty tokens, which you can use to get acquainted with the messenger.\nRemember, your security and anonymity is up to you also. Do not follow links you receive, otherwise your IP can be compromised. Do not trust browser extensions. Better to share your ADM address personally, but not using other messengers. Keep your secret passphrase secure. Set a password on your device or logout before leaving.\nLearn more about security and anonymity at https://adamant.im/staysecured/.\n\nDo not reply to this message, it is a system account." = "Добро пожаловать в самый анонимный и безопасный мессенджер АДАМАНТ. Вам начислены приветственные токены, которые вы можете использовать для ознакомления с мессенджером.\nПомните, что безопасность и анонимность зависит и от вас самих. Не переходите по ссылкам, которые вы получаете в чатах, иначе ваш IP-адрес может быть определен. Не доверяйте расширениям браузера. Лучше всего передавать ваш ADM-адрес собеседникам лично, а не через другие мессенджеры. Храните вашу секретную фразу (пароль) от аккаунта в тайне. Установите на ваше устройство пароль или закрываете вкладку браузера после завершения диалогов.\nБолее полную информацию о безопасности и анонимности читайте на странице https://adamant.im/ru-staysecured/\n\nНе отвечайте на это сообщение, этот адрес служебный.";
+
 /* Login: user typed in wrong passphrase */
 "Wrong passphrase!" = "Неправильный пароль";
 
@@ -219,6 +228,12 @@
 
 /* New chat: Notify user that he can't start chat with himself */
 "You don't need an encrypted anonymous chat to talk to yourself" = "Вам не нужен анонимный чат, чтобы говорить с самим собой";
+
+/* Known contacts: Adamant pre ICO message */
+"You have a possibility to invest in ADAMANT, the most secure and anonymous messenger. Now is a Pre-ICO stage — the most profitable for investors. Learn more on Adamant.im website or in the Whitepaper. To participate just reply to this message and we will assist. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\nAfter you invest and receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper." = "Сегодня последний день, когда мы принимаем инвестиции по минимальной цене 0.001 ETH за токен ADM до начала публичного сейла ICO — 30.01. Это самые выгодные условия для инвесторов. Минимальная инвестиция — эквивалент 2 ETH (на этапе публичного сейла ограничений по минимальной сумме нет, но цена токена начинается с 0.002 ETH). Подробная информация о проекте АДАМАНТ на сайте Adamant.im и в Белой книге. Для участия достаточно ответить на это сообщение, и мы вам поможем.";
+
+/* Known contacts: Adamant ICO message */
+"You have a possibility to invest in ICO of ADAMANT, the most secure and anonymous messenger. Earlier you participate, better offer you will get. Learn more on Adamant.im website or in the Whitepaper. To invest, go to Wallet→Invest in the ICO, or follow a website page Adamant.im/ico/. If you still have any questions, you can ask them by replying to this message. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\nAfter you invest and receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper." = "У вас есть возможность инвестировать в ICO самого защищенного мессенджера АДАМАНТ. Более раннее участие — более выгодные условия. Подробная информация об условиях на сайте Adamant.im и в Белой книге проекта. Если вы уже ознакомились с нашим сайтом и Белой книгой, но у вас остались вопросы, вы можете задать их, ответив на это сообщение. Мы стараемся реагировать быстро, но иногда возможны задержки до нескольких часов.\nВажно! Пожалуйста, убедитесь, что вы сохранили пароль к этому аккаунту — выйдите из аккаунта и войдите в него снова. Лучше всего иметь запись пароля и на бумаге. Однако помните, только вы несете ответственность за сохранность вашего пароля. Его невозможно восстановить. А если он попадет в другие руки, ваши деньги будут украдены. Отнеситесь к этому вопросу так серьезно, как если бы цена токенов на вашем кошельке когда-то станет равна миллиарду долларов.\nЧтобы инвестировать, перейдите в этом месседжере на вкладку Кошелек и нажмите кнопку Инвестировать в ICO, или откройте в браузере веб-страницу Adamant.im/ico/. В форме для инвестирования укажите ваш адрес АДАМАНТа — на него будут перечислены токены ADM. При переходе из мессенджера он будет вставлен автоматически, в другом случае вернитесь в мессенджер и кликните на блок Ваш адрес, он будет скопирован в буфер обмена. Укажите криптовалюту, в которой вы хотите инвестировать, и какую сумму. Вы увидите сколько ADM-токенов вы получите, с учетом скидки за объем: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Нажмите кнопку Купить токены АДАМАНТ. Вы получите уникальный адрес, на который необходимо выполнить перевод. Как только на него поступит ожидаемая сумма и транзакция будет подтверждена, вы получите токены ADM. Транзакцию можно выполнить с любого кошелька, включая биржи. Необязятельно переводить точную сумму с учетом комиссии, платеж все равно будет засчитан. Остались вопросы? Спрашивайте.\nПосле того, как вы инвестируете и получите токены ADM, мы рекомендуем вам хранить их в кошельке как можно дольше. Ежемесячно все нераспроданные на ICO токены будут распределяться по кошелькам пользователей, увеличивая балансы на 5%. Подробную информацию можно получить на сайте Adamant.im и в Белой книге Проекта.";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "You need to authorize Adamant to use device's Camera" = "Для чтения QR кодов необходимо разрешить доступ к камере";

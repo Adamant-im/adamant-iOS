@@ -15,7 +15,6 @@ private struct AdamantResources {
 	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
 	static let api = URL(string: "https://endless.adamant.im")!
 	static let coreDataModel = Bundle.main.url(forResource: "ChatModels", withExtension: "momd")!
-	static let knownContacts = Bundle.main.url(forResource: "knownContacts", withExtension: "json")!
 	
 	private init() {}
 }
@@ -83,7 +82,7 @@ extension Container {
 		
 		// MARK: Accounts
 		self.register(AccountsProvider.self) { r in
-			let provider = try! AdamantAccountsProvider(contactsJsonUrl: AdamantResources.knownContacts)
+			let provider = AdamantAccountsProvider()
 			provider.stack = r.resolve(CoreDataStack.self)
 			provider.apiService = r.resolve(ApiService.self)
 			return provider
