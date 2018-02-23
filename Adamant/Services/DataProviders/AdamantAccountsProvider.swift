@@ -9,15 +9,59 @@
 import Foundation
 import CoreData
 
+private enum Contacts {
+	case adamantBountyWallet
+	case adamantIco
+	
+	var name: String {
+		switch self {
+		case .adamantBountyWallet: return "ADAMANT Bounty Wallet"
+		case .adamantIco: return "ADAMANT ICO"
+		}
+	}
+	
+	var address: String {
+		switch self {
+		case .adamantBountyWallet: return "U15423595369615486571"
+		case .adamantIco: return "U7047165086065693428"
+		}
+	}
+	
+	var avatar: String {
+		return "avatar_bots"
+	}
+	
+	var messages: [String:String] {
+		switch self {
+		case .adamantBountyWallet:
+			return ["chats.welcome_message": NSLocalizedString("Welcome to ADAMANT, the most secure and anonymous messenger. You are credited with bounty tokens, which you can use to get acquainted with the messenger.\nRemember, your security and anonymity is up to you also. Do not follow links you receive, otherwise your IP can be compromised. Do not trust browser extensions. Better to share your ADM address personally, but not using other messengers. Keep your secret passphrase secure. Set a password on your device or logout before leaving.\nLearn more about security and anonymity at https://adamant.im/staysecured/.\n\nDo not reply to this message, it is a system account.", comment: "Known contacts: Adamant welcome message")]
+			
+		case .adamantIco:
+			return [
+				"chats.preico_message": NSLocalizedString("You have a possibility to invest in ADAMANT, the most secure and anonymous messenger. Now is a Pre-ICO stage — the most profitable for investors. Learn more on Adamant.im website or in the Whitepaper. To participate just reply to this message and we will assist. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\nAfter you invest and receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.", comment: "Known contacts: Adamant pre ICO message"),
+				"chats.ico_message": NSLocalizedString("You have a possibility to invest in ICO of ADAMANT, the most secure and anonymous messenger. Earlier you participate, better offer you will get. Learn more on Adamant.im website or in the Whitepaper. To invest, go to Wallet→Invest in the ICO, or follow a website page Adamant.im/ico/. If you still have any questions, you can ask them by replying to this message. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\nAfter you invest and receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.", comment: "Known contacts: Adamant ICO message")
+			]
+		}
+	}
+}
+
+
 class AdamantAccountsProvider: AccountsProvider {
-	struct KnownContact: Codable {
+	struct KnownContact {
 		let address: String
 		let name: String
 		let avatar: String?
 		let messages: [KnownMessage]?
+		
+		fileprivate init(contact: Contacts) {
+			self.address = contact.address
+			self.name = contact.name
+			self.avatar = contact.avatar
+			self.messages = contact.messages.map({ KnownMessage(key: $0, message: $1) })
+		}
 	}
 	
-	struct KnownMessage: Codable {
+	struct KnownMessage {
 		let key: String
 		let message: String
 	}
@@ -32,13 +76,11 @@ class AdamantAccountsProvider: AccountsProvider {
 	
 	
 	// MARK: Lifecycle
-	init(contactsJsonUrl url: URL) throws {
-		let raw = try Data(contentsOf: url)
-		let knownContacts = try JSONDecoder().decode([KnownContact].self, from: raw)
-		
-		self.knownContacts = knownContacts.reduce(into: [String:KnownContact](), { (result, contact) in
-			result[contact.address] = contact
-		})
+	init() {
+		self.knownContacts = [
+			Contacts.adamantIco.address: KnownContact(contact: Contacts.adamantIco),
+			Contacts.adamantBountyWallet.address: KnownContact(contact: Contacts.adamantBountyWallet)
+		]
 	}
 	
 	

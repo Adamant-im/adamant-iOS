@@ -19,7 +19,6 @@ extension Container {
 		
 		self.storyboardInitCompleted(ChatViewController.self) { r, c in
 			c.chatsProvider = r.resolve(ChatsProvider.self)
-			c.feeCalculator = r.resolve(FeeCalculator.self)
 			c.dialogService = r.resolve(DialogService.self)
 		}
 		

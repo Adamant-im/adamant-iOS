@@ -8,8 +8,8 @@
 
 import Foundation
 
-class AdamantExportTools: ExportTools {
-	func summaryFor(transaction: Transaction, url: URL) -> String {
+class AdamantExportTools {
+	static func summaryFor(transaction: Transaction, url: URL) -> String {
 		return """
 Transaction #\(String(transaction.id))
 
@@ -24,4 +24,6 @@ Block: \(transaction.blockId)
 URL: \(url)
 """
 	}
+	
+	private init() {}
 }

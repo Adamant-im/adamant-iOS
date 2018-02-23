@@ -13,5 +13,9 @@ extension Container {
 		self.storyboardInitCompleted(SettingsTableViewController.self) { r, c in
 			c.dialogService = r.resolve(DialogService.self)
 		}
+		
+		self.storyboardInitCompleted(QRGeneratorViewController.self) { r, c in
+			c.dialogService = r.resolve(DialogService.self)
+		}
 	}
 }
