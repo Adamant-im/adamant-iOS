@@ -2,12 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSCameraUsageDescription</key>
-	<string>The camera needed to scan QR codes - addresses and passphrases</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Saving generated QR codes - passphrases and addresses</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Reading QR codes - passphrases and addresses</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en_US</string>
 	<key>CFBundleDisplayName</key>
@@ -23,11 +17,17 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.2.3</string>
+	<string>0.2.4</string>
 	<key>CFBundleVersion</key>
-	<string>10</string>
+	<string>11</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>The camera needed to scan QR codes - addresses and passphrases</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Saving generated QR codes - passphrases and addresses</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Reading QR codes - passphrases and addresses</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Exo+2_100_normal.ttf</string>
