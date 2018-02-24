@@ -21,7 +21,7 @@ class AdamantChatsProvider: ChatsProvider {
 	private(set) var state: State = .empty
 	private(set) var lastHeight: Int?
 	private let apiTransactions = 100
-	private var unconfirmedTransactions: [UInt:ChatTransaction] = [:]
+	private var unconfirmedTransactions: [UInt64:ChatTransaction] = [:]
 	
 	private let processingQueue = DispatchQueue(label: "im.adamant.processing.chat", qos: .utility, attributes: [.concurrent])
 	private let sendingQueue = DispatchQueue(label: "im.adamant.sending.chat", qos: .utility, attributes: [.concurrent])
@@ -704,7 +704,7 @@ extension AdamantChatsProvider {
 	///   - transaction: Unconfirmed transaction
 	///   - id: New transaction id
 	///   - height: New transaction height
-	private func confirmTransaction(_ transaction: ChatTransaction, id: UInt, height: Int) {
+	private func confirmTransaction(_ transaction: ChatTransaction, id: UInt64, height: Int) {
 		if transaction.isConfirmed {
 			return
 		}

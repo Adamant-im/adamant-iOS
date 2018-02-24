@@ -67,13 +67,13 @@ protocol ApiService {
 	
 	// MARK: - Transactions
 	
-	func getTransaction(id: UInt, completion: @escaping (ApiServiceResult<Transaction>) -> Void)
-	func getTransactions(forAccount: String, type: TransactionType, fromHeight: UInt?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
+	func getTransaction(id: UInt64, completion: @escaping (ApiServiceResult<Transaction>) -> Void)
+	func getTransactions(forAccount: String, type: TransactionType, fromHeight: UInt64?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
 	
 	
 	// MARK: - Funds
 	
-	func transferFunds(sender: String, recipient: String, amount: UInt, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void)
+	func transferFunds(sender: String, recipient: String, amount: UInt64, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void)
 	
 	
 	// MARK: - Chats
@@ -87,5 +87,5 @@ protocol ApiService {
 	
 	/// Send text message
 	///   - completion: Contains processed transactionId, if success, or AdamantError, if fails.
-	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completion: @escaping (ApiServiceResult<UInt>) -> Void)
+	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
 }

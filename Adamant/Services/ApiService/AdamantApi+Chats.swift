@@ -52,7 +52,7 @@ extension AdamantApiService {
 		}
 	}
 	
-	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completion: @escaping (ApiServiceResult<UInt>) -> Void) {
+	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
 		// MARK: 1. Prepare params
 		let params: [String : Any] = [
 			"type": TransactionType.chatMessage.rawValue,

@@ -9,14 +9,14 @@
 import Foundation
 
 class AdamantFeeCalculator {
-	static func estimatedFeeFor(message: AdamantMessage) -> UInt {
+	static func estimatedFeeFor(message: AdamantMessage) -> UInt64 {
 		switch message {
 		case .text(let text):
 			return AdamantUtilities.from(double: ceil(Double(text.count) / 255.0) * 0.001)
 		}
 	}
 	
-	static func estimatedFeeFor(transfer: UInt) -> UInt {
+	static func estimatedFeeFor(transfer: UInt64) -> UInt64 {
 		return AdamantUtilities.from(double: 0.5)
 	}
 	

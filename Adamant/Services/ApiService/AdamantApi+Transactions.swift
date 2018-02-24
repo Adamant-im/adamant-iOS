@@ -18,7 +18,7 @@ extension AdamantApiService.ApiCommands {
 }
 
 extension AdamantApiService {
-	func getTransaction(id: UInt, completion: @escaping (ApiServiceResult<Transaction>) -> Void) {
+	func getTransaction(id: UInt64, completion: @escaping (ApiServiceResult<Transaction>) -> Void) {
 		let endpoint: URL
 		do {
 			endpoint = try buildUrl(path: ApiCommands.Transactions.getTransaction, queryItems: [URLQueryItem(name: "id", value: String(id))])
@@ -44,7 +44,7 @@ extension AdamantApiService {
 		}
 	}
 	
-	func getTransactions(forAccount account: String, type: TransactionType, fromHeight: UInt?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
+	func getTransactions(forAccount account: String, type: TransactionType, fromHeight: UInt64?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
 		var queryItems = [URLQueryItem(name: "inId", value: account),
 						  URLQueryItem(name: "and:type", value: String(type.rawValue))]
 		

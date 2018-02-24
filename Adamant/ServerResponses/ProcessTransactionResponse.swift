@@ -9,7 +9,7 @@
 import Foundation
 
 class ProcessTransactionResponse: ServerResponse {
-	let transactionId: UInt?
+	let transactionId: UInt64?
 	
 	required init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -17,7 +17,7 @@ class ProcessTransactionResponse: ServerResponse {
 		let error = try? container.decode(String.self, forKey: .error)
 		
 		if let idRaw = try? container.decode(String.self, forKey: CodingKeys.init(stringValue: "transactionId")!) {
-			transactionId = UInt(idRaw)
+			transactionId = UInt64(idRaw)
 		} else {
 			transactionId = nil
 		}
