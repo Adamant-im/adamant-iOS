@@ -60,7 +60,7 @@ class ChatViewController: MessagesViewController {
 	private var feeIsVisible: Bool = false
 	private var feeTimer: Timer?
 	private var feeLabel: InputBarButtonItem?
-	private var prevFee: UInt = 0
+	private var prevFee: UInt64 = 0
 	
 	
 	// MARK: - Lifecycle
@@ -170,7 +170,7 @@ class ChatViewController: MessagesViewController {
 
 // MARK: - EstimatedFee label
 extension ChatViewController {
-	private func setEstimatedFee(_ fee: UInt) {
+	private func setEstimatedFee(_ fee: UInt64) {
 		if prevFee != fee && fee > 0 {
 			guard let feeLabel = feeLabel else {
 				return

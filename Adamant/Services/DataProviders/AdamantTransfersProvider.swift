@@ -18,7 +18,7 @@ class AdamantTransfersProvider: TransfersProvider {
 	
 	// MARK: Properties
 	private(set) var state: State = .empty
-	private var lastHeight: UInt?
+	private var lastHeight: UInt64?
 	
 	private let processingQueue = DispatchQueue(label: "im.Adamant.processing.transfers", qos: .utility, attributes: [.concurrent])
 	private let stateSemaphore = DispatchSemaphore(value: 1)
@@ -148,7 +148,7 @@ extension AdamantTransfersProvider {
 			return
 		}
 		
-		apiService.transferFunds(sender: senderAddress, recipient: recipient, amount: (amount as NSDecimalNumber).uintValue, keypair: keypair) { result in
+		apiService.transferFunds(sender: senderAddress, recipient: recipient, amount: (amount as NSDecimalNumber).uint64Value, keypair: keypair) { result in
 			switch result {
 			case .success(_):
 				completion(.success)
@@ -263,7 +263,7 @@ extension AdamantTransfersProvider {
 		// MARK: 4. Check lastHeight
 		// API returns transactions from lastHeight INCLUDING transaction with height == lastHeight, so +1
 		if height > 0 {
-			let uH = UInt(height + 1)
+			let uH = UInt64(height + 1)
 			
 			if let lastHeight = lastHeight {
 				if lastHeight < uH {

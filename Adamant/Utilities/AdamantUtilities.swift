@@ -37,7 +37,7 @@ extension AdamantUtilities {
 		return formatter
 	}()
 	
-	static func format(balance: UInt) -> String {
+	static func format(balance: UInt64) -> String {
 		return currencyFormatter.string(from: NSNumber(value: from(uInt: balance)))!
 	}
 	
@@ -45,11 +45,11 @@ extension AdamantUtilities {
 		return currencyFormatter.string(from: NSNumber(value: balance))!
 	}
 	
-	static func from(double: Double) -> UInt {
-		return UInt(double / currencyShift)
+	static func from(double: Double) -> UInt64 {
+		return UInt64(double / currencyShift)
 	}
 	
-	static func from(uInt: UInt) -> Double {
+	static func from(uInt: UInt64) -> Double {
 		return Double(uInt) * currencyShift
 	}
 	

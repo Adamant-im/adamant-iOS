@@ -72,39 +72,39 @@ import JavaScriptCore
 // MARK: - Transaction
 
 @objc protocol JSTransactionProtocol: JSExport {
-	var id: UInt { get set }
+	var id: UInt64 { get set }
 	var height: Int { get set }
-	var blockId: UInt { get set }
+	var blockId: UInt64 { get set }
 	var type: Int { get set }
-	var timestamp: UInt { get set }
+	var timestamp: UInt64 { get set }
 	var senderPublicKey: String? { get set }
 	var senderId: String? { get set }
 	var recipientId: String? { get set }
 	var recipientPublicKey: String? { get set }
-	var amount: UInt { get set }
-	var fee: UInt { get set }
+	var amount: UInt64 { get set }
+	var fee: UInt64 { get set }
 	var signature: String? { get set }
-	var confirmations: UInt { get set }
+	var confirmations: UInt64 { get set }
 	var asset: JSAsset { get set }
 }
 
 @objc class JSTransaction: NSObject, JSTransactionProtocol {
-	dynamic var id: UInt
+	dynamic var id: UInt64
 	dynamic var height: Int
-	dynamic var blockId: UInt
+	dynamic var blockId: UInt64
 	dynamic var type: Int
-	dynamic var timestamp: UInt
+	dynamic var timestamp: UInt64
 	dynamic var senderPublicKey: String?
 	dynamic var senderId: String?
 	dynamic var recipientId: String?
 	dynamic var recipientPublicKey: String?
-	dynamic var amount: UInt
-	dynamic var fee: UInt
+	dynamic var amount: UInt64
+	dynamic var fee: UInt64
 	dynamic var signature: String?
-	dynamic var confirmations: UInt
+	dynamic var confirmations: UInt64
 	dynamic var asset: JSAsset
 
-	init(id: UInt, height: Int, blockId: UInt, type: Int, timestamp: UInt, senderPublicKey: String?, senderId: String?, recipientId: String?, recipientPublicKey: String?, amount: UInt, fee: UInt, signature: String?, confirmations: UInt, asset: JSAsset) {
+	init(id: UInt64, height: Int, blockId: UInt64, type: Int, timestamp: UInt64, senderPublicKey: String?, senderId: String?, recipientId: String?, recipientPublicKey: String?, amount: UInt64, fee: UInt64, signature: String?, confirmations: UInt64, asset: JSAsset) {
 		self.id = id
 		self.height = height
 		self.blockId = blockId
