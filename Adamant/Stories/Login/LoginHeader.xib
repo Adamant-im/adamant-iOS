@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
+    <device id="retina4_0" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
@@ -20,36 +20,39 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="zyJ-1h-Ix7">
-            <rect key="frame" x="0.0" y="0.0" width="374" height="374"/>
+            <rect key="frame" x="0.0" y="0.0" width="320" height="350"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="15" translatesAutoresizingMaskIntoConstraints="NO" id="hUF-Ul-HEi">
-                    <rect key="frame" x="75" y="42" width="225" height="290.5"/>
+                    <rect key="frame" x="0.0" y="46.5" width="320" height="257"/>
                     <subviews>
                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Adamant_Logo" translatesAutoresizingMaskIntoConstraints="NO" id="Ci1-bB-rdf">
-                            <rect key="frame" x="0.0" y="0.0" width="225" height="225"/>
+                            <rect key="frame" x="64" y="0.0" width="192" height="191.5"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="Ci1-bB-rdf" secondAttribute="height" multiplier="1:1" id="whs-kN-2Wa"/>
                             </constraints>
                         </imageView>
                         <label opaque="NO" userInteractionEnabled="NO" tag="888" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ADAMANT" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MaP-ZE-Rez">
-                            <rect key="frame" x="16.5" y="240" width="192.5" height="50.5"/>
+                            <rect key="frame" x="64" y="206.5" width="192.5" height="50.5"/>
                             <fontDescription key="fontDescription" name="Exo2-Thin" family="Exo 2 Thin" pointSize="42"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
                         </label>
                     </subviews>
+                    <constraints>
+                        <constraint firstItem="Ci1-bB-rdf" firstAttribute="width" secondItem="hUF-Ul-HEi" secondAttribute="width" multiplier="0.6" id="lTA-wh-5Ws"/>
+                    </constraints>
                 </stackView>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
-                <constraint firstItem="hUF-Ul-HEi" firstAttribute="width" secondItem="zyJ-1h-Ix7" secondAttribute="width" multiplier="0.6" id="92q-lM-4uz"/>
+                <constraint firstItem="hUF-Ul-HEi" firstAttribute="width" secondItem="zyJ-1h-Ix7" secondAttribute="width" id="92q-lM-4uz"/>
                 <constraint firstItem="hUF-Ul-HEi" firstAttribute="centerX" secondItem="kK0-eO-vLx" secondAttribute="centerX" id="e0L-Wd-P6W"/>
                 <constraint firstItem="hUF-Ul-HEi" firstAttribute="centerY" secondItem="kK0-eO-vLx" secondAttribute="centerY" id="gef-QZ-C1q"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <viewLayoutGuide key="safeArea" id="kK0-eO-vLx"/>
-            <point key="canvasLocation" x="8" y="116"/>
+            <point key="canvasLocation" x="8" y="7"/>
         </view>
     </objects>
     <resources>
