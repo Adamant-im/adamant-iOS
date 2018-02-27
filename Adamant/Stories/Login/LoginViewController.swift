@@ -272,7 +272,13 @@ extension LoginViewController {
 		case .notDetermined:
 			AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
 				if granted, let qrReader = self?.qrReader {
-					self?.present(qrReader, animated: true, completion: nil)
+					if Thread.isMainThread {
+						self?.present(qrReader, animated: true, completion: nil)
+					} else {
+						DispatchQueue.main.async {
+							self?.present(qrReader, animated: true, completion: nil)
+						}
+					}
 				} else {
 					return
 				}
