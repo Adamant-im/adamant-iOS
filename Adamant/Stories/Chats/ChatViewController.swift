@@ -67,14 +67,9 @@ class ChatViewController: MessagesViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
-		guard let chatroom = chatroom else {
-			print("Failed to get chat controller")
-			return
-		}
-		
 		// MARK: 1. Initial configuration
 		
-		if let partner = chatroom.partner {
+		if let partner = chatroom?.partner {
 			if let name = partner.name {
 				self.navigationItem.title = name
 			} else {
@@ -88,7 +83,7 @@ class ChatViewController: MessagesViewController {
 		maintainPositionOnKeyboardFrameChanged = true
 		
 		DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-			guard let controller = self?.chatsProvider.getChatController(for: chatroom) else {
+			guard let chatroom = self?.chatroom, let controller = self?.chatsProvider.getChatController(for: chatroom) else {
 				return
 			}
 
@@ -110,36 +105,49 @@ class ChatViewController: MessagesViewController {
 		
 		let bordersColor = UIColor(red: 200/255, green: 200/255, blue: 200/255, alpha: 1)
 		let size: CGFloat = 6.0
+		let buttonHeight: CGFloat = 36
+		let buttonWidth: CGFloat = 46
 		
+		// Text & Colors
 		messageInputBar.inputTextView.placeholder = String.adamantLocalized.chat.messageInputPlaceholder
 		messageInputBar.separatorLine.backgroundColor = bordersColor
 		messageInputBar.inputTextView.placeholderTextColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1)
-		messageInputBar.inputTextView.textContainerInset = UIEdgeInsets(top: size, left: size*2, bottom: size, right: size*2)
-		messageInputBar.inputTextView.placeholderLabelInsets = UIEdgeInsets(top: size, left: size*2+4, bottom: size, right: size*2+4)
 		messageInputBar.inputTextView.layer.borderColor = bordersColor.cgColor
 		messageInputBar.inputTextView.layer.borderWidth = 1.0
 		messageInputBar.inputTextView.layer.cornerRadius = size*2
 		messageInputBar.inputTextView.layer.masksToBounds = true
+		
+		// Insets
+		messageInputBar.inputTextView.textContainerInset = UIEdgeInsets(top: size, left: size*2, bottom: size, right: buttonWidth + size/2)
+		messageInputBar.inputTextView.placeholderLabelInsets = UIEdgeInsets(top: size, left: size*2+4, bottom: size, right: buttonWidth + size/2+2)
 		messageInputBar.inputTextView.scrollIndicatorInsets = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
+		messageInputBar.textViewPadding.right = -buttonWidth
 		
-		messageInputBar.setStackViewItems([], forStack: .right, animated: false)
-		messageInputBar.setRightStackViewWidthConstant(to: 0, animated: false)
+		messageInputBar.setRightStackViewWidthConstant(to: buttonWidth, animated: false)
 		
+		// Make feeLabel
 		let feeLabel = InputBarButtonItem()
 		self.feeLabel = feeLabel
 		feeLabel.isEnabled = false
 		feeLabel.titleLabel?.font = UIFont.adamantPrimary(size: 12)
 		feeLabel.alpha = 0
-		feeLabel.isHidden = true
 		
-		messageInputBar.setStackViewItems([feeLabel, .flexibleSpace, messageInputBar.sendButton], forStack: .bottom, animated: false)
+		// Setup stack views
+		messageInputBar.setStackViewItems([messageInputBar.sendButton], forStack: .right, animated: false)
+		messageInputBar.setStackViewItems([feeLabel, .flexibleSpace], forStack: .bottom, animated: false)
+		
 		messageInputBar.sendButton.configure {
-			$0.setTitleColor(UIColor.adamantPrimary, for: .normal)
-			$0.setTitleColor(UIColor.adamantSecondary, for: .highlighted)
-			$0.title = String.adamantLocalized.chat.sendButton
+			
+			$0.layer.cornerRadius = size*2
+			$0.layer.borderWidth = 1
+			$0.layer.borderColor = bordersColor.cgColor
+			$0.setSize(CGSize(width: buttonWidth, height: buttonHeight), animated: false)
+			$0.title = nil
+			$0.image = #imageLiteral(resourceName: "Arrow")
+			$0.setImage(#imageLiteral(resourceName: "Arrow_innactive"), for: UIControlState.disabled)
 		}
 		
-		if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
+		if let delegate = delegate, let address = chatroom?.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
 			messageInputBar.inputTextView.text = message
 			setEstimatedFee(AdamantFeeCalculator.estimatedFeeFor(message: AdamantMessage.text(message)))
 		}
@@ -187,7 +195,6 @@ extension ChatViewController {
 			feeIsVisible = true
 			feeTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { [weak self] _ in
 				DispatchQueue.main.async {
-					self?.feeLabel?.isHidden = false
 					UIView.animate(withDuration: 0.3, animations: {
 						self?.feeLabel?.alpha = 1
 					})
@@ -204,8 +211,6 @@ extension ChatViewController {
 			
 			UIView.animate(withDuration: 0.3, animations: {
 				self.feeLabel?.alpha = 0
-			}, completion: { _ in
-				self.feeLabel?.isHidden = true
 			})
 			
 			feeTimer = nil
