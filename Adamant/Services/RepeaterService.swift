@@ -68,7 +68,13 @@ class RepeaterService {
 	func pauseAll() {
 		pauseSemaphore.wait()
 		
-		if isPaused { return }
+		defer {
+			pauseSemaphore.signal()
+		}
+		
+		if isPaused {
+			return
+		}
 		
 		DispatchQueue.main.async {
 			for (_, client) in self.foregroundTimers {
@@ -78,14 +84,18 @@ class RepeaterService {
 		}
 		
 		isPaused = true
-		
-		pauseSemaphore.signal()
 	}
 	
-	func resume() {
+	func resumeAll() {
 		pauseSemaphore.wait()
 		
-		if !isPaused { return }
+		defer {
+			pauseSemaphore.signal()
+		}
+		
+		if !isPaused {
+			return
+		}
 		
 		DispatchQueue.main.async {
 			for (_, client) in self.foregroundTimers {
@@ -96,8 +106,6 @@ class RepeaterService {
 		}
 		
 		isPaused = false
-		
-		pauseSemaphore.signal()
 	}
 	
 	@objc private func timerFired(timer: Timer) {

@@ -18,6 +18,10 @@ extension String.adamantLocalized {
 		static let rowInvest = NSLocalizedString("Invest in ICO", comment: "Wallet page: 'Invest in ICO' button")
 		static let rowLogout = NSLocalizedString("Logout", comment: "Wallet page: 'Logout' button")
 		
+		static let sorryAlert = NSLocalizedString("Sorry!", comment: "Wallet page: 'Transfer not allowed' alert title")
+		static let webApp = NSLocalizedString("Go to msg.adamant.im", comment: "Wallet page: 'Transfer not allowed' alert 'go to WebApp button'")
+		static let transferNotAllowed = NSLocalizedString("Due to Apple restrictions, sending tokens is not allowed until the end of the ICO. For now, you can send tokens using WebApp at msg.adamant.im", comment: "Wallet page: Inform user that sending tokens not allowed by Apple until the end of ICO")
+		
 		static let sectionAccount = NSLocalizedString("Account", comment: "Wallet page: Account section title.")
 		static let sectionWallet = NSLocalizedString("Wallet", comment: "Wallet page: Wallet section title")
 		static let sectionActions = NSLocalizedString("Actions", comment: "Wallet page: Actions section title")
@@ -39,6 +43,8 @@ class AccountViewController: UIViewController {
 	private let showTransactionsSegue = "showTransactions"
 	private let showTransferSegue = "showTransfer"
 	
+	private let webAppUrl = URL.init(string: "https://msg.adamant.im")
+	
 	private enum Sections: Int {
 		case account = 0, wallet, actions
 		
@@ -46,9 +52,9 @@ class AccountViewController: UIViewController {
 	}
 	
 	private enum WalletRows: Int {
-		case balance, /*sendTokens, */ invest
+		case balance, sendTokens, invest
 		
-		static let total = 2
+		static let total = 3
 	}
 	
 	
@@ -177,8 +183,25 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 			case .balance:
 				performSegue(withIdentifier: showTransactionsSegue, sender: nil)
 				
-//			case .sendTokens:
+			case .sendTokens:
 //				performSegue(withIdentifier: showTransferSegue, sender: nil)
+				// <Sending funds not allowed>
+				let alert = UIAlertController(title: String.adamantLocalized.account.sorryAlert, message: String.adamantLocalized.account.transferNotAllowed, preferredStyle: .alert)
+				
+				alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+				
+				if let url = self.webAppUrl {
+					alert.addAction(UIAlertAction(title: String.adamantLocalized.account.webApp, style: .default, handler: { [weak self] _ in
+						let safari  = SFSafariViewController(url: url)
+						safari.preferredControlTintColor = UIColor.adamantPrimary
+						self?.present(safari, animated: true, completion: nil)
+					}))
+				}
+				
+				present(alert, animated: true, completion: { [weak self] in
+					self?.tableView.deselectRow(at: indexPath, animated: true)
+				})
+				// </Sending funds not allowed>
 				
 			case .invest:
 				guard let address = accountService.account?.address,
@@ -253,10 +276,10 @@ extension AccountViewController {
 				cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
 				cell.imageView?.image = nil
 				
-//			case .sendTokens:
-//				cell.textLabel?.text = String.adamantLocalized.account.rowSendTokens
-//				cell.detailTextLabel?.text = nil
-//				cell.imageView?.image = nil
+			case .sendTokens:
+				cell.textLabel?.text = String.adamantLocalized.account.rowSendTokens
+				cell.detailTextLabel?.text = nil
+				cell.imageView?.image = nil
 				
 			case .invest:
 				cell.textLabel?.text = String.adamantLocalized.account.rowInvest
