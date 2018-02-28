@@ -18,6 +18,7 @@ extension ChatTransaction {
     }
 
     @NSManaged public var isConfirmed: Bool
+	@NSManaged public var isUnread: Bool
     @NSManaged public var message: String?
     @NSManaged public var chatroom: Chatroom?
     @NSManaged public var lastIn: Chatroom?

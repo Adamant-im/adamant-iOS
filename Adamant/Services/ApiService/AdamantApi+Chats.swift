@@ -18,7 +18,7 @@ extension AdamantApiService.ApiCommands {
 }
 
 extension AdamantApiService {
-	func getChatTransactions(account: String, height: Int?, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
+	func getChatTransactions(account: String, height: Int64?, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
 		// MARK: 1. Prepare params
 		var queryItems: [URLQueryItem] = [URLQueryItem(name: "isIn", value: account),
 										  URLQueryItem(name: "orderBy", value: "timestamp:desc")]

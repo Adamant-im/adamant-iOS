@@ -37,7 +37,19 @@ enum AdamantMessage {
 
 extension Notification.Name {
 	static let adamantChatsProviderNewChatroom = Notification.Name("adamantChatsProviderNewChatroom")
-	static let adamantChatsProviderNewTransactions = Notification.Name("adamantChatsProviderNewTransactions")
+	static let adamantChatsProviderNewUnreadMessages = Notification.Name("adamantChatsProviderNewUnrMessages")
+}
+
+
+/// <#Description#>
+///
+/// - newChatroomAddress: Contains new chatroom partner's address as String
+/// - newUnreadMessagesIDs: Contains [NSManagedObjectID] of new unread messages
+/// - lastMessageHeight: new lastMessageHeight
+enum NotificationsUserInfoKeys: String {
+	case newChatroomAddress = "adamant.chatsProvider.newChatroom.address"
+	case newUnreadMessagesIDs = "adamant.chatsProvider.newMessage.ids"
+	case lastMessageHeight = "adamant.chatsProvider.newMessage.lastHeight"
 }
 
 protocol ChatsProvider: DataProvider {

@@ -19,7 +19,8 @@ class AdamantChatsProvider: ChatsProvider {
 	
 	// MARK: Properties
 	private(set) var state: State = .empty
-	private(set) var lastHeight: Int?
+	private(set) var lastHeight: Int64?
+	private(set) var unreadHeight: Int64?
 	private let apiTransactions = 100
 	private var unconfirmedTransactions: [UInt64:ChatTransaction] = [:]
 	
@@ -28,6 +29,9 @@ class AdamantChatsProvider: ChatsProvider {
 	private let unconfirmedsSemaphore = DispatchSemaphore(value: 1)
 	private let highSemaphore = DispatchSemaphore(value: 1)
 	private let stateSemaphore = DispatchSemaphore(value: 1)
+	
+	private var unreadMessages: [NSManagedObjectID]? = nil
+	private let unreadSemaphore = DispatchSemaphore(value: 1)
 	
 	// MARK: Lifecycle
 	init() {
@@ -129,6 +133,7 @@ extension AdamantChatsProvider {
 		privateContext.parent = self.stack.container.viewContext
 		let processingGroup = DispatchGroup()
 		let cms = DispatchSemaphore(value: 1)
+		unreadMessages = nil
 		
 		getTransactions(senderId: address, privateKey: privateKey, height: lastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
 		
@@ -140,7 +145,22 @@ extension AdamantChatsProvider {
 				
 			default:
 				self.setState(.upToDate, previous: prevState)
+				
+				
+				if let unreadMessages = self.unreadMessages {
+					var userInfo: [AnyHashable: Any] = [NotificationsUserInfoKeys.newUnreadMessagesIDs: unreadMessages]
+					
+					if let lastHeight = self.lastHeight {
+						userInfo[NotificationsUserInfoKeys.lastMessageHeight] = lastHeight
+					}
+					
+					NotificationCenter.default.post(name: Notification.Name.adamantChatsProviderNewUnreadMessages,
+													object: self,
+													userInfo: userInfo)
+				}
 			}
+			
+			self.unreadMessages = nil
 		}
 	}
 }
@@ -228,12 +248,12 @@ extension AdamantChatsProvider {
 			chatroom = privateContext.object(with: room.objectID) as! Chatroom
 		} else {
 			if Thread.isMainThread {
-				let chrm = createChatroom(with: account, context: stack.container.viewContext)
+				let chrm = createChatroom(with: account)
 				chatroom = privateContext.object(with: chrm.objectID) as! Chatroom
 			} else {
 				var chrmId: NSManagedObjectID? = nil
 				DispatchQueue.main.sync {
-					let chrm = createChatroom(with: account, context: stack.container.viewContext)
+					let chrm = createChatroom(with: account)
 					chrmId = chrm.objectID
 				}
 				chatroom = privateContext.object(with: chrmId!) as! Chatroom
@@ -343,36 +363,21 @@ extension AdamantChatsProvider {
 	
 	func chatroomWith(_ account: CoreDataAccount) -> Chatroom {
 		var chatroom: Chatroom! = nil
-		if Thread.isMainThread {
-			chatroom = chatroomWith(account, context: stack.container.viewContext)
-		} else {
-			DispatchQueue.main.sync {
-				chatroom = chatroomWith(account, context: stack.container.viewContext)
-			}
-		}
 		
-		return chatroom
-	}
-	
-	private func chatroomWith(_ account: CoreDataAccount, context: NSManagedObjectContext) -> Chatroom {
 		let request = NSFetchRequest<Chatroom>(entityName: Chatroom.entityName)
 		request.fetchLimit = 1
 		request.predicate = NSPredicate(format: "partner = %@", account)
 		
-		if let chatroom = (try? context.fetch(request))?.first {
+		if let chatroom = (try? stack.container.viewContext.fetch(request))?.first {
 			return chatroom
 		}
 		
-		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
-		chatroom.updatedAt = Date() as NSDate
-		
-		if chatroom.managedObjectContext == account.managedObjectContext {
-			chatroom.partner = account
-		} else if let acc = chatroom.managedObjectContext?.object(with: account.objectID) as? CoreDataAccount {
-			chatroom.partner = acc
+		if Thread.isMainThread {
+			chatroom = createChatroom(with: account)
 		} else {
-			// You are too deep, partner.
-			fatalError("Not implemented")
+			DispatchQueue.main.sync {
+				chatroom = createChatroom(with: account)
+			}
 		}
 		
 		return chatroom
@@ -391,7 +396,7 @@ extension AdamantChatsProvider {
 	/// - Returns: ammount of new messages was added
 	private func getTransactions(senderId: String,
 								 privateKey: String,
-								 height: Int?,
+								 height: Int64?,
 								 offset: Int?,
 								 dispatchGroup: DispatchGroup,
 								 context: NSManagedObjectContext,
@@ -421,11 +426,23 @@ extension AdamantChatsProvider {
 						dispatchGroup.leave()
 					}
 					
-					self.process(chatTransactions: transactions,
-								 senderId: senderId,
-								 privateKey: privateKey,
-								 context: context,
-								 contextMutatingSemaphore: cms)
+					let unreadMessages = self.process(chatTransactions: transactions,
+														senderId: senderId,
+														privateKey: privateKey,
+														context: context,
+														contextMutatingSemaphore: cms)
+					
+					if let unreadMessages = unreadMessages {
+						self.unreadSemaphore.wait()
+						
+						if self.unreadMessages == nil {
+							self.unreadMessages = [NSManagedObjectID]()
+						}
+						
+						self.unreadMessages?.append(contentsOf: unreadMessages)
+						
+						self.unreadSemaphore.signal()
+					}
 				}
 				
 				// MARK: 4. Get more transactions
@@ -446,32 +463,38 @@ extension AdamantChatsProvider {
 		}
 	}
 	
-	private func process(chatTransactions: [Transaction], senderId: String, privateKey: String, context: NSManagedObjectContext, contextMutatingSemaphore: DispatchSemaphore) {
-		struct DirectionalTransaction {
+	
+	/// - Returns: New unread messagess ids
+	private func process(chatTransactions: [Transaction],
+						 senderId: String,
+						 privateKey: String,
+						 context: NSManagedObjectContext,
+						 contextMutatingSemaphore: DispatchSemaphore) -> [NSManagedObjectID]? {
+		struct DirectionedTransaction {
 			let transaction: Transaction
 			let isOut: Bool
 		}
 		
 		// MARK: 1. Gather partner keys
-		var grouppedTransactions = [String:[DirectionalTransaction]]()
+		var grouppedTransactions = [String:[DirectionedTransaction]]()
 		
 		for transaction in chatTransactions {
 			let isOut = transaction.senderId == senderId
 			let partner = isOut ? transaction.recipientId : transaction.senderId
 			
 			if grouppedTransactions[partner] == nil {
-				grouppedTransactions[partner] = [DirectionalTransaction]()
+				grouppedTransactions[partner] = [DirectionedTransaction]()
 			}
 			
-			grouppedTransactions[partner]!.append(DirectionalTransaction(transaction: transaction, isOut: isOut))
+			grouppedTransactions[partner]!.append(DirectionedTransaction(transaction: transaction, isOut: isOut))
 		}
 		
 		
 		// MARK: 2. Gather Accounts
-		var partners: [CoreDataAccount:[DirectionalTransaction]] = [:]
+		var partners: [CoreDataAccount:[DirectionedTransaction]] = [:]
 		
 		let request = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
-		request.fetchLimit = partners.count
+		request.fetchLimit = grouppedTransactions.count
 		let predicates = grouppedTransactions.keys.map { NSPredicate(format: "address = %@", $0) }
 		request.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
 		
@@ -535,7 +558,7 @@ extension AdamantChatsProvider {
 			if let chrm = account.chatroom {
 				chatroom = chrm
 			} else {
-				chatroom = createChatroom(with: account, context: context)
+				chatroom = createChatroom(with: account)
 			}
 			contextMutatingSemaphore.signal()
 			
@@ -547,7 +570,7 @@ extension AdamantChatsProvider {
 			for trs in transactions {
 				unconfirmedsSemaphore.wait()
 				if unconfirmedTransactions.count > 0, let unconfirmed = unconfirmedTransactions[trs.transaction.id] {
-					confirmTransaction(unconfirmed, id: trs.transaction.id, height: trs.transaction.height)
+					confirmTransaction(unconfirmed, id: trs.transaction.id, height: Int64(trs.transaction.height))
 					let h = Int64(trs.transaction.height)
 					if height < h {
 						height = h
@@ -616,11 +639,33 @@ extension AdamantChatsProvider {
 			}
 		} catch {
 			print(error)
-			return
+			return nil
 		}
 		
 		
-		// MARK: 5. Save!
+		// MARK: 5. Unread messagess
+		var unreadMessagess: [NSManagedObjectID]?
+		highSemaphore.wait()
+		
+		if let unreadHeight = unreadHeight {
+			let request = NSFetchRequest<ChatTransaction>(entityName: ChatTransaction.entityName)
+			request.predicate = NSPredicate(format: "height > %i", unreadHeight)
+			
+			if let results = (try? context.fetch(request))?.filter({!$0.isOutgoing}), results.count > 0 {
+				results.forEach({$0.isUnread = true})
+				unreadMessagess = results.map({$0.objectID})
+			} else {
+				unreadMessagess = nil
+			}
+		} else {
+			unreadMessagess = nil
+		}
+		
+		unreadHeight = height
+		highSemaphore.signal()
+		
+		
+		// MARK: 6. Save!
 		do {
 			defer {
 				contextMutatingSemaphore.signal()
@@ -633,17 +678,20 @@ extension AdamantChatsProvider {
 			print(error)
 		}
 		
-		// MARK 6. Last message height
-		let h = Int(height)
+		
+		// MARK 7. Last message height
 		highSemaphore.wait()
 		if let lastHeight = lastHeight {
-			if lastHeight < h {
-				self.lastHeight = h
+			if lastHeight < height {
+				self.lastHeight = height
 			}
 		} else {
-			lastHeight = h
+			lastHeight = height
 		}
+		
 		highSemaphore.signal()
+		
+		return unreadMessagess
 	}
 }
 
@@ -702,15 +750,14 @@ extension AdamantChatsProvider {
 	///
 	/// - Parameters:
 	///   - transaction: Unconfirmed transaction
-	///   - id: New transaction id
-	///   - height: New transaction height
-	private func confirmTransaction(_ transaction: ChatTransaction, id: UInt64, height: Int) {
+	///   - id: New transaction id	///   - height: New transaction height
+	private func confirmTransaction(_ transaction: ChatTransaction, id: UInt64, height: Int64) {
 		if transaction.isConfirmed {
 			return
 		}
 		
 		transaction.isConfirmed = true
-		transaction.height = Int64(height)
+		transaction.height = height
 		self.unconfirmedTransactions.removeValue(forKey: id)
 		
 		if let lastHeight = lastHeight, lastHeight < height {
@@ -725,10 +772,19 @@ extension AdamantChatsProvider {
 	///   - address: chatroom with
 	///   - context: Context to insert chatroom into
 	/// - Returns: Chatroom
-	private func createChatroom(with account: CoreDataAccount, context: NSManagedObjectContext) -> Chatroom {
-		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
+	private func createChatroom(with account: CoreDataAccount) -> Chatroom {
+		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: account.managedObjectContext)
 		chatroom.partner = account
 		chatroom.updatedAt = NSDate()
+		
+		let userInfo: [AnyHashable: Any]?
+		if let address = account.address {
+			userInfo = [NotificationsUserInfoKeys.newChatroomAddress:address]
+		} else {
+			userInfo = nil
+		}
+		
+		NotificationCenter.default.post(name: Notification.Name.adamantChatsProviderNewChatroom, object: self, userInfo: userInfo)
 		
 		return chatroom
 	}
