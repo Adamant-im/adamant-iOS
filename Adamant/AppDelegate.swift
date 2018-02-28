@@ -14,6 +14,7 @@ import SwinjectStoryboard
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	var window: UIWindow?
+	var repeater: RepeaterService!
 
 	// MARK: - Lifecycle
 	
@@ -60,7 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		// MARK: 4 Autoupdate
 		let chatsProvider = container.resolve(ChatsProvider.self)!
-		let repeater = RepeaterService()
+		repeater = RepeaterService()
 		repeater.registerForegroundCall(label: "chatsProvider", interval: 3, queue: DispatchQueue.global(qos: .utility), callback: chatsProvider.update)
 		
 		
@@ -76,5 +77,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		return true
+	}
+	
+	func applicationWillResignActive(_ application: UIApplication) {
+		repeater.pauseAll()
+	}
+	
+	func applicationDidEnterBackground(_ application: UIApplication) {
+		repeater.pauseAll()
+	}
+	
+	func applicationDidBecomeActive(_ application: UIApplication) {
+		repeater.resumeAll()
 	}
 }
