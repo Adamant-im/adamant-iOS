@@ -10,36 +10,43 @@ import UIKit
 import CoreData
 
 class ChatsListViewController: UIViewController {
-	// MARK: - Dependencies
+	// MARK: Dependencies
 	var accountService: AccountService!
 	var chatsProvider: ChatsProvider!
 	var cellFactory: CellFactory!
 	var router: Router!
 	
-	// MARK: - IBOutlet
+	// MARK: IBOutlet
 	@IBOutlet weak var tableView: UITableView!
 	@IBOutlet weak var newChatButton: UIBarButtonItem!
 	
-	// MARK: - Properties
+	// MARK: Properties
 	let showChatSegue = "showChat"
 	let newChatSegue = "newChat"
 	var chatsController: NSFetchedResultsController<Chatroom>?
+	var unreadController: NSFetchedResultsController<ChatTransaction>?
+	
 	let chatCell = SharedCell.ChatCell.cellIdentifier
 	private var preservedMessagess = [String:String]()
 	
-	// MARK: - Lifecycle
+	
+	// MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
 		
+		// MARK: TableView
 		tableView.dataSource = self
 		tableView.delegate = self
 		tableView.register(cellFactory.nib(for: SharedCell.ChatCell), forCellReuseIdentifier: chatCell)
 		
 		chatsController = chatsProvider.getChatroomsController()
 		chatsController?.delegate = self
+		unreadController = chatsProvider.getUnreadMessagesController()
+		unreadController?.delegate = self
 		
 		tableView.reloadData()
 		
+		// MARK: Login/Logout
 		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			guard let controller = self?.chatsProvider.getChatroomsController() else {
 				return
@@ -143,6 +150,7 @@ extension ChatsListViewController {
 	
 	func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
 		if let chatCell = cell as? ChatTableViewCell, let chat = chatsController?.object(at: indexPath) {
+			chatCell.badgeColor = UIColor.adamantPrimary
 			configureCell(chatCell, for: chat)
 		}
 	}
@@ -165,7 +173,9 @@ extension ChatsListViewController {
 			}
 		}
 		
+		cell.hasUnreadMessages = chatroom.hasUnreadMessages
 		cell.lastMessageLabel.text = chatroom.lastTransaction?.message
+		
 		if let date = chatroom.updatedAt as Date? {
 			cell.dateLabel.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
 		} else {
@@ -178,15 +188,42 @@ extension ChatsListViewController {
 // MARK: - NSFetchedResultsControllerDelegate
 extension ChatsListViewController: NSFetchedResultsControllerDelegate {
 	func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-		tableView.beginUpdates()
+		if controller == chatsController {
+			tableView.beginUpdates()
+		}
 	}
 	
 	func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-		tableView.endUpdates()
+		
+		switch controller {
+		case let c where c == chatsController:
+			tableView.endUpdates()
+			
+		case let c where c == unreadController:
+			let item: UITabBarItem
+			if let i = navigationController?.tabBarItem {
+				item = i
+			} else {
+				item = tabBarItem
+			}
+			
+			if let count = controller.fetchedObjects?.count, count > 0 {
+				item.badgeValue = String(count)
+			} else {
+				item.badgeValue = nil
+			}
+			
+		default:
+			break
+		}
 	}
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-
+		
+		guard controller == chatsController else {
+			return
+		}
+		
 		switch type {
 		case .insert:
 			if let newIndexPath = newIndexPath {
@@ -270,5 +307,35 @@ extension ChatsListViewController: ChatViewControllerDelegate {
 		}
 		
 		return message
+	}
+}
+
+
+// MARK: - Current chat
+extension ChatsListViewController {
+	func presentedChatroom() -> Chatroom? {
+		// Showing another page
+		guard tabBarController?.selectedViewController == self else {
+			return nil
+		}
+		
+		// Showing list of chats
+		guard var vc = presentedViewController else {
+			return nil
+		}
+		
+		while vc != self {
+			if let ch = vc as? ChatViewController {
+				return ch.chatroom
+			}
+			
+			if let v = vc.presentingViewController {
+				vc = v
+			} else {
+				return nil
+			}
+		}
+
+		return nil
 	}
 }

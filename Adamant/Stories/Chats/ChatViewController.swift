@@ -38,11 +38,11 @@ protocol ChatViewControllerDelegate: class {
 
 // MARK: -
 class ChatViewController: MessagesViewController {
-	// MARK: - Dependencies
+	// MARK: Dependencies
 	var chatsProvider: ChatsProvider!
 	var dialogService: DialogService!
 	
-	// MARK: - Properties
+	// MARK: Properties
 	weak var delegate: ChatViewControllerDelegate?
 	var account: Account?
 	var chatroom: Chatroom?
@@ -63,7 +63,7 @@ class ChatViewController: MessagesViewController {
 	private var prevFee: UInt64 = 0
 	
 	
-	// MARK: - Lifecycle
+	// MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
 		
@@ -86,7 +86,7 @@ class ChatViewController: MessagesViewController {
 			guard let chatroom = self?.chatroom, let controller = self?.chatsProvider.getChatController(for: chatroom) else {
 				return
 			}
-
+			
 			controller.delegate = self
 			self?.chatController = controller
 
@@ -153,6 +153,12 @@ class ChatViewController: MessagesViewController {
 		}
     }
 	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		
+		chatroom?.markAsReaded()
+	}
+	
 	override func viewDidDisappear(_ animated: Bool) {
 		super.viewDidDisappear(animated)
 		
@@ -160,6 +166,9 @@ class ChatViewController: MessagesViewController {
 			delegate.preserveMessage(message, forAddress: address)
 		}
 	}
+	
+	
+	// MARK: IBAction
 	
 	@IBAction func properties(_ sender: Any) {
 		if let address = chatroom?.partner?.address {
@@ -230,6 +239,12 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	}
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+		
+		if type == .insert, let trs = anObject as? ChatTransaction {
+			trs.isUnread = false
+			chatroom?.hasUnreadMessages = false
+		}
+		
 		if controllerChanges[type] == nil {
 			controllerChanges[type] = [(IndexPath?, IndexPath?)]()
 		}

@@ -720,6 +720,11 @@
 					E913C8ED1FFFA51D001A83F7 = {
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Manual;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					E9EC344320066D4A00C0E546 = {
 						CreatedOnToolsVersion = 9.2;

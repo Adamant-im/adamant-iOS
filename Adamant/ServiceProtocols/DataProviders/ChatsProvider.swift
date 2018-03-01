@@ -37,13 +37,24 @@ enum AdamantMessage {
 
 extension Notification.Name {
 	static let adamantChatsProviderNewChatroom = Notification.Name("adamantChatsProviderNewChatroom")
-	static let adamantChatsProviderNewTransactions = Notification.Name("adamantChatsProviderNewTransactions")
+	static let adamantChatsProviderNewUnreadMessages = Notification.Name("adamantChatsProviderNewUnrMessages")
+}
+
+
+/// - newChatroomAddress: Contains new chatroom partner's address as String
+/// - lastMessageHeight: new lastMessageHeight
+enum NotificationUserInfoKeys: String {
+	case newChatroomAddress = "adamant.chatsProvider.newChatroom.address"
+	case lastMessageHeight = "adamant.chatsProvider.newMessage.lastHeight"
 }
 
 protocol ChatsProvider: DataProvider {
 	// MARK: - Getting chats and messages
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>?
 	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>?
+	
+	/// Unread messages controller. Sections by chatroom.
+	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>?
 	
 	/// Returns asociated with account chatroom, or create new, in viewContext
 	func chatroomWith(_ account: CoreDataAccount) -> Chatroom
