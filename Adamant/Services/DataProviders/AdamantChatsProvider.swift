@@ -30,9 +30,6 @@ class AdamantChatsProvider: ChatsProvider {
 	private let highSemaphore = DispatchSemaphore(value: 1)
 	private let stateSemaphore = DispatchSemaphore(value: 1)
 	
-	private var unreadMessages: [NSManagedObjectID]? = nil
-	private let unreadSemaphore = DispatchSemaphore(value: 1)
-	
 	// MARK: Lifecycle
 	init() {
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { _ in
@@ -133,7 +130,7 @@ extension AdamantChatsProvider {
 		privateContext.parent = self.stack.container.viewContext
 		let processingGroup = DispatchGroup()
 		let cms = DispatchSemaphore(value: 1)
-		unreadMessages = nil
+		let prevHeight = lastHeight
 		
 		getTransactions(senderId: address, privateKey: privateKey, height: lastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
 		
@@ -146,21 +143,14 @@ extension AdamantChatsProvider {
 			default:
 				self.setState(.upToDate, previous: prevState)
 				
-				
-				if let unreadMessages = self.unreadMessages {
-					var userInfo: [AnyHashable: Any] = [NotificationsUserInfoKeys.newUnreadMessagesIDs: unreadMessages]
-					
-					if let lastHeight = self.lastHeight {
-						userInfo[NotificationsUserInfoKeys.lastMessageHeight] = lastHeight
-					}
-					
+				if prevHeight != self.lastHeight, let h = self.lastHeight {
 					NotificationCenter.default.post(name: Notification.Name.adamantChatsProviderNewUnreadMessages,
 													object: self,
-													userInfo: userInfo)
+													userInfo: [NotificationUserInfoKeys.lastMessageHeight:h])
 				}
+				
+				self.unreadHeight = self.lastHeight
 			}
-			
-			self.unreadMessages = nil
 		}
 	}
 }
@@ -343,14 +333,14 @@ extension AdamantChatsProvider {
 	}
 	
 	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>? {
-		guard chatroom.managedObjectContext == stack.container.viewContext else {
+		guard let context = chatroom.managedObjectContext else {
 			return nil
 		}
 		
 		let request: NSFetchRequest<ChatTransaction> = NSFetchRequest(entityName: ChatTransaction.entityName)
 		request.predicate = NSPredicate(format: "chatroom = %@", chatroom)
 		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
-		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
 		
 		do {
 			try controller.performFetch()
@@ -381,6 +371,23 @@ extension AdamantChatsProvider {
 		}
 		
 		return chatroom
+	}
+	
+	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>? {
+		let request = NSFetchRequest<ChatTransaction>(entityName: ChatTransaction.entityName)
+		request.predicate = NSPredicate(format: "isUnread == true")
+		request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false)]
+		
+		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: "chatroom.partner.address", cacheName: nil)
+		controller.section
+		
+		do {
+			try controller.performFetch()
+			return controller
+		} catch {
+			print("Error fetching unread messages: \(error)")
+			return nil
+		}
 	}
 }
 
@@ -426,23 +433,11 @@ extension AdamantChatsProvider {
 						dispatchGroup.leave()
 					}
 					
-					let unreadMessages = self.process(chatTransactions: transactions,
-														senderId: senderId,
-														privateKey: privateKey,
-														context: context,
-														contextMutatingSemaphore: cms)
-					
-					if let unreadMessages = unreadMessages {
-						self.unreadSemaphore.wait()
-						
-						if self.unreadMessages == nil {
-							self.unreadMessages = [NSManagedObjectID]()
-						}
-						
-						self.unreadMessages?.append(contentsOf: unreadMessages)
-						
-						self.unreadSemaphore.signal()
-					}
+					self.process(chatTransactions: transactions,
+								 senderId: senderId,
+								 privateKey: privateKey,
+								 context: context,
+								 contextMutatingSemaphore: cms)
 				}
 				
 				// MARK: 4. Get more transactions
@@ -469,25 +464,15 @@ extension AdamantChatsProvider {
 						 senderId: String,
 						 privateKey: String,
 						 context: NSManagedObjectContext,
-						 contextMutatingSemaphore: DispatchSemaphore) -> [NSManagedObjectID]? {
+						 contextMutatingSemaphore: DispatchSemaphore) {
 		struct DirectionedTransaction {
 			let transaction: Transaction
 			let isOut: Bool
 		}
 		
 		// MARK: 1. Gather partner keys
-		var grouppedTransactions = [String:[DirectionedTransaction]]()
-		
-		for transaction in chatTransactions {
-			let isOut = transaction.senderId == senderId
-			let partner = isOut ? transaction.recipientId : transaction.senderId
-			
-			if grouppedTransactions[partner] == nil {
-				grouppedTransactions[partner] = [DirectionedTransaction]()
-			}
-			
-			grouppedTransactions[partner]!.append(DirectionedTransaction(transaction: transaction, isOut: isOut))
-		}
+		let mapped = chatTransactions.map({ DirectionedTransaction(transaction: $0, isOut: $0.senderId == senderId) })
+		let grouppedTransactions = Dictionary(grouping: mapped, by: { $0.isOut ? $0.transaction.recipientId : $0.transaction.senderId })
 		
 		
 		// MARK: 2. Gather Accounts
@@ -549,6 +534,7 @@ extension AdamantChatsProvider {
 		var height: Int64 = 0
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = context
+		var newChatTransactions = [ChatTransaction]()
 		
 		for (account, transactions) in partners {
 			// We can't save whole context while we are mass creating ChatTransactions.
@@ -565,7 +551,7 @@ extension AdamantChatsProvider {
 			let privateChatroom = privateContext.object(with: chatroom.objectID) as! Chatroom
 			
 			// MARK: 3.2 Transactions
-			var chats = Set<ChatTransaction>()
+			var messages = Set<ChatTransaction>()
 			
 			for trs in transactions {
 				unconfirmedsSemaphore.wait()
@@ -594,22 +580,36 @@ extension AdamantChatsProvider {
 						height = chatTransaction.height
 					}
 					
-					if !trs.isOut,
-						let preset = account.knownMessages,
-						let message = chatTransaction.message,
-						let translatedMessage = preset.first(where: {message.range(of: $0.key) != nil}) {
-						chatTransaction.message = translatedMessage.value
+					if !trs.isOut {
+						newChatTransactions.append(chatTransaction)
+						
+						// Preset messages
+						if let preset = account.knownMessages,
+							let message = chatTransaction.message,
+							let translatedMessage = preset.first(where: {message.range(of: $0.key) != nil}) {
+							chatTransaction.message = translatedMessage.value
+						}
 					}
 					
-					chats.insert(chatTransaction)
+					messages.insert(chatTransaction)
 				}
 			}
 			
-			privateChatroom.addToTransactions(chats as NSSet)
+			privateChatroom.addToTransactions(messages as NSSet)
 		}
 		
 		
-		// MARK: 4. Set newest transactions
+		// MARK: 4. Unread messagess
+		if let unreadHeight = unreadHeight {
+			let msgs = Dictionary(grouping: newChatTransactions.filter({$0.height > unreadHeight}), by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
+			for (chatroom, trs) in msgs {
+				chatroom.hasUnreadMessages = true
+				trs.forEach({$0.isUnread = true})
+			}
+		}
+		
+		
+		// MARK: 5. Set newest transactions
 		do {
 			defer {
 				contextMutatingSemaphore.signal()
@@ -639,30 +639,7 @@ extension AdamantChatsProvider {
 			}
 		} catch {
 			print(error)
-			return nil
 		}
-		
-		
-		// MARK: 5. Unread messagess
-		var unreadMessagess: [NSManagedObjectID]?
-		highSemaphore.wait()
-		
-		if let unreadHeight = unreadHeight {
-			let request = NSFetchRequest<ChatTransaction>(entityName: ChatTransaction.entityName)
-			request.predicate = NSPredicate(format: "height > %i", unreadHeight)
-			
-			if let results = (try? context.fetch(request))?.filter({!$0.isOutgoing}), results.count > 0 {
-				results.forEach({$0.isUnread = true})
-				unreadMessagess = results.map({$0.objectID})
-			} else {
-				unreadMessagess = nil
-			}
-		} else {
-			unreadMessagess = nil
-		}
-		
-		unreadHeight = height
-		highSemaphore.signal()
 		
 		
 		// MARK: 6. Save!
@@ -690,8 +667,6 @@ extension AdamantChatsProvider {
 		}
 		
 		highSemaphore.signal()
-		
-		return unreadMessagess
 	}
 }
 
@@ -779,7 +754,7 @@ extension AdamantChatsProvider {
 		
 		let userInfo: [AnyHashable: Any]?
 		if let address = account.address {
-			userInfo = [NotificationsUserInfoKeys.newChatroomAddress:address]
+			userInfo = [NotificationUserInfoKeys.newChatroomAddress:address]
 		} else {
 			userInfo = nil
 		}

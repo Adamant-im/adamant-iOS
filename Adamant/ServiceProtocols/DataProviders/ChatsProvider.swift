@@ -41,14 +41,10 @@ extension Notification.Name {
 }
 
 
-/// <#Description#>
-///
 /// - newChatroomAddress: Contains new chatroom partner's address as String
-/// - newUnreadMessagesIDs: Contains [NSManagedObjectID] of new unread messages
 /// - lastMessageHeight: new lastMessageHeight
-enum NotificationsUserInfoKeys: String {
+enum NotificationUserInfoKeys: String {
 	case newChatroomAddress = "adamant.chatsProvider.newChatroom.address"
-	case newUnreadMessagesIDs = "adamant.chatsProvider.newMessage.ids"
 	case lastMessageHeight = "adamant.chatsProvider.newMessage.lastHeight"
 }
 
@@ -56,6 +52,9 @@ protocol ChatsProvider: DataProvider {
 	// MARK: - Getting chats and messages
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>?
 	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>?
+	
+	/// Unread messages controller. Sections by chatroom.
+	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>?
 	
 	/// Returns asociated with account chatroom, or create new, in viewContext
 	func chatroomWith(_ account: CoreDataAccount) -> Chatroom

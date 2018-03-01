@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -48,24 +49,34 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Today, 20:24" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PP8-Tp-mvQ">
-                        <rect key="frame" x="294.5" y="53" width="68.5" height="14.5"/>
+                        <rect key="frame" x="295" y="53.5" width="68" height="14"/>
                         <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="12"/>
                         <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vtC-fH-ReF">
+                        <rect key="frame" x="282" y="13" width="12" height="12"/>
+                        <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="vtC-fH-ReF" secondAttribute="height" multiplier="1:1" id="Awu-Bc-M7m"/>
+                            <constraint firstAttribute="height" constant="12" id="eHH-7p-pDT"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="C7l-tD-ej1" secondAttribute="bottom" constant="8" id="0SK-AT-azY"/>
                     <constraint firstItem="aVv-ww-kYa" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="1fI-md-PMc"/>
                     <constraint firstItem="SiC-bM-ZsH" firstAttribute="leading" secondItem="aVv-ww-kYa" secondAttribute="trailing" constant="10" id="6my-Hp-uyp"/>
                     <constraint firstItem="C7l-tD-ej1" firstAttribute="top" secondItem="SiC-bM-ZsH" secondAttribute="bottom" constant="2" id="9ey-Qv-1He"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="vtC-fH-ReF" secondAttribute="trailing" constant="12" id="9qX-Ut-vIf"/>
                     <constraint firstItem="C7l-tD-ej1" firstAttribute="leading" secondItem="SiC-bM-ZsH" secondAttribute="leading" id="GgP-A8-aEU"/>
                     <constraint firstItem="C7l-tD-ej1" firstAttribute="trailing" secondItem="PP8-Tp-mvQ" secondAttribute="trailing" id="cKX-oK-8dF"/>
                     <constraint firstAttribute="trailing" secondItem="PP8-Tp-mvQ" secondAttribute="trailing" constant="12" id="dX6-xD-7WY"/>
                     <constraint firstAttribute="bottom" secondItem="PP8-Tp-mvQ" secondAttribute="bottom" constant="6" id="gB7-zA-C3o"/>
-                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="SiC-bM-ZsH" secondAttribute="trailing" constant="10" id="ma1-IT-KW3"/>
+                    <constraint firstItem="SiC-bM-ZsH" firstAttribute="centerY" secondItem="vtC-fH-ReF" secondAttribute="centerY" id="ugp-j2-sbR"/>
                     <constraint firstItem="aVv-ww-kYa" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="14" id="xpk-tG-FaG"/>
                     <constraint firstItem="SiC-bM-ZsH" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="9" id="zNL-XP-X54"/>
+                    <constraint firstItem="vtC-fH-ReF" firstAttribute="leading" secondItem="SiC-bM-ZsH" secondAttribute="trailing" constant="4" id="zsS-r7-3ci"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
@@ -73,6 +84,7 @@
             <connections>
                 <outlet property="accountLabel" destination="SiC-bM-ZsH" id="HPE-pt-X6B"/>
                 <outlet property="avatarImageView" destination="aVv-ww-kYa" id="LHB-x4-hC2"/>
+                <outlet property="badgeView" destination="vtC-fH-ReF" id="lGZ-I8-Lv2"/>
                 <outlet property="dateLabel" destination="PP8-Tp-mvQ" id="R6V-ec-1km"/>
                 <outlet property="lastMessageLabel" destination="C7l-tD-ej1" id="BrB-Hs-i7K"/>
             </connections>
