@@ -35,18 +35,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		self.window!.rootViewController = UITabBarController()
 		self.window!.rootViewController?.view.backgroundColor = .white
 		self.window!.makeKeyAndVisible()
-
+		
 		self.window!.tintColor = UIColor.adamantPrimary
-
+		
 		guard let router = container.resolve(Router.self) else {
 			fatalError("Failed to get Router")
 		}
-
+		
 		if let tabbar = self.window!.rootViewController as? UITabBarController {
 			let account = router.get(story: .Account).instantiateInitialViewController()!
 			let chats = router.get(story: .Chats).instantiateInitialViewController()!
 			let settings = router.get(story: .Settings).instantiateInitialViewController()!
 
+			account.tabBarItem.badgeColor = UIColor.adamantPrimary
+			chats.tabBarItem.badgeColor = UIColor.adamantPrimary
+			settings.tabBarItem.badgeColor = UIColor.adamantPrimary
+			
 			tabbar.setViewControllers([account, chats, settings], animated: false)
 		}
 

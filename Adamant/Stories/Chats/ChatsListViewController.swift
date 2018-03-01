@@ -24,6 +24,7 @@ class ChatsListViewController: UIViewController {
 	let showChatSegue = "showChat"
 	let newChatSegue = "newChat"
 	var chatsController: NSFetchedResultsController<Chatroom>?
+	var unreadController: NSFetchedResultsController<ChatTransaction>?
 	
 	let chatCell = SharedCell.ChatCell.cellIdentifier
 	private var preservedMessagess = [String:String]()
@@ -40,6 +41,8 @@ class ChatsListViewController: UIViewController {
 		
 		chatsController = chatsProvider.getChatroomsController()
 		chatsController?.delegate = self
+		unreadController = chatsProvider.getUnreadMessagesController()
+		unreadController?.delegate = self
 		
 		tableView.reloadData()
 		
@@ -185,15 +188,42 @@ extension ChatsListViewController {
 // MARK: - NSFetchedResultsControllerDelegate
 extension ChatsListViewController: NSFetchedResultsControllerDelegate {
 	func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-		tableView.beginUpdates()
+		if controller == chatsController {
+			tableView.beginUpdates()
+		}
 	}
 	
 	func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-		tableView.endUpdates()
+		
+		switch controller {
+		case let c where c == chatsController:
+			tableView.endUpdates()
+			
+		case let c where c == unreadController:
+			let item: UITabBarItem
+			if let i = navigationController?.tabBarItem {
+				item = i
+			} else {
+				item = tabBarItem
+			}
+			
+			if let count = controller.fetchedObjects?.count, count > 0 {
+				item.badgeValue = String(count)
+			} else {
+				item.badgeValue = nil
+			}
+			
+		default:
+			break
+		}
 	}
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-
+		
+		guard controller == chatsController else {
+			return
+		}
+		
 		switch type {
 		case .insert:
 			if let newIndexPath = newIndexPath {
