@@ -55,8 +55,6 @@ extension Container {
 			let service = AdamantAccountService()
 			service.apiService = r.resolve(ApiService.self)!
 			service.adamantCore = r.resolve(AdamantCore.self)!
-			service.dialogService = r.resolve(DialogService.self)!
-			service.router = r.resolve(Router.self)!
 			return service
 		}.inObjectScope(.container)
 		
