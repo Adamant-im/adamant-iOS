@@ -41,6 +41,9 @@ extension Container {
 		// MARK: DialogService
 		self.register(DialogService.self) { r in AdamantDialogService() }.inObjectScope(.container)
 		
+		// MARK: Secured Store
+		self.register(SecuredStore.self) { r in KeychainStore() }.inObjectScope(.container)
+		
 		
 		// MARK: - Services with dependencies
 		// MARK: ApiService

@@ -4,8 +4,8 @@ platform :ios, '10.0'
 target 'Adamant' do
   use_frameworks!
 
-  # Network
-  pod 'Alamofire'
+  pod 'Alamofire' # Network
+  pod 'KeychainAccess' # Keychain
   
   # Swinject DI
   pod 'Swinject'

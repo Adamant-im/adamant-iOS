@@ -11,6 +11,7 @@ PODS:
   - FTIndicator/FTProgressIndicator (1.2.6)
   - FTIndicator/FTToastIndicator (1.2.6)
   - GrowingTextView (0.5.4)
+  - KeychainAccess (3.1.0)
   - MessageKit (0.13.1)
   - QRCodeReader.swift (8.1.0)
   - Swinject (2.1.1)
@@ -25,6 +26,7 @@ DEPENDENCIES:
   - FreakingSimpleRoundImageView
   - FTIndicator
   - GrowingTextView
+  - KeychainAccess
   - MessageKit
   - QRCodeReader.swift
   - Swinject
@@ -38,12 +40,13 @@ SPEC CHECKSUMS:
   FreakingSimpleRoundImageView: ae69d35a7bb7870411d0348b62969415be4031f0
   FTIndicator: d2a7c204341b7b0165b6dbeb5bf6979c6d7d4bb7
   GrowingTextView: 0615429affef558cbbb610aa6f9baf19b027fdbe
+  KeychainAccess: 94c5540b32eabf7bc32bfb976a268e8ea05fd6da
   MessageKit: fc74d71d9b05385138d47b3a4b7beef5c687daf1
   QRCodeReader.swift: 353c605aaaa6472541236edd6503e6f3ef9c3f6b
   Swinject: afea49fd95f392b41171669f165842879c48fad6
   SwinjectStoryboard: 92e75763c3299cdf627bef98a5180dc894864336
   TableKit: 42d4dff2944f273cdeec2ef6352064eb6a9a355b
 
-PODFILE CHECKSUM: 969bbfe9a495e5fd01b1e2404df0a0456928a480
+PODFILE CHECKSUM: 65fcbf869901d28a2a26f2738aabe954291eebe9
 
 COCOAPODS: 1.4.0
