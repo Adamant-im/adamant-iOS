@@ -19,54 +19,62 @@ extension Notification.Name {
 	static let adamantAccountDataUpdated = Notification.Name("adamantAccountDataUpdated")
 }
 
-enum AccountStatus {
-	case notLogged, isLoggingIn, loggedIn
+
+/// - notLogged: Not logged, empty
+/// - isLoggingIn: Is currently trying to log in
+/// - loggedIn: Logged in and idling
+/// - updating: Is logged in and updating account info
+enum AccountServiceState {
+	case notLogged, isLoggingIn, loggedIn, updating
+}
+
+enum AccountServiceResult {
+	case success(account: Account)
+	case failure(AccountServiceError)
+}
+
+enum AccountServiceError {
+	case invalidPassphrase
+	case wrongPassphrase
+	case apiError(error: ApiServiceError)
+	case internalError(message: String, error: Error?)
+	
+	var localized: String {
+		switch self {
+		case .invalidPassphrase:
+			return NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase")
+			
+		case .wrongPassphrase:
+			return NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase")
+			
+		case .apiError(let error):
+			return error.localized
+			
+		case .internalError(let message, _):
+			return String.localizedStringWithFormat(NSLocalizedString("Internal error: %@, report this as a bug", comment: "ApiService: Bad internal application error, report a bug"), message)
+		}
+	}
 }
 
 protocol AccountService {
+	// MARK: - State
 	
-	// MARK: - Status
-	
-	var status: AccountStatus { get }
-	var autoupdate: Bool { get set }
-	/// Default = 5 seconds
-	var autoupdateInterval: TimeInterval { get set }
-	
-	
-	// MARK: - Personal information
-	
-	/// Currently logged account. nil if not logged.
+	var state: AccountServiceState { get }
 	var account: Account? { get }
-	
-	/// Keypair of logged account
 	var keypair: Keypair? { get }
 	
 	
-	// MARK: - Update functions
+	// MARK: - Account functions
 	
-	func updateAccountData()
+	/// Update logged account info
+	func update()
 	
-	
-	// MARK: - Login functions
-	
-	/// Create new account and login using new passphrase.
-	///
-	/// - Parameters:
-	///   - passphrase: Your new unique passphrase
-	///   - completion: New logged account, if success, error if not.
-	func createAccount(with passphrase: String, completion: ((Account?, AdamantError?) -> Void)?)
+	/// Create new account with passphrase.
+	func createAccount(with passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
 	
 	/// Login into Adamant using passphrase.
-	///
-	/// - Parameters:
-	///   - passphrase: Your unique passphrase
-	///   - logincompletion: Logged account if success, error if not.
-	func login(with passphrase: String, completion: ((Account?, AdamantError?) -> Void)?)
+	func login(with passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
 	
-	/// Logout (if logged in) and present authorization viewControllers modally. After login or cancel will dismiss modal window and then call a callback.
-	///
-	/// - Parameters:
-	///   - animated: Present modally with or without animation.
-	///   - authorizationFinished: callback. Success and error, if present.
-	func logoutAndPresentLoginStoryboard(animated: Bool, authorizationFinishedHandler: (() -> Void)?)
+	/// Logout
+	func logout()
 }

@@ -13,27 +13,12 @@
         <!--Login View Controller-->
         <scene sceneID="Buz-eY-Cp8">
             <objects>
-                <viewController id="29G-lT-8Fq" customClass="LoginViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LoginViewController" id="29G-lT-8Fq" customClass="LoginViewController" customModule="Adamant" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="pSU-cK-dHQ">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" keyboardDismissMode="interactive" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="7YN-vx-Dlq">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                            </tableView>
-                        </subviews>
-                        <constraints>
-                            <constraint firstItem="eH9-Sh-rPG" firstAttribute="bottom" secondItem="7YN-vx-Dlq" secondAttribute="bottom" id="9nJ-Y6-81b"/>
-                            <constraint firstItem="7YN-vx-Dlq" firstAttribute="leading" secondItem="eH9-Sh-rPG" secondAttribute="leading" id="LxA-YT-uzC"/>
-                            <constraint firstItem="eH9-Sh-rPG" firstAttribute="trailing" secondItem="7YN-vx-Dlq" secondAttribute="trailing" id="NZw-G7-IyH"/>
-                            <constraint firstItem="7YN-vx-Dlq" firstAttribute="top" secondItem="pSU-cK-dHQ" secondAttribute="top" id="SWz-KD-ozN"/>
-                        </constraints>
                         <viewLayoutGuide key="safeArea" id="eH9-Sh-rPG"/>
                     </view>
-                    <connections>
-                        <outlet property="tableView" destination="7YN-vx-Dlq" id="cdR-TE-142"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iZ4-5L-dbb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
