@@ -56,11 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 		
 		// MARK: 3. Initiate login
-		guard let accountService = container.resolve(AccountService.self) else {
-			fatalError("Failed to get AccountService")
-		}
-		
-		accountService.logoutAndPresentLoginStoryboard(animated: false, authorizationFinishedHandler: nil)
+		self.window!.rootViewController?.present(router.get(scene: .Login), animated: false, completion: nil)
 		
 		
 		// MARK: 4 Autoupdate

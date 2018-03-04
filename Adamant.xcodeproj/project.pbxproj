@@ -8,12 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
+		E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39E204C281400DDB504 /* LoginViewController.swift */; };
+		E90A4943204C5ED6009F6A65 /* EurekaPassphraseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A4942204C5ED6009F6A65 /* EurekaPassphraseRow.swift */; };
+		E90A4945204C6204009F6A65 /* PassphraseCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E90A4944204C5F60009F6A65 /* PassphraseCell.xib */; };
 		E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */; };
 		E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E913C8F81FFFA51D001A83F7 /* Assets.xcassets */; };
 		E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9071FFFA943001A83F7 /* AdamantCore.swift */; };
 		E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C90C1FFFA99B001A83F7 /* Keypair.swift */; };
 		E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */; };
-		E919479C2000102E001362F8 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E919479B2000102E001362F8 /* LoginViewController.swift */; };
 		E91947AC20001A9A001362F8 /* ApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AB20001A9A001362F8 /* ApiService.swift */; };
 		E91947B020002393001362F8 /* AdamantApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AF20002393001362F8 /* AdamantApiService.swift */; };
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
@@ -158,6 +160,9 @@
 		C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1311CE46EB635FFC95BFEF4 /* Pods_Adamant_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D283570A539D864115735AAA /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
+		E905D39E204C281400DDB504 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		E90A4942204C5ED6009F6A65 /* EurekaPassphraseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EurekaPassphraseRow.swift; sourceTree = "<group>"; };
+		E90A4944204C5F60009F6A65 /* PassphraseCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PassphraseCell.xib; sourceTree = "<group>"; };
 		E913C8EE1FFFA51D001A83F7 /* Adamant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Adamant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E913C8F81FFFA51D001A83F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -165,7 +170,6 @@
 		E913C9071FFFA943001A83F7 /* AdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCore.swift; sourceTree = "<group>"; };
 		E913C90C1FFFA99B001A83F7 /* Keypair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keypair.swift; sourceTree = "<group>"; };
 		E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAdamantCore.swift; sourceTree = "<group>"; };
-		E919479B2000102E001362F8 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		E919479F200010DC001362F8 /* Exo+2_400_italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo+2_400_italic.ttf"; sourceTree = "<group>"; };
 		E91947A0200010DC001362F8 /* Roboto_300_normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_300_normal.ttf; sourceTree = "<group>"; };
 		E91947A1200010DD001362F8 /* Roboto_400_italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_400_italic.ttf; sourceTree = "<group>"; };
@@ -466,9 +470,11 @@
 				E9256F6B2034E98700DE86E9 /* Login.storyboard */,
 				E9E7CD942002812400DFC4DB /* LoginDependencies.swift */,
 				E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */,
-				E919479B2000102E001362F8 /* LoginViewController.swift */,
+				E905D39E204C281400DDB504 /* LoginViewController.swift */,
 				E9256F6C20357B1700DE86E9 /* LoginHeader.xib */,
 				E948E0472024F02700975D6B /* LoginFooter.xib */,
+				E90A4942204C5ED6009F6A65 /* EurekaPassphraseRow.swift */,
+				E90A4944204C5F60009F6A65 /* PassphraseCell.xib */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -767,6 +773,7 @@
 				E9256F692034E98700DE86E9 /* Login.storyboard in Resources */,
 				E9942B89203D9ECA00C163AF /* QrCell.xib in Resources */,
 				E9C51EED2011416E00385EB7 /* adamant-core.js in Resources */,
+				E90A4945204C6204009F6A65 /* PassphraseCell.xib in Resources */,
 				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
 				E9EC3417200524CA00C0E546 /* Exo+2_400_italic.ttf in Resources */,
 				E9EC341E200524CA00C0E546 /* Roboto_500_normal.ttf in Resources */,
@@ -912,6 +919,7 @@
 				E9E7CDC22003F5A400DFC4DB /* TransactionsViewController.swift in Sources */,
 				E9E7CDA92002AF1E00DFC4DB /* AccountDependencies.swift in Sources */,
 				E9B6CC51201763FE00486EA1 /* ButtonTableViewCell.swift in Sources */,
+				E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */,
 				E9CE7785202B9DC2009CF70D /* Chatroom+CoreDataClass.swift in Sources */,
 				E9CE7786202B9DC2009CF70D /* Chatroom+CoreDataProperties.swift in Sources */,
 				E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */,
@@ -946,7 +954,6 @@
 				E9E7CD952002812400DFC4DB /* LoginDependencies.swift in Sources */,
 				E9E7CDCC20040FDC00DFC4DB /* TransactionType.swift in Sources */,
 				E95F85852008CB3A0070534A /* ChatsListViewController.swift in Sources */,
-				E919479C2000102E001362F8 /* LoginViewController.swift in Sources */,
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,
 				E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */,
 				E9FAE5DA203DBFEF008D3A6B /* Comparable+Clamped.swift in Sources */,
@@ -962,6 +969,7 @@
 				E95F856520067A030070534A /* GlobalConstants.swift in Sources */,
 				E9502740202E257E002C1098 /* RepeaterService.swift in Sources */,
 				E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */,
+				E90A4943204C5ED6009F6A65 /* EurekaPassphraseRow.swift in Sources */,
 				E95F8589200900B10070534A /* ChatType.swift in Sources */,
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
 				E9EC342120052ABB00C0E546 /* TransferViewController.swift in Sources */,

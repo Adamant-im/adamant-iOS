@@ -302,7 +302,7 @@ class TransferViewController: FormViewController {
 							DispatchQueue.main.async {
 								dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
 								
-								self?.accountService.updateAccountData()
+								self?.accountService.update()
 								
 								if let nav = self?.navigationController {
 									nav.popViewController(animated: true)

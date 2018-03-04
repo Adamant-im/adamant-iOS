@@ -31,12 +31,14 @@ enum ApiServiceError: Error {
 		case .serverError(error: let error):
 			return String.localizedStringWithFormat(NSLocalizedString("Remote Server error: %@", comment: "ApiService: Remote server returned an error"), error)
 			
-		case .internalError(_, let error):
+		case .internalError(let msg, let error):
 			let message: String
 			if let apiError = error as? ApiServiceError {
 				message = apiError.localized
-			} else {
+			} else if let error = error {
 				message = String(describing: error)
+			} else {
+				message = msg
 			}
 			
 			return String.localizedStringWithFormat(NSLocalizedString("Internal error: %@, report this as a bug", comment: "ApiService: Bad internal application error, report a bug"), message)

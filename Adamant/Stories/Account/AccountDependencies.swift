@@ -13,6 +13,7 @@ extension Container {
 		self.storyboardInitCompleted(AccountViewController.self) { r, c in
 			c.accountService = r.resolve(AccountService.self)
 			c.dialogService = r.resolve(DialogService.self)
+			c.router = r.resolve(Router.self)
 		}
 		self.storyboardInitCompleted(TransactionsViewController.self) { (r, c) in
 			c.apiService = r.resolve(ApiService.self)
