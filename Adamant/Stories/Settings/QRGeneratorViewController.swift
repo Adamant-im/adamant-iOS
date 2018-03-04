@@ -15,7 +15,7 @@ import Photos
 extension String.adamantLocalized {
 	struct qrGenerator {
 		static let tapToSaveTip = NSLocalizedString("Tap to save", comment: "QRGenerator: small 'Tap to save' tooltip under generated QR")
-		static let passphrasePlaceholder = NSLocalizedString("passphrase", comment: "QRGenerator: Passphrase textview placeholder")
+		static let passphrasePlaceholder = NSLocalizedString("Passphrase", comment: "QRGenerator: Passphrase textview placeholder")
 		
 		static let wrongPassphraseError = NSLocalizedString("Enter correct passphrase", comment: "QRGenerator: user typed in wrong invalid")
 		static let internalError = NSLocalizedString("Internal error: %@", comment: "QRGenerator: Bad Internal generator error message format")
@@ -60,6 +60,7 @@ class QRGeneratorViewController: FormViewController {
 	// MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+		navigationOptions = .Disabled
 		
 		self.tableView.showsVerticalScrollIndicator = false
 		self.tableView.showsHorizontalScrollIndicator = false
