@@ -10,7 +10,7 @@ import Swinject
 
 extension Container {
 	func registerAdamantSettingsStory() {
-		self.storyboardInitCompleted(SettingsTableViewController.self) { r, c in
+		self.storyboardInitCompleted(SettingsViewController.self) { r, c in
 			c.dialogService = r.resolve(DialogService.self)
 		}
 		
