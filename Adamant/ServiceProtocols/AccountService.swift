@@ -38,6 +38,22 @@ enum AccountServiceError {
 	case wrongPassphrase
 	case apiError(error: ApiServiceError)
 	case internalError(message: String, error: Error?)
+	
+	var localized: String {
+		switch self {
+		case .invalidPassphrase:
+			return NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase")
+			
+		case .wrongPassphrase:
+			return NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase")
+			
+		case .apiError(let error):
+			return error.localized
+			
+		case .internalError(let message, _):
+			return String.localizedStringWithFormat(NSLocalizedString("Internal error: %@, report this as a bug", comment: "ApiService: Bad internal application error, report a bug"), message)
+		}
+	}
 }
 
 protocol AccountService {

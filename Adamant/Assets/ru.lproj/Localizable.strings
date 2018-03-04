@@ -258,7 +258,7 @@
 
 /* Login: Passphrase placeholder
    QRGenerator: Passphrase textview placeholder */
-"passphrase" = "Пароль";
+"Passphrase" = "Пароль";
 
 /* Transfer: transfer amount placeholder */
 "to send" = "для перевода";
