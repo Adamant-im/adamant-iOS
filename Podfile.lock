@@ -16,7 +16,6 @@ PODS:
   - Swinject (2.1.1)
   - SwinjectStoryboard (1.1.2):
     - Swinject (~> 2.1)
-  - TableKit (2.5.0)
 
 DEPENDENCIES:
   - Alamofire
@@ -29,7 +28,6 @@ DEPENDENCIES:
   - QRCodeReader.swift
   - Swinject
   - SwinjectStoryboard
-  - TableKit
 
 SPEC CHECKSUMS:
   Alamofire: f41a599bd63041760b26d393ec1069d9d7b917f4
@@ -42,8 +40,7 @@ SPEC CHECKSUMS:
   QRCodeReader.swift: 353c605aaaa6472541236edd6503e6f3ef9c3f6b
   Swinject: afea49fd95f392b41171669f165842879c48fad6
   SwinjectStoryboard: 92e75763c3299cdf627bef98a5180dc894864336
-  TableKit: 42d4dff2944f273cdeec2ef6352064eb6a9a355b
 
-PODFILE CHECKSUM: 969bbfe9a495e5fd01b1e2404df0a0456928a480
+PODFILE CHECKSUM: 8dfb672cd25a1f637f7a73b8fea9a2169280990c
 
 COCOAPODS: 1.4.0

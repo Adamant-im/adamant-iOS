@@ -17,7 +17,6 @@ target 'Adamant' do
   pod 'Eureka' # Forms
   pod 'MessageKit' # Chat UI
   pod 'GrowingTextView' # Passphrase text view
-  pod 'TableKit' # Declarative TableView
 
   # QR
   pod "EFQRCode" # QR generator
