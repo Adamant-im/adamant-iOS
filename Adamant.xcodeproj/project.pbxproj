@@ -77,12 +77,6 @@
 		E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D39D201F99F40019EB36 /* DataProvider.swift */; };
 		E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D3A0201FA26B0019EB36 /* AdamantAccountsProvider.swift */; };
 		E9B3D3A9202082450019EB36 /* AdamantTransfersProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D3A8202082450019EB36 /* AdamantTransfersProvider.swift */; };
-		E9B6CC51201763FE00486EA1 /* ButtonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B6CC4F201763FE00486EA1 /* ButtonTableViewCell.swift */; };
-		E9B6CC52201763FE00486EA1 /* ButtonTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9B6CC50201763FE00486EA1 /* ButtonTableViewCell.xib */; };
-		E9B6CC5520176F3300486EA1 /* TextViewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B6CC5320176F3300486EA1 /* TextViewTableViewCell.swift */; };
-		E9B6CC5620176F3300486EA1 /* TextViewTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9B6CC5420176F3300486EA1 /* TextViewTableViewCell.xib */; };
-		E9B6CC5F201793D800486EA1 /* MultilineLableTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B6CC5D201793D800486EA1 /* MultilineLableTableViewCell.swift */; };
-		E9B6CC60201793D800486EA1 /* MultilineLableTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9B6CC5E201793D800486EA1 /* MultilineLableTableViewCell.xib */; };
 		E9C51ECD200E2BF900385EB7 /* AdamantFeeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51ECC200E2BF900385EB7 /* AdamantFeeCalculator.swift */; };
 		E9C51ECF200E2D1100385EB7 /* FeeCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51ECE200E2D1100385EB7 /* FeeCalculatorTests.swift */; };
 		E9C51EED2011416E00385EB7 /* adamant-core.js in Resources */ = {isa = PBXBuildFile; fileRef = E9C51EEC2011416E00385EB7 /* adamant-core.js */; };
@@ -246,12 +240,6 @@
 		E9B3D39D201F99F40019EB36 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 		E9B3D3A0201FA26B0019EB36 /* AdamantAccountsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAccountsProvider.swift; sourceTree = "<group>"; };
 		E9B3D3A8202082450019EB36 /* AdamantTransfersProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantTransfersProvider.swift; sourceTree = "<group>"; };
-		E9B6CC4F201763FE00486EA1 /* ButtonTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTableViewCell.swift; sourceTree = "<group>"; };
-		E9B6CC50201763FE00486EA1 /* ButtonTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ButtonTableViewCell.xib; sourceTree = "<group>"; };
-		E9B6CC5320176F3300486EA1 /* TextViewTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewTableViewCell.swift; sourceTree = "<group>"; };
-		E9B6CC5420176F3300486EA1 /* TextViewTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextViewTableViewCell.xib; sourceTree = "<group>"; };
-		E9B6CC5D201793D800486EA1 /* MultilineLableTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineLableTableViewCell.swift; sourceTree = "<group>"; };
-		E9B6CC5E201793D800486EA1 /* MultilineLableTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MultilineLableTableViewCell.xib; sourceTree = "<group>"; };
 		E9C51ECC200E2BF900385EB7 /* AdamantFeeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantFeeCalculator.swift; sourceTree = "<group>"; };
 		E9C51ECE200E2D1100385EB7 /* FeeCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeeCalculatorTests.swift; sourceTree = "<group>"; };
 		E9C51EEC2011416E00385EB7 /* adamant-core.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adamant-core.js"; sourceTree = "<group>"; };
@@ -628,16 +616,10 @@
 		E9E7CDB82003AA8E00DFC4DB /* SharedCells */ = {
 			isa = PBXGroup;
 			children = (
-				E9B6CC4F201763FE00486EA1 /* ButtonTableViewCell.swift */,
-				E9B6CC50201763FE00486EA1 /* ButtonTableViewCell.xib */,
 				E95F85C5200A9B070070534A /* ChatTableViewCell.swift */,
 				E95F85C6200A9B070070534A /* ChatTableViewCell.xib */,
-				E9B6CC5D201793D800486EA1 /* MultilineLableTableViewCell.swift */,
-				E9B6CC5E201793D800486EA1 /* MultilineLableTableViewCell.xib */,
 				E9E7CDB92003AAA700DFC4DB /* RoundAvatarTableViewCell.swift */,
 				E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */,
-				E9B6CC5320176F3300486EA1 /* TextViewTableViewCell.swift */,
-				E9B6CC5420176F3300486EA1 /* TextViewTableViewCell.xib */,
 				E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */,
 				E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */,
 				E9942B86203D9E5100C163AF /* EurekaQRRow.swift */,
@@ -769,7 +751,6 @@
 				E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
 				E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */,
-				E9B6CC52201763FE00486EA1 /* ButtonTableViewCell.xib in Resources */,
 				E9256F692034E98700DE86E9 /* Login.storyboard in Resources */,
 				E9942B89203D9ECA00C163AF /* QrCell.xib in Resources */,
 				E9C51EED2011416E00385EB7 /* adamant-core.js in Resources */,
@@ -784,8 +765,6 @@
 				E9256F632034E7DE00DE86E9 /* Settings.storyboard in Resources */,
 				E9EC341C200524CA00C0E546 /* Roboto_400_italic.ttf in Resources */,
 				E9256F792039B29A00DE86E9 /* Localizable.strings in Resources */,
-				E9B6CC60201793D800486EA1 /* MultilineLableTableViewCell.xib in Resources */,
-				E9B6CC5620176F3300486EA1 /* TextViewTableViewCell.xib in Resources */,
 				E9EC3415200524CA00C0E546 /* Exo+2_100_normal.ttf in Resources */,
 				E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */,
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
@@ -829,7 +808,6 @@
 				"${BUILT_PRODUCTS_DIR}/QRCodeReader.swift/QRCodeReader.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
 				"${BUILT_PRODUCTS_DIR}/SwinjectStoryboard/SwinjectStoryboard.framework",
-				"${BUILT_PRODUCTS_DIR}/TableKit/TableKit.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -843,7 +821,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCodeReader.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwinjectStoryboard.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TableKit.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -902,7 +879,6 @@
 				E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */,
 				E948E0462024DAE800975D6B /* AdamantUserInfoKeys.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
-				E9B6CC5F201793D800486EA1 /* MultilineLableTableViewCell.swift in Sources */,
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				E9B3D39A201F90570019EB36 /* AccountsProvider.swift in Sources */,
 				E950652320404C84008352E5 /* AdamantUriTools.swift in Sources */,
@@ -918,7 +894,6 @@
 				E91947B420002809001362F8 /* Account.swift in Sources */,
 				E9E7CDC22003F5A400DFC4DB /* TransactionsViewController.swift in Sources */,
 				E9E7CDA92002AF1E00DFC4DB /* AccountDependencies.swift in Sources */,
-				E9B6CC51201763FE00486EA1 /* ButtonTableViewCell.swift in Sources */,
 				E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */,
 				E9CE7785202B9DC2009CF70D /* Chatroom+CoreDataClass.swift in Sources */,
 				E9CE7786202B9DC2009CF70D /* Chatroom+CoreDataProperties.swift in Sources */,
@@ -943,7 +918,6 @@
 				E9CAE8D42018AC1800345E76 /* AdamantApi+Keys.swift in Sources */,
 				E9C51EEF20139DC600385EB7 /* ProcessTransactionResponse.swift in Sources */,
 				E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */,
-				E9B6CC5520176F3300486EA1 /* TextViewTableViewCell.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E9CE778D202B9DC2009CF70D /* TransferTransaction+CoreDataClass.swift in Sources */,
 				E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */,
