@@ -9,10 +9,9 @@
 import Foundation
 import LocalAuthentication
 
-class AdamantAuthentication: BiometryAuthentication {
-	private let context = LAContext()
-	
+class AdamantAuthentication: LocalAuthentication {
 	var biometryType: BiometryType {
+		let context = LAContext()
 		var error: NSError?
 		let available: Bool
 		
@@ -52,6 +51,42 @@ class AdamantAuthentication: BiometryAuthentication {
 			}
 		} else {
 			return .none
+		}
+	}
+	
+	func authorizeUser(reason: String, completion: @escaping (AuthenticationResult) -> Void) {
+		let context = LAContext()
+		context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { (success, error) in
+			if success {
+				completion(.success)
+				return
+			}
+			
+			guard let error = error as? LAError else {
+				completion(.failed)
+				return
+			}
+			
+			if error.code == LAError.userFallback {
+				completion(.fallback)
+				return
+			}
+			
+			let tryDeviceOwner: Bool
+			
+			if #available(iOS 11.0, *) {
+				tryDeviceOwner = error.code == LAError.biometryLockout
+			} else {
+				tryDeviceOwner = error.code == LAError.touchIDLockout
+			}
+			
+			if tryDeviceOwner {
+				context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { (success, _) in
+					completion(.success)
+				}
+			} else {
+				completion(.failed)
+			}
 		}
 	}
 }

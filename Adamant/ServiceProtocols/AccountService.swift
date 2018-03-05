@@ -56,15 +56,23 @@ enum AccountServiceError {
 	}
 }
 
+enum AuthorizeOptions {
+	case pin(String)
+	case touchId
+	case faceId
+}
+
+
+// MARK: - Protocol
 protocol AccountService {
-	// MARK: - State
+	// MARK: State
 	
 	var state: AccountServiceState { get }
 	var account: Account? { get }
 	var keypair: Keypair? { get }
 	
 	
-	// MARK: - Account functions
+	// MARK: Account functions
 	
 	/// Update logged account info
 	func update()
@@ -77,4 +85,10 @@ protocol AccountService {
 	
 	/// Logout
 	func logout()
+	
+	
+	// MARK: Stay in functions
+	var hasSavedCredentials: Bool { get }
+	var stayLogged: Bool { get set }
+	var biometryEnabled: Bool { get set }
 }

@@ -44,6 +44,9 @@ extension Container {
 		// MARK: Secured Store
 		self.register(SecuredStore.self) { r in KeychainStore() }.inObjectScope(.container)
 		
+		// MARK: LocalAuthentication
+		self.register(LocalAuthentication.self) { r in AdamantAuthentication() }.inObjectScope(.container)
+		
 		
 		// MARK: - Services with dependencies
 		// MARK: ApiService

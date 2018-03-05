@@ -29,6 +29,9 @@
 /* Config: Application Info section */
 "Application info" = "Приложение";
 
+/* Config: Biometry authorization reason for turning on/off biometry usage to log in */
+"Authorize yourself" = "Для внесения изменений необходимо авторизироваться";
+
 /* Transfer: logged user balance.
    Wallet page: Balance row title */
 "Balance" = "Баланс";
@@ -180,7 +183,8 @@
 /* Transfer: Processing message */
 "Sending funds..." = "Отправляем токены...";
 
-/* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
+/* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title.
+ Config: Settings section */
 "Settings" = "Настройки";
 
 /* Wallet page: 'Transfer not allowed' alert title */
@@ -188,6 +192,9 @@
 
 /* Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu. */
 "Share" = "Поделиться";
+
+/* Config: Stay logged option */
+"Stay Logged in" = "Оставаться в сети";
 
 /* Export transaction: 'Share transaction summary' button */
 "Summary" = "Сводка";

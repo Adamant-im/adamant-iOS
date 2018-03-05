@@ -1,5 +1,5 @@
 //
-//  BiometryAuthentication.swift
+//  LocalAuthentication.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 05.03.2018.
@@ -12,6 +12,14 @@ enum BiometryType {
 	case none, touchID, faceID
 }
 
-protocol BiometryAuthentication {
+enum AuthenticationResult {
+	case success
+	case fallback
+	case failed
+}
+
+protocol LocalAuthentication {
 	var biometryType: BiometryType { get }
+	
+	func authorizeUser(reason: String, completion: @escaping (AuthenticationResult) -> Void)
 }

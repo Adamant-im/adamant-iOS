@@ -29,6 +29,12 @@ class AdamantAccountService {
 		self.state = state
 		stateSemaphore.signal()
 	}
+	
+	
+	// MARK: Staying logged
+	var hasSavedCredentials: Bool = false
+	var stayLogged: Bool = false
+	var biometryEnabled: Bool = false
 }
 
 
