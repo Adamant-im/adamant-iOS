@@ -8,11 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
+		E905D39B2048A9BD00DDB504 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39A2048A9BD00DDB504 /* KeychainStore.swift */; };
+		E905D39D204C13B900DDB504 /* SecuredStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39C204C13B900DDB504 /* SecuredStore.swift */; };
 		E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39E204C281400DDB504 /* LoginViewController.swift */; };
 		E90A4943204C5ED6009F6A65 /* EurekaPassphraseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A4942204C5ED6009F6A65 /* EurekaPassphraseRow.swift */; };
 		E90A4945204C6204009F6A65 /* PassphraseCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E90A4944204C5F60009F6A65 /* PassphraseCell.xib */; };
-		E905D39B2048A9BD00DDB504 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39A2048A9BD00DDB504 /* KeychainStore.swift */; };
-		E905D39D204C13B900DDB504 /* SecuredStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39C204C13B900DDB504 /* SecuredStore.swift */; };
+		E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */; };
+		E90A494D204DA932009F6A65 /* LocalAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A494C204DA932009F6A65 /* LocalAuthentication.swift */; };
 		E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */; };
 		E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E913C8F81FFFA51D001A83F7 /* Assets.xcassets */; };
 		E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9071FFFA943001A83F7 /* AdamantCore.swift */; };
@@ -162,11 +164,13 @@
 		C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1311CE46EB635FFC95BFEF4 /* Pods_Adamant_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D283570A539D864115735AAA /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
+		E905D39A2048A9BD00DDB504 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		E905D39C204C13B900DDB504 /* SecuredStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuredStore.swift; sourceTree = "<group>"; };
 		E905D39E204C281400DDB504 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		E90A4942204C5ED6009F6A65 /* EurekaPassphraseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EurekaPassphraseRow.swift; sourceTree = "<group>"; };
 		E90A4944204C5F60009F6A65 /* PassphraseCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PassphraseCell.xib; sourceTree = "<group>"; };
-		E905D39A2048A9BD00DDB504 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
-		E905D39C204C13B900DDB504 /* SecuredStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuredStore.swift; sourceTree = "<group>"; };
+		E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAuthentication.swift; sourceTree = "<group>"; };
+		E90A494C204DA932009F6A65 /* LocalAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAuthentication.swift; sourceTree = "<group>"; };
 		E913C8EE1FFFA51D001A83F7 /* Adamant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Adamant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E913C8F81FFFA51D001A83F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -397,6 +401,7 @@
 				E9E7CD8C20026B6600DFC4DB /* DialogService.swift */,
 				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
 				E905D39C204C13B900DDB504 /* SecuredStore.swift */,
+				E90A494C204DA932009F6A65 /* LocalAuthentication.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -413,6 +418,7 @@
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
 				E950273F202E257E002C1098 /* RepeaterService.swift */,
 				E905D39A2048A9BD00DDB504 /* KeychainStore.swift */,
+				E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -921,6 +927,7 @@
 				E9CE778E202B9DC2009CF70D /* TransferTransaction+CoreDataProperties.swift in Sources */,
 				E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */,
 				E95F858B200931410070534A /* TransactionAsset.swift in Sources */,
+				E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */,
 				E9E7CDAC2002AFA500DFC4DB /* AccountViewController.swift in Sources */,
 				E95F85812008C8D70070534A /* ChatsDependencies.swift in Sources */,
 				E91947B420002809001362F8 /* Account.swift in Sources */,
@@ -933,6 +940,7 @@
 				E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */,
 				E9CE7787202B9DC2009CF70D /* BaseTransaction+CoreDataClass.swift in Sources */,
 				E95F85872008FDBF0070534A /* Chat.swift in Sources */,
+				E90A494D204DA932009F6A65 /* LocalAuthentication.swift in Sources */,
 				E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */,
 				E9E7CDBB2003AAA700DFC4DB /* RoundAvatarTableViewCell.swift in Sources */,
 				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
