@@ -16,8 +16,7 @@ target 'Adamant' do
   pod 'FTIndicator' # Notifications and activity indicator
   pod 'Eureka' # Forms
   pod 'MessageKit' # Chat UI
-  pod 'GrowingTextView' # Passphrase text view
-  pod 'TableKit' # Declarative TableView
+  pod 'MyLittlePinpad' # Pinpad
 
   # QR
   pod "EFQRCode" # QR generator
