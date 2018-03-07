@@ -20,6 +20,7 @@
 		E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9071FFFA943001A83F7 /* AdamantCore.swift */; };
 		E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C90C1FFFA99B001A83F7 /* Keypair.swift */; };
 		E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */; };
+		E9147B5F20500E9300145913 /* MyLittlePinpad+Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9147B5E20500E9300145913 /* MyLittlePinpad+Config.swift */; };
 		E91947AC20001A9A001362F8 /* ApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AB20001A9A001362F8 /* ApiService.swift */; };
 		E91947B020002393001362F8 /* AdamantApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AF20002393001362F8 /* AdamantApiService.swift */; };
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
@@ -172,6 +173,7 @@
 		E913C9071FFFA943001A83F7 /* AdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCore.swift; sourceTree = "<group>"; };
 		E913C90C1FFFA99B001A83F7 /* Keypair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keypair.swift; sourceTree = "<group>"; };
 		E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAdamantCore.swift; sourceTree = "<group>"; };
+		E9147B5E20500E9300145913 /* MyLittlePinpad+Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MyLittlePinpad+Config.swift"; sourceTree = "<group>"; };
 		E919479F200010DC001362F8 /* Exo+2_400_italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo+2_400_italic.ttf"; sourceTree = "<group>"; };
 		E91947A0200010DC001362F8 /* Roboto_300_normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_300_normal.ttf; sourceTree = "<group>"; };
 		E91947A1200010DD001362F8 /* Roboto_400_italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_400_italic.ttf; sourceTree = "<group>"; };
@@ -435,6 +437,7 @@
 				E95F856A200789450070534A /* JSModels.swift */,
 				E913C90C1FFFA99B001A83F7 /* Keypair.swift */,
 				E9256F5E2034C21100DE86E9 /* String+localized.swift */,
+				E9147B5E20500E9300145913 /* MyLittlePinpad+Config.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -970,6 +973,7 @@
 				E95F856B200789450070534A /* JSModels.swift in Sources */,
 				E9CE778C202B9DC2009CF70D /* CoreDataAccount+CoreDataProperties.swift in Sources */,
 				E9CE7788202B9DC2009CF70D /* BaseTransaction+CoreDataProperties.swift in Sources */,
+				E9147B5F20500E9300145913 /* MyLittlePinpad+Config.swift in Sources */,
 				E905D39D204C13B900DDB504 /* SecuredStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
