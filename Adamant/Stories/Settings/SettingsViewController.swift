@@ -8,10 +8,13 @@
 
 import UIKit
 import Eureka
+import MyLittlePinpad
 
 extension String.adamantLocalized {
 	struct settings {
-		static let biometryReason = NSLocalizedString("Authorize yourself", comment: "Config: Authorization reason for turning on/off biometry")
+		static let stayInTurnOff = NSLocalizedString("Do not stay logged in", comment: "Config: turn off 'Stay Logged In' confirmation")
+		static let biometryOnReason = NSLocalizedString("Use biometry to log in", comment: "Config: Authorization reason for turning biometry on")
+		static let biometryOffReason = NSLocalizedString("Do not use biometry to log in", comment: "Config: Authorization reason for turning biometry off")
 	}
 }
 
@@ -71,6 +74,12 @@ class SettingsViewController: FormViewController {
 		}
 	}
 	
+	// MARK: Pinpad
+	private enum PinpadRequest {
+		case createPin, reenterPin(pin: String), turnOffPin(pin: String), turnOnBiometry(pin: String), turnOffBiometry(pin: String)
+	}
+	
+	
 	// MARK: Dependencies
 	var accountService: AccountService!
 	var dialogService: DialogService!
@@ -78,7 +87,8 @@ class SettingsViewController: FormViewController {
 	
 	
 	// MARK: Properties
-	private var showBiometry = false
+	private var showBiometryRow = false
+	private var pinpadRequest: PinpadRequest?
 	
 	
 	// MARK: Lifetime
@@ -93,7 +103,7 @@ class SettingsViewController: FormViewController {
 		<<< SwitchRow() {
 			$0.tag = Rows.stayLoggedIn.tag
 			$0.title = Rows.stayLoggedIn.localized
-			$0.value = false//accountService.stayLogged
+			$0.value = accountService.stayLogged
 		}.onChange({ [weak self] row in
 			guard let enabled = row.value else { return }
 			self?.setStayLoggedIn(enabled: enabled)
@@ -107,9 +117,9 @@ class SettingsViewController: FormViewController {
 		// Biometry
 		<<< SwitchRow() {
 			$0.tag = Rows.biometry.tag
-			$0.value = false//accountService.biometryEnabled
+			$0.value = accountService.biometryEnabled
 			$0.hidden = Condition.function([], { [weak self] _ -> Bool in
-				guard let showBiometry = self?.showBiometry else {
+				guard let showBiometry = self?.showBiometryRow else {
 					return true
 				}
 				
@@ -189,65 +199,306 @@ class SettingsViewController: FormViewController {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
 	}
-	
+}
+
+
+// MARK: - Stay in
+extension SettingsViewController {
 	private func setStayLoggedIn(enabled: Bool) {
 		guard accountService.stayLogged != enabled else {
 			return
 		}
 		
-		accountService.stayLogged = enabled
-		
-		if enabled {
-			switch localAuth.biometryType {
-			case .touchID: showBiometry = true
-			case .faceID: showBiometry = true
-			case .none: showBiometry = false
+		if enabled { // Create pin and turn on Stay In
+			pinpadRequest = .createPin
+			let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
+			pinpad.commentLabel.text = String.adamantLocalized.pinpad.createPin
+			pinpad.commentLabel.isHidden = false
+			pinpad.delegate = self
+			present(pinpad, animated: true, completion: nil)
+		} else { // Validate pin and turn off Stay In
+			guard let pin = accountService.pin else {
+				return
 			}
 			
-			if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
-				row.value = false
-				row.evaluateHidden()
-			}
-		} else {
-			accountService.biometryEnabled = false
-			showBiometry = false
-			if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
-				row.value = false
-				row.evaluateHidden()
-			}
+			pinpadRequest = PinpadRequest.turnOffPin(pin: pin)
+			let biometryButton: PinpadBiometryButtonType = accountService.biometryEnabled ? localAuth.biometryType.pinpadButtonType : .hidden
+			let pinpad = PinpadViewController.adamantPinpad(biometryButton: biometryButton)
+			pinpad.commentLabel.text = String.adamantLocalized.settings.stayInTurnOff
+			pinpad.commentLabel.isHidden = false
+			pinpad.delegate = self
+			
+			present(pinpad, animated: true, completion: nil)
 		}
 	}
 	
 	private func setBiometry(enabled: Bool) {
-		guard accountService.stayLogged == true, accountService.biometryEnabled != enabled else {
+		guard showBiometryRow, accountService.stayLogged == true, accountService.biometryEnabled != enabled else {
 			return
 		}
 		
-		localAuth.authorizeUser(reason: String.adamantLocalized.settings.biometryReason) { [weak self] result in
+		let reason = enabled ? String.adamantLocalized.settings.biometryOnReason : String.adamantLocalized.settings.biometryOffReason
+		localAuth.authorizeUser(reason: reason) { [weak self] result in
 			switch result {
 			case .success:
+				self?.dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
 				self?.accountService.biometryEnabled = enabled
 				
-			case .fallback:
-				print("A user knopochku nazal")
-				fallthrough
+			case .cancel:
+				DispatchQueue.main.async { [weak self] in
+					if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
+						row.value = self?.accountService.biometryEnabled
+						row.updateCell()
+					}
+				}
 				
+			case .fallback:
+				guard let pin = self?.accountService.pin else {
+					return
+				}
+				
+				let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
+				
+				if enabled {
+					pinpad.commentLabel.text = String.adamantLocalized.settings.biometryOnReason
+					self?.pinpadRequest = PinpadRequest.turnOnBiometry(pin: pin)
+				} else {
+					pinpad.commentLabel.text = String.adamantLocalized.settings.biometryOffReason
+					self?.pinpadRequest = PinpadRequest.turnOffBiometry(pin: pin)
+				}
+				
+				pinpad.commentLabel.isHidden = false
+				pinpad.delegate = self
+				
+				DispatchQueue.main.async {
+					self?.present(pinpad, animated: true, completion: nil)
+				}
+
 			case .failed:
 				DispatchQueue.main.async {
 					guard let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) else {
 						return
 					}
-					
+
 					if let value = self?.accountService.biometryEnabled {
 						row.value = value
 					} else {
 						row.value = false
 					}
-					
+
 					row.updateCell()
 					row.evaluateHidden()
 				}
 			}
 		}
 	}
+}
+
+
+// MARK: - PinpadDelegate
+extension SettingsViewController: PinpadDelegate {
+	func pinpad(_ pinpad: PinpadViewController, didEnterPin pin: String) {
+		switch pinpadRequest {
+			
+		// MARK: User has entered new pin first time. Request re-enter pin
+		case PinpadRequest.createPin?:
+			pinpadRequest = PinpadRequest.reenterPin(pin: pin)
+			pinpad.commentLabel.text = String.adamantLocalized.pinpad.reenterPin
+			pinpad.clearPin()
+			return
+			
+			
+		// MARK: User has reentered pin. Save pin.
+		case PinpadRequest.reenterPin(let pinToVerify)?:
+			guard pin == pinToVerify else {
+				pinpad.playWrongPinAnimation()
+				pinpad.clearPin()
+				break
+			}
+			
+			accountService.setStayLogged(true, pin: pin) { [weak self] result in
+				switch result {
+				case .success(account: _):
+					self?.pinpadRequest = nil
+					DispatchQueue.main.async {
+						if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
+							self?.showBiometryRow = true
+							row.value = false
+							row.updateCell()
+							row.evaluateHidden()
+						}
+						
+						pinpad.dismiss(animated: true, completion: nil)
+					}
+					
+				case .failure(let error):
+					self?.dialogService.showError(withMessage: error.localized)
+				}
+			}
+			
+			
+		// MARK: Users want to turn off the pin. Validate and turn off.
+		case PinpadRequest.turnOffPin(let pinToValidate)?:
+			guard pinToValidate == pin else {
+				pinpad.playWrongPinAnimation()
+				pinpad.clearPin()
+				break
+			}
+			
+			accountService.setStayLogged(false, pin: pinToValidate) { [weak self] result in
+				switch result {
+				case .success(_):
+					break
+					
+				case .failure(let error):
+					self?.dialogService.showError(withMessage: error.localized)
+				}
+			}
+			
+			if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
+				showBiometryRow = false
+				row.value = false
+				row.updateCell()
+				row.evaluateHidden()
+			}
+			
+			pinpad.dismiss(animated: true, completion: nil)
+			
+			
+		// MARK: User wants to turn on biometry
+		case PinpadRequest.turnOnBiometry(let pinToValidate)?:
+			guard pin == pinToValidate else {
+				pinpad.playWrongPinAnimation()
+				pinpad.clearPin()
+				break
+			}
+			
+			accountService.biometryEnabled = true
+			pinpad.dismiss(animated: true, completion: nil)
+			
+			
+		// MARK: User wants to turn off biometry
+		case PinpadRequest.turnOffBiometry(let pinToValidate)?:
+			guard pin == pinToValidate else {
+				pinpad.playWrongPinAnimation()
+				pinpad.clearPin()
+				break
+			}
+			
+			accountService.biometryEnabled = false
+			pinpad.dismiss(animated: true, completion: nil)
+			
+		default:
+			pinpad.dismiss(animated: true, completion: nil)
+		}
+	}
+	
+	func pinpadDidTapBiometryButton(_ pinpad: PinpadViewController) {
+		switch pinpadRequest {
+			
+		// MARK: User wants to turn of StayIn with his face. Or finger.
+		case PinpadRequest.turnOffPin(_)?:
+			localAuth.authorizeUser(reason: String.adamantLocalized.settings.stayInTurnOff, completion: { [weak self] result in
+				switch result {
+				case .success:
+					
+					
+					
+					self?.accountService.setStayLogged(false, pin: nil) { [weak self] result in
+						switch result {
+						case .success(_):
+							break
+							
+						case .failure(let error):
+							self?.dialogService.showError(withMessage: error.localized)
+						}
+					}
+					
+					DispatchQueue.main.async {
+						if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
+							self?.showBiometryRow = false
+							row.value = false
+							row.updateCell()
+							row.evaluateHidden()
+						}
+						
+						pinpad.dismiss(animated: true, completion: nil)
+					}
+					
+				case .cancel: break
+				case .fallback: break
+				case .failed: break
+				}
+			})
+			
+		default:
+			return
+		}
+	}
+	
+	func pinpadDidCancel(_ pinpad: PinpadViewController) {
+		switch pinpadRequest {
+			
+		// MARK: User canceled turning on StayIn
+		case PinpadRequest.createPin?:
+			fallthrough
+			
+		case PinpadRequest.reenterPin(pin: _)?:
+			if let row: SwitchRow = form.rowBy(tag: Rows.stayLoggedIn.tag) {
+				row.value = false
+				row.updateCell()
+			}
+			
+		// MARK: User canceled turning off StayIn
+		case PinpadRequest.turnOffPin(_)?:
+			if let row: SwitchRow = form.rowBy(tag: Rows.stayLoggedIn.tag) {
+				row.value = true
+				row.updateCell()
+			}
+			
+		// MARK: User canceled Biometry On
+		case PinpadRequest.turnOnBiometry(_)?:
+			if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
+				row.value = false
+				row.updateCell()
+			}
+		
+		// MARK: User canceled Biometry Off
+		case PinpadRequest.turnOffBiometry(_)?:
+			if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
+				row.value = true
+				row.updateCell()
+			}
+			
+		default:
+			break
+		}
+		
+		pinpadRequest = nil
+		pinpad.dismiss(animated: true, completion: nil)
+	}
+	
+	/*
+	return
+	
+	if enabled {
+	switch localAuth.biometryType {
+	case .touchID: showBiometry = true
+	case .faceID: showBiometry = true
+	case .none: showBiometry = false
+	}
+	
+	if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
+	row.value = false
+	row.evaluateHidden()
+	}
+	} else {
+	accountService.biometryEnabled = false
+	showBiometry = false
+	if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
+	row.value = false
+	row.evaluateHidden()
+	}
+	}
+*/
 }

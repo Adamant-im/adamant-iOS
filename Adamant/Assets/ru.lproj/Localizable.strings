@@ -54,6 +54,9 @@
 /* Transaction details: date row. */
 "Date" = "Дата";
 
+/* Config: turn off 'Stay Logged In' confirmation */
+"Do not stay logged in" = "Выходить из системы при выходе из приложения";
+
 /* Shared alert Done message. Used anywhere */
 "Done" = "Готово";
 
@@ -65,6 +68,9 @@
 
 /* QRGenerator: user typed in wrong invalid */
 "Enter correct passphrase" = "Введите корректный пароль";
+
+/* Pinpad: Ask user to create new pin */
+"Enter new pin" = "Введите новый пин";
 
 /* Shared alert 'Error' title. Used anywhere */
 "Error" = "Ошибка";
@@ -158,6 +164,9 @@
 /* Login: Notify user that device not supported by QR reader */
 "QR codes reading not supported by the current device" = "На этом устройстве не поддерживается чтение QR кодов";
 
+/* Pinpad: Ask user to repeat new pin */
+"Re-enter new pin" = "Введите пин ещё раз";
+
 /* Shared alert 'Save' button. Used anywhere */
 "Save" = "Сохранить";
 
@@ -196,6 +205,9 @@
 /* Config: Stay logged option */
 "Stay Logged in" = "Оставаться в сети";
 
+/* Config: Authorization reason for turning biometry off */
+"Do not use biometry to log in" = "Отключить вход с биометрией";
+
 /* Export transaction: 'Share transaction summary' button */
 "Summary" = "Сводка";
 
@@ -217,6 +229,12 @@
 
 /* Export transaction: 'Share transaction URL' button */
 "URL" = "URL";
+
+/* Config: Authorization reason for turning biometry on */
+"Use biometry to log in" = "Использовать биометрию для входа в систему";
+
+/* Login: user not logged error */
+"User not logged!" = "Не выполнен вход";
 
 /* Unknown internal error */
 "Unknown error" = "Неизвестная ошибка";

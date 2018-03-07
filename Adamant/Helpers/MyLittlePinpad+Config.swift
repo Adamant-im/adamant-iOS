@@ -12,7 +12,37 @@ import MyLittlePinpad
 extension String.adamantLocalized {
 	struct pinpad {
 		static let createPin = NSLocalizedString("Enter new pin", comment: "Pinpad: Ask user to create new pin")
-		static let repeatPin = NSLocalizedString("Re-enter new pin", comment: "Pinpad: Ask user to repeat new pin")
+		static let reenterPin = NSLocalizedString("Re-enter new pin", comment: "Pinpad: Ask user to repeat new pin")
+	}
+}
+
+extension PinpadBiometryButtonType {
+	var localAuthType: BiometryType {
+		switch self {
+		case .hidden:
+			return .none
+			
+		case .faceID:
+			return .faceID
+			
+		case .touchID:
+			return .touchID
+		}
+	}
+}
+
+extension BiometryType {
+	var pinpadButtonType: PinpadBiometryButtonType {
+		switch self {
+		case .none:
+			return .hidden
+		
+		case .faceID:
+			return .faceID
+			
+		case .touchID:
+			return .touchID
+		}
 	}
 }
 
