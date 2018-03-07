@@ -89,7 +89,7 @@ protocol AccountService {
 	
 	
 	/// Login into Adamant using previously logged account
-	func loginWith(pincode: String, completion: @escaping (AccountServiceResult) -> Void)
+	func loginWithSavedAccount(completion: @escaping (AccountServiceResult) -> Void)
 	
 	/// Logout
 	func logout()

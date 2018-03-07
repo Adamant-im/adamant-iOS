@@ -1,5 +1,5 @@
 //
-//  MyLittlePinpad+Config.swift
+//  MyLittlePinpad+adamant.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 07.03.2018.
@@ -48,7 +48,7 @@ extension BiometryType {
 
 extension PinpadViewController {
 	static func adamantPinpad(biometryButton: PinpadBiometryButtonType) -> PinpadViewController {
-		let pinpad = PinpadViewController.instantiateFromNib()
+		let pinpad = PinpadViewController.instantiateFromResourceNib()
 		
 		pinpad.bordersColor = UIColor.adamantSecondary
 		pinpad.setColor(UIColor.adamantPrimary, for: .normal)
@@ -59,6 +59,8 @@ extension PinpadViewController {
 		pinpad.placeholdersSize = 15
 		pinpad.placeholderActiveColor = UIColor.adamantPinpadHighlightButton
 		pinpad.biometryButtonType = biometryButton
+		pinpad.cancelButton.setTitle(String.adamantLocalized.alert.cancel, for: .normal)
+		pinpad.pinDigits = 6
 		
 		return pinpad
 	}

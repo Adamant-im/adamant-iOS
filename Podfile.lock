@@ -12,7 +12,7 @@ PODS:
   - FTIndicator/FTToastIndicator (1.2.6)
   - KeychainAccess (3.1.0)
   - MessageKit (0.13.1)
-  - MyLittlePinpad (0.1.0)
+  - MyLittlePinpad (0.2.2)
   - QRCodeReader.swift (8.1.0)
   - Swinject (2.1.1)
   - SwinjectStoryboard (1.1.2):
@@ -39,7 +39,7 @@ SPEC CHECKSUMS:
   FTIndicator: d2a7c204341b7b0165b6dbeb5bf6979c6d7d4bb7
   KeychainAccess: 94c5540b32eabf7bc32bfb976a268e8ea05fd6da
   MessageKit: fc74d71d9b05385138d47b3a4b7beef5c687daf1
-  MyLittlePinpad: 40b29237d36dd95a200c3791184a9e586c200972
+  MyLittlePinpad: 8b24927da4c1c8daa64ab1b9f142a8329f480745
   QRCodeReader.swift: 353c605aaaa6472541236edd6503e6f3ef9c3f6b
   Swinject: afea49fd95f392b41171669f165842879c48fad6
   SwinjectStoryboard: 92e75763c3299cdf627bef98a5180dc894864336

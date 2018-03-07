@@ -193,9 +193,10 @@ extension AdamantAccountService: AccountService {
 	
 	
 	
-	func loginWith(pincode: String, completion: @escaping (AccountServiceResult) -> Void) {
+	func loginWithSavedAccount(completion: @escaping (AccountServiceResult) -> Void) {
 		
 	}
+	
 	
 	
 	// MARK: Logout

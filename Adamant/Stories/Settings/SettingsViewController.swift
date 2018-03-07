@@ -295,8 +295,8 @@ extension SettingsViewController {
 }
 
 
-// MARK: - PinpadDelegate
-extension SettingsViewController: PinpadDelegate {
+// MARK: - PinpadViewControllerDelegate
+extension SettingsViewController: PinpadViewControllerDelegate {
 	func pinpad(_ pinpad: PinpadViewController, didEnterPin pin: String) {
 		switch pinpadRequest {
 			

@@ -20,7 +20,10 @@
 		E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9071FFFA943001A83F7 /* AdamantCore.swift */; };
 		E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C90C1FFFA99B001A83F7 /* Keypair.swift */; };
 		E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */; };
-		E9147B5F20500E9300145913 /* MyLittlePinpad+Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9147B5E20500E9300145913 /* MyLittlePinpad+Config.swift */; };
+		E9147B5F20500E9300145913 /* MyLittlePinpad+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9147B5E20500E9300145913 /* MyLittlePinpad+adamant.swift */; };
+		E9147B612050599000145913 /* LoginViewController+QR.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9147B602050599000145913 /* LoginViewController+QR.swift */; };
+		E9147B6320505C7500145913 /* QRCodeReader+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9147B6220505C7500145913 /* QRCodeReader+adamant.swift */; };
+		E9147B6F205088DE00145913 /* LoginViewController+Pinpad.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9147B6E205088DE00145913 /* LoginViewController+Pinpad.swift */; };
 		E91947AC20001A9A001362F8 /* ApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AB20001A9A001362F8 /* ApiService.swift */; };
 		E91947B020002393001362F8 /* AdamantApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AF20002393001362F8 /* AdamantApiService.swift */; };
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
@@ -173,7 +176,10 @@
 		E913C9071FFFA943001A83F7 /* AdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantCore.swift; sourceTree = "<group>"; };
 		E913C90C1FFFA99B001A83F7 /* Keypair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keypair.swift; sourceTree = "<group>"; };
 		E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAdamantCore.swift; sourceTree = "<group>"; };
-		E9147B5E20500E9300145913 /* MyLittlePinpad+Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MyLittlePinpad+Config.swift"; sourceTree = "<group>"; };
+		E9147B5E20500E9300145913 /* MyLittlePinpad+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MyLittlePinpad+adamant.swift"; sourceTree = "<group>"; };
+		E9147B602050599000145913 /* LoginViewController+QR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginViewController+QR.swift"; sourceTree = "<group>"; };
+		E9147B6220505C7500145913 /* QRCodeReader+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QRCodeReader+adamant.swift"; sourceTree = "<group>"; };
+		E9147B6E205088DE00145913 /* LoginViewController+Pinpad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginViewController+Pinpad.swift"; sourceTree = "<group>"; };
 		E919479F200010DC001362F8 /* Exo+2_400_italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo+2_400_italic.ttf"; sourceTree = "<group>"; };
 		E91947A0200010DC001362F8 /* Roboto_300_normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_300_normal.ttf; sourceTree = "<group>"; };
 		E91947A1200010DD001362F8 /* Roboto_400_italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Roboto_400_italic.ttf; sourceTree = "<group>"; };
@@ -437,7 +443,8 @@
 				E95F856A200789450070534A /* JSModels.swift */,
 				E913C90C1FFFA99B001A83F7 /* Keypair.swift */,
 				E9256F5E2034C21100DE86E9 /* String+localized.swift */,
-				E9147B5E20500E9300145913 /* MyLittlePinpad+Config.swift */,
+				E9147B5E20500E9300145913 /* MyLittlePinpad+adamant.swift */,
+				E9147B6220505C7500145913 /* QRCodeReader+adamant.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -474,6 +481,8 @@
 				E9E7CD942002812400DFC4DB /* LoginDependencies.swift */,
 				E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */,
 				E905D39E204C281400DDB504 /* LoginViewController.swift */,
+				E9147B602050599000145913 /* LoginViewController+QR.swift */,
+				E9147B6E205088DE00145913 /* LoginViewController+Pinpad.swift */,
 				E9256F6C20357B1700DE86E9 /* LoginHeader.xib */,
 				E948E0472024F02700975D6B /* LoginFooter.xib */,
 				E90A4942204C5ED6009F6A65 /* EurekaPassphraseRow.swift */,
@@ -893,6 +902,7 @@
 				E91947B020002393001362F8 /* AdamantApiService.swift in Sources */,
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
 				E9E7CDB72003994E00DFC4DB /* AdamantUtilities.swift in Sources */,
+				E9147B6320505C7500145913 /* QRCodeReader+adamant.swift in Sources */,
 				E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */,
 				E948E0462024DAE800975D6B /* AdamantUserInfoKeys.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
@@ -901,7 +911,9 @@
 				E950652320404C84008352E5 /* AdamantUriTools.swift in Sources */,
 				E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */,
 				E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */,
+				E9147B612050599000145913 /* LoginViewController+QR.swift in Sources */,
 				E982F69C20235B4D00566AC7 /* SettingsViewController.swift in Sources */,
+				E9147B6F205088DE00145913 /* LoginViewController+Pinpad.swift in Sources */,
 				E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */,
 				E9CE778E202B9DC2009CF70D /* TransferTransaction+CoreDataProperties.swift in Sources */,
 				E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */,
@@ -973,7 +985,7 @@
 				E95F856B200789450070534A /* JSModels.swift in Sources */,
 				E9CE778C202B9DC2009CF70D /* CoreDataAccount+CoreDataProperties.swift in Sources */,
 				E9CE7788202B9DC2009CF70D /* BaseTransaction+CoreDataProperties.swift in Sources */,
-				E9147B5F20500E9300145913 /* MyLittlePinpad+Config.swift in Sources */,
+				E9147B5F20500E9300145913 /* MyLittlePinpad+adamant.swift in Sources */,
 				E905D39D204C13B900DDB504 /* SecuredStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
