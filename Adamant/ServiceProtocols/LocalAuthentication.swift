@@ -14,6 +14,7 @@ enum BiometryType {
 
 enum AuthenticationResult {
 	case success
+	case cancel
 	case fallback
 	case failed
 }

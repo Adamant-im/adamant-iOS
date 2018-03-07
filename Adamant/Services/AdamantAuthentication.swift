@@ -72,6 +72,11 @@ class AdamantAuthentication: LocalAuthentication {
 				return
 			}
 			
+			if error.code == LAError.userCancel {
+				completion(.cancel)
+				return
+			}
+			
 			let tryDeviceOwner: Bool
 			
 			if #available(iOS 11.0, *) {
@@ -81,8 +86,18 @@ class AdamantAuthentication: LocalAuthentication {
 			}
 			
 			if tryDeviceOwner {
-				context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { (success, _) in
-					completion(.success)
+				context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { (success, error) in
+					let result: AuthenticationResult
+					
+					if success {
+						result = .success
+					} else if let error = error as? LAError, error.code == LAError.userCancel {
+						result = .cancel
+					} else {
+						result = .failed
+					}
+					
+					completion(result)
 				}
 			} else {
 				completion(.failed)

@@ -355,7 +355,7 @@ extension LoginViewController {
 	}
 	
 	private func loginIntoExistingAccount(passphrase: String) {
-		accountService.login(with: passphrase, completion: { [weak self] result in
+		accountService.loginWith(passphrase: passphrase, completion: { [weak self] result in
 			switch result {
 			case .success(_):
 				if let nav = self?.navigationController {

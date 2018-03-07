@@ -35,6 +35,15 @@ class AdamantAccountService {
 	var hasSavedCredentials: Bool = false
 	var stayLogged: Bool = false
 	var biometryEnabled: Bool = false
+	
+	var pin: String?
+	
+	func setStayLogged(_ stayLogged: Bool, pin: String?, completion: @escaping (AccountServiceResult) -> Void) {
+		self.stayLogged = stayLogged
+		self.pin = pin
+		
+		completion(.success(account: account!))
+	}
 }
 
 
@@ -124,7 +133,7 @@ extension AdamantAccountService: AccountService {
 	}
 	
 	// MARK: Login with passphrase
-	func login(with passphrase: String, completion: @escaping (AccountServiceResult) -> Void) {
+	func loginWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void) {
 		guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
 			completion(.failure(.invalidPassphrase))
 			return
@@ -179,6 +188,15 @@ extension AdamantAccountService: AccountService {
 			}
 		}
 	}
+	
+	
+	
+	
+	
+	func loginWith(pincode: String, completion: @escaping (AccountServiceResult) -> Void) {
+		
+	}
+	
 	
 	// MARK: Logout
 	func logout() {

@@ -34,6 +34,7 @@ enum AccountServiceResult {
 }
 
 enum AccountServiceError {
+	case userNotLogged
 	case invalidPassphrase
 	case wrongPassphrase
 	case apiError(error: ApiServiceError)
@@ -41,6 +42,9 @@ enum AccountServiceError {
 	
 	var localized: String {
 		switch self {
+		case .userNotLogged:
+			return NSLocalizedString("User not logged!", comment: "Login: user not logged error")
+			
 		case .invalidPassphrase:
 			return NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase")
 			
@@ -81,7 +85,11 @@ protocol AccountService {
 	func createAccount(with passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
 	
 	/// Login into Adamant using passphrase.
-	func login(with passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
+	func loginWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
+	
+	
+	/// Login into Adamant using previously logged account
+	func loginWith(pincode: String, completion: @escaping (AccountServiceResult) -> Void)
 	
 	/// Logout
 	func logout()
@@ -89,6 +97,10 @@ protocol AccountService {
 	
 	// MARK: Stay in functions
 	var hasSavedCredentials: Bool { get }
-	var stayLogged: Bool { get set }
+	var stayLogged: Bool { get }
 	var biometryEnabled: Bool { get set }
+	var pin: String? { get }
+	
+	/// Pin required for turning on
+	func setStayLogged(_ stayLogged: Bool, pin: String?, completion: @escaping (AccountServiceResult) -> Void)
 }
