@@ -14,12 +14,32 @@ class AdamantAccountService {
 	
 	var apiService: ApiService!
 	var adamantCore: AdamantCore!
+	var securedStore: SecuredStore! {
+		didSet {
+			securedStoreSemaphore.wait()
+			defer {
+				securedStoreSemaphore.signal()
+			}
+			
+			if securedStore.get(.publicKey) != nil,
+				securedStore.get(.privateKey) != nil,
+				securedStore.get(.pin) != nil {
+				hasStayInAccount = true
+				
+				_useBiometry = securedStore.get(.useBiometry) != nil
+			} else {
+				hasStayInAccount = false
+				_useBiometry = false
+			}
+		}
+	}
 	
 	
 	// MARK: Properties
 	
 	private(set) var state: AccountServiceState = .notLogged
 	private let stateSemaphore = DispatchSemaphore(value: 1)
+	private let securedStoreSemaphore = DispatchSemaphore(value: 1)
 	
 	private(set) var account: Account?
 	private(set) var keypair: Keypair?
@@ -28,6 +48,84 @@ class AdamantAccountService {
 		stateSemaphore.wait()
 		self.state = state
 		stateSemaphore.signal()
+	}
+	
+	
+	
+	private(set) var hasStayInAccount: Bool = false
+	
+	private var _useBiometry: Bool = false
+	var useBiometry: Bool {
+		get {
+			return _useBiometry
+		}
+		set {
+			securedStoreSemaphore.wait()
+			defer {
+				securedStoreSemaphore.signal()
+			}
+			
+			guard hasStayInAccount else {
+				_useBiometry = false
+				return
+			}
+			
+			_useBiometry = newValue
+			
+			if newValue {
+				securedStore.set(String(useBiometry), for: .useBiometry)
+			} else {
+				securedStore.remove(.useBiometry)
+			}
+		}
+	}
+}
+
+// MARK: - Saved data
+extension AdamantAccountService {
+	func setStayLoggedIn(pin: String, completion: @escaping (AccountServiceResult) -> Void) {
+		guard let account = account, let keypair = keypair else {
+			completion(.failure(.userNotLogged))
+			return
+		}
+		
+		securedStoreSemaphore.wait()
+		defer {
+			securedStoreSemaphore.signal()
+		}
+		
+		if hasStayInAccount {
+			completion(.failure(.internalError(message: "Already has account", error: nil)))
+			return
+		}
+		
+		securedStore.set(pin, for: .pin)
+		securedStore.set(keypair.publicKey, for: .publicKey)
+		securedStore.set(keypair.privateKey, for: .privateKey)
+		hasStayInAccount = true
+		completion(.success(account: account))
+	}
+	
+	func validatePin(_ pin: String) -> Bool {
+		guard let savedPin = securedStore.get(.pin) else {
+			return false
+		}
+		
+		return pin == savedPin
+	}
+	
+	func dropSavedAccount() {
+		securedStoreSemaphore.wait()
+		defer {
+			securedStoreSemaphore.signal()
+		}
+		
+		_useBiometry = false
+		securedStore.remove(.pin)
+		securedStore.remove(.publicKey)
+		securedStore.remove(.privateKey)
+		securedStore.remove(.useBiometry)
+		hasStayInAccount = false
 	}
 }
 
@@ -81,9 +179,13 @@ extension AdamantAccountService: AccountService {
 			}
 		}
 	}
-	
-	// Create new account
-	func createAccount(with passphrase: String, completion: @escaping (AccountServiceResult) -> Void) {
+}
+
+
+// MARK: - Creating account
+extension AdamantAccountService {
+	// MARK: passphrase
+	func createAccountWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void) {
 		guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
 			completion(.failure(.invalidPassphrase))
 			return
@@ -116,9 +218,12 @@ extension AdamantAccountService: AccountService {
 			}
 		}
 	}
-	
-	// MARK: Login with passphrase
-	func login(with passphrase: String, completion: @escaping (AccountServiceResult) -> Void) {
+}
+
+// MARK: - Log In
+extension AdamantAccountService {
+	// MARK: Passphrase
+	func loginWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void) {
 		guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
 			completion(.failure(.invalidPassphrase))
 			return
@@ -129,6 +234,37 @@ extension AdamantAccountService: AccountService {
 			return
 		}
 		
+		loginWith(keypair: keypair, completion: completion)
+	}
+	
+	// MARK: Pincode
+	func loginWith(pincode: String, completion: @escaping (AccountServiceResult) -> Void) {
+		guard let storePin = securedStore.get(.pin) else {
+			completion(.failure(.invalidPassphrase))
+			return
+		}
+		
+		guard storePin == pincode else {
+			completion(.failure(.invalidPassphrase))
+			return
+		}
+		
+		loginWithStoredAccount(completion: completion)
+	}
+	
+	// MARK: Biometry
+	func loginWithStoredAccount(completion: @escaping (AccountServiceResult) -> Void) {
+		guard let publicKey = securedStore.get(.publicKey), let privateKey = securedStore.get(.privateKey) else {
+			completion(.failure(.invalidPassphrase))
+			return
+		}
+		
+		loginWith(keypair: Keypair(publicKey: publicKey, privateKey: privateKey), completion: completion)
+	}
+	
+	
+	// MARK: Keypair
+	private func loginWith(keypair: Keypair, completion: @escaping (AccountServiceResult) -> Void) {
 		stateSemaphore.wait()
 		switch state {
 		case .isLoggingIn:
@@ -161,8 +297,6 @@ extension AdamantAccountService: AccountService {
 				completion(.success(account: account))
 				
 			case .failure(let error):
-				self.setState(.notLogged)
-				
 				switch error {
 				case .accountNotFound:
 					completion(.failure(.wrongPassphrase))
@@ -173,13 +307,18 @@ extension AdamantAccountService: AccountService {
 			}
 		}
 	}
-	
-	// MARK: Logout
+}
+
+
+// MARK: - Log Out
+extension AdamantAccountService {
 	func logout() {
 		logout(lockSemaphore: true)
 	}
 	
 	private func logout(lockSemaphore: Bool) {
+		dropSavedAccount()
+		
 		let wasLogged = account != nil
 		account = nil
 		keypair = nil
@@ -193,5 +332,28 @@ extension AdamantAccountService: AccountService {
 		if wasLogged {
 			NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedOut, object: nil)
 		}
+	}
+}
+
+
+// MARK: - Secured Store
+fileprivate enum StoreKey: String {
+	case publicKey = "publicKey"
+	case privateKey = "privateKey"
+	case pin = "pin"
+	case useBiometry = "useBiometry"
+}
+
+extension SecuredStore {
+	fileprivate func set(_ value: String, for key: StoreKey) {
+		set(value, for: key.rawValue)
+	}
+	
+	fileprivate func get(_ key: StoreKey) -> String? {
+		return get(key.rawValue)
+	}
+	
+	fileprivate func remove(_ key: StoreKey) {
+		remove(key.rawValue)
 	}
 }

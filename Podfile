@@ -4,8 +4,8 @@ platform :ios, '10.0'
 target 'Adamant' do
   use_frameworks!
 
-  # Network
-  pod 'Alamofire'
+  pod 'Alamofire' # Network
+  pod 'KeychainAccess' # Keychain
   
   # Swinject DI
   pod 'Swinject'
@@ -16,10 +16,10 @@ target 'Adamant' do
   pod 'FTIndicator' # Notifications and activity indicator
   pod 'Eureka' # Forms
   pod 'MessageKit' # Chat UI
-  pod 'GrowingTextView' # Passphrase text view
+  pod 'MyLittlePinpad' # Pinpad
 
   # QR
-  pod "EFQRCode" # QR generator
-  pod "QRCodeReader.swift" # QR reader
+  pod 'EFQRCode' # QR generator
+  pod 'QRCodeReader.swift' # QR reader
   
 end

@@ -41,6 +41,12 @@ extension Container {
 		// MARK: DialogService
 		self.register(DialogService.self) { r in AdamantDialogService() }.inObjectScope(.container)
 		
+		// MARK: Secured Store
+		self.register(SecuredStore.self) { r in KeychainStore() }.inObjectScope(.container)
+		
+		// MARK: LocalAuthentication
+		self.register(LocalAuthentication.self) { r in AdamantAuthentication() }.inObjectScope(.container)
+		
 		
 		// MARK: - Services with dependencies
 		// MARK: ApiService
@@ -55,6 +61,7 @@ extension Container {
 			let service = AdamantAccountService()
 			service.apiService = r.resolve(ApiService.self)!
 			service.adamantCore = r.resolve(AdamantCore.self)!
+			service.securedStore = r.resolve(SecuredStore.self)!
 			return service
 		}.inObjectScope(.container)
 		

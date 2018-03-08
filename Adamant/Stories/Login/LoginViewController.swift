@@ -8,13 +8,14 @@
 
 import UIKit
 import Eureka
-import QRCodeReader
-import AVFoundation
+import MyLittlePinpad
 
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct login {
 		static let loggingInProgressMessage = NSLocalizedString("Logging in", comment: "Login: notify user that we a logging in")
+		
+		static let loginIntoPrevAccount = NSLocalizedString("Login into Adamant", comment: "Login: Login into previous account with biometry or pincode")
 		
 		static let wrongQrError = NSLocalizedString("QR code does not contains a valid passphrase", comment: "Login: Notify user that scanned QR doesn't contains a passphrase.")
 		static let noNetworkError = NSLocalizedString("No connection with The Internet", comment: "Login: No network error.")
@@ -47,12 +48,20 @@ class LoginViewController: FormViewController {
 				return NSLocalizedString("New account", comment: "Login: Create new account section")
 			}
 		}
+		
+		var tag: String {
+			switch self {
+			case .login: return "loginSection"
+			case .newAccount: return "newAccount"
+			}
+		}
 	}
 	
 	enum Rows {
 		case passphrase
 		case loginButton
 		case loginWithQr
+		case loginWithPin
 		case newPassphrase
 		case saveYourPassphraseAlert
 		case tapToSaveHint
@@ -68,6 +77,9 @@ class LoginViewController: FormViewController {
 				
 			case .loginWithQr:
 				return NSLocalizedString("QR", comment: "Login: Login with QR button.")
+				
+			case .loginWithPin:
+				return NSLocalizedString("Pin", comment: "Login: Login with pincode button")
 				
 			case .saveYourPassphraseAlert:
 				return NSLocalizedString("Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it", comment: "Login: security alert, notify user that he must save his new passphrase")
@@ -88,6 +100,7 @@ class LoginViewController: FormViewController {
 			case .passphrase: return "pass"
 			case .loginButton: return "login"
 			case .loginWithQr: return "qr"
+			case .loginWithPin: return "pin"
 			case .newPassphrase: return "newPass"
 			case .saveYourPassphraseAlert: return "alert"
 			case .generateNewPassphraseButton: return "generate"
@@ -102,23 +115,12 @@ class LoginViewController: FormViewController {
 	var accountService: AccountService!
 	var adamantCore: AdamantCore!
 	var dialogService: DialogService!
+	var localAuth: LocalAuthentication!
 	
 	
 	// MARK: Properties
 	private var hideNewPassphrase: Bool = true
 	private var generatedPassphrases = [String]()
-	
-	lazy var qrReader: QRCodeReaderViewController = {
-		let builder = QRCodeReaderViewControllerBuilder {
-			$0.reader = QRCodeReader(metadataObjectTypes: [.qr ], captureDevicePosition: .back)
-			$0.cancelButtonTitle = String.adamantLocalized.alert.cancel
-			$0.showSwitchCameraButton = false
-		}
-		
-		let vc = QRCodeReaderViewController(builder: builder)
-		vc.delegate = self
-		return vc
-	}()
 	
 	
 	// MARK: Lifecycle
@@ -147,7 +149,9 @@ class LoginViewController: FormViewController {
 		
 		
 		// MARK: Login section
-		form +++ Section(Sections.login.localized)
+		form +++ Section(Sections.login.localized) {
+			$0.tag = Sections.login.tag
+		}
 		// Passphrase row
 		<<< PasswordRow() {
 			$0.tag = Rows.passphrase.tag
@@ -190,8 +194,11 @@ class LoginViewController: FormViewController {
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 		})
 		
+		
 		// MARK: New account section
-		form +++ Section(Sections.newAccount.localized)
+		form +++ Section(Sections.newAccount.localized) {
+			$0.tag = Sections.newAccount.tag
+		}
 		
 		// Alert
 		<<< TextAreaRow() {
@@ -253,6 +260,28 @@ class LoginViewController: FormViewController {
 		}).cellUpdate({ (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 		})
+		
+		
+		// MARK: We got a saved account
+		if accountService.hasStayInAccount, let section = form.sectionBy(tag: Sections.login.tag) {
+			let row = ButtonRow() {
+				$0.tag = Rows.loginWithPin.tag
+				$0.title = Rows.loginWithPin.localized
+			}.onCellSelection({ [weak self] (cell, row) in
+				self?.loginWithPinpad()
+			}).cellSetup({ (cell, row) in
+				cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+				cell.textLabel?.textColor = UIColor.adamantPrimary
+			}).cellUpdate({ (cell, row) in
+				cell.textLabel?.textColor = UIColor.adamantPrimary
+			})
+			
+			section.append(row)
+			
+			if accountService.useBiometry {
+				loginWithBiometry()
+			}
+		}
     }
 }
 
@@ -278,50 +307,6 @@ extension LoginViewController {
 		}
 	}
 	
-	
-	/// Login with QR code
-	func loginWithQr() {
-		switch AVCaptureDevice.authorizationStatus(for: .video) {
-		case .authorized:
-			present(qrReader, animated: true, completion: nil)
-			
-		case .notDetermined:
-			AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
-				if granted, let qrReader = self?.qrReader {
-					if Thread.isMainThread {
-						self?.present(qrReader, animated: true, completion: nil)
-					} else {
-						DispatchQueue.main.async {
-							self?.present(qrReader, animated: true, completion: nil)
-						}
-					}
-				} else {
-					return
-				}
-			}
-			
-		case .restricted:
-			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
-			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
-			present(alert, animated: true, completion: nil)
-			
-		case .denied:
-			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized, preferredStyle: .alert)
-			
-			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
-				DispatchQueue.main.async {
-					if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
-						UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
-					}
-				}
-			})
-			
-			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-			
-			present(alert, animated: true, completion: nil)
-		}
-	}
-	
 	func generateNewPassphrase() {
 		let passphrase = adamantCore.generateNewPassphrase()
 		generatedPassphrases.append(passphrase)
@@ -343,7 +328,7 @@ extension LoginViewController {
 	
 	// MARK: Login helpers
 	private func createAccountAndLogin(passphrase: String) {
-		accountService.createAccount(with: passphrase, completion: { [weak self] result in
+		accountService.createAccountWith(passphrase: passphrase, completion: { [weak self] result in
 			switch result {
 			case .success:
 				self?.loginIntoExistingAccount(passphrase: passphrase)
@@ -355,7 +340,7 @@ extension LoginViewController {
 	}
 	
 	private func loginIntoExistingAccount(passphrase: String) {
-		accountService.login(with: passphrase, completion: { [weak self] result in
+		accountService.loginWith(passphrase: passphrase, completion: { [weak self] result in
 			switch result {
 			case .success(_):
 				if let nav = self?.navigationController {
@@ -370,26 +355,5 @@ extension LoginViewController {
 				self?.dialogService.showError(withMessage: error.localized)
 			}
 		})
-	}
-}
-
-
-// MARK: - QR
-extension LoginViewController: QRCodeReaderViewControllerDelegate {
-	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-		guard AdamantUtilities.validateAdamantPassphrase(passphrase: result.value) else {
-			dialogService.showError(withMessage: String.adamantLocalized.login.wrongQrError)
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-				reader.startScanning()
-			}
-			return
-		}
-		
-		reader.dismiss(animated: true, completion: nil)
-		loginWith(passphrase: result.value)
-	}
-	
-	func readerDidCancel(_ reader: QRCodeReaderViewController) {
-		reader.dismiss(animated: true, completion: nil)
 	}
 }
