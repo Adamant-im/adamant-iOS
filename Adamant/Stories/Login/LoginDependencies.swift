@@ -14,6 +14,7 @@ extension Container {
 			c.accountService = r.resolve(AccountService.self)
 			c.adamantCore = r.resolve(AdamantCore.self)
 			c.dialogService = r.resolve(DialogService.self)
+			c.localAuth = r.resolve(LocalAuthentication.self)
 		}
 	}
 }

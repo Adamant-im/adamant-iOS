@@ -17,9 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.2.7</string>
+	<string>0.2.8</string>
 	<key>CFBundleVersion</key>
-	<string>14</string>
+	<string>15</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
@@ -41,6 +41,10 @@
 		<string>Roboto_400_italic.ttf</string>
 		<string>Roboto_500_normal.ttf</string>
 		<string>Roboto_700_normal.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

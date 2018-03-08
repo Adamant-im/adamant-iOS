@@ -7,228 +7,172 @@
 //
 
 import Foundation
-import UIKit
 
-private struct Constants {
-	static let loginStoryboard = "Login"
-	
-	private init() {}
-}
-
-class AdamantAccountService: AccountService {
+class AdamantAccountService {
 	
 	// MARK: Dependencies
 	
 	var apiService: ApiService!
 	var adamantCore: AdamantCore!
-	var router: Router!
-	var dialogService: DialogService!
+	var securedStore: SecuredStore! {
+		didSet {
+			securedStoreSemaphore.wait()
+			defer {
+				securedStoreSemaphore.signal()
+			}
+			
+			if securedStore.get(.publicKey) != nil,
+				securedStore.get(.privateKey) != nil,
+				securedStore.get(.pin) != nil {
+				hasStayInAccount = true
+				
+				_useBiometry = securedStore.get(.useBiometry) != nil
+			} else {
+				hasStayInAccount = false
+				_useBiometry = false
+			}
+		}
+	}
 	
 	
 	// MARK: Properties
-	var autoupdateInterval: TimeInterval = 3.0
-	var autoupdate: Bool = true {
-		didSet {
-			if autoupdate {
-				start()
-			} else {
-				stop()
-			}
-		}
-	}
 	
-	private(set) var updating = false
+	private(set) var state: AccountServiceState = .notLogged
+	private let stateSemaphore = DispatchSemaphore(value: 1)
+	private let securedStoreSemaphore = DispatchSemaphore(value: 1)
 	
-	private(set) var status: AccountStatus = .notLogged
 	private(set) var account: Account?
 	private(set) var keypair: Keypair?
 	
-	private var loginViewController: UIViewController? = nil
-	private var storyboardAuthorizationFinishedCallbacks: [(() -> Void)]?
-	private var timer: Timer?
-	
-	// MARK: Lifecycle
-	deinit {
-		stop()
-	}
-}
-
-
-// MARK: - Login&Logout functions
-extension AdamantAccountService {
-	func createAccount(with passphrase: String, completion: ((Account?, AdamantError?) -> Void)?) {
-		switch status {
-		// Is logging in, return
-		case .isLoggingIn:
-			completion?(nil, AdamantError(message: "Service is busy"))
-			return
-			
-		// Logout first
-		case .loggedIn:
-			logout(stopAutoupdate: false)
-			
-		// Go login
-		case .notLogged:
-			break
-		}
-		
-		status = .isLoggingIn
-		guard let publicKey = adamantCore.createKeypairFor(passphrase: passphrase)?.publicKey else {
-			completion?(nil, AdamantError(message: "Can't create key for passphrase"))
-			return
-		}
-		
-		self.apiService.getAccount(byPublicKey: publicKey) { result in
-			switch result {
-			case .success(_):
-				self.login(with: passphrase, completion: completion)
-				
-			case .failure(_):
-				self.apiService.newAccount(byPublicKey: publicKey) { result in
-					switch result {
-					case .success(let account):
-						self.setLoggedInWith(account: account, passphrase: passphrase)
-						completion?(account, nil)
-						
-					case .failure(let error):
-						self.status = .notLogged
-						completion?(nil, AdamantError(message: String(describing: error), error: error))
-					}
-				}
-			}
-		}
+	private func setState(_ state: AccountServiceState) {
+		stateSemaphore.wait()
+		self.state = state
+		stateSemaphore.signal()
 	}
 	
-	func login(with passphrase: String, completion: ((Account?, AdamantError?) -> Void)?) {
-		switch status {
-		// Is logging in, return
-		case .isLoggingIn:
-			completion?(nil, AdamantError(message: "Service is busy"))
-			return
-			
-		// Logout first
-		case .loggedIn:
-			logout(stopAutoupdate: false)
-			
-		// Go login
-		case .notLogged:
-			break
-		}
-		
-		status = .isLoggingIn
-		self.apiService.getAccount(byPassphrase: passphrase) { result in
-			switch result {
-			case .success(let account):
-				self.setLoggedInWith(account: account, passphrase: passphrase)
-				completion?(account, nil)
-				
-			case .failure(let error):
-				self.status = .notLogged
-				completion?(nil, AdamantError(message: String(describing: error), error: error))
-			}
-		}
-	}
 	
-	func logout(stopAutoupdate: Bool = true) {
-		if stopAutoupdate && autoupdate {
-			stop()
-		}
-		
-		let wasLogged = account != nil
-		account = nil
-		keypair = nil
-		status = .notLogged
-		
-		if wasLogged {
-			NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedOut, object: nil)
-		}
-	}
 	
-	private func setLoggedInWith(account: Account, passphrase: String) {
-		self.account = account
-		keypair = adamantCore.createKeypairFor(passphrase: passphrase)
-		
-		NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: nil)
-		
-		if let vc = loginViewController {
-			DispatchQueue.main.async {
-				vc.dismiss(animated: true, completion: nil)
-			}
-			loginViewController = nil
+	private(set) var hasStayInAccount: Bool = false
+	
+	private var _useBiometry: Bool = false
+	var useBiometry: Bool {
+		get {
+			return _useBiometry
 		}
-		
-		if let callbacks = self.storyboardAuthorizationFinishedCallbacks {
-			for	aCallback in callbacks {
-				aCallback()
+		set {
+			securedStoreSemaphore.wait()
+			defer {
+				securedStoreSemaphore.signal()
 			}
 			
-			self.storyboardAuthorizationFinishedCallbacks = nil
-		}
-		
-		self.status = .loggedIn
-		if self.autoupdate {
-			self.start()
+			guard hasStayInAccount else {
+				_useBiometry = false
+				return
+			}
+			
+			_useBiometry = newValue
+			
+			if newValue {
+				securedStore.set(String(useBiometry), for: .useBiometry)
+			} else {
+				securedStore.remove(.useBiometry)
+			}
 		}
 	}
 }
 
-
-// MARK: - Update
+// MARK: - Saved data
 extension AdamantAccountService {
-	private func start() {
-		if let timer = timer {
-			timer.invalidate()
-			self.timer = nil
-		}
-		
-		timer = Timer(timeInterval: autoupdateInterval, repeats: true, block: { _ in
-			if self.status != .loggedIn {
-				return
-			}
-			
-			if !self.updating {
-				self.updateAccountData()
-			}
-		})
-		DispatchQueue.main.async {
-			guard let timer = self.timer else {
-				return
-			}
-			RunLoop.current.add(timer, forMode: .commonModes)
-			timer.fire()
-		}
-	}
-	
-	private func stop() {
-		timer?.invalidate()
-		timer = nil
-	}
-	
-	func updateAccountData() {
-		guard !updating else {
+	func setStayLoggedIn(pin: String, completion: @escaping (AccountServiceResult) -> Void) {
+		guard let account = account, let keypair = keypair else {
+			completion(.failure(.userNotLogged))
 			return
 		}
 		
-		updating = true
+		securedStoreSemaphore.wait()
+		defer {
+			securedStoreSemaphore.signal()
+		}
+		
+		if hasStayInAccount {
+			completion(.failure(.internalError(message: "Already has account", error: nil)))
+			return
+		}
+		
+		securedStore.set(pin, for: .pin)
+		securedStore.set(keypair.publicKey, for: .publicKey)
+		securedStore.set(keypair.privateKey, for: .privateKey)
+		hasStayInAccount = true
+		completion(.success(account: account))
+	}
+	
+	func validatePin(_ pin: String) -> Bool {
+		guard let savedPin = securedStore.get(.pin) else {
+			return false
+		}
+		
+		return pin == savedPin
+	}
+	
+	func dropSavedAccount() {
+		securedStoreSemaphore.wait()
+		defer {
+			securedStoreSemaphore.signal()
+		}
+		
+		_useBiometry = false
+		securedStore.remove(.pin)
+		securedStore.remove(.publicKey)
+		securedStore.remove(.privateKey)
+		securedStore.remove(.useBiometry)
+		hasStayInAccount = false
+	}
+}
+
+
+// MARK: - AccountService
+extension AdamantAccountService: AccountService {
+	// MARK: Update logged account info
+	func update() {
+		stateSemaphore.wait()
+		
+		switch state {
+		case .notLogged:
+			fallthrough
+		
+		case .isLoggingIn:
+			fallthrough
+		
+		case .updating:
+			stateSemaphore.signal()
+			return
+			
+		case .loggedIn:
+			break
+		}
+		
+		state = .updating
+		stateSemaphore.signal()
 		
 		guard let loggedAccount = account else {
-			stop()
 			return
 		}
 		
-		apiService.getAccount(byPublicKey: loggedAccount.publicKey) { result in
+		apiService.getAccount(byPublicKey: loggedAccount.publicKey) { [weak self] result in
 			switch result {
 			case .success(let account):
-				var hasChanges = false
+				guard let acc = self?.account, acc.address == account.address else {
+					// User has logged out, we not interested anymore
+					self?.setState(.notLogged)
+					return
+				}
 				
-				if loggedAccount.balance != account.balance { hasChanges = true }
-				
-				if hasChanges {
-					self.account = account
+				if loggedAccount.balance != account.balance {
+					self?.account = account
 					NotificationCenter.default.post(name: Notification.Name.adamantAccountDataUpdated, object: nil)
 				}
 				
-				self.updating = false
+				self?.setState(.loggedIn)
 				
 			case .failure(let error):
 				print("Error update account: \(String(describing: error))")
@@ -238,30 +182,178 @@ extension AdamantAccountService {
 }
 
 
-// MARK: - AccountService
+// MARK: - Creating account
 extension AdamantAccountService {
-	func logoutAndPresentLoginStoryboard(animated: Bool, authorizationFinishedHandler: (() -> Void)?) {
-		logout(stopAutoupdate: false)
+	// MARK: passphrase
+	func createAccountWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void) {
+		guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
+			completion(.failure(.invalidPassphrase))
+			return
+		}
 		
-		if loginViewController != nil {	// Already presenting view controller. We will add you to a list, and call you back later. Maybe.
-			if let aCallback = authorizationFinishedHandler {
-				if var callbacks = storyboardAuthorizationFinishedCallbacks {
-					callbacks.append(aCallback)
+		guard let publicKey = adamantCore.createKeypairFor(passphrase: passphrase)?.publicKey else {
+			completion(.failure(.internalError(message: "Can't create key for passphrase", error: nil)))
+			return
+		}
+		
+		self.apiService.getAccount(byPublicKey: publicKey) { [weak self] result in
+			switch result {
+			case .success(_):
+				completion(.failure(.wrongPassphrase))
+				
+			case .failure(_):
+				if let apiService = self?.apiService {
+					apiService.newAccount(byPublicKey: publicKey) { result in
+						switch result {
+						case .success(let account):
+							completion(.success(account: account))
+							
+						case .failure(let error):
+							completion(.failure(.apiError(error: error)))
+						}
+					}
 				} else {
-					storyboardAuthorizationFinishedCallbacks = [aCallback]
+					completion(.failure(.internalError(message: "A bad thing happened", error: nil)))
 				}
 			}
-		} else {	// Not presenting. Create and present.
-			guard let vc = router.get(story: .Login).instantiateInitialViewController() else {
-				fatalError("Failed to get LoginStory")
-			}
+		}
+	}
+}
+
+// MARK: - Log In
+extension AdamantAccountService {
+	// MARK: Passphrase
+	func loginWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void) {
+		guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
+			completion(.failure(.invalidPassphrase))
+			return
+		}
+		
+		guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase) else {
+			completion(.failure(.internalError(message: "Failed to generate keypair for passphrase", error: nil)))
+			return
+		}
+		
+		loginWith(keypair: keypair, completion: completion)
+	}
+	
+	// MARK: Pincode
+	func loginWith(pincode: String, completion: @escaping (AccountServiceResult) -> Void) {
+		guard let storePin = securedStore.get(.pin) else {
+			completion(.failure(.invalidPassphrase))
+			return
+		}
+		
+		guard storePin == pincode else {
+			completion(.failure(.invalidPassphrase))
+			return
+		}
+		
+		loginWithStoredAccount(completion: completion)
+	}
+	
+	// MARK: Biometry
+	func loginWithStoredAccount(completion: @escaping (AccountServiceResult) -> Void) {
+		guard let publicKey = securedStore.get(.publicKey), let privateKey = securedStore.get(.privateKey) else {
+			completion(.failure(.invalidPassphrase))
+			return
+		}
+		
+		loginWith(keypair: Keypair(publicKey: publicKey, privateKey: privateKey), completion: completion)
+	}
+	
+	
+	// MARK: Keypair
+	private func loginWith(keypair: Keypair, completion: @escaping (AccountServiceResult) -> Void) {
+		stateSemaphore.wait()
+		switch state {
+		case .isLoggingIn:
+			stateSemaphore.signal()
+			completion(.failure(.internalError(message: "Service is busy", error: nil)))
+			return
 			
-			loginViewController = vc
-			dialogService.presentModallyViewController(vc, animated: animated, completion: nil)
+		case .updating:
+			fallthrough
 			
-			if let callback = authorizationFinishedHandler {
-				storyboardAuthorizationFinishedCallbacks = [callback]
+		// Logout first
+		case .loggedIn:
+			logout(lockSemaphore: false)
+			
+		// Go login
+		case .notLogged:
+			break
+		}
+		
+		state = .isLoggingIn
+		stateSemaphore.signal()
+		
+		apiService.getAccount(byPublicKey: keypair.publicKey) { result in
+			switch result {
+			case .success(let account):
+				self.account = account
+				self.keypair = keypair
+				NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: nil)
+				self.setState(.loggedIn)
+				completion(.success(account: account))
+				
+			case .failure(let error):
+				switch error {
+				case .accountNotFound:
+					completion(.failure(.wrongPassphrase))
+					
+				default:
+					completion(.failure(.apiError(error: error)))
+				}
 			}
 		}
+	}
+}
+
+
+// MARK: - Log Out
+extension AdamantAccountService {
+	func logout() {
+		logout(lockSemaphore: true)
+	}
+	
+	private func logout(lockSemaphore: Bool) {
+		dropSavedAccount()
+		
+		let wasLogged = account != nil
+		account = nil
+		keypair = nil
+		
+		if lockSemaphore {
+			setState(.notLogged)
+		} else {
+			state = .notLogged
+		}
+		
+		if wasLogged {
+			NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedOut, object: nil)
+		}
+	}
+}
+
+
+// MARK: - Secured Store
+fileprivate enum StoreKey: String {
+	case publicKey = "publicKey"
+	case privateKey = "privateKey"
+	case pin = "pin"
+	case useBiometry = "useBiometry"
+}
+
+extension SecuredStore {
+	fileprivate func set(_ value: String, for key: StoreKey) {
+		set(value, for: key.rawValue)
+	}
+	
+	fileprivate func get(_ key: StoreKey) -> String? {
+		return get(key.rawValue)
+	}
+	
+	fileprivate func remove(_ key: StoreKey) {
+		remove(key.rawValue)
 	}
 }

@@ -11,23 +11,28 @@ import UIKit
 extension UIColor {
 	// MARK: Global colors
 	
-	/// UIColor(named: "Gray_main")
+	/// Main dark gray, ~70% gray
 	static let adamantPrimary = UIColor(red: 0.29, green: 0.29, blue: 0.29, alpha: 1)
 	
-	/// UIColor(named: "Gray_secondary")
+	/// Secondary color, ~50% gray
 	static let adamantSecondary = UIColor(red: 0.478, green: 0.478, blue: 0.478, alpha: 1)
 	
-	/// UIColor(named: "Icons")
+	/// Chat icons color, ~40% gray
 	static let adamantChatIcons = UIColor(red: 0.62, green: 0.62, blue: 0.62, alpha: 1)
 	
 	
 	// MARK: Chat colors
 	
-	/// UIColor(named:  "Chat_recipient")
+	/// User chat bubble background, ~4% gray
 	static let adamantChatRecipientBackground = UIColor(red: 0.965, green: 0.973, blue: 0.981, alpha: 1)
 	
-	/// UIColor(named: "Chat_sender")!
+	/// Partner chat bubble background, ~8% gray
 	static let adamantChatSenderBackground = UIColor(red: 0.925, green: 0.925, blue: 0.925, alpha: 1)
+	
+	
+	// MARK: Pinpad
+	/// Pinpad highligh button background, 12% gray
+	static let adamantPinpadHighlightButton = UIColor(red: 0.88, green: 0.88, blue: 0.88, alpha: 1)
 }
 
 extension UIFont {

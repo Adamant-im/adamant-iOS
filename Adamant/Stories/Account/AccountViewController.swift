@@ -61,6 +61,7 @@ class AccountViewController: UIViewController {
 	// MARK: - Dependencies
 	var accountService: AccountService!
 	var dialogService: DialogService!
+	var router: Router!
 	
 	
 	// MARK: - IBOutlets
@@ -124,7 +125,11 @@ class AccountViewController: UIViewController {
 // MARK: - UITableView
 extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 	func numberOfSections(in tableView: UITableView) -> Int {
-		return Sections.total
+		if accountService.account != nil {
+			return Sections.total
+		} else {
+			return 0
+		}
 	}
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -221,11 +226,14 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 			}
 			
 			let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.logoutMessageFormat, address), message: nil, preferredStyle: .alert)
-			let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { _ in
-				self.tableView.deselectRow(at: indexPath, animated: true)
+			let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { [weak self] _ in
+				self?.tableView.deselectRow(at: indexPath, animated: true)
 			}
-			let logout = UIAlertAction(title: String.adamantLocalized.alert.logoutButton, style: .default) { _ in
-				self.accountService.logoutAndPresentLoginStoryboard(animated: true, authorizationFinishedHandler: nil)
+			let logout = UIAlertAction(title: String.adamantLocalized.alert.logoutButton, style: .default) { [weak self] _ in
+				self?.accountService.logout()
+				if let vc = self?.router.get(scene: .Login) {
+					self?.dialogService.present(vc, animated: true, completion: nil)
+				}
 			}
 			
 			alert.addAction(cancel)

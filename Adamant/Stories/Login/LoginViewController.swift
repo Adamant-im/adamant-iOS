@@ -2,23 +2,21 @@
 //  LoginViewController.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 05.01.2018.
+//  Created by Anokhov Pavel on 04.03.2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
 import UIKit
-import TableKit
-import QRCodeReader
-import AVFoundation
-
+import Eureka
+import MyLittlePinpad
 
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct login {
-		static let passphrasePlaceholder = NSLocalizedString("passphrase", comment: "Login: Passphrase placeholder")
 		static let loggingInProgressMessage = NSLocalizedString("Logging in", comment: "Login: notify user that we a logging in")
 		
-		static let wrongPassphraseError = NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase")
+		static let loginIntoPrevAccount = NSLocalizedString("Login into Adamant", comment: "Login: Login into previous account with biometry or pincode")
+		
 		static let wrongQrError = NSLocalizedString("QR code does not contains a valid passphrase", comment: "Login: Notify user that scanned QR doesn't contains a passphrase.")
 		static let noNetworkError = NSLocalizedString("No connection with The Internet", comment: "Login: No network error.")
 		
@@ -32,38 +30,56 @@ extension String.adamantLocalized {
 }
 
 
-// MARK: -
-class LoginViewController: UIViewController {
+// MARK: - ViewController
+class LoginViewController: FormViewController {
+	
+	// MARK: Rows & Sections
 	
 	enum Sections {
-		case passphrase
+		case login
 		case newAccount
 		
 		var localized: String {
 			switch self {
-			case .passphrase:
+			case .login:
 				return NSLocalizedString("Login", comment: "Login: login with existing passphrase section")
 				
 			case .newAccount:
 				return NSLocalizedString("New account", comment: "Login: Create new account section")
 			}
 		}
+		
+		var tag: String {
+			switch self {
+			case .login: return "loginSection"
+			case .newAccount: return "newAccount"
+			}
+		}
 	}
 	
 	enum Rows {
+		case passphrase
 		case loginButton
 		case loginWithQr
+		case loginWithPin
+		case newPassphrase
 		case saveYourPassphraseAlert
-		case generateNewPassphraseButton
 		case tapToSaveHint
+		case generateNewPassphraseButton
 		
 		var localized: String {
 			switch self {
+			case .passphrase:
+				return NSLocalizedString("Passphrase", comment: "Login: Passphrase placeholder")
+				
 			case .loginButton:
 				return NSLocalizedString("Login", comment: "Login: Login button")
 				
 			case .loginWithQr:
 				return NSLocalizedString("QR", comment: "Login: Login with QR button.")
+				
+			case .loginWithPin:
+				return NSLocalizedString("Pin", comment: "Login: Login with pincode button")
 				
 			case .saveYourPassphraseAlert:
 				return NSLocalizedString("Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it", comment: "Login: security alert, notify user that he must save his new passphrase")
@@ -73,30 +89,47 @@ class LoginViewController: UIViewController {
 				
 			case .tapToSaveHint:
 				return NSLocalizedString("Tap to save", comment: "Login: a small hint for a user, that he can tap on passphrase to save it")
+				
+			case .newPassphrase:
+				return ""
+			}
+		}
+		
+		var tag:String {
+			switch self {
+			case .passphrase: return "pass"
+			case .loginButton: return "login"
+			case .loginWithQr: return "qr"
+			case .loginWithPin: return "pin"
+			case .newPassphrase: return "newPass"
+			case .saveYourPassphraseAlert: return "alert"
+			case .generateNewPassphraseButton: return "generate"
+			case .tapToSaveHint: return "hint"
 			}
 		}
 	}
 	
-	// MARK: - Dependencies
+	
+	// MARK: Dependencies
+	
 	var accountService: AccountService!
 	var adamantCore: AdamantCore!
 	var dialogService: DialogService!
+	var localAuth: LocalAuthentication!
 	
 	
-	// MARK: - Properties
-	@IBOutlet var tableView: UITableView!
-	var tableDirector: TableDirector!
-	private var newPassphraseRowsIsVisible = false
+	// MARK: Properties
+	private var hideNewPassphrase: Bool = true
 	private var generatedPassphrases = [String]()
 	
-	// MARK: - Lifecycle
+	
+	// MARK: Lifecycle
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+		navigationOptions = RowNavigationOptions.Disabled
 		
-		
-		// MARK: TableView configuration
-		tableDirector = TableDirector(tableView: tableView)
+		// MARK: Header & Footer
 		if let header = UINib(nibName: "LoginHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
 			tableView.tableHeaderView = header
 			
@@ -116,299 +149,211 @@ class LoginViewController: UIViewController {
 		
 		
 		// MARK: Login section
-		
-		let passphraseRow = TableRow<TextViewTableViewCell>(item: "")
-		passphraseRow.on(.configure) { (options) in
-			if let cell = options.cell {
-				cell.placeHolder = String.adamantLocalized.login.passphrasePlaceholder
-				cell.textView.font = UIFont.adamantPrimary(size: 17)
-				cell.textView.textAlignment = .center
-				cell.textView.textColor = UIColor.adamantPrimary
-				cell.textView.returnKeyType = .done
-				cell.textView.delegate = self
-				cell.delegate = self
+		form +++ Section(Sections.login.localized) {
+			$0.tag = Sections.login.tag
+		}
+		// Passphrase row
+		<<< PasswordRow() {
+			$0.tag = Rows.passphrase.tag
+			$0.placeholder = Rows.passphrase.localized
+			$0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
+		}
+			
+		// Login with passphrase row
+		<<< ButtonRow() {
+			$0.tag = Rows.loginButton.tag
+			$0.title = Rows.loginButton.localized
+			$0.disabled = Condition.function([Rows.passphrase.tag], { form -> Bool in
+				guard let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag), row.value != nil else {
+					return true
+				}
+				return false
+			})
+		}.onCellSelection({ [weak self] (cell, row) in
+			guard let row: PasswordRow = self?.form.rowBy(tag: Rows.passphrase.tag), let passphrase = row.value else {
+				return
 			}
+			
+			self?.loginWith(passphrase: passphrase)
+		}).cellSetup({ (cell, row) in
+			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+		}).cellUpdate({ (cell, row) in
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		})
+		
+		// Login with QR
+		<<< ButtonRow() {
+			$0.tag = Rows.loginWithQr.tag
+			$0.title = Rows.loginWithQr.localized
+		}.onCellSelection({ [weak self] (cell, row) in
+			self?.loginWithQr()
+		}).cellSetup({ (cell, row) in
+			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		}).cellUpdate({ (cell, row) in
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		})
+		
+		
+		// MARK: New account section
+		form +++ Section(Sections.newAccount.localized) {
+			$0.tag = Sections.newAccount.tag
 		}
 		
-		let loginRow = TableRow<ButtonTableViewCell>(item: Rows.loginButton.localized)
-		loginRow.on(.click) { [weak self] options in self?.login() }
+		// Alert
+		<<< TextAreaRow() {
+			$0.tag = Rows.saveYourPassphraseAlert.tag
+			$0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
+			$0.value = Rows.saveYourPassphraseAlert.localized
+			$0.hidden = Condition.function([], { [weak self] form -> Bool in
+				return self?.hideNewPassphrase ?? false
+			})
+			}.cellUpdate({ (cell, row) in
+				cell.textView.textAlignment = .center
+				cell.textView.font = UIFont.adamantPrimary(size: 14)
+				cell.textView.textColor = UIColor.adamantPrimary
+				cell.textView.isSelectable = false
+				cell.textView.isEditable = false
+			})
 		
-		let loginWithQrRow = TableRow<ButtonTableViewCell>(item: Rows.loginWithQr.localized)
-		loginWithQrRow.on(.click) { [weak self] _ in self?.loginWithQr() }
+		// New genegated passphrase
+		<<< PassphraseRow() {
+			$0.tag = Rows.newPassphrase.tag
+			$0.cell.tip = Rows.tapToSaveHint.localized
+			$0.cell.height = {96.0}
+			$0.hidden = Condition.function([], { [weak self] form -> Bool in
+				return self?.hideNewPassphrase ?? true
+			})
+		}.cellUpdate({ (cell, row) in
+			cell.passphraseLabel.font = UIFont.adamantPrimary(size: 19)
+			cell.passphraseLabel.textColor = UIColor.adamantPrimary
+			cell.passphraseLabel.textAlignment = .center
 		
-		let loginSection = TableSection(headerTitle: Sections.passphrase.localized, footerTitle: nil, rows: [passphraseRow, loginRow, loginWithQrRow])
-		tableDirector.append(section: loginSection)
+			cell.tipLabel.font = UIFont.adamantPrimary(size: 12)
+			cell.tipLabel.textColor = UIColor.adamantSecondary
+			cell.tipLabel.textAlignment = .center
+		}).onCellSelection({ [weak self] (cell, row) in
+			guard let passphrase = self?.generatedPassphrases.last, let dialogService = self?.dialogService else {
+				return
+			}
+			
+			if let indexPath = row.indexPath, let tableView = self?.tableView {
+				tableView.deselectRow(at: indexPath, animated: true)
+			}
+			
+			let encodedPassphrase = AdamantUriTools.encode(request: AdamantUri.passphrase(passphrase: passphrase))
+			dialogService.presentShareAlertFor(string: encodedPassphrase,
+											   types: [.copyToPasteboard, .share, .generateQr(sharingTip: nil)],
+											   excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
+											   animated: true,
+											   completion: nil)
+		})
+		
+		<<< ButtonRow() {
+			$0.tag = Rows.generateNewPassphraseButton.tag
+			$0.title = Rows.generateNewPassphraseButton.localized
+		}.onCellSelection({ [weak self] (cell, row) in
+			self?.generateNewPassphrase()
+		}).cellSetup({ (cell, row) in
+			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		}).cellUpdate({ (cell, row) in
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		})
 		
 		
-		// MARK: NewPassphrase section
-		
-		let generateRow = TableRow<ButtonTableViewCell>(item: Rows.generateNewPassphraseButton.localized)
-		generateRow.on(TableRowActionType.click) { [weak self] _ in self?.generateNewPassphrase() }
-		
-		let newAccSection = TableSection(headerTitle: Sections.newAccount.localized, footerTitle: nil, rows: [generateRow])
-		tableDirector.append(section: newAccSection)
-		
-		
-		// MARK: Notifications
-		
-		NotificationCenter.default.addObserver(forName: NSNotification.Name.UIKeyboardWillShow, object: nil, queue: nil, using: keyboardWillShow)
-		NotificationCenter.default.addObserver(forName: NSNotification.Name.UIKeyboardWillHide, object: nil, queue: nil, using: keyboardWillHide)
+		// MARK: We got a saved account
+		if accountService.hasStayInAccount, let section = form.sectionBy(tag: Sections.login.tag) {
+			let row = ButtonRow() {
+				$0.tag = Rows.loginWithPin.tag
+				$0.title = Rows.loginWithPin.localized
+			}.onCellSelection({ [weak self] (cell, row) in
+				self?.loginWithPinpad()
+			}).cellSetup({ (cell, row) in
+				cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+				cell.textLabel?.textColor = UIColor.adamantPrimary
+			}).cellUpdate({ (cell, row) in
+				cell.textLabel?.textColor = UIColor.adamantPrimary
+			})
+			
+			section.append(row)
+			
+			if accountService.useBiometry {
+				loginWithBiometry()
+			}
+		}
     }
-	
-	
+}
+
+
+// MARK: - Login functions
+extension LoginViewController {
+	func loginWith(passphrase: String) {
+		guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
+			dialogService.showError(withMessage: AccountServiceError.wrongPassphrase.localized)
+			return
+		}
+		
+		dialogService.showProgress(withMessage: String.adamantLocalized.login.loggingInProgressMessage, userInteractionEnable: false)
+		
+		if generatedPassphrases.contains(passphrase) {
+			DispatchQueue.global(qos: .utility).async { [weak self] in
+				self?.createAccountAndLogin(passphrase: passphrase)
+			}
+		} else {
+			DispatchQueue.global(qos: .utility).async { [weak self] in
+				self?.loginIntoExistingAccount(passphrase: passphrase)
+			}
+		}
+	}
 	
 	func generateNewPassphrase() {
 		let passphrase = adamantCore.generateNewPassphrase()
 		generatedPassphrases.append(passphrase)
 		
-		if !newPassphraseRowsIsVisible {
-			newPassphraseRowsIsVisible = true
-			
-			let alertRow = TableRow<MultilineLableTableViewCell>(item: Rows.saveYourPassphraseAlert.localized)
-			alertRow.on(.shouldHighlight, handler: { _ -> Bool in
-				return false
-			}).on(.configure, handler: { options in
-				if let label = options.cell?.multilineLabel {
-					label.textAlignment = .center
-					label.font = UIFont.adamantPrimary(size: 14)
-					label.textColor = UIColor.adamantPrimary
-				}
-				options.cell?.layoutSubviews()
-			})
-			
-			let newPassphraseRow = createPassphraseRow(passphrase: passphrase)
-			
-			if let indexPath = tableView.indexPathForSelectedRow {
-				tableView.deselectRow(at: indexPath, animated: false)
+		hideNewPassphrase = false
+		
+		form.rowBy(tag: Rows.saveYourPassphraseAlert.tag)?.evaluateHidden()
+		
+		if let row: PassphraseRow = form.rowBy(tag: Rows.newPassphrase.tag) {
+			row.value = passphrase
+			row.updateCell()
+			row.evaluateHidden()
+		}
+		
+		if let row = form.rowBy(tag: Rows.generateNewPassphraseButton.tag), let indexPath = row.indexPath {
+			tableView.scrollToRow(at: indexPath, at: .none, animated: true)
+		}
+	}
+	
+	// MARK: Login helpers
+	private func createAccountAndLogin(passphrase: String) {
+		accountService.createAccountWith(passphrase: passphrase, completion: { [weak self] result in
+			switch result {
+			case .success:
+				self?.loginIntoExistingAccount(passphrase: passphrase)
+				
+			case .failure(let error):
+				self?.dialogService.showError(withMessage: error.localized)
 			}
-			
-			self.tableDirector.sections[1].insert(rows: [alertRow, newPassphraseRow], at: 0)
-			self.tableView.insertRows(at: [IndexPath(row: 0, section: 1), IndexPath(row: 1, section: 1)], with: .automatic)
-			
-			// Hack for a broken deselect animation
-			let index = IndexPath(row: 2, section: 1)
-			tableView.selectRow(at: index, animated: false, scrollPosition: .none)
-			tableView.deselectRow(at: index, animated: true)
-			tableView.scrollToRow(at: index, at: .none, animated: true)
-		} else {
-			let newPassphraseRow = createPassphraseRow(passphrase: passphrase)
-			
-			tableDirector.sections[1].replace(rowAt: 1, with: newPassphraseRow)
-			tableView.reloadRows(at: [IndexPath(row: 1, section: 1)], with: .fade)
-		}
+		})
 	}
 	
-	private func createPassphraseRow(passphrase: String) -> Row {
-		let row = TableRow<MultilineLableTableViewCell>(item: passphrase).on(.click, handler: { [weak self] _ in
-			self?.presentPassphraseActions()
-		}).on(.configure) { options in
-			if let label = options.cell?.multilineLabel {
-				label.font = UIFont.adamantPrimary(size: 19)
-				label.textColor = UIColor.adamantPrimary
-				label.textAlignment = .center
-			}
-			if let label = options.cell?.detailsMultilineLabel {
-				label.font = UIFont.adamantPrimary(size: 12)
-				label.textColor = UIColor.adamantSecondary
-				label.text = Rows.tapToSaveHint.localized
-				label.textAlignment = .center
-			}
-		}
-		
-		return row
-	}
-	
-	
-	// MARK: Saving new passphrase
-	func presentPassphraseActions() {
-		guard let passphrase = generatedPassphrases.last else {
-			return
-		}
-		
-		let encodedPassphrase = AdamantUriTools.encode(request: AdamantUri.passphrase(passphrase: passphrase))
-		
-		dialogService.presentShareAlertFor(string: encodedPassphrase,
-										   types: [.copyToPasteboard, .share, .generateQr(sharingTip: nil)],
-										   excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
-										   animated: true,
-										   completion: nil)
-	}
-	
-	lazy var qrReader: QRCodeReaderViewController = {
-		let builder = QRCodeReaderViewControllerBuilder {
-			$0.reader = QRCodeReader(metadataObjectTypes: [.qr ], captureDevicePosition: .back)
-			$0.cancelButtonTitle = String.adamantLocalized.alert.cancel
-			$0.showSwitchCameraButton = false
-		}
-		
-		let vc = QRCodeReaderViewController(builder: builder)
-		vc.delegate = self
-		return vc
-	}()
-}
-
-
-// MARK: Login
-extension LoginViewController {
-	func login() {
-		guard let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? TextViewTableViewCell,
-			let passphrase = cell.textView.text else {
-			return
-		}
-		
-		guard passphrase.count > 0 else {
-			dialogService.showToastMessage(String.adamantLocalized.login.emptyPassphraseAlert)
-			return
-		}
-		
-		loginWith(passphrase: passphrase.lowercased())
-	}
-	
-	func loginWithQr() {
-		switch AVCaptureDevice.authorizationStatus(for: .video) {
-		case .authorized:
-			present(qrReader, animated: true, completion: nil)
-			
-		case .notDetermined:
-			AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
-				if granted, let qrReader = self?.qrReader {
-					if Thread.isMainThread {
-						self?.present(qrReader, animated: true, completion: nil)
-					} else {
-						DispatchQueue.main.async {
-							self?.present(qrReader, animated: true, completion: nil)
-						}
-					}
+	private func loginIntoExistingAccount(passphrase: String) {
+		accountService.loginWith(passphrase: passphrase, completion: { [weak self] result in
+			switch result {
+			case .success(_):
+				if let nav = self?.navigationController {
+					nav.popViewController(animated: true)
 				} else {
-					return
+					self?.dismiss(animated: true, completion: nil)
 				}
+				
+				self?.dialogService.dismissProgress()
+				
+			case .failure(let error):
+				self?.dialogService.showError(withMessage: error.localized)
 			}
-			
-		case .restricted:
-			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
-			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
-			present(alert, animated: true, completion: nil)
-			
-		case .denied:
-			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized, preferredStyle: .alert)
-			
-			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
-				DispatchQueue.main.async {
-					if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
-						UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
-					}
-				}
-			})
-			
-			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-			
-			present(alert, animated: true, completion: nil)
-		}
-	}
-	
-	private func loginWith(passphrase: String) {
-		dialogService.showProgress(withMessage: String.adamantLocalized.login.loggingInProgressMessage, userInteractionEnable: false)
-		
-		// Dialog service currently presenting progress async. So if AccountService fails instantly, progress will be presented AFTER fail.
-		DispatchQueue.global(qos: .utility).async {
-			if self.generatedPassphrases.contains(passphrase) {
-				self.accountService.createAccount(with: passphrase) { (_, error) in
-					if let error = error {
-						self.dialogService.showError(withMessage: error.message)
-					} else {
-						self.dialogService.dismissProgress()
-					}
-				}
-			} else {
-				self.accountService.login(with: passphrase) { (_, error) in
-					if let error = error {
-						if let internalError = error.internalError as? ApiServiceError {
-							switch internalError {
-							case .accountNotFound:
-								self.dialogService.showError(withMessage: String.adamantLocalized.login.wrongPassphraseError)
-								return
-								
-							case .networkError(error: _):
-								self.dialogService.showError(withMessage: String.adamantLocalized.login.noNetworkError)
-								return
-								
-							default:
-								break
-							}
-						}
-						
-						self.dialogService.showError(withMessage: error.message)
-					} else {
-						self.dialogService.dismissProgress()
-					}
-				}
-			}
-		}
-	}
-}
-
-
-// MARK: - QR
-extension LoginViewController: QRCodeReaderViewControllerDelegate {
-	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-		guard AdamantUtilities.validateAdamantPassphrase(passphrase: result.value) else {
-			dialogService.showError(withMessage: String.adamantLocalized.login.wrongQrError)
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-				reader.startScanning()
-			}
-			return
-		}
-		
-		reader.dismiss(animated: true, completion: nil)
-		loginWith(passphrase: result.value)
-	}
-	
-	func readerDidCancel(_ reader: QRCodeReaderViewController) {
-		reader.dismiss(animated: true, completion: nil)
-	}
-}
-
-
-// MARK: - Passphrase cell delegates
-extension LoginViewController: TextViewTableViewCellDelegate {
-	func cellDidChangeHeight(_ textView: TextViewTableViewCell, height: CGFloat) {
-		tableView.beginUpdates()
-		tableView.endUpdates()
-	}
-}
-
-extension LoginViewController: UITextViewDelegate {
-	func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-		if (text == "\n") {
-			textView.resignFirstResponder()
-			login()
-			return false
-		} else {
-			return true
-		}
-	}
-}
-
-
-// MARK: - Keyboard
-extension LoginViewController {
-	func keyboardWillShow(notification: Notification) {
-		guard let keyboard = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {
-			return
-		}
-		
-		var contentInset: UIEdgeInsets = tableView.contentInset
-		contentInset.bottom = keyboard.size.height
-		tableView.contentInset = contentInset
-		tableView.scrollIndicatorInsets = contentInset
-		
-		DispatchQueue.main.async {
-			self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
-		}
-	}
-	
-	func keyboardWillHide(notification: Notification) {
-		tableView.contentInset = UIEdgeInsets.zero
-		tableView.scrollIndicatorInsets = UIEdgeInsets.zero
+		})
 	}
 }

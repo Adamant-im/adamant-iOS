@@ -19,7 +19,7 @@ class AdamantDialogService: DialogService {
 
 // MARK: - Modal dialogs
 extension AdamantDialogService {
-	func presentModallyViewController(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
+	func present(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
 		if Thread.isMainThread {
 			AdamantDialogService.getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
 		} else {
@@ -94,7 +94,7 @@ extension AdamantDialogService {
 				alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
 					let vc = UIActivityViewController(activityItems: [string], applicationActivities: nil)
 					vc.excludedActivityTypes = excludedActivityTypes
-					self?.presentModallyViewController(vc, animated: true, completion: completion)
+					self?.present(vc, animated: true, completion: completion)
 				})
 				
 			case .generateQr(let sharingTip):
@@ -105,7 +105,7 @@ extension AdamantDialogService {
 						vc.qrCode = qr
 						vc.sharingTip = sharingTip
 						vc.excludedActivityTypes = excludedActivityTypes
-						self?.presentModallyViewController(vc, animated: true, completion: completion)
+						self?.present(vc, animated: true, completion: completion)
 						
 					case .failure(error: let error):
 						self?.showError(withMessage: String(describing: error))
@@ -116,6 +116,6 @@ extension AdamantDialogService {
 		
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
 		
-		presentModallyViewController(alert, animated: animated, completion: completion)
+		present(alert, animated: animated, completion: completion)
 	}
 }

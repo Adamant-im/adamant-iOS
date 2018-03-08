@@ -13,5 +13,5 @@ extension AdamantStory {
 }
 
 extension AdamantScene {
-	static let LoginDetails = AdamantScene(story: .Login, identifier: "LoginViewController")
+	static let Login = AdamantScene(story: .Login, identifier: "LoginViewController")
 }

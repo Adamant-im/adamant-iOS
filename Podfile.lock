@@ -1,8 +1,8 @@
 PODS:
-  - Alamofire (4.6.0)
+  - Alamofire (4.7.0)
   - EFQRCode (4.2.1)
-  - Eureka (4.0.1)
-  - FreakingSimpleRoundImageView (1.0.1)
+  - Eureka (4.1.0)
+  - FreakingSimpleRoundImageView (1.0.2)
   - FTIndicator (1.2.6):
     - FTIndicator/FTNotificationIndicator (= 1.2.6)
     - FTIndicator/FTProgressIndicator (= 1.2.6)
@@ -10,13 +10,13 @@ PODS:
   - FTIndicator/FTNotificationIndicator (1.2.6)
   - FTIndicator/FTProgressIndicator (1.2.6)
   - FTIndicator/FTToastIndicator (1.2.6)
-  - GrowingTextView (0.5.4)
+  - KeychainAccess (3.1.0)
   - MessageKit (0.13.1)
-  - QRCodeReader.swift (8.1.0)
-  - Swinject (2.1.1)
+  - MyLittlePinpad (0.2.2)
+  - QRCodeReader.swift (8.1.1)
+  - Swinject (2.2.0)
   - SwinjectStoryboard (1.1.2):
     - Swinject (~> 2.1)
-  - TableKit (2.5.0)
 
 DEPENDENCIES:
   - Alamofire
@@ -24,26 +24,26 @@ DEPENDENCIES:
   - Eureka
   - FreakingSimpleRoundImageView
   - FTIndicator
-  - GrowingTextView
+  - KeychainAccess
   - MessageKit
+  - MyLittlePinpad
   - QRCodeReader.swift
   - Swinject
   - SwinjectStoryboard
-  - TableKit
 
 SPEC CHECKSUMS:
-  Alamofire: f41a599bd63041760b26d393ec1069d9d7b917f4
+  Alamofire: 907e0a98eb68cdb7f9d1f541a563d6ac5dc77b25
   EFQRCode: f3fd67049faa07adb575495c05d72a34e407a940
-  Eureka: c8bd5cc07143b6f66268c208d28a246c99b41955
-  FreakingSimpleRoundImageView: ae69d35a7bb7870411d0348b62969415be4031f0
+  Eureka: 5770ef95bbbbe52f8abbc0d9bea6ee8282c50209
+  FreakingSimpleRoundImageView: e87b0ef24c9b95b74b1c2cab5b03832dbabd4873
   FTIndicator: d2a7c204341b7b0165b6dbeb5bf6979c6d7d4bb7
-  GrowingTextView: 0615429affef558cbbb610aa6f9baf19b027fdbe
+  KeychainAccess: 94c5540b32eabf7bc32bfb976a268e8ea05fd6da
   MessageKit: fc74d71d9b05385138d47b3a4b7beef5c687daf1
-  QRCodeReader.swift: 353c605aaaa6472541236edd6503e6f3ef9c3f6b
-  Swinject: afea49fd95f392b41171669f165842879c48fad6
+  MyLittlePinpad: 8b24927da4c1c8daa64ab1b9f142a8329f480745
+  QRCodeReader.swift: b164a681887de276d405ff02bce854d82cd6360b
+  Swinject: 4ca48bca7de5f398229a26abe1ac902b9f3ee541
   SwinjectStoryboard: 92e75763c3299cdf627bef98a5180dc894864336
-  TableKit: 42d4dff2944f273cdeec2ef6352064eb6a9a355b
 
-PODFILE CHECKSUM: 969bbfe9a495e5fd01b1e2404df0a0456928a480
+PODFILE CHECKSUM: 54b55788f642fe125eb02ede607957e5138bf2a1
 
 COCOAPODS: 1.4.0
