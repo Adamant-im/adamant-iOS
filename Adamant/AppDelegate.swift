@@ -19,7 +19,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	// MARK: - Lifecycle
 	
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-		
 		// MARK: 1. Initiating Swinject
 		let container = SwinjectStoryboard.defaultContainer
 		Container.loggingFunction = nil // Logging currently not supported with SwinjectStoryboards.
@@ -65,8 +64,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		repeater.registerForegroundCall(label: "chatsProvider", interval: 3, queue: DispatchQueue.global(qos: .utility), callback: chatsProvider.update)
 		
 		
-		// MARK: 4. On logout, pop all navigators to root.
+		// MARK: 4. Login / Logut
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { _ in
+			// Background Fetch
+			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
+		}
+		
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			// Background Fetch
+			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+			
+			// On logout, pop all navigators to root.
 			guard let tbc = self?.window?.rootViewController as? UITabBarController, let vcs = tbc.viewControllers else {
 				return
 			}
@@ -79,6 +87,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		return true
 	}
 	
+	// MARK: Timers
+	
 	func applicationWillResignActive(_ application: UIApplication) {
 		repeater.pauseAll()
 	}
@@ -89,5 +99,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	func applicationDidBecomeActive(_ application: UIApplication) {
 		repeater.resumeAll()
+	}
+	
+	// MARK: Background fetch
+	
+	func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+		let container = Container()
+		container.registerAdamantBackgroundFetchServices()
+		
+		guard let securedStore = container.resolve(SecuredStore.self), let apiService = container.resolve(ApiService.self) else {
+			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+			completionHandler(.failed)
+			return
+		}
+		
+		guard let address = securedStore.get(StoreKey.chatProvider.address), let lastHeightRaw = securedStore.get(StoreKey.chatProvider.lastHeight), let lastHeight = Int64(lastHeightRaw) else {
+			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+			completionHandler(.failed)
+			return
+		}
+		
+		apiService.getChatTransactions(address: address, height: lastHeight, offset: nil) { result in
+			switch result {
+			case .success(let transactions):
+				completionHandler(transactions.count > 0 ? .newData : .noData)
+				
+			case .failure(_):
+				completionHandler(.failed)
+			}
+		}
 	}
 }
