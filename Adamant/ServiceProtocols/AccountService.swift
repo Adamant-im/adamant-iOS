@@ -82,25 +82,39 @@ protocol AccountService {
 	func update()
 	
 	/// Create new account with passphrase.
-	func createAccount(with passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
+	func createAccountWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
 	
 	/// Login into Adamant using passphrase.
 	func loginWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
 	
 	
 	/// Login into Adamant using previously logged account
-	func loginWithSavedAccount(completion: @escaping (AccountServiceResult) -> Void)
+	func loginWithStoredAccount(completion: @escaping (AccountServiceResult) -> Void)
 	
 	/// Logout
 	func logout()
 	
 	
 	// MARK: Stay in functions
-	var hasSavedCredentials: Bool { get }
-	var stayLogged: Bool { get }
-	var biometryEnabled: Bool { get set }
-	var pin: String? { get }
 	
-	/// Pin required for turning on
-	func setStayLogged(_ stayLogged: Bool, pin: String?, completion: @escaping (AccountServiceResult) -> Void)
+	/// There is a stored account information in secured store
+	var hasStayInAccount: Bool { get }
+	
+	/// Use TouchID or FaceID to log in
+	var useBiometry: Bool { get set }
+	
+	
+	/// Save account data and use pincode to login
+	///
+	/// - Parameters:
+	///   - pin: pincode to login
+	///   - completion: completion handler
+	func setStayLoggedIn(pin: String, completion: @escaping (AccountServiceResult) -> Void)
+	
+	
+	/// Remove stored data
+	func dropSavedAccount()
+	
+	/// If we have stored data with pin, validate it. If no data saved, always returns false.
+	func validatePin(_ pin: String) -> Bool
 }

@@ -61,6 +61,7 @@ extension Container {
 			let service = AdamantAccountService()
 			service.apiService = r.resolve(ApiService.self)!
 			service.adamantCore = r.resolve(AdamantCore.self)!
+			service.securedStore = r.resolve(SecuredStore.self)!
 			return service
 		}.inObjectScope(.container)
 		

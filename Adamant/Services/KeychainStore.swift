@@ -10,7 +10,7 @@ import Foundation
 import KeychainAccess
 
 class KeychainStore: SecuredStore {
-	let keychain = Keychain()
+	let keychain = Keychain(service: "im.adamant")
 	
 	func get(_ key: String) -> String? {
 		return keychain[key]
@@ -18,5 +18,9 @@ class KeychainStore: SecuredStore {
 	
 	func set(_ value: String, for key: String) {
 		keychain[key] = value
+	}
+	
+	func remove(_ key: String) {
+		try? keychain.remove(key)
 	}
 }

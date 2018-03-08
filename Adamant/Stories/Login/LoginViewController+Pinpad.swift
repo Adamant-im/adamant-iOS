@@ -12,7 +12,9 @@ import MyLittlePinpad
 extension LoginViewController {
 	/// Shows pinpad in main.async queue
 	func loginWithPinpad() {
-		let pinpad = PinpadViewController.adamantPinpad(biometryButton: localAuth.biometryType.pinpadButtonType)
+		let button: PinpadBiometryButtonType = accountService.useBiometry ? localAuth.biometryType.pinpadButtonType : .hidden
+		
+		let pinpad = PinpadViewController.adamantPinpad(biometryButton: button)
 		pinpad.commentLabel.text = String.adamantLocalized.login.loginIntoPrevAccount
 		pinpad.commentLabel.isHidden = false
 		pinpad.delegate = self
@@ -49,8 +51,24 @@ extension LoginViewController {
 	}
 	
 	private func loginIntoSavedAccount() {
-		guard accountService.hasSavedCredentials else {
-			return
+		dialogService.showProgress(withMessage: String.adamantLocalized.login.loggingInProgressMessage, userInteractionEnable: false)
+		
+		accountService.loginWithStoredAccount { [weak self] result in
+			switch result {
+			case .success(account: _):
+				self?.dialogService.dismissProgress()
+				
+				if Thread.isMainThread {
+					self?.presentingViewController?.dismiss(animated: true, completion: nil)
+				} else {
+					DispatchQueue.main.async {
+						self?.presentingViewController?.dismiss(animated: true, completion: nil)
+					}
+				}
+				
+			case .failure(let error):
+				self?.dialogService.showError(withMessage: error.localized)
+			}
 		}
 	}
 }
@@ -59,11 +77,11 @@ extension LoginViewController {
 // MARK: - PinpadViewControllerDelegate
 extension LoginViewController: PinpadViewControllerDelegate {
 	func pinpad(_ pinpad: PinpadViewController, didEnterPin pin: String) {
-		guard accountService.hasSavedCredentials, let savedPin = accountService.pin else {
+		guard accountService.hasStayInAccount else {
 			return
 		}
 		
-		guard pin == savedPin else {
+		guard accountService.validatePin(pin) else {
 			pinpad.clearPin()
 			pinpad.playWrongPinAnimation()
 			return

@@ -263,7 +263,7 @@ class LoginViewController: FormViewController {
 		
 		
 		// MARK: We got a saved account
-		if accountService.hasSavedCredentials, let section = form.sectionBy(tag: Sections.login.tag) {
+		if accountService.hasStayInAccount, let section = form.sectionBy(tag: Sections.login.tag) {
 			let row = ButtonRow() {
 				$0.tag = Rows.loginWithPin.tag
 				$0.title = Rows.loginWithPin.localized
@@ -278,7 +278,7 @@ class LoginViewController: FormViewController {
 			
 			section.append(row)
 			
-			if accountService.biometryEnabled {
+			if accountService.useBiometry {
 				loginWithBiometry()
 			}
 		}
@@ -307,7 +307,6 @@ extension LoginViewController {
 		}
 	}
 	
-	
 	func generateNewPassphrase() {
 		let passphrase = adamantCore.generateNewPassphrase()
 		generatedPassphrases.append(passphrase)
@@ -329,7 +328,7 @@ extension LoginViewController {
 	
 	// MARK: Login helpers
 	private func createAccountAndLogin(passphrase: String) {
-		accountService.createAccount(with: passphrase, completion: { [weak self] result in
+		accountService.createAccountWith(passphrase: passphrase, completion: { [weak self] result in
 			switch result {
 			case .success:
 				self?.loginIntoExistingAccount(passphrase: passphrase)

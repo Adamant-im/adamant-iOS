@@ -112,6 +112,9 @@
    Login: login with existing passphrase section */
 "Login" = "Вход";
 
+/* Login: Login into previous account with biometry or pincode */
+"Login into Adamant" = "Вход в Адамант";
+
 /* Wallet page: 'Logout' button
    Wallet page: Confirm logout alert: Logout (Ok) button */
 "Logout" = "Выход";
@@ -145,6 +148,9 @@
 
 /* Transaction details: 'Open transaction in explorer' row. */
 "Open in Explorer" = "Открыть в Explorer";
+
+/* Login: Login with pincode button */
+"Pin" = "Войти с pin-кодом";
 
 /* Transfer: Address validation error */
 "Please enter a valid recipient address" = "Введите корректный адрес получателя";
