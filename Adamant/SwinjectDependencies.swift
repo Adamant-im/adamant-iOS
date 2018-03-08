@@ -98,7 +98,17 @@ extension Container {
 			provider.stack = r.resolve(CoreDataStack.self)
 			provider.adamantCore = r.resolve(AdamantCore.self)
 			provider.accountsProvider = r.resolve(AccountsProvider.self)
+			provider.securedStore = r.resolve(SecuredStore.self)
 			return provider
 		}.inObjectScope(.container)
+	}
+	
+	func registerAdamantBackgroundFetchServices() {
+		// MARK: Secured Store
+		self.register(SecuredStore.self) { r in KeychainStore() }.inObjectScope(.container)
+		
+		// MARK: ApiService
+		// No need to init AdamantCore
+		self.register(ApiService.self) { r in AdamantApiService(apiUrl: AdamantResources.api)}.inObjectScope(.container)
 	}
 }

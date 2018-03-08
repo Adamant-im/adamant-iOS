@@ -292,7 +292,9 @@ extension AdamantAccountService {
 			case .success(let account):
 				self.account = account
 				self.keypair = keypair
-				NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: nil)
+				
+				let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress:account.address]
+				NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: self, userInfo: userInfo)
 				self.setState(.loggedIn)
 				completion(.success(account: account))
 				
@@ -337,23 +339,23 @@ extension AdamantAccountService {
 
 
 // MARK: - Secured Store
-fileprivate enum StoreKey: String {
+fileprivate enum Key: String {
 	case publicKey = "publicKey"
 	case privateKey = "privateKey"
 	case pin = "pin"
 	case useBiometry = "useBiometry"
 }
 
-extension SecuredStore {
-	fileprivate func set(_ value: String, for key: StoreKey) {
+fileprivate extension SecuredStore {
+	func set(_ value: String, for key: Key) {
 		set(value, for: key.rawValue)
 	}
 	
-	fileprivate func get(_ key: StoreKey) -> String? {
+	func get(_ key: Key) -> String? {
 		return get(key.rawValue)
 	}
 	
-	fileprivate func remove(_ key: StoreKey) {
+	func remove(_ key: Key) {
 		remove(key.rawValue)
 	}
 }

@@ -9,6 +9,9 @@
 import Foundation
 import CoreData
 
+
+// MARK: - Callbacks
+
 enum ChatsProviderResult {
 	case success
 	case error(ChatsProviderError)
@@ -30,24 +33,49 @@ enum ValidateMessageResult {
 	case tooLong
 }
 
-/// Available message types
+
+// MARK: - Available message types
+
+/// Adamant message types
+///
+/// - text: Simple text message
 enum AdamantMessage {
 	case text(String)
 }
 
+
+// MARK: - Notifications
 extension Notification.Name {
 	static let adamantChatsProviderNewChatroom = Notification.Name("adamantChatsProviderNewChatroom")
+	
+	/// Received new messagess. See AdamantUserInfoKey.ChatProvider
 	static let adamantChatsProviderNewUnreadMessages = Notification.Name("adamantChatsProviderNewUnrMessages")
 }
 
 
-/// - newChatroomAddress: Contains new chatroom partner's address as String
-/// - lastMessageHeight: new lastMessageHeight
-enum NotificationUserInfoKeys: String {
-	case newChatroomAddress = "adamant.chatsProvider.newChatroom.address"
-	case lastMessageHeight = "adamant.chatsProvider.newMessage.lastHeight"
+// MARK: - Notification UserInfo keys
+extension AdamantUserInfoKey {
+	struct ChatProvider {
+		/// newChatroomAddress: Contains new chatroom partner's address as String
+		static let newChatroomAddress = "adamant.chatsProvider.newChatroom.address"
+		/// lastMessageHeight: new lastMessageHeight
+		static let lastMessageHeight = "adamant.chatsProvider.newMessage.lastHeight"
+		
+		private init() {}
+	}
 }
 
+
+// MARK: - SecuredStore keys
+extension StoreKey {
+	struct chatProvider {
+		static let address = "chatProvider.address"
+		static let lastHeight = "chatProvider.lastHeight"
+	}
+}
+
+
+// MARK: - Protocol
 protocol ChatsProvider: DataProvider {
 	// MARK: - Getting chats and messages
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>?

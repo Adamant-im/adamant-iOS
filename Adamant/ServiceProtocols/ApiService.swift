@@ -83,9 +83,9 @@ protocol ApiService {
 	/// Get chat transactions (type 8)
 	///
 	/// - Parameters:
-	///   - account: Transactions for specified account
+	///   - address: Transactions for specified account
 	///   - height: From this height. Minimal value is 1.
-	func getChatTransactions(account: String, height: Int64?, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
+	func getChatTransactions(address: String, height: Int64?, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
 	
 	/// Send text message
 	///   - completion: Contains processed transactionId, if success, or AdamantError, if fails.
