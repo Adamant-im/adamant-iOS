@@ -12,13 +12,22 @@ extension Notification.Name {
 	/// Raised when user has logged out.
 	static let adamantUserLoggedOut = Notification.Name("adamantUserHasLoggedOut")
 	
-	/// Raised when user has successfully logged in.
+	/// Raised when user has successfully logged in. See AdamantUserInfoKey.AccountService
 	static let adamantUserLoggedIn = Notification.Name("adamantUserHasLoggedIn")
 	
 	// Raised on account info (balance) updated.
 	static let adamantAccountDataUpdated = Notification.Name("adamantAccountDataUpdated")
 }
 
+
+/// - loggedAccountAddress: Newly logged account's address
+extension AdamantUserInfoKey {
+	struct AccountService {
+		static let loggedAccountAddress = "adamant.accountService.loggedin.address"
+		
+		private init() {}
+	}
+}
 
 /// - notLogged: Not logged, empty
 /// - isLoggingIn: Is currently trying to log in

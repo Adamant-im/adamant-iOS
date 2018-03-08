@@ -16,6 +16,7 @@ class AdamantChatsProvider: ChatsProvider {
 	var stack: CoreDataStack!
 	var adamantCore: AdamantCore!
 	var accountsProvider: AccountsProvider!
+	var securedStore: SecuredStore!
 	
 	// MARK: Properties
 	private(set) var state: State = .empty
@@ -32,13 +33,24 @@ class AdamantChatsProvider: ChatsProvider {
 	
 	// MARK: Lifecycle
 	init() {
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { _ in
-			self.update()
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { [weak self] notification in
+			self?.update()
+			
+			if let address = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String {
+				self?.securedStore.set(address, for: StoreKey.chatProvider.address)
+			} else {
+				print("Can't get logged address.")
+			}
 		}
 		
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { _ in
-			self.lastHeight = nil
-			self.setState(.empty, previous: self.state, notify: true)
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
+			self?.lastHeight = nil
+			if let prevState = self?.state {
+				self?.setState(.empty, previous: prevState, notify: true)
+			}
+			
+			self?.securedStore.remove(StoreKey.chatProvider.address)
+			self?.securedStore.remove(StoreKey.chatProvider.lastHeight)
 		}
 	}
 	
@@ -146,7 +158,7 @@ extension AdamantChatsProvider {
 				if prevHeight != self.lastHeight, let h = self.lastHeight {
 					NotificationCenter.default.post(name: Notification.Name.adamantChatsProviderNewUnreadMessages,
 													object: self,
-													userInfo: [NotificationUserInfoKeys.lastMessageHeight:h])
+													userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h])
 				}
 				
 				self.unreadHeight = self.lastHeight
@@ -412,7 +424,7 @@ extension AdamantChatsProvider {
 		dispatchGroup.enter()
 		
 		// MARK: 1. Get new transactions
-		apiService.getChatTransactions(account: senderId, height: height, offset: offset) { result in
+		apiService.getChatTransactions(address: senderId, height: height, offset: offset) { result in
 			defer {
 				// Leave 1
 				dispatchGroup.leave()
@@ -754,7 +766,7 @@ extension AdamantChatsProvider {
 		
 		let userInfo: [AnyHashable: Any]?
 		if let address = account.address {
-			userInfo = [NotificationUserInfoKeys.newChatroomAddress:address]
+			userInfo = [AdamantUserInfoKey.ChatProvider.newChatroomAddress:address]
 		} else {
 			userInfo = nil
 		}
