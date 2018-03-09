@@ -72,6 +72,8 @@ extension StoreKey {
 		static let address = "chatProvider.address"
 		static let receivedLastHeight = "chatProvider.receivedLastHeight"
 		static let readedLastHeight = "chatProvider.readedLastHeight"
+		static let notifiedLastHeight = "chatProvider.notifiedLastHeight"
+		static let notifiedMessagesCount = "chatProvider.notifiedCount"
 	}
 }
 

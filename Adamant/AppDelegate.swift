@@ -15,6 +15,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	var window: UIWindow?
 	var repeater: RepeaterService!
+	
+	weak var accountService: AccountService?
+	weak var notificationService: NotificationsService?
 
 	// MARK: - Lifecycle
 	
@@ -27,6 +30,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		container.registerAdamantLoginStory()
 		container.registerAdamantChatsStory()
 		container.registerAdamantSettingsStory()
+		
+		accountService = container.resolve(AccountService.self)
+		notificationService = container.resolve(NotificationsService.self)
 		
 		
 		// MARK: 2. Prepare UI
@@ -109,6 +115,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	func applicationDidBecomeActive(_ application: UIApplication) {
 		repeater.resumeAll()
+		
+		if accountService?.account != nil {
+			notificationService?.removeAllDeliveredNotifications()
+		}
 	}
 	
 	// MARK: Background fetch
@@ -131,18 +141,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			return
 		}
 		
-		let lastHeight: Int64?
+		var lastHeight: Int64?
 		if let raw = securedStore.get(StoreKey.chatProvider.receivedLastHeight) {
 			lastHeight = Int64(raw)
 		} else {
 			lastHeight = nil
 		}
 		
+		var notifiedCount = 0
+		if let raw = securedStore.get(StoreKey.chatProvider.notifiedLastHeight), let notifiedHeight = Int64(raw), let h = lastHeight {
+			if h < notifiedHeight {
+				lastHeight = notifiedHeight
+				
+				if let raw = securedStore.get(StoreKey.chatProvider.notifiedMessagesCount), let count = Int(raw) {
+					notifiedCount = count
+				}
+			}
+		}
+		
+		
 		apiService.getChatTransactions(address: address, height: lastHeight, offset: nil) { result in
 			switch result {
 			case .success(let transactions):
 				if transactions.count > 0 {
-					notificationsService.showNotification(title: String.adamantLocalized.notifications.newMessageTitle, body: String.localizedStringWithFormat(String.adamantLocalized.notifications.newMessageBody, transactions.count), type: .newMessages)
+					let total = transactions.count + notifiedCount
+					securedStore.set(String(total), for: StoreKey.chatProvider.notifiedMessagesCount)
+					
+					if let newLastHeight = transactions.map({$0.height}).sorted().last {
+						securedStore.set(String(newLastHeight), for: StoreKey.chatProvider.notifiedLastHeight)
+					}
+					
+					
+					notificationsService.showNotification(title: String.adamantLocalized.notifications.newMessageTitle, body: String.localizedStringWithFormat(String.adamantLocalized.notifications.newMessageBody, total), type: .newMessages(count: total))
 					completionHandler(.newData)
 				} else {
 					completionHandler(.noData)

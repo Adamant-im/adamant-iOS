@@ -33,9 +33,9 @@ extension StoreKey {
 /// - transaction: token transaction
 /// - custom: other
 enum AdamantNotificationType {
-	case newMessages
-	case newTransactions
-	case custom(identifier: String)
+	case newMessages(count: Int)
+	case newTransactions(count: Int)
+	case custom(identifier: String, badge: NSNumber?)
 	
 	var identifier: String {
 		switch self {
@@ -45,8 +45,21 @@ enum AdamantNotificationType {
 		case .newTransactions:
 			return "newTransactions"
 			
-		case .custom(let identifier):
+		case .custom(let identifier, _):
 			return identifier
+		}
+	}
+	
+	var badge: NSNumber? {
+		switch self {
+		case .newMessages(let count):
+			return NSNumber(integerLiteral: count)
+			
+		case .newTransactions(let count):
+			return NSNumber(integerLiteral: count)
+			
+		case .custom(_, let badge):
+			return badge
 		}
 	}
 }
@@ -64,13 +77,15 @@ enum NotificationsServiceResult {
 	case denied(error: Error?)
 }
 
-protocol NotificationsService {
+protocol NotificationsService: class {
 	var notificationsEnabled: Bool { get }
 	
 	func setNotificationsEnabled(_ enabled: Bool, completion: @escaping (NotificationsServiceResult) -> Void)
 	
 	func showNotification(title: String, body: String, type: AdamantNotificationType)
 	
-	func removeAllPendingNotificationRequests(ofType type: AdamantNotificationType)
-	func removeAllDeliveredNotifications(ofType type: AdamantNotificationType)
+	func removeAllPendingNotificationRequests()
+	func removeAllDeliveredNotifications()
+//	func removeAllPendingNotificationRequests(ofType type: AdamantNotificationType)
+//	func removeAllDeliveredNotifications(ofType type: AdamantNotificationType)
 }

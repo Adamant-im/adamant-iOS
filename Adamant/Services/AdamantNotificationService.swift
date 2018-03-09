@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 import UserNotifications
 
 class AdamantNotificationsService: NotificationsService {
@@ -43,6 +44,11 @@ class AdamantNotificationsService: NotificationsService {
 	
 	// MARK: Lifecycle
 	init() {
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { _ in
+			UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+			UIApplication.shared.applicationIconBadgeNumber = 0
+		}
+		
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.notificationsEnabled = false
 			self?.securedStore.remove(StoreKey.notificationsService.notificationsEnabled)
@@ -99,6 +105,7 @@ class AdamantNotificationsService: NotificationsService {
 		content.title = title
 		content.body = body
 		content.sound = UNNotificationSound.default()
+		content.badge = type.badge
 		
 		let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
 		let request = UNNotificationRequest(identifier: type.identifier, content: content, trigger: trigger)
@@ -110,11 +117,12 @@ class AdamantNotificationsService: NotificationsService {
 		}
 	}
 	
-	func removeAllPendingNotificationRequests(ofType type: AdamantNotificationType) {
-		UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [type.identifier])
+	func removeAllPendingNotificationRequests() {
+		UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
 	}
 	
-	func removeAllDeliveredNotifications(ofType type: AdamantNotificationType) {
-		UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [type.identifier])
+	func removeAllDeliveredNotifications() {
+		UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+		UIApplication.shared.applicationIconBadgeNumber = 0
 	}
 }
