@@ -8,7 +8,11 @@
 
 import Foundation
 
-protocol SecuredStore {
+struct StoreKey {
+	private init() {}
+}
+
+protocol SecuredStore: class {
 	func get(_ key: String) -> String?
 	func set(_ value: String, for key: String)
 	func remove(_ key: String)

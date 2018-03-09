@@ -22,6 +22,8 @@ private struct AdamantResources {
 // MARK: - Services
 extension Container {
 	func registerAdamantServices() {
+		
+		
 		// MARK: - Standalone services
 		// MARK: AdamantCore
 		self.register(AdamantCore.self) { _ in
@@ -49,6 +51,13 @@ extension Container {
 		
 		
 		// MARK: - Services with dependencies
+		// MARK: Notifications
+		self.register(NotificationsService.self) { r in
+			let service = AdamantNotificationsService()
+			service.securedStore = r.resolve(SecuredStore.self)
+			return service
+		}.inObjectScope(.container)
+		
 		// MARK: ApiService
 		self.register(ApiService.self) { r in
 			let service = AdamantApiService(apiUrl: AdamantResources.api)
@@ -98,7 +107,24 @@ extension Container {
 			provider.stack = r.resolve(CoreDataStack.self)
 			provider.adamantCore = r.resolve(AdamantCore.self)
 			provider.accountsProvider = r.resolve(AccountsProvider.self)
+			provider.securedStore = r.resolve(SecuredStore.self)
 			return provider
+		}.inObjectScope(.container)
+	}
+	
+	func registerAdamantBackgroundFetchServices() {
+		// MARK: Secured Store
+		self.register(SecuredStore.self) { r in KeychainStore() }.inObjectScope(.container)
+		
+		// MARK: ApiService
+		// No need to init AdamantCore
+		self.register(ApiService.self) { r in AdamantApiService(apiUrl: AdamantResources.api)}.inObjectScope(.container)
+		
+		// MARK: Notifications
+		self.register(NotificationsService.self) { r in
+			let service = AdamantNotificationsService()
+			service.securedStore = r.resolve(SecuredStore.self)
+			return service
 		}.inObjectScope(.container)
 	}
 }

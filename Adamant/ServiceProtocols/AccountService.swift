@@ -8,17 +8,29 @@
 
 import Foundation
 
+// MARK: - Notifications
 extension Notification.Name {
 	/// Raised when user has logged out.
 	static let adamantUserLoggedOut = Notification.Name("adamantUserHasLoggedOut")
 	
-	/// Raised when user has successfully logged in.
+	/// Raised when user has successfully logged in. See AdamantUserInfoKey.AccountService
 	static let adamantUserLoggedIn = Notification.Name("adamantUserHasLoggedIn")
 	
 	// Raised on account info (balance) updated.
 	static let adamantAccountDataUpdated = Notification.Name("adamantAccountDataUpdated")
 }
 
+
+/// - loggedAccountAddress: Newly logged account's address
+extension AdamantUserInfoKey {
+	struct AccountService {
+		static let loggedAccountAddress = "adamant.accountService.loggedin.address"
+		
+		private init() {}
+	}
+}
+
+// MARK: - Other const
 
 /// - notLogged: Not logged, empty
 /// - isLoggingIn: Is currently trying to log in
@@ -43,13 +55,13 @@ enum AccountServiceError {
 	var localized: String {
 		switch self {
 		case .userNotLogged:
-			return NSLocalizedString("User not logged!", comment: "Login: user not logged error")
+			return NSLocalizedString("User not logged", comment: "Login: user not logged error")
 			
 		case .invalidPassphrase:
-			return NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase")
+			return NSLocalizedString("Wrong passphrase", comment: "Login: user typed in wrong passphrase")
 			
 		case .wrongPassphrase:
-			return NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase")
+			return NSLocalizedString("Wrong passphrase", comment: "Login: user typed in wrong passphrase")
 			
 		case .apiError(let error):
 			return error.localized
@@ -60,15 +72,9 @@ enum AccountServiceError {
 	}
 }
 
-enum AuthorizeOptions {
-	case pin(String)
-	case touchId
-	case faceId
-}
-
 
 // MARK: - Protocol
-protocol AccountService {
+protocol AccountService: class {
 	// MARK: State
 	
 	var state: AccountServiceState { get }

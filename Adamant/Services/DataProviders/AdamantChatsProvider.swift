@@ -16,11 +16,12 @@ class AdamantChatsProvider: ChatsProvider {
 	var stack: CoreDataStack!
 	var adamantCore: AdamantCore!
 	var accountsProvider: AccountsProvider!
+	var securedStore: SecuredStore!
 	
 	// MARK: Properties
 	private(set) var state: State = .empty
-	private(set) var lastHeight: Int64?
-	private(set) var unreadHeight: Int64?
+	private(set) var receivedLastHeight: Int64?
+	private(set) var readedLastHeight: Int64?
 	private let apiTransactions = 100
 	private var unconfirmedTransactions: [UInt64:ChatTransaction] = [:]
 	
@@ -32,13 +33,24 @@ class AdamantChatsProvider: ChatsProvider {
 	
 	// MARK: Lifecycle
 	init() {
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { _ in
-			self.update()
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { [weak self] notification in
+			self?.update()
+			
+			if let address = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String {
+				self?.securedStore.set(address, for: StoreKey.chatProvider.address)
+			} else {
+				print("Can't get logged address.")
+			}
 		}
 		
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { _ in
-			self.lastHeight = nil
-			self.setState(.empty, previous: self.state, notify: true)
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
+			self?.receivedLastHeight = nil
+			if let prevState = self?.state {
+				self?.setState(.empty, previous: prevState, notify: true)
+			}
+			
+			self?.securedStore.remove(StoreKey.chatProvider.address)
+			self?.securedStore.remove(StoreKey.chatProvider.receivedLastHeight)
 		}
 	}
 	
@@ -84,7 +96,7 @@ extension AdamantChatsProvider {
 	private func reset(notify: Bool) {
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false) // Block update calls
-		lastHeight = nil
+		receivedLastHeight = nil
 		
 		let chatrooms = NSFetchRequest<Chatroom>(entityName: Chatroom.entityName)
 		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -130,26 +142,34 @@ extension AdamantChatsProvider {
 		privateContext.parent = self.stack.container.viewContext
 		let processingGroup = DispatchGroup()
 		let cms = DispatchSemaphore(value: 1)
-		let prevHeight = lastHeight
+		let prevHeight = receivedLastHeight
 		
-		getTransactions(senderId: address, privateKey: privateKey, height: lastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
+		getTransactions(senderId: address, privateKey: privateKey, height: receivedLastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
 		
 		// MARK: 4. Check
-		processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) {
-			switch self.state {
+		processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) { [weak self] in
+			guard let state = self?.state else {
+				return
+			}
+			
+			switch state {
 			case .failedToUpdate(_): // Processing failed
 				break
 				
 			default:
-				self.setState(.upToDate, previous: prevState)
+				self?.setState(.upToDate, previous: prevState)
 				
-				if prevHeight != self.lastHeight, let h = self.lastHeight {
+				if prevHeight != self?.receivedLastHeight, let h = self?.receivedLastHeight {
 					NotificationCenter.default.post(name: Notification.Name.adamantChatsProviderNewUnreadMessages,
 													object: self,
-													userInfo: [NotificationUserInfoKeys.lastMessageHeight:h])
+													userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h])
 				}
 				
-				self.unreadHeight = self.lastHeight
+				self?.readedLastHeight = self?.receivedLastHeight
+				
+				if let h = self?.receivedLastHeight, let store = self?.securedStore {
+					store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
+				}
 			}
 		}
 	}
@@ -412,7 +432,7 @@ extension AdamantChatsProvider {
 		dispatchGroup.enter()
 		
 		// MARK: 1. Get new transactions
-		apiService.getChatTransactions(account: senderId, height: height, offset: offset) { result in
+		apiService.getChatTransactions(address: senderId, height: height, offset: offset) { result in
 			defer {
 				// Leave 1
 				dispatchGroup.leave()
@@ -600,7 +620,7 @@ extension AdamantChatsProvider {
 		
 		
 		// MARK: 4. Unread messagess
-		if let unreadHeight = unreadHeight {
+		if let unreadHeight = readedLastHeight {
 			let msgs = Dictionary(grouping: newChatTransactions.filter({$0.height > unreadHeight}), by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
 			for (chatroom, trs) in msgs {
 				chatroom.hasUnreadMessages = true
@@ -658,12 +678,12 @@ extension AdamantChatsProvider {
 		
 		// MARK 7. Last message height
 		highSemaphore.wait()
-		if let lastHeight = lastHeight {
+		if let lastHeight = receivedLastHeight {
 			if lastHeight < height {
-				self.lastHeight = height
+				self.receivedLastHeight = height
 			}
 		} else {
-			lastHeight = height
+			receivedLastHeight = height
 		}
 		
 		highSemaphore.signal()
@@ -735,8 +755,8 @@ extension AdamantChatsProvider {
 		transaction.height = height
 		self.unconfirmedTransactions.removeValue(forKey: id)
 		
-		if let lastHeight = lastHeight, lastHeight < height {
-			self.lastHeight = height
+		if let lastHeight = receivedLastHeight, lastHeight < height {
+			self.receivedLastHeight = height
 		}
 	}
 	
@@ -754,7 +774,7 @@ extension AdamantChatsProvider {
 		
 		let userInfo: [AnyHashable: Any]?
 		if let address = account.address {
-			userInfo = [NotificationUserInfoKeys.newChatroomAddress:address]
+			userInfo = [AdamantUserInfoKey.ChatProvider.newChatroomAddress:address]
 		} else {
 			userInfo = nil
 		}

@@ -114,6 +114,14 @@ extension AdamantAccountService {
 		return pin == savedPin
 	}
 	
+	private func getSavedKeypair() -> Keypair? {
+		if let publicKey = securedStore.get(.publicKey), let privateKey = securedStore.get(.privateKey) {
+			return Keypair(publicKey: publicKey, privateKey: privateKey)
+		}
+		
+		return nil
+	}
+	
 	func dropSavedAccount() {
 		securedStoreSemaphore.wait()
 		defer {
@@ -234,7 +242,23 @@ extension AdamantAccountService {
 			return
 		}
 		
-		loginWith(keypair: keypair, completion: completion)
+		if let savedKeypair = getSavedKeypair() {
+			loginWith(keypair: keypair) { [weak self] result in
+				switch result {
+				case .success(_):
+					if let newKeypair = self?.keypair, newKeypair != savedKeypair {
+						self?.dropSavedAccount()
+					}
+					
+				default:
+					break
+				}
+				
+				completion(result)
+			}
+		} else {
+			loginWith(keypair: keypair, completion: completion)
+		}
 	}
 	
 	// MARK: Pincode
@@ -254,12 +278,12 @@ extension AdamantAccountService {
 	
 	// MARK: Biometry
 	func loginWithStoredAccount(completion: @escaping (AccountServiceResult) -> Void) {
-		guard let publicKey = securedStore.get(.publicKey), let privateKey = securedStore.get(.privateKey) else {
+		guard let keypair = getSavedKeypair() else {
 			completion(.failure(.invalidPassphrase))
 			return
 		}
 		
-		loginWith(keypair: Keypair(publicKey: publicKey, privateKey: privateKey), completion: completion)
+		loginWith(keypair: keypair, completion: completion)
 	}
 	
 	
@@ -292,7 +316,9 @@ extension AdamantAccountService {
 			case .success(let account):
 				self.account = account
 				self.keypair = keypair
-				NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: nil)
+				
+				let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress:account.address]
+				NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: self, userInfo: userInfo)
 				self.setState(.loggedIn)
 				completion(.success(account: account))
 				
@@ -337,23 +363,43 @@ extension AdamantAccountService {
 
 
 // MARK: - Secured Store
-fileprivate enum StoreKey: String {
-	case publicKey = "publicKey"
-	case privateKey = "privateKey"
-	case pin = "pin"
-	case useBiometry = "useBiometry"
+extension StoreKey {
+	fileprivate struct accountService {
+		static let publicKey = "accountService.publicKey"
+		static let privateKey = "accountService.privateKey"
+		static let pin = "accountService.pin"
+		static let useBiometry = "accountService.useBiometry"
+		
+		private init() {}
+	}
 }
 
-extension SecuredStore {
-	fileprivate func set(_ value: String, for key: StoreKey) {
-		set(value, for: key.rawValue)
+fileprivate enum Key {
+	case publicKey
+	case privateKey
+	case pin
+	case useBiometry
+	
+	var stringValue: String {
+		switch self {
+		case .publicKey: return StoreKey.accountService.publicKey
+		case .privateKey: return StoreKey.accountService.privateKey
+		case .pin: return StoreKey.accountService.pin
+		case .useBiometry: return StoreKey.accountService.useBiometry
+		}
+	}
+}
+
+fileprivate extension SecuredStore {
+	func set(_ value: String, for key: Key) {
+		set(value, for: key.stringValue)
 	}
 	
-	fileprivate func get(_ key: StoreKey) -> String? {
-		return get(key.rawValue)
+	func get(_ key: Key) -> String? {
+		return get(key.stringValue)
 	}
 	
-	fileprivate func remove(_ key: StoreKey) {
-		remove(key.rawValue)
+	func remove(_ key: Key) {
+		remove(key.stringValue)
 	}
 }

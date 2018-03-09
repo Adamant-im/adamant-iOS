@@ -14,6 +14,7 @@ PODS:
   - MessageKit (0.13.1)
   - MyLittlePinpad (0.2.2)
   - QRCodeReader.swift (8.1.1)
+  - RNCryptor (5.0.2)
   - Swinject (2.2.0)
   - SwinjectStoryboard (1.1.2):
     - Swinject (~> 2.1)
@@ -28,6 +29,7 @@ DEPENDENCIES:
   - MessageKit
   - MyLittlePinpad
   - QRCodeReader.swift
+  - RNCryptor
   - Swinject
   - SwinjectStoryboard
 
@@ -41,9 +43,10 @@ SPEC CHECKSUMS:
   MessageKit: fc74d71d9b05385138d47b3a4b7beef5c687daf1
   MyLittlePinpad: 8b24927da4c1c8daa64ab1b9f142a8329f480745
   QRCodeReader.swift: b164a681887de276d405ff02bce854d82cd6360b
+  RNCryptor: 59b9f92e9fa8a1af74c32dc6b1af5e30ff5e1b64
   Swinject: 4ca48bca7de5f398229a26abe1ac902b9f3ee541
   SwinjectStoryboard: 92e75763c3299cdf627bef98a5180dc894864336
 
-PODFILE CHECKSUM: 54b55788f642fe125eb02ede607957e5138bf2a1
+PODFILE CHECKSUM: f56801713dedd8f5b2d1ec95f822fbbce22dc294
 
 COCOAPODS: 1.4.0

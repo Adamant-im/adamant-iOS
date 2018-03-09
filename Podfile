@@ -6,6 +6,7 @@ target 'Adamant' do
 
   pod 'Alamofire' # Network
   pod 'KeychainAccess' # Keychain
+  pod 'RNCryptor' # Cryptor
   
   # Swinject DI
   pod 'Swinject'

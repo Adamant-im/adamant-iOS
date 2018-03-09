@@ -14,6 +14,7 @@ extension Container {
 			c.dialogService = r.resolve(DialogService.self)
 			c.accountService = r.resolve(AccountService.self)
 			c.localAuth = r.resolve(LocalAuthentication.self)
+			c.notificationsService = r.resolve(NotificationsService.self)
 		}
 		
 		self.storyboardInitCompleted(QRGeneratorViewController.self) { r, c in

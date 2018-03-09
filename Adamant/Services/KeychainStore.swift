@@ -8,16 +8,28 @@
 
 import Foundation
 import KeychainAccess
+import RNCryptor
 
 class KeychainStore: SecuredStore {
 	let keychain = Keychain(service: "im.adamant")
+	private let 🍩 = "hello titty"	// For AppStore builds, we use a real password
 	
 	func get(_ key: String) -> String? {
-		return keychain[key]
+		if let rawData = keychain[key],
+			let encryptedData = Data(base64Encoded: rawData),
+			let data = try? RNCryptor.decrypt(data: encryptedData, withPassword: 🍩),
+			let string = String(data: data, encoding: .utf8) {
+			return string
+		}
+		
+		return nil
 	}
 	
 	func set(_ value: String, for key: String) {
-		keychain[key] = value
+		if let data = value.data(using: .utf8) {
+			let encryptedString = RNCryptor.encrypt(data: data, withPassword: 🍩).base64EncodedString()
+			try? keychain.set(encryptedString, key: key)
+		}
 	}
 	
 	func remove(_ key: String) {

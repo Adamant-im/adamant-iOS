@@ -31,7 +31,7 @@ struct SharedCell: Equatable, Hashable {
 }
 
 
-protocol CellFactory {
+protocol CellFactory: class {
 	func nib(for sharedCell: SharedCell) -> UINib?
 	func cellInstance(for sharedCell: SharedCell) -> UITableViewCell?
 }

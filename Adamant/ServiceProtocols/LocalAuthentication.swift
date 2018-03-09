@@ -19,7 +19,7 @@ enum AuthenticationResult {
 	case failed
 }
 
-protocol LocalAuthentication {
+protocol LocalAuthentication: class {
 	var biometryType: BiometryType { get }
 	
 	func authorizeUser(reason: String, completion: @escaping (AuthenticationResult) -> Void)
