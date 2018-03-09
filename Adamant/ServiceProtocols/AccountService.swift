@@ -8,6 +8,7 @@
 
 import Foundation
 
+// MARK: - Notifications
 extension Notification.Name {
 	/// Raised when user has logged out.
 	static let adamantUserLoggedOut = Notification.Name("adamantUserHasLoggedOut")
@@ -28,6 +29,8 @@ extension AdamantUserInfoKey {
 		private init() {}
 	}
 }
+
+// MARK: - Other const
 
 /// - notLogged: Not logged, empty
 /// - isLoggingIn: Is currently trying to log in
@@ -52,13 +55,13 @@ enum AccountServiceError {
 	var localized: String {
 		switch self {
 		case .userNotLogged:
-			return NSLocalizedString("User not logged!", comment: "Login: user not logged error")
+			return NSLocalizedString("User not logged", comment: "Login: user not logged error")
 			
 		case .invalidPassphrase:
-			return NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase")
+			return NSLocalizedString("Wrong passphrase", comment: "Login: user typed in wrong passphrase")
 			
 		case .wrongPassphrase:
-			return NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase")
+			return NSLocalizedString("Wrong passphrase", comment: "Login: user typed in wrong passphrase")
 			
 		case .apiError(let error):
 			return error.localized
@@ -69,15 +72,9 @@ enum AccountServiceError {
 	}
 }
 
-enum AuthorizeOptions {
-	case pin(String)
-	case touchId
-	case faceId
-}
-
 
 // MARK: - Protocol
-protocol AccountService {
+protocol AccountService: class {
 	// MARK: State
 	
 	var state: AccountServiceState { get }

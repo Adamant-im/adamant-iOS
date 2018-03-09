@@ -15,6 +15,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	var window: UIWindow?
 	var repeater: RepeaterService!
+	
+	weak var accountService: AccountService?
+	weak var notificationService: NotificationsService?
 
 	// MARK: - Lifecycle
 	
@@ -27,6 +30,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		container.registerAdamantLoginStory()
 		container.registerAdamantChatsStory()
 		container.registerAdamantSettingsStory()
+		
+		accountService = container.resolve(AccountService.self)
+		notificationService = container.resolve(NotificationsService.self)
 		
 		
 		// MARK: 2. Prepare UI
@@ -64,16 +70,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		repeater.registerForegroundCall(label: "chatsProvider", interval: 3, queue: DispatchQueue.global(qos: .utility), callback: chatsProvider.update)
 		
 		
-		// MARK: 4. Login / Logut
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { _ in
-			// Background Fetch
-			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
+		// MARK: 4. Notifications
+		if let service = container.resolve(NotificationsService.self) {
+			if service.notificationsEnabled {
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
+			} else {
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+			}
+			
+			NotificationCenter.default.addObserver(forName: Notification.Name.adamantShowNotificationsChanged, object: service, queue: OperationQueue.main) { _ in
+				if service.notificationsEnabled {
+					UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
+				} else {
+					UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+				}
+			}
 		}
 		
+		
+		// MARK: 5. Logout reset
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			// Background Fetch
-			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
-			
 			// On logout, pop all navigators to root.
 			guard let tbc = self?.window?.rootViewController as? UITabBarController, let vcs = tbc.viewControllers else {
 				return
@@ -99,6 +115,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	func applicationDidBecomeActive(_ application: UIApplication) {
 		repeater.resumeAll()
+		
+		if accountService?.account != nil {
+			notificationService?.removeAllDeliveredNotifications()
+		}
 	}
 	
 	// MARK: Background fetch
@@ -107,22 +127,56 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let container = Container()
 		container.registerAdamantBackgroundFetchServices()
 		
-		guard let securedStore = container.resolve(SecuredStore.self), let apiService = container.resolve(ApiService.self) else {
+		guard let securedStore = container.resolve(SecuredStore.self),
+			let apiService = container.resolve(ApiService.self),
+			let notificationsService = container.resolve(NotificationsService.self) else {
 			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
 			completionHandler(.failed)
 			return
 		}
 		
-		guard let address = securedStore.get(StoreKey.chatProvider.address), let lastHeightRaw = securedStore.get(StoreKey.chatProvider.lastHeight), let lastHeight = Int64(lastHeightRaw) else {
+		guard let address = securedStore.get(StoreKey.chatProvider.address) else {
 			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
 			completionHandler(.failed)
 			return
 		}
+		
+		var lastHeight: Int64?
+		if let raw = securedStore.get(StoreKey.chatProvider.receivedLastHeight) {
+			lastHeight = Int64(raw)
+		} else {
+			lastHeight = nil
+		}
+		
+		var notifiedCount = 0
+		if let raw = securedStore.get(StoreKey.chatProvider.notifiedLastHeight), let notifiedHeight = Int64(raw), let h = lastHeight {
+			if h < notifiedHeight {
+				lastHeight = notifiedHeight
+				
+				if let raw = securedStore.get(StoreKey.chatProvider.notifiedMessagesCount), let count = Int(raw) {
+					notifiedCount = count
+				}
+			}
+		}
+		
 		
 		apiService.getChatTransactions(address: address, height: lastHeight, offset: nil) { result in
 			switch result {
 			case .success(let transactions):
-				completionHandler(transactions.count > 0 ? .newData : .noData)
+				if transactions.count > 0 {
+					let total = transactions.count + notifiedCount
+					securedStore.set(String(total), for: StoreKey.chatProvider.notifiedMessagesCount)
+					
+					if let newLastHeight = transactions.map({$0.height}).sorted().last {
+						securedStore.set(String(newLastHeight), for: StoreKey.chatProvider.notifiedLastHeight)
+					}
+					
+					
+					notificationsService.showNotification(title: String.adamantLocalized.notifications.newMessageTitle, body: String.localizedStringWithFormat(String.adamantLocalized.notifications.newMessageBody, total), type: .newMessages(count: total))
+					completionHandler(.newData)
+				} else {
+					completionHandler(.noData)
+				}
 				
 			case .failure(_):
 				completionHandler(.failed)

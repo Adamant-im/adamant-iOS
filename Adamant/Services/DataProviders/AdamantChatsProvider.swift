@@ -20,8 +20,8 @@ class AdamantChatsProvider: ChatsProvider {
 	
 	// MARK: Properties
 	private(set) var state: State = .empty
-	private(set) var lastHeight: Int64?
-	private(set) var unreadHeight: Int64?
+	private(set) var receivedLastHeight: Int64?
+	private(set) var readedLastHeight: Int64?
 	private let apiTransactions = 100
 	private var unconfirmedTransactions: [UInt64:ChatTransaction] = [:]
 	
@@ -44,13 +44,13 @@ class AdamantChatsProvider: ChatsProvider {
 		}
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
-			self?.lastHeight = nil
+			self?.receivedLastHeight = nil
 			if let prevState = self?.state {
 				self?.setState(.empty, previous: prevState, notify: true)
 			}
 			
 			self?.securedStore.remove(StoreKey.chatProvider.address)
-			self?.securedStore.remove(StoreKey.chatProvider.lastHeight)
+			self?.securedStore.remove(StoreKey.chatProvider.receivedLastHeight)
 		}
 	}
 	
@@ -96,7 +96,7 @@ extension AdamantChatsProvider {
 	private func reset(notify: Bool) {
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false) // Block update calls
-		lastHeight = nil
+		receivedLastHeight = nil
 		
 		let chatrooms = NSFetchRequest<Chatroom>(entityName: Chatroom.entityName)
 		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -142,26 +142,34 @@ extension AdamantChatsProvider {
 		privateContext.parent = self.stack.container.viewContext
 		let processingGroup = DispatchGroup()
 		let cms = DispatchSemaphore(value: 1)
-		let prevHeight = lastHeight
+		let prevHeight = receivedLastHeight
 		
-		getTransactions(senderId: address, privateKey: privateKey, height: lastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
+		getTransactions(senderId: address, privateKey: privateKey, height: receivedLastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
 		
 		// MARK: 4. Check
-		processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) {
-			switch self.state {
+		processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) { [weak self] in
+			guard let state = self?.state else {
+				return
+			}
+			
+			switch state {
 			case .failedToUpdate(_): // Processing failed
 				break
 				
 			default:
-				self.setState(.upToDate, previous: prevState)
+				self?.setState(.upToDate, previous: prevState)
 				
-				if prevHeight != self.lastHeight, let h = self.lastHeight {
+				if prevHeight != self?.receivedLastHeight, let h = self?.receivedLastHeight {
 					NotificationCenter.default.post(name: Notification.Name.adamantChatsProviderNewUnreadMessages,
 													object: self,
 													userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h])
 				}
 				
-				self.unreadHeight = self.lastHeight
+				self?.readedLastHeight = self?.receivedLastHeight
+				
+				if let h = self?.receivedLastHeight, let store = self?.securedStore {
+					store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
+				}
 			}
 		}
 	}
@@ -612,7 +620,7 @@ extension AdamantChatsProvider {
 		
 		
 		// MARK: 4. Unread messagess
-		if let unreadHeight = unreadHeight {
+		if let unreadHeight = readedLastHeight {
 			let msgs = Dictionary(grouping: newChatTransactions.filter({$0.height > unreadHeight}), by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
 			for (chatroom, trs) in msgs {
 				chatroom.hasUnreadMessages = true
@@ -670,12 +678,12 @@ extension AdamantChatsProvider {
 		
 		// MARK 7. Last message height
 		highSemaphore.wait()
-		if let lastHeight = lastHeight {
+		if let lastHeight = receivedLastHeight {
 			if lastHeight < height {
-				self.lastHeight = height
+				self.receivedLastHeight = height
 			}
 		} else {
-			lastHeight = height
+			receivedLastHeight = height
 		}
 		
 		highSemaphore.signal()
@@ -747,8 +755,8 @@ extension AdamantChatsProvider {
 		transaction.height = height
 		self.unconfirmedTransactions.removeValue(forKey: id)
 		
-		if let lastHeight = lastHeight, lastHeight < height {
-			self.lastHeight = height
+		if let lastHeight = receivedLastHeight, lastHeight < height {
+			self.receivedLastHeight = height
 		}
 	}
 	
