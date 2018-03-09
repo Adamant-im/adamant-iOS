@@ -70,13 +70,18 @@ extension AdamantUserInfoKey {
 extension StoreKey {
 	struct chatProvider {
 		static let address = "chatProvider.address"
-		static let lastHeight = "chatProvider.lastHeight"
+		static let receivedLastHeight = "chatProvider.receivedLastHeight"
+		static let readedLastHeight = "chatProvider.readedLastHeight"
 	}
 }
 
 
 // MARK: - Protocol
 protocol ChatsProvider: DataProvider {
+	// MARK: - Properties
+	var receivedLastHeight: Int64? { get }
+	var readedLastHeight: Int64? { get }
+	
 	// MARK: - Getting chats and messages
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>?
 	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>?
