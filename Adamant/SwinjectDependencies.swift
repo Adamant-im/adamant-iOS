@@ -49,11 +49,15 @@ extension Container {
 		// MARK: LocalAuthentication
 		self.register(LocalAuthentication.self) { r in AdamantAuthentication() }.inObjectScope(.container)
 		
-		// MARK: Notifications
-		self.register(NotificationsService.self) { r in AdamantNotificationsService() }.inObjectScope(.container)
-		
 		
 		// MARK: - Services with dependencies
+		// MARK: Notifications
+		self.register(NotificationsService.self) { r in
+			let service = AdamantNotificationsService()
+			service.securedStore = r.resolve(SecuredStore.self)
+			return service
+		}.inObjectScope(.container)
+		
 		// MARK: ApiService
 		self.register(ApiService.self) { r in
 			let service = AdamantApiService(apiUrl: AdamantResources.api)

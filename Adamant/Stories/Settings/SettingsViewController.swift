@@ -62,6 +62,9 @@ class SettingsViewController: FormViewController {
 				
 			case .biometry:
 				return ""
+				
+			case .notifications:
+				return NSLocalizedString("Notifications", comment: "Config: Show notifications")
 			}
 		}
 		
@@ -71,6 +74,7 @@ class SettingsViewController: FormViewController {
 			case .stayLoggedIn: return "in"
 			case .version: return "ver"
 			case .qrPassphraseGenerator: return "qr"
+			case .notifications: return "ntfy"
 			}
 		}
 	}
@@ -80,6 +84,7 @@ class SettingsViewController: FormViewController {
 	var accountService: AccountService!
 	var dialogService: DialogService!
 	var localAuth: LocalAuthentication!
+	var notificationsService: NotificationsService!
 	
 	
 	// MARK: Properties
@@ -131,6 +136,29 @@ class SettingsViewController: FormViewController {
 		}.onChange({ [weak self] row in
 			guard let enabled = row.value else { return }
 			self?.setBiometry(enabled: enabled)
+		}).cellUpdate({ (cell, _) in
+			if let label = cell.textLabel {
+				label.font = UIFont.adamantPrimary(size: 17)
+				label.textColor = UIColor.adamantPrimary
+			}
+		})
+		
+		// Notifications
+		<<< SwitchRow() {
+			$0.tag = Rows.notifications.tag
+			$0.title = Rows.notifications.localized
+			$0.value = notificationsService.notificationsEnabled
+			
+			$0.hidden = Condition.function([Rows.stayLoggedIn.tag], { form -> Bool in
+				guard let row: SwitchRow = form.rowBy(tag: Rows.stayLoggedIn.tag), let value = row.value else {
+					return true
+				}
+				
+				return !value
+			})
+		}.onChange({ [weak self] row in
+			guard let enabled = row.value else { return }
+			self?.setNotifications(enabled: enabled)
 		}).cellUpdate({ (cell, _) in
 			if let label = cell.textLabel {
 				label.font = UIFont.adamantPrimary(size: 17)
@@ -209,6 +237,16 @@ class SettingsViewController: FormViewController {
 				row.evaluateHidden()
 			}
 		}
+		
+		// MARK: Notifications
+		NotificationCenter.default.addObserver(forName: .adamantShowNotificationsChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			guard let row: SwitchRow = self?.form.rowBy(tag: Rows.notifications.tag), let value = self?.notificationsService.notificationsEnabled else {
+				return
+			}
+			
+			row.value = value
+			row.updateCell()
+		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -227,7 +265,7 @@ class SettingsViewController: FormViewController {
 // MARK: - Properties
 extension SettingsViewController {
 	func setNotifications(enabled: Bool) {
-		guard enabled != notificationsService.showNotifications else {
+		guard enabled != notificationsService.notificationsEnabled else {
 			return
 		}
 		
@@ -237,24 +275,31 @@ extension SettingsViewController {
 				break
 				
 			case .denied(error: _):
-				if let row: SwitchRow = self?.form.rowBy(tag: Rows.notifications.tag) {
-					row.value = false
-					row.updateCell()
-				}
-				
-				let alert = UIAlertController(title: nil, message: String.adamantLocalized.notificationsService.notificationsDisabled, preferredStyle: .alert)
-				
-				alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
-					DispatchQueue.main.async {
-						if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
-							UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+				DispatchQueue.main.async {
+					let alert = UIAlertController(title: nil, message: String.adamantLocalized.notificationsService.notificationsDisabled, preferredStyle: .alert)
+					
+					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
+						DispatchQueue.main.async {
+							if let row: SwitchRow = self?.form.rowBy(tag: Rows.notifications.tag) {
+								row.value = false
+								row.updateCell()
+							}
+							
+							if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
+								UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+							}
 						}
-					}
-				})
-				
-				alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-				
-				self?.present(alert, animated: true, completion: nil)
+					})
+					
+					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: { _ in
+						if let row: SwitchRow = self?.form.rowBy(tag: Rows.notifications.tag) {
+							row.value = false
+							row.updateCell()
+						}
+					}))
+					
+					self?.present(alert, animated: true, completion: nil)
+				}
 			}
 		}
 	}

@@ -18,32 +18,46 @@ class AdamantNotificationsService: NotificationsService {
 					UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
 						switch settings.authorizationStatus {
 						case .authorized:
-							self?.showNotifications = true
+							self?.notificationsEnabled = true
 							
 						case .denied:
-							self?.showNotifications = false
+							self?.notificationsEnabled = false
 							
 						case .notDetermined:
-							self?.showNotifications = false
+							self?.notificationsEnabled = false
 						}
 					}
 				} else {
-					showNotifications = false
+					notificationsEnabled = false
 				}
 			} else {
-				showNotifications = false
+				notificationsEnabled = false
 			}
 		}
 	}
 	
 	
 	// MARK: Properties
-	private(set) var showNotifications: Bool = false
+	private(set) var notificationsEnabled: Bool = false
+	
+	
+	// MARK: Lifecycle
+	init() {
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
+			self?.notificationsEnabled = false
+			self?.securedStore.remove(StoreKey.notificationsService.notificationsEnabled)
+			NotificationCenter.default.post(name: Notification.Name.adamantShowNotificationsChanged, object: self)
+		}
+	}
+	
+	deinit {
+		NotificationCenter.default.removeObserver(self)
+	}
 	
 	
 	// MARK: Notifications authorization
 	func setNotificationsEnabled(_ enabled: Bool, completion: @escaping (NotificationsServiceResult) -> Void) {
-		guard showNotifications != enabled else {
+		guard notificationsEnabled != enabled else {
 			return
 		}
 		
@@ -51,18 +65,18 @@ class AdamantNotificationsService: NotificationsService {
 			UNUserNotificationCenter.current().getNotificationSettings(completionHandler: { [weak self] settings in
 				switch settings.authorizationStatus {
 				case .authorized:
-					self?.showNotifications = true
+					self?.notificationsEnabled = true
 					self?.securedStore.set(String(true), for: StoreKey.notificationsService.notificationsEnabled)
 					NotificationCenter.default.post(name: Notification.Name.adamantShowNotificationsChanged, object: self)
 					completion(.success)
 					
 				case .denied:
-					self?.showNotifications = false
+					self?.notificationsEnabled = false
 					completion(.denied(error: nil))
 					
 				case .notDetermined:
 					UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound], completionHandler: { (granted, error) in
-						self?.showNotifications = false
+						self?.notificationsEnabled = false
 						if granted {
 							completion(.success)
 						} else {
@@ -72,7 +86,7 @@ class AdamantNotificationsService: NotificationsService {
 				}
 			})
 		} else { // MARK: Turn off
-			showNotifications = false
+			notificationsEnabled = false
 			securedStore.remove(StoreKey.notificationsService.notificationsEnabled)
 			NotificationCenter.default.post(name: Notification.Name.adamantShowNotificationsChanged, object: self)
 		}

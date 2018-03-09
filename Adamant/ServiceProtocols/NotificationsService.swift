@@ -10,7 +10,7 @@ import Foundation
 
 extension String.adamantLocalized {
 	struct notificationsService {
-		static let notificationsDisabled = NSLocalizedString("Notifications disabled. You can reenable notifications in Settings", comment: "Notifications: User has disabled notifications. Head him into settings.")
+		static let notificationsDisabled = NSLocalizedString("Notifications disabled. You can reenable notifications in Settings", comment: "Notifications: User has disabled notifications. Head him into settings")
 		
 		private init() {}
 	}
@@ -62,7 +62,7 @@ enum NotificationsServiceResult {
 }
 
 protocol NotificationsService {
-	var showNotifications: Bool { get }
+	var notificationsEnabled: Bool { get }
 	
 	func setNotificationsEnabled(_ enabled: Bool, completion: @escaping (NotificationsServiceResult) -> Void)
 	
