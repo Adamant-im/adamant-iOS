@@ -343,7 +343,9 @@ extension SettingsViewController: PinpadViewControllerDelegate {
 				case .success(account: _):
 					self?.pinpadRequest = nil
 					DispatchQueue.main.async {
-						if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
+						if let biometryType = self?.localAuth.biometryType,
+							biometryType == .touchID || biometryType == .faceID,
+							let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
 							self?.showBiometryRow = true
 							row.value = false
 							row.updateCell()
