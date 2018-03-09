@@ -282,6 +282,20 @@ class LoginViewController: FormViewController {
 				loginWithBiometry()
 			}
 		}
+		
+		
+		// MARK: tableView position tuning
+		if let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
+			NotificationCenter.default.addObserver(forName: NSNotification.Name.UITextFieldTextDidBeginEditing, object: row.cell.textField, queue: nil) { [weak self] _ in
+				guard let tableView = self?.tableView, let indexPath = self?.form.rowBy(tag: Rows.loginButton.tag)?.indexPath else {
+					return
+				}
+				
+				DispatchQueue.main.async {
+					tableView.scrollToRow(at: indexPath, at: .none, animated: true)
+				}
+			}
+		}
     }
 }
 
