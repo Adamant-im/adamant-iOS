@@ -29,9 +29,6 @@
 /* Config: Application Info section */
 "Application info" = "Приложение";
 
-/* Config: Biometry authorization reason for turning on/off biometry usage to log in */
-"Authorize yourself" = "Для внесения изменений необходимо авторизироваться";
-
 /* Transfer: logged user balance.
    Wallet page: Balance row title */
 "Balance" = "Баланс";
@@ -56,6 +53,9 @@
 
 /* Config: turn off 'Stay Logged In' confirmation */
 "Do not stay logged in" = "Выходить из системы при выходе из приложения";
+
+/* Config: Authorization reason for turning biometry off */
+"Do not use biometry to log in" = "Отключить вход с биометрией";
 
 /* Shared alert Done message. Used anywhere */
 "Done" = "Готово";
@@ -134,7 +134,8 @@
 /* Login: Create new account section */
 "New account" = "Новый аккаунт";
 
-/* Chat: message input placeholder */
+/* Chat: message input placeholder
+   Notifications: New message notification title */
 "New message" = "Новое сообщение";
 
 /* ApiService: No connection message. Generally bad network. */
@@ -155,8 +156,12 @@
 /* Transaction details: 'Open transaction in explorer' row. */
 "Open in Explorer" = "Открыть в Explorer";
 
+/* Login: Passphrase placeholder
+   QRGenerator: Passphrase textview placeholder */
+"Passphrase" = "Пароль";
+
 /* Login: Login with pincode button */
-"Pin" = "Войти с pin-кодом";
+"Login with Pincode" = "Войти с pin-кодом";
 
 /* Transfer: Address validation error */
 "Please enter a valid recipient address" = "Введите корректный адрес получателя";
@@ -165,7 +170,7 @@
 "Please specify valid recipient address" = "Неверный адрес";
 
 /* Login: Login with QR button. */
-"QR" = "Войти с QR-кодом";
+"Login with QR" = "Войти с QR-кодом";
 
 /* New Chat: Notify user that scanned QR doesn't contains an address */
 "QR code does not contains a valid adamant address" = "QR код не содержит адреса";
@@ -204,21 +209,18 @@
 /* Transfer: Processing message */
 "Sending funds..." = "Отправляем токены...";
 
-/* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title.
- Config: Settings section */
+/* Config: Settings section
+   Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Settings" = "Настройки";
-
-/* Wallet page: 'Transfer not allowed' alert title */
-"Sorry!" = "Ой!";
 
 /* Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu. */
 "Share" = "Поделиться";
 
+/* Wallet page: 'Transfer not allowed' alert title */
+"Sorry!" = "Ой!";
+
 /* Config: Stay logged option */
 "Stay Logged in" = "Оставаться в сети";
-
-/* Config: Authorization reason for turning biometry off */
-"Do not use biometry to log in" = "Отключить вход с биометрией";
 
 /* Export transaction: 'Share transaction summary' button */
 "Summary" = "Сводка";
@@ -242,14 +244,15 @@
 /* Export transaction: 'Share transaction URL' button */
 "URL" = "URL";
 
+/* Unknown internal error */
+"Unknown error" = "Неизвестная ошибка";
+
 /* Config: Authorization reason for turning biometry on */
 "Use biometry to log in" = "Использовать биометрию для входа в систему";
 
-/* Login: user not logged error */
-"User not logged!" = "Не выполнен вход";
-
-/* Unknown internal error */
-"Unknown error" = "Неизвестная ошибка";
+/* ApiService: User not logged error
+ Login: user not logged error */
+"User not logged" = "Не выполнен вход";
 
 /* Config: Utilities section */
 "Utilities" = "Утилиты";
@@ -292,10 +295,6 @@
 
 /* Transfer: recipient address placeholder */
 "of the recipient" = "получателя";
-
-/* Login: Passphrase placeholder
-   QRGenerator: Passphrase textview placeholder */
-"Passphrase" = "Пароль";
 
 /* Transfer: transfer amount placeholder */
 "to send" = "для перевода";

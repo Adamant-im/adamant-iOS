@@ -55,13 +55,13 @@ enum AccountServiceError {
 	var localized: String {
 		switch self {
 		case .userNotLogged:
-			return NSLocalizedString("User not logged!", comment: "Login: user not logged error")
+			return NSLocalizedString("User not logged", comment: "Login: user not logged error")
 			
 		case .invalidPassphrase:
-			return NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase")
+			return NSLocalizedString("Wrong passphrase", comment: "Login: user typed in wrong passphrase")
 			
 		case .wrongPassphrase:
-			return NSLocalizedString("Wrong passphrase!", comment: "Login: user typed in wrong passphrase")
+			return NSLocalizedString("Wrong passphrase", comment: "Login: user typed in wrong passphrase")
 			
 		case .apiError(let error):
 			return error.localized

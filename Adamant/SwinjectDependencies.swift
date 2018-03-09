@@ -121,6 +121,10 @@ extension Container {
 		self.register(ApiService.self) { r in AdamantApiService(apiUrl: AdamantResources.api)}.inObjectScope(.container)
 		
 		// MARK: Notifications
-		self.register(NotificationsService.self) { r in AdamantNotificationsService() }.inObjectScope(.container)
+		self.register(NotificationsService.self) { r in
+			let service = AdamantNotificationsService()
+			service.securedStore = r.resolve(SecuredStore.self)
+			return service
+		}.inObjectScope(.container)
 	}
 }

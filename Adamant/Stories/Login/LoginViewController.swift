@@ -76,10 +76,10 @@ class LoginViewController: FormViewController {
 				return NSLocalizedString("Login", comment: "Login: Login button")
 				
 			case .loginWithQr:
-				return NSLocalizedString("QR", comment: "Login: Login with QR button.")
+				return NSLocalizedString("Login with QR", comment: "Login: Login with QR button.")
 				
 			case .loginWithPin:
-				return NSLocalizedString("Pin", comment: "Login: Login with pincode button")
+				return NSLocalizedString("Login with Pincode", comment: "Login: Login with pincode button")
 				
 			case .saveYourPassphraseAlert:
 				return NSLocalizedString("Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it", comment: "Login: security alert, notify user that he must save his new passphrase")

@@ -41,6 +41,7 @@
 		E93D7ABE2052CEE1005D19DC /* NotificationsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */; };
 		E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */; };
 		E93D7AC22052EE21005D19DC /* SettingsViewController+StayIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D7AC12052EE21005D19DC /* SettingsViewController+StayIn.swift */; };
+		E93D7AC520530F76005D19DC /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = E93D7AC720530F76005D19DC /* Localizable.stringsdict */; };
 		E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EFE12200D1156000BB482 /* ChatViewController.swift */; };
 		E9452A4C20344834005BA34C /* Account.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9452A4E20344834005BA34C /* Account.storyboard */; };
 		E94883E7203F07CD00F6E1B0 /* PassphraseValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */; };
@@ -215,6 +216,8 @@
 		E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsService.swift; sourceTree = "<group>"; };
 		E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantNotificationService.swift; sourceTree = "<group>"; };
 		E93D7AC12052EE21005D19DC /* SettingsViewController+StayIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsViewController+StayIn.swift"; sourceTree = "<group>"; };
+		E93D7AC620530F76005D19DC /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ru; path = ru.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		E93D7AC920530F8E005D19DC /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = Base; path = Base.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		E93EFE12200D1156000BB482 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		E9452A4D20344834005BA34C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Account.storyboard; sourceTree = "<group>"; };
 		E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassphraseValidation.swift; sourceTree = "<group>"; };
@@ -464,6 +467,7 @@
 				E913C8F81FFFA51D001A83F7 /* Assets.xcassets */,
 				E9256F802039B29D00DE86E9 /* InfoPlist.strings */,
 				E9256F7B2039B29A00DE86E9 /* Localizable.strings */,
+				E93D7AC720530F76005D19DC /* Localizable.stringsdict */,
 				E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */,
 				E9C51EEC2011416E00385EB7 /* adamant-core.js */,
 			);
@@ -798,6 +802,7 @@
 				E9256F632034E7DE00DE86E9 /* Settings.storyboard in Resources */,
 				E9EC341C200524CA00C0E546 /* Roboto_400_italic.ttf in Resources */,
 				E9256F792039B29A00DE86E9 /* Localizable.strings in Resources */,
+				E93D7AC520530F76005D19DC /* Localizable.stringsdict in Resources */,
 				E9EC3415200524CA00C0E546 /* Exo+2_100_normal.ttf in Resources */,
 				E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */,
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
@@ -1070,6 +1075,15 @@
 				E9256F7F2039B29D00DE86E9 /* ru */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		E93D7AC720530F76005D19DC /* Localizable.stringsdict */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E93D7AC620530F76005D19DC /* ru */,
+				E93D7AC920530F8E005D19DC /* Base */,
+			);
+			name = Localizable.stringsdict;
 			sourceTree = "<group>";
 		};
 		E9452A4E20344834005BA34C /* Account.storyboard */ = {

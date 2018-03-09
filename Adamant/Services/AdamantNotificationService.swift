@@ -98,6 +98,7 @@ class AdamantNotificationsService: NotificationsService {
 		let content = UNMutableNotificationContent()
 		content.title = title
 		content.body = body
+		content.sound = UNNotificationSound.default()
 		
 		let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
 		let request = UNNotificationRequest(identifier: type.identifier, content: content, trigger: trigger)
@@ -111,5 +112,9 @@ class AdamantNotificationsService: NotificationsService {
 	
 	func removeAllPendingNotificationRequests(ofType type: AdamantNotificationType) {
 		UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [type.identifier])
+	}
+	
+	func removeAllDeliveredNotifications(ofType type: AdamantNotificationType) {
+		UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [type.identifier])
 	}
 }

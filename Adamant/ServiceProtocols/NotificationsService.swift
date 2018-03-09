@@ -9,8 +9,11 @@
 import Foundation
 
 extension String.adamantLocalized {
-	struct notificationsService {
+	struct notifications {
 		static let notificationsDisabled = NSLocalizedString("Notifications disabled. You can reenable notifications in Settings", comment: "Notifications: User has disabled notifications. Head him into settings")
+		
+		static let newMessageTitle = NSLocalizedString("New message", comment: "Notifications: New message notification title")
+		static let newMessageBody = NSLocalizedString("You have %d new message(s)", comment: "Notifications: new messages notification details")
 		
 		private init() {}
 	}
@@ -30,17 +33,17 @@ extension StoreKey {
 /// - transaction: token transaction
 /// - custom: other
 enum AdamantNotificationType {
-	case message
-	case transaction
+	case newMessages
+	case newTransactions
 	case custom(identifier: String)
 	
 	var identifier: String {
 		switch self {
-		case .message:
-			return "message"
+		case .newMessages:
+			return "newMessages"
 			
-		case .transaction:
-			return "transaction"
+		case .newTransactions:
+			return "newTransactions"
 			
 		case .custom(let identifier):
 			return identifier
@@ -67,5 +70,7 @@ protocol NotificationsService {
 	func setNotificationsEnabled(_ enabled: Bool, completion: @escaping (NotificationsServiceResult) -> Void)
 	
 	func showNotification(title: String, body: String, type: AdamantNotificationType)
+	
 	func removeAllPendingNotificationRequests(ofType type: AdamantNotificationType)
+	func removeAllDeliveredNotifications(ofType type: AdamantNotificationType)
 }

@@ -276,7 +276,7 @@ extension SettingsViewController {
 				
 			case .denied(error: _):
 				DispatchQueue.main.async {
-					let alert = UIAlertController(title: nil, message: String.adamantLocalized.notificationsService.notificationsDisabled, preferredStyle: .alert)
+					let alert = UIAlertController(title: nil, message: String.adamantLocalized.notifications.notificationsDisabled, preferredStyle: .alert)
 					
 					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
 						DispatchQueue.main.async {

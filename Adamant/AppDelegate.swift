@@ -64,16 +64,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		repeater.registerForegroundCall(label: "chatsProvider", interval: 3, queue: DispatchQueue.global(qos: .utility), callback: chatsProvider.update)
 		
 		
-		// MARK: 4. Login / Logut
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { _ in
-			// Background Fetch
-			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
+		// MARK: 4. Notifications
+		if let service = container.resolve(NotificationsService.self) {
+			if service.notificationsEnabled {
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
+			} else {
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+			}
+			
+			NotificationCenter.default.addObserver(forName: Notification.Name.adamantShowNotificationsChanged, object: service, queue: OperationQueue.main) { _ in
+				if service.notificationsEnabled {
+					UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
+				} else {
+					UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+				}
+			}
 		}
 		
+		
+		// MARK: 5. Logout reset
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			// Background Fetch
-			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
-			
 			// On logout, pop all navigators to root.
 			guard let tbc = self?.window?.rootViewController as? UITabBarController, let vcs = tbc.viewControllers else {
 				return
@@ -121,10 +131,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			return
 		}
 		
+		let lastHeight: Int64?
+		if let raw = securedStore.get(StoreKey.chatProvider.receivedLastHeight) {
+			lastHeight = Int64(raw)
+		} else {
+			lastHeight = nil
+		}
+		
 		apiService.getChatTransactions(address: address, height: lastHeight, offset: nil) { result in
 			switch result {
 			case .success(let transactions):
-				completionHandler(transactions.count > 0 ? .newData : .noData)
+				if transactions.count > 0 {
+					notificationsService.showNotification(title: String.adamantLocalized.notifications.newMessageTitle, body: String.localizedStringWithFormat(String.adamantLocalized.notifications.newMessageBody, transactions.count), type: .newMessages)
+					completionHandler(.newData)
+				} else {
+					completionHandler(.noData)
+				}
 				
 			case .failure(_):
 				completionHandler(.failed)
