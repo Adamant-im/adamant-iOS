@@ -38,6 +38,8 @@
 		E9256F7E2039B29D00DE86E9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9256F802039B29D00DE86E9 /* InfoPlist.strings */; };
 		E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D732028B21400126346 /* ChatsProvider.swift */; };
 		E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */; };
+		E93D7ABE2052CEE1005D19DC /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D7ABD2052CEE1005D19DC /* NotificationService.swift */; };
+		E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */; };
 		E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EFE12200D1156000BB482 /* ChatViewController.swift */; };
 		E9452A4C20344834005BA34C /* Account.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9452A4E20344834005BA34C /* Account.storyboard */; };
 		E94883E7203F07CD00F6E1B0 /* PassphraseValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */; };
@@ -209,6 +211,8 @@
 		E9256F7F2039B29D00DE86E9 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E93B0D732028B21400126346 /* ChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsProvider.swift; sourceTree = "<group>"; };
 		E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantChatsProvider.swift; sourceTree = "<group>"; };
+		E93D7ABD2052CEE1005D19DC /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantNotificationService.swift; sourceTree = "<group>"; };
 		E93EFE12200D1156000BB482 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		E9452A4D20344834005BA34C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Account.storyboard; sourceTree = "<group>"; };
 		E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassphraseValidation.swift; sourceTree = "<group>"; };
@@ -398,6 +402,7 @@
 				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
 				E905D39C204C13B900DDB504 /* SecuredStore.swift */,
 				E90A494C204DA932009F6A65 /* LocalAuthentication.swift */,
+				E93D7ABD2052CEE1005D19DC /* NotificationService.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -410,6 +415,7 @@
 				E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */,
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
+				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
 				E950273F202E257E002C1098 /* RepeaterService.swift */,
@@ -968,12 +974,14 @@
 				E9CE7789202B9DC2009CF70D /* ChatTransaction+CoreDataClass.swift in Sources */,
 				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
 				E9CAE8D62018AC5300345E76 /* AdamantApi+Transactions.swift in Sources */,
+				E93D7ABE2052CEE1005D19DC /* NotificationService.swift in Sources */,
 				E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */,
 				E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */,
 				E9C51EF12013F18000385EB7 /* NewChatViewController.swift in Sources */,
 				E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */,
 				E95F856520067A030070534A /* GlobalConstants.swift in Sources */,
 				E9502740202E257E002C1098 /* RepeaterService.swift in Sources */,
+				E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */,
 				E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */,
 				E90A4943204C5ED6009F6A65 /* EurekaPassphraseRow.swift in Sources */,
 				E95F8589200900B10070534A /* ChatType.swift in Sources */,

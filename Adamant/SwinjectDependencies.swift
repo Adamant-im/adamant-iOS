@@ -22,6 +22,8 @@ private struct AdamantResources {
 // MARK: - Services
 extension Container {
 	func registerAdamantServices() {
+		
+		
 		// MARK: - Standalone services
 		// MARK: AdamantCore
 		self.register(AdamantCore.self) { _ in
@@ -46,6 +48,9 @@ extension Container {
 		
 		// MARK: LocalAuthentication
 		self.register(LocalAuthentication.self) { r in AdamantAuthentication() }.inObjectScope(.container)
+		
+		// MARK: Notifications
+		self.register(NotificationService.self) { r in AdamantNotificationService() }.inObjectScope(.container)
 		
 		
 		// MARK: - Services with dependencies
@@ -110,5 +115,8 @@ extension Container {
 		// MARK: ApiService
 		// No need to init AdamantCore
 		self.register(ApiService.self) { r in AdamantApiService(apiUrl: AdamantResources.api)}.inObjectScope(.container)
+		
+		// MARK: Notifications
+		self.register(NotificationService.self) { r in AdamantNotificationService() }.inObjectScope(.container)
 	}
 }
