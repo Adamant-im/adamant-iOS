@@ -74,7 +74,7 @@ enum AccountServiceError {
 
 
 // MARK: - Protocol
-protocol AccountService {
+protocol AccountService: class {
 	// MARK: State
 	
 	var state: AccountServiceState { get }

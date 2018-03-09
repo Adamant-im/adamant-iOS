@@ -65,7 +65,7 @@ enum ShareContentType {
 	}
 }
 
-protocol DialogService {
+protocol DialogService: class {
 	
 	/// Present view controller modally
 	func present(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?)

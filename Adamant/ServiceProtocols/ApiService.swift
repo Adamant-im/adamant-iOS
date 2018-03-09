@@ -49,7 +49,7 @@ enum ApiServiceError: Error {
 	}
 }
 
-protocol ApiService {
+protocol ApiService: class {
 	
 	/// Default is async queue with .utilities priority.
 	var defaultResponseDispatchQueue: DispatchQueue { get set }

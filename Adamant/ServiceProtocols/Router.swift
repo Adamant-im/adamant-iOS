@@ -46,7 +46,7 @@ struct AdamantScene: Equatable, Hashable {
 
 
 // MARK: - Adamant Router
-protocol Router {
+protocol Router: class {
 	func get(story: AdamantStory) -> UIStoryboard
 	func get(scene: AdamantScene) -> UIViewController
 }
