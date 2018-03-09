@@ -114,6 +114,14 @@ extension AdamantAccountService {
 		return pin == savedPin
 	}
 	
+	private func getSavedKeypair() -> Keypair? {
+		if let publicKey = securedStore.get(.publicKey), let privateKey = securedStore.get(.privateKey) {
+			return Keypair(publicKey: publicKey, privateKey: privateKey)
+		}
+		
+		return nil
+	}
+	
 	func dropSavedAccount() {
 		securedStoreSemaphore.wait()
 		defer {
@@ -234,7 +242,23 @@ extension AdamantAccountService {
 			return
 		}
 		
-		loginWith(keypair: keypair, completion: completion)
+		if let savedKeypair = getSavedKeypair() {
+			loginWith(keypair: keypair) { [weak self] result in
+				switch result {
+				case .success(_):
+					if let newKeypair = self?.keypair, newKeypair != savedKeypair {
+						self?.dropSavedAccount()
+					}
+					
+				default:
+					break
+				}
+				
+				completion(result)
+			}
+		} else {
+			loginWith(keypair: keypair, completion: completion)
+		}
 	}
 	
 	// MARK: Pincode
@@ -254,12 +278,12 @@ extension AdamantAccountService {
 	
 	// MARK: Biometry
 	func loginWithStoredAccount(completion: @escaping (AccountServiceResult) -> Void) {
-		guard let publicKey = securedStore.get(.publicKey), let privateKey = securedStore.get(.privateKey) else {
+		guard let keypair = getSavedKeypair() else {
 			completion(.failure(.invalidPassphrase))
 			return
 		}
 		
-		loginWith(keypair: Keypair(publicKey: publicKey, privateKey: privateKey), completion: completion)
+		loginWith(keypair: keypair, completion: completion)
 	}
 	
 	
