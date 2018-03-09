@@ -8,6 +8,7 @@
 
 import Foundation
 
+// MARK: - Notifications
 extension Notification.Name {
 	/// Raised when user has logged out.
 	static let adamantUserLoggedOut = Notification.Name("adamantUserHasLoggedOut")
@@ -28,6 +29,8 @@ extension AdamantUserInfoKey {
 		private init() {}
 	}
 }
+
+// MARK: - Other const
 
 /// - notLogged: Not logged, empty
 /// - isLoggingIn: Is currently trying to log in
@@ -67,12 +70,6 @@ enum AccountServiceError {
 			return String.localizedStringWithFormat(NSLocalizedString("Internal error: %@, report this as a bug", comment: "ApiService: Bad internal application error, report a bug"), message)
 		}
 	}
-}
-
-enum AuthorizeOptions {
-	case pin(String)
-	case touchId
-	case faceId
 }
 
 

@@ -50,7 +50,7 @@ extension Container {
 		self.register(LocalAuthentication.self) { r in AdamantAuthentication() }.inObjectScope(.container)
 		
 		// MARK: Notifications
-		self.register(NotificationService.self) { r in AdamantNotificationService() }.inObjectScope(.container)
+		self.register(NotificationsService.self) { r in AdamantNotificationsService() }.inObjectScope(.container)
 		
 		
 		// MARK: - Services with dependencies
@@ -117,6 +117,6 @@ extension Container {
 		self.register(ApiService.self) { r in AdamantApiService(apiUrl: AdamantResources.api)}.inObjectScope(.container)
 		
 		// MARK: Notifications
-		self.register(NotificationService.self) { r in AdamantNotificationService() }.inObjectScope(.container)
+		self.register(NotificationsService.self) { r in AdamantNotificationsService() }.inObjectScope(.container)
 	}
 }

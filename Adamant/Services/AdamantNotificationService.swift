@@ -1,5 +1,5 @@
 //
-//  AdamantNotificationService.swift
+//  AdamantNotificationsService.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 09.03.2018.
@@ -9,11 +9,11 @@
 import Foundation
 import UserNotifications
 
-class AdamantNotificationService: NotificationService {
+class AdamantNotificationsService: NotificationsService {
 	// MARK: Dependencies
 	var securedStore: SecuredStore! {
 		didSet {
-			if let raw = securedStore.get(StoreKey.notificationService.showNotifications), let show = Bool(raw) {
+			if let raw = securedStore.get(StoreKey.notificationsService.notificationsEnabled), let show = Bool(raw) {
 				if show {
 					UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
 						switch settings.authorizationStatus {
@@ -42,17 +42,17 @@ class AdamantNotificationService: NotificationService {
 	
 	
 	// MARK: Notifications authorization
-	func setShowNotifications(_ value: Bool, completion: @escaping (NotificationServiceResult) -> Void) {
-		guard showNotifications != value else {
+	func setNotificationsEnabled(_ enabled: Bool, completion: @escaping (NotificationsServiceResult) -> Void) {
+		guard showNotifications != enabled else {
 			return
 		}
 		
-		if value { // MARK: Turn on
+		if enabled { // MARK: Turn on
 			UNUserNotificationCenter.current().getNotificationSettings(completionHandler: { [weak self] settings in
 				switch settings.authorizationStatus {
 				case .authorized:
 					self?.showNotifications = true
-					self?.securedStore.set(String(true), for: StoreKey.notificationService.showNotifications)
+					self?.securedStore.set(String(true), for: StoreKey.notificationsService.notificationsEnabled)
 					NotificationCenter.default.post(name: Notification.Name.adamantShowNotificationsChanged, object: self)
 					completion(.success)
 					
@@ -73,7 +73,7 @@ class AdamantNotificationService: NotificationService {
 			})
 		} else { // MARK: Turn off
 			showNotifications = false
-			securedStore.remove(StoreKey.notificationService.showNotifications)
+			securedStore.remove(StoreKey.notificationsService.notificationsEnabled)
 			NotificationCenter.default.post(name: Notification.Name.adamantShowNotificationsChanged, object: self)
 		}
 	}

@@ -107,13 +107,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let container = Container()
 		container.registerAdamantBackgroundFetchServices()
 		
-		guard let securedStore = container.resolve(SecuredStore.self), let apiService = container.resolve(ApiService.self) else {
+		guard let securedStore = container.resolve(SecuredStore.self),
+			let apiService = container.resolve(ApiService.self),
+			let notificationsService = container.resolve(NotificationsService.self) else {
 			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
 			completionHandler(.failed)
 			return
 		}
 		
-		guard let address = securedStore.get(StoreKey.chatProvider.address), let lastHeightRaw = securedStore.get(StoreKey.chatProvider.lastHeight), let lastHeight = Int64(lastHeightRaw) else {
+		guard let address = securedStore.get(StoreKey.chatProvider.address) else {
 			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
 			completionHandler(.failed)
 			return

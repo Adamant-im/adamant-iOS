@@ -1,5 +1,5 @@
 //
-//  NotificationService.swift
+//  NotificationsService.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 09.03.2018.
@@ -8,9 +8,17 @@
 
 import Foundation
 
+extension String.adamantLocalized {
+	struct notificationsService {
+		static let notificationsDisabled = NSLocalizedString("Notifications disabled. You can reenable notifications in Settings", comment: "Notifications: User has disabled notifications. Head him into settings.")
+		
+		private init() {}
+	}
+}
+
 extension StoreKey {
-	struct notificationService {
-		static let showNotifications = "notifications.show"
+	struct notificationsService {
+		static let notificationsEnabled = "notifications.show"
 		
 		private init() {}
 	}
@@ -48,15 +56,15 @@ extension Notification.Name {
 
 
 // MARK: - Protocol
-enum NotificationServiceResult {
+enum NotificationsServiceResult {
 	case success
 	case denied(error: Error?)
 }
 
-protocol NotificationService {
+protocol NotificationsService {
 	var showNotifications: Bool { get }
 	
-	func setShowNotifications(_ value: Bool, completion: @escaping (NotificationServiceResult) -> Void)
+	func setNotificationsEnabled(_ enabled: Bool, completion: @escaping (NotificationsServiceResult) -> Void)
 	
 	func showNotification(title: String, body: String, type: AdamantNotificationType)
 	func removeAllPendingNotificationRequests(ofType type: AdamantNotificationType)

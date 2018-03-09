@@ -363,23 +363,43 @@ extension AdamantAccountService {
 
 
 // MARK: - Secured Store
-fileprivate enum Key: String {
-	case publicKey = "publicKey"
-	case privateKey = "privateKey"
-	case pin = "pin"
-	case useBiometry = "useBiometry"
+extension StoreKey {
+	fileprivate struct accountService {
+		static let publicKey = "accountService.publicKey"
+		static let privateKey = "accountService.privateKey"
+		static let pin = "accountService.pin"
+		static let useBiometry = "accountService.useBiometry"
+		
+		private init() {}
+	}
+}
+
+fileprivate enum Key {
+	case publicKey
+	case privateKey
+	case pin
+	case useBiometry
+	
+	var stringValue: String {
+		switch self {
+		case .publicKey: return StoreKey.accountService.publicKey
+		case .privateKey: return StoreKey.accountService.privateKey
+		case .pin: return StoreKey.accountService.pin
+		case .useBiometry: return StoreKey.accountService.useBiometry
+		}
+	}
 }
 
 fileprivate extension SecuredStore {
 	func set(_ value: String, for key: Key) {
-		set(value, for: key.rawValue)
+		set(value, for: key.stringValue)
 	}
 	
 	func get(_ key: Key) -> String? {
-		return get(key.rawValue)
+		return get(key.stringValue)
 	}
 	
 	func remove(_ key: Key) {
-		remove(key.rawValue)
+		remove(key.stringValue)
 	}
 }
