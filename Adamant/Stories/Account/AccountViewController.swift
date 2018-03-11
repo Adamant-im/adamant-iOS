@@ -101,11 +101,6 @@ class AccountViewController: UIViewController {
 		}
 		
 		switch identifier {
-		case showTransactionsSegue:
-			if let account = accountService.account?.address, let vc = segue.destination as? TransactionsViewController {
-				vc.account = account
-			}
-			
 		case showTransferSegue:
 			if let account = accountService.account, let vc = segue.destination as? TransferViewController {
 				vc.account = account

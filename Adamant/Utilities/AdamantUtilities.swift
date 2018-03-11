@@ -45,6 +45,14 @@ extension AdamantUtilities {
 		return currencyFormatter.string(from: NSNumber(value: balance))!
 	}
 	
+	static func format(balance: Decimal) -> String {
+		return currencyFormatter.string(from: balance as NSNumber)!
+	}
+	
+	static func format(balance: NSDecimalNumber) -> String {
+		return currencyFormatter.string(from: balance as NSNumber)!
+	}
+	
 	static func from(double: Double) -> UInt64 {
 		return UInt64(double / currencyShift)
 	}

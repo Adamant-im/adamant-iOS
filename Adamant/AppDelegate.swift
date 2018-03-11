@@ -65,9 +65,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		
 		// MARK: 4 Autoupdate
-		let chatsProvider = container.resolve(ChatsProvider.self)!
 		repeater = RepeaterService()
-		repeater.registerForegroundCall(label: "chatsProvider", interval: 3, queue: DispatchQueue.global(qos: .utility), callback: chatsProvider.update)
+		if let chatsProvider = container.resolve(ChatsProvider.self) {
+			repeater.registerForegroundCall(label: "chatsProvider", interval: 3, queue: .global(qos: .utility), callback: chatsProvider.update)
+		} else {
+			fatalError("Failed to get chatsProvider")
+		}
+		
+		if let transfersProvider = container.resolve(TransfersProvider.self) {
+			repeater.registerForegroundCall(label: "transfersProvider", interval: 15, queue: .global(qos: .utility), callback: transfersProvider.update)
+		}
 		
 		
 		// MARK: 4. Notifications
