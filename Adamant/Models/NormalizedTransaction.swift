@@ -10,7 +10,7 @@ import Foundation
 
 struct NormalizedTransaction {
 	let type: TransactionType
-	let amount: UInt64
+	let amount: Decimal
 	let senderPublicKey: String
 	let requesterPublicKey: String?
 	let timestamp: UInt64
@@ -37,12 +37,14 @@ extension NormalizedTransaction: Decodable {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		
 		self.type = try container.decode(TransactionType.self, forKey: .type)
-		self.amount = try container.decode(UInt64.self, forKey: .amount)
 		self.senderPublicKey = try container.decode(String.self, forKey: .senderPublicKey)
 		self.requesterPublicKey = try? container.decode(String.self, forKey: .requesterPublicKey)
 		self.timestamp = try container.decode(UInt64.self, forKey: .timestamp)
 		self.recipientId = try container.decode(String.self, forKey: .recipientId)
 		self.asset = try container.decode(TransactionAsset.self, forKey: .asset)
+		
+		let amount = try container.decode(Decimal.self, forKey: .amount)
+		self.amount = amount.shiftedFromAdamant()
 	}
 }
 

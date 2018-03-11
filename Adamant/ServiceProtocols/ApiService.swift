@@ -75,7 +75,7 @@ protocol ApiService: class {
 	
 	// MARK: - Funds
 	
-	func transferFunds(sender: String, recipient: String, amount: UInt64, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void)
+	func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void)
 	
 	
 	// MARK: - Chats

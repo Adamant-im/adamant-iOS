@@ -273,7 +273,7 @@ extension JSAdamantCore {
 										  senderId: senderId,
 										  recipientId: t.recipientId,
 										  recipientPublicKey: t.requesterPublicKey,
-										  amount: t.amount,
+										  amount: (t.amount.shiftedToAdamant() as NSDecimalNumber).uint64Value,
 										  fee: 0,
 										  signature: "",
 										  confirmations: 0,

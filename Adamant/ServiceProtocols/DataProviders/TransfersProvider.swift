@@ -44,6 +44,8 @@ extension AdamantUserInfoKey {
 }
 
 protocol TransfersProvider: DataProvider {
+	var transferFee: Decimal { get }
+	
 	func transfersController() -> NSFetchedResultsController<TransferTransaction>
 	
 	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void)

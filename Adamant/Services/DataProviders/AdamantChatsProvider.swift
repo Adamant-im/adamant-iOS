@@ -184,7 +184,7 @@ extension AdamantChatsProvider {
 			return
 		}
 		
-		guard loggedAccount.balance >= AdamantFeeCalculator.estimatedFeeFor(message: message) else {
+		guard loggedAccount.balance >= message.fee else {
 			completion(.error(.notEnoughtMoneyToSend))
 			return
 		}

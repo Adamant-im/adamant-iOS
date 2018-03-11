@@ -17,6 +17,8 @@ class AdamantTransfersProvider: TransfersProvider {
 	var accountsProvider: AccountsProvider!
 	
 	// MARK: Properties
+	var transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
+	
 	private(set) var state: State = .empty
 	private var lastHeight: UInt64?
 	
@@ -148,7 +150,7 @@ extension AdamantTransfersProvider {
 			return
 		}
 		
-		apiService.transferFunds(sender: senderAddress, recipient: recipient, amount: (amount as NSDecimalNumber).uint64Value, keypair: keypair) { result in
+		apiService.transferFunds(sender: senderAddress, recipient: recipient, amount: amount, keypair: keypair) { result in
 			switch result {
 			case .success(_):
 				completion(.success)
@@ -238,9 +240,9 @@ extension AdamantTransfersProvider {
 		var height = 0
 		for t in transactions {
 			let transfer = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
-			transfer.amount = Decimal(t.amount) as NSDecimalNumber
+			transfer.amount = t.amount as NSDecimalNumber
 			transfer.date = t.date as NSDate
-			transfer.fee = Decimal(t.fee) as NSDecimalNumber
+			transfer.fee = t.fee as NSDecimalNumber
 			transfer.height = Int64(t.height)
 			transfer.recipientId = t.recipientId
 			transfer.senderId = t.senderId

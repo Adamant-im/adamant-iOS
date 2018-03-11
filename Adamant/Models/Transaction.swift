@@ -19,8 +19,8 @@ struct Transaction {
 	let requesterPublicKey: String?
 	let recipientId: String
 	let recipientPublicKey: String?
-	let amount: UInt64
-	let fee: UInt64
+	let amount: Decimal
+	let fee: Decimal
 	let signature: String
 	let signSignature: String?
 	let confirmations: UInt64
@@ -63,14 +63,18 @@ extension Transaction: Decodable {
 		self.senderId = try container.decode(String.self, forKey: .senderId)
 		self.recipientId = try container.decode(String.self, forKey: .recipientId)
 		self.recipientPublicKey = try? container.decode(String.self, forKey: .recipientPublicKey)
-		self.amount = try container.decode(UInt64.self, forKey: .amount)
-		self.fee = try container.decode(UInt64.self, forKey: .fee)
 		self.signature = try container.decode(String.self, forKey: .signature)
 		self.confirmations = (try? container.decode(UInt64.self, forKey: .confirmations)) ?? 0
 		self.requesterPublicKey = try? container.decode(String.self, forKey: .requesterPublicKey)
 		self.signSignature = try? container.decode(String.self, forKey: .signSignature)
 		self.signatures = try container.decode([String].self, forKey: .signatures)
 		self.asset = try container.decode(TransactionAsset.self, forKey: .asset)
+		
+		let amount = try container.decode(Decimal.self, forKey: .amount)
+		self.amount = amount.shiftedFromAdamant()
+		
+		let fee = try container.decode(Decimal.self, forKey: .fee)
+		self.fee = fee.shiftedFromAdamant()
 
 		self.date = AdamantUtilities.decodeAdamantDate(timestamp: TimeInterval(self.timestamp))
 	}
