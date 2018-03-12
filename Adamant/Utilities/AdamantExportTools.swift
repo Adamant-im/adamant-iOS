@@ -9,18 +9,27 @@
 import Foundation
 
 class AdamantExportTools {
+	static func summaryFor(transaction: BaseTransaction, url: URL) -> String {
+		return summaryFor(id: transaction.blockId!, sender: transaction.senderId!, recipient: transaction.recipientId!, date: transaction.date as Date!, amount: transaction.amount as Decimal!, fee: transaction.fee as Decimal!, confirmations: transaction.confirmations, blockId: transaction.blockId!, url: url)
+	}
+	
 	static func summaryFor(transaction: Transaction, url: URL) -> String {
+		return summaryFor(id: String(transaction.id), sender: transaction.senderId, recipient: transaction.recipientId, date: transaction.date, amount: transaction.amount, fee: transaction.fee, confirmations: transaction.confirmations, blockId: transaction.blockId, url: url)
+	}
+	
+	private static func summaryFor(id: String, sender: String, recipient: String, date: Date, amount: Decimal, fee: Decimal, confirmations: Int64, blockId: String, url: URL) -> String {
+		
 		return """
-Transaction #\(String(transaction.id))
+Transaction #\(id)
 
 Summary
-Sender: \(transaction.senderId)
-Recipient: \(transaction.recipientId)
-Date: \(DateFormatter.localizedString(from: transaction.date, dateStyle: .short, timeStyle: .medium))
-Amount: \(AdamantUtilities.format(balance: transaction.amount))
-Fee: \(AdamantUtilities.format(balance: transaction.fee))
-Confirmations: \(String(transaction.confirmations))
-Block: \(transaction.blockId)
+Sender: \(sender)
+Recipient: \(recipient)
+Date: \(DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .medium))
+Amount: \(AdamantUtilities.format(balance: amount))
+Fee: \(AdamantUtilities.format(balance: fee))
+Confirmations: \(String(confirmations))
+Block: \(blockId)
 URL: \(url)
 """
 	}

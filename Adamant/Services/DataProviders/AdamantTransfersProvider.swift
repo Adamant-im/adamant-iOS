@@ -237,7 +237,7 @@ extension AdamantTransfersProvider {
 		}
 		
 		var totalTransactions = 0
-		var height = 0
+		var height: Int64 = 0
 		for t in transactions {
 			let transfer = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
 			transfer.amount = t.amount as NSDecimalNumber
@@ -248,6 +248,8 @@ extension AdamantTransfersProvider {
 			transfer.senderId = t.senderId
 			transfer.transactionId = String(t.id)
 			transfer.type = Int16(t.type.rawValue)
+			transfer.blockId = t.blockId
+			transfer.confirmations = t.confirmations
 			
 			transfer.isOutgoing = t.senderId == address
 			

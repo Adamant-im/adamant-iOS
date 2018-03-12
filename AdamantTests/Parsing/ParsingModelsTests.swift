@@ -15,7 +15,7 @@ class ParsingModelsTests: XCTestCase {
 		
 		XCTAssertEqual(t.id, 1873173140086400619)
 		XCTAssertEqual(t.height, 777336)
-		XCTAssertEqual(t.blockId, 10172499053153614044)
+		XCTAssertEqual(t.blockId, "10172499053153614044")
 		XCTAssertEqual(t.type, TransactionType.send)
 		XCTAssertEqual(t.timestamp, 10724447)
 		XCTAssertEqual(t.senderPublicKey, "cdab95b082b9774bd975677c868261618c7ce7bea97d02e0f56d483e30c077b6")
@@ -37,7 +37,7 @@ class ParsingModelsTests: XCTestCase {
 
 		XCTAssertEqual(t.id, 16214962152767034408)
 		XCTAssertEqual(t.height, 857385)
-		XCTAssertEqual(t.blockId, 11054360802486546958)
+		XCTAssertEqual(t.blockId, "11054360802486546958")
 		XCTAssertEqual(t.type, TransactionType(rawValue: 8))
 		XCTAssertEqual(t.timestamp, 11138999)
 		XCTAssertEqual(t.senderPublicKey, "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f")

@@ -52,7 +52,7 @@ class TransactionDetailsViewController: UIViewController {
 	
 	// MARK: - Properties
 	private let cellIdentifier = "cell"
-	var transaction: Transaction?
+	var transaction: TransferTransaction?
 	var explorerUrl: URL!
 	
 	// MARK: - IBOutlets
@@ -66,7 +66,9 @@ class TransactionDetailsViewController: UIViewController {
 		if let transaction = transaction {
 			tableView.reloadData()
 			
-			explorerUrl = URL(string: "https://explorer.adamant.im/tx/\(transaction.id)")
+			if let id = transaction.transactionId {
+				explorerUrl = URL(string: "https://explorer.adamant.im/tx/\(id)")
+			}
 		} else {
 			self.navigationItem.rightBarButtonItems = nil
 		}
@@ -209,19 +211,27 @@ extension TransactionDetailsViewController {
 		
 		switch row {
 		case .amount:
-			cell.detailTextLabel?.text = AdamantUtilities.format(balance: transaction.amount)
+			if let amount = transaction.amount {
+				cell.detailTextLabel?.text = AdamantUtilities.format(balance: amount)
+			}
 			
 		case .date:
-			cell.detailTextLabel?.text = DateFormatter.localizedString(from: transaction.date, dateStyle: .short, timeStyle: .medium)
+			if let date = transaction.date as Date? {
+				cell.detailTextLabel?.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .medium)
+			}
 			
 		case .confirmations:
 			cell.detailTextLabel?.text = String(transaction.confirmations)
 			
 		case .fee:
-			cell.detailTextLabel?.text = AdamantUtilities.format(balance: transaction.fee)
+			if let fee = transaction.fee {
+				cell.detailTextLabel?.text = AdamantUtilities.format(balance: fee)
+			}
 			
 		case .transactionNumber:
-			cell.detailTextLabel?.text = String(transaction.id)
+			if let id = transaction.transactionId {
+				cell.detailTextLabel?.text = String(id)
+			}
 			
 		case .from:
 			cell.detailTextLabel?.text = transaction.senderId
@@ -230,7 +240,7 @@ extension TransactionDetailsViewController {
 			cell.detailTextLabel?.text = transaction.recipientId
 			
 		case .block:
-			cell.detailTextLabel?.text = String(transaction.blockId)
+			cell.detailTextLabel?.text = transaction.blockId
 			
 		case .openInExplorer:
 			cell.detailTextLabel?.text = nil

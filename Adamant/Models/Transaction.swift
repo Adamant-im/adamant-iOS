@@ -10,8 +10,8 @@ import Foundation
 
 struct Transaction {
 	let id: UInt64
-	let height: Int
-	let blockId: UInt64
+	let height: Int64
+	let blockId: String
 	let type: TransactionType
 	let timestamp: UInt64
 	let senderPublicKey: String
@@ -23,7 +23,7 @@ struct Transaction {
 	let fee: Decimal
 	let signature: String
 	let signSignature: String?
-	let confirmations: UInt64
+	let confirmations: Int64
 	let signatures: [String]
 	let asset: TransactionAsset
 	
@@ -55,8 +55,8 @@ extension Transaction: Decodable {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		
 		self.id = UInt64(try container.decode(String.self, forKey: .id))!
-		self.height = try container.decode(Int.self, forKey: .height)
-		self.blockId = UInt64(try container.decode(String.self, forKey: .blockId))!
+		self.height = try container.decode(Int64.self, forKey: .height)
+		self.blockId = try container.decode(String.self, forKey: .blockId)
 		self.type = try container.decode(TransactionType.self, forKey: .type)
 		self.timestamp = try container.decode(UInt64.self, forKey: .timestamp)
 		self.senderPublicKey = try container.decode(String.self, forKey: .senderPublicKey)
@@ -64,7 +64,7 @@ extension Transaction: Decodable {
 		self.recipientId = try container.decode(String.self, forKey: .recipientId)
 		self.recipientPublicKey = try? container.decode(String.self, forKey: .recipientPublicKey)
 		self.signature = try container.decode(String.self, forKey: .signature)
-		self.confirmations = (try? container.decode(UInt64.self, forKey: .confirmations)) ?? 0
+		self.confirmations = (try? container.decode(Int64.self, forKey: .confirmations)) ?? 0
 		self.requesterPublicKey = try? container.decode(String.self, forKey: .requesterPublicKey)
 		self.signSignature = try? container.decode(String.self, forKey: .signSignature)
 		self.signatures = try container.decode([String].self, forKey: .signatures)
