@@ -12,14 +12,9 @@ import CoreData
 class TransactionsViewController: UIViewController {
 	// MARK: - Dependencies
 	var cellFactory: CellFactory!
-	var apiService: ApiService!
-	var dialogService: DialogService!
 	var transfersProvider: TransfersProvider!
 	
 	// MARK: - Properties
-	private(set) var transactions: [Transaction]?
-	private var updatingTransactions: Bool = false
-	
 	var controller: NSFetchedResultsController<TransferTransaction>?
 	let transactionDetailsSegue = "showTransactionDetails"
 	
@@ -51,14 +46,13 @@ class TransactionsViewController: UIViewController {
 		}
 	}
 
-	// TODO:
-//	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//		if segue.identifier == transactionDetailsSegue,
-//			let vc = segue.destination as? TransactionDetailsViewController,
-//			let transaction = sender as? Transaction{
-//			vc.transaction = transaction
-//		}
-//	}
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		if segue.identifier == transactionDetailsSegue,
+			let vc = segue.destination as? TransactionDetailsViewController,
+			let transaction = sender as? TransferTransaction {
+			vc.transaction = transaction
+		}
+	}
 }
 
 // MARK: - UITableView Cells
@@ -111,7 +105,8 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		guard let transaction = transactions?[indexPath.row] else {
+		guard let transaction = controller?.object(at: indexPath) else {
+			tableView.deselectRow(at: indexPath, animated: true)
 			return
 		}
 		

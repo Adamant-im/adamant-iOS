@@ -16,9 +16,7 @@ extension Container {
 			c.router = r.resolve(Router.self)
 		}
 		self.storyboardInitCompleted(TransactionsViewController.self) { (r, c) in
-			c.apiService = r.resolve(ApiService.self)
 			c.cellFactory = r.resolve(CellFactory.self)
-			c.dialogService = r.resolve(DialogService.self)
 			c.transfersProvider = r.resolve(TransfersProvider.self)
 		}
 		self.storyboardInitCompleted(TransferViewController.self) { (r, c) in
