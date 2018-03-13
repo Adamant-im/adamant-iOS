@@ -1,5 +1,5 @@
 //
-//  FeeCalculatorTests.swift
+//  FeeTests.swift
 //  AdamantTests
 //
 //  Created by Anokhov Pavel on 16.01.2018.
@@ -9,21 +9,17 @@
 import XCTest
 @testable import Adamant
 
-class HardFeeCalculatorTests: XCTestCase {
+class FeeTests: XCTestCase {
     func testTransferFee() {
-		let amountToTransfer: UInt64 = 50000000000000000
-		let estimatedFee: UInt64 = 50000000
-		
-		let calculatedFee = AdamantFeeCalculator.estimatedFeeFor(transfer: amountToTransfer)
-		XCTAssertEqual(estimatedFee, calculatedFee)
+		let estimatedFee = Decimal(0.5)
+		XCTAssertEqual(estimatedFee, AdamantTransfersProvider().transferFee)
     }
 	
 	func testShortMessageFee() {
 		let message = "A quick brown fox bought bitcoins in 2009. Good for you, mr fox. You quick brown mother fucker."
-		let estimatedFee: UInt64 = 100000
+		let estimatedFee = Decimal(0.001)
 		
-		let calculatedFee = AdamantFeeCalculator.estimatedFeeFor(message: AdamantMessage.text(message))
-		XCTAssertEqual(estimatedFee, calculatedFee)
+		XCTAssertEqual(estimatedFee, AdamantMessage.text(message).fee)
 	}
 	
 	func testLongMessageFee() {
@@ -33,10 +29,9 @@ The olfactory system is reduced, suggesting that the sperm whale has a poor sens
 By contrast, the auditory system is enlarged.
 The pyramidal tract is poorly developed, reflecting the reduction of its limbs.
 """
-		let estimatedFee: UInt64 = 200000
+		let estimatedFee = Decimal(0.002)
 		
-		let calculatedFee = AdamantFeeCalculator.estimatedFeeFor(message: AdamantMessage.text(message))
-		XCTAssertEqual(estimatedFee, calculatedFee)
+		XCTAssertEqual(estimatedFee, AdamantMessage.text(message).fee)
 	}
 	
 	func testVeryLongMessageFee() {
@@ -88,9 +83,8 @@ I'll tell you when
 Mastodon / The Hunter / All The Heavy Lifting
 Brann Timothy Dailor / Troy Jayson Sanders / William Breen Kelliher / William Brent Hinds
 """
-		let estimatedFee: UInt64 = 400000
+		let estimatedFee = Decimal(0.004)
 		
-		let calculatedFee = AdamantFeeCalculator.estimatedFeeFor(message: AdamantMessage.text(message))
-		XCTAssertEqual(estimatedFee, calculatedFee)
+		XCTAssertEqual(estimatedFee, AdamantMessage.text(message).fee)
 	}
 }

@@ -55,7 +55,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vtC-fH-ReF">
-                        <rect key="frame" x="282" y="13" width="12" height="12"/>
+                        <rect key="frame" x="284" y="13" width="12" height="12"/>
                         <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="vtC-fH-ReF" secondAttribute="height" multiplier="1:1" id="Awu-Bc-M7m"/>
@@ -76,7 +76,7 @@
                     <constraint firstItem="SiC-bM-ZsH" firstAttribute="centerY" secondItem="vtC-fH-ReF" secondAttribute="centerY" id="ugp-j2-sbR"/>
                     <constraint firstItem="aVv-ww-kYa" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="14" id="xpk-tG-FaG"/>
                     <constraint firstItem="SiC-bM-ZsH" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="9" id="zNL-XP-X54"/>
-                    <constraint firstItem="vtC-fH-ReF" firstAttribute="leading" secondItem="SiC-bM-ZsH" secondAttribute="trailing" constant="4" id="zsS-r7-3ci"/>
+                    <constraint firstItem="vtC-fH-ReF" firstAttribute="leading" secondItem="SiC-bM-ZsH" secondAttribute="trailing" constant="6" id="zsS-r7-3ci"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>

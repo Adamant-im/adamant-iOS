@@ -34,22 +34,12 @@ enum ValidateMessageResult {
 }
 
 
-// MARK: - Available message types
-
-/// Adamant message types
-///
-/// - text: Simple text message
-enum AdamantMessage {
-	case text(String)
-}
-
-
 // MARK: - Notifications
 extension Notification.Name {
-	static let adamantChatsProviderNewChatroom = Notification.Name("adamantChatsProviderNewChatroom")
+	static let adamantChatsProviderNewChatroom = Notification.Name("adamant.chatsProvider.newChatroom")
 	
 	/// Received new messagess. See AdamantUserInfoKey.ChatProvider
-	static let adamantChatsProviderNewUnreadMessages = Notification.Name("adamantChatsProviderNewUnrMessages")
+	static let adamantChatsProviderNewUnreadMessages = Notification.Name("adamant.chatsProvider.newUnreadMessages")
 }
 
 

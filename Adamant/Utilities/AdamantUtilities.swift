@@ -27,6 +27,7 @@ class AdamantUtilities {
 // MARK: - Currency
 extension AdamantUtilities {
 	static let currencyShift: Double = 0.00_000_001
+	static let currencyExponent: Int = -8
 	static let currencyCode = "ADM"
 	
 	static var currencyFormatter: NumberFormatter = {
@@ -37,26 +38,19 @@ extension AdamantUtilities {
 		return formatter
 	}()
 	
-	static func format(balance: UInt64) -> String {
-		return currencyFormatter.string(from: NSNumber(value: from(uInt: balance)))!
+	static func format(balance: Decimal) -> String {
+		return currencyFormatter.string(from: balance as NSNumber)!
 	}
 	
-	static func format(balance: Double) -> String {
-		return currencyFormatter.string(from: NSNumber(value: balance))!
+	static func format(balance: NSDecimalNumber) -> String {
+		return currencyFormatter.string(from: balance as NSNumber)!
 	}
 	
-	static func from(double: Double) -> UInt64 {
-		return UInt64(double / currencyShift)
-	}
-	
-	static func from(uInt: UInt64) -> Double {
-		return Double(uInt) * currencyShift
-	}
-	
-	static func validateAmount(amount: Double) -> Bool {
-		if amount < currencyShift {
+	static func validateAmount(amount: Decimal) -> Bool {
+		if amount < Decimal(sign: .plus, exponent: AdamantUtilities.currencyExponent, significand: 1) {
 			return false
 		}
+		
 		return true
 	}
 }

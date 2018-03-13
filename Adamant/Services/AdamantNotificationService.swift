@@ -104,7 +104,7 @@ class AdamantNotificationsService: NotificationsService {
 		let content = UNMutableNotificationContent()
 		content.title = title
 		content.body = body
-		content.sound = UNNotificationSound.default()
+		content.sound = UNNotificationSound(named: "notification.mp3")
 		content.badge = type.badge
 		
 		let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)

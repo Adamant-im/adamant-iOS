@@ -15,7 +15,7 @@ extension String.adamantLocalized {
 	struct chat {
 		static let sendButton = NSLocalizedString("Send", comment: "Chat: Send message button")
 		static let messageInputPlaceholder = NSLocalizedString("New message", comment: "Chat: message input placeholder")
-		static let estimatedFeeFormat = NSLocalizedString("Estimated fee: %@", comment: "Chat: input bar: Estimated fee")
+		static let estimatedFeeFormat = NSLocalizedString("~%@", comment: "Chat: input bar: Estimated fee")
 		
 		static let messageIsEmpty = NSLocalizedString("Message is empty", comment: "Chat: Notify user that message cannot be empty")
 		static let messageTooLong = NSLocalizedString("Message is too long", comment: "Chat: Message is too long")
@@ -60,7 +60,7 @@ class ChatViewController: MessagesViewController {
 	private var feeIsVisible: Bool = false
 	private var feeTimer: Timer?
 	private var feeLabel: InputBarButtonItem?
-	private var prevFee: UInt64 = 0
+	private var prevFee: Decimal = 0
 	
 	
 	// MARK: Lifecycle
@@ -149,7 +149,7 @@ class ChatViewController: MessagesViewController {
 		
 		if let delegate = delegate, let address = chatroom?.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
 			messageInputBar.inputTextView.text = message
-			setEstimatedFee(AdamantFeeCalculator.estimatedFeeFor(message: AdamantMessage.text(message)))
+			setEstimatedFee(AdamantMessage.text(message).fee)
 		}
     }
 	
@@ -187,7 +187,7 @@ class ChatViewController: MessagesViewController {
 
 // MARK: - EstimatedFee label
 extension ChatViewController {
-	private func setEstimatedFee(_ fee: UInt64) {
+	private func setEstimatedFee(_ fee: Decimal) {
 		if prevFee != fee && fee > 0 {
 			guard let feeLabel = feeLabel else {
 				return
@@ -427,7 +427,7 @@ extension ChatViewController: MessageInputBarDelegate {
 	
 	func messageInputBar(_ inputBar: MessageInputBar, textViewTextDidChangeTo text: String) {
 		if text.count > 0 {
-			let fee = AdamantFeeCalculator.estimatedFeeFor(message: .text(text))
+			let fee = AdamantMessage.text(text).fee
 			setEstimatedFee(fee)
 		} else {
 			setEstimatedFee(0)

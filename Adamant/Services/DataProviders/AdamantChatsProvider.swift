@@ -45,12 +45,16 @@ class AdamantChatsProvider: ChatsProvider {
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.receivedLastHeight = nil
+			self?.readedLastHeight = nil
 			if let prevState = self?.state {
 				self?.setState(.empty, previous: prevState, notify: true)
 			}
 			
-			self?.securedStore.remove(StoreKey.chatProvider.address)
-			self?.securedStore.remove(StoreKey.chatProvider.receivedLastHeight)
+			if let store = self?.securedStore {
+				store.remove(StoreKey.chatProvider.address)
+				store.remove(StoreKey.chatProvider.receivedLastHeight)
+				store.remove(StoreKey.chatProvider.readedLastHeight)
+			}
 		}
 	}
 	
@@ -97,6 +101,7 @@ extension AdamantChatsProvider {
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false) // Block update calls
 		receivedLastHeight = nil
+		readedLastHeight = nil
 		
 		let chatrooms = NSFetchRequest<Chatroom>(entityName: Chatroom.entityName)
 		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -184,7 +189,7 @@ extension AdamantChatsProvider {
 			return
 		}
 		
-		guard loggedAccount.balance >= AdamantFeeCalculator.estimatedFeeFor(message: message) else {
+		guard loggedAccount.balance >= message.fee else {
 			completion(.error(.notEnoughtMoneyToSend))
 			return
 		}
@@ -276,10 +281,12 @@ extension AdamantChatsProvider {
 		transaction.date = Date() as NSDate
 		transaction.recipientId = recipientId
 		transaction.senderId = senderId
-		transaction.type = Int16(ChatType.message.rawValue)
+		transaction.type = ChatType.message.rawValue
 		transaction.isOutgoing = true
 		transaction.message = text
+		
 		transaction.transactionId = UUID().uuidString
+		transaction.blockId = UUID().uuidString
 		
 		chatroom.addToTransactions(transaction)
 		
@@ -576,7 +583,7 @@ extension AdamantChatsProvider {
 			for trs in transactions {
 				unconfirmedsSemaphore.wait()
 				if unconfirmedTransactions.count > 0, let unconfirmed = unconfirmedTransactions[trs.transaction.id] {
-					confirmTransaction(unconfirmed, id: trs.transaction.id, height: Int64(trs.transaction.height))
+					confirmTransaction(unconfirmed, id: trs.transaction.id, height: Int64(trs.transaction.height), blockId: trs.transaction.blockId, confirmations: trs.transaction.confirmations)
 					let h = Int64(trs.transaction.height)
 					if height < h {
 						height = h
@@ -620,8 +627,14 @@ extension AdamantChatsProvider {
 		
 		
 		// MARK: 4. Unread messagess
-		if let unreadHeight = readedLastHeight {
-			let msgs = Dictionary(grouping: newChatTransactions.filter({$0.height > unreadHeight}), by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
+		if let readedLastHeight = readedLastHeight {
+			let msgs = Dictionary(grouping: newChatTransactions.filter({$0.height > readedLastHeight}), by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
+			for (chatroom, trs) in msgs {
+				chatroom.hasUnreadMessages = true
+				trs.forEach({$0.isUnread = true})
+			}
+		} else {
+			let msgs = Dictionary(grouping: newChatTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
 			for (chatroom, trs) in msgs {
 				chatroom.hasUnreadMessages = true
 				trs.forEach({$0.isUnread = true})
@@ -732,6 +745,8 @@ extension AdamantChatsProvider {
 		chatTransaction.height = Int64(transaction.height)
 		chatTransaction.isConfirmed = true
 		chatTransaction.isOutgoing = isOutgoing
+		chatTransaction.blockId = transaction.blockId
+		chatTransaction.confirmations = transaction.confirmations
 		
 		if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey) {
 			chatTransaction.message = decodedMessage
@@ -746,13 +761,15 @@ extension AdamantChatsProvider {
 	/// - Parameters:
 	///   - transaction: Unconfirmed transaction
 	///   - id: New transaction id	///   - height: New transaction height
-	private func confirmTransaction(_ transaction: ChatTransaction, id: UInt64, height: Int64) {
+	private func confirmTransaction(_ transaction: ChatTransaction, id: UInt64, height: Int64, blockId: String, confirmations: Int64) {
 		if transaction.isConfirmed {
 			return
 		}
 		
 		transaction.isConfirmed = true
 		transaction.height = height
+		transaction.blockId = blockId
+		transaction.confirmations = confirmations
 		self.unconfirmedTransactions.removeValue(forKey: id)
 		
 		if let lastHeight = receivedLastHeight, lastHeight < height {
