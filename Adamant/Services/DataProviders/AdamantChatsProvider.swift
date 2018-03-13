@@ -281,10 +281,12 @@ extension AdamantChatsProvider {
 		transaction.date = Date() as NSDate
 		transaction.recipientId = recipientId
 		transaction.senderId = senderId
-		transaction.type = Int16(ChatType.message.rawValue)
+		transaction.type = ChatType.message.rawValue
 		transaction.isOutgoing = true
 		transaction.message = text
+		
 		transaction.transactionId = UUID().uuidString
+		transaction.blockId = UUID().uuidString
 		
 		chatroom.addToTransactions(transaction)
 		

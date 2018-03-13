@@ -99,6 +99,7 @@ extension AdamantTransfersProvider {
 	func update() {
 		stateSemaphore.wait()
 		if state == .updating {
+			stateSemaphore.signal()
 			return
 		}
 		

@@ -60,7 +60,8 @@ extension AdamantApiService {
 			"recipientId": recipientId,
 			"publicKey": keypair.publicKey,
 			"message": message,
-			"own_message": nonce
+			"own_message": nonce,
+			"message_type": ChatType.message.rawValue
 		]
 		
 		let headers = [
@@ -111,7 +112,7 @@ extension AdamantApiService {
 						"chat": [
 							"message": message,
 							"own_message": nonce,
-							"type": 0
+							"type": ChatType.message.rawValue
 						]
 					]
 				]

@@ -10,7 +10,7 @@ import Foundation
 
 /// - messageExpensive: Old message type, with 0.005 transaction fee
 /// - message: new and main message type, with 0.001 transaction fee
-enum ChatType: Int, Codable {
+enum ChatType: Int16, Codable {
 	case messageOld = 0
 	case message = 1
 }
