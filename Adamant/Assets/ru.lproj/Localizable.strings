@@ -76,7 +76,7 @@
 "Error" = "Ошибка";
 
 /* Chat: input bar: Estimated fee */
-"Estimated fee: %@" = "Примерная комиссия: %@";
+"~%@" = "~%@";
 
 /* Transaction details: fee row. */
 "Fee" = "Комиссия";

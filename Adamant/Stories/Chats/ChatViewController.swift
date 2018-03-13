@@ -15,7 +15,7 @@ extension String.adamantLocalized {
 	struct chat {
 		static let sendButton = NSLocalizedString("Send", comment: "Chat: Send message button")
 		static let messageInputPlaceholder = NSLocalizedString("New message", comment: "Chat: message input placeholder")
-		static let estimatedFeeFormat = NSLocalizedString("Estimated fee: %@", comment: "Chat: input bar: Estimated fee")
+		static let estimatedFeeFormat = NSLocalizedString("~%@", comment: "Chat: input bar: Estimated fee")
 		
 		static let messageIsEmpty = NSLocalizedString("Message is empty", comment: "Chat: Notify user that message cannot be empty")
 		static let messageTooLong = NSLocalizedString("Message is too long", comment: "Chat: Message is too long")
