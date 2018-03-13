@@ -76,7 +76,7 @@
 "Error" = "Ошибка";
 
 /* Chat: input bar: Estimated fee */
-"Estimated fee: %@" = "Ориентировочная комиссия: %@";
+"~%@" = "~%@";
 
 /* Transaction details: fee row. */
 "Fee" = "Комиссия";
@@ -148,7 +148,7 @@
 "Notifications" = "Уведомления";
 
 /* Notifications: User has disabled notifications. Head him into settings */
-"Notifications disabled. You can reenable notifications in Settings" = "Уведомления отключены. Вы можете включить их в Настройках.";
+"Notifications disabled. You can reenable notifications in Settings" = "Уведомления отключены. Вы можете включить их в Настройках";
 
 /* Shared alert 'Ok' button. Used anywhere */
 "Ok" = "Ок";
