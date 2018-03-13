@@ -12,13 +12,8 @@ import XCTest
 class CurrencyFormatterTests: XCTestCase {
 	var decimalSeparator: String = Locale.current.decimalSeparator!
 	
-	override func setUp() {
-		super.setUp()
-		decimalSeparator = Locale.current.decimalSeparator!
-	}
-	
     func testInt() {
-		let number = 123
+		let number = Decimal(123)
 		let format = "123 \(AdamantUtilities.currencyCode)"
 		let formatted = AdamantUtilities.currencyFormatter.string(for: number)
 
@@ -26,7 +21,7 @@ class CurrencyFormatterTests: XCTestCase {
 	}
 
 	func testFracted() {
-		let number = 123.5
+		let number = Decimal(123.5)
 		
 		let format = "123\(decimalSeparator)5 \(AdamantUtilities.currencyCode)"
 		let formatted = AdamantUtilities.currencyFormatter.string(for: number)
@@ -35,7 +30,7 @@ class CurrencyFormatterTests: XCTestCase {
 	}
 
 	func testZeroFracted() {
-		let number = 0.53
+		let number = Decimal(0.53)
 		let format = "0\(decimalSeparator)53 \(AdamantUtilities.currencyCode)"
 		let formatted = AdamantUtilities.currencyFormatter.string(for: number)
 
@@ -43,7 +38,7 @@ class CurrencyFormatterTests: XCTestCase {
 	}
 
 	func testVerySmallFracted() {
-		let number = 0.00000007
+		let number = Decimal(0.00000007)
 		let format = "0\(decimalSeparator)00000007 \(AdamantUtilities.currencyCode)"
 		let formatted = AdamantUtilities.currencyFormatter.string(for: number)
 
@@ -51,7 +46,7 @@ class CurrencyFormatterTests: XCTestCase {
 	}
 	
 	func testTooSmallFracted() {
-		let number = 0.0000000699
+		let number = Decimal(0.0000000699)
 		let format = "0\(decimalSeparator)00000006 \(AdamantUtilities.currencyCode)"
 		let formatted = AdamantUtilities.currencyFormatter.string(for: number)
 		
@@ -59,15 +54,15 @@ class CurrencyFormatterTests: XCTestCase {
 	}
 
 	func testLargeInt() {
-		let number = 349034839840234
-		let format = "349034839840234 \(AdamantUtilities.currencyCode)"
+		let number = Decimal(34903483984)
+		let format = "34903483984 \(AdamantUtilities.currencyCode)"
 		let formatted = AdamantUtilities.currencyFormatter.string(for: number)
-
+		
 		XCTAssertEqual(format, formatted)
 	}
 
 	func testLargeNumber() {
-		let number = 9342034.5848984
+		let number = Decimal(9342034.5848984)
 		let format = "9342034\(decimalSeparator)5848984 \(AdamantUtilities.currencyCode)"
 		let formatted = AdamantUtilities.currencyFormatter.string(for: number)
 
@@ -75,11 +70,10 @@ class CurrencyFormatterTests: XCTestCase {
 	}
 
 	func testNegative() {
-		let number = -34.504
+		let number = Decimal(-34.504)
 		let format = "-34\(decimalSeparator)504 \(AdamantUtilities.currencyCode)"
 		let formatted = AdamantUtilities.currencyFormatter.string(for: number)
 
 		XCTAssertEqual(format, formatted)
 	}
-
 }

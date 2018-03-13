@@ -259,7 +259,7 @@ extension JSAdamantCore {
 	func sign(transaction t: NormalizedTransaction, senderId: String, keypair: Keypair) -> String? {
 		let asset: JSAsset
 		if let chat = t.asset.chat {
-			asset = JSAsset(chat: JSChat(type: chat.type.rawValue, message: chat.message, own_message: chat.ownMessage))
+			asset = JSAsset(chat: JSChat(type: Int(chat.type.rawValue), message: chat.message, own_message: chat.ownMessage))
 		} else {
 			asset = JSAsset(chat: nil)
 		}
@@ -273,7 +273,7 @@ extension JSAdamantCore {
 										  senderId: senderId,
 										  recipientId: t.recipientId,
 										  recipientPublicKey: t.requesterPublicKey,
-										  amount: t.amount,
+										  amount: (t.amount.shiftedToAdamant() as NSDecimalNumber).uint64Value,
 										  fee: 0,
 										  signature: "",
 										  confirmations: 0,

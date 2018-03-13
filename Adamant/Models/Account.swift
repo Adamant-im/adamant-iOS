@@ -10,8 +10,8 @@ import Foundation
 
 struct Account {
 	let address: String
-	var unconfirmedBalance: UInt64
-	var balance: UInt64
+	var unconfirmedBalance: Decimal
+	var balance: Decimal
 	let publicKey: String
 	let unconfirmedSignature: Int
 	let secondSignature: Int
@@ -37,14 +37,17 @@ extension Account: Decodable {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		
 		self.address = try container.decode(String.self, forKey: .address)
-		self.unconfirmedBalance = UInt64(try container.decode(String.self, forKey: .unconfirmedBalance))!
-		self.balance = UInt64(try container.decode(String.self, forKey: .balance))!
 		self.unconfirmedSignature = try container.decode(Int.self, forKey: .unconfirmedSignature)
 		self.publicKey = try container.decode(String.self, forKey: .publicKey)
 		self.secondSignature = try container.decode(Int.self, forKey: .secondSignature)
 		self.secondPublicKey = try? container.decode(String.self, forKey: .secondPublicKey)
 		self.multisignatures = try? container.decode([String].self, forKey: .multisignatures)
 		self.uMultisignatures = try? container.decode([String].self, forKey: .uMultisignatures)
+		
+		let unconfirmedBalance = Decimal(string: try container.decode(String.self, forKey: .unconfirmedBalance))!
+		self.unconfirmedBalance = unconfirmedBalance.shiftedFromAdamant()
+		let balance = Decimal(string: try container.decode(String.self, forKey: .balance))!
+		self.balance = balance.shiftedFromAdamant()
 	}
 }
 

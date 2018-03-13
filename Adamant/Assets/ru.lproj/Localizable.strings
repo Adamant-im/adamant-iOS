@@ -138,6 +138,9 @@
    Notifications: New message notification title */
 "New message" = "Новое сообщение";
 
+/* Notifications: New transfer transaction title */
+"New transfer" = "Новый перевод";
+
 /* ApiService: No connection message. Generally bad network. */
 "No connection" = "Нет соединения с интернетом";
 

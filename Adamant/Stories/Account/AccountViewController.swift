@@ -76,11 +76,19 @@ class AccountViewController: UIViewController {
 		tableView.delegate = self
 		tableView.dataSource = self
 		
-		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { _ in
-			self.tableView.reloadData()
+		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			self?.tableView.reloadData()
 		}
-		NotificationCenter.default.addObserver(forName: .adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { _ in
-			self.tableView.reloadData()
+		NotificationCenter.default.addObserver(forName: .adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			self?.tableView.reloadData()
+		}
+		NotificationCenter.default.addObserver(forName: .adamantAccountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			guard let account = self?.accountService.account,
+				let cell = self?.tableView.cellForRow(at: IndexPath(row: 0, section: 1)) else  {
+				return
+			}
+			
+			cell.detailTextLabel?.text = AdamantUtilities.format(balance: account.balance)
 		}
     }
 	
@@ -101,11 +109,6 @@ class AccountViewController: UIViewController {
 		}
 		
 		switch identifier {
-		case showTransactionsSegue:
-			if let account = accountService.account?.address, let vc = segue.destination as? TransactionsViewController {
-				vc.account = account
-			}
-			
 		case showTransferSegue:
 			if let account = accountService.account, let vc = segue.destination as? TransferViewController {
 				vc.account = account

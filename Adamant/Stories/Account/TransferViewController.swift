@@ -116,7 +116,7 @@ class TransferViewController: FormViewController {
 		// MARK: - Wallet section
 		if let account = account {
 			sendButton.isEnabled = maxToTransfer > 0.0
-			let balance = Double(account.balance) * AdamantUtilities.currencyShift
+			let balance = (account.balance as NSDecimalNumber).doubleValue
 			maxToTransfer = balance - defaultFee > 0 ? balance - defaultFee : 0.0
 			
 			form +++ Section(Sections.wallet.localized)
@@ -186,7 +186,7 @@ class TransferViewController: FormViewController {
 				guard let row: DecimalRow = form.rowBy(tag: Row.amount.tag),
 					let amount = row.value,
 					amount > 0,
-					AdamantUtilities.validateAmount(amount: amount),
+					AdamantUtilities.validateAmount(amount: Decimal(amount)),
 					let maxToTransfer = self?.maxToTransfer else {
 					return true
 				}
@@ -239,8 +239,8 @@ class TransferViewController: FormViewController {
 		totalRow.evaluateDisabled()
 		
 		if let totalAmount = totalAmount {
-			if amount > 0, AdamantUtilities.validateAmount(amount: amount),
-				totalAmount > 0.0 && totalAmount < (Double(account.balance) * AdamantUtilities.currencyShift) {
+			if amount > 0, AdamantUtilities.validateAmount(amount: Decimal(amount)),
+				totalAmount > 0.0 && totalAmount < (account.balance as NSDecimalNumber).doubleValue {
 				sendButton.isEnabled = true
 				row.cell.titleLabel?.textColor = .black
 			} else {
@@ -268,11 +268,13 @@ class TransferViewController: FormViewController {
 		guard let recipientRow = form.rowBy(tag: Row.address.tag) as? TextRow,
 			let recipient = recipientRow.value,
 			let amountRow = form.rowBy(tag: Row.amount.tag) as? DecimalRow,
-			let amount = amountRow.value else {
+			let raw = amountRow.value else {
 			return
 		}
 		
-		guard amount > 0, AdamantUtilities.validateAmount(amount: amount) else {
+		let amount = Decimal(raw)
+		
+		guard AdamantUtilities.validateAmount(amount: amount) else {
 			dialogService.showError(withMessage: String.adamantLocalized.transfer.amountZeroError)
 			return
 		}
@@ -282,7 +284,7 @@ class TransferViewController: FormViewController {
 			return
 		}
 		
-		guard amount <= maxToTransfer else {
+		guard amount <= Decimal(maxToTransfer) else {
 			dialogService.showError(withMessage: String.adamantLocalized.transfer.amountTooHigh)
 			return
 		}
@@ -296,7 +298,7 @@ class TransferViewController: FormViewController {
 			apiService.getPublicKey(byAddress: recipient) { result in
 				switch result {
 				case .success(_):
-					apiService.transferFunds(sender: account.address, recipient: recipient, amount: AdamantUtilities.from(double: amount), keypair: keypair) { [weak self] result in
+					apiService.transferFunds(sender: account.address, recipient: recipient, amount: amount, keypair: keypair) { [weak self] result in
 						switch result {
 						case .success(_):
 							DispatchQueue.main.async {

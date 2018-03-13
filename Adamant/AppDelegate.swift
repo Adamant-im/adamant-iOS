@@ -65,9 +65,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		
 		// MARK: 4 Autoupdate
-		let chatsProvider = container.resolve(ChatsProvider.self)!
 		repeater = RepeaterService()
-		repeater.registerForegroundCall(label: "chatsProvider", interval: 3, queue: DispatchQueue.global(qos: .utility), callback: chatsProvider.update)
+		if let chatsProvider = container.resolve(ChatsProvider.self),
+			let transfersProvider = container.resolve(TransfersProvider.self),
+			let accountService = container.resolve(AccountService.self) {
+			repeater.registerForegroundCall(label: "chatsProvider", interval: 3, queue: .global(qos: .utility), callback: chatsProvider.update)
+			repeater.registerForegroundCall(label: "transfersProvider", interval: 15, queue: .global(qos: .utility), callback: transfersProvider.update)
+			repeater.registerForegroundCall(label: "accountService", interval: 15, queue: .global(qos: .utility), callback: accountService.update)
+		} else {
+			fatalError("Failed to get chatsProvider")
+		}
 		
 		
 		// MARK: 4. Notifications
@@ -120,67 +127,57 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			notificationService?.removeAllDeliveredNotifications()
 		}
 	}
-	
-	// MARK: Background fetch
-	
+}
+
+
+// MARK: - BackgroundFetch
+extension AppDelegate {
 	func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
 		let container = Container()
 		container.registerAdamantBackgroundFetchServices()
 		
-		guard let securedStore = container.resolve(SecuredStore.self),
-			let apiService = container.resolve(ApiService.self),
-			let notificationsService = container.resolve(NotificationsService.self) else {
-			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
-			completionHandler(.failed)
-			return
-		}
-		
-		guard let address = securedStore.get(StoreKey.chatProvider.address) else {
-			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
-			completionHandler(.failed)
-			return
-		}
-		
-		var lastHeight: Int64?
-		if let raw = securedStore.get(StoreKey.chatProvider.receivedLastHeight) {
-			lastHeight = Int64(raw)
-		} else {
-			lastHeight = nil
-		}
-		
-		var notifiedCount = 0
-		if let raw = securedStore.get(StoreKey.chatProvider.notifiedLastHeight), let notifiedHeight = Int64(raw), let h = lastHeight {
-			if h < notifiedHeight {
-				lastHeight = notifiedHeight
-				
-				if let raw = securedStore.get(StoreKey.chatProvider.notifiedMessagesCount), let count = Int(raw) {
-					notifiedCount = count
-				}
-			}
-		}
-		
-		
-		apiService.getChatTransactions(address: address, height: lastHeight, offset: nil) { result in
-			switch result {
-			case .success(let transactions):
-				if transactions.count > 0 {
-					let total = transactions.count + notifiedCount
-					securedStore.set(String(total), for: StoreKey.chatProvider.notifiedMessagesCount)
-					
-					if let newLastHeight = transactions.map({$0.height}).sorted().last {
-						securedStore.set(String(newLastHeight), for: StoreKey.chatProvider.notifiedLastHeight)
-					}
-					
-					
-					notificationsService.showNotification(title: String.adamantLocalized.notifications.newMessageTitle, body: String.localizedStringWithFormat(String.adamantLocalized.notifications.newMessageBody, total), type: .newMessages(count: total))
-					completionHandler(.newData)
-				} else {
-					completionHandler(.noData)
-				}
-				
-			case .failure(_):
+		guard let notificationsService = container.resolve(NotificationsService.self) else {
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
 				completionHandler(.failed)
+				return
+		}
+		
+		let services: [BackgroundFetchService] = [
+			container.resolve(ChatsProvider.self) as! BackgroundFetchService,
+			container.resolve(TransfersProvider.self) as! BackgroundFetchService
+		]
+		
+		let group = DispatchGroup()
+		let semaphore = DispatchSemaphore(value: 1)
+		var results = [FetchResult]()
+		
+		for service in services {
+			group.enter()
+			service.fetchBackgroundData(notificationService: notificationsService) { result in
+				defer {
+					group.leave()
+				}
+				
+				semaphore.wait()
+				results.append(result)
+				semaphore.signal()
 			}
 		}
-	}
-}
+		
+		group.wait()
+		
+		for result in results {
+			switch result {
+			case .newData:
+				completionHandler(.newData)
+				return
+				
+			case .noData:
+				break
+				
+			case .failed:
+				completionHandler(.failed)
+				return
+			}
+		}
+	}}

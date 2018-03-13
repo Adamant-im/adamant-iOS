@@ -5,7 +5,7 @@
 	<key>You have %d new message(s)</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@messages@</string>
+		<string>У вас %#@messages@</string>
 		<key>messages</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -13,11 +13,29 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>У вас %d новое сообщение</string>
+			<string>%d новое сообщение</string>
 			<key>many</key>
-			<string>У вас %d новых сообщений</string>
+			<string>%d новых сообщений</string>
 			<key>other</key>
-			<string>У вас %d новых сообщения</string>
+			<string>%d новых сообщения</string>
+		</dict>
+	</dict>
+	<key>You have %d new transfer(s)</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>У вас %#@transfers@</string>
+		<key>transfers</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%d новая транзакция</string>
+			<key>many</key>
+			<string>%d новых транзакций</string>
+			<key>other</key>
+			<string>%d новые транзакции</string>
 		</dict>
 	</dict>
 </dict>

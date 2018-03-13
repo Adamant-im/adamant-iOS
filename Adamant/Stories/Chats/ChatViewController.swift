@@ -60,7 +60,7 @@ class ChatViewController: MessagesViewController {
 	private var feeIsVisible: Bool = false
 	private var feeTimer: Timer?
 	private var feeLabel: InputBarButtonItem?
-	private var prevFee: UInt64 = 0
+	private var prevFee: Decimal = 0
 	
 	
 	// MARK: Lifecycle
@@ -149,7 +149,7 @@ class ChatViewController: MessagesViewController {
 		
 		if let delegate = delegate, let address = chatroom?.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
 			messageInputBar.inputTextView.text = message
-			setEstimatedFee(AdamantFeeCalculator.estimatedFeeFor(message: AdamantMessage.text(message)))
+			setEstimatedFee(AdamantMessage.text(message).fee)
 		}
     }
 	
@@ -187,7 +187,7 @@ class ChatViewController: MessagesViewController {
 
 // MARK: - EstimatedFee label
 extension ChatViewController {
-	private func setEstimatedFee(_ fee: UInt64) {
+	private func setEstimatedFee(_ fee: Decimal) {
 		if prevFee != fee && fee > 0 {
 			guard let feeLabel = feeLabel else {
 				return
@@ -427,7 +427,7 @@ extension ChatViewController: MessageInputBarDelegate {
 	
 	func messageInputBar(_ inputBar: MessageInputBar, textViewTextDidChangeTo text: String) {
 		if text.count > 0 {
-			let fee = AdamantFeeCalculator.estimatedFeeFor(message: .text(text))
+			let fee = AdamantMessage.text(text).fee
 			setEstimatedFee(fee)
 		} else {
 			setEstimatedFee(0)

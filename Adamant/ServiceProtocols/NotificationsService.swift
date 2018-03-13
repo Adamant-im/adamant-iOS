@@ -13,7 +13,10 @@ extension String.adamantLocalized {
 		static let notificationsDisabled = NSLocalizedString("Notifications disabled. You can reenable notifications in Settings", comment: "Notifications: User has disabled notifications. Head him into settings")
 		
 		static let newMessageTitle = NSLocalizedString("New message", comment: "Notifications: New message notification title")
-		static let newMessageBody = NSLocalizedString("You have %d new message(s)", comment: "Notifications: new messages notification details")
+		static let newMessageBody = NSLocalizedString("You have %d new message(s)", comment: "Notifications: new messages notification body")
+		
+		static let newTransferTitle = NSLocalizedString("New transfer", comment: "Notifications: New transfer transaction title")
+		static let newTransferBody = NSLocalizedString("You have %d new transfer(s)", comment: "Notifications: New transfer notification body")
 		
 		private init() {}
 	}
@@ -86,6 +89,4 @@ protocol NotificationsService: class {
 	
 	func removeAllPendingNotificationRequests()
 	func removeAllDeliveredNotifications()
-//	func removeAllPendingNotificationRequests(ofType type: AdamantNotificationType)
-//	func removeAllDeliveredNotifications(ofType type: AdamantNotificationType)
 }

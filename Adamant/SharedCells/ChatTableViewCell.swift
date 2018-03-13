@@ -25,7 +25,6 @@ class ChatTableViewCell: UITableViewCell {
 	
 	override func awakeFromNib() {
 		badgeView.layer.cornerRadius = badgeView.bounds.height / 2
-		badgeView.isHidden = true
 	}
 	
 	var avatarImage: UIImage? {
