@@ -15,12 +15,14 @@ class AdamantTransfersProvider: TransfersProvider {
 	var stack: CoreDataStack!
 	var accountService: AccountService!
 	var accountsProvider: AccountsProvider!
+	var securedStore: SecuredStore!
 	
 	// MARK: Properties
 	var transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
 	
 	private(set) var state: State = .empty
-	private var lastHeight: UInt64?
+	private(set) var receivedLastHeight: Int64?
+	private(set) var readedLastHeight: Int64?
 	
 	private let processingQueue = DispatchQueue(label: "im.Adamant.processing.transfers", qos: .utility, attributes: [.concurrent])
 	private let stateSemaphore = DispatchSemaphore(value: 1)
@@ -50,6 +52,39 @@ class AdamantTransfersProvider: TransfersProvider {
 			}
 		}
 	}
+	
+	
+	// MARK: Lifecycle
+	init() {
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { [weak self] notification in
+			self?.update()
+			
+			if let address = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String {
+				self?.securedStore.set(address, for: StoreKey.transfersProvider.address)
+			} else {
+				print("Can't get logged address")
+			}
+		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
+			self?.receivedLastHeight = nil
+			self?.readedLastHeight = nil
+			
+			if let prevState = self?.state {
+				self?.setState(.empty, previous: prevState)
+			}
+			
+			if let store = self?.securedStore {
+				store.remove(StoreKey.transfersProvider.address)
+				store.remove(StoreKey.transfersProvider.receivedLastHeight)
+				store.remove(StoreKey.transfersProvider.readedLastHeight)
+			}
+		}
+	}
+	
+	deinit {
+		NotificationCenter.default.removeObserver(self)
+	}
 }
 
 
@@ -76,7 +111,7 @@ extension AdamantTransfersProvider {
 			return
 		}
 		
-		apiService.getTransactions(forAccount: address, type: .send, fromHeight: lastHeight) { result in
+		apiService.getTransactions(forAccount: address, type: .send, fromHeight: receivedLastHeight) { result in
 			switch result {
 			case .success(let transactions):
 				guard transactions.count > 0 else {
@@ -115,7 +150,10 @@ extension AdamantTransfersProvider {
 	private func reset(notify: Bool) {
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false)
-		lastHeight = nil
+		receivedLastHeight = nil
+		readedLastHeight = nil
+		securedStore.remove(StoreKey.transfersProvider.receivedLastHeight)
+		securedStore.remove(StoreKey.transfersProvider.readedLastHeight)
 		
 		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
 		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -138,6 +176,15 @@ extension AdamantTransfersProvider {
 extension AdamantTransfersProvider {
 	func transfersController() -> NSFetchedResultsController<TransferTransaction> {
 		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+		try! controller.performFetch()
+		return controller
+	}
+	
+	func unreadTransfersController() -> NSFetchedResultsController<TransferTransaction> {
+		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+		request.predicate = NSPredicate(format: "isUnread == true")
 		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 		try! controller.performFetch()
@@ -171,7 +218,9 @@ extension AdamantTransfersProvider {
 		case error(Error)
 	}
 	
-	private func processRawTransactions(_ transactions: [Transaction], currentAddress address: String, completion: @escaping (ProcessingResult) -> Void) {
+	private func processRawTransactions(_ transactions: [Transaction],
+										currentAddress address: String,
+										completion: @escaping (ProcessingResult) -> Void) {
 		// MARK: 0. Transactions?
 		guard transactions.count > 0 else {
 			completion(.success(new: 0))
@@ -236,7 +285,7 @@ extension AdamantTransfersProvider {
 			}
 		}
 		
-		var totalTransactions = 0
+		var transfers = [TransferTransaction]()
 		var height: Int64 = 0
 		for t in transactions {
 			let transfer = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
@@ -261,28 +310,43 @@ extension AdamantTransfersProvider {
 				height = t.height
 			}
 			
-			totalTransactions += 1
+			transfers.append(transfer)
 		}
 		
 		// MARK: 4. Check lastHeight
 		// API returns transactions from lastHeight INCLUDING transaction with height == lastHeight, so +1
 		if height > 0 {
-			let uH = UInt64(height + 1)
+			let uH = Int64(height + 1)
 			
-			if let lastHeight = lastHeight {
+			if let lastHeight = receivedLastHeight {
 				if lastHeight < uH {
-					self.lastHeight = uH
+					self.receivedLastHeight = uH
 				}
 			} else {
-				self.lastHeight = uH
+				self.receivedLastHeight = uH
 			}
 		}
 		
-		// MARK: 5. Dump transactions to viewContext
+		// MARK: 5. Unread transactions
+		if let unreadedHeight = readedLastHeight {
+			transfers.filter({$0.height > unreadedHeight}).forEach({$0.isUnread = true})
+			
+			readedLastHeight = self.receivedLastHeight
+		}
+		
+		if let h = self.receivedLastHeight {
+			securedStore.set(String(h), for: StoreKey.transfersProvider.receivedLastHeight)
+		}
+		
+		if let h = self.readedLastHeight {
+			securedStore.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
+		}
+		
+		// MARK: 6. Dump transactions to viewContext
 		if context.hasChanges {
 			do {
 				try context.save()
-				completion(.success(new: totalTransactions))
+				completion(.success(new: transfers.count))
 			} catch {
 				completion(.error(error))
 			}

@@ -139,6 +139,10 @@ extension TransactionsViewController: NSFetchedResultsControllerDelegate {
 		case .insert:
 			if let newIndexPath = newIndexPath {
 				tableView.insertRows(at: [newIndexPath], with: .automatic)
+				
+				if let transfer = anObject as? TransferTransaction {
+					transfer.isUnread = false
+				}
 			}
 			
 		case .delete:

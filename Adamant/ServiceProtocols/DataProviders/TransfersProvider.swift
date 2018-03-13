@@ -43,10 +43,27 @@ extension AdamantUserInfoKey {
 	}
 }
 
+extension StoreKey {
+	struct transfersProvider {
+		static let address = "transfersProvider.address"
+		static let receivedLastHeight = "transfersProvider.receivedLastHeight"
+		static let readedLastHeight = "transfersProvider.readedLastHeight"
+		static let notifiedLastHeight = "transfersProvider.notifiedLastHeight"
+		static let notifiedTransfersCount = "transfersProvider.notifiedCount"
+	}
+}
+
 protocol TransfersProvider: DataProvider {
+	// MARK: - Properties
+	var receivedLastHeight: Int64? { get }
+	var readedLastHeight: Int64? { get }
+	
 	var transferFee: Decimal { get }
 	
+	// MARK: Controller
 	func transfersController() -> NSFetchedResultsController<TransferTransaction>
+	func unreadTransfersController() -> NSFetchedResultsController<TransferTransaction>
 	
+	// MARK: - Sending funds
 	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void)
 }

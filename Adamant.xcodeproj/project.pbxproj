@@ -87,6 +87,9 @@
 		E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */; };
 		E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B86203D9E5100C163AF /* EurekaQRRow.swift */; };
 		E9942B89203D9ECA00C163AF /* QrCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9942B88203D9ECA00C163AF /* QrCell.xib */; };
+		E9A174B32057EC47003667CD /* BackgroundFetchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A174B22057EC47003667CD /* BackgroundFetchService.swift */; };
+		E9A174B52057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A174B42057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift */; };
+		E9A174B72057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A174B62057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift */; };
 		E9B3D39A201F90570019EB36 /* AccountsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D399201F90570019EB36 /* AccountsProvider.swift */; };
 		E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D39D201F99F40019EB36 /* DataProvider.swift */; };
 		E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D3A0201FA26B0019EB36 /* AdamantAccountsProvider.swift */; };
@@ -264,6 +267,9 @@
 		E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantQRTools.swift; sourceTree = "<group>"; };
 		E9942B86203D9E5100C163AF /* EurekaQRRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EurekaQRRow.swift; sourceTree = "<group>"; };
 		E9942B88203D9ECA00C163AF /* QrCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = QrCell.xib; sourceTree = "<group>"; };
+		E9A174B22057EC47003667CD /* BackgroundFetchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundFetchService.swift; sourceTree = "<group>"; };
+		E9A174B42057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantTransfersProvider+backgroundFetch.swift"; sourceTree = "<group>"; };
+		E9A174B62057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantChatsProvider+backgroundFetch.swift"; sourceTree = "<group>"; };
 		E9B3D399201F90570019EB36 /* AccountsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsProvider.swift; sourceTree = "<group>"; };
 		E9B3D39D201F99F40019EB36 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 		E9B3D3A0201FA26B0019EB36 /* AdamantAccountsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAccountsProvider.swift; sourceTree = "<group>"; };
@@ -410,6 +416,7 @@
 				E905D39C204C13B900DDB504 /* SecuredStore.swift */,
 				E90A494C204DA932009F6A65 /* LocalAuthentication.swift */,
 				E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */,
+				E9A174B22057EC47003667CD /* BackgroundFetchService.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -420,6 +427,7 @@
 				E9CAE8D02018AA5000345E76 /* ApiService */,
 				E9B3D39F201FA2090019EB36 /* DataProviders */,
 				E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */,
+				E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */,
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
 				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
@@ -427,7 +435,6 @@
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
 				E950273F202E257E002C1098 /* RepeaterService.swift */,
 				E905D39A2048A9BD00DDB504 /* KeychainStore.swift */,
-				E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -602,7 +609,9 @@
 			children = (
 				E9B3D3A0201FA26B0019EB36 /* AdamantAccountsProvider.swift */,
 				E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */,
+				E9A174B62057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift */,
 				E9B3D3A8202082450019EB36 /* AdamantTransfersProvider.swift */,
+				E9A174B42057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift */,
 				E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */,
 			);
 			path = DataProviders;
@@ -957,6 +966,7 @@
 				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
 				E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */,
 				E9B3D3A9202082450019EB36 /* AdamantTransfersProvider.swift in Sources */,
+				E9A174B72057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift in Sources */,
 				E948E04E20278D5600975D6B /* SettingsDependencies.swift in Sources */,
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
@@ -985,6 +995,7 @@
 				E9FAE5DA203DBFEF008D3A6B /* Comparable+Clamped.swift in Sources */,
 				E95F857A2007F0260070534A /* ServerResponse.swift in Sources */,
 				E9CE778B202B9DC2009CF70D /* CoreDataAccount+CoreDataClass.swift in Sources */,
+				E9A174B32057EC47003667CD /* BackgroundFetchService.swift in Sources */,
 				E9CE7789202B9DC2009CF70D /* ChatTransaction+CoreDataClass.swift in Sources */,
 				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
 				E9CAE8D62018AC5300345E76 /* AdamantApi+Transactions.swift in Sources */,
@@ -1006,6 +1017,7 @@
 				E948E04C2027679300975D6B /* AdamantExportTools.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,
 				E95F856B200789450070534A /* JSModels.swift in Sources */,
+				E9A174B52057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift in Sources */,
 				E9CE778C202B9DC2009CF70D /* CoreDataAccount+CoreDataProperties.swift in Sources */,
 				E9CE7788202B9DC2009CF70D /* BaseTransaction+CoreDataProperties.swift in Sources */,
 				E9147B5F20500E9300145913 /* MyLittlePinpad+adamant.swift in Sources */,

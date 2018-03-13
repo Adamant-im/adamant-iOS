@@ -37,6 +37,7 @@
         <relationship name="transfers" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TransferTransaction" inverseName="partner" inverseEntity="TransferTransaction" syncable="YES"/>
     </entity>
     <entity name="TransferTransaction" representedClassName="TransferTransaction" parentEntity="BaseTransaction" syncable="YES">
+        <attribute name="isUnread" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="partner" maxCount="1" deletionRule="Nullify" destinationEntity="CoreDataAccount" inverseName="transfers" inverseEntity="CoreDataAccount" syncable="YES"/>
     </entity>
     <elements>
@@ -44,6 +45,6 @@
         <element name="Chatroom" positionX="-45" positionY="108" width="128" height="120"/>
         <element name="ChatTransaction" positionX="-18" positionY="27" width="128" height="120"/>
         <element name="CoreDataAccount" positionX="0" positionY="81" width="128" height="150"/>
-        <element name="TransferTransaction" positionX="-18" positionY="63" width="128" height="60"/>
+        <element name="TransferTransaction" positionX="-18" positionY="63" width="128" height="75"/>
     </elements>
 </model>

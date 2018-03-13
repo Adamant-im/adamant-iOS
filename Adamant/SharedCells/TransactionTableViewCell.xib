@@ -35,22 +35,22 @@
                         </constraints>
                     </imageView>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="SXp-rd-UrY">
-                        <rect key="frame" x="80" y="10.5" width="214" height="65"/>
+                        <rect key="frame" x="80" y="10.5" width="163.5" height="65"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="U00000000000000000000" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2lX-Ur-HbP">
-                                <rect key="frame" x="0.0" y="0.0" width="214" height="20.5"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="500" text="U000000000000000" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2lX-Ur-HbP">
+                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="20.5"/>
                                 <fontDescription key="fontDescription" name="Exo2-Light" family="Exo 2 Light" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100500.0003 ADM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2PE-tm-CaZ">
-                                <rect key="frame" x="0.0" y="23.5" width="214" height="20.5"/>
+                                <rect key="frame" x="0.0" y="23.5" width="163.5" height="20.5"/>
                                 <fontDescription key="fontDescription" name="Exo2-Light" family="Exo 2 Light" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="01.01.2018, 23:59:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tj3-KB-8BU">
-                                <rect key="frame" x="0.0" y="47" width="214" height="18"/>
+                                <rect key="frame" x="0.0" y="47" width="163.5" height="18"/>
                                 <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="15"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>

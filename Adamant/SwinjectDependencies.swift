@@ -96,6 +96,7 @@ extension Container {
 			provider.stack = r.resolve(CoreDataStack.self)
 			provider.accountService = r.resolve(AccountService.self)
 			provider.accountsProvider = r.resolve(AccountsProvider.self)
+			provider.securedStore = r.resolve(SecuredStore.self)
 			return provider
 		}.inObjectScope(.container)
 		
@@ -125,6 +126,21 @@ extension Container {
 			let service = AdamantNotificationsService()
 			service.securedStore = r.resolve(SecuredStore.self)
 			return service
+		}.inObjectScope(.container)
+		
+		// MARK: Fetch Services
+		self.register(ChatsProvider.self) { r in
+			let provider = AdamantChatsProvider()
+			provider.apiService = r.resolve(ApiService.self)
+			provider.securedStore = r.resolve(SecuredStore.self)
+			return provider
+		}.inObjectScope(.container)
+		
+		self.register(TransfersProvider.self) { r in
+			let provider = AdamantTransfersProvider()
+			provider.apiService = r.resolve(ApiService.self)
+			provider.securedStore = r.resolve(SecuredStore.self)
+			return provider
 		}.inObjectScope(.container)
 	}
 }

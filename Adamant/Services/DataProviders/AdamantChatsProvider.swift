@@ -45,12 +45,16 @@ class AdamantChatsProvider: ChatsProvider {
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.receivedLastHeight = nil
+			self?.readedLastHeight = nil
 			if let prevState = self?.state {
 				self?.setState(.empty, previous: prevState, notify: true)
 			}
 			
-			self?.securedStore.remove(StoreKey.chatProvider.address)
-			self?.securedStore.remove(StoreKey.chatProvider.receivedLastHeight)
+			if let store = self?.securedStore {
+				store.remove(StoreKey.chatProvider.address)
+				store.remove(StoreKey.chatProvider.receivedLastHeight)
+				store.remove(StoreKey.chatProvider.readedLastHeight)
+			}
 		}
 	}
 	
@@ -97,6 +101,7 @@ extension AdamantChatsProvider {
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false) // Block update calls
 		receivedLastHeight = nil
+		readedLastHeight = nil
 		
 		let chatrooms = NSFetchRequest<Chatroom>(entityName: Chatroom.entityName)
 		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)

@@ -44,7 +44,7 @@ extension AdamantApiService {
 		}
 	}
 	
-	func getTransactions(forAccount account: String, type: TransactionType, fromHeight: UInt64?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
+	func getTransactions(forAccount account: String, type: TransactionType, fromHeight: Int64?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
 		var queryItems = [URLQueryItem(name: "inId", value: account),
 						  URLQueryItem(name: "and:type", value: String(type.rawValue))]
 		
