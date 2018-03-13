@@ -627,8 +627,14 @@ extension AdamantChatsProvider {
 		
 		
 		// MARK: 4. Unread messagess
-		if let unreadHeight = readedLastHeight {
-			let msgs = Dictionary(grouping: newChatTransactions.filter({$0.height > unreadHeight}), by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
+		if let readedLastHeight = readedLastHeight {
+			let msgs = Dictionary(grouping: newChatTransactions.filter({$0.height > readedLastHeight}), by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
+			for (chatroom, trs) in msgs {
+				chatroom.hasUnreadMessages = true
+				trs.forEach({$0.isUnread = true})
+			}
+		} else {
+			let msgs = Dictionary(grouping: newChatTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
 			for (chatroom, trs) in msgs {
 				chatroom.hasUnreadMessages = true
 				trs.forEach({$0.isUnread = true})

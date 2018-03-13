@@ -90,6 +90,7 @@
 		E9A174B32057EC47003667CD /* BackgroundFetchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A174B22057EC47003667CD /* BackgroundFetchService.swift */; };
 		E9A174B52057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A174B42057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift */; };
 		E9A174B72057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A174B62057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift */; };
+		E9A174B920587B84003667CD /* notification.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E9A174B820587B83003667CD /* notification.mp3 */; };
 		E9B3D39A201F90570019EB36 /* AccountsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D399201F90570019EB36 /* AccountsProvider.swift */; };
 		E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D39D201F99F40019EB36 /* DataProvider.swift */; };
 		E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D3A0201FA26B0019EB36 /* AdamantAccountsProvider.swift */; };
@@ -270,6 +271,7 @@
 		E9A174B22057EC47003667CD /* BackgroundFetchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundFetchService.swift; sourceTree = "<group>"; };
 		E9A174B42057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantTransfersProvider+backgroundFetch.swift"; sourceTree = "<group>"; };
 		E9A174B62057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantChatsProvider+backgroundFetch.swift"; sourceTree = "<group>"; };
+		E9A174B820587B83003667CD /* notification.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = notification.mp3; sourceTree = "<group>"; };
 		E9B3D399201F90570019EB36 /* AccountsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsProvider.swift; sourceTree = "<group>"; };
 		E9B3D39D201F99F40019EB36 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 		E9B3D3A0201FA26B0019EB36 /* AdamantAccountsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAccountsProvider.swift; sourceTree = "<group>"; };
@@ -432,9 +434,9 @@
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
 				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
-				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
-				E950273F202E257E002C1098 /* RepeaterService.swift */,
 				E905D39A2048A9BD00DDB504 /* KeychainStore.swift */,
+				E950273F202E257E002C1098 /* RepeaterService.swift */,
+				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -476,6 +478,7 @@
 			children = (
 				E9E7CDA42002A6EB00DFC4DB /* Fonts */,
 				E913C8F81FFFA51D001A83F7 /* Assets.xcassets */,
+				E9A174B820587B83003667CD /* notification.mp3 */,
 				E9256F802039B29D00DE86E9 /* InfoPlist.strings */,
 				E9256F7B2039B29A00DE86E9 /* Localizable.strings */,
 				E93D7AC720530F76005D19DC /* Localizable.stringsdict */,
@@ -818,6 +821,7 @@
 				E9EC3415200524CA00C0E546 /* Exo+2_100_normal.ttf in Resources */,
 				E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */,
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
+				E9A174B920587B84003667CD /* notification.mp3 in Resources */,
 				E9256F602034E0E100DE86E9 /* Chats.storyboard in Resources */,
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
 				E948E0482024F02700975D6B /* LoginFooter.xib in Resources */,
