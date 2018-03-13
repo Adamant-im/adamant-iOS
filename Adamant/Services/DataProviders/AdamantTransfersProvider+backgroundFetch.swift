@@ -43,7 +43,7 @@ extension AdamantTransfersProvider: BackgroundFetchService {
 					self?.securedStore.set(String(total), for: StoreKey.transfersProvider.notifiedTransfersCount)
 					
 					if var newLastHeight = transactions.map({$0.height}).sorted().last {
-//						newLastHeight += 1 // Server will return new transactions including this one
+						newLastHeight += 1 // Server will return new transactions including this one
 						self?.securedStore.set(String(newLastHeight), for: StoreKey.transfersProvider.notifiedLastHeight)
 					}
 					
