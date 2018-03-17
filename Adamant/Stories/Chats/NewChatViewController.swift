@@ -14,6 +14,8 @@ import AVFoundation
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct newChat {
+		static let title = NSLocalizedString("NewChat.title", comment: "New chat: scene title")
+		
 		static let addressPlaceholder = NSLocalizedString("", comment: "New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
 		static let scanQrButton = NSLocalizedString("Scan QR", comment: "New chat: Scan QR with address button")
 		
@@ -80,6 +82,9 @@ class NewChatViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+		navigationItem.title = String.adamantLocalized.newChat.title
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
 		
 		navigationOptions = .Disabled
 		

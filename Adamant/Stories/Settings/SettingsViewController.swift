@@ -12,6 +12,8 @@ import MyLittlePinpad
 
 extension String.adamantLocalized {
 	struct settings {
+		static let title = NSLocalizedString("Config.title", comment: "Config: scene title")
+		
 		static let stayInTurnOff = NSLocalizedString("Do not stay logged in", comment: "Config: turn off 'Stay Logged In' confirmation")
 		static let biometryOnReason = NSLocalizedString("Use biometry to log in", comment: "Config: Authorization reason for turning biometry on")
 		static let biometryOffReason = NSLocalizedString("Do not use biometry to log in", comment: "Config: Authorization reason for turning biometry off")
@@ -19,9 +21,6 @@ extension String.adamantLocalized {
 }
 
 class SettingsViewController: FormViewController {
-	
-	private let qrGeneratorSegue = "passphraseToQR"
-	
 	// MARK: Sections & Rows
 	enum Sections {
 		case settings
@@ -85,6 +84,7 @@ class SettingsViewController: FormViewController {
 	var dialogService: DialogService!
 	var localAuth: LocalAuthentication!
 	var notificationsService: NotificationsService!
+	var router: Router!
 	
 	
 	// MARK: Properties
@@ -95,6 +95,7 @@ class SettingsViewController: FormViewController {
 	// MARK: Lifetime
     override func viewDidLoad() {
         super.viewDidLoad()
+		self.navigationItem.title = String.adamantLocalized.settings.title
 		navigationOptions = .Disabled
 		showBiometryRow = accountService.hasStayInAccount
 		
@@ -174,10 +175,10 @@ class SettingsViewController: FormViewController {
 		}.cellSetup({ (cell, _) in
 			cell.selectionStyle = .gray
 		}).onCellSelection({ [weak self] (_, _) in
-			guard let segue = self?.qrGeneratorSegue else {
+			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.qRGenerator) else {
 				return
 			}
-			self?.performSegue(withIdentifier: segue, sender: nil)
+			nav.pushViewController(vc, animated: true)
 		}).cellUpdate({ (cell, _) in
 			if let label = cell.textLabel {
 				label.font = UIFont.adamantPrimary(size: 17)

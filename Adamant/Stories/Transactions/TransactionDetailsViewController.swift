@@ -57,9 +57,9 @@ class TransactionDetailsViewController: UIViewController {
 	
 	// MARK: - IBOutlets
 	@IBOutlet weak var tableView: UITableView!
-	@IBOutlet weak var shareButton: UIBarButtonItem!
 	
 	override func viewDidLoad() {
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(share))
 		tableView.dataSource = self
 		tableView.delegate = self
 		

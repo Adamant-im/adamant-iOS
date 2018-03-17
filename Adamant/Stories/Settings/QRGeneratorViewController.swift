@@ -14,6 +14,8 @@ import Photos
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct qrGenerator {
+		static let title = NSLocalizedString("QrGenerator.title", comment: "QRGenerator: scene title")
+		
 		static let tapToSaveTip = NSLocalizedString("Tap to save", comment: "QRGenerator: small 'Tap to save' tooltip under generated QR")
 		static let passphrasePlaceholder = NSLocalizedString("Passphrase", comment: "QRGenerator: Passphrase textview placeholder")
 		

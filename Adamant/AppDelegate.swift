@@ -8,13 +8,20 @@
 
 import UIKit
 import Swinject
-import SwinjectStoryboard
+
+extension String.adamantLocalized {
+	struct tabItems {
+		static let account = NSLocalizedString("Tabs.Account", comment: "Main tab bar: Account/Wallet page")
+		static let chats = NSLocalizedString("Tabs.Chats", comment: "Main tab bar: Chats page")
+		static let settings = NSLocalizedString("Tabs.Settings", comment: "Main tab bar: Settings page")
+	}
+}
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-	
 	var window: UIWindow?
 	var repeater: RepeaterService!
+	var container: Container!
 	
 	weak var accountService: AccountService?
 	weak var notificationService: NotificationsService?
@@ -23,14 +30,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 		// MARK: 1. Initiating Swinject
-		let container = SwinjectStoryboard.defaultContainer
-		Container.loggingFunction = nil // Logging currently not supported with SwinjectStoryboards.
+		container = Container()
 		container.registerAdamantServices()
-		container.registerAdamantAccountStory()
-		container.registerAdamantLoginStory()
-		container.registerAdamantChatsStory()
-		container.registerAdamantSettingsStory()
-		
 		accountService = container.resolve(AccountService.self)
 		notificationService = container.resolve(NotificationsService.self)
 		
@@ -48,20 +49,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		if let tabbar = self.window!.rootViewController as? UITabBarController {
-			let account = router.get(story: .Account).instantiateInitialViewController()!
-			let chats = router.get(story: .Chats).instantiateInitialViewController()!
-			let settings = router.get(story: .Settings).instantiateInitialViewController()!
-
+			let accountRoot = router.get(scene: AdamantScene.Account.account)
+			let account = UINavigationController(rootViewController: accountRoot)
+			account.tabBarItem.title = String.adamantLocalized.tabItems.account
+			account.tabBarItem.image = #imageLiteral(resourceName: "wallet_tab")
+			
+			let chatListRoot = router.get(scene: AdamantScene.Chats.chatList)
+			let chatList = UINavigationController(rootViewController: chatListRoot)
+			chatList.tabBarItem.title = String.adamantLocalized.tabItems.chats
+			chatList.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
+			
+			let settingsRoot = router.get(scene: AdamantScene.Settings.settings)
+			let settings = UINavigationController(rootViewController: settingsRoot)
+			settings.tabBarItem.title = String.adamantLocalized.tabItems.settings
+			settings.tabBarItem.image = #imageLiteral(resourceName: "settings_tab")
+			
+			
 			account.tabBarItem.badgeColor = UIColor.adamantPrimary
-			chats.tabBarItem.badgeColor = UIColor.adamantPrimary
+			chatList.tabBarItem.badgeColor = UIColor.adamantPrimary
 			settings.tabBarItem.badgeColor = UIColor.adamantPrimary
 			
-			tabbar.setViewControllers([account, chats, settings], animated: false)
+			tabbar.setViewControllers([account, chatList, settings], animated: false)
 		}
 
 		
 		// MARK: 3. Initiate login
-		self.window!.rootViewController?.present(router.get(scene: .Login), animated: false, completion: nil)
+		let login = router.get(scene: AdamantScene.Login.login)
+		self.window!.rootViewController?.present(login, animated: false, completion: nil)
 		
 		
 		// MARK: 4 Autoupdate

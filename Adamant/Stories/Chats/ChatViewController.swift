@@ -66,6 +66,7 @@ class ChatViewController: MessagesViewController {
 	// MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+		navigationItem.rightBarButtonItem = UIBarButtonItem(title: "•••", style: .plain, target: self, action: #selector(properties))
 		
 		// MARK: 1. Initial configuration
 		

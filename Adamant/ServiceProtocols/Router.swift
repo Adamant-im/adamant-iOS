@@ -7,46 +7,22 @@
 //
 
 import UIKit
+import Swinject
 
-// MARK: - Adamant Story struct
-struct AdamantStory: Equatable, Hashable {
-	let name: String
-	
-	init(_ name: String) {
-		self.name = name
-	}
-	
-	static func ==(lhs: AdamantStory, rhs: AdamantStory) -> Bool {
-		return lhs.name == rhs.name
-	}
-	
-	var hashValue: Int {
-		return name.hashValue &* 171717
-	}
-}
 
 // MARK: - Adamant Scene
-struct AdamantScene: Equatable, Hashable {
+struct AdamantScene {
 	let identifier: String
-	let story: AdamantStory
+	let factory: (Resolver) -> UIViewController
 	
-	init(story: AdamantStory, identifier: String) {
-		self.story = story
+	init(identifier: String, factory: @escaping (Resolver) -> UIViewController) {
 		self.identifier = identifier
-	}
-	
-	static func ==(lhs: AdamantScene, rhs: AdamantScene) -> Bool {
-		return lhs.identifier == rhs.identifier
-	}
-	
-	var hashValue: Int {
-		return identifier.hashValue ^ story.hashValue &* 717171
+		self.factory = factory
 	}
 }
 
 
 // MARK: - Adamant Router
 protocol Router: class {
-	func get(story: AdamantStory) -> UIStoryboard
 	func get(scene: AdamantScene) -> UIViewController
 }

@@ -13,10 +13,10 @@ class TransactionsViewController: UIViewController {
 	// MARK: - Dependencies
 	var cellFactory: CellFactory!
 	var transfersProvider: TransfersProvider!
+	var router: Router!
 	
 	// MARK: - Properties
 	var controller: NSFetchedResultsController<TransferTransaction>?
-	let transactionDetailsSegue = "showTransactionDetails"
 	
 	
 	// MARK: - IBOutlets
@@ -43,14 +43,6 @@ class TransactionsViewController: UIViewController {
 		super.viewWillAppear(animated)
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
-		}
-	}
-
-	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-		if segue.identifier == transactionDetailsSegue,
-			let vc = segue.destination as? TransactionDetailsViewController,
-			let transaction = sender as? TransferTransaction {
-			vc.transaction = transaction
 		}
 	}
 }
@@ -110,7 +102,12 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 			return
 		}
 		
-		performSegue(withIdentifier: transactionDetailsSegue, sender: transaction)
+		guard let controller = router.get(scene: AdamantScene.Transactions.transactionDetails) as? TransactionDetailsViewController else {
+			return
+		}
+		
+		controller.transaction = transaction
+		navigationController?.pushViewController(controller, animated: true)
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

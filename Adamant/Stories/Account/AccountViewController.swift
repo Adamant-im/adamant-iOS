@@ -13,6 +13,8 @@ import SafariServices
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct account {
+		static let title = NSLocalizedString("Wallet.title", comment: "Wallet page: scene title")
+		
 		static let rowBalance = NSLocalizedString("Balance", comment: "Wallet page: Balance row title")
 		static let rowSendTokens = NSLocalizedString("Send Tokens", comment: "Wallet page: 'Send tokens' button")
 		static let rowInvest = NSLocalizedString("Invest in ICO", comment: "Wallet page: 'Invest in ICO' button")
@@ -40,8 +42,6 @@ fileprivate extension String.adamantLocalized.alert {
 class AccountViewController: UIViewController {
 	// MARK: - Constants
 	private let cellIdentifier = "cell"
-	private let showTransactionsSegue = "showTransactions"
-	private let showTransferSegue = "showTransfer"
 	
 	private let webAppUrl = URL.init(string: "https://msg.adamant.im")
 	
@@ -72,6 +72,7 @@ class AccountViewController: UIViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+		navigationItem.title = String.adamantLocalized.account.title
 
 		tableView.delegate = self
 		tableView.dataSource = self
@@ -100,22 +101,6 @@ class AccountViewController: UIViewController {
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantAccountDataUpdated, object: nil, queue: OperationQueue.main) { _ in
 			self.refreshBalanceCell()
-		}
-	}
-	
-	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-		guard let identifier = segue.identifier else {
-			return
-		}
-		
-		switch identifier {
-		case showTransferSegue:
-			if let account = accountService.account, let vc = segue.destination as? TransferViewController {
-				vc.account = account
-			}
-			
-		default:
-			return
 		}
 	}
 	
@@ -189,10 +174,10 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 			
 			switch row {
 			case .balance:
-				performSegue(withIdentifier: showTransactionsSegue, sender: nil)
+				let vc = router.get(scene: AdamantScene.Transactions.transactions)
+				navigationController?.pushViewController(vc, animated: true)
 				
 			case .sendTokens:
-//				performSegue(withIdentifier: showTransferSegue, sender: nil)
 				// <Sending funds not allowed>
 				let alert = UIAlertController(title: String.adamantLocalized.account.sorryAlert, message: String.adamantLocalized.account.transferNotAllowed, preferredStyle: .alert)
 				
@@ -234,7 +219,7 @@ extension AccountViewController: UITableViewDataSource, UITableViewDelegate {
 			}
 			let logout = UIAlertAction(title: String.adamantLocalized.alert.logoutButton, style: .default) { [weak self] _ in
 				self?.accountService.logout()
-				if let vc = self?.router.get(scene: .Login) {
+				if let vc = self?.router.get(scene: AdamantScene.Login.login) {
 					self?.dialogService.present(vc, animated: true, completion: nil)
 				}
 			}

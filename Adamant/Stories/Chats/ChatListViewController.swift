@@ -1,5 +1,5 @@
 //
-//  ChatsListViewController.swift
+//  ChatListViewController.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 12.01.2018.
@@ -9,7 +9,15 @@
 import UIKit
 import CoreData
 
-class ChatsListViewController: UIViewController {
+extension String.adamantLocalized {
+	struct chatList {
+		static let title = NSLocalizedString("ChatList.title", comment: "ChatList: scene title")
+		
+		private init() {}
+	}
+}
+
+class ChatListViewController: UIViewController {
 	// MARK: Dependencies
 	var accountService: AccountService!
 	var chatsProvider: ChatsProvider!
@@ -21,8 +29,6 @@ class ChatsListViewController: UIViewController {
 	@IBOutlet weak var newChatButton: UIBarButtonItem!
 	
 	// MARK: Properties
-	let showChatSegue = "showChat"
-	let newChatSegue = "newChat"
 	var chatsController: NSFetchedResultsController<Chatroom>?
 	var unreadController: NSFetchedResultsController<ChatTransaction>?
 	
@@ -33,6 +39,8 @@ class ChatsListViewController: UIViewController {
 	// MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+		navigationItem.title = String.adamantLocalized.chatList.title
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
 		
 		// MARK: TableView
 		tableView.dataSource = self
@@ -73,29 +81,22 @@ class ChatsListViewController: UIViewController {
 		}
 	}
 	
-	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-		guard let identifier = segue.identifier else {
-			return
+	
+	// MARK: IB Actions
+	@IBAction func newChat(sender: Any) {
+		let controller = router.get(scene: AdamantScene.Chats.newChat)
+		
+		if let c = controller as? NewChatViewController {
+			c.delegate = self
+		} else if let nav = controller as? UINavigationController, let c = nav.viewControllers.last as? NewChatViewController {
+			c.delegate = self
 		}
 		
-		switch identifier {
-		case showChatSegue:
-			if let chatroom = sender as? Chatroom, let vc = segue.destination as? ChatViewController {
-				prepareChatViewController(vc, chatroom: chatroom)
-			}
-			
-		case newChatSegue:
-			if let vc = segue.destination as? NewChatViewController {
-				vc.delegate = self
-			} else if let nav = segue.destination as? UINavigationController, let vc = nav.viewControllers.first as? NewChatViewController {
-				vc.delegate = self
-			}
-			
-		default:
-			return
-		}
+		present(controller, animated: true, completion: nil)
 	}
 	
+	
+	// MARK: Helpers
 	private func prepareChatViewController(_ vc: ChatViewController, chatroom: Chatroom) {
 		if let account = accountService.account {
 			vc.account = account
@@ -109,7 +110,7 @@ class ChatsListViewController: UIViewController {
 
 
 // MARK: - UITableView
-extension ChatsListViewController: UITableViewDelegate, UITableViewDataSource {
+extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		if let f = chatsController?.fetchedObjects {
 			return f.count
@@ -127,15 +128,21 @@ extension ChatsListViewController: UITableViewDelegate, UITableViewDataSource {
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		if let chatroom = chatsController?.object(at: indexPath) {
-			performSegue(withIdentifier: showChatSegue, sender: chatroom)
+		if let chatroom = chatsController?.object(at: indexPath), let c = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController {
+			prepareChatViewController(c, chatroom: chatroom)
+			
+			if let nav = navigationController {
+				nav.pushViewController(c, animated: true)
+			} else {
+				present(c, animated: true)
+			}
 		}
 	}
 }
 
 
 // MARK: - UITableView Cells
-extension ChatsListViewController {
+extension ChatListViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: chatCell, for: indexPath) as! ChatTableViewCell
 		
@@ -186,7 +193,7 @@ extension ChatsListViewController {
 
 
 // MARK: - NSFetchedResultsControllerDelegate
-extension ChatsListViewController: NSFetchedResultsControllerDelegate {
+extension ChatListViewController: NSFetchedResultsControllerDelegate {
 	func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
 		if controller == chatsController {
 			tableView.beginUpdates()
@@ -255,12 +262,12 @@ extension ChatsListViewController: NSFetchedResultsControllerDelegate {
 
 
 // MARK: - NewChatViewControllerDelegate
-extension ChatsListViewController: NewChatViewControllerDelegate {
+extension ChatListViewController: NewChatViewControllerDelegate {
 	func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount) {
 		let chatroom = self.chatsProvider.chatroomWith(account)
 		
 		DispatchQueue.main.async {
-			if let vc = self.router.get(scene: .Chat) as? ChatViewController {
+			if let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController {
 				self.prepareChatViewController(vc, chatroom: chatroom)
 				self.navigationController?.pushViewController(vc, animated: false)
 				
@@ -292,7 +299,7 @@ extension ChatsListViewController: NewChatViewControllerDelegate {
 
 
 // MARK: - ChatViewControllerDelegate
-extension ChatsListViewController: ChatViewControllerDelegate {
+extension ChatListViewController: ChatViewControllerDelegate {
 	func preserveMessage(_ message: String, forAddress address: String) {
 		preservedMessagess[address] = message
 	}
@@ -312,7 +319,7 @@ extension ChatsListViewController: ChatViewControllerDelegate {
 
 
 // MARK: - Current chat
-extension ChatsListViewController {
+extension ChatListViewController {
 	func presentedChatroom() -> Chatroom? {
 		// Showing another page
 		guard tabBarController?.selectedViewController == self else {
