@@ -179,7 +179,7 @@ extension AdamantTransfersProvider {
 		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
 		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-		try! controller.performFetch()
+		
 		return controller
 	}
 	
@@ -188,7 +188,7 @@ extension AdamantTransfersProvider {
 		request.predicate = NSPredicate(format: "isUnread == true")
 		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-		try! controller.performFetch()
+		
 		return controller
 	}
 	

@@ -48,27 +48,16 @@ class ChatListViewController: UIViewController {
 		tableView.delegate = self
 		tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
 		
-		chatsController = chatsProvider.getChatroomsController()
-		chatsController?.delegate = self
-		unreadController = chatsProvider.getUnreadMessagesController()
-		unreadController?.delegate = self
-		
-		tableView.reloadData()
+		if self.accountService.account != nil {
+			initFetchedRequestControllers(provider: chatsProvider)
+		}
 		
 		// MARK: Login/Logout
 		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			guard let controller = self?.chatsProvider.getChatroomsController() else {
-				return
-			}
-			
-			controller.delegate = self
-			self?.chatsController = controller
-			self?.tableView.reloadData()
+			self?.initFetchedRequestControllers(provider: self?.chatsProvider)
 		}
 		NotificationCenter.default.addObserver(forName: .adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			self?.setBadgeValue(nil)
-			self?.chatsController = nil
-			self?.tableView.reloadData()
+			self?.initFetchedRequestControllers(provider: nil)
 		}
     }
 	
@@ -107,6 +96,35 @@ class ChatListViewController: UIViewController {
 		vc.hidesBottomBarWhenPushed = true
 		vc.chatroom = chatroom
 		vc.delegate = self
+	}
+	
+	
+	/// - Parameter provider: nil to drop controllers and reset table
+	private func initFetchedRequestControllers(provider: ChatsProvider?) {
+		guard let provider = provider else {
+			chatsController = nil
+			unreadController = nil
+			tableView.reloadData()
+			return
+		}
+		
+		chatsController = provider.getChatroomsController()
+		unreadController = provider.getUnreadMessagesController()
+		
+		chatsController?.delegate = self
+		unreadController?.delegate = self
+		
+		do {
+			try chatsController?.performFetch()
+			try unreadController?.performFetch()
+		} catch {
+			chatsController = nil
+			unreadController = nil
+			print("There was an error performing fetch: \(error)")
+		}
+		
+		tableView.reloadData()
+		setBadgeValue(unreadController?.fetchedObjects?.count)
 	}
 }
 

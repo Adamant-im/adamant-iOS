@@ -89,6 +89,12 @@ class ChatViewController: MessagesViewController {
 			
 			controller.delegate = self
 			self?.chatController = controller
+			
+			do {
+				try controller.performFetch()
+			} catch {
+				print("There was an error performing fetch: \(error)")
+			}
 
 			if let collection = self?.messagesCollectionView {
 				DispatchQueue.main.async {
