@@ -145,13 +145,7 @@ extension AdamantAccountService: AccountService {
 		stateSemaphore.wait()
 		
 		switch state {
-		case .notLogged:
-			fallthrough
-		
-		case .isLoggingIn:
-			fallthrough
-		
-		case .updating:
+		case .notLogged, .isLoggingIn, .updating:
 			stateSemaphore.signal()
 			return
 			
