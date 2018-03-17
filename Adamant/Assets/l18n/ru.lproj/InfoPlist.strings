@@ -5,7 +5,7 @@
 "CFBundleName" = "Адамант";
 
 /* Camera authorization reason */
-"NSCameraUsageDescription" = "Чтения QR-кодов с адресами и паролями";
+"NSCameraUsageDescription" = "Чтение QR-кодов с адресами и паролями";
 
 /* Readonly access to photolibrary reason */
 "NSPhotoLibraryAddUsageDescription" = "Сохранение созданных QR-кодов";
