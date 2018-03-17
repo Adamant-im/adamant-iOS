@@ -34,13 +34,28 @@ class AdamantChatsProvider: ChatsProvider {
 	// MARK: Lifecycle
 	init() {
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { [weak self] notification in
-			self?.update()
-			
-			if let address = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String {
-				self?.securedStore.set(address, for: StoreKey.chatProvider.address)
-			} else {
-				print("Can't get logged address.")
+			guard let store = self?.securedStore else {
+				return
 			}
+			
+			guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
+				store.remove(StoreKey.chatProvider.address)
+				store.remove(StoreKey.chatProvider.receivedLastHeight)
+				store.remove(StoreKey.chatProvider.readedLastHeight)
+				return
+			}
+			
+			if let savedAddress = self?.securedStore.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
+				if let raw = store.get(StoreKey.chatProvider.readedLastHeight), let h = Int64(raw) {
+					self?.readedLastHeight = h
+				}
+			} else {
+				store.remove(StoreKey.chatProvider.receivedLastHeight)
+				store.remove(StoreKey.chatProvider.readedLastHeight)
+				store.set(loggedAddress, for: StoreKey.chatProvider.address)
+			}
+			
+			self?.update()
 		}
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
@@ -100,8 +115,11 @@ extension AdamantChatsProvider {
 	private func reset(notify: Bool) {
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false) // Block update calls
+		
 		receivedLastHeight = nil
 		readedLastHeight = nil
+		securedStore.remove(StoreKey.chatProvider.receivedLastHeight)
+		securedStore.remove(StoreKey.chatProvider.readedLastHeight)
 		
 		let chatrooms = NSFetchRequest<Chatroom>(entityName: Chatroom.entityName)
 		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -172,8 +190,14 @@ extension AdamantChatsProvider {
 				
 				self?.readedLastHeight = self?.receivedLastHeight
 				
-				if let h = self?.receivedLastHeight, let store = self?.securedStore {
-					store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
+				if let store = self?.securedStore {
+					if let h = self?.receivedLastHeight {
+						store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
+					}
+					
+					if let h = self?.readedLastHeight {
+						store.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
+					}
 				}
 			}
 		}
