@@ -11,7 +11,7 @@ import Swinject
 
 extension String.adamantLocalized {
 	struct tabItems {
-		static let account = NSLocalizedString("Tabs.Account", comment: "Main tab bar: Account/Wallet page")
+		static let account = NSLocalizedString("Tabs.Account", comment: "Main tab bar: Account page")
 		static let chats = NSLocalizedString("Tabs.Chats", comment: "Main tab bar: Chats page")
 		static let settings = NSLocalizedString("Tabs.Settings", comment: "Main tab bar: Settings page")
 	}

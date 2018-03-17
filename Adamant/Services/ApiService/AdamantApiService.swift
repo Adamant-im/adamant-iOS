@@ -33,16 +33,16 @@ class AdamantApiService: ApiService {
 		var localized: String {
 			switch self {
 			case .endpointBuildFailed:
-				return NSLocalizedString("Endpoint build failed", comment: "Serious internal error: Failed to build endpoint url")
+				return NSLocalizedString("ApiService.InternalError.EndpointBuildFailed", comment: "Serious internal error: Failed to build endpoint url")
 				
 			case .signTransactionFailed:
-				return NSLocalizedString("Failed transaction signing", comment: "Serious internal error: Failed to sign transaction")
+				return NSLocalizedString("ApiService.InternalError.FailedTransactionSigning", comment: "Serious internal error: Failed to sign transaction")
 				
 			case .parsingFailed:
-				return NSLocalizedString("Parsing failed", comment: "Serious internal error: Error parsing response")
+				return NSLocalizedString("ApiService.InternalError.ParsingFailed", comment: "Serious internal error: Error parsing response")
 				
 			case .unknownError:
-				return NSLocalizedString("Unknown error", comment: "Unknown internal error")
+				return NSLocalizedString("ApiService.InternalError.UnknownError", comment: "Unknown internal error")
 			}
 		}
 	}

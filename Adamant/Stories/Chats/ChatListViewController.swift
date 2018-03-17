@@ -11,7 +11,7 @@ import CoreData
 
 extension String.adamantLocalized {
 	struct chatList {
-		static let title = NSLocalizedString("ChatList.title", comment: "ChatList: scene title")
+		static let title = NSLocalizedString("ChatListPage.Title", comment: "ChatList: scene title")
 		
 		private init() {}
 	}

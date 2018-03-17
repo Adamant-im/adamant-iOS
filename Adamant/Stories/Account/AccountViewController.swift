@@ -13,28 +13,28 @@ import SafariServices
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct account {
-		static let title = NSLocalizedString("Wallet.title", comment: "Wallet page: scene title")
+		static let title = NSLocalizedString("AccountTab.title", comment: "Account page: scene title")
 		
-		static let rowBalance = NSLocalizedString("Balance", comment: "Wallet page: Balance row title")
-		static let rowSendTokens = NSLocalizedString("Send Tokens", comment: "Wallet page: 'Send tokens' button")
-		static let rowInvest = NSLocalizedString("Invest in ICO", comment: "Wallet page: 'Invest in ICO' button")
-		static let rowLogout = NSLocalizedString("Logout", comment: "Wallet page: 'Logout' button")
+		static let rowBalance = NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
+		static let rowSendTokens = NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
+		static let rowInvest = NSLocalizedString("AccountTab.Row.JoinIco", comment: "Account tab: 'Invest in ICO' button")
+		static let rowLogout = NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
 		
-		static let sorryAlert = NSLocalizedString("Sorry!", comment: "Wallet page: 'Transfer not allowed' alert title")
-		static let webApp = NSLocalizedString("Go to msg.adamant.im", comment: "Wallet page: 'Transfer not allowed' alert 'go to WebApp button'")
-		static let transferNotAllowed = NSLocalizedString("Due to Apple restrictions, sending tokens is not allowed until the end of the ICO. For now, you can send tokens using WebApp at msg.adamant.im", comment: "Wallet page: Inform user that sending tokens not allowed by Apple until the end of ICO")
+		static let sorryAlert = NSLocalizedString("AccountTab.TransferBlocked.Title", comment: "Account tab: 'Transfer not allowed' alert title")
+		static let webApp = NSLocalizedString("AccountTab.TransferBlocked.GoToPWA", comment: "Account tab: 'Transfer not allowed' alert 'go to WebApp button'")
+		static let transferNotAllowed = NSLocalizedString("AccountTab.Message", comment: "Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO")
 		
-		static let sectionAccount = NSLocalizedString("Account", comment: "Wallet page: Account section title.")
-		static let sectionWallet = NSLocalizedString("Wallet", comment: "Wallet page: Wallet section title")
-		static let sectionActions = NSLocalizedString("Actions", comment: "Wallet page: Actions section title")
+		static let sectionAccount = NSLocalizedString("AccountTab.Section.Account", comment: "Account tab: Account section title.")
+		static let sectionWallet = NSLocalizedString("AccountTab.Section.Wallet", comment: "Account tab: Wallet section title")
+		static let sectionActions = NSLocalizedString("AccountTab.Section.Actions", comment: "Account tab: Actions section title")
 		
 		private init() { }
 	}
 }
 
 fileprivate extension String.adamantLocalized.alert {
-	static let logoutMessageFormat = NSLocalizedString("Logout from %@?", comment: "Wallet page: Confirm logout alert")
-	static let logoutButton = NSLocalizedString("Logout", comment: "Wallet page: Confirm logout alert: Logout (Ok) button")
+	static let logoutMessageFormat = NSLocalizedString("AccountTab.ConfirmLogout.MessageFormat", comment: "Account tab: Confirm logout alert")
+	static let logoutButton = NSLocalizedString("AccountTab.ConfirmLogout.Logout", comment: "Account tab: Confirm logout alert: Logout (Ok) button")
 }
 
 

@@ -28,9 +28,9 @@ enum ShareType {
 }
 
 extension String.adamantLocalized.alert {
-	static let copyToPasteboard = NSLocalizedString("Copy to Pasteboard", comment: "Shared alert 'Copy' button. Used anywhere. Used for copy-paste info.")
-	static let share = NSLocalizedString("Share", comment: "Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu.")
-	static let generateQr = NSLocalizedString("Generate QR Code", comment: "Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere.")
+	static let copyToPasteboard = NSLocalizedString("Shared.CopyToPasteboard", comment: "Shared alert 'Copy' button. Used anywhere. Used for copy-paste info.")
+	static let share = NSLocalizedString("Shared.Share", comment: "Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu.")
+	static let generateQr = NSLocalizedString("Shared.GenerateQRCode", comment: "Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere.")
 }
 
 enum ShareContentType {

@@ -13,17 +13,17 @@ import MyLittlePinpad
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct login {
-		static let loggingInProgressMessage = NSLocalizedString("Logging in", comment: "Login: notify user that we a logging in")
+		static let loggingInProgressMessage = NSLocalizedString("LoginScene.LoggingInProgress", comment: "Login: notify user that we are trying to log in")
 		
-		static let loginIntoPrevAccount = NSLocalizedString("Login into Adamant", comment: "Login: Login into previous account with biometry or pincode")
+		static let loginIntoPrevAccount = NSLocalizedString("LoginScene.LoginIntoAdamant", comment: "Login: Login into previous account with biometry or pincode")
 		
-		static let wrongQrError = NSLocalizedString("QR code does not contains a valid passphrase", comment: "Login: Notify user that scanned QR doesn't contains a passphrase.")
-		static let noNetworkError = NSLocalizedString("No connection with The Internet", comment: "Login: No network error.")
+		static let wrongQrError = NSLocalizedString("LoginScene.Error.WrongQr", comment: "Login: Notify user that scanned QR doesn't contains a passphrase.")
+		static let noNetworkError = NSLocalizedString("LoginScene.Error.NoInternet", comment: "Login: No network error.")
 		
-		static let cameraNotAuthorized = NSLocalizedString("You need to authorize Adamant to use device's Camera", comment: "Login: Notify user, that he disabled camera in settings, and need to authorize application.")
-		static let cameraNotSupported = NSLocalizedString("QR codes reading not supported by the current device", comment: "Login: Notify user that device not supported by QR reader")
+		static let cameraNotAuthorized = NSLocalizedString("LoginScene.Error.AuthorizeCamera", comment: "Login: Notify user, that he disabled camera in settings, and need to authorize application.")
+		static let cameraNotSupported = NSLocalizedString("LoginScene.Error.QrNotSupported", comment: "Login: Notify user that device not supported by QR reader")
 		
-		static let emptyPassphraseAlert = NSLocalizedString("Enter a passphrase!", comment: "Login: notify user that he is trying to login without a passphrase")
+		static let emptyPassphraseAlert = NSLocalizedString("LoginScene.Error.NoPassphrase", comment: "Login: notify user that he is trying to login without a passphrase")
 		
 		private init() {}
 	}
@@ -42,10 +42,10 @@ class LoginViewController: FormViewController {
 		var localized: String {
 			switch self {
 			case .login:
-				return NSLocalizedString("Login", comment: "Login: login with existing passphrase section")
+				return NSLocalizedString("LoginScene.Section.Login", comment: "Login: login with existing passphrase section")
 				
 			case .newAccount:
-				return NSLocalizedString("New account", comment: "Login: Create new account section")
+				return NSLocalizedString("LoginScene.Section.NewAccount", comment: "Login: Create new account section")
 			}
 		}
 		
@@ -70,25 +70,25 @@ class LoginViewController: FormViewController {
 		var localized: String {
 			switch self {
 			case .passphrase:
-				return NSLocalizedString("Passphrase", comment: "Login: Passphrase placeholder")
+				return NSLocalizedString("LoginScene.Row.Passphrase.Placeholder", comment: "Login: Passphrase placeholder")
 				
 			case .loginButton:
-				return NSLocalizedString("Login", comment: "Login: Login button")
+				return NSLocalizedString("LoginScene.Row.Login", comment: "Login: Login button")
 				
 			case .loginWithQr:
-				return NSLocalizedString("Login with QR", comment: "Login: Login with QR button.")
+				return NSLocalizedString("LoginScene.Row.Qr", comment: "Login: Login with QR button.")
 				
 			case .loginWithPin:
-				return NSLocalizedString("Login with Pincode", comment: "Login: Login with pincode button")
+				return NSLocalizedString("LoginScene.Row.Pincode", comment: "Login: Login with pincode button")
 				
 			case .saveYourPassphraseAlert:
-				return NSLocalizedString("Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it", comment: "Login: security alert, notify user that he must save his new passphrase")
+				return NSLocalizedString("LoginScene.Row.SavePassphraseAlert", comment: "Login: security alert, notify user that he must save his new passphrase")
 				
 			case .generateNewPassphraseButton:
-				return NSLocalizedString("Generate new passphrase", comment: "Login: generate new passphrase button")
+				return NSLocalizedString("LoginScene.Row.Generate", comment: "Login: generate new passphrase button")
 				
 			case .tapToSaveHint:
-				return NSLocalizedString("Tap to save", comment: "Login: a small hint for a user, that he can tap on passphrase to save it")
+				return NSLocalizedString("LoginScene.Row.TapToSave", comment: "Login: a small hint for a user, that he can tap on passphrase to save it")
 				
 			case .newPassphrase:
 				return ""

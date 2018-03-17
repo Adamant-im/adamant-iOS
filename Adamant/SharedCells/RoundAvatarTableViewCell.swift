@@ -10,8 +10,8 @@ import UIKit
 
 extension SharedCell {
 	static let RoundAvatarCell = SharedCell(cellIdentifier: "roundAvatar",
-										xibName: "RoundAvatarTableViewCell",
-										rowHeight: 72)
+											xibName: "RoundAvatarTableViewCell",
+											rowHeight: 72)
 }
 
 class RoundAvatarTableViewCell: UITableViewCell {
