@@ -21,7 +21,7 @@ extension String.adamantLocalized {
 		static let notEnoughMoney = NSLocalizedString("ChatScene.Error.NotEnoughMoney", comment: "Chat: Notify user that he doesn't have money to pay a message fee")
 		
 		static let internalErrorFormat = NSLocalizedString("ChatScene.Error.InternalErrorFormat", comment: "Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description")
-		static let serverErrorFormat = NSLocalizedString("ChatScene.Error.RemoteServerError", comment: "Chat: Notify user about server error. Using %@ for error description")
+		static let serverErrorFormat = NSLocalizedString("ChatScene.Error.RemoteServerErrorFormat", comment: "Chat: Notify user about server error. Using %@ for error description")
 		
 		private init() { }
 	}

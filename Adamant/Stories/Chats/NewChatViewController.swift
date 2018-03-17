@@ -16,7 +16,7 @@ extension String.adamantLocalized {
 	struct newChat {
 		static let title = NSLocalizedString("NewChatScene.Title", comment: "New chat: scene title")
 		
-		static let addressPlaceholder = NSLocalizedString(NewChatScene.Address.Placeholder, comment: "New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
+		static let addressPlaceholder = NSLocalizedString("NewChatScene.Address.Placeholder", comment: "New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
 		static let scanQrButton = NSLocalizedString("NewChatScene.ScanQr", comment: "New chat: Scan QR with address button")
 		
 		static let specifyValidAddressMessage = NSLocalizedString("NewChatScene.Error.InvalidAddress", comment: "New chat: Notify user that he did enter invalid address")

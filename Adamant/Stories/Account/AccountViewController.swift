@@ -13,7 +13,7 @@ import SafariServices
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct account {
-		static let title = NSLocalizedString("AccountTab.title", comment: "Account page: scene title")
+		static let title = NSLocalizedString("AccountTab.Title", comment: "Account page: scene title")
 		
 		static let rowBalance = NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
 		static let rowSendTokens = NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
@@ -22,7 +22,7 @@ extension String.adamantLocalized {
 		
 		static let sorryAlert = NSLocalizedString("AccountTab.TransferBlocked.Title", comment: "Account tab: 'Transfer not allowed' alert title")
 		static let webApp = NSLocalizedString("AccountTab.TransferBlocked.GoToPWA", comment: "Account tab: 'Transfer not allowed' alert 'go to WebApp button'")
-		static let transferNotAllowed = NSLocalizedString("AccountTab.Message", comment: "Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO")
+		static let transferNotAllowed = NSLocalizedString("AccountTab.TransferBlocked.Message", comment: "Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO")
 		
 		static let sectionAccount = NSLocalizedString("AccountTab.Section.Account", comment: "Account tab: Account section title.")
 		static let sectionWallet = NSLocalizedString("AccountTab.Section.Wallet", comment: "Account tab: Wallet section title")

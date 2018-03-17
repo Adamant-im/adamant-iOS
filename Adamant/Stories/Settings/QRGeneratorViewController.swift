@@ -20,7 +20,7 @@ extension String.adamantLocalized {
 		static let passphrasePlaceholder = NSLocalizedString("QrGeneratorScene.Passphrase.Placeholder", comment: "QRGenerator: Passphrase textview placeholder")
 		
 		static let wrongPassphraseError = NSLocalizedString("QrGeneratorScene.Error.InvalidPassphrase", comment: "QRGenerator: user typed in wrong invalid")
-		static let internalError = NSLocalizedString("QrGeneratorScene.ErrorInternalError", comment: "QRGenerator: Bad Internal generator error message format. Using %@ for error description")
+		static let internalError = NSLocalizedString("QrGeneratorScene.Error.InternalErrorFormat", comment: "QRGenerator: Bad Internal generator error message format. Using %@ for error description")
 		
 		private init() {}
 	}

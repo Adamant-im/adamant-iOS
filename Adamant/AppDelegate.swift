@@ -194,4 +194,6 @@ extension AppDelegate {
 				return
 			}
 		}
+		
+		completionHandler(.noData)
 	}}

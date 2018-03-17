@@ -2,7 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>You have %d new message(s)</key>
+	<key>NotificationsService.NewMessage.BodyFormat</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
 		<string>You have %#@messages@</string>
@@ -18,7 +18,7 @@
 			<string>%d new messages</string>
 		</dict>
 	</dict>
-	<key>You have %d new transfer(s)</key>
+	<key>NotificationsService.NewTransfer.BodyFormat</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
 		<string>You have %#@transfers@</string>
