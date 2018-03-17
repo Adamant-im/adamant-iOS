@@ -1,7 +1,7 @@
 PODS:
   - Alamofire (4.7.0)
   - EFQRCode (4.2.1)
-  - Eureka (4.1.0)
+  - Eureka (4.1.1)
   - FreakingSimpleRoundImageView (1.0.2)
   - FTIndicator (1.2.6):
     - FTIndicator/FTNotificationIndicator (= 1.2.6)
@@ -16,8 +16,6 @@ PODS:
   - QRCodeReader.swift (8.1.1)
   - RNCryptor (5.0.2)
   - Swinject (2.2.0)
-  - SwinjectStoryboard (1.1.2):
-    - Swinject (~> 2.1)
 
 DEPENDENCIES:
   - Alamofire
@@ -31,12 +29,11 @@ DEPENDENCIES:
   - QRCodeReader.swift
   - RNCryptor
   - Swinject
-  - SwinjectStoryboard
 
 SPEC CHECKSUMS:
   Alamofire: 907e0a98eb68cdb7f9d1f541a563d6ac5dc77b25
   EFQRCode: f3fd67049faa07adb575495c05d72a34e407a940
-  Eureka: 5770ef95bbbbe52f8abbc0d9bea6ee8282c50209
+  Eureka: b88fb930e42c79f8c03c373d0fcdc28c1d6c50ed
   FreakingSimpleRoundImageView: e87b0ef24c9b95b74b1c2cab5b03832dbabd4873
   FTIndicator: d2a7c204341b7b0165b6dbeb5bf6979c6d7d4bb7
   KeychainAccess: 94c5540b32eabf7bc32bfb976a268e8ea05fd6da
@@ -45,8 +42,7 @@ SPEC CHECKSUMS:
   QRCodeReader.swift: b164a681887de276d405ff02bce854d82cd6360b
   RNCryptor: 59b9f92e9fa8a1af74c32dc6b1af5e30ff5e1b64
   Swinject: 4ca48bca7de5f398229a26abe1ac902b9f3ee541
-  SwinjectStoryboard: 92e75763c3299cdf627bef98a5180dc894864336
 
-PODFILE CHECKSUM: f56801713dedd8f5b2d1ec95f822fbbce22dc294
+PODFILE CHECKSUM: 870cc099d296984357fb6053beeb8a6ff5acc92c
 
 COCOAPODS: 1.4.0

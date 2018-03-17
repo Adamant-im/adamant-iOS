@@ -6,14 +6,36 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
-
-extension AdamantStory {
-	static let Chats = AdamantStory("Chats")
-}
+import UIKit
 
 extension AdamantScene {
-	static let ChatsList = AdamantScene(story: .Chats, identifier: "ChatsListViewController")
-	static let Chat = AdamantScene(story: .Chats, identifier: "ChatViewController")
-	static let NewChat = AdamantScene(story: .Chats, identifier: "NewChatViewController")
+	struct Chats {
+		static let chatList = AdamantScene(identifier: "ChatListViewController", factory: { r in
+			let c = ChatListViewController(nibName: "ChatListViewController", bundle: nil)
+			c.accountService = r.resolve(AccountService.self)
+			c.chatsProvider = r.resolve(ChatsProvider.self)
+			c.router = r.resolve(Router.self)
+			return c
+		})
+		
+		static let chat = AdamantScene(identifier: "ChatViewController", factory: { r in
+			let c = ChatViewController()
+			c.chatsProvider = r.resolve(ChatsProvider.self)
+			c.dialogService = r.resolve(DialogService.self)
+			return c
+		})
+		
+		static let newChat = AdamantScene(identifier: "NewChatViewController", factory: { r in
+			let c = NewChatViewController()
+			c.dialogService = r.resolve(DialogService.self)
+			c.accountService = r.resolve(AccountService.self)
+			c.accountsProvider = r.resolve(AccountsProvider.self)
+			
+			let navigator = UINavigationController(rootViewController: c)
+			
+			return navigator
+		})
+		
+		private init() {}
+	}
 }

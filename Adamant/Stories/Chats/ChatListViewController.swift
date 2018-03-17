@@ -1,5 +1,5 @@
 //
-//  ChatsListViewController.swift
+//  ChatListViewController.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 12.01.2018.
@@ -9,11 +9,21 @@
 import UIKit
 import CoreData
 
-class ChatsListViewController: UIViewController {
+extension String.adamantLocalized {
+	struct chatList {
+		static let title = NSLocalizedString("ChatListPage.Title", comment: "ChatList: scene title")
+		
+		private init() {}
+	}
+}
+
+class ChatListViewController: UIViewController {
+	let cellIdentifier = "cell"
+	let cellHeight: CGFloat = 74.0
+	
 	// MARK: Dependencies
 	var accountService: AccountService!
 	var chatsProvider: ChatsProvider!
-	var cellFactory: CellFactory!
 	var router: Router!
 	
 	// MARK: IBOutlet
@@ -21,44 +31,33 @@ class ChatsListViewController: UIViewController {
 	@IBOutlet weak var newChatButton: UIBarButtonItem!
 	
 	// MARK: Properties
-	let showChatSegue = "showChat"
-	let newChatSegue = "newChat"
 	var chatsController: NSFetchedResultsController<Chatroom>?
 	var unreadController: NSFetchedResultsController<ChatTransaction>?
 	
-	let chatCell = SharedCell.ChatCell.cellIdentifier
 	private var preservedMessagess = [String:String]()
 	
 	
 	// MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+		navigationItem.title = String.adamantLocalized.chatList.title
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
 		
 		// MARK: TableView
 		tableView.dataSource = self
 		tableView.delegate = self
-		tableView.register(cellFactory.nib(for: SharedCell.ChatCell), forCellReuseIdentifier: chatCell)
+		tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
 		
-		chatsController = chatsProvider.getChatroomsController()
-		chatsController?.delegate = self
-		unreadController = chatsProvider.getUnreadMessagesController()
-		unreadController?.delegate = self
-		
-		tableView.reloadData()
+		if self.accountService.account != nil {
+			initFetchedRequestControllers(provider: chatsProvider)
+		}
 		
 		// MARK: Login/Logout
 		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			guard let controller = self?.chatsProvider.getChatroomsController() else {
-				return
-			}
-			
-			controller.delegate = self
-			self?.chatsController = controller
-			self?.tableView.reloadData()
+			self?.initFetchedRequestControllers(provider: self?.chatsProvider)
 		}
 		NotificationCenter.default.addObserver(forName: .adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			self?.chatsController = nil
-			self?.tableView.reloadData()
+			self?.initFetchedRequestControllers(provider: nil)
 		}
     }
 	
@@ -73,29 +72,22 @@ class ChatsListViewController: UIViewController {
 		}
 	}
 	
-	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-		guard let identifier = segue.identifier else {
-			return
+	
+	// MARK: IB Actions
+	@IBAction func newChat(sender: Any) {
+		let controller = router.get(scene: AdamantScene.Chats.newChat)
+		
+		if let c = controller as? NewChatViewController {
+			c.delegate = self
+		} else if let nav = controller as? UINavigationController, let c = nav.viewControllers.last as? NewChatViewController {
+			c.delegate = self
 		}
 		
-		switch identifier {
-		case showChatSegue:
-			if let chatroom = sender as? Chatroom, let vc = segue.destination as? ChatViewController {
-				prepareChatViewController(vc, chatroom: chatroom)
-			}
-			
-		case newChatSegue:
-			if let vc = segue.destination as? NewChatViewController {
-				vc.delegate = self
-			} else if let nav = segue.destination as? UINavigationController, let vc = nav.viewControllers.first as? NewChatViewController {
-				vc.delegate = self
-			}
-			
-		default:
-			return
-		}
+		present(controller, animated: true, completion: nil)
 	}
 	
+	
+	// MARK: Helpers
 	private func prepareChatViewController(_ vc: ChatViewController, chatroom: Chatroom) {
 		if let account = accountService.account {
 			vc.account = account
@@ -105,11 +97,40 @@ class ChatsListViewController: UIViewController {
 		vc.chatroom = chatroom
 		vc.delegate = self
 	}
+	
+	
+	/// - Parameter provider: nil to drop controllers and reset table
+	private func initFetchedRequestControllers(provider: ChatsProvider?) {
+		guard let provider = provider else {
+			chatsController = nil
+			unreadController = nil
+			tableView.reloadData()
+			return
+		}
+		
+		chatsController = provider.getChatroomsController()
+		unreadController = provider.getUnreadMessagesController()
+		
+		chatsController?.delegate = self
+		unreadController?.delegate = self
+		
+		do {
+			try chatsController?.performFetch()
+			try unreadController?.performFetch()
+		} catch {
+			chatsController = nil
+			unreadController = nil
+			print("There was an error performing fetch: \(error)")
+		}
+		
+		tableView.reloadData()
+		setBadgeValue(unreadController?.fetchedObjects?.count)
+	}
 }
 
 
 // MARK: - UITableView
-extension ChatsListViewController: UITableViewDelegate, UITableViewDataSource {
+extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		if let f = chatsController?.fetchedObjects {
 			return f.count
@@ -119,7 +140,7 @@ extension ChatsListViewController: UITableViewDelegate, UITableViewDataSource {
 	}
 	
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-		return SharedCell.ChatCell.defaultRowHeight
+		return cellHeight
 	}
 	
 	func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -127,17 +148,23 @@ extension ChatsListViewController: UITableViewDelegate, UITableViewDataSource {
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		if let chatroom = chatsController?.object(at: indexPath) {
-			performSegue(withIdentifier: showChatSegue, sender: chatroom)
+		if let chatroom = chatsController?.object(at: indexPath), let c = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController {
+			prepareChatViewController(c, chatroom: chatroom)
+			
+			if let nav = navigationController {
+				nav.pushViewController(c, animated: true)
+			} else {
+				present(c, animated: true)
+			}
 		}
 	}
 }
 
 
 // MARK: - UITableView Cells
-extension ChatsListViewController {
+extension ChatListViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCell(withIdentifier: chatCell, for: indexPath) as! ChatTableViewCell
+		let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! ChatTableViewCell
 		
 		cell.accessoryType = .disclosureIndicator
 		cell.accountLabel.textColor = UIColor.adamantPrimary
@@ -186,7 +213,7 @@ extension ChatsListViewController {
 
 
 // MARK: - NSFetchedResultsControllerDelegate
-extension ChatsListViewController: NSFetchedResultsControllerDelegate {
+extension ChatListViewController: NSFetchedResultsControllerDelegate {
 	func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
 		if controller == chatsController {
 			tableView.beginUpdates()
@@ -194,24 +221,12 @@ extension ChatsListViewController: NSFetchedResultsControllerDelegate {
 	}
 	
 	func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-		
 		switch controller {
 		case let c where c == chatsController:
 			tableView.endUpdates()
 			
 		case let c where c == unreadController:
-			let item: UITabBarItem
-			if let i = navigationController?.tabBarItem {
-				item = i
-			} else {
-				item = tabBarItem
-			}
-			
-			if let count = controller.fetchedObjects?.count, count > 0 {
-				item.badgeValue = String(count)
-			} else {
-				item.badgeValue = nil
-			}
+			setBadgeValue(controller.fetchedObjects?.count)
 			
 		default:
 			break
@@ -255,12 +270,12 @@ extension ChatsListViewController: NSFetchedResultsControllerDelegate {
 
 
 // MARK: - NewChatViewControllerDelegate
-extension ChatsListViewController: NewChatViewControllerDelegate {
+extension ChatListViewController: NewChatViewControllerDelegate {
 	func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount) {
 		let chatroom = self.chatsProvider.chatroomWith(account)
 		
 		DispatchQueue.main.async {
-			if let vc = self.router.get(scene: .Chat) as? ChatViewController {
+			if let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController {
 				self.prepareChatViewController(vc, chatroom: chatroom)
 				self.navigationController?.pushViewController(vc, animated: false)
 				
@@ -292,7 +307,7 @@ extension ChatsListViewController: NewChatViewControllerDelegate {
 
 
 // MARK: - ChatViewControllerDelegate
-extension ChatsListViewController: ChatViewControllerDelegate {
+extension ChatListViewController: ChatViewControllerDelegate {
 	func preserveMessage(_ message: String, forAddress address: String) {
 		preservedMessagess[address] = message
 	}
@@ -311,8 +326,25 @@ extension ChatsListViewController: ChatViewControllerDelegate {
 }
 
 
-// MARK: - Current chat
-extension ChatsListViewController {
+// MARK: - Tools
+extension ChatListViewController {
+	/// TabBar item badge
+	func setBadgeValue(_ value: Int?) {
+		let item: UITabBarItem
+		if let i = navigationController?.tabBarItem {
+			item = i
+		} else {
+			item = tabBarItem
+		}
+		
+		if let value = value, value > 0 {
+			item.badgeValue = String(value)
+		} else {
+			item.badgeValue = nil
+		}
+	}
+	
+	/// Current chat
 	func presentedChatroom() -> Chatroom? {
 		// Showing another page
 		guard tabBarController?.selectedViewController == self else {

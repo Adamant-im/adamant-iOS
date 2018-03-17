@@ -10,13 +10,16 @@ import UIKit
 import CoreData
 
 class TransactionsViewController: UIViewController {
+	let cellIdentifier = "cell"
+	let cellHeight: CGFloat = 90.0
+	
 	// MARK: - Dependencies
-	var cellFactory: CellFactory!
+	var accountService: AccountService!
 	var transfersProvider: TransfersProvider!
+	var router: Router!
 	
 	// MARK: - Properties
 	var controller: NSFetchedResultsController<TransferTransaction>?
-	let transactionDetailsSegue = "showTransactionDetails"
 	
 	
 	// MARK: - IBOutlets
@@ -28,15 +31,21 @@ class TransactionsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
-		controller = transfersProvider.transfersController()
-		controller?.delegate = self
+		if accountService.account != nil {
+			initFetchedResultController(provider: transfersProvider)
+		}
 		
-		
-		tableView.register(cellFactory.nib(for: .TransactionCell), forCellReuseIdentifier: SharedCell.TransactionCell.cellIdentifier)
+		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
 		tableView.dataSource = self
 		tableView.delegate = self
 		
-		tableView.reloadData()
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { [weak self] notification in
+			self?.initFetchedResultController(provider: self?.transfersProvider)
+		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
+			self?.initFetchedResultController(provider: nil)
+		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -45,13 +54,21 @@ class TransactionsViewController: UIViewController {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
 	}
-
-	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-		if segue.identifier == transactionDetailsSegue,
-			let vc = segue.destination as? TransactionDetailsViewController,
-			let transaction = sender as? TransferTransaction {
-			vc.transaction = transaction
+	
+	
+	/// - Parameter provider: nil to drop and reset
+	private func initFetchedResultController(provider: TransfersProvider?) {
+		controller = transfersProvider.transfersController()
+		controller?.delegate = self
+		
+		do {
+			try controller?.performFetch()
+		} catch {
+			print("There was an error performing fetch: \(error)")
+			controller = nil
 		}
+		
+		tableView.reloadData()
 	}
 }
 
@@ -101,7 +118,7 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 	}
 	
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-		return SharedCell.TransactionCell.defaultRowHeight
+		return cellHeight
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -110,11 +127,16 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 			return
 		}
 		
-		performSegue(withIdentifier: transactionDetailsSegue, sender: transaction)
+		guard let controller = router.get(scene: AdamantScene.Transactions.transactionDetails) as? TransactionDetailsViewController else {
+			return
+		}
+		
+		controller.transaction = transaction
+		navigationController?.pushViewController(controller, animated: true)
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		guard let cell = tableView.dequeueReusableCell(withIdentifier: SharedCell.TransactionCell.cellIdentifier, for: indexPath) as? TransactionTableViewCell,
+		guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? TransactionTableViewCell,
 			let transfer = controller?.object(at: indexPath) else {
 				// TODO: Display & Log error
 				return UITableViewCell(style: .default, reuseIdentifier: "cell")

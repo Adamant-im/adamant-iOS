@@ -13,16 +13,15 @@ import CoreData
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct chat {
-		static let sendButton = NSLocalizedString("Send", comment: "Chat: Send message button")
-		static let messageInputPlaceholder = NSLocalizedString("New message", comment: "Chat: message input placeholder")
-		static let estimatedFeeFormat = NSLocalizedString("~%@", comment: "Chat: input bar: Estimated fee")
+		static let sendButton = NSLocalizedString("ChatScene.Send", comment: "Chat: Send message button")
+		static let messageInputPlaceholder = NSLocalizedString("ChatScene.NewMessage.Placeholder", comment: "Chat: message input placeholder")
 		
-		static let messageIsEmpty = NSLocalizedString("Message is empty", comment: "Chat: Notify user that message cannot be empty")
-		static let messageTooLong = NSLocalizedString("Message is too long", comment: "Chat: Message is too long")
-		static let notEnoughMoney = NSLocalizedString("You don't have enough money to send a message", comment: "Chat: Notify user that he doesn't have money to pay a message fee")
+		static let messageIsEmpty = NSLocalizedString("ChatScene.Error.MessageIsEmpty", comment: "Chat: Notify user that message cannot be empty")
+		static let messageTooLong = NSLocalizedString("ChatScene.Error.MessageTooLong", comment: "Chat: Message is too long")
+		static let notEnoughMoney = NSLocalizedString("ChatScene.Error.NotEnoughMoney", comment: "Chat: Notify user that he doesn't have money to pay a message fee")
 		
-		static let internalErrorFormat = NSLocalizedString("Internal error: %@. You should report this bug.", comment: "Chat: Notify user about bad internal error. Usually this should be reported as a bug.")
-		static let serverErrorFormat = NSLocalizedString("Remote server error: %@", comment: "Chat: Notify user about server error.")
+		static let internalErrorFormat = NSLocalizedString("ChatScene.Error.InternalErrorFormat", comment: "Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description")
+		static let serverErrorFormat = NSLocalizedString("ChatScene.Error.RemoteServerErrorFormat", comment: "Chat: Notify user about server error. Using %@ for error description")
 		
 		private init() { }
 	}
@@ -66,6 +65,7 @@ class ChatViewController: MessagesViewController {
 	// MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+		navigationItem.rightBarButtonItem = UIBarButtonItem(title: "•••", style: .plain, target: self, action: #selector(properties))
 		
 		// MARK: 1. Initial configuration
 		
@@ -89,6 +89,12 @@ class ChatViewController: MessagesViewController {
 			
 			controller.delegate = self
 			self?.chatController = controller
+			
+			do {
+				try controller.performFetch()
+			} catch {
+				print("There was an error performing fetch: \(error)")
+			}
 
 			if let collection = self?.messagesCollectionView {
 				DispatchQueue.main.async {
@@ -193,7 +199,7 @@ extension ChatViewController {
 				return
 			}
 			
-			let text = String.localizedStringWithFormat(String.adamantLocalized.chat.estimatedFeeFormat, AdamantUtilities.format(balance: fee))
+			let text = "~\(AdamantUtilities.format(balance: fee))"
 			prevFee = fee
 			
 			feeLabel.title = text

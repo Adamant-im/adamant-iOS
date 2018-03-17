@@ -34,13 +34,28 @@ class AdamantChatsProvider: ChatsProvider {
 	// MARK: Lifecycle
 	init() {
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { [weak self] notification in
-			self?.update()
-			
-			if let address = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String {
-				self?.securedStore.set(address, for: StoreKey.chatProvider.address)
-			} else {
-				print("Can't get logged address.")
+			guard let store = self?.securedStore else {
+				return
 			}
+			
+			guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
+				store.remove(StoreKey.chatProvider.address)
+				store.remove(StoreKey.chatProvider.receivedLastHeight)
+				store.remove(StoreKey.chatProvider.readedLastHeight)
+				return
+			}
+			
+			if let savedAddress = self?.securedStore.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
+				if let raw = store.get(StoreKey.chatProvider.readedLastHeight), let h = Int64(raw) {
+					self?.readedLastHeight = h
+				}
+			} else {
+				store.remove(StoreKey.chatProvider.receivedLastHeight)
+				store.remove(StoreKey.chatProvider.readedLastHeight)
+				store.set(loggedAddress, for: StoreKey.chatProvider.address)
+			}
+			
+			self?.update()
 		}
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
@@ -100,8 +115,11 @@ extension AdamantChatsProvider {
 	private func reset(notify: Bool) {
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false) // Block update calls
+		
 		receivedLastHeight = nil
 		readedLastHeight = nil
+		securedStore.remove(StoreKey.chatProvider.receivedLastHeight)
+		securedStore.remove(StoreKey.chatProvider.readedLastHeight)
 		
 		let chatrooms = NSFetchRequest<Chatroom>(entityName: Chatroom.entityName)
 		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -170,10 +188,20 @@ extension AdamantChatsProvider {
 													userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h])
 				}
 				
-				self?.readedLastHeight = self?.receivedLastHeight
+				if let h = self?.receivedLastHeight {
+					self?.readedLastHeight = h
+				} else {
+					self?.readedLastHeight = 0
+				}
 				
-				if let h = self?.receivedLastHeight, let store = self?.securedStore {
-					store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
+				if let store = self?.securedStore {
+					if let h = self?.receivedLastHeight {
+						store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
+					}
+					
+					if let h = self?.readedLastHeight, h > 0 {
+						store.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
+					}
 				}
 			}
 		}
@@ -344,24 +372,18 @@ extension AdamantChatsProvider {
 
 // MARK: - Getting messages
 extension AdamantChatsProvider {
-	func getChatroomsController() -> NSFetchedResultsController<Chatroom>? {
+	func getChatroomsController() -> NSFetchedResultsController<Chatroom> {
 		let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
 		request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false)]
 		request.predicate = NSPredicate(format: "partner!=nil")
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 		
-		do {
-			try controller.performFetch()
-			return controller
-		} catch {
-			print("Error fetching request: \(error)")
-			return nil
-		}
+		return controller
 	}
 	
-	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>? {
+	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction> {
 		guard let context = chatroom.managedObjectContext else {
-			return nil
+			fatalError()
 		}
 		
 		let request: NSFetchRequest<ChatTransaction> = NSFetchRequest(entityName: ChatTransaction.entityName)
@@ -369,13 +391,7 @@ extension AdamantChatsProvider {
 		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
 		
-		do {
-			try controller.performFetch()
-			return controller
-		} catch {
-			print("Error fetching request: \(error)")
-			return nil
-		}
+		return controller
 	}
 	
 	func chatroomWith(_ account: CoreDataAccount) -> Chatroom {
@@ -400,21 +416,14 @@ extension AdamantChatsProvider {
 		return chatroom
 	}
 	
-	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>? {
+	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction> {
 		let request = NSFetchRequest<ChatTransaction>(entityName: ChatTransaction.entityName)
 		request.predicate = NSPredicate(format: "isUnread == true")
 		request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false)]
 		
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: "chatroom.partner.address", cacheName: nil)
-		controller.section
 		
-		do {
-			try controller.performFetch()
-			return controller
-		} catch {
-			print("Error fetching unread messages: \(error)")
-			return nil
-		}
+		return controller
 	}
 }
 
@@ -629,12 +638,6 @@ extension AdamantChatsProvider {
 		// MARK: 4. Unread messagess
 		if let readedLastHeight = readedLastHeight {
 			let msgs = Dictionary(grouping: newChatTransactions.filter({$0.height > readedLastHeight}), by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
-			for (chatroom, trs) in msgs {
-				chatroom.hasUnreadMessages = true
-				trs.forEach({$0.isUnread = true})
-			}
-		} else {
-			let msgs = Dictionary(grouping: newChatTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
 			for (chatroom, trs) in msgs {
 				chatroom.hasUnreadMessages = true
 				trs.forEach({$0.isUnread = true})

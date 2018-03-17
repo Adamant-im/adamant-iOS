@@ -10,13 +10,13 @@ import Foundation
 
 extension String.adamantLocalized {
 	struct notifications {
-		static let notificationsDisabled = NSLocalizedString("Notifications disabled. You can reenable notifications in Settings", comment: "Notifications: User has disabled notifications. Head him into settings")
+		static let notificationsDisabled = NSLocalizedString("NotificationsService.NotificationsDisabled", comment: "Notifications: User has disabled notifications. Head him into settings")
 		
-		static let newMessageTitle = NSLocalizedString("New message", comment: "Notifications: New message notification title")
-		static let newMessageBody = NSLocalizedString("You have %d new message(s)", comment: "Notifications: new messages notification body")
+		static let newMessageTitle = NSLocalizedString("NotificationsService.NewMessage.Title", comment: "Notifications: New message notification title")
+		static let newMessageBody = NSLocalizedString("NotificationsService.NewMessage.BodyFormat", comment: "Notifications: new messages notification body. Using %d for amount")
 		
-		static let newTransferTitle = NSLocalizedString("New transfer", comment: "Notifications: New transfer transaction title")
-		static let newTransferBody = NSLocalizedString("You have %d new transfer(s)", comment: "Notifications: New transfer notification body")
+		static let newTransferTitle = NSLocalizedString("NotificationsService.NewTransfer.Title", comment: "Notifications: New transfer transaction title")
+		static let newTransferBody = NSLocalizedString("NotificationsService.NewTransfer.BodyFormat", comment: "Notifications: New transfer notification body. Using %d for amount")
 		
 		private init() {}
 	}

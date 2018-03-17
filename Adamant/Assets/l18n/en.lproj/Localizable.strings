@@ -1,0 +1,377 @@
+/* Product name */
+"ADAMANT" = "ADAMANT";
+
+/* ApiService: Bad internal application error, report a bug. Using %@ as error description */
+"AccountServiceError.Internal errorFormat" = "Internal error: %@";
+
+/* Login: user typed in invalid passphrase */
+"AccountServiceError.InvalidPassphrase" = "Wrong passphrase";
+
+/* Login: user not logged error */
+"AccountServiceError.UserNotLogged" = "User not logged";
+
+/* Login: user typed in wrong passphrase */
+"AccountServiceError.WrongPassphrase" = "Wrong passphrase: %@";
+
+/* Account tab: Confirm logout alert: Logout (Ok) button */
+"AccountTab.ConfirmLogout.Logout" = "Logout";
+
+/* Account tab: Confirm logout alert */
+"AccountTab.ConfirmLogout.MessageFormat" = "Logout from %@?";
+
+/* Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO */
+"AccountTab.TransferBlocked.Message" = "Due to Apple restrictions, sending tokens is not allowed until the end of the ICO. For now, you can send tokens using WebApp at msg.adamant.im";
+
+/* Account tab: Balance row title */
+"AccountTab.Row.Balance" = "Balance";
+
+/* Account tab: 'Invest in ICO' button */
+"AccountTab.Row.JoinIco" = "Join the ICO";
+
+/* Account tab: 'Logout' button */
+"AccountTab.Row.Logout" = "Logout";
+
+/* Account tab: 'Send tokens' button */
+"AccountTab.Row.SendTokens" = "Send Tokens";
+
+/* Account tab: Account section title. */
+"AccountTab.Section.Account" = "Account";
+
+/* Account tab: Actions section title */
+"AccountTab.Section.Actions" = "Actions";
+
+/* Account tab: Wallet section title */
+"AccountTab.Section.Wallet" = "Wallet";
+
+/* Account tab: 'Transfer not allowed' alert 'go to WebApp button' */
+"AccountTab.TransferBlocked.GoToPWA" = "msg.adamant.im";
+
+/* Account tab: 'Transfer not allowed' alert title */
+"AccountTab.TransferBlocked.Title" = "Sorry!";
+
+/* Account page: scene title */
+"AccountTab.Title" = "Account";
+
+/* ApiService: Account not found error. Using %@ for address. */
+"ApiService.Error.AccountNotFoundFormat" = "Account not found: %@";
+
+/* ApiService: Bad internal application error, report a bug. Using %@ for error description */
+"ApiService.Error.InternalErrorFormat" = "Internal error: %@";
+
+/* ApiService: No connection message. Generally bad network. */
+"ApiService.Error.NoConnection" = "No connection to the Internet";
+
+/* ApiService: Remote server returned an error. Using %@ for error description */
+"ApiService.Error.RemoteServerErrorFormat" = "Remote server error: %@";
+
+/* ApiService: User not logged error */
+"ApiService.Error.UserNotLogged" = "User not logged";
+
+/* Serious internal error: Failed to build endpoint url */
+"ApiService.InternalError.EndpointBuildFailed" = "Endpoint build failed. Report a bug";
+
+/* Serious internal error: Failed to sign transaction */
+"ApiService.InternalError.FailedTransactionSigning" = "Transaction failed";
+
+/* Serious internal error: Error parsing response */
+"ApiService.InternalError.ParsingFailed" = "Parsing failed. Report a bug";
+
+/* Unknown internal error */
+"ApiService.InternalError.UnknownError" = "Unknown error. Report a bug";
+
+/* ChatList: scene title */
+"ChatListPage.Title" = "Chats";
+
+/* Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description */
+"ChatScene.Error.InternalErrorFormat" = "Internal error: %@. Report a bug";
+
+/* Chat: Notify user that message cannot be empty */
+"ChatScene.Error.MessageIsEmpty" = "Message is empty!";
+
+/* Chat: Message is too long */
+"ChatScene.Error.MessageTooLong" = "Message is too long";
+
+/* Chat: Notify user that he doesn't have money to pay a message fee */
+"ChatScene.Error.NotEnoughMoney" = "You don't have enought money to send a message";
+
+/* Chat: Notify user about server error. Using %@ for error description */
+"ChatScene.Error.RemoteServerErrorFormat" = "Remote error: %@. Report a bug";
+
+/* Chat: message input placeholder */
+"ChatScene.NewMessage.Placeholder" = "New message";
+
+/* Chat: Send message button */
+"ChatScene.Send" = "Send";
+
+/* Known contacts: Adamant ICO message */
+"Chats.IcoMessage" = "ou have a possibility to invest in ICO of ADAMANT, the most secure and anonymous messenger. Earlier you participate, better offer you will get. Learn more on Adamant.im website or in the Whitepaper. To invest, go to Wallet→Invest in the ICO, or follow a website page Adamant.im/ico/. If you still have any questions, you can ask them by replying to this message. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\\nAfter you invest and receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.";
+
+/* Known contacts: Adamant pre ICO message */
+"Chats.PreIcoMessage" = "You have a possibility to invest in ADAMANT, the most secure and anonymous messenger. Now is a Pre-ICO stage — the most profitable for investors. Learn more on Adamant.im website or in the Whitepaper. To participate just reply to this message and we will assist. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\\nAfter you invest and receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.";
+
+/* Known contacts: Adamant welcome message */
+"Chats.WelcomeMessage" = "Welcome to ADAMANT, the most secure and anonymous messenger. You are credited with bounty tokens, which you can use to get acquainted with the messenger.\\nRemember, your security and anonymity is up to you also. Do not follow links you receive, otherwise your IP can be compromised. Do not trust browser extensions. Better to share your ADM address personally, but not using other messengers. Keep your secret passphrase secure. Set a password on your device or logout before leaving.\\nLearn more about security and anonymity at https://adamant.im/staysecured/.\\n\\nDo not reply to this message, it is a system account.";
+
+/* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
+"LoginScene.Error.AuthorizeCamera" = "You need to authorize Adamant to use device's Camera";
+
+/* Login: No network error. */
+"LoginScene.Error.NoInternet" = "No connection to the Internet";
+
+/* Login: notify user that he is trying to login without a passphrase */
+"LoginScene.Error.NoPassphrase" = "Enter a passphrase";
+
+/* Login: Notify user that device not supported by QR reader */
+"LoginScene.Error.QrNotSupported" = "QR code reading not supported by the device";
+
+/* Login: Notify user that scanned QR doesn't contains a passphrase. */
+"LoginScene.Error.WrongQr" = "QR code does not contains a valid passphrase";
+
+/* Login: notify user that we are trying to log in */
+"LoginScene.LoggingInProgress" = "Logging in...";
+
+/* Login: Login into previous account with biometry or pincode */
+"LoginScene.LoginIntoAdamant" = "Login into Adamant";
+
+/* Login: generate new passphrase button */
+"LoginScene.Row.Generate" = "Generate new passphrase";
+
+/* Login: Login button */
+"LoginScene.Row.Login" = "Login";
+
+/* Login: Passphrase placeholder */
+"LoginScene.Row.Passphrase.Placeholder" = "Passphrase";
+
+/* Login: Login with pincode button */
+"LoginScene.Row.Pincode" = "Login with PIN-code";
+
+/* Login: Login with QR button. */
+"LoginScene.Row.Qr" = "Login with QR-code";
+
+/* Login: security alert, notify user that he must save his new passphrase */
+"LoginScene.Row.SavePassphraseAlert" = "Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it.";
+
+/* Login: a small hint for a user, that he can tap on passphrase to save it */
+"LoginScene.Row.TapToSave" = "Tap to save";
+
+/* Login: login with existing passphrase section */
+"LoginScene.Section.Login" = "Login";
+
+/* Login: Create new account section */
+"LoginScene.Section.NewAccount" = "New account";
+
+/* New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank. */
+"NewChatScene.Address.Placeholder" = "";
+
+/* New chat: Notify user that specified address (%@) not found. Using %@ for address */
+"NewChatScene.Error.AddressNotFoundFormat" = "Address not found: %@";
+
+/* New chat: Notify user that he did enter invalid address */
+"NewChatScene.Error.InvalidAddress" = "Enter a valid address";
+
+/* New chat: Notify user that he can't start chat with himself */
+"NewChatScene.Error.OwnAddress" = "You don't need an encrypted anonymous chat to talk to yourself";
+
+/* New chat: Remote server returned an error. Using %@ for error description */
+"NewChatScene.Error.RemoteServerFormat" = "Remote server error: %@. Report a bug";
+
+/* New Chat: Notify user that scanned QR doesn't contains an address */
+"NewChatScene.Error.WrongQr" = "QR code does not contains a valid address";
+
+/* New chat: Scan QR with address button */
+"NewChatScene.ScanQr" = "Scan QR-code";
+
+/* New chat: scene title */
+"NewChatScene.Title" = "New Chat";
+
+/* Notifications: New message notification title */
+"NotificationsService.NewMessage.Title" = "New Message";
+
+/* Notifications: New transfer transaction title */
+"NotificationsService.NewTransfer.Title" = "New Transfer";
+
+/* Notifications: User has disabled notifications. Head him into settings */
+"NotificationsService.NotificationsDisabled" = "Notifications disabled. You can enable notifications in Settings";
+
+/* Pinpad: Ask user to create new pin */
+"Pinpad.EnterNewPin" = "Enter new pin-code";
+
+/* Pinpad: Ask user to repeat new pin */
+"Pinpad.ReenterPin" = "Re-enter your pin-code";
+
+/* QRGenerator: user typed in wrong invalid */
+"QrGeneratorScene.Error.InvalidPassphrase" = "Enter a valid passphrase";
+
+/* QRGenerator: Bad Internal generator error message format. Using %@ for error description */
+"QrGeneratorScene.Error.InternalErrorFormat" = "Internal error: %@. Report a bug";
+
+/* QRGenerator: Passphrase textview placeholder */
+"QrGeneratorScene.Passphrase.Placeholder" = "Passphrase";
+
+/* QRGenerator: small 'Tap to save' tooltip under generated QR */
+"QrGeneratorScene.TapToSave" = "Tap to save";
+
+/* QRGenerator: scene title */
+"QrGeneratorScene.Title" = "QR Generator";
+
+/* Config: turn off 'Stay Logged In' confirmation */
+"SettingsPage.DoNotStayLoggedIn" = "Do not stay logged in";
+
+/* Config: Authorization reason for turning biometry off */
+"SettingsPage.DoNotUseBiometry" = "Do not use biometry to log in";
+
+/* Config: Generate QR with passphrase row */
+"SettingsPage.Row.GenerateQr" = "Generate QR with passphrase";
+
+/* Config: Show notifications */
+"SettingsPage.Row.Notifications" = "Notifications";
+
+/* Config: Stay logged option */
+"SettingsPage.Row.StayLoggedIn" = "Stay logged in";
+
+/* Config: Version row */
+"SettingsPage.Row.Version" = "Version";
+
+/* Config: Application Info section */
+"SettingsPage.Section.ApplicationInfo" = "Application";
+
+/* Config: Settings section */
+"SettingsPage.Section.Settings" = "Settings";
+
+/* Config: Utilities section */
+"SettingsPage.Section.Utilities" = "Utilities";
+
+/* Config: scene title */
+"SettingsPage.Title" = "Settings";
+
+/* Config: Authorization reason for turning biometry on */
+"SettingsPage.UseBiometry" = "Use biometry";
+
+/* Shared alert 'Cancel' button. Used anywhere */
+"Shared.Cancel" = "Cancel";
+
+/* Shared alert notification: message about item copied to pasteboard. */
+"Shared.CopiedToPasteboard" = "Copied to Pasteboard!";
+
+/* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
+"Shared.CopyToPasteboard" = "Copy to Pasteboard";
+
+/* Shared alert Done message. Used anywhere */
+"Shared.Done" = "Done";
+
+/* Shared alert 'Error' title. Used anywhere */
+"Shared.Error" = "Error";
+
+/* Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere. */
+"Shared.GenerateQRCode" = "Generate QR code";
+
+/* Shared alert 'Ok' button. Used anywhere */
+"Shared.Ok" = "Ok";
+
+/* Shared alert 'Save' button. Used anywhere */
+"Shared.Save" = "Save";
+
+/* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
+"Shared.Settings" = "Settings";
+
+/* Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu. */
+"Shared.Share" = "Share";
+
+/* Main tab bar: Account page */
+"Tabs.Account" = "Account";
+
+/* Main tab bar: Chats page */
+"Tabs.Chats" = "Chats";
+
+/* Main tab bar: Settings page */
+"Tabs.Settings" = "Settings";
+
+/* Transaction details: amount row. */
+"TransactionDetailsScene.Row.Amount" = "Amount";
+
+/* Transaction details: Block id row. */
+"TransactionDetailsScene.Row.Block" = "Block";
+
+/* Transaction details: confirmations row. */
+"TransactionDetailsScene.Row.Confirmations" = "Confirmations";
+
+/* Transaction details: date row. */
+"TransactionDetailsScene.Row.Date" = "Date";
+
+/* Transaction details: 'Open transaction in explorer' row. */
+"TransactionDetailsScene.Row.Explorer" = "Open in Explorer";
+
+/* Transaction details: fee row. */
+"TransactionDetailsScene.Row.Fee" = "Fee";
+
+/* Transaction details: sender row. */
+"TransactionDetailsScene.Row.From" = "From";
+
+/* Transaction details: Id row. */
+"TransactionDetailsScene.Row.Id" = "Id";
+
+/* Transaction details: recipient row. */
+"TransactionDetailsScene.Row.To" = "To";
+
+/* Export transaction: 'Share transaction summary' button */
+"TransactionDetailsScene.Share.Summary" = "Summary";
+
+/* Export transaction: 'Share transaction URL' button */
+"TransactionDetailsScene.Share.URL" = "URL";
+
+/* Transfer: transfer amount placeholder */
+"TransferScene.Amount.Placeholder" = "to send";
+
+/* Transfer: Address not found error */
+"TransferScene.Error.AddressNotFound" = "Address not found";
+
+/* Transfer: Address validation error */
+"TransferScene.Error.InvalidAddress" = "Enter a valid address";
+
+/* Transfer: Amount is hiegher that user's total money notification */
+"TransferScene.Error.NotEnoughtMoney" = "You don't have that money";
+
+/* Transfer: Amount is zero, or even negative notification */
+"TransferScene.Error.TooLittleMoney" = "You should send more money";
+
+/* Transfer: recipient address placeholder */
+"TransferScene.Recipient.Placeholder" = "of the recipient";
+
+/* Transfer: amount of adamant to transfer. */
+"TransferScene.Row.Amount" = "Amount";
+
+/* Transfer: logged user balance. */
+"TransferScene.Row.Balance" = "Balance";
+
+/* Transfer: maximum amount to transfer: available account money substracting transfer fee. */
+"TransferScene.Row.MaxToTransfer" = "Max to transfer";
+
+/* Transfer: recipient address */
+"TransferScene.Row.Recipient" = "Address";
+
+/* Transfer: Send button */
+"TransferScene.Row.Send" = "Send";
+
+/* Transfer: total amount of transaction: money to transfer adding fee */
+"TransferScene.Row.Total" = "Total";
+
+/* Transfer: transfer fee */
+"TransferScene.Row.TransactionFee" = "Fee";
+
+/* Transfer: 'Transfer info' section */
+"TransferScene.Section.TransferInfo" = "Transfer Info";
+
+/* Transfer: 'Your wallet' section */
+"TransferScene.Section.YourWallet" = "Your Wallet";
+
+/* Transfer: Confirm transfer alert: Send tokens button */
+"TransferScene.Send" = "Send";
+
+/* Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
+"TransferScene.SendConfirmFormat" = "Send %1$@ to %2$@?";
+
+/* Transfer: Processing message */
+"TransferScene.SendingFundsProgress" = "Sending funds...";
+
+/* Transfer: Tokens transfered successfully message */
+"TransferScene.TransferSuccessMessage" = "Done!";

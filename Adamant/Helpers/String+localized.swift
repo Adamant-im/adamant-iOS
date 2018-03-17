@@ -18,17 +18,17 @@ extension String {
 		
 		struct alert {
 			// MARK: Buttons
-			static let cancel = NSLocalizedString("Cancel", comment: "Shared alert 'Cancel' button. Used anywhere")
-			static let ok = NSLocalizedString("Ok", comment: "Shared alert 'Ok' button. Used anywhere")
-			static let save = NSLocalizedString("Save", comment: "Shared alert 'Save' button. Used anywhere")
-			static let settings = NSLocalizedString("Settings", comment: "Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title.")
+			static let cancel = NSLocalizedString("Shared.Cancel", comment: "Shared alert 'Cancel' button. Used anywhere")
+			static let ok = NSLocalizedString("Shared.Ok", comment: "Shared alert 'Ok' button. Used anywhere")
+			static let save = NSLocalizedString("Shared.Save", comment: "Shared alert 'Save' button. Used anywhere")
+			static let settings = NSLocalizedString("Shared.Settings", comment: "Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title.")
 			
 			// MARK: Titles and messages
-			static let error = NSLocalizedString("Error", comment: "Shared alert 'Error' title. Used anywhere")
-			static let done = NSLocalizedString("Done", comment: "Shared alert Done message. Used anywhere")
+			static let error = NSLocalizedString("Shared.Error", comment: "Shared alert 'Error' title. Used anywhere")
+			static let done = NSLocalizedString("Shared.Done", comment: "Shared alert Done message. Used anywhere")
 			
 			// MARK: Notifications
-			static let copiedToPasteboardNotification = NSLocalizedString("Copied to Pasteboard", comment: "Shared alert notification: message about item copied to pasteboard.")
+			static let copiedToPasteboardNotification = NSLocalizedString("Shared.CopiedToPasteboard", comment: "Shared alert notification: message about item copied to pasteboard.")
 		}
 		
 		private init() { }

@@ -12,16 +12,15 @@ import MyLittlePinpad
 
 extension String.adamantLocalized {
 	struct settings {
-		static let stayInTurnOff = NSLocalizedString("Do not stay logged in", comment: "Config: turn off 'Stay Logged In' confirmation")
-		static let biometryOnReason = NSLocalizedString("Use biometry to log in", comment: "Config: Authorization reason for turning biometry on")
-		static let biometryOffReason = NSLocalizedString("Do not use biometry to log in", comment: "Config: Authorization reason for turning biometry off")
+		static let title = NSLocalizedString("SettingsPage.Title", comment: "Config: scene title")
+		
+		static let stayInTurnOff = NSLocalizedString("SettingsPage.DoNotStayLoggedIn", comment: "Config: turn off 'Stay Logged In' confirmation")
+		static let biometryOnReason = NSLocalizedString("SettingsPage.UseBiometry", comment: "Config: Authorization reason for turning biometry on")
+		static let biometryOffReason = NSLocalizedString("SettingsPage.DoNotUseBiometry", comment: "Config: Authorization reason for turning biometry off")
 	}
 }
 
 class SettingsViewController: FormViewController {
-	
-	private let qrGeneratorSegue = "passphraseToQR"
-	
 	// MARK: Sections & Rows
 	enum Sections {
 		case settings
@@ -31,13 +30,13 @@ class SettingsViewController: FormViewController {
 		var localized: String {
 			switch self {
 			case .settings:
-				return NSLocalizedString("Settings", comment: "Config: Settings section")
+				return NSLocalizedString("SettingsPage.Section.Settings", comment: "Config: Settings section")
 				
 			case .applicationInfo:
-				return NSLocalizedString("Application info", comment: "Config: Application Info section")
+				return NSLocalizedString("SettingsPage.Section.ApplicationInfo", comment: "Config: Application Info section")
 				
 			case .utilities:
-				return NSLocalizedString("Utilities", comment: "Config: Utilities section")
+				return NSLocalizedString("SettingsPage.Section.Utilities", comment: "Config: Utilities section")
 			}
 		}
 	}
@@ -52,19 +51,19 @@ class SettingsViewController: FormViewController {
 		var localized: String {
 			switch self {
 			case .version:
-				return NSLocalizedString("Version", comment: "Config: Version row")
+				return NSLocalizedString("SettingsPage.Row.Version", comment: "Config: Version row")
 				
 			case .qrPassphraseGenerator:
-				return NSLocalizedString("Generate QR with passphrase", comment: "Config: Generate QR with passphrase row")
+				return NSLocalizedString("SettingsPage.Row.GenerateQr", comment: "Config: Generate QR with passphrase row")
 				
 			case .stayLoggedIn:
-				return NSLocalizedString("Stay Logged in", comment: "Config: Stay logged option")
+				return NSLocalizedString("SettingsPage.Row.StayLoggedIn", comment: "Config: Stay logged option")
 				
 			case .biometry:
 				return ""
 				
 			case .notifications:
-				return NSLocalizedString("Notifications", comment: "Config: Show notifications")
+				return NSLocalizedString("SettingsPage.Row.Notifications", comment: "Config: Show notifications")
 			}
 		}
 		
@@ -85,6 +84,7 @@ class SettingsViewController: FormViewController {
 	var dialogService: DialogService!
 	var localAuth: LocalAuthentication!
 	var notificationsService: NotificationsService!
+	var router: Router!
 	
 	
 	// MARK: Properties
@@ -95,6 +95,7 @@ class SettingsViewController: FormViewController {
 	// MARK: Lifetime
     override func viewDidLoad() {
         super.viewDidLoad()
+		self.navigationItem.title = String.adamantLocalized.settings.title
 		navigationOptions = .Disabled
 		showBiometryRow = accountService.hasStayInAccount
 		
@@ -174,10 +175,10 @@ class SettingsViewController: FormViewController {
 		}.cellSetup({ (cell, _) in
 			cell.selectionStyle = .gray
 		}).onCellSelection({ [weak self] (_, _) in
-			guard let segue = self?.qrGeneratorSegue else {
+			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.qRGenerator) else {
 				return
 			}
-			self?.performSegue(withIdentifier: segue, sender: nil)
+			nav.pushViewController(vc, animated: true)
 		}).cellUpdate({ (cell, _) in
 			if let label = cell.textLabel {
 				label.font = UIFont.adamantPrimary(size: 17)
