@@ -14,15 +14,17 @@ import AVFoundation
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct newChat {
-		static let addressPlaceholder = NSLocalizedString("", comment: "New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
-		static let scanQrButton = NSLocalizedString("Scan QR", comment: "New chat: Scan QR with address button")
+		static let title = NSLocalizedString("NewChatScene.Title", comment: "New chat: scene title")
 		
-		static let specifyValidAddressMessage = NSLocalizedString("Please specify valid recipient address", comment: "New chat: Notify user that he did enter invalid address")
-		static let loggedUserAddressMessage = NSLocalizedString("You don't need an encrypted anonymous chat to talk to yourself", comment: "New chat: Notify user that he can't start chat with himself")
+		static let addressPlaceholder = NSLocalizedString("NewChatScene.Address.Placeholder", comment: "New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
+		static let scanQrButton = NSLocalizedString("NewChatScene.ScanQr", comment: "New chat: Scan QR with address button")
 		
-		static let wrongQrError = NSLocalizedString("QR code does not contains a valid adamant address", comment: "New Chat: Notify user that scanned QR doesn't contains an address")
-		static let addressNotFoundFormat = NSLocalizedString("Address %@ not found", comment: "New chat: Notify user that specified address (%@) not found")
-		static let serverErrorFormat = NSLocalizedString("%@", comment: "New chat: Remote server returned an error.")
+		static let specifyValidAddressMessage = NSLocalizedString("NewChatScene.Error.InvalidAddress", comment: "New chat: Notify user that he did enter invalid address")
+		static let loggedUserAddressMessage = NSLocalizedString("NewChatScene.Error.OwnAddress", comment: "New chat: Notify user that he can't start chat with himself")
+		
+		static let wrongQrError = NSLocalizedString("NewChatScene.Error.WrongQr", comment: "New Chat: Notify user that scanned QR doesn't contains an address")
+		static let addressNotFoundFormat = NSLocalizedString("NewChatScene.Error.AddressNotFoundFormat", comment: "New chat: Notify user that specified address (%@) not found. Using %@ for address")
+		static let serverErrorFormat = NSLocalizedString("NewChatScene.Error.RemoteServerFormat", comment: "New chat: Remote server returned an error. Using %@ for error description")
 		
 		private init() { }
 	}
@@ -80,6 +82,9 @@ class NewChatViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+		navigationItem.title = String.adamantLocalized.newChat.title
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
 		
 		navigationOptions = .Disabled
 		

@@ -14,11 +14,13 @@ import Photos
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct qrGenerator {
-		static let tapToSaveTip = NSLocalizedString("Tap to save", comment: "QRGenerator: small 'Tap to save' tooltip under generated QR")
-		static let passphrasePlaceholder = NSLocalizedString("Passphrase", comment: "QRGenerator: Passphrase textview placeholder")
+		static let title = NSLocalizedString("QrGeneratorScene.Title", comment: "QRGenerator: scene title")
 		
-		static let wrongPassphraseError = NSLocalizedString("Enter correct passphrase", comment: "QRGenerator: user typed in wrong invalid")
-		static let internalError = NSLocalizedString("Internal error: %@", comment: "QRGenerator: Bad Internal generator error message format")
+		static let tapToSaveTip = NSLocalizedString("QrGeneratorScene.TapToSave", comment: "QRGenerator: small 'Tap to save' tooltip under generated QR")
+		static let passphrasePlaceholder = NSLocalizedString("QrGeneratorScene.Passphrase.Placeholder", comment: "QRGenerator: Passphrase textview placeholder")
+		
+		static let wrongPassphraseError = NSLocalizedString("QrGeneratorScene.Error.InvalidPassphrase", comment: "QRGenerator: user typed in wrong invalid")
+		static let internalError = NSLocalizedString("QrGeneratorScene.Error.InternalErrorFormat", comment: "QRGenerator: Bad Internal generator error message format. Using %@ for error description")
 		
 		private init() {}
 	}
@@ -60,6 +62,7 @@ class QRGeneratorViewController: FormViewController {
 	// MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+		navigationItem.title = String.adamantLocalized.qrGenerator.title
 		navigationOptions = .Disabled
 		
 		self.tableView.showsVerticalScrollIndicator = false

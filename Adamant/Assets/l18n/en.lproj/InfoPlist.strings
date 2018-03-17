@@ -1,0 +1,15 @@
+/* (No Comment) */
+"CFBundleDisplayName" = "Adamant";
+
+/* (No Comment) */
+"CFBundleName" = "Adamant";
+
+/* (No Comment) */
+"NSCameraUsageDescription" = "The camera needed to scan QR codes for addresses and passphrases";
+
+/* (No Comment) */
+"NSPhotoLibraryAddUsageDescription" = "Saving generated QR codes with passphrases and addresses";
+
+/* (No Comment) */
+"NSPhotoLibraryUsageDescription" = "Reading QR codes with passphrases and addresses";
+

@@ -7,7 +7,6 @@
 //
 
 import Swinject
-import SwinjectStoryboard
 
 // MARK: - Resources
 private struct AdamantResources {
@@ -22,8 +21,6 @@ private struct AdamantResources {
 // MARK: - Services
 extension Container {
 	func registerAdamantServices() {
-		
-		
 		// MARK: - Standalone services
 		// MARK: AdamantCore
 		self.register(AdamantCore.self) { _ in
@@ -35,7 +32,11 @@ extension Container {
 		}.inObjectScope(.container)
 		
 		// MARK: Router
-		self.register(Router.self) { _ in SwinjectedRouter() }.inObjectScope(.container)
+		self.register(Router.self) { _ in
+			let router = SwinjectedRouter()
+			router.container = self
+			return router
+		}.inObjectScope(.container)
 		
 		// MARK: CellFactory
 		self.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)

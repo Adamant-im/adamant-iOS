@@ -11,8 +11,8 @@ import MyLittlePinpad
 
 extension String.adamantLocalized {
 	struct pinpad {
-		static let createPin = NSLocalizedString("Enter new pin", comment: "Pinpad: Ask user to create new pin")
-		static let reenterPin = NSLocalizedString("Re-enter new pin", comment: "Pinpad: Ask user to repeat new pin")
+		static let createPin = NSLocalizedString("Pinpad.EnterNewPin", comment: "Pinpad: Ask user to create new pin")
+		static let reenterPin = NSLocalizedString("Pinpad.ReenterPin", comment: "Pinpad: Ask user to repeat new pin")
 	}
 }
 

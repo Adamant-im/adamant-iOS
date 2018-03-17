@@ -7,11 +7,8 @@ target 'Adamant' do
   pod 'Alamofire' # Network
   pod 'KeychainAccess' # Keychain
   pod 'RNCryptor' # Cryptor
+  pod 'Swinject' # Swinject DI
   
-  # Swinject DI
-  pod 'Swinject'
-  pod 'SwinjectStoryboard'
-
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars
   pod 'FTIndicator' # Notifications and activity indicator

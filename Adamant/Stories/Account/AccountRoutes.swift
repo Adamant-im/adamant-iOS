@@ -8,13 +8,22 @@
 
 import Foundation
 
-extension AdamantStory {
-	static let Account = AdamantStory("Account")
-}
-
 extension AdamantScene {
-	static let AccountDetails = AdamantScene(story: .Account, identifier: "AccountViewController")
-	static let TransactionsList = AdamantScene(story: .Account, identifier: "TransactionsViewController")
-	static let TransactionDetails = AdamantScene(story: .Account, identifier: "TransactionDetailsViewController")
-	static let Transfer = AdamantScene(story: .Account, identifier: "TransferViewController")
+	struct Account {
+		static let account = AdamantScene(identifier: "AccountViewController", factory: { r in
+			let c = AccountViewController()
+			c.accountService = r.resolve(AccountService.self)
+			c.dialogService = r.resolve(DialogService.self)
+			c.router = r.resolve(Router.self)
+			return c
+		})
+		
+		static let transfer = AdamantScene(identifier: "TransferViewController", factory: { r in
+			let c = TransferViewController()
+			c.apiService = r.resolve(ApiService.self)
+			c.accountService = r.resolve(AccountService.self)
+			c.dialogService = r.resolve(DialogService.self)
+			return c
+		})
+	}
 }

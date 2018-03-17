@@ -1,0 +1,15 @@
+/* (No Comment) */
+"CFBundleDisplayName" = "Адамант";
+
+/* (No Comment) */
+"CFBundleName" = "Адамант";
+
+/* (No Comment) */
+"NSCameraUsageDescription" = "Чтения QR-кодов с адресами и паролями";
+
+/* (No Comment) */
+"NSPhotoLibraryAddUsageDescription" = "Сохранение созданных QR-кодов";
+
+/* (No Comment) */
+"NSPhotoLibraryUsageDescription" = "Сканирование QR-кодов с адресами и паролями со сделанных ранее фотографий";
+

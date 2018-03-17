@@ -1,0 +1,377 @@
+/* Product name */
+"ADAMANT" = "АДАМАНТ";
+
+/* ApiService: Bad internal application error, report a bug. Using %@ as error description */
+"AccountServiceError.Internal errorFormat" = "Внутренняя ошибка: %@";
+
+/* Login: user typed in invalid passphrase */
+"AccountServiceError.InvalidPassphrase" = "Неправильный пароль";
+
+/* Login: user not logged error */
+"AccountServiceError.UserNotLogged" = "Не выполнен вход";
+
+/* Login: user typed in wrong passphrase */
+"AccountServiceError.WrongPassphrase" = "Неправильный пароль: %@";
+
+/* Account tab: Confirm logout alert: Logout (Ok) button */
+"AccountTab.ConfirmLogout.Logout" = "Выход";
+
+/* Account tab: Confirm logout alert */
+"AccountTab.ConfirmLogout.MessageFormat" = "Выйти из %@?";
+
+/* Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO */
+"AccountTab.TransferBlocked.Message" = "Ввиду ограничений Apple, отправка токенов отключена до конца ICO. В данный момент вы можете отправлять токены с помощью WebApp по адресу msg.adamant.im";
+
+/* Account tab: Balance row title */
+"AccountTab.Row.Balance" = "Баланс";
+
+/* Account tab: 'Invest in ICO' button */
+"AccountTab.Row.JoinIco" = "Учавствовать в ICO";
+
+/* Account tab: 'Logout' button */
+"AccountTab.Row.Logout" = "Выход";
+
+/* Account tab: 'Send tokens' button */
+"AccountTab.Row.SendTokens" = "Отправить токены";
+
+/* Account tab: Account section title. */
+"AccountTab.Section.Account" = "Аккаунт";
+
+/* Account tab: Actions section title */
+"AccountTab.Section.Actions" = "Действия";
+
+/* Account tab: Wallet section title */
+"AccountTab.Section.Wallet" = "Кошелёк";
+
+/* Account tab: 'Transfer not allowed' alert 'go to WebApp button' */
+"AccountTab.TransferBlocked.GoToPWA" = "msg.adamant.im";
+
+/* Account tab: 'Transfer not allowed' alert title */
+"AccountTab.TransferBlocked.Title" = "Ой!";
+
+/* Account page: scene title */
+"AccountTab.Title" = "Аккаунт";
+
+/* ApiService: Account not found error. Using %@ for address. */
+"ApiService.Error.AccountNotFoundFormat" = "Аккаун не найден: %@";
+
+/* ApiService: Bad internal application error, report a bug. Using %@ for error description */
+"ApiService.Error.InternalErrorFormat" = "Внутренняя ошибка: %@";
+
+/* ApiService: No connection message. Generally bad network. */
+"ApiService.Error.NoConnection" = "Нет соединения с сетью";
+
+/* ApiService: Remote server returned an error. Using %@ for error description */
+"ApiService.Error.RemoteServerErrorFormat" = "Ошибка на сервере: %@";
+
+/* ApiService: User not logged error */
+"ApiService.Error.UserNotLogged" = "Не выполнен вход";
+
+/* Serious internal error: Failed to build endpoint url */
+"ApiService.InternalError.EndpointBuildFailed" = "Endpoint build failed. Report a bug";
+
+/* Serious internal error: Failed to sign transaction */
+"ApiService.InternalError.FailedTransactionSigning" = "Transaction failed";
+
+/* Serious internal error: Error parsing response */
+"ApiService.InternalError.ParsingFailed" = "Parsing failed. Report a bug";
+
+/* Unknown internal error */
+"ApiService.InternalError.UnknownError" = "Неизвестная ошибка";
+
+/* ChatList: scene title */
+"ChatListPage.Title" = "Чаты";
+
+/* Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description */
+"ChatScene.Error.InternalErrorFormat" = "Internal error: %@. Report a bug";
+
+/* Chat: Notify user that message cannot be empty */
+"ChatScene.Error.MessageIsEmpty" = "Сообщение пустое!";
+
+/* Chat: Message is too long */
+"ChatScene.Error.MessageTooLong" = "Сообщение слишком длинное";
+
+/* Chat: Notify user that he doesn't have money to pay a message fee */
+"ChatScene.Error.NotEnoughMoney" = "Недостаточно токенов для отправки сообщения";
+
+/* Chat: Notify user about server error. Using %@ for error description */
+"ChatScene.Error.RemoteServerErrorFormat" = "Remote error: %@. Report a bug";
+
+/* Chat: message input placeholder */
+"ChatScene.NewMessage.Placeholder" = "Сообщение";
+
+/* Chat: Send message button */
+"ChatScene.Send" = "Отправить";
+
+/* Known contacts: Adamant ICO message */
+"Chats.IcoMessage" = "У вас есть возможность инвестировать в ICO самого защищенного мессенджера АДАМАНТ. Более раннее участие — более выгодные условия. Подробная информация об условиях на сайте Adamant.im и в Белой книге проекта. Если вы уже ознакомились с нашим сайтом и Белой книгой, но у вас остались вопросы, вы можете задать их, ответив на это сообщение. Мы стараемся реагировать быстро, но иногда возможны задержки до нескольких часов.\\nВажно! Пожалуйста, убедитесь, что вы сохранили пароль к этому аккаунту — выйдите из аккаунта и войдите в него снова. Лучше всего иметь запись пароля и на бумаге. Однако помните, только вы несете ответственность за сохранность вашего пароля. Его невозможно восстановить. А если он попадет в другие руки, ваши деньги будут украдены. Отнеситесь к этому вопросу так серьезно, как если бы цена токенов на вашем кошельке когда-то станет равна миллиарду долларов.\\nЧтобы инвестировать, перейдите в этом месседжере на вкладку Кошелек и нажмите кнопку Инвестировать в ICO, или откройте в браузере веб-страницу Adamant.im/ico/. В форме для инвестирования укажите ваш адрес АДАМАНТа — на него будут перечислены токены ADM. При переходе из мессенджера он будет вставлен автоматически, в другом случае вернитесь в мессенджер и кликните на блок Ваш адрес, он будет скопирован в буфер обмена. Укажите криптовалюту, в которой вы хотите инвестировать, и какую сумму. Вы увидите сколько ADM-токенов вы получите, с учетом скидки за объем: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Нажмите кнопку Купить токены АДАМАНТ. Вы получите уникальный адрес, на который необходимо выполнить перевод. Как только на него поступит ожидаемая сумма и транзакция будет подтверждена, вы получите токены ADM. Транзакцию можно выполнить с любого кошелька, включая биржи. Необязятельно переводить точную сумму с учетом комиссии, платеж все равно будет засчитан. Остались вопросы? Спрашивайте.\\nПосле того, как вы инвестируете и получите токены ADM, мы рекомендуем вам хранить их в кошельке как можно дольше. Ежемесячно все нераспроданные на ICO токены будут распределяться по кошелькам пользователей, увеличивая балансы на 5%. Подробную информацию можно получить на сайте Adamant.im и в Белой книге Проекта.";
+
+/* Known contacts: Adamant pre ICO message */
+"Chats.PreIcoMessage" = "Сегодня последний день, когда мы принимаем инвестиции по минимальной цене 0.001 ETH за токен ADM до начала публичного сейла ICO — 30.01. Это самые выгодные условия для инвесторов. Минимальная инвестиция — эквивалент 2 ETH (на этапе публичного сейла ограничений по минимальной сумме нет, но цена токена начинается с 0.002 ETH). Подробная информация о проекте АДАМАНТ на сайте Adamant.im и в Белой книге. Для участия достаточно ответить на это сообщение, и мы вам поможем.";
+
+/* Known contacts: Adamant welcome message */
+"Chats.WelcomeMessage" = "Добро пожаловать в самый анонимный и безопасный мессенджер АДАМАНТ. Вам начислены приветственные токены, которые вы можете использовать для ознакомления с мессенджером.\\nПомните, что безопасность и анонимность зависит и от вас самих. Не переходите по ссылкам, которые вы получаете в чатах, иначе ваш IP-адрес может быть определен. Не доверяйте расширениям браузера. Лучше всего передавать ваш ADM-адрес собеседникам лично, а не через другие мессенджеры. Храните вашу секретную фразу (пароль) от аккаунта в тайне. Установите на ваше устройство пароль или закрываете вкладку браузера после завершения диалогов.\\nБолее полную информацию о безопасности и анонимности читайте на странице https://adamant.im/ru-staysecured/\\n\\nНе отвечайте на это сообщение, этот адрес служебный.";
+
+/* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
+"LoginScene.Error.AuthorizeCamera" = "Для чтения QR кодов необходимо разрешить доступ к камере";
+
+/* Login: No network error. */
+"LoginScene.Error.NoInternet" = "Нет соединения с сетью";
+
+/* Login: notify user that he is trying to login without a passphrase */
+"LoginScene.Error.NoPassphrase" = "Введите пароль";
+
+/* Login: Notify user that device not supported by QR reader */
+"LoginScene.Error.QrNotSupported" = "На этом устройстве не поддерживается чтение QR кодов";
+
+/* Login: Notify user that scanned QR doesn't contains a passphrase. */
+"LoginScene.Error.WrongQr" = "QR код не содержит пароля";
+
+/* Login: notify user that we are trying to log in */
+"LoginScene.LoggingInProgress" = "Входим…";
+
+/* Login: Login into previous account with biometry or pincode */
+"LoginScene.LoginIntoAdamant" = "Вход в Адамант";
+
+/* Login: generate new passphrase button */
+"LoginScene.Row.Generate" = "Создать новый пароль";
+
+/* Login: Login button */
+"LoginScene.Row.Login" = "Вход";
+
+/* Login: Passphrase placeholder */
+"LoginScene.Row.Passphrase.Placeholder" = "Пароль";
+
+/* Login: Login with pincode button */
+"LoginScene.Row.Pincode" = "Войти с PIN-кодом";
+
+/* Login: Login with QR button. */
+"LoginScene.Row.Qr" = "Войти с QR-кодом";
+
+/* Login: security alert, notify user that he must save his new passphrase */
+"LoginScene.Row.SavePassphraseAlert" = "Это пароль для нового Кошелька и Мессенджера. Сохраните его! Для входа в Кошелек не нужно логина, только этот пароль. Восстановление пароля невозможно.";
+
+/* Login: a small hint for a user, that he can tap on passphrase to save it */
+"LoginScene.Row.TapToSave" = "Нажмите чтобы сохранить";
+
+/* Login: login with existing passphrase section */
+"LoginScene.Section.Login" = "Вход";
+
+/* Login: Create new account section */
+"LoginScene.Section.NewAccount" = "Новый аккаунт";
+
+/* New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank. */
+"NewChatScene.Address.Placeholder" = "";
+
+/* New chat: Notify user that specified address (%@) not found. Using %@ for address */
+"NewChatScene.Error.AddressNotFoundFormat" = "Адрес не найден: %@";
+
+/* New chat: Notify user that he did enter invalid address */
+"NewChatScene.Error.InvalidAddress" = "Неверный адрес";
+
+/* New chat: Notify user that he can't start chat with himself */
+"NewChatScene.Error.OwnAddress" = "Вам не нужен анонимный чат, чтобы говорить с самим собой";
+
+/* New chat: Remote server returned an error. Using %@ for error description */
+"NewChatScene.Error.RemoteServerFormat" = "Remote server error: %@. Report a bug";
+
+/* New Chat: Notify user that scanned QR doesn't contains an address */
+"NewChatScene.Error.WrongQr" = "QR код не содержит адреса";
+
+/* New chat: Scan QR with address button */
+"NewChatScene.ScanQr" = "Сканировать QR-код";
+
+/* New chat: scene title */
+"NewChatScene.Title" = "Новый Чат";
+
+/* Notifications: New message notification title */
+"NotificationsService.NewMessage.Title" = "Новое Сообщение";
+
+/* Notifications: New transfer transaction title */
+"NotificationsService.NewTransfer.Title" = "Новый перевод";
+
+/* Notifications: User has disabled notifications. Head him into settings */
+"NotificationsService.NotificationsDisabled" = "Уведомления отключены. Вы можете включить их в Настройках";
+
+/* Pinpad: Ask user to create new pin */
+"Pinpad.EnterNewPin" = "Введите новый PIN-код";
+
+/* Pinpad: Ask user to repeat new pin */
+"Pinpad.ReenterPin" = "Введите PIN-код ещё раз";
+
+/* QRGenerator: user typed in wrong invalid */
+"QrGeneratorScene.Error.InvalidPassphrase" = "Введите корректный пароль";
+
+/* QRGenerator: Bad Internal generator error message format. Using %@ for error description */
+"QrGeneratorScene.Error.InternalErrorFormat" = "Internal error: %@. Report a bug";
+
+/* QRGenerator: Passphrase textview placeholder */
+"QrGeneratorScene.Passphrase.Placeholder" = "Пароль";
+
+/* QRGenerator: small 'Tap to save' tooltip under generated QR */
+"QrGeneratorScene.TapToSave" = "Нажмите для сохранения";
+
+/* QRGenerator: scene title */
+"QrGeneratorScene.Title" = "QR Генератор";
+
+/* Config: turn off 'Stay Logged In' confirmation */
+"SettingsPage.DoNotStayLoggedIn" = "Выходить из системы при выходе из приложения";
+
+/* Config: Authorization reason for turning biometry off */
+"SettingsPage.DoNotUseBiometry" = "Отключить вход с биометрией";
+
+/* Config: Generate QR with passphrase row */
+"SettingsPage.Row.GenerateQr" = "Создать QR-код с паролем";
+
+/* Config: Show notifications */
+"SettingsPage.Row.Notifications" = "Уведомления";
+
+/* Config: Stay logged option */
+"SettingsPage.Row.StayLoggedIn" = "Оставаться в системе";
+
+/* Config: Version row */
+"SettingsPage.Row.Version" = "Версия";
+
+/* Config: Application Info section */
+"SettingsPage.Section.ApplicationInfo" = "Приложение";
+
+/* Config: Settings section */
+"SettingsPage.Section.Settings" = "Безопасность";
+
+/* Config: Utilities section */
+"SettingsPage.Section.Utilities" = "Утилиты";
+
+/* Config: scene title */
+"SettingsPage.Title" = "Настройки";
+
+/* Config: Authorization reason for turning biometry on */
+"SettingsPage.UseBiometry" = "Использовать биометрию для входа в систему";
+
+/* Shared alert 'Cancel' button. Used anywhere */
+"Shared.Cancel" = "Отмена";
+
+/* Shared alert notification: message about item copied to pasteboard. */
+"Shared.CopiedToPasteboard" = "Скопировано!";
+
+/* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
+"Shared.CopyToPasteboard" = "Копировать";
+
+/* Shared alert Done message. Used anywhere */
+"Shared.Done" = "Готово";
+
+/* Shared alert 'Error' title. Used anywhere */
+"Shared.Error" = "Ошибка";
+
+/* Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere. */
+"Shared.GenerateQRCode" = "Создать QR-код";
+
+/* Shared alert 'Ok' button. Used anywhere */
+"Shared.Ok" = "Ок";
+
+/* Shared alert 'Save' button. Used anywhere */
+"Shared.Save" = "Сохранить";
+
+/* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
+"Shared.Settings" = "Настройки";
+
+/* Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu. */
+"Shared.Share" = "Поделиться";
+
+/* Main tab bar: Account page */
+"Tabs.Account" = "Аккаунт";
+
+/* Main tab bar: Chats page */
+"Tabs.Chats" = "Чаты";
+
+/* Main tab bar: Settings page */
+"Tabs.Settings" = "Настройки";
+
+/* Transaction details: amount row. */
+"TransactionDetailsScene.Row.Amount" = "Количество";
+
+/* Transaction details: Block id row. */
+"TransactionDetailsScene.Row.Block" = "Блок";
+
+/* Transaction details: confirmations row. */
+"TransactionDetailsScene.Row.Confirmations" = "Подтверждения";
+
+/* Transaction details: date row. */
+"TransactionDetailsScene.Row.Date" = "Дата";
+
+/* Transaction details: 'Open transaction in explorer' row. */
+"TransactionDetailsScene.Row.Explorer" = "Открыть в Explorer";
+
+/* Transaction details: fee row. */
+"TransactionDetailsScene.Row.Fee" = "Комиссия";
+
+/* Transaction details: sender row. */
+"TransactionDetailsScene.Row.From" = "Отправитель";
+
+/* Transaction details: Id row. */
+"TransactionDetailsScene.Row.Id" = "Id";
+
+/* Transaction details: recipient row. */
+"TransactionDetailsScene.Row.To" = "Получатель";
+
+/* Export transaction: 'Share transaction summary' button */
+"TransactionDetailsScene.Share.Summary" = "Сводка";
+
+/* Export transaction: 'Share transaction URL' button */
+"TransactionDetailsScene.Share.URL" = "URL";
+
+/* Transfer: transfer amount placeholder */
+"TransferScene.Amount.Placeholder" = "для перевода";
+
+/* Transfer: Address not found error */
+"TransferScene.Error.AddressNotFound" = "Адрес не найден";
+
+/* Transfer: Address validation error */
+"TransferScene.Error.InvalidAddress" = "Введите корректный адрес";
+
+/* Transfer: Amount is hiegher that user's total money notification */
+"TransferScene.Error.NotEnoughtMoney" = "У вас нет такого количества токенов";
+
+/* Transfer: Amount is zero, or even negative notification */
+"TransferScene.Error.TooLittleMoney" = "Вам следует отправить больше токенов";
+
+/* Transfer: recipient address placeholder */
+"TransferScene.Recipient.Placeholder" = "получателя";
+
+/* Transfer: amount of adamant to transfer. */
+"TransferScene.Row.Amount" = "Количество";
+
+/* Transfer: logged user balance. */
+"TransferScene.Row.Balance" = "Баланс";
+
+/* Transfer: maximum amount to transfer: available account money substracting transfer fee. */
+"TransferScene.Row.MaxToTransfer" = "Максимум";
+
+/* Transfer: recipient address */
+"TransferScene.Row.Recipient" = "Адрес";
+
+/* Transfer: Send button */
+"TransferScene.Row.Send" = "Отправить";
+
+/* Transfer: total amount of transaction: money to transfer adding fee */
+"TransferScene.Row.Total" = "Итого";
+
+/* Transfer: transfer fee */
+"TransferScene.Row.TransactionFee" = "Комиссия";
+
+/* Transfer: 'Transfer info' section */
+"TransferScene.Section.TransferInfo" = "Перевод";
+
+/* Transfer: 'Your wallet' section */
+"TransferScene.Section.YourWallet" = "Ваш кошелёк";
+
+/* Transfer: Confirm transfer alert: Send tokens button */
+"TransferScene.Send" = "Отправить";
+
+/* Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
+"TransferScene.SendConfirmFormat" = "Отправить %1$@ получателю %2$@?";
+
+/* Transfer: Processing message */
+"TransferScene.SendingFundsProgress" = "Отправляем токены...";
+
+/* Transfer: Tokens transfered successfully message */
+"TransferScene.TransferSuccessMessage" = "Готово!";

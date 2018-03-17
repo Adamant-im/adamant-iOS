@@ -6,13 +6,26 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
-
-extension AdamantStory {
-	static let Settings = AdamantStory("Settings")
-}
+import UIKit
 
 extension AdamantScene {
-	static let SettingsPage = AdamantScene(story: .Settings, identifier: "SettingsTableViewController")
-	static let QRGenerator = AdamantScene(story: .Settings, identifier: "QRGeneratorViewController")
+	struct Settings {
+		static let settings = AdamantScene(identifier: "SettingsTableViewController", factory: { r in
+			let c = SettingsViewController()
+			c.dialogService = r.resolve(DialogService.self)
+			c.accountService = r.resolve(AccountService.self)
+			c.localAuth = r.resolve(LocalAuthentication.self)
+			c.notificationsService = r.resolve(NotificationsService.self)
+			c.router = r.resolve(Router.self)
+			return c
+		})
+		
+		static let qRGenerator = AdamantScene(identifier: "QRGeneratorViewController", factory: { r in
+			let c = QRGeneratorViewController()
+			c.dialogService = r.resolve(DialogService.self)
+			return c
+		})
+		
+		private init() {}
+	}
 }

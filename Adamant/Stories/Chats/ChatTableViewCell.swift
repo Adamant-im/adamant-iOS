@@ -9,12 +9,6 @@
 import UIKit
 import FreakingSimpleRoundImageView
 
-extension SharedCell {
-	static let ChatCell = SharedCell(cellIdentifier: "chatCell",
-									 xibName: "ChatTableViewCell",
-									 rowHeight: 74)
-}
-
 class ChatTableViewCell: UITableViewCell {
 	// MARK: - IBOutlets
 	@IBOutlet weak var avatarImageView: RoundImageView!

@@ -23,11 +23,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>The camera needed to scan QR codes - addresses and passphrases</string>
+	<string>The camera needed to scan QR codes for addresses and passphrases</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Saving generated QR codes - passphrases and addresses</string>
+	<string>Saving generated QR codes with passphrases and addresses</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Reading QR codes - passphrases and addresses</string>
+	<string>Reading QR codes with passphrases and addresses</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Exo+2_100_normal.ttf</string>

@@ -232,10 +232,8 @@ extension SettingsViewController: PinpadViewControllerDelegate {
 		switch pinpadRequest {
 			
 		// MARK: User canceled turning on StayIn
-		case PinpadRequest.createPin?:
-			fallthrough
-			
-		case PinpadRequest.reenterPin(pin: _)?:
+		case PinpadRequest.createPin?,
+			 PinpadRequest.reenterPin(pin: _)?:
 			if let row: SwitchRow = form.rowBy(tag: Rows.stayLoggedIn.tag) {
 				row.value = false
 				row.updateCell()

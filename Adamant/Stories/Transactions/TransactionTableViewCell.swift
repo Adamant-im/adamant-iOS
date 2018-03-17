@@ -8,12 +8,6 @@
 
 import UIKit
 
-extension SharedCell {
-	static let TransactionCell = SharedCell(cellIdentifier: "transactionCell",
-											xibName: "TransactionTableViewCell",
-											rowHeight: 90)
-}
-
 class TransactionTableViewCell: UITableViewCell {
 	
 	enum TransactionType {
