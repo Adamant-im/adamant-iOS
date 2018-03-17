@@ -188,14 +188,18 @@ extension AdamantChatsProvider {
 													userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h])
 				}
 				
-				self?.readedLastHeight = self?.receivedLastHeight
+				if let h = self?.receivedLastHeight {
+					self?.readedLastHeight = h
+				} else {
+					self?.readedLastHeight = 0
+				}
 				
 				if let store = self?.securedStore {
 					if let h = self?.receivedLastHeight {
 						store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
 					}
 					
-					if let h = self?.readedLastHeight {
+					if let h = self?.readedLastHeight, h > 0 {
 						store.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
 					}
 				}
@@ -634,12 +638,6 @@ extension AdamantChatsProvider {
 		// MARK: 4. Unread messagess
 		if let readedLastHeight = readedLastHeight {
 			let msgs = Dictionary(grouping: newChatTransactions.filter({$0.height > readedLastHeight}), by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
-			for (chatroom, trs) in msgs {
-				chatroom.hasUnreadMessages = true
-				trs.forEach({$0.isUnread = true})
-			}
-		} else {
-			let msgs = Dictionary(grouping: newChatTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
 			for (chatroom, trs) in msgs {
 				chatroom.hasUnreadMessages = true
 				trs.forEach({$0.isUnread = true})
