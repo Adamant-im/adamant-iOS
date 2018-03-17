@@ -12,7 +12,6 @@ extension AdamantScene {
 	struct Transactions {
 		static let transactions = AdamantScene(identifier: "TransactionsViewController", factory: { r in
 			let c = TransactionsViewController(nibName: "TransactionsViewController", bundle: nil)
-			c.cellFactory = r.resolve(CellFactory.self)
 			c.transfersProvider = r.resolve(TransfersProvider.self)
 			c.router = r.resolve(Router.self)
 			return c

@@ -127,8 +127,6 @@
 		E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */; };
 		E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */; };
 		E9E7CDB72003994E00DFC4DB /* AdamantUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB62003994E00DFC4DB /* AdamantUtilities.swift */; };
-		E9E7CDBB2003AAA700DFC4DB /* RoundAvatarTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB92003AAA700DFC4DB /* RoundAvatarTableViewCell.swift */; };
-		E9E7CDBC2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */; };
 		E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */; };
 		E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */; };
 		E9E7CDC22003F5A400DFC4DB /* TransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDC12003F5A400DFC4DB /* TransactionsViewController.swift */; };
@@ -306,8 +304,6 @@
 		E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRoutes.swift; sourceTree = "<group>"; };
 		E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectedRouter.swift; sourceTree = "<group>"; };
 		E9E7CDB62003994E00DFC4DB /* AdamantUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantUtilities.swift; sourceTree = "<group>"; };
-		E9E7CDB92003AAA700DFC4DB /* RoundAvatarTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundAvatarTableViewCell.swift; sourceTree = "<group>"; };
-		E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RoundAvatarTableViewCell.xib; sourceTree = "<group>"; };
 		E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellFactory.swift; sourceTree = "<group>"; };
 		E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantCellFactory.swift; sourceTree = "<group>"; };
 		E9E7CDC12003F5A400DFC4DB /* TransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsViewController.swift; sourceTree = "<group>"; };
@@ -526,10 +522,12 @@
 			isa = PBXGroup;
 			children = (
 				E94E7B05205D48B20042B639 /* TransactionsRoutes.swift */,
-				E94E7B0B205D5E4A0042B639 /* TransactionsViewController.xib */,
 				E9E7CDC12003F5A400DFC4DB /* TransactionsViewController.swift */,
-				E94E7B0D205D5EA80042B639 /* TransactionDetailsViewController.xib */,
+				E94E7B0B205D5E4A0042B639 /* TransactionsViewController.xib */,
 				E9EC34132005178500C0E546 /* TransactionDetailsViewController.swift */,
+				E94E7B0D205D5EA80042B639 /* TransactionDetailsViewController.xib */,
+				E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */,
+				E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */,
 			);
 			path = Transactions;
 			sourceTree = "<group>";
@@ -559,10 +557,12 @@
 			isa = PBXGroup;
 			children = (
 				E95F857E2008C8D60070534A /* ChatsRoutes.swift */,
-				E94E7B00205D3F090042B639 /* ChatListViewController.xib */,
 				E95F85842008CB3A0070534A /* ChatListViewController.swift */,
+				E94E7B00205D3F090042B639 /* ChatListViewController.xib */,
 				E93EFE12200D1156000BB482 /* ChatViewController.swift */,
 				E9C51EF02013F18000385EB7 /* NewChatViewController.swift */,
+				E95F85C5200A9B070070534A /* ChatTableViewCell.swift */,
+				E95F85C6200A9B070070534A /* ChatTableViewCell.xib */,
 			);
 			path = Chats;
 			sourceTree = "<group>";
@@ -669,8 +669,8 @@
 			isa = PBXGroup;
 			children = (
 				E9E7CDB02002B97B00DFC4DB /* AccountRoutes.swift */,
-				E94E7B09205D59F50042B639 /* AccountViewController.xib */,
 				E9E7CDAA2002AFA500DFC4DB /* AccountViewController.swift */,
+				E94E7B09205D59F50042B639 /* AccountViewController.xib */,
 				E9EC342020052ABB00C0E546 /* TransferViewController.swift */,
 			);
 			path = Account;
@@ -679,12 +679,6 @@
 		E9E7CDB82003AA8E00DFC4DB /* SharedCells */ = {
 			isa = PBXGroup;
 			children = (
-				E95F85C5200A9B070070534A /* ChatTableViewCell.swift */,
-				E95F85C6200A9B070070534A /* ChatTableViewCell.xib */,
-				E9E7CDB92003AAA700DFC4DB /* RoundAvatarTableViewCell.swift */,
-				E9E7CDBA2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib */,
-				E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */,
-				E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */,
 				E9942B86203D9E5100C163AF /* EurekaQRRow.swift */,
 				E9942B88203D9ECA00C163AF /* QrCell.xib */,
 				E95CB462205D8BBA00A7218E /* EurekaAccountRow.swift */,
@@ -713,8 +707,8 @@
 		E9FAE5DB203ECD41008D3A6B /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */,
 				E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */,
+				E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */,
 				E94E7B07205D4CB80042B639 /* SharedRoutes.swift */,
 			);
 			path = Shared;
@@ -814,7 +808,6 @@
 				E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */,
 				E95CB451205D77B200A7218E /* InfoPlist.strings in Resources */,
 				E9EC341B200524CA00C0E546 /* Roboto_300_normal.ttf in Resources */,
-				E9E7CDBC2003AAA700DFC4DB /* RoundAvatarTableViewCell.xib in Resources */,
 				E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
 				E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */,
@@ -979,7 +972,6 @@
 				E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */,
 				E90A494D204DA932009F6A65 /* LocalAuthentication.swift in Sources */,
 				E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */,
-				E9E7CDBB2003AAA700DFC4DB /* RoundAvatarTableViewCell.swift in Sources */,
 				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
 				E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */,
 				E9B3D3A9202082450019EB36 /* AdamantTransfersProvider.swift in Sources */,

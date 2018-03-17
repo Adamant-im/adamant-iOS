@@ -10,8 +10,10 @@ import UIKit
 import CoreData
 
 class TransactionsViewController: UIViewController {
+	let cellIdentifier = "cell"
+	let cellHeight: CGFloat = 90.0
+	
 	// MARK: - Dependencies
-	var cellFactory: CellFactory!
 	var transfersProvider: TransfersProvider!
 	var router: Router!
 	
@@ -31,8 +33,7 @@ class TransactionsViewController: UIViewController {
 		controller = transfersProvider.transfersController()
 		controller?.delegate = self
 		
-		
-		tableView.register(cellFactory.nib(for: .TransactionCell), forCellReuseIdentifier: SharedCell.TransactionCell.cellIdentifier)
+		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
 		tableView.dataSource = self
 		tableView.delegate = self
 		
@@ -93,7 +94,7 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 	}
 	
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-		return SharedCell.TransactionCell.defaultRowHeight
+		return cellHeight
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -111,7 +112,7 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		guard let cell = tableView.dequeueReusableCell(withIdentifier: SharedCell.TransactionCell.cellIdentifier, for: indexPath) as? TransactionTableViewCell,
+		guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? TransactionTableViewCell,
 			let transfer = controller?.object(at: indexPath) else {
 				// TODO: Display & Log error
 				return UITableViewCell(style: .default, reuseIdentifier: "cell")

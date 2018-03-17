@@ -14,7 +14,6 @@ extension AdamantScene {
 			let c = ChatListViewController(nibName: "ChatListViewController", bundle: nil)
 			c.accountService = r.resolve(AccountService.self)
 			c.chatsProvider = r.resolve(ChatsProvider.self)
-			c.cellFactory = r.resolve(CellFactory.self)
 			c.router = r.resolve(Router.self)
 			return c
 		})

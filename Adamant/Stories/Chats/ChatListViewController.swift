@@ -18,10 +18,12 @@ extension String.adamantLocalized {
 }
 
 class ChatListViewController: UIViewController {
+	let cellIdentifier = "cell"
+	let cellHeight: CGFloat = 74.0
+	
 	// MARK: Dependencies
 	var accountService: AccountService!
 	var chatsProvider: ChatsProvider!
-	var cellFactory: CellFactory!
 	var router: Router!
 	
 	// MARK: IBOutlet
@@ -32,7 +34,6 @@ class ChatListViewController: UIViewController {
 	var chatsController: NSFetchedResultsController<Chatroom>?
 	var unreadController: NSFetchedResultsController<ChatTransaction>?
 	
-	let chatCell = SharedCell.ChatCell.cellIdentifier
 	private var preservedMessagess = [String:String]()
 	
 	
@@ -45,7 +46,7 @@ class ChatListViewController: UIViewController {
 		// MARK: TableView
 		tableView.dataSource = self
 		tableView.delegate = self
-		tableView.register(cellFactory.nib(for: SharedCell.ChatCell), forCellReuseIdentifier: chatCell)
+		tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
 		
 		chatsController = chatsProvider.getChatroomsController()
 		chatsController?.delegate = self
@@ -121,7 +122,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
 	}
 	
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-		return SharedCell.ChatCell.defaultRowHeight
+		return cellHeight
 	}
 	
 	func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -145,7 +146,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
 // MARK: - UITableView Cells
 extension ChatListViewController {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCell(withIdentifier: chatCell, for: indexPath) as! ChatTableViewCell
+		let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! ChatTableViewCell
 		
 		cell.accessoryType = .disclosureIndicator
 		cell.accountLabel.textColor = UIColor.adamantPrimary
@@ -202,7 +203,6 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
 	}
 	
 	func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-		
 		switch controller {
 		case let c where c == chatsController:
 			tableView.endUpdates()
