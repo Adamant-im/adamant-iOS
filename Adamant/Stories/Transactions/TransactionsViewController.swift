@@ -14,6 +14,7 @@ class TransactionsViewController: UIViewController {
 	let cellHeight: CGFloat = 90.0
 	
 	// MARK: - Dependencies
+	var accountService: AccountService!
 	var transfersProvider: TransfersProvider!
 	var router: Router!
 	
@@ -30,14 +31,21 @@ class TransactionsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
-		controller = transfersProvider.transfersController()
-		controller?.delegate = self
+		if accountService.account != nil {
+			initFetchedResultController(provider: transfersProvider)
+		}
 		
 		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
 		tableView.dataSource = self
 		tableView.delegate = self
 		
-		tableView.reloadData()
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { [weak self] notification in
+			self?.initFetchedResultController(provider: self?.transfersProvider)
+		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
+			self?.initFetchedResultController(provider: nil)
+		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -45,6 +53,22 @@ class TransactionsViewController: UIViewController {
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
+	}
+	
+	
+	/// - Parameter provider: nil to drop and reset
+	private func initFetchedResultController(provider: TransfersProvider?) {
+		controller = transfersProvider.transfersController()
+		controller?.delegate = self
+		
+		do {
+			try controller?.performFetch()
+		} catch {
+			print("There was an error performing fetch: \(error)")
+			controller = nil
+		}
+		
+		tableView.reloadData()
 	}
 }
 

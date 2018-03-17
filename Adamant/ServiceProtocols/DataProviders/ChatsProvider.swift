@@ -75,11 +75,11 @@ protocol ChatsProvider: DataProvider {
 	var readedLastHeight: Int64? { get }
 	
 	// MARK: - Getting chats and messages
-	func getChatroomsController() -> NSFetchedResultsController<Chatroom>?
-	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>?
+	func getChatroomsController() -> NSFetchedResultsController<Chatroom>
+	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
 	
 	/// Unread messages controller. Sections by chatroom.
-	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>?
+	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>
 	
 	/// Returns asociated with account chatroom, or create new, in viewContext
 	func chatroomWith(_ account: CoreDataAccount) -> Chatroom

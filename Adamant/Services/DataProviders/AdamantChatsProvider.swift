@@ -344,24 +344,18 @@ extension AdamantChatsProvider {
 
 // MARK: - Getting messages
 extension AdamantChatsProvider {
-	func getChatroomsController() -> NSFetchedResultsController<Chatroom>? {
+	func getChatroomsController() -> NSFetchedResultsController<Chatroom> {
 		let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
 		request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false)]
 		request.predicate = NSPredicate(format: "partner!=nil")
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 		
-		do {
-			try controller.performFetch()
-			return controller
-		} catch {
-			print("Error fetching request: \(error)")
-			return nil
-		}
+		return controller
 	}
 	
-	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>? {
+	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction> {
 		guard let context = chatroom.managedObjectContext else {
-			return nil
+			fatalError()
 		}
 		
 		let request: NSFetchRequest<ChatTransaction> = NSFetchRequest(entityName: ChatTransaction.entityName)
@@ -369,13 +363,7 @@ extension AdamantChatsProvider {
 		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
 		
-		do {
-			try controller.performFetch()
-			return controller
-		} catch {
-			print("Error fetching request: \(error)")
-			return nil
-		}
+		return controller
 	}
 	
 	func chatroomWith(_ account: CoreDataAccount) -> Chatroom {
@@ -400,21 +388,14 @@ extension AdamantChatsProvider {
 		return chatroom
 	}
 	
-	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>? {
+	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction> {
 		let request = NSFetchRequest<ChatTransaction>(entityName: ChatTransaction.entityName)
 		request.predicate = NSPredicate(format: "isUnread == true")
 		request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false)]
 		
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: "chatroom.partner.address", cacheName: nil)
-		controller.section
 		
-		do {
-			try controller.performFetch()
-			return controller
-		} catch {
-			print("Error fetching unread messages: \(error)")
-			return nil
-		}
+		return controller
 	}
 }
 
