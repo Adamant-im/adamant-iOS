@@ -65,6 +65,7 @@ class ChatListViewController: UIViewController {
 			self?.tableView.reloadData()
 		}
 		NotificationCenter.default.addObserver(forName: .adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			self?.setBadgeValue(nil)
 			self?.chatsController = nil
 			self?.tableView.reloadData()
 		}
@@ -207,18 +208,7 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
 			tableView.endUpdates()
 			
 		case let c where c == unreadController:
-			let item: UITabBarItem
-			if let i = navigationController?.tabBarItem {
-				item = i
-			} else {
-				item = tabBarItem
-			}
-			
-			if let count = controller.fetchedObjects?.count, count > 0 {
-				item.badgeValue = String(count)
-			} else {
-				item.badgeValue = nil
-			}
+			setBadgeValue(controller.fetchedObjects?.count)
 			
 		default:
 			break
@@ -318,8 +308,25 @@ extension ChatListViewController: ChatViewControllerDelegate {
 }
 
 
-// MARK: - Current chat
+// MARK: - Tools
 extension ChatListViewController {
+	/// TabBar item badge
+	func setBadgeValue(_ value: Int?) {
+		let item: UITabBarItem
+		if let i = navigationController?.tabBarItem {
+			item = i
+		} else {
+			item = tabBarItem
+		}
+		
+		if let value = value, value > 0 {
+			item.badgeValue = String(value)
+		} else {
+			item.badgeValue = nil
+		}
+	}
+	
+	/// Current chat
 	func presentedChatroom() -> Chatroom? {
 		// Showing another page
 		guard tabBarController?.selectedViewController == self else {

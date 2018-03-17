@@ -119,7 +119,7 @@ class AccountViewController: FormViewController {
 		// MARK: Account Section
 		form +++ Section(Sections.account.localized)
 			
-			<<< AccountRow() { [weak self] in
+			<<< AccountRow() {
 				$0.tag = Rows.account.tag
 				$0.cell.height = {65}
 			}
