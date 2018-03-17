@@ -1,15 +1,15 @@
-/* (No Comment) */
+/* The user-visible name of the bundle; used by Siri and visible on the Home screen in iOS. */
 "CFBundleDisplayName" = "Adamant";
 
-/* (No Comment) */
+/* The short name of the bundle, which may be displayed to users in situations such as the absence of a value for CFBundleDisplayName. This name should be less than 16 characters long. */
 "CFBundleName" = "Adamant";
 
-/* (No Comment) */
+/* Camera authorization reason */
 "NSCameraUsageDescription" = "The camera needed to scan QR codes for addresses and passphrases";
 
-/* (No Comment) */
+/* Readonly access to photolibrary reason */
 "NSPhotoLibraryAddUsageDescription" = "Saving generated QR codes with passphrases and addresses";
 
-/* (No Comment) */
+/* ReadWrite access to photolibrary reason */
 "NSPhotoLibraryUsageDescription" = "Reading QR codes with passphrases and addresses";
 
