@@ -36,19 +36,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		notificationService = container.resolve(NotificationsService.self)
 		
 		
-		// MARK: 2. Prepare UI
-		self.window = UIWindow(frame: UIScreen.main.bounds)
-		self.window!.rootViewController = UITabBarController()
-		self.window!.rootViewController?.view.backgroundColor = .white
-		self.window!.makeKeyAndVisible()
+		// MARK: 2. Init UI
+		window = UIWindow(frame: UIScreen.main.bounds)
+		window!.rootViewController = UITabBarController()
+		window!.rootViewController?.view.backgroundColor = .white
+		window!.makeKeyAndVisible()
+		window!.tintColor = UIColor.adamantPrimary
 		
-		self.window!.tintColor = UIColor.adamantPrimary
+		
+		// MARK: 3. Show login
 		
 		guard let router = container.resolve(Router.self) else {
 			fatalError("Failed to get Router")
 		}
 		
-		if let tabbar = self.window!.rootViewController as? UITabBarController {
+		let login = router.get(scene: AdamantScene.Login.login)
+		window!.rootViewController?.present(login, animated: false, completion: nil)
+		
+		// MARK: 4. Async prepare pages
+		if let tabbar = window?.rootViewController as? UITabBarController {
 			let accountRoot = router.get(scene: AdamantScene.Account.account)
 			let account = UINavigationController(rootViewController: accountRoot)
 			account.tabBarItem.title = String.adamantLocalized.tabItems.account
@@ -64,21 +70,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			settings.tabBarItem.title = String.adamantLocalized.tabItems.settings
 			settings.tabBarItem.image = #imageLiteral(resourceName: "settings_tab")
 			
-			
 			account.tabBarItem.badgeColor = UIColor.adamantPrimary
 			chatList.tabBarItem.badgeColor = UIColor.adamantPrimary
 			settings.tabBarItem.badgeColor = UIColor.adamantPrimary
 			
 			tabbar.setViewControllers([account, chatList, settings], animated: false)
 		}
-
 		
-		// MARK: 3. Initiate login
-		let login = router.get(scene: AdamantScene.Login.login)
-		self.window!.rootViewController?.present(login, animated: false, completion: nil)
-		
-		
-		// MARK: 4 Autoupdate
+		// MARK: 5 Autoupdate
 		repeater = RepeaterService()
 		if let chatsProvider = container.resolve(ChatsProvider.self),
 			let transfersProvider = container.resolve(TransfersProvider.self),
@@ -91,7 +90,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		
-		// MARK: 4. Notifications
+		// MARK: 6. Notifications
 		if let service = container.resolve(NotificationsService.self) {
 			if service.notificationsEnabled {
 				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
@@ -109,7 +108,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		
-		// MARK: 5. Logout reset
+		// MARK: 7. Logout reset
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			// On logout, pop all navigators to root.
 			guard let tbc = self?.window?.rootViewController as? UITabBarController, let vcs = tbc.viewControllers else {

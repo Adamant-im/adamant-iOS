@@ -121,7 +121,7 @@ class LoginViewController: FormViewController {
 	// MARK: Properties
 	private var hideNewPassphrase: Bool = true
 	private var generatedPassphrases = [String]()
-	
+	private var firstTimeActive: Bool = true
 	
 	// MARK: Lifecycle
 	
@@ -277,16 +277,12 @@ class LoginViewController: FormViewController {
 			})
 			
 			section.append(row)
-			
-			if accountService.useBiometry {
-				loginWithBiometry()
-			}
 		}
 		
 		
 		// MARK: tableView position tuning
 		if let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
-			NotificationCenter.default.addObserver(forName: NSNotification.Name.UITextFieldTextDidBeginEditing, object: row.cell.textField, queue: nil) { [weak self] _ in
+			NotificationCenter.default.addObserver(forName: Notification.Name.UITextFieldTextDidBeginEditing, object: row.cell.textField, queue: nil) { [weak self] _ in
 				guard let tableView = self?.tableView, let indexPath = self?.form.rowBy(tag: Rows.loginButton.tag)?.indexPath else {
 					return
 				}
@@ -294,6 +290,15 @@ class LoginViewController: FormViewController {
 				DispatchQueue.main.async {
 					tableView.scrollToRow(at: indexPath, at: .none, animated: true)
 				}
+			}
+		}
+		
+		// MARK: Requesting biometry onActive
+		NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationDidBecomeActive, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			if let firstTimeActive = self?.firstTimeActive, firstTimeActive,
+				let accountService = self?.accountService, accountService.hasStayInAccount, accountService.useBiometry {
+				self?.loginWithBiometry()
+				self?.firstTimeActive = false
 			}
 		}
     }
