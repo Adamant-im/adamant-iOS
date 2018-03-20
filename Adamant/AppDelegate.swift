@@ -77,8 +77,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			tabbar.setViewControllers([account, chatList, settings], animated: false)
 		}
 		
-		// MARK: 5 Autoupdate
+		// MARK: 5 Reachability & Autoupdate
 		repeater = RepeaterService()
+		
+		// Configure reachability
+		if let reachability = container.resolve(ReachabilityMonitor.self) {
+			reachability.start()
+			
+			switch reachability.connection {
+			case .cellular, .wifi:
+				break
+				
+			case .none:
+				repeater.pauseAll()
+			}
+			
+			NotificationCenter.default.addObserver(forName: .adamantReachabilityChanged, object: reachability, queue: nil) { [weak self] notification in
+				guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection,
+					let repeater = self?.repeater else {
+						return
+				}
+				
+				switch connection {
+				case .cellular, .wifi:
+					repeater.resumeAll()
+					
+				case .none:
+					repeater.pauseAll()
+				}
+			}
+		}
+		
+		// Register repeater services
 		if let chatsProvider = container.resolve(ChatsProvider.self),
 			let transfersProvider = container.resolve(TransfersProvider.self),
 			let accountService = container.resolve(AccountService.self) {
@@ -134,10 +164,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 	
 	func applicationDidBecomeActive(_ application: UIApplication) {
-		repeater.resumeAll()
-		
 		if accountService?.account != nil {
 			notificationService?.removeAllDeliveredNotifications()
+		}
+		
+		if let connection = container.resolve(ReachabilityMonitor.self)?.connection {
+			switch connection {
+			case .wifi, .cellular:
+				repeater.resumeAll()
+				
+			case .none:
+				break
+			}
+		} else {
+			repeater.resumeAll()
 		}
 	}
 }
@@ -195,4 +235,5 @@ extension AppDelegate {
 		}
 		
 		completionHandler(.noData)
-	}}
+	}
+}
