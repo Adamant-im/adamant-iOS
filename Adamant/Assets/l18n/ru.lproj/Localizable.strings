@@ -91,6 +91,9 @@
 /* Chat: Message is too long */
 "ChatScene.Error.MessageTooLong" = "Сообщение слишком длинное";
 
+/* Chat: Network problems. In most cases - no connection */
+"ChatScene.Error.NoNetwork" = "Нет соединения с сетью";
+
 /* Chat: Notify user that he doesn't have money to pay a message fee */
 "ChatScene.Error.NotEnoughMoney" = "Недостаточно токенов для отправки сообщения";
 
