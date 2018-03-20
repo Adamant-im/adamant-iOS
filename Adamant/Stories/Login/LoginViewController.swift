@@ -8,7 +8,6 @@
 
 import UIKit
 import Eureka
-import MyLittlePinpad
 
 // MARK: - Localization
 extension String.adamantLocalized {

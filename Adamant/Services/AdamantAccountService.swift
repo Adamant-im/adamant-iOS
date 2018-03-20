@@ -317,6 +317,7 @@ extension AdamantAccountService {
 				completion(.success(account: account))
 				
 			case .failure(let error):
+				self.setState(.notLogged)
 				switch error {
 				case .accountNotFound:
 					completion(.failure(.wrongPassphrase))

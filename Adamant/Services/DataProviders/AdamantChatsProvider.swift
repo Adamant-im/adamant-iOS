@@ -363,7 +363,26 @@ extension AdamantChatsProvider {
 			case .failure(let error):
 				privateContext.delete(transaction)
 				try? privateContext.save()
-				completion(.error(.serverError(error)))
+				
+				let serviceError: ChatsProviderError
+				switch error {
+				case .networkError(_):
+					serviceError = .networkError
+					
+				case .accountNotFound:
+					serviceError = .accountNotFound(recipientId)
+					
+				case .notLogged:
+					serviceError = .notLogged
+					
+				case .serverError(let e):
+					serviceError = .serverError(AdamantError(message: e))
+					
+				case .internalError(let message, let e):
+					serviceError = ChatsProviderError.internalError(AdamantError(message: message, error: e))
+				}
+				
+				completion(.error(serviceError))
 			}
 		}
 	}

@@ -48,6 +48,10 @@ extension AdamantDialogService {
 	func showToastMessage(_ message: String) {
 		FTIndicator.showToastMessage(message)
 	}
+	
+	func dismissToast() {
+		FTIndicator.dismissToast()
+	}
 }
 
 

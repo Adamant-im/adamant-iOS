@@ -91,6 +91,9 @@
 /* Chat: Message is too long */
 "ChatScene.Error.MessageTooLong" = "Message is too long";
 
+/* Chat: Network problems. In most cases - no connection */
+"ChatScene.Error.NoNetwork" = "No connection";
+
 /* Chat: Notify user that he doesn't have money to pay a message fee */
 "ChatScene.Error.NotEnoughMoney" = "You don't have enought money to send a message";
 

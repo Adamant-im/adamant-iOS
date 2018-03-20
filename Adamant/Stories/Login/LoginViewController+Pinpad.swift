@@ -68,6 +68,10 @@ extension LoginViewController {
 				
 			case .failure(let error):
 				self?.dialogService.showError(withMessage: error.localized)
+				
+				if let pinpad = self?.presentedViewController as? PinpadViewController {
+					pinpad.clearPin()
+				}
 			}
 		}
 	}
@@ -96,9 +100,8 @@ extension LoginViewController: PinpadViewControllerDelegate {
 			case .success:
 				self?.loginIntoSavedAccount()
 				
-			case .fallback: break
-			case .cancel: break
-			case .failed: break
+			case .fallback, .cancel, .failed:
+				break
 			}
 		})
 	}

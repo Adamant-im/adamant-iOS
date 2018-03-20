@@ -74,7 +74,7 @@ protocol DialogService: class {
 	// MARK: - Toast messages
 	/// Show pop-up message
 	func showToastMessage(_ message: String)
-	
+	func dismissToast()
 	
 	// MARK: - Indicators
 	func showProgress(withMessage: String?, userInteractionEnable: Bool)
