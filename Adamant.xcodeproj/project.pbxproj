@@ -28,6 +28,8 @@
 		E91947B020002393001362F8 /* AdamantApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AF20002393001362F8 /* AdamantApiService.swift */; };
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
 		E91947B420002809001362F8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B320002809001362F8 /* Account.swift */; };
+		E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */; };
+		E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921597420611A6A0000CA5C /* AdamantReachability.swift */; };
 		E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9256F5E2034C21100DE86E9 /* String+localized.swift */; };
 		E9256F6D20357B1700DE86E9 /* LoginHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9256F6C20357B1700DE86E9 /* LoginHeader.xib */; };
 		E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */; };
@@ -202,6 +204,8 @@
 		E91947AF20002393001362F8 /* AdamantApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantApiService.swift; sourceTree = "<group>"; };
 		E91947B12000246A001362F8 /* AdamantError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantError.swift; sourceTree = "<group>"; };
 		E91947B320002809001362F8 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
+		E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachabilityMonitor.swift; sourceTree = "<group>"; };
+		E921597420611A6A0000CA5C /* AdamantReachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantReachability.swift; sourceTree = "<group>"; };
 		E9256F5E2034C21100DE86E9 /* String+localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+localized.swift"; sourceTree = "<group>"; };
 		E9256F6C20357B1700DE86E9 /* LoginHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoginHeader.xib; sourceTree = "<group>"; };
 		E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -413,6 +417,7 @@
 				E90A494C204DA932009F6A65 /* LocalAuthentication.swift */,
 				E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */,
 				E9A174B22057EC47003667CD /* BackgroundFetchService.swift */,
+				E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -427,6 +432,7 @@
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
 				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
+				E921597420611A6A0000CA5C /* AdamantReachability.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
 				E905D39A2048A9BD00DDB504 /* KeychainStore.swift */,
 				E950273F202E257E002C1098 /* RepeaterService.swift */,
@@ -870,6 +876,7 @@
 				"${BUILT_PRODUCTS_DIR}/MyLittlePinpad/MyLittlePinpad.framework",
 				"${BUILT_PRODUCTS_DIR}/QRCodeReader.swift/QRCodeReader.framework",
 				"${BUILT_PRODUCTS_DIR}/RNCryptor/RNCryptor.framework",
+				"${BUILT_PRODUCTS_DIR}/ReachabilitySwift/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -884,6 +891,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MyLittlePinpad.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCodeReader.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCryptor.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -945,6 +953,7 @@
 				E93D7AC22052EE21005D19DC /* SettingsViewController+StayIn.swift in Sources */,
 				E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */,
 				E948E0462024DAE800975D6B /* AdamantUserInfoKeys.swift in Sources */,
+				E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				E9B3D39A201F90570019EB36 /* AccountsProvider.swift in Sources */,
@@ -960,6 +969,7 @@
 				E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */,
 				E95F858B200931410070534A /* TransactionAsset.swift in Sources */,
 				E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */,
+				E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */,
 				E9E7CDAC2002AFA500DFC4DB /* AccountViewController.swift in Sources */,
 				E91947B420002809001362F8 /* Account.swift in Sources */,
 				E9E7CDC22003F5A400DFC4DB /* TransactionsViewController.swift in Sources */,

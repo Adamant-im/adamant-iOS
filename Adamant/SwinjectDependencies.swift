@@ -50,6 +50,8 @@ extension Container {
 		// MARK: LocalAuthentication
 		self.register(LocalAuthentication.self) { r in AdamantAuthentication() }.inObjectScope(.container)
 		
+		// MARK: Reachability
+		self.register(ReachabilityMonitor.self) { r in AdamantReachability() }.inObjectScope(.container)
 		
 		// MARK: - Services with dependencies
 		// MARK: Notifications

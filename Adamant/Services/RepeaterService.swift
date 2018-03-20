@@ -12,7 +12,7 @@ class RepeaterService {
 	private class Client {
 		let interval: TimeInterval
 		let queue: DispatchQueue?
-		weak var timer: Timer? = nil
+		var timer: Timer? = nil
 		let callback: () -> Void
 		
 		init(interval: TimeInterval, queue: DispatchQueue?, callback: @escaping () -> Void) {
@@ -44,8 +44,6 @@ class RepeaterService {
 	///   - call: function to call
 	func registerForegroundCall(label: String, interval: TimeInterval, queue: DispatchQueue?, callback: @escaping () -> Void) {
 		let client = Client(interval: interval, queue: queue, callback: callback)
-		let timer = Timer(timeInterval: interval, target: self, selector: #selector(timerFired), userInfo: client, repeats: true)
-		client.timer = timer
 		
 		if let t = foregroundTimers[label]?.timer {
 			t.invalidate()
@@ -53,8 +51,17 @@ class RepeaterService {
 		
 		foregroundTimers[label] = client
 		
-		DispatchQueue.main.async {
-			RunLoop.current.add(timer, forMode: .commonModes)
+		// Start timer
+		pauseSemaphore.wait()
+		defer {
+			pauseSemaphore.signal()
+		}
+		
+		if !isPaused {
+			let timer = Timer(timeInterval: interval, target: self, selector: #selector(timerFired), userInfo: client, repeats: true)
+			client.timer = timer
+			
+			RunLoop.main.add(timer, forMode: .commonModes)
 		}
 	}
 	
@@ -76,11 +83,9 @@ class RepeaterService {
 			return
 		}
 		
-		DispatchQueue.main.async {
-			for (_, client) in self.foregroundTimers {
-				client.timer?.invalidate()
-				client.timer = nil
-			}
+		for (_, client) in self.foregroundTimers {
+			client.timer?.invalidate()
+			client.timer = nil
 		}
 		
 		isPaused = true
@@ -97,12 +102,11 @@ class RepeaterService {
 			return
 		}
 		
-		DispatchQueue.main.async {
-			for (_, client) in self.foregroundTimers {
-				let timer = Timer(timeInterval: client.interval, target: self, selector: #selector(self.timerFired), userInfo: client, repeats: true)
-				
-				RunLoop.current.add(timer, forMode: .commonModes)
-			}
+		for (_, client) in self.foregroundTimers {
+			let timer = Timer(timeInterval: client.interval, target: self, selector: #selector(timerFired), userInfo: client, repeats: true)
+			client.timer = timer
+			
+			RunLoop.main.add(timer, forMode: .commonModes)
 		}
 		
 		isPaused = false
