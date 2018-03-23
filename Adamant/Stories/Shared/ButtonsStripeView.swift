@@ -15,7 +15,7 @@ enum StripeButtonType: Int, Equatable {
 	case touchID = 888
 	case faceID = 999
 	case qrCameraReader = 777
-	//	case qrPhotoReader
+	case qrPhotoReader = 1111
 	
 	var image: UIImage {
 		switch self {
@@ -30,6 +30,9 @@ enum StripeButtonType: Int, Equatable {
 			
 		case .qrCameraReader:
 			return #imageLiteral(resourceName: "Stripe_QRCamera")
+			
+		case .qrPhotoReader:
+			return #imageLiteral(resourceName: "Stripe_QRLibrary")
 		}
 	}
 }
