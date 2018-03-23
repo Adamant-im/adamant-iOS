@@ -8,17 +8,29 @@
 
 import UIKit
 import Eureka
+import Photos
+
+extension String.adamantLocalized.shared {
+	static let photolibraryNotAuthorized = NSLocalizedString("ShareQR.photolibraryNotAuthorized", comment: "ShareQR scene: User had not authorized access to write images to photolibrary")
+}
 
 class ShareQrViewController: FormViewController {
+	// MARK: - Dependencies
+	var dialogService: DialogService!
+	
+	
+	// MARK: - Rows
 	private enum Rows {
 		case qr
-		case saveButton
+		case saveToPhotos
+		case shareButton
 		case cancelButton
 		
 		var tag: String {
 			switch self {
 			case .qr: return "qr"
-			case .saveButton: return "sv"
+			case .saveToPhotos: return "svp"
+			case .shareButton: return "sh"
 			case .cancelButton: return "cl"
 			}
 		}
@@ -28,8 +40,11 @@ class ShareQrViewController: FormViewController {
 			case .qr:
 				return ""
 			
-			case .saveButton:
-				return String.adamantLocalized.alert.save
+			case .saveToPhotos:
+				return String.adamantLocalized.alert.saveToPhotolibrary
+				
+			case .shareButton:
+				return String.adamantLocalized.alert.share
 				
 			case .cancelButton:
 				return String.adamantLocalized.alert.cancel
@@ -80,18 +95,46 @@ class ShareQrViewController: FormViewController {
 			} else {
 				$0.cell.tipLabelIsHidden = true
 			}
-			}.cellSetup({ (cell, row) in
-				cell.tipLabel.font = UIFont.adamantPrimary(size: 17)
-				cell.tipLabel.textColor = UIColor.adamantPrimary
-			}).cellUpdate({ (cell, row) in
-				cell.tipLabel.textColor = UIColor.adamantPrimary
-			})
+		}.cellSetup({ (cell, row) in
+			cell.tipLabel.font = UIFont.adamantPrimary(size: 17)
+			cell.tipLabel.textColor = UIColor.adamantPrimary
+		}).cellUpdate({ (cell, row) in
+			cell.tipLabel.textColor = UIColor.adamantPrimary
+		})
 		
 		// MARK: Buttons
 		+++ Section()
+			
+		// Photolibrary
 		<<< ButtonRow() {
-			$0.tag = Rows.saveButton.tag
-			$0.title = Rows.saveButton.localized
+			$0.tag = Rows.saveToPhotos.tag
+			$0.title = Rows.saveToPhotos.localized
+		}.onCellSelection({ [weak self] (cell, row) in
+			guard let row: QrRow = self?.form.rowBy(tag: Rows.qr.tag), let qrCode = row.value else {
+				return
+			}
+			
+			switch PHPhotoLibrary.authorizationStatus() {
+			case .authorized:
+				UIImageWriteToSavedPhotosAlbum(qrCode, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
+				
+			case .notDetermined:
+				UIImageWriteToSavedPhotosAlbum(qrCode, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
+				
+			case .restricted, .denied:
+				self?.dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.shared.photolibraryNotAuthorized)
+			}
+		}).cellSetup({ (cell, row) in
+			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		}).cellUpdate({ (cell, row) in
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		})
+			
+		// Share
+		<<< ButtonRow() {
+			$0.tag = Rows.shareButton.tag
+			$0.title = Rows.shareButton.localized
 		}.onCellSelection({ [weak self] (cell, row) in
 			guard let row: QrRow = self?.form.rowBy(tag: Rows.qr.tag), let qrCode = row.value else {
 				return
@@ -104,6 +147,7 @@ class ShareQrViewController: FormViewController {
 			
 			vc.completionWithItemsHandler = { [weak self] (_, success: Bool, _, _) in
 				if success {
+					self?.dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
 					self?.close()
 				}
 			}
@@ -134,6 +178,15 @@ class ShareQrViewController: FormViewController {
 			nav.popViewController(animated: true)
 		} else {
 			dismiss(animated: true, completion: nil)
+		}
+	}
+	
+	@objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
+		if error != nil {
+			dialogService.presentGoToSettingsAlert(title: String.adamantLocalized.shared.photolibraryNotAuthorized, message: nil)
+		} else {
+			dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
+			close()
 		}
 	}
 }

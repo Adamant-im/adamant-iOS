@@ -8,7 +8,6 @@
 
 import UIKit
 import Eureka
-import MyLittlePinpad
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -18,10 +17,13 @@ extension String.adamantLocalized {
 		static let loginIntoPrevAccount = NSLocalizedString("LoginScene.LoginIntoAdamant", comment: "Login: Login into previous account with biometry or pincode")
 		
 		static let wrongQrError = NSLocalizedString("LoginScene.Error.WrongQr", comment: "Login: Notify user that scanned QR doesn't contains a passphrase.")
+		static let noQrError = NSLocalizedString("LoginScene.Error.NoQrOnPhoto", comment: "Login: Notify user that picked photo doesn't contains a valid qr code with passphrase")
 		static let noNetworkError = NSLocalizedString("LoginScene.Error.NoInternet", comment: "Login: No network error.")
 		
 		static let cameraNotAuthorized = NSLocalizedString("LoginScene.Error.AuthorizeCamera", comment: "Login: Notify user, that he disabled camera in settings, and need to authorize application.")
 		static let cameraNotSupported = NSLocalizedString("LoginScene.Error.QrNotSupported", comment: "Login: Notify user that device not supported by QR reader")
+		
+		static let photolibraryNotAuthorized = NSLocalizedString("LoginScene.Error.AuthorizePhotolibrary", comment: "Login: User disabled access to photolibrary, he can authorize application in settings")
 		
 		static let emptyPassphraseAlert = NSLocalizedString("LoginScene.Error.NoPassphrase", comment: "Login: notify user that he is trying to login without a passphrase")
 		
@@ -151,7 +153,33 @@ class LoginViewController: FormViewController {
 		// MARK: Login section
 		form +++ Section(Sections.login.localized) {
 			$0.tag = Sections.login.tag
+			
+			$0.footer = { [weak self] in
+				var footer = HeaderFooterView<UIView>(.callback {
+					let view = ButtonsStripeView.adamantConfigured()
+					
+					var stripe: [StripeButtonType] = [.qrCameraReader, .qrPhotoReader]
+					
+					if let accountService = self?.accountService, accountService.hasStayInAccount {
+						if accountService.useBiometry, let button = self?.localAuth.biometryType.stripeButtonType {
+							stripe.append(button)
+						} else {
+							stripe.append(.pinpad)
+						}
+					}
+					
+					view.stripe = stripe
+					view.delegate = self
+					
+					return view
+				})
+				
+				footer.height = { ButtonsStripeView.adamantDefaultHeight }
+				
+				return footer
+			}()
 		}
+		
 		// Passphrase row
 		<<< PasswordRow() {
 			$0.tag = Rows.passphrase.tag
@@ -177,19 +205,6 @@ class LoginViewController: FormViewController {
 			self?.loginWith(passphrase: passphrase)
 		}).cellSetup({ (cell, row) in
 			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-		}).cellUpdate({ (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		})
-		
-		// Login with QR
-		<<< ButtonRow() {
-			$0.tag = Rows.loginWithQr.tag
-			$0.title = Rows.loginWithQr.localized
-		}.onCellSelection({ [weak self] (cell, row) in
-			self?.loginWithQr()
-		}).cellSetup({ (cell, row) in
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-			cell.textLabel?.textColor = UIColor.adamantPrimary
 		}).cellUpdate({ (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 		})
@@ -260,24 +275,6 @@ class LoginViewController: FormViewController {
 		}).cellUpdate({ (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 		})
-		
-		
-		// MARK: We got a saved account
-		if accountService.hasStayInAccount, let section = form.sectionBy(tag: Sections.login.tag) {
-			let row = ButtonRow() {
-				$0.tag = Rows.loginWithPin.tag
-				$0.title = Rows.loginWithPin.localized
-			}.onCellSelection({ [weak self] (cell, row) in
-				self?.loginWithPinpad()
-			}).cellSetup({ (cell, row) in
-				cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-				cell.textLabel?.textColor = UIColor.adamantPrimary
-			}).cellUpdate({ (cell, row) in
-				cell.textLabel?.textColor = UIColor.adamantPrimary
-			})
-			
-			section.append(row)
-		}
 		
 		
 		// MARK: tableView position tuning
@@ -374,5 +371,25 @@ extension LoginViewController {
 				self?.dialogService.showError(withMessage: error.localized)
 			}
 		})
+	}
+}
+
+
+// MARK: - Button stripe
+extension LoginViewController: ButtonsStripeViewDelegate {
+	func buttonsStripe(_ stripe: ButtonsStripeView, didTapButton button: StripeButtonType) {
+		switch button {
+		case .pinpad:
+			loginWithPinpad()
+			
+		case .touchID, .faceID:
+			loginWithBiometry()
+			
+		case .qrCameraReader:
+			loginWithQrFromCamera()
+			
+		case .qrPhotoReader:
+			loginWithQrFromLibrary()
+		}
 	}
 }

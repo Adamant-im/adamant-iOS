@@ -14,6 +14,7 @@ public class AccountCell: Cell<String>, CellType {
 	@IBOutlet weak var addressLabel: UILabel!
 	
 	public override func update() {
+		super.update()
 		addressLabel.text = row.value
 	}
 }

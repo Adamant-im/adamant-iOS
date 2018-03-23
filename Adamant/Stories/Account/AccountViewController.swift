@@ -131,6 +131,7 @@ class AccountViewController: FormViewController {
 				}
 				
 				row.value = self?.accountService.account?.address
+				cell.accessoryType = .disclosureIndicator
 			})
 			.onCellSelection({ [weak self] (_, row) in
 				guard let address = self?.accountService.account?.address else {

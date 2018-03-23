@@ -19,6 +19,7 @@ extension String.adamantLocalized {
 		static let messageIsEmpty = NSLocalizedString("ChatScene.Error.MessageIsEmpty", comment: "Chat: Notify user that message cannot be empty")
 		static let messageTooLong = NSLocalizedString("ChatScene.Error.MessageTooLong", comment: "Chat: Message is too long")
 		static let notEnoughMoney = NSLocalizedString("ChatScene.Error.NotEnoughMoney", comment: "Chat: Notify user that he doesn't have money to pay a message fee")
+		static let noNetwork = NSLocalizedString("ChatScene.Error.NoNetwork", comment: "Chat: Network problems. In most cases - no connection")
 		
 		static let internalErrorFormat = NSLocalizedString("ChatScene.Error.InternalErrorFormat", comment: "Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description")
 		static let serverErrorFormat = NSLocalizedString("ChatScene.Error.RemoteServerErrorFormat", comment: "Chat: Notify user about server error. Using %@ for error description")
@@ -387,47 +388,48 @@ extension ChatViewController: MessageInputBarDelegate {
 			return
 		}
 		
-		DispatchQueue.global(qos: .userInitiated).async {
-			self.chatsProvider.sendMessage(.text(text), recipientId: partner, completion: { result in
-				switch result {
-				case .success: break
-					
-				case .error(let error):
-					let message: String
-					switch error {
-					case .accountNotFound(let account):
-						message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "Account not found: \(account)")
-					case .dependencyError(let error):
-						message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error)
-					case .internalError(let error):
-						message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, String(describing: error))
-					case .notLogged:
-						message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "User not logged")
-					case .serverError(let error):
-						message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, String(describing: error))
-
-					case .notEnoughtMoneyToSend:
-						message = String.adamantLocalized.chat.notEnoughMoney
+		self.chatsProvider.sendMessage(.text(text), recipientId: partner, completion: { result in
+			switch result {
+			case .success: break
 				
-					case .messageNotValid(let problem):
-						switch problem {
-						case .tooLong:
-							message = String.adamantLocalized.chat.messageTooLong
-							
-						case .empty:
-							message = String.adamantLocalized.chat.messageIsEmpty
-							
-						case .isValid:
-							message = ""
-						}
-					}
+			case .error(let error):
+				let message: String
+				switch error {
+				case .accountNotFound(let account):
+					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "Account not found: \(account)")
+				case .dependencyError(let error):
+					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error)
+				case .internalError(let error):
+					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, String(describing: error))
+				case .notLogged:
+					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "User not logged")
+				case .serverError(let error):
+					message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, String(describing: error))
 					
-					// TODO: Log this
-					self.dialogService.showToastMessage(message)
+				case .networkError:
+					message = String.adamantLocalized.chat.noNetwork
+					
+				case .notEnoughtMoneyToSend:
+					message = String.adamantLocalized.chat.notEnoughMoney
+					
+				case .messageNotValid(let problem):
+					switch problem {
+					case .tooLong:
+						message = String.adamantLocalized.chat.messageTooLong
+						
+					case .empty:
+						message = String.adamantLocalized.chat.messageIsEmpty
+						
+					case .isValid:
+						message = ""
+					}
 				}
 				
-			})
-		}
+				// TODO: Log this
+				self.dialogService.showError(withMessage: message)
+			}
+		})
+		
 		inputBar.inputTextView.text = String()
 	}
 	

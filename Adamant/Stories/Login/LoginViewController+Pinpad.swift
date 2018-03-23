@@ -14,12 +14,12 @@ extension LoginViewController {
 	func loginWithPinpad() {
 		let button: PinpadBiometryButtonType = accountService.useBiometry ? localAuth.biometryType.pinpadButtonType : .hidden
 		
-		let pinpad = PinpadViewController.adamantPinpad(biometryButton: button)
-		pinpad.commentLabel.text = String.adamantLocalized.login.loginIntoPrevAccount
-		pinpad.commentLabel.isHidden = false
-		pinpad.delegate = self
-		
 		DispatchQueue.main.async { [weak self] in
+			let pinpad = PinpadViewController.adamantPinpad(biometryButton: button)
+			pinpad.commentLabel.text = String.adamantLocalized.login.loginIntoPrevAccount
+			pinpad.commentLabel.isHidden = false
+			pinpad.delegate = self
+			
 			self?.present(pinpad, animated: true, completion: nil)
 		}
 	}
@@ -68,6 +68,10 @@ extension LoginViewController {
 				
 			case .failure(let error):
 				self?.dialogService.showError(withMessage: error.localized)
+				
+				if let pinpad = self?.presentedViewController as? PinpadViewController {
+					pinpad.clearPin()
+				}
 			}
 		}
 	}
@@ -96,9 +100,8 @@ extension LoginViewController: PinpadViewControllerDelegate {
 			case .success:
 				self?.loginIntoSavedAccount()
 				
-			case .fallback: break
-			case .cancel: break
-			case .failed: break
+			case .fallback, .cancel, .failed:
+				break
 			}
 		})
 	}

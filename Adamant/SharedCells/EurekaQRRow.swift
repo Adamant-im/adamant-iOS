@@ -27,6 +27,7 @@ public class QrCell: Cell<UIImage>, CellType {
 	}
 	
 	public override func update() {
+		super.update()
 		qrImageView.image = row.value
 	}
 }

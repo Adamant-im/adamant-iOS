@@ -84,16 +84,40 @@ class QRGeneratorViewController: FormViewController {
 				return
 			}
 			
-			let vc = UIActivityViewController(activityItems: [qr], applicationActivities: nil)
-			vc.excludedActivityTypes = ShareContentType.passphrase.excludedActivityTypes
-			vc.completionWithItemsHandler = { (_, completed: Bool, _, error: Error?) in
-				if completed {
-					self?.dialogService.showToastMessage(String.adamantLocalized.alert.done)
-				} else if let error = error {
-					self?.dialogService.showToastMessage(String(describing: error))
+			let save = UIAlertAction(title: String.adamantLocalized.alert.saveToPhotolibrary, style: .default, handler: { _ in
+				
+				switch PHPhotoLibrary.authorizationStatus() {
+				case .authorized:
+					UIImageWriteToSavedPhotosAlbum(qr, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
+					
+				case .notDetermined:
+					UIImageWriteToSavedPhotosAlbum(qr, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
+					
+				case .restricted, .denied:
+					self?.dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.shared.photolibraryNotAuthorized)
 				}
-			}
-			self?.present(vc, animated: true, completion: nil)
+			})
+			
+			let share = UIAlertAction(title: String.adamantLocalized.alert.share, style: .default, handler: { _ in
+				let vc = UIActivityViewController(activityItems: [qr], applicationActivities: nil)
+				vc.excludedActivityTypes = ShareContentType.passphrase.excludedActivityTypes
+				vc.completionWithItemsHandler = { (_, completed: Bool, _, error: Error?) in
+					if completed {
+						self?.dialogService.showToastMessage(String.adamantLocalized.alert.done)
+					} else if let error = error {
+						self?.dialogService.showToastMessage(String(describing: error))
+					}
+				}
+				self?.present(vc, animated: true, completion: nil)
+			})
+			
+			let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
+			
+			let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+			alert.addAction(save)
+			alert.addAction(share)
+			alert.addAction(cancel)
+			self?.present(alert, animated: true, completion: nil)
 		})
 		
 		if let section = form.sectionBy(tag: Sections.qr.tag) {
@@ -134,6 +158,14 @@ class QRGeneratorViewController: FormViewController {
 	
 	override func insertAnimation(forRows rows: [BaseRow]) -> UITableViewRowAnimation {
 		return .top
+	}
+	
+	@objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
+		if error != nil {
+			dialogService.presentGoToSettingsAlert(title: String.adamantLocalized.shared.photolibraryNotAuthorized, message: nil)
+		} else {
+			dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
+		}
 	}
 }
 
