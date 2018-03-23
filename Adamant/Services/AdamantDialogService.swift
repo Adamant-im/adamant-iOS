@@ -122,4 +122,26 @@ extension AdamantDialogService {
 		
 		present(alert, animated: animated, completion: completion)
 	}
+	
+	func presentGoToSettingsAlert(title: String?, message: String?) {
+		let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+		
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
+			DispatchQueue.main.async {
+				if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
+					UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+				}
+			}
+		})
+		
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+		
+		if Thread.isMainThread {
+			present(alert, animated: true, completion: nil)
+		} else {
+			DispatchQueue.main.async { [weak self] in
+				self?.present(alert, animated: true, completion: nil)
+			}
+		}
+	}
 }

@@ -17,10 +17,13 @@ extension String.adamantLocalized {
 		static let loginIntoPrevAccount = NSLocalizedString("LoginScene.LoginIntoAdamant", comment: "Login: Login into previous account with biometry or pincode")
 		
 		static let wrongQrError = NSLocalizedString("LoginScene.Error.WrongQr", comment: "Login: Notify user that scanned QR doesn't contains a passphrase.")
+		static let noQrError = NSLocalizedString("LoginScene.Error.NoQrOnPhoto", comment: "Login: Notify user that picked photo doesn't contains a valid qr code with passphrase")
 		static let noNetworkError = NSLocalizedString("LoginScene.Error.NoInternet", comment: "Login: No network error.")
 		
 		static let cameraNotAuthorized = NSLocalizedString("LoginScene.Error.AuthorizeCamera", comment: "Login: Notify user, that he disabled camera in settings, and need to authorize application.")
 		static let cameraNotSupported = NSLocalizedString("LoginScene.Error.QrNotSupported", comment: "Login: Notify user that device not supported by QR reader")
+		
+		static let photolibraryNotAuthorized = NSLocalizedString("LoginScene.Error.AuthorizePhotolibrary", comment: "Login: User disabled access to photolibrary, he can authorize application in settings")
 		
 		static let emptyPassphraseAlert = NSLocalizedString("LoginScene.Error.NoPassphrase", comment: "Login: notify user that he is trying to login without a passphrase")
 		
@@ -155,7 +158,7 @@ class LoginViewController: FormViewController {
 				var footer = HeaderFooterView<UIView>(.callback {
 					let view = ButtonsStripeView.adamantConfigured()
 					
-					var stripe: [StripeButtonType] = [.qrCameraReader]
+					var stripe: [StripeButtonType] = [.qrCameraReader, .qrPhotoReader]
 					
 					if let accountService = self?.accountService, accountService.hasStayInAccount {
 						if accountService.useBiometry, let button = self?.localAuth.biometryType.stripeButtonType {
@@ -383,7 +386,10 @@ extension LoginViewController: ButtonsStripeViewDelegate {
 			loginWithBiometry()
 			
 		case .qrCameraReader:
-			loginWithQr()
+			loginWithQrFromCamera()
+			
+		case .qrPhotoReader:
+			loginWithQrFromLibrary()
 		}
 	}
 }

@@ -8,10 +8,12 @@
 
 import Foundation
 import AVFoundation
+import Photos
 import QRCodeReader
+import EFQRCode
 
 extension LoginViewController {
-	func loginWithQr() {
+	func loginWithQrFromCamera() {
 		switch AVCaptureDevice.authorizationStatus(for: .video) {
 		case .authorized:
 			let reader = QRCodeReaderViewController.adamantQrCodeReader()
@@ -43,19 +45,32 @@ extension LoginViewController {
 			present(alert, animated: true, completion: nil)
 			
 		case .denied:
-			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized, preferredStyle: .alert)
+			dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized)
+		}
+	}
+	
+	func loginWithQrFromLibrary() {
+		let presenter: () -> Void = { [weak self] in
+			let picker = UIImagePickerController()
+			picker.delegate = self
+			picker.allowsEditing = false
+			picker.sourceType = .photoLibrary
+			self?.present(picker, animated: true, completion: nil)
+		}
+		
+		switch PHPhotoLibrary.authorizationStatus() {
+		case .authorized:
+			presenter()
 			
-			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
-				DispatchQueue.main.async {
-					if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
-						UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
-					}
+		case .notDetermined:
+			PHPhotoLibrary.requestAuthorization { status in
+				if status == .authorized {
+					presenter()
 				}
-			})
+			}
 			
-			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-			
-			present(alert, animated: true, completion: nil)
+		case .restricted, .denied:
+			dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.login.photolibraryNotAuthorized)
 		}
 	}
 }
@@ -78,5 +93,29 @@ extension LoginViewController: QRCodeReaderViewControllerDelegate {
 	
 	func readerDidCancel(_ reader: QRCodeReaderViewController) {
 		reader.dismiss(animated: true, completion: nil)
+	}
+}
+
+// MARK: - UIImagePickerControllerDelegate
+extension LoginViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+		dismiss(animated: true, completion: nil)
+		
+		guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else {
+			return
+		}
+		
+		if let cgImage = image.toCGImage(), let codes = EFQRCode.recognize(image: cgImage), codes.count > 0 {
+			for aCode in codes {
+				if AdamantUtilities.validateAdamantPassphrase(passphrase: aCode) {
+					loginWith(passphrase: aCode)
+					return
+				}
+			}
+			
+			dialogService.showError(withMessage: String.adamantLocalized.login.wrongQrError)
+		} else {
+			dialogService.showError(withMessage: String.adamantLocalized.login.noQrError)
+		}
 	}
 }

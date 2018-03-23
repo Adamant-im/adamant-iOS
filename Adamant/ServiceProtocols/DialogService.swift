@@ -84,4 +84,6 @@ protocol DialogService: class {
 	
 	// MARK: - ActivityControllers
 	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, completion: (() -> Void)?)
+	
+	func presentGoToSettingsAlert(title: String?, message: String?)
 }

@@ -118,11 +118,17 @@
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "LoginScene.Error.AuthorizeCamera" = "Для чтения QR кодов необходимо разрешить доступ к камере";
 
+/* Login: User disabled access to photolibrary, he can authorize application in settings */
+"LoginScene.Error.AuthorizePhotolibrary" = "Для чтения QR кодов необходимо разрешить доступ к Фото";
+
 /* Login: No network error. */
 "LoginScene.Error.NoInternet" = "Нет соединения с сетью";
 
 /* Login: notify user that he is trying to login without a passphrase */
 "LoginScene.Error.NoPassphrase" = "Введите пароль";
+
+/* Login: Notify user that picked photo doesn't contains a valid qr code with passphrase */
+"LoginScene.Error.NoQrOnPhoto" = "Выбранное изображение не содержит подходящих QR кодов";
 
 /* Login: Notify user that device not supported by QR reader */
 "LoginScene.Error.QrNotSupported" = "На этом устройстве не поддерживается чтение QR кодов";
