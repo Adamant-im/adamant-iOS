@@ -11,17 +11,40 @@ import MyLittlePinpad
 
 // MARK: - Button types
 enum StripeButtonType: Int, Equatable {
-	case pinpad
-	case qrCameraReader
+	case pinpad = 555
+	case touchID = 888
+	case faceID = 999
+	case qrCameraReader = 777
 	//	case qrPhotoReader
 	
 	var image: UIImage {
 		switch self {
 		case .pinpad:
-			return UIImage(named: "Stripe_Pinpad")!
+			return #imageLiteral(resourceName: "Stripe_Pinpad")
+		
+		case .touchID:
+			return #imageLiteral(resourceName: "Stripe_TouchID")
+			
+		case .faceID:
+			return #imageLiteral(resourceName: "Stripe_FaceID")
 			
 		case .qrCameraReader:
-			return UIImage(named: "Stripe_Camera")!
+			return #imageLiteral(resourceName: "Stripe_QRCamera")
+		}
+	}
+}
+
+extension BiometryType {
+	var stripeButtonType: StripeButtonType? {
+		switch self {
+		case .touchID:
+			return .touchID
+			
+		case .faceID:
+			return .faceID
+			
+		case .none:
+			return nil
 		}
 	}
 }
