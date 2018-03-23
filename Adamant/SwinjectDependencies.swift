@@ -41,9 +41,6 @@ extension Container {
 		// MARK: CellFactory
 		self.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
 		
-		// MARK: DialogService
-		self.register(DialogService.self) { r in AdamantDialogService() }.inObjectScope(.container)
-		
 		// MARK: Secured Store
 		self.register(SecuredStore.self) { r in KeychainStore() }.inObjectScope(.container)
 		
@@ -53,7 +50,15 @@ extension Container {
 		// MARK: Reachability
 		self.register(ReachabilityMonitor.self) { r in AdamantReachability() }.inObjectScope(.container)
 		
+		
 		// MARK: - Services with dependencies
+		// MARK: DialogService
+		self.register(DialogService.self) { r in
+			let service = AdamantDialogService()
+			service.router = r.resolve(Router.self)
+			return service
+		}.inObjectScope(.container)
+		
 		// MARK: Notifications
 		self.register(NotificationsService.self) { r in
 			let service = AdamantNotificationsService()

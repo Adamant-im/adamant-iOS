@@ -280,11 +280,17 @@
 /* Shared alert 'Save' button. Used anywhere */
 "Shared.Save" = "Сохранить";
 
+/* Shared alert 'Save to Photos'. Used with saving images to photolibrary */
+"Shared.SaveToPhotolibrary" = "Сохранить в Фото";
+
 /* Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title. */
 "Shared.Settings" = "Настройки";
 
 /* Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu. */
 "Shared.Share" = "Поделиться";
+
+/* ShareQR scene: User had not authorized access to write images to photolibrary */
+"ShareQR.photolibraryNotAuthorized" = "Для сохранения QR кодов необходимо разрешить доступ к Фото";
 
 /* Main tab bar: Account page */
 "Tabs.Account" = "Аккаунт";
