@@ -30,6 +30,8 @@
 		E91947B420002809001362F8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B320002809001362F8 /* Account.swift */; };
 		E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */; };
 		E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921597420611A6A0000CA5C /* AdamantReachability.swift */; };
+		E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921597A206503000000CA5C /* ButtonsStripeView.swift */; };
+		E921597D2065031D0000CA5C /* ButtonsStripe.xib in Resources */ = {isa = PBXBuildFile; fileRef = E921597C2065031D0000CA5C /* ButtonsStripe.xib */; };
 		E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9256F5E2034C21100DE86E9 /* String+localized.swift */; };
 		E9256F6D20357B1700DE86E9 /* LoginHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9256F6C20357B1700DE86E9 /* LoginHeader.xib */; };
 		E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */; };
@@ -206,6 +208,8 @@
 		E91947B320002809001362F8 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachabilityMonitor.swift; sourceTree = "<group>"; };
 		E921597420611A6A0000CA5C /* AdamantReachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantReachability.swift; sourceTree = "<group>"; };
+		E921597A206503000000CA5C /* ButtonsStripeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonsStripeView.swift; sourceTree = "<group>"; };
+		E921597C2065031D0000CA5C /* ButtonsStripe.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ButtonsStripe.xib; sourceTree = "<group>"; };
 		E9256F5E2034C21100DE86E9 /* String+localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+localized.swift"; sourceTree = "<group>"; };
 		E9256F6C20357B1700DE86E9 /* LoginHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoginHeader.xib; sourceTree = "<group>"; };
 		E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -713,9 +717,11 @@
 		E9FAE5DB203ECD41008D3A6B /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				E94E7B07205D4CB80042B639 /* SharedRoutes.swift */,
 				E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */,
 				E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */,
-				E94E7B07205D4CB80042B639 /* SharedRoutes.swift */,
+				E921597A206503000000CA5C /* ButtonsStripeView.swift */,
+				E921597C2065031D0000CA5C /* ButtonsStripe.xib */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -819,6 +825,7 @@
 				E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */,
 				E9942B89203D9ECA00C163AF /* QrCell.xib in Resources */,
 				E95CB465205D8BBA00A7218E /* AccountCell.xib in Resources */,
+				E921597D2065031D0000CA5C /* ButtonsStripe.xib in Resources */,
 				E9C51EED2011416E00385EB7 /* adamant-core.js in Resources */,
 				E90A4945204C6204009F6A65 /* PassphraseCell.xib in Resources */,
 				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
@@ -947,6 +954,7 @@
 				E9CE778A202B9DC2009CF70D /* ChatTransaction+CoreDataProperties.swift in Sources */,
 				E9CAE8DA2018ACD300345E76 /* AdamantApi+Chats.swift in Sources */,
 				E91947B020002393001362F8 /* AdamantApiService.swift in Sources */,
+				E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */,
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
 				E9E7CDB72003994E00DFC4DB /* AdamantUtilities.swift in Sources */,
 				E9147B6320505C7500145913 /* QRCodeReader+adamant.swift in Sources */,

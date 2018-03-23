@@ -150,7 +150,33 @@ class LoginViewController: FormViewController {
 		// MARK: Login section
 		form +++ Section(Sections.login.localized) {
 			$0.tag = Sections.login.tag
+			
+			$0.footer = { [weak self] in
+				var footer = HeaderFooterView<UIView>(.callback {
+					let view = ButtonsStripeView.adamantConfigured()
+					
+					var stripe: [StripeButtonType] = [.qrCameraReader]
+					
+					if let accountService = self?.accountService, accountService.hasStayInAccount {
+						if accountService.useBiometry, let button = self?.localAuth.biometryType.stripeButtonType {
+							stripe.append(button)
+						} else {
+							stripe.append(.pinpad)
+						}
+					}
+					
+					view.stripe = stripe
+					view.delegate = self
+					
+					return view
+				})
+				
+				footer.height = { ButtonsStripeView.adamantDefaultHeight }
+				
+				return footer
+			}()
 		}
+		
 		// Passphrase row
 		<<< PasswordRow() {
 			$0.tag = Rows.passphrase.tag
@@ -176,19 +202,6 @@ class LoginViewController: FormViewController {
 			self?.loginWith(passphrase: passphrase)
 		}).cellSetup({ (cell, row) in
 			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-		}).cellUpdate({ (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		})
-		
-		// Login with QR
-		<<< ButtonRow() {
-			$0.tag = Rows.loginWithQr.tag
-			$0.title = Rows.loginWithQr.localized
-		}.onCellSelection({ [weak self] (cell, row) in
-			self?.loginWithQr()
-		}).cellSetup({ (cell, row) in
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-			cell.textLabel?.textColor = UIColor.adamantPrimary
 		}).cellUpdate({ (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 		})
@@ -259,24 +272,6 @@ class LoginViewController: FormViewController {
 		}).cellUpdate({ (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 		})
-		
-		
-		// MARK: We got a saved account
-		if accountService.hasStayInAccount, let section = form.sectionBy(tag: Sections.login.tag) {
-			let row = ButtonRow() {
-				$0.tag = Rows.loginWithPin.tag
-				$0.title = Rows.loginWithPin.localized
-			}.onCellSelection({ [weak self] (cell, row) in
-				self?.loginWithPinpad()
-			}).cellSetup({ (cell, row) in
-				cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-				cell.textLabel?.textColor = UIColor.adamantPrimary
-			}).cellUpdate({ (cell, row) in
-				cell.textLabel?.textColor = UIColor.adamantPrimary
-			})
-			
-			section.append(row)
-		}
 		
 		
 		// MARK: tableView position tuning
@@ -373,5 +368,22 @@ extension LoginViewController {
 				self?.dialogService.showError(withMessage: error.localized)
 			}
 		})
+	}
+}
+
+
+// MARK: - Button stripe
+extension LoginViewController: ButtonsStripeViewDelegate {
+	func buttonsStripe(_ stripe: ButtonsStripeView, didTapButton button: StripeButtonType) {
+		switch button {
+		case .pinpad:
+			loginWithPinpad()
+			
+		case .touchID, .faceID:
+			loginWithBiometry()
+			
+		case .qrCameraReader:
+			loginWithQr()
+		}
 	}
 }

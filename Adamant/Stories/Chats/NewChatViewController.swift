@@ -88,7 +88,20 @@ class NewChatViewController: FormViewController {
 		
 		navigationOptions = .Disabled
 		
-		form +++ Section()
+		form +++ Section() {
+			$0.footer = { [weak self] in
+				var footer = HeaderFooterView<UIView>(.callback {
+					let view = ButtonsStripeView.adamantConfigured()
+					view.stripe = [.qrCameraReader]
+					view.delegate = self
+					return view
+				})
+				
+				footer.height = { ButtonsStripeView.adamantDefaultHeight }
+				
+				return footer
+				}()
+		}
 		<<< TextRow() {
 			$0.tag = Rows.addressField.tag
 			$0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
@@ -114,18 +127,6 @@ class NewChatViewController: FormViewController {
 			if let text = cell.textField.text {
 				cell.textField.text = text.components(separatedBy: NewChatViewController.invalidCharacters).joined()
 			}
-		})
-		
-		<<< ButtonRow() {
-			$0.tag = Rows.scanQr.tag
-			$0.title = String.adamantLocalized.newChat.scanQrButton
-		}.cellSetup({ (cell, row) in
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		}).cellUpdate({ (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		}).onCellSelection({ [weak self] (_, _) in
-			self?.scanQr()
 		})
 		
 		if let row: TextRow = form.rowBy(tag: Rows.addressField.tag) {
@@ -237,6 +238,20 @@ class NewChatViewController: FormViewController {
 			case .serverError(let error):
 				self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.serverErrorFormat, String(describing: error)))
 			}
+		}
+	}
+}
+
+
+// MARK: - ButtonsStripe
+extension NewChatViewController: ButtonsStripeViewDelegate {
+	func buttonsStripe(_ stripe: ButtonsStripeView, didTapButton button: StripeButtonType) {
+		switch button {
+		case .qrCameraReader:
+			scanQr()
+			
+		default:
+			return
 		}
 	}
 }
