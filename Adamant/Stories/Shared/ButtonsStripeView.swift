@@ -144,6 +144,8 @@ class ButtonsStripeView: UIView {
 
 // MARK: Adamant config
 extension ButtonsStripeView {
+	static let adamantDefaultHeight: CGFloat = 75
+	
 	static func adamantConfigured() -> ButtonsStripeView {
 		guard let view = UINib(nibName: "ButtonsStripe", bundle: nil).instantiate(withOwner: nil, options: nil).first as? ButtonsStripeView else {
 			fatalError("Can't get UINib")
