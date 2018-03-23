@@ -85,7 +85,17 @@ class QRGeneratorViewController: FormViewController {
 			}
 			
 			let save = UIAlertAction(title: String.adamantLocalized.alert.saveToPhotolibrary, style: .default, handler: { _ in
-				UIImageWriteToSavedPhotosAlbum(qr, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
+				
+				switch PHPhotoLibrary.authorizationStatus() {
+				case .authorized:
+					UIImageWriteToSavedPhotosAlbum(qr, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
+					
+				case .notDetermined:
+					UIImageWriteToSavedPhotosAlbum(qr, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
+					
+				case .restricted, .denied:
+					self?.dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.shared.photolibraryNotAuthorized)
+				}
 			})
 			
 			let share = UIAlertAction(title: String.adamantLocalized.alert.share, style: .default, handler: { _ in
@@ -152,7 +162,7 @@ class QRGeneratorViewController: FormViewController {
 	
 	@objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
 		if error != nil {
-			dialogService.presentGoToSettingsAlert(title: String.adamantLocalized.login.photolibraryNotAuthorized, message: nil)
+			dialogService.presentGoToSettingsAlert(title: String.adamantLocalized.shared.photolibraryNotAuthorized, message: nil)
 		} else {
 			dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
 		}

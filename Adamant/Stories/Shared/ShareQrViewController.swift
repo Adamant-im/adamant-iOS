@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import Photos
 
 extension String.adamantLocalized.shared {
 	static let photolibraryNotAuthorized = NSLocalizedString("ShareQR.photolibraryNotAuthorized", comment: "ShareQR scene: User had not authorized access to write images to photolibrary")
@@ -113,7 +114,16 @@ class ShareQrViewController: FormViewController {
 				return
 			}
 			
-			UIImageWriteToSavedPhotosAlbum(qrCode, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
+			switch PHPhotoLibrary.authorizationStatus() {
+			case .authorized:
+				UIImageWriteToSavedPhotosAlbum(qrCode, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
+				
+			case .notDetermined:
+				UIImageWriteToSavedPhotosAlbum(qrCode, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
+				
+			case .restricted, .denied:
+				self?.dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.shared.photolibraryNotAuthorized)
+			}
 		}).cellSetup({ (cell, row) in
 			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
 			cell.textLabel?.textColor = UIColor.adamantPrimary
@@ -173,7 +183,7 @@ class ShareQrViewController: FormViewController {
 	
 	@objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
 		if error != nil {
-			dialogService.presentGoToSettingsAlert(title: String.adamantLocalized.login.photolibraryNotAuthorized, message: nil)
+			dialogService.presentGoToSettingsAlert(title: String.adamantLocalized.shared.photolibraryNotAuthorized, message: nil)
 		} else {
 			dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
 			close()
