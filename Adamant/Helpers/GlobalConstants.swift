@@ -39,5 +39,13 @@ extension UIFont {
 	static func adamantPrimary(size: CGFloat) -> UIFont {
 		return UIFont(name: "Exo 2", size: size)!
 	}
+	
+	static func adamantPrimaryLight(size: CGFloat) -> UIFont {
+		return UIFont(name: "Exo 2 Light", size: size)!
+	}
+	
+	static func adamantPrimaryThin(size: CGFloat) -> UIFont {
+		return UIFont(name: "Exo 2 Thin", size: size)!
+	}
 }
 

@@ -21,7 +21,7 @@ enum StripeButtonType: Int, Equatable {
 			return UIImage(named: "Stripe_Pinpad")!
 			
 		case .qrCameraReader:
-			return UIImage(named: "Stripe_QRCamera")!
+			return UIImage(named: "Stripe_Camera")!
 		}
 	}
 }
@@ -144,7 +144,7 @@ class ButtonsStripeView: UIView {
 
 // MARK: Adamant config
 extension ButtonsStripeView {
-	static let adamantDefaultHeight: CGFloat = 75
+	static let adamantDefaultHeight: CGFloat = 85
 	
 	static func adamantConfigured() -> ButtonsStripeView {
 		guard let view = UINib(nibName: "ButtonsStripe", bundle: nil).instantiate(withOwner: nil, options: nil).first as? ButtonsStripeView else {
@@ -154,7 +154,7 @@ extension ButtonsStripeView {
 		view.buttonsBorderColor = UIColor.adamantSecondary
 		view.buttonsBorderWidth = 1
 		view.buttonsSize = 50
-		view.buttonsRoundingMode = .circle
+		view.buttonsRoundingMode = .customRadius(radius: 13)
 		view.buttonsHighlightedColor = UIColor.adamantPinpadHighlightButton
 		view.buttonsNormalColor = .white
 		view.stripeStackView.spacing = 15
