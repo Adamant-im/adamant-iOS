@@ -9,7 +9,9 @@
 import UIKit
 import Eureka
 import QRCodeReader
+import EFQRCode
 import AVFoundation
+import Photos
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -92,7 +94,7 @@ class NewChatViewController: FormViewController {
 			$0.footer = { [weak self] in
 				var footer = HeaderFooterView<UIView>(.callback {
 					let view = ButtonsStripeView.adamantConfigured()
-					view.stripe = [.qrCameraReader]
+					view.stripe = [.qrCameraReader, .qrPhotoReader]
 					view.delegate = self
 					return view
 				})
@@ -163,6 +165,67 @@ class NewChatViewController: FormViewController {
 		dismiss(animated: true)
 	}
 	
+	
+	// MARK: - Other
+	
+	func startNewChat(with address: String, name: String? = nil) {
+		guard AdamantUtilities.validateAdamantAddress(address: address) else {
+			dialogService.showToastMessage(String.adamantLocalized.newChat.specifyValidAddressMessage)
+			return
+		}
+		
+		if let loggedAccount = accountService.account, loggedAccount.address == address {
+			dialogService.showToastMessage(String.adamantLocalized.newChat.loggedUserAddressMessage)
+			return
+		}
+		
+		dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+		
+		accountsProvider.getAccount(byAddress: address) { result in
+			switch result {
+			case .success(let account):
+				DispatchQueue.main.async {
+					if account.name == nil {
+						account.name = name
+						try? account.managedObjectContext?.save()
+					}
+					
+					self.delegate?.newChatController(self, didSelectAccount: account)
+					self.dialogService.dismissProgress()
+				}
+				
+			case .notFound:
+				self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.addressNotFoundFormat, address))
+				
+			case .serverError(let error):
+				self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.serverErrorFormat, String(describing: error)))
+			}
+		}
+	}
+	
+	func startNewChat(with uri: AdamantUri) -> Bool {
+		switch uri {
+		case .address(address: let addr, params: let params):
+			if let params = params?.first {
+				switch params {
+				case .label(label: let label):
+					startNewChat(with: addr, name: label)
+				}
+			} else {
+				startNewChat(with: addr)
+			}
+			
+			return true
+			
+		default:
+			return false
+		}
+	}
+}
+
+
+// MARK: - QR
+extension NewChatViewController {
 	func scanQr() {
 		switch AVCaptureDevice.authorizationStatus(for: .video) {
 		case .authorized:
@@ -205,39 +268,83 @@ class NewChatViewController: FormViewController {
 		}
 	}
 	
-	// MARK: - Other
-	func startNewChat(with address: String, name: String? = nil) {
-		guard AdamantUtilities.validateAdamantAddress(address: address) else {
-			dialogService.showToastMessage(String.adamantLocalized.newChat.specifyValidAddressMessage)
-			return
+	func loadQr() {
+		let presenter: () -> Void = { [weak self] in
+			let picker = UIImagePickerController()
+			picker.delegate = self
+			picker.allowsEditing = false
+			picker.sourceType = .photoLibrary
+			self?.present(picker, animated: true, completion: nil)
 		}
 		
-		if let loggedAccount = accountService.account, loggedAccount.address == address {
-			dialogService.showToastMessage(String.adamantLocalized.newChat.loggedUserAddressMessage)
-			return
-		}
-		
-		dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
-		
-		accountsProvider.getAccount(byAddress: address) { result in
-			switch result {
-			case .success(let account):
-				DispatchQueue.main.async {
-					if account.name == nil {
-						account.name = name
-						try? account.managedObjectContext?.save()
+		if #available(iOS 11.0, *) {
+			presenter()
+		} else {
+			switch PHPhotoLibrary.authorizationStatus() {
+			case .authorized:
+				presenter()
+				
+			case .notDetermined:
+				PHPhotoLibrary.requestAuthorization { status in
+					if status == .authorized {
+						presenter()
 					}
-					
-					self.delegate?.newChatController(self, didSelectAccount: account)
-					self.dialogService.dismissProgress()
 				}
 				
-			case .notFound:
-				self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.addressNotFoundFormat, address))
-				
-			case .serverError(let error):
-				self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.serverErrorFormat, String(describing: error)))
+			case .restricted, .denied:
+				dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.login.photolibraryNotAuthorized)
 			}
+		}
+	}
+}
+
+
+// MARK: - QRCodeReaderViewControllerDelegate
+extension NewChatViewController: QRCodeReaderViewControllerDelegate {
+	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
+		guard let uri = AdamantUriTools.decode(uri: result.value) else {
+			dialogService.showError(withMessage: String.adamantLocalized.newChat.wrongQrError)
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+				reader.startScanning()
+			}
+			return
+		}
+		
+		if !startNewChat(with: uri) {
+			dialogService.showError(withMessage: String.adamantLocalized.newChat.wrongQrError)
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+				reader.startScanning()
+			}
+		}
+	}
+	
+	func readerDidCancel(_ reader: QRCodeReaderViewController) {
+		reader.dismiss(animated: true, completion: nil)
+	}
+}
+
+
+// MARK: - UIImagePickerControllerDelegate
+extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+		dismiss(animated: true, completion: nil)
+		
+		guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else {
+			return
+		}
+		
+		if let cgImage = image.toCGImage(), let codes = EFQRCode.recognize(image: cgImage), codes.count > 0 {
+			for aCode in codes {
+				if let uri = AdamantUriTools.decode(uri: aCode) {
+					if startNewChat(with: uri) {
+						return
+					}
+				}
+			}
+			
+			dialogService.showError(withMessage: String.adamantLocalized.newChat.wrongQrError)
+		} else {
+			dialogService.showError(withMessage: String.adamantLocalized.login.noQrError)
 		}
 	}
 }
@@ -250,46 +357,11 @@ extension NewChatViewController: ButtonsStripeViewDelegate {
 		case .qrCameraReader:
 			scanQr()
 			
+		case .qrPhotoReader:
+			loadQr()
+			
 		default:
 			return
 		}
-	}
-}
-
-
-// MARK: - QR
-extension NewChatViewController: QRCodeReaderViewControllerDelegate {
-	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-		guard let uri = AdamantUriTools.decode(uri: result.value) else {
-			dialogService.showError(withMessage: String.adamantLocalized.newChat.wrongQrError)
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-				reader.startScanning()
-			}
-			return
-		}
-		
-		switch uri {
-		case .address(address: let addr, params: let params):
-			if let params = params?.first {
-				switch params {
-				case .label(label: let label):
-					startNewChat(with: addr, name: label)
-				}
-			} else {
-				startNewChat(with: addr)
-			}
-			
-			reader.dismiss(animated: true, completion: nil)
-			
-		default:
-			dialogService.showError(withMessage: String.adamantLocalized.newChat.wrongQrError)
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-				reader.startScanning()
-			}
-		}
-	}
-	
-	func readerDidCancel(_ reader: QRCodeReaderViewController) {
-		reader.dismiss(animated: true, completion: nil)
 	}
 }

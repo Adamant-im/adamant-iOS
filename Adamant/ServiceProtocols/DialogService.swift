@@ -12,6 +12,7 @@ enum ShareType {
 	case copyToPasteboard
 	case share
 	case generateQr(sharingTip: String?)
+	case saveToPhotolibrary(image: UIImage)
 	
 	var localized: String {
 		switch self {
@@ -23,6 +24,9 @@ enum ShareType {
 			
 		case .generateQr:
 			return String.adamantLocalized.alert.generateQr
+			
+		case .saveToPhotolibrary:
+			return String.adamantLocalized.alert.saveToPhotolibrary
 		}
 	}
 }
@@ -31,6 +35,7 @@ extension String.adamantLocalized.alert {
 	static let copyToPasteboard = NSLocalizedString("Shared.CopyToPasteboard", comment: "Shared alert 'Copy' button. Used anywhere. Used for copy-paste info.")
 	static let share = NSLocalizedString("Shared.Share", comment: "Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu.")
 	static let generateQr = NSLocalizedString("Shared.GenerateQRCode", comment: "Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere.")
+	static let saveToPhotolibrary = NSLocalizedString("Shared.SaveToPhotolibrary", comment: "Shared alert 'Save to Photos'. Used with saving images to photolibrary")
 }
 
 enum ShareContentType {
@@ -84,4 +89,6 @@ protocol DialogService: class {
 	
 	// MARK: - ActivityControllers
 	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, completion: (() -> Void)?)
+	
+	func presentGoToSettingsAlert(title: String?, message: String?)
 }
