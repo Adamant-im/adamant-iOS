@@ -14,12 +14,12 @@ extension LoginViewController {
 	func loginWithPinpad() {
 		let button: PinpadBiometryButtonType = accountService.useBiometry ? localAuth.biometryType.pinpadButtonType : .hidden
 		
-		let pinpad = PinpadViewController.adamantPinpad(biometryButton: button)
-		pinpad.commentLabel.text = String.adamantLocalized.login.loginIntoPrevAccount
-		pinpad.commentLabel.isHidden = false
-		pinpad.delegate = self
-		
 		DispatchQueue.main.async { [weak self] in
+			let pinpad = PinpadViewController.adamantPinpad(biometryButton: button)
+			pinpad.commentLabel.text = String.adamantLocalized.login.loginIntoPrevAccount
+			pinpad.commentLabel.isHidden = false
+			pinpad.delegate = self
+			
 			self?.present(pinpad, animated: true, completion: nil)
 		}
 	}
