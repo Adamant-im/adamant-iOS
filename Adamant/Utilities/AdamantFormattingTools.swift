@@ -1,5 +1,5 @@
 //
-//  AdamantExportTools.swift
+//  AdamantFormattingTools.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 04.02.2018.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-class AdamantExportTools {
+class AdamantFormattingTools {
 	static func summaryFor(transaction: BaseTransaction, url: URL) -> String {
 		return summaryFor(id: transaction.blockId!, sender: transaction.senderId!, recipient: transaction.recipientId!, date: transaction.date as Date!, amount: transaction.amount as Decimal!, fee: transaction.fee as Decimal!, confirmations: transaction.confirmations, blockId: transaction.blockId!, url: url)
 	}
@@ -32,6 +32,10 @@ Confirmations: \(String(confirmations))
 Block: \(blockId)
 URL: \(url)
 """
+	}
+	
+	static func formatTransferTransaction(_ transfer: TransferTransaction) -> NSAttributedString {
+		fatalError()
 	}
 	
 	private init() {}
