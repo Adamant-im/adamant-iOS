@@ -2,7 +2,7 @@
 //  Chatroom+CoreDataProperties.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 01.03.2018.
+//  Created by Anokhov Pavel on 24.03.2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 //
@@ -17,9 +17,9 @@ extension Chatroom {
         return NSFetchRequest<Chatroom>(entityName: "Chatroom")
     }
 
-    @NSManaged public var updatedAt: NSDate?
     @NSManaged public var hasUnreadMessages: Bool
-    @NSManaged public var lastTransaction: MessageTransaction?
+    @NSManaged public var updatedAt: NSDate?
+    @NSManaged public var lastTransaction: ChatTransaction?
     @NSManaged public var partner: CoreDataAccount?
     @NSManaged public var transactions: NSSet?
 
@@ -29,10 +29,10 @@ extension Chatroom {
 extension Chatroom {
 
     @objc(addTransactionsObject:)
-    @NSManaged public func addToTransactions(_ value: MessageTransaction)
+    @NSManaged public func addToTransactions(_ value: ChatTransaction)
 
     @objc(removeTransactionsObject:)
-    @NSManaged public func removeFromTransactions(_ value: MessageTransaction)
+    @NSManaged public func removeFromTransactions(_ value: ChatTransaction)
 
     @objc(addTransactions:)
     @NSManaged public func addToTransactions(_ values: NSSet)

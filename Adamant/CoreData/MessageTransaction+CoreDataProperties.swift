@@ -2,7 +2,7 @@
 //  MessageTransaction+CoreDataProperties.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 07.02.2018.
+//  Created by Anokhov Pavel on 24.03.2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 //
@@ -18,9 +18,6 @@ extension MessageTransaction {
     }
 
     @NSManaged public var isConfirmed: Bool
-    @NSManaged public var isUnread: Bool
     @NSManaged public var message: String?
-    @NSManaged public var chatroom: Chatroom?
-    @NSManaged public var lastIn: Chatroom?
 
 }
