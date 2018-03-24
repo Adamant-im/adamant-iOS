@@ -175,11 +175,22 @@ extension AdamantTransfersProvider {
 
 // MARK: - TransfersProvider
 extension AdamantTransfersProvider {
+	// MARK: Controllers
 	func transfersController() -> NSFetchedResultsController<TransferTransaction> {
 		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
 		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 		
+		return controller
+	}
+	
+	func transfersController(for account: CoreDataAccount) -> NSFetchedResultsController<TransferTransaction> {
+		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending:false)]
+		request.predicate = NSPredicate(format: "partner = %@", account)
+		
+		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+		try! controller.performFetch()
 		return controller
 	}
 	
@@ -192,6 +203,7 @@ extension AdamantTransfersProvider {
 		return controller
 	}
 	
+	// MARK: Sending Funds
 	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void) {
 		guard let senderAddress = accountService.account?.address, let keypair = accountService.keypair else {
 			completion(.error(.notLogged))
