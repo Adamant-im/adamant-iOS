@@ -19,7 +19,7 @@ public class Chatroom: NSManagedObject {
 			hasUnreadMessages = false
 		}
 		
-		if let trs = transactions as? Set<ChatTransaction> {
+		if let trs = transactions as? Set<MessageTransaction> {
 			trs.forEach({
 				if $0.isUnread {
 					$0.isUnread = false

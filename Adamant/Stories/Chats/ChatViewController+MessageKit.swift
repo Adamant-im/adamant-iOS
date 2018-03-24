@@ -164,8 +164,8 @@ extension ChatViewController: MessageInputBarDelegate {
 
 
 // MARK: - MessageType
-// MARK: ChatTransaction
-extension ChatTransaction: MessageType {
+// MARK: MessageTransaction
+extension MessageTransaction: MessageType {
 	public var sender: Sender {
 		let id = self.senderId!
 		return Sender(id: id, displayName: id)

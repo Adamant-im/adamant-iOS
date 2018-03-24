@@ -77,10 +77,10 @@ protocol ChatsProvider: DataProvider {
 	
 	// MARK: - Getting chats and messages
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>
-	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
+	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<MessageTransaction>
 	
 	/// Unread messages controller. Sections by chatroom.
-	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>
+	func getUnreadMessagesController() -> NSFetchedResultsController<MessageTransaction>
 	
 	/// Returns asociated with account chatroom, or create new, in viewContext
 	func chatroomWith(_ account: CoreDataAccount) -> Chatroom

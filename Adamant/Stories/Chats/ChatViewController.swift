@@ -41,6 +41,7 @@ class ChatViewController: MessagesViewController {
 	// MARK: Dependencies
 	var chatsProvider: ChatsProvider!
 	var dialogService: DialogService!
+	var stack: CoreDataStack!
 	
 	// MARK: Properties
 	weak var delegate: ChatViewControllerDelegate?
@@ -53,7 +54,7 @@ class ChatViewController: MessagesViewController {
 		return formatter
 	}
 	
-	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
+	private(set) var chatController: NSFetchedResultsController<MessageTransaction>?
 	private var controllerChanges: [NSFetchedResultsChangeType:[(indexPath: IndexPath?, newIndexPath: IndexPath?)]] = [:]
 	
 	// MARK: Fee label
@@ -247,7 +248,7 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 		
-		if type == .insert, let trs = anObject as? ChatTransaction {
+		if type == .insert, let trs = anObject as? MessageTransaction {
 			trs.isUnread = false
 			chatroom?.hasUnreadMessages = false
 		}

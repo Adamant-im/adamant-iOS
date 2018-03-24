@@ -32,7 +32,7 @@ class ChatListViewController: UIViewController {
 	
 	// MARK: Properties
 	var chatsController: NSFetchedResultsController<Chatroom>?
-	var unreadController: NSFetchedResultsController<ChatTransaction>?
+	var unreadController: NSFetchedResultsController<MessageTransaction>?
 	
 	private var preservedMessagess = [String:String]()
 	

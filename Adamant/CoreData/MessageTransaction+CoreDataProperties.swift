@@ -1,5 +1,5 @@
 //
-//  ChatTransaction+CoreDataProperties.swift
+//  MessageTransaction+CoreDataProperties.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 07.02.2018.
@@ -11,10 +11,10 @@ import Foundation
 import CoreData
 
 
-extension ChatTransaction {
+extension MessageTransaction {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<ChatTransaction> {
-        return NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<MessageTransaction> {
+        return NSFetchRequest<MessageTransaction>(entityName: "MessageTransaction")
     }
 
     @NSManaged public var isConfirmed: Bool

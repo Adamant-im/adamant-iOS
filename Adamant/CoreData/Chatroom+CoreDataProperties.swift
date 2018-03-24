@@ -19,7 +19,7 @@ extension Chatroom {
 
     @NSManaged public var updatedAt: NSDate?
     @NSManaged public var hasUnreadMessages: Bool
-    @NSManaged public var lastTransaction: ChatTransaction?
+    @NSManaged public var lastTransaction: MessageTransaction?
     @NSManaged public var partner: CoreDataAccount?
     @NSManaged public var transactions: NSSet?
 
@@ -29,10 +29,10 @@ extension Chatroom {
 extension Chatroom {
 
     @objc(addTransactionsObject:)
-    @NSManaged public func addToTransactions(_ value: ChatTransaction)
+    @NSManaged public func addToTransactions(_ value: MessageTransaction)
 
     @objc(removeTransactionsObject:)
-    @NSManaged public func removeFromTransactions(_ value: ChatTransaction)
+    @NSManaged public func removeFromTransactions(_ value: MessageTransaction)
 
     @objc(addTransactions:)
     @NSManaged public func addToTransactions(_ values: NSSet)
