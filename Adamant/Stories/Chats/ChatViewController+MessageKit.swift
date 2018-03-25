@@ -19,7 +19,7 @@ extension ChatViewController: MessagesDataSource {
 	}
 	
 	func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
-		guard let message = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) else {
+		guard let message = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) as? MessageType else {
 			// TODO: something
 			fatalError("What?")
 		}

@@ -54,7 +54,7 @@ class ChatViewController: MessagesViewController {
 		return formatter
 	}
 	
-	private(set) var chatController: NSFetchedResultsController<MessageTransaction>?
+	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
 	private var controllerChanges: [NSFetchedResultsChangeType:[(indexPath: IndexPath?, newIndexPath: IndexPath?)]] = [:]
 	
 	// MARK: Fee label

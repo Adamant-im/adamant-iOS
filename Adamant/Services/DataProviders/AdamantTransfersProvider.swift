@@ -315,8 +315,9 @@ extension AdamantTransfersProvider {
 			
 			transfer.isOutgoing = t.senderId == address
 			
-			if let partnerKey = transfer.isOutgoing ? t.recipientPublicKey : t.senderPublicKey {
-				transfer.partner = partners[partnerKey]
+			if let partnerKey = transfer.isOutgoing ? t.recipientPublicKey : t.senderPublicKey, let partner = partners[partnerKey] {
+				transfer.partner = partner
+				transfer.chatroom = partner.chatroom
 			}
 			
 			if t.height > height {

@@ -37,8 +37,6 @@ enum ValidateMessageResult {
 
 // MARK: - Notifications
 extension Notification.Name {
-	static let adamantChatsProviderNewChatroom = Notification.Name("adamant.chatsProvider.newChatroom")
-	
 	/// Received new messagess. See AdamantUserInfoKey.ChatProvider
 	static let adamantChatsProviderNewUnreadMessages = Notification.Name("adamant.chatsProvider.newUnreadMessages")
 }
@@ -77,13 +75,10 @@ protocol ChatsProvider: DataProvider {
 	
 	// MARK: - Getting chats and messages
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>
-	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<MessageTransaction>
+	func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
 	
 	/// Unread messages controller. Sections by chatroom.
-	func getUnreadMessagesController() -> NSFetchedResultsController<MessageTransaction>
-	
-	/// Returns asociated with account chatroom, or create new, in viewContext
-	func chatroomWith(_ account: CoreDataAccount) -> Chatroom
+	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>
 	
 	
 	// MARK: - Sending messages
