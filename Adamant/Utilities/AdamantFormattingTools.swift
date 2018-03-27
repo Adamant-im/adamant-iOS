@@ -49,7 +49,7 @@ URL: \(url)
 		
 		let sended = String.adamantLocalized.chat.sended
 		
-		let attributedString = NSMutableAttributedString.init(string: "\(sended)\n\(balance)\n\n\(String.adamantLocalized.chat.tapForDetails)")
+		let attributedString = NSMutableAttributedString(string: "\(sended)\n\(balance)\n\n\(String.adamantLocalized.chat.tapForDetails)")
 		
 		let rangeReference = attributedString.string as NSString
 		let sendedRange = rangeReference.range(of: sended)

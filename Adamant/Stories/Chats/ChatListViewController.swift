@@ -19,7 +19,7 @@ extension String.adamantLocalized {
 
 class ChatListViewController: UIViewController {
 	let cellIdentifier = "cell"
-	let cellHeight: CGFloat = 74.0
+	let cellHeight: CGFloat = 76.0
 	
 	// MARK: Dependencies
 	var accountService: AccountService!
@@ -209,7 +209,7 @@ extension ChatListViewController {
 		case let transfer as TransferTransaction:
 			if let balance = transfer.amount {
 				let prefix = transfer.isOutgoing ? "⬅️" : "➡️"
-				cell.lastMessageLabel.text = "\(prefix) \(AdamantUtilities.format(balance: balance))"
+				cell.lastMessageLabel.text = "\(prefix)  \(AdamantUtilities.format(balance: balance))"
 			}
 			break
 			
