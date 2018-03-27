@@ -310,7 +310,9 @@ extension NewChatViewController: QRCodeReaderViewControllerDelegate {
 			return
 		}
 		
-		if !startNewChat(with: uri) {
+		if startNewChat(with: uri) {
+			dismiss(animated: true, completion: nil)
+		} else {
 			dialogService.showError(withMessage: String.adamantLocalized.newChat.wrongQrError)
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
 				reader.startScanning()
