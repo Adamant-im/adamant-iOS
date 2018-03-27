@@ -171,14 +171,14 @@ extension ChatListViewController {
 		cell.dateLabel.textColor = UIColor.adamantSecondary
 		cell.avatarImageView.tintColor = UIColor.adamantChatIcons
 		cell.borderColor = UIColor.adamantPrimary
+		cell.badgeColor = UIColor.adamantPrimary
 		
 		return cell
 	}
 	
 	func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-		if let chatCell = cell as? ChatTableViewCell, let chat = chatsController?.object(at: indexPath) {
-			chatCell.badgeColor = UIColor.adamantPrimary
-			configureCell(chatCell, for: chat)
+		if let cell = cell as? ChatTableViewCell, let chat = chatsController?.object(at: indexPath) {
+			configureCell(cell, for: chat)
 		}
 	}
 	
@@ -211,10 +211,9 @@ extension ChatListViewController {
 				let prefix = transfer.isOutgoing ? "⬅️" : "➡️"
 				cell.lastMessageLabel.text = "\(prefix)  \(AdamantUtilities.format(balance: balance))"
 			}
-			break
 			
 		default:
-			break
+			cell.lastMessageLabel.text = nil
 		}
 		
 		if let date = chatroom.updatedAt as Date? {
