@@ -41,7 +41,7 @@ class ChatViewController: MessagesViewController {
 	// MARK: Dependencies
 	var chatsProvider: ChatsProvider!
 	var dialogService: DialogService!
-	var stack: CoreDataStack!
+	var router: Router!
 	
 	// MARK: Properties
 	weak var delegate: ChatViewControllerDelegate?
@@ -82,6 +82,7 @@ class ChatViewController: MessagesViewController {
 		messagesCollectionView.messagesDataSource = self
 		messagesCollectionView.messagesDisplayDelegate = self
 		messagesCollectionView.messagesLayoutDelegate = self
+		messagesCollectionView.messageCellDelegate = self
 		maintainPositionOnKeyboardFrameChanged = true
 		
 		DispatchQueue.global(qos: .userInitiated).async { [weak self] in

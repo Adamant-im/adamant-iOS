@@ -73,6 +73,32 @@ extension ChatViewController: MessagesDisplayDelegate {
 	}
 }
 
+extension ChatViewController: MessageCellDelegate {
+	func didTapMessage(in cell: MessageCollectionViewCell) {
+		guard let indexPath = messagesCollectionView.indexPath(for: cell),
+			let message = messagesCollectionView.messagesDataSource?.messageForItem(at: indexPath, in: messagesCollectionView) else {
+			return
+		}
+		
+		guard let transfer = message as? TransferTransaction else {
+			return
+		}
+		
+		guard let vc = router.get(scene: AdamantScene.Transactions.transactionDetails) as? TransactionDetailsViewController else {
+			print("Can't get TransactionDetailsViewController")
+			return
+		}
+		
+		vc.transaction = transfer
+		
+		if let nav = navigationController {
+			nav.pushViewController(vc, animated: true)
+		} else {
+			present(vc, animated: true, completion: nil)
+		}
+	}
+}
+
 
 // MARK: - MessagesLayoutDelegate
 extension ChatViewController: MessagesLayoutDelegate {
