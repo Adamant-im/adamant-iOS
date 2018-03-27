@@ -106,6 +106,12 @@
 /* Chat: Send message button */
 "ChatScene.Send" = "Send";
 
+/* Chat: 'Sended funds' bubble title */
+"ChatScene.Sended" = "Sended";
+
+/* Chat: 'Sended funds' buble 'Tap for details' tip */
+"ChatScene.tapForDetails" = "Tap for details";
+
 /* Known contacts: Adamant ICO message */
 "Chats.IcoMessage" = "ou have a possibility to invest in ICO of ADAMANT, the most secure and anonymous messenger. Earlier you participate, better offer you will get. Learn more on Adamant.im website or in the Whitepaper. To invest, go to Wallet→Invest in the ICO, or follow a website page Adamant.im/ico/. If you still have any questions, you can ask them by replying to this message. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\\nAfter you invest and receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.";
 

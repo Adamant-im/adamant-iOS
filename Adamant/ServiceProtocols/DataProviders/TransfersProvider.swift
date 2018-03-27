@@ -64,6 +64,9 @@ protocol TransfersProvider: DataProvider {
 	func transfersController() -> NSFetchedResultsController<TransferTransaction>
 	func unreadTransfersController() -> NSFetchedResultsController<TransferTransaction>
 	
+	func transfersController(for account: CoreDataAccount) -> NSFetchedResultsController<TransferTransaction>
+
+	
 	// MARK: - Sending funds
 	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void)
 }

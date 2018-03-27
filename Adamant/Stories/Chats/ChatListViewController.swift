@@ -201,7 +201,21 @@ extension ChatListViewController {
 		}
 		
 		cell.hasUnreadMessages = chatroom.hasUnreadMessages
-		cell.lastMessageLabel.text = chatroom.lastTransaction?.message
+		
+		switch chatroom.lastTransaction {
+		case let message as MessageTransaction:
+			cell.lastMessageLabel.text = message.message
+			
+		case let transfer as TransferTransaction:
+			if let balance = transfer.amount {
+				let prefix = transfer.isOutgoing ? "⬅️" : "➡️"
+				cell.lastMessageLabel.text = "\(prefix) \(AdamantUtilities.format(balance: balance))"
+			}
+			break
+			
+		default:
+			break
+		}
 		
 		if let date = chatroom.updatedAt as Date? {
 			cell.dateLabel.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
@@ -272,7 +286,9 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
 // MARK: - NewChatViewControllerDelegate
 extension ChatListViewController: NewChatViewControllerDelegate {
 	func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount) {
-		let chatroom = self.chatsProvider.chatroomWith(account)
+		guard let chatroom = account.chatroom else {
+			fatalError("No chatroom?")
+		}
 		
 		DispatchQueue.main.async {
 			if let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController {
