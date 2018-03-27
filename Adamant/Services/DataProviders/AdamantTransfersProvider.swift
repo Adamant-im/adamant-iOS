@@ -227,7 +227,7 @@ extension AdamantTransfersProvider {
 extension AdamantTransfersProvider {
 	private enum ProcessingResult {
 		case success(new: Int)
-		case accountNotFound(publicKey: String)
+		case accountNotFound(address: String)
 		case error(Error)
 	}
 	
@@ -241,23 +241,22 @@ extension AdamantTransfersProvider {
 		}
 		
 		// MARK: 1. Collect all partners
-		var partnersKeys: Set<String> = []
+		var partnerIds: Set<String> = []
 		
 		for t in transactions {
-			let isOutgoing = t.senderId == address
-			guard let partersKey = isOutgoing ? t.recipientPublicKey : t.senderPublicKey else {
-				continue
+			if t.senderId == address {
+				partnerIds.insert(t.recipientId)
+			} else {
+				partnerIds.insert(t.senderId)
 			}
-			
-			partnersKeys.insert(partersKey)
 		}
 		
 		// MARK: 2. Let AccountProvider get all partners from server.
 		let partnersGroup = DispatchGroup()
 		var errors: [ProcessingResult] = []
-		for key in partnersKeys {
+		for id in partnerIds {
 			partnersGroup.enter()
-			accountsProvider.getAccount(byPublicKey: key, completion: { result in
+			accountsProvider.getAccount(byAddress: id, completion: { result in
 				defer {
 					partnersGroup.leave()
 				}
@@ -267,7 +266,7 @@ extension AdamantTransfersProvider {
 					break
 					
 				case .notFound:
-					errors.append(ProcessingResult.accountNotFound(publicKey: key))
+					errors.append(ProcessingResult.accountNotFound(address: id))
 					
 				case .serverError(let error):
 					errors.append(ProcessingResult.error(error))
@@ -289,12 +288,12 @@ extension AdamantTransfersProvider {
 		context.parent = self.stack.container.viewContext
 		
 		var partners: [String:CoreDataAccount] = [:]
-		for key in partnersKeys {
+		for id in partnerIds {
 			let request = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
-			request.predicate = NSPredicate(format: "publicKey == %@", key)
+			request.predicate = NSPredicate(format: "address == %@", id)
 			request.fetchLimit = 1
 			if let partner = (try? context.fetch(request))?.first {
-				partners[key] = partner
+				partners[id] = partner
 			}
 		}
 		
@@ -314,8 +313,9 @@ extension AdamantTransfersProvider {
 			transfer.confirmations = t.confirmations
 			
 			transfer.isOutgoing = t.senderId == address
+			let partnerId = transfer.isOutgoing ? t.recipientId : t.senderId
 			
-			if let partnerKey = transfer.isOutgoing ? t.recipientPublicKey : t.senderPublicKey, let partner = partners[partnerKey] {
+			if let partner = partners[partnerId] {
 				transfer.partner = partner
 				transfer.chatroom = partner.chatroom
 			}
@@ -327,7 +327,23 @@ extension AdamantTransfersProvider {
 			transfers.append(transfer)
 		}
 		
-		// MARK: 4. Check lastHeight
+		// MARK: 4. Last in
+		for (chatroom, trs) in Dictionary(grouping: transfers, by: { $0.chatroom! }) {
+			if let newest = trs.sorted(by: { $0.date!.timeIntervalSinceNow > $1.date!.timeIntervalSinceNow }).last {
+				if let last = chatroom.lastTransaction {
+					if (last.date! as Date).compare(newest.date! as Date) == .orderedAscending {
+						chatroom.lastTransaction = newest
+						chatroom.updatedAt = newest.date
+					}
+				} else {
+					chatroom.lastTransaction = newest
+					chatroom.updatedAt = newest.date
+				}
+			}
+		}
+		
+		
+		// MARK: 5. Check lastHeight
 		// API returns transactions from lastHeight INCLUDING transaction with height == lastHeight, so +1
 		if height > 0 {
 			let uH = Int64(height + 1)
@@ -341,7 +357,7 @@ extension AdamantTransfersProvider {
 			}
 		}
 		
-		// MARK: 5. Unread transactions
+		// MARK: 6. Unread transactions
 		if let unreadedHeight = readedLastHeight {
 			transfers.filter({$0.height > unreadedHeight}).forEach({$0.isUnread = true})
 			
@@ -356,7 +372,7 @@ extension AdamantTransfersProvider {
 			securedStore.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
 		}
 		
-		// MARK: 6. Dump transactions to viewContext
+		// MARK: 7. Dump transactions to viewContext
 		if context.hasChanges {
 			do {
 				try context.save()
