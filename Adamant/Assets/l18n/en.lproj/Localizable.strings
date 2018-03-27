@@ -62,7 +62,7 @@
 "ApiService.Error.NoConnection" = "No connection to the Internet";
 
 /* ApiService: Remote server returned an error. Using %@ for error description */
-"ApiService.Error.RemoteServerErrorFormat" = "Remote server error: %@";
+"ApiService.Error.RemoteServerErrorFormat" = "Blockchain Node error: %@";
 
 /* ApiService: User not logged error */
 "ApiService.Error.UserNotLogged" = "User not logged";
@@ -98,7 +98,7 @@
 "ChatScene.Error.NotEnoughMoney" = "You don't have enough money to send a message";
 
 /* Chat: Notify user about server error. Using %@ for error description */
-"ChatScene.Error.RemoteServerErrorFormat" = "Remote error: %@. Report a bug";
+"ChatScene.Error.RemoteServerErrorFormat" = "Blockchain Node error: %@. Report a bug";
 
 /* Chat: message input placeholder */
 "ChatScene.NewMessage.Placeholder" = "New message";
@@ -182,7 +182,7 @@
 "NewChatScene.Error.OwnAddress" = "You don't need an encrypted anonymous chat to talk to yourself";
 
 /* New chat: Remote server returned an error. Using %@ for error description */
-"NewChatScene.Error.RemoteServerFormat" = "Remote server error: %@. Report a bug";
+"NewChatScene.Error.RemoteServerFormat" = "Blockchain Node error: %@. Report a bug";
 
 /* New Chat: Notify user that scanned QR doesn't contains an address */
 "NewChatScene.Error.WrongQr" = "QR code does not contain a valid address";
