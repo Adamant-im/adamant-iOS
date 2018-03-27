@@ -23,7 +23,7 @@ class AdamantChatsProvider: ChatsProvider {
 	private(set) var receivedLastHeight: Int64?
 	private(set) var readedLastHeight: Int64?
 	private let apiTransactions = 100
-	private var unconfirmedTransactions: [UInt64:ChatTransaction] = [:]
+	private var unconfirmedTransactions: [UInt64:MessageTransaction] = [:]
 	
 	private let processingQueue = DispatchQueue(label: "im.adamant.processing.chat", qos: .utility, attributes: [.concurrent])
 	private let sendingQueue = DispatchQueue(label: "im.adamant.sending.chat", qos: .utility, attributes: [.concurrent])
@@ -285,27 +285,12 @@ extension AdamantChatsProvider {
 		}
 		
 		
-		// MARK 3. Get or Create Chatroom
-		let chatroom: Chatroom
-		if let room = account.chatroom {
-			chatroom = privateContext.object(with: room.objectID) as! Chatroom
-		} else {
-			if Thread.isMainThread {
-				let chrm = createChatroom(with: account)
-				chatroom = privateContext.object(with: chrm.objectID) as! Chatroom
-			} else {
-				var chrmId: NSManagedObjectID? = nil
-				DispatchQueue.main.sync {
-					let chrm = createChatroom(with: account)
-					chrmId = chrm.objectID
-				}
-				chatroom = privateContext.object(with: chrmId!) as! Chatroom
-			}
-		}
+		// MARK 3. Get Chatroom
+		let chatroom = privateContext.object(with: account.chatroom!.objectID) as! Chatroom
 		
 		
 		// MARK: 4. Create chat transaction
-		let transaction = ChatTransaction(entity: ChatTransaction.entity(), insertInto: privateContext)
+		let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: privateContext)
 		transaction.date = Date() as NSDate
 		transaction.recipientId = recipientId
 		transaction.senderId = senderId
@@ -348,7 +333,7 @@ extension AdamantChatsProvider {
 				// If we will save transaction from privateContext, we will hold strong reference to whole context, and we won't ever save it.
 				self.unconfirmedsSemaphore.wait()
 				DispatchQueue.main.sync {
-					self.unconfirmedTransactions[id] = self.stack.container.viewContext.object(with: transaction.objectID) as? ChatTransaction
+					self.unconfirmedTransactions[id] = self.stack.container.viewContext.object(with: transaction.objectID) as? MessageTransaction
 				}
 				self.unconfirmedsSemaphore.signal()
 				
@@ -405,7 +390,7 @@ extension AdamantChatsProvider {
 			fatalError()
 		}
 		
-		let request: NSFetchRequest<ChatTransaction> = NSFetchRequest(entityName: ChatTransaction.entityName)
+		let request: NSFetchRequest<ChatTransaction> = NSFetchRequest(entityName: "ChatTransaction")
 		request.predicate = NSPredicate(format: "chatroom = %@", chatroom)
 		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
@@ -413,30 +398,8 @@ extension AdamantChatsProvider {
 		return controller
 	}
 	
-	func chatroomWith(_ account: CoreDataAccount) -> Chatroom {
-		var chatroom: Chatroom! = nil
-		
-		let request = NSFetchRequest<Chatroom>(entityName: Chatroom.entityName)
-		request.fetchLimit = 1
-		request.predicate = NSPredicate(format: "partner = %@", account)
-		
-		if let chatroom = (try? stack.container.viewContext.fetch(request))?.first {
-			return chatroom
-		}
-		
-		if Thread.isMainThread {
-			chatroom = createChatroom(with: account)
-		} else {
-			DispatchQueue.main.sync {
-				chatroom = createChatroom(with: account)
-			}
-		}
-		
-		return chatroom
-	}
-	
 	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction> {
-		let request = NSFetchRequest<ChatTransaction>(entityName: ChatTransaction.entityName)
+		let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
 		request.predicate = NSPredicate(format: "isUnread == true")
 		request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false)]
 		
@@ -467,7 +430,7 @@ extension AdamantChatsProvider {
 		dispatchGroup.enter()
 		
 		// MARK: 1. Get new transactions
-		apiService.getChatTransactions(address: senderId, height: height, offset: offset) { result in
+		apiService.getMessageTransactions(address: senderId, height: height, offset: offset) { result in
 			defer {
 				// Leave 1
 				dispatchGroup.leave()
@@ -488,7 +451,7 @@ extension AdamantChatsProvider {
 						dispatchGroup.leave()
 					}
 					
-					self.process(chatTransactions: transactions,
+					self.process(messageTransactions: transactions,
 								 senderId: senderId,
 								 privateKey: privateKey,
 								 context: context,
@@ -515,7 +478,7 @@ extension AdamantChatsProvider {
 	
 	
 	/// - Returns: New unread messagess ids
-	private func process(chatTransactions: [Transaction],
+	private func process(messageTransactions: [Transaction],
 						 senderId: String,
 						 privateKey: String,
 						 context: NSManagedObjectContext,
@@ -526,7 +489,7 @@ extension AdamantChatsProvider {
 		}
 		
 		// MARK: 1. Gather partner keys
-		let mapped = chatTransactions.map({ DirectionedTransaction(transaction: $0, isOut: $0.senderId == senderId) })
+		let mapped = messageTransactions.map({ DirectionedTransaction(transaction: $0, isOut: $0.senderId == senderId) })
 		let grouppedTransactions = Dictionary(grouping: mapped, by: { $0.isOut ? $0.transaction.recipientId : $0.transaction.senderId })
 		
 		
@@ -589,24 +552,14 @@ extension AdamantChatsProvider {
 		var height: Int64 = 0
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = context
-		var newChatTransactions = [ChatTransaction]()
+		var newMessageTransactions = [MessageTransaction]()
 		
 		for (account, transactions) in partners {
-			// We can't save whole context while we are mass creating ChatTransactions.
-			// MARK: 3.1 Chatrooms
-			contextMutatingSemaphore.wait()
-			let chatroom: Chatroom
-			if let chrm = account.chatroom {
-				chatroom = chrm
-			} else {
-				chatroom = createChatroom(with: account)
-			}
-			contextMutatingSemaphore.signal()
+			// We can't save whole context while we are mass creating MessageTransactions.
+			let privateChatroom = privateContext.object(with: account.chatroom!.objectID) as! Chatroom
 			
-			let privateChatroom = privateContext.object(with: chatroom.objectID) as! Chatroom
-			
-			// MARK: 3.2 Transactions
-			var messages = Set<ChatTransaction>()
+			// MARK: Transactions
+			var messages = Set<MessageTransaction>()
 			
 			for trs in transactions {
 				unconfirmedsSemaphore.wait()
@@ -630,23 +583,23 @@ extension AdamantChatsProvider {
 					publicKey = trs.transaction.senderPublicKey
 				}
 				
-				if let chatTransaction = chatTransaction(from: trs.transaction, isOutgoing: trs.isOut, publicKey: publicKey, privateKey: privateKey, context: privateContext) {
-					if height < chatTransaction.height {
-						height = chatTransaction.height
+				if let messageTransaction = messageTransaction(from: trs.transaction, isOutgoing: trs.isOut, publicKey: publicKey, privateKey: privateKey, context: privateContext) {
+					if height < messageTransaction.height {
+						height = messageTransaction.height
 					}
 					
 					if !trs.isOut {
-						newChatTransactions.append(chatTransaction)
+						newMessageTransactions.append(messageTransaction)
 						
 						// Preset messages
 						if let preset = account.knownMessages,
-							let message = chatTransaction.message,
+							let message = messageTransaction.message,
 							let translatedMessage = preset.first(where: {message.range(of: $0.key) != nil}) {
-							chatTransaction.message = translatedMessage.value
+							messageTransaction.message = translatedMessage.value
 						}
 					}
 					
-					messages.insert(chatTransaction)
+					messages.insert(messageTransaction)
 				}
 			}
 			
@@ -656,7 +609,7 @@ extension AdamantChatsProvider {
 		
 		// MARK: 4. Unread messagess
 		if let readedLastHeight = readedLastHeight {
-			let msgs = Dictionary(grouping: newChatTransactions.filter({$0.height > readedLastHeight}), by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom!}))
+			let msgs = Dictionary(grouping: newMessageTransactions.filter({$0.height > readedLastHeight}), by: ({ (t: MessageTransaction) -> Chatroom in t.chatroom!}))
 			for (chatroom, trs) in msgs {
 				chatroom.hasUnreadMessages = true
 				trs.forEach({$0.isUnread = true})
@@ -675,7 +628,7 @@ extension AdamantChatsProvider {
 			try privateContext.save()
 			
 			for chatroom in partners.keys.flatMap({$0.chatroom}) {
-				let request = NSFetchRequest<ChatTransaction>(entityName: ChatTransaction.entityName)
+				let request = NSFetchRequest<MessageTransaction>(entityName: MessageTransaction.entityName)
 				request.predicate = NSPredicate(format: "chatroom = %@", chatroom)
 				request.fetchLimit = 1
 				request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
@@ -753,28 +706,28 @@ extension AdamantChatsProvider {
 	///   - privateKey: logged account private key
 	///   - context: context to insert parsed transaction to
 	/// - Returns: New parsed transaction
-	private func chatTransaction(from transaction: Transaction, isOutgoing: Bool, publicKey: String, privateKey: String, context: NSManagedObjectContext) -> ChatTransaction? {
+	private func messageTransaction(from transaction: Transaction, isOutgoing: Bool, publicKey: String, privateKey: String, context: NSManagedObjectContext) -> MessageTransaction? {
 		guard let chat = transaction.asset.chat else {
 			return nil
 		}
 		
-		let chatTransaction = ChatTransaction(entity: ChatTransaction.entity(), insertInto: context)
-		chatTransaction.date = transaction.date as NSDate
-		chatTransaction.recipientId = transaction.recipientId
-		chatTransaction.senderId = transaction.senderId
-		chatTransaction.transactionId = String(transaction.id)
-		chatTransaction.type = Int16(chat.type.rawValue)
-		chatTransaction.height = Int64(transaction.height)
-		chatTransaction.isConfirmed = true
-		chatTransaction.isOutgoing = isOutgoing
-		chatTransaction.blockId = transaction.blockId
-		chatTransaction.confirmations = transaction.confirmations
+		let messageTransaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+		messageTransaction.date = transaction.date as NSDate
+		messageTransaction.recipientId = transaction.recipientId
+		messageTransaction.senderId = transaction.senderId
+		messageTransaction.transactionId = String(transaction.id)
+		messageTransaction.type = Int16(chat.type.rawValue)
+		messageTransaction.height = Int64(transaction.height)
+		messageTransaction.isConfirmed = true
+		messageTransaction.isOutgoing = isOutgoing
+		messageTransaction.blockId = transaction.blockId
+		messageTransaction.confirmations = transaction.confirmations
 		
 		if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey) {
-			chatTransaction.message = decodedMessage
+			messageTransaction.message = decodedMessage
 		}
 		
-		return chatTransaction
+		return messageTransaction
 	}
 	
 	
@@ -783,7 +736,7 @@ extension AdamantChatsProvider {
 	/// - Parameters:
 	///   - transaction: Unconfirmed transaction
 	///   - id: New transaction id	///   - height: New transaction height
-	private func confirmTransaction(_ transaction: ChatTransaction, id: UInt64, height: Int64, blockId: String, confirmations: Int64) {
+	private func confirmTransaction(_ transaction: MessageTransaction, id: UInt64, height: Int64, blockId: String, confirmations: Int64) {
 		if transaction.isConfirmed {
 			return
 		}
@@ -797,29 +750,5 @@ extension AdamantChatsProvider {
 		if let lastHeight = receivedLastHeight, lastHeight < height {
 			self.receivedLastHeight = height
 		}
-	}
-	
-	
-	/// Create and configure Chatroom
-	///
-	/// - Parameters:
-	///   - address: chatroom with
-	///   - context: Context to insert chatroom into
-	/// - Returns: Chatroom
-	private func createChatroom(with account: CoreDataAccount) -> Chatroom {
-		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: account.managedObjectContext)
-		chatroom.partner = account
-		chatroom.updatedAt = NSDate()
-		
-		let userInfo: [AnyHashable: Any]?
-		if let address = account.address {
-			userInfo = [AdamantUserInfoKey.ChatProvider.newChatroomAddress:address]
-		} else {
-			userInfo = nil
-		}
-		
-		NotificationCenter.default.post(name: Notification.Name.adamantChatsProviderNewChatroom, object: self, userInfo: userInfo)
-		
-		return chatroom
 	}
 }

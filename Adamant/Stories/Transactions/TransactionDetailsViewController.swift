@@ -97,7 +97,7 @@ class TransactionDetailsViewController: UIViewController {
 		
 		// Description
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportSummaryButton, style: .default, handler: { [weak self] _ in
-			let text = AdamantExportTools.summaryFor(transaction: transaction, url: url)
+			let text = AdamantFormattingTools.summaryFor(transaction: transaction, url: url)
 			let alert = UIActivityViewController(activityItems: [text], applicationActivities: nil)
 			self?.present(alert, animated: true, completion: nil)
 		}))

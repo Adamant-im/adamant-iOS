@@ -33,7 +33,7 @@ extension AdamantChatsProvider: BackgroundFetchService {
 			}
 		}
 		
-		apiService.getChatTransactions(address: address, height: lastHeight, offset: nil) { [weak self] result in
+		apiService.getMessageTransactions(address: address, height: lastHeight, offset: nil) { [weak self] result in
 			switch result {
 			case .success(let transactions):
 				if transactions.count > 0 {

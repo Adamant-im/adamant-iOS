@@ -2,7 +2,7 @@
 //  Chatroom+CoreDataClass.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 07.02.2018.
+//  Created by Anokhov Pavel on 24.03.2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 //
@@ -20,11 +20,7 @@ public class Chatroom: NSManagedObject {
 		}
 		
 		if let trs = transactions as? Set<ChatTransaction> {
-			trs.forEach({
-				if $0.isUnread {
-					$0.isUnread = false
-				}
-			})
+			trs.filter { $0.isUnread }.forEach { $0.isUnread = false }
 		}
 	}
 }

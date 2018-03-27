@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 
+// MARK: - Known contacts
 private enum Contacts {
 	case adamantBountyWallet
 	case adamantIco
@@ -46,6 +47,7 @@ private enum Contacts {
 }
 
 
+// MARK: - Provider
 class AdamantAccountsProvider: AccountsProvider {
 	struct KnownContact {
 		let address: String
@@ -96,6 +98,9 @@ class AdamantAccountsProvider: AccountsProvider {
 		request.predicate = predicate
 		
 		var acc: CoreDataAccount? = nil
+		
+		
+		// TODO: Обернуть это в семафор
 		
 		if Thread.isMainThread {
 			acc = (try? (context ?? stack.container.viewContext).fetch(request))?.first
@@ -169,6 +174,11 @@ extension AdamantAccountsProvider {
 	}
 	
 	
+	
+	/*
+	
+	Запросы на аккаунт по publicId и запросы на аккаунт по address надо взаимно согласовывать. Иначе может случиться такое, что разные службы запросят один и тот же аккаунт через разные методы - он будет добавлен дважды.
+	
 	/// Get account info from servier.
 	///
 	/// - Parameters:
@@ -225,6 +235,9 @@ extension AdamantAccountsProvider {
 			}
 		}
 	}
+
+	*/
+
 	
 	private func createCoreDataAccount(from account: Account) -> CoreDataAccount {
 		let coreAccount: CoreDataAccount
@@ -245,6 +258,12 @@ extension AdamantAccountsProvider {
 		let coreAccount = CoreDataAccount(entity: CoreDataAccount.entity(), insertInto: context)
 		coreAccount.address = account.address
 		coreAccount.publicKey = account.publicKey
+		
+		let chatroom = Chatroom(entity: Chatroom.entity(), insertInto: context)
+		chatroom.updatedAt = NSDate()
+		
+		coreAccount.chatroom = chatroom
+		
 		
 		if let acc = knownContacts[account.address] {
 			coreAccount.name = acc.name

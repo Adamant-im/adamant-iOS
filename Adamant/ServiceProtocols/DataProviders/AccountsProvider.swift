@@ -22,8 +22,9 @@ protocol AccountsProvider {
 	/// - Returns: Account, if found, created in main viewContext
 	func getAccount(byAddress address: String, completion: @escaping (AccountsProviderResult) -> Void)
 	
+	/* That one bugged. Will be fixed later. Maybe. */
 	/// Search for fetched account, if not found, asks server for account.
 	///
 	/// - Returns: Account, if found, created in main viewContext
-	func getAccount(byPublicKey publicKey: String, completion: @escaping (AccountsProviderResult) -> Void)
+//	func getAccount(byPublicKey publicKey: String, completion: @escaping (AccountsProviderResult) -> Void)
 }

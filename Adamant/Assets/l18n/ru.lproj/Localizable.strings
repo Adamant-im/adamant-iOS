@@ -25,8 +25,8 @@
 /* Account tab: Balance row title */
 "AccountTab.Row.Balance" = "Баланс";
 
-/* Account tab: 'Invest in ICO' button */
-"AccountTab.Row.JoinIco" = "Учавствовать в ICO";
+/* Account tab: 'Join the ICO' button */
+"AccountTab.Row.JoinIco" = "Участвовать в ICO";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Выход";
@@ -62,19 +62,19 @@
 "ApiService.Error.NoConnection" = "Нет соединения с сетью";
 
 /* ApiService: Remote server returned an error. Using %@ for error description */
-"ApiService.Error.RemoteServerErrorFormat" = "Ошибка на сервере: %@";
+"ApiService.Error.RemoteServerErrorFormat" = "Ошибка на узле блокчейна: %@";
 
 /* ApiService: User not logged error */
 "ApiService.Error.UserNotLogged" = "Не выполнен вход";
 
 /* Serious internal error: Failed to build endpoint url */
-"ApiService.InternalError.EndpointBuildFailed" = "Endpoint build failed. Report a bug";
+"ApiService.InternalError.EndpointBuildFailed" = "Ошибка взаимодействия с блокчейном. Сообщите об ошибке";
 
 /* Serious internal error: Failed to sign transaction */
-"ApiService.InternalError.FailedTransactionSigning" = "Transaction failed";
+"ApiService.InternalError.FailedTransactionSigning" = "Ошибка создания транзакции";
 
 /* Serious internal error: Error parsing response */
-"ApiService.InternalError.ParsingFailed" = "Parsing failed. Report a bug";
+"ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите об ошибке";
 
 /* Unknown internal error */
 "ApiService.InternalError.UnknownError" = "Неизвестная ошибка";
@@ -83,7 +83,7 @@
 "ChatListPage.Title" = "Чаты";
 
 /* Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description */
-"ChatScene.Error.InternalErrorFormat" = "Internal error: %@. Report a bug";
+"ChatScene.Error.InternalErrorFormat" = "Внутренняя ошибка: %@. Сообщите об ошибке";
 
 /* Chat: Notify user that message cannot be empty */
 "ChatScene.Error.MessageIsEmpty" = "Сообщение пустое!";
@@ -98,7 +98,7 @@
 "ChatScene.Error.NotEnoughMoney" = "Недостаточно токенов для отправки сообщения";
 
 /* Chat: Notify user about server error. Using %@ for error description */
-"ChatScene.Error.RemoteServerErrorFormat" = "Remote error: %@. Report a bug";
+"ChatScene.Error.RemoteServerErrorFormat" = "Ошибка на узле блокчейна: %@. Сообщите об ошибке";
 
 /* Chat: message input placeholder */
 "ChatScene.NewMessage.Placeholder" = "Сообщение";
@@ -106,20 +106,26 @@
 /* Chat: Send message button */
 "ChatScene.Send" = "Отправить";
 
+/* Chat: 'Sended funds' bubble title */
+"ChatScene.Sended" = "Отправлено";
+
+/* Chat: 'Sended funds' buble 'Tap for details' tip */
+"ChatScene.tapForDetails" = "Подробнее…";
+
 /* Known contacts: Adamant ICO message */
-"Chats.IcoMessage" = "У вас есть возможность инвестировать в ICO самого защищенного мессенджера АДАМАНТ. Более раннее участие — более выгодные условия. Подробная информация об условиях на сайте Adamant.im и в Белой книге проекта. Если вы уже ознакомились с нашим сайтом и Белой книгой, но у вас остались вопросы, вы можете задать их, ответив на это сообщение. Мы стараемся реагировать быстро, но иногда возможны задержки до нескольких часов.\\nВажно! Пожалуйста, убедитесь, что вы сохранили пароль к этому аккаунту — выйдите из аккаунта и войдите в него снова. Лучше всего иметь запись пароля и на бумаге. Однако помните, только вы несете ответственность за сохранность вашего пароля. Его невозможно восстановить. А если он попадет в другие руки, ваши деньги будут украдены. Отнеситесь к этому вопросу так серьезно, как если бы цена токенов на вашем кошельке когда-то станет равна миллиарду долларов.\\nЧтобы инвестировать, перейдите в этом месседжере на вкладку Кошелек и нажмите кнопку Инвестировать в ICO, или откройте в браузере веб-страницу Adamant.im/ico/. В форме для инвестирования укажите ваш адрес АДАМАНТа — на него будут перечислены токены ADM. При переходе из мессенджера он будет вставлен автоматически, в другом случае вернитесь в мессенджер и кликните на блок Ваш адрес, он будет скопирован в буфер обмена. Укажите криптовалюту, в которой вы хотите инвестировать, и какую сумму. Вы увидите сколько ADM-токенов вы получите, с учетом скидки за объем: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Нажмите кнопку Купить токены АДАМАНТ. Вы получите уникальный адрес, на который необходимо выполнить перевод. Как только на него поступит ожидаемая сумма и транзакция будет подтверждена, вы получите токены ADM. Транзакцию можно выполнить с любого кошелька, включая биржи. Необязятельно переводить точную сумму с учетом комиссии, платеж все равно будет засчитан. Остались вопросы? Спрашивайте.\\nПосле того, как вы инвестируете и получите токены ADM, мы рекомендуем вам хранить их в кошельке как можно дольше. Ежемесячно все нераспроданные на ICO токены будут распределяться по кошелькам пользователей, увеличивая балансы на 5%. Подробную информацию можно получить на сайте Adamant.im и в Белой книге Проекта.";
+"Chats.IcoMessage" = "У вас есть возможность инвестировать в ICO самого защищенного мессенджера АДАМАНТ. Более раннее участие — более выгодные условия. Подробная информация об условиях на сайте Adamant.im и в Белой книге проекта. Если вы уже ознакомились с нашим сайтом и Белой книгой, но у вас остались вопросы, вы можете задать их, ответив на это сообщение. Мы стараемся реагировать быстро, но иногда возможны задержки до нескольких часов.\nВажно! Пожалуйста, убедитесь, что вы сохранили пароль к этому аккаунту — выйдите из аккаунта и войдите в него снова. Лучше всего иметь запись пароля и на бумаге. Однако помните, только вы несете ответственность за сохранность вашего пароля. Его невозможно восстановить. А если он попадет в другие руки, ваши деньги будут украдены. Отнеситесь к этому вопросу так серьезно, как если бы цена токенов на вашем кошельке когда-то станет равна миллиарду долларов.\nЧтобы инвестировать, перейдите в этом месседжере на вкладку Кошелек и нажмите кнопку Инвестировать в ICO, или откройте в браузере веб-страницу Adamant.im/ico/. В форме для инвестирования укажите ваш адрес АДАМАНТа — на него будут перечислены токены ADM. При переходе из мессенджера он будет вставлен автоматически, в другом случае вернитесь в мессенджер и кликните на блок Ваш адрес, он будет скопирован в буфер обмена. Укажите криптовалюту, в которой вы хотите инвестировать, и какую сумму. Вы увидите сколько ADM-токенов вы получите, с учетом скидки за объем: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Нажмите кнопку Купить токены АДАМАНТ. Вы получите уникальный адрес, на который необходимо выполнить перевод. Как только на него поступит ожидаемая сумма и транзакция будет подтверждена, вы получите токены ADM. Транзакцию можно выполнить с любого кошелька, включая биржи. Необязятельно переводить точную сумму с учетом комиссии, платеж все равно будет засчитан. Остались вопросы? Спрашивайте.\nПосле того, как вы инвестируете и получите токены ADM, мы рекомендуем вам хранить их в кошельке как можно дольше. Ежемесячно все нераспроданные на ICO токены будут распределяться по кошелькам пользователей, увеличивая балансы на 5%. Подробную информацию можно получить на сайте Adamant.im и в Белой книге Проекта.";
 
 /* Known contacts: Adamant pre ICO message */
 "Chats.PreIcoMessage" = "Сегодня последний день, когда мы принимаем инвестиции по минимальной цене 0.001 ETH за токен ADM до начала публичного сейла ICO — 30.01. Это самые выгодные условия для инвесторов. Минимальная инвестиция — эквивалент 2 ETH (на этапе публичного сейла ограничений по минимальной сумме нет, но цена токена начинается с 0.002 ETH). Подробная информация о проекте АДАМАНТ на сайте Adamant.im и в Белой книге. Для участия достаточно ответить на это сообщение, и мы вам поможем.";
 
 /* Known contacts: Adamant welcome message */
-"Chats.WelcomeMessage" = "Добро пожаловать в самый анонимный и безопасный мессенджер АДАМАНТ. Вам начислены приветственные токены, которые вы можете использовать для ознакомления с мессенджером.\\nПомните, что безопасность и анонимность зависит и от вас самих. Не переходите по ссылкам, которые вы получаете в чатах, иначе ваш IP-адрес может быть определен. Не доверяйте расширениям браузера. Лучше всего передавать ваш ADM-адрес собеседникам лично, а не через другие мессенджеры. Храните вашу секретную фразу (пароль) от аккаунта в тайне. Установите на ваше устройство пароль или закрываете вкладку браузера после завершения диалогов.\\nБолее полную информацию о безопасности и анонимности читайте на странице https://adamant.im/ru-staysecured/\\n\\nНе отвечайте на это сообщение, этот адрес служебный.";
+"Chats.WelcomeMessage" = "Добро пожаловать в самый анонимный и безопасный мессенджер АДАМАНТ. Вам начислены приветственные токены, которые вы можете использовать для ознакомления с мессенджером.\nПомните, что безопасность и анонимность зависит и от вас самих. Не переходите по ссылкам, которые вы получаете в чатах, иначе ваш IP-адрес может быть определен. Не доверяйте расширениям браузера. Лучше всего передавать ваш ADM-адрес собеседникам лично, а не через другие мессенджеры. Храните вашу секретную фразу (пароль) от аккаунта в тайне. Установите на ваше устройство пароль или закрываете вкладку браузера после завершения диалогов.\nБолее полную информацию о безопасности и анонимности читайте на странице https://adamant.im/ru-staysecured/\n\nНе отвечайте на это сообщение, этот адрес служебный.";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
-"LoginScene.Error.AuthorizeCamera" = "Для чтения QR кодов необходимо разрешить доступ к камере";
+"LoginScene.Error.AuthorizeCamera" = "Для чтения QR-кодов необходимо разрешить доступ к камере";
 
 /* Login: User disabled access to photolibrary, he can authorize application in settings */
-"LoginScene.Error.AuthorizePhotolibrary" = "Для чтения QR кодов необходимо разрешить доступ к Фото";
+"LoginScene.Error.AuthorizePhotolibrary" = "Для чтения QR-кодов необходимо разрешить доступ к Фото";
 
 /* Login: No network error. */
 "LoginScene.Error.NoInternet" = "Нет соединения с сетью";
@@ -128,19 +134,19 @@
 "LoginScene.Error.NoPassphrase" = "Введите пароль";
 
 /* Login: Notify user that picked photo doesn't contains a valid qr code with passphrase */
-"LoginScene.Error.NoQrOnPhoto" = "Выбранное изображение не содержит подходящих QR кодов";
+"LoginScene.Error.NoQrOnPhoto" = "Выбранное изображение не содержит подходящих QR-кодов";
 
 /* Login: Notify user that device not supported by QR reader */
-"LoginScene.Error.QrNotSupported" = "На этом устройстве не поддерживается чтение QR кодов";
+"LoginScene.Error.QrNotSupported" = "На этом устройстве не поддерживается чтение QR-кодов";
 
 /* Login: Notify user that scanned QR doesn't contains a passphrase. */
-"LoginScene.Error.WrongQr" = "QR код не содержит пароля";
+"LoginScene.Error.WrongQr" = "QR-код не содержит пароля";
 
 /* Login: notify user that we are trying to log in */
 "LoginScene.LoggingInProgress" = "Входим…";
 
 /* Login: Login into previous account with biometry or pincode */
-"LoginScene.LoginIntoAdamant" = "Вход в Адамант";
+"LoginScene.LoginIntoAdamant" = "Вход в АДАМАНТ";
 
 /* Login: generate new passphrase button */
 "LoginScene.Row.Generate" = "Создать новый пароль";
@@ -161,7 +167,7 @@
 "LoginScene.Row.SavePassphraseAlert" = "Это пароль для нового Кошелька и Мессенджера. Сохраните его! Для входа в Кошелек не нужно логина, только этот пароль. Восстановление пароля невозможно.";
 
 /* Login: a small hint for a user, that he can tap on passphrase to save it */
-"LoginScene.Row.TapToSave" = "Нажмите чтобы сохранить";
+"LoginScene.Row.TapToSave" = "Нажмите, чтобы сохранить";
 
 /* Login: login with existing passphrase section */
 "LoginScene.Section.Login" = "Вход";
@@ -182,10 +188,10 @@
 "NewChatScene.Error.OwnAddress" = "Вам не нужен анонимный чат, чтобы говорить с самим собой";
 
 /* New chat: Remote server returned an error. Using %@ for error description */
-"NewChatScene.Error.RemoteServerFormat" = "Remote server error: %@. Report a bug";
+"NewChatScene.Error.RemoteServerFormat" = "Ошибка на узле блокчейна: %@. Сообщите об ошибке";
 
 /* New Chat: Notify user that scanned QR doesn't contains an address */
-"NewChatScene.Error.WrongQr" = "QR код не содержит адреса";
+"NewChatScene.Error.WrongQr" = "QR-код не содержит адреса";
 
 /* New chat: Scan QR with address button */
 "NewChatScene.ScanQr" = "Сканировать QR-код";
@@ -212,7 +218,7 @@
 "QrGeneratorScene.Error.InvalidPassphrase" = "Введите корректный пароль";
 
 /* QRGenerator: Bad Internal generator error message format. Using %@ for error description */
-"QrGeneratorScene.Error.InternalErrorFormat" = "Internal error: %@. Report a bug";
+"QrGeneratorScene.Error.InternalErrorFormat" = "Внутренняя ошибка: %@. Сообщите об ошибке";
 
 /* QRGenerator: Passphrase textview placeholder */
 "QrGeneratorScene.Passphrase.Placeholder" = "Пароль";
@@ -221,10 +227,10 @@
 "QrGeneratorScene.TapToSave" = "Нажмите для сохранения";
 
 /* QRGenerator: scene title */
-"QrGeneratorScene.Title" = "QR Генератор";
+"QrGeneratorScene.Title" = "Генератор QR";
 
 /* Config: turn off 'Stay Logged In' confirmation */
-"SettingsPage.DoNotStayLoggedIn" = "Выходить из системы при выходе из приложения";
+"SettingsPage.DoNotStayLoggedIn" = "Выходить из системы при закрытии приложения";
 
 /* Config: Authorization reason for turning biometry off */
 "SettingsPage.DoNotUseBiometry" = "Отключить вход с биометрией";
@@ -290,7 +296,7 @@
 "Shared.Share" = "Поделиться";
 
 /* ShareQR scene: User had not authorized access to write images to photolibrary */
-"ShareQR.photolibraryNotAuthorized" = "Для сохранения QR кодов необходимо разрешить доступ к Фото";
+"ShareQR.photolibraryNotAuthorized" = "Для сохранения QR-кодов необходимо разрешить доступ к Фото";
 
 /* Main tab bar: Account page */
 "Tabs.Account" = "Аккаунт";
