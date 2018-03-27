@@ -94,7 +94,7 @@ class AccountViewController: FormViewController {
 				return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
 				
 			case .invest:
-				return NSLocalizedString("AccountTab.Row.JoinIco", comment: "Account tab: 'Invest in ICO' button")
+				return NSLocalizedString("AccountTab.Row.JoinIco", comment: "Account tab: 'Join the ICO' button")
 				
 			case .logout:
 				return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
