@@ -9,8 +9,8 @@
 import UIKit
 
 extension String.adamantLocalized.chat {
-	static let sended = NSLocalizedString("ChatScene.Sended", comment: "Chat: 'Sended funds' bubble title")
-	static let tapForDetails = NSLocalizedString("ChatScene.tapForDetails", comment: "Chat: 'Sended funds' buble 'Tap for details' tip")
+	static let sent = NSLocalizedString("ChatScene.Sent", comment: "Chat: 'Sent funds' bubble title")
+	static let tapForDetails = NSLocalizedString("ChatScene.tapForDetails", comment: "Chat: 'Sent funds' buble 'Tap for details' tip")
 }
 
 class AdamantFormattingTools {
@@ -47,15 +47,15 @@ URL: \(url)
 			balance = AdamantUtilities.format(balance: Decimal(0.0))
 		}
 		
-		let sended = String.adamantLocalized.chat.sended
+		let sent = String.adamantLocalized.chat.sent
 		
-		let attributedString = NSMutableAttributedString(string: "\(sended)\n\(balance)\n\n\(String.adamantLocalized.chat.tapForDetails)")
+		let attributedString = NSMutableAttributedString(string: "\(sent)\n\(balance)\n\n\(String.adamantLocalized.chat.tapForDetails)")
 		
 		let rangeReference = attributedString.string as NSString
-		let sendedRange = rangeReference.range(of: sended)
+		let sentRange = rangeReference.range(of: sent)
 		let amountRange = rangeReference.range(of: balance)
 		
-		attributedString.setAttributes([.font: UIFont.adamantPrimary(size: 14)], range: sendedRange)
+		attributedString.setAttributes([.font: UIFont.adamantPrimary(size: 14)], range: sentRange)
 		attributedString.setAttributes([.font: UIFont.adamantPrimary(size: 28)], range: amountRange)
 		
 		return attributedString
