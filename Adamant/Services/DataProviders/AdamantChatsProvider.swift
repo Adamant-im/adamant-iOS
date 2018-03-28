@@ -617,50 +617,42 @@ extension AdamantChatsProvider {
 		}
 		
 		
-		// MARK: 5. Set newest transactions
-		do {
-			defer {
-				contextMutatingSemaphore.signal()
-			}
-			
-			contextMutatingSemaphore.wait()
-			
-			try privateContext.save()
-			
-			for chatroom in partners.keys.flatMap({$0.chatroom}) {
-				let request = NSFetchRequest<MessageTransaction>(entityName: MessageTransaction.entityName)
-				request.predicate = NSPredicate(format: "chatroom = %@", chatroom)
-				request.fetchLimit = 1
-				request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
-				
-				if let newest = (try? context.fetch(request))?.first {
-					if let last = chatroom.lastTransaction {
-						if (last.date! as Date).compare(newest.date! as Date) == .orderedAscending {
-							chatroom.lastTransaction = newest
-							chatroom.updatedAt = newest.date
-						}
-					} else {
-						chatroom.lastTransaction = newest
-						chatroom.updatedAt = newest.date
-					}
+		// MARK: 5. Dump new transactions
+		if privateContext.hasChanges {
+			do {
+				defer {
+					contextMutatingSemaphore.signal()
 				}
+				
+				contextMutatingSemaphore.wait()
+				
+				try privateContext.save()
+			} catch {
+				print(error)
 			}
-		} catch {
-			print(error)
 		}
 		
 		
-		// MARK: 6. Save!
-		do {
-			defer {
-				contextMutatingSemaphore.signal()
+		// MARK: 6. Save to main!
+		if context.hasChanges {
+			do {
+				defer {
+					contextMutatingSemaphore.signal()
+				}
+				
+				contextMutatingSemaphore.wait()
+				
+				try context.save()
+				
+				// MARK: 6. Update lastTransaction
+				let viewContextChatrooms = Set<Chatroom>(partners.keys.flatMap { $0.chatroom }).flatMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
+				
+				DispatchQueue.main.async {
+					viewContextChatrooms.forEach { $0.updateLastTransaction() }
+				}
+			} catch {
+				print(error)
 			}
-			
-			contextMutatingSemaphore.wait()
-			
-			try context.save()
-		} catch {
-			print(error)
 		}
 		
 		
