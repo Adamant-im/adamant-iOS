@@ -146,7 +146,6 @@ class ChatViewController: MessagesViewController {
 		messageInputBar.setStackViewItems([feeLabel, .flexibleSpace], forStack: .bottom, animated: false)
 		
 		messageInputBar.sendButton.configure {
-			
 			$0.layer.cornerRadius = size*2
 			$0.layer.borderWidth = 1
 			$0.layer.borderColor = bordersColor.cgColor
