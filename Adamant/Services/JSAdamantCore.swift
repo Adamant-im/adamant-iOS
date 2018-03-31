@@ -77,7 +77,7 @@ class JSAdamantCore : AdamantCore {
 				let consoleLog: @convention(block) (String) -> Void = { message in
 					print("JSCore: " + message)
 				}
-				context.setObject(unsafeBitCast(consoleLog, to: AnyObject.self), forKeyedSubscript: "_consoleLog" as (NSCopying & NSObjectProtocol)!)
+				context.setObject(unsafeBitCast(consoleLog, to: AnyObject.self), forKeyedSubscript: "_consoleLog" as (NSCopying & NSObjectProtocol))
 				
 				// MARK: 5. Integrate PRNG, because Webpacks strips out crypto libraries.
 				let crypto: @convention(block) (Int) -> JSValue = { count in

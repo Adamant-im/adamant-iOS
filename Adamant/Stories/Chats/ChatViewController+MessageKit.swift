@@ -8,6 +8,7 @@
 
 import Foundation
 import MessageKit
+import SafariServices
 
 // MARK: - MessagesDataSource
 extension ChatViewController: MessagesDataSource {
@@ -57,7 +58,7 @@ extension ChatViewController: MessagesDisplayDelegate {
 	}
 	
 	func enabledDetectors(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> [DetectorType] {
-		return []
+		return [.url]
 	}
 	
 	func cellBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
@@ -96,6 +97,12 @@ extension ChatViewController: MessageCellDelegate {
 		} else {
 			present(vc, animated: true, completion: nil)
 		}
+	}
+	
+	func didSelectURL(_ url: URL) {
+		let safari = SFSafariViewController(url: url)
+		safari.preferredControlTintColor = UIColor.adamantPrimary
+		present(safari, animated: true, completion: nil)
 	}
 }
 

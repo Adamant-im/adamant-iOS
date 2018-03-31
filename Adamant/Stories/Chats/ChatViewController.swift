@@ -146,7 +146,6 @@ class ChatViewController: MessagesViewController {
 		messageInputBar.setStackViewItems([feeLabel, .flexibleSpace], forStack: .bottom, animated: false)
 		
 		messageInputBar.sendButton.configure {
-			
 			$0.layer.cornerRadius = size*2
 			$0.layer.borderWidth = 1
 			$0.layer.borderColor = bordersColor.cgColor
@@ -264,14 +263,14 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 		for (type, change) in changes {
 			switch type {
 			case .insert:
-				let sections = IndexSet(change.flatMap({$0.newIndexPath?.row}))
+				let sections = IndexSet(change.compactMap {$0.newIndexPath?.row})
 				if sections.count > 0 {
 					messagesCollectionView.insertSections(sections)
 					messagesCollectionView.scrollToBottom(animated: true)
 				}
 				
 			case .delete:
-				let sections = IndexSet(change.flatMap({$0.indexPath?.row}))
+				let sections = IndexSet(change.compactMap {$0.indexPath?.row})
 				if sections.count > 0 {
 					messagesCollectionView.deleteSections(sections)
 				}

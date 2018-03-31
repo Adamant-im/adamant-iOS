@@ -378,7 +378,8 @@ extension AdamantChatsProvider {
 extension AdamantChatsProvider {
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom> {
 		let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
-		request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false)]
+		request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false),
+								   NSSortDescriptor(key: "height", ascending: false)]
 		request.predicate = NSPredicate(format: "partner!=nil")
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 		
@@ -392,7 +393,8 @@ extension AdamantChatsProvider {
 		
 		let request: NSFetchRequest<ChatTransaction> = NSFetchRequest(entityName: "ChatTransaction")
 		request.predicate = NSPredicate(format: "chatroom = %@", chatroom)
-		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true),
+								   NSSortDescriptor(key: "height", ascending: true)]
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
 		
 		return controller
@@ -401,7 +403,8 @@ extension AdamantChatsProvider {
 	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction> {
 		let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
 		request.predicate = NSPredicate(format: "isUnread == true")
-		request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false)]
+		request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
+								   NSSortDescriptor(key: "height", ascending: false)]
 		
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: "chatroom.partner.address", cacheName: nil)
 		
@@ -511,7 +514,7 @@ extension AdamantChatsProvider {
 		
 		// MARK: 2.5 Get accounts, that we did not found.
 		if partners.count != grouppedTransactions.keys.count {
-			let foundedKeys = partners.keys.flatMap({$0.address})
+			let foundedKeys = partners.keys.compactMap {$0.address}
 			let notFound = Set<String>(grouppedTransactions.keys).subtracting(foundedKeys)
 			var ids = [NSManagedObjectID]()
 			let semaphore = DispatchSemaphore(value: 1)
@@ -544,7 +547,7 @@ extension AdamantChatsProvider {
 		
 		if partners.count != grouppedTransactions.keys.count {
 			// TODO: Log this strange thing
-			print("Failed to get all accounts: Needed keys:\n\(grouppedTransactions.keys.joined(separator: "\n"))\nFounded Addresses: \(partners.keys.flatMap({$0.address}).joined(separator: "\n"))")
+			print("Failed to get all accounts: Needed keys:\n\(grouppedTransactions.keys.joined(separator: "\n"))\nFounded Addresses: \(partners.keys.compactMap { $0.address }.joined(separator: "\n"))")
 		}
 		
 		
@@ -617,50 +620,42 @@ extension AdamantChatsProvider {
 		}
 		
 		
-		// MARK: 5. Set newest transactions
-		do {
-			defer {
-				contextMutatingSemaphore.signal()
-			}
-			
-			contextMutatingSemaphore.wait()
-			
-			try privateContext.save()
-			
-			for chatroom in partners.keys.flatMap({$0.chatroom}) {
-				let request = NSFetchRequest<MessageTransaction>(entityName: MessageTransaction.entityName)
-				request.predicate = NSPredicate(format: "chatroom = %@", chatroom)
-				request.fetchLimit = 1
-				request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
-				
-				if let newest = (try? context.fetch(request))?.first {
-					if let last = chatroom.lastTransaction {
-						if (last.date! as Date).compare(newest.date! as Date) == .orderedAscending {
-							chatroom.lastTransaction = newest
-							chatroom.updatedAt = newest.date
-						}
-					} else {
-						chatroom.lastTransaction = newest
-						chatroom.updatedAt = newest.date
-					}
+		// MARK: 5. Dump new transactions
+		if privateContext.hasChanges {
+			do {
+				defer {
+					contextMutatingSemaphore.signal()
 				}
+				
+				contextMutatingSemaphore.wait()
+				
+				try privateContext.save()
+			} catch {
+				print(error)
 			}
-		} catch {
-			print(error)
 		}
 		
 		
-		// MARK: 6. Save!
-		do {
-			defer {
-				contextMutatingSemaphore.signal()
+		// MARK: 6. Save to main!
+		if context.hasChanges {
+			do {
+				defer {
+					contextMutatingSemaphore.signal()
+				}
+				
+				contextMutatingSemaphore.wait()
+				
+				try context.save()
+				
+				// MARK: 6. Update lastTransaction
+				let viewContextChatrooms = Set<Chatroom>(partners.keys.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
+				
+				DispatchQueue.main.async {
+					viewContextChatrooms.forEach { $0.updateLastTransaction() }
+				}
+			} catch {
+				print(error)
 			}
-			
-			contextMutatingSemaphore.wait()
-			
-			try context.save()
-		} catch {
-			print(error)
 		}
 		
 		

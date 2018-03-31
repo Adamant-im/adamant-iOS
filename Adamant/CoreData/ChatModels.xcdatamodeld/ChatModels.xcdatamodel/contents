@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="13772" systemVersion="17D102" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14133" systemVersion="17E199" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="BaseTransaction" representedClassName="BaseTransaction" isAbstract="YES" syncable="YES">
         <attribute name="amount" optional="YES" attributeType="Decimal" defaultValueString="0" syncable="YES"/>
         <attribute name="blockId" attributeType="String" syncable="YES"/>
@@ -15,6 +15,7 @@
     </entity>
     <entity name="Chatroom" representedClassName="Chatroom" syncable="YES">
         <attribute name="hasUnreadMessages" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <relationship name="lastTransaction" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ChatTransaction" inverseName="lastIn" inverseEntity="ChatTransaction" syncable="YES"/>
         <relationship name="partner" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CoreDataAccount" inverseName="chatroom" inverseEntity="CoreDataAccount" syncable="YES"/>
@@ -43,10 +44,10 @@
     </entity>
     <elements>
         <element name="BaseTransaction" positionX="378" positionY="18" width="128" height="210"/>
-        <element name="Chatroom" positionX="-74" positionY="26" width="128" height="118"/>
-        <element name="MessageTransaction" positionX="243" positionY="326" width="128" height="73"/>
-        <element name="CoreDataAccount" positionX="-236" positionY="174" width="128" height="148"/>
-        <element name="TransferTransaction" positionX="97" positionY="342" width="128" height="58"/>
+        <element name="Chatroom" positionX="-74" positionY="26" width="128" height="135"/>
         <element name="ChatTransaction" positionX="142" positionY="137" width="128" height="88"/>
+        <element name="CoreDataAccount" positionX="-236" positionY="174" width="128" height="148"/>
+        <element name="MessageTransaction" positionX="243" positionY="326" width="128" height="73"/>
+        <element name="TransferTransaction" positionX="97" positionY="342" width="128" height="58"/>
     </elements>
 </model>

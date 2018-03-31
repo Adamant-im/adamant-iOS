@@ -185,9 +185,12 @@ class NewChatViewController: FormViewController {
 			switch result {
 			case .success(let account):
 				DispatchQueue.main.async {
-					if account.name == nil {
+					if let name = name, account.name == nil {
 						account.name = name
-						try? account.managedObjectContext?.save()
+						
+						if let chatroom = account.chatroom, chatroom.title == nil {
+							account.chatroom?.title = name
+						}
 					}
 					
 					self.delegate?.newChatController(self, didSelectAccount: account)
@@ -310,7 +313,9 @@ extension NewChatViewController: QRCodeReaderViewControllerDelegate {
 			return
 		}
 		
-		if !startNewChat(with: uri) {
+		if startNewChat(with: uri) {
+			dismiss(animated: true, completion: nil)
+		} else {
 			dialogService.showError(withMessage: String.adamantLocalized.newChat.wrongQrError)
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
 				reader.startScanning()

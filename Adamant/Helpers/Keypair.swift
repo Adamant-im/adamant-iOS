@@ -11,8 +11,4 @@ import Foundation
 struct Keypair: Equatable {
 	let publicKey: String
 	let privateKey: String
-	
-	static func ==(lhs: Keypair, rhs: Keypair) -> Bool {
-		return lhs.publicKey == rhs.publicKey && lhs.privateKey == rhs.privateKey
-	}
 }

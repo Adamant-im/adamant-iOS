@@ -327,23 +327,8 @@ extension AdamantTransfersProvider {
 			transfers.append(transfer)
 		}
 		
-		// MARK: 4. Last in
-		for (chatroom, trs) in Dictionary(grouping: transfers, by: { $0.chatroom! }) {
-			if let newest = trs.sorted(by: { $0.date!.timeIntervalSinceNow > $1.date!.timeIntervalSinceNow }).last {
-				if let last = chatroom.lastTransaction {
-					if (last.date! as Date).compare(newest.date! as Date) == .orderedAscending {
-						chatroom.lastTransaction = newest
-						chatroom.updatedAt = newest.date
-					}
-				} else {
-					chatroom.lastTransaction = newest
-					chatroom.updatedAt = newest.date
-				}
-			}
-		}
 		
-		
-		// MARK: 5. Check lastHeight
+		// MARK: 4. Check lastHeight
 		// API returns transactions from lastHeight INCLUDING transaction with height == lastHeight, so +1
 		if height > 0 {
 			let uH = Int64(height + 1)
@@ -357,7 +342,7 @@ extension AdamantTransfersProvider {
 			}
 		}
 		
-		// MARK: 6. Unread transactions
+		// MARK: 5. Unread transactions
 		if let unreadedHeight = readedLastHeight {
 			transfers.filter({$0.height > unreadedHeight}).forEach({$0.isUnread = true})
 			
@@ -372,10 +357,17 @@ extension AdamantTransfersProvider {
 			securedStore.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
 		}
 		
-		// MARK: 7. Dump transactions to viewContext
+		// MARK: 6. Dump transactions to viewContext
 		if context.hasChanges {
 			do {
 				try context.save()
+				
+				// MARK: 7. Update lastTransactions
+				let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
+				DispatchQueue.main.async {
+					viewContextChatrooms.forEach { $0.updateLastTransaction() }
+				}
+				
 				completion(.success(new: transfers.count))
 			} catch {
 				completion(.error(error))

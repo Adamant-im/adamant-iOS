@@ -106,10 +106,10 @@
 /* Chat: Send message button */
 "ChatScene.Send" = "Отправить";
 
-/* Chat: 'Sended funds' bubble title */
-"ChatScene.Sended" = "Отправлено";
+/* Chat: 'Sent funds' bubble title */
+"ChatScene.Sent" = "Отправлено";
 
-/* Chat: 'Sended funds' buble 'Tap for details' tip */
+/* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Подробнее…";
 
 /* Known contacts: Adamant ICO message */
