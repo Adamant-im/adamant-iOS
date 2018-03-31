@@ -363,7 +363,7 @@ extension AdamantTransfersProvider {
 				try context.save()
 				
 				// MARK: 7. Update lastTransactions
-				let viewContextChatrooms = Set<Chatroom>(transfers.flatMap { $0.chatroom }).flatMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
+				let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
 				DispatchQueue.main.async {
 					viewContextChatrooms.forEach { $0.updateLastTransaction() }
 				}

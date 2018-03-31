@@ -11,12 +11,12 @@ PODS:
   - FTIndicator/FTProgressIndicator (1.2.6)
   - FTIndicator/FTToastIndicator (1.2.6)
   - KeychainAccess (3.1.0)
-  - MessageKit (0.13.1)
-  - MyLittlePinpad (0.2.2)
+  - MessageKit (0.13.2)
+  - MyLittlePinpad (0.2.3)
   - QRCodeReader.swift (8.1.1)
   - ReachabilitySwift (4.1.0)
   - RNCryptor (5.0.2)
-  - Swinject (2.2.0)
+  - Swinject (2.3.0)
 
 DEPENDENCIES:
   - Alamofire
@@ -39,12 +39,12 @@ SPEC CHECKSUMS:
   FreakingSimpleRoundImageView: e87b0ef24c9b95b74b1c2cab5b03832dbabd4873
   FTIndicator: d2a7c204341b7b0165b6dbeb5bf6979c6d7d4bb7
   KeychainAccess: 94c5540b32eabf7bc32bfb976a268e8ea05fd6da
-  MessageKit: fc74d71d9b05385138d47b3a4b7beef5c687daf1
-  MyLittlePinpad: 8b24927da4c1c8daa64ab1b9f142a8329f480745
+  MessageKit: 274efb4454ddc9b3408b031b3396498dd4ed2462
+  MyLittlePinpad: 4ead0ea2da9957bb37d961b39743c1dfc8431efa
   QRCodeReader.swift: b164a681887de276d405ff02bce854d82cd6360b
   ReachabilitySwift: 6849231cd4e06559f3b9ef4a97a0a0f96d41e09f
   RNCryptor: 59b9f92e9fa8a1af74c32dc6b1af5e30ff5e1b64
-  Swinject: 4ca48bca7de5f398229a26abe1ac902b9f3ee541
+  Swinject: 6e29897396bab81fe4aa40c5ca92ba996136334b
 
 PODFILE CHECKSUM: d73e1c940db551ee6dfc242c1b5307dc8ed560be
 

@@ -511,7 +511,7 @@ extension AdamantChatsProvider {
 		
 		// MARK: 2.5 Get accounts, that we did not found.
 		if partners.count != grouppedTransactions.keys.count {
-			let foundedKeys = partners.keys.flatMap({$0.address})
+			let foundedKeys = partners.keys.compactMap {$0.address}
 			let notFound = Set<String>(grouppedTransactions.keys).subtracting(foundedKeys)
 			var ids = [NSManagedObjectID]()
 			let semaphore = DispatchSemaphore(value: 1)
@@ -544,7 +544,7 @@ extension AdamantChatsProvider {
 		
 		if partners.count != grouppedTransactions.keys.count {
 			// TODO: Log this strange thing
-			print("Failed to get all accounts: Needed keys:\n\(grouppedTransactions.keys.joined(separator: "\n"))\nFounded Addresses: \(partners.keys.flatMap({$0.address}).joined(separator: "\n"))")
+			print("Failed to get all accounts: Needed keys:\n\(grouppedTransactions.keys.joined(separator: "\n"))\nFounded Addresses: \(partners.keys.compactMap { $0.address }.joined(separator: "\n"))")
 		}
 		
 		
@@ -645,7 +645,7 @@ extension AdamantChatsProvider {
 				try context.save()
 				
 				// MARK: 6. Update lastTransaction
-				let viewContextChatrooms = Set<Chatroom>(partners.keys.flatMap { $0.chatroom }).flatMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
+				let viewContextChatrooms = Set<Chatroom>(partners.keys.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
 				
 				DispatchQueue.main.async {
 					viewContextChatrooms.forEach { $0.updateLastTransaction() }

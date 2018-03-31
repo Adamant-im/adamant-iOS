@@ -15,7 +15,7 @@ extension String.adamantLocalized.chat {
 
 class AdamantFormattingTools {
 	static func summaryFor(transaction: BaseTransaction, url: URL) -> String {
-		return summaryFor(id: transaction.blockId!, sender: transaction.senderId!, recipient: transaction.recipientId!, date: transaction.date as Date!, amount: transaction.amount as Decimal!, fee: transaction.fee as Decimal!, confirmations: transaction.confirmations, blockId: transaction.blockId!, url: url)
+		return summaryFor(id: transaction.blockId!, sender: transaction.senderId!, recipient: transaction.recipientId!, date: transaction.date! as Date, amount: transaction.amount! as Decimal, fee: transaction.fee! as Decimal, confirmations: transaction.confirmations, blockId: transaction.blockId!, url: url)
 	}
 	
 	static func summaryFor(transaction: Transaction, url: URL) -> String {

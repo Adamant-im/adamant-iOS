@@ -119,6 +119,6 @@ extension AdamantUtilities {
 	
 	static func getBytes(from hex: String) -> [UInt8] {
 		let hexa = Array(hex)
-		return stride(from: 0, to: hex.count, by: 2).flatMap { UInt8(String(hexa[$0..<$0.advanced(by: 2)]), radix: 16) }
+		return stride(from: 0, to: hex.count, by: 2).compactMap { UInt8(String(hexa[$0..<$0.advanced(by: 2)]), radix: 16) }
 	}
 }

@@ -18,16 +18,6 @@ struct SharedCell: Equatable, Hashable {
 		self.defaultXibName = xibName
 		self.defaultRowHeight = rowHeight
 	}
-	
-	static func ==(lhs: SharedCell, rhs: SharedCell) -> Bool {
-		return lhs.cellIdentifier == rhs.cellIdentifier &&
-			lhs.defaultXibName == rhs.defaultXibName &&
-			lhs.defaultRowHeight == rhs.defaultRowHeight
-	}
-	
-	var hashValue: Int {
-		return cellIdentifier.hashValue ^ defaultXibName.hashValue ^ defaultRowHeight.hashValue &* 717171
-	}
 }
 
 

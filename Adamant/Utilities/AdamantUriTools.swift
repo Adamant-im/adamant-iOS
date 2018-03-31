@@ -86,7 +86,7 @@ class AdamantUriTools {
 		if addressAndParams.count > 1 {
 			var p = [AdamantAddressParam]()
 			
-			for param in addressAndParams[1].split(separator: "&").flatMap({AdamantAddressParam(raw: String($0))}) {
+			for param in addressAndParams[1].split(separator: "&").compactMap({ AdamantAddressParam(raw: String($0)) }) {
 				p.append(param)
 			}
 			
