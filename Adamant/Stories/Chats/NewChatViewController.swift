@@ -185,9 +185,8 @@ class NewChatViewController: FormViewController {
 			switch result {
 			case .success(let account):
 				DispatchQueue.main.async {
-					if account.name == nil {
+					if let name = name, account.name == nil {
 						account.name = name
-						try? account.managedObjectContext?.save()
 					}
 					
 					self.delegate?.newChatController(self, didSelectAccount: account)
