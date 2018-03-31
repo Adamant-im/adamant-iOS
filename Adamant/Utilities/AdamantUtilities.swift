@@ -26,7 +26,6 @@ class AdamantUtilities {
 
 // MARK: - Currency
 extension AdamantUtilities {
-	static let currencyShift: Double = 0.00_000_001
 	static let currencyExponent: Int = -8
 	static let currencyCode = "ADM"
 	

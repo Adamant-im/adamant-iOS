@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct AdamantError: Error {
+struct AdamantError: Error, CustomStringConvertible {
 	public let message: String
 	public let internalError: Error?
 	
@@ -16,11 +16,9 @@ struct AdamantError: Error {
 		self.message = message
 		self.internalError = error
 	}
-}
-
-extension AdamantError: CustomStringConvertible {
+	
+	// MARK: CustomStringConvertible
 	public var description: String {
 		return message
 	}
 }
-
