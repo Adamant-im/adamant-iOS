@@ -187,6 +187,10 @@ class NewChatViewController: FormViewController {
 				DispatchQueue.main.async {
 					if let name = name, account.name == nil {
 						account.name = name
+						
+						if let chatroom = account.chatroom, chatroom.title == nil {
+							account.chatroom?.title = name
+						}
 					}
 					
 					self.delegate?.newChatController(self, didSelectAccount: account)

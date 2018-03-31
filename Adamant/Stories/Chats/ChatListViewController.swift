@@ -184,7 +184,9 @@ extension ChatListViewController {
 	
 	private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
 		if let partner = chatroom.partner {
-			if let name = partner.name {
+			if let title = chatroom.title {
+				cell.accountLabel.text = title
+			} else if let name = partner.name {
 				cell.accountLabel.text = name
 			} else {
 				cell.accountLabel.text = partner.address
@@ -198,6 +200,8 @@ extension ChatListViewController {
 				cell.avatarImage = nil
 				cell.borderWidth = 0
 			}
+		} else if let title = chatroom.title {
+			cell.accountLabel.text = title
 		}
 		
 		cell.hasUnreadMessages = chatroom.hasUnreadMessages
