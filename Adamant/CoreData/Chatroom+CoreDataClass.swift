@@ -42,7 +42,26 @@ public class Chatroom: NSManagedObject {
 		}
 		
 		if let transactions = transactions as? Set<ChatTransaction> {
-			if let newest = transactions.sorted(by: { $0.date!.timeIntervalSinceNow > $1.date!.timeIntervalSinceNow }).first {
+			if let newest = transactions.sorted(by: { (lhs: ChatTransaction, rhs: ChatTransaction) in
+				guard let l = lhs.date as Date? else {
+					return true
+				}
+				
+				guard let r = rhs.date as Date? else {
+					return false
+				}
+				
+				switch l.compare(r) {
+				case .orderedAscending:
+					return true
+					
+				case .orderedDescending:
+					return false
+					
+				case .orderedSame:
+					return lhs.height < rhs.height
+				}
+			}).last {
 				if newest != lastTransaction {
 					lastTransaction = newest
 					updatedAt = newest.date
