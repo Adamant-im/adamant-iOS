@@ -12,6 +12,7 @@ import CoreData
 extension String.adamantLocalized {
 	struct chatList {
 		static let title = NSLocalizedString("ChatListPage.Title", comment: "ChatList: scene title")
+		static let sentMessagePrefix = NSLocalizedString("ChatListPage.SentMessageFormat", comment: "ChatList: outgoing message preview format, like 'You: %@'")
 		
 		private init() {}
 	}
@@ -208,12 +209,29 @@ extension ChatListViewController {
 		
 		switch chatroom.lastTransaction {
 		case let message as MessageTransaction:
-			cell.lastMessageLabel.text = message.message
+			guard let text = message.message else {
+				cell.lastMessageLabel.text = nil
+				break
+			}
+			
+			if message.isOutgoing {
+				cell.lastMessageLabel.text = String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, text)
+			} else {
+				cell.lastMessageLabel.text = text
+			}
 			
 		case let transfer as TransferTransaction:
 			if let balance = transfer.amount {
-				let prefix = transfer.isOutgoing ? "⬅️" : "➡️"
-				cell.lastMessageLabel.text = "\(prefix)  \(AdamantUtilities.format(balance: balance))"
+				let text: String
+				if transfer.isOutgoing {
+					text = String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(AdamantUtilities.format(balance: balance))")
+				} else {
+					text = "➡️  \(AdamantUtilities.format(balance: balance))"
+				}
+				
+				cell.lastMessageLabel.text = text
+			} else {
+				cell.lastMessageLabel.text = nil
 			}
 			
 		default:

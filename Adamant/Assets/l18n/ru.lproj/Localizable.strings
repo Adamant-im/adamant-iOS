@@ -79,6 +79,9 @@
 /* Unknown internal error */
 "ApiService.InternalError.UnknownError" = "Неизвестная ошибка";
 
+/* ChatList: outgoing message preview format, like 'You: %@' */
+"ChatListPage.SentMessageFormat" = "Вы: %@";
+
 /* ChatList: scene title */
 "ChatListPage.Title" = "Чаты";
 
