@@ -79,6 +79,9 @@
 /* Unknown internal error */
 "ApiService.InternalError.UnknownError" = "Unknown error. Report a bug";
 
+/* ChatList: outgoing message preview format, like 'You: %@' */
+"ChatListPage.SentMessageFormat" = "You: %@";
+
 /* ChatList: scene title */
 "ChatListPage.Title" = "Chats";
 
