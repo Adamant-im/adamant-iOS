@@ -28,6 +28,8 @@
 	<string>Saving generated QR codes with passphrases and addresses</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Reading QR codes with passphrases and addresses</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Sign In into your ADAMANT with Face ID</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Exo+2_100_normal.ttf</string>
