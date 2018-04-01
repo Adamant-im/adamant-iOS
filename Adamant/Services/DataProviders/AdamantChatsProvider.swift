@@ -379,7 +379,7 @@ extension AdamantChatsProvider {
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom> {
 		let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
 		request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false),
-								   NSSortDescriptor(key: "height", ascending: false)]
+								   NSSortDescriptor(key: "transactionId", ascending: false)]
 		request.predicate = NSPredicate(format: "partner!=nil")
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 		
@@ -394,7 +394,7 @@ extension AdamantChatsProvider {
 		let request: NSFetchRequest<ChatTransaction> = NSFetchRequest(entityName: "ChatTransaction")
 		request.predicate = NSPredicate(format: "chatroom = %@", chatroom)
 		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true),
-								   NSSortDescriptor(key: "height", ascending: true)]
+								   NSSortDescriptor(key: "transactionId", ascending: true)]
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
 		
 		return controller
@@ -404,7 +404,7 @@ extension AdamantChatsProvider {
 		let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
 		request.predicate = NSPredicate(format: "isUnread == true")
 		request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
-								   NSSortDescriptor(key: "height", ascending: false)]
+								   NSSortDescriptor(key: "transactionId", ascending: false)]
 		
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: "chatroom.partner.address", cacheName: nil)
 		

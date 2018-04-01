@@ -58,8 +58,17 @@ public class Chatroom: NSManagedObject {
 				case .orderedDescending:
 					return false
 					
+				/// Rare case of identical date, compare IDs
 				case .orderedSame:
-					return lhs.height < rhs.height
+					guard let lid = lhs.transactionId else {
+						return true
+					}
+					
+					guard let hid = rhs.transactionId else {
+						return false
+					}
+					
+					return lid < hid
 				}
 			}).last {
 				if newest != lastTransaction {
