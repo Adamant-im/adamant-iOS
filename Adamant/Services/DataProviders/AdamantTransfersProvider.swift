@@ -65,6 +65,7 @@ class AdamantTransfersProvider: TransfersProvider {
 				store.remove(StoreKey.transfersProvider.address)
 				store.remove(StoreKey.transfersProvider.receivedLastHeight)
 				store.remove(StoreKey.transfersProvider.readedLastHeight)
+				self?.dropStateData()
 				return
 			}
 			
@@ -73,9 +74,10 @@ class AdamantTransfersProvider: TransfersProvider {
 					self?.readedLastHeight = h
 				}
 			} else {
-				store.remove(StoreKey.transfersProvider.address)
 				store.remove(StoreKey.transfersProvider.receivedLastHeight)
 				store.remove(StoreKey.transfersProvider.readedLastHeight)
+				self?.dropStateData()
+				store.set(loggedAddress, for: StoreKey.transfersProvider.address)
 			}
 			
 			self?.update()
@@ -94,6 +96,9 @@ class AdamantTransfersProvider: TransfersProvider {
 				store.remove(StoreKey.transfersProvider.receivedLastHeight)
 				store.remove(StoreKey.transfersProvider.readedLastHeight)
 			}
+			
+			// BackgroundFetch
+			self?.dropStateData()
 		}
 	}
 	

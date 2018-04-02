@@ -42,6 +42,7 @@ class AdamantChatsProvider: ChatsProvider {
 				store.remove(StoreKey.chatProvider.address)
 				store.remove(StoreKey.chatProvider.receivedLastHeight)
 				store.remove(StoreKey.chatProvider.readedLastHeight)
+				self?.dropStateData()
 				return
 			}
 			
@@ -52,6 +53,7 @@ class AdamantChatsProvider: ChatsProvider {
 			} else {
 				store.remove(StoreKey.chatProvider.receivedLastHeight)
 				store.remove(StoreKey.chatProvider.readedLastHeight)
+				self?.dropStateData()
 				store.set(loggedAddress, for: StoreKey.chatProvider.address)
 			}
 			
@@ -70,6 +72,9 @@ class AdamantChatsProvider: ChatsProvider {
 				store.remove(StoreKey.chatProvider.receivedLastHeight)
 				store.remove(StoreKey.chatProvider.readedLastHeight)
 			}
+			
+			// BackgroundFetch
+			self?.dropStateData()
 		}
 	}
 	
