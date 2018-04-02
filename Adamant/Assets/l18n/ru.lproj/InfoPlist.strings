@@ -11,5 +11,5 @@
 "NSPhotoLibraryAddUsageDescription" = "Сохранение созданных QR-кодов";
 
 /* ReadWrite access to photolibrary reason */
-"NSPhotoLibraryUsageDescription" = "Сканирование QR-кодов с адресами и паролями со сделанных ранее фотографий";
+"NSPhotoLibraryUsageDescription" = "Сканирование QR-кодов с адресами и паролями со сделанных ранее изображений";
 
