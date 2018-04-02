@@ -195,6 +195,8 @@ extension AppDelegate {
 				return
 		}
 		
+		notificationsService.startBackgroundBatchNotifications()
+		
 		let services: [BackgroundFetchService] = [
 			container.resolve(ChatsProvider.self) as! BackgroundFetchService,
 			container.resolve(TransfersProvider.self) as! BackgroundFetchService
@@ -217,23 +219,25 @@ extension AppDelegate {
 			}
 		}
 		
-		group.wait()
-		
-		for result in results {
-			switch result {
-			case .newData:
-				completionHandler(.newData)
-				return
-				
-			case .noData:
-				break
-				
-			case .failed:
-				completionHandler(.failed)
-				return
+		group.notify(queue: DispatchQueue.global(qos: .utility)) {
+			notificationsService.stopBackgroundBatchNotifications()
+			
+			for result in results {
+				switch result {
+				case .newData:
+					completionHandler(.newData)
+					return
+					
+				case .noData:
+					break
+					
+				case .failed:
+					completionHandler(.failed)
+					return
+				}
 			}
+			
+			completionHandler(.noData)
 		}
-		
-		completionHandler(.noData)
 	}
 }

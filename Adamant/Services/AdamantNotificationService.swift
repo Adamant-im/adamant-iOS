@@ -39,8 +39,11 @@ class AdamantNotificationsService: NotificationsService {
 	
 	
 	// MARK: Properties
-	private(set) var notificationsEnabled: Bool = false
+	private(set) var notificationsEnabled = false
+	private(set) var customBadgeNumber = 0
 	
+	private var isBackgroundSession = false
+	private var backgroundNotifications = 0
 	
 	// MARK: Lifecycle
 	init() {
@@ -105,7 +108,20 @@ class AdamantNotificationsService: NotificationsService {
 		content.title = title
 		content.body = body
 		content.sound = UNNotificationSound(named: "notification.mp3")
-		content.badge = type.badge
+		
+		if let number = type.badge {
+			if Thread.isMainThread {
+				content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + backgroundNotifications + number)
+			} else {
+				DispatchQueue.main.sync {
+					content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + backgroundNotifications + number)
+				}
+			}
+			
+			if isBackgroundSession {
+				backgroundNotifications += number
+			}
+		}
 		
 		let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
 		let request = UNNotificationRequest(identifier: type.identifier, content: content, trigger: trigger)
@@ -117,12 +133,38 @@ class AdamantNotificationsService: NotificationsService {
 		}
 	}
 	
+	func setBadge(number: Int?) {
+		if let number = number {
+			customBadgeNumber = number
+			UIApplication.shared.applicationIconBadgeNumber = number
+			securedStore.set(String(number), for: StoreKey.notificationsService.customBadgeNumber)
+		} else {
+			customBadgeNumber = 0
+			UIApplication.shared.applicationIconBadgeNumber = 0
+			securedStore.remove(StoreKey.notificationsService.customBadgeNumber)
+		}
+	}
+	
 	func removeAllPendingNotificationRequests() {
 		UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+		UIApplication.shared.applicationIconBadgeNumber = customBadgeNumber
 	}
 	
 	func removeAllDeliveredNotifications() {
 		UNUserNotificationCenter.current().removeAllDeliveredNotifications()
-		UIApplication.shared.applicationIconBadgeNumber = 0
+		UIApplication.shared.applicationIconBadgeNumber = customBadgeNumber
+	}
+}
+
+// MARK: Background batch notifications
+extension AdamantNotificationsService {
+	func startBackgroundBatchNotifications() {
+		isBackgroundSession = true
+		backgroundNotifications = 0
+	}
+	
+	func stopBackgroundBatchNotifications() {
+		isBackgroundSession = false
+		backgroundNotifications = 0
 	}
 }

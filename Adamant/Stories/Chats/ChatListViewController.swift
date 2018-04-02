@@ -26,6 +26,7 @@ class ChatListViewController: UIViewController {
 	var accountService: AccountService!
 	var chatsProvider: ChatsProvider!
 	var router: Router!
+	var notificationsService: NotificationsService!
 	
 	// MARK: IBOutlet
 	@IBOutlet weak var tableView: UITableView!
@@ -376,8 +377,10 @@ extension ChatListViewController {
 		
 		if let value = value, value > 0 {
 			item.badgeValue = String(value)
+			notificationsService.setBadge(number: value)
 		} else {
 			item.badgeValue = nil
+			notificationsService.setBadge(number: nil)
 		}
 	}
 	

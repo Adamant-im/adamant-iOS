@@ -42,16 +42,18 @@ class AdamantChatsProvider: ChatsProvider {
 				store.remove(StoreKey.chatProvider.address)
 				store.remove(StoreKey.chatProvider.receivedLastHeight)
 				store.remove(StoreKey.chatProvider.readedLastHeight)
+				self?.dropStateData()
 				return
 			}
 			
-			if let savedAddress = self?.securedStore.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
+			if let savedAddress = store.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
 				if let raw = store.get(StoreKey.chatProvider.readedLastHeight), let h = Int64(raw) {
 					self?.readedLastHeight = h
 				}
 			} else {
 				store.remove(StoreKey.chatProvider.receivedLastHeight)
 				store.remove(StoreKey.chatProvider.readedLastHeight)
+				self?.dropStateData()
 				store.set(loggedAddress, for: StoreKey.chatProvider.address)
 			}
 			
@@ -70,6 +72,9 @@ class AdamantChatsProvider: ChatsProvider {
 				store.remove(StoreKey.chatProvider.receivedLastHeight)
 				store.remove(StoreKey.chatProvider.readedLastHeight)
 			}
+			
+			// BackgroundFetch
+			self?.dropStateData()
 		}
 	}
 	
@@ -612,10 +617,12 @@ extension AdamantChatsProvider {
 		
 		// MARK: 4. Unread messagess
 		if let readedLastHeight = readedLastHeight {
-			let msgs = Dictionary(grouping: newMessageTransactions.filter({$0.height > readedLastHeight}), by: ({ (t: MessageTransaction) -> Chatroom in t.chatroom!}))
-			for (chatroom, trs) in msgs {
+			let unreadTransactions = newMessageTransactions.filter { $0.height > readedLastHeight }
+			let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: MessageTransaction) -> Chatroom in t.chatroom! }))
+			
+			for (chatroom, trs) in chatrooms {
 				chatroom.hasUnreadMessages = true
-				trs.forEach({$0.isUnread = true})
+				trs.forEach { $0.isUnread = true }
 			}
 		}
 		
