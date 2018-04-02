@@ -57,13 +57,28 @@ class AdamantTransfersProvider: TransfersProvider {
 	// MARK: Lifecycle
 	init() {
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { [weak self] notification in
-			self?.update()
-			
-			if let address = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String {
-				self?.securedStore.set(address, for: StoreKey.transfersProvider.address)
-			} else {
-				print("Can't get logged address")
+			guard let store = self?.securedStore else {
+				return
 			}
+			
+			guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
+				store.remove(StoreKey.transfersProvider.address)
+				store.remove(StoreKey.transfersProvider.receivedLastHeight)
+				store.remove(StoreKey.transfersProvider.readedLastHeight)
+				return
+			}
+			
+			if let savedAddress = store.get(StoreKey.transfersProvider.address), savedAddress == loggedAddress {
+				if let raw = store.get(StoreKey.transfersProvider.readedLastHeight), let h = Int64(raw) {
+					self?.readedLastHeight = h
+				}
+			} else {
+				store.remove(StoreKey.transfersProvider.address)
+				store.remove(StoreKey.transfersProvider.receivedLastHeight)
+				store.remove(StoreKey.transfersProvider.readedLastHeight)
+			}
+			
+			self?.update()
 		}
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
@@ -121,19 +136,25 @@ extension AdamantTransfersProvider {
 				}
 				
 				self.processingQueue.async {
-					self.processRawTransactions(transactions, currentAddress: address) { result in
+					self.processRawTransactions(transactions, currentAddress: address) { [weak self] result in
 						switch result {
 						case .success(let total):
-							self.setState(.upToDate, previous: prevState)
+							self?.setState(.upToDate, previous: prevState)
 							if total > 0 {
-								self.postNotification(.adamantTransfersServiceNewTransactions, userInfo: [AdamantUserInfoKey.TransfersProvider.newTransactions: total])
+								self?.postNotification(.adamantTransfersServiceNewTransactions, userInfo: [AdamantUserInfoKey.TransfersProvider.newTransactions: total])
+							}
+							
+							if let h = self?.receivedLastHeight {
+								self?.readedLastHeight = h
+							} else {
+								self?.readedLastHeight = 0
 							}
 							
 						case .error(let error):
-							self.setState(.failedToUpdate(error), previous: prevState)
+							self?.setState(.failedToUpdate(error), previous: prevState)
 							
 						case .accountNotFound(let key):
-							self.setState(.failedToUpdate(TransfersProviderError.accountNotFound(key)), previous: prevState)
+							self?.setState(.failedToUpdate(TransfersProviderError.accountNotFound(key)), previous: prevState)
 						}
 					}
 				}
@@ -347,6 +368,14 @@ extension AdamantTransfersProvider {
 		
 		// MARK: 5. Unread transactions
 		if let unreadedHeight = readedLastHeight {
+			let unreadTransactions = transfers.filter { $0.height > unreadedHeight }
+			let chatrooms = Dictionary.init(grouping: unreadTransactions, by: ({ (t: TransferTransaction) -> Chatroom in t.chatroom!}))
+			
+			for (chatroom, trs) in chatrooms {
+				chatroom.hasUnreadMessages = true
+				trs.forEach { $0.isUnread = true }
+			}
+			
 			transfers.filter({$0.height > unreadedHeight}).forEach({$0.isUnread = true})
 			
 			readedLastHeight = self.receivedLastHeight
