@@ -72,6 +72,8 @@ enum ShareContentType {
 
 protocol DialogService: class {
 	
+	func getTopmostViewController() -> UIViewController?
+	
 	/// Present view controller modally
 	func present(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
 	
@@ -86,6 +88,10 @@ protocol DialogService: class {
 	func dismissProgress()
 	func showSuccess(withMessage: String)
 	func showError(withMessage: String)
+	
+	// MARK: - Notifications
+	func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?)
+	func dismissNotification()
 	
 	// MARK: - ActivityControllers
 	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, completion: (() -> Void)?)
