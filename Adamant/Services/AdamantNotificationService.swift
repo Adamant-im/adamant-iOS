@@ -34,21 +34,16 @@ class AdamantNotificationsService: NotificationsService {
 			} else {
 				notificationsEnabled = false
 			}
-			
-			if let raw = securedStore.get(StoreKey.notificationsService.customBadgeNumber), let number = Int(raw) {
-				customBadgeNumber = number
-				DispatchQueue.main.async {
-					UIApplication.shared.applicationIconBadgeNumber = number
-				}
-			}
 		}
 	}
 	
 	
 	// MARK: Properties
-	private(set) var notificationsEnabled: Bool = false
-	private(set) var customBadgeNumber: Int = 0
+	private(set) var notificationsEnabled = false
+	private(set) var customBadgeNumber = 0
 	
+	private var isBackgroundSession = false
+	private var backgroundNotifications = 0
 	
 	// MARK: Lifecycle
 	init() {
@@ -116,11 +111,15 @@ class AdamantNotificationsService: NotificationsService {
 		
 		if let number = type.badge {
 			if Thread.isMainThread {
-				content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + number.intValue)
+				content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + backgroundNotifications + number)
 			} else {
 				DispatchQueue.main.sync {
-					content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + number.intValue)
+					content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + backgroundNotifications + number)
 				}
+			}
+			
+			if isBackgroundSession {
+				backgroundNotifications += number
 			}
 		}
 		
@@ -154,5 +153,18 @@ class AdamantNotificationsService: NotificationsService {
 	func removeAllDeliveredNotifications() {
 		UNUserNotificationCenter.current().removeAllDeliveredNotifications()
 		UIApplication.shared.applicationIconBadgeNumber = customBadgeNumber
+	}
+}
+
+// MARK: Background batch notifications
+extension AdamantNotificationsService {
+	func startBackgroundBatchNotifications() {
+		isBackgroundSession = true
+		backgroundNotifications = 0
+	}
+	
+	func stopBackgroundBatchNotifications() {
+		isBackgroundSession = false
+		backgroundNotifications = 0
 	}
 }

@@ -39,7 +39,7 @@ extension StoreKey {
 enum AdamantNotificationType {
 	case newMessages(count: Int)
 	case newTransactions(count: Int)
-	case custom(identifier: String, badge: NSNumber?)
+	case custom(identifier: String, badge: Int?)
 	
 	var identifier: String {
 		switch self {
@@ -54,13 +54,13 @@ enum AdamantNotificationType {
 		}
 	}
 	
-	var badge: NSNumber? {
+	var badge: Int? {
 		switch self {
 		case .newMessages(let count):
-			return NSNumber(integerLiteral: count)
+			return count
 			
 		case .newTransactions(let count):
-			return NSNumber(integerLiteral: count)
+			return count
 			
 		case .custom(_, let badge):
 			return badge
@@ -92,4 +92,8 @@ protocol NotificationsService: class {
 	
 	func removeAllPendingNotificationRequests()
 	func removeAllDeliveredNotifications()
+	
+	// MARK: Background batch notifications
+	func startBackgroundBatchNotifications()
+	func stopBackgroundBatchNotifications()
 }
