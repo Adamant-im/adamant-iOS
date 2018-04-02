@@ -27,6 +27,7 @@ class ChatListViewController: UIViewController {
 	var chatsProvider: ChatsProvider!
 	var router: Router!
 	var notificationsService: NotificationsService!
+	var dialogService: DialogService!
 	
 	// MARK: IBOutlet
 	@IBOutlet weak var tableView: UITableView!
@@ -38,6 +39,7 @@ class ChatListViewController: UIViewController {
 	
 	private var preservedMessagess = [String:String]()
 	
+	private lazy var defaultAvatar: UIImage = { #imageLiteral(resourceName: "account") }()
 	
 	// MARK: Lifecycle
     override func viewDidLoad() {
@@ -222,18 +224,7 @@ extension ChatListViewController {
 			}
 			
 		case let transfer as TransferTransaction:
-			if let balance = transfer.amount {
-				let text: String
-				if transfer.isOutgoing {
-					text = String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(AdamantUtilities.format(balance: balance))")
-				} else {
-					text = "➡️  \(AdamantUtilities.format(balance: balance))"
-				}
-				
-				cell.lastMessageLabel.text = text
-			} else {
-				cell.lastMessageLabel.text = nil
-			}
+			cell.lastMessageLabel.text = formatTransferPreview(transfer)
 			
 		default:
 			cell.lastMessageLabel.text = nil
@@ -271,35 +262,48 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 		
-		guard controller == chatsController else {
-			return
-		}
-		
-		switch type {
-		case .insert:
-			if let newIndexPath = newIndexPath {
-				tableView.insertRows(at: [newIndexPath], with: .automatic)
-			}
-			
-		case .delete:
-			if let indexPath = indexPath {
-				tableView.deleteRows(at: [indexPath], with: .automatic)
-			}
-			
-		case .update:
-			if let indexPath = indexPath,
-				let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
-				let chatroom = anObject as? Chatroom {
-				configureCell(cell, for: chatroom)
-			}
-			
-		case .move:
-			if let indexPath = indexPath, let newIndexPath = newIndexPath {
-				if let cell = tableView.cellForRow(at: indexPath) as? ChatTableViewCell, let chatroom = anObject as? Chatroom {
+		switch controller {
+		// MARK: Chats controller
+		case let c where c == chatsController:
+			switch type {
+			case .insert:
+				if let newIndexPath = newIndexPath {
+					tableView.insertRows(at: [newIndexPath], with: .automatic)
+				}
+				
+			case .delete:
+				if let indexPath = indexPath {
+					tableView.deleteRows(at: [indexPath], with: .automatic)
+				}
+				
+			case .update:
+				if let indexPath = indexPath,
+					let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
+					let chatroom = anObject as? Chatroom {
 					configureCell(cell, for: chatroom)
 				}
-				tableView.moveRow(at: indexPath, to: newIndexPath)
+				
+			case .move:
+				if let indexPath = indexPath, let newIndexPath = newIndexPath {
+					if let cell = tableView.cellForRow(at: indexPath) as? ChatTableViewCell, let chatroom = anObject as? Chatroom {
+						configureCell(cell, for: chatroom)
+					}
+					tableView.moveRow(at: indexPath, to: newIndexPath)
+				}
 			}
+			
+		// MARK: Unread controller
+		case let c where c == unreadController:
+			guard type == .insert else {
+				break
+			}
+			
+			if let transaction = anObject as? ChatTransaction {
+				showNotification(for: transaction)
+			}
+			
+		default:
+			break
 		}
 	}
 }
@@ -364,6 +368,74 @@ extension ChatListViewController: ChatViewControllerDelegate {
 }
 
 
+// MARK: - Working with in-app notifications
+extension ChatListViewController {
+	private func showNotification(for transaction: ChatTransaction) {
+		guard !transaction.isOutgoing,
+			let chatroom = transaction.chatroom, chatroom != presentedChatroom(),
+			let partner = chatroom.partner else {
+			return
+		}
+		
+		let title = partner.name ?? partner.address
+		
+		let tapHandler = { [weak self] in
+			guard let vc = self?.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController,
+				let nav = self?.navigationController else {
+					return
+			}
+			
+			self?.prepareChatViewController(vc, chatroom: chatroom)
+			nav.pushViewController(vc, animated: false)
+		}
+		
+		let text: String
+		
+		switch transaction {
+		case let message as MessageTransaction:
+			guard let t = message.message else {
+				return
+			}
+			
+			text = t
+			
+		case let transfer as TransferTransaction:
+			guard let t = formatTransferPreview(transfer) else {
+				return
+			}
+			
+			text = t
+			
+		default:
+			return
+		}
+		
+		let image: UIImage
+		if let ava = partner.avatar, let img = UIImage(named: ava) {
+			image = img
+		} else {
+			image = defaultAvatar
+		}
+		
+		dialogService.showNotification(title: title, message: text, image: image) {
+			DispatchQueue.main.async(execute: tapHandler)
+		}
+	}
+	
+	private func formatTransferPreview(_ transfer: TransferTransaction) -> String? {
+		guard let balance = transfer.amount else {
+			return nil
+		}
+		
+		if transfer.isOutgoing {
+			return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(AdamantUtilities.format(balance: balance))")
+		} else {
+			return "➡️  \(AdamantUtilities.format(balance: balance))"
+		}
+	}
+}
+
+
 // MARK: - Tools
 extension ChatListViewController {
 	/// TabBar item badge
@@ -386,28 +458,10 @@ extension ChatListViewController {
 	
 	/// Current chat
 	func presentedChatroom() -> Chatroom? {
-		// Showing another page
-		guard tabBarController?.selectedViewController == self else {
+		guard let vc = dialogService.getTopmostViewController() as? ChatViewController else {
 			return nil
 		}
 		
-		// Showing list of chats
-		guard var vc = presentedViewController else {
-			return nil
-		}
-		
-		while vc != self {
-			if let ch = vc as? ChatViewController {
-				return ch.chatroom
-			}
-			
-			if let v = vc.presentingViewController {
-				vc = v
-			} else {
-				return nil
-			}
-		}
-
-		return nil
+		return vc.chatroom
 	}
 }
