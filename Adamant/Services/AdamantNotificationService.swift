@@ -34,12 +34,20 @@ class AdamantNotificationsService: NotificationsService {
 			} else {
 				notificationsEnabled = false
 			}
+			
+			if let raw = securedStore.get(StoreKey.notificationsService.customBadgeNumber), let number = Int(raw) {
+				customBadgeNumber = number
+				DispatchQueue.main.async {
+					UIApplication.shared.applicationIconBadgeNumber = number
+				}
+			}
 		}
 	}
 	
 	
 	// MARK: Properties
 	private(set) var notificationsEnabled: Bool = false
+	private(set) var customBadgeNumber: Int = 0
 	
 	
 	// MARK: Lifecycle
@@ -105,7 +113,16 @@ class AdamantNotificationsService: NotificationsService {
 		content.title = title
 		content.body = body
 		content.sound = UNNotificationSound(named: "notification.mp3")
-		content.badge = type.badge
+		
+		if let number = type.badge {
+			if Thread.isMainThread {
+				content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + number.intValue)
+			} else {
+				DispatchQueue.main.sync {
+					content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + number.intValue)
+				}
+			}
+		}
 		
 		let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
 		let request = UNNotificationRequest(identifier: type.identifier, content: content, trigger: trigger)
@@ -117,12 +134,25 @@ class AdamantNotificationsService: NotificationsService {
 		}
 	}
 	
+	func setBadge(number: Int?) {
+		if let number = number {
+			customBadgeNumber = number
+			UIApplication.shared.applicationIconBadgeNumber = number
+			securedStore.set(String(number), for: StoreKey.notificationsService.customBadgeNumber)
+		} else {
+			customBadgeNumber = 0
+			UIApplication.shared.applicationIconBadgeNumber = 0
+			securedStore.remove(StoreKey.notificationsService.customBadgeNumber)
+		}
+	}
+	
 	func removeAllPendingNotificationRequests() {
 		UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+		UIApplication.shared.applicationIconBadgeNumber = customBadgeNumber
 	}
 	
 	func removeAllDeliveredNotifications() {
 		UNUserNotificationCenter.current().removeAllDeliveredNotifications()
-		UIApplication.shared.applicationIconBadgeNumber = 0
+		UIApplication.shared.applicationIconBadgeNumber = customBadgeNumber
 	}
 }

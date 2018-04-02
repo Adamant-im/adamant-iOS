@@ -25,6 +25,7 @@ extension String.adamantLocalized {
 extension StoreKey {
 	struct notificationsService {
 		static let notificationsEnabled = "notifications.show"
+		static let customBadgeNumber = "notifications.number"
 		
 		private init() {}
 	}
@@ -86,6 +87,8 @@ protocol NotificationsService: class {
 	func setNotificationsEnabled(_ enabled: Bool, completion: @escaping (NotificationsServiceResult) -> Void)
 	
 	func showNotification(title: String, body: String, type: AdamantNotificationType)
+	
+	func setBadge(number: Int?)
 	
 	func removeAllPendingNotificationRequests()
 	func removeAllDeliveredNotifications()
