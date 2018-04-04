@@ -17,19 +17,19 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.3.6</string>
+	<string>0.3.7</string>
 	<key>CFBundleVersion</key>
-	<string>23</string>
+	<string>24</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>The camera needed to scan QR codes for addresses and passphrases</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Sign In into your ADAMANT with Face ID</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Saving generated QR codes with passphrases and addresses</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Reading QR codes with passphrases and addresses</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Sign In into your ADAMANT with Face ID</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Exo+2_100_normal.ttf</string>
