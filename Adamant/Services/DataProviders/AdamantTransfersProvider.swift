@@ -21,6 +21,7 @@ class AdamantTransfersProvider: TransfersProvider {
 	var transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
 	
 	private(set) var state: State = .empty
+	private(set) var isInitiallySynced: Bool = false
 	private(set) var receivedLastHeight: Int64?
 	private(set) var readedLastHeight: Int64?
 	
@@ -155,6 +156,11 @@ extension AdamantTransfersProvider {
 								self?.readedLastHeight = 0
 							}
 							
+							if let synced = self?.isInitiallySynced, !synced {
+								self?.isInitiallySynced = true
+								NotificationCenter.default.post(name: Notification.Name.adamantTransfersProviderInitialSyncFinished, object: self)
+							}
+							
 						case .error(let error):
 							self?.setState(.failedToUpdate(error), previous: prevState)
 							
@@ -175,6 +181,7 @@ extension AdamantTransfersProvider {
 	}
 	
 	private func reset(notify: Bool) {
+		isInitiallySynced = false
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false)
 		receivedLastHeight = nil

@@ -16,6 +16,7 @@ class AdamantDialogService: DialogService {
 	// Configure notifications
 	init() {
 		FTIndicator.setIndicatorStyle(.extraLight)
+		FTNotificationIndicator.setDefaultNotificationDelay(4)
 	}
 }
 
@@ -24,16 +25,24 @@ class AdamantDialogService: DialogService {
 extension AdamantDialogService {
 	func present(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
 		if Thread.isMainThread {
-			AdamantDialogService.getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
+			getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
 		} else {
-			DispatchQueue.main.async {
-				AdamantDialogService.getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
+			DispatchQueue.main.async { [weak self] in
+				self?.getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
 			}
 		}
 	}
 	
-	private static func getTopmostViewController() -> UIViewController? {
+	func getTopmostViewController() -> UIViewController? {
 		if var topController = UIApplication.shared.keyWindow?.rootViewController {
+			if let tab = topController as? UITabBarController, let selected = tab.selectedViewController {
+				topController = selected
+			}
+			
+			if let nav = topController as? UINavigationController, let visible = nav.visibleViewController {
+				return visible
+			}
+			
 			while let presentedViewController = topController.presentedViewController {
 				topController = presentedViewController
 			}
@@ -80,6 +89,22 @@ extension AdamantDialogService {
 	
 	func showError(withMessage message: String) {
 		FTIndicator.showError(withMessage: message)
+	}
+}
+
+
+// MARK: - Notifications
+extension AdamantDialogService {
+	func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?) {
+		if let image = image {
+			FTIndicator.showNotification(with: image, title: title, message: message, tapHandler: tapHandler)
+		} else {
+			FTIndicator.showNotification(withTitle: title, message: message, tapHandler: tapHandler)
+		}
+	}
+	
+	func dismissNotification() {
+		FTIndicator.dismissNotification()
 	}
 }
 
