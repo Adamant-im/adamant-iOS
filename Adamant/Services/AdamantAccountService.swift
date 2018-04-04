@@ -171,7 +171,7 @@ extension AdamantAccountService: AccountService {
 				
 				if loggedAccount.balance != account.balance {
 					self?.account = account
-					NotificationCenter.default.post(name: Notification.Name.adamantAccountDataUpdated, object: nil)
+					NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil)
 				}
 				
 				self?.setState(.loggedIn)
@@ -312,7 +312,7 @@ extension AdamantAccountService {
 				self.keypair = keypair
 				
 				let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress:account.address]
-				NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedIn, object: self, userInfo: userInfo)
+				NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userLoggedIn, object: self, userInfo: userInfo)
 				self.setState(.loggedIn)
 				completion(.success(account: account))
 				
@@ -351,7 +351,7 @@ extension AdamantAccountService {
 		}
 		
 		if wasLogged {
-			NotificationCenter.default.post(name: Notification.Name.adamantUserLoggedOut, object: nil)
+			NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userLoggedOut, object: nil)
 		}
 	}
 }

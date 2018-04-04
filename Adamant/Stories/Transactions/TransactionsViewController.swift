@@ -39,11 +39,11 @@ class TransactionsViewController: UIViewController {
 		tableView.dataSource = self
 		tableView.delegate = self
 		
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { [weak self] notification in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
 			self?.initFetchedResultController(provider: self?.transfersProvider)
 		}
 		
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.initFetchedResultController(provider: nil)
 		}
     }

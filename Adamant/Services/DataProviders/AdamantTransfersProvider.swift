@@ -29,9 +29,6 @@ class AdamantTransfersProvider: TransfersProvider {
 	private let stateSemaphore = DispatchSemaphore(value: 1)
 	
 	// MARK: Tools
-	private func postNotification(_ name: Notification.Name, userInfo: [AnyHashable : Any]? = nil) {
-		NotificationCenter.default.post(name: name, object: nil, userInfo: userInfo)
-	}
 	
 	/// Free stateSemaphore before calling this method, or you will deadlock.
 	private func setState(_ state: State, previous prevState: State, notify: Bool = true) {
@@ -42,12 +39,12 @@ class AdamantTransfersProvider: TransfersProvider {
 		if notify {
 			switch prevState {
 			case .failedToUpdate(_):
-				NotificationCenter.default.post(name: .adamantTransfersServiceStateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
+				NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
 																													 AdamantUserInfoKey.TransfersProvider.prevState: prevState])
 				
 			default:
 				if prevState != self.state {
-					NotificationCenter.default.post(name: .adamantTransfersServiceStateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
+					NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
 																														 AdamantUserInfoKey.TransfersProvider.prevState: prevState])
 				}
 			}
@@ -57,7 +54,7 @@ class AdamantTransfersProvider: TransfersProvider {
 	
 	// MARK: Lifecycle
 	init() {
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { [weak self] notification in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
 			guard let store = self?.securedStore else {
 				return
 			}
@@ -84,7 +81,7 @@ class AdamantTransfersProvider: TransfersProvider {
 			self?.update()
 		}
 		
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.receivedLastHeight = nil
 			self?.readedLastHeight = nil
 			
@@ -147,7 +144,9 @@ extension AdamantTransfersProvider {
 						case .success(let total):
 							self?.setState(.upToDate, previous: prevState)
 							if total > 0 {
-								self?.postNotification(.adamantTransfersServiceNewTransactions, userInfo: [AdamantUserInfoKey.TransfersProvider.newTransactions: total])
+								NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.newTransactions,
+																object: self,
+																userInfo: [AdamantUserInfoKey.TransfersProvider.newTransactions: total])
 							}
 							
 							if let h = self?.receivedLastHeight {
@@ -158,7 +157,7 @@ extension AdamantTransfersProvider {
 							
 							if let synced = self?.isInitiallySynced, !synced {
 								self?.isInitiallySynced = true
-								NotificationCenter.default.post(name: Notification.Name.adamantTransfersProviderInitialSyncFinished, object: self)
+								NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.initialSyncFinished, object: self)
 							}
 							
 						case .error(let error):

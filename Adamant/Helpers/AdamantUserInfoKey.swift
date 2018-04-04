@@ -1,5 +1,5 @@
 //
-//  AdamantUserInfoKeys.swift
+//  AdamantUserInfoKey.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 02.02.2018.
