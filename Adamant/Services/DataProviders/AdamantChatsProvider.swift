@@ -20,6 +20,7 @@ class AdamantChatsProvider: ChatsProvider {
 	
 	// MARK: Properties
 	private(set) var state: State = .empty
+	private(set) var isInitiallySynced: Bool = false
 	private(set) var receivedLastHeight: Int64?
 	private(set) var readedLastHeight: Int64?
 	private let apiTransactions = 100
@@ -118,6 +119,7 @@ extension AdamantChatsProvider {
 	}
 	
 	private func reset(notify: Bool) {
+		isInitiallySynced = false
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false) // Block update calls
 		
@@ -207,6 +209,11 @@ extension AdamantChatsProvider {
 					if let h = self?.readedLastHeight, h > 0 {
 						store.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
 					}
+				}
+				
+				if let synced = self?.isInitiallySynced, !synced {
+					self?.isInitiallySynced = true
+					NotificationCenter.default.post(name: Notification.Name.adamantChatsProviderInitialSyncFinished, object: self)
 				}
 			}
 		}

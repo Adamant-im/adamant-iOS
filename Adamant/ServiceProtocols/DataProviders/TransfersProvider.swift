@@ -26,6 +26,8 @@ extension Notification.Name {
 	
 	/// userInfo contains newState element. See AdamantUserInfoKey.TransfersProvider
 	static let adamantTransfersServiceStateChanged = Notification.Name("adamantTransfersServiceStateChanged")
+	
+	static let adamantTransfersProviderInitialSyncFinished = Notification.Name("adamant.transfersProvider.initialSyncFinished")
 }
 
 extension AdamantUserInfoKey {
