@@ -39,12 +39,12 @@ class AdamantReachability: ReachabilityMonitor {
 		reachability = Reachability()!
 		reachability.whenReachable = { [weak self] reachability in
 			let userInfo: [String:Any] = [AdamantUserInfoKey.ReachabilityMonitor.connection:reachability.connection.adamantConnection]
-			NotificationCenter.default.post(name: .adamantReachabilityChanged, object: self, userInfo: userInfo)
+			NotificationCenter.default.post(name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: self, userInfo: userInfo)
 		}
 		
 		reachability.whenUnreachable = { [weak self] reachability in
 			let userInfo: [String:Any] = [AdamantUserInfoKey.ReachabilityMonitor.connection:reachability.connection.adamantConnection]
-			NotificationCenter.default.post(name: .adamantReachabilityChanged, object: self, userInfo: userInfo)
+			NotificationCenter.default.post(name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: self, userInfo: userInfo)
 		}
 	}
 	

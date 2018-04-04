@@ -37,10 +37,14 @@ enum ValidateMessageResult {
 
 // MARK: - Notifications
 extension Notification.Name {
-	/// Received new messagess. See AdamantUserInfoKey.ChatProvider
-	static let adamantChatsProviderNewUnreadMessages = Notification.Name("adamant.chatsProvider.newUnreadMessages")
-	
-	static let adamantChatsProviderInitialSyncFinished = Notification.Name("adamant.chatsProvider.initialSyncFinished")
+	struct AdamantChatsProvider {
+		/// Received new messagess. See AdamantUserInfoKey.ChatProvider
+		static let newUnreadMessages = Notification.Name("adamant.chatsProvider.newUnreadMessages")
+
+		static let initialSyncFinished = Notification.Name("adamant.chatsProvider.initialSyncFinished")
+
+		private init() {}
+	}
 }
 
 

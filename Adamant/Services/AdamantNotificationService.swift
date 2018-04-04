@@ -47,15 +47,15 @@ class AdamantNotificationsService: NotificationsService {
 	
 	// MARK: Lifecycle
 	init() {
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { _ in
 			UNUserNotificationCenter.current().removeAllDeliveredNotifications()
 			UIApplication.shared.applicationIconBadgeNumber = 0
 		}
 		
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.notificationsEnabled = false
 			self?.securedStore.remove(StoreKey.notificationsService.notificationsEnabled)
-			NotificationCenter.default.post(name: Notification.Name.adamantShowNotificationsChanged, object: self)
+			NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.showNotificationsChanged, object: self)
 		}
 	}
 	
@@ -76,7 +76,7 @@ class AdamantNotificationsService: NotificationsService {
 				case .authorized:
 					self?.notificationsEnabled = true
 					self?.securedStore.set(String(true), for: StoreKey.notificationsService.notificationsEnabled)
-					NotificationCenter.default.post(name: Notification.Name.adamantShowNotificationsChanged, object: self)
+					NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.showNotificationsChanged, object: self)
 					completion(.success)
 					
 				case .denied:
@@ -97,7 +97,7 @@ class AdamantNotificationsService: NotificationsService {
 		} else { // MARK: Turn off
 			notificationsEnabled = false
 			securedStore.remove(StoreKey.notificationsService.notificationsEnabled)
-			NotificationCenter.default.post(name: Notification.Name.adamantShowNotificationsChanged, object: self)
+			NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.showNotificationsChanged, object: self)
 		}
 	}
 	

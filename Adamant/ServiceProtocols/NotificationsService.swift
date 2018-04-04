@@ -70,8 +70,12 @@ enum AdamantNotificationType {
 
 // MARK: - Notifications
 extension Notification.Name {
-	/// Raised when user has logged out.
-	static let adamantShowNotificationsChanged = Notification.Name("adamantShowNotifications")
+	struct AdamantNotificationService {
+		/// Raised when user has logged out.
+		static let showNotificationsChanged = Notification.Name("adamant.notificationService.showNotifications")
+		
+		private init() {}
+	}
 }
 
 

@@ -295,14 +295,14 @@ class AccountViewController: FormViewController {
 		
 		
 		// MARK: Notifications
-		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.refreshBalanceCell()
 		}
-		NotificationCenter.default.addObserver(forName: .adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.refreshBalanceCell()
 		}
 		
-		NotificationCenter.default.addObserver(forName: .adamantAccountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.refreshBalanceCell()
 		}
     }

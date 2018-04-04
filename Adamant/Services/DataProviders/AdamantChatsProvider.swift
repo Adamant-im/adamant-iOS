@@ -34,7 +34,7 @@ class AdamantChatsProvider: ChatsProvider {
 	
 	// MARK: Lifecycle
 	init() {
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { [weak self] notification in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
 			guard let store = self?.securedStore else {
 				return
 			}
@@ -61,7 +61,7 @@ class AdamantChatsProvider: ChatsProvider {
 			self?.update()
 		}
 		
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.receivedLastHeight = nil
 			self?.readedLastHeight = nil
 			if let prevState = self?.state {
@@ -93,12 +93,12 @@ class AdamantChatsProvider: ChatsProvider {
 		if notify {
 			switch prevState {
 			case .failedToUpdate(_):
-				NotificationCenter.default.post(name: .adamantTransfersServiceStateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
+				NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: self, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
 																													AdamantUserInfoKey.TransfersProvider.prevState: prevState])
 				
 			default:
 				if prevState != self.state {
-					NotificationCenter.default.post(name: .adamantTransfersServiceStateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
+					NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: self, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
 																														AdamantUserInfoKey.TransfersProvider.prevState: prevState])
 				}
 			}
@@ -190,7 +190,7 @@ extension AdamantChatsProvider {
 				self?.setState(.upToDate, previous: prevState)
 				
 				if prevHeight != self?.receivedLastHeight, let h = self?.receivedLastHeight {
-					NotificationCenter.default.post(name: Notification.Name.adamantChatsProviderNewUnreadMessages,
+					NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
 													object: self,
 													userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h])
 				}
@@ -213,7 +213,7 @@ extension AdamantChatsProvider {
 				
 				if let synced = self?.isInitiallySynced, !synced {
 					self?.isInitiallySynced = true
-					NotificationCenter.default.post(name: Notification.Name.adamantChatsProviderInitialSyncFinished, object: self)
+					NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: self)
 				}
 			}
 		}

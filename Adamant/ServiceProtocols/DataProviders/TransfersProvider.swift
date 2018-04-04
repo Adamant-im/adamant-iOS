@@ -21,13 +21,18 @@ enum TransfersProviderResult {
 }
 
 extension Notification.Name {
-	/// userInfo contains 'newTransactions' element. See AdamantUserInfoKey.TransfersProvider
-	static let adamantTransfersServiceNewTransactions = Notification.Name("adamantTransfersServiceNewTransactions")
-	
-	/// userInfo contains newState element. See AdamantUserInfoKey.TransfersProvider
-	static let adamantTransfersServiceStateChanged = Notification.Name("adamantTransfersServiceStateChanged")
-	
-	static let adamantTransfersProviderInitialSyncFinished = Notification.Name("adamant.transfersProvider.initialSyncFinished")
+	struct AdamantTransfersProvider {
+		/// userInfo contains 'newTransactions' element. See AdamantUserInfoKey.TransfersProvider
+		static let newTransactions = Notification.Name("adamant.transfersProvider.newTransactions")
+		
+		/// userInfo contains newState element. See AdamantUserInfoKey.TransfersProvider
+		static let stateChanged = Notification.Name("adamant.transfersProvider.stateChanged")
+		
+		static let initialSyncFinished = Notification.Name("adamant.transfersProvider.initialSyncFinished")
+		
+		
+		private init() {}
+	}
 }
 
 extension AdamantUserInfoKey {
