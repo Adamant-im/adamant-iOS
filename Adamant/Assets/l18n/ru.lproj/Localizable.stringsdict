@@ -12,10 +12,12 @@
 			<string>NSStringPluralRuleType</string>
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
-			<key>one</key>
-			<string>%d новое сообщение</string>
+			<key>few</key>
+			<string>%d новых сообщения</string>
 			<key>many</key>
 			<string>%d новых сообщений</string>
+			<key>one</key>
+			<string>%d новое сообщение</string>
 			<key>other</key>
 			<string>%d новых сообщения</string>
 		</dict>
@@ -30,10 +32,12 @@
 			<string>NSStringPluralRuleType</string>
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
-			<key>one</key>
-			<string>%d новая транзакция</string>
+			<key>few</key>
+			<string>%d новые транзакции</string>
 			<key>many</key>
 			<string>%d новых транзакций</string>
+			<key>one</key>
+			<string>%d новая транзакция</string>
 			<key>other</key>
 			<string>%d новые транзакции</string>
 		</dict>

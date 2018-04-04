@@ -92,7 +92,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 				repeater.pauseAll()
 			}
 			
-			NotificationCenter.default.addObserver(forName: .adamantReachabilityChanged, object: reachability, queue: nil) { [weak self] notification in
+			NotificationCenter.default.addObserver(forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: reachability, queue: nil) { [weak self] notification in
 				guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection,
 					let repeater = self?.repeater else {
 						return
@@ -128,7 +128,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
 			}
 			
-			NotificationCenter.default.addObserver(forName: Notification.Name.adamantShowNotificationsChanged, object: service, queue: OperationQueue.main) { _ in
+			NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.showNotificationsChanged, object: service, queue: OperationQueue.main) { _ in
 				if service.notificationsEnabled {
 					UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
 				} else {
@@ -139,7 +139,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		
 		// MARK: 7. Logout reset
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			// On logout, pop all navigators to root.
 			guard let tbc = self?.window?.rootViewController as? UITabBarController, let vcs = tbc.viewControllers else {
 				return
@@ -195,6 +195,8 @@ extension AppDelegate {
 				return
 		}
 		
+		notificationsService.startBackgroundBatchNotifications()
+		
 		let services: [BackgroundFetchService] = [
 			container.resolve(ChatsProvider.self) as! BackgroundFetchService,
 			container.resolve(TransfersProvider.self) as! BackgroundFetchService
@@ -217,23 +219,25 @@ extension AppDelegate {
 			}
 		}
 		
-		group.wait()
-		
-		for result in results {
-			switch result {
-			case .newData:
-				completionHandler(.newData)
-				return
-				
-			case .noData:
-				break
-				
-			case .failed:
-				completionHandler(.failed)
-				return
+		group.notify(queue: DispatchQueue.global(qos: .utility)) {
+			notificationsService.stopBackgroundBatchNotifications()
+			
+			for result in results {
+				switch result {
+				case .newData:
+					completionHandler(.newData)
+					return
+					
+				case .noData:
+					break
+					
+				case .failed:
+					completionHandler(.failed)
+					return
+				}
 			}
+			
+			completionHandler(.noData)
 		}
-		
-		completionHandler(.noData)
 	}
 }

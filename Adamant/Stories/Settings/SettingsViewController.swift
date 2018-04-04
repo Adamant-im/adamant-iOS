@@ -220,7 +220,7 @@ class SettingsViewController: FormViewController {
 		
 		
 		// MARK: User login
-		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.tableView.reloadData()
 			
 			guard let form = self?.form, let accountService = self?.accountService else {
@@ -240,7 +240,7 @@ class SettingsViewController: FormViewController {
 		}
 		
 		// MARK: Notifications
-		NotificationCenter.default.addObserver(forName: .adamantShowNotificationsChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.showNotificationsChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			guard let row: SwitchRow = self?.form.rowBy(tag: Rows.notifications.tag), let value = self?.notificationsService.notificationsEnabled else {
 				return
 			}

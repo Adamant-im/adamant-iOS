@@ -20,6 +20,7 @@ class AdamantChatsProvider: ChatsProvider {
 	
 	// MARK: Properties
 	private(set) var state: State = .empty
+	private(set) var isInitiallySynced: Bool = false
 	private(set) var receivedLastHeight: Int64?
 	private(set) var readedLastHeight: Int64?
 	private let apiTransactions = 100
@@ -33,7 +34,7 @@ class AdamantChatsProvider: ChatsProvider {
 	
 	// MARK: Lifecycle
 	init() {
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { [weak self] notification in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
 			guard let store = self?.securedStore else {
 				return
 			}
@@ -42,23 +43,25 @@ class AdamantChatsProvider: ChatsProvider {
 				store.remove(StoreKey.chatProvider.address)
 				store.remove(StoreKey.chatProvider.receivedLastHeight)
 				store.remove(StoreKey.chatProvider.readedLastHeight)
+				self?.dropStateData()
 				return
 			}
 			
-			if let savedAddress = self?.securedStore.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
+			if let savedAddress = store.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
 				if let raw = store.get(StoreKey.chatProvider.readedLastHeight), let h = Int64(raw) {
 					self?.readedLastHeight = h
 				}
 			} else {
 				store.remove(StoreKey.chatProvider.receivedLastHeight)
 				store.remove(StoreKey.chatProvider.readedLastHeight)
+				self?.dropStateData()
 				store.set(loggedAddress, for: StoreKey.chatProvider.address)
 			}
 			
 			self?.update()
 		}
 		
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.receivedLastHeight = nil
 			self?.readedLastHeight = nil
 			if let prevState = self?.state {
@@ -70,6 +73,9 @@ class AdamantChatsProvider: ChatsProvider {
 				store.remove(StoreKey.chatProvider.receivedLastHeight)
 				store.remove(StoreKey.chatProvider.readedLastHeight)
 			}
+			
+			// BackgroundFetch
+			self?.dropStateData()
 		}
 	}
 	
@@ -87,12 +93,12 @@ class AdamantChatsProvider: ChatsProvider {
 		if notify {
 			switch prevState {
 			case .failedToUpdate(_):
-				NotificationCenter.default.post(name: .adamantTransfersServiceStateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
+				NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: self, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
 																													AdamantUserInfoKey.TransfersProvider.prevState: prevState])
 				
 			default:
 				if prevState != self.state {
-					NotificationCenter.default.post(name: .adamantTransfersServiceStateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
+					NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: self, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
 																														AdamantUserInfoKey.TransfersProvider.prevState: prevState])
 				}
 			}
@@ -113,6 +119,7 @@ extension AdamantChatsProvider {
 	}
 	
 	private func reset(notify: Bool) {
+		isInitiallySynced = false
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false) // Block update calls
 		
@@ -183,7 +190,7 @@ extension AdamantChatsProvider {
 				self?.setState(.upToDate, previous: prevState)
 				
 				if prevHeight != self?.receivedLastHeight, let h = self?.receivedLastHeight {
-					NotificationCenter.default.post(name: Notification.Name.adamantChatsProviderNewUnreadMessages,
+					NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
 													object: self,
 													userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h])
 				}
@@ -202,6 +209,11 @@ extension AdamantChatsProvider {
 					if let h = self?.readedLastHeight, h > 0 {
 						store.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
 					}
+				}
+				
+				if let synced = self?.isInitiallySynced, !synced {
+					self?.isInitiallySynced = true
+					NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: self)
 				}
 			}
 		}
@@ -612,10 +624,12 @@ extension AdamantChatsProvider {
 		
 		// MARK: 4. Unread messagess
 		if let readedLastHeight = readedLastHeight {
-			let msgs = Dictionary(grouping: newMessageTransactions.filter({$0.height > readedLastHeight}), by: ({ (t: MessageTransaction) -> Chatroom in t.chatroom!}))
-			for (chatroom, trs) in msgs {
+			let unreadTransactions = newMessageTransactions.filter { $0.height > readedLastHeight }
+			let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: MessageTransaction) -> Chatroom in t.chatroom! }))
+			
+			for (chatroom, trs) in chatrooms {
 				chatroom.hasUnreadMessages = true
-				trs.forEach({$0.isUnread = true})
+				trs.forEach { $0.isUnread = true }
 			}
 		}
 		

@@ -25,7 +25,10 @@ class ChatListViewController: UIViewController {
 	// MARK: Dependencies
 	var accountService: AccountService!
 	var chatsProvider: ChatsProvider!
+	var transfersProvider: TransfersProvider!
 	var router: Router!
+	var notificationsService: NotificationsService!
+	var dialogService: DialogService!
 	
 	// MARK: IBOutlet
 	@IBOutlet weak var tableView: UITableView!
@@ -37,6 +40,7 @@ class ChatListViewController: UIViewController {
 	
 	private var preservedMessagess = [String:String]()
 	
+	private lazy var defaultAvatar: UIImage = { #imageLiteral(resourceName: "account") }()
 	
 	// MARK: Lifecycle
     override func viewDidLoad() {
@@ -54,10 +58,10 @@ class ChatListViewController: UIViewController {
 		}
 		
 		// MARK: Login/Logout
-		NotificationCenter.default.addObserver(forName: .adamantUserLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.initFetchedRequestControllers(provider: self?.chatsProvider)
 		}
-		NotificationCenter.default.addObserver(forName: .adamantUserLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.initFetchedRequestControllers(provider: nil)
 		}
     }
@@ -89,7 +93,11 @@ class ChatListViewController: UIViewController {
 	
 	
 	// MARK: Helpers
-	private func prepareChatViewController(_ vc: ChatViewController, chatroom: Chatroom) {
+	private func chatViewController(for chatroom: Chatroom) -> ChatViewController {
+		guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
+			fatalError("Can't get ChatViewController")
+		}
+		
 		if let account = accountService.account {
 			vc.account = account
 		}
@@ -97,6 +105,8 @@ class ChatListViewController: UIViewController {
 		vc.hidesBottomBarWhenPushed = true
 		vc.chatroom = chatroom
 		vc.delegate = self
+		
+		return vc
 	}
 	
 	
@@ -149,13 +159,13 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		if let chatroom = chatsController?.object(at: indexPath), let c = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController {
-			prepareChatViewController(c, chatroom: chatroom)
+		if let chatroom = chatsController?.object(at: indexPath) {
+			let vc = chatViewController(for: chatroom)
 			
 			if let nav = navigationController {
-				nav.pushViewController(c, animated: true)
+				nav.pushViewController(vc, animated: true)
 			} else {
-				present(c, animated: true)
+				present(vc, animated: true)
 			}
 		}
 	}
@@ -221,18 +231,7 @@ extension ChatListViewController {
 			}
 			
 		case let transfer as TransferTransaction:
-			if let balance = transfer.amount {
-				let text: String
-				if transfer.isOutgoing {
-					text = String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(AdamantUtilities.format(balance: balance))")
-				} else {
-					text = "➡️  \(AdamantUtilities.format(balance: balance))"
-				}
-				
-				cell.lastMessageLabel.text = text
-			} else {
-				cell.lastMessageLabel.text = nil
-			}
+			cell.lastMessageLabel.text = formatTransferPreview(transfer)
 			
 		default:
 			cell.lastMessageLabel.text = nil
@@ -269,36 +268,48 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
 	}
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-		
-		guard controller == chatsController else {
-			return
-		}
-		
-		switch type {
-		case .insert:
-			if let newIndexPath = newIndexPath {
-				tableView.insertRows(at: [newIndexPath], with: .automatic)
-			}
-			
-		case .delete:
-			if let indexPath = indexPath {
-				tableView.deleteRows(at: [indexPath], with: .automatic)
-			}
-			
-		case .update:
-			if let indexPath = indexPath,
-				let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
-				let chatroom = anObject as? Chatroom {
-				configureCell(cell, for: chatroom)
-			}
-			
-		case .move:
-			if let indexPath = indexPath, let newIndexPath = newIndexPath {
-				if let cell = tableView.cellForRow(at: indexPath) as? ChatTableViewCell, let chatroom = anObject as? Chatroom {
+		switch controller {
+		// MARK: Chats controller
+		case let c where c == chatsController:
+			switch type {
+			case .insert:
+				if let newIndexPath = newIndexPath {
+					tableView.insertRows(at: [newIndexPath], with: .automatic)
+				}
+				
+			case .delete:
+				if let indexPath = indexPath {
+					tableView.deleteRows(at: [indexPath], with: .automatic)
+				}
+				
+			case .update:
+				if let indexPath = indexPath,
+					let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
+					let chatroom = anObject as? Chatroom {
 					configureCell(cell, for: chatroom)
 				}
-				tableView.moveRow(at: indexPath, to: newIndexPath)
+				
+			case .move:
+				if let indexPath = indexPath, let newIndexPath = newIndexPath {
+					if let cell = tableView.cellForRow(at: indexPath) as? ChatTableViewCell, let chatroom = anObject as? Chatroom {
+						configureCell(cell, for: chatroom)
+					}
+					tableView.moveRow(at: indexPath, to: newIndexPath)
+				}
 			}
+			
+		// MARK: Unread controller
+		case let c where c == unreadController:
+			guard type == .insert else {
+				break
+			}
+			
+			if let transaction = anObject as? ChatTransaction {
+				showNotification(for: transaction)
+			}
+			
+		default:
+			break
 		}
 	}
 }
@@ -311,24 +322,25 @@ extension ChatListViewController: NewChatViewControllerDelegate {
 			fatalError("No chatroom?")
 		}
 		
-		DispatchQueue.main.async {
-			if let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController {
-				self.prepareChatViewController(vc, chatroom: chatroom)
-				self.navigationController?.pushViewController(vc, animated: false)
+		DispatchQueue.main.async { [weak self] in
+			guard let vc = self?.chatViewController(for: chatroom) else {
+				return
+			}
+			
+			self?.navigationController?.pushViewController(vc, animated: false)
+			
+			let nvc: UIViewController
+			if let nav = controller.navigationController {
+				nvc = nav
+			} else {
+				nvc = controller
+			}
+			
+			nvc.dismiss(animated: true) {
+				vc.becomeFirstResponder()
 				
-				let nvc: UIViewController
-				if let nav = controller.navigationController {
-					nvc = nav
-				} else {
-					nvc = controller
-				}
-				
-				nvc.dismiss(animated: true) {
-					vc.becomeFirstResponder()
-					
-					if let count = vc.chatroom?.transactions?.count, count == 0 {
-						vc.messageInputBar.inputTextView.becomeFirstResponder()
-					}
+				if let count = vc.chatroom?.transactions?.count, count == 0 {
+					vc.messageInputBar.inputTextView.becomeFirstResponder()
 				}
 			}
 		}
@@ -363,6 +375,97 @@ extension ChatListViewController: ChatViewControllerDelegate {
 }
 
 
+// MARK: - Working with in-app notifications
+extension ChatListViewController {
+	private func showNotification(for transaction: ChatTransaction) {
+		// MARK: 1. Show notification only for incomming transactions
+		guard !transaction.isOutgoing,
+			let chatroom = transaction.chatroom, chatroom != presentedChatroom(),
+			let partner = chatroom.partner else {
+			return
+		}
+		
+		
+		// MARK: 2. Check transaction type. Do not show notifications for initial sync
+		let text: String
+		switch transaction {
+		case let message as MessageTransaction:
+			guard chatsProvider.isInitiallySynced, let t = message.message else {
+				return
+			}
+			
+			text = t
+			
+		case let transfer as TransferTransaction:
+			guard transfersProvider.isInitiallySynced, let t = formatTransferPreview(transfer) else {
+				return
+			}
+			
+			text = t
+			
+		default:
+			return
+		}
+		
+		// MARK: 3. Prepare notification
+		let title = partner.name ?? partner.address
+		
+		let image: UIImage
+		if let ava = partner.avatar, let img = UIImage(named: ava) {
+			image = img
+		} else {
+			image = defaultAvatar
+		}
+		
+		// MARK: 4. Show notification with tap handler
+		dialogService.showNotification(title: title, message: text, image: image) { [weak self] in
+			DispatchQueue.main.async {
+				self?.presentChatroom(chatroom)
+			}
+		}
+	}
+	
+	private func presentChatroom(_ chatroom: Chatroom) {
+		// MARK: 1. Create and config ViewController
+		let vc = chatViewController(for: chatroom)
+		
+		
+		// MARK: 2. Config TabBarController
+		let animated: Bool
+		if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController {
+			if let navigator = navigationController, selectedView != navigator, let index = tabVC.viewControllers?.index(of: navigator) {
+				animated = false
+				tabVC.selectedIndex = index
+			} else {
+				animated = true
+			}
+		} else {
+			animated = true
+		}
+		
+		
+		// MARK: 3. Present ViewController
+		if let nav = navigationController {
+			nav.pushViewController(vc, animated: animated)
+		} else {
+			present(vc, animated: true)
+		}
+	}
+	
+	private func formatTransferPreview(_ transfer: TransferTransaction) -> String? {
+		guard let balance = transfer.amount else {
+			return nil
+		}
+		
+		if transfer.isOutgoing {
+			return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(AdamantUtilities.format(balance: balance))")
+		} else {
+			return "➡️  \(AdamantUtilities.format(balance: balance))"
+		}
+	}
+}
+
+
 // MARK: - Tools
 extension ChatListViewController {
 	/// TabBar item badge
@@ -376,35 +479,19 @@ extension ChatListViewController {
 		
 		if let value = value, value > 0 {
 			item.badgeValue = String(value)
+			notificationsService.setBadge(number: value)
 		} else {
 			item.badgeValue = nil
+			notificationsService.setBadge(number: nil)
 		}
 	}
 	
 	/// Current chat
 	func presentedChatroom() -> Chatroom? {
-		// Showing another page
-		guard tabBarController?.selectedViewController == self else {
+		guard let vc = navigationController?.visibleViewController as? ChatViewController else {
 			return nil
 		}
 		
-		// Showing list of chats
-		guard var vc = presentedViewController else {
-			return nil
-		}
-		
-		while vc != self {
-			if let ch = vc as? ChatViewController {
-				return ch.chatroom
-			}
-			
-			if let v = vc.presentingViewController {
-				vc = v
-			} else {
-				return nil
-			}
-		}
-
-		return nil
+		return vc.chatroom
 	}
 }

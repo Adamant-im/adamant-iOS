@@ -1,6 +1,3 @@
-/* Product name */
-"ADAMANT" = "ADAMANT";
-
 /* ApiService: Bad internal application error, report a bug. Using %@ as error description */
 "AccountServiceError.Internal errorFormat" = "Internal error: %@";
 
@@ -18,9 +15,6 @@
 
 /* Account tab: Confirm logout alert */
 "AccountTab.ConfirmLogout.MessageFormat" = "Logout from %@?";
-
-/* Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO */
-"AccountTab.TransferBlocked.Message" = "Due to Apple restrictions, sending tokens is not allowed until the end of the ICO. For now, you can send tokens using WebApp at msg.adamant.im";
 
 /* Account tab: Balance row title */
 "AccountTab.Row.Balance" = "Balance";
@@ -43,14 +37,20 @@
 /* Account tab: Wallet section title */
 "AccountTab.Section.Wallet" = "Wallet";
 
+/* Account page: scene title */
+"AccountTab.Title" = "Account";
+
 /* Account tab: 'Transfer not allowed' alert 'go to WebApp button' */
 "AccountTab.TransferBlocked.GoToPWA" = "msg.adamant.im";
+
+/* Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO */
+"AccountTab.TransferBlocked.Message" = "Due to Apple restrictions, sending tokens is not allowed until the end of the ICO. For now, you can send tokens using WebApp at msg.adamant.im";
 
 /* Account tab: 'Transfer not allowed' alert title */
 "AccountTab.TransferBlocked.Title" = "Sorry!";
 
-/* Account page: scene title */
-"AccountTab.Title" = "Account";
+/* Product name */
+"ADAMANT" = "ADAMANT";
 
 /* ApiService: Account not found error. Using %@ for address. */
 "ApiService.Error.AccountNotFoundFormat" = "Account not found: %@";
@@ -85,6 +85,15 @@
 /* ChatList: scene title */
 "ChatListPage.Title" = "Chats";
 
+/* Known contacts: Adamant ICO message */
+"Chats.IcoMessage" = "You have a possibility to Join the ICO of ADAMANT, the most secure and anonymous messenger. Learn more on Adamant.im website or in the Whitepaper. If you still have any questions, you can ask them by replying to this message. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\nPlease make sure your have saved the passphrase to this account — exit your account and open it again. Better save your password on a sheet of paper also. But remember, only you are responsible for the passphrase safety. It cannot be recovered. And if other person will get it, your money will be stolen. Treat this question as secure, as if tokens in your wallet will cost a billion dollars some time.\nTo buy ADM tokens, go to Wallet tab and click Join the ICO, or open the page Adamant.im/ico/ in the web browser. In the ICO form enter your ADAMANT address — you will receive ADM tokens there. If you moved from Messenger App, your ADM address will be filled already, other way go back to Messenger and click ADAMANT address to copy it to clipboard. Next, choose crypto you want to spend and its amount. You'll see how much ADM tokens you will receive, including volume bonus: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Click Buy ADAMANT tokens. You'll get unique address where you need to send crypto. As soon as your transaction will be confirmed, you'll receive ADM tokens. Transaction can be done from any wallet or exchange. It is not necessary to transfer exact amount including transaction fees, the payment will be processed anyway. Have questions still? Ask us.\nAfter you receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users' wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.";
+
+/* Known contacts: Adamant pre ICO message */
+"Chats.PreIcoMessage" = "You have a possibility to invest in ADAMANT, the most secure and anonymous messenger. Now is a Pre-ICO stage — the most profitable for investors. Learn more on Adamant.im website or in the Whitepaper. To participate just reply to this message and we will assist. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\nAfter you invest and receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.";
+
+/* Known contacts: Adamant welcome message */
+"Chats.WelcomeMessage" = "Welcome to ADAMANT, the most secure and anonymous messenger. You are credited with bounty tokens, which you can use to get acquainted with the messenger.\nRemember, your security and anonymity is up to you also. Do not follow links you receive, otherwise your IP can be compromised. Do not trust browser extensions. Better to share your ADM address personally, but not using other messengers. Keep your secret passphrase secure. Set a password on your device or logout before leaving.\nLearn more about security and anonymity at https://adamant.im/staysecured/.\n\nDo not reply to this message, it is a system account.";
+
 /* Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description */
 "ChatScene.Error.InternalErrorFormat" = "Internal error: %@. Report a bug";
 
@@ -114,15 +123,6 @@
 
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Tap for details";
-
-/* Known contacts: Adamant ICO message */
-"Chats.IcoMessage" = "You have a possibility to Join the ICO of ADAMANT, the most secure and anonymous messenger. Learn more on Adamant.im website or in the Whitepaper. If you still have any questions, you can ask them by replying to this message. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\nPlease make sure your have saved the passphrase to this account — exit your account and open it again. Better save your password on a sheet of paper also. But remember, only you are responsible for the passphrase safety. It cannot be recovered. And if other person will get it, your money will be stolen. Treat this question as secure, as if tokens in your wallet will cost a billion dollars some time.\nTo buy ADM tokens, go to Wallet tab and click Join the ICO, or open the page Adamant.im/ico/ in the web browser. In the ICO form enter your ADAMANT address — you will receive ADM tokens there. If you moved from Messenger App, your ADM address will be filled already, other way go back to Messenger and click ADAMANT address to copy it to clipboard. Next, choose crypto you want to spend and its amount. You'll see how much ADM tokens you will receive, including volume bonus: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Click Buy ADAMANT tokens. You'll get unique address where you need to send crypto. As soon as your transaction will be confirmed, you'll receive ADM tokens. Transaction can be done from any wallet or exchange. It is not necessary to transfer exact amount including transaction fees, the payment will be processed anyway. Have questions still? Ask us.\nAfter you receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users' wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.";
-
-/* Known contacts: Adamant pre ICO message */
-"Chats.PreIcoMessage" = "You have a possibility to invest in ADAMANT, the most secure and anonymous messenger. Now is a Pre-ICO stage — the most profitable for investors. Learn more on Adamant.im website or in the Whitepaper. To participate just reply to this message and we will assist. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\nAfter you invest and receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.";
-
-/* Known contacts: Adamant welcome message */
-"Chats.WelcomeMessage" = "Welcome to ADAMANT, the most secure and anonymous messenger. You are credited with bounty tokens, which you can use to get acquainted with the messenger.\nRemember, your security and anonymity is up to you also. Do not follow links you receive, otherwise your IP can be compromised. Do not trust browser extensions. Better to share your ADM address personally, but not using other messengers. Keep your secret passphrase secure. Set a password on your device or logout before leaving.\nLearn more about security and anonymity at https://adamant.im/staysecured/.\n\nDo not reply to this message, it is a system account.";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "LoginScene.Error.AuthorizeCamera" = "You need to authorize ADAMANT to use device's camera";
@@ -217,11 +217,11 @@
 /* Pinpad: Ask user to repeat new pin */
 "Pinpad.ReenterPin" = "Re-enter your PIN code";
 
-/* QRGenerator: user typed in wrong invalid */
-"QrGeneratorScene.Error.InvalidPassphrase" = "Enter a valid passphrase";
-
 /* QRGenerator: Bad Internal generator error message format. Using %@ for error description */
 "QrGeneratorScene.Error.InternalErrorFormat" = "Internal error: %@. Report a bug";
+
+/* QRGenerator: user typed in invalid passphrase */
+"QrGeneratorScene.Error.InvalidPassphrase" = "Enter a valid passphrase";
 
 /* QRGenerator: Passphrase textview placeholder */
 "QrGeneratorScene.Passphrase.Placeholder" = "Passphrase";
@@ -399,3 +399,4 @@
 
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "Done!";
+

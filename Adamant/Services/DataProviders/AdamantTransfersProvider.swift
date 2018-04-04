@@ -21,6 +21,7 @@ class AdamantTransfersProvider: TransfersProvider {
 	var transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
 	
 	private(set) var state: State = .empty
+	private(set) var isInitiallySynced: Bool = false
 	private(set) var receivedLastHeight: Int64?
 	private(set) var readedLastHeight: Int64?
 	
@@ -28,9 +29,6 @@ class AdamantTransfersProvider: TransfersProvider {
 	private let stateSemaphore = DispatchSemaphore(value: 1)
 	
 	// MARK: Tools
-	private func postNotification(_ name: Notification.Name, userInfo: [AnyHashable : Any]? = nil) {
-		NotificationCenter.default.post(name: name, object: nil, userInfo: userInfo)
-	}
 	
 	/// Free stateSemaphore before calling this method, or you will deadlock.
 	private func setState(_ state: State, previous prevState: State, notify: Bool = true) {
@@ -41,12 +39,12 @@ class AdamantTransfersProvider: TransfersProvider {
 		if notify {
 			switch prevState {
 			case .failedToUpdate(_):
-				NotificationCenter.default.post(name: .adamantTransfersServiceStateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
+				NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
 																													 AdamantUserInfoKey.TransfersProvider.prevState: prevState])
 				
 			default:
 				if prevState != self.state {
-					NotificationCenter.default.post(name: .adamantTransfersServiceStateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
+					NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
 																														 AdamantUserInfoKey.TransfersProvider.prevState: prevState])
 				}
 			}
@@ -56,17 +54,34 @@ class AdamantTransfersProvider: TransfersProvider {
 	
 	// MARK: Lifecycle
 	init() {
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedIn, object: nil, queue: nil) { [weak self] notification in
-			self?.update()
-			
-			if let address = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String {
-				self?.securedStore.set(address, for: StoreKey.transfersProvider.address)
-			} else {
-				print("Can't get logged address")
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
+			guard let store = self?.securedStore else {
+				return
 			}
+			
+			guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
+				store.remove(StoreKey.transfersProvider.address)
+				store.remove(StoreKey.transfersProvider.receivedLastHeight)
+				store.remove(StoreKey.transfersProvider.readedLastHeight)
+				self?.dropStateData()
+				return
+			}
+			
+			if let savedAddress = store.get(StoreKey.transfersProvider.address), savedAddress == loggedAddress {
+				if let raw = store.get(StoreKey.transfersProvider.readedLastHeight), let h = Int64(raw) {
+					self?.readedLastHeight = h
+				}
+			} else {
+				store.remove(StoreKey.transfersProvider.receivedLastHeight)
+				store.remove(StoreKey.transfersProvider.readedLastHeight)
+				self?.dropStateData()
+				store.set(loggedAddress, for: StoreKey.transfersProvider.address)
+			}
+			
+			self?.update()
 		}
 		
-		NotificationCenter.default.addObserver(forName: Notification.Name.adamantUserLoggedOut, object: nil, queue: nil) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.receivedLastHeight = nil
 			self?.readedLastHeight = nil
 			
@@ -79,6 +94,9 @@ class AdamantTransfersProvider: TransfersProvider {
 				store.remove(StoreKey.transfersProvider.receivedLastHeight)
 				store.remove(StoreKey.transfersProvider.readedLastHeight)
 			}
+			
+			// BackgroundFetch
+			self?.dropStateData()
 		}
 	}
 	
@@ -121,19 +139,32 @@ extension AdamantTransfersProvider {
 				}
 				
 				self.processingQueue.async {
-					self.processRawTransactions(transactions, currentAddress: address) { result in
+					self.processRawTransactions(transactions, currentAddress: address) { [weak self] result in
 						switch result {
 						case .success(let total):
-							self.setState(.upToDate, previous: prevState)
+							self?.setState(.upToDate, previous: prevState)
 							if total > 0 {
-								self.postNotification(.adamantTransfersServiceNewTransactions, userInfo: [AdamantUserInfoKey.TransfersProvider.newTransactions: total])
+								NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.newTransactions,
+																object: self,
+																userInfo: [AdamantUserInfoKey.TransfersProvider.newTransactions: total])
+							}
+							
+							if let h = self?.receivedLastHeight {
+								self?.readedLastHeight = h
+							} else {
+								self?.readedLastHeight = 0
+							}
+							
+							if let synced = self?.isInitiallySynced, !synced {
+								self?.isInitiallySynced = true
+								NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.initialSyncFinished, object: self)
 							}
 							
 						case .error(let error):
-							self.setState(.failedToUpdate(error), previous: prevState)
+							self?.setState(.failedToUpdate(error), previous: prevState)
 							
 						case .accountNotFound(let key):
-							self.setState(.failedToUpdate(TransfersProviderError.accountNotFound(key)), previous: prevState)
+							self?.setState(.failedToUpdate(TransfersProviderError.accountNotFound(key)), previous: prevState)
 						}
 					}
 				}
@@ -149,6 +180,7 @@ extension AdamantTransfersProvider {
 	}
 	
 	private func reset(notify: Bool) {
+		isInitiallySynced = false
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false)
 		receivedLastHeight = nil
@@ -347,6 +379,14 @@ extension AdamantTransfersProvider {
 		
 		// MARK: 5. Unread transactions
 		if let unreadedHeight = readedLastHeight {
+			let unreadTransactions = transfers.filter { $0.height > unreadedHeight }
+			let chatrooms = Dictionary.init(grouping: unreadTransactions, by: ({ (t: TransferTransaction) -> Chatroom in t.chatroom!}))
+			
+			for (chatroom, trs) in chatrooms {
+				chatroom.hasUnreadMessages = true
+				trs.forEach { $0.isUnread = true }
+			}
+			
 			transfers.filter({$0.height > unreadedHeight}).forEach({$0.isUnread = true})
 			
 			readedLastHeight = self.receivedLastHeight

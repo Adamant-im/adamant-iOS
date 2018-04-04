@@ -10,7 +10,8 @@ import Foundation
 
 extension AdamantTransfersProvider: BackgroundFetchService {
 	func fetchBackgroundData(notificationService: NotificationsService, completion: @escaping (FetchResult) -> Void) {
-		guard let address = securedStore.get(StoreKey.transfersProvider.address) else {
+		guard let securedStore = self.securedStore,
+			let address = securedStore.get(StoreKey.transfersProvider.address) else {
 			completion(.failed)
 			return
 		}
@@ -33,21 +34,20 @@ extension AdamantTransfersProvider: BackgroundFetchService {
 			}
 		}
 		
-		apiService.getTransactions(forAccount: address, type: .send, fromHeight: lastHeight) { [weak self] result in
+		apiService.getTransactions(forAccount: address, type: .send, fromHeight: lastHeight) { result in
 			switch result {
 			case .success(let transactions):
-				let income = transactions.filter({$0.recipientId == address}).count
+				let total = transactions.filter({$0.recipientId == address}).count
 				
-				if income > 0 {
-					let total = income + notifiedCount
-					self?.securedStore.set(String(total), for: StoreKey.transfersProvider.notifiedTransfersCount)
+				if total > 0 {
+					securedStore.set(String(total + notifiedCount), for: StoreKey.transfersProvider.notifiedTransfersCount)
 					
 					if var newLastHeight = transactions.map({$0.height}).sorted().last {
 						newLastHeight += 1 // Server will return new transactions including this one
-						self?.securedStore.set(String(newLastHeight), for: StoreKey.transfersProvider.notifiedLastHeight)
+						securedStore.set(String(newLastHeight), for: StoreKey.transfersProvider.notifiedLastHeight)
 					}
 					
-					notificationService.showNotification(title: String.adamantLocalized.notifications.newTransferTitle, body: String.localizedStringWithFormat(String.adamantLocalized.notifications.newTransferBody, total), type: .newTransactions(count: total))
+					notificationService.showNotification(title: String.adamantLocalized.notifications.newTransferTitle, body: String.localizedStringWithFormat(String.adamantLocalized.notifications.newTransferBody, total + notifiedCount), type: .newTransactions(count: total))
 					
 					completion(.newData)
 				} else {
@@ -58,5 +58,10 @@ extension AdamantTransfersProvider: BackgroundFetchService {
 				completion(.failed)
 			}
 		}
+	}
+	
+	func dropStateData() {
+		securedStore.remove(StoreKey.transfersProvider.notifiedLastHeight)
+		securedStore.remove(StoreKey.transfersProvider.notifiedTransfersCount)
 	}
 }

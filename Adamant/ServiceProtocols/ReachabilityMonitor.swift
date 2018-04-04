@@ -9,7 +9,11 @@
 import Foundation
 
 extension Notification.Name {
-	static let adamantReachabilityChanged = Notification.Name("adamantReachabilityChanged")
+	struct AdamantReachabilityMonitor {
+		static let reachabilityChanged = Notification.Name("adamant.reachabilityMonitor.reachabilityChanged")
+		
+		private init() {}
+	}
 }
 
 extension AdamantUserInfoKey {
