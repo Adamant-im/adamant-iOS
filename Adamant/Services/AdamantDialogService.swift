@@ -16,6 +16,7 @@ class AdamantDialogService: DialogService {
 	// Configure notifications
 	init() {
 		FTIndicator.setIndicatorStyle(.extraLight)
+		FTNotificationIndicator.setDefaultNotificationDelay(4)
 	}
 }
 
