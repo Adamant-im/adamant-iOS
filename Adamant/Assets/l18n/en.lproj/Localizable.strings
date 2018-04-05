@@ -16,6 +16,9 @@
 /* Account tab: Confirm logout alert */
 "AccountTab.ConfirmLogout.MessageFormat" = "Logout from %@?";
 
+/* Account tab: A full 'Join ICO' link, with %@ as address */
+"AccountTab.JoinIcoUrlFormat" = "https://adamant.im/ico?wallet=%@";
+
 /* Account tab: Balance row title */
 "AccountTab.Row.Balance" = "Balance";
 

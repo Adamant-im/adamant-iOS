@@ -20,6 +20,8 @@ extension String.adamantLocalized {
 		static let webApp = NSLocalizedString("AccountTab.TransferBlocked.GoToPWA", comment: "Account tab: 'Transfer not allowed' alert 'go to WebApp button'")
 		static let transferNotAllowed = NSLocalizedString("AccountTab.TransferBlocked.Message", comment: "Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO")
 		
+		static let joinIcoUrlFormat = NSLocalizedString("AccountTab.JoinIcoUrlFormat", comment: "Account tab: A full 'Join ICO' link, with %@ as address")
+		
 		private init() { }
 	}
 }
@@ -241,7 +243,7 @@ class AccountViewController: FormViewController {
 			})
 			.onCellSelection({ [weak self] (_, _) in
 				guard let address = self?.accountService.account?.address,
-					let url = URL(string: "https://adamant.im/ico/?wallet=\(address)") else {
+					let url = URL(string:  String.localizedStringWithFormat(String.adamantLocalized.account.joinIcoUrlFormat, address)) else {
 					return
 				}
 				
