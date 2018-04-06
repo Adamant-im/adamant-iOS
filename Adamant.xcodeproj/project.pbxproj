@@ -180,6 +180,7 @@
 		E905D39C204C13B900DDB504 /* SecuredStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuredStore.swift; sourceTree = "<group>"; };
 		E905D39E204C281400DDB504 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		E9061B96207501E40011F104 /* AdamantUserInfoKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantUserInfoKey.swift; sourceTree = "<group>"; };
+		E9061B982077AF8E0011F104 /* Adamant.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Adamant.entitlements; sourceTree = "<group>"; };
 		E90A4942204C5ED6009F6A65 /* EurekaPassphraseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EurekaPassphraseRow.swift; sourceTree = "<group>"; };
 		E90A4944204C5F60009F6A65 /* PassphraseCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PassphraseCell.xib; sourceTree = "<group>"; };
 		E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAuthentication.swift; sourceTree = "<group>"; };
@@ -409,6 +410,7 @@
 				E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */,
 				E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */,
 				E913C8FD1FFFA51E001A83F7 /* Info.plist */,
+				E9061B982077AF8E0011F104 /* Adamant.entitlements */,
 			);
 			path = Adamant;
 			sourceTree = "<group>";
@@ -791,6 +793,9 @@
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
 								enabled = 1;
 							};
 						};
@@ -1240,6 +1245,7 @@
 			baseConfigurationReference = 871009461457F6B7B47D99C5 /* Pods-Adamant.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Adamant/Adamant.entitlements;
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = ADM.Dev;
@@ -1248,7 +1254,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "37a2cc10-f98c-431d-b00f-e929c1e336fc";
+				PROVISIONING_PROFILE = "e4233bbf-3705-44fe-95b0-e77475672c60";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Debug Dev";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1260,6 +1266,7 @@
 			baseConfigurationReference = D283570A539D864115735AAA /* Pods-Adamant.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Adamant/Adamant.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
@@ -1270,111 +1277,12 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "65b9c88e-381e-45f4-83fb-10cb9d8b343d";
+				PROVISIONING_PROFILE = "bedd1b75-2f23-4a85-a0b2-14c424fcff42";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
-		};
-		E9722062201E654D004F2AAD /* Testing */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = ADAMANT;
-				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			};
-			name = Testing;
-		};
-		E9722063201E654D004F2AAD /* Testing */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 903AC078A8A55175A05E42D4 /* Pods-Adamant.testing.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = J2L77FMN46;
-				DISPLAY_NAME = Adamant;
-				INFOPLIST_FILE = Adamant/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-qa";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "79394ceb-6016-46b9-8b60-1927d7bd227a";
-				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT QA Dev";
-				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Testing;
-		};
-		E9722064201E654D004F2AAD /* Testing */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = J2L77FMN46;
-				INFOPLIST_FILE = AdamantTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = im.adamant.AdamantTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Adamant.app/Adamant";
-			};
-			name = Testing;
 		};
 		E9EC344C20066D4A00C0E546 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1419,7 +1327,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E913C8FE1FFFA51E001A83F7 /* Debug */,
-				E9722062201E654D004F2AAD /* Testing */,
 				E913C8FF1FFFA51E001A83F7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1429,7 +1336,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E913C9011FFFA51E001A83F7 /* Debug */,
-				E9722063201E654D004F2AAD /* Testing */,
 				E913C9021FFFA51E001A83F7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1439,7 +1345,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E9EC344C20066D4A00C0E546 /* Debug */,
-				E9722064201E654D004F2AAD /* Testing */,
 				E9EC344D20066D4A00C0E546 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
