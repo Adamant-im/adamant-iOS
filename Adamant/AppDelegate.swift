@@ -150,6 +150,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			}
 		}
 		
+//		UIApplication.shared.registerForRemoteNotifications()
+//		UIApplication.shared.unregisterForRemoteNotifications()
+		
 		return true
 	}
 	
@@ -179,6 +182,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		} else {
 			repeater.resumeAll()
 		}
+	}
+}
+
+// MARK: - Remote notifications
+extension AppDelegate {
+	func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+		print(userInfo)
+	}
+	
+	func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+		let tokenParts = deviceToken.map { data -> String in
+			return String(format: "%02.2hhx", data)
+		}
+		
+		let token = tokenParts.joined()
+		print("Device Token: \(token)")
+	}
+	
+	func application(_ application: UIApplication,
+					 didFailToRegisterForRemoteNotificationsWithError error: Error) {
+		print("Failed to register: \(error)")
 	}
 }
 
