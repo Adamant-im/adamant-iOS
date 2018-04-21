@@ -749,7 +749,6 @@
 				E913C8EB1FFFA51D001A83F7 /* Frameworks */,
 				E913C8EC1FFFA51D001A83F7 /* Resources */,
 				1C93FABD2FEB3E73F76872C8 /* [CP] Embed Pods Frameworks */,
-				9103110972E84A36FC64A689 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -918,21 +917,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		9103110972E84A36FC64A689 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Adamant/Pods-Adamant-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E40A2E5936758D20792675C8 /* [CP] Check Pods Manifest.lock */ = {
