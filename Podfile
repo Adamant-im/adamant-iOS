@@ -12,7 +12,7 @@ target 'Adamant' do
   
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars
-  pod 'FTIndicator', :git => 'git@github.com:RealBonus/FTIndicator' # Notifications and activity indicator
+  pod 'FTIndicator' # Notifications and activity indicator
   pod 'Eureka' # Forms
   pod 'MessageKit' # Chat UI
   pod 'MyLittlePinpad' # Pinpad
