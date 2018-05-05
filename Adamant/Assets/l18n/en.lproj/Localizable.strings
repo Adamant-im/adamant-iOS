@@ -209,8 +209,14 @@
 /* Notifications: New message notification title */
 "NotificationsService.NewMessage.Title" = "New Message";
 
+/* Notifications: New single message notification body */
+"NotificationsService.NewMessage.BodySingle" = "You have new message";
+
 /* Notifications: New transfer transaction title */
 "NotificationsService.NewTransfer.Title" = "New Transfer";
+
+/* Notifications: New single transfer transaction body */
+"NotificationsService.NewTransfer.BodySingle" = "You have new transfer";
 
 /* Notifications: User has disabled notifications. Head him into settings */
 "NotificationsService.NotificationsDisabled" = "Notifications disabled. You can enable notifications in Settings";
