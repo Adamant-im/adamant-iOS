@@ -9,6 +9,7 @@ target 'Adamant' do
   pod 'RNCryptor' # Cryptor
   pod 'Swinject' # Dependency Injection
   pod 'ReachabilitySwift' # Network status
+  pod 'Haring' # Markdown parser
   
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars

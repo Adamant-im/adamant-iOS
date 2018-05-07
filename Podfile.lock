@@ -10,6 +10,7 @@ PODS:
   - FTIndicator/FTNotificationIndicator (1.2.8)
   - FTIndicator/FTProgressIndicator (1.2.8)
   - FTIndicator/FTToastIndicator (1.2.8)
+  - Haring (2.0.7)
   - KeychainAccess (3.1.1)
   - MessageKit (0.13.4)
   - MyLittlePinpad (0.2.4)
@@ -24,6 +25,7 @@ DEPENDENCIES:
   - Eureka
   - FreakingSimpleRoundImageView
   - FTIndicator
+  - Haring
   - KeychainAccess
   - MessageKit
   - MyLittlePinpad
@@ -39,6 +41,7 @@ SPEC REPOS:
     - Eureka
     - FreakingSimpleRoundImageView
     - FTIndicator
+    - Haring
     - KeychainAccess
     - MessageKit
     - MyLittlePinpad
@@ -53,6 +56,7 @@ SPEC CHECKSUMS:
   Eureka: b88fb930e42c79f8c03c373d0fcdc28c1d6c50ed
   FreakingSimpleRoundImageView: 4a3a1cb1347beb247f8c63b5b5cae9d770b431ee
   FTIndicator: 5218a42e6a3bb6623f58e4931fc36bb09b7e1b78
+  Haring: e9fa27a6ca648045fbacccc59547abed44b26694
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
   MessageKit: b600e3f466632f93c0333c78fd9006c960c8cbe2
   MyLittlePinpad: dc5f8a7fc13a4ad6fc9dc8d3359d91f1b5b1c7e8
@@ -61,6 +65,6 @@ SPEC CHECKSUMS:
   RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
   Swinject: a1364b0f66c2736bb03c1c7cab54809e16df25da
 
-PODFILE CHECKSUM: d73e1c940db551ee6dfc242c1b5307dc8ed560be
+PODFILE CHECKSUM: 2afa7e8b57ec3b78d5cea2c6ce51fd5f71e3c1f6
 
 COCOAPODS: 1.5.0
