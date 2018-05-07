@@ -82,6 +82,9 @@
 /* Unknown internal error */
 "ApiService.InternalError.UnknownError" = "Unknown error. Report a bug";
 
+/* Eureka forms Cancel button */
+"Cancel" = "Cancel";
+
 /* ChatList: outgoing message preview format, like 'You: %@' */
 "ChatListPage.SentMessageFormat" = "You: %@";
 
@@ -205,6 +208,39 @@
 
 /* New chat: scene title */
 "NewChatScene.Title" = "New Chat";
+
+/* Notifications: Modes description. Markdown supported. */
+"Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. This can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You receive notification almost instantly after a message was sent and approved by the Blockchain - a few seconds delay. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.";
+
+/* Notifications: Notifications update mode */
+"Notifications.Section.Settings" = "Notifications settings";
+
+/* Notifications: Selected notifications types */
+"Notifications.Section.NotificationsType" = "Notifications";
+
+/* Notifications: About ANS */
+"Notifications.Section.AboutANS" = "About ANS";
+
+/* Notifications: Disable notifications */
+"Notifications.Mode.NotificationsDisabled" = "Disabled";
+
+/* Notifications: Use Background fetch notifications */
+"Notifications.Mode.BackgroundFetch" = "Background Fetch";
+
+/* Notifications: Use Apple Push notifications */
+"Notifications.Mode.ApplePush" = "Push";
+
+/* Notifications: Visit Github */
+"Notifications.Row.VisitGithub" = "Visit Github";
+
+/* Notifications: Mode */
+"Notifications.Row.Mode" = "Notifications mode";
+
+/* Notifications: Send new messages notifications */
+"Notifications.Row.Messages" = "Messages";
+
+/* Notifications: Send new transfers notifications */
+"Notifications.Row.Transfers" = "Transfers";
 
 /* Notifications: New message notification title */
 "NotificationsService.NewMessage.Title" = "New Message";

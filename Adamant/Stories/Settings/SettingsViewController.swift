@@ -17,6 +17,8 @@ extension String.adamantLocalized {
 		static let stayInTurnOff = NSLocalizedString("SettingsPage.DoNotStayLoggedIn", comment: "Config: turn off 'Stay Logged In' confirmation")
 		static let biometryOnReason = NSLocalizedString("SettingsPage.UseBiometry", comment: "Config: Authorization reason for turning biometry on")
 		static let biometryOffReason = NSLocalizedString("SettingsPage.DoNotUseBiometry", comment: "Config: Authorization reason for turning biometry off")
+		
+		private init() {}
 	}
 }
 
@@ -145,26 +147,44 @@ class SettingsViewController: FormViewController {
 		})
 		
 		// Notifications
-		<<< SwitchRow() {
-			$0.tag = Rows.notifications.tag
+//		<<< SwitchRow() {
+//			$0.tag = Rows.notifications.tag
+//			$0.title = Rows.notifications.localized
+//			$0.value = notificationsService.notificationsEnabled
+//
+//			$0.hidden = Condition.function([Rows.stayLoggedIn.tag], { form -> Bool in
+//				guard let row: SwitchRow = form.rowBy(tag: Rows.stayLoggedIn.tag), let value = row.value else {
+//					return true
+//				}
+//
+//				return !value
+//			})
+//		}.onChange({ [weak self] row in
+//			guard let enabled = row.value else { return }
+//			self?.setNotifications(enabled: enabled)
+//		}).cellUpdate({ (cell, _) in
+//			if let label = cell.textLabel {
+//				label.font = UIFont.adamantPrimary(size: 17)
+//				label.textColor = UIColor.adamantPrimary
+//			}
+//		})
+		<<< LabelRow() {
 			$0.title = Rows.notifications.localized
-			$0.value = notificationsService.notificationsEnabled
-			
-			$0.hidden = Condition.function([Rows.stayLoggedIn.tag], { form -> Bool in
-				guard let row: SwitchRow = form.rowBy(tag: Rows.stayLoggedIn.tag), let value = row.value else {
-					return true
-				}
-				
-				return !value
-			})
-		}.onChange({ [weak self] row in
-			guard let enabled = row.value else { return }
-			self?.setNotifications(enabled: enabled)
+			$0.tag = Rows.notifications.tag
+		}.cellSetup({ (cell, _) in
+			cell.selectionStyle = .gray
+		}).onCellSelection({ [weak self] (cell, _) in
+			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.notifications) else {
+				return
+			}
+			nav.pushViewController(vc, animated: true)
 		}).cellUpdate({ (cell, _) in
 			if let label = cell.textLabel {
 				label.font = UIFont.adamantPrimary(size: 17)
 				label.textColor = UIColor.adamantPrimary
 			}
+			
+			cell.accessoryType = .disclosureIndicator
 		})
 		
 		// MARK: Utilities

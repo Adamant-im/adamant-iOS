@@ -26,6 +26,11 @@ extension AdamantScene {
 			return c
 		})
 		
+		static let notifications = AdamantScene(identifier: "NotificationsViewController") { r -> UIViewController in
+			let c = NotificationsViewController()
+			return c
+		}
+		
 		private init() {}
 	}
 }

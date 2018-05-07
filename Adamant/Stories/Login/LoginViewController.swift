@@ -223,13 +223,13 @@ class LoginViewController: FormViewController {
 			$0.hidden = Condition.function([], { [weak self] form -> Bool in
 				return self?.hideNewPassphrase ?? false
 			})
-			}.cellUpdate({ (cell, row) in
-				cell.textView.textAlignment = .center
-				cell.textView.font = UIFont.adamantPrimary(size: 14)
-				cell.textView.textColor = UIColor.adamantPrimary
-				cell.textView.isSelectable = false
-				cell.textView.isEditable = false
-			})
+		}.cellUpdate({ (cell, _) in
+			cell.textView.textAlignment = .center
+			cell.textView.font = UIFont.adamantPrimary(size: 14)
+			cell.textView.textColor = UIColor.adamantPrimary
+			cell.textView.isSelectable = false
+			cell.textView.isEditable = false
+		})
 		
 		// New genegated passphrase
 		<<< PassphraseRow() {

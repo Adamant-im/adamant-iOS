@@ -42,6 +42,7 @@
 		E91947B020002393001362F8 /* AdamantApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AF20002393001362F8 /* AdamantApiService.swift */; };
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
 		E91947B420002809001362F8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B320002809001362F8 /* Account.swift */; };
+		E91A063A209F05AA0018A102 /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91A0639209F05AA0018A102 /* NotificationsViewController.swift */; };
 		E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */; };
 		E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921597420611A6A0000CA5C /* AdamantReachability.swift */; };
 		E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921597A206503000000CA5C /* ButtonsStripeView.swift */; };
@@ -224,6 +225,7 @@
 		E91947AF20002393001362F8 /* AdamantApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantApiService.swift; sourceTree = "<group>"; };
 		E91947B12000246A001362F8 /* AdamantError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantError.swift; sourceTree = "<group>"; };
 		E91947B320002809001362F8 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
+		E91A0639209F05AA0018A102 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachabilityMonitor.swift; sourceTree = "<group>"; };
 		E921597420611A6A0000CA5C /* AdamantReachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantReachability.swift; sourceTree = "<group>"; };
 		E921597A206503000000CA5C /* ButtonsStripeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonsStripeView.swift; sourceTree = "<group>"; };
@@ -626,6 +628,7 @@
 				E982F69B20235B4D00566AC7 /* SettingsViewController.swift */,
 				E93D7AC12052EE21005D19DC /* SettingsViewController+StayIn.swift */,
 				E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */,
+				E91A0639209F05AA0018A102 /* NotificationsViewController.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -1001,6 +1004,7 @@
 				E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */,
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
+				E91A063A209F05AA0018A102 /* NotificationsViewController.swift in Sources */,
 				E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */,
 				E9150BA12066DA210065A985 /* ChatTransaction+CoreDataClass.swift in Sources */,
 				E9CAE8D42018AC1800345E76 /* AdamantApi+Keys.swift in Sources */,
