@@ -85,7 +85,6 @@ class SettingsViewController: FormViewController {
 	var accountService: AccountService!
 	var dialogService: DialogService!
 	var localAuth: LocalAuthentication!
-	var notificationsService: NotificationsService!
 	var router: Router!
 	
 	
@@ -147,27 +146,6 @@ class SettingsViewController: FormViewController {
 		})
 		
 		// Notifications
-//		<<< SwitchRow() {
-//			$0.tag = Rows.notifications.tag
-//			$0.title = Rows.notifications.localized
-//			$0.value = notificationsService.notificationsEnabled
-//
-//			$0.hidden = Condition.function([Rows.stayLoggedIn.tag], { form -> Bool in
-//				guard let row: SwitchRow = form.rowBy(tag: Rows.stayLoggedIn.tag), let value = row.value else {
-//					return true
-//				}
-//
-//				return !value
-//			})
-//		}.onChange({ [weak self] row in
-//			guard let enabled = row.value else { return }
-//			self?.setNotifications(enabled: enabled)
-//		}).cellUpdate({ (cell, _) in
-//			if let label = cell.textLabel {
-//				label.font = UIFont.adamantPrimary(size: 17)
-//				label.textColor = UIColor.adamantPrimary
-//			}
-//		})
 		<<< LabelRow() {
 			$0.title = Rows.notifications.localized
 			$0.tag = Rows.notifications.tag
@@ -258,16 +236,6 @@ class SettingsViewController: FormViewController {
 				row.evaluateHidden()
 			}
 		}
-		
-		// MARK: Notifications
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.showNotificationsChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			guard let row: SwitchRow = self?.form.rowBy(tag: Rows.notifications.tag), let value = self?.notificationsService.notificationsEnabled else {
-				return
-			}
-			
-			row.value = value
-			row.updateCell()
-		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -281,50 +249,3 @@ class SettingsViewController: FormViewController {
 		NotificationCenter.default.removeObserver(self)
 	}
 }
-
-
-// MARK: - Properties
-extension SettingsViewController {
-	func setNotifications(enabled: Bool) {
-		guard enabled != notificationsService.notificationsEnabled else {
-			return
-		}
-		
-		notificationsService.setNotificationsEnabled(enabled) { [weak self] result in
-			switch result {
-			case .success:
-				break
-				
-			case .denied(error: _):
-				DispatchQueue.main.async {
-					let alert = UIAlertController(title: nil, message: String.adamantLocalized.notifications.notificationsDisabled, preferredStyle: .alert)
-					
-					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
-						DispatchQueue.main.async {
-							if let row: SwitchRow = self?.form.rowBy(tag: Rows.notifications.tag) {
-								row.value = false
-								row.updateCell()
-							}
-							
-							if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
-								UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
-							}
-						}
-					})
-					
-					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: { _ in
-						if let row: SwitchRow = self?.form.rowBy(tag: Rows.notifications.tag) {
-							row.value = false
-							row.updateCell()
-						}
-					}))
-					
-					self?.present(alert, animated: true, completion: nil)
-				}
-			}
-		}
-	}
-}
-
-
-

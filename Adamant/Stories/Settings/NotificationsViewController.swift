@@ -18,11 +18,7 @@ extension String.adamantLocalized {
 	}
 }
 
-enum NotificationMode: CustomStringConvertible {
-	case disabled
-	case backgroundFetch
-	case push
-	
+extension NotificationsMode: CustomStringConvertible {
 	var localized: String {
 		switch self {
 		case .disabled:
@@ -42,8 +38,6 @@ enum NotificationMode: CustomStringConvertible {
 }
 
 class NotificationsViewController: FormViewController {
-	private static let githubUrl = URL.init(string: "https://github.com/Adamant-im/AdamantNotificationService/blob/master/README.md")
-	
 	// MARK: Sections & Rows
 	enum Sections {
 		case settings
@@ -109,11 +103,16 @@ class NotificationsViewController: FormViewController {
 		}
 	}
 	
+	// MARK: Dependencies
+	
+	var notificationsService: NotificationsService!
+	
+	
 	// MARK: Properties
 	
-	private(set) var notificationMode: NotificationMode = .disabled
-	
+	private static let githubUrl = URL.init(string: "https://github.com/Adamant-im/AdamantNotificationService/blob/master/README.md")
 	private var notificationTypesHidden: Bool = true
+	
 	
 	// MARK: Lifecycle
 	
@@ -127,12 +126,12 @@ class NotificationsViewController: FormViewController {
 			$0.tag = Sections.settings.tag
 		}
 		
-		<<< ActionSheetRow<NotificationMode>() {
+		<<< ActionSheetRow<NotificationsMode>() {
 			$0.tag = Rows.notificationsMode.tag
 			$0.title = Rows.notificationsMode.localized
 			$0.selectorTitle = Rows.notificationsMode.localized
 			$0.options = [.disabled, .backgroundFetch, .push]
-			$0.value = NotificationMode.disabled
+			$0.value = notificationsService.notificationsMode
 		}.onChange({ [weak self] row in
 			guard let mode = row.value else {
 				return
@@ -144,30 +143,7 @@ class NotificationsViewController: FormViewController {
 		})
 		
 		
-		// MARK: Types
-		+++ Section(Sections.types.localized) {
-			$0.tag = Sections.types.tag
-			$0.hidden = Condition.function([Rows.notificationsMode.tag], { [weak self] _ -> Bool in
-				guard let notificationTypesHidden = self?.notificationTypesHidden else {
-					return true
-				}
-				return notificationTypesHidden
-			})
-		}
-		
-		<<< SwitchRow() {
-			$0.tag = Rows.messages.tag
-			$0.title = Rows.messages.localized
-		}
-		
-		<<< SwitchRow() {
-			$0.tag = Rows.transfers.tag
-			$0.title = Rows.transfers.localized
-		}
-		
-		
 		// MARK: ANS
-		
 		+++ Section(Sections.ans.localized) {
 			$0.tag = Sections.ans.tag
 		}
@@ -202,25 +178,61 @@ class NotificationsViewController: FormViewController {
 	
 	// MARK: Logic
 	
-	func setNotificationMode(_ mode: NotificationMode) {
-		guard mode != notificationMode else {
+	func setNotificationMode(_ mode: NotificationsMode) {
+		guard mode != notificationsService.notificationsMode else {
 			return
 		}
 		
-		print(mode.localized)
+		switch mode {
+		case .backgroundFetch:
+			notificationTypesHidden = false
+			
+			if let msgs: SwitchRow = form.rowBy(tag: Rows.messages.tag),
+				let tgs: SwitchRow = form.rowBy(tag: Rows.transfers.tag) {
+				msgs.value = true
+				tgs.value = true
+			}
+			
+		default: notificationTypesHidden = true
+		}
 		
-		notificationMode = mode;
-		notificationTypesHidden = mode == .disabled
+		notificationsService.setNotificationsMode(mode) { [weak self] result in
+			switch result {
+			case .success:
+				return
+				
+			case .denied(error: _):
+				if let row: SwitchRow = self?.form.rowBy(tag: Rows.notificationsMode.tag) {
+					row.value = false
+					row.updateCell()
+				}
+				
+				self?.notificationTypesHidden = true
+				
+				if let section = self?.form.sectionBy(tag: Sections.types.tag) {
+					section.evaluateHidden()
+				}
+				
+				DispatchQueue.main.async {
+					self?.presentNotificationsDeniedError()
+				}
+			}
+		}
+	}
+	
+	private func presentNotificationsDeniedError() {
+		let alert = UIAlertController(title: nil, message: String.adamantLocalized.notifications.notificationsDisabled, preferredStyle: .alert)
 		
-//		switch mode {
-//		case .disabled:
-//			return
-//
-//		case .backgroundFetch:
-//			return
-//
-//		case .push:
-//			return
-//		}
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
+			DispatchQueue.main.async {
+				if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
+					UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+				}
+			}
+		})
+		
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+		
+		present(alert, animated: true, completion: nil)
 	}
 }

@@ -15,7 +15,6 @@ extension AdamantScene {
 			c.dialogService = r.resolve(DialogService.self)
 			c.accountService = r.resolve(AccountService.self)
 			c.localAuth = r.resolve(LocalAuthentication.self)
-			c.notificationsService = r.resolve(NotificationsService.self)
 			c.router = r.resolve(Router.self)
 			return c
 		})
@@ -28,6 +27,7 @@ extension AdamantScene {
 		
 		static let notifications = AdamantScene(identifier: "NotificationsViewController") { r -> UIViewController in
 			let c = NotificationsViewController()
+			c.notificationsService = r.resolve(NotificationsService.self)
 			return c
 		}
 		

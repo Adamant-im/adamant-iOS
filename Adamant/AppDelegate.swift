@@ -17,14 +17,29 @@ extension String.adamantLocalized {
 	}
 }
 
+// MARK: Resources
+struct AdamantResources {
+	// Storyboard
+	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
+	static let api = URL(string: "https://endless.adamant.im")!
+	static let ans = URL(string: "")!
+	static let coreDataModel = Bundle.main.url(forResource: "ChatModels", withExtension: "momd")!
+	
+	private init() {}
+}
+
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var window: UIWindow?
 	var repeater: RepeaterService!
 	var container: Container!
 	
+	// MARK: Dependencies
+	weak var ansApiService: AnsApiService?
 	weak var accountService: AccountService?
 	weak var notificationService: NotificationsService?
+	weak var dialogService: DialogService?
 
 	// MARK: - Lifecycle
 	
@@ -120,25 +135,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		
-		// MARK: 6. Notifications
-		if let service = container.resolve(NotificationsService.self) {
-			if service.notificationsEnabled {
-				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
-			} else {
-				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
-			}
-			
-			NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.showNotificationsChanged, object: service, queue: OperationQueue.main) { _ in
-				if service.notificationsEnabled {
-					UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
-				} else {
-					UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
-				}
-			}
-		}
-		
-		
-		// MARK: 7. Logout reset
+		// MARK: 6. Logout reset
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			// On logout, pop all navigators to root.
 			guard let tbc = self?.window?.rootViewController as? UITabBarController, let vcs = tbc.viewControllers else {
@@ -149,9 +146,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 				nav.popToRootViewController(animated: false)
 			}
 		}
-		
-//		UIApplication.shared.registerForRemoteNotifications()
-//		UIApplication.shared.unregisterForRemoteNotifications()
 		
 		return true
 	}
@@ -165,6 +159,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func applicationDidEnterBackground(_ application: UIApplication) {
 		repeater.pauseAll()
 	}
+	
+	// MARK: Notifications
 	
 	func applicationDidBecomeActive(_ application: UIApplication) {
 		if accountService?.account != nil {
@@ -187,27 +183,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 // MARK: - Remote notifications
 extension AppDelegate {
-	func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-		print(userInfo)
-	}
+//	func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+//		print(userInfo)
+//	}
 	
 	func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-		let tokenParts = deviceToken.map { data -> String in
-			return String(format: "%02.2hhx", data)
-		}
+		let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
 		
-		let token = tokenParts.joined()
-		print("Device Token: \(token)")
+		ansApiService?.register(token: token) { [weak self] result in
+			switch result {
+			case .success:
+				return
+				
+			case .failure(let error):
+				self?.notificationService?.setNotificationsMode(.disabled, completion: nil)
+				self?.dialogService?.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription))
+			}
+		}
 	}
 	
-	func application(_ application: UIApplication,
-					 didFailToRegisterForRemoteNotificationsWithError error: Error) {
-		print("Failed to register: \(error)")
+	func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+		notificationService?.setNotificationsMode(.disabled, completion: nil)
+		dialogService?.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription))
 	}
 }
 
 
-// MARK: - BackgroundFetch
+// MARK: - Background Fetch
 extension AppDelegate {
 	func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
 		let container = Container()

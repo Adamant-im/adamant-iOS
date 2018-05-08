@@ -8,15 +8,6 @@
 
 import Swinject
 
-// MARK: - Resources
-private struct AdamantResources {
-	// Storyboard
-	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
-	static let api = URL(string: "https://endless.adamant.im")!
-	static let coreDataModel = Bundle.main.url(forResource: "ChatModels", withExtension: "momd")!
-	
-	private init() {}
-}
 
 // MARK: - Services
 extension Container {

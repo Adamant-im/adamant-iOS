@@ -10,36 +10,27 @@ import Foundation
 import UIKit
 import UserNotifications
 
+extension NotificationsMode {
+	func toRaw() -> String {
+		return String(self.rawValue)
+	}
+	
+	init?(string: String) {
+		guard let int = Int(string: string), let mode = NotificationsMode(rawValue: int) else {
+			return nil
+		}
+		
+		self = mode
+	}
+}
+
 class AdamantNotificationsService: NotificationsService {
 	// MARK: Dependencies
-	var securedStore: SecuredStore! {
-		didSet {
-			if let raw = securedStore.get(StoreKey.notificationsService.notificationsEnabled), let show = Bool(raw) {
-				if show {
-					UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
-						switch settings.authorizationStatus {
-						case .authorized:
-							self?.notificationsEnabled = true
-							
-						case .denied:
-							self?.notificationsEnabled = false
-							
-						case .notDetermined:
-							self?.notificationsEnabled = false
-						}
-					}
-				} else {
-					notificationsEnabled = false
-				}
-			} else {
-				notificationsEnabled = false
-			}
-		}
-	}
+	var securedStore: SecuredStore!
 	
 	
 	// MARK: Properties
-	private(set) var notificationsEnabled = false
+	private(set) var notificationsMode: NotificationsMode = .disabled
 	private(set) var customBadgeNumber = 0
 	
 	private var isBackgroundSession = false
@@ -47,62 +38,94 @@ class AdamantNotificationsService: NotificationsService {
 	
 	// MARK: Lifecycle
 	init() {
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { _ in
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			UNUserNotificationCenter.current().removeAllDeliveredNotifications()
 			UIApplication.shared.applicationIconBadgeNumber = 0
+			
+			if let securedStore = self?.securedStore, let raw = securedStore.get(StoreKey.notificationsService.notificationsMode), let mode = NotificationsMode(string: raw) {
+				self?.setNotificationsMode(mode, completion: nil)
+			} else {
+				self?.setNotificationsMode(.disabled, completion: nil)
+			}
 		}
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-			self?.notificationsEnabled = false
-			self?.securedStore.remove(StoreKey.notificationsService.notificationsEnabled)
-			NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.showNotificationsChanged, object: self)
+			self?.setNotificationsMode(.disabled, completion: nil)
 		}
 	}
 	
 	deinit {
 		NotificationCenter.default.removeObserver(self)
 	}
-	
-	
-	// MARK: Notifications authorization
-	func setNotificationsEnabled(_ enabled: Bool, completion: @escaping (NotificationsServiceResult) -> Void) {
-		guard notificationsEnabled != enabled else {
+}
+
+
+// MARK: - Notifications mode {
+extension AdamantNotificationsService {
+	func setNotificationsMode(_ mode: NotificationsMode, completion: ((NotificationsServiceResult) -> Void)?) {
+		switch mode {
+		case .disabled:
+			UIApplication.shared.unregisterForRemoteNotifications()
+			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+			securedStore.remove(StoreKey.notificationsService.notificationsMode)
+			notificationsMode = mode
+			NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: self)
+			completion?(.success)
 			return
-		}
-		
-		if enabled { // MARK: Turn on
-			UNUserNotificationCenter.current().getNotificationSettings(completionHandler: { [weak self] settings in
-				switch settings.authorizationStatus {
-				case .authorized:
-					self?.notificationsEnabled = true
-					self?.securedStore.set(String(true), for: StoreKey.notificationsService.notificationsEnabled)
-					NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.showNotificationsChanged, object: self)
-					completion(.success)
-					
-				case .denied:
-					self?.notificationsEnabled = false
-					completion(.denied(error: nil))
-					
-				case .notDetermined:
-					UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound], completionHandler: { (granted, error) in
-						self?.notificationsEnabled = false
-						if granted {
-							completion(.success)
-						} else {
-							completion(.denied(error: error))
-						}
-					})
+			
+		case .backgroundFetch:
+			authorizeNotifications { [weak self] (success, error) in
+				guard success else {
+					completion?(.denied(error: error))
+					return
 				}
-			})
-		} else { // MARK: Turn off
-			notificationsEnabled = false
-			securedStore.remove(StoreKey.notificationsService.notificationsEnabled)
-			NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.showNotificationsChanged, object: self)
+				
+				UIApplication.shared.unregisterForRemoteNotifications()
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
+				self?.securedStore.set(mode.toRaw(), for: StoreKey.notificationsService.notificationsMode)
+				self?.notificationsMode = mode
+				NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: self)
+				completion?(.success)
+			}
+			
+		case .push:
+			authorizeNotifications { [weak self] (success, error) in
+				guard success else {
+					completion?(.denied(error: error))
+					return
+				}
+				
+				UIApplication.shared.registerForRemoteNotifications()
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+				self?.securedStore.set(mode.toRaw(), for: StoreKey.notificationsService.notificationsMode)
+				self?.notificationsMode = mode
+				NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: self)
+				completion?(.success)
+			}
 		}
 	}
 	
-	
-	// MARK: Posting & removing Notifications
+	private func authorizeNotifications(completion: @escaping (Bool, Error?) -> Void) {
+		UNUserNotificationCenter.current().getNotificationSettings { settings in
+			switch settings.authorizationStatus {
+			case .authorized:
+				completion(true, nil)
+				
+			case .denied:
+				completion(false, nil)
+				
+			case .notDetermined:
+				UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound], completionHandler: { (granted, error) in
+					completion(granted, error)
+				})
+			}
+		}
+	}
+}
+
+
+// MARK: - Posting & removing Notifications
+extension AdamantNotificationsService {
 	func showNotification(title: String, body: String, type: AdamantNotificationType) {
 		let content = UNMutableNotificationContent()
 		content.title = title
@@ -156,7 +179,8 @@ class AdamantNotificationsService: NotificationsService {
 	}
 }
 
-// MARK: Background batch notifications
+
+// MARK: - Background batch notifications
 extension AdamantNotificationsService {
 	func startBackgroundBatchNotifications() {
 		isBackgroundSession = true
