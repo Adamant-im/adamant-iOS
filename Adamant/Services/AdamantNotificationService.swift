@@ -65,8 +65,7 @@ extension AdamantNotificationsService {
 	func setNotificationsMode(_ mode: NotificationsMode, completion: ((NotificationsServiceResult) -> Void)?) {
 		switch mode {
 		case .disabled:
-			UIApplication.shared.unregisterForRemoteNotifications()
-			UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+			AdamantNotificationsService.configureUIApplicationFor(mode: mode)
 			securedStore.remove(StoreKey.notificationsService.notificationsMode)
 			notificationsMode = mode
 			NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: self)
@@ -80,8 +79,7 @@ extension AdamantNotificationsService {
 					return
 				}
 				
-				UIApplication.shared.unregisterForRemoteNotifications()
-				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
+				AdamantNotificationsService.configureUIApplicationFor(mode: mode)
 				self?.securedStore.set(mode.toRaw(), for: StoreKey.notificationsService.notificationsMode)
 				self?.notificationsMode = mode
 				NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: self)
@@ -95,8 +93,7 @@ extension AdamantNotificationsService {
 					return
 				}
 				
-				UIApplication.shared.registerForRemoteNotifications()
-				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+				AdamantNotificationsService.configureUIApplicationFor(mode: mode)
 				self?.securedStore.set(mode.toRaw(), for: StoreKey.notificationsService.notificationsMode)
 				self?.notificationsMode = mode
 				NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: self)
@@ -118,6 +115,32 @@ extension AdamantNotificationsService {
 				UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound], completionHandler: { (granted, error) in
 					completion(granted, error)
 				})
+			}
+		}
+	}
+	
+	private static func configureUIApplicationFor(mode: NotificationsMode) {
+		let callback = {
+			switch mode {
+			case .disabled:
+				UIApplication.shared.unregisterForRemoteNotifications()
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+				
+			case .backgroundFetch:
+				UIApplication.shared.unregisterForRemoteNotifications()
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
+				
+			case .push:
+				UIApplication.shared.registerForRemoteNotifications()
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+			}
+		}
+		
+		if Thread.isMainThread {
+			callback()
+		} else {
+			DispatchQueue.main.sync {
+				callback()
 			}
 		}
 	}

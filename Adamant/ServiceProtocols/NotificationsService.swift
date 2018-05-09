@@ -18,7 +18,7 @@ extension String.adamantLocalized {
 		static let newTransferTitle = NSLocalizedString("NotificationsService.NewTransfer.Title", comment: "Notifications: New transfer transaction title")
 		static let newTransferBody = NSLocalizedString("NotificationsService.NewTransfer.BodyFormat", comment: "Notifications: New transfer notification body. Using %d for amount")
 		
-		static let registerRemotesError = NSLocalizedString("NotificationsService.Error.RegistrationRemotesFormat", comment: "Notifications: Something went wrong with registration remote notifications. %@ for description")
+		static let registerRemotesError = NSLocalizedString("NotificationsService.Error.RegistrationRemotesFormat", comment: "Notifications: while registering remote notifications. %@ for description")
 		
 		private init() {}
 	}

@@ -242,6 +242,9 @@
 /* Notifications: Send new transfers notifications */
 "Notifications.Row.Transfers" = "Transfers";
 
+/* Notifications: Something went wrong while registering remote notifications. %@ for description */
+"NotificationsService.Error.RegistrationRemotesFormat" = "Registration in ANS failed. Please, try again later. Reason %@";
+
 /* Notifications: New message notification title */
 "NotificationsService.NewMessage.Title" = "New Message";
 

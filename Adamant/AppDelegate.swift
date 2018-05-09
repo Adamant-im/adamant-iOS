@@ -36,10 +36,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var container: Container!
 	
 	// MARK: Dependencies
-	weak var ansApiService: AnsApiService?
-	weak var accountService: AccountService?
-	weak var notificationService: NotificationsService?
-	weak var dialogService: DialogService?
+	var ansApiService: AnsApiService!
+	var accountService: AccountService!
+	var notificationService: NotificationsService!
 
 	// MARK: - Lifecycle
 	
@@ -50,6 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		accountService = container.resolve(AccountService.self)
 		notificationService = container.resolve(NotificationsService.self)
 		
+		ansApiService = AnsApiService(ansApi: AdamantResources.ans)
 		
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
@@ -163,8 +163,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	// MARK: Notifications
 	
 	func applicationDidBecomeActive(_ application: UIApplication) {
-		if accountService?.account != nil {
-			notificationService?.removeAllDeliveredNotifications()
+		if accountService.account != nil {
+			notificationService.removeAllDeliveredNotifications()
 		}
 		
 		if let connection = container.resolve(ReachabilityMonitor.self)?.connection {
@@ -188,23 +188,34 @@ extension AppDelegate {
 //	}
 	
 	func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+		guard let address = accountService.account?.address else {
+			print("Trying to register with no user logged")
+			UIApplication.shared.unregisterForRemoteNotifications()
+			return
+		}
+		
 		let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
 		
-		ansApiService?.register(token: token) { [weak self] result in
+		ansApiService?.register(token: token, address: address) { [weak self] result in
 			switch result {
 			case .success:
 				return
 				
 			case .failure(let error):
 				self?.notificationService?.setNotificationsMode(.disabled, completion: nil)
-				self?.dialogService?.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription))
+				if let service = self?.container.resolve(DialogService.self) {
+					service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription))
+				}
 			}
 		}
 	}
 	
 	func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
 		notificationService?.setNotificationsMode(.disabled, completion: nil)
-		dialogService?.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription))
+		
+		if let service = container.resolve(DialogService.self) {
+			service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription))
+		}
 	}
 }
 
@@ -234,7 +245,7 @@ extension AppDelegate {
 		
 		for service in services {
 			group.enter()
-			service.fetchBackgroundData(notificationService: notificationsService) { result in
+			service.fetchBackgroundData(notificationsService: notificationsService) { result in
 				defer {
 					group.leave()
 				}
