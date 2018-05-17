@@ -441,6 +441,7 @@
 		E913C9061FFFA92E001A83F7 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				E965A52E20ADC6080041A3EA /* AdamantServices */,
 				E9CAE8D02018AA5000345E76 /* ApiService */,
 				E9B3D39F201FA2090019EB36 /* DataProviders */,
 				E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */,
@@ -623,6 +624,14 @@
 			path = Parsing;
 			sourceTree = "<group>";
 		};
+		E965A52E20ADC6080041A3EA /* AdamantServices */ = {
+			isa = PBXGroup;
+			children = (
+				E961E94C20A1E203005C8872 /* AnsApiService.swift */,
+			);
+			path = AdamantServices;
+			sourceTree = "<group>";
+		};
 		E982F69820235AF000566AC7 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -669,7 +678,6 @@
 				E9CAE8D32018AC1800345E76 /* AdamantApi+Keys.swift */,
 				E9CAE8D52018AC5300345E76 /* AdamantApi+Transactions.swift */,
 				E9CAE8D72018ACA700345E76 /* AdamantApi+Transfers.swift */,
-				E961E94C20A1E203005C8872 /* AnsApiService.swift */,
 			);
 			path = ApiService;
 			sourceTree = "<group>";

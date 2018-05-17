@@ -15,6 +15,13 @@ enum AnsApiServiceResult {
 }
 
 class AnsApiService {
+	
+	/// Fallback registration ANS address
+	static private let ansAccount = (
+		address: "U10629337621822775991",
+		publicKey: "188b24bd116a556ac8ba905bbbdaa16e237dfb14269f5a4f9a26be77537d977c"
+	)
+	
 	struct ApiCommands {
 		static let register = "/api/devices/register"
 		
