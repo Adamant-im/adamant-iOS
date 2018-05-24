@@ -54,7 +54,8 @@ class AdamantApiService: ApiService {
 	
 	// MARK: - Properties
 	
-	let apiUrl: URL
+    var apiUrl: URL
+    let apiUrls: [String]
 	var defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility, attributes: [.concurrent])
 	
 	
@@ -62,8 +63,25 @@ class AdamantApiService: ApiService {
 	
 	init(apiUrl: URL) {
 		self.apiUrl = apiUrl
+        self.apiUrls = [apiUrl.absoluteString] // Temp
 	}
-	
+    
+    init(apiUrls: [String]) {
+        self.apiUrls = apiUrls
+        self.apiUrl = URL(string: apiUrls[0])! // Temp
+        
+        self.newServerAddress()
+    }
+    
+    func newServerAddress() {
+        let randomIndex = Int(arc4random_uniform(UInt32(self.apiUrls.count)))
+        let url = self.apiUrls[randomIndex]
+        self.apiUrl = URL(string: url)!
+        
+        self.testServer { (isAlive) in
+            if isAlive == false { self.newServerAddress() }
+        }
+    }
 	
 	// MARK: - Tools
 	
@@ -122,4 +140,28 @@ class AdamantApiService: ApiService {
 			return .serverError(error: error)
 		}
 	}
+    
+    // Test current server is it alive or not
+    func testServer(completion: @escaping (Bool) -> Void) {
+        // MARK: 1. Build endpoint
+        let endpoint: URL
+        do {
+            endpoint = try buildUrl(path: ApiCommands.Accounts.newAccount)
+        } catch {
+            completion(false)
+            return
+        }
+        
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        
+        // MARK: 2. Send
+        sendRequest(url: endpoint, method: .post, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerModelResponse<Account>>) in
+            switch serverResponse {
+            case .success: completion(true)
+            case .failure: completion(false)
+            }
+        }
+    }
 }
