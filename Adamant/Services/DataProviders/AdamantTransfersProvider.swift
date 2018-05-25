@@ -130,7 +130,7 @@ extension AdamantTransfersProvider {
 			return
 		}
 		
-		apiService.getTransactions(forAccount: address, type: .send, fromHeight: receivedLastHeight) { result in
+        apiService.getTransactions(forAccount: address, type: .send, fromHeight: receivedLastHeight, offset: 0) { result in
 			switch result {
 			case .success(let transactions):
 				guard transactions.count > 0 else {
