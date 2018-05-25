@@ -78,6 +78,12 @@ protocol ApiService: class {
 	func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void)
 	
 	
+	// MARK: - States
+	
+	/// - Returns: Transaction ID
+	func store(key: String, value: String, type: StateType, sender: String, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
+	
+	
 	// MARK: - Chats
 	
 	/// Get chat transactions (type 8)

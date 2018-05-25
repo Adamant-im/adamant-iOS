@@ -99,6 +99,7 @@
 		E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85C5200A9B070070534A /* ChatTableViewCell.swift */; };
 		E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C6200A9B070070534A /* ChatTableViewCell.xib */; };
 		E961E94D20A1E203005C8872 /* AnsApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E961E94C20A1E203005C8872 /* AnsApiService.swift */; };
+		E965A53020B594120041A3EA /* AdamantApi+States.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A52F20B594120041A3EA /* AdamantApi+States.swift */; };
 		E965A53220B82C850041A3EA /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53120B82C850041A3EA /* StateType.swift */; };
 		E965A53420B833A00041A3EA /* StateAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53320B833A00041A3EA /* StateAsset.swift */; };
 		E965A53620B8370C0041A3EA /* TransactionAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53520B8370C0041A3EA /* TransactionAsset.swift */; };
@@ -288,6 +289,7 @@
 		E95F85C5200A9B070070534A /* ChatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
 		E95F85C6200A9B070070534A /* ChatTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatTableViewCell.xib; sourceTree = "<group>"; };
 		E961E94C20A1E203005C8872 /* AnsApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnsApiService.swift; sourceTree = "<group>"; };
+		E965A52F20B594120041A3EA /* AdamantApi+States.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+States.swift"; sourceTree = "<group>"; };
 		E965A53120B82C850041A3EA /* StateType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateType.swift; sourceTree = "<group>"; };
 		E965A53320B833A00041A3EA /* StateAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateAsset.swift; sourceTree = "<group>"; };
 		E965A53520B8370C0041A3EA /* TransactionAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAsset.swift; sourceTree = "<group>"; };
@@ -684,6 +686,7 @@
 				E9CAE8D32018AC1800345E76 /* AdamantApi+Keys.swift */,
 				E9CAE8D52018AC5300345E76 /* AdamantApi+Transactions.swift */,
 				E9CAE8D72018ACA700345E76 /* AdamantApi+Transfers.swift */,
+				E965A52F20B594120041A3EA /* AdamantApi+States.swift */,
 			);
 			path = ApiService;
 			sourceTree = "<group>";
@@ -1042,6 +1045,7 @@
 				E95F85852008CB3A0070534A /* ChatListViewController.swift in Sources */,
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,
 				E9150B9F2066DA210065A985 /* MessageTransaction+CoreDataClass.swift in Sources */,
+				E965A53020B594120041A3EA /* AdamantApi+States.swift in Sources */,
 				E9150B982066DA210065A985 /* CoreDataAccount+CoreDataProperties.swift in Sources */,
 				E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */,
 				E9FAE5DA203DBFEF008D3A6B /* Comparable+Clamped.swift in Sources */,
