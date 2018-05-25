@@ -120,7 +120,7 @@
 		E9B3D3A9202082450019EB36 /* AdamantTransfersProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3D3A8202082450019EB36 /* AdamantTransfersProvider.swift */; };
 		E9C51ECF200E2D1100385EB7 /* FeeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51ECE200E2D1100385EB7 /* FeeTests.swift */; };
 		E9C51EED2011416E00385EB7 /* adamant-core.js in Resources */ = {isa = PBXBuildFile; fileRef = E9C51EEC2011416E00385EB7 /* adamant-core.js */; };
-		E9C51EEF20139DC600385EB7 /* ProcessTransactionResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51EEE20139DC600385EB7 /* ProcessTransactionResponse.swift */; };
+		E9C51EEF20139DC600385EB7 /* TransactionIdResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51EEE20139DC600385EB7 /* TransactionIdResponse.swift */; };
 		E9C51EF12013F18000385EB7 /* NewChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C51EF02013F18000385EB7 /* NewChatViewController.swift */; };
 		E9CAE8D22018AA7700345E76 /* AdamantApi+Accounts.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CAE8D12018AA7700345E76 /* AdamantApi+Accounts.swift */; };
 		E9CAE8D42018AC1800345E76 /* AdamantApi+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CAE8D32018AC1800345E76 /* AdamantApi+Keys.swift */; };
@@ -309,7 +309,7 @@
 		E9B3D3A8202082450019EB36 /* AdamantTransfersProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantTransfersProvider.swift; sourceTree = "<group>"; };
 		E9C51ECE200E2D1100385EB7 /* FeeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeeTests.swift; sourceTree = "<group>"; };
 		E9C51EEC2011416E00385EB7 /* adamant-core.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adamant-core.js"; sourceTree = "<group>"; };
-		E9C51EEE20139DC600385EB7 /* ProcessTransactionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessTransactionResponse.swift; sourceTree = "<group>"; };
+		E9C51EEE20139DC600385EB7 /* TransactionIdResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionIdResponse.swift; sourceTree = "<group>"; };
 		E9C51EF02013F18000385EB7 /* NewChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewChatViewController.swift; sourceTree = "<group>"; };
 		E9CAE8D12018AA7700345E76 /* AdamantApi+Accounts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Accounts.swift"; sourceTree = "<group>"; };
 		E9CAE8D32018AC1800345E76 /* AdamantApi+Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Keys.swift"; sourceTree = "<group>"; };
@@ -541,7 +541,7 @@
 			isa = PBXGroup;
 			children = (
 				E95F85792007F0260070534A /* ServerResponse.swift */,
-				E9C51EEE20139DC600385EB7 /* ProcessTransactionResponse.swift */,
+				E9C51EEE20139DC600385EB7 /* TransactionIdResponse.swift */,
 				E95F856E2007B61D0070534A /* GetPublicKeyResponse.swift */,
 			);
 			path = ServerResponses;
@@ -1025,7 +1025,7 @@
 				E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */,
 				E9150BA12066DA210065A985 /* ChatTransaction+CoreDataClass.swift in Sources */,
 				E9CAE8D42018AC1800345E76 /* AdamantApi+Keys.swift in Sources */,
-				E9C51EEF20139DC600385EB7 /* ProcessTransactionResponse.swift in Sources */,
+				E9C51EEF20139DC600385EB7 /* TransactionIdResponse.swift in Sources */,
 				E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E905D39B2048A9BD00DDB504 /* KeychainStore.swift in Sources */,

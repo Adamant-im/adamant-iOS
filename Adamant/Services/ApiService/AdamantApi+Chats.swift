@@ -105,7 +105,7 @@ extension AdamantApiService {
 					"senderPublicKey": normalizedTransaction.senderPublicKey,
 					"requesterPublicKey": normalizedTransaction.requesterPublicKey ?? NSNull(),
 					"timestamp": normalizedTransaction.timestamp,
-					"recipientId": normalizedTransaction.recipientId,
+					"recipientId": normalizedTransaction.recipientId ?? NSNull(),
 					"senderId": senderId,
 					"signature": signature,
 					"asset": [
@@ -122,7 +122,7 @@ extension AdamantApiService {
 				]
 				
 				// MARK: 5. Send
-				self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ProcessTransactionResponse>) in
+				self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<TransactionIdResponse>) in
 					switch serverResponse {
 					case .success(let response):
 						if let id = response.transactionId {

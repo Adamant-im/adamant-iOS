@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ProcessTransactionResponse: ServerResponse {
+class TransactionIdResponse: ServerResponse {
 	let transactionId: UInt64?
 	
 	required init(from decoder: Decoder) throws {
