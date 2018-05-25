@@ -44,9 +44,15 @@ extension AdamantApiService {
 		}
 	}
 	
-	func getTransactions(forAccount account: String, type: TransactionType, fromHeight: Int64?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
+	func getTransactions(forAccount account: String, type: TransactionType, fromHeight: Int64?, offset: Int? = 0, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
+        let chunkSize: Int = 20 // This is Hordcode. Remove later. For test only
+        
 		var queryItems = [URLQueryItem(name: "inId", value: account),
-						  URLQueryItem(name: "and:type", value: String(type.rawValue))]
+						  URLQueryItem(name: "and:type", value: String(type.rawValue)),
+                          URLQueryItem(name: "limit", value: String(chunkSize))
+        ]
+        
+        if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
 		
 		if let fromHeight = fromHeight, fromHeight > 0 {
 			queryItems.append(URLQueryItem(name: "and:fromHeight", value: String(fromHeight)))
@@ -65,7 +71,14 @@ extension AdamantApiService {
 			switch serverResponse {
 			case .success(let response):
 				if let collection = response.collection {
-					completion(.success(collection))
+                    print("Recive \(collection.count) trantaction(s)")
+                    completion(.success(collection))
+                    
+                    if collection.count >= chunkSize {
+                        let newOffset = (offset ?? 0) + collection.count
+                        print("Get next trantactions ftom \(newOffset) offset")
+                        self.getTransactions(forAccount: account, type: type, fromHeight: fromHeight, offset: newOffset, completion: completion)
+                    }
 				} else {
 					let error = AdamantApiService.translateServerError(response.error)
 					completion(.failure(error))

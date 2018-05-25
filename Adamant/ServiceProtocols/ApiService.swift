@@ -70,7 +70,7 @@ protocol ApiService: class {
 	// MARK: - Transactions
 	
 	func getTransaction(id: UInt64, completion: @escaping (ApiServiceResult<Transaction>) -> Void)
-	func getTransactions(forAccount: String, type: TransactionType, fromHeight: Int64?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
+	func getTransactions(forAccount: String, type: TransactionType, fromHeight: Int64?, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
 	
 	
 	// MARK: - Funds
