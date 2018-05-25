@@ -71,7 +71,7 @@ class ParsingModelsTests: XCTestCase {
 	}
 
 	func testChat() {
-		let c: Chat = TestTools.LoadJsonAndDecode(filename: "Chat")
+		let c: AssetChat = TestTools.LoadJsonAndDecode(filename: "Chat")
 
 		XCTAssertEqual(c.message, "7b7b3802f1d081e10624a373628fd0ba57e9348a7bca196c7511b05403a10611e3b4cf8b37cb9858f7f52cd5")
 		XCTAssertEqual(c.ownMessage, "f4f7972f735997b4c2014d87cb491bb156f9cc4d0404cb9c")

@@ -86,9 +86,8 @@
 		E95F857A2007F0260070534A /* ServerResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85792007F0260070534A /* ServerResponse.swift */; };
 		E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F857E2008C8D60070534A /* ChatsRoutes.swift */; };
 		E95F85852008CB3A0070534A /* ChatListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85842008CB3A0070534A /* ChatListViewController.swift */; };
-		E95F85872008FDBF0070534A /* Chat.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85862008FDBF0070534A /* Chat.swift */; };
+		E95F85872008FDBF0070534A /* ChatAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85862008FDBF0070534A /* ChatAsset.swift */; };
 		E95F8589200900B10070534A /* ChatType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F8588200900B10070534A /* ChatType.swift */; };
-		E95F858B200931410070534A /* TransactionAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F858A200931410070534A /* TransactionAsset.swift */; };
 		E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E95F85B1200954D00070534A /* ChatModels.xcdatamodeld */; };
 		E95F85B7200A4D8F0070534A /* TestTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85B6200A4D8F0070534A /* TestTools.swift */; };
 		E95F85BA200A4DC90070534A /* TransactionSend.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85B9200A4DC90070534A /* TransactionSend.json */; };
@@ -100,6 +99,9 @@
 		E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85C5200A9B070070534A /* ChatTableViewCell.swift */; };
 		E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C6200A9B070070534A /* ChatTableViewCell.xib */; };
 		E961E94D20A1E203005C8872 /* AnsApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E961E94C20A1E203005C8872 /* AnsApiService.swift */; };
+		E965A53220B82C850041A3EA /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53120B82C850041A3EA /* StateType.swift */; };
+		E965A53420B833A00041A3EA /* StateAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53320B833A00041A3EA /* StateAsset.swift */; };
+		E965A53620B8370C0041A3EA /* TransactionAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53520B8370C0041A3EA /* TransactionAsset.swift */; };
 		E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722065201F42BB004F2AAD /* CoreDataStack.swift */; };
 		E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */; };
 		E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E972206A201F44CA004F2AAD /* TransfersProvider.swift */; };
@@ -273,9 +275,8 @@
 		E95F85792007F0260070534A /* ServerResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerResponse.swift; sourceTree = "<group>"; };
 		E95F857E2008C8D60070534A /* ChatsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsRoutes.swift; sourceTree = "<group>"; };
 		E95F85842008CB3A0070534A /* ChatListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListViewController.swift; sourceTree = "<group>"; };
-		E95F85862008FDBF0070534A /* Chat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chat.swift; sourceTree = "<group>"; };
+		E95F85862008FDBF0070534A /* ChatAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAsset.swift; sourceTree = "<group>"; };
 		E95F8588200900B10070534A /* ChatType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatType.swift; sourceTree = "<group>"; };
-		E95F858A200931410070534A /* TransactionAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAsset.swift; sourceTree = "<group>"; };
 		E95F85B2200954D00070534A /* ChatModels.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ChatModels.xcdatamodel; sourceTree = "<group>"; };
 		E95F85B6200A4D8F0070534A /* TestTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTools.swift; sourceTree = "<group>"; };
 		E95F85B9200A4DC90070534A /* TransactionSend.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = TransactionSend.json; sourceTree = "<group>"; };
@@ -287,6 +288,9 @@
 		E95F85C5200A9B070070534A /* ChatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
 		E95F85C6200A9B070070534A /* ChatTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatTableViewCell.xib; sourceTree = "<group>"; };
 		E961E94C20A1E203005C8872 /* AnsApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnsApiService.swift; sourceTree = "<group>"; };
+		E965A53120B82C850041A3EA /* StateType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateType.swift; sourceTree = "<group>"; };
+		E965A53320B833A00041A3EA /* StateAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateAsset.swift; sourceTree = "<group>"; };
+		E965A53520B8370C0041A3EA /* TransactionAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAsset.swift; sourceTree = "<group>"; };
 		E9722065201F42BB004F2AAD /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InMemoryCoreDataStack.swift; sourceTree = "<group>"; };
 		E972206A201F44CA004F2AAD /* TransfersProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransfersProvider.swift; sourceTree = "<group>"; };
@@ -462,13 +466,15 @@
 			isa = PBXGroup;
 			children = (
 				E91947B320002809001362F8 /* Account.swift */,
-				E95F85862008FDBF0070534A /* Chat.swift */,
+				E95F85862008FDBF0070534A /* ChatAsset.swift */,
 				E95F8588200900B10070534A /* ChatType.swift */,
+				E965A53320B833A00041A3EA /* StateAsset.swift */,
+				E965A53120B82C850041A3EA /* StateType.swift */,
 				E95F85682006AB9D0070534A /* NormalizedTransaction.swift */,
 				E9E7CDC920040CC200DFC4DB /* Transaction.swift */,
-				E95F858A200931410070534A /* TransactionAsset.swift */,
 				E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */,
 				E9393FA92055D03300EE6F30 /* AdamantMessage.swift */,
+				E965A53520B8370C0041A3EA /* TransactionAsset.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -990,7 +996,6 @@
 				E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */,
 				E94E7B06205D48B20042B639 /* TransactionsRoutes.swift in Sources */,
 				E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */,
-				E95F858B200931410070534A /* TransactionAsset.swift in Sources */,
 				E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */,
 				E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */,
 				E9E7CDAC2002AFA500DFC4DB /* AccountViewController.swift in Sources */,
@@ -999,7 +1004,7 @@
 				E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */,
 				E9150B9C2066DA210065A985 /* BaseTransaction+CoreDataProperties.swift in Sources */,
 				E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */,
-				E95F85872008FDBF0070534A /* Chat.swift in Sources */,
+				E95F85872008FDBF0070534A /* ChatAsset.swift in Sources */,
 				E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */,
 				E90A494D204DA932009F6A65 /* LocalAuthentication.swift in Sources */,
 				E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */,
@@ -1044,6 +1049,8 @@
 				E95F857A2007F0260070534A /* ServerResponse.swift in Sources */,
 				E9A174B32057EC47003667CD /* BackgroundFetchService.swift in Sources */,
 				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
+				E965A53220B82C850041A3EA /* StateType.swift in Sources */,
+				E965A53620B8370C0041A3EA /* TransactionAsset.swift in Sources */,
 				E9061B97207501E40011F104 /* AdamantUserInfoKey.swift in Sources */,
 				E9CAE8D62018AC5300345E76 /* AdamantApi+Transactions.swift in Sources */,
 				E93D7ABE2052CEE1005D19DC /* NotificationsService.swift in Sources */,
@@ -1056,6 +1063,7 @@
 				E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */,
 				E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */,
 				E90A4943204C5ED6009F6A65 /* EurekaPassphraseRow.swift in Sources */,
+				E965A53420B833A00041A3EA /* StateAsset.swift in Sources */,
 				E9393FA82055C92700EE6F30 /* Decimal+adamant.swift in Sources */,
 				E95F8589200900B10070534A /* ChatType.swift in Sources */,
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,

@@ -256,12 +256,13 @@ extension JSAdamantCore {
 
 // MARK: - Transactions
 extension JSAdamantCore {
-	func sign(transaction t: NormalizedTransaction, senderId: String, keypair: Keypair) -> String? {
-		let asset: JSAsset
+	func sign(transaction t: SignableTransaction, senderId: String, keypair: Keypair) -> String? {
+		let asset = JSAsset()
 		if let chat = t.asset.chat {
-			asset = JSAsset(chat: JSChat(type: Int(chat.type.rawValue), message: chat.message, own_message: chat.ownMessage))
-		} else {
-			asset = JSAsset(chat: nil)
+			asset.chat = JSChat(type: Int(chat.type.rawValue), message: chat.message, own_message: chat.ownMessage)
+		}
+		if let store = t.asset.state {
+			asset.store = JSStore(key: store.key, value: store.value, type: Int(store.type.rawValue))
 		}
 		
 		let jsTransaction = JSTransaction(id: 0,
