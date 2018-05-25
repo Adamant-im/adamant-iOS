@@ -18,9 +18,9 @@ private struct AdamantResources {
     
     static let servers = [
         "https://endless.adamant.im",
-//        "https://clown.adamant.im",
-//        "https://lake.adamant.im",
-        "https://fake.adamant.im"
+        "https://clown.adamant.im",
+        "https://lake.adamant.im",
+//        "https://fake.adamant.im"
     ]
     
 	private init() {}
