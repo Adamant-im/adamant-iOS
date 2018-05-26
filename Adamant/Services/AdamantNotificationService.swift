@@ -51,6 +51,7 @@ class AdamantNotificationsService: NotificationsService {
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.setNotificationsMode(.disabled, completion: nil)
+			self?.securedStore.remove(StoreKey.notificationsService.notificationsMode)
 		}
 	}
 	

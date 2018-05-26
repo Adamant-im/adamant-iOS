@@ -8,6 +8,7 @@
 
 import UIKit
 import Swinject
+import CryptoSwift
 
 extension String.adamantLocalized {
 	struct tabItems {
@@ -17,12 +18,20 @@ extension String.adamantLocalized {
 	}
 }
 
+extension StoreKey {
+	struct application {
+		static let deviceTokenHash = "app.deviceTokenHash"
+		
+		private init() {}
+	}
+}
+
 // MARK: Resources
 struct AdamantResources {
 	// Storyboard
 	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
 	static let api = URL(string: "https://endless.adamant.im")!
-	static let ans = URL(string: "")!
+	static let ans = URL(string: "https://192.168.1.69:44340")!
 	static let coreDataModel = Bundle.main.url(forResource: "ChatModels", withExtension: "momd")!
 	
 	private init() {}
@@ -36,7 +45,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var container: Container!
 	
 	// MARK: Dependencies
-	var ansApiService: AnsApiService!
 	var accountService: AccountService!
 	var notificationService: NotificationsService!
 
@@ -48,8 +56,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		container.registerAdamantServices()
 		accountService = container.resolve(AccountService.self)
 		notificationService = container.resolve(NotificationsService.self)
-		
-		ansApiService = AnsApiService(ansApi: AdamantResources.ans)
 		
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
@@ -183,12 +189,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 // MARK: - Remote notifications
 extension AppDelegate {
-//	func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-//		print(userInfo)
-//	}
-	
 	func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-		guard let address = accountService.account?.address else {
+		guard let address = accountService.account?.address, let keypair = accountService.keypair else {
 			print("Trying to register with no user logged")
 			UIApplication.shared.unregisterForRemoteNotifications()
 			return
@@ -196,23 +198,37 @@ extension AppDelegate {
 		
 		let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
 		
-		ansApiService?.register(token: token, address: address) { [weak self] result in
+		// Checking, if device token had not changed
+		guard let securedStore = container.resolve(SecuredStore.self) else {
+			fatalError("can't get secured store to get device token hash")
+		}
+		
+		let tokenHash = token.md5()
+		
+		if let savedHash = securedStore.get(StoreKey.application.deviceTokenHash), tokenHash == savedHash {
+			return
+		} else {
+			securedStore.set(tokenHash, for: StoreKey.application.deviceTokenHash)
+		}
+		
+		// Storing new token in blockchain
+		guard let apiService = container.resolve(ApiService.self) else {
+			fatalError("can't get api service to register device token")
+		}
+		
+		apiService.store(key: "deviceToken", value: token, type: StateType.keyValue, sender: address, keypair: keypair) { [weak self] result in
 			switch result {
 			case .success:
 				return
 				
 			case .failure(let error):
+				print("Failed to store device token: \(error)")
 				self?.notificationService?.setNotificationsMode(.disabled, completion: nil)
-				if let service = self?.container.resolve(DialogService.self) {
-					service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription))
-				}
 			}
 		}
 	}
 	
 	func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-		notificationService?.setNotificationsMode(.disabled, completion: nil)
-		
 		if let service = container.resolve(DialogService.self) {
 			service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription))
 		}

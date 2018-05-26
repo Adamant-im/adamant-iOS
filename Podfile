@@ -7,6 +7,7 @@ target 'Adamant' do
   pod 'Alamofire' # Network
   pod 'KeychainAccess' # Keychain
   pod 'RNCryptor' # Cryptor
+  pod 'CryptoSwift' # MD5 hash
   pod 'Swinject' # Dependency Injection
   pod 'ReachabilitySwift' # Network status
   pod 'Haring' # Markdown parser
