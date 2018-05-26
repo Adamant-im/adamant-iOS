@@ -14,6 +14,7 @@ class AdamantAccountService {
 	
 	var apiService: ApiService!
 	var adamantCore: AdamantCore!
+	var notificationsService: NotificationsService!
 	var securedStore: SecuredStore! {
 		didSet {
 			securedStoreSemaphore.wait()
@@ -134,6 +135,7 @@ extension AdamantAccountService {
 		securedStore.remove(.privateKey)
 		securedStore.remove(.useBiometry)
 		hasStayInAccount = false
+		notificationsService.setNotificationsMode(.disabled, completion: nil)
 	}
 }
 

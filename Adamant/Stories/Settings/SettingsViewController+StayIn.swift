@@ -47,7 +47,7 @@ extension SettingsViewController {
 	
 	// MARK: Use biometry
 	func setBiometry(enabled: Bool) {
-		guard showBiometryRow, accountService.hasStayInAccount, accountService.useBiometry != enabled else {
+		guard showLoggedInOptions, accountService.hasStayInAccount, accountService.useBiometry != enabled else {
 			return
 		}
 		
@@ -86,18 +86,20 @@ extension SettingsViewController {
 				
 			case .failed:
 				DispatchQueue.main.async {
-					guard let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) else {
-						return
+					if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
+						if let value = self?.accountService.useBiometry {
+							row.value = value
+						} else {
+							row.value = false
+						}
+						
+						row.updateCell()
+						row.evaluateHidden()
 					}
 					
-					if let value = self?.accountService.useBiometry {
-						row.value = value
-					} else {
-						row.value = false
+					if let row: LabelRow = self?.form.rowBy(tag: Rows.notifications.tag) {
+						row.evaluateHidden()
 					}
-					
-					row.updateCell()
-					row.evaluateHidden()
 				}
 			}
 		}
@@ -134,9 +136,13 @@ extension SettingsViewController: PinpadViewControllerDelegate {
 						if let biometryType = self?.localAuth.biometryType,
 							biometryType == .touchID || biometryType == .faceID,
 							let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-							self?.showBiometryRow = true
+							self?.showLoggedInOptions = true
 							row.value = false
 							row.updateCell()
+							row.evaluateHidden()
+						}
+						
+						if let row: LabelRow = self?.form.rowBy(tag: Rows.notifications.tag) {
 							row.evaluateHidden()
 						}
 						
@@ -159,9 +165,13 @@ extension SettingsViewController: PinpadViewControllerDelegate {
 			
 			accountService.dropSavedAccount()
 			if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
-				showBiometryRow = false
+				showLoggedInOptions = false
 				row.value = false
 				row.updateCell()
+				row.evaluateHidden()
+			}
+			
+			if let row: LabelRow = form.rowBy(tag: Rows.notifications.tag) {
 				row.evaluateHidden()
 			}
 			
@@ -208,9 +218,13 @@ extension SettingsViewController: PinpadViewControllerDelegate {
 					
 					DispatchQueue.main.async {
 						if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-							self?.showBiometryRow = false
+							self?.showLoggedInOptions = false
 							row.value = false
 							row.updateCell()
+							row.evaluateHidden()
+						}
+						
+						if let row: LabelRow = self?.form.rowBy(tag: Rows.notifications.tag) {
 							row.evaluateHidden()
 						}
 						

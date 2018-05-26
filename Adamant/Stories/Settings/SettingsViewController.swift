@@ -89,7 +89,7 @@ class SettingsViewController: FormViewController {
 	
 	
 	// MARK: Properties
-	var showBiometryRow = false
+	var showLoggedInOptions = false
 	var pinpadRequest: SettingsViewController.PinpadRequest?
 	
 	
@@ -98,7 +98,7 @@ class SettingsViewController: FormViewController {
         super.viewDidLoad()
 		self.navigationItem.title = String.adamantLocalized.settings.title
 		navigationOptions = .Disabled
-		showBiometryRow = accountService.hasStayInAccount
+		showLoggedInOptions = accountService.hasStayInAccount
 		
 		// MARK: Settings
 		form +++ Section(Sections.settings.localized)
@@ -123,7 +123,7 @@ class SettingsViewController: FormViewController {
 			$0.tag = Rows.biometry.tag
 			$0.value = accountService.useBiometry
 			$0.hidden = Condition.function([], { [weak self] _ -> Bool in
-				guard let showBiometry = self?.showBiometryRow else {
+				guard let showBiometry = self?.showLoggedInOptions else {
 					return true
 				}
 				
@@ -149,6 +149,13 @@ class SettingsViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.notifications.localized
 			$0.tag = Rows.notifications.tag
+			$0.hidden = Condition.function([], { [weak self] _ -> Bool in
+				guard let showNotifications = self?.showLoggedInOptions else {
+					return true
+				}
+				
+				return !showNotifications
+			})
 		}.cellSetup({ (cell, _) in
 			cell.selectionStyle = .gray
 		}).onCellSelection({ [weak self] (cell, _) in
@@ -225,7 +232,7 @@ class SettingsViewController: FormViewController {
 				return
 			}
 			
-			self?.showBiometryRow = accountService.hasStayInAccount
+			self?.showLoggedInOptions = accountService.hasStayInAccount
 			
 			if let row: SwitchRow = form.rowBy(tag: Rows.stayLoggedIn.tag) {
 				row.value = accountService.hasStayInAccount
@@ -233,6 +240,10 @@ class SettingsViewController: FormViewController {
 			
 			if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
 				row.value = accountService.hasStayInAccount && accountService.useBiometry
+				row.evaluateHidden()
+			}
+			
+			if let row: LabelRow = form.rowBy(tag: Rows.notifications.tag) {
 				row.evaluateHidden()
 			}
 		}

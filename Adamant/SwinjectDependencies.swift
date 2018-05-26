@@ -70,6 +70,7 @@ extension Container {
 			service.apiService = r.resolve(ApiService.self)!
 			service.adamantCore = r.resolve(AdamantCore.self)!
 			service.securedStore = r.resolve(SecuredStore.self)!
+			service.notificationsService = r.resolve(NotificationsService.self)!
 			return service
 		}.inObjectScope(.container)
 		
