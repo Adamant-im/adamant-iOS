@@ -37,12 +37,12 @@ import JavaScriptCore
 
 @objc protocol JSAssetProtocol: JSExport {
 	var chat: JSChat? { get set }
-	var store: JSStore? { get set }
+	var state: JSState? { get set }
 }
 
 @objc class JSAsset: NSObject, JSAssetProtocol {
 	dynamic var chat: JSChat?
-	dynamic var store: JSStore?
+	dynamic var state: JSState?
 }
 
 
@@ -69,13 +69,13 @@ import JavaScriptCore
 
 // MARK: - Store
 
-@objc protocol JSStoreProtocol: JSExport {
+@objc protocol JSStateProtocol: JSExport {
 	var key: String { get set }
 	var value: String { get set }
 	var type: Int { get set }
 }
 
-@objc class JSStore: NSObject, JSStoreProtocol {
+@objc class JSState: NSObject, JSStateProtocol {
 	dynamic var key: String
 	dynamic var value: String
 	dynamic var type: Int

@@ -261,8 +261,8 @@ extension JSAdamantCore {
 		if let chat = t.asset.chat {
 			asset.chat = JSChat(type: Int(chat.type.rawValue), message: chat.message, own_message: chat.ownMessage)
 		}
-		if let store = t.asset.state {
-			asset.store = JSStore(key: store.key, value: store.value, type: Int(store.type.rawValue))
+		if let state = t.asset.state {
+			asset.state = JSState(key: state.key, value: state.value, type: Int(state.type.rawValue))
 		}
 		
 		let jsTransaction = JSTransaction(id: 0,

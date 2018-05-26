@@ -34,13 +34,22 @@ extension AdamantApiService {
 		}
 		
 		let params: [String: Any] = [
-			"type": transaction.type.rawValue,
-			"amount": transaction.amount,
-			"senderPublicKey": transaction.senderPublicKey,
-			"senderId": sender,
-			"timestamp": transaction.timestamp,
-			"signature": signature,
-			"asset": transaction.asset
+			"transaction": [
+				"type": transaction.type.rawValue,
+				"amount": transaction.amount,
+				"senderPublicKey": transaction.senderPublicKey,
+				"senderId": sender,
+				"timestamp": transaction.timestamp,
+				"signature": signature,
+				"recipientId": NSNull(),
+				"asset": [
+					"state": [
+						"key": key,
+						"value": value,
+						"type": type.rawValue
+					]
+				]
+			]
 		]
 		
 		let headers = [
