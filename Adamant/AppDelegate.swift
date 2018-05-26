@@ -10,6 +10,8 @@ import UIKit
 import Swinject
 import CryptoSwift
 
+
+// MARK: - Constants
 extension String.adamantLocalized {
 	struct tabItems {
 		static let account = NSLocalizedString("Tabs.Account", comment: "Main tab bar: Account page")
@@ -26,16 +28,25 @@ extension StoreKey {
 	}
 }
 
-// MARK: Resources
+
+// MARK: - Resources
 struct AdamantResources {
 	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
 	static let api = URL(string: "https://endless.adamant.im")!
 	static let coreDataModel = Bundle.main.url(forResource: "ChatModels", withExtension: "momd")!
 	
+	static let servers = [
+		"https://endless.adamant.im",
+//        "https://clown.adamant.im",
+//        "https://lake.adamant.im",
+		"https://fake.adamant.im"
+	]
+	
 	private init() {}
 }
 
 
+// MARK: - Application
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var window: UIWindow?
