@@ -1,5 +1,5 @@
 //
-//  TransactionAsset.swift
+//  StateType.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 25.05.2018.
@@ -8,7 +8,6 @@
 
 import Foundation
 
-struct TransactionAsset: Codable {
-	let chat: ChatAsset?
-	let state: StateAsset?
+enum StateType: Int16, Codable {
+	case keyValue = 0
 }

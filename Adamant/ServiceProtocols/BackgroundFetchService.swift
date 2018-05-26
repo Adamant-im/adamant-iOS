@@ -15,6 +15,6 @@ enum FetchResult {
 }
 
 protocol BackgroundFetchService {
-	func fetchBackgroundData(notificationService: NotificationsService, completion: @escaping (FetchResult) -> Void)
+	func fetchBackgroundData(notificationsService: NotificationsService, completion: @escaping (FetchResult) -> Void)
 	func dropStateData()
 }

@@ -94,7 +94,11 @@ extension AdamantUtilities {
 
 // MARK: - Dates
 extension AdamantUtilities {
-	static func decodeAdamantDate(timestamp: TimeInterval) -> Date {
+	static func encodeAdamant(date: Date) -> TimeInterval {
+		return date.timeIntervalSince1970 - magicAdamantTimeInterval
+	}
+	
+	static func decodeAdamant(timestamp: TimeInterval) -> Date {
 		return Date(timeIntervalSince1970: timestamp + magicAdamantTimeInterval)
 	}
 	

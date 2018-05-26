@@ -37,14 +37,12 @@ import JavaScriptCore
 
 @objc protocol JSAssetProtocol: JSExport {
 	var chat: JSChat? { get set }
+	var state: JSState? { get set }
 }
 
 @objc class JSAsset: NSObject, JSAssetProtocol {
 	dynamic var chat: JSChat?
-	
-	init(chat: JSChat?) {
-		self.chat = chat
-	}
+	dynamic var state: JSState?
 }
 
 
@@ -64,6 +62,27 @@ import JavaScriptCore
 	init(type: Int, message: String, own_message: String) {
 		self.message = message
 		self.own_message = own_message
+		self.type = type
+	}
+}
+
+
+// MARK: - Store
+
+@objc protocol JSStateProtocol: JSExport {
+	var key: String { get set }
+	var value: String { get set }
+	var type: Int { get set }
+}
+
+@objc class JSState: NSObject, JSStateProtocol {
+	dynamic var key: String
+	dynamic var value: String
+	dynamic var type: Int
+	
+	init(key: String, value: String, type: Int) {
+		self.key = key
+		self.value = value
 		self.type = type
 	}
 }

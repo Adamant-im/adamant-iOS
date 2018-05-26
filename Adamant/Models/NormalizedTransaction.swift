@@ -8,17 +8,30 @@
 
 import Foundation
 
-struct NormalizedTransaction {
+struct NormalizedTransaction: SignableTransaction {
 	let type: TransactionType
 	let amount: Decimal
 	let senderPublicKey: String
 	let requesterPublicKey: String?
 	let timestamp: UInt64
-	let recipientId: String
+	let recipientId: String?
 	let asset: TransactionAsset
 	
 	var date: Date {
-		return AdamantUtilities.decodeAdamantDate(timestamp: TimeInterval(timestamp))
+		return AdamantUtilities.decodeAdamant(timestamp: TimeInterval(timestamp))
+	}
+}
+
+// Convinient init
+extension NormalizedTransaction {
+	init(type: TransactionType, amount: Decimal, senderPublicKey: String, requesterPublicKey: String?, date: Date, recipientId: String?, asset: TransactionAsset) {
+		self.type = type
+		self.amount = amount
+		self.senderPublicKey = senderPublicKey
+		self.requesterPublicKey = requesterPublicKey
+		self.timestamp = UInt64(AdamantUtilities.encodeAdamant(date: date))
+		self.recipientId = recipientId
+		self.asset = asset
 	}
 }
 

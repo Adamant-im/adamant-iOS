@@ -76,7 +76,7 @@ extension Transaction: Decodable {
 		let fee = try container.decode(Decimal.self, forKey: .fee)
 		self.fee = fee.shiftedFromAdamant()
 
-		self.date = AdamantUtilities.decodeAdamantDate(timestamp: TimeInterval(self.timestamp))
+		self.date = AdamantUtilities.decodeAdamant(timestamp: TimeInterval(self.timestamp))
 	}
 }
 

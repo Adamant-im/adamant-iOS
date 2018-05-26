@@ -17,6 +17,8 @@ extension String.adamantLocalized {
 		static let stayInTurnOff = NSLocalizedString("SettingsPage.DoNotStayLoggedIn", comment: "Config: turn off 'Stay Logged In' confirmation")
 		static let biometryOnReason = NSLocalizedString("SettingsPage.UseBiometry", comment: "Config: Authorization reason for turning biometry on")
 		static let biometryOffReason = NSLocalizedString("SettingsPage.DoNotUseBiometry", comment: "Config: Authorization reason for turning biometry off")
+		
+		private init() {}
 	}
 }
 
@@ -83,12 +85,11 @@ class SettingsViewController: FormViewController {
 	var accountService: AccountService!
 	var dialogService: DialogService!
 	var localAuth: LocalAuthentication!
-	var notificationsService: NotificationsService!
 	var router: Router!
 	
 	
 	// MARK: Properties
-	var showBiometryRow = false
+	var showLoggedInOptions = false
 	var pinpadRequest: SettingsViewController.PinpadRequest?
 	
 	
@@ -97,7 +98,7 @@ class SettingsViewController: FormViewController {
         super.viewDidLoad()
 		self.navigationItem.title = String.adamantLocalized.settings.title
 		navigationOptions = .Disabled
-		showBiometryRow = accountService.hasStayInAccount
+		showLoggedInOptions = accountService.hasStayInAccount
 		
 		// MARK: Settings
 		form +++ Section(Sections.settings.localized)
@@ -122,7 +123,7 @@ class SettingsViewController: FormViewController {
 			$0.tag = Rows.biometry.tag
 			$0.value = accountService.useBiometry
 			$0.hidden = Condition.function([], { [weak self] _ -> Bool in
-				guard let showBiometry = self?.showBiometryRow else {
+				guard let showBiometry = self?.showLoggedInOptions else {
 					return true
 				}
 				
@@ -145,26 +146,30 @@ class SettingsViewController: FormViewController {
 		})
 		
 		// Notifications
-		<<< SwitchRow() {
-			$0.tag = Rows.notifications.tag
+		<<< LabelRow() {
 			$0.title = Rows.notifications.localized
-			$0.value = notificationsService.notificationsEnabled
-			
-			$0.hidden = Condition.function([Rows.stayLoggedIn.tag], { form -> Bool in
-				guard let row: SwitchRow = form.rowBy(tag: Rows.stayLoggedIn.tag), let value = row.value else {
+			$0.tag = Rows.notifications.tag
+			$0.hidden = Condition.function([], { [weak self] _ -> Bool in
+				guard let showNotifications = self?.showLoggedInOptions else {
 					return true
 				}
 				
-				return !value
+				return !showNotifications
 			})
-		}.onChange({ [weak self] row in
-			guard let enabled = row.value else { return }
-			self?.setNotifications(enabled: enabled)
+		}.cellSetup({ (cell, _) in
+			cell.selectionStyle = .gray
+		}).onCellSelection({ [weak self] (cell, _) in
+			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.notifications) else {
+				return
+			}
+			nav.pushViewController(vc, animated: true)
 		}).cellUpdate({ (cell, _) in
 			if let label = cell.textLabel {
 				label.font = UIFont.adamantPrimary(size: 17)
 				label.textColor = UIColor.adamantPrimary
 			}
+			
+			cell.accessoryType = .disclosureIndicator
 		})
 		
 		// MARK: Utilities
@@ -227,7 +232,7 @@ class SettingsViewController: FormViewController {
 				return
 			}
 			
-			self?.showBiometryRow = accountService.hasStayInAccount
+			self?.showLoggedInOptions = accountService.hasStayInAccount
 			
 			if let row: SwitchRow = form.rowBy(tag: Rows.stayLoggedIn.tag) {
 				row.value = accountService.hasStayInAccount
@@ -237,16 +242,10 @@ class SettingsViewController: FormViewController {
 				row.value = accountService.hasStayInAccount && accountService.useBiometry
 				row.evaluateHidden()
 			}
-		}
-		
-		// MARK: Notifications
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.showNotificationsChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			guard let row: SwitchRow = self?.form.rowBy(tag: Rows.notifications.tag), let value = self?.notificationsService.notificationsEnabled else {
-				return
-			}
 			
-			row.value = value
-			row.updateCell()
+			if let row: LabelRow = form.rowBy(tag: Rows.notifications.tag) {
+				row.evaluateHidden()
+			}
 		}
     }
 	
@@ -261,50 +260,3 @@ class SettingsViewController: FormViewController {
 		NotificationCenter.default.removeObserver(self)
 	}
 }
-
-
-// MARK: - Properties
-extension SettingsViewController {
-	func setNotifications(enabled: Bool) {
-		guard enabled != notificationsService.notificationsEnabled else {
-			return
-		}
-		
-		notificationsService.setNotificationsEnabled(enabled) { [weak self] result in
-			switch result {
-			case .success:
-				break
-				
-			case .denied(error: _):
-				DispatchQueue.main.async {
-					let alert = UIAlertController(title: nil, message: String.adamantLocalized.notifications.notificationsDisabled, preferredStyle: .alert)
-					
-					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
-						DispatchQueue.main.async {
-							if let row: SwitchRow = self?.form.rowBy(tag: Rows.notifications.tag) {
-								row.value = false
-								row.updateCell()
-							}
-							
-							if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
-								UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
-							}
-						}
-					})
-					
-					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: { _ in
-						if let row: SwitchRow = self?.form.rowBy(tag: Rows.notifications.tag) {
-							row.value = false
-							row.updateCell()
-						}
-					}))
-					
-					self?.present(alert, animated: true, completion: nil)
-				}
-			}
-		}
-	}
-}
-
-
-

@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdamantChatsProvider: BackgroundFetchService {
-	func fetchBackgroundData(notificationService: NotificationsService, completion: @escaping (FetchResult) -> Void) {
+	func fetchBackgroundData(notificationsService: NotificationsService, completion: @escaping (FetchResult) -> Void) {
 		guard let securedStore = self.securedStore,
 			let address = securedStore.get(StoreKey.chatProvider.address) else {
 			completion(.failed)
@@ -45,7 +45,7 @@ extension AdamantChatsProvider: BackgroundFetchService {
 						securedStore.set(String(newLastHeight), for: StoreKey.chatProvider.notifiedLastHeight)
 					}
 					
-					notificationService.showNotification(title: String.adamantLocalized.notifications.newMessageTitle, body: String.localizedStringWithFormat(String.adamantLocalized.notifications.newMessageBody, total + notifiedCount), type: .newMessages(count: total))
+					notificationsService.showNotification(title: String.adamantLocalized.notifications.newMessageTitle, body: String.localizedStringWithFormat(String.adamantLocalized.notifications.newMessageBody, total + notifiedCount), type: .newMessages(count: total))
 					
 					completion(.newData)
 				} else {
