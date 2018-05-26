@@ -28,10 +28,8 @@ extension StoreKey {
 
 // MARK: Resources
 struct AdamantResources {
-	// Storyboard
 	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
 	static let api = URL(string: "https://endless.adamant.im")!
-	static let ans = URL(string: "https://192.168.1.69:44340")!
 	static let coreDataModel = Bundle.main.url(forResource: "ChatModels", withExtension: "momd")!
 	
 	private init() {}

@@ -98,7 +98,6 @@
 		E95F85C4200A540B0070534A /* Chat.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C3200A540B0070534A /* Chat.json */; };
 		E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85C5200A9B070070534A /* ChatTableViewCell.swift */; };
 		E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E95F85C6200A9B070070534A /* ChatTableViewCell.xib */; };
-		E961E94D20A1E203005C8872 /* AnsApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E961E94C20A1E203005C8872 /* AnsApiService.swift */; };
 		E965A53020B594120041A3EA /* AdamantApi+States.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A52F20B594120041A3EA /* AdamantApi+States.swift */; };
 		E965A53220B82C850041A3EA /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53120B82C850041A3EA /* StateType.swift */; };
 		E965A53420B833A00041A3EA /* StateAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53320B833A00041A3EA /* StateAsset.swift */; };
@@ -288,7 +287,6 @@
 		E95F85C3200A540B0070534A /* Chat.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Chat.json; sourceTree = "<group>"; };
 		E95F85C5200A9B070070534A /* ChatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
 		E95F85C6200A9B070070534A /* ChatTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatTableViewCell.xib; sourceTree = "<group>"; };
-		E961E94C20A1E203005C8872 /* AnsApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnsApiService.swift; sourceTree = "<group>"; };
 		E965A52F20B594120041A3EA /* AdamantApi+States.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+States.swift"; sourceTree = "<group>"; };
 		E965A53120B82C850041A3EA /* StateType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateType.swift; sourceTree = "<group>"; };
 		E965A53320B833A00041A3EA /* StateAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateAsset.swift; sourceTree = "<group>"; };
@@ -447,7 +445,6 @@
 		E913C9061FFFA92E001A83F7 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				E965A52E20ADC6080041A3EA /* AdamantServices */,
 				E9CAE8D02018AA5000345E76 /* ApiService */,
 				E9B3D39F201FA2090019EB36 /* DataProviders */,
 				E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */,
@@ -630,14 +627,6 @@
 				E95F85B9200A4DC90070534A /* TransactionSend.json */,
 			);
 			path = Parsing;
-			sourceTree = "<group>";
-		};
-		E965A52E20ADC6080041A3EA /* AdamantServices */ = {
-			isa = PBXGroup;
-			children = (
-				E961E94C20A1E203005C8872 /* AnsApiService.swift */,
-			);
-			path = AdamantServices;
 			sourceTree = "<group>";
 		};
 		E982F69820235AF000566AC7 /* Settings */ = {
@@ -1024,7 +1013,6 @@
 				E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */,
 				E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */,
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
-				E961E94D20A1E203005C8872 /* AnsApiService.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
 				E91A063A209F05AA0018A102 /* NotificationsViewController.swift in Sources */,
 				E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */,
