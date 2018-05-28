@@ -24,6 +24,7 @@ class AdamantTransfersProvider: TransfersProvider {
 	private(set) var isInitiallySynced: Bool = false
 	private(set) var receivedLastHeight: Int64?
 	private(set) var readedLastHeight: Int64?
+    private let apiTransactions = 100
 	
 	private let processingQueue = DispatchQueue(label: "im.Adamant.processing.transfers", qos: .utility, attributes: [.concurrent])
 	private let stateSemaphore = DispatchSemaphore(value: 1)
@@ -129,50 +130,57 @@ extension AdamantTransfersProvider {
 			self.setState(.failedToUpdate(TransfersProviderError.notLogged), previous: prevState)
 			return
 		}
+        
+        // MARK: 3. Get transactions
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = self.stack.container.viewContext
+        let processingGroup = DispatchGroup()
+        let cms = DispatchSemaphore(value: 1)
+        let prevHeight = receivedLastHeight
 		
-        apiService.getTransactions(forAccount: address, type: .send, fromHeight: receivedLastHeight, offset: 0) { result in
-			switch result {
-			case .success(let transactions):
-				guard transactions.count > 0 else {
-					self.setState(.upToDate, previous: prevState)
-					return
-				}
-				
-				self.processingQueue.async {
-					self.processRawTransactions(transactions, currentAddress: address) { [weak self] result in
-						switch result {
-						case .success(let total):
-							self?.setState(.upToDate, previous: prevState)
-							if total > 0 {
-								NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.newTransactions,
-																object: self,
-																userInfo: [AdamantUserInfoKey.TransfersProvider.newTransactions: total])
-							}
-							
-							if let h = self?.receivedLastHeight {
-								self?.readedLastHeight = h
-							} else {
-								self?.readedLastHeight = 0
-							}
-							
-							if let synced = self?.isInitiallySynced, !synced {
-								self?.isInitiallySynced = true
-								NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.initialSyncFinished, object: self)
-							}
-							
-						case .error(let error):
-							self?.setState(.failedToUpdate(error), previous: prevState)
-							
-						case .accountNotFound(let key):
-							self?.setState(.failedToUpdate(TransfersProviderError.accountNotFound(key)), previous: prevState)
-						}
-					}
-				}
-				
-			case .failure(let error):
-				self.setState(.failedToUpdate(error), previous: prevState)
-			}
-		}
+        getTransactions(forAccount: address, type: .send, fromHeight: prevHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
+        
+        // MARK: 4. Check
+        processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) { [weak self] in
+            guard let state = self?.state else {
+                return
+            }
+            
+            switch state {
+            case .failedToUpdate(_): // Processing failed
+                break
+                
+            default:
+                self?.setState(.upToDate, previous: prevState)
+                
+                if prevHeight != self?.receivedLastHeight, let h = self?.receivedLastHeight {
+                    NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
+                                                    object: self,
+                                                    userInfo: [AdamantUserInfoKey.TransfersProvider.lastTransactionHeight:h])
+                }
+                
+                if let h = self?.receivedLastHeight {
+                    self?.readedLastHeight = h
+                } else {
+                    self?.readedLastHeight = 0
+                }
+                
+                if let store = self?.securedStore {
+                    if let h = self?.receivedLastHeight {
+                        store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
+                    }
+                    
+                    if let h = self?.readedLastHeight, h > 0 {
+                        store.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
+                    }
+                }
+                
+                if let synced = self?.isInitiallySynced, !synced {
+                    self?.isInitiallySynced = true
+                    NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.initialSyncFinished, object: self)
+                }
+            }
+        }
 	}
 	
 	func reset() {
@@ -265,6 +273,226 @@ extension AdamantTransfersProvider {
 		case accountNotFound(address: String)
 		case error(Error)
 	}
+    
+    /// Get transactions
+    ///
+    /// - Parameters:
+    ///   - account: for account
+    ///   - height: last transaction height.
+    ///   - offset: offset, if greater than 100
+    /// - Returns: ammount of new messages was added
+    private func getTransactions(forAccount account: String,
+                                 type: TransactionType,
+                                 fromHeight: Int64?,
+                                 offset: Int?,
+                                 dispatchGroup: DispatchGroup,
+                                 context: NSManagedObjectContext,
+                                 contextMutatingSemaphore cms: DispatchSemaphore) {
+        // Enter 1
+        dispatchGroup.enter()
+        
+        // MARK: 1. Get new transactions
+        apiService.getTransactions(forAccount: account, type: type, fromHeight: fromHeight, offset: offset, limit: self.apiTransactions) { result in
+            
+            defer {
+                // Leave 1
+                dispatchGroup.leave()
+            }
+            
+            switch result {
+            case .success(let transactions):
+                guard transactions.count > 0 else {
+                    return
+                }
+                
+                // MARK: 2. Process transactions in background
+                // Enter 2
+                dispatchGroup.enter()
+                self.processingQueue.async {
+                    defer {
+                        // Leave 2
+                        dispatchGroup.leave()
+                    }
+                    
+                    self.processRawTransactions(transactions,
+                                                currentAddress: account,
+                                                context: context,
+                                                contextMutatingSemaphore: cms)
+                }
+                
+                // MARK: 3. Get more transactions
+                if transactions.count == self.apiTransactions {
+                    let newOffset: Int
+                    if let offset = offset {
+                        newOffset = offset + self.apiTransactions
+                    } else {
+                        newOffset = self.apiTransactions
+                    }
+                    
+                    self.getTransactions(forAccount: account, type: type, fromHeight: fromHeight, offset: newOffset, dispatchGroup: dispatchGroup, context: context, contextMutatingSemaphore: cms)
+                }
+                
+            case .failure(let error):
+                self.setState(.failedToUpdate(error), previous: .updating)
+            }
+        }
+    }
+    
+    private func processRawTransactions(_ transactions: [Transaction],
+                                        currentAddress address: String,
+                                        context: NSManagedObjectContext,
+                                        contextMutatingSemaphore cms: DispatchSemaphore) {
+        // MARK: 0. Transactions?
+        guard transactions.count > 0 else {
+            return
+        }
+        
+        // MARK: 1. Collect all partners
+        var partnerIds: Set<String> = []
+        
+        for t in transactions {
+            if t.senderId == address {
+                partnerIds.insert(t.recipientId)
+            } else {
+                partnerIds.insert(t.senderId)
+            }
+        }
+        
+        // MARK: 2. Let AccountProvider get all partners from server.
+        let partnersGroup = DispatchGroup()
+        var errors: [ProcessingResult] = []
+        for id in partnerIds {
+            partnersGroup.enter()
+            accountsProvider.getAccount(byAddress: id, completion: { result in
+                defer {
+                    partnersGroup.leave()
+                }
+                
+                switch result {
+                case .success(_):
+                    break
+                    
+                case .notFound:
+                    errors.append(ProcessingResult.accountNotFound(address: id))
+                    
+                case .serverError(let error):
+                    errors.append(ProcessingResult.error(error))
+                }
+            })
+        }
+        
+        partnersGroup.wait()
+        
+        // MARK: 2.5. If we have any errors - drop processing.
+        if let error = errors.first {
+            print(error)
+            return
+        }
+        
+        
+        // MARK: 3. Create private context, and process transactions
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = self.stack.container.viewContext
+        
+        var partners: [String:CoreDataAccount] = [:]
+        for id in partnerIds {
+            let request = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
+            request.predicate = NSPredicate(format: "address == %@", id)
+            request.fetchLimit = 1
+            if let partner = (try? context.fetch(request))?.first {
+                partners[id] = partner
+            }
+        }
+        
+        var transfers = [TransferTransaction]()
+        var height: Int64 = 0
+        for t in transactions {
+            let transfer = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
+            transfer.amount = t.amount as NSDecimalNumber
+            transfer.date = t.date as NSDate
+            transfer.fee = t.fee as NSDecimalNumber
+            transfer.height = Int64(t.height)
+            transfer.recipientId = t.recipientId
+            transfer.senderId = t.senderId
+            transfer.transactionId = String(t.id)
+            transfer.type = Int16(t.type.rawValue)
+            transfer.blockId = t.blockId
+            transfer.confirmations = t.confirmations
+            
+            transfer.isOutgoing = t.senderId == address
+            let partnerId = transfer.isOutgoing ? t.recipientId : t.senderId
+            
+            if let partner = partners[partnerId] {
+                transfer.partner = partner
+                transfer.chatroom = partner.chatroom
+            }
+            
+            if t.height > height {
+                height = t.height
+            }
+            
+            transfers.append(transfer)
+        }
+        
+        
+        // MARK: 4. Check lastHeight
+        // API returns transactions from lastHeight INCLUDING transaction with height == lastHeight, so +1
+        if height > 0 {
+            let uH = Int64(height + 1)
+            
+            if let lastHeight = receivedLastHeight {
+                if lastHeight < uH {
+                    self.receivedLastHeight = uH
+                }
+            } else {
+                self.receivedLastHeight = uH
+            }
+        }
+        
+        // MARK: 5. Unread transactions
+        if let unreadedHeight = readedLastHeight {
+            let unreadTransactions = transfers.filter { $0.height > unreadedHeight }
+            let chatrooms = Dictionary.init(grouping: unreadTransactions, by: ({ (t: TransferTransaction) -> Chatroom in t.chatroom!}))
+            
+            for (chatroom, trs) in chatrooms {
+                chatroom.hasUnreadMessages = true
+                trs.forEach { $0.isUnread = true }
+            }
+            
+            transfers.filter({$0.height > unreadedHeight}).forEach({$0.isUnread = true})
+            
+            readedLastHeight = self.receivedLastHeight
+        }
+        
+        if let h = self.receivedLastHeight {
+            securedStore.set(String(h), for: StoreKey.transfersProvider.receivedLastHeight)
+        }
+        
+        if let h = self.readedLastHeight {
+            securedStore.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
+        }
+        
+        // MARK: 6. Dump transactions to viewContext
+        if context.hasChanges {
+            do {
+                try context.save()
+                
+                // MARK: 7. Update lastTransactions
+                let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
+                DispatchQueue.main.async {
+                    viewContextChatrooms.forEach { $0.updateLastTransaction() }
+                }
+                print(".success \(transfers.count)")
+//                completion(.success(new: transfers.count))
+            } catch {
+//                completion(.error(error))
+                print(error)
+            }
+        } else {
+//            completion(.success(new: 0))
+            print(".success 0")
+        }
+    }
 	
 	private func processRawTransactions(_ transactions: [Transaction],
 										currentAddress address: String,
