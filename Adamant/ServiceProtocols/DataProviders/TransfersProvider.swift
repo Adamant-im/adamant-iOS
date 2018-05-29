@@ -45,6 +45,9 @@ extension AdamantUserInfoKey {
 		
 		// New received transactions
 		static let newTransactions = "transfersNewTransactions"
+        
+        /// lastMessageHeight: new lastMessageHeight
+        static let lastTransactionHeight = "adamant.transfersProvider.newTransactions.lastHeight"
 		
 		private init() {}
 	}
