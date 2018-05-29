@@ -1,5 +1,5 @@
 # Adamant-iOS
-Adamant Messenger - iOS native client
+iOS native client for ADAMANT Messenger
 
 https://adamant.im
 
