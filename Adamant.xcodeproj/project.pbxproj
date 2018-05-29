@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
+		644D3DBB20BD5F22002EB002 /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644D3DBA20BD5F22002EB002 /* Status.swift */; };
 		E905D39B2048A9BD00DDB504 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39A2048A9BD00DDB504 /* KeychainStore.swift */; };
 		E905D39D204C13B900DDB504 /* SecuredStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39C204C13B900DDB504 /* SecuredStore.swift */; };
 		E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39E204C281400DDB504 /* LoginViewController.swift */; };
@@ -175,6 +176,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		644D3DBA20BD5F22002EB002 /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
 		871009461457F6B7B47D99C5 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
 		903AC078A8A55175A05E42D4 /* Pods-Adamant.testing.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.testing.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.testing.xcconfig"; sourceTree = "<group>"; };
 		C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -469,6 +471,7 @@
 				E95F8588200900B10070534A /* ChatType.swift */,
 				E965A53320B833A00041A3EA /* StateAsset.swift */,
 				E965A53120B82C850041A3EA /* StateType.swift */,
+				644D3DBA20BD5F22002EB002 /* Status.swift */,
 				E95F85682006AB9D0070534A /* NormalizedTransaction.swift */,
 				E9E7CDC920040CC200DFC4DB /* Transaction.swift */,
 				E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */,
@@ -1041,6 +1044,7 @@
 				E9FAE5DA203DBFEF008D3A6B /* Comparable+Clamped.swift in Sources */,
 				E9150B972066DA210065A985 /* CoreDataAccount+CoreDataClass.swift in Sources */,
 				E95F857A2007F0260070534A /* ServerResponse.swift in Sources */,
+				644D3DBB20BD5F22002EB002 /* Status.swift in Sources */,
 				E9A174B32057EC47003667CD /* BackgroundFetchService.swift in Sources */,
 				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
 				E965A53220B82C850041A3EA /* StateType.swift in Sources */,

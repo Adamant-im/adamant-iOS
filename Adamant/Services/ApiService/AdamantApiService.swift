@@ -14,6 +14,11 @@ class AdamantApiService: ApiService {
 	
 	struct ApiCommands {
 		private init() {}
+        
+        static let Service = (
+            root: "/api/loader",
+            statusCheck: "/api/loader/status"
+        )
 	}
 	
 	enum Encoding {
@@ -146,7 +151,7 @@ class AdamantApiService: ApiService {
         // MARK: 1. Build endpoint
         let endpoint: URL
         do {
-            endpoint = try buildUrl(path: ApiCommands.Accounts.newAccount)
+            endpoint = try buildUrl(path: ApiCommands.Service.statusCheck)
         } catch {
             completion(false)
             return
@@ -157,9 +162,15 @@ class AdamantApiService: ApiService {
         ]
         
         // MARK: 2. Send
-        sendRequest(url: endpoint, method: .post, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerModelResponse<Account>>) in
+        sendRequest(url: endpoint, method: .get, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerModelResponse<Status>>) in
             switch serverResponse {
-            case .success: completion(true)
+            case .success(let data):
+                if data.success {
+                    completion(true)
+                } else {
+                    if let error = data.error { print("error: \(error)") }
+                    completion(false)
+                }
             case .failure: completion(false)
             }
         }
