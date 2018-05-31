@@ -34,7 +34,7 @@ extension AdamantTransfersProvider: BackgroundFetchService {
 			}
 		}
 		
-		apiService.getTransactions(forAccount: address, type: .send, fromHeight: lastHeight) { result in
+        apiService.getTransactions(forAccount: address, type: .send, fromHeight: lastHeight, offset: 0, limit: 100) { result in
 			switch result {
 			case .success(let transactions):
 				let total = transactions.filter({$0.recipientId == address}).count
