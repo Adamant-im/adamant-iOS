@@ -1,5 +1,5 @@
 //
-//  Comparable+Clamped.swift
+//  Comparable+clamped.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 21.02.2018.

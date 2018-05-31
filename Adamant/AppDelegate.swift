@@ -32,7 +32,6 @@ extension StoreKey {
 // MARK: - Resources
 struct AdamantResources {
 	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
-	static let api = URL(string: "https://endless.adamant.im")!
 	static let coreDataModel = Bundle.main.url(forResource: "ChatModels", withExtension: "momd")!
 	
 	static let servers = [
@@ -40,6 +39,8 @@ struct AdamantResources {
         "https://clown.adamant.im",
         "https://lake.adamant.im"
 	]
+	
+	static let iosAppSupportEmail = "ios@adamant.im"
 	
 	private init() {}
 }

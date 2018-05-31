@@ -48,7 +48,3 @@ extension UIFont {
 		return UIFont(name: "Exo 2 Thin", size: size)!
 	}
 }
-
-extension String {
-    static let adamantSupportEmail = "support@adamant.im"
-}

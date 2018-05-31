@@ -1,5 +1,5 @@
 //
-//  UIColor+adamant.swift
+//  UIColor+hex.swift
 //  Adamant
 //
 //  Created by Anton Boyarkin on 30/05/2018.

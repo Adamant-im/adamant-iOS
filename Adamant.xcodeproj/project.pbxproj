@@ -50,6 +50,7 @@
 		E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9256F5E2034C21100DE86E9 /* String+localized.swift */; };
 		E9256F6D20357B1700DE86E9 /* LoginHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9256F6C20357B1700DE86E9 /* LoginHeader.xib */; };
 		E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */; };
+		E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927171D20C04613002BB9A6 /* UIColor+hex.swift */; };
 		E9393FA82055C92700EE6F30 /* Decimal+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */; };
 		E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA92055D03300EE6F30 /* AdamantMessage.swift */; };
 		E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D732028B21400126346 /* ChatsProvider.swift */; };
@@ -159,7 +160,7 @@
 		E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A7200010DF001362F8 /* Roboto_700_normal.ttf */; };
 		E9EC342120052ABB00C0E546 /* TransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC342020052ABB00C0E546 /* TransferViewController.swift */; };
 		E9EC344720066D4A00C0E546 /* AddressValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */; };
-		E9FAE5DA203DBFEF008D3A6B /* Comparable+Clamped.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FAE5D9203DBFEF008D3A6B /* Comparable+Clamped.swift */; };
+		E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FAE5D9203DBFEF008D3A6B /* Comparable+clamped.swift */; };
 		E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */; };
 		E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */; };
 /* End PBXBuildFile section */
@@ -236,6 +237,7 @@
 		E9256F5E2034C21100DE86E9 /* String+localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+localized.swift"; sourceTree = "<group>"; };
 		E9256F6C20357B1700DE86E9 /* LoginHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoginHeader.xib; sourceTree = "<group>"; };
 		E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		E927171D20C04613002BB9A6 /* UIColor+hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+hex.swift"; sourceTree = "<group>"; };
 		E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+adamant.swift"; sourceTree = "<group>"; };
 		E9393FA92055D03300EE6F30 /* AdamantMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantMessage.swift; sourceTree = "<group>"; };
 		E93B0D732028B21400126346 /* ChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsProvider.swift; sourceTree = "<group>"; };
@@ -339,7 +341,7 @@
 		E9EC344420066D4A00C0E546 /* AdamantTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AdamantTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressValidationTests.swift; sourceTree = "<group>"; };
 		E9EC344820066D4A00C0E546 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E9FAE5D9203DBFEF008D3A6B /* Comparable+Clamped.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Comparable+Clamped.swift"; sourceTree = "<group>"; };
+		E9FAE5D9203DBFEF008D3A6B /* Comparable+clamped.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Comparable+clamped.swift"; sourceTree = "<group>"; };
 		E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareQrViewController.swift; sourceTree = "<group>"; };
 		E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShareQrViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -483,7 +485,7 @@
 			children = (
 				E91947B12000246A001362F8 /* AdamantError.swift */,
 				E9061B96207501E40011F104 /* AdamantUserInfoKey.swift */,
-				E9FAE5D9203DBFEF008D3A6B /* Comparable+Clamped.swift */,
+				E9FAE5D9203DBFEF008D3A6B /* Comparable+clamped.swift */,
 				E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */,
 				E95F856420067A030070534A /* GlobalConstants.swift */,
 				E95F856A200789450070534A /* JSModels.swift */,
@@ -491,6 +493,7 @@
 				E9147B5E20500E9300145913 /* MyLittlePinpad+adamant.swift */,
 				E9147B6220505C7500145913 /* QRCodeReader+adamant.swift */,
 				E9256F5E2034C21100DE86E9 /* String+localized.swift */,
+				E927171D20C04613002BB9A6 /* UIColor+hex.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -908,6 +911,7 @@
 				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
 				"${BUILT_PRODUCTS_DIR}/MyLittlePinpad/MyLittlePinpad.framework",
+				"${BUILT_PRODUCTS_DIR}/PMAlertController/PMAlertController.framework",
 				"${BUILT_PRODUCTS_DIR}/QRCodeReader.swift/QRCodeReader.framework",
 				"${BUILT_PRODUCTS_DIR}/RNCryptor/RNCryptor.framework",
 				"${BUILT_PRODUCTS_DIR}/ReachabilitySwift/Reachability.framework",
@@ -925,6 +929,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MyLittlePinpad.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PMAlertController.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCodeReader.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCryptor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
@@ -1012,6 +1017,7 @@
 				E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */,
 				E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */,
 				E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */,
+				E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */,
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
 				E91A063A209F05AA0018A102 /* NotificationsViewController.swift in Sources */,
@@ -1038,7 +1044,7 @@
 				E965A53020B594120041A3EA /* AdamantApi+States.swift in Sources */,
 				E9150B982066DA210065A985 /* CoreDataAccount+CoreDataProperties.swift in Sources */,
 				E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */,
-				E9FAE5DA203DBFEF008D3A6B /* Comparable+Clamped.swift in Sources */,
+				E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */,
 				E9150B972066DA210065A985 /* CoreDataAccount+CoreDataClass.swift in Sources */,
 				E95F857A2007F0260070534A /* ServerResponse.swift in Sources */,
 				E9A174B32057EC47003667CD /* BackgroundFetchService.swift in Sources */,

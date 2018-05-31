@@ -103,7 +103,7 @@ extension AdamantDialogService {
         alertVC.alertDescription.font = UIFont.adamantPrimaryLight(size: 14)
         alertVC.headerViewHeightConstraint.constant = 50
         
-        let supportBtn = PMAlertAction(title: String.adamantSupportEmail, style: .default, action: { () -> Void in
+        let supportBtn = PMAlertAction(title: AdamantResources.iosAppSupportEmail, style: .default, action: { () -> Void in
             print("Support")
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
@@ -111,7 +111,7 @@ extension AdamantDialogService {
                 
                 let mailVC = MFMailComposeViewController()
                 mailVC.mailComposeDelegate = self?.mailDelegate
-                mailVC.setToRecipients([String.adamantSupportEmail])
+                mailVC.setToRecipients([AdamantResources.iosAppSupportEmail])
                 mailVC.setSubject(String.adamantLocalized.alert.emailErrorMessageTitle)
                 
                 let systemVersion = UIDevice.current.systemVersion
