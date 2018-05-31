@@ -131,6 +131,12 @@
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Tap for details";
 
+/* Error messge title for support email */
+"Error.Mail.Title" = "I have error in my iOS app";
+
+/* Error messge body for support email */
+"Error.Mail.Body" = "Hello,\nI have this error:\n\n%@\n\nMy device info:\n%2";
+
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "LoginScene.Error.AuthorizeCamera" = "You need to authorize Adamant to use device's Camera";
 
@@ -331,6 +337,12 @@
 
 /* Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere. */
 "Shared.GenerateQRCode" = "Generate QR code";
+
+/* Shared alert notification: title for no internet connection message. */
+"Shared.NoInternet.Title" = "No internet connection";
+
+/* Shared alert notification: body message for no internet connection. */
+"Shared.NoInternet.Body" = "Please check your internet connection and try again";
 
 /* Shared alert 'Ok' button. Used anywhere */
 "Shared.Ok" = "Ok";

@@ -18,6 +18,7 @@ target 'Adamant' do
   pod 'Eureka' # Forms
   pod 'MessageKit' # Chat UI
   pod 'MyLittlePinpad' # Pinpad
+  pod 'PMAlertController' # Custom alert controller
 
   # QR
   pod 'EFQRCode' # QR generator

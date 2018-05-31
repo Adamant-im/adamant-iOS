@@ -29,6 +29,13 @@ extension String {
 			
 			// MARK: Notifications
 			static let copiedToPasteboardNotification = NSLocalizedString("Shared.CopiedToPasteboard", comment: "Shared alert notification: message about item copied to pasteboard.")
+            
+            static let noInternetNotificationTitle = NSLocalizedString("Shared.NoInternet.Title", comment: "Shared alert notification: title for no internet connection message.")
+            static let noInternetNotificationBoby = NSLocalizedString("Shared.NoInternet.Body", comment: "Shared alert notification: body message for no internet connection.")
+            
+            static let emailErrorMessageTitle = NSLocalizedString("Error.Mail.Title", comment: "Error messge title for support email")
+            static let emailErrorMessageBody = NSLocalizedString("Error.Mail.Body", comment: "SError messge body for support email")
+            
 		}
 		
 		private init() { }

@@ -8,10 +8,14 @@
 
 import UIKit
 import FTIndicator
+import PMAlertController
+import MessageUI
 
 class AdamantDialogService: DialogService {
 	// MARK: Dependencies
 	var router: Router!
+    
+    var mailDelegate = MailDelegate()
 	
 	// Configure notifications
 	init() {
@@ -88,8 +92,73 @@ extension AdamantDialogService {
 	}
 	
 	func showError(withMessage message: String) {
-		FTIndicator.showError(withMessage: message)
+//        FTIndicator.showError(withMessage: message)
+        
+        let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
+        
+        alertVC.gravityDismissAnimation = false
+        alertVC.alertTitle.textColor = UIColor.adamantPrimary
+        alertVC.alertDescription.textColor = .adamantSecondary
+        alertVC.alertTitle.font = UIFont.adamantPrimary(size: 20)
+        alertVC.alertDescription.font = UIFont.adamantPrimaryLight(size: 14)
+        alertVC.headerViewHeightConstraint.constant = 50
+        
+        let supportBtn = PMAlertAction(title: String.adamantSupportEmail, style: .default, action: { () -> Void in
+            print("Support")
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                print("Send mail")
+                
+                let mailVC = MFMailComposeViewController()
+                mailVC.mailComposeDelegate = self?.mailDelegate
+                mailVC.setToRecipients([String.adamantSupportEmail])
+                mailVC.setSubject(String.adamantLocalized.alert.emailErrorMessageTitle)
+                
+                let systemVersion = UIDevice.current.systemVersion
+                let model = AdamantUtilities.deviceModelCode
+                let deviceInfo = "Model: \(model)\n" + "iOS: \(systemVersion)\n" + "App version: \(AdamantUtilities.applicationVersion)"
+                
+                let body = String(format: String.adamantLocalized.alert.emailErrorMessageBody, message, deviceInfo)
+                
+                mailVC.setMessageBody(body, isHTML: false)
+                
+                self?.present(mailVC, animated: true, completion: nil)
+            }
+        })
+        
+        supportBtn.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+        supportBtn.setTitleColor(UIColor(hex: "#00B6FF"), for: .normal)
+        supportBtn.separator.isHidden = true
+        
+        alertVC.addAction(supportBtn)
+        
+        let okBtn = PMAlertAction(title: String.adamantLocalized.alert.ok, style: .default, action: { () in
+            print("Capture action OK")
+        })
+        
+        okBtn.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+        okBtn.setTitleColor(UIColor.white, for: .normal)
+        okBtn.backgroundColor = UIColor.adamantSecondary
+        alertVC.addAction(okBtn)
+        
+        alertVC.alertActionStackView.axis = .vertical
+        alertVC.alertActionStackView.spacing = 0
+        alertVC.alertActionStackViewHeightConstraint.constant = 100
+        
+        self.present(alertVC, animated: true, completion: nil)
 	}
+    
+    func showNoConnectionNotification() {
+        FTIndicator.showNotification(with: #imageLiteral(resourceName: "error"), title: String.adamantLocalized.alert.noInternetNotificationTitle, message: String.adamantLocalized.alert.noInternetNotificationBoby, autoDismiss: false, tapHandler: {
+            //
+        }) {
+            //
+        }
+    }
+    
+    func dissmisNoConnectionNotification() {
+        FTIndicator.dismissNotification()
+    }
 }
 
 
@@ -190,4 +259,12 @@ extension AdamantDialogService {
 			}
 		}
 	}
+}
+
+class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true, completion: nil)
+    }
+
 }
