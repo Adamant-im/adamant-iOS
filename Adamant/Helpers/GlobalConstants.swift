@@ -49,3 +49,6 @@ extension UIFont {
 	}
 }
 
+extension String {
+    static let adamantSupportEmail = "support@adamant.im"
+}

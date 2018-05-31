@@ -37,9 +37,8 @@ struct AdamantResources {
 	
 	static let servers = [
 		"https://endless.adamant.im",
-//        "https://clown.adamant.im",
-//        "https://lake.adamant.im",
-		"https://fake.adamant.im"
+        "https://clown.adamant.im",
+        "https://lake.adamant.im"
 	]
 	
 	private init() {}
@@ -56,6 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	// MARK: Dependencies
 	var accountService: AccountService!
 	var notificationService: NotificationsService!
+    var dialogService: DialogService!
 
 	// MARK: - Lifecycle
 	
@@ -65,6 +65,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		container.registerAdamantServices()
 		accountService = container.resolve(AccountService.self)
 		notificationService = container.resolve(NotificationsService.self)
+        dialogService = container.resolve(DialogService.self)
 		
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
@@ -116,9 +117,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			
 			switch reachability.connection {
 			case .cellular, .wifi:
+                dialogService.dissmisNoConnectionNotification()
 				break
 				
 			case .none:
+                dialogService.showNoConnectionNotification()
 				repeater.pauseAll()
 			}
 			
@@ -130,9 +133,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 				
 				switch connection {
 				case .cellular, .wifi:
+                    self?.dialogService.dissmisNoConnectionNotification()
 					repeater.resumeAll()
 					
 				case .none:
+                    self?.dialogService.showNoConnectionNotification()
 					repeater.pauseAll()
 				}
 			}
