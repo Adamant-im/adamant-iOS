@@ -130,7 +130,7 @@ class NotificationsViewController: FormViewController {
 			$0.tag = Rows.notificationsMode.tag
 			$0.title = Rows.notificationsMode.localized
 			$0.selectorTitle = Rows.notificationsMode.localized
-			$0.options = [.disabled, .backgroundFetch, .push]
+			$0.options = [.disabled, .backgroundFetch]
 			$0.value = notificationsService.notificationsMode
 		}.onChange({ [weak self] row in
 			guard let mode = row.value else {
@@ -138,39 +138,6 @@ class NotificationsViewController: FormViewController {
 			}
 			
 			self?.setNotificationMode(mode)
-		}).cellUpdate({ (cell, _) in
-			cell.accessoryType = .disclosureIndicator
-		})
-		
-		
-		// MARK: ANS
-		+++ Section(Sections.ans.localized) {
-			$0.tag = Sections.ans.tag
-		}
-		
-		<<< TextAreaRow() {
-			$0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
-			$0.tag = Rows.description.tag
-		}.cellUpdate({ (cell, _) in
-			let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
-			cell.textView.attributedText = parser.parse(Rows.description.localized)
-			cell.textView.isSelectable = false
-			cell.textView.isEditable = false
-		})
-			
-		<<< LabelRow() {
-			$0.title = Rows.github.localized
-			$0.tag = Rows.github.tag
-		}.cellSetup({ (cell, _) in
-			cell.selectionStyle = .gray
-		}).onCellSelection({ [weak self] (_, row) in
-			guard let url = NotificationsViewController.githubUrl else {
-				return
-			}
-			
-			let safari = SFSafariViewController(url: url)
-			safari.preferredControlTintColor = UIColor.adamantPrimary
-			self?.present(safari, animated: true, completion: nil)
 		}).cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
 		})
