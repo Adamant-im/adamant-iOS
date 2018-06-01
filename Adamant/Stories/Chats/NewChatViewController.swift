@@ -198,7 +198,7 @@ class NewChatViewController: FormViewController {
 				}
 				
 			case .notFound:
-				self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.addressNotFoundFormat, address))
+				self.dialogService.showWarning(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.addressNotFoundFormat, address))
 				
 			case .serverError(let error):
 				self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.serverErrorFormat, String(describing: error)))
@@ -306,7 +306,7 @@ extension NewChatViewController {
 extension NewChatViewController: QRCodeReaderViewControllerDelegate {
 	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
 		guard let uri = AdamantUriTools.decode(uri: result.value) else {
-			dialogService.showError(withMessage: String.adamantLocalized.newChat.wrongQrError)
+			dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
 				reader.startScanning()
 			}
@@ -316,7 +316,7 @@ extension NewChatViewController: QRCodeReaderViewControllerDelegate {
 		if startNewChat(with: uri) {
 			dismiss(animated: true, completion: nil)
 		} else {
-			dialogService.showError(withMessage: String.adamantLocalized.newChat.wrongQrError)
+			dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
 				reader.startScanning()
 			}
@@ -347,9 +347,9 @@ extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerCo
 				}
 			}
 			
-			dialogService.showError(withMessage: String.adamantLocalized.newChat.wrongQrError)
+			dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
 		} else {
-			dialogService.showError(withMessage: String.adamantLocalized.login.noQrError)
+			dialogService.showWarning(withMessage: String.adamantLocalized.login.noQrError)
 		}
 	}
 }

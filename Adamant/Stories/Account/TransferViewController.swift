@@ -275,17 +275,17 @@ class TransferViewController: FormViewController {
 		let amount = Decimal(raw)
 		
 		guard AdamantUtilities.validateAmount(amount: amount) else {
-			dialogService.showError(withMessage: String.adamantLocalized.transfer.amountZeroError)
+			dialogService.showWarning(withMessage: String.adamantLocalized.transfer.amountZeroError)
 			return
 		}
 		
 		guard AdamantUtilities.validateAdamantAddress(address: recipient) else {
-			dialogService.showError(withMessage: String.adamantLocalized.transfer.addressValidationError)
+			dialogService.showWarning(withMessage: String.adamantLocalized.transfer.addressValidationError)
 			return
 		}
 		
 		guard amount <= Decimal(maxToTransfer) else {
-			dialogService.showError(withMessage: String.adamantLocalized.transfer.amountTooHigh)
+			dialogService.showWarning(withMessage: String.adamantLocalized.transfer.amountTooHigh)
 			return
 		}
 		

@@ -91,10 +91,20 @@ extension AdamantDialogService {
 		FTIndicator.showSuccess(withMessage: message)
 	}
 	
+	func showWarning(withMessage message: String) {
+		FTIndicator.showError(withMessage: message)
+	}
+	
 	func showError(withMessage message: String) {
-//        FTIndicator.showError(withMessage: message)
-        
-        let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
+		if Thread.isMainThread {
+			FTIndicator.dismissProgress()
+		} else {
+			DispatchQueue.main.sync {
+				FTIndicator.dismissProgress()
+			}
+		}
+		
+		let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
         
         alertVC.gravityDismissAnimation = false
         alertVC.alertTitle.textColor = UIColor.adamantPrimary
@@ -103,9 +113,7 @@ extension AdamantDialogService {
         alertVC.alertDescription.font = UIFont.adamantPrimaryLight(size: 14)
         alertVC.headerViewHeightConstraint.constant = 50
         
-        let supportBtn = PMAlertAction(title: AdamantResources.iosAppSupportEmail, style: .default, action: { () -> Void in
-            print("Support")
-            
+        let supportBtn = PMAlertAction(title: AdamantResources.iosAppSupportEmail, style: .default) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                 print("Send mail")
                 
@@ -132,9 +140,7 @@ extension AdamantDialogService {
         
         alertVC.addAction(supportBtn)
         
-        let okBtn = PMAlertAction(title: String.adamantLocalized.alert.ok, style: .default, action: { () in
-            print("Capture action OK")
-        })
+        let okBtn = PMAlertAction(title: String.adamantLocalized.alert.ok, style: .default)
         
         okBtn.titleLabel?.font = UIFont.adamantPrimary(size: 16)
         okBtn.setTitleColor(UIColor.white, for: .normal)
@@ -149,11 +155,7 @@ extension AdamantDialogService {
 	}
     
     func showNoConnectionNotification() {
-        FTIndicator.showNotification(with: #imageLiteral(resourceName: "error"), title: String.adamantLocalized.alert.noInternetNotificationTitle, message: String.adamantLocalized.alert.noInternetNotificationBoby, autoDismiss: false, tapHandler: {
-            //
-        }) {
-            //
-        }
+		FTIndicator.showNotification(with: #imageLiteral(resourceName: "error"), title: String.adamantLocalized.alert.noInternetNotificationTitle, message: String.adamantLocalized.alert.noInternetNotificationBoby, autoDismiss: false, tapHandler: nil, completion: nil)
     }
     
     func dissmisNoConnectionNotification() {
