@@ -21,6 +21,7 @@ extension AdamantScene {
 		static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewController", factory: { r in
 			let c = TransactionDetailsViewController(nibName: "TransactionDetailsViewController", bundle: nil)
 			c.dialogService = r.resolve(DialogService.self)
+            c.transfersProvider = r.resolve(TransfersProvider.self)
 			return c
 		})
 	}

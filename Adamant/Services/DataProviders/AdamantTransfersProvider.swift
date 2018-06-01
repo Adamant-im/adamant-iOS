@@ -280,7 +280,7 @@ extension AdamantTransfersProvider {
     ///   - account: for account
     ///   - height: last transaction height.
     ///   - offset: offset, if greater than 100
-    /// - Returns: ammount of new messages was added
+    /// - Returns: ammount of new transactions was added
     private func getTransactions(forAccount account: String,
                                  type: TransactionType,
                                  fromHeight: Int64?,
@@ -335,6 +335,51 @@ extension AdamantTransfersProvider {
             case .failure(let error):
                 self.setState(.failedToUpdate(error), previous: .updating)
             }
+        }
+    }
+    
+    /// Get transaction
+    ///
+    /// - Parameters:
+    ///   - id: transation ID
+    /// - Returns: Transaction object
+    func getTransaction(id: UInt64, completion: @escaping (TransferTransaction) -> Void) {
+        apiService.getTransaction(id: id, completion: { (result) in
+            switch result {
+            case .success(let transaction):
+                print("Updating transaction: Recive data")
+                self.updateTransaction(id: id, with: transaction, completion: { (processedTransaction) in
+                    completion(processedTransaction)
+                })
+            case .failure(let error):
+                print("Updating transaction: Recive error")
+                print(error)
+            }
+        })
+    }
+    
+    private func updateTransaction(id: UInt64, with rawTransaction:Transaction, completion: @escaping (TransferTransaction) -> Void) {
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = self.stack.container.viewContext
+        
+        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        if let transaction = (try? context.fetch(request))?.first {
+            transaction.confirmations = rawTransaction.confirmations
+            completion(transaction)
+        }
+        
+        if context.hasChanges {
+            do {
+                try context.save()
+                
+                print(".success")
+            } catch {
+                print(error)
+            }
+        } else {
+            print(".empty")
         }
     }
     
