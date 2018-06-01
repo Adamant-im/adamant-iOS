@@ -9,6 +9,12 @@
 import UIKit
 import CoreData
 
+extension String.adamantLocalized {
+	struct transactionList {
+		static let title = NSLocalizedString("TransactionListScene.Title", comment: "TransactionList: scene title")
+	}
+}
+
 class TransactionsViewController: UIViewController {
 	let cellIdentifier = "cell"
 	let cellHeight: CGFloat = 90.0
@@ -30,6 +36,7 @@ class TransactionsViewController: UIViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+		navigationItem.title = String.adamantLocalized.transactionList.title
 		
 		if accountService.account != nil {
 			initFetchedResultController(provider: transfersProvider)
@@ -141,6 +148,8 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 				// TODO: Display & Log error
 				return UITableViewCell(style: .default, reuseIdentifier: "cell")
 		}
+		
+		cell.accessoryType = .disclosureIndicator
 		
 		configureCell(cell, for: transfer)
 		return cell

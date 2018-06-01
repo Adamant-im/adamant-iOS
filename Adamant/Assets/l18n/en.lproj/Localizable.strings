@@ -374,6 +374,12 @@
 /* Main tab bar: Settings page */
 "Tabs.Settings" = "Settings";
 
+/* TransactionList: scene title */
+"TransactionListScene.Title" = "Transactions";
+
+/* Transaction details: scene title */
+"TransactionDetailsScene.Title" = "Details";
+
 /* Transaction details: amount row. */
 "TransactionDetailsScene.Row.Amount" = "Amount";
 
