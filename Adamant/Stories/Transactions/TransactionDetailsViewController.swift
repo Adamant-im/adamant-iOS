@@ -139,43 +139,12 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 		}
 		
 		guard let cell = tableView.cellForRow(at: indexPath),
-			let row = Row(rawValue: indexPath.row),
 			let details = cell.detailTextLabel?.text else {
 			tableView.deselectRow(at: indexPath, animated: true)
 			return
 		}
 		
-		let payload: String
-		switch row {
-		case .amount:
-			payload = "\(row.localized): \(details)"
-			
-		case .date:
-			payload = "\(row.localized): \(details)"
-			
-		case .confirmations:
-			payload = "\(row.localized): \(details)"
-			
-		case .fee:
-			payload = "\(row.localized): \(details)"
-			
-		case .transactionNumber:
-			payload = "\(row.localized): \(details)"
-			
-		case .from:
-			payload = "\(row.localized): \(details)"
-			
-		case .to:
-			payload = "\(row.localized): \(details)"
-			
-		case .block:
-			payload = "\(row.localized): \(details)"
-			
-		case .openInExplorer:
-			payload = ""
-		}
-		
-		dialogService.presentShareAlertFor(string: payload,
+		dialogService.presentShareAlertFor(string: details,
 										   types: [.copyToPasteboard, .share],
 										   excludedActivityTypes: nil,
 										   animated: true) {
