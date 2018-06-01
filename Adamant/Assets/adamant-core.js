@@ -42501,12 +42501,19 @@ class Adamant {
     var assetBytes = null
 
     switch (transaction.type) {
-      case 0:
+      case 0: // Send
         break
-      case 8:
+
+      case 8: // Chat message
         assetBytes = this.chatGetBytes(transaction)
         assetSize = assetBytes.length
         break
+
+      case 9: // State
+        assetBytes = this.statesGetBytes(transaction)
+        assetSize = assetBytes.length
+        break
+
       default:
         alert('Not supported yet')
     }
@@ -42578,7 +42585,7 @@ class Adamant {
 
   static transactionSign (trs, keypair) {
     var hash = Adamant.getHash(trs)
-    return Adamant.sign(hash, keypair).toString('hex')
+    return Adamant.sign(hash, keypair).toString('hex');
   }
 
   static chatGetBytes (trs) {
@@ -42596,12 +42603,41 @@ class Adamant {
       var bb = new ByteBuffer(4 + 4, true)
       bb.writeInt(trs.asset.chat.type)
       bb.flip()
+
       buf = Buffer.concat([buf, Buffer.from(bb.toBuffer())])
     } catch (e) {
       throw e
     }
 
     return buf
+  }
+
+  static statesGetBytes (trs) {
+    if (!trs.asset.state.value) {
+      return null;
+    }
+    var buf;
+
+    try {
+      buf = Buffer.from([]);
+      var stateBuf = Buffer.from(trs.asset.state.value);
+      buf = Buffer.concat([buf, stateBuf]);
+
+      if (trs.asset.state.key) {
+          var keyBuf = Buffer.from(trs.asset.state.key);
+          buf = Buffer.concat([buf, keyBuf]);
+      }
+
+      var bb = new ByteBuffer(4 + 4, true);
+      bb.writeInt(trs.asset.state.type);
+      bb.flip();
+
+      buf = Buffer.concat([buf, Buffer.from(bb.toBuffer())]);
+    } catch (e) {
+        throw e;
+    }
+
+    return buf;
   }
 
   /**

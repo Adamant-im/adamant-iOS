@@ -152,11 +152,11 @@ extension ChatViewController: MessageInputBarDelegate {
 				case .dependencyError(let error):
 					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error)
 				case .internalError(let error):
-					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, String(describing: error))
+					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error.localizedDescription)
 				case .notLogged:
 					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "User not logged")
 				case .serverError(let error):
-					message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, String(describing: error))
+					message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, error.localizedDescription)
 					
 				case .networkError:
 					message = String.adamantLocalized.chat.noNetwork
@@ -178,7 +178,7 @@ extension ChatViewController: MessageInputBarDelegate {
 				}
 				
 				// TODO: Log this
-				self.dialogService.showError(withMessage: message)
+				self.dialogService.showError(withMessage: message, error: error)
 			}
 		})
 		

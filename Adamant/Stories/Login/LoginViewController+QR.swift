@@ -84,7 +84,7 @@ extension LoginViewController {
 extension LoginViewController: QRCodeReaderViewControllerDelegate {
 	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
 		guard AdamantUtilities.validateAdamantPassphrase(passphrase: result.value) else {
-			dialogService.showError(withMessage: String.adamantLocalized.login.wrongQrError)
+			dialogService.showWarning(withMessage: String.adamantLocalized.login.wrongQrError)
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
 				reader.startScanning()
 			}
@@ -117,9 +117,9 @@ extension LoginViewController: UINavigationControllerDelegate, UIImagePickerCont
 				}
 			}
 			
-			dialogService.showError(withMessage: String.adamantLocalized.login.wrongQrError)
+			dialogService.showWarning(withMessage: String.adamantLocalized.login.wrongQrError)
 		} else {
-			dialogService.showError(withMessage: String.adamantLocalized.login.noQrError)
+			dialogService.showWarning(withMessage: String.adamantLocalized.login.noQrError)
 		}
 	}
 }

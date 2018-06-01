@@ -8,7 +8,10 @@
 
 import UIKit
 import Swinject
+import CryptoSwift
 
+
+// MARK: - Constants
 extension String.adamantLocalized {
 	struct tabItems {
 		static let account = NSLocalizedString("Tabs.Account", comment: "Main tab bar: Account page")
@@ -17,14 +20,43 @@ extension String.adamantLocalized {
 	}
 }
 
+extension StoreKey {
+	struct application {
+		static let deviceTokenHash = "app.deviceTokenHash"
+		
+		private init() {}
+	}
+}
+
+
+// MARK: - Resources
+struct AdamantResources {
+	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
+	static let coreDataModel = Bundle.main.url(forResource: "ChatModels", withExtension: "momd")!
+	
+	static let servers = [
+		"https://endless.adamant.im",
+        "https://clown.adamant.im",
+        "https://lake.adamant.im"
+	]
+	
+	static let iosAppSupportEmail = "ios@adamant.im"
+	
+	private init() {}
+}
+
+
+// MARK: - Application
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var window: UIWindow?
 	var repeater: RepeaterService!
 	var container: Container!
 	
-	weak var accountService: AccountService?
-	weak var notificationService: NotificationsService?
+	// MARK: Dependencies
+	var accountService: AccountService!
+	var notificationService: NotificationsService!
+    var dialogService: DialogService!
 
 	// MARK: - Lifecycle
 	
@@ -34,7 +66,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		container.registerAdamantServices()
 		accountService = container.resolve(AccountService.self)
 		notificationService = container.resolve(NotificationsService.self)
-		
+        dialogService = container.resolve(DialogService.self)
 		
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
@@ -86,9 +118,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			
 			switch reachability.connection {
 			case .cellular, .wifi:
+                dialogService.dissmisNoConnectionNotification()
 				break
 				
 			case .none:
+                dialogService.showNoConnectionNotification()
 				repeater.pauseAll()
 			}
 			
@@ -100,9 +134,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 				
 				switch connection {
 				case .cellular, .wifi:
+                    self?.dialogService.dissmisNoConnectionNotification()
 					repeater.resumeAll()
 					
 				case .none:
+                    self?.dialogService.showNoConnectionNotification()
 					repeater.pauseAll()
 				}
 			}
@@ -120,25 +156,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		
-		// MARK: 6. Notifications
-		if let service = container.resolve(NotificationsService.self) {
-			if service.notificationsEnabled {
-				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
-			} else {
-				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
-			}
-			
-			NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.showNotificationsChanged, object: service, queue: OperationQueue.main) { _ in
-				if service.notificationsEnabled {
-					UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
-				} else {
-					UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
-				}
-			}
-		}
-		
-		
-		// MARK: 7. Logout reset
+		// MARK: 6. Logout reset
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			// On logout, pop all navigators to root.
 			guard let tbc = self?.window?.rootViewController as? UITabBarController, let vcs = tbc.viewControllers else {
@@ -163,9 +181,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		repeater.pauseAll()
 	}
 	
+	// MARK: Notifications
+	
 	func applicationDidBecomeActive(_ application: UIApplication) {
-		if accountService?.account != nil {
-			notificationService?.removeAllDeliveredNotifications()
+		if accountService.account != nil {
+			notificationService.removeAllDeliveredNotifications()
 		}
 		
 		if let connection = container.resolve(ReachabilityMonitor.self)?.connection {
@@ -182,8 +202,56 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 }
 
+// MARK: - Remote notifications
+extension AppDelegate {
+	func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+		guard let address = accountService.account?.address, let keypair = accountService.keypair else {
+			print("Trying to register with no user logged")
+			UIApplication.shared.unregisterForRemoteNotifications()
+			return
+		}
+		
+		let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+		
+		// Checking, if device token had not changed
+		guard let securedStore = container.resolve(SecuredStore.self) else {
+			fatalError("can't get secured store to get device token hash")
+		}
+		
+		let tokenHash = token.md5()
+		
+		if let savedHash = securedStore.get(StoreKey.application.deviceTokenHash), tokenHash == savedHash {
+			return
+		} else {
+			securedStore.set(tokenHash, for: StoreKey.application.deviceTokenHash)
+		}
+		
+		// Storing new token in blockchain
+		guard let apiService = container.resolve(ApiService.self) else {
+			fatalError("can't get api service to register device token")
+		}
+		
+		apiService.store(key: "deviceToken", value: token, type: StateType.keyValue, sender: address, keypair: keypair) { [weak self] result in
+			switch result {
+			case .success:
+				return
+				
+			case .failure(let error):
+				print("Failed to store device token: \(error)")
+				self?.notificationService?.setNotificationsMode(.disabled, completion: nil)
+			}
+		}
+	}
+	
+	func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+		if let service = container.resolve(DialogService.self) {
+			service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription), error: error)
+		}
+	}
+}
 
-// MARK: - BackgroundFetch
+
+// MARK: - Background Fetch
 extension AppDelegate {
 	func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
 		let container = Container()
@@ -208,7 +276,7 @@ extension AppDelegate {
 		
 		for service in services {
 			group.enter()
-			service.fetchBackgroundData(notificationService: notificationsService) { result in
+			service.fetchBackgroundData(notificationsService: notificationsService) { result in
 				defer {
 					group.leave()
 				}

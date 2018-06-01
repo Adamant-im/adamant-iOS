@@ -18,4 +18,5 @@ enum TransactionType: Int, Codable {
 	case inTransfer
 	case outTransfer
 	case chatMessage
+	case state
 }

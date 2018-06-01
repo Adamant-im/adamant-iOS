@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdamantTransfersProvider: BackgroundFetchService {
-	func fetchBackgroundData(notificationService: NotificationsService, completion: @escaping (FetchResult) -> Void) {
+	func fetchBackgroundData(notificationsService: NotificationsService, completion: @escaping (FetchResult) -> Void) {
 		guard let securedStore = self.securedStore,
 			let address = securedStore.get(StoreKey.transfersProvider.address) else {
 			completion(.failed)
@@ -34,7 +34,7 @@ extension AdamantTransfersProvider: BackgroundFetchService {
 			}
 		}
 		
-		apiService.getTransactions(forAccount: address, type: .send, fromHeight: lastHeight) { result in
+        apiService.getTransactions(forAccount: address, type: .send, fromHeight: lastHeight, offset: 0, limit: 100) { result in
 			switch result {
 			case .success(let transactions):
 				let total = transactions.filter({$0.recipientId == address}).count
@@ -47,7 +47,7 @@ extension AdamantTransfersProvider: BackgroundFetchService {
 						securedStore.set(String(newLastHeight), for: StoreKey.transfersProvider.notifiedLastHeight)
 					}
 					
-					notificationService.showNotification(title: String.adamantLocalized.notifications.newTransferTitle, body: String.localizedStringWithFormat(String.adamantLocalized.notifications.newTransferBody, total + notifiedCount), type: .newTransactions(count: total))
+					notificationsService.showNotification(title: String.adamantLocalized.notifications.newTransferTitle, body: String.localizedStringWithFormat(String.adamantLocalized.notifications.newTransferBody, total + notifiedCount), type: .newTransactions(count: total))
 					
 					completion(.newData)
 				} else {

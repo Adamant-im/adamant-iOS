@@ -223,13 +223,13 @@ class LoginViewController: FormViewController {
 			$0.hidden = Condition.function([], { [weak self] form -> Bool in
 				return self?.hideNewPassphrase ?? false
 			})
-			}.cellUpdate({ (cell, row) in
-				cell.textView.textAlignment = .center
-				cell.textView.font = UIFont.adamantPrimary(size: 14)
-				cell.textView.textColor = UIColor.adamantPrimary
-				cell.textView.isSelectable = false
-				cell.textView.isEditable = false
-			})
+		}.cellUpdate({ (cell, _) in
+			cell.textView.textAlignment = .center
+			cell.textView.font = UIFont.adamantPrimary(size: 14)
+			cell.textView.textColor = UIColor.adamantPrimary
+			cell.textView.isSelectable = false
+			cell.textView.isEditable = false
+		})
 		
 		// New genegated passphrase
 		<<< PassphraseRow() {
@@ -306,7 +306,7 @@ class LoginViewController: FormViewController {
 extension LoginViewController {
 	func loginWith(passphrase: String) {
 		guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
-			dialogService.showError(withMessage: AccountServiceError.wrongPassphrase.localized)
+			dialogService.showWarning(withMessage: AccountServiceError.wrongPassphrase.localized)
 			return
 		}
 		
@@ -350,7 +350,7 @@ extension LoginViewController {
 				self?.loginIntoExistingAccount(passphrase: passphrase)
 				
 			case .failure(let error):
-				self?.dialogService.showError(withMessage: error.localized)
+				self?.dialogService.showError(withMessage: error.localized, error: error)
 			}
 		})
 	}
@@ -368,7 +368,7 @@ extension LoginViewController {
 				self?.dialogService.dismissProgress()
 				
 			case .failure(let error):
-				self?.dialogService.showError(withMessage: error.localized)
+				self?.dialogService.showError(withMessage: error.localized, error: error)
 			}
 		})
 	}

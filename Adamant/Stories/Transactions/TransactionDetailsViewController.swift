@@ -11,6 +11,12 @@ import SafariServices
 
 
 // MARK: - Localization
+extension String.adamantLocalized {
+	struct transactionDetails {
+		static let title = NSLocalizedString("TransactionDetailsScene.Title", comment: "Transaction details: scene title")
+	}
+}
+
 extension String.adamantLocalized.alert {
 	static let exportUrlButton = NSLocalizedString("TransactionDetailsScene.Share.URL", comment: "Export transaction: 'Share transaction URL' button")
 	static let exportSummaryButton = NSLocalizedString("TransactionDetailsScene.Share.Summary", comment: "Export transaction: 'Share transaction summary' button")
@@ -59,6 +65,7 @@ class TransactionDetailsViewController: UIViewController {
 	@IBOutlet weak var tableView: UITableView!
 	
 	override func viewDidLoad() {
+		navigationItem.title = String.adamantLocalized.transactionDetails.title
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(share))
 		tableView.dataSource = self
 		tableView.delegate = self
@@ -139,43 +146,12 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 		}
 		
 		guard let cell = tableView.cellForRow(at: indexPath),
-			let row = Row(rawValue: indexPath.row),
 			let details = cell.detailTextLabel?.text else {
 			tableView.deselectRow(at: indexPath, animated: true)
 			return
 		}
 		
-		let payload: String
-		switch row {
-		case .amount:
-			payload = "\(row.localized): \(details)"
-			
-		case .date:
-			payload = "\(row.localized): \(details)"
-			
-		case .confirmations:
-			payload = "\(row.localized): \(details)"
-			
-		case .fee:
-			payload = "\(row.localized): \(details)"
-			
-		case .transactionNumber:
-			payload = "\(row.localized): \(details)"
-			
-		case .from:
-			payload = "\(row.localized): \(details)"
-			
-		case .to:
-			payload = "\(row.localized): \(details)"
-			
-		case .block:
-			payload = "\(row.localized): \(details)"
-			
-		case .openInExplorer:
-			payload = ""
-		}
-		
-		dialogService.presentShareAlertFor(string: payload,
+		dialogService.presentShareAlertFor(string: details,
 										   types: [.copyToPasteboard, .share],
 										   excludedActivityTypes: nil,
 										   animated: true) {

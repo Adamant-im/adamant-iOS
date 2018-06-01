@@ -87,7 +87,10 @@ protocol DialogService: class {
 	func showProgress(withMessage: String?, userInteractionEnable: Bool)
 	func dismissProgress()
 	func showSuccess(withMessage: String)
-	func showError(withMessage: String)
+	func showWarning(withMessage: String)
+	func showError(withMessage: String, error: Error?)
+    func showNoConnectionNotification()
+    func dissmisNoConnectionNotification()
 	
 	// MARK: - Notifications
 	func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?)

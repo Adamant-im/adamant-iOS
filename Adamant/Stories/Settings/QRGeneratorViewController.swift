@@ -105,7 +105,7 @@ class QRGeneratorViewController: FormViewController {
 					if completed {
 						self?.dialogService.showToastMessage(String.adamantLocalized.alert.done)
 					} else if let error = error {
-						self?.dialogService.showToastMessage(String(describing: error))
+						self?.dialogService.showToastMessage(error.localizedDescription)
 					}
 				}
 				self?.present(vc, animated: true, completion: nil)
@@ -187,7 +187,7 @@ extension QRGeneratorViewController {
 			setQr(image: qr)
 			
 		case .failure(let error):
-			dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.qrGenerator.internalError, String(describing: error)))
+			dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.qrGenerator.internalError, error.localizedDescription), error: error)
 		}
 	}
 	

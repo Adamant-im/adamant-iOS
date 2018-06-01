@@ -48,4 +48,3 @@ extension UIFont {
 		return UIFont(name: "Exo 2 Thin", size: size)!
 	}
 }
-

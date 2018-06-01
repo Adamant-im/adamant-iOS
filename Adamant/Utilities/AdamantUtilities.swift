@@ -19,6 +19,19 @@ class AdamantUtilities {
 		
 		return ""
 	}()
+    
+    // MARK: Device model
+    static var deviceModelCode: String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let modelCode = withUnsafePointer(to: &systemInfo.machine) {
+            $0.withMemoryRebound(to: CChar.self, capacity: 1) {
+                ptr in String.init(validatingUTF8: ptr)
+                
+            }
+        }
+        return modelCode ?? "Unknown"
+    }
 	
 	private init() { }
 }
@@ -94,7 +107,11 @@ extension AdamantUtilities {
 
 // MARK: - Dates
 extension AdamantUtilities {
-	static func decodeAdamantDate(timestamp: TimeInterval) -> Date {
+	static func encodeAdamant(date: Date) -> TimeInterval {
+		return date.timeIntervalSince1970 - magicAdamantTimeInterval
+	}
+	
+	static func decodeAdamant(timestamp: TimeInterval) -> Date {
 		return Date(timeIntervalSince1970: timestamp + magicAdamantTimeInterval)
 	}
 	

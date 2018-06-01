@@ -1,5 +1,5 @@
 //
-//  Chat.swift
+//  ChatAsset.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 12.01.2018.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Chat: Codable {
+struct ChatAsset: Codable {
 	enum CodingKeys: String, CodingKey {
 		case message, ownMessage = "own_message", type
 	}

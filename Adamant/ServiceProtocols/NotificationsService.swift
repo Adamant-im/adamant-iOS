@@ -18,17 +18,25 @@ extension String.adamantLocalized {
 		static let newTransferTitle = NSLocalizedString("NotificationsService.NewTransfer.Title", comment: "Notifications: New transfer transaction title")
 		static let newTransferBody = NSLocalizedString("NotificationsService.NewTransfer.BodyFormat", comment: "Notifications: New transfer notification body. Using %d for amount")
 		
+		static let registerRemotesError = NSLocalizedString("NotificationsService.Error.RegistrationRemotesFormat", comment: "Notifications: while registering remote notifications. %@ for description")
+		
 		private init() {}
 	}
 }
 
 extension StoreKey {
 	struct notificationsService {
-		static let notificationsEnabled = "notifications.show"
+		static let notificationsMode = "notifications.mode"
 		static let customBadgeNumber = "notifications.number"
 		
 		private init() {}
 	}
+}
+
+enum NotificationsMode: Int {
+	case disabled
+	case backgroundFetch
+	case push
 }
 
 /// Supported notification types
@@ -72,7 +80,7 @@ enum AdamantNotificationType {
 extension Notification.Name {
 	struct AdamantNotificationService {
 		/// Raised when user has logged out.
-		static let showNotificationsChanged = Notification.Name("adamant.notificationService.showNotifications")
+		static let notificationsModeChanged = Notification.Name("adamant.notificationService.notificationsMode")
 		
 		private init() {}
 	}
@@ -86,9 +94,9 @@ enum NotificationsServiceResult {
 }
 
 protocol NotificationsService: class {
-	var notificationsEnabled: Bool { get }
+	var notificationsMode: NotificationsMode { get }
 	
-	func setNotificationsEnabled(_ enabled: Bool, completion: @escaping (NotificationsServiceResult) -> Void)
+	func setNotificationsMode(_ mode: NotificationsMode, completion: ((NotificationsServiceResult) -> Void)?)
 	
 	func showNotification(title: String, body: String, type: AdamantNotificationType)
 	

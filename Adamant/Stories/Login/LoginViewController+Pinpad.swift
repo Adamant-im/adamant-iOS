@@ -67,7 +67,7 @@ extension LoginViewController {
 				}
 				
 			case .failure(let error):
-				self?.dialogService.showError(withMessage: error.localized)
+				self?.dialogService.showError(withMessage: error.localized, error: error)
 				
 				if let pinpad = self?.presentedViewController as? PinpadViewController {
 					pinpad.clearPin()

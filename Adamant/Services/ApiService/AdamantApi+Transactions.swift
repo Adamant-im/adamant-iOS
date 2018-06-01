@@ -44,36 +44,42 @@ extension AdamantApiService {
 		}
 	}
 	
-	func getTransactions(forAccount account: String, type: TransactionType, fromHeight: Int64?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
-		var queryItems = [URLQueryItem(name: "inId", value: account),
-						  URLQueryItem(name: "and:type", value: String(type.rawValue))]
-		
-		if let fromHeight = fromHeight, fromHeight > 0 {
-			queryItems.append(URLQueryItem(name: "and:fromHeight", value: String(fromHeight)))
-		}
-		
-		let endpoint: URL
-		do {
-			endpoint = try buildUrl(path: ApiCommands.Transactions.root, queryItems: queryItems)
-		} catch {
-			let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-			completion(.failure(err))
-			return
-		}
-		
-		sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
-			switch serverResponse {
-			case .success(let response):
-				if let collection = response.collection {
-					completion(.success(collection))
-				} else {
-					let error = AdamantApiService.translateServerError(response.error)
-					completion(.failure(error))
-				}
-				
-			case .failure(let error):
-				completion(.failure(.networkError(error: error)))
-			}
-		}
-	}
+    func getTransactions(forAccount account: String, type: TransactionType, fromHeight: Int64?, offset: Int?, limit: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
+        
+        var queryItems = [URLQueryItem(name: "inId", value: account),
+                          URLQueryItem(name: "and:type", value: String(type.rawValue))
+        ]
+        
+        if let limit = limit { queryItems.append(URLQueryItem(name: "limit", value: String(limit))) }
+        
+        if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
+        
+        if let fromHeight = fromHeight, fromHeight > 0 {
+            queryItems.append(URLQueryItem(name: "and:fromHeight", value: String(fromHeight)))
+        }
+        
+        let endpoint: URL
+        do {
+            endpoint = try buildUrl(path: ApiCommands.Transactions.root, queryItems: queryItems)
+        } catch {
+            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+            completion(.failure(err))
+            return
+        }
+        
+        sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
+            switch serverResponse {
+            case .success(let response):
+                if let collection = response.collection {
+                    completion(.success(collection))
+                } else {
+                    let error = AdamantApiService.translateServerError(response.error)
+                    completion(.failure(error))
+                }
+                
+            case .failure(let error):
+                completion(.failure(.networkError(error: error)))
+            }
+        }
+    }
 }

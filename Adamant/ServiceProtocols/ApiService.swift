@@ -36,7 +36,7 @@ enum ApiServiceError: Error {
 			if let apiError = error as? ApiServiceError {
 				message = apiError.localized
 			} else if let error = error {
-				message = String(describing: error)
+				message = error.localizedDescription
 			} else {
 				message = msg
 			}
@@ -70,12 +70,18 @@ protocol ApiService: class {
 	// MARK: - Transactions
 	
 	func getTransaction(id: UInt64, completion: @escaping (ApiServiceResult<Transaction>) -> Void)
-	func getTransactions(forAccount: String, type: TransactionType, fromHeight: Int64?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
+	func getTransactions(forAccount: String, type: TransactionType, fromHeight: Int64?, offset: Int?, limit: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
 	
 	
 	// MARK: - Funds
 	
 	func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void)
+	
+	
+	// MARK: - States
+	
+	/// - Returns: Transaction ID
+	func store(key: String, value: String, type: StateType, sender: String, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
 	
 	
 	// MARK: - Chats

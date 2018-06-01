@@ -1,51 +1,78 @@
 PODS:
-  - Alamofire (4.7.0)
+  - Alamofire (4.7.2)
+  - CryptoSwift (0.9.0)
   - EFQRCode (4.2.1)
   - Eureka (4.1.1)
-  - FreakingSimpleRoundImageView (1.0.2)
-  - FTIndicator (1.2.6):
-    - FTIndicator/FTNotificationIndicator (= 1.2.6)
-    - FTIndicator/FTProgressIndicator (= 1.2.6)
-    - FTIndicator/FTToastIndicator (= 1.2.6)
-  - FTIndicator/FTNotificationIndicator (1.2.6)
-  - FTIndicator/FTProgressIndicator (1.2.6)
-  - FTIndicator/FTToastIndicator (1.2.6)
-  - KeychainAccess (3.1.0)
-  - MessageKit (0.13.2)
-  - MyLittlePinpad (0.2.3)
-  - QRCodeReader.swift (8.1.1)
+  - FreakingSimpleRoundImageView (1.1)
+  - FTIndicator (1.2.9):
+    - FTIndicator/FTNotificationIndicator (= 1.2.9)
+    - FTIndicator/FTProgressIndicator (= 1.2.9)
+    - FTIndicator/FTToastIndicator (= 1.2.9)
+  - FTIndicator/FTNotificationIndicator (1.2.9)
+  - FTIndicator/FTProgressIndicator (1.2.9)
+  - FTIndicator/FTToastIndicator (1.2.9)
+  - Haring (2.0.8)
+  - KeychainAccess (3.1.1)
+  - MessageKit (0.13.5)
+  - MyLittlePinpad (0.2.4)
+  - PMAlertController (3.4.0)
+  - QRCodeReader.swift (8.2.0)
   - ReachabilitySwift (4.1.0)
-  - RNCryptor (5.0.2)
-  - Swinject (2.3.0)
+  - RNCryptor (5.0.3)
+  - Swinject (2.4.0)
 
 DEPENDENCIES:
   - Alamofire
+  - CryptoSwift
   - EFQRCode
   - Eureka
   - FreakingSimpleRoundImageView
   - FTIndicator
+  - Haring
   - KeychainAccess
   - MessageKit
   - MyLittlePinpad
+  - PMAlertController
   - QRCodeReader.swift
   - ReachabilitySwift
   - RNCryptor
   - Swinject
 
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - Alamofire
+    - CryptoSwift
+    - EFQRCode
+    - Eureka
+    - FreakingSimpleRoundImageView
+    - FTIndicator
+    - Haring
+    - KeychainAccess
+    - MessageKit
+    - MyLittlePinpad
+    - PMAlertController
+    - QRCodeReader.swift
+    - ReachabilitySwift
+    - RNCryptor
+    - Swinject
+
 SPEC CHECKSUMS:
-  Alamofire: 907e0a98eb68cdb7f9d1f541a563d6ac5dc77b25
+  Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
+  CryptoSwift: bca8c5b653dcc2d9734409242a070ff53bafac86
   EFQRCode: f3fd67049faa07adb575495c05d72a34e407a940
   Eureka: b88fb930e42c79f8c03c373d0fcdc28c1d6c50ed
-  FreakingSimpleRoundImageView: e87b0ef24c9b95b74b1c2cab5b03832dbabd4873
-  FTIndicator: d2a7c204341b7b0165b6dbeb5bf6979c6d7d4bb7
-  KeychainAccess: 94c5540b32eabf7bc32bfb976a268e8ea05fd6da
-  MessageKit: 274efb4454ddc9b3408b031b3396498dd4ed2462
-  MyLittlePinpad: 4ead0ea2da9957bb37d961b39743c1dfc8431efa
-  QRCodeReader.swift: b164a681887de276d405ff02bce854d82cd6360b
+  FreakingSimpleRoundImageView: 4a3a1cb1347beb247f8c63b5b5cae9d770b431ee
+  FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
+  Haring: d2a4cfc00dfb63836dffc93e45919369f850e134
+  KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
+  MessageKit: c4bd50e285a0f0761bc23a2e982aa7840873c4f5
+  MyLittlePinpad: dc5f8a7fc13a4ad6fc9dc8d3359d91f1b5b1c7e8
+  PMAlertController: efb781925d741d50e0200018a00c53cecb8b4910
+  QRCodeReader.swift: 003eb32f18a5a675b936ec82ba0ff368cddbff45
   ReachabilitySwift: 6849231cd4e06559f3b9ef4a97a0a0f96d41e09f
-  RNCryptor: 59b9f92e9fa8a1af74c32dc6b1af5e30ff5e1b64
-  Swinject: 6e29897396bab81fe4aa40c5ca92ba996136334b
+  RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
+  Swinject: a1364b0f66c2736bb03c1c7cab54809e16df25da
 
-PODFILE CHECKSUM: d73e1c940db551ee6dfc242c1b5307dc8ed560be
+PODFILE CHECKSUM: d5efe36624e504f34934e8b20f4138c7db823908
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.5.0

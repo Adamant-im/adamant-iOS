@@ -8,15 +8,6 @@
 
 import Swinject
 
-// MARK: - Resources
-private struct AdamantResources {
-	// Storyboard
-	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
-	static let api = URL(string: "https://endless.adamant.im")!
-	static let coreDataModel = Bundle.main.url(forResource: "ChatModels", withExtension: "momd")!
-	
-	private init() {}
-}
 
 // MARK: - Services
 extension Container {
@@ -68,9 +59,9 @@ extension Container {
 		
 		// MARK: ApiService
 		self.register(ApiService.self) { r in
-			let service = AdamantApiService(apiUrl: AdamantResources.api)
-			service.adamantCore = r.resolve(AdamantCore.self)!
-			return service
+            let service = AdamantApiService(apiUrls: AdamantResources.servers)
+            service.adamantCore = r.resolve(AdamantCore.self)!
+            return service
 		}.inObjectScope(.container)
 		
 		// MARK: AccountService
@@ -79,6 +70,7 @@ extension Container {
 			service.apiService = r.resolve(ApiService.self)!
 			service.adamantCore = r.resolve(AdamantCore.self)!
 			service.securedStore = r.resolve(SecuredStore.self)!
+			service.notificationsService = r.resolve(NotificationsService.self)!
 			return service
 		}.inObjectScope(.container)
 		
@@ -127,7 +119,7 @@ extension Container {
 		
 		// MARK: ApiService
 		// No need to init AdamantCore
-		self.register(ApiService.self) { r in AdamantApiService(apiUrl: AdamantResources.api)}.inObjectScope(.container)
+		self.register(ApiService.self) { r in AdamantApiService(apiUrls: AdamantResources.servers)}.inObjectScope(.container)
 		
 		// MARK: Notifications
 		self.register(NotificationsService.self) { r in
