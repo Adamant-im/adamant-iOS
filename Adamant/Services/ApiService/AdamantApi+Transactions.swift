@@ -71,7 +71,6 @@ extension AdamantApiService {
             switch serverResponse {
             case .success(let response):
                 if let collection = response.collection {
-                    print("Recive \(collection.count) trantaction(s)")
                     completion(.success(collection))
                 } else {
                     let error = AdamantApiService.translateServerError(response.error)

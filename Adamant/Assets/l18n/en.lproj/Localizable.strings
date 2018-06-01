@@ -135,7 +135,10 @@
 "Error.Mail.Title" = "I have error in my iOS app";
 
 /* Error messge body for support email */
-"Error.Mail.Body" = "Hello,\nI have this error:\n\n%@\n\nMy device info:\n%2";
+"Error.Mail.Body" = "Hello,\nI have this error:\n\n%@\n\nMy device info:\n%@";
+
+/* Error messge body for support email, with detailed error description. Where first %@ - error's short message, second %@ - detailed description, third %@ - deviceInfo */
+"Error.Mail.Body.Detailed" = "Hello,\nI have this error:\n\n%@\n\n%@\n\nDevice:\n%@";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "LoginScene.Error.AuthorizeCamera" = "You need to authorize Adamant to use device's Camera";

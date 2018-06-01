@@ -49,7 +49,7 @@ enum AccountServiceResult {
 	case failure(AccountServiceError)
 }
 
-enum AccountServiceError {
+enum AccountServiceError: Error {
 	case userNotLogged
 	case invalidPassphrase
 	case wrongPassphrase
