@@ -1,6 +1,6 @@
 # Adamant-iOS
 
-iOS native client for ADAMANT Messenger. Available at App Store *(now it's in TestFlight)*. You can use this repository to build your own ADAMANT iOS application.
+iOS native client for ADAMANT Messenger. Available at App Store *(via TestFlight)*. You can use this repository to build your own ADAMANT iOS application.
 
 ADAMANT is the most secure and anonymous messenger, encrypted with Blockchain.
 
@@ -12,7 +12,7 @@ Highlights:
 - The only one which is Blockchain-powered
 - Integrated token transfers
 
-Read more about ADAMANT at https://adamant.im
+Read more about ADAMANT at [adamant.im](https://adamant.im)
 
 ## Build Setup
 
