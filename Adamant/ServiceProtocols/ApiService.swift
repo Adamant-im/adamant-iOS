@@ -36,7 +36,7 @@ enum ApiServiceError: Error {
 			if let apiError = error as? ApiServiceError {
 				message = apiError.localized
 			} else if let error = error {
-				message = String(describing: error)
+				message = error.localizedDescription
 			} else {
 				message = msg
 			}

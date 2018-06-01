@@ -88,7 +88,7 @@ protocol DialogService: class {
 	func dismissProgress()
 	func showSuccess(withMessage: String)
 	func showWarning(withMessage: String)
-	func showError(withMessage: String)
+	func showError(withMessage: String, error: Error?)
     func showNoConnectionNotification()
     func dissmisNoConnectionNotification()
 	

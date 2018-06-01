@@ -350,7 +350,7 @@ extension LoginViewController {
 				self?.loginIntoExistingAccount(passphrase: passphrase)
 				
 			case .failure(let error):
-				self?.dialogService.showError(withMessage: error.localized)
+				self?.dialogService.showError(withMessage: error.localized, error: error)
 			}
 		})
 	}
@@ -368,7 +368,7 @@ extension LoginViewController {
 				self?.dialogService.dismissProgress()
 				
 			case .failure(let error):
-				self?.dialogService.showError(withMessage: error.localized)
+				self?.dialogService.showError(withMessage: error.localized, error: error)
 			}
 		})
 	}

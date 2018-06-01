@@ -95,7 +95,7 @@ extension AdamantDialogService {
 		FTIndicator.showError(withMessage: message)
 	}
 	
-	func showError(withMessage message: String) {
+	func showError(withMessage message: String, error: Error? = nil) {
 		if Thread.isMainThread {
 			FTIndicator.dismissProgress()
 		} else {
@@ -115,8 +115,10 @@ extension AdamantDialogService {
         
         let supportBtn = PMAlertAction(title: AdamantResources.iosAppSupportEmail, style: .default) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                print("Send mail")
-                
+				guard let presenter = self else {
+					return
+				}
+				
                 let mailVC = MFMailComposeViewController()
                 mailVC.mailComposeDelegate = self?.mailDelegate
                 mailVC.setToRecipients([AdamantResources.iosAppSupportEmail])
@@ -125,14 +127,21 @@ extension AdamantDialogService {
                 let systemVersion = UIDevice.current.systemVersion
                 let model = AdamantUtilities.deviceModelCode
                 let deviceInfo = "Model: \(model)\n" + "iOS: \(systemVersion)\n" + "App version: \(AdamantUtilities.applicationVersion)"
-                
-                let body = String(format: String.adamantLocalized.alert.emailErrorMessageBody, message, deviceInfo)
-                
+				
+				let body: String
+				
+				if let error = error {
+					let errorDescription = String(describing: error)
+					body = String(format: String.adamantLocalized.alert.emailErrorMessageBodyWithDescription, message, errorDescription, deviceInfo)
+				} else {
+					body = String(format: String.adamantLocalized.alert.emailErrorMessageBody, message, deviceInfo)
+				}
+				
                 mailVC.setMessageBody(body, isHTML: false)
                 
-                self?.present(mailVC, animated: true, completion: nil)
+                presenter.present(mailVC, animated: true, completion: nil)
             }
-        })
+        }
         
         supportBtn.titleLabel?.font = UIFont.adamantPrimary(size: 16)
         supportBtn.setTitleColor(UIColor(hex: "#00B6FF"), for: .normal)
@@ -214,7 +223,7 @@ extension AdamantDialogService {
 						self?.present(vc, animated: true, completion: completion)
 						
 					case .failure(error: let error):
-						self?.showError(withMessage: String(describing: error))
+						self?.showError(withMessage: error.localizedDescription, error: error)
 					}
 				})
 				

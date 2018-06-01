@@ -314,14 +314,14 @@ class TransferViewController: FormViewController {
 							}
 							
 						case .failure(let error):
-							dialogService.showError(withMessage: String(describing: error))
+							dialogService.showError(withMessage: error.localized, error: error)
 						}
 						
 					}
 					
 					
-				case .failure(_):
-					dialogService.showError(withMessage: String.adamantLocalized.transfer.accountNotFound)
+				case .failure(let error):
+					dialogService.showError(withMessage: String.adamantLocalized.transfer.accountNotFound, error: error)
 				}
 			}
 		})

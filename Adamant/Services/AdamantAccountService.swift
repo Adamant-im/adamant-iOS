@@ -179,7 +179,7 @@ extension AdamantAccountService: AccountService {
 				self?.setState(.loggedIn)
 				
 			case .failure(let error):
-				print("Error update account: \(String(describing: error))")
+				print("Error update account: \(error.localized))")
 			}
 		}
 	}
