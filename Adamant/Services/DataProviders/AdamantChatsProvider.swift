@@ -225,12 +225,12 @@ extension AdamantChatsProvider {
 extension AdamantChatsProvider {
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
 		guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
-			completion(.error(.notLogged))
+			completion(.failure(.notLogged))
 			return
 		}
 		
 		guard loggedAccount.balance >= message.fee else {
-			completion(.error(.notEnoughtMoneyToSend))
+			completion(.failure(.notEnoughtMoneyToSend))
 			return
 		}
 		
@@ -239,11 +239,11 @@ extension AdamantChatsProvider {
 			break
 			
 		case .empty:
-			completion(.error(.messageNotValid(.empty)))
+			completion(.failure(.messageNotValid(.empty)))
 			return
 			
 		case .tooLong:
-			completion(.error(.messageNotValid(.tooLong)))
+			completion(.failure(.messageNotValid(.tooLong)))
 			return
 		}
 		
@@ -264,7 +264,7 @@ extension AdamantChatsProvider {
 		// MARK: 1. Get recipient account
 		let accountsGroup = DispatchGroup()
 		accountsGroup.enter()
-		var accountViewContext: CoreDataAccount? = nil
+		var acc: CoreDataAccount? = nil
 		accountsProvider.getAccount(byAddress: recipientId) { result in
 			defer {
 				accountsGroup.leave()
@@ -272,27 +272,26 @@ extension AdamantChatsProvider {
 			
 			switch result {
 			case .notFound:
-				completion(.error(.accountNotFound(recipientId)))
+				completion(.failure(.accountNotFound(recipientId)))
 				
 			case .serverError(let error):
-				completion(.error(.serverError(error)))
+				completion(.failure(.serverError(error)))
 				
 			case .success(let account):
-				accountViewContext = account
+				acc = account
 			}
 		}
 		
 		accountsGroup.wait()
 		
-		guard let account = accountViewContext, let recipientPublicKey = account.publicKey else {
-			completion(.error(.accountNotFound(recipientId)))
+		guard let account = acc, let recipientPublicKey = account.publicKey else {
 			return
 		}
 		
 		
 		// MARK: 2. Encode message
 		guard let encodedMessage = adamantCore.encodeMessage(text, recipientPublicKey: recipientPublicKey, privateKey: keypair.privateKey) else {
-			completion(.error(.dependencyError("Failed to encode message")))
+			completion(.failure(.dependencyError("Failed to encode message")))
 			return
 		}
 		
@@ -320,7 +319,7 @@ extension AdamantChatsProvider {
 		do {
 			try privateContext.save()
 		} catch {
-			completion(.error(.internalError(error)))
+			completion(.failure(.internalError(error)))
 			return
 		}
 		
@@ -353,7 +352,7 @@ extension AdamantChatsProvider {
 					try privateContext.save()
 					completion(.success)
 				} catch {
-					completion(.error(.internalError(error)))
+					completion(.failure(.internalError(error)))
 				}
 				
 				
@@ -379,7 +378,7 @@ extension AdamantChatsProvider {
 					serviceError = ChatsProviderError.internalError(AdamantError(message: message, error: e))
 				}
 				
-				completion(.error(serviceError))
+				completion(.failure(serviceError))
 			}
 		}
 	}

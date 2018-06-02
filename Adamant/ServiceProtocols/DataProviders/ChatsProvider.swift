@@ -14,7 +14,7 @@ import CoreData
 
 enum ChatsProviderResult {
 	case success
-	case error(ChatsProviderError)
+	case failure(ChatsProviderError)
 }
 
 enum ChatsProviderError: Error {
@@ -92,4 +92,8 @@ protocol ChatsProvider: DataProvider {
 	
 	// MARK: - Tools
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
+	
+	// MARK: - Fake messages
+	func fakeSentMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void)
+	func fakeReceivedMessage(_ message: AdamantMessage, senderId: String, completion: @escaping (ChatsProviderResult) -> Void)
 }

@@ -144,7 +144,7 @@ extension ChatViewController: MessageInputBarDelegate {
 			switch result {
 			case .success: break
 				
-			case .error(let error):
+			case .failure(let error):
 				let message: String
 				switch error {
 				case .accountNotFound(let account):
