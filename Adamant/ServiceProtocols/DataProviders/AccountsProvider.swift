@@ -56,6 +56,10 @@ enum AdamantContacts {
 		}
 	}
 	
+	var isReadonly: Bool {
+		return true
+	}
+	
 	var avatar: String {
 		return "avatar_bots"
 	}

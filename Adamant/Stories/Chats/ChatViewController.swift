@@ -114,10 +114,6 @@ class ChatViewController: MessagesViewController {
 		
 		// MARK: 2. InputBar configuration
 		
-		if chatroom.isReadonly {
-			messageInputBar.isHidden = true
-		}
-		
 		messageInputBar.delegate = self
 		
 		let bordersColor = UIColor(red: 200/255, green: 200/255, blue: 200/255, alpha: 1)
@@ -166,6 +162,14 @@ class ChatViewController: MessagesViewController {
 		if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
 			messageInputBar.inputTextView.text = message
 			setEstimatedFee(AdamantMessage.text(message).fee)
+		}
+		
+		// MARK: 3. Readonly chat
+		
+		if chatroom.isReadonly {
+			messageInputBar.inputTextView.backgroundColor = UIColor.adamantChatSenderBackground
+			messageInputBar.inputTextView.isEditable = false
+			messageInputBar.sendButton.isEnabled = false
 		}
     }
 	

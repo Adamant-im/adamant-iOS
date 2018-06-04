@@ -17,12 +17,14 @@ class AdamantAccountsProvider: AccountsProvider {
 		let name: String
 		let avatar: String?
 		let messages: [KnownMessage]?
+		let isReadonly: Bool
 		
 		fileprivate init(contact: AdamantContacts) {
 			self.address = contact.address
 			self.name = contact.name
 			self.avatar = contact.avatar
 			self.messages = contact.messages.map({ KnownMessage(key: $0, message: $1) })
+			self.isReadonly = contact.isReadonly
 		}
 	}
 	
@@ -294,6 +296,8 @@ extension AdamantAccountsProvider {
 		if let acc = knownContacts[account.address] {
 			coreAccount.name = acc.name
 			coreAccount.avatar = acc.avatar
+			chatroom.isReadonly = acc.isReadonly
+			
 			if let messages = acc.messages {
 				coreAccount.knownMessages = messages.reduce(into: [String:String](), { (result, message) in
 					result[message.key] = message.message
@@ -318,6 +322,8 @@ extension AdamantAccountsProvider {
 		if let acc = knownContacts[address] {
 			coreAccount.name = acc.name
 			coreAccount.avatar = acc.avatar
+			chatroom.isReadonly = acc.isReadonly
+			
 			if let messages = acc.messages {
 				coreAccount.knownMessages = messages.reduce(into: [String:String](), { (result, message) in
 					result[message.key] = message.message
