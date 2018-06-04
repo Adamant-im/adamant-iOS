@@ -23,7 +23,8 @@
         <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ChatTransaction" inverseName="chatroom" inverseEntity="ChatTransaction" syncable="YES"/>
     </entity>
     <entity name="ChatTransaction" representedClassName="ChatTransaction" isAbstract="YES" parentEntity="BaseTransaction" syncable="YES">
-        <attribute name="isUnread" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isUnread" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="silentNotification" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="chatroom" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="transactions" inverseEntity="Chatroom" syncable="YES"/>
         <relationship name="lastIn" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="lastTransaction" inverseEntity="Chatroom" syncable="YES"/>
     </entity>
@@ -46,7 +47,7 @@
     <elements>
         <element name="BaseTransaction" positionX="378" positionY="18" width="128" height="210"/>
         <element name="Chatroom" positionX="-74" positionY="26" width="128" height="150"/>
-        <element name="ChatTransaction" positionX="142" positionY="137" width="128" height="88"/>
+        <element name="ChatTransaction" positionX="142" positionY="137" width="128" height="105"/>
         <element name="CoreDataAccount" positionX="-236" positionY="174" width="128" height="150"/>
         <element name="MessageTransaction" positionX="243" positionY="326" width="128" height="73"/>
         <element name="TransferTransaction" positionX="97" positionY="342" width="128" height="58"/>

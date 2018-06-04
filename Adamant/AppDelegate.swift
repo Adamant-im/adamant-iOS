@@ -336,6 +336,7 @@ extension AppDelegate {
 											 senderId: AdamantContacts.adamantBountyWallet.name,
 											 date: Date.adamantNullDate,
 											 unread: unread,
+											 silent: true,
 											 completion: { _ in })
 		}
 		
@@ -344,6 +345,7 @@ extension AppDelegate {
 											 senderId: AdamantContacts.adamantIco.name,
 											 date: Date.adamantNullDate,
 											 unread: unread,
+											 silent: true,
 											 completion: { _ in })
 		}
 	}

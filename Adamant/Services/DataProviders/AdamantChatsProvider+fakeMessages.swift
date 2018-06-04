@@ -26,13 +26,13 @@ extension AdamantChatsProvider {
 		}
 	}
 	
-	func fakeReceivedMessage(_ message: AdamantMessage, senderId: String, date: Date, unread: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
+	func fakeReceivedMessage(_ message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
 		validate(message: message, partnerId: senderId) { [weak self] result in
 			switch result {
 			case .success(let loggedAccount, let partner):
 				switch message {
 				case .text(let text):
-					self?.fakeReceivedTextMessage(text: text, loggedAddress: loggedAccount, sender: partner, date: date, unread: unread, completion: completion)
+					self?.fakeReceivedTextMessage(text: text, loggedAddress: loggedAccount, sender: partner, date: date, unread: unread, silent: silent, completion: completion)
 				}
 				
 			case .failure(let error):
@@ -78,7 +78,7 @@ extension AdamantChatsProvider {
 		}
 	}
 	
-	private func fakeReceivedTextMessage(text: String, loggedAddress: String, sender: CoreDataAccount, date: Date, unread: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
+	private func fakeReceivedTextMessage(text: String, loggedAddress: String, sender: CoreDataAccount, date: Date, unread: Bool, silent: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
 		// MARK: 0. Prepare
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = stack.container.viewContext
@@ -92,6 +92,7 @@ extension AdamantChatsProvider {
 		transaction.isOutgoing = false
 		transaction.message = text
 		transaction.isUnread = unread
+		transaction.silentNotification = silent
 		
 		transaction.transactionId = UUID().uuidString
 		transaction.blockId = UUID().uuidString
