@@ -62,17 +62,8 @@ class AdamantChatsProvider: ChatsProvider {
 		}
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-			self?.receivedLastHeight = nil
-			self?.readedLastHeight = nil
-			if let prevState = self?.state {
-				self?.setState(.empty, previous: prevState, notify: true)
-			}
-			
-			if let store = self?.securedStore {
-				store.remove(StoreKey.chatProvider.address)
-				store.remove(StoreKey.chatProvider.receivedLastHeight)
-				store.remove(StoreKey.chatProvider.readedLastHeight)
-			}
+			// Drop everything
+			self?.reset()
 			
 			// BackgroundFetch
 			self?.dropStateData()
@@ -123,11 +114,16 @@ extension AdamantChatsProvider {
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false) // Block update calls
 		
+		// Drop props
 		receivedLastHeight = nil
 		readedLastHeight = nil
+		
+		// Drop store
+		securedStore.remove(StoreKey.chatProvider.address)
 		securedStore.remove(StoreKey.chatProvider.receivedLastHeight)
 		securedStore.remove(StoreKey.chatProvider.readedLastHeight)
 		
+		// Drop CoreData
 		let chatrooms = NSFetchRequest<Chatroom>(entityName: Chatroom.entityName)
 		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		context.parent = stack.container.viewContext
@@ -140,6 +136,7 @@ extension AdamantChatsProvider {
 			try? context.save()
 		}
 		
+		// Set State
 		setState(.empty, previous: prevState, notify: notify)
 	}
 	
@@ -390,7 +387,7 @@ extension AdamantChatsProvider {
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom> {
 		let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
 		request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false),
-								   NSSortDescriptor(key: "transactionId", ascending: false)]
+								   NSSortDescriptor(key: "hasUnreadMessages", ascending: true)]
 		request.predicate = NSPredicate(format: "partner!=nil")
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 		

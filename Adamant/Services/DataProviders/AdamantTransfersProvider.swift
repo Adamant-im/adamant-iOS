@@ -83,18 +83,8 @@ class AdamantTransfersProvider: TransfersProvider {
 		}
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-			self?.receivedLastHeight = nil
-			self?.readedLastHeight = nil
-			
-			if let prevState = self?.state {
-				self?.setState(.empty, previous: prevState)
-			}
-			
-			if let store = self?.securedStore {
-				store.remove(StoreKey.transfersProvider.address)
-				store.remove(StoreKey.transfersProvider.receivedLastHeight)
-				store.remove(StoreKey.transfersProvider.readedLastHeight)
-			}
+			// Drop everything
+			self?.reset()
 			
 			// BackgroundFetch
 			self?.dropStateData()
@@ -190,12 +180,18 @@ extension AdamantTransfersProvider {
 	private func reset(notify: Bool) {
 		isInitiallySynced = false
 		let prevState = self.state
-		setState(.updating, previous: prevState, notify: false)
+		setState(.updating, previous: prevState, notify: false)	// Block update calls
+		
+		// Drop props
 		receivedLastHeight = nil
 		readedLastHeight = nil
+		
+		// Drop store
+		securedStore.remove(StoreKey.transfersProvider.address)
 		securedStore.remove(StoreKey.transfersProvider.receivedLastHeight)
 		securedStore.remove(StoreKey.transfersProvider.readedLastHeight)
 		
+		// Drop CoreData
 		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
 		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		context.parent = stack.container.viewContext
@@ -208,6 +204,7 @@ extension AdamantTransfersProvider {
 			try? context.save()
 		}
 		
+		// Set state
 		setState(.empty, previous: prevState, notify: notify)
 	}
 }
