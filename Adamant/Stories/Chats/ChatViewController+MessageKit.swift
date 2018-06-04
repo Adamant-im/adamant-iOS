@@ -35,6 +35,14 @@ extension ChatViewController: MessagesDataSource {
 			return 0
 		}
 	}
+	
+	func cellBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+		if message.sentDate == Date.adamantNullDate {
+			return nil
+		}
+		
+		return NSAttributedString(string: dateFormatter.string(from: message.sentDate), attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
+	}
 }
 
 
@@ -59,18 +67,6 @@ extension ChatViewController: MessagesDisplayDelegate {
 	
 	func enabledDetectors(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> [DetectorType] {
 		return [.url]
-	}
-	
-	func cellBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
-		return NSAttributedString(string: dateFormatter.string(from: message.sentDate), attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
-	}
-	
-	func cellBottomLabelAlignment(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> LabelAlignment {
-		if isFromCurrentSender(message: message) {
-			return LabelAlignment.messageTrailing(UIEdgeInsets(top: 2, left: 0, bottom: 0, right: 16))
-		} else {
-			return LabelAlignment.messageLeading(UIEdgeInsets(top: 2, left: 16, bottom: 0, right: 0))
-		}
 	}
 }
 
@@ -115,6 +111,14 @@ extension ChatViewController: MessagesLayoutDelegate {
 	
 	func avatarSize(for: MessageType, at: IndexPath, in: MessagesCollectionView) -> CGSize {
 		return .zero
+	}
+	
+	func cellBottomLabelAlignment(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> LabelAlignment {
+		if isFromCurrentSender(message: message) {
+			return LabelAlignment.messageTrailing(UIEdgeInsets(top: 2, left: 0, bottom: 0, right: 16))
+		} else {
+			return LabelAlignment.messageLeading(UIEdgeInsets(top: 2, left: 16, bottom: 0, right: 0))
+		}
 	}
 }
 

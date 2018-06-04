@@ -48,3 +48,7 @@ extension UIFont {
 		return UIFont(name: "Exo 2 Thin", size: size)!
 	}
 }
+
+extension Date {
+	static let adamantNullDate = Date(timeIntervalSince1970: 0)
+}

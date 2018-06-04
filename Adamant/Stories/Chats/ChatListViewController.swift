@@ -237,7 +237,7 @@ extension ChatListViewController {
 			cell.lastMessageLabel.text = nil
 		}
 		
-		if let date = chatroom.updatedAt as Date? {
+		if let date = chatroom.updatedAt as Date?, date != Date.adamantNullDate {
 			cell.dateLabel.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
 		} else {
 			cell.dateLabel.text = nil
