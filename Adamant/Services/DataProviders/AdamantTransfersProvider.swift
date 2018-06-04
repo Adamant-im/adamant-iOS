@@ -372,8 +372,8 @@ extension AdamantTransfersProvider {
                 case .success(_):
                     break
                     
-                case .notFound:
-                    errors.append(ProcessingResult.accountNotFound(address: id))
+                case .notFound, .invalidAddress:
+					errors.append(ProcessingResult.accountNotFound(address: id))
                     
                 case .serverError(let error):
                     errors.append(ProcessingResult.error(error))

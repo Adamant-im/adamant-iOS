@@ -271,7 +271,7 @@ extension AdamantChatsProvider {
 			}
 			
 			switch result {
-			case .notFound:
+			case .notFound, .invalidAddress:
 				completion(.failure(.accountNotFound(recipientId)))
 				
 			case .serverError(let error):

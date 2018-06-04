@@ -12,6 +12,7 @@ import CoreData
 enum AccountsProviderResult {
 	case success(CoreDataAccount)
 	case notFound
+	case invalidAddress
 	case serverError(Error)
 }
 
@@ -34,12 +35,16 @@ protocol AccountsProvider {
 
 // MARK: - Known contacts
 enum AdamantContacts {
+	static let systemAddresses: [String] = {
+		return [AdamantContacts.adamantIco.name, AdamantContacts.adamantBountyWallet.name]
+	}()
+	
 	case adamantBountyWallet
 	case adamantIco
 	
 	var name: String {
 		switch self {
-		case .adamantBountyWallet: return "ADAMANT Bounty Wallet"
+		case .adamantBountyWallet: return "ADAMANT Bounty"
 		case .adamantIco: return "ADAMANT ICO"
 		}
 	}

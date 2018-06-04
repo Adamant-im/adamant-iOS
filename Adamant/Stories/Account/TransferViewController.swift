@@ -146,10 +146,15 @@ class TransferViewController: FormViewController {
 			$0.placeholder = String.adamantLocalized.transfer.addressPlaceholder
 			$0.tag = Row.address.tag
 			$0.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
-				if let value = value?.uppercased(),
-					AdamantUtilities.validateAdamantAddress(address: value) {
+				guard let value = value?.uppercased() else {
+					return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
+				}
+				
+				switch AdamantUtilities.validateAdamantAddress(address: value) {
+				case .valid:
 					return nil
-				} else {
+					
+				case .system, .invalid:
 					return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
 				}
 			}))
@@ -279,7 +284,11 @@ class TransferViewController: FormViewController {
 			return
 		}
 		
-		guard AdamantUtilities.validateAdamantAddress(address: recipient) else {
+		switch AdamantUtilities.validateAdamantAddress(address: recipient) {
+		case .valid:
+			break
+			
+		case .system, .invalid:
 			dialogService.showWarning(withMessage: String.adamantLocalized.transfer.addressValidationError)
 			return
 		}

@@ -78,7 +78,11 @@ class AdamantUriTools {
 		}
 		
 		let address = String(addressRaw)
-		guard AdamantUtilities.validateAdamantAddress(address: address) else {
+		switch AdamantUtilities.validateAdamantAddress(address: address) {
+		case .valid:
+			break
+			
+		case .system, .invalid:
 			return nil
 		}
 		

@@ -147,7 +147,7 @@ extension AdamantChatsProvider {
 			case .success(let account):
 				completion(.success(loggedAccount: loggedAddress, partner: account))
 				
-			case .notFound:
+			case .notFound, .invalidAddress:
 				completion(.failure(.accountNotFound(partnerId)))
 				
 			case .serverError(let error):
