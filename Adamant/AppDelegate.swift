@@ -168,6 +168,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			}
 		}
 		
+		// MARK: 7. Welcome messages
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: nil, queue: OperationQueue.main, using: handleWelcomeMessages)
+		
 		return true
 	}
 	
@@ -306,6 +309,39 @@ extension AppDelegate {
 			}
 			
 			completionHandler(.noData)
+		}
+	}
+}
+
+
+// MARK: - Welcome messages
+extension AppDelegate {
+	private func handleWelcomeMessages(notification: Notification) {
+		guard let chatProvider = container.resolve(ChatsProvider.self) else {
+			fatalError("Whoa...")
+		}
+		
+		let unread: Bool
+		if let count = chatProvider.getChatroomsController().fetchedObjects?.count, count > 0 {
+			unread = false
+		} else {
+			unread = true
+		}
+		
+		if let welcome = AdamantContacts.adamantBountyWallet.messages["chats.welcome_message"] {
+			chatProvider.fakeReceivedMessage(AdamantMessage.text(welcome),
+											 senderId: AdamantContacts.adamantBountyWallet.name,
+											 date: Date.adamantNullDate,
+											 unread: unread,
+											 completion: { _ in })
+		}
+		
+		if let ico = AdamantContacts.adamantIco.messages["chats.ico_message"] {
+			chatProvider.fakeReceivedMessage(AdamantMessage.text(ico),
+											 senderId: AdamantContacts.adamantIco.name,
+											 date: Date.adamantNullDate,
+											 unread: unread,
+											 completion: { _ in })
 		}
 	}
 }
