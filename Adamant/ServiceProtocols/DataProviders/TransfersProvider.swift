@@ -67,6 +67,7 @@ protocol TransfersProvider: DataProvider {
 	// MARK: - Properties
 	var receivedLastHeight: Int64? { get }
 	var readedLastHeight: Int64? { get }
+	var isInitiallySynced: Bool { get }
 	
 	var transferFee: Decimal { get }
 	

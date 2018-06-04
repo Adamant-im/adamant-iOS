@@ -9,43 +9,6 @@
 import Foundation
 import CoreData
 
-// MARK: - Known contacts
-private enum Contacts {
-	case adamantBountyWallet
-	case adamantIco
-	
-	var name: String {
-		switch self {
-		case .adamantBountyWallet: return "ADAMANT Bounty Wallet"
-		case .adamantIco: return "ADAMANT ICO"
-		}
-	}
-	
-	var address: String {
-		switch self {
-		case .adamantBountyWallet: return "U15423595369615486571"
-		case .adamantIco: return "U7047165086065693428"
-		}
-	}
-	
-	var avatar: String {
-		return "avatar_bots"
-	}
-	
-	var messages: [String:String] {
-		switch self {
-		case .adamantBountyWallet:
-			return ["chats.welcome_message": NSLocalizedString("Chats.WelcomeMessage", comment: "Known contacts: Adamant welcome message")]
-			
-		case .adamantIco:
-			return [
-				"chats.preico_message": NSLocalizedString("Chats.PreIcoMessage", comment: "Known contacts: Adamant pre ICO message"),
-				"chats.ico_message": NSLocalizedString("Chats.IcoMessage", comment: "Known contacts: Adamant ICO message")
-			]
-		}
-	}
-}
-
 
 // MARK: - Provider
 class AdamantAccountsProvider: AccountsProvider {
@@ -55,7 +18,7 @@ class AdamantAccountsProvider: AccountsProvider {
 		let avatar: String?
 		let messages: [KnownMessage]?
 		
-		fileprivate init(contact: Contacts) {
+		fileprivate init(contact: AdamantContacts) {
 			self.address = contact.address
 			self.name = contact.name
 			self.avatar = contact.avatar
@@ -80,8 +43,8 @@ class AdamantAccountsProvider: AccountsProvider {
 	// MARK: Lifecycle
 	init() {
 		self.knownContacts = [
-			Contacts.adamantIco.address: KnownContact(contact: Contacts.adamantIco),
-			Contacts.adamantBountyWallet.address: KnownContact(contact: Contacts.adamantBountyWallet)
+			AdamantContacts.adamantIco.address: KnownContact(contact: AdamantContacts.adamantIco),
+			AdamantContacts.adamantBountyWallet.address: KnownContact(contact: AdamantContacts.adamantBountyWallet)
 		]
 	}
 	
@@ -117,6 +80,27 @@ class AdamantAccountsProvider: AccountsProvider {
 
 // MARK: - Getting account info from API
 extension AdamantAccountsProvider {
+	/// Check, if we already have account
+	///
+	/// - Parameter address: account's address
+	/// - Returns: do have acccount, or not
+	func hasAccount(address: String, completion: @escaping (Bool) -> Void) -> Bool {
+		queue.async {
+			self.groupsSemaphore.wait()
+			
+			if let group = self.requestGroups[address] {
+				self.groupsSemaphore.signal()
+				group.wait()
+			} else {
+				self.groupsSemaphore.signal()
+			}
+			
+			let account = self.getAccount(byPredicate: NSPredicate(format: "address == %@", address))
+			
+			completion(account != nil)
+		}
+	}
+	
 	/// Get account info from servier.
 	///
 	/// - Parameters:
