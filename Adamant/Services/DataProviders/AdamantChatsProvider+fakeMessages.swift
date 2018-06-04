@@ -10,14 +10,14 @@ import Foundation
 import CoreData
 
 extension AdamantChatsProvider {
-	// MARK: Public
-	func fakeSentMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+	// MARK: - Public
+	func fakeSentMessage(_ message: AdamantMessage, recipientId: String, date: Date, completion: @escaping (ChatsProviderResult) -> Void) {
 		validate(message: message, partnerId: recipientId) { [weak self] result in
 			switch result {
 			case .success(let loggedAddress, let partner):
 				switch message {
 				case .text(let text):
-					self?.fakeSentTextMessage(text: text, loggedAddress: loggedAddress, recipient: partner, completion: completion)
+					self?.fakeSentTextMessage(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, completion: completion)
 				}
 				
 			case .failure(let error):
@@ -26,18 +26,87 @@ extension AdamantChatsProvider {
 		}
 	}
 	
-	func fakeReceivedMessage(_ message: AdamantMessage, senderId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+	func fakeReceivedMessage(_ message: AdamantMessage, senderId: String, date: Date, completion: @escaping (ChatsProviderResult) -> Void) {
 		validate(message: message, partnerId: senderId) { [weak self] result in
 			switch result {
 			case .success(let loggedAccount, let partner):
 				switch message {
 				case .text(let text):
-					self?.fakeReceivedTextMessage(text: text, loggedAddress: loggedAccount, sender: partner, completion: completion)
+					self?.fakeReceivedTextMessage(text: text, loggedAddress: loggedAccount, sender: partner, date: date, completion: completion)
 				}
 				
 			case .failure(let error):
 				completion(.failure(error))
 			}
+		}
+	}
+	
+	
+	// MARK: - Logic
+	
+	func fakeSentTextMessage(text: String, loggedAddress: String, recipient: CoreDataAccount, date: Date, completion: @escaping (ChatsProviderResult) -> Void) {
+		// MARK: 0. Prepare
+		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+		privateContext.parent = stack.container.viewContext
+		
+		// MARK: 1. Create transaction
+		let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: privateContext)
+		transaction.date = date as NSDate
+		transaction.recipientId = recipient.address
+		transaction.senderId = loggedAddress
+		transaction.type = ChatType.message.rawValue
+		transaction.isOutgoing = true
+		transaction.message = text
+		
+		transaction.transactionId = UUID().uuidString
+		transaction.blockId = UUID().uuidString
+		
+		// MARK: 2. Get Chatroom
+		guard let id = recipient.chatroom?.objectID, let chatroom = privateContext.object(with: id) as? Chatroom else {
+			return
+		}
+		
+		// MARK: 3. Save it
+		do {
+			chatroom.addToTransactions(transaction)
+			recheckLastTransactionFor(chatroom: chatroom, with: transaction)
+			try privateContext.save()
+			completion(.success)
+		} catch {
+			completion(.failure(.internalError(error)))
+		}
+	}
+	
+	private func fakeReceivedTextMessage(text: String, loggedAddress: String, sender: CoreDataAccount, date: Date, completion: @escaping (ChatsProviderResult) -> Void) {
+		// MARK: 0. Prepare
+		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+		privateContext.parent = stack.container.viewContext
+		
+		// MARK: 1. Create transaction
+		let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: privateContext)
+		transaction.date = date as NSDate
+		transaction.recipientId = loggedAddress
+		transaction.senderId = sender.address
+		transaction.type = ChatType.message.rawValue
+		transaction.isOutgoing = false
+		transaction.message = text
+		
+		transaction.transactionId = UUID().uuidString
+		transaction.blockId = UUID().uuidString
+		
+		// MARK: 2. Get Chatroom
+		guard let id = sender.chatroom?.objectID, let chatroom = privateContext.object(with: id) as? Chatroom else {
+			return
+		}
+		
+		// MARK: 3. Save it
+		do {
+			chatroom.addToTransactions(transaction)
+			recheckLastTransactionFor(chatroom: chatroom, with: transaction)
+			try privateContext.save()
+			completion(.success)
+		} catch {
+			completion(.failure(.internalError(error)))
 		}
 	}
 	
@@ -86,69 +155,22 @@ extension AdamantChatsProvider {
 	}
 	
 	
-	// MARK: - Private
+	// MARK: - Tools
 	
-	func fakeSentTextMessage(text: String, loggedAddress: String, recipient: CoreDataAccount, completion: @escaping (ChatsProviderResult) -> Void) {
-		// MARK: 0. Prepare
-		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-		privateContext.parent = stack.container.viewContext
-		
-		// MARK: 1. Create transaction
-		let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: privateContext)
-		transaction.date = Date() as NSDate
-		transaction.recipientId = recipient.address
-		transaction.senderId = loggedAddress
-		transaction.type = ChatType.message.rawValue
-		transaction.isOutgoing = true
-		transaction.message = text
-		
-		transaction.transactionId = UUID().uuidString
-		transaction.blockId = UUID().uuidString
-		
-		// MARK: 2. Get Chatroom
-		guard let id = recipient.chatroom?.objectID, let chatroom = privateContext.object(with: id) as? Chatroom else {
+	private func recheckLastTransactionFor(chatroom: Chatroom, with transaction: ChatTransaction) {
+		if let ch = transaction.chatroom, ch != chatroom {
 			return
 		}
 		
-		// MARK: 3. Save it
-		do {
-			chatroom.addToTransactions(transaction)
-			try privateContext.save()
-			completion(.success)
-		} catch {
-			completion(.failure(.internalError(error)))
-		}
-	}
-	
-	private func fakeReceivedTextMessage(text: String, loggedAddress: String, sender: CoreDataAccount, completion: @escaping (ChatsProviderResult) -> Void) {
-		// MARK: 0. Prepare
-		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-		privateContext.parent = stack.container.viewContext
-		
-		// MARK: 1. Create transaction
-		let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: privateContext)
-		transaction.date = Date() as NSDate
-		transaction.recipientId = loggedAddress
-		transaction.senderId = sender.address
-		transaction.type = ChatType.message.rawValue
-		transaction.isOutgoing = false
-		transaction.message = text
-		
-		transaction.transactionId = UUID().uuidString
-		transaction.blockId = UUID().uuidString
-		
-		// MARK: 2. Get Chatroom
-		guard let id = sender.chatroom?.objectID, let chatroom = privateContext.object(with: id) as? Chatroom else {
-			return
-		}
-		
-		// MARK: 2. Save it
-		do {
-			chatroom.addToTransactions(transaction)
-			try privateContext.save()
-			completion(.success)
-		} catch {
-			completion(.failure(.internalError(error)))
+		if let lastTransaction = chatroom.lastTransaction {
+			if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
+				dateA.compare(dateB) == ComparisonResult.orderedAscending {
+				chatroom.lastTransaction = transaction
+				chatroom.updatedAt = transaction.date
+			}
+		} else {
+			chatroom.lastTransaction = transaction
+			chatroom.updatedAt = transaction.date
 		}
 	}
 }
