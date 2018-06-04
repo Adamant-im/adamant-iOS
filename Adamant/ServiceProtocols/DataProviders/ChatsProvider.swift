@@ -95,6 +95,6 @@ protocol ChatsProvider: DataProvider {
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
 	
 	// MARK: - Fake messages
-	func fakeSentMessage(_ message: AdamantMessage, recipientId: String, date: Date, completion: @escaping (ChatsProviderResult) -> Void)
-	func fakeReceivedMessage(_ message: AdamantMessage, senderId: String, date: Date, completion: @escaping (ChatsProviderResult) -> Void)
+	func fakeSentMessage(_ message: AdamantMessage, recipientId: String, date: Date, unread: Bool, completion: @escaping (ChatsProviderResult) -> Void)
+	func fakeReceivedMessage(_ message: AdamantMessage, senderId: String, date: Date, unread: Bool, completion: @escaping (ChatsProviderResult) -> Void)
 }

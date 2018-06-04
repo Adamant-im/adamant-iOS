@@ -11,13 +11,13 @@ import CoreData
 
 extension AdamantChatsProvider {
 	// MARK: - Public
-	func fakeSentMessage(_ message: AdamantMessage, recipientId: String, date: Date, completion: @escaping (ChatsProviderResult) -> Void) {
+	func fakeSentMessage(_ message: AdamantMessage, recipientId: String, date: Date, unread: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
 		validate(message: message, partnerId: recipientId) { [weak self] result in
 			switch result {
 			case .success(let loggedAddress, let partner):
 				switch message {
 				case .text(let text):
-					self?.fakeSentTextMessage(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, completion: completion)
+					self?.fakeSentTextMessage(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, unread: unread, completion: completion)
 				}
 				
 			case .failure(let error):
@@ -26,13 +26,13 @@ extension AdamantChatsProvider {
 		}
 	}
 	
-	func fakeReceivedMessage(_ message: AdamantMessage, senderId: String, date: Date, completion: @escaping (ChatsProviderResult) -> Void) {
+	func fakeReceivedMessage(_ message: AdamantMessage, senderId: String, date: Date, unread: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
 		validate(message: message, partnerId: senderId) { [weak self] result in
 			switch result {
 			case .success(let loggedAccount, let partner):
 				switch message {
 				case .text(let text):
-					self?.fakeReceivedTextMessage(text: text, loggedAddress: loggedAccount, sender: partner, date: date, completion: completion)
+					self?.fakeReceivedTextMessage(text: text, loggedAddress: loggedAccount, sender: partner, date: date, unread: unread, completion: completion)
 				}
 				
 			case .failure(let error):
@@ -44,7 +44,7 @@ extension AdamantChatsProvider {
 	
 	// MARK: - Logic
 	
-	func fakeSentTextMessage(text: String, loggedAddress: String, recipient: CoreDataAccount, date: Date, completion: @escaping (ChatsProviderResult) -> Void) {
+	func fakeSentTextMessage(text: String, loggedAddress: String, recipient: CoreDataAccount, date: Date, unread: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
 		// MARK: 0. Prepare
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = stack.container.viewContext
@@ -57,6 +57,7 @@ extension AdamantChatsProvider {
 		transaction.type = ChatType.message.rawValue
 		transaction.isOutgoing = true
 		transaction.message = text
+		transaction.isUnread = unread
 		
 		transaction.transactionId = UUID().uuidString
 		transaction.blockId = UUID().uuidString
@@ -77,7 +78,7 @@ extension AdamantChatsProvider {
 		}
 	}
 	
-	private func fakeReceivedTextMessage(text: String, loggedAddress: String, sender: CoreDataAccount, date: Date, completion: @escaping (ChatsProviderResult) -> Void) {
+	private func fakeReceivedTextMessage(text: String, loggedAddress: String, sender: CoreDataAccount, date: Date, unread: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
 		// MARK: 0. Prepare
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = stack.container.viewContext
@@ -90,6 +91,7 @@ extension AdamantChatsProvider {
 		transaction.type = ChatType.message.rawValue
 		transaction.isOutgoing = false
 		transaction.message = text
+		transaction.isUnread = unread
 		
 		transaction.transactionId = UUID().uuidString
 		transaction.blockId = UUID().uuidString
