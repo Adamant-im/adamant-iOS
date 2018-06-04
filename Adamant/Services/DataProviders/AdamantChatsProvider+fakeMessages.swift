@@ -11,13 +11,13 @@ import CoreData
 
 extension AdamantChatsProvider {
 	// MARK: - Public
-	func fakeSentMessage(_ message: AdamantMessage, recipientId: String, date: Date, unread: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
+	func fakeSentMessage(_ message: AdamantMessage, recipientId: String, date: Date, completion: @escaping (ChatsProviderResult) -> Void) {
 		validate(message: message, partnerId: recipientId) { [weak self] result in
 			switch result {
 			case .success(let loggedAddress, let partner):
 				switch message {
 				case .text(let text):
-					self?.fakeSentTextMessage(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, unread: unread, completion: completion)
+					self?.fakeSentTextMessage(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, completion: completion)
 				}
 				
 			case .failure(let error):
@@ -44,7 +44,7 @@ extension AdamantChatsProvider {
 	
 	// MARK: - Logic
 	
-	func fakeSentTextMessage(text: String, loggedAddress: String, recipient: CoreDataAccount, date: Date, unread: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
+	func fakeSentTextMessage(text: String, loggedAddress: String, recipient: CoreDataAccount, date: Date, completion: @escaping (ChatsProviderResult) -> Void) {
 		// MARK: 0. Prepare
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = stack.container.viewContext
@@ -57,7 +57,7 @@ extension AdamantChatsProvider {
 		transaction.type = ChatType.message.rawValue
 		transaction.isOutgoing = true
 		transaction.message = text
-		transaction.isUnread = unread
+		transaction.isUnread = false
 		
 		transaction.transactionId = UUID().uuidString
 		transaction.blockId = UUID().uuidString
@@ -99,6 +99,10 @@ extension AdamantChatsProvider {
 		// MARK: 2. Get Chatroom
 		guard let id = sender.chatroom?.objectID, let chatroom = privateContext.object(with: id) as? Chatroom else {
 			return
+		}
+		
+		if unread {
+			chatroom.hasUnreadMessages = true
 		}
 		
 		// MARK: 3. Save it

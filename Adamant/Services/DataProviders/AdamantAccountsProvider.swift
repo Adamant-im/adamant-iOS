@@ -297,6 +297,7 @@ extension AdamantAccountsProvider {
 			coreAccount.name = acc.name
 			coreAccount.avatar = acc.avatar
 			chatroom.isReadonly = acc.isReadonly
+			chatroom.title = acc.name
 			
 			if let messages = acc.messages {
 				coreAccount.knownMessages = messages.reduce(into: [String:String](), { (result, message) in
@@ -323,6 +324,7 @@ extension AdamantAccountsProvider {
 			coreAccount.name = acc.name
 			coreAccount.avatar = acc.avatar
 			chatroom.isReadonly = acc.isReadonly
+			chatroom.title = acc.name
 			
 			if let messages = acc.messages {
 				coreAccount.knownMessages = messages.reduce(into: [String:String](), { (result, message) in

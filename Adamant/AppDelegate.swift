@@ -9,6 +9,7 @@
 import UIKit
 import Swinject
 import CryptoSwift
+import CoreData
 
 
 // MARK: - Constants
@@ -317,12 +318,14 @@ extension AppDelegate {
 // MARK: - Welcome messages
 extension AppDelegate {
 	private func handleWelcomeMessages(notification: Notification) {
-		guard let chatProvider = container.resolve(ChatsProvider.self) else {
+		guard let stack = container.resolve(CoreDataStack.self), let chatProvider = container.resolve(ChatsProvider.self) else {
 			fatalError("Whoa...")
 		}
 		
+		let request = NSFetchRequest<MessageTransaction>(entityName: MessageTransaction.entityName)
+		
 		let unread: Bool
-		if let count = chatProvider.getChatroomsController().fetchedObjects?.count, count > 0 {
+		if let count = try? stack.container.viewContext.count(for: request), count > 0 {
 			unread = false
 		} else {
 			unread = true
