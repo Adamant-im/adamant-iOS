@@ -67,12 +67,12 @@ enum AdamantContacts {
 	var messages: [String:String] {
 		switch self {
 		case .adamantBountyWallet:
-			return ["chats.welcome_message": NSLocalizedString("Chats.WelcomeMessage", comment: "Known contacts: Adamant welcome message")]
+			return ["chats.welcome_message": NSLocalizedString("Chats.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported.")]
 			
 		case .adamantIco:
 			return [
 				"chats.preico_message": NSLocalizedString("Chats.PreIcoMessage", comment: "Known contacts: Adamant pre ICO message"),
-				"chats.ico_message": NSLocalizedString("Chats.IcoMessage", comment: "Known contacts: Adamant ICO message")
+				"chats.ico_message": NSLocalizedString("Chats.IcoMessage", comment: "Known contacts: Adamant ICO message. Markdown supported.")
 			]
 		}
 	}
