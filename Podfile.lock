@@ -1,7 +1,7 @@
 PODS:
   - Alamofire (4.7.2)
-  - CryptoSwift (0.9.0)
-  - EFQRCode (4.2.1)
+  - CryptoSwift (0.10.0)
+  - EFQRCode (4.2.2)
   - Eureka (4.1.1)
   - FreakingSimpleRoundImageView (1.1)
   - FTIndicator (1.2.9):
@@ -39,7 +39,7 @@ DEPENDENCIES:
   - Swinject
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  https://github.com/cocoapods/specs.git:
     - Alamofire
     - CryptoSwift
     - EFQRCode
@@ -58,8 +58,8 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
-  CryptoSwift: bca8c5b653dcc2d9734409242a070ff53bafac86
-  EFQRCode: f3fd67049faa07adb575495c05d72a34e407a940
+  CryptoSwift: 6c778d69282bed3b4e975ff97a79d074f20bb011
+  EFQRCode: 203846c7b135b5f7c1d18bb7923bc32a74c8b363
   Eureka: b88fb930e42c79f8c03c373d0fcdc28c1d6c50ed
   FreakingSimpleRoundImageView: 4a3a1cb1347beb247f8c63b5b5cae9d770b431ee
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
@@ -75,4 +75,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: d5efe36624e504f34934e8b20f4138c7db823908
 
-COCOAPODS: 1.5.0
+COCOAPODS: 1.5.3
