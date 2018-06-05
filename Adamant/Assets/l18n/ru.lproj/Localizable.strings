@@ -8,7 +8,7 @@
 "AccountServiceError.UserNotLogged" = "Не выполнен вход";
 
 /* Login: user typed in wrong passphrase */
-"AccountServiceError.WrongPassphrase" = "Неправильный пароль: %@";
+"AccountServiceError.WrongPassphrase" = "Неправильный пароль";
 
 /* Account tab: Confirm logout alert: Logout (Ok) button */
 "AccountTab.ConfirmLogout.Logout" = "Выход";

@@ -306,7 +306,7 @@ class LoginViewController: FormViewController {
 extension LoginViewController {
 	func loginWith(passphrase: String) {
 		guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
-			dialogService.showWarning(withMessage: AccountServiceError.wrongPassphrase.localized)
+			dialogService.showWarning(withMessage: AccountServiceError.invalidPassphrase.localized)
 			return
 		}
 		
@@ -368,7 +368,16 @@ extension LoginViewController {
 				self?.dialogService.dismissProgress()
 				
 			case .failure(let error):
-				self?.dialogService.showError(withMessage: error.localized, error: error)
+				switch error {
+				case .invalidPassphrase, .wrongPassphrase, .userNotLogged:
+					self?.dialogService.showWarning(withMessage: error.localized)
+					
+				case .apiError(let apiError):
+					self?.dialogService.showError(withMessage: apiError.localized, error: apiError)
+					
+				case .internalError(let message, let internalError):
+					self?.dialogService.showError(withMessage: message, error: internalError)
+				}
 			}
 		})
 	}
