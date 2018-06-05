@@ -27,6 +27,7 @@ extension NotificationsMode {
 class AdamantNotificationsService: NotificationsService {
 	// MARK: Dependencies
 	var securedStore: SecuredStore!
+	weak var accountService: AccountService?
 	
 	
 	// MARK: Properties
@@ -35,6 +36,8 @@ class AdamantNotificationsService: NotificationsService {
 	
 	private var isBackgroundSession = false
 	private var backgroundNotifications = 0
+	
+	private var preservedBadgeNumber: Int? = nil
 	
 	// MARK: Lifecycle
 	init() {
@@ -47,11 +50,24 @@ class AdamantNotificationsService: NotificationsService {
 			} else {
 				self?.setNotificationsMode(.disabled, completion: nil)
 			}
+			
+			self?.preservedBadgeNumber = nil
 		}
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.setNotificationsMode(.disabled, completion: nil)
 			self?.securedStore.remove(StoreKey.notificationsService.notificationsMode)
+			self?.preservedBadgeNumber = nil
+		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: nil) { [weak self] notification in
+			guard let state = notification.userInfo?[AdamantUserInfoKey.AccountService.newStayInState] as? Bool, state else {
+				self?.preservedBadgeNumber = nil
+				self?.setBadge(number: nil, force: true)
+				return
+			}
+			
+			self?.setBadge(number: self?.preservedBadgeNumber, force: false)
 		}
 	}
 	
@@ -181,6 +197,17 @@ extension AdamantNotificationsService {
 	}
 	
 	func setBadge(number: Int?) {
+		setBadge(number: number, force: false)
+	}
+	
+	private func setBadge(number: Int?, force: Bool) {
+		if !force {
+			guard let stayIn = accountService?.hasStayInAccount, stayIn else {
+				preservedBadgeNumber = number
+				return
+			}
+		}
+		
 		if let number = number {
 			customBadgeNumber = number
 			UIApplication.shared.applicationIconBadgeNumber = number
