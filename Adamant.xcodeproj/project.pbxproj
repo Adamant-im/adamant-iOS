@@ -762,11 +762,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant" */;
 			buildPhases = (
+				E9204B4120C6C10000F3B9AB /* [ADAMANT] Set AppStore passphrase for KeychainStore */,
 				E40A2E5936758D20792675C8 /* [CP] Check Pods Manifest.lock */,
 				E913C8EA1FFFA51D001A83F7 /* Sources */,
 				E913C8EB1FFFA51D001A83F7 /* Frameworks */,
 				E913C8EC1FFFA51D001A83F7 /* Resources */,
 				1C93FABD2FEB3E73F76872C8 /* [CP] Embed Pods Frameworks */,
+				E9204B4420C6D80900F3B9AB /* [ADAMANT] Set Debug passphrase for KeychainStore */,
 			);
 			buildRules = (
 			);
@@ -960,6 +962,34 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
+		};
+		E9204B4120C6C10000F3B9AB /* [ADAMANT] Set AppStore passphrase for KeychainStore */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[ADAMANT] Set AppStore passphrase for KeychainStore";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    ${SOURCE_ROOT}/keychain-toAppstore.sh\nfi";
+		};
+		E9204B4420C6D80900F3B9AB /* [ADAMANT] Set Debug passphrase for KeychainStore */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[ADAMANT] Set Debug passphrase for KeychainStore";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    ${SOURCE_ROOT}/keychain-toDebug.sh\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
