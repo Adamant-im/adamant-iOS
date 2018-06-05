@@ -69,9 +69,13 @@ class ChatViewController: MessagesViewController {
         super.viewDidLoad()
 		navigationItem.rightBarButtonItem = UIBarButtonItem(title: "•••", style: .plain, target: self, action: #selector(properties))
 		
+		guard let chatroom = chatroom else {
+			return
+		}
+		
 		// MARK: 1. Initial configuration
 		
-		if let partner = chatroom?.partner {
+		if let partner = chatroom.partner {
 			if let name = partner.name {
 				self.navigationItem.title = name
 			} else {
@@ -155,9 +159,17 @@ class ChatViewController: MessagesViewController {
 			$0.setImage(#imageLiteral(resourceName: "Arrow_innactive"), for: UIControlState.disabled)
 		}
 		
-		if let delegate = delegate, let address = chatroom?.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
+		if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
 			messageInputBar.inputTextView.text = message
 			setEstimatedFee(AdamantMessage.text(message).fee)
+		}
+		
+		// MARK: 3. Readonly chat
+		
+		if chatroom.isReadonly {
+			messageInputBar.inputTextView.backgroundColor = UIColor.adamantChatSenderBackground
+			messageInputBar.inputTextView.isEditable = false
+			messageInputBar.sendButton.isEnabled = false
 		}
     }
 	

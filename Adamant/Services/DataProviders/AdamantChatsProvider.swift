@@ -62,17 +62,8 @@ class AdamantChatsProvider: ChatsProvider {
 		}
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-			self?.receivedLastHeight = nil
-			self?.readedLastHeight = nil
-			if let prevState = self?.state {
-				self?.setState(.empty, previous: prevState, notify: true)
-			}
-			
-			if let store = self?.securedStore {
-				store.remove(StoreKey.chatProvider.address)
-				store.remove(StoreKey.chatProvider.receivedLastHeight)
-				store.remove(StoreKey.chatProvider.readedLastHeight)
-			}
+			// Drop everything
+			self?.reset()
 			
 			// BackgroundFetch
 			self?.dropStateData()
@@ -123,11 +114,16 @@ extension AdamantChatsProvider {
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false) // Block update calls
 		
+		// Drop props
 		receivedLastHeight = nil
 		readedLastHeight = nil
+		
+		// Drop store
+		securedStore.remove(StoreKey.chatProvider.address)
 		securedStore.remove(StoreKey.chatProvider.receivedLastHeight)
 		securedStore.remove(StoreKey.chatProvider.readedLastHeight)
 		
+		// Drop CoreData
 		let chatrooms = NSFetchRequest<Chatroom>(entityName: Chatroom.entityName)
 		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		context.parent = stack.container.viewContext
@@ -140,6 +136,7 @@ extension AdamantChatsProvider {
 			try? context.save()
 		}
 		
+		// Set State
 		setState(.empty, previous: prevState, notify: notify)
 	}
 	
@@ -225,12 +222,12 @@ extension AdamantChatsProvider {
 extension AdamantChatsProvider {
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
 		guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
-			completion(.error(.notLogged))
+			completion(.failure(.notLogged))
 			return
 		}
 		
 		guard loggedAccount.balance >= message.fee else {
-			completion(.error(.notEnoughtMoneyToSend))
+			completion(.failure(.notEnoughtMoneyToSend))
 			return
 		}
 		
@@ -239,17 +236,17 @@ extension AdamantChatsProvider {
 			break
 			
 		case .empty:
-			completion(.error(.messageNotValid(.empty)))
+			completion(.failure(.messageNotValid(.empty)))
 			return
 			
 		case .tooLong:
-			completion(.error(.messageNotValid(.tooLong)))
+			completion(.failure(.messageNotValid(.tooLong)))
 			return
 		}
 		
 		sendingQueue.async {
 			switch message {
-			case .text(let text):
+			case .text(let text), .markdownText(let text):
 				self.sendTextMessage(text: text, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, completion: completion)
 			}
 		}
@@ -264,35 +261,34 @@ extension AdamantChatsProvider {
 		// MARK: 1. Get recipient account
 		let accountsGroup = DispatchGroup()
 		accountsGroup.enter()
-		var accountViewContext: CoreDataAccount? = nil
+		var acc: CoreDataAccount? = nil
 		accountsProvider.getAccount(byAddress: recipientId) { result in
 			defer {
 				accountsGroup.leave()
 			}
 			
 			switch result {
-			case .notFound:
-				completion(.error(.accountNotFound(recipientId)))
+			case .notFound, .invalidAddress:
+				completion(.failure(.accountNotFound(recipientId)))
 				
 			case .serverError(let error):
-				completion(.error(.serverError(error)))
+				completion(.failure(.serverError(error)))
 				
 			case .success(let account):
-				accountViewContext = account
+				acc = account
 			}
 		}
 		
 		accountsGroup.wait()
 		
-		guard let account = accountViewContext, let recipientPublicKey = account.publicKey else {
-			completion(.error(.accountNotFound(recipientId)))
+		guard let account = acc, let recipientPublicKey = account.publicKey else {
 			return
 		}
 		
 		
 		// MARK: 2. Encode message
 		guard let encodedMessage = adamantCore.encodeMessage(text, recipientPublicKey: recipientPublicKey, privateKey: keypair.privateKey) else {
-			completion(.error(.dependencyError("Failed to encode message")))
+			completion(.failure(.dependencyError("Failed to encode message")))
 			return
 		}
 		
@@ -320,7 +316,7 @@ extension AdamantChatsProvider {
 		do {
 			try privateContext.save()
 		} catch {
-			completion(.error(.internalError(error)))
+			completion(.failure(.internalError(error)))
 			return
 		}
 		
@@ -353,7 +349,7 @@ extension AdamantChatsProvider {
 					try privateContext.save()
 					completion(.success)
 				} catch {
-					completion(.error(.internalError(error)))
+					completion(.failure(.internalError(error)))
 				}
 				
 				
@@ -379,7 +375,7 @@ extension AdamantChatsProvider {
 					serviceError = ChatsProviderError.internalError(AdamantError(message: message, error: e))
 				}
 				
-				completion(.error(serviceError))
+				completion(.failure(serviceError))
 			}
 		}
 	}
@@ -391,7 +387,7 @@ extension AdamantChatsProvider {
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom> {
 		let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
 		request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false),
-								   NSSortDescriptor(key: "transactionId", ascending: false)]
+								   NSSortDescriptor(key: "title", ascending: true)]
 		request.predicate = NSPredicate(format: "partner!=nil")
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 		
@@ -607,10 +603,18 @@ extension AdamantChatsProvider {
 						newMessageTransactions.append(messageTransaction)
 						
 						// Preset messages
-						if let preset = account.knownMessages,
-							let message = messageTransaction.message,
-							let translatedMessage = preset.first(where: {message.range(of: $0.key) != nil}) {
-							messageTransaction.message = translatedMessage.value
+						if account.isSystem, let address = account.address,
+							let messages = AdamantContacts.messagesFor(address: address),
+							let key = messageTransaction.message,
+							let adamantMessage = messages.first(where: { key.range(of: $0.key) != nil })?.value {
+							switch adamantMessage {
+							case .text(let text):
+								messageTransaction.message = text
+								
+							case .markdownText(let text):
+								messageTransaction.message = text
+								messageTransaction.isMarkdown = true
+							}
 						}
 					}
 					
@@ -694,7 +698,7 @@ extension AdamantChatsProvider {
 	/// Check if message is valid for sending
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult {
 		switch message {
-		case .text(let text):
+		case .text(let text), .markdownText(let text):
 			if text.count == 0 {
 				return .empty
 			}

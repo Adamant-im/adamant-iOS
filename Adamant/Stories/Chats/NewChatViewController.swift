@@ -169,7 +169,11 @@ class NewChatViewController: FormViewController {
 	// MARK: - Other
 	
 	func startNewChat(with address: String, name: String? = nil) {
-		guard AdamantUtilities.validateAdamantAddress(address: address) else {
+		switch AdamantUtilities.validateAdamantAddress(address: address) {
+		case .valid:
+			break
+			
+		case .system, .invalid:
 			dialogService.showToastMessage(String.adamantLocalized.newChat.specifyValidAddressMessage)
 			return
 		}
@@ -197,7 +201,7 @@ class NewChatViewController: FormViewController {
 					self.dialogService.dismissProgress()
 				}
 				
-			case .notFound:
+			case .notFound, .invalidAddress:
 				self.dialogService.showWarning(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.addressNotFoundFormat, address))
 				
 			case .serverError(let error as ApiServiceError):

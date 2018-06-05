@@ -14,7 +14,7 @@ import CoreData
 
 enum ChatsProviderResult {
 	case success
-	case error(ChatsProviderError)
+	case failure(ChatsProviderError)
 }
 
 enum ChatsProviderError: Error {
@@ -78,6 +78,7 @@ protocol ChatsProvider: DataProvider {
 	// MARK: - Properties
 	var receivedLastHeight: Int64? { get }
 	var readedLastHeight: Int64? { get }
+	var isInitiallySynced: Bool { get }
 	
 	// MARK: - Getting chats and messages
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>
@@ -92,4 +93,8 @@ protocol ChatsProvider: DataProvider {
 	
 	// MARK: - Tools
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
+	
+	// MARK: - Fake messages
+	func fakeSent(message: AdamantMessage, recipientId: String, date: Date, completion: @escaping (ChatsProviderResult) -> Void)
+	func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, completion: @escaping (ChatsProviderResult) -> Void)
 }

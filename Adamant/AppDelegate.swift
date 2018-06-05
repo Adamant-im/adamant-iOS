@@ -9,6 +9,7 @@
 import UIKit
 import Swinject
 import CryptoSwift
+import CoreData
 
 
 // MARK: - Constants
@@ -168,6 +169,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			}
 		}
 		
+		// MARK: 7. Welcome messages
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: nil, queue: OperationQueue.main, using: handleWelcomeMessages)
+		
 		return true
 	}
 	
@@ -306,6 +310,43 @@ extension AppDelegate {
 			}
 			
 			completionHandler(.noData)
+		}
+	}
+}
+
+
+// MARK: - Welcome messages
+extension AppDelegate {
+	private func handleWelcomeMessages(notification: Notification) {
+		guard let stack = container.resolve(CoreDataStack.self), let chatProvider = container.resolve(ChatsProvider.self) else {
+			fatalError("Whoa...")
+		}
+		
+		let request = NSFetchRequest<MessageTransaction>(entityName: MessageTransaction.entityName)
+		
+		let unread: Bool
+		if let count = try? stack.container.viewContext.count(for: request), count > 0 {
+			unread = false
+		} else {
+			unread = true
+		}
+		
+		if let welcome = AdamantContacts.adamantBountyWallet.messages["chats.welcome_message"] {
+			chatProvider.fakeReceived(message: welcome,
+									  senderId: AdamantContacts.adamantBountyWallet.name,
+									  date: Date.adamantNullDate,
+									  unread: unread,
+									  silent: true,
+									  completion: { _ in })
+		}
+		
+		if let ico = AdamantContacts.adamantIco.messages["chats.ico_message"] {
+			chatProvider.fakeReceived(message: ico,
+									  senderId: AdamantContacts.adamantIco.name,
+									  date: Date.adamantNullDate,
+									  unread: unread,
+									  silent: true,
+									  completion: { _ in })
 		}
 	}
 }

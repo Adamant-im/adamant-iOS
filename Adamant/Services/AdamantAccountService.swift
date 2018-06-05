@@ -104,6 +104,7 @@ extension AdamantAccountService {
 		securedStore.set(keypair.publicKey, for: .publicKey)
 		securedStore.set(keypair.privateKey, for: .privateKey)
 		hasStayInAccount = true
+		NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.stayInChanged, object: self, userInfo: [AdamantUserInfoKey.AccountService.newStayInState : true])
 		completion(.success(account: account))
 	}
 	
@@ -135,6 +136,7 @@ extension AdamantAccountService {
 		securedStore.remove(.privateKey)
 		securedStore.remove(.useBiometry)
 		hasStayInAccount = false
+		NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.stayInChanged, object: self, userInfo: [AdamantUserInfoKey.AccountService.newStayInState : false])
 		notificationsService.setNotificationsMode(.disabled, completion: nil)
 	}
 }
@@ -173,7 +175,7 @@ extension AdamantAccountService: AccountService {
 				
 				if loggedAccount.balance != account.balance {
 					self?.account = account
-					NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil)
+					NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.accountDataUpdated, object: self)
 				}
 				
 				self?.setState(.loggedIn)
@@ -353,7 +355,7 @@ extension AdamantAccountService {
 		}
 		
 		if wasLogged {
-			NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userLoggedOut, object: nil)
+			NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userLoggedOut, object: self)
 		}
 	}
 }

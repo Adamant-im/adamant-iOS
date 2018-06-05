@@ -55,6 +55,9 @@ extension Container {
 			let service = AdamantNotificationsService()
 			service.securedStore = r.resolve(SecuredStore.self)
 			return service
+		}.initCompleted { (r, c) in	// Weak reference
+			let service = c as! AdamantNotificationsService
+			service.accountService = r.resolve(AccountService.self)
 		}.inObjectScope(.container)
 		
 		// MARK: ApiService

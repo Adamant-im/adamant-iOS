@@ -75,15 +75,27 @@ extension AdamantUtilities {
 	static let passphraseRegex = try! NSRegularExpression(pattern: passphraseRegexString, options: [])
 	static let addressRegex = try! NSRegularExpression(pattern: addressRegexString, options: [])
 	
+	enum AddressValidationResult {
+		case valid
+		case system
+		case invalid
+	}
+	
 	/// Rules are simple:
 	///
 	/// - Leading uppercase U
 	/// - From 6 to 20 numbers
 	/// - No leading or trailing whitespaces
-	static func validateAdamantAddress(address: String) -> Bool {
-		return validate(string: address, with: addressRegex)
+	/// - System addresses are allowed. Enum is AdamantContacts.systemAddresses
+	static func validateAdamantAddress(address: String) -> AddressValidationResult {
+		if validate(string: address, with: addressRegex) {
+			return .valid
+		} else if AdamantContacts.systemAddresses.contains(address) {
+			return .system
+		} else {
+			return .invalid
+		}
 	}
-	
 	
 	/// Rules are simple:
 	///

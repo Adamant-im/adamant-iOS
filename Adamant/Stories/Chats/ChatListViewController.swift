@@ -237,7 +237,7 @@ extension ChatListViewController {
 			cell.lastMessageLabel.text = nil
 		}
 		
-		if let date = chatroom.updatedAt as Date? {
+		if let date = chatroom.updatedAt as Date?, date != Date.adamantNullDate {
 			cell.dateLabel.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
 		} else {
 			cell.dateLabel.text = nil
@@ -379,7 +379,7 @@ extension ChatListViewController: ChatViewControllerDelegate {
 extension ChatListViewController {
 	private func showNotification(for transaction: ChatTransaction) {
 		// MARK: 1. Show notification only for incomming transactions
-		guard !transaction.isOutgoing,
+		guard !transaction.silentNotification, !transaction.isOutgoing,
 			let chatroom = transaction.chatroom, chatroom != presentedChatroom(),
 			let partner = chatroom.partner else {
 			return

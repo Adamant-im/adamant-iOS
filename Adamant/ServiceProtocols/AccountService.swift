@@ -17,8 +17,14 @@ extension Notification.Name {
 		/// Raised when user has successfully logged in. See AdamantUserInfoKey.AccountService
 		static let userLoggedIn = Notification.Name("adamant.accountService.userHasLoggedIn")
 		
-		// Raised on account info (balance) updated.
+		/// Raised on account info (balance) updated.
 		static let accountDataUpdated = Notification.Name("adamant.accountService.accountDataUpdated")
+		
+		/// Raised when user changed Stay In option.
+		///
+		/// UserInfo:
+		/// - Adamant.AccountService.newStayInState with new state
+		static let stayInChanged = Notification.Name("adamant.accountService.stayInChanged")
 		
 		private init() {}
 	}
@@ -29,6 +35,7 @@ extension Notification.Name {
 extension AdamantUserInfoKey {
 	struct AccountService {
 		static let loggedAccountAddress = "adamant.accountService.loggedin.address"
+		static let newStayInState = "adamant.accountService.stayIn"
 		
 		private init() {}
 	}
@@ -71,7 +78,7 @@ enum AccountServiceError: Error {
 			return error.localized
 			
 		case .internalError(let message, _):
-			return String.localizedStringWithFormat(NSLocalizedString("AccountServiceError.Internal errorFormat", comment: "ApiService: Bad internal application error, report a bug. Using %@ as error description"), message)
+			return String.localizedStringWithFormat(NSLocalizedString("AccountServiceError.InternalErrorFormat", comment: "ApiService: Bad internal application error, report a bug. Using %@ as error description"), message)
 		}
 	}
 }
