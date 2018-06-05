@@ -31,7 +31,7 @@
     <entity name="CoreDataAccount" representedClassName="CoreDataAccount" syncable="YES">
         <attribute name="address" attributeType="String" syncable="YES"/>
         <attribute name="avatar" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="knownMessages" optional="YES" attributeType="Transformable" customClassName="[String:String]" syncable="YES"/>
+        <attribute name="isSystem" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="publicKey" attributeType="String" syncable="YES"/>
         <relationship name="chatroom" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="partner" inverseEntity="Chatroom" syncable="YES"/>

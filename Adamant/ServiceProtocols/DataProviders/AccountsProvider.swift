@@ -39,6 +39,19 @@ enum AdamantContacts {
 		return [AdamantContacts.adamantIco.name, AdamantContacts.adamantBountyWallet.name]
 	}()
 	
+	static func messagesFor(address: String) -> [String:AdamantMessage]? {
+		switch address {
+		case AdamantContacts.adamantBountyWallet.address, AdamantContacts.adamantBountyWallet.name:
+			return AdamantContacts.adamantBountyWallet.messages
+			
+		case AdamantContacts.adamantIco.address, AdamantContacts.adamantIco.name:
+			return AdamantContacts.adamantIco.messages
+			
+		default:
+			return nil
+		}
+	}
+	
 	case adamantBountyWallet
 	case adamantIco
 	

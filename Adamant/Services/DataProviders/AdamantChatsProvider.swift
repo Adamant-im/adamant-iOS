@@ -603,10 +603,18 @@ extension AdamantChatsProvider {
 						newMessageTransactions.append(messageTransaction)
 						
 						// Preset messages
-						if let preset = account.knownMessages,
-							let message = messageTransaction.message,
-							let translatedMessage = preset.first(where: {message.range(of: $0.key) != nil}) {
-							messageTransaction.message = translatedMessage.value
+						if account.isSystem, let address = account.address,
+							let messages = AdamantContacts.messagesFor(address: address),
+							let key = messageTransaction.message,
+							let adamantMessage = messages.first(where: { key.range(of: $0.key) != nil })?.value {
+							switch adamantMessage {
+							case .text(let text):
+								messageTransaction.message = text
+								
+							case .markdownText(let text):
+								messageTransaction.message = text
+								messageTransaction.isMarkdown = true
+							}
 						}
 					}
 					
