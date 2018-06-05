@@ -12,6 +12,7 @@ import CoreData
 enum AccountsProviderResult {
 	case success(CoreDataAccount)
 	case notFound
+	case invalidAddress
 	case serverError(Error)
 }
 
@@ -27,4 +28,65 @@ protocol AccountsProvider {
 	///
 	/// - Returns: Account, if found, created in main viewContext
 //	func getAccount(byPublicKey publicKey: String, completion: @escaping (AccountsProviderResult) -> Void)
+	
+	/// Check locally if has account with specified address
+	func hasAccount(address: String, completion: @escaping (Bool) -> Void)
+}
+
+// MARK: - Known contacts
+enum AdamantContacts {
+	static let systemAddresses: [String] = {
+		return [AdamantContacts.adamantIco.name, AdamantContacts.adamantBountyWallet.name]
+	}()
+	
+	static func messagesFor(address: String) -> [String:AdamantMessage]? {
+		switch address {
+		case AdamantContacts.adamantBountyWallet.address, AdamantContacts.adamantBountyWallet.name:
+			return AdamantContacts.adamantBountyWallet.messages
+			
+		case AdamantContacts.adamantIco.address, AdamantContacts.adamantIco.name:
+			return AdamantContacts.adamantIco.messages
+			
+		default:
+			return nil
+		}
+	}
+	
+	case adamantBountyWallet
+	case adamantIco
+	
+	var name: String {
+		switch self {
+		case .adamantBountyWallet: return "ADAMANT Bounty"
+		case .adamantIco: return "ADAMANT ICO"
+		}
+	}
+	
+	var address: String {
+		switch self {
+		case .adamantBountyWallet: return "U15423595369615486571"
+		case .adamantIco: return "U7047165086065693428"
+		}
+	}
+	
+	var isReadonly: Bool {
+		return true
+	}
+	
+	var avatar: String {
+		return "avatar_bots"
+	}
+	
+	var messages: [String:AdamantMessage] {
+		switch self {
+		case .adamantBountyWallet:
+			return ["chats.welcome_message": AdamantMessage.markdownText(NSLocalizedString("Chats.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported."))]
+			
+		case .adamantIco:
+			return [
+				"chats.preico_message": AdamantMessage.text(NSLocalizedString("Chats.PreIcoMessage", comment: "Known contacts: Adamant pre ICO message")),
+				"chats.ico_message": AdamantMessage.markdownText(NSLocalizedString("Chats.IcoMessage", comment: "Known contacts: Adamant ICO message. Markdown supported."))
+			]
+		}
+	}
 }

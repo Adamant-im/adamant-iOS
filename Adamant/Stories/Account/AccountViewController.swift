@@ -20,7 +20,9 @@ extension String.adamantLocalized {
 		static let webApp = NSLocalizedString("AccountTab.TransferBlocked.GoToPWA", comment: "Account tab: 'Transfer not allowed' alert 'go to WebApp button'")
 		static let transferNotAllowed = NSLocalizedString("AccountTab.TransferBlocked.Message", comment: "Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO")
 		
-		static let joinIcoUrlFormat = NSLocalizedString("AccountTab.JoinIcoUrlFormat", comment: "Account tab: A full 'Join ICO' link, with %@ as address")
+		// URLs
+		static let joinIcoUrlFormat = NSLocalizedString("AccountTab.JoinIco.UrlFormat", comment: "Account tab: A full 'Join ICO' link, with %@ as address")
+		static let getFreeTokensUrlFormat = NSLocalizedString("AccountTab.FreeTokens.UrlFormat", comment: "Account atb: A full 'Get free tokens' link, with %@ as address")
 		
 		private init() { }
 	}
@@ -64,6 +66,7 @@ class AccountViewController: FormViewController {
 		case sendTokens
 		case invest
 		case logout
+		case freeTokens
 		
 		var tag: String {
 			switch self {
@@ -81,6 +84,9 @@ class AccountViewController: FormViewController {
 				
 			case .logout:
 				return "logout"
+				
+			case .freeTokens:
+				return "frrtkns"
 			}
 		}
 		
@@ -100,6 +106,9 @@ class AccountViewController: FormViewController {
 				
 			case .logout:
 				return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
+				
+			case .freeTokens:
+				return NSLocalizedString("AccountTab.Row.FreeTokens", comment: "Account tab: 'Get free tokens' button")
 			}
 		}
 	}
@@ -109,6 +118,10 @@ class AccountViewController: FormViewController {
 	var accountService: AccountService!
 	var dialogService: DialogService!
 	var router: Router!
+	
+	
+	// MARK: - Properties
+	var hideFreeTokensRow = false
 	
 	
 	// MARK: - Lifecycle
@@ -252,6 +265,41 @@ class AccountViewController: FormViewController {
 				self?.present(safari, animated: true, completion: nil)
 			})
 		
+		// MARK: Free Tokens
+			<<< LabelRow() {
+				$0.tag = Rows.freeTokens.tag
+				$0.title = Rows.freeTokens.localized
+				$0.hidden = Condition.function([], { [weak self] _ -> Bool in
+					guard let hideFreeTokensRow = self?.hideFreeTokensRow else {
+						return true
+					}
+					
+					return hideFreeTokensRow
+				})
+			}
+			.cellSetup({ (cell, _) in
+				cell.selectionStyle = .gray
+			})
+			.cellUpdate({ (cell, _) in
+				if let label = cell.textLabel {
+					label.font = UIFont.adamantPrimary(size: 17)
+					label.textColor = UIColor.adamantPrimary
+				}
+				
+				cell.accessoryType = .disclosureIndicator
+			})
+			.onCellSelection({ [weak self] (_, _) in
+				guard let address = self?.accountService.account?.address,
+					let url = URL(string: String.localizedStringWithFormat(String.adamantLocalized.account.getFreeTokensUrlFormat, address)) else {
+						return
+				}
+				
+				let safari = SFSafariViewController(url: url)
+				safari.preferredControlTintColor = UIColor.adamantPrimary
+				self?.present(safari, animated: true, completion: nil)
+			})
+			
+			
 		// MARK: Actions section
 		+++ Section(Sections.actions.localized)
 			
@@ -331,9 +379,11 @@ extension AccountViewController {
 		if let account = accountService.account {
 			address = account.address
 			balance = AdamantUtilities.format(balance: account.balance)
+			hideFreeTokensRow = account.balance > 0
 		} else {
 			address = nil
 			balance = nil
+			hideFreeTokensRow = true
 		}
 		
 		if let row: AccountRow = form.rowBy(tag: Rows.account.tag) {
@@ -344,6 +394,10 @@ extension AccountViewController {
 		if let row: LabelRow = form.rowBy(tag: Rows.balance.tag) {
 			row.value = balance
 			row.reload()
+		}
+		
+		if let row: LabelRow = form.rowBy(tag: Rows.freeTokens.tag) {
+			row.evaluateHidden()
 		}
 	}
 }

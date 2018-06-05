@@ -47,4 +47,10 @@ extension UIFont {
 	static func adamantPrimaryThin(size: CGFloat) -> UIFont {
 		return UIFont(name: "Exo 2 Thin", size: size)!
 	}
+	
+	static var adamantChatDefault = UIFont.systemFont(ofSize: 17)
+}
+
+extension Date {
+	static let adamantNullDate = Date(timeIntervalSince1970: 0)
 }

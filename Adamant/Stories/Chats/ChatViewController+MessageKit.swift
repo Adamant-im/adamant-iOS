@@ -9,6 +9,7 @@
 import Foundation
 import MessageKit
 import SafariServices
+import Haring
 
 // MARK: - MessagesDataSource
 extension ChatViewController: MessagesDataSource {
@@ -35,6 +36,14 @@ extension ChatViewController: MessagesDataSource {
 			return 0
 		}
 	}
+	
+	func cellBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+		if message.sentDate == Date.adamantNullDate {
+			return nil
+		}
+		
+		return NSAttributedString(string: dateFormatter.string(from: message.sentDate), attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
+	}
 }
 
 
@@ -59,18 +68,6 @@ extension ChatViewController: MessagesDisplayDelegate {
 	
 	func enabledDetectors(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> [DetectorType] {
 		return [.url]
-	}
-	
-	func cellBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
-		return NSAttributedString(string: dateFormatter.string(from: message.sentDate), attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
-	}
-	
-	func cellBottomLabelAlignment(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> LabelAlignment {
-		if isFromCurrentSender(message: message) {
-			return LabelAlignment.messageTrailing(UIEdgeInsets(top: 2, left: 0, bottom: 0, right: 16))
-		} else {
-			return LabelAlignment.messageLeading(UIEdgeInsets(top: 2, left: 16, bottom: 0, right: 0))
-		}
 	}
 }
 
@@ -116,6 +113,14 @@ extension ChatViewController: MessagesLayoutDelegate {
 	func avatarSize(for: MessageType, at: IndexPath, in: MessagesCollectionView) -> CGSize {
 		return .zero
 	}
+	
+	func cellBottomLabelAlignment(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> LabelAlignment {
+		if isFromCurrentSender(message: message) {
+			return LabelAlignment.messageTrailing(UIEdgeInsets(top: 2, left: 0, bottom: 0, right: 16))
+		} else {
+			return LabelAlignment.messageLeading(UIEdgeInsets(top: 2, left: 16, bottom: 0, right: 0))
+		}
+	}
 }
 
 
@@ -144,7 +149,7 @@ extension ChatViewController: MessageInputBarDelegate {
 			switch result {
 			case .success: break
 				
-			case .error(let error):
+			case .failure(let error):
 				let message: String
 				switch error {
 				case .accountNotFound(let account):
@@ -213,7 +218,16 @@ extension MessageTransaction: MessageType {
 	}
 	
 	public var data: MessageData {
-		return MessageData.text(self.message ?? "")
+		guard let message = message else {
+			return MessageData.text("")
+		}
+		
+		if isMarkdown {
+			let parser = MarkdownParser(font: UIFont.adamantChatDefault)
+			return MessageData.attributedText(parser.parse(message))
+		} else {
+			return MessageData.text(message)
+		}
 	}
 }
 
@@ -225,11 +239,11 @@ extension TransferTransaction: MessageType {
 	}
 	
 	public var messageId: String {
-		return self.transactionId!
+		return transactionId!
 	}
 	
 	public var sentDate: Date {
-		return self.date! as Date
+		return date! as Date
 	}
 	
 	public var data: MessageData {
