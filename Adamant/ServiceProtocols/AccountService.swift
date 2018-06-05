@@ -78,7 +78,7 @@ enum AccountServiceError: Error {
 			return error.localized
 			
 		case .internalError(let message, _):
-			return String.localizedStringWithFormat(NSLocalizedString("AccountServiceError.Internal errorFormat", comment: "ApiService: Bad internal application error, report a bug. Using %@ as error description"), message)
+			return String.localizedStringWithFormat(NSLocalizedString("AccountServiceError.InternalErrorFormat", comment: "ApiService: Bad internal application error, report a bug. Using %@ as error description"), message)
 		}
 	}
 }

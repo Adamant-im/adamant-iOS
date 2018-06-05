@@ -1,5 +1,5 @@
 /* ApiService: Bad internal application error, report a bug. Using %@ as error description */
-"AccountServiceError.Internal errorFormat" = "Внутренняя ошибка: %@";
+"AccountServiceError.InternalErrorFormat" = "Внутренняя ошибка: %@";
 
 /* Login: user typed in invalid passphrase */
 "AccountServiceError.InvalidPassphrase" = "Неправильный пароль";
