@@ -238,7 +238,7 @@ extension ChatListViewController {
 		}
 		
 		if let date = chatroom.updatedAt as Date?, date != Date.adamantNullDate {
-			cell.dateLabel.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
+			cell.dateLabel.text = AdamantUtilities.formatHumanizedFullDate(date)
 		} else {
 			cell.dateLabel.text = nil
 		}
