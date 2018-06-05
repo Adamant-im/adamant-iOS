@@ -64,15 +64,15 @@ enum AdamantContacts {
 		return "avatar_bots"
 	}
 	
-	var messages: [String:String] {
+	var messages: [String:AdamantMessage] {
 		switch self {
 		case .adamantBountyWallet:
-			return ["chats.welcome_message": NSLocalizedString("Chats.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported.")]
+			return ["chats.welcome_message": AdamantMessage.markdownText(NSLocalizedString("Chats.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported."))]
 			
 		case .adamantIco:
 			return [
-				"chats.preico_message": NSLocalizedString("Chats.PreIcoMessage", comment: "Known contacts: Adamant pre ICO message"),
-				"chats.ico_message": NSLocalizedString("Chats.IcoMessage", comment: "Known contacts: Adamant ICO message. Markdown supported.")
+				"chats.preico_message": AdamantMessage.text(NSLocalizedString("Chats.PreIcoMessage", comment: "Known contacts: Adamant pre ICO message")),
+				"chats.ico_message": AdamantMessage.markdownText(NSLocalizedString("Chats.IcoMessage", comment: "Known contacts: Adamant ICO message. Markdown supported."))
 			]
 		}
 	}

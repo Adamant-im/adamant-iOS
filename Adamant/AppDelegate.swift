@@ -332,21 +332,21 @@ extension AppDelegate {
 		}
 		
 		if let welcome = AdamantContacts.adamantBountyWallet.messages["chats.welcome_message"] {
-			chatProvider.fakeReceivedMessage(AdamantMessage.text(welcome),
-											 senderId: AdamantContacts.adamantBountyWallet.name,
-											 date: Date.adamantNullDate,
-											 unread: unread,
-											 silent: true,
-											 completion: { _ in })
+			chatProvider.fakeReceived(message: welcome,
+									  senderId: AdamantContacts.adamantBountyWallet.name,
+									  date: Date.adamantNullDate,
+									  unread: unread,
+									  silent: true,
+									  completion: { _ in })
 		}
 		
 		if let ico = AdamantContacts.adamantIco.messages["chats.ico_message"] {
-			chatProvider.fakeReceivedMessage(AdamantMessage.text(ico),
-											 senderId: AdamantContacts.adamantIco.name,
-											 date: Date.adamantNullDate,
-											 unread: unread,
-											 silent: true,
-											 completion: { _ in })
+			chatProvider.fakeReceived(message: ico,
+									  senderId: AdamantContacts.adamantIco.name,
+									  date: Date.adamantNullDate,
+									  unread: unread,
+									  silent: true,
+									  completion: { _ in })
 		}
 	}
 }

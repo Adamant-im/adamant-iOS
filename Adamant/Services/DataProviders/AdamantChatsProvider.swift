@@ -246,7 +246,7 @@ extension AdamantChatsProvider {
 		
 		sendingQueue.async {
 			switch message {
-			case .text(let text):
+			case .text(let text), .markdownText(let text):
 				self.sendTextMessage(text: text, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, completion: completion)
 			}
 		}
@@ -690,7 +690,7 @@ extension AdamantChatsProvider {
 	/// Check if message is valid for sending
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult {
 		switch message {
-		case .text(let text):
+		case .text(let text), .markdownText(let text):
 			if text.count == 0 {
 				return .empty
 			}

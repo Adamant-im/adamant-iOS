@@ -9,6 +9,7 @@
 import Foundation
 import MessageKit
 import SafariServices
+import Haring
 
 // MARK: - MessagesDataSource
 extension ChatViewController: MessagesDataSource {
@@ -217,7 +218,16 @@ extension MessageTransaction: MessageType {
 	}
 	
 	public var data: MessageData {
-		return MessageData.text(self.message ?? "")
+		guard let message = message else {
+			return MessageData.text("")
+		}
+		
+		if isMarkdown {
+			let parser = MarkdownParser(font: UIFont.adamantChatDefault)
+			return MessageData.attributedText(parser.parse(message))
+		} else {
+			return MessageData.text(message)
+		}
 	}
 }
 
@@ -229,11 +239,11 @@ extension TransferTransaction: MessageType {
 	}
 	
 	public var messageId: String {
-		return self.transactionId!
+		return transactionId!
 	}
 	
 	public var sentDate: Date {
-		return self.date! as Date
+		return date! as Date
 	}
 	
 	public var data: MessageData {

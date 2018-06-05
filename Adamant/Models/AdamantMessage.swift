@@ -11,8 +11,10 @@ import Foundation
 /// Adamant message types
 ///
 /// - text: Simple text message
+/// - markdownText: attributed text, formatted with markdown
 enum AdamantMessage {
 	case text(String)
+	case markdownText(String)
 }
 
 extension AdamantMessage {
@@ -20,7 +22,7 @@ extension AdamantMessage {
 	
 	var fee: Decimal {
 		switch self {
-		case .text(let message):
+		case .text(let message), .markdownText(let message):
 			return Decimal(ceil(Double(message.count) / 255.0)) * AdamantMessage.textFee
 		}
 	}
