@@ -16,8 +16,11 @@
 /* Account tab: Confirm logout alert */
 "AccountTab.ConfirmLogout.MessageFormat" = "Выйти из %@?";
 
+/* Account atb: A full 'Get free tokens' link, with %@ as address */
+"AccountTab.FreeTokens.UrlFormat" = "https://adamant.im/ru-free-adm-tokens/?wallet=%@";
+
 /* Account tab: A full 'Join ICO' link, with %@ as address */
-"AccountTab.JoinIcoUrlFormat" = "https://adamant.im/ru-ico?wallet=%@";
+"AccountTab.JoinIco.UrlFormat" = "https://adamant.im/ru-ico/?wallet=%@";
 
 /* Account tab: Balance row title */
 "AccountTab.Row.Balance" = "Баланс";
@@ -30,6 +33,9 @@
 
 /* Account tab: 'Send tokens' button */
 "AccountTab.Row.SendTokens" = "Отправить токены";
+
+/* Account tab: 'Get free tokens' button */
+"AccountTab.Row.FreeTokens" = "Бесплатные ADM токены";
 
 /* Account tab: Account section title. */
 "AccountTab.Section.Account" = "Аккаунт";
