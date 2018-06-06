@@ -41,6 +41,10 @@ extension ChatViewController: MessagesDataSource {
 		if message.sentDate == Date.adamantNullDate {
 			return nil
 		}
+        
+        if let message = message as? MessageTransaction, message.messageStatus == .pending || message.statusEnum == .fail {
+            return nil
+        }
 		
 		return NSAttributedString(string: dateFormatter.string(from: message.sentDate), attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
 	}
@@ -56,7 +60,20 @@ extension ChatViewController: MessagesDisplayDelegate {
 	
 	func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
 		if isFromCurrentSender(message: message) {
-			return UIColor.adamantChatSenderBackground
+            guard let message = message as? MessageTransaction else {
+                return UIColor.adamantChatSenderBackground
+            }
+            
+            switch message.messageStatus {
+            case .pending:
+                return UIColor.adamantPendingChatBackground
+            case .fail:
+                return UIColor.adamantFailChatBackground
+            case .sent:
+                return UIColor.adamantChatSenderBackground
+            }
+            
+			
 		} else {
 			return UIColor.adamantChatRecipientBackground
 		}
@@ -185,6 +202,13 @@ extension ChatViewController: MessageInputBarDelegate {
 				// TODO: Log this
 				self.dialogService.showError(withMessage: message, error: error)
 			}
+            DispatchQueue.main.async {
+                
+                print("reload data")
+                self.messagesCollectionView.reloadDataAndKeepOffset()
+                
+            }
+            
 		})
 		
 		inputBar.inputTextView.text = String()
@@ -229,6 +253,10 @@ extension MessageTransaction: MessageType {
 			return MessageData.text(message)
 		}
 	}
+    
+    public var messageStatus: MessageStatus {
+        return self.statusEnum
+    }
 }
 
 // MARK: TransferTransaction

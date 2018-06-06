@@ -308,6 +308,8 @@ extension AdamantChatsProvider {
 		
 		transaction.transactionId = UUID().uuidString
 		transaction.blockId = UUID().uuidString
+        
+        transaction.statusEnum = MessageStatus.pending
 		
 		chatroom.addToTransactions(transaction)
 		
@@ -319,13 +321,49 @@ extension AdamantChatsProvider {
 			completion(.failure(.internalError(error)))
 			return
 		}
-		
+        
+//        transaction.statusEnum = MessageStatus.fail
+        print("TEST: NOT sending MSG ")
+        
+        DispatchQueue.global().asyncAfter(deadline: .now() + 1, execute: {
+            print("Fake recive")
+            transaction.statusEnum = MessageStatus.fail
+            try? privateContext.save()
+//            if let lastTransaction = chatroom.lastTransaction {
+//                if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
+//                    dateA.compare(dateB) == ComparisonResult.orderedAscending {
+//                    chatroom.lastTransaction = transaction
+//                    chatroom.updatedAt = transaction.date
+//                }
+//            } else {
+//                chatroom.lastTransaction = transaction
+//                chatroom.updatedAt = transaction.date
+//            }
+            
+//            self.unconfirmedsSemaphore.wait()
+//            DispatchQueue.main.sync {
+//                self.unconfirmedTransactions[id] = self.stack.container.viewContext.object(with: transaction.objectID) as? MessageTransaction
+//            }
+//            self.unconfirmedsSemaphore.signal()
+            
+//            do {
+//                try privateContext.save()
+//                completion(.success)
+//            } catch {
+                completion(.failure(.internalError(AdamantError(message: "fake"))))
+//            }
+        })
+        
+		return
+            /*
 		// MARK: 6. Send
 		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { result in
 			switch result {
 			case .success(let id):
 				// Update ID with recieved, add to unconfirmed transactions.
 				transaction.transactionId = String(id)
+                
+                transaction.statusEnum = MessageStatus.sent
 				
 				if let lastTransaction = chatroom.lastTransaction {
 					if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
@@ -354,7 +392,8 @@ extension AdamantChatsProvider {
 				
 				
 			case .failure(let error):
-				privateContext.delete(transaction)
+                transaction.statusEnum = MessageStatus.fail
+//                privateContext.delete(transaction)
 				try? privateContext.save()
 				
 				let serviceError: ChatsProviderError
@@ -377,7 +416,7 @@ extension AdamantChatsProvider {
 				
 				completion(.failure(serviceError))
 			}
-		}
+		}*/
 	}
 }
 
@@ -735,6 +774,8 @@ extension AdamantChatsProvider {
 		messageTransaction.isOutgoing = isOutgoing
 		messageTransaction.blockId = transaction.blockId
 		messageTransaction.confirmations = transaction.confirmations
+        
+        messageTransaction.statusEnum = MessageStatus.sent
 		
 		if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey) {
 			messageTransaction.message = decodedMessage
