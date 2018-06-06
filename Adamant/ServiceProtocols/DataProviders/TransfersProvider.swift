@@ -12,7 +12,9 @@ import CoreData
 enum TransfersProviderError: Error {
 	case notLogged
 	case serverError(Error)
-	case accountNotFound(String)
+	case accountNotFound(address: String)
+	case transactionNotFound(id: String)
+	case internalError(message: String)
 }
 
 enum TransfersProviderResult {
@@ -81,6 +83,7 @@ protocol TransfersProvider: DataProvider {
 	// MARK: - Sending funds
 	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void)
     
-    // MARK: - Get transaction by ID
-    func getTransaction(id: UInt64, completion: @escaping (TransferTransaction) -> Void)
+    // MARK: - Transactions
+    func getTransfer(id: String) -> TransferTransaction?
+	func refreshTransfer(id: String, completion: @escaping (TransfersProviderResult) -> Void)
 }

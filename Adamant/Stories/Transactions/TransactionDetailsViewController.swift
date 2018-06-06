@@ -25,6 +25,7 @@ extension String.adamantLocalized.alert {
 
 // MARK: - 
 class TransactionDetailsViewController: UIViewController {
+	// MARK: - Rows
 	fileprivate enum Row: Int {
 		case transactionNumber = 0
 		case from
@@ -61,11 +62,16 @@ class TransactionDetailsViewController: UIViewController {
 	private let cellIdentifier = "cell"
 	var transaction: TransferTransaction?
 	var explorerUrl: URL!
+	
+	private let autoupdateInterval: TimeInterval = 5.0
     
     weak var timer: Timer?
     
 	// MARK: - IBOutlets
 	@IBOutlet weak var tableView: UITableView!
+	
+	
+	// MARK: - Lifecycle
 	
 	override func viewDidLoad() {
 		navigationItem.title = String.adamantLocalized.transactionDetails.title
@@ -93,6 +99,13 @@ class TransactionDetailsViewController: UIViewController {
 		}
 	}
 	
+	deinit {
+		stopUpdate()
+	}
+	
+	
+	// MARK: - IBActions
+	
 	@IBAction func share(_ sender: Any) {
 		guard let transaction = transaction, let url = explorerUrl else {
 			return
@@ -116,29 +129,33 @@ class TransactionDetailsViewController: UIViewController {
 		
 		present(alert, animated: true, completion: nil)
 	}
-    
+	
+	
+	// MARK: - Autoupdate
+	
     func startUpdate() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { [weak self] _ in
-            print("Updating transaction: Start")
-            if let transactionId = self?.transaction?.transactionId, let id: UInt64 = UInt64(transactionId) {
-                print("Updating transaction: Senting request")
-                self?.transfersProvider.getTransaction(id: id, completion: { (transaction) in
-                    self?.transaction?.confirmations = transaction.confirmations
-                    DispatchQueue.main.async{
-                        self?.tableView.reloadData()
-                    }
-                })
-            }
+        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
+			guard let id = self?.transaction?.transactionId else {
+				return
+			}
+			
+			self?.transfersProvider.refreshTransfer(id: id) { result in
+				switch result {
+				case .success:
+					DispatchQueue.main.async {
+						self?.tableView.reloadData()
+					}
+					
+				case .error(_):
+					return
+				}
+			}
         }
     }
     
     func stopUpdate() {
         timer?.invalidate()
-    }
-    
-    deinit {
-        stopUpdate()
     }
 }
 
