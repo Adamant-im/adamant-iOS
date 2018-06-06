@@ -55,12 +55,15 @@ class TransactionDetailsViewController: UIViewController {
 	
 	// MARK: - Dependencies
 	var dialogService: DialogService!
+    var transfersProvider: TransfersProvider!
 	
 	// MARK: - Properties
 	private let cellIdentifier = "cell"
 	var transaction: TransferTransaction?
 	var explorerUrl: URL!
-	
+    
+    weak var timer: Timer?
+    
 	// MARK: - IBOutlets
 	@IBOutlet weak var tableView: UITableView!
 	
@@ -79,6 +82,8 @@ class TransactionDetailsViewController: UIViewController {
 		} else {
 			self.navigationItem.rightBarButtonItems = nil
 		}
+        
+        startUpdate()
 	}
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -111,6 +116,30 @@ class TransactionDetailsViewController: UIViewController {
 		
 		present(alert, animated: true, completion: nil)
 	}
+    
+    func startUpdate() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { [weak self] _ in
+            print("Updating transaction: Start")
+            if let transactionId = self?.transaction?.transactionId, let id: UInt64 = UInt64(transactionId) {
+                print("Updating transaction: Senting request")
+                self?.transfersProvider.getTransaction(id: id, completion: { (transaction) in
+                    self?.transaction?.confirmations = transaction.confirmations
+                    DispatchQueue.main.async{
+                        self?.tableView.reloadData()
+                    }
+                })
+            }
+        }
+    }
+    
+    func stopUpdate() {
+        timer?.invalidate()
+    }
+    
+    deinit {
+        stopUpdate()
+    }
 }
 
 
