@@ -141,9 +141,15 @@ extension ChatViewController: MessageCellDelegate {
 					case .success: break
 						
 					case .failure(let error):
-						if let message = ChatViewController.humanize(chatsProviderError: error) {
-							// TODO: Log this
-							self?.dialogService.showError(withMessage: message, error: error)
+						// TODO: Log this
+						if let err = ChatViewController.humanize(chatsProviderError: error) {
+							switch err.level {
+							case .warning:
+								self?.dialogService.showWarning(withMessage: err.message)
+								
+							case .error:
+								self?.dialogService.showError(withMessage: err.message, error: error)
+							}
 						}
 						
 					case .invalidTransactionStatus(_):
@@ -228,14 +234,20 @@ extension ChatViewController: MessageInputBarDelegate {
 			return
 		}
 		
-		self.chatsProvider.sendMessage(.text(text), recipientId: partner, completion: { result in
+		chatsProvider.sendMessage(.text(text), recipientId: partner, completion: { [weak self] result in
 			switch result {
 			case .success: break
 				
 			case .failure(let error):
-				if let message = ChatViewController.humanize(chatsProviderError: error) {
-					// TODO: Log this
-					self.dialogService.showError(withMessage: message, error: error)
+				// TODO: Log this
+				if let err = ChatViewController.humanize(chatsProviderError: error) {
+					switch err.level {
+					case .warning:
+						self?.dialogService.showWarning(withMessage: err.message)
+						
+					case .error:
+						self?.dialogService.showError(withMessage: err.message, error: error)
+					}
 				}
 			}
 		})
@@ -256,29 +268,43 @@ extension ChatViewController: MessageInputBarDelegate {
 
 // MARK: - Tools
 extension ChatViewController {
-	private static func humanize(chatsProviderError error: ChatsProviderError) -> String? {
+	enum ErrorLevel {
+		case warning
+		case error
+	}
+	
+	private static func humanize(chatsProviderError error: ChatsProviderError) -> (message: String, level: ErrorLevel)? {
 		let message: String?
+		let level: ErrorLevel
+		
 		switch error {
 		case .accountNotFound(let account):
 			message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "Account not found: \(account)")
+			level = .error
 			
 		case .dependencyError(let error):
 			message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error)
+			level = .error
 			
 		case .notLogged:
 			message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "User not logged")
+			level = .error
 			
 		case .networkError:
 			message = String.adamantLocalized.chat.noNetwork
+			level = .warning
 			
 		case .notEnoughtMoneyToSend:
 			message = String.adamantLocalized.chat.notEnoughMoney
+			level = .warning
 			
 		case .serverError(let error), .internalError(let error):
 			message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, error.localizedDescription)
+			level = .error
 			
 		case .transactionNotFound(_):
 			message = nil
+			level = .error
 			
 		case .messageNotValid(let problem):
 			switch problem {
@@ -291,9 +317,15 @@ extension ChatViewController {
 			case .isValid:
 				message = nil
 			}
+			
+			level = .warning
 		}
 		
-		return message
+		if let message = message {
+			return (message, level)
+		} else {
+			return nil
+		}
 	}
 }
 
