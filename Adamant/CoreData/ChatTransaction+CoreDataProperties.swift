@@ -2,7 +2,7 @@
 //  ChatTransaction+CoreDataProperties.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 04.06.2018.
+//  Created by Anokhov Pavel on 07.06.2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 //
@@ -19,6 +19,7 @@ extension ChatTransaction {
 
     @NSManaged public var isUnread: Bool
     @NSManaged public var silentNotification: Bool
+    @NSManaged public var status: Int16
     @NSManaged public var chatroom: Chatroom?
     @NSManaged public var lastIn: Chatroom?
 

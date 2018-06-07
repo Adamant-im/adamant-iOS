@@ -328,8 +328,6 @@ extension AdamantChatsProvider {
 			case .success(let id):
 				// Update ID with recieved, add to unconfirmed transactions.
 				transaction.transactionId = String(id)
-                
-                transaction.statusEnum = MessageStatus.sent
 				
 				if let lastTransaction = chatroom.lastTransaction {
 					if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,

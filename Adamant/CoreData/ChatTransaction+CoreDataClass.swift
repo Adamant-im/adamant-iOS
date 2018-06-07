@@ -12,5 +12,8 @@ import CoreData
 
 @objc(ChatTransaction)
 public class ChatTransaction: BaseTransaction {
-	
+	var statusEnum: MessageStatus {
+		get { return MessageStatus(rawValue: self.status) ?? .failed }
+		set { self.status = newValue.rawValue }
+	}
 }

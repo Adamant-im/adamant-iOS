@@ -13,9 +13,4 @@ import CoreData
 @objc(MessageTransaction)
 public class MessageTransaction: ChatTransaction {
 	static let entityName = "MessageTransaction"
-	
-	var statusEnum: MessageStatus {
-		get { return MessageStatus(rawValue: self.status) ?? .failed }
-		set { self.status = newValue.rawValue }
-	}
 }
