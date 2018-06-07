@@ -106,6 +106,15 @@
 /* Known contacts: Adamant welcome message. Markdown supported. */
 "Chats.WelcomeMessage" = "Добро пожаловать в самый анонимный и безопасный мессенджер АДАМАНТ. Помните, что безопасность и анонимность зависит и от вас самих. Не переходите по ссылкам, которые вы получаете в чатах, иначе ваш IP-адрес может быть определен. Не доверяйте расширениям браузера. Лучше всего передавать ваш ADM-адрес собеседникам лично, а не через другие мессенджеры. Храните вашу секретную фразу (пароль) от аккаунта в тайне. Установите на ваше устройство пароль или закрываете вкладку браузера после завершения диалогов.\n\nБолее полную информацию о безопасности и анонимности читайте на странице https://adamant.im/staysecured/\n\nВсе транзакции в блокчейне требуют минимальной комиссии. Это необходимо для поддержания инфраструктуры сети. Чтобы начать общаться, **получите бесплатные токены** — перейдите на вкладку Кошелек и нажмите Бесплатные токены. Затем на вкладке Диалоги нажмите Новый чат и введите адрес собеседника. Чтобы скопировать ваш адрес, нажмите Идентификатор кошелька на вкладке Кошелек.\n\nНе отвечайте на это сообщение, этот адрес служебный. Если же у вас остались вопросы, напишите в аккаунт **U15677078342684640219**.";
 
+/* Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them */
+"Chats.RetryOrDelete.Title" = "Повторить или удалить?";
+
+/* Alert 'Retry Or Delete' body message. Used in caht for sending failed messages again or delete them */
+"Chats.RetryOrDelete.Body" = "Вы хотите отправить сообщение еще раз или удалить его?";
+
+/* Chat: inform user that he can't cancel transaction, that was sent */
+"ChatScene.Error.cancelError" = "Сообщение уже отправлено";
+
 /* Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description */
 "ChatScene.Error.InternalErrorFormat" = "Внутренняя ошибка: %@. Сообщите об ошибке";
 
@@ -384,6 +393,12 @@
 
 /* Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu. */
 "Shared.Share" = "Поделиться";
+
+/* Shared alert 'Retry' button. Used anywhere. */
+"Shared.Retry" = "Повторить";
+
+/* Shared alert 'Delete' button. Used anywhere. */
+"Shared.Delete" = "Удалить";
 
 /* ShareQR scene: User had not authorized access to write images to photolibrary */
 "ShareQR.photolibraryNotAuthorized" = "Для сохранения QR-кодов необходимо разрешить доступ к Фото";

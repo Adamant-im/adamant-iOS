@@ -22,10 +22,14 @@ extension String {
 			static let ok = NSLocalizedString("Shared.Ok", comment: "Shared alert 'Ok' button. Used anywhere")
 			static let save = NSLocalizedString("Shared.Save", comment: "Shared alert 'Save' button. Used anywhere")
 			static let settings = NSLocalizedString("Shared.Settings", comment: "Shared alert 'Settings' button. Used to go to system Settings app, on application settings page. Should be same as Settings application title.")
+            static let retry = NSLocalizedString("Shared.Retry", comment: "Shared alert 'Retry' button. Used anywhere")
+            static let delete = NSLocalizedString("Shared.Delete", comment: "Shared alert 'Delete' button. Used anywhere")
 			
 			// MARK: Titles and messages
 			static let error = NSLocalizedString("Shared.Error", comment: "Shared alert 'Error' title. Used anywhere")
 			static let done = NSLocalizedString("Shared.Done", comment: "Shared alert Done message. Used anywhere")
+            static let retryOrDeleteTitle = NSLocalizedString("Chats.RetryOrDelete.Title", comment: "Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them")
+            static let retryOrDeleteBody = NSLocalizedString("Chats.RetryOrDelete.Body", comment: "Alert 'Retry Or Delete' body message. Used in caht for sending failed messages again or delete them")
 			
 			// MARK: Notifications
 			static let copiedToPasteboardNotification = NSLocalizedString("Shared.CopiedToPasteboard", comment: "Shared alert notification: message about item copied to pasteboard.")

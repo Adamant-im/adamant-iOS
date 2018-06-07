@@ -286,18 +286,11 @@ extension AdamantChatsProvider {
 		}
 		
 		
-		// MARK: 2. Encode message
-		guard let encodedMessage = adamantCore.encodeMessage(text, recipientPublicKey: recipientPublicKey, privateKey: keypair.privateKey) else {
-			completion(.failure(.dependencyError("Failed to encode message")))
-			return
-		}
-		
-		
-		// MARK 3. Get Chatroom
+		// MARK 2. Get Chatroom
 		let chatroom = privateContext.object(with: account.chatroom!.objectID) as! Chatroom
 		
 		
-		// MARK: 4. Create chat transaction
+		// MARK: 3. Create chat transaction
 		let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: privateContext)
 		transaction.date = Date() as NSDate
 		transaction.recipientId = recipientId
@@ -308,8 +301,23 @@ extension AdamantChatsProvider {
 		
 		transaction.transactionId = UUID().uuidString
 		transaction.blockId = UUID().uuidString
+        
+        transaction.statusEnum = MessageStatus.pending
 		
 		chatroom.addToTransactions(transaction)
+		
+		
+		// MARK: 4. Last in
+		if let lastTransaction = chatroom.lastTransaction {
+			if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
+				dateA.compare(dateB) == ComparisonResult.orderedAscending {
+				chatroom.lastTransaction = transaction
+				chatroom.updatedAt = transaction.date
+			}
+		} else {
+			chatroom.lastTransaction = transaction
+			chatroom.updatedAt = transaction.date
+		}
 		
 		
 		// MARK: 5. Save unconfirmed transaction
@@ -320,23 +328,148 @@ extension AdamantChatsProvider {
 			return
 		}
 		
+		
 		// MARK: 6. Send
+		sendTransaction(transaction, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
+			switch result {
+			case .success:
+				do {
+					try privateContext.save()
+					completion(.success)
+				} catch {
+					completion(.failure(.internalError(error)))
+				}
+				
+			case .failure(let error):
+				try? privateContext.save()
+				completion(.failure(error))
+			}
+		}
+	}
+    
+    func retrySendMessage(_ message: MessageTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void) {
+		// MARK: 0. Prepare
+		switch message.statusEnum {
+		case .delivered, .pending:
+			completion(.invalidTransactionStatus(message.statusEnum))
+			return
+			
+		case .failed:
+			break
+		}
+		
+		guard let keypair = accountService.keypair else {
+			completion(.failure(.notLogged))
+			return
+		}
+		
+		guard let recipientPublicKey = message.chatroom?.partner?.publicKey else {
+			completion(.failure(.accountNotFound(message.recipientId ?? "")))
+			return
+		}
+		
+		// MARK: 1. Prepare private context
+		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+		privateContext.parent = stack.container.viewContext
+		
+		guard let transaction = privateContext.object(with: message.objectID) as? MessageTransaction else {
+			completion(.failure(.notLogged)) //
+			return
+		}
+		
+		// MARK: 2. Update transaction
+		transaction.date = Date() as NSDate
+		transaction.statusEnum = .pending
+		
+		if let chatroom = transaction.chatroom {
+			if let lastTransaction = chatroom.lastTransaction {
+				if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
+					dateA.compare(dateB) == ComparisonResult.orderedAscending {
+					chatroom.lastTransaction = transaction
+					chatroom.updatedAt = transaction.date
+				}
+			} else {
+				chatroom.lastTransaction = transaction
+				chatroom.updatedAt = transaction.date
+			}
+		}
+		
+		try? privateContext.save()
+		
+		
+		// MARK: 3. Send
+		sendTransaction(transaction, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
+			switch result {
+			case .success:
+				do {
+					try privateContext.save()
+					completion(.success)
+				} catch {
+					completion(.failure(.internalError(error)))
+				}
+				
+			case .failure(let error):
+				try? privateContext.save()
+				completion(.failure(error))
+			}
+		}
+    }
+    
+    // MARK: - Delete local message
+	func cancelMessage(_ message: MessageTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void) {
+		// MARK: 0. Prepare
+		switch message.statusEnum {
+		case .delivered, .pending:
+			// We can't cancel sent transactions
+			completion(.invalidTransactionStatus(message.statusEnum))
+			return
+			
+		case .failed:
+			break
+		}
+		
+		// MARK: 1. Find. Destroy. Save.
+		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+		privateContext.parent = stack.container.viewContext
+		
+		privateContext.delete(privateContext.object(with: message.objectID))
+		
+		do {
+			try privateContext.save()
+			completion(.success)
+		} catch {
+			completion(.failure(.internalError(error)))
+			return
+		}
+	}
+	
+	
+	// MARK: - Logic
+	
+	/// Send transaction.
+	///
+	/// If success - update transaction's id and add it to unconfirmed transactions.
+	/// If fails - set transaction status to .failed
+	private func sendTransaction(_ transaction: MessageTransaction, keypair: Keypair, recipientPublicKey: String, completion: @escaping (ChatsProviderResult) -> Void) {
+		// MARK: 0. Prepare
+		guard let senderId = transaction.senderId,
+			let recipientId = transaction.recipientId else {
+			completion(.failure(.accountNotFound(recipientPublicKey)))
+				return
+		}
+		
+		// MARK: 1. Encode
+		guard let text = transaction.message, let encodedMessage = adamantCore.encodeMessage(text, recipientPublicKey: recipientPublicKey, privateKey: keypair.privateKey) else {
+			completion(.failure(.dependencyError("Failed to encode message")))
+			return
+		}
+		
+		// MARK: 2. Send
 		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { result in
 			switch result {
 			case .success(let id):
 				// Update ID with recieved, add to unconfirmed transactions.
 				transaction.transactionId = String(id)
-				
-				if let lastTransaction = chatroom.lastTransaction {
-					if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
-						dateA.compare(dateB) == ComparisonResult.orderedAscending {
-						chatroom.lastTransaction = transaction
-						chatroom.updatedAt = transaction.date
-					}
-				} else {
-					chatroom.lastTransaction = transaction
-					chatroom.updatedAt = transaction.date
-				}
 				
 				// If we will save transaction from privateContext, we will hold strong reference to whole context, and we won't ever save it.
 				self.unconfirmedsSemaphore.wait()
@@ -345,17 +478,10 @@ extension AdamantChatsProvider {
 				}
 				self.unconfirmedsSemaphore.signal()
 				
-				do {
-					try privateContext.save()
-					completion(.success)
-				} catch {
-					completion(.failure(.internalError(error)))
-				}
-				
+				completion(.success)
 				
 			case .failure(let error):
-				privateContext.delete(transaction)
-				try? privateContext.save()
+				transaction.statusEnum = MessageStatus.failed
 				
 				let serviceError: ChatsProviderError
 				switch error {
@@ -735,6 +861,8 @@ extension AdamantChatsProvider {
 		messageTransaction.isOutgoing = isOutgoing
 		messageTransaction.blockId = transaction.blockId
 		messageTransaction.confirmations = transaction.confirmations
+        
+        messageTransaction.statusEnum = MessageStatus.delivered
 		
 		if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey) {
 			messageTransaction.message = decodedMessage
@@ -758,6 +886,7 @@ extension AdamantChatsProvider {
 		transaction.height = height
 		transaction.blockId = blockId
 		transaction.confirmations = confirmations
+		transaction.statusEnum = .delivered
 		self.unconfirmedTransactions.removeValue(forKey: id)
 		
 		if let lastHeight = receivedLastHeight, lastHeight < height {

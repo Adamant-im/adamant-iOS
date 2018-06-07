@@ -43,6 +43,7 @@
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
 		E91947B420002809001362F8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B320002809001362F8 /* Account.swift */; };
 		E91A063A209F05AA0018A102 /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91A0639209F05AA0018A102 /* NotificationsViewController.swift */; };
+		E9204B5220C9762400F3B9AB /* MessageStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9204B5120C9762300F3B9AB /* MessageStatus.swift */; };
 		E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */; };
 		E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921597420611A6A0000CA5C /* AdamantReachability.swift */; };
 		E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921597A206503000000CA5C /* ButtonsStripeView.swift */; };
@@ -231,6 +232,7 @@
 		E91947B12000246A001362F8 /* AdamantError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantError.swift; sourceTree = "<group>"; };
 		E91947B320002809001362F8 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		E91A0639209F05AA0018A102 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
+		E9204B5120C9762300F3B9AB /* MessageStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageStatus.swift; sourceTree = "<group>"; };
 		E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachabilityMonitor.swift; sourceTree = "<group>"; };
 		E921597420611A6A0000CA5C /* AdamantReachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantReachability.swift; sourceTree = "<group>"; };
 		E921597A206503000000CA5C /* ButtonsStripeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonsStripeView.swift; sourceTree = "<group>"; };
@@ -469,15 +471,16 @@
 			isa = PBXGroup;
 			children = (
 				E91947B320002809001362F8 /* Account.swift */,
+				E9393FA92055D03300EE6F30 /* AdamantMessage.swift */,
 				E95F85862008FDBF0070534A /* ChatAsset.swift */,
 				E95F8588200900B10070534A /* ChatType.swift */,
+				E9204B5120C9762300F3B9AB /* MessageStatus.swift */,
+				E95F85682006AB9D0070534A /* NormalizedTransaction.swift */,
 				E965A53320B833A00041A3EA /* StateAsset.swift */,
 				E965A53120B82C850041A3EA /* StateType.swift */,
-				E95F85682006AB9D0070534A /* NormalizedTransaction.swift */,
 				E9E7CDC920040CC200DFC4DB /* Transaction.swift */,
-				E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */,
-				E9393FA92055D03300EE6F30 /* AdamantMessage.swift */,
 				E965A53520B8370C0041A3EA /* TransactionAsset.swift */,
+				E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -762,8 +765,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant" */;
 			buildPhases = (
-				E9204B4120C6C10000F3B9AB /* [ADAMANT] Set AppStore passphrase for KeychainStore */,
 				E40A2E5936758D20792675C8 /* [CP] Check Pods Manifest.lock */,
+				E9204B4120C6C10000F3B9AB /* [ADAMANT] Set AppStore passphrase for KeychainStore */,
 				E913C8EA1FFFA51D001A83F7 /* Sources */,
 				E913C8EB1FFFA51D001A83F7 /* Frameworks */,
 				E913C8EC1FFFA51D001A83F7 /* Resources */,
@@ -908,6 +911,7 @@
 				"${SRCROOT}/Pods/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/CryptoSwift/CryptoSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/DateToolsSwift/DateToolsSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/EFQRCode/EFQRCode.framework",
 				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
 				"${BUILT_PRODUCTS_DIR}/FTIndicator/FTIndicator.framework",
@@ -926,6 +930,7 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CryptoSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DateToolsSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/EFQRCode.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Eureka.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FTIndicator.framework",
@@ -1069,6 +1074,7 @@
 				E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */,
 				E9150B802066861D0065A985 /* ChatViewController+MessageKit.swift in Sources */,
 				E95CB464205D8BBA00A7218E /* EurekaAccountRow.swift in Sources */,
+				E9204B5220C9762400F3B9AB /* MessageStatus.swift in Sources */,
 				E948E03B20235E2300975D6B /* SettingsRoutes.swift in Sources */,
 				E9CAE8D82018ACA700345E76 /* AdamantApi+Transfers.swift in Sources */,
 				E9E7CDCC20040FDC00DFC4DB /* TransactionType.swift in Sources */,

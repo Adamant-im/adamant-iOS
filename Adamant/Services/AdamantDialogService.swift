@@ -272,6 +272,63 @@ extension AdamantDialogService {
 	}
 }
 
+// MAKR: - Alerts
+extension AdamantDialogService {
+    func showAlert(title: String, message: String, actions: [PMAlertAction]?) {
+        let alertVC = PMAlertController(title: title, description: message, image: nil, style: .alert)
+        
+        alertVC.gravityDismissAnimation = false
+        alertVC.alertTitle.textColor = UIColor.adamantPrimary
+        alertVC.alertDescription.textColor = .adamantSecondary
+        alertVC.alertTitle.font = UIFont.adamantPrimary(size: 20)
+        alertVC.alertDescription.font = UIFont.adamantPrimaryLight(size: 14)
+        
+        if let actions = actions {
+            for action in actions {
+                action.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+                action.setTitleColor(UIColor.adamantSecondary, for: .normal)
+                alertVC.addAction(action)
+            }
+            
+            let cancelAction = PMAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
+            cancelAction.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+            cancelAction.setTitleColor(UIColor.white, for: .normal)
+            cancelAction.backgroundColor = UIColor.adamantSecondary
+
+            alertVC.addAction(cancelAction)
+            
+            alertVC.alertActionStackViewHeightConstraint.constant = CGFloat((actions.count + 1) * 50) + alertVC.alertActionStackView.spacing * CGFloat(actions.count)
+        } else {
+            let okBtn = PMAlertAction(title: String.adamantLocalized.alert.ok, style: .default)
+            
+            okBtn.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+            okBtn.setTitleColor(UIColor.white, for: .normal)
+            okBtn.backgroundColor = UIColor.adamantSecondary
+            alertVC.addAction(okBtn)
+            
+            alertVC.alertActionStackViewHeightConstraint.constant = 50
+        }
+        
+        self.present(alertVC, animated: true, completion: nil)
+    }
+    
+    func showSystemActionSheet(title: String, message: String, actions: [UIAlertAction]?) {
+        guard let actions = actions, actions.count > 0 else {
+            return
+        }
+        
+        let alertVC = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+        
+        for action in actions {
+            alertVC.addAction(action)
+        }
+        
+        alertVC.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel))
+        
+        self.present(alertVC, animated: true, completion: nil)
+    }
+}
+
 class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
     
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {

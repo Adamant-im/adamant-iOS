@@ -22,8 +22,7 @@ extension ChatViewController: MessagesDataSource {
 	
 	func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
 		guard let message = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) as? MessageType else {
-			// TODO: something
-			fatalError("What?")
+			fatalError("Data not synced")
 		}
 		
 		return message
@@ -41,6 +40,10 @@ extension ChatViewController: MessagesDataSource {
 		if message.sentDate == Date.adamantNullDate {
 			return nil
 		}
+        
+        if let message = message as? MessageTransaction, message.messageStatus == .pending || message.statusEnum == .failed {
+            return nil
+        }
 		
 		return NSAttributedString(string: AdamantUtilities.formatHumanizedTime(message.sentDate), attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
 	}
@@ -56,7 +59,20 @@ extension ChatViewController: MessagesDisplayDelegate {
 	
 	func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
 		if isFromCurrentSender(message: message) {
-			return UIColor.adamantChatSenderBackground
+            guard let transaction = message as? ChatTransaction else {
+                return UIColor.adamantChatSenderBackground
+            }
+            
+            switch transaction.statusEnum {
+            case .failed:
+                return UIColor.adamantFailChatBackground
+				
+			case .pending:
+				return UIColor.adamantPendingChatBackground
+				
+            case .delivered:
+                return UIColor.adamantChatSenderBackground
+            }
 		} else {
 			return UIColor.adamantChatRecipientBackground
 		}
@@ -70,6 +86,26 @@ extension ChatViewController: MessagesDisplayDelegate {
 		return [.url]
 	}
     
+    func configureAccessoryView(_ accessoryView: UIView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
+        guard let message = message as? MessageTransaction else {
+            accessoryView.subviews.first?.removeFromSuperview()
+            return
+        }
+        
+        switch message.messageStatus {
+        case .failed:
+            let icon = UIImageView(frame: CGRect(x: -28, y: -10, width: 20, height: 20))
+            icon.contentMode = .scaleAspectFit
+            icon.backgroundColor = UIColor.clear
+            icon.image = #imageLiteral(resourceName: "cross")
+            accessoryView.addSubview(icon)
+            return
+        default:
+            accessoryView.subviews.first?.removeFromSuperview()
+            return
+        }
+    }
+    
     func messageHeaderView(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageHeaderView {
         let header = messagesCollectionView.dequeueReusableHeaderView(MessageDateHeaderView.self, for: indexPath)
         
@@ -82,8 +118,14 @@ extension ChatViewController: MessagesDisplayDelegate {
             return false
         }
         
-        guard let dataSource = messagesCollectionView.messagesDataSource else { return false }
-        if indexPath.section == 0 { return true }
+        guard let dataSource = messagesCollectionView.messagesDataSource else {
+			return false
+		}
+		
+        if indexPath.section == 0 {
+			return true
+		}
+		
         let previousSection = indexPath.section - 1
         let previousIndexPath = IndexPath(item: 0, section: previousSection)
         let previousMessage = dataSource.messageForItem(at: previousIndexPath, in: messagesCollectionView)
@@ -99,21 +141,74 @@ extension ChatViewController: MessageCellDelegate {
 			return
 		}
 		
-		guard let transfer = message as? TransferTransaction else {
-			return
-		}
-		
-		guard let vc = router.get(scene: AdamantScene.Transactions.transactionDetails) as? TransactionDetailsViewController else {
-			print("Can't get TransactionDetailsViewController")
-			return
-		}
-		
-		vc.transaction = transfer
-		
-		if let nav = navigationController {
-			nav.pushViewController(vc, animated: true)
-		} else {
-			present(vc, animated: true, completion: nil)
+		switch message {
+		case let transfer as TransferTransaction:
+			// MARK: Show transfer details
+			guard let vc = router.get(scene: AdamantScene.Transactions.transactionDetails) as? TransactionDetailsViewController else {
+				fatalError("Can't get TransactionDetails scene")
+			}
+			
+			vc.transaction = transfer
+			
+			if let nav = navigationController {
+				nav.pushViewController(vc, animated: true)
+			} else {
+				present(vc, animated: true, completion: nil)
+			}
+			
+		case let message as MessageTransaction:
+			// MARK: Show Retry/Cancel action sheet
+			guard message.messageStatus == .failed else {
+				break
+			}
+			
+			let retry = UIAlertAction(title: String.adamantLocalized.alert.retry, style: .default, handler: { [weak self] action in
+				self?.chatsProvider.retrySendMessage(message) { result in
+					switch result {
+					case .success: break
+						
+					case .failure(let error):
+						// TODO: Log this
+						if let err = ChatViewController.humanize(chatsProviderError: error) {
+							switch err.level {
+							case .warning:
+								self?.dialogService.showWarning(withMessage: err.message)
+								
+							case .error:
+								self?.dialogService.showError(withMessage: err.message, error: error)
+							}
+						}
+						
+					case .invalidTransactionStatus(_):
+						break
+					}
+				}
+			})
+			
+			let cancelMessage = UIAlertAction(title: String.adamantLocalized.alert.delete, style: .default, handler: { [weak self] action in
+				self?.chatsProvider.cancelMessage(message) { result in
+					switch result {
+					case .success:
+						DispatchQueue.main.async {
+							self?.messagesCollectionView.reloadDataAndKeepOffset()
+						}
+						
+					case .invalidTransactionStatus(_):
+						self?.dialogService.showWarning(withMessage: String.adamantLocalized.chat.cancelError)
+						
+					case .failure(let error):
+						let message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error.localizedDescription)
+						self?.dialogService.showError(withMessage: message, error: error)
+					}
+					
+					
+				}
+			})
+			
+			dialogService.showSystemActionSheet(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, actions: [retry, cancelMessage])
+			
+		default:
+			break
 		}
 	}
 	
@@ -166,45 +261,21 @@ extension ChatViewController: MessageInputBarDelegate {
 			return
 		}
 		
-		self.chatsProvider.sendMessage(.text(text), recipientId: partner, completion: { result in
+		chatsProvider.sendMessage(.text(text), recipientId: partner, completion: { [weak self] result in
 			switch result {
 			case .success: break
 				
 			case .failure(let error):
-				let message: String
-				switch error {
-				case .accountNotFound(let account):
-					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "Account not found: \(account)")
-				case .dependencyError(let error):
-					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error)
-				case .internalError(let error):
-					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error.localizedDescription)
-				case .notLogged:
-					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "User not logged")
-				case .serverError(let error):
-					message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, error.localizedDescription)
-					
-				case .networkError:
-					message = String.adamantLocalized.chat.noNetwork
-					
-				case .notEnoughtMoneyToSend:
-					message = String.adamantLocalized.chat.notEnoughMoney
-					
-				case .messageNotValid(let problem):
-					switch problem {
-					case .tooLong:
-						message = String.adamantLocalized.chat.messageTooLong
+				// TODO: Log this
+				if let err = ChatViewController.humanize(chatsProviderError: error) {
+					switch err.level {
+					case .warning:
+						self?.dialogService.showWarning(withMessage: err.message)
 						
-					case .empty:
-						message = String.adamantLocalized.chat.messageIsEmpty
-						
-					case .isValid:
-						message = ""
+					case .error:
+						self?.dialogService.showError(withMessage: err.message, error: error)
 					}
 				}
-				
-				// TODO: Log this
-				self.dialogService.showError(withMessage: message, error: error)
 			}
 		})
 		
@@ -217,6 +288,70 @@ extension ChatViewController: MessageInputBarDelegate {
 			setEstimatedFee(fee)
 		} else {
 			setEstimatedFee(0)
+		}
+	}
+}
+
+
+// MARK: - Tools
+extension ChatViewController {
+	enum ErrorLevel {
+		case warning
+		case error
+	}
+	
+	private static func humanize(chatsProviderError error: ChatsProviderError) -> (message: String, level: ErrorLevel)? {
+		let message: String?
+		let level: ErrorLevel
+		
+		switch error {
+		case .accountNotFound(let account):
+			message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "Account not found: \(account)")
+			level = .error
+			
+		case .dependencyError(let error):
+			message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error)
+			level = .error
+			
+		case .notLogged:
+			message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "User not logged")
+			level = .error
+			
+		case .networkError:
+			message = String.adamantLocalized.chat.noNetwork
+			level = .warning
+			
+		case .notEnoughtMoneyToSend:
+			message = String.adamantLocalized.chat.notEnoughMoney
+			level = .warning
+			
+		case .serverError(let error), .internalError(let error):
+			message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, error.localizedDescription)
+			level = .error
+			
+		case .transactionNotFound(_):
+			message = nil
+			level = .error
+			
+		case .messageNotValid(let problem):
+			switch problem {
+			case .tooLong:
+				message = String.adamantLocalized.chat.messageTooLong
+				
+			case .empty:
+				message = String.adamantLocalized.chat.messageIsEmpty
+				
+			case .isValid:
+				message = nil
+			}
+			
+			level = .warning
+		}
+		
+		if let message = message {
+			return (message, level)
+		} else {
+			return nil
 		}
 	}
 }
@@ -250,6 +385,10 @@ extension MessageTransaction: MessageType {
 			return MessageData.text(message)
 		}
 	}
+    
+    public var messageStatus: MessageStatus {
+        return self.statusEnum
+    }
 }
 
 // MARK: TransferTransaction
