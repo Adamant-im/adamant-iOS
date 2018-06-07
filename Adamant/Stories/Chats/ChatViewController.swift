@@ -24,6 +24,8 @@ extension String.adamantLocalized {
 		static let internalErrorFormat = NSLocalizedString("ChatScene.Error.InternalErrorFormat", comment: "Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description")
 		static let serverErrorFormat = NSLocalizedString("ChatScene.Error.RemoteServerErrorFormat", comment: "Chat: Notify user about server error. Using %@ for error description")
 		
+		static let cancelError = NSLocalizedString("ChatScene.Error.cancelError", comment: "Chat: inform user that he can't cancel transaction, that was sent")
+		
 		private init() { }
 	}
 }
@@ -295,7 +297,7 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 				}
 				
 			case .update:
-				// TODO: update
+				messagesCollectionView.reloadItems(at: change.compactMap {$0.indexPath})
 				return
 			}
 		}

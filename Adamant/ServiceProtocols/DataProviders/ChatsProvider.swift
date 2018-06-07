@@ -17,6 +17,12 @@ enum ChatsProviderResult {
 	case failure(ChatsProviderError)
 }
 
+enum ChatsProviderRetryCancelResult {
+	case success
+	case invalidTransactionStatus(MessageStatus)
+	case failure(ChatsProviderError)
+}
+
 enum ChatsProviderError: Error {
 	case notLogged
 	case messageNotValid(ValidateMessageResult)
@@ -91,10 +97,10 @@ protocol ChatsProvider: DataProvider {
 	
 	// MARK: - Sending messages
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
-    func reSendMessage(_ transaction: MessageTransaction, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void)
+	func retrySendMessage(_ message: MessageTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void)
     
     // MARK: - Delete local message
-    func deleteLocalMessage(_ message: MessageTransaction, completion: @escaping (ChatsProviderResult) -> Void )
+    func cancelMessage(_ message: MessageTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void )
 	
 	// MARK: - Tools
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult

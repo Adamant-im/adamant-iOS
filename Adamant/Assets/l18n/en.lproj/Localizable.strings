@@ -113,6 +113,9 @@
 /* Alert 'Retry Or Delete' body message. Used in caht for sending failed messages again or delete them */
 "Chats.RetryOrDelete.Body" = "Do you whant to send message again or delete it?";
 
+/* Chat: inform user that he can't cancel transaction, that was sent */
+"ChatScene.Error.cancelError" = "Message already sended";
+
 /* Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description */
 "ChatScene.Error.InternalErrorFormat" = "Internal error: %@. Report a bug";
 
