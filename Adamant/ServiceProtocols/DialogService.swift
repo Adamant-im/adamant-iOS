@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import PMAlertController
 
 enum ShareType {
 	case copyToPasteboard
@@ -100,4 +101,8 @@ protocol DialogService: class {
 	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, completion: (() -> Void)?)
 	
 	func presentGoToSettingsAlert(title: String?, message: String?)
+    
+    // MARK: - Alerts
+    func showAlert(title:String, message: String, actions: [PMAlertAction]?)
+    
 }

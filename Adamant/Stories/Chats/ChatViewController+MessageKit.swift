@@ -10,6 +10,7 @@ import Foundation
 import MessageKit
 import SafariServices
 import Haring
+import PMAlertController
 
 // MARK: - MessagesDataSource
 extension ChatViewController: MessagesDataSource {
@@ -65,15 +66,11 @@ extension ChatViewController: MessagesDisplayDelegate {
             }
             
             switch message.messageStatus {
-            case .pending:
-                return UIColor.adamantPendingChatBackground
             case .fail:
                 return UIColor.adamantFailChatBackground
-            case .sent:
+            default:
                 return UIColor.adamantChatSenderBackground
             }
-            
-			
 		} else {
 			return UIColor.adamantChatRecipientBackground
 		}
@@ -86,6 +83,26 @@ extension ChatViewController: MessagesDisplayDelegate {
 	func enabledDetectors(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> [DetectorType] {
 		return [.url]
 	}
+    
+    func configureAccessoryView(_ accessoryView: UIView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
+        guard let message = message as? MessageTransaction else {
+            accessoryView.subviews.first?.removeFromSuperview()
+            return
+        }
+        
+        switch message.messageStatus {
+        case .fail:
+            let icon = UIImageView(frame: CGRect(x: -28, y: -10, width: 20, height: 20))
+            icon.contentMode = .scaleAspectFit
+            icon.backgroundColor = UIColor.clear
+            icon.image = #imageLiteral(resourceName: "cross")
+            accessoryView.addSubview(icon)
+            return
+        default:
+            accessoryView.subviews.first?.removeFromSuperview()
+            return
+        }
+    }
 }
 
 extension ChatViewController: MessageCellDelegate {
@@ -94,6 +111,79 @@ extension ChatViewController: MessageCellDelegate {
 			let message = messagesCollectionView.messagesDataSource?.messageForItem(at: indexPath, in: messagesCollectionView) else {
 			return
 		}
+        
+        if let message = message as? MessageTransaction, message.messageStatus == .fail {
+            dialogService.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, actions: [
+                PMAlertAction(title: String.adamantLocalized.alert.retry, style: .default, action: {
+                    guard let partner = self.chatroom?.partner?.address else {
+                        // TODO show warning
+                        return
+                    }
+                    
+                    self.chatsProvider.reSendMessage(message, recipientId: partner, completion: { result in
+                        switch result {
+                        case .success: break
+                            
+                        case .failure(let error):
+                            let message: String
+                            switch error {
+                            case .accountNotFound(let account):
+                                message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "Account not found: \(account)")
+                            case .dependencyError(let error):
+                                message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error)
+                            case .internalError(let error):
+                                message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error.localizedDescription)
+                            case .notLogged:
+                                message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "User not logged")
+                            case .serverError(let error):
+                                message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, error.localizedDescription)
+                                
+                            case .networkError:
+                                message = String.adamantLocalized.chat.noNetwork
+                                
+                            case .notEnoughtMoneyToSend:
+                                message = String.adamantLocalized.chat.notEnoughMoney
+                                
+                            case .messageNotValid(let problem):
+                                switch problem {
+                                case .tooLong:
+                                    message = String.adamantLocalized.chat.messageTooLong
+                                    
+                                case .empty:
+                                    message = String.adamantLocalized.chat.messageIsEmpty
+                                    
+                                case .isValid:
+                                    message = ""
+                                }
+                            }
+                            
+                            // TODO: Log this
+                            self.dialogService.showError(withMessage: message, error: error)
+                        }
+                        DispatchQueue.main.async {
+                            print("reload data")
+                            self.messagesCollectionView.reloadDataAndKeepOffset()
+                        }
+                    })
+                }),
+                PMAlertAction(title: String.adamantLocalized.alert.delete, style: .default, action: {
+                    self.chatsProvider.deleteLocalMessage(message, completion: { result in
+                        switch result {
+                        case .success: break
+                            
+                        case .failure(let error):
+                            let message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error.localizedDescription)
+                            
+                            self.dialogService.showError(withMessage: message, error: error)
+                        }
+                        DispatchQueue.main.async {
+                            print("reload data")
+                            self.messagesCollectionView.reloadDataAndKeepOffset()
+                        }
+                    })
+                })])
+            return
+        }
 		
 		guard let transfer = message as? TransferTransaction else {
 			return

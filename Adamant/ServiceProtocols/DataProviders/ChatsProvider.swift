@@ -90,6 +90,10 @@ protocol ChatsProvider: DataProvider {
 	
 	// MARK: - Sending messages
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
+    func reSendMessage(_ transaction: MessageTransaction, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void)
+    
+    // MARK: - Delete local message
+    func deleteLocalMessage(_ message: MessageTransaction, completion: @escaping (ChatsProviderResult) -> Void )
 	
 	// MARK: - Tools
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
@@ -97,4 +101,6 @@ protocol ChatsProvider: DataProvider {
 	// MARK: - Fake messages
 	func fakeSent(message: AdamantMessage, recipientId: String, date: Date, completion: @escaping (ChatsProviderResult) -> Void)
 	func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, completion: @escaping (ChatsProviderResult) -> Void)
+    func fakeSendFailMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
+    func fakeReSendMessage(_ message: MessageTransaction, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
 }

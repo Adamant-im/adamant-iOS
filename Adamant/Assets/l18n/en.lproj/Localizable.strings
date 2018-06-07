@@ -107,6 +107,12 @@
 /* Known contacts: Adamant welcome message. Markdown supported. */
 "Chats.WelcomeMessage" = "Welcome to ADAMANT, the most secure and anonymous messenger. Remember, your security and anonymity is up to you also. Do not follow links you receive, otherwise your IP can be compromised. Do not trust browser extensions. Better to share your ADM address personally, but not using other messengers. Keep your secret passphrase secure. Set a password on your device or logout before leaving.\nLearn more about security and anonymity at https://adamant.im/staysecured.\nAll the transactions within the blockchain do need to have their minimal fees. This is necessary to support the network infrastructure. To start messengning now, **get free tokens** — go to Wallet tab and click Free ADM tokens. Then click Start new chat on Chats tab and put your interlocutor's address. To copy your address, click on ADAMANT address on Wallet tab.\nDo not reply to this message, it is a system account. If you still have any questions, contact account U15677078342684640219";
 
+/* Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them */
+"Chats.RetryOrDelete.Title" = "Retry or delete?";
+
+/* Alert 'Retry Or Delete' body message. Used in caht for sending failed messages again or delete them */
+"Chats.RetryOrDelete.Body" = "Do you whant to send message again or delete it?";
+
 /* Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description */
 "ChatScene.Error.InternalErrorFormat" = "Internal error: %@. Report a bug";
 
@@ -367,6 +373,12 @@
 
 /* Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu. */
 "Shared.Share" = "Share";
+
+/* Shared alert 'Retry' button. Used anywhere. */
+"Shared.Retry" = "Retry";
+
+/* Shared alert 'Delete' button. Used anywhere. */
+"Shared.Delete" = "Delete";
 
 /* ShareQR scene: User had not authorized access to write images to photolibrary */
 "ShareQR.photolibraryNotAuthorized" = "You need to authorize Adamant to use your Photolibrary";

@@ -321,41 +321,7 @@ extension AdamantChatsProvider {
 			completion(.failure(.internalError(error)))
 			return
 		}
-        
-//        transaction.statusEnum = MessageStatus.fail
-        print("TEST: NOT sending MSG ")
-        
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1, execute: {
-            print("Fake recive")
-            transaction.statusEnum = MessageStatus.fail
-            try? privateContext.save()
-//            if let lastTransaction = chatroom.lastTransaction {
-//                if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
-//                    dateA.compare(dateB) == ComparisonResult.orderedAscending {
-//                    chatroom.lastTransaction = transaction
-//                    chatroom.updatedAt = transaction.date
-//                }
-//            } else {
-//                chatroom.lastTransaction = transaction
-//                chatroom.updatedAt = transaction.date
-//            }
             
-//            self.unconfirmedsSemaphore.wait()
-//            DispatchQueue.main.sync {
-//                self.unconfirmedTransactions[id] = self.stack.container.viewContext.object(with: transaction.objectID) as? MessageTransaction
-//            }
-//            self.unconfirmedsSemaphore.signal()
-            
-//            do {
-//                try privateContext.save()
-//                completion(.success)
-//            } catch {
-                completion(.failure(.internalError(AdamantError(message: "fake"))))
-//            }
-        })
-        
-		return
-            /*
 		// MARK: 6. Send
 		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { result in
 			switch result {
@@ -393,7 +359,7 @@ extension AdamantChatsProvider {
 				
 			case .failure(let error):
                 transaction.statusEnum = MessageStatus.fail
-//                privateContext.delete(transaction)
+                
 				try? privateContext.save()
 				
 				let serviceError: ChatsProviderError
@@ -416,8 +382,180 @@ extension AdamantChatsProvider {
 				
 				completion(.failure(serviceError))
 			}
-		}*/
+		}
 	}
+    
+    func reSendMessage(_ transaction: MessageTransaction, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+        guard let text = transaction.message else {
+            return
+        }
+        
+        let message = AdamantMessage.text(text)
+        
+        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+            completion(.failure(.notLogged))
+            return
+        }
+        
+        guard loggedAccount.balance >= message.fee else {
+            completion(.failure(.notEnoughtMoneyToSend))
+            return
+        }
+        
+        let senderId = loggedAccount.address
+        
+        sendingQueue.async {
+            switch message {
+            case .text(let text), .markdownText(let text):
+                // MARK: 0. Prepare
+                let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+                privateContext.parent = self.stack.container.viewContext
+                
+                
+                // MARK: 1. Get recipient account
+                let accountsGroup = DispatchGroup()
+                accountsGroup.enter()
+                var acc: CoreDataAccount? = nil
+                self.accountsProvider.getAccount(byAddress: recipientId) { result in
+                    defer {
+                        accountsGroup.leave()
+                    }
+                    
+                    switch result {
+                    case .notFound, .invalidAddress:
+                        completion(.failure(.accountNotFound(recipientId)))
+                        
+                    case .serverError(let error):
+                        completion(.failure(.serverError(error)))
+                        
+                    case .success(let account):
+                        acc = account
+                    }
+                }
+                
+                accountsGroup.wait()
+                
+                guard let account = acc, let recipientPublicKey = account.publicKey else {
+                    return
+                }
+                
+                // MARK: 2. Encode message
+                guard let encodedMessage = self.adamantCore.encodeMessage(text, recipientPublicKey: recipientPublicKey, privateKey: keypair.privateKey) else {
+                    completion(.failure(.dependencyError("Failed to encode message")))
+                    return
+                }
+                
+                // MARK 3. Get Chatroom
+                let chatroom = privateContext.object(with: account.chatroom!.objectID) as! Chatroom
+                
+                // MARK 4. Update transaction
+                let request = NSFetchRequest<MessageTransaction>(entityName: MessageTransaction.entityName)
+                request.predicate = NSPredicate(format: "transactionId == %@", transaction.messageId)
+                request.fetchLimit = 1
+                guard  let transaction = (try? privateContext.fetch(request))?.first else {
+                    completion(.failure(.dependencyError("Failed to found transaction")))
+                    return
+                }
+                
+                transaction.date = Date() as NSDate
+                transaction.statusEnum = MessageStatus.pending
+                
+                // MARK: 5. Save unconfirmed transaction
+                do {
+                    try privateContext.save()
+                } catch {
+                    completion(.failure(.internalError(error)))
+                    return
+                }
+                
+                // MARK: 6. Send
+                self.apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { result in
+                    switch result {
+                    case .success(let id):
+                        // Update ID with recieved, add to unconfirmed transactions.
+                        transaction.transactionId = String(id)
+                        
+                        transaction.statusEnum = MessageStatus.sent
+                        
+                        if let lastTransaction = chatroom.lastTransaction {
+                            if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
+                                dateA.compare(dateB) == ComparisonResult.orderedAscending {
+                                chatroom.lastTransaction = transaction
+                                chatroom.updatedAt = transaction.date
+                            }
+                        } else {
+                            chatroom.lastTransaction = transaction
+                            chatroom.updatedAt = transaction.date
+                        }
+                        
+                        // If we will save transaction from privateContext, we will hold strong reference to whole context, and we won't ever save it.
+                        self.unconfirmedsSemaphore.wait()
+                        DispatchQueue.main.sync {
+                            self.unconfirmedTransactions[id] = self.stack.container.viewContext.object(with: transaction.objectID) as? MessageTransaction
+                        }
+                        self.unconfirmedsSemaphore.signal()
+                        
+                        do {
+                            try privateContext.save()
+                            completion(.success)
+                        } catch {
+                            completion(.failure(.internalError(error)))
+                        }
+                        
+                        
+                    case .failure(let error):
+                        transaction.statusEnum = MessageStatus.fail
+                        
+                        try? privateContext.save()
+                        
+                        let serviceError: ChatsProviderError
+                        switch error {
+                        case .networkError(_):
+                            serviceError = .networkError
+                            
+                        case .accountNotFound:
+                            serviceError = .accountNotFound(recipientId)
+                            
+                        case .notLogged:
+                            serviceError = .notLogged
+                            
+                        case .serverError(let e):
+                            serviceError = .serverError(AdamantError(message: e))
+                            
+                        case .internalError(let message, let e):
+                            serviceError = ChatsProviderError.internalError(AdamantError(message: message, error: e))
+                        }
+                        
+                        completion(.failure(serviceError))
+                    }
+                }
+            }
+        }
+    }
+    
+    // MARK: - Delete local message
+    func deleteLocalMessage(_ transaction: MessageTransaction, completion: @escaping (ChatsProviderResult) -> Void ) {
+        // MARK: 0. Prepare
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = stack.container.viewContext
+        
+        // MARK 4. Update transaction
+        let request = NSFetchRequest<MessageTransaction>(entityName: MessageTransaction.entityName)
+        request.predicate = NSPredicate(format: "transactionId == %@", transaction.messageId)
+        request.fetchLimit = 1
+        if let transaction = (try? privateContext.fetch(request))?.first {
+            privateContext.delete(transaction)
+            
+            do {
+                try privateContext.save()
+            } catch {
+                completion(.failure(.internalError(error)))
+                return
+            }
+            
+            completion(.success)
+        }
+    }
 }
 
 

@@ -46,7 +46,88 @@ extension AdamantChatsProvider {
 			}
 		}
 	}
-	
+    
+    func fakeSendFailMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+            completion(.failure(.notLogged))
+            return
+        }
+        
+        guard loggedAccount.balance >= message.fee else {
+            completion(.failure(.notEnoughtMoneyToSend))
+            return
+        }
+        
+        switch validateMessage(message) {
+        case .isValid:
+            break
+            
+        case .empty:
+            completion(.failure(.messageNotValid(.empty)))
+            return
+            
+        case .tooLong:
+            completion(.failure(.messageNotValid(.tooLong)))
+            return
+        }
+        
+        let sendingQueue = DispatchQueue(label: "im.adamant.sending.chat.fake", qos: .utility, attributes: [.concurrent])
+
+        sendingQueue.async {
+            switch message {
+            case .text(let text), .markdownText(let text):
+                self.fakeSendFailMessage(text: text, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, completion: completion)
+            }
+        }
+    }
+    
+    func fakeReSendMessage(_ transaction: MessageTransaction, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+        print("Fake resending")
+        
+        guard let text = transaction.message else {
+            return
+        }
+        
+        let message = AdamantMessage.text(text)
+        
+        guard let loggedAccount = accountService.account else {
+            completion(.failure(.notLogged))
+            return
+        }
+        
+        guard loggedAccount.balance >= message.fee else {
+            completion(.failure(.notEnoughtMoneyToSend))
+            return
+        }
+        
+        // MARK: 0. Prepare
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = stack.container.viewContext
+        
+        // MARK 4. Update transaction
+        let request = NSFetchRequest<MessageTransaction>(entityName: MessageTransaction.entityName)
+        request.predicate = NSPredicate(format: "transactionId == %@", transaction.messageId)
+        request.fetchLimit = 1
+        if let transaction = (try? privateContext.fetch(request))?.first {
+            transaction.date = Date() as NSDate
+            transaction.statusEnum = MessageStatus.pending
+            
+            // MARK: 5. Save unconfirmed transaction
+            do {
+                try privateContext.save()
+            } catch {
+                completion(.failure(.internalError(error)))
+                return
+            }
+            
+            DispatchQueue.global().asyncAfter(deadline: .now() + 1, execute: {
+                print("Fake success recive")
+                transaction.statusEnum = MessageStatus.sent
+                try? privateContext.save()
+                completion(.success)
+            })
+        }
+    }
 	
 	// MARK: - Logic
 	
@@ -124,7 +205,74 @@ extension AdamantChatsProvider {
 			completion(.failure(.internalError(error)))
 		}
 	}
-	
+    
+    private func fakeSendFailMessage(text: String, senderId: String, recipientId: String, keypair: Keypair, completion: @escaping (ChatsProviderResult) -> Void) {
+        // MARK: 0. Prepare
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = stack.container.viewContext
+        
+        
+        // MARK: 1. Get recipient account
+        let accountsGroup = DispatchGroup()
+        accountsGroup.enter()
+        var acc: CoreDataAccount? = nil
+        accountsProvider.getAccount(byAddress: recipientId) { result in
+            defer {
+                accountsGroup.leave()
+            }
+            
+            switch result {
+            case .notFound, .invalidAddress:
+                completion(.failure(.accountNotFound(recipientId)))
+                
+            case .serverError(let error):
+                completion(.failure(.serverError(error)))
+                
+            case .success(let account):
+                acc = account
+            }
+        }
+        
+        accountsGroup.wait()
+        
+        guard let account = acc else {
+            return
+        }
+        
+        // MARK 3. Get Chatroom
+        let chatroom = privateContext.object(with: account.chatroom!.objectID) as! Chatroom
+        
+        // MARK: 4. Create chat transaction
+        let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: privateContext)
+        transaction.date = Date() as NSDate
+        transaction.recipientId = recipientId
+        transaction.senderId = senderId
+        transaction.type = ChatType.message.rawValue
+        transaction.isOutgoing = true
+        transaction.message = text
+        
+        transaction.transactionId = UUID().uuidString
+        transaction.blockId = UUID().uuidString
+        
+        transaction.statusEnum = MessageStatus.pending
+        
+        chatroom.addToTransactions(transaction)
+        
+        // MARK: 5. Save unconfirmed transaction
+        do {
+            try privateContext.save()
+        } catch {
+            completion(.failure(.internalError(error)))
+            return
+        }
+        
+        DispatchQueue.global().asyncAfter(deadline: .now() + 1, execute: {
+            print("Fake fail recive")
+            transaction.statusEnum = MessageStatus.fail
+            try? privateContext.save()
+            completion(.failure(.internalError(AdamantError(message: "fake"))))
+        })
+    }
 	
 	// MARK: - Validate & prepare
 	
