@@ -104,5 +104,6 @@ protocol DialogService: class {
     
     // MARK: - Alerts
     func showAlert(title:String, message: String, actions: [PMAlertAction]?)
+    func showSystemActionSheet(title: String, message: String, actions: [UIAlertAction]?)
     
 }

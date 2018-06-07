@@ -28,8 +28,8 @@ extension String {
 			// MARK: Titles and messages
 			static let error = NSLocalizedString("Shared.Error", comment: "Shared alert 'Error' title. Used anywhere")
 			static let done = NSLocalizedString("Shared.Done", comment: "Shared alert Done message. Used anywhere")
-            static let retryOrDeleteTitle = NSLocalizedString("Chat.RetryOrDelete.Title", comment: "Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them")
-            static let retryOrDeleteBody = NSLocalizedString("Chat.RetryOrDelete.Body", comment: "Alert 'Retry Or Delete' body message. Used in caht for sending failed messages again or delete them")
+            static let retryOrDeleteTitle = NSLocalizedString("Chats.RetryOrDelete.Title", comment: "Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them")
+            static let retryOrDeleteBody = NSLocalizedString("Chats.RetryOrDelete.Body", comment: "Alert 'Retry Or Delete' body message. Used in caht for sending failed messages again or delete them")
 			
 			// MARK: Notifications
 			static let copiedToPasteboardNotification = NSLocalizedString("Shared.CopiedToPasteboard", comment: "Shared alert notification: message about item copied to pasteboard.")

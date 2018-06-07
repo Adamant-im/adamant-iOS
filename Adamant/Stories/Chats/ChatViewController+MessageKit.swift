@@ -10,7 +10,6 @@ import Foundation
 import MessageKit
 import SafariServices
 import Haring
-import PMAlertController
 
 // MARK: - MessagesDataSource
 extension ChatViewController: MessagesDataSource {
@@ -113,8 +112,8 @@ extension ChatViewController: MessageCellDelegate {
 		}
         
         if let message = message as? MessageTransaction, message.messageStatus == .fail {
-            dialogService.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, actions: [
-                PMAlertAction(title: String.adamantLocalized.alert.retry, style: .default, action: {
+            dialogService.showSystemActionSheet(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, actions: [
+                UIAlertAction(title: String.adamantLocalized.alert.retry, style: .default, handler: { action in
                     guard let partner = self.chatroom?.partner?.address else {
                         // TODO show warning
                         return
@@ -166,7 +165,7 @@ extension ChatViewController: MessageCellDelegate {
                         }
                     })
                 }),
-                PMAlertAction(title: String.adamantLocalized.alert.delete, style: .default, action: {
+                UIAlertAction(title: String.adamantLocalized.alert.delete, style: .default, handler: { action in
                     self.chatsProvider.deleteLocalMessage(message, completion: { result in
                         switch result {
                         case .success: break

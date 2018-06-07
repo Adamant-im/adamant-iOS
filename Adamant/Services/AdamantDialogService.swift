@@ -311,6 +311,22 @@ extension AdamantDialogService {
         
         self.present(alertVC, animated: true, completion: nil)
     }
+    
+    func showSystemActionSheet(title: String, message: String, actions: [UIAlertAction]?) {
+        guard let actions = actions, actions.count > 0 else {
+            return
+        }
+        
+        let alertVC = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+        
+        for action in actions {
+            alertVC.addAction(action)
+        }
+        
+        alertVC.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel))
+        
+        self.present(alertVC, animated: true, completion: nil)
+    }
 }
 
 class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
