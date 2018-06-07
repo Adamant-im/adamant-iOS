@@ -239,7 +239,7 @@ extension TransactionDetailsViewController {
 			
 		case .date:
 			if let date = transaction.date as Date? {
-				cell.detailTextLabel?.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .medium)
+				cell.detailTextLabel?.text = AdamantUtilities.formatHumanizedFullDate(date)
 			}
 			
 		case .confirmations:
