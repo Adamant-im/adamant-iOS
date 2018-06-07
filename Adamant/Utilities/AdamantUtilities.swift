@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import DateToolsSwift
 
 class AdamantUtilities {
 	// MARK: Application version
@@ -133,67 +132,6 @@ extension AdamantUtilities {
 		let components = DateComponents(calendar: Calendar(identifier: .gregorian), timeZone: TimeZone(abbreviation: "UTC"), year: 2017, month: 9, day: 2, hour: 17)
 		return components.date!.timeIntervalSince1970
 	}()
-    
-    static func formatHumanizedFullDate(_ date:Date) -> String {
-        var dateString = ""
-        
-        if date.secondsAgo > 1 {
-            if date.minutesAgo < 2 {
-                dateString = date.timeAgoSinceNow
-            } else {
-                let daysAgo = date.daysAgo
-                
-                if daysAgo < 7 {
-                    if date.isToday {
-                        dateString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "") + " "
-                    } else if daysAgo < 2 {
-                        dateString = date.timeAgoSinceNow + " "
-                    } else {
-                        dateString = date.format(with: "EEEE") + " "
-                    }
-                } else {
-                    dateString = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .none) + ", "
-                }
-                
-                dateString += DateFormatter.localizedString(from: date, dateStyle: .none, timeStyle: .short)
-            }
-        }
-        
-        return dateString
-    }
-    
-    static func formatHumanizedDate(_ date:Date) -> String {
-        var dateString = ""
-        
-        let daysAgo = date.daysAgo
-        
-        if daysAgo < 7 {
-            if date.isToday {
-                dateString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
-            } else if daysAgo < 2 {
-                dateString = date.timeAgoSinceNow
-            } else {
-                dateString = date.format(with: "EEEE")
-            }
-        } else {
-            dateString = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .none)
-        }
-        
-        return dateString
-    }
-    
-    static func formatHumanizedTime(_ date:Date) -> String {
-        var dateString = ""
-        
-        if date.minutesAgo < 2 {
-            dateString = date.timeAgoSinceNow
-        } else {
-            let localizedDateString = DateFormatter.localizedString(from: date, dateStyle: .none, timeStyle: .short)
-            dateString = localizedDateString
-        }
-        
-        return dateString
-    }
 }
 
 

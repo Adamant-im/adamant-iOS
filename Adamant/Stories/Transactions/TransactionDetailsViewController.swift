@@ -183,6 +183,7 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		// Open in Explorer row
 		if indexPath.row == Row.openInExplorer.rawValue,
 			let url = explorerUrl {
 			let safari = SFSafariViewController(url: url)
@@ -191,13 +192,21 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 			return
 		}
 		
-		guard let cell = tableView.cellForRow(at: indexPath),
-			let details = cell.detailTextLabel?.text else {
-			tableView.deselectRow(at: indexPath, animated: true)
-			return
+		let share: String
+		if indexPath.row == Row.date.rawValue, let date = transaction?.date as Date? {
+			share = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .medium)
+		} else {
+			guard let cell = tableView.cellForRow(at: indexPath),
+				let details = cell.detailTextLabel?.text else {
+					tableView.deselectRow(at: indexPath, animated: true)
+					return
+			}
+			
+			share = details
 		}
 		
-		dialogService.presentShareAlertFor(string: details,
+		
+		dialogService.presentShareAlertFor(string: share,
 										   types: [.copyToPasteboard, .share],
 										   excludedActivityTypes: nil,
 										   animated: true) {
@@ -239,7 +248,7 @@ extension TransactionDetailsViewController {
 			
 		case .date:
 			if let date = transaction.date as Date? {
-				cell.detailTextLabel?.text = AdamantUtilities.formatHumanizedFullDate(date)
+				cell.detailTextLabel?.text = date.humanizedDateTime()
 			}
 			
 		case .confirmations:

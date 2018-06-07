@@ -45,7 +45,7 @@ extension ChatViewController: MessagesDataSource {
             return nil
         }
 		
-		return NSAttributedString(string: AdamantUtilities.formatHumanizedTime(message.sentDate), attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
+		return NSAttributedString(string: message.sentDate.humanizedTime(), attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
 	}
 }
 
@@ -109,7 +109,7 @@ extension ChatViewController: MessagesDisplayDelegate {
     func messageHeaderView(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageHeaderView {
         let header = messagesCollectionView.dequeueReusableHeaderView(MessageDateHeaderView.self, for: indexPath)
         
-        header.dateLabel.text = AdamantUtilities.formatHumanizedDate(message.sentDate)
+        header.dateLabel.text = message.sentDate.humanizedDay()
         return header
     }
     
