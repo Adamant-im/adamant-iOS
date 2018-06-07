@@ -41,7 +41,7 @@
         <attribute name="isConfirmed" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isMarkdown" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="message" attributeType="String" syncable="YES"/>
-        <attribute name="status" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="status" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
     </entity>
     <entity name="TransferTransaction" representedClassName="TransferTransaction" parentEntity="ChatTransaction" syncable="YES">
         <relationship name="partner" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CoreDataAccount" inverseName="transfers" inverseEntity="CoreDataAccount" syncable="YES"/>

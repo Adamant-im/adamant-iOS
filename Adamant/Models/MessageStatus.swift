@@ -10,6 +10,6 @@ import Foundation
 
 public enum MessageStatus: Int16, Codable {
     case pending = 0
-    case sent = 1
-    case fail = 2
+    case delivered = 1
+    case failed = 2
 }

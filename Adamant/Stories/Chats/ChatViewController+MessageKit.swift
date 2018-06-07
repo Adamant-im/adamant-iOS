@@ -42,7 +42,7 @@ extension ChatViewController: MessagesDataSource {
 			return nil
 		}
         
-        if let message = message as? MessageTransaction, message.messageStatus == .pending || message.statusEnum == .fail {
+        if let message = message as? MessageTransaction, message.messageStatus == .pending || message.statusEnum == .failed {
             return nil
         }
 		
@@ -65,7 +65,7 @@ extension ChatViewController: MessagesDisplayDelegate {
             }
             
             switch message.messageStatus {
-            case .fail:
+            case .failed:
                 return UIColor.adamantFailChatBackground
             default:
                 return UIColor.adamantChatSenderBackground
@@ -90,7 +90,7 @@ extension ChatViewController: MessagesDisplayDelegate {
         }
         
         switch message.messageStatus {
-        case .fail:
+        case .failed:
             let icon = UIImageView(frame: CGRect(x: -28, y: -10, width: 20, height: 20))
             icon.contentMode = .scaleAspectFit
             icon.backgroundColor = UIColor.clear
@@ -111,7 +111,7 @@ extension ChatViewController: MessageCellDelegate {
 			return
 		}
         
-        if let message = message as? MessageTransaction, message.messageStatus == .fail {
+        if let message = message as? MessageTransaction, message.messageStatus == .failed {
             dialogService.showSystemActionSheet(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, actions: [
                 UIAlertAction(title: String.adamantLocalized.alert.retry, style: .default, handler: { action in
                     guard let partner = self.chatroom?.partner?.address else {
@@ -130,12 +130,9 @@ extension ChatViewController: MessageCellDelegate {
                                 message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "Account not found: \(account)")
                             case .dependencyError(let error):
                                 message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error)
-                            case .internalError(let error):
-                                message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error.localizedDescription)
                             case .notLogged:
                                 message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "User not logged")
-                            case .serverError(let error):
-                                message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, error.localizedDescription)
+								
                                 
                             case .networkError:
                                 message = String.adamantLocalized.chat.noNetwork
@@ -154,7 +151,13 @@ extension ChatViewController: MessageCellDelegate {
                                 case .isValid:
                                     message = ""
                                 }
-                            }
+								
+							case .serverError(let error), .internalError(let error):
+								message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, error.localizedDescription)
+								
+							case .transactionNotFound(_):
+								message = ""
+							}
                             
                             // TODO: Log this
                             self.dialogService.showError(withMessage: message, error: error)
@@ -260,14 +263,12 @@ extension ChatViewController: MessageInputBarDelegate {
 				switch error {
 				case .accountNotFound(let account):
 					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "Account not found: \(account)")
+					
 				case .dependencyError(let error):
 					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error)
-				case .internalError(let error):
-					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error.localizedDescription)
+				
 				case .notLogged:
 					message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "User not logged")
-				case .serverError(let error):
-					message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, error.localizedDescription)
 					
 				case .networkError:
 					message = String.adamantLocalized.chat.noNetwork
@@ -286,6 +287,12 @@ extension ChatViewController: MessageInputBarDelegate {
 					case .isValid:
 						message = ""
 					}
+					
+				case .serverError(let error), .internalError(let error):
+					message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, error.localizedDescription)
+					
+				case .transactionNotFound(_):
+					message = ""
 				}
 				
 				// TODO: Log this

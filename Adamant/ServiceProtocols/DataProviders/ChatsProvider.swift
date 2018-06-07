@@ -25,6 +25,7 @@ enum ChatsProviderError: Error {
 	case serverError(Error)
 	case accountNotFound(String)
 	case dependencyError(String)
+	case transactionNotFound(id: String)
 	case internalError(Error)
 }
 
@@ -99,8 +100,7 @@ protocol ChatsProvider: DataProvider {
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
 	
 	// MARK: - Fake messages
-	func fakeSent(message: AdamantMessage, recipientId: String, date: Date, completion: @escaping (ChatsProviderResult) -> Void)
+	func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, completion: @escaping (ChatsProviderResult) -> Void)
 	func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, completion: @escaping (ChatsProviderResult) -> Void)
-    func fakeSendFailMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
-    func fakeReSendMessage(_ message: MessageTransaction, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
+    func fakeUpdate(status: MessageStatus, forTransactionId id: String, completion: @escaping (ChatsProviderResult) -> Void)
 }

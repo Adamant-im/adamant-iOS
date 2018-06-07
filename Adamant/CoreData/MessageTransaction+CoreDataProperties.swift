@@ -21,10 +21,5 @@ extension MessageTransaction {
     @NSManaged public var message: String?
     @NSManaged public var isMarkdown: Bool
     @NSManaged public var status: Int16
-    
-    var statusEnum: MessageStatus {
-        get { return MessageStatus(rawValue: self.status) ?? .fail }
-        set { self.status = newValue.rawValue }
-    }
-
+	
 }

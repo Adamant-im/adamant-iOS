@@ -358,7 +358,7 @@ extension AdamantChatsProvider {
 				
 				
 			case .failure(let error):
-                transaction.statusEnum = MessageStatus.fail
+                transaction.statusEnum = MessageStatus.failed
                 
 				try? privateContext.save()
 				
@@ -475,7 +475,7 @@ extension AdamantChatsProvider {
                         // Update ID with recieved, add to unconfirmed transactions.
                         transaction.transactionId = String(id)
                         
-                        transaction.statusEnum = MessageStatus.sent
+                        transaction.statusEnum = MessageStatus.delivered
                         
                         if let lastTransaction = chatroom.lastTransaction {
                             if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
@@ -504,7 +504,7 @@ extension AdamantChatsProvider {
                         
                         
                     case .failure(let error):
-                        transaction.statusEnum = MessageStatus.fail
+                        transaction.statusEnum = MessageStatus.failed
                         
                         try? privateContext.save()
                         
@@ -913,7 +913,7 @@ extension AdamantChatsProvider {
 		messageTransaction.blockId = transaction.blockId
 		messageTransaction.confirmations = transaction.confirmations
         
-        messageTransaction.statusEnum = MessageStatus.sent
+        messageTransaction.statusEnum = MessageStatus.delivered
 		
 		if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey) {
 			messageTransaction.message = decodedMessage
@@ -937,6 +937,7 @@ extension AdamantChatsProvider {
 		transaction.height = height
 		transaction.blockId = blockId
 		transaction.confirmations = confirmations
+		transaction.statusEnum = .delivered
 		self.unconfirmedTransactions.removeValue(forKey: id)
 		
 		if let lastHeight = receivedLastHeight, lastHeight < height {
