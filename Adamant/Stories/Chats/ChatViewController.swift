@@ -297,7 +297,14 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 				}
 				
 			case .update:
-				messagesCollectionView.reloadItems(at: change.compactMap {$0.indexPath})
+				let indexes = change.compactMap { (indexPath: IndexPath?, _) -> IndexPath? in
+					if let row = indexPath?.row {
+						return IndexPath(row: 0, section: row)
+					} else {
+						return nil
+					}
+				}
+				messagesCollectionView.reloadItems(at: indexes)
 				return
 			}
 		}

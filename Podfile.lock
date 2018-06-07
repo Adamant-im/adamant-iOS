@@ -30,7 +30,7 @@ DEPENDENCIES:
   - FTIndicator
   - Haring
   - KeychainAccess
-  - MessageKit
+  - MessageKit (from `https://github.com/boyarkin-anton/MessageKit.git`, branch `develop`)
   - MyLittlePinpad
   - PMAlertController
   - QRCodeReader.swift
@@ -48,13 +48,22 @@ SPEC REPOS:
     - FTIndicator
     - Haring
     - KeychainAccess
-    - MessageKit
     - MyLittlePinpad
     - PMAlertController
     - QRCodeReader.swift
     - ReachabilitySwift
     - RNCryptor
     - Swinject
+
+EXTERNAL SOURCES:
+  MessageKit:
+    :branch: develop
+    :git: https://github.com/boyarkin-anton/MessageKit.git
+
+CHECKOUT OPTIONS:
+  MessageKit:
+    :commit: e2364d2394eddc211be6957893fbd0f726c233f0
+    :git: https://github.com/boyarkin-anton/MessageKit.git
 
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
@@ -73,6 +82,6 @@ SPEC CHECKSUMS:
   RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
   Swinject: a1364b0f66c2736bb03c1c7cab54809e16df25da
 
-PODFILE CHECKSUM: d5efe36624e504f34934e8b20f4138c7db823908
+PODFILE CHECKSUM: 91037ed81eef7658ef62244366c4b275c227fbcf
 
 COCOAPODS: 1.5.3

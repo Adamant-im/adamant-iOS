@@ -25,7 +25,7 @@ extension UIColor {
 	
 	/// User chat bubble background, ~4% gray
 	static let adamantChatRecipientBackground = UIColor(red: 0.965, green: 0.973, blue: 0.981, alpha: 1)
-    static let adamantPendingChatBackground = UIColor(white: 0.94, alpha: 1.0)
+    static let adamantPendingChatBackground = UIColor(white: 0.98, alpha: 1.0)
     static let adamantFailChatBackground = UIColor(white: 0.8, alpha: 1.0)
 	
 	/// Partner chat bubble background, ~8% gray

@@ -59,14 +59,18 @@ extension ChatViewController: MessagesDisplayDelegate {
 	
 	func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
 		if isFromCurrentSender(message: message) {
-            guard let message = message as? MessageTransaction else {
+            guard let transaction = message as? ChatTransaction else {
                 return UIColor.adamantChatSenderBackground
             }
             
-            switch message.messageStatus {
+            switch transaction.statusEnum {
             case .failed:
                 return UIColor.adamantFailChatBackground
-            default:
+				
+			case .pending:
+				return UIColor.adamantPendingChatBackground
+				
+            case .delivered:
                 return UIColor.adamantChatSenderBackground
             }
 		} else {
