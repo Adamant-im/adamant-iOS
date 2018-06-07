@@ -99,8 +99,8 @@ extension TransactionsViewController {
 			cell.ammountLabel.text = AdamantUtilities.format(balance: amount)
 		}
 		
-		if let date = transfer.date {
-			cell.dateLabel.text = AdamantUtilities.formatHumanizedFullDate(date as Date)
+		if let date = transfer.date as Date? {
+			cell.dateLabel.text = date.humanizedDateTime()
 		}
 	}
 }
