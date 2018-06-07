@@ -45,7 +45,7 @@ extension ChatViewController: MessagesDataSource {
             return nil
         }
 		
-		return NSAttributedString(string: dateFormatter.string(from: message.sentDate), attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
+		return NSAttributedString(string: AdamantUtilities.formatHumanizedTime(message.sentDate), attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
 	}
 }
 
@@ -104,6 +104,33 @@ extension ChatViewController: MessagesDisplayDelegate {
             accessoryView.subviews.first?.removeFromSuperview()
             return
         }
+    }
+    
+    func messageHeaderView(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageHeaderView {
+        let header = messagesCollectionView.dequeueReusableHeaderView(MessageDateHeaderView.self, for: indexPath)
+        
+        header.dateLabel.text = AdamantUtilities.formatHumanizedDate(message.sentDate)
+        return header
+    }
+    
+    func shouldDisplayHeader(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> Bool {
+        if message.sentDate == Date.adamantNullDate {
+            return false
+        }
+        
+        guard let dataSource = messagesCollectionView.messagesDataSource else {
+			return false
+		}
+		
+        if indexPath.section == 0 {
+			return true
+		}
+		
+        let previousSection = indexPath.section - 1
+        let previousIndexPath = IndexPath(item: 0, section: previousSection)
+        let previousMessage = dataSource.messageForItem(at: previousIndexPath, in: messagesCollectionView)
+        let timeIntervalSinceLastMessage = message.sentDate.timeIntervalSince(previousMessage.sentDate)
+        return timeIntervalSinceLastMessage >= messagesCollectionView.showsDateHeaderAfterTimeInterval
     }
 }
 

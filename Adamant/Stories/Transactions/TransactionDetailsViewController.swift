@@ -25,6 +25,7 @@ extension String.adamantLocalized.alert {
 
 // MARK: - 
 class TransactionDetailsViewController: UIViewController {
+	// MARK: - Rows
 	fileprivate enum Row: Int {
 		case transactionNumber = 0
 		case from
@@ -55,14 +56,22 @@ class TransactionDetailsViewController: UIViewController {
 	
 	// MARK: - Dependencies
 	var dialogService: DialogService!
+    var transfersProvider: TransfersProvider!
 	
 	// MARK: - Properties
 	private let cellIdentifier = "cell"
 	var transaction: TransferTransaction?
 	var explorerUrl: URL!
 	
+	private let autoupdateInterval: TimeInterval = 5.0
+    
+    weak var timer: Timer?
+    
 	// MARK: - IBOutlets
 	@IBOutlet weak var tableView: UITableView!
+	
+	
+	// MARK: - Lifecycle
 	
 	override func viewDidLoad() {
 		navigationItem.title = String.adamantLocalized.transactionDetails.title
@@ -79,6 +88,8 @@ class TransactionDetailsViewController: UIViewController {
 		} else {
 			self.navigationItem.rightBarButtonItems = nil
 		}
+        
+        startUpdate()
 	}
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -87,6 +98,13 @@ class TransactionDetailsViewController: UIViewController {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
 	}
+	
+	deinit {
+		stopUpdate()
+	}
+	
+	
+	// MARK: - IBActions
 	
 	@IBAction func share(_ sender: Any) {
 		guard let transaction = transaction, let url = explorerUrl else {
@@ -111,6 +129,34 @@ class TransactionDetailsViewController: UIViewController {
 		
 		present(alert, animated: true, completion: nil)
 	}
+	
+	
+	// MARK: - Autoupdate
+	
+    func startUpdate() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
+			guard let id = self?.transaction?.transactionId else {
+				return
+			}
+			
+			self?.transfersProvider.refreshTransfer(id: id) { result in
+				switch result {
+				case .success:
+					DispatchQueue.main.async {
+						self?.tableView.reloadData()
+					}
+					
+				case .error(_):
+					return
+				}
+			}
+        }
+    }
+    
+    func stopUpdate() {
+        timer?.invalidate()
+    }
 }
 
 
@@ -193,7 +239,7 @@ extension TransactionDetailsViewController {
 			
 		case .date:
 			if let date = transaction.date as Date? {
-				cell.detailTextLabel?.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .medium)
+				cell.detailTextLabel?.text = AdamantUtilities.formatHumanizedFullDate(date)
 			}
 			
 		case .confirmations:

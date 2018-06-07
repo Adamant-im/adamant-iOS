@@ -1,6 +1,7 @@
 PODS:
   - Alamofire (4.7.2)
   - CryptoSwift (0.10.0)
+  - DateToolsSwift (4.0.0)
   - EFQRCode (4.2.2)
   - Eureka (4.1.1)
   - FreakingSimpleRoundImageView (1.1)
@@ -24,6 +25,7 @@ PODS:
 DEPENDENCIES:
   - Alamofire
   - CryptoSwift
+  - DateToolsSwift
   - EFQRCode
   - Eureka
   - FreakingSimpleRoundImageView
@@ -42,6 +44,7 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
     - CryptoSwift
+    - DateToolsSwift
     - EFQRCode
     - Eureka
     - FreakingSimpleRoundImageView
@@ -68,6 +71,7 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
   CryptoSwift: 6c778d69282bed3b4e975ff97a79d074f20bb011
+  DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   EFQRCode: 203846c7b135b5f7c1d18bb7923bc32a74c8b363
   Eureka: b88fb930e42c79f8c03c373d0fcdc28c1d6c50ed
   FreakingSimpleRoundImageView: 4a3a1cb1347beb247f8c63b5b5cae9d770b431ee
@@ -82,6 +86,6 @@ SPEC CHECKSUMS:
   RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
   Swinject: a1364b0f66c2736bb03c1c7cab54809e16df25da
 
-PODFILE CHECKSUM: 91037ed81eef7658ef62244366c4b275c227fbcf
+PODFILE CHECKSUM: 0e5d9be873127d2eb44d7e7ce759b6583feccb21
 
 COCOAPODS: 1.5.3

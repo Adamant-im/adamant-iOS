@@ -12,7 +12,10 @@ import RNCryptor
 
 class KeychainStore: SecuredStore {
 	let keychain = Keychain(service: "im.adamant")
-	private let 🍩 = "hello titty"	// For AppStore builds, we use a real password
+	
+	// For AppStore builds, we use a real password.
+	// See keychain-toAppstore.sh & keychain-toDebug.sh scripts. They runs automaticatlly for Release builds.
+	private let 🍩 = "debug"
 	
 	func get(_ key: String) -> String? {
 		if let rawData = keychain[key],

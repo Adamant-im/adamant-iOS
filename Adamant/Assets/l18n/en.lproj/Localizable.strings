@@ -71,7 +71,7 @@
 "ApiService.Error.NoConnection" = "No connection to the Internet";
 
 /* ApiService: Remote server returned an error. Using %@ for error description */
-"ApiService.Error.RemoteServerErrorFormat" = "Remote server error: %@";
+"ApiService.Error.RemoteServerErrorFormat" = "Blockchain Node error: %@";
 
 /* ApiService: User not logged error */
 "ApiService.Error.UserNotLogged" = "User not logged";
@@ -99,7 +99,6 @@
 
 /* Known contacts: Adamant ICO message. Markdown supported. */
 "Chats.IcoMessage" = "You have a possibility to **Join the ICO** of ADAMANT, the most secure and anonymous messenger. Learn more on Adamant.im website or in the Whitepaper.\n\nPlease make sure your have saved the passphrase to this account — exit your account and open it again. Better save your password on a sheet of paper also. But remember, only **you are responsible for the passphrase safety**. It cannot be recovered. And if other person will get it, your money will be stolen. Treat this question as secure, as if tokens in your wallet will cost a billion dollars some time.\n\nTo buy ADM tokens, go to Wallet tab and click Join the ICO, or open the page Adamant.im/ico/ in the web browser. In the ICO form enter your ADAMANT address — you will receive ADM tokens there. If you moved from Messenger App, your ADM address will be filled already, other way go back to Messenger and click ADAMANT address to copy it to clipboard. Next, choose crypto you want to spend and its amount. You'll see how much ADM tokens you will receive, including volume bonus: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Click Buy ADAMANT tokens. You'll get unique address where you need to send crypto. As soon as your transaction will be confirmed, you'll receive ADM tokens. Transaction can be done **from any wallet or exchange**. It is not necessary to transfer exact amount including transaction fees, the payment will be processed anyway.\nAfter you receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users' wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.\n\nDo not reply to this message, it is a system account. If you still have any questions, contact account **U15677078342684640219**";
-
 
 /* Known contacts: Adamant pre ICO message */
 "Chats.PreIcoMessage" = "You have a possibility to invest in ADAMANT, the most secure and anonymous messenger. Now is a Pre-ICO stage — the most profitable for investors. Learn more on Adamant.im website or in the Whitepaper. To participate just reply to this message and we will assist. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\nAfter you invest and receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.";
@@ -129,10 +128,10 @@
 "ChatScene.Error.NoNetwork" = "No connection";
 
 /* Chat: Notify user that he doesn't have money to pay a message fee */
-"ChatScene.Error.NotEnoughMoney" = "You don't have enought money to send a message";
+"ChatScene.Error.NotEnoughMoney" = "You don't have enough money to send a message";
 
 /* Chat: Notify user about server error. Using %@ for error description */
-"ChatScene.Error.RemoteServerErrorFormat" = "Remote error: %@. Report a bug";
+"ChatScene.Error.RemoteServerErrorFormat" = "Blockchain Node error: %@. Report a bug";
 
 /* Chat: message input placeholder */
 "ChatScene.NewMessage.Placeholder" = "New message";
@@ -156,10 +155,10 @@
 "Error.Mail.Body.Detailed" = "Hello,\nI have this error:\n\n%@\n\n%@\n\nDevice:\n%@";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
-"LoginScene.Error.AuthorizeCamera" = "You need to authorize Adamant to use device's Camera";
+"LoginScene.Error.AuthorizeCamera" = "You need to authorize ADAMANT to use device's camera";
 
 /* Login: User disabled access to photolibrary, he can authorize application in settings */
-"LoginScene.Error.AuthorizePhotolibrary" = "You need to authorize Adamant to use your Photolibrary";
+"LoginScene.Error.AuthorizePhotolibrary" = "You need to authorize ADAMANT to use your Photo library";
 
 /* Login: No network error. */
 "LoginScene.Error.NoInternet" = "No connection to the Internet";
@@ -168,19 +167,19 @@
 "LoginScene.Error.NoPassphrase" = "Enter a passphrase";
 
 /* Login: Notify user that picked photo doesn't contains a valid qr code with passphrase */
-"LoginScene.Error.NoQrOnPhoto" = "Selected image does not contain valid QR-codes";
+"LoginScene.Error.NoQrOnPhoto" = "Selected image does not contain valid QR codes";
 
 /* Login: Notify user that device not supported by QR reader */
-"LoginScene.Error.QrNotSupported" = "QR code reading not supported by the device";
+"LoginScene.Error.QrNotSupported" = "QR code reading is not supported by the device";
 
 /* Login: Notify user that scanned QR doesn't contains a passphrase. */
 "LoginScene.Error.WrongQr" = "QR code does not contains a valid passphrase";
 
 /* Login: notify user that we are trying to log in */
-"LoginScene.LoggingInProgress" = "Logging in...";
+"LoginScene.LoggingInProgress" = "Logging in…";
 
 /* Login: Login into previous account with biometry or pincode */
-"LoginScene.LoginIntoAdamant" = "Login into Adamant";
+"LoginScene.LoginIntoAdamant" = "Login into ADAMANT";
 
 /* Login: generate new passphrase button */
 "LoginScene.Row.Generate" = "Generate new passphrase";
@@ -192,10 +191,10 @@
 "LoginScene.Row.Passphrase.Placeholder" = "Passphrase";
 
 /* Login: Login with pincode button */
-"LoginScene.Row.Pincode" = "Login with PIN-code";
+"LoginScene.Row.Pincode" = "Login with PIN code";
 
 /* Login: Login with QR button. */
-"LoginScene.Row.Qr" = "Login with QR-code";
+"LoginScene.Row.Qr" = "Login with QR code";
 
 /* Login: security alert, notify user that he must save his new passphrase */
 "LoginScene.Row.SavePassphraseAlert" = "Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it.";
@@ -222,13 +221,13 @@
 "NewChatScene.Error.OwnAddress" = "You don't need an encrypted anonymous chat to talk to yourself";
 
 /* New chat: Remote server returned an error. Using %@ for error description */
-"NewChatScene.Error.RemoteServerFormat" = "Remote server error: %@. Report a bug";
+"NewChatScene.Error.RemoteServerFormat" = "Blockchain Node error: %@. Report a bug";
 
 /* New Chat: Notify user that scanned QR doesn't contains an address */
-"NewChatScene.Error.WrongQr" = "QR code does not contains a valid address";
+"NewChatScene.Error.WrongQr" = "QR code does not contain a valid address";
 
 /* New chat: Scan QR with address button */
-"NewChatScene.ScanQr" = "Scan QR-code";
+"NewChatScene.ScanQr" = "Scan QR code";
 
 /* New chat: scene title */
 "NewChatScene.Title" = "New Chat";
@@ -285,10 +284,10 @@
 "NotificationsService.NotificationsDisabled" = "Notifications disabled. You can enable notifications in Settings";
 
 /* Pinpad: Ask user to create new pin */
-"Pinpad.EnterNewPin" = "Enter new pin-code";
+"Pinpad.EnterNewPin" = "Enter new PIN code";
 
 /* Pinpad: Ask user to repeat new pin */
-"Pinpad.ReenterPin" = "Re-enter your pin-code";
+"Pinpad.ReenterPin" = "Re-enter your PIN code";
 
 /* QRGenerator: Bad Internal generator error message format. Using %@ for error description */
 "QrGeneratorScene.Error.InternalErrorFormat" = "Internal error: %@. Report a bug";
@@ -384,7 +383,7 @@
 "Shared.Delete" = "Delete";
 
 /* ShareQR scene: User had not authorized access to write images to photolibrary */
-"ShareQR.photolibraryNotAuthorized" = "You need to authorize Adamant to use your Photolibrary";
+"ShareQR.photolibraryNotAuthorized" = "You need to authorize ADAMANT to use your Photo library";
 
 /* Main tab bar: Account page */
 "Tabs.Account" = "Account";
@@ -444,10 +443,10 @@
 "TransferScene.Error.InvalidAddress" = "Enter a valid address";
 
 /* Transfer: Amount is hiegher that user's total money notification */
-"TransferScene.Error.NotEnoughtMoney" = "You don't have that money";
+"TransferScene.Error.NotEnoughtMoney" = "You don't have that tokens";
 
 /* Transfer: Amount is zero, or even negative notification */
-"TransferScene.Error.TooLittleMoney" = "You should send more money";
+"TransferScene.Error.TooLittleMoney" = "You should send more tokens";
 
 /* Transfer: recipient address placeholder */
 "TransferScene.Recipient.Placeholder" = "of the recipient";
@@ -486,7 +485,7 @@
 "TransferScene.SendConfirmFormat" = "Send %1$@ to %2$@?";
 
 /* Transfer: Processing message */
-"TransferScene.SendingFundsProgress" = "Sending funds...";
+"TransferScene.SendingFundsProgress" = "Sending tokens…";
 
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "Done!";

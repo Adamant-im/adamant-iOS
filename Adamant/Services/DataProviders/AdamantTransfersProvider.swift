@@ -260,6 +260,75 @@ extension AdamantTransfersProvider {
 			}
 		}
 	}
+	
+	// MARK: Getting & refreshing transfers
+	
+	/// Search transaction in local storage
+	///
+	/// - Parameter id: Transacton ID
+	/// - Returns: Transaction, if found
+	func getTransfer(id: String) -> TransferTransaction? {
+		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+		request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+		request.fetchLimit = 1
+		
+		do {
+			let result = try stack.container.viewContext.fetch(request)
+			return result.first
+		} catch {
+			return nil
+		}
+	}
+	
+	
+	/// Call Server, check if transaction updated
+	///
+	/// - Parameters:
+	///   - id: Transaction ID
+	///   - completion: callback
+	func refreshTransfer(id: String, completion: @escaping (TransfersProviderResult) -> Void) {
+		guard let transfer = getTransfer(id: id) else {
+			completion(.error(.transactionNotFound(id: id)))
+			return
+		}
+		
+		guard let intId = UInt64(id) else {
+			completion(.error(.internalError(message: "Can't parse transaction id: \(id)")))
+			return
+		}
+		
+		apiService.getTransaction(id: intId) { result in
+			switch result {
+			case .success(let transaction):
+				guard transfer.confirmations != transaction.confirmations else {
+					completion(.success)
+					return
+				}
+				
+				// Update transaction
+				
+				let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+				context.parent = self.stack.container.viewContext
+				
+				guard let trsfr = context.object(with: transfer.objectID) as? TransferTransaction else {
+					completion(.error(.internalError(message: "Failed to update transaction: CoreData context changed")))
+					return
+				}
+				
+				trsfr.confirmations = transaction.confirmations
+				
+				do {
+					try context.save()
+					completion(.success)
+				} catch {
+					completion(.error(.internalError(message: "Failed saving changes to CoreData: \(error.localizedDescription)")))
+				}
+				
+			case .failure(let error):
+				completion(.error(.serverError(error)))
+			}
+		}
+	}
 }
 
 
@@ -277,7 +346,7 @@ extension AdamantTransfersProvider {
     ///   - account: for account
     ///   - height: last transaction height.
     ///   - offset: offset, if greater than 100
-    /// - Returns: ammount of new messages was added
+    /// - Returns: ammount of new transactions was added
     private func getTransactions(forAccount account: String,
                                  type: TransactionType,
                                  fromHeight: Int64?,
@@ -334,7 +403,7 @@ extension AdamantTransfersProvider {
             }
         }
     }
-    
+	
     private func processRawTransactions(_ transactions: [Transaction],
                                         currentAddress address: String,
                                         context: NSManagedObjectContext,
@@ -479,15 +548,9 @@ extension AdamantTransfersProvider {
                 DispatchQueue.main.async {
                     viewContextChatrooms.forEach { $0.updateLastTransaction() }
                 }
-                print(".success \(transfers.count)")
-                //                completion(.success(new: transfers.count))
             } catch {
-                //                completion(.error(error))
-                print(error)
+				print("TransferProvider: Failed to save changes to CoreData: \(error.localizedDescription)")
             }
-        } else {
-            //            completion(.success(new: 0))
-            print(".success 0")
         }
     }
 	

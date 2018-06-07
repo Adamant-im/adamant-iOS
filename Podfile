@@ -11,6 +11,7 @@ target 'Adamant' do
   pod 'Swinject' # Dependency Injection
   pod 'ReachabilitySwift' # Network status
   pod 'Haring' # Markdown parser
+  pod 'DateToolsSwift' # Date formatter tools
   
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars

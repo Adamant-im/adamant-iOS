@@ -100,7 +100,7 @@ extension TransactionsViewController {
 		}
 		
 		if let date = transfer.date {
-			cell.dateLabel.text = DateFormatter.localizedString(from: date as Date, dateStyle: .short, timeStyle: .medium)
+			cell.dateLabel.text = AdamantUtilities.formatHumanizedFullDate(date as Date)
 		}
 	}
 }
