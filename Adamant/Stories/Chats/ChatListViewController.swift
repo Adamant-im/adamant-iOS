@@ -151,6 +151,13 @@ class ChatListViewController: UIViewController {
     
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
         self.chatsProvider.forceUpdate { (result) in
+            guard let result = result else {
+                DispatchQueue.main.async {
+                    refreshControl.endRefreshing()
+                }
+                return
+            }
+            
             switch result {
             case .success:
                 DispatchQueue.main.async {

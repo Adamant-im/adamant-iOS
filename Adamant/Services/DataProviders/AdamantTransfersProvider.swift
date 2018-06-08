@@ -109,10 +109,11 @@ extension AdamantTransfersProvider {
 		self.forceUpdate(nil)
 	}
     
-    func forceUpdate(_ completion: ((TransfersProviderResult) -> Void)?) {
+    func forceUpdate(_ completion: ((TransfersProviderResult?) -> Void)?) {
         stateSemaphore.wait()
         if state == .updating {
             stateSemaphore.signal()
+            completion?(nil)
             return
         }
         
@@ -138,6 +139,7 @@ extension AdamantTransfersProvider {
         // MARK: 4. Check
         processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) { [weak self] in
             guard let state = self?.state else {
+                completion?(nil)
                 return
             }
             

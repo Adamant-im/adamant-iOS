@@ -144,8 +144,9 @@ extension AdamantChatsProvider {
 		self.forceUpdate(nil)
 	}
     
-    func forceUpdate(_ completion: ((ChatsProviderResult) -> Void)?) {
+    func forceUpdate(_ completion: ((ChatsProviderResult?) -> Void)?) {
         if state == .updating {
+            completion?(nil)
             return
         }
         
@@ -153,6 +154,7 @@ extension AdamantChatsProvider {
         // MARK: 1. Check state
         if state == .updating {
             stateSemaphore.signal()
+            completion?(nil)
             return
         }
         
@@ -181,6 +183,7 @@ extension AdamantChatsProvider {
         // MARK: 4. Check
         processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) { [weak self] in
             guard let state = self?.state else {
+                completion?(.failure(.dependencyError("Updating")))
                 return
             }
             

@@ -95,7 +95,7 @@ protocol ChatsProvider: DataProvider {
 	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>
 	
     // ForceUpdate chats
-    func forceUpdate(_ completion: ((ChatsProviderResult) -> Void)?)
+    func forceUpdate(_ completion: ((ChatsProviderResult?) -> Void)?)
 	
 	// MARK: - Sending messages
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
