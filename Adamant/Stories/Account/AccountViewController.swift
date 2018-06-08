@@ -122,6 +122,16 @@ class AccountViewController: FormViewController {
 	
 	// MARK: - Properties
 	var hideFreeTokensRow = false
+    
+    lazy var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action:
+            #selector(AccountViewController.handleRefresh(_:)),
+                                 for: UIControlEvents.valueChanged)
+        refreshControl.tintColor = UIColor.adamantPrimary
+        
+        return refreshControl
+    }()
 	
 	
 	// MARK: - Lifecycle
@@ -130,6 +140,8 @@ class AccountViewController: FormViewController {
         super.viewDidLoad()
 		navigationItem.title = String.adamantLocalized.account.title
 		navigationOptions = .Disabled
+        
+        self.tableView.addSubview(self.refreshControl)
 		
 		// MARK: Account Section
 		form +++ Section(Sections.account.localized)
@@ -400,4 +412,24 @@ extension AccountViewController {
 			row.evaluateHidden()
 		}
 	}
+    
+    @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
+        self.accountService.update { (result) in
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+                
+                break
+            case .failure(let error):
+                print("Error update accout: \(error)")
+                break
+            }
+            
+            DispatchQueue.main.async {
+                refreshControl.endRefreshing()
+            }
+        }
+    }
 }

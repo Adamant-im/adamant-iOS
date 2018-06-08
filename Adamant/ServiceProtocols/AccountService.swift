@@ -96,7 +96,8 @@ protocol AccountService: class {
 	// MARK: Account functions
 	
 	/// Update logged account info
-	func update()
+    func update()
+    func update(_ completion: ((AccountServiceResult) -> Void)?)
 	
 	/// Create new account with passphrase.
 	func createAccountWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
