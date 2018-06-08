@@ -123,7 +123,7 @@ class AccountViewController: FormViewController {
 	// MARK: - Properties
 	var hideFreeTokensRow = false
     
-    lazy var refreshControl: UIRefreshControl = {
+    private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action:
             #selector(AccountViewController.handleRefresh(_:)),
@@ -423,7 +423,7 @@ extension AccountViewController {
                 
                 break
             case .failure(let error):
-                print("Error update accout: \(error)")
+                print("Error update account: \(error)")
                 break
             }
             

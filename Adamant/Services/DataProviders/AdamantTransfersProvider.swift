@@ -106,20 +106,25 @@ extension AdamantTransfersProvider {
 	}
 	
 	func update() {
-		stateSemaphore.wait()
-		if state == .updating {
-			stateSemaphore.signal()
-			return
-		}
-		
-		let prevState = state
-		state = .updating
-		stateSemaphore.signal()
-		
-		guard let address = accountService.account?.address else {
-			self.setState(.failedToUpdate(TransfersProviderError.notLogged), previous: prevState)
-			return
-		}
+		self.forceUpdate(nil)
+	}
+    
+    func forceUpdate(_ completion: ((TransfersProviderResult) -> Void)?) {
+        stateSemaphore.wait()
+        if state == .updating {
+            stateSemaphore.signal()
+            return
+        }
+        
+        let prevState = state
+        state = .updating
+        stateSemaphore.signal()
+        
+        guard let address = accountService.account?.address else {
+            self.setState(.failedToUpdate(TransfersProviderError.notLogged), previous: prevState)
+            completion?(.error(TransfersProviderError.notLogged))
+            return
+        }
         
         // MARK: 3. Get transactions
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -127,7 +132,7 @@ extension AdamantTransfersProvider {
         let processingGroup = DispatchGroup()
         let cms = DispatchSemaphore(value: 1)
         let prevHeight = receivedLastHeight
-		
+        
         getTransactions(forAccount: address, type: .send, fromHeight: prevHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
         
         // MARK: 4. Check
@@ -138,6 +143,7 @@ extension AdamantTransfersProvider {
             
             switch state {
             case .failedToUpdate(_): // Processing failed
+                completion?(.error(.internalError(message: "Processing failed")))
                 break
                 
             default:
@@ -169,9 +175,11 @@ extension AdamantTransfersProvider {
                     self?.isInitiallySynced = true
                     NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.initialSyncFinished, object: self)
                 }
+                
+                completion?(.success)
             }
         }
-	}
+    }
 	
 	func reset() {
 		reset(notify: true)

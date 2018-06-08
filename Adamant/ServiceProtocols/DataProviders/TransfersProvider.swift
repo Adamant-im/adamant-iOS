@@ -79,6 +79,8 @@ protocol TransfersProvider: DataProvider {
 	
 	func transfersController(for account: CoreDataAccount) -> NSFetchedResultsController<TransferTransaction>
 
+    // Force update transactions
+    func forceUpdate(_ completion: ((TransfersProviderResult) -> Void)?)
 	
 	// MARK: - Sending funds
 	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void)

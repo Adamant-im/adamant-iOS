@@ -141,80 +141,88 @@ extension AdamantChatsProvider {
 	}
 	
 	func update() {
-		if state == .updating {
-			return
-		}
-		
-		stateSemaphore.wait()
-		// MARK: 1. Check state
-		if state == .updating {
-			stateSemaphore.signal()
-			return
-		}
-		
-		// MARK: 2. Prepare
-		let prevState = state
-		
-		guard let address = accountService.account?.address, let privateKey = accountService.keypair?.privateKey else {
-			stateSemaphore.signal()
-			setState(.failedToUpdate(ChatsProviderError.notLogged), previous: prevState)
-			return
-		}
-		
-		state = .updating
-		stateSemaphore.signal()
-		
-		// MARK: 3. Get transactions
-		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-		privateContext.parent = self.stack.container.viewContext
-		let processingGroup = DispatchGroup()
-		let cms = DispatchSemaphore(value: 1)
-		let prevHeight = receivedLastHeight
-		
-		getTransactions(senderId: address, privateKey: privateKey, height: receivedLastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
-		
-		// MARK: 4. Check
-		processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) { [weak self] in
-			guard let state = self?.state else {
-				return
-			}
-			
-			switch state {
-			case .failedToUpdate(_): // Processing failed
-				break
-				
-			default:
-				self?.setState(.upToDate, previous: prevState)
-				
-				if prevHeight != self?.receivedLastHeight, let h = self?.receivedLastHeight {
-					NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
-													object: self,
-													userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h])
-				}
-				
-				if let h = self?.receivedLastHeight {
-					self?.readedLastHeight = h
-				} else {
-					self?.readedLastHeight = 0
-				}
-				
-				if let store = self?.securedStore {
-					if let h = self?.receivedLastHeight {
-						store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
-					}
-					
-					if let h = self?.readedLastHeight, h > 0 {
-						store.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
-					}
-				}
-				
-				if let synced = self?.isInitiallySynced, !synced {
-					self?.isInitiallySynced = true
-					NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: self)
-				}
-			}
-		}
+		self.forceUpdate(nil)
 	}
+    
+    func forceUpdate(_ completion: ((ChatsProviderResult) -> Void)?) {
+        if state == .updating {
+            return
+        }
+        
+        stateSemaphore.wait()
+        // MARK: 1. Check state
+        if state == .updating {
+            stateSemaphore.signal()
+            return
+        }
+        
+        // MARK: 2. Prepare
+        let prevState = state
+        
+        guard let address = accountService.account?.address, let privateKey = accountService.keypair?.privateKey else {
+            stateSemaphore.signal()
+            setState(.failedToUpdate(ChatsProviderError.notLogged), previous: prevState)
+            completion?(.failure(ChatsProviderError.notLogged))
+            return
+        }
+        
+        state = .updating
+        stateSemaphore.signal()
+        
+        // MARK: 3. Get transactions
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = self.stack.container.viewContext
+        let processingGroup = DispatchGroup()
+        let cms = DispatchSemaphore(value: 1)
+        let prevHeight = receivedLastHeight
+        
+        getTransactions(senderId: address, privateKey: privateKey, height: receivedLastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
+        
+        // MARK: 4. Check
+        processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) { [weak self] in
+            guard let state = self?.state else {
+                return
+            }
+            
+            switch state {
+            case .failedToUpdate(_): // Processing failed
+                completion?(.failure(.dependencyError("Processing failed")))
+                break
+                
+            default:
+                self?.setState(.upToDate, previous: prevState)
+                
+                if prevHeight != self?.receivedLastHeight, let h = self?.receivedLastHeight {
+                    NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
+                                                    object: self,
+                                                    userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h])
+                }
+                
+                if let h = self?.receivedLastHeight {
+                    self?.readedLastHeight = h
+                } else {
+                    self?.readedLastHeight = 0
+                }
+                
+                if let store = self?.securedStore {
+                    if let h = self?.receivedLastHeight {
+                        store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
+                    }
+                    
+                    if let h = self?.readedLastHeight, h > 0 {
+                        store.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
+                    }
+                }
+                
+                if let synced = self?.isInitiallySynced, !synced {
+                    self?.isInitiallySynced = true
+                    NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: self)
+                }
+                
+                completion?(.success)
+            }
+        }
+    }
 }
 
 

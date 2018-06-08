@@ -26,6 +26,16 @@ class TransactionsViewController: UIViewController {
 	
 	// MARK: - Properties
 	var controller: NSFetchedResultsController<TransferTransaction>?
+    
+    private lazy var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action:
+            #selector(self.handleRefresh(_:)),
+                                 for: UIControlEvents.valueChanged)
+        refreshControl.tintColor = UIColor.adamantPrimary
+        
+        return refreshControl
+    }()
 	
 	
 	// MARK: - IBOutlets
@@ -45,6 +55,7 @@ class TransactionsViewController: UIViewController {
 		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
 		tableView.dataSource = self
 		tableView.delegate = self
+        tableView.addSubview(self.refreshControl)
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
 			self?.initFetchedResultController(provider: self?.transfersProvider)
@@ -77,6 +88,24 @@ class TransactionsViewController: UIViewController {
 		
 		tableView.reloadData()
 	}
+    
+    @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
+        self.transfersProvider.forceUpdate { (result) in
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+                break
+            case .error(let error):
+                print("Error update transfers: \(error)")
+            }
+            
+            DispatchQueue.main.async {
+                refreshControl.endRefreshing()
+            }
+        }
+    }
 }
 
 // MARK: - UITableView Cells
