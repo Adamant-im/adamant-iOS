@@ -11,16 +11,16 @@ import CoreData
 
 extension AdamantChatsProvider {
 	// MARK: - Public
-	func fakeSent(message: AdamantMessage, recipientId: String, date: Date, completion: @escaping (ChatsProviderResult) -> Void) {
+	func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, completion: @escaping (ChatsProviderResult) -> Void) {
 		validate(message: message, partnerId: recipientId) { [weak self] result in
 			switch result {
 			case .success(let loggedAddress, let partner):
 				switch message {
 				case .text(let text):
-					self?.fakeSent(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, markdown: false, completion: completion)
+					self?.fakeSent(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, status: status, markdown: false, completion: completion)
 					
 				case .markdownText(let text):
-					self?.fakeSent(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, markdown: true, completion: completion)
+					self?.fakeSent(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, status: status, markdown: true, completion: completion)
 				}
 				
 			case .failure(let error):
@@ -46,11 +46,46 @@ extension AdamantChatsProvider {
 			}
 		}
 	}
-	
+    
+	func fakeUpdate(status: MessageStatus, forTransactionId id: String, completion: @escaping (ChatsProviderResult) -> Void) {
+		// MARK: 1. Get transaction
+		let request = NSFetchRequest<MessageTransaction>(entityName: MessageTransaction.entityName)
+		request.predicate = NSPredicate(format: "transactionId == %@", id)
+		request.fetchLimit = 1
+		
+		guard let transaction = (try? stack.container.viewContext.fetch(request))?.first else {
+			completion(.failure(.transactionNotFound(id: id)))
+			return
+		}
+		
+		// MARK: 2. Update transaction in private context
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = stack.container.viewContext
+		
+		if let trs = privateContext.object(with: transaction.objectID) as? MessageTransaction {
+			trs.date = Date() as NSDate
+			trs.status = status.rawValue
+		} else {
+			completion(.failure(.internalError(AdamantError(message: "CoreData changed"))))
+			return
+		}
+        
+        // MARK 3. Save changes
+		if privateContext.hasChanges {
+			do {
+				try privateContext.save()
+				completion(.success)
+			} catch {
+				completion(.failure(.internalError(error)))
+			}
+		} else {
+			completion(.success)
+		}
+    }
 	
 	// MARK: - Logic
 	
-	private func fakeSent(text: String, loggedAddress: String, recipient: CoreDataAccount, date: Date, markdown: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
+	private func fakeSent(text: String, loggedAddress: String, recipient: CoreDataAccount, date: Date, status: MessageStatus, markdown: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
 		// MARK: 0. Prepare
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = stack.container.viewContext
@@ -65,6 +100,7 @@ extension AdamantChatsProvider {
 		transaction.message = text
 		transaction.isUnread = false
 		transaction.isMarkdown = markdown
+		transaction.status = status.rawValue
 		
 		transaction.transactionId = UUID().uuidString
 		transaction.blockId = UUID().uuidString
@@ -101,6 +137,7 @@ extension AdamantChatsProvider {
 		transaction.isUnread = unread
 		transaction.silentNotification = silent
 		transaction.isMarkdown = markdown
+		transaction.status = MessageStatus.delivered.rawValue
 		
 		transaction.transactionId = UUID().uuidString
 		transaction.blockId = UUID().uuidString
@@ -124,7 +161,6 @@ extension AdamantChatsProvider {
 			completion(.failure(.internalError(error)))
 		}
 	}
-	
 	
 	// MARK: - Validate & prepare
 	

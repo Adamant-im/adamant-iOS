@@ -11,12 +11,13 @@ target 'Adamant' do
   pod 'Swinject' # Dependency Injection
   pod 'ReachabilitySwift' # Network status
   pod 'Haring' # Markdown parser
+  pod 'DateToolsSwift' # Date formatter tools
   
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars
   pod 'FTIndicator' # Notifications and activity indicator
   pod 'Eureka' # Forms
-  pod 'MessageKit' # Chat UI
+  pod 'MessageKit', :git => 'https://github.com/boyarkin-anton/MessageKit.git', :branch => 'develop' # Chat UI
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
 
