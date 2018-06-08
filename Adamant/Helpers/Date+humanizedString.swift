@@ -17,7 +17,12 @@ extension Date {
 			if isToday {
 				dayString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
 			} else if daysAgo < 2 {
-				dayString = timeAgoSinceNow
+				/*
+					We can't use 'self.timeAgoSinceNow' here, because after midnight, when it is already not 'isToday',
+					but less than 24 hours has passed, so it is technically not 'Yesterday' yet,
+					it will display something like '6 hours ago'
+				*/
+				dayString = NSLocalizedString("Yesterday", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
 			} else {
 				dayString = format(with: "EEEE") // weekday
 			}
