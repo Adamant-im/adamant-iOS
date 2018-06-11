@@ -193,6 +193,9 @@
 		E90A4944204C5F60009F6A65 /* PassphraseCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PassphraseCell.xib; sourceTree = "<group>"; };
 		E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAuthentication.swift; sourceTree = "<group>"; };
 		E90A494C204DA932009F6A65 /* LocalAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAuthentication.swift; sourceTree = "<group>"; };
+		E91319F820CEC4E100192A18 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = de; path = de.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		E91319F920CEC4E200192A18 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		E91319FA20CEC4E200192A18 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E913C8EE1FFFA51D001A83F7 /* Adamant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Adamant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E913C8F81FFFA51D001A83F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -839,6 +842,7 @@
 			knownRegions = (
 				en,
 				ru,
+				de,
 			);
 			mainGroup = E913C8E51FFFA51D001A83F7;
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
@@ -1154,6 +1158,7 @@
 			children = (
 				E95CB452205D77B200A7218E /* en */,
 				E95CB45A205D77DD00A7218E /* ru */,
+				E91319FA20CEC4E200192A18 /* de */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1163,6 +1168,7 @@
 			children = (
 				E95CB457205D77B500A7218E /* en */,
 				E95CB459205D77DC00A7218E /* ru */,
+				E91319F920CEC4E200192A18 /* de */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1172,6 +1178,7 @@
 			children = (
 				E95CB45F205D7F9600A7218E /* en */,
 				E95CB461205D7FD000A7218E /* ru */,
+				E91319F820CEC4E100192A18 /* de */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";

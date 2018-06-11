@@ -1,0 +1,18 @@
+/* Bundle display name */
+"CFBundleDisplayName" = "Adamant";
+
+/* Bundle name */
+"CFBundleName" = "Adamant";
+
+/* Privacy - Camera Usage Description */
+"NSCameraUsageDescription" = "The camera needed to scan QR codes for addresses and passphrases";
+
+/* Privacy - Face ID Usage Description */
+"NSFaceIDUsageDescription" = "Sign In into your ADAMANT with Face ID";
+
+/* Privacy - Photo Library Additions Usage Description */
+"NSPhotoLibraryAddUsageDescription" = "Saving generated QR codes with passphrases and addresses";
+
+/* Privacy - Photo Library Usage Description */
+"NSPhotoLibraryUsageDescription" = "Reading QR codes with passphrases and addresses";
+
