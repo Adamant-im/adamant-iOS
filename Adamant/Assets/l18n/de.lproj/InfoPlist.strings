@@ -5,14 +5,14 @@
 "CFBundleName" = "Adamant";
 
 /* Privacy - Camera Usage Description */
-"NSCameraUsageDescription" = "The camera needed to scan QR codes for addresses and passphrases";
+"NSCameraUsageDescription" = "Die Kamera wird benötigt, um QR-Codes für Adressen und Passphrases zu scannen";
 
 /* Privacy - Face ID Usage Description */
-"NSFaceIDUsageDescription" = "Sign In into your ADAMANT with Face ID";
+"NSFaceIDUsageDescription" = "In dein ADAMANT mit Face ID einloggen";
 
 /* Privacy - Photo Library Additions Usage Description */
-"NSPhotoLibraryAddUsageDescription" = "Saving generated QR codes with passphrases and addresses";
+"NSPhotoLibraryAddUsageDescription" = "Generierte QR-Codes mit Passphrases und Adressen werden gespeichert";
 
 /* Privacy - Photo Library Usage Description */
-"NSPhotoLibraryUsageDescription" = "Reading QR codes with passphrases and addresses";
+"NSPhotoLibraryUsageDescription" = "QR-Codes mit Passphrases und Adressen werden gelesen";
 
