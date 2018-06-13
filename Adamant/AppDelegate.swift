@@ -45,6 +45,10 @@ struct AdamantResources {
 		Node(scheme: .https, host: "lake.adamant.im", port: nil),
 		Node(scheme: .http, host: "80.211.177.181", port: nil)
 	]
+    
+    static let ethServers = [
+        "https://api.myetherapi.com/eth"
+    ]
 	
 	// Addresses
 	static let supportEmail = "ios@adamant.im"
