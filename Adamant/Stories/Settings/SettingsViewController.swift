@@ -192,6 +192,27 @@ class SettingsViewController: FormViewController {
 			
 			cell.accessoryType = .disclosureIndicator
 		})
+        
+        // MARK: Nodes list settings
+        form +++ Section()
+            <<< LabelRow() {
+                $0.title = "Nodes list"
+                $0.tag = "nodes"
+                }.cellSetup({ (cell, _) in
+                    cell.selectionStyle = .gray
+                }).onCellSelection({ [weak self] (_, _) in
+                    guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.nodesList) else {
+                        return
+                    }
+                    nav.pushViewController(vc, animated: true)
+                }).cellUpdate({ (cell, _) in
+                    if let label = cell.textLabel {
+                        label.font = UIFont.adamantPrimary(size: 17)
+                        label.textColor = UIColor.adamantPrimary
+                    }
+                    
+                    cell.accessoryType = .disclosureIndicator
+                })
 		
 		// MARK: Application
 		form +++ Section(Sections.applicationInfo.localized)
