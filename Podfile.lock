@@ -1,5 +1,6 @@
 PODS:
   - Alamofire (4.7.2)
+  - BigInt.swift (1.0.0)
   - CryptoSwift (0.10.0)
   - DateToolsSwift (4.0.0)
   - EFQRCode (4.2.2)
@@ -20,7 +21,21 @@ PODS:
   - QRCodeReader.swift (8.2.0)
   - ReachabilitySwift (4.1.0)
   - RNCryptor (5.0.3)
+<<<<<<< HEAD
   - Swinject (2.4.1)
+=======
+  - secp256k1.swift (0.1.4)
+  - Swinject (2.4.0)
+  - Web3 (0.1.1):
+    - Web3/Core (= 0.1.1)
+    - Web3/HTTPExtension (= 0.1.1)
+  - Web3/Core (0.1.1):
+    - BigInt.swift (~> 1.0)
+    - CryptoSwift (~> 0.8)
+    - secp256k1.swift (~> 0.1)
+  - Web3/HTTPExtension (0.1.1):
+    - Web3/Core
+>>>>>>> Eth integration init
 
 DEPENDENCIES:
   - Alamofire
@@ -39,10 +54,12 @@ DEPENDENCIES:
   - ReachabilitySwift
   - RNCryptor
   - Swinject
+  - Web3
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
+    - BigInt.swift
     - CryptoSwift
     - DateToolsSwift
     - EFQRCode
@@ -56,7 +73,9 @@ SPEC REPOS:
     - QRCodeReader.swift
     - ReachabilitySwift
     - RNCryptor
+    - secp256k1.swift
     - Swinject
+    - Web3
 
 EXTERNAL SOURCES:
   MessageKit:
@@ -70,6 +89,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
+  BigInt.swift: 1e0ddf08d82166e72dfb0fa8d40301d273081afc
   CryptoSwift: 6c778d69282bed3b4e975ff97a79d074f20bb011
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   EFQRCode: 203846c7b135b5f7c1d18bb7923bc32a74c8b363
@@ -84,8 +104,14 @@ SPEC CHECKSUMS:
   QRCodeReader.swift: 003eb32f18a5a675b936ec82ba0ff368cddbff45
   ReachabilitySwift: 6849231cd4e06559f3b9ef4a97a0a0f96d41e09f
   RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
+<<<<<<< HEAD
   Swinject: f7f15a9672e99328c1f07f277091087917215700
+=======
+  secp256k1.swift: a7e7a214f6db6ce5db32cc6b2b45e5c4dd633634
+  Swinject: a1364b0f66c2736bb03c1c7cab54809e16df25da
+  Web3: 1f0c38c8508b8487948af1cb597653b018f4b5d3
+>>>>>>> Eth integration init
 
-PODFILE CHECKSUM: 0e5d9be873127d2eb44d7e7ce759b6583feccb21
+PODFILE CHECKSUM: 515461f4af013cf25e5baf6629f9ebac87a15c17
 
 COCOAPODS: 1.5.3
