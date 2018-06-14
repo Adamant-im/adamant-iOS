@@ -150,3 +150,27 @@ extension AdamantUtilities {
 		return stride(from: 0, to: hex.count, by: 2).compactMap { UInt8(String(hexa[$0..<$0.advanced(by: 2)]), radix: 16) }
 	}
 }
+
+// MARK: - JSON
+extension AdamantUtilities {
+    static func json(from object:Any) -> String? {
+        do {
+            let data = try JSONSerialization.data(withJSONObject: object, options: [])
+            return String(data: data, encoding: String.Encoding.utf8)
+        } catch {
+            print(error.localizedDescription)
+        }
+        return nil
+    }
+    
+    static func toArray(text: String) -> [String]? {
+        if let data = text.data(using: .utf8) {
+            do {
+                return try JSONSerialization.jsonObject(with: data, options: []) as? [String]
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        return nil
+    }
+}

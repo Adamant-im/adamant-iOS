@@ -232,6 +232,24 @@
 /* New chat: scene title */
 "NewChatScene.Title" = "New Chat";
 
+/* NodesList: Button label */
+"NodesList.NodesList" = "Nodes list";
+
+/* NodesList: scene title */
+"NodesList.Title" = "List of used nodes";
+
+/* NodesList: 'Saved' message */
+"NodesList.Saved" = "Saved";
+
+/* NodesList: 'Unable To Save' message */
+"NodesList.UnableToSave" = "Unable to save";
+
+/* NodesList: 'Add new node' button lable */
+"NodesList.AddNewNode" = "Add new node";
+
+/* NodesList: 'Node url' plaseholder */
+"NodesList.NodeUrl" = "Node url";
+
 /* Notifications: Modes description. Markdown supported. */
 "Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. This can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You receive notification almost instantly after a message was sent and approved by the Blockchain - a few seconds delay. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.";
 

@@ -55,7 +55,7 @@ class AdamantApiService: ApiService {
 	// MARK: - Properties
 	
     var apiUrl: URL
-    let apiUrls: [String]
+    var apiUrls: [String]
 	var defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility, attributes: [.concurrent])
 	
 	
@@ -81,6 +81,11 @@ class AdamantApiService: ApiService {
         self.testServer { (isAlive) in
             if isAlive == false { self.newServerAddress() }
         }
+    }
+    
+    func updateServersList(servers: [String]) {
+        self.apiUrls = servers
+        self.newServerAddress()
     }
 	
 	// MARK: - Tools

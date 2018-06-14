@@ -280,7 +280,7 @@ class LoginViewController: FormViewController {
         // MARK: Nodes list settings
         form +++ Section()
             <<< ButtonRow() {
-                $0.title = "Nodes list"
+                $0.title = String.adamantLocalized.nodesList.nodesListButton
                 $0.tag = "nodes"
                 }.cellSetup({ (cell, _) in
                     cell.selectionStyle = .gray

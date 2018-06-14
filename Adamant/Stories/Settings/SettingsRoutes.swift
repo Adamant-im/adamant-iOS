@@ -28,6 +28,8 @@ extension AdamantScene {
         static let nodesList = AdamantScene(identifier: "NodesListViewController", factory: { r in
             let c = NodesListViewController()
             c.dialogService = r.resolve(DialogService.self)
+            c.securedStore = r.resolve(SecuredStore.self)
+            c.apiService = r.resolve(ApiService.self)
             return c
         })
 		
