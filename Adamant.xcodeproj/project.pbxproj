@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
+		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
 		E905D39B2048A9BD00DDB504 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39A2048A9BD00DDB504 /* KeychainStore.swift */; };
 		E905D39D204C13B900DDB504 /* SecuredStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39C204C13B900DDB504 /* SecuredStore.swift */; };
 		E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39E204C281400DDB504 /* LoginViewController.swift */; };
@@ -179,6 +180,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
 		871009461457F6B7B47D99C5 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
 		903AC078A8A55175A05E42D4 /* Pods-Adamant.testing.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.testing.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.testing.xcconfig"; sourceTree = "<group>"; };
 		C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -383,6 +385,13 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		64D059FB20D1343B003AD655 /* NodesList */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = NodesList;
+			sourceTree = "<group>";
+		};
 		E59396A8E0053F21F768E69B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -530,6 +539,7 @@
 				E94E7B04205D48950042B639 /* Transactions */,
 				E95F857B2008C8B20070534A /* Chats */,
 				E919479A20001007001362F8 /* Login */,
+				64D059FB20D1343B003AD655 /* NodesList */,
 				E982F69820235AF000566AC7 /* Settings */,
 			);
 			path = Stories;
@@ -650,6 +660,7 @@
 				E982F69B20235B4D00566AC7 /* SettingsViewController.swift */,
 				E93D7AC12052EE21005D19DC /* SettingsViewController+StayIn.swift */,
 				E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */,
+				64D059FE20D3116A003AD655 /* NodesListViewController.swift */,
 				E91A0639209F05AA0018A102 /* NotificationsViewController.swift */,
 			);
 			path = Settings;
@@ -1090,6 +1101,7 @@
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,
 				E9150B9F2066DA210065A985 /* MessageTransaction+CoreDataClass.swift in Sources */,
 				E965A53020B594120041A3EA /* AdamantApi+States.swift in Sources */,
+				64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */,
 				E9150B982066DA210065A985 /* CoreDataAccount+CoreDataProperties.swift in Sources */,
 				E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */,
 				E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */,
