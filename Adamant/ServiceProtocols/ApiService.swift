@@ -53,6 +53,10 @@ protocol ApiService: class {
 	
 	/// Default is async queue with .utilities priority.
 	var defaultResponseDispatchQueue: DispatchQueue { get set }
+    
+    // MARK: - Servers list
+    
+    func updateServersList(servers:[String])
 	
 	// MARK: - Accounts
 	

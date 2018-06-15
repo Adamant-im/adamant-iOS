@@ -232,6 +232,24 @@
 /* New chat: scene title */
 "NewChatScene.Title" = "Новый Чат";
 
+/* NodesList: Button label */
+"NodesList.NodesList" = "Список нод";
+
+/* NodesList: scene title */
+"NodesList.Title" = "Список используемых нод";
+
+/* NodesList: 'Saved' message */
+"NodesList.Saved" = "Сохранено";
+
+/* NodesList: 'Unable To Save' message */
+"NodesList.UnableToSave" = "Не удалось сохранить";
+
+/* NodesList: 'Add new node' button lable */
+"NodesList.AddNewNode" = "Добавить новую нода";
+
+/* NodesList: 'Node url' plaseholder */
+"NodesList.NodeUrl" = "Адрес ноды";
+
 /* Notifications: scene title */
 "Notifications.Title" = "Уведомления";
 
