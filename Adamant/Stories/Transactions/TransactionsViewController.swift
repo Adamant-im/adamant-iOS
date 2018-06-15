@@ -22,6 +22,7 @@ class TransactionsViewController: UIViewController {
 	// MARK: - Dependencies
 	var accountService: AccountService!
 	var transfersProvider: TransfersProvider!
+	var dialogService: DialogService!
 	var router: Router!
 	
 	// MARK: - Properties
@@ -90,7 +91,7 @@ class TransactionsViewController: UIViewController {
 	}
     
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.transfersProvider.forceUpdate { (result) in
+        self.transfersProvider.forceUpdate { [weak self] (result) in
             guard let result = result else {
                 DispatchQueue.main.async {
                     refreshControl.endRefreshing()
@@ -101,11 +102,11 @@ class TransactionsViewController: UIViewController {
             switch result {
             case .success:
                 DispatchQueue.main.async {
-                    self.tableView.reloadData()
+                    self?.tableView.reloadData()
                 }
                 break
             case .error(let error):
-                print("Error update transfers: \(error)")
+				self?.dialogService.showRichError(error: error)
             }
             
             DispatchQueue.main.async {

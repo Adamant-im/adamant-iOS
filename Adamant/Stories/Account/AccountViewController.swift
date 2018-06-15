@@ -24,6 +24,9 @@ extension String.adamantLocalized {
 		static let joinIcoUrlFormat = NSLocalizedString("AccountTab.JoinIco.UrlFormat", comment: "Account tab: A full 'Join ICO' link, with %@ as address")
 		static let getFreeTokensUrlFormat = NSLocalizedString("AccountTab.FreeTokens.UrlFormat", comment: "Account atb: A full 'Get free tokens' link, with %@ as address")
 		
+		// Errors
+		static let failedToUpdate = NSLocalizedString("AccountTab.Error.FailedToUpdateAccountFormat", comment: "Account tab: Failed to update account message. %@ for error message")
+		
 		private init() { }
 	}
 }
@@ -414,17 +417,19 @@ extension AccountViewController {
 	}
     
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.accountService.update { (result) in
+        accountService.update { [weak self] (result) in
             switch result {
             case .success:
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-                
-                break
+				guard let tableView = self?.tableView else {
+					break
+				}
+				
+				DispatchQueue.main.async {
+					tableView.reloadData()
+				}
+				
             case .failure(let error):
-                print("Error update account: \(error)")
-                break
+				self?.dialogService.showRichError(error: error)
             }
             
             DispatchQueue.main.async {

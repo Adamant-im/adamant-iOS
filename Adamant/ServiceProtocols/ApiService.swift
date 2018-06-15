@@ -23,10 +23,10 @@ enum ApiServiceError: Error {
 	var localized: String {
 		switch self {
 		case .notLogged:
-			return NSLocalizedString("ApiService.Error.UserNotLogged", comment: "ApiService: User not logged error")
+			return String.adamantLocalized.sharedErrors.userNotLogged
 			
 		case .accountNotFound:
-			return NSLocalizedString("ApiService.Error.AccountNotFoundFormat", comment: "ApiService: Account not found error. Using %@ for address.")
+			return String.adamantLocalized.sharedErrors.accountNotFound
 			
 		case .serverError(error: let error):
 			return String.localizedStringWithFormat(NSLocalizedString("ApiService.Error.RemoteServerErrorFormat", comment: "ApiService: Remote server returned an error. Using %@ for error description"), error)
@@ -41,10 +41,11 @@ enum ApiServiceError: Error {
 				message = msg
 			}
 			
-			return String.localizedStringWithFormat(NSLocalizedString("ApiService.Error.InternalErrorFormat", comment: "ApiService: Bad internal application error, report a bug. Using %@ for error description"), message)
+			return
+				String.adamantLocalized.sharedErrors.internalError(message: message)
 			
 		case .networkError(error: _):
-			return NSLocalizedString("ApiService.Error.NoConnection", comment: "ApiService: No connection message. Generally bad network.")
+			return String.adamantLocalized.sharedErrors.networkError
 		}
 	}
 }

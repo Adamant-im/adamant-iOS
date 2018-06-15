@@ -450,8 +450,8 @@ extension AdamantTransfersProvider {
                     
                 case .notFound, .invalidAddress:
 					errors.append(ProcessingResult.accountNotFound(address: id))
-                    
-                case .serverError(let error):
+					
+                case .networkError(let error), .serverError(let error):
                     errors.append(ProcessingResult.error(error))
                 }
             })

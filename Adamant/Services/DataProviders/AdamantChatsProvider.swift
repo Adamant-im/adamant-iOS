@@ -285,6 +285,9 @@ extension AdamantChatsProvider {
 			case .serverError(let error):
 				completion(.failure(.serverError(error)))
 				
+			case .networkError(_):
+				completion(.failure(ChatsProviderError.networkError))
+				
 			case .success(let account):
 				acc = account
 			}

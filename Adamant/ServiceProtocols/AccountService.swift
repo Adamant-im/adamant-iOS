@@ -66,21 +66,58 @@ enum AccountServiceError: Error {
 	var localized: String {
 		switch self {
 		case .userNotLogged:
-			return NSLocalizedString("AccountServiceError.UserNotLogged", comment: "Login: user not logged error")
+			return String.adamantLocalized.sharedErrors.userNotLogged
 			
 		case .invalidPassphrase:
 			return NSLocalizedString("AccountServiceError.InvalidPassphrase", comment: "Login: user typed in invalid passphrase")
 			
 		case .wrongPassphrase:
 			return NSLocalizedString("AccountServiceError.WrongPassphrase", comment: "Login: user typed in wrong passphrase")
-			
+		
 		case .apiError(let error):
 			return error.localized
-			
+		
 		case .internalError(let message, _):
-			return String.localizedStringWithFormat(NSLocalizedString("AccountServiceError.InternalErrorFormat", comment: "ApiService: Bad internal application error, report a bug. Using %@ as error description"), message)
+			return String.adamantLocalized.sharedErrors.internalError(message: message)
 		}
 	}
+}
+
+extension AccountServiceError: RichError {
+	var message: String {
+		return localized
+	}
+	
+	var internalError: Error? {
+		switch self {
+		case .apiError(let error as Error?), .internalError(_, let error):
+			return error
+			
+		default:
+			return nil
+		}
+	}
+	
+	var level: ErrorLevel {
+		switch self {
+		case .wrongPassphrase, .userNotLogged, .invalidPassphrase:
+			return .warning
+			
+		case .apiError(let error):
+			switch error {
+			case .accountNotFound, .notLogged, .networkError:
+				return .warning
+				
+			case .serverError, .internalError:
+				return .error
+			}
+			
+		case .internalError:
+			return .error
+		}
+	}
+	
+	
 }
 
 

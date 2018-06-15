@@ -35,10 +35,84 @@ enum ChatsProviderError: Error {
 	case internalError(Error)
 }
 
+extension ChatsProviderError: RichError {
+	var message: String {
+		switch self {
+		case .notLogged:
+			return String.adamantLocalized.sharedErrors.userNotLogged
+			
+		case .messageNotValid(let result):
+			return result.localized
+			
+		case .notEnoughtMoneyToSend:
+			return NSLocalizedString("ChatsProvider.Error.NotEnoughtMoney", comment: "ChatsProvider: Notify user that he doesn't have money to pay a message fee")
+			
+		case .networkError:
+			return String.adamantLocalized.sharedErrors.networkError
+			
+		case .serverError(let error):
+			return ApiServiceError.serverError(error: error.localizedDescription).localized
+			
+		case .accountNotFound(let address):
+			return AccountsProviderResult.notFound(address: address).localized
+			
+		case .dependencyError(let message):
+			return String.adamantLocalized.sharedErrors.internalError(message: message)
+			
+		case .transactionNotFound(let id):
+			return String.localizedStringWithFormat(NSLocalizedString("ChatsProvider.Error.TransactionNotFoundFormat", comment: "ChatsProvider: Transaction not found error. %@ for transaction's ID"), id)
+			
+		case .internalError(let error):
+			return String.adamantLocalized.sharedErrors.internalError(message: error.localizedDescription)
+		}
+	}
+	
+	var internalError: Error? {
+		switch self {
+		case .internalError(let error), .serverError(let error):
+			return error
+			
+		default:
+			return nil
+		}
+	}
+	
+	var level: ErrorLevel {
+		switch self {
+			case .accountNotFound,
+				 .messageNotValid,
+				 .networkError,
+				 .notEnoughtMoneyToSend,
+				 .notLogged:
+			return .warning
+			
+		case .dependencyError,
+			 .internalError,
+			 .serverError,
+			 .transactionNotFound:
+			return .error
+		}
+	}
+	
+	
+}
+
 enum ValidateMessageResult {
 	case isValid
 	case empty
 	case tooLong
+	
+	var localized: String {
+		switch self {
+		case .isValid: return NSLocalizedString("ChatsProvider.Validation.Passed", comment: "ChatsProvider: Validation passed, message is valid")
+			
+		case .empty:
+			return NSLocalizedString("ChatsProvider.Validation.MessageIsEmpty", comment: "ChatsProvider: Validation error: Message is empty")
+			
+		case .tooLong:
+			return NSLocalizedString("ChatsProvider.Validation.MessageTooLong", comment: "ChatsProvider: Validation error: Message is too long")
+		}
+	}
 }
 
 

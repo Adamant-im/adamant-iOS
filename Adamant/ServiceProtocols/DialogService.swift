@@ -9,6 +9,13 @@
 import UIKit
 import PMAlertController
 
+extension String.adamantLocalized.alert {
+	static let copyToPasteboard = NSLocalizedString("Shared.CopyToPasteboard", comment: "Shared alert 'Copy' button. Used anywhere. Used for copy-paste info.")
+	static let share = NSLocalizedString("Shared.Share", comment: "Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu.")
+	static let generateQr = NSLocalizedString("Shared.GenerateQRCode", comment: "Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere.")
+	static let saveToPhotolibrary = NSLocalizedString("Shared.SaveToPhotolibrary", comment: "Shared alert 'Save to Photos'. Used with saving images to photolibrary")
+}
+
 enum ShareType {
 	case copyToPasteboard
 	case share
@@ -30,13 +37,6 @@ enum ShareType {
 			return String.adamantLocalized.alert.saveToPhotolibrary
 		}
 	}
-}
-
-extension String.adamantLocalized.alert {
-	static let copyToPasteboard = NSLocalizedString("Shared.CopyToPasteboard", comment: "Shared alert 'Copy' button. Used anywhere. Used for copy-paste info.")
-	static let share = NSLocalizedString("Shared.Share", comment: "Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu.")
-	static let generateQr = NSLocalizedString("Shared.GenerateQRCode", comment: "Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere.")
-	static let saveToPhotolibrary = NSLocalizedString("Shared.SaveToPhotolibrary", comment: "Shared alert 'Save to Photos'. Used with saving images to photolibrary")
 }
 
 enum ShareContentType {
@@ -71,6 +71,16 @@ enum ShareContentType {
 	}
 }
 
+enum ErrorLevel {
+	case warning, error
+}
+
+protocol RichError: Error {
+	var message: String { get }
+	var internalError: Error? { get }
+	var level: ErrorLevel { get }
+}
+
 protocol DialogService: class {
 	
 	func getTopmostViewController() -> UIViewController?
@@ -90,6 +100,7 @@ protocol DialogService: class {
 	func showSuccess(withMessage: String)
 	func showWarning(withMessage: String)
 	func showError(withMessage: String, error: Error?)
+	func showRichError(error: RichError)
     func showNoConnectionNotification()
     func dissmisNoConnectionNotification()
 	
@@ -105,5 +116,4 @@ protocol DialogService: class {
     // MARK: - Alerts
     func showAlert(title:String, message: String, actions: [PMAlertAction]?)
     func showSystemActionSheet(title: String, message: String, actions: [UIAlertAction]?)
-    
 }

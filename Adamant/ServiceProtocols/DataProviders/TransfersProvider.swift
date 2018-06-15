@@ -22,6 +22,49 @@ enum TransfersProviderResult {
 	case error(TransfersProviderError)
 }
 
+extension TransfersProviderError: RichError {
+	var message: String {
+		switch self {
+		case .notLogged:
+			return String.adamantLocalized.sharedErrors.userNotLogged
+			
+		case .serverError(let error):
+			return ApiServiceError.serverError(error: error.localizedDescription).localized
+			
+		case .accountNotFound(let address):
+			return AccountsProviderResult.notFound(address: address).localized
+			
+		case .internalError(let message):
+			return String.adamantLocalized.sharedErrors.internalError(message: message)
+			
+		case .transactionNotFound(let id):
+			return String.localizedStringWithFormat(NSLocalizedString("TransfersProvider.Error.TransactionNotFoundFormat", comment: "TransfersProvider: Transaction not found error. %@ for transaction's ID"), id)
+		}
+	}
+	
+	var internalError: Error? {
+		switch self {
+		case .serverError(let error):
+			return error
+			
+		default:
+			return nil
+		}
+	}
+	
+	var level: ErrorLevel {
+		switch self {
+		case .notLogged, .accountNotFound(_), .transactionNotFound(_):
+			return .warning
+			
+		case .serverError(_), .internalError(_):
+			return .error
+		}
+	}
+	
+	
+}
+
 extension Notification.Name {
 	struct AdamantTransfersProvider {
 		/// userInfo contains 'newTransactions' element. See AdamantUserInfoKey.TransfersProvider
