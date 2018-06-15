@@ -12,6 +12,8 @@ import CoreData
 extension String.adamantLocalized {
 	struct transactionList {
 		static let title = NSLocalizedString("TransactionListScene.Title", comment: "TransactionList: scene title")
+        static let toChat = NSLocalizedString("TransactionListScene.ToChat", comment: "TransactionList: To Chat button")
+        static let startChat = NSLocalizedString("TransactionListScene.StartChat", comment: "TransactionList: Start Chat button")
 	}
 }
 
@@ -22,6 +24,7 @@ class TransactionsViewController: UIViewController {
 	// MARK: - Dependencies
 	var accountService: AccountService!
 	var transfersProvider: TransfersProvider!
+    var chatsProvider: ChatsProvider!
 	var router: Router!
 	
 	// MARK: - Properties
@@ -154,6 +157,67 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 		configureCell(cell, for: transfer)
 		return cell
 	}
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt: IndexPath) -> [UITableViewRowAction]? {
+        guard let transfer = controller?.object(at: editActionsForRowAt), let chatroom = transfer.partner?.chatroom, let transactions = chatroom.transactions  else {
+                return nil
+        }
+        
+        let messeges = transactions.first (where: { (object) -> Bool in
+            return !(object is TransferTransaction)
+        })
+        
+        let title = (messeges != nil) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
+        
+        let toChat = UITableViewRowAction(style: .normal, title: title) { action, index in
+            guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
+                return
+            }
+            
+            if let account = self.accountService.account {
+                vc.account = account
+            }
+            
+            vc.hidesBottomBarWhenPushed = true
+            vc.chatroom = chatroom
+            
+            if let nav = self.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                self.present(vc, animated: true)
+            }
+        }
+        
+        toChat.backgroundColor = UIColor.adamantPrimary
+        
+        return [toChat]
+    }
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    @available(iOS 11.0, *)
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let transfer = controller?.object(at: indexPath), let chatroom = transfer.partner?.chatroom, let transactions = chatroom.transactions  else {
+            return nil
+        }
+
+        let messeges = transactions.first (where: { (object) -> Bool in
+            return !(object is TransferTransaction)
+        })
+
+        let title = (messeges != nil) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
+
+        let toChat = UIContextualAction(style: .normal, title:  title, handler: { (ac:UIContextualAction, view:UIView, success:(Bool) -> Void) in
+
+        })
+
+        toChat.image = (messeges != nil) ? #imageLiteral(resourceName: "chats_tab") : #imageLiteral(resourceName: "Chat")
+        toChat.backgroundColor = UIColor.adamantPrimary
+        return UISwipeActionsConfiguration(actions: [toChat])
+    }
+
 }
 
 extension TransactionsViewController: NSFetchedResultsControllerDelegate {
@@ -193,4 +257,5 @@ extension TransactionsViewController: NSFetchedResultsControllerDelegate {
 		}
 	}
 }
+
 

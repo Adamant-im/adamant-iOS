@@ -415,6 +415,12 @@
 /* TransactionList: scene title */
 "TransactionListScene.Title" = "Transactions";
 
+/* TransactionList: To Chat button */
+"TransactionListScene.ToChat" = "To Chat";
+
+/* TransactionList: Start Chat button */
+"TransactionListScene.StartChat" = "Start Chat";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";
 

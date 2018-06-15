@@ -36,8 +36,9 @@ class TransactionDetailsViewController: UIViewController {
 		case confirmations
 		case block
 		case openInExplorer
+        case openChat
 		
-		static let total = 9
+		static let total = 10
 		
 		var localized: String {
 			switch self {
@@ -50,18 +51,22 @@ class TransactionDetailsViewController: UIViewController {
 			case .confirmations: return NSLocalizedString("TransactionDetailsScene.Row.Confirmations", comment: "Transaction details: confirmations row.")
 			case .block: return NSLocalizedString("TransactionDetailsScene.Row.Block", comment: "Transaction details: Block id row.")
 			case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
+            case .openChat: return ""
 			}
 		}
 	}
 	
 	// MARK: - Dependencies
+    var accountService: AccountService!
 	var dialogService: DialogService!
     var transfersProvider: TransfersProvider!
+    var router: Router!
 	
 	// MARK: - Properties
 	private let cellIdentifier = "cell"
 	var transaction: TransferTransaction?
 	var explorerUrl: URL!
+    var haveChatroom = false
 	
 	private let autoupdateInterval: TimeInterval = 5.0
     
@@ -80,6 +85,14 @@ class TransactionDetailsViewController: UIViewController {
 		tableView.delegate = self
 		
 		if let transaction = transaction {
+            if let chatroom = transaction.partner?.chatroom, let transactions = chatroom.transactions  {
+                let messeges = transactions.first (where: { (object) -> Bool in
+                    return !(object is TransferTransaction)
+                })
+                
+                haveChatroom = (messeges != nil)
+            }
+            
 			tableView.reloadData()
 			
 			if let id = transaction.transactionId {
@@ -191,6 +204,26 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 			present(safari, animated: true, completion: nil)
 			return
 		}
+        
+        if indexPath.row == Row.openChat.rawValue {
+            guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController, let chatroom = transaction?.partner?.chatroom  else {
+                return
+            }
+            
+            if let account = self.accountService.account {
+                vc.account = account
+            }
+            
+            vc.hidesBottomBarWhenPushed = true
+            vc.chatroom = chatroom
+            
+            if let nav = self.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                self.present(vc, animated: true)
+            }
+            return
+        }
 		
 		let share: String
 		if indexPath.row == Row.date.rawValue, let date = transaction?.date as Date? {
@@ -204,7 +237,6 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 			
 			share = details
 		}
-		
 		
 		dialogService.presentShareAlertFor(string: share,
 										   types: [.copyToPasteboard, .share],
@@ -228,6 +260,7 @@ extension TransactionDetailsViewController {
 		if let c = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
 			cell = c
 			cell.accessoryType = .none
+            cell.imageView?.image = nil
 		} else {
 			cell = UITableViewCell(style: .value1, reuseIdentifier: cellIdentifier)
 			cell.textLabel?.textColor = UIColor.adamantPrimary
@@ -276,7 +309,12 @@ extension TransactionDetailsViewController {
 		case .openInExplorer:
 			cell.detailTextLabel?.text = nil
 			cell.accessoryType = .disclosureIndicator
-		}
+        case .openChat:
+            cell.textLabel?.text = (self.haveChatroom) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
+            cell.detailTextLabel?.text = nil
+            cell.accessoryType = .disclosureIndicator
+            cell.imageView?.image = (haveChatroom) ? #imageLiteral(resourceName: "chats_tab") : #imageLiteral(resourceName: "Chat")
+        }
 		
 		return cell
 	}
