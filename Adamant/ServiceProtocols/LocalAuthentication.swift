@@ -10,6 +10,14 @@ import Foundation
 
 enum BiometryType {
 	case none, touchID, faceID
+	
+	var localized: String {
+		switch self {
+		case .none: return "None"
+		case .touchID: return "Touch ID"
+		case .faceID: return "Face ID"
+		}
+	}
 }
 
 enum AuthenticationResult {

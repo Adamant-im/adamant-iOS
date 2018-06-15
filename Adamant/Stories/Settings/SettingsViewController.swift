@@ -49,6 +49,7 @@ class SettingsViewController: FormViewController {
 		case stayLoggedIn
 		case biometry
 		case notifications
+		case nodes
 		
 		var localized: String {
 			switch self {
@@ -66,6 +67,9 @@ class SettingsViewController: FormViewController {
 				
 			case .notifications:
 				return NSLocalizedString("SettingsPage.Row.Notifications", comment: "Config: Show notifications")
+				
+			case .nodes:
+				return String.adamantLocalized.nodesList.nodesListButton
 			}
 		}
 		
@@ -76,6 +80,7 @@ class SettingsViewController: FormViewController {
 			case .version: return "ver"
 			case .qrPassphraseGenerator: return "qr"
 			case .notifications: return "ntfy"
+			case .nodes: return "nds"
 			}
 		}
 	}
@@ -130,11 +135,7 @@ class SettingsViewController: FormViewController {
 				return !showBiometry
 			})
 			
-			switch localAuth.biometryType {
-			case .touchID: $0.title = "Touch ID"
-			case .faceID: $0.title = "Face ID"
-			case .none: break
-			}
+			$0.title = localAuth.biometryType.localized
 		}.onChange({ [weak self] row in
 			guard let enabled = row.value else { return }
 			self?.setBiometry(enabled: enabled)
@@ -192,30 +193,28 @@ class SettingsViewController: FormViewController {
 			
 			cell.accessoryType = .disclosureIndicator
 		})
-        
-        // MARK: Nodes list settings
-        form +++ Section()
-            <<< LabelRow() {
-                $0.title = String.adamantLocalized.nodesList.nodesListButton
-                $0.tag = "nodes"
-                }.cellSetup({ (cell, _) in
-                    cell.selectionStyle = .gray
-                }).onCellSelection({ [weak self] (_, _) in
-                    guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.nodesList) else {
-                        return
-                    }
-                    nav.pushViewController(vc, animated: true)
-                }).cellUpdate({ (cell, _) in
-                    if let label = cell.textLabel {
-                        label.font = UIFont.adamantPrimary(size: 17)
-                        label.textColor = UIColor.adamantPrimary
-                    }
-                    
-                    cell.accessoryType = .disclosureIndicator
-                })
+		
 		
 		// MARK: Application
 		form +++ Section(Sections.applicationInfo.localized)
+		<<< LabelRow() {
+			$0.title = Rows.nodes.localized
+			$0.tag = Rows.nodes.tag
+			}.cellSetup({ (cell, _) in
+				cell.selectionStyle = .gray
+			}).onCellSelection({ [weak self] (_, _) in
+				guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.nodesList) else {
+					return
+				}
+				nav.pushViewController(vc, animated: true)
+			}).cellUpdate({ (cell, _) in
+				if let label = cell.textLabel {
+					label.font = UIFont.adamantPrimary(size: 17)
+					label.textColor = UIColor.adamantPrimary
+				}
+				
+				cell.accessoryType = .disclosureIndicator
+			})
 		<<< LabelRow() {
 			$0.title = Rows.version.localized
 			$0.value = AdamantUtilities.applicationVersion
