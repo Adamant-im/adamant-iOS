@@ -63,6 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var accountService: AccountService!
 	var notificationService: NotificationsService!
     var dialogService: DialogService!
+    var ethApiService: EthApiServiceProtocol!
 
 	// MARK: - Lifecycle
 	
@@ -73,6 +74,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		accountService = container.resolve(AccountService.self)
 		notificationService = container.resolve(NotificationsService.self)
         dialogService = container.resolve(DialogService.self)
+        ethApiService = container.resolve(EthApiServiceProtocol.self)
 		
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)

@@ -26,18 +26,6 @@ target 'Adamant' do
   pod 'QRCodeReader.swift' # QR reader
   
   # ETH
-  # https://github.com/ethereum/web3.js/
-
-#  https://github.com/MercuryProtocol/web3.swift
-#  https://medium.com/mercuryprotocol/introducing-web3-swift-for-ethereum-ios-development-1e02212b662b
-#  pod 'web3swift', :git => 'https://github.com/MercuryProtocol/web3.swift.git', :branch => 'master'
-
-#  https://github.com/Boilertalk/Web3.swift
-  pod 'Web3'
-  
-
-#  https://github.com/yuzushioh/EthereumKit
-#  https://github.com/bankex/web3swift
-#  https://github.com/IndisputableLabs/Swifthereum
+  pod 'web3swift', '~> 0.8.0' # Web3 Swift Port
 
 end

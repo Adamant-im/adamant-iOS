@@ -1,6 +1,9 @@
 PODS:
   - Alamofire (4.7.2)
-  - BigInt.swift (1.0.0)
+  - Alamofire-Synchronous (4.0.0):
+    - Alamofire (~> 4.0)
+  - BigInt (3.0.1):
+    - SipHash (~> 1.2)
   - CryptoSwift (0.10.0)
   - DateToolsSwift (4.0.0)
   - EFQRCode (4.2.2)
@@ -15,27 +18,25 @@ PODS:
   - FTIndicator/FTToastIndicator (1.2.9)
   - Haring (2.0.8)
   - KeychainAccess (3.1.1)
+  - libsodium (1.0.12)
   - MessageKit (0.13.5)
   - MyLittlePinpad (0.2.4)
   - PMAlertController (3.4.0)
   - QRCodeReader.swift (8.2.0)
   - ReachabilitySwift (4.1.0)
+  - Result (3.0.0)
   - RNCryptor (5.0.3)
-<<<<<<< HEAD
+  - secp256k1_ios (0.1.3)
+  - SipHash (1.2.2)
   - Swinject (2.4.1)
-=======
-  - secp256k1.swift (0.1.4)
-  - Swinject (2.4.0)
-  - Web3 (0.1.1):
-    - Web3/Core (= 0.1.1)
-    - Web3/HTTPExtension (= 0.1.1)
-  - Web3/Core (0.1.1):
-    - BigInt.swift (~> 1.0)
-    - CryptoSwift (~> 0.8)
-    - secp256k1.swift (~> 0.1)
-  - Web3/HTTPExtension (0.1.1):
-    - Web3/Core
->>>>>>> Eth integration init
+  - web3swift (0.8.1):
+    - Alamofire (~> 4.7)
+    - Alamofire-Synchronous (~> 4.0)
+    - BigInt (~> 3.0.1)
+    - CryptoSwift (~> 0.10.0)
+    - libsodium (~> 1.0.12)
+    - Result (~> 3.0.0)
+    - secp256k1_ios (~> 0.1.3)
 
 DEPENDENCIES:
   - Alamofire
@@ -54,12 +55,13 @@ DEPENDENCIES:
   - ReachabilitySwift
   - RNCryptor
   - Swinject
-  - Web3
+  - web3swift (~> 0.8.0)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
-    - BigInt.swift
+    - Alamofire-Synchronous
+    - BigInt
     - CryptoSwift
     - DateToolsSwift
     - EFQRCode
@@ -68,14 +70,17 @@ SPEC REPOS:
     - FTIndicator
     - Haring
     - KeychainAccess
+    - libsodium
     - MyLittlePinpad
     - PMAlertController
     - QRCodeReader.swift
     - ReachabilitySwift
+    - Result
     - RNCryptor
-    - secp256k1.swift
+    - secp256k1_ios
+    - SipHash
     - Swinject
-    - Web3
+    - web3swift
 
 EXTERNAL SOURCES:
   MessageKit:
@@ -89,7 +94,8 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
-  BigInt.swift: 1e0ddf08d82166e72dfb0fa8d40301d273081afc
+  Alamofire-Synchronous: eedf1e6e961c3795a63c74990b3f7d9fbfac7e50
+  BigInt: 8e8a52161c745cd3ab78e3dc346a9fbee51e6cf6
   CryptoSwift: 6c778d69282bed3b4e975ff97a79d074f20bb011
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   EFQRCode: 203846c7b135b5f7c1d18bb7923bc32a74c8b363
@@ -98,20 +104,19 @@ SPEC CHECKSUMS:
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   Haring: d2a4cfc00dfb63836dffc93e45919369f850e134
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
+  libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   MessageKit: c4bd50e285a0f0761bc23a2e982aa7840873c4f5
   MyLittlePinpad: dc5f8a7fc13a4ad6fc9dc8d3359d91f1b5b1c7e8
   PMAlertController: efb781925d741d50e0200018a00c53cecb8b4910
   QRCodeReader.swift: 003eb32f18a5a675b936ec82ba0ff368cddbff45
   ReachabilitySwift: 6849231cd4e06559f3b9ef4a97a0a0f96d41e09f
+  Result: 1b3e431f37cbcd3ad89c6aa9ab0ae55515fae3b6
   RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
-<<<<<<< HEAD
+  secp256k1_ios: ac9ef04e761f43c58012b28548afa91493761f17
+  SipHash: fad90a4683e420c52ef28063063dbbce248ea6d4
   Swinject: f7f15a9672e99328c1f07f277091087917215700
-=======
-  secp256k1.swift: a7e7a214f6db6ce5db32cc6b2b45e5c4dd633634
-  Swinject: a1364b0f66c2736bb03c1c7cab54809e16df25da
-  Web3: 1f0c38c8508b8487948af1cb597653b018f4b5d3
->>>>>>> Eth integration init
+  web3swift: 79f72b48005f1b28e73191eaf78194d6cf5f8a35
 
-PODFILE CHECKSUM: 515461f4af013cf25e5baf6629f9ebac87a15c17
+PODFILE CHECKSUM: e8eb304aaab35b0a88a5061076e0ce130e155579
 
 COCOAPODS: 1.5.3
