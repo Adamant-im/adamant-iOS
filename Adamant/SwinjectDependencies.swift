@@ -73,9 +73,13 @@ extension Container {
             let service = AdamantApiService()
             service.adamantCore = r.resolve(AdamantCore.self)
             return service
-        }.initCompleted { (r, c) in    // Weak reference
-            let service = c as! AdamantApiService
-            service.nodesSource = r.resolve(NodesSource.self)
+		}.inObjectScope(.container)
+        
+        // MARK: EthApiService
+        self.register(EthApiServiceProtocol.self) { r in
+            let service = EthApiService(apiUrl: AdamantResources.ethServers.first!)
+            service.adamantCore = r.resolve(AdamantCore.self)!
+            return service
         }.inObjectScope(.container)
 		
 		// MARK: AccountService

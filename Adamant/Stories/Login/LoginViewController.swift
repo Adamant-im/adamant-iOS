@@ -125,6 +125,7 @@ class LoginViewController: FormViewController {
 	var dialogService: DialogService!
 	var localAuth: LocalAuthentication!
     var router: Router!
+    var ethAPiService: EthApiServiceProtocol!
 	
 	
 	// MARK: Properties
@@ -386,13 +387,22 @@ extension LoginViewController {
 		accountService.loginWith(passphrase: passphrase, completion: { [weak self] result in
 			switch result {
 			case .success(_):
-				if let nav = self?.navigationController {
-					nav.popViewController(animated: true)
-				} else {
-					self?.dismiss(animated: true, completion: nil)
-				}
-				
-				self?.dialogService.dismissProgress()
+                self?.ethAPiService.newAccount(byPassphrase: passphrase, completion: { (result) in
+                    switch result {
+                    case .success(_):
+                        break
+                    case .failure(let error):
+                        print(error)
+                        break
+                    }
+                    
+                    if let nav = self?.navigationController {
+                        nav.popViewController(animated: true)
+                    } else {
+                        self?.dismiss(animated: true, completion: nil)
+                    }
+                    self?.dialogService.dismissProgress()
+                })
 				
 			case .failure(let error):
 				self?.dialogService.showRichError(error: error)

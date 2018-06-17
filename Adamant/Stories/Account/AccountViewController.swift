@@ -115,6 +115,7 @@ class AccountViewController: FormViewController {
 	var accountService: AccountService!
 	var dialogService: DialogService!
 	var router: Router!
+    var ethApiService: EthApiServiceProtocol!
 	var notificationsService: NotificationsService!
 	var transfersProvider: TransfersProvider!
 	
@@ -329,6 +330,10 @@ class AccountViewController: FormViewController {
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.updateAccountInfo()
 		}
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.EthApiService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.refreshEthCells()
+        }
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -624,4 +629,23 @@ extension AccountViewController {
 		
 		return section
 	}
+
+func refreshEthCells() {
+if let row: AccountRow = form.rowBy(tag: Rows.ethAccount.tag) {
+row.value = self.ethApiService.account?.address
+row.reload()
+}
+
+ethApiService.getBalance { (result) in
+switch result {
+case .success(let balance):
+if let row: LabelRow = self.form.rowBy(tag: Rows.ethBalance.tag) {
+row.value = balance
+row.reload()
+}
+case .failure(let error):
+print(error)
+}
+}
+}
 }
