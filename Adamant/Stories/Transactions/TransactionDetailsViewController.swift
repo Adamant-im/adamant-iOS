@@ -160,7 +160,7 @@ class TransactionDetailsViewController: UIViewController {
 						self?.tableView.reloadData()
 					}
 					
-				case .error(_):
+				case .failure:
 					return
 				}
 			}

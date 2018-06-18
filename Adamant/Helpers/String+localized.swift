@@ -42,6 +42,20 @@ extension String {
 			static let emailErrorMessageBodyWithDescription = NSLocalizedString("Error.Mail.Body.Detailed", comment: "Error messge body for support email, with detailed error description. Where first %@ - error's short message, second %@ - detailed description, third %@ - deviceInfo")
 		}
 		
+		struct sharedErrors {
+			static let userNotLogged = NSLocalizedString("Error.UserNotLogged", comment: "Shared error: User not logged")
+			static let networkError = NSLocalizedString("Error.NoNetwork", comment: "Shared error: Network problems. In most cases - no connection")
+			static let accountNotFound = NSLocalizedString("Error.AccountNotFoundFormat", comment: "Shared error: Account not found error. Using %@ for address.")
+			
+			static func internalError(message: String) -> String {
+				return String.localizedStringWithFormat(NSLocalizedString("Error.InternalErrorFormat", comment: "Shared error: Internal error format, %@ for message"), message)
+			}
+			
+			static func remoteServerError(message: String) -> String {
+				return String.localizedStringWithFormat(NSLocalizedString("Error.RemoteErrorFormat", comment: "Shared error: Remote error format, %@ for message"), message)
+			}
+		}
+		
 		private init() { }
 	}
 	

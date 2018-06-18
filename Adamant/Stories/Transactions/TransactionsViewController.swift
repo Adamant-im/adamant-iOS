@@ -24,11 +24,22 @@ class TransactionsViewController: UIViewController {
 	// MARK: - Dependencies
 	var accountService: AccountService!
 	var transfersProvider: TransfersProvider!
-    var chatsProvider: ChatsProvider!
+  var chatsProvider: ChatsProvider!
+  var dialogService: DialogService!
 	var router: Router!
 	
 	// MARK: - Properties
 	var controller: NSFetchedResultsController<TransferTransaction>?
+    
+    private lazy var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action:
+            #selector(self.handleRefresh(_:)),
+                                 for: UIControlEvents.valueChanged)
+        refreshControl.tintColor = UIColor.adamantPrimary
+        
+        return refreshControl
+    }()
 	
 	
 	// MARK: - IBOutlets
@@ -48,6 +59,7 @@ class TransactionsViewController: UIViewController {
 		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
 		tableView.dataSource = self
 		tableView.delegate = self
+        tableView.addSubview(self.refreshControl)
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
 			self?.initFetchedResultController(provider: self?.transfersProvider)
@@ -84,6 +96,31 @@ class TransactionsViewController: UIViewController {
 		
 		tableView.reloadData()
 	}
+    
+    @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
+        self.transfersProvider.update { [weak self] (result) in
+            guard let result = result else {
+                DispatchQueue.main.async {
+                    refreshControl.endRefreshing()
+                }
+                return
+            }
+            
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    self?.tableView.reloadData()
+                }
+                break
+            case .failure(let error):
+				self?.dialogService.showRichError(error: error)
+            }
+            
+            DispatchQueue.main.async {
+                refreshControl.endRefreshing()
+            }
+        }
+    }
 }
 
 // MARK: - UITableView Cells

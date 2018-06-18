@@ -25,8 +25,6 @@ extension String.adamantLocalized {
 		static let loggedUserAddressMessage = NSLocalizedString("NewChatScene.Error.OwnAddress", comment: "New chat: Notify user that he can't start chat with himself")
 		
 		static let wrongQrError = NSLocalizedString("NewChatScene.Error.WrongQr", comment: "New Chat: Notify user that scanned QR doesn't contains an address")
-		static let addressNotFoundFormat = NSLocalizedString("NewChatScene.Error.AddressNotFoundFormat", comment: "New chat: Notify user that specified address (%@) not found. Using %@ for address")
-		static let serverErrorFormat = NSLocalizedString("NewChatScene.Error.RemoteServerFormat", comment: "New chat: Remote server returned an error. Using %@ for error description")
 		
 		private init() { }
 	}
@@ -201,23 +199,11 @@ class NewChatViewController: FormViewController {
 					self.dialogService.dismissProgress()
 				}
 				
-			case .notFound, .invalidAddress:
-				self.dialogService.showWarning(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.addressNotFoundFormat, address))
-				
-			case .serverError(let error as ApiServiceError):
-				let message: String
-				switch error {
-				case .networkError(let internalError):
-					message = internalError.localizedDescription
-					
-				default:
-					message = error.localized
-				}
-				
-				self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.serverErrorFormat, message), error: error)
+			case .notFound, .invalidAddress, .networkError(_):
+				self.dialogService.showWarning(withMessage: result.localized)
 				
 			case .serverError(let error):
-				self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.newChat.serverErrorFormat, error.localizedDescription), error: error)
+				self.dialogService.showError(withMessage: result.localized, error: error)
 			}
 		}
 	}

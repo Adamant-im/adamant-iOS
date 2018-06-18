@@ -11,9 +11,29 @@ import CoreData
 
 enum AccountsProviderResult {
 	case success(CoreDataAccount)
-	case notFound
-	case invalidAddress
+	case notFound(address: String)
+	case invalidAddress(address: String)
 	case serverError(Error)
+	case networkError(Error)
+	
+	var localized: String {
+		switch self {
+		case .success(_):
+			return ""
+			
+		case .notFound(let address):
+			return String.localizedStringWithFormat(String.adamantLocalized.sharedErrors.accountNotFound, address) 
+			
+		case .invalidAddress(let address):
+			return String.localizedStringWithFormat(NSLocalizedString("AccountsProvider.Error.AddressNotValidFormat", comment: "AccountsProvider: Address not valid error, %@ for address"), address)
+			
+		case .serverError(let error):
+			return ApiServiceError.serverError(error: error.localizedDescription).localized
+			
+		case .networkError:
+			return String.adamantLocalized.sharedErrors.networkError
+		}
+	}
 }
 
 protocol AccountsProvider {
