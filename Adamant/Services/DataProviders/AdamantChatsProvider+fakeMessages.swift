@@ -199,6 +199,9 @@ extension AdamantChatsProvider {
 			case .notFound, .invalidAddress:
 				completion(.failure(.accountNotFound(partnerId)))
 				
+			case .networkError(_):
+				completion(.failure(.networkError))
+				
 			case .serverError(let error):
 				completion(.failure(.serverError(error)))
 			}

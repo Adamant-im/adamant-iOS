@@ -109,7 +109,7 @@ extension AdamantAccountsProvider {
 	func getAccount(byAddress address: String, completion: @escaping (AccountsProviderResult) -> Void) {
 		let validation = AdamantUtilities.validateAdamantAddress(address: address)
 		if validation == .invalid {
-			completion(.invalidAddress)
+			completion(.invalidAddress(address: address))
 			return
 		}
 		
@@ -155,7 +155,10 @@ extension AdamantAccountsProvider {
 					case .failure(let error):
 						switch error {
 						case .accountNotFound:
-							completion(.notFound)
+							completion(.notFound(address: address))
+							
+						case .networkError(let error):
+							completion(.networkError(error))
 							
 						default:
 							completion(.serverError(error))
@@ -170,7 +173,7 @@ extension AdamantAccountsProvider {
 				
 			case .invalid:
 				group.leave()
-				completion(.invalidAddress)
+				completion(.invalidAddress(address: address))
 			}
 		}
 	}

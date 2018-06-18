@@ -162,6 +162,16 @@ extension AdamantDialogService {
         
         self.present(alertVC, animated: true, completion: nil)
 	}
+	
+	func showRichError(error: RichError) {
+		switch error.level {
+		case .warning:
+			showWarning(withMessage: error.message)
+			
+		case .error:
+			showError(withMessage: error.message, error: error.internalError)
+		}
+	}
     
     func showNoConnectionNotification() {
 		FTIndicator.showNotification(with: #imageLiteral(resourceName: "error"), title: String.adamantLocalized.alert.noInternetNotificationTitle, message: String.adamantLocalized.alert.noInternetNotificationBoby, autoDismiss: false, tapHandler: nil, completion: nil)
