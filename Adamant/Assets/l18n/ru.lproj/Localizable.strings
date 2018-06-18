@@ -427,6 +427,12 @@
 /* TransactionList: scene title */
 "TransactionListScene.Title" = "Транзакции";
 
+/* TransactionList: To Chat button */
+"TransactionListScene.ToChat" = "К чату";
+
+/* TransactionList: Start Chat button */
+"TransactionListScene.StartChat" = "Начать чат";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Подробности";
 
