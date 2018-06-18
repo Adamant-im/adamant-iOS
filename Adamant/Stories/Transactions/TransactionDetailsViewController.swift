@@ -196,53 +196,65 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		// Open in Explorer row
-		if indexPath.row == Row.openInExplorer.rawValue,
-			let url = explorerUrl {
-			let safari = SFSafariViewController(url: url)
-			safari.preferredControlTintColor = UIColor.adamantPrimary
-			present(safari, animated: true, completion: nil)
+		guard let row = Row(rawValue: indexPath.row) else {
+			tableView.deselectRow(at: indexPath, animated: true)
 			return
 		}
-        
-        if indexPath.row == Row.openChat.rawValue {
-            guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController, let chatroom = transaction?.partner?.chatroom  else {
-                return
-            }
-            
-            if let account = self.accountService.account {
-                vc.account = account
-            }
-            
-            vc.hidesBottomBarWhenPushed = true
-            vc.chatroom = chatroom
-            
-            if let nav = self.navigationController {
-                nav.pushViewController(vc, animated: true)
-            } else {
-                self.present(vc, animated: true)
-            }
-            return
-        }
 		
-		let share: String
-		if indexPath.row == Row.date.rawValue, let date = transaction?.date as Date? {
-			share = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .medium)
-		} else {
-			guard let cell = tableView.cellForRow(at: indexPath),
-				let details = cell.detailTextLabel?.text else {
-					tableView.deselectRow(at: indexPath, animated: true)
-					return
+		switch row {
+		case .openInExplorer:
+			if let url = explorerUrl {
+				let safari = SFSafariViewController(url: url)
+				safari.preferredControlTintColor = UIColor.adamantPrimary
+				present(safari, animated: true, completion: nil)
 			}
 			
-			share = details
-		}
-		
-		dialogService.presentShareAlertFor(string: share,
-										   types: [.copyToPasteboard, .share],
-										   excludedActivityTypes: nil,
-										   animated: true) {
-			tableView.deselectRow(at: indexPath, animated: true)
+		case .openChat:
+			// TODO: Log errors
+			guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
+				dialogService.showError(withMessage: "TransactionDetailsViewController: Failed to get ChatViewController", error: nil)
+				break
+			}
+			
+			guard let chatroom = transaction?.partner?.chatroom else {
+				dialogService.showError(withMessage: "TransactionDetailsViewController: Failed to get chatroom for transaction.", error: nil)
+				break
+			}
+			
+			guard let account = self.accountService.account else {
+				dialogService.showError(withMessage: "TransactionDetailsViewController: User not logged.", error: nil)
+				break
+			}
+			
+			vc.account = account
+			vc.chatroom = chatroom
+			vc.hidesBottomBarWhenPushed = true
+			
+			if let nav = self.navigationController {
+				nav.pushViewController(vc, animated: true)
+			} else {
+				self.present(vc, animated: true)
+			}
+			
+		default:
+			let share: String
+			if row == .date, let date = transaction?.date as Date? {
+				share = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .medium)
+				
+			} else if let cell = tableView.cellForRow(at: indexPath), let details = cell.detailTextLabel?.text {
+				share = details
+			} else {
+				tableView.deselectRow(at: indexPath, animated: true)
+				break
+			}
+			
+			dialogService.presentShareAlertFor(string: share,
+											   types: [.copyToPasteboard, .share],
+											   excludedActivityTypes: nil,
+											   animated: true)
+			{
+				tableView.deselectRow(at: indexPath, animated: true)
+			}
 		}
 	}
 }
@@ -313,7 +325,7 @@ extension TransactionDetailsViewController {
             cell.textLabel?.text = (self.haveChatroom) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
             cell.detailTextLabel?.text = nil
             cell.accessoryType = .disclosureIndicator
-            cell.imageView?.image = (haveChatroom) ? #imageLiteral(resourceName: "chats_tab") : #imageLiteral(resourceName: "Chat")
+//            cell.imageView?.image = (haveChatroom) ? #imageLiteral(resourceName: "chats_tab") : #imageLiteral(resourceName: "Chat")
         }
 		
 		return cell

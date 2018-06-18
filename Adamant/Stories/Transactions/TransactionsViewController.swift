@@ -63,6 +63,10 @@ class TransactionsViewController: UIViewController {
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
+		
+		if tableView.isEditing {
+			tableView.setEditing(false, animated: false)
+		}
 	}
 	
 	
@@ -160,7 +164,7 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
     
     func tableView(_ tableView: UITableView, editActionsForRowAt: IndexPath) -> [UITableViewRowAction]? {
         guard let transfer = controller?.object(at: editActionsForRowAt), let chatroom = transfer.partner?.chatroom, let transactions = chatroom.transactions  else {
-                return nil
+			return nil
         }
         
         let messeges = transactions.first (where: { (object) -> Bool in
@@ -171,15 +175,17 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
         
         let toChat = UITableViewRowAction(style: .normal, title: title) { action, index in
             guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
+				// TODO: Log this
                 return
             }
-            
-            if let account = self.accountService.account {
-                vc.account = account
-            }
-            
-            vc.hidesBottomBarWhenPushed = true
+			
+			guard let account = self.accountService.account else {
+				return
+			}
+			
+			vc.account = account
             vc.chatroom = chatroom
+			vc.hidesBottomBarWhenPushed = true
             
             if let nav = self.navigationController {
                 nav.pushViewController(vc, animated: true)
@@ -210,14 +216,30 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
         let title = (messeges != nil) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
 
         let toChat = UIContextualAction(style: .normal, title:  title, handler: { (ac:UIContextualAction, view:UIView, success:(Bool) -> Void) in
-
+			guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
+				// TODO: Log this
+				return
+			}
+			
+			guard let account = self.accountService.account else {
+				return
+			}
+			
+			vc.account = account
+			vc.chatroom = chatroom
+			vc.hidesBottomBarWhenPushed = true
+			
+			if let nav = self.navigationController {
+				nav.pushViewController(vc, animated: true)
+			} else {
+				self.present(vc, animated: true)
+			}
         })
 
         toChat.image = (messeges != nil) ? #imageLiteral(resourceName: "chats_tab") : #imageLiteral(resourceName: "Chat")
         toChat.backgroundColor = UIColor.adamantPrimary
         return UISwipeActionsConfiguration(actions: [toChat])
     }
-
 }
 
 extension TransactionsViewController: NSFetchedResultsControllerDelegate {
