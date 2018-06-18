@@ -116,8 +116,6 @@ extension AccountServiceError: RichError {
 			return .error
 		}
 	}
-	
-	
 }
 
 

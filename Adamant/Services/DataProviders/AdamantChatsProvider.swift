@@ -141,10 +141,10 @@ extension AdamantChatsProvider {
 	}
 	
 	func update() {
-		self.forceUpdate(nil)
+		self.update(completion: nil)
 	}
     
-    func forceUpdate(_ completion: ((ChatsProviderResult?) -> Void)?) {
+    func update(completion: ((ChatsProviderResult?) -> Void)?) {
         if state == .updating {
             completion?(nil)
             return
@@ -188,41 +188,65 @@ extension AdamantChatsProvider {
             }
             
             switch state {
-            case .failedToUpdate(_): // Processing failed
-                completion?(.failure(.dependencyError("Processing failed")))
-                break
-                
-            default:
-                self?.setState(.upToDate, previous: prevState)
-                
-                if prevHeight != self?.receivedLastHeight, let h = self?.receivedLastHeight {
-                    NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
-                                                    object: self,
-                                                    userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h])
-                }
-                
-                if let h = self?.receivedLastHeight {
-                    self?.readedLastHeight = h
-                } else {
-                    self?.readedLastHeight = 0
-                }
-                
-                if let store = self?.securedStore {
-                    if let h = self?.receivedLastHeight {
-                        store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
-                    }
-                    
-                    if let h = self?.readedLastHeight, h > 0 {
-                        store.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
-                    }
-                }
-                
-                if let synced = self?.isInitiallySynced, !synced {
-                    self?.isInitiallySynced = true
-                    NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: self)
-                }
-                
-                completion?(.success)
+			case .upToDate, .empty, .updating:
+				self?.setState(.upToDate, previous: prevState)
+				
+				if prevHeight != self?.receivedLastHeight, let h = self?.receivedLastHeight {
+					NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.newUnreadMessages,
+													object: self,
+													userInfo: [AdamantUserInfoKey.ChatProvider.lastMessageHeight:h])
+				}
+				
+				if let h = self?.receivedLastHeight {
+					self?.readedLastHeight = h
+				} else {
+					self?.readedLastHeight = 0
+				}
+				
+				if let store = self?.securedStore {
+					if let h = self?.receivedLastHeight {
+						store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
+					}
+					
+					if let h = self?.readedLastHeight, h > 0 {
+						store.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
+					}
+				}
+				
+				if let synced = self?.isInitiallySynced, !synced {
+					self?.isInitiallySynced = true
+					NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: self)
+				}
+				
+				completion?(.success)
+				
+            case .failedToUpdate(let error): // Processing failed
+				let err: ChatsProviderError
+				
+				switch error {
+				case let error as ApiServiceError:
+					switch error {
+					case .notLogged:
+						err = .notLogged
+						
+					case .accountNotFound:
+						err = .accountNotFound(address)
+						
+					case .serverError(_):
+						err = .serverError(error)
+						
+					case .internalError(let message, _):
+						err = .dependencyError(message)
+						
+					case .networkError(_):
+						err = .networkError
+					}
+					
+				default:
+					err = .internalError(error)
+				}
+				
+				completion?(.failure(err))
             }
         }
     }

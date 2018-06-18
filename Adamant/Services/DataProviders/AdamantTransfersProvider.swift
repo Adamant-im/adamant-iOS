@@ -106,10 +106,10 @@ extension AdamantTransfersProvider {
 	}
 	
 	func update() {
-		self.forceUpdate(nil)
+		self.update(completion: nil)
 	}
     
-    func forceUpdate(_ completion: ((TransfersProviderResult?) -> Void)?) {
+    func update(completion: ((TransfersProviderResult?) -> Void)?) {
         stateSemaphore.wait()
         if state == .updating {
             stateSemaphore.signal()
@@ -123,7 +123,7 @@ extension AdamantTransfersProvider {
         
         guard let address = accountService.account?.address else {
             self.setState(.failedToUpdate(TransfersProviderError.notLogged), previous: prevState)
-            completion?(.error(TransfersProviderError.notLogged))
+            completion?(.failure(TransfersProviderError.notLogged))
             return
         }
         
@@ -144,11 +144,7 @@ extension AdamantTransfersProvider {
             }
             
             switch state {
-            case .failedToUpdate(_): // Processing failed
-                completion?(.error(.internalError(message: "Processing failed")))
-                break
-                
-            default:
+			case .empty, .updating, .upToDate:
                 self?.setState(.upToDate, previous: prevState)
                 
                 if prevHeight != self?.receivedLastHeight, let h = self?.receivedLastHeight {
@@ -179,6 +175,35 @@ extension AdamantTransfersProvider {
                 }
                 
                 completion?(.success)
+				
+				
+			case .failedToUpdate(let error): // Processing failed
+				let err: TransfersProviderError
+				
+				switch error {
+				case let error as ApiServiceError:
+					switch error {
+					case .notLogged:
+						err = .notLogged
+						
+					case .accountNotFound:
+						err = .accountNotFound(address: address)
+						
+					case .serverError(_):
+						err = .serverError(error)
+						
+					case .internalError(let message, _):
+						err = .dependencyError(message: message)
+						
+					case .networkError(_):
+						err = .networkError
+					}
+					
+				default:
+					err = TransfersProviderError.internalError(message: String.adamantLocalized.sharedErrors.internalError(message: error.localizedDescription), error: error)
+				}
+				
+				completion?(.failure(err))
             }
         }
     }
@@ -256,7 +281,7 @@ extension AdamantTransfersProvider {
 	// MARK: Sending Funds
 	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void) {
 		guard let senderAddress = accountService.account?.address, let keypair = accountService.keypair else {
-			completion(.error(.notLogged))
+			completion(.failure(.notLogged))
 			return
 		}
 		
@@ -266,7 +291,7 @@ extension AdamantTransfersProvider {
 				completion(.success)
 				
 			case .failure(let error):
-				completion(.error(.serverError(error)))
+				completion(.failure(.serverError(error)))
 			}
 		}
 	}
@@ -298,12 +323,12 @@ extension AdamantTransfersProvider {
 	///   - completion: callback
 	func refreshTransfer(id: String, completion: @escaping (TransfersProviderResult) -> Void) {
 		guard let transfer = getTransfer(id: id) else {
-			completion(.error(.transactionNotFound(id: id)))
+			completion(.failure(.transactionNotFound(id: id)))
 			return
 		}
 		
 		guard let intId = UInt64(id) else {
-			completion(.error(.internalError(message: "Can't parse transaction id: \(id)")))
+			completion(.failure(.internalError(message: "Can't parse transaction id: \(id)", error: nil)))
 			return
 		}
 		
@@ -321,7 +346,7 @@ extension AdamantTransfersProvider {
 				context.parent = self.stack.container.viewContext
 				
 				guard let trsfr = context.object(with: transfer.objectID) as? TransferTransaction else {
-					completion(.error(.internalError(message: "Failed to update transaction: CoreData context changed")))
+					completion(.failure(.internalError(message: "Failed to update transaction: CoreData context changed", error: nil)))
 					return
 				}
 				
@@ -331,11 +356,11 @@ extension AdamantTransfersProvider {
 					try context.save()
 					completion(.success)
 				} catch {
-					completion(.error(.internalError(message: "Failed saving changes to CoreData: \(error.localizedDescription)")))
+					completion(.failure(.internalError(message: "Failed saving changes to CoreData: \(error.localizedDescription)", error: error)))
 				}
 				
 			case .failure(let error):
-				completion(.error(.serverError(error)))
+				completion(.failure(.serverError(error)))
 			}
 		}
 	}

@@ -14,12 +14,14 @@ enum TransfersProviderError: Error {
 	case serverError(Error)
 	case accountNotFound(address: String)
 	case transactionNotFound(id: String)
-	case internalError(message: String)
+	case internalError(message: String, error: Error?)
+	case dependencyError(message: String)
+	case networkError
 }
 
 enum TransfersProviderResult {
 	case success
-	case error(TransfersProviderError)
+	case failure(TransfersProviderError)
 }
 
 extension TransfersProviderError: RichError {
@@ -34,11 +36,17 @@ extension TransfersProviderError: RichError {
 		case .accountNotFound(let address):
 			return AccountsProviderResult.notFound(address: address).localized
 			
-		case .internalError(let message):
+		case .internalError(let message, _):
 			return String.adamantLocalized.sharedErrors.internalError(message: message)
 			
 		case .transactionNotFound(let id):
 			return String.localizedStringWithFormat(NSLocalizedString("TransfersProvider.Error.TransactionNotFoundFormat", comment: "TransfersProvider: Transaction not found error. %@ for transaction's ID"), id)
+			
+		case .dependencyError(let message):
+			return String.adamantLocalized.sharedErrors.internalError(message: message)
+			
+		case .networkError:
+			return String.adamantLocalized.sharedErrors.networkError
 		}
 	}
 	
@@ -54,10 +62,10 @@ extension TransfersProviderError: RichError {
 	
 	var level: ErrorLevel {
 		switch self {
-		case .notLogged, .accountNotFound(_), .transactionNotFound(_):
+		case .notLogged, .accountNotFound, .transactionNotFound, .networkError:
 			return .warning
 			
-		case .serverError(_), .internalError(_):
+		case .serverError, .internalError, .dependencyError:
 			return .error
 		}
 	}
@@ -123,7 +131,8 @@ protocol TransfersProvider: DataProvider {
 	func transfersController(for account: CoreDataAccount) -> NSFetchedResultsController<TransferTransaction>
 
     // Force update transactions
-    func forceUpdate(_ completion: ((TransfersProviderResult?) -> Void)?)
+	func update()
+    func update(completion: ((TransfersProviderResult?) -> Void)?)
 	
 	// MARK: - Sending funds
 	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void)

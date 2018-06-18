@@ -161,6 +161,7 @@ extension AdamantAccountService: AccountService {
 			break
 		}
 		
+		let prevState = state
 		state = .updating
 		stateSemaphore.signal()
 		
@@ -186,8 +187,8 @@ extension AdamantAccountService: AccountService {
                 completion?(.success(account: account))
 				
 			case .failure(let error):
-				print("Error update account: \(error.localized))")
-                completion?(.failure(.internalError(message: "Unable to update account", error: error)))
+                completion?(.failure(.apiError(error: error)))
+				self?.setState(prevState)
 			}
 		}
 	}

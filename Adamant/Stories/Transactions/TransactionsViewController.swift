@@ -91,7 +91,7 @@ class TransactionsViewController: UIViewController {
 	}
     
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.transfersProvider.forceUpdate { [weak self] (result) in
+        self.transfersProvider.update { [weak self] (result) in
             guard let result = result else {
                 DispatchQueue.main.async {
                     refreshControl.endRefreshing()
@@ -105,7 +105,7 @@ class TransactionsViewController: UIViewController {
                     self?.tableView.reloadData()
                 }
                 break
-            case .error(let error):
+            case .failure(let error):
 				self?.dialogService.showRichError(error: error)
             }
             

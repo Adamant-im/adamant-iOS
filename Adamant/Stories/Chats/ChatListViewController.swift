@@ -150,7 +150,7 @@ class ChatListViewController: UIViewController {
 	}
     
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        chatsProvider.forceUpdate { [weak self] (result) in
+        chatsProvider.update { [weak self] (result) in
             guard let result = result else {
                 DispatchQueue.main.async {
                     refreshControl.endRefreshing()
@@ -164,6 +164,7 @@ class ChatListViewController: UIViewController {
                     self?.tableView.reloadData()
                 }
                 break
+				
             case .failure(let error):
 				self?.dialogService.showRichError(error: error)
             }

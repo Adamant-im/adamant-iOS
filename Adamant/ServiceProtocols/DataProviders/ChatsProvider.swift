@@ -93,8 +93,6 @@ extension ChatsProviderError: RichError {
 			return .error
 		}
 	}
-	
-	
 }
 
 enum ValidateMessageResult {
@@ -169,7 +167,8 @@ protocol ChatsProvider: DataProvider {
 	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>
 	
     // ForceUpdate chats
-    func forceUpdate(_ completion: ((ChatsProviderResult?) -> Void)?)
+	func update()
+    func update(completion: ((ChatsProviderResult?) -> Void)?)
 	
 	// MARK: - Sending messages
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
