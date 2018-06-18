@@ -1,11 +1,8 @@
-/* ApiService: Bad internal application error, report a bug. Using %@ as error description */
-"AccountServiceError.InternalErrorFormat" = "Internal error: %@";
+/* AccountsProvider: Address not valid error, %@ for address */
+"AccountsProvider.Error.AddressNotValidFormat" = "Invalid address: %@";
 
 /* Login: user typed in invalid passphrase */
 "AccountServiceError.InvalidPassphrase" = "Wrong passphrase";
-
-/* Login: user not logged error */
-"AccountServiceError.UserNotLogged" = "User not logged";
 
 /* Login: user typed in wrong passphrase */
 "AccountServiceError.WrongPassphrase" = "Wrong passphrase";
@@ -15,6 +12,9 @@
 
 /* Account tab: Confirm logout alert */
 "AccountTab.ConfirmLogout.MessageFormat" = "Logout from %@?";
+
+/* Account tab: Failed to update account message. %@ for error message */
+"AccountTab.Error.FailedToUpdateAccountFormat" = "Failed to update account: %@";
 
 /* Account atb: A full 'Get free tokens' link, with %@ as address */
 "AccountTab.FreeTokens.UrlFormat" = "https://adamant.im/free-adm-tokens/?wallet=%@";
@@ -61,20 +61,8 @@
 /* Product name */
 "ADAMANT" = "ADAMANT";
 
-/* ApiService: Account not found error. Using %@ for address. */
-"ApiService.Error.AccountNotFoundFormat" = "Account not found: %@";
-
-/* ApiService: Bad internal application error, report a bug. Using %@ for error description */
-"ApiService.Error.InternalErrorFormat" = "Internal error: %@";
-
 /* ApiService: No connection message. Generally bad network. */
 "ApiService.Error.NoConnection" = "No connection to the Internet";
-
-/* ApiService: Remote server returned an error. Using %@ for error description */
-"ApiService.Error.RemoteServerErrorFormat" = "Blockchain Node error: %@";
-
-/* ApiService: User not logged error */
-"ApiService.Error.UserNotLogged" = "User not logged";
 
 /* Serious internal error: Failed to build endpoint url */
 "ApiService.InternalError.EndpointBuildFailed" = "Endpoint build failed. Report a bug";
@@ -97,6 +85,18 @@
 /* ChatList: scene title */
 "ChatListPage.Title" = "Chats";
 
+/* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
+"ChatsProvider.Error.NotEnoughtMoney" = "You don't have enough money to send a message";
+
+/* ChatsProvider: Transaction not found error. %@ for transaction's ID */
+"ChatsProvider.Error.TransactionNotFoundFormat" = "Message with id %@ not found";
+
+/* ChatsProvider: Validation error: Message is empty */
+"ChatsProvider.Validation.MessageIsEmpty" = "Message is empty";
+
+/* ChatsProvider: Validation error: Message is too long */
+"ChatsProvider.Validation.MessageTooLong" = "Message is too long";
+
 /* Known contacts: Adamant ICO message. Markdown supported. */
 "Chats.IcoMessage" = "You have a possibility to **Join the ICO** of ADAMANT, the most secure and anonymous messenger. Learn more on Adamant.im website or in the Whitepaper.\n\nPlease make sure your have saved the passphrase to this account — exit your account and open it again. Better save your password on a sheet of paper also. But remember, only **you are responsible for the passphrase safety**. It cannot be recovered. And if other person will get it, your money will be stolen. Treat this question as secure, as if tokens in your wallet will cost a billion dollars some time.\n\nTo buy ADM tokens, go to Wallet tab and click Join the ICO, or open the page Adamant.im/ico/ in the web browser. In the ICO form enter your ADAMANT address — you will receive ADM tokens there. If you moved from Messenger App, your ADM address will be filled already, other way go back to Messenger and click ADAMANT address to copy it to clipboard. Next, choose crypto you want to spend and its amount. You'll see how much ADM tokens you will receive, including volume bonus: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Click Buy ADAMANT tokens. You'll get unique address where you need to send crypto. As soon as your transaction will be confirmed, you'll receive ADM tokens. Transaction can be done **from any wallet or exchange**. It is not necessary to transfer exact amount including transaction fees, the payment will be processed anyway.\nAfter you receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users' wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.\n\nDo not reply to this message, it is a system account. If you still have any questions, contact account **U15677078342684640219**";
 
@@ -115,24 +115,6 @@
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Message already sended";
 
-/* Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description */
-"ChatScene.Error.InternalErrorFormat" = "Internal error: %@. Report a bug";
-
-/* Chat: Notify user that message cannot be empty */
-"ChatScene.Error.MessageIsEmpty" = "Message is empty!";
-
-/* Chat: Message is too long */
-"ChatScene.Error.MessageTooLong" = "Message is too long";
-
-/* Chat: Network problems. In most cases - no connection */
-"ChatScene.Error.NoNetwork" = "No connection";
-
-/* Chat: Notify user that he doesn't have money to pay a message fee */
-"ChatScene.Error.NotEnoughMoney" = "You don't have enough money to send a message";
-
-/* Chat: Notify user about server error. Using %@ for error description */
-"ChatScene.Error.RemoteServerErrorFormat" = "Blockchain Node error: %@. Report a bug";
-
 /* Chat: message input placeholder */
 "ChatScene.NewMessage.Placeholder" = "New message";
 
@@ -145,6 +127,12 @@
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Tap for details";
 
+/* Shared error: Account not found error. Using %@ for address. */
+"Error.AccountNotFoundFormat" = "Account not found: %@";
+
+/* Shared error: Internal error format, %@ for message */
+"Error.InternalErrorFormat" = "Internal error: %@";
+
 /* Error messge title for support email */
 "Error.Mail.Title" = "I have error in my iOS app";
 
@@ -153,6 +141,15 @@
 
 /* Error messge body for support email, with detailed error description. Where first %@ - error's short message, second %@ - detailed description, third %@ - deviceInfo */
 "Error.Mail.Body.Detailed" = "Hello,\nI have this error:\n\n%@\n\n%@\n\nDevice:\n%@";
+
+/* Shared error: Network problems. In most cases - no connection */
+"Error.NoNetwork" = "No connection";
+
+/* Shared error: Remote error format, %@ for message */
+"Error.RemoteServerErrorFormat" = "Blockchain Node error: %@";
+
+/* Shared error: User not logged */
+"Error.UserNotLogged" = "User not logged";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "LoginScene.Error.AuthorizeCamera" = "You need to authorize ADAMANT to use device's camera";
@@ -220,9 +217,6 @@
 /* New chat: Notify user that he can't start chat with himself */
 "NewChatScene.Error.OwnAddress" = "You don't need an encrypted anonymous chat to talk to yourself";
 
-/* New chat: Remote server returned an error. Using %@ for error description */
-"NewChatScene.Error.RemoteServerFormat" = "Blockchain Node error: %@. Report a bug";
-
 /* New Chat: Notify user that scanned QR doesn't contains an address */
 "NewChatScene.Error.WrongQr" = "QR code does not contain a valid address";
 
@@ -231,6 +225,24 @@
 
 /* New chat: scene title */
 "NewChatScene.Title" = "New Chat";
+
+/* NodesList: Button label */
+"NodesList.NodesList" = "Nodes list";
+
+/* NodesList: scene title */
+"NodesList.Title" = "List of used nodes";
+
+/* NodesList: 'Saved' message */
+"NodesList.Saved" = "Saved";
+
+/* NodesList: 'Unable To Save' message */
+"NodesList.UnableToSave" = "Unable to save";
+
+/* NodesList: 'Add new node' button lable */
+"NodesList.AddNewNode" = "Add new node";
+
+/* NodesList: 'Node url' plaseholder */
+"NodesList.NodeUrl" = "Node url";
 
 /* Notifications: Modes description. Markdown supported. */
 "Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. This can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You receive notification almost instantly after a message was sent and approved by the Blockchain - a few seconds delay. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.";
@@ -432,6 +444,9 @@
 
 /* Export transaction: 'Share transaction URL' button */
 "TransactionDetailsScene.Share.URL" = "URL";
+
+/* TransfersProvider: Transaction not found error. %@ for transaction's ID */
+"TransfersProvider.Error.TransactionNotFoundFormat" = "Transaction with id %@ not found";
 
 /* Transfer: transfer amount placeholder */
 "TransferScene.Amount.Placeholder" = "to send";
