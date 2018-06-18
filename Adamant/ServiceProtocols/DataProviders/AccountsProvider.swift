@@ -54,12 +54,17 @@ protocol AccountsProvider {
 }
 
 // MARK: - Known contacts
+struct SystemMessage {
+	let message: AdamantMessage
+	let silentNotification: Bool
+}
+
 enum AdamantContacts {
 	static let systemAddresses: [String] = {
 		return [AdamantContacts.adamantIco.name, AdamantContacts.adamantBountyWallet.name]
 	}()
 	
-	static func messagesFor(address: String) -> [String:AdamantMessage]? {
+	static func messagesFor(address: String) -> [String:SystemMessage]? {
 		switch address {
 		case AdamantContacts.adamantBountyWallet.address, AdamantContacts.adamantBountyWallet.name:
 			return AdamantContacts.adamantBountyWallet.messages
@@ -97,15 +102,18 @@ enum AdamantContacts {
 		return "avatar_bots"
 	}
 	
-	var messages: [String:AdamantMessage] {
+	var messages: [String: SystemMessage] {
 		switch self {
 		case .adamantBountyWallet:
-			return ["chats.welcome_message": AdamantMessage.markdownText(NSLocalizedString("Chats.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported."))]
+			return ["chats.welcome_message": SystemMessage(message: AdamantMessage.markdownText(NSLocalizedString("Chats.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported.")),
+														   silentNotification: true)]
 			
 		case .adamantIco:
 			return [
-				"chats.preico_message": AdamantMessage.text(NSLocalizedString("Chats.PreIcoMessage", comment: "Known contacts: Adamant pre ICO message")),
-				"chats.ico_message": AdamantMessage.markdownText(NSLocalizedString("Chats.IcoMessage", comment: "Known contacts: Adamant ICO message. Markdown supported."))
+				"chats.preico_message": SystemMessage(message: AdamantMessage.text(NSLocalizedString("Chats.PreIcoMessage", comment: "Known contacts: Adamant pre ICO message")),
+													  silentNotification: true),
+				"chats.ico_message": SystemMessage(message: AdamantMessage.markdownText(NSLocalizedString("Chats.IcoMessage", comment: "Known contacts: Adamant ICO message. Markdown supported.")),
+												   silentNotification: true)
 			]
 		}
 	}

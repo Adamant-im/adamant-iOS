@@ -770,8 +770,9 @@ extension AdamantChatsProvider {
 						if account.isSystem, let address = account.address,
 							let messages = AdamantContacts.messagesFor(address: address),
 							let key = messageTransaction.message,
-							let adamantMessage = messages.first(where: { key.range(of: $0.key) != nil })?.value {
-							switch adamantMessage {
+							let systemMessage = messages.first(where: { key.range(of: $0.key) != nil })?.value {
+							
+							switch systemMessage.message {
 							case .text(let text):
 								messageTransaction.message = text
 								
@@ -779,6 +780,8 @@ extension AdamantChatsProvider {
 								messageTransaction.message = text
 								messageTransaction.isMarkdown = true
 							}
+							
+							messageTransaction.silentNotification = systemMessage.silentNotification
 						}
 					}
 					
