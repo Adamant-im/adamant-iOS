@@ -41,11 +41,33 @@ extension ChatViewController: MessagesDataSource {
 			return nil
 		}
         
-        if let message = message as? MessageTransaction, message.messageStatus == .pending || message.statusEnum == .failed {
+        if let message = message as? MessageTransaction, message.statusEnum == .failed {
             return nil
         }
 		
-		return NSAttributedString(string: message.sentDate.humanizedTime(), attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
+		let humanizedTime = message.sentDate.humanizedTime()
+		
+		if let expire = humanizedTime.expireIn {
+			if !cellsUpdating.contains(indexPath) {
+				cellsUpdating.append(indexPath)
+				
+				let timer = Timer.scheduledTimer(withTimeInterval: expire + 1, repeats: false) { [weak self] timer in
+					self?.messagesCollectionView.reloadItems(at: [indexPath])
+					
+					if let index = self?.cellsUpdating.index(of: indexPath) {
+						self?.cellsUpdating.remove(at: index)
+					}
+					
+					if let index = self?.cellUpdateTimers.index(of: timer) {
+						self?.cellUpdateTimers.remove(at: index)
+					}
+				}
+				
+				cellUpdateTimers.append(timer)
+			}
+		}
+		
+		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
 	}
 }
 

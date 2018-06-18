@@ -50,6 +50,9 @@ class ChatViewController: MessagesViewController {
 	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
 	private var controllerChanges: [NSFetchedResultsChangeType:[(indexPath: IndexPath?, newIndexPath: IndexPath?)]] = [:]
 	
+	var cellUpdateTimers: [Timer] = [Timer]()
+	var cellsUpdating: [IndexPath] = [IndexPath]()
+	
 	// MARK: Fee label
 	private var feeIsVisible: Bool = false
 	private var feeTimer: Timer?
@@ -178,6 +181,14 @@ class ChatViewController: MessagesViewController {
 		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.partner?.address {
 			delegate.preserveMessage(message, forAddress: address)
 		}
+	}
+	
+	deinit {
+		for timer in cellUpdateTimers {
+			timer.invalidate()
+		}
+		
+		cellUpdateTimers.removeAll()
 	}
 	
 	
