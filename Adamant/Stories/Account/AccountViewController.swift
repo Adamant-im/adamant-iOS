@@ -24,6 +24,9 @@ extension String.adamantLocalized {
 		static let joinIcoUrlFormat = NSLocalizedString("AccountTab.JoinIco.UrlFormat", comment: "Account tab: A full 'Join ICO' link, with %@ as address")
 		static let getFreeTokensUrlFormat = NSLocalizedString("AccountTab.FreeTokens.UrlFormat", comment: "Account atb: A full 'Get free tokens' link, with %@ as address")
 		
+		// Errors
+		static let failedToUpdate = NSLocalizedString("AccountTab.Error.FailedToUpdateAccountFormat", comment: "Account tab: Failed to update account message. %@ for error message")
+		
 		private init() { }
 	}
 }
@@ -122,6 +125,16 @@ class AccountViewController: FormViewController {
 	
 	// MARK: - Properties
 	var hideFreeTokensRow = false
+    
+    private lazy var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action:
+            #selector(AccountViewController.handleRefresh(_:)),
+                                 for: UIControlEvents.valueChanged)
+        refreshControl.tintColor = UIColor.adamantPrimary
+        
+        return refreshControl
+    }()
 	
 	
 	// MARK: - Lifecycle
@@ -130,6 +143,8 @@ class AccountViewController: FormViewController {
         super.viewDidLoad()
 		navigationItem.title = String.adamantLocalized.account.title
 		navigationOptions = .Disabled
+        
+        self.tableView.addSubview(self.refreshControl)
 		
 		// MARK: Account Section
 		form +++ Section(Sections.account.localized)
@@ -400,4 +415,26 @@ extension AccountViewController {
 			row.evaluateHidden()
 		}
 	}
+    
+    @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
+        accountService.update { [weak self] (result) in
+            switch result {
+            case .success:
+				guard let tableView = self?.tableView else {
+					break
+				}
+				
+				DispatchQueue.main.async {
+					tableView.reloadData()
+				}
+				
+            case .failure(let error):
+				self?.dialogService.showRichError(error: error)
+            }
+            
+            DispatchQueue.main.async {
+                refreshControl.endRefreshing()
+            }
+        }
+    }
 }

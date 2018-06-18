@@ -55,16 +55,28 @@ extension Date {
 	
 	
 	/// Returns readable time string. "Just now, minutes ago, 11:30, etc"
-	func humanizedTime() -> String {
-		let dateString: String
+	/// - Returns: Readable string, and time when string will be expired and needs an update
+	func humanizedTime() -> (string: String, expireIn: TimeInterval?) {
+		let timeString: String
+		let expire: TimeInterval?
 		
-		if minutesAgo < 2 {
-			dateString = timeAgoSinceNow
+		
+		let seconds = secondsAgo
+		if seconds < 30 {
+			timeString = NSLocalizedString("Just now", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
+			expire = TimeInterval(30 - seconds)
+		} else if seconds < 90 {
+			timeString = NSLocalizedString("A minute ago", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
+			expire = TimeInterval(60 - (seconds % 60))
+		} else if minutesAgo < 5 {
+			timeString = timeAgoSinceNow
+			expire = TimeInterval(60 - (seconds % 60))
 		} else {
 			let localizedDateString = DateFormatter.localizedString(from: self, dateStyle: .none, timeStyle: .short)
-			dateString = localizedDateString
+			timeString = localizedDateString
+			expire = nil
 		}
 		
-		return dateString
+		return (timeString, expire)
 	}
 }

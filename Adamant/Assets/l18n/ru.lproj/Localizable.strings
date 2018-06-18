@@ -1,11 +1,8 @@
-/* ApiService: Bad internal application error, report a bug. Using %@ as error description */
-"AccountServiceError.InternalErrorFormat" = "Внутренняя ошибка: %@";
+/* AccountsProvider: Address not valid error, %@ for address */
+"AccountsProvider.Error.AddressNotValidFormat" = "Invalid address: %@";
 
 /* Login: user typed in invalid passphrase */
 "AccountServiceError.InvalidPassphrase" = "Неправильный пароль";
-
-/* Login: user not logged error */
-"AccountServiceError.UserNotLogged" = "Не выполнен вход";
 
 /* Login: user typed in wrong passphrase */
 "AccountServiceError.WrongPassphrase" = "Неправильный пароль";
@@ -15,6 +12,9 @@
 
 /* Account tab: Confirm logout alert */
 "AccountTab.ConfirmLogout.MessageFormat" = "Выйти из %@?";
+
+/* Account tab: Failed to update account message. %@ for error message */
+"AccountTab.Error.FailedToUpdateAccountFormat" = "Возникла ошибка обновления аккаунта: %@";
 
 /* Account atb: A full 'Get free tokens' link, with %@ as address */
 "AccountTab.FreeTokens.UrlFormat" = "https://adamant.im/ru-free-adm-tokens/?wallet=%@";
@@ -61,20 +61,8 @@
 /* Product name */
 "ADAMANT" = "АДАМАНТ";
 
-/* ApiService: Account not found error. Using %@ for address. */
-"ApiService.Error.AccountNotFoundFormat" = "Аккаун не найден: %@";
-
-/* ApiService: Bad internal application error, report a bug. Using %@ for error description */
-"ApiService.Error.InternalErrorFormat" = "Внутренняя ошибка: %@";
-
 /* ApiService: No connection message. Generally bad network. */
 "ApiService.Error.NoConnection" = "Нет соединения с сетью";
-
-/* ApiService: Remote server returned an error. Using %@ for error description */
-"ApiService.Error.RemoteServerErrorFormat" = "Ошибка на узле блокчейна: %@";
-
-/* ApiService: User not logged error */
-"ApiService.Error.UserNotLogged" = "Не выполнен вход";
 
 /* Serious internal error: Failed to build endpoint url */
 "ApiService.InternalError.EndpointBuildFailed" = "Ошибка взаимодействия с блокчейном. Сообщите об ошибке";
@@ -97,6 +85,18 @@
 /* ChatList: scene title */
 "ChatListPage.Title" = "Чаты";
 
+/* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
+"ChatsProvider.Error.NotEnoughtMoney" = "Недостаточно токенов для отправки сообщения";
+
+/* ChatsProvider: Transaction not found error. %@ for transaction's ID */
+"ChatsProvider.Error.TransactionNotFoundFormat" = "Сообщение с идентификатором %@ не найдено";
+
+/* ChatsProvider: Validation error: Message is empty */
+"ChatsProvider.Validation.MessageIsEmpty" = "Сообщение пустое";
+
+/* ChatsProvider: Validation error: Message is too long */
+"ChatsProvider.Validation.MessageTooLong" = "Сообщение слишком длинное";
+
 /* Known contacts: Adamant ICO message. Markdown supported. */
 "Chats.IcoMessage" = "У вас есть возможность **принять участие в ICO** самого защищенного мессенджера АДАМАНТ. Подробная информация об условиях на сайте Adamant.im и в Белой книге проекта.\n\nВажно! Пожалуйста, убедитесь, что вы сохранили пароль к этому аккаунту — выйдите из аккаунта и войдите в него снова. Лучше всего иметь запись пароля и на бумаге. Однако помните, только **вы несете ответственность за сохранность вашего пароля**. Его невозможно восстановить. А если он попадет в другие руки, ваши деньги будут украдены. Отнеситесь к этому вопросу так серьезно, как если бы цена токенов на вашем кошельке когда-то станет равна миллиарду долларов.\n\nЧтобы купить токены ADM, перейдите в этом месседжере на вкладку Кошелек и нажмите кнопку Участвовать в ICO, или откройте в браузере веб-страницу Adamant.im/ico/. В форме покупки токенов укажите ваш адрес АДАМАНТа — на него будут перечислены токены ADM. При переходе из мессенджера он будет вставлен автоматически, в другом случае вернитесь в мессенджер и кликните на блок Идентификатор кошелька, он будет скопирован в буфер обмена. Укажите криптовалюту, в которой вы хотите произвести оплату, и какую сумму. Вы увидите сколько ADM-токенов вы получите, с учетом скидки за объем: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Нажмите кнопку Купить токены АДАМАНТ. Вы получите уникальный адрес, на который необходимо выполнить перевод. Как только на него поступит ожидаемая сумма и транзакция будет подтверждена, вы получите токены ADM. Транзакцию можно выполнить **с любого кошелька, включая биржи**. Необязятельно переводить точную сумму с учетом комиссии, платеж все равно будет засчитан.\nПосле того, как вы получите токены ADM, мы рекомендуем вам хранить их в кошельке как можно дольше. Ежемесячно все нераспроданные на ICO токены будут распределяться по кошелькам пользователей, увеличивая балансы на 5%. Подробную информацию можно получить на сайте Adamant.im и в Белой книге Проекта.\n\nНе отвечайте на это сообщение, этот адрес служебный. Если же у вас остались вопросы, напишите в аккаунт **U15677078342684640219**.";
 
@@ -115,24 +115,6 @@
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Сообщение уже отправлено";
 
-/* Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description */
-"ChatScene.Error.InternalErrorFormat" = "Внутренняя ошибка: %@. Сообщите об ошибке";
-
-/* Chat: Notify user that message cannot be empty */
-"ChatScene.Error.MessageIsEmpty" = "Сообщение пустое!";
-
-/* Chat: Message is too long */
-"ChatScene.Error.MessageTooLong" = "Сообщение слишком длинное";
-
-/* Chat: Network problems. In most cases - no connection */
-"ChatScene.Error.NoNetwork" = "Нет соединения с сетью";
-
-/* Chat: Notify user that he doesn't have money to pay a message fee */
-"ChatScene.Error.NotEnoughMoney" = "Недостаточно токенов для отправки сообщения";
-
-/* Chat: Notify user about server error. Using %@ for error description */
-"ChatScene.Error.RemoteServerErrorFormat" = "Ошибка на узле блокчейна: %@. Сообщите об ошибке";
-
 /* Chat: message input placeholder */
 "ChatScene.NewMessage.Placeholder" = "Сообщение";
 
@@ -145,6 +127,12 @@
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Подробнее…";
 
+/* Shared error: Account not found error. Using %@ for address. */
+"Error.AccountNotFoundFormat" = "Аккаун не найден: %@";
+
+/* Shared error: Internal error format, %@ for message */
+"Error.InternalErrorFormat" = "Внутренняя ошибка: %@";
+
 /* Error messge title for support email */
 "Error.Mail.Title" = "У меня проблема с iOS приложением";
 
@@ -153,6 +141,15 @@
 
 /* Error messge body for support email, with detailed error description. Where first %@ - error's short message, second %@ - detailed description, third %@ - deviceInfo */
 "Error.Mail.Body.Detailed" = "Привет, Адамант!\nУ меня вот такая ошибка:\n\n%@\n\n%@\n\nУстройство:\n%@";
+
+/* Shared error: Network problems. In most cases - no connection */
+"Error.NoNetwork" = "Нет соединения с сетью";
+
+/* Shared error: Remote error format, %@ for message */
+"Error.RemoteServerErrorFormat" = "Ошибка на узле блокчейна: %@. Сообщите об ошибке";
+
+/* Shared error: User not logged */
+"Error.UserNotLogged" = "Не выполнен вход";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "LoginScene.Error.AuthorizeCamera" = "Для чтения QR-кодов необходимо разрешить доступ к камере";
@@ -220,9 +217,6 @@
 /* New chat: Notify user that he can't start chat with himself */
 "NewChatScene.Error.OwnAddress" = "Вам не нужен анонимный чат, чтобы говорить с самим собой";
 
-/* New chat: Remote server returned an error. Using %@ for error description */
-"NewChatScene.Error.RemoteServerFormat" = "Ошибка на узле блокчейна: %@. Сообщите об ошибке";
-
 /* New Chat: Notify user that scanned QR doesn't contains an address */
 "NewChatScene.Error.WrongQr" = "QR-код не содержит адреса";
 
@@ -231,6 +225,24 @@
 
 /* New chat: scene title */
 "NewChatScene.Title" = "Новый Чат";
+
+/* NodesList: Button label */
+"NodesList.NodesList" = "Список нод";
+
+/* NodesList: scene title */
+"NodesList.Title" = "Список используемых нод";
+
+/* NodesList: 'Saved' message */
+"NodesList.Saved" = "Сохранено";
+
+/* NodesList: 'Unable To Save' message */
+"NodesList.UnableToSave" = "Не удалось сохранить";
+
+/* NodesList: 'Add new node' button lable */
+"NodesList.AddNewNode" = "Добавить новую нода";
+
+/* NodesList: 'Node url' plaseholder */
+"NodesList.NodeUrl" = "Адрес ноды";
 
 /* Notifications: scene title */
 "Notifications.Title" = "Уведомления";
@@ -415,6 +427,12 @@
 /* TransactionList: scene title */
 "TransactionListScene.Title" = "Транзакции";
 
+/* TransactionList: To Chat button */
+"TransactionListScene.ToChat" = "К чату";
+
+/* TransactionList: Start Chat button */
+"TransactionListScene.StartChat" = "Начать чат";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Подробности";
 
@@ -450,6 +468,9 @@
 
 /* Export transaction: 'Share transaction URL' button */
 "TransactionDetailsScene.Share.URL" = "URL";
+
+/* TransfersProvider: Transaction not found error. %@ for transaction's ID */
+"TransfersProvider.Error.TransactionNotFoundFormat" = "Транзакция с идентификатором %@ не найдена";
 
 /* Transfer: transfer amount placeholder */
 "TransferScene.Amount.Placeholder" = "для перевода";

@@ -145,7 +145,11 @@ extension AdamantAccountService {
 // MARK: - AccountService
 extension AdamantAccountService: AccountService {
 	// MARK: Update logged account info
-	func update() {
+    func update() {
+        self.update(nil)
+    }
+    
+	func update(_ completion: ((AccountServiceResult) -> Void)?) {
 		stateSemaphore.wait()
 		
 		switch state {
@@ -157,6 +161,7 @@ extension AdamantAccountService: AccountService {
 			break
 		}
 		
+		let prevState = state
 		state = .updating
 		stateSemaphore.signal()
 		
@@ -179,9 +184,11 @@ extension AdamantAccountService: AccountService {
 				}
 				
 				self?.setState(.loggedIn)
+                completion?(.success(account: account))
 				
 			case .failure(let error):
-				print("Error update account: \(error.localized))")
+                completion?(.failure(.apiError(error: error)))
+				self?.setState(prevState)
 			}
 		}
 	}

@@ -15,15 +15,6 @@ extension String.adamantLocalized {
 	struct chat {
 		static let sendButton = NSLocalizedString("ChatScene.Send", comment: "Chat: Send message button")
 		static let messageInputPlaceholder = NSLocalizedString("ChatScene.NewMessage.Placeholder", comment: "Chat: message input placeholder")
-		
-		static let messageIsEmpty = NSLocalizedString("ChatScene.Error.MessageIsEmpty", comment: "Chat: Notify user that message cannot be empty")
-		static let messageTooLong = NSLocalizedString("ChatScene.Error.MessageTooLong", comment: "Chat: Message is too long")
-		static let notEnoughMoney = NSLocalizedString("ChatScene.Error.NotEnoughMoney", comment: "Chat: Notify user that he doesn't have money to pay a message fee")
-		static let noNetwork = NSLocalizedString("ChatScene.Error.NoNetwork", comment: "Chat: Network problems. In most cases - no connection")
-		
-		static let internalErrorFormat = NSLocalizedString("ChatScene.Error.InternalErrorFormat", comment: "Chat: Notify user about bad internal error. Usually this should be reported as a bug. Using %@ for error description")
-		static let serverErrorFormat = NSLocalizedString("ChatScene.Error.RemoteServerErrorFormat", comment: "Chat: Notify user about server error. Using %@ for error description")
-		
 		static let cancelError = NSLocalizedString("ChatScene.Error.cancelError", comment: "Chat: inform user that he can't cancel transaction, that was sent")
 		
 		private init() { }
@@ -58,6 +49,9 @@ class ChatViewController: MessagesViewController {
 	
 	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
 	private var controllerChanges: [NSFetchedResultsChangeType:[(indexPath: IndexPath?, newIndexPath: IndexPath?)]] = [:]
+	
+	var cellUpdateTimers: [Timer] = [Timer]()
+	var cellsUpdating: [IndexPath] = [IndexPath]()
 	
 	// MARK: Fee label
 	private var feeIsVisible: Bool = false
@@ -187,6 +181,14 @@ class ChatViewController: MessagesViewController {
 		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.partner?.address {
 			delegate.preserveMessage(message, forAddress: address)
 		}
+	}
+	
+	deinit {
+		for timer in cellUpdateTimers {
+			timer.invalidate()
+		}
+		
+		cellUpdateTimers.removeAll()
 	}
 	
 	

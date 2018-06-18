@@ -41,11 +41,33 @@ extension ChatViewController: MessagesDataSource {
 			return nil
 		}
         
-        if let message = message as? MessageTransaction, message.messageStatus == .pending || message.statusEnum == .failed {
+        if let message = message as? MessageTransaction, message.statusEnum == .failed {
             return nil
         }
 		
-		return NSAttributedString(string: message.sentDate.humanizedTime(), attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
+		let humanizedTime = message.sentDate.humanizedTime()
+		
+		if let expire = humanizedTime.expireIn {
+			if !cellsUpdating.contains(indexPath) {
+				cellsUpdating.append(indexPath)
+				
+				let timer = Timer.scheduledTimer(withTimeInterval: expire + 1, repeats: false) { [weak self] timer in
+					self?.messagesCollectionView.reloadItems(at: [indexPath])
+					
+					if let index = self?.cellsUpdating.index(of: indexPath) {
+						self?.cellsUpdating.remove(at: index)
+					}
+					
+					if let index = self?.cellUpdateTimers.index(of: timer) {
+						self?.cellUpdateTimers.remove(at: index)
+					}
+				}
+				
+				cellUpdateTimers.append(timer)
+			}
+		}
+		
+		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
 	}
 }
 
@@ -168,16 +190,7 @@ extension ChatViewController: MessageCellDelegate {
 					case .success: break
 						
 					case .failure(let error):
-						// TODO: Log this
-						if let err = ChatViewController.humanize(chatsProviderError: error) {
-							switch err.level {
-							case .warning:
-								self?.dialogService.showWarning(withMessage: err.message)
-								
-							case .error:
-								self?.dialogService.showError(withMessage: err.message, error: error)
-							}
-						}
+						self?.dialogService.showRichError(error: error)
 						
 					case .invalidTransactionStatus(_):
 						break
@@ -197,11 +210,8 @@ extension ChatViewController: MessageCellDelegate {
 						self?.dialogService.showWarning(withMessage: String.adamantLocalized.chat.cancelError)
 						
 					case .failure(let error):
-						let message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error.localizedDescription)
-						self?.dialogService.showError(withMessage: message, error: error)
+						self?.dialogService.showRichError(error: error)
 					}
-					
-					
 				}
 			})
 			
@@ -244,7 +254,8 @@ extension ChatViewController: MessagesLayoutDelegate {
 extension ChatViewController: MessageInputBarDelegate {
 	func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
 		let message = AdamantMessage.text(text)
-		switch chatsProvider.validateMessage(message) {
+		let valid = chatsProvider.validateMessage(message)
+		switch valid {
 		case .isValid:
 			break
 			
@@ -252,7 +263,7 @@ extension ChatViewController: MessageInputBarDelegate {
 			return
 			
 		case .tooLong:
-			dialogService.showToastMessage(String.adamantLocalized.chat.messageTooLong)
+			dialogService.showToastMessage(valid.localized)
 			return
 		}
 		
@@ -266,16 +277,18 @@ extension ChatViewController: MessageInputBarDelegate {
 			case .success: break
 				
 			case .failure(let error):
-				// TODO: Log this
-				if let err = ChatViewController.humanize(chatsProviderError: error) {
-					switch err.level {
-					case .warning:
-						self?.dialogService.showWarning(withMessage: err.message)
-						
-					case .error:
-						self?.dialogService.showError(withMessage: err.message, error: error)
+				switch error {
+				case .messageNotValid, .notEnoughtMoneyToSend:
+					DispatchQueue.main.async {
+						if inputBar.inputTextView.text.count == 0 {
+							inputBar.inputTextView.text = text
+						}
 					}
+				default:
+					break
 				}
+				
+				self?.dialogService.showRichError(error: error)
 			}
 		})
 		
@@ -288,70 +301,6 @@ extension ChatViewController: MessageInputBarDelegate {
 			setEstimatedFee(fee)
 		} else {
 			setEstimatedFee(0)
-		}
-	}
-}
-
-
-// MARK: - Tools
-extension ChatViewController {
-	enum ErrorLevel {
-		case warning
-		case error
-	}
-	
-	private static func humanize(chatsProviderError error: ChatsProviderError) -> (message: String, level: ErrorLevel)? {
-		let message: String?
-		let level: ErrorLevel
-		
-		switch error {
-		case .accountNotFound(let account):
-			message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "Account not found: \(account)")
-			level = .error
-			
-		case .dependencyError(let error):
-			message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, error)
-			level = .error
-			
-		case .notLogged:
-			message = String.localizedStringWithFormat(String.adamantLocalized.chat.internalErrorFormat, "User not logged")
-			level = .error
-			
-		case .networkError:
-			message = String.adamantLocalized.chat.noNetwork
-			level = .warning
-			
-		case .notEnoughtMoneyToSend:
-			message = String.adamantLocalized.chat.notEnoughMoney
-			level = .warning
-			
-		case .serverError(let error), .internalError(let error):
-			message = String.localizedStringWithFormat(String.adamantLocalized.chat.serverErrorFormat, error.localizedDescription)
-			level = .error
-			
-		case .transactionNotFound(_):
-			message = nil
-			level = .error
-			
-		case .messageNotValid(let problem):
-			switch problem {
-			case .tooLong:
-				message = String.adamantLocalized.chat.messageTooLong
-				
-			case .empty:
-				message = String.adamantLocalized.chat.messageIsEmpty
-				
-			case .isValid:
-				message = nil
-			}
-			
-			level = .warning
-		}
-		
-		if let message = message {
-			return (message, level)
-		} else {
-			return nil
 		}
 	}
 }

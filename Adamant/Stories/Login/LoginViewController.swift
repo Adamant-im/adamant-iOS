@@ -118,6 +118,7 @@ class LoginViewController: FormViewController {
 	var adamantCore: AdamantCore!
 	var dialogService: DialogService!
 	var localAuth: LocalAuthentication!
+    var router: Router!
 	
 	
 	// MARK: Properties
@@ -275,6 +276,27 @@ class LoginViewController: FormViewController {
 		}).cellUpdate({ (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 		})
+        
+        // MARK: Nodes list settings
+        form +++ Section()
+            <<< ButtonRow() {
+                $0.title = String.adamantLocalized.nodesList.nodesListButton
+                $0.tag = "nodes"
+                }.cellSetup({ (cell, _) in
+                    cell.selectionStyle = .gray
+                }).onCellSelection({ [weak self] (_, _) in
+                    guard let vc = self?.router.get(scene: AdamantScene.Settings.nodesList) else {
+                        return
+                    }
+                    
+                    let nav = UINavigationController(rootViewController: vc)
+                    self?.present(nav, animated: true, completion: nil)
+                }).cellSetup({ (cell, row) in
+                    cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+                    cell.textLabel?.textColor = UIColor.adamantPrimary
+                }).cellUpdate({ (cell, _) in
+                    cell.textLabel?.textColor = UIColor.adamantPrimary
+                })
 		
 		
 		// MARK: tableView position tuning

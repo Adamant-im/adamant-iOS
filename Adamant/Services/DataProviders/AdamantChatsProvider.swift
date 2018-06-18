@@ -141,49 +141,54 @@ extension AdamantChatsProvider {
 	}
 	
 	func update() {
-		if state == .updating {
-			return
-		}
-		
-		stateSemaphore.wait()
-		// MARK: 1. Check state
-		if state == .updating {
-			stateSemaphore.signal()
-			return
-		}
-		
-		// MARK: 2. Prepare
-		let prevState = state
-		
-		guard let address = accountService.account?.address, let privateKey = accountService.keypair?.privateKey else {
-			stateSemaphore.signal()
-			setState(.failedToUpdate(ChatsProviderError.notLogged), previous: prevState)
-			return
-		}
-		
-		state = .updating
-		stateSemaphore.signal()
-		
-		// MARK: 3. Get transactions
-		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-		privateContext.parent = self.stack.container.viewContext
-		let processingGroup = DispatchGroup()
-		let cms = DispatchSemaphore(value: 1)
-		let prevHeight = receivedLastHeight
-		
-		getTransactions(senderId: address, privateKey: privateKey, height: receivedLastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
-		
-		// MARK: 4. Check
-		processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) { [weak self] in
-			guard let state = self?.state else {
-				return
-			}
-			
-			switch state {
-			case .failedToUpdate(_): // Processing failed
-				break
-				
-			default:
+		self.update(completion: nil)
+	}
+    
+    func update(completion: ((ChatsProviderResult?) -> Void)?) {
+        if state == .updating {
+            completion?(nil)
+            return
+        }
+        
+        stateSemaphore.wait()
+        // MARK: 1. Check state
+        if state == .updating {
+            stateSemaphore.signal()
+            completion?(nil)
+            return
+        }
+        
+        // MARK: 2. Prepare
+        let prevState = state
+        
+        guard let address = accountService.account?.address, let privateKey = accountService.keypair?.privateKey else {
+            stateSemaphore.signal()
+            setState(.failedToUpdate(ChatsProviderError.notLogged), previous: prevState)
+            completion?(.failure(ChatsProviderError.notLogged))
+            return
+        }
+        
+        state = .updating
+        stateSemaphore.signal()
+        
+        // MARK: 3. Get transactions
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = self.stack.container.viewContext
+        let processingGroup = DispatchGroup()
+        let cms = DispatchSemaphore(value: 1)
+        let prevHeight = receivedLastHeight
+        
+        getTransactions(senderId: address, privateKey: privateKey, height: receivedLastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
+        
+        // MARK: 4. Check
+        processingGroup.notify(queue: DispatchQueue.global(qos: .utility)) { [weak self] in
+            guard let state = self?.state else {
+                completion?(.failure(.dependencyError("Updating")))
+                return
+            }
+            
+            switch state {
+			case .upToDate, .empty, .updating:
 				self?.setState(.upToDate, previous: prevState)
 				
 				if prevHeight != self?.receivedLastHeight, let h = self?.receivedLastHeight {
@@ -212,9 +217,39 @@ extension AdamantChatsProvider {
 					self?.isInitiallySynced = true
 					NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: self)
 				}
-			}
-		}
-	}
+				
+				completion?(.success)
+				
+            case .failedToUpdate(let error): // Processing failed
+				let err: ChatsProviderError
+				
+				switch error {
+				case let error as ApiServiceError:
+					switch error {
+					case .notLogged:
+						err = .notLogged
+						
+					case .accountNotFound:
+						err = .accountNotFound(address)
+						
+					case .serverError(_):
+						err = .serverError(error)
+						
+					case .internalError(let message, _):
+						err = .dependencyError(message)
+						
+					case .networkError(_):
+						err = .networkError
+					}
+					
+				default:
+					err = .internalError(error)
+				}
+				
+				completion?(.failure(err))
+            }
+        }
+    }
 }
 
 
@@ -273,6 +308,9 @@ extension AdamantChatsProvider {
 				
 			case .serverError(let error):
 				completion(.failure(.serverError(error)))
+				
+			case .networkError(_):
+				completion(.failure(ChatsProviderError.networkError))
 				
 			case .success(let account):
 				acc = account
@@ -732,8 +770,9 @@ extension AdamantChatsProvider {
 						if account.isSystem, let address = account.address,
 							let messages = AdamantContacts.messagesFor(address: address),
 							let key = messageTransaction.message,
-							let adamantMessage = messages.first(where: { key.range(of: $0.key) != nil })?.value {
-							switch adamantMessage {
+							let systemMessage = messages.first(where: { key.range(of: $0.key) != nil })?.value {
+							
+							switch systemMessage.message {
 							case .text(let text):
 								messageTransaction.message = text
 								
@@ -741,6 +780,8 @@ extension AdamantChatsProvider {
 								messageTransaction.message = text
 								messageTransaction.isMarkdown = true
 							}
+							
+							messageTransaction.silentNotification = systemMessage.silentNotification
 						}
 					}
 					

@@ -62,7 +62,14 @@ extension Container {
 		
 		// MARK: ApiService
 		self.register(ApiService.self) { r in
-            let service = AdamantApiService(apiUrls: AdamantResources.servers)
+            
+            let securedStore = r.resolve(SecuredStore.self)
+            var serverUrls = AdamantResources.servers
+            if let usersNodesString = securedStore?.get(StoreKey.nodesList.userNodes), let usersNodes = AdamantUtilities.toArray(text: usersNodesString) {
+                serverUrls = usersNodes
+            }
+            
+            let service = AdamantApiService(apiUrls: serverUrls)
             service.adamantCore = r.resolve(AdamantCore.self)!
             return service
 		}.inObjectScope(.container)
