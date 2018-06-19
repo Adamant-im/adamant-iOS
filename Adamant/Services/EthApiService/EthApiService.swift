@@ -33,7 +33,8 @@ struct EthAccount {
 class EthApiService: EthApiServiceProtocol {
     
     // MARK: - Dependencies
-    var adamantCore: AdamantCore!
+    var apiService: ApiService!
+    var accountService: AccountService!
     
     // MARK: - Properties
     var apiUrl: String
@@ -77,6 +78,33 @@ class EthApiService: EthApiServiceProtocol {
         if let account = self.account {
             NotificationCenter.default.post(name: Notification.Name.EthApiService.userLoggedIn, object: self)
             completion(.success(account))
+            
+            if let address = accountService.account?.address, let keypair = accountService.keypair {
+                apiService.get(key: "eth:address", sender: address) { (result) in
+                    switch result {
+                    case .success(let value):
+                        if value == nil {
+                            print("NOTFOUND")
+                            self.apiService.store(key: "eth:address", value: account.address!, type: StateType.keyValue, sender: address, keypair: keypair, completion: { (result) in
+                                switch result {
+                                case .success(let transactionId):
+                                    print("SAVED: \(transactionId)")
+                                    break
+                                case .failure(let error):
+                                    completion(.failure(.internalError(message: "ETH Wallet: fail to save address to KVS", error: error)))
+                                    break
+                                }
+                            })
+                        } else {
+                            print("FOUND: \(value)")
+                        }
+                        break
+                    case .failure(let error):
+                        completion(.failure(.internalError(message: "ETH Wallet: fail to get address from KVS", error: error)))
+                        break
+                    }
+                }
+            }
         } else {
             completion(.failure(.internalError(message: "ETH Wallet: fail to create Account", error: nil)))
         }
