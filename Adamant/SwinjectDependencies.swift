@@ -78,7 +78,8 @@ extension Container {
         // MARK: EthApiService
         self.register(EthApiServiceProtocol.self) { r in
             let service = EthApiService(apiUrl: AdamantResources.ethServers.first!)
-            service.adamantCore = r.resolve(AdamantCore.self)!
+            service.apiService = r.resolve(ApiService.self)!
+            service.accountService = r.resolve(AccountService.self)
             return service
         }.inObjectScope(.container)
 		
