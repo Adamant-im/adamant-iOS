@@ -87,7 +87,7 @@ protocol ApiService: class {
 	
 	/// - Returns: Transaction ID
 	func store(key: String, value: String, type: StateType, sender: String, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
-	
+	func get(key: String, sender: String, completion: @escaping (ApiServiceResult<String?>) -> Void)
 	
 	// MARK: - Chats
 	
