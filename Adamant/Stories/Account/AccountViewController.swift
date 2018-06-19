@@ -173,7 +173,7 @@ class AccountViewController: FormViewController {
 					label.font = UIFont.adamantPrimary(size: 17)
 					label.textColor = UIColor.adamantPrimary
 				}
-				
+				cell.avatarImageView.image = #imageLiteral(resourceName: "adamant_token")
 				row.value = self?.accountService.account?.address
 				cell.accessoryType = .disclosureIndicator
 			})
@@ -208,6 +208,7 @@ class AccountViewController: FormViewController {
                         label.font = UIFont.adamantPrimary(size: 17)
                         label.textColor = UIColor.adamantPrimary
                     }
+                    cell.avatarImageView.image = #imageLiteral(resourceName: "eth_token")
                     row.value = self?.ethApiService.account?.address
                     cell.accessoryType = .disclosureIndicator
                 })
