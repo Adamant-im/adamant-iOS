@@ -61,7 +61,7 @@ extension Transaction: Decodable {
 		self.timestamp = try container.decode(UInt64.self, forKey: .timestamp)
 		self.senderPublicKey = try container.decode(String.self, forKey: .senderPublicKey)
 		self.senderId = try container.decode(String.self, forKey: .senderId)
-		self.recipientId = try container.decode(String.self, forKey: .recipientId)
+		self.recipientId = (try? container.decode(String.self, forKey: .recipientId)) ?? ""
 		self.recipientPublicKey = try? container.decode(String.self, forKey: .recipientPublicKey)
 		self.signature = try container.decode(String.self, forKey: .signature)
 		self.confirmations = (try? container.decode(Int64.self, forKey: .confirmations)) ?? 0
