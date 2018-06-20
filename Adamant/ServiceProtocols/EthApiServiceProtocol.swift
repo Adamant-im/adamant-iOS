@@ -19,4 +19,5 @@ protocol EthApiServiceProtocol: class {
     // MARK: - Tools
     func getBalance(_ completion: @escaping (ApiServiceResult<String>) -> Void)
     func getBalance(byAddress address: String, completion: @escaping (ApiServiceResult<String>) -> Void)
+    func getEthAddress(byAdamandAddress address: String, completion: @escaping (ApiServiceResult<String?>) -> Void)
 }
