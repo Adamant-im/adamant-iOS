@@ -17,6 +17,9 @@ extension AdamantApiService.ApiCommands {
 }
 
 extension AdamantApiService {
+    
+    static let KVSfee: Decimal = 0.001
+    
 	func store(key: String, value: String, type: StateType, sender: String, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
 		
 		// MARK: 1. Create and sign transaction
