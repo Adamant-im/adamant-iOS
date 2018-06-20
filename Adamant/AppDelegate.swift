@@ -47,6 +47,8 @@ struct AdamantResources {
     ]
 	
 	static let iosAppSupportEmail = "ios@adamant.im"
+    
+    static let webAppUrl = URL.init(string: "https://msg.adamant.im")
 	
 	private init() {}
 }

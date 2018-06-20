@@ -39,9 +39,6 @@ fileprivate extension String.adamantLocalized.alert {
 
 // MARK: -
 class AccountViewController: FormViewController {
-	// MARK: - Constants
-	private let webAppUrl = URL.init(string: "https://msg.adamant.im")
-	
 	
 	// MARK: - Rows & Sections
 	private enum Sections {
@@ -282,13 +279,10 @@ class AccountViewController: FormViewController {
                     cell.accessoryType = .disclosureIndicator
                 })
                 .onCellSelection({ [weak self] (_, _) in
-                    self?.ethApiService.getBalance { (result) in
+                    self?.ethApiService.getTransactionsCount{ (result) in
                         switch result {
-                        case .success(let balance):
-                            if let row: LabelRow = self?.form.rowBy(tag: Rows.ethBalance.tag) {
-                                row.value = balance
-                                row.reload()
-                            }
+                        case .success(let count):
+                            print(count)
                         case .failure(let error):
                             print(error)
                         }
@@ -324,7 +318,7 @@ class AccountViewController: FormViewController {
 				
 				alert.addAction(cancel)
 				
-				if let url = self?.webAppUrl {
+				if let url = AdamantResources.webAppUrl {
 					let webApp = UIAlertAction(title: String.adamantLocalized.account.webApp, style: .default) { [weak self] _ in
 						let safari  = SFSafariViewController(url: url)
 						safari.preferredControlTintColor = UIColor.adamantPrimary
