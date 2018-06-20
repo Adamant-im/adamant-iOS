@@ -32,6 +32,11 @@ struct EthAccount {
 
 class EthApiService: EthApiServiceProtocol {
     
+    // MARK: - Constans
+    static let transferGas = 21000
+    static let kvsAddress = "eth:address"
+    static let defaultGasPrice = 20000000000 // 20 Gwei
+    
     // MARK: - Dependencies
     var apiService: ApiService!
     var accountService: AccountService!
@@ -80,11 +85,21 @@ class EthApiService: EthApiServiceProtocol {
             completion(.success(account))
             
             if let address = accountService.account?.address, let keypair = accountService.keypair {
-                apiService.get(key: "eth:address", sender: address) { (result) in
+                self.getEthAddress(byAdamandAddress: address) { (result) in
                     switch result {
                     case .success(let value):
                         if value == nil {
-                            self.apiService.store(key: "eth:address", value: account.address!, type: StateType.keyValue, sender: address, keypair: keypair, completion: { (result) in
+                            guard let loggedAccount = self.accountService.account else {
+                                completion(.failure(.notLogged))
+                                return
+                            }
+                            
+                            guard loggedAccount.balance >= AdamantApiService.KVSfee else {
+                                completion(.failure(.internalError(message: "ETH Wallet: Not enought ADM to save address to KVS", error: nil)))
+                                return
+                            }
+                            
+                            self.apiService.store(key: EthApiService.kvsAddress, value: account.address!, type: StateType.keyValue, sender: address, keypair: keypair, completion: { (result) in
                                 switch result {
                                 case .success(let transactionId):
                                     print("SAVED: \(transactionId)")
@@ -157,7 +172,7 @@ class EthApiService: EthApiServiceProtocol {
         }
     }
     func getEthAddress(byAdamandAddress address: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
-        apiService.get(key: "eth:address", sender: address) { (result) in
+        apiService.get(key: EthApiService.kvsAddress, sender: address) { (result) in
             switch result {
             case .success(let value):
                 if let value = value {
