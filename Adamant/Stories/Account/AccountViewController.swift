@@ -541,5 +541,17 @@ extension AccountViewController {
                 refreshControl.endRefreshing()
             }
         }
+        
+        self.ethApiService.getBalance { (result) in
+            switch result {
+            case .success(let balance):
+                if let row: LabelRow = self.form.rowBy(tag: Rows.ethBalance.tag) {
+                    row.value = balance
+                    row.reload()
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
 }

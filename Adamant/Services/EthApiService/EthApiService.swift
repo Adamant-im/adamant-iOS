@@ -84,7 +84,6 @@ class EthApiService: EthApiServiceProtocol {
                     switch result {
                     case .success(let value):
                         if value == nil {
-                            print("NOTFOUND")
                             self.apiService.store(key: "eth:address", value: account.address!, type: StateType.keyValue, sender: address, keypair: keypair, completion: { (result) in
                                 switch result {
                                 case .success(let transactionId):
@@ -96,7 +95,7 @@ class EthApiService: EthApiServiceProtocol {
                                 }
                             })
                         } else {
-                            print("FOUND: \(value)")
+                            print("FOUND: \(value!)")
                         }
                         break
                     case .failure(let error):
@@ -112,21 +111,23 @@ class EthApiService: EthApiServiceProtocol {
     
     func getBalance(_ completion: @escaping (ApiServiceResult<String>) -> Void) {
         if let walletAddress = self.account?.wallet.addresses?.first {
-            let balanceResult = web3.eth.getBalance(address: walletAddress)
-            guard case .success(let balance) = balanceResult else {
-                completion(.failure(.internalError(message: "ETH Wallet: fail to get balance", error: nil)))
-                return
-            }
-            self.account?.balance = balance
-            
-            if let formattedAmount = Web3.Utils.formatToEthereumUnits(balance,
-                                                                      toUnits: .eth,
-                                                                      decimals: 5,
-                                                                      fallbackToScientific: true) {
-                self.account?.balanceString = formattedAmount
-                completion(.success("\(formattedAmount) ETH"))
-            } else {
-                completion(.failure(.internalError(message: "ETH Wallet: fail to get balance amount", error: nil)))
+            self.getBalance(byAddress: walletAddress) { (result) in
+                switch result {
+                case .success(let balance):
+                    self.account?.balance = balance
+                    
+                    if let formattedAmount = Web3.Utils.formatToEthereumUnits(balance,
+                                                                              toUnits: .eth,
+                                                                              decimals: 5,
+                                                                              fallbackToScientific: true) {
+                        completion(.success("\(formattedAmount) ETH"))
+                    } else {
+                        completion(.failure(.internalError(message: "ETH Wallet: fail to get balance amount", error: nil)))
+                    }
+                    break
+                case .failure(let error):
+                    completion(.failure(.internalError(message: "ETH Wallet: Can't load balance", error: error)))
+                }
             }
         } else {
             completion(.failure(.internalError(message: "ETH Wallet: not found", error: nil)))
@@ -135,22 +136,51 @@ class EthApiService: EthApiServiceProtocol {
     
     func getBalance(byAddress address: String, completion: @escaping (ApiServiceResult<String>) -> Void) {
         if let walletAddress = EthereumAddress(address) {
-            let balanceResult = web3.eth.getBalance(address: walletAddress)
-            guard case .success(let balance) = balanceResult else {
-                completion(.failure(.internalError(message: "ETH Wallet: fail to get balance", error: nil)))
-                return
-            }
-            
-            if let formattedAmount = Web3.Utils.formatToEthereumUnits(balance,
-                                                                   toUnits: .eth,
-                                                                   decimals: 8,
-                                                                   fallbackToScientific: true) {
-                completion(.success("\(formattedAmount) ETH"))
-            } else {
-                completion(.failure(.internalError(message: "ETH Wallet: fail to get balance amount", error: nil)))
+            self.getBalance(byAddress: walletAddress) { (result) in
+                switch result {
+                case .success(let balance):
+                    if let formattedAmount = Web3.Utils.formatToEthereumUnits(balance,
+                                                                              toUnits: .eth,
+                                                                              decimals: 5,
+                                                                              fallbackToScientific: true) {
+                        completion(.success("\(formattedAmount) ETH"))
+                    } else {
+                        completion(.failure(.internalError(message: "ETH Wallet: fail to get balance amount", error: nil)))
+                    }
+                    break
+                case .failure(let error):
+                    completion(.failure(.internalError(message: "ETH Wallet: Can't load balance", error: error)))
+                }
             }
         } else {
             completion(.failure(.internalError(message: "ETH Wallet: not found", error: nil)))
         }
+    }
+    func getEthAddress(byAdamandAddress address: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
+        apiService.get(key: "eth:address", sender: address) { (result) in
+            switch result {
+            case .success(let value):
+                if let value = value {
+                    completion(.success(value))
+                } else {
+                    completion(.success(nil))
+                }
+                break
+            case .failure(let error):
+                completion(.failure(.internalError(message: "ETH Wallet: fail to get address from KVS", error: error)))
+                break
+            }
+        }
+    }
+    
+    // MARK: - Private
+    func getBalance(byAddress address: EthereumAddress, completion: @escaping (ApiServiceResult<BigUInt>) -> Void) {
+        let balanceResult = web3.eth.getBalance(address: address)
+        guard case .success(let balance) = balanceResult else {
+            completion(.failure(.internalError(message: "ETH Wallet: fail to get balance", error: nil)))
+            return
+        }
+        
+        completion(.success(balance))
     }
 }
