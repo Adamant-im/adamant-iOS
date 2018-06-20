@@ -203,7 +203,7 @@ class SettingsViewController: FormViewController {
 			}.cellSetup({ (cell, _) in
 				cell.selectionStyle = .gray
 			}).onCellSelection({ [weak self] (_, _) in
-				guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.nodesList) else {
+				guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
 					return
 				}
 				nav.pushViewController(vc, animated: true)

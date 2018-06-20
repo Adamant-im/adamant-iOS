@@ -61,6 +61,8 @@
 		E93D7ABE2052CEE1005D19DC /* NotificationsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */; };
 		E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */; };
 		E93D7AC22052EE21005D19DC /* SettingsViewController+StayIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D7AC12052EE21005D19DC /* SettingsViewController+StayIn.swift */; };
+		E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EB09E20DA3FA4001F9601 /* NodesEditorRoutes.swift */; };
+		E93EB0A120DA405A001F9601 /* NodeEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EB0A020DA405A001F9601 /* NodeEditorViewController.swift */; };
 		E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EFE12200D1156000BB482 /* ChatViewController.swift */; };
 		E94883E7203F07CD00F6E1B0 /* PassphraseValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */; };
 		E948E03B20235E2300975D6B /* SettingsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E948E03A20235E2300975D6B /* SettingsRoutes.swift */; };
@@ -255,6 +257,8 @@
 		E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsService.swift; sourceTree = "<group>"; };
 		E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantNotificationService.swift; sourceTree = "<group>"; };
 		E93D7AC12052EE21005D19DC /* SettingsViewController+StayIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsViewController+StayIn.swift"; sourceTree = "<group>"; };
+		E93EB09E20DA3FA4001F9601 /* NodesEditorRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodesEditorRoutes.swift; sourceTree = "<group>"; };
+		E93EB0A020DA405A001F9601 /* NodeEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeEditorViewController.swift; sourceTree = "<group>"; };
 		E93EFE12200D1156000BB482 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassphraseValidation.swift; sourceTree = "<group>"; };
 		E948E03A20235E2300975D6B /* SettingsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRoutes.swift; sourceTree = "<group>"; };
@@ -527,6 +531,7 @@
 		E919479920000FFD001362F8 /* Stories */ = {
 			isa = PBXGroup;
 			children = (
+				E93EB09D20DA3F3A001F9601 /* NodesEditor */,
 				E9FAE5DB203ECD41008D3A6B /* Shared */,
 				E9E7CDA52002AE1C00DFC4DB /* Account */,
 				E94E7B04205D48950042B639 /* Transactions */,
@@ -560,6 +565,16 @@
 				E95F856E2007B61D0070534A /* GetPublicKeyResponse.swift */,
 			);
 			path = ServerResponses;
+			sourceTree = "<group>";
+		};
+		E93EB09D20DA3F3A001F9601 /* NodesEditor */ = {
+			isa = PBXGroup;
+			children = (
+				E93EB09E20DA3FA4001F9601 /* NodesEditorRoutes.swift */,
+				64D059FE20D3116A003AD655 /* NodesListViewController.swift */,
+				E93EB0A020DA405A001F9601 /* NodeEditorViewController.swift */,
+			);
+			path = NodesEditor;
 			sourceTree = "<group>";
 		};
 		E94E7B04205D48950042B639 /* Transactions */ = {
@@ -652,7 +667,6 @@
 				E982F69B20235B4D00566AC7 /* SettingsViewController.swift */,
 				E93D7AC12052EE21005D19DC /* SettingsViewController+StayIn.swift */,
 				E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */,
-				64D059FE20D3116A003AD655 /* NodesListViewController.swift */,
 				E91A0639209F05AA0018A102 /* NotificationsViewController.swift */,
 			);
 			path = Settings;
@@ -1014,6 +1028,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E94E7B08205D4CB80042B639 /* SharedRoutes.swift in Sources */,
+				E93EB0A120DA405A001F9601 /* NodeEditorViewController.swift in Sources */,
 				E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */,
 				E9CAE8D22018AA7700345E76 /* AdamantApi+Accounts.swift in Sources */,
 				E987024920C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift in Sources */,
@@ -1120,6 +1135,7 @@
 				E95F8589200900B10070534A /* ChatType.swift in Sources */,
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
 				E9EC342120052ABB00C0E546 /* TransferViewController.swift in Sources */,
+				E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */,
 				E9EC34142005178500C0E546 /* TransactionDetailsViewController.swift in Sources */,
 				E948E04C2027679300975D6B /* AdamantFormattingTools.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,
