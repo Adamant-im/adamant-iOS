@@ -35,6 +35,7 @@ class ChatViewController: MessagesViewController {
 	var chatsProvider: ChatsProvider!
 	var dialogService: DialogService!
 	var router: Router!
+    var ethApiService: EthApiServiceProtocol!
 	
 	// MARK: Properties
 	weak var delegate: ChatViewControllerDelegate?
@@ -46,6 +47,8 @@ class ChatViewController: MessagesViewController {
 		formatter.timeStyle = .short
 		return formatter
 	}
+    
+    private var ethAddress: String?
 	
 	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
 	private var controllerChanges: [NSFetchedResultsChangeType:[(indexPath: IndexPath?, newIndexPath: IndexPath?)]] = [:]
@@ -59,6 +62,22 @@ class ChatViewController: MessagesViewController {
 	private var feeLabel: InputBarButtonItem?
 	private var prevFee: Decimal = 0
 	
+    // MARK: Attachment button
+    lazy var attachmentButton: InputBarButtonItem = {
+        return InputBarButtonItem()
+            .configure {
+                $0.setSize(CGSize(width: 36, height: 36), animated: false)
+                $0.image = #imageLiteral(resourceName: "attachment")
+            }.onTouchUpInside { _ in
+                self.dialogService.showSystemActionSheet(title: "Send", message: "", actions: [UIAlertAction(title: "Ethereum", style: .default, handler: { (action) in
+                    if let ethAddress = self.ethAddress {
+                        self.dialogService.showSuccess(withMessage: ethAddress)
+                    } else {
+                        self.dialogService.showWarning(withMessage: "User don't have public Eth wallet yet.")
+                    }
+                })])
+        }
+    }()
 	
 	// MARK: Lifecycle
     override func viewDidLoad() {
@@ -133,6 +152,7 @@ class ChatViewController: MessagesViewController {
 		messageInputBar.textViewPadding.right = -buttonWidth
 		
 		messageInputBar.setRightStackViewWidthConstant(to: buttonWidth, animated: false)
+        messageInputBar.setLeftStackViewWidthConstant(to: 36, animated: false)
 		
 		// Make feeLabel
 		let feeLabel = InputBarButtonItem()
@@ -144,6 +164,7 @@ class ChatViewController: MessagesViewController {
 		// Setup stack views
 		messageInputBar.setStackViewItems([messageInputBar.sendButton], forStack: .right, animated: false)
 		messageInputBar.setStackViewItems([feeLabel, .flexibleSpace], forStack: .bottom, animated: false)
+        messageInputBar.setStackViewItems([attachmentButton], forStack: .left, animated: false)
 		
 		messageInputBar.sendButton.configure {
 			$0.layer.cornerRadius = size*2
@@ -166,7 +187,16 @@ class ChatViewController: MessagesViewController {
 			messageInputBar.inputTextView.backgroundColor = UIColor.adamantChatSenderBackground
 			messageInputBar.inputTextView.isEditable = false
 			messageInputBar.sendButton.isEnabled = false
-		}
+        } else {
+            // MARK: 4. Check partner for Eth Address
+            
+            if let address = chatroom.partner?.address {
+                ethApiService.getEthAddress(byAdamandAddress: address) { (result) in
+                    guard case .success(let address) = result, let ethAddress = address else { return }
+                    self.ethAddress = ethAddress
+                }
+            }
+        }
     }
 	
 	override func viewDidAppear(_ animated: Bool) {
