@@ -9,6 +9,7 @@
 import UIKit
 import MessageKit
 import CoreData
+import SafariServices
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -75,13 +76,33 @@ class ChatViewController: MessagesViewController {
                 $0.setSize(CGSize(width: 36, height: 36), animated: false)
                 $0.image = #imageLiteral(resourceName: "attachment")
             }.onTouchUpInside { _ in
-                self.dialogService.showSystemActionSheet(title: "Send", message: "", actions: [UIAlertAction(title: "Ethereum", style: .default, handler: { (action) in
+                self.dialogService.showSystemActionSheet(title: "Send", message: "", actions: [
+                    UIAlertAction(title: "Ethereum", style: .default, handler: { (action) in
                     if let ethAddress = self.ethAddress {
                         self.dialogService.showSuccess(withMessage: ethAddress)
                     } else {
                         self.dialogService.showWarning(withMessage: "User don't have public Eth wallet yet.")
                     }
-                })])
+                }),
+                    UIAlertAction(title: "ADM", style: .default, handler: { [weak self] (_) in
+                        let alert = UIAlertController(title: String.adamantLocalized.account.sorryAlert, message: String.adamantLocalized.account.transferNotAllowed, preferredStyle: .alert)
+                        
+                        let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { (_) in }
+                        
+                        alert.addAction(cancel)
+                        
+                        if let url = AdamantResources.webAppUrl {
+                            let webApp = UIAlertAction(title: String.adamantLocalized.account.webApp, style: .default) { [weak self] _ in
+                                let safari  = SFSafariViewController(url: url)
+                                safari.preferredControlTintColor = UIColor.adamantPrimary
+                                self?.present(safari, animated: true, completion: nil)
+                            }
+                            alert.addAction(webApp)
+                        }
+                        
+                        self?.present(alert, animated: true, completion: nil)
+                    })
+                                                                                               ])
         }
     }()
 	
