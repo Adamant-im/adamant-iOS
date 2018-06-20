@@ -140,3 +140,31 @@ extension Transaction: WrappableCollection {
 	}
 }
 */
+
+/* State transaction
+{
+	"id": "",
+	"height": 0,
+	"blockId": "",
+	"type": 9,
+	"timestamp": 22645079,
+	"senderPublicKey": "",
+	"requesterPublicKey": null,
+	"senderId": "",
+	"recipientId": null,
+	"recipientPublicKey": null,
+	"amount": 0,
+	"fee": 100000,
+	"signature": "",
+	"signSignature": null,
+	"signatures": [
+	],
+	"confirmations": null,
+	"asset": {
+	"state": {
+		"value": "0",
+		"key": "eth:address",
+		"type": 0
+	}
+}
+*/
