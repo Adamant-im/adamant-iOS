@@ -50,49 +50,45 @@ class AdamantApiService: ApiService {
 	// MARK: - Dependencies
 	
 	var adamantCore: AdamantCore!
-	
+	var nodesSource: NodesSource! {
+		didSet {
+			refreshNode()
+		}
+	}
 	
 	// MARK: - Properties
 	
-    var apiUrl: URL
-    var apiUrls: [String]
-	var defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility, attributes: [.concurrent])
-	
-	
-	// MARK: - Initialization
-	
-	init(apiUrl: URL) {
-		self.apiUrl = apiUrl
-        self.apiUrls = [apiUrl.absoluteString] // Temp
+	var node: Node? {
+		didSet {
+			currentUrl = node?.asURL()
+		}
 	}
-    
-    init(apiUrls: [String]) {
-        self.apiUrls = apiUrls
-        self.apiUrl = URL(string: apiUrls[0])! // Temp
-        
-        self.newServerAddress()
-    }
-    
-    func newServerAddress() {
-        let randomIndex = Int(arc4random_uniform(UInt32(self.apiUrls.count)))
-        let url = self.apiUrls[randomIndex]
-        self.apiUrl = URL(string: url)!
-        
-        self.testServer { (isAlive) in
-            if isAlive == false { self.newServerAddress() }
-        }
-    }
-    
-    func updateServersList(servers: [String]) {
-        self.apiUrls = servers
-        self.newServerAddress()
-    }
+	private var currentUrl: URL?
+	
+	let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility, attributes: [.concurrent])
+	
+	
+	// MARK: - Init
+	init() {
+		NotificationCenter.default.addObserver(forName: Notification.Name.NodesSource.nodesChanged, object: nil, queue: nil) { [weak self] _ in
+			self?.refreshNode()
+		}
+	}
+	
+	deinit {
+		NotificationCenter.default.removeObserver(self)
+	}
+	
 	
 	// MARK: - Tools
 	
+	func refreshNode() {
+		node = nodesSource?.getNewNode()
+	}
+	
 	func buildUrl(path: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
-		guard var components = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false) else {
-			fatalError("Parsing API URL failed: \(apiUrl)")
+		guard let url = currentUrl, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+			throw InternalError.endpointBuildFailed
 		}
 		
 		components.path = path
@@ -156,28 +152,4 @@ class AdamantApiService: ApiService {
 			return .serverError(error: error)
 		}
 	}
-    
-    // Test current server is it alive or not
-    func testServer(completion: @escaping (Bool) -> Void) {
-        // MARK: 1. Build endpoint
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Accounts.newAccount)
-        } catch {
-            completion(false)
-            return
-        }
-        
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
-        // MARK: 2. Send
-        sendRequest(url: endpoint, method: .post, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerModelResponse<Account>>) in
-            switch serverResponse {
-            case .success: completion(true)
-            case .failure: completion(false)
-            }
-        }
-    }
 }

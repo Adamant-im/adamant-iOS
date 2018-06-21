@@ -53,12 +53,15 @@ enum ApiServiceError: Error {
 protocol ApiService: class {
 	
 	/// Default is async queue with .utilities priority.
-	var defaultResponseDispatchQueue: DispatchQueue { get set }
+	var defaultResponseDispatchQueue: DispatchQueue { get }
     
     // MARK: - Servers list
-    
-    func updateServersList(servers:[String])
 	
+	/// Current node
+	var node: Node? { get }
+	
+	/// Request new node from source
+	func refreshNode()
 	
 	// MARK: - Peers
 	

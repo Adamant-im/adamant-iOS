@@ -35,10 +35,10 @@ struct AdamantResources {
 	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
 	static let coreDataModel = Bundle.main.url(forResource: "ChatModels", withExtension: "momd")!
 	
-	static let servers = [
-		"https://endless.adamant.im",
-        "https://clown.adamant.im",
-        "https://lake.adamant.im"
+	static let nodes: [Node] = [
+		Node(scheme: .https, host: "endless.adamant.im", port: nil),
+		Node(scheme: .https, host: "clown.adamant.im", port: nil),
+		Node(scheme: .https, host: "lake.adamant.im", port: nil)
 	]
 	
 	static let iosAppSupportEmail = "ios@adamant.im"
