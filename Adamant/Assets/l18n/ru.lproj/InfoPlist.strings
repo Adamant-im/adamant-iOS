@@ -1,8 +1,8 @@
 /* Bundle display name */
-"CFBundleDisplayName" = "Адамант";
+"CFBundleDisplayName" = "АДАМАНТ";
 
 /* Bundle name */
-"CFBundleName" = "Адамант";
+"CFBundleName" = "Мессенджер АДАМАНТ";
 
 /* Privacy - Camera Usage Description */
 "NSCameraUsageDescription" = "Чтение QR-кодов с адресами и паролями";
@@ -14,5 +14,5 @@
 "NSPhotoLibraryAddUsageDescription" = "Сохранение созданных QR-кодов";
 
 /* Privacy - Photo Library Usage Description */
-"NSPhotoLibraryUsageDescription" = "Сканирование QR-кодов с адресами и паролями со сделанных ранее изображений";
+"NSPhotoLibraryUsageDescription" = "Сканирование QR-кодов с адресами и паролями с сохраненных ранее изображений";
 
