@@ -91,11 +91,6 @@ class NodesListViewController: FormViewController {
 	
     // MARK: - Lifecycle
 	
-//	override func viewWillAppear(_ animated: Bool) {
-//		super.viewWillAppear(animated)
-//		tableView.setEditing(false, animated: false)
-//	}
-	
     override func viewDidLoad() {
         super.viewDidLoad()
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editModeStart))
@@ -132,11 +127,11 @@ class NodesListViewController: FormViewController {
 				
 				cell.accessoryType = .disclosureIndicator
 			}).onCellSelection { [weak self] (_, row) in
-				guard let tag = row.tag, let index = Int(tag) else {
-					return
-				}
-				
-				self?.editNode(at: index)
+//				guard let node = row.value, let tag = row.tag else {
+//					return
+//				}
+//
+//				self?.editNode(node, tag: tag)
 			}
 		}
 		
@@ -206,7 +201,7 @@ class NodesListViewController: FormViewController {
 // MARK: - Manipulating node list
 extension NodesListViewController {
 	func createNewNode() {
-		present(router.get(scene: AdamantScene.NodesEditor.nodeEditor), animated: true, completion: nil)
+		presentEditor(forNode: nil, tag: nil)
 	}
 	
 	func removeNode(at index: Int) {
@@ -217,8 +212,8 @@ extension NodesListViewController {
 		}
 	}
 	
-	func editNode(at index: Int) {
-		present(router.get(scene: AdamantScene.NodesEditor.nodeEditor), animated: true, completion: nil)
+	func editNode(_ node: Node, tag: String) {
+		presentEditor(forNode: node, tag: tag)
 	}
 	
 	@objc func close() {
@@ -281,10 +276,8 @@ extension NodesListViewController {
 		
 		section.removeAll()
 		
-		for (i, node) in nodes.enumerated() {
-			let row = createRowFor(node: node)
-			row.tag = String(i)
-			
+		for node in nodes {
+			let row = createRowFor(node: node, tag: generateRandomTag())
 			section.append(row)
 		}
 		
@@ -293,11 +286,62 @@ extension NodesListViewController {
 }
 
 
+// MARK: - NodeEditorDelegate
+extension NodesListViewController: NodeEditorDelegate {
+	func nodeEditorViewController(_ editor: NodeEditorViewController, didFinishEditingWithResult result: NodeEditorResult) {
+		switch result {
+		case .new(let node):
+			guard let section = form.sectionBy(tag: Sections.nodes.tag) else {
+				return
+			}
+			
+			nodes.append(node)
+			
+			let row = createRowFor(node: node, tag: generateRandomTag())
+			section <<< row
+			
+		case .done(let node, let tag):
+			guard let row: NodeRow = form.rowBy(tag: tag) else {
+				return
+			}
+			
+			if let prevNode = row.value, let index = nodes.index(of: prevNode) {
+				nodes.remove(at: index)
+			}
+			
+			nodes.append(node)
+			row.value = node
+			
+		case .cancel:
+			break
+			
+		case .delete(let editorNode, let tag):
+			guard let row: NodeRow = form.rowBy(tag: tag), let node = row.value else {
+				return
+			}
+			
+			if let index = nodes.index(of: node) {
+				nodes.remove(at: index)
+			} else if let index = nodes.index(of: editorNode) {
+				nodes.remove(at:index)
+			}
+			
+			if let section = form.sectionBy(tag: Sections.nodes.tag), let index = section.index(of: row) {
+				section.remove(at: index)
+			}
+		}
+		
+		dismiss(animated: true, completion: nil)
+	}
+}
+
+
 // MARK: - Tools
 extension NodesListViewController {
-	private func createRowFor(node: Node) -> BaseRow {
+	private func createRowFor(node: Node, tag: String) -> BaseRow {
 		let row = NodeRow() {
 			$0.value = node
+			$0.tag = tag
 			
 			let deleteAction = SwipeAction(style: .destructive, title: "Delete") { [weak self] (action, row, completionHandler) in
 				if let node = row.baseValue as? Node, let index = self?.nodes.index(of: node) {
@@ -319,13 +363,37 @@ extension NodesListViewController {
 			
 			cell.accessoryType = .disclosureIndicator
 		}).onCellSelection { [weak self] (_, row) in
-			guard let tag = row.tag, let index = Int(tag) else {
+			guard let node = row.value, let tag = row.tag else {
 				return
 			}
 			
-			self?.editNode(at: index)
+			self?.editNode(node, tag: tag)
 		}
 		
 		return row
+	}
+	
+	private func presentEditor(forNode node: Node?, tag: String?) {
+		guard let editor = router.get(scene: AdamantScene.NodesEditor.nodeEditor) as? NodeEditorViewController else {
+			fatalError("Failed to get editor")
+		}
+		
+		editor.delegate = self
+		editor.node = node
+		editor.nodeTag = tag
+		
+		let navigator = UINavigationController(rootViewController: editor)
+		present(navigator, animated: true, completion: nil)
+	}
+	
+	private func generateRandomTag() -> String {
+		let capacity = 6
+		var nums = [UInt32](reserveCapacity: capacity);
+		
+		for _ in 0...capacity {
+			nums.append(arc4random_uniform(10))
+		}
+		
+		return nums.compactMap { String($0) }.joined()
 	}
 }
