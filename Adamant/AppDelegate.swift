@@ -38,9 +38,7 @@ struct AdamantResources {
 	static let nodes: [Node] = [
 		Node(scheme: .https, host: "endless.adamant.im", port: nil),
 		Node(scheme: .https, host: "clown.adamant.im", port: nil),
-		Node(scheme: .https, host: "lake.adamant.im", port: nil),
-		Node(scheme: .https, host: "158.69.59.45", port: nil),
-		Node(scheme: .https, host: "54.36.183.233", port: nil)
+		Node(scheme: .https, host: "lake.adamant.im", port: nil)
 	]
 	
 	static let iosAppSupportEmail = "ios@adamant.im"
