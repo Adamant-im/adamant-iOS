@@ -79,7 +79,20 @@ class ChatViewController: MessagesViewController {
                 self.dialogService.showSystemActionSheet(title: "Send", message: "", actions: [
                     UIAlertAction(title: "Ethereum", style: .default, handler: { (action) in
                     if let ethAddress = self.ethAddress {
-                        self.dialogService.showSuccess(withMessage: ethAddress)
+//                        self.dialogService.showSuccess(withMessage: ethAddress)
+                        // MARK: Show transfer details
+                        guard let vc = self.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
+                            fatalError("Can't get TransferViewController scene")
+                        }
+                        
+                        vc.token = .ETH
+                        vc.toAddress = ethAddress
+                        
+                        if let nav = self.navigationController {
+                            nav.pushViewController(vc, animated: true)
+                        } else {
+                            self.present(vc, animated: true, completion: nil)
+                        }
                     } else {
                         self.dialogService.showWarning(withMessage: "User don't have public Eth wallet yet.")
                     }

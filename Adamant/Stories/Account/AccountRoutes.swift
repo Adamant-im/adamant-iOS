@@ -26,6 +26,7 @@ extension AdamantScene {
 			c.apiService = r.resolve(ApiService.self)
 			c.accountService = r.resolve(AccountService.self)
 			c.dialogService = r.resolve(DialogService.self)
+            c.ethApiService = r.resolve(EthApiServiceProtocol.self)
 			return c
 		}
 		

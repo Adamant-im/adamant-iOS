@@ -8,7 +8,8 @@
 
 import UIKit
 import Eureka
-
+import web3swift
+import BigInt
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -84,6 +85,11 @@ class TransferViewController: FormViewController {
 			}
 		}
 	}
+    
+    enum Token {
+        case ADM
+        case ETH
+    }
 	
 	
 	// MARK: - Dependencies
@@ -91,136 +97,229 @@ class TransferViewController: FormViewController {
 	var apiService: ApiService!
 	var accountService: AccountService!
 	var dialogService: DialogService!
+    var ethApiService: EthApiServiceProtocol!
 	
 	private(set) var maxToTransfer: Double = 0.0
 	
 	
 	// MARK: - Properties
 	
-	let defaultFee = 0.5
+	var defaultFee = 0.5
 	var account: Account?
 	
+    var token: Token = .ADM
+    var toAddress: String = ""
+    var reciverADMAddress: String = "" // ????
+    
 	private(set) var totalAmount: Double? = nil
-	
-	
-	// MARK: - IBOutlets
-	
-	@IBOutlet weak var sendButton: UIBarButtonItem!
-	
+
 	
 	// MARK: - Lifecycle
 	
     override func viewDidLoad() {
         super.viewDidLoad()
 		
-		// MARK: - Wallet section
-		if let account = account {
-			sendButton.isEnabled = maxToTransfer > 0.0
-			let balance = (account.balance as NSDecimalNumber).doubleValue
-			maxToTransfer = balance - defaultFee > 0 ? balance - defaultFee : 0.0
-			
-			form +++ Section(Sections.wallet.localized)
-			<<< DecimalRow() {
-				$0.title = Row.balance.localized
-				$0.value = balance
-				$0.tag = Row.balance.tag
-				$0.disabled = true
-				$0.formatter = AdamantUtilities.currencyFormatter
-			}
-			<<< DecimalRow() {
-				$0.title = Row.maxToTransfer.localized
-				$0.value = maxToTransfer
-				$0.tag = Row.maxToTransfer.tag
-				$0.disabled = true
-				$0.formatter = AdamantUtilities.currencyFormatter
-			}
-		} else {
-			sendButton.isEnabled = false
-		}
+        switch token {
+        case .ADM:
+            createADMForm()
+        case .ETH:
+            createETHForm()
+        }
 		
-		// MARK: - Transfer section
-		form +++ Section(Sections.transferInfo.localized)
-		
-		<<< TextRow() {
-			$0.title = Row.address.localized
-			$0.placeholder = String.adamantLocalized.transfer.addressPlaceholder
-			$0.tag = Row.address.tag
-			$0.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
-				guard let value = value?.uppercased() else {
-					return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
-				}
-				
-				switch AdamantUtilities.validateAdamantAddress(address: value) {
-				case .valid:
-					return nil
-					
-				case .system, .invalid:
-					return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
-				}
-			}))
-			$0.validationOptions = .validatesOnBlur
-		}.cellUpdate({ (cell, row) in
-			cell.titleLabel?.textColor = row.isValid ? .black : .red
-		})
-		<<< DecimalRow() {
-			$0.title = Row.amount.localized
-			$0.placeholder = String.adamantLocalized.transfer.amountPlaceholder
-			$0.tag = Row.amount.tag
-			$0.formatter = AdamantUtilities.currencyFormatter
-//			$0.add(rule: RuleSmallerOrEqualThan<Double>(max: maxToTransfer))
-//			$0.validationOptions = .validatesOnChange
-			}.onChange(amountChanged)
-		<<< DecimalRow() {
-			$0.title = Row.fee.localized
-			$0.value = defaultFee
-			$0.tag = Row.fee.tag
-			$0.disabled = true
-			$0.formatter = AdamantUtilities.currencyFormatter
-		}
-		<<< DecimalRow() {
-			$0.title = Row.total.localized
-			$0.value = nil
-			$0.tag = Row.total.tag
-			$0.disabled = true
-			$0.formatter = AdamantUtilities.currencyFormatter
-		}
-		<<< ButtonRow() {
-			$0.title = Row.sendButton.localized
-			$0.tag = Row.sendButton.tag
-			$0.disabled = Condition.function([Row.total.tag], { [weak self] form -> Bool in
-				guard let row: DecimalRow = form.rowBy(tag: Row.amount.tag),
-					let amount = row.value,
-					amount > 0,
-					AdamantUtilities.validateAmount(amount: Decimal(amount)),
-					let maxToTransfer = self?.maxToTransfer else {
-					return true
-				}
-
-				return amount > maxToTransfer
-			})
-			}.onCellSelection({ [weak self] (cell, row) in
-				self?.sendFunds(row)
-			})
-		
-		
+        // MARK: - Transfer section
+        form +++ Section()
+            <<< ButtonRow() {
+                $0.title = Row.sendButton.localized
+                $0.tag = Row.sendButton.tag
+                $0.disabled = Condition.function([Row.total.tag], { [weak self] form -> Bool in
+                    guard let row: DecimalRow = form.rowBy(tag: Row.amount.tag),
+                        let amount = row.value,
+                        amount > 0,
+                        AdamantUtilities.validateAmount(amount: Decimal(amount)),
+                        let maxToTransfer = self?.maxToTransfer else {
+                            return true
+                    }
+                    
+                    return amount > maxToTransfer
+                })
+                }.onCellSelection({ [weak self] (cell, row) in
+                    self?.sendFunds(row)
+                })
+        
 		// MARK: - UI
 		navigationAccessoryView.tintColor = UIColor.adamantPrimary
 		
 		let button: ButtonRow? = form.rowBy(tag: Row.sendButton.tag)
-		button?.evaluateDisabled()
+        button?.disabled = true
+        button?.evaluateDisabled()
     }
 	
+    // MARK: - Form constructors
+    
+    private func createADMForm() {
+        // MARK: - Wallet section
+        if let account = accountService.account {
+            let balance = (account.balance as NSDecimalNumber).doubleValue
+            maxToTransfer = balance - defaultFee > 0 ? balance - defaultFee : 0.0
+            
+            form +++ Section(Sections.wallet.localized)
+                <<< DecimalRow() {
+                    $0.title = Row.balance.localized
+                    $0.value = balance
+                    $0.tag = Row.balance.tag
+                    $0.disabled = true
+                    $0.formatter = AdamantUtilities.currencyFormatter
+                }
+                <<< DecimalRow() {
+                    $0.title = Row.maxToTransfer.localized
+                    $0.value = maxToTransfer
+                    $0.tag = Row.maxToTransfer.tag
+                    $0.disabled = true
+                    $0.formatter = AdamantUtilities.currencyFormatter
+            }
+        }
+        
+        // MARK: - Transfer section
+        form +++ Section(Sections.transferInfo.localized)
+            
+            <<< TextRow() {
+                $0.title = Row.address.localized
+                $0.placeholder = String.adamantLocalized.transfer.addressPlaceholder
+                $0.tag = Row.address.tag
+                $0.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
+                    guard let value = value?.uppercased() else {
+                        return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
+                    }
+                    
+                    switch AdamantUtilities.validateAdamantAddress(address: value) {
+                    case .valid:
+                        return nil
+                        
+                    case .system, .invalid:
+                        return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
+                    }
+                }))
+                $0.value = toAddress
+                $0.validationOptions = .validatesOnBlur
+                }.cellUpdate({ (cell, row) in
+                    cell.titleLabel?.textColor = row.isValid ? .black : .red
+                })
+            <<< DecimalRow() {
+                $0.title = Row.amount.localized
+                $0.placeholder = String.adamantLocalized.transfer.amountPlaceholder
+                $0.tag = Row.amount.tag
+                $0.formatter = AdamantUtilities.currencyFormatter
+                //            $0.add(rule: RuleSmallerOrEqualThan<Double>(max: maxToTransfer))
+                //            $0.validationOptions = .validatesOnChange
+                }.onChange(amountChanged)
+            <<< DecimalRow() {
+                $0.title = Row.fee.localized
+                $0.value = defaultFee
+                $0.tag = Row.fee.tag
+                $0.disabled = true
+                $0.formatter = AdamantUtilities.currencyFormatter
+            }
+            <<< DecimalRow() {
+                $0.title = Row.total.localized
+                $0.value = nil
+                $0.tag = Row.total.tag
+                $0.disabled = true
+                $0.formatter = AdamantUtilities.currencyFormatter
+            }
+    }
+    
+    private func createETHForm() {
+        // MARK: - Wallet section
+        if let account = accountService.account, let ethAccount = ethApiService.account, let ethBalanceBigInt = ethAccount.balance, let ethBalanceString = Web3.Utils.formatToEthereumUnits(ethBalanceBigInt), let ethBalance = Double(ethBalanceString) {
+            let balance = (account.balance as NSDecimalNumber).doubleValue
+            
+            maxToTransfer = ethBalance
+            
+            if let feeString = Web3.Utils.formatToEthereumUnits(BigInt(EthApiService.defaultGasPrice), toUnits: .Gwei), let fee = Double(feeString) {
+                defaultFee = fee
+            }
+            
+            let currencyFormatter = NumberFormatter()
+            currencyFormatter.numberStyle = .decimal
+            currencyFormatter.roundingMode = .floor
+            currencyFormatter.positiveFormat = "#.######## ETH"
+            
+            let currencyFormatterGwie = NumberFormatter()
+            currencyFormatterGwie.numberStyle = .decimal
+            currencyFormatterGwie.roundingMode = .floor
+            currencyFormatterGwie.positiveFormat = "#.######## Gwei"
+            
+            form +++ Section(Sections.wallet.localized)
+                <<< DecimalRow() {
+                    $0.title = Row.balance.localized
+                    $0.value = ethBalance
+                    $0.tag = Row.balance.tag
+                    $0.disabled = true
+                    $0.formatter = currencyFormatter
+                }
+            
+            // MARK: - Transfer section
+            form +++ Section(Sections.transferInfo.localized)
+                
+                <<< TextRow() {
+                    $0.title = Row.address.localized
+                    $0.placeholder = String.adamantLocalized.transfer.addressPlaceholder
+                    $0.tag = Row.address.tag
+                    $0.value = toAddress
+                    
+                    // TODO: Validation for ETH address
+//                    $0.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
+//                        guard let value = value?.uppercased() else {
+//                            return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
+//                        }
+//
+//                        switch AdamantUtilities.validateAdamantAddress(address: value) {
+//                        case .valid:
+//                            return nil
+//
+//                        case .system, .invalid:
+//                            return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
+//                        }
+//                    }))
+//                    $0.validationOptions = .validatesOnBlur
+                    }.cellUpdate({ (cell, row) in
+                        cell.titleLabel?.textColor = row.isValid ? .black : .red
+                    })
+                <<< DecimalRow() {
+                    $0.title = Row.amount.localized
+                    $0.placeholder = String.adamantLocalized.transfer.amountPlaceholder
+                    $0.tag = Row.amount.tag
+                    $0.formatter = currencyFormatter
+                    $0.add(rule: RuleSmallerOrEqualThan<Double>(max: maxToTransfer))
+                    $0.validationOptions = .validatesOnChange
+                    }.onChange(ethAmountChanged)
+                <<< DecimalRow() {
+                    $0.title = Row.fee.localized
+                    $0.value = defaultFee
+                    $0.tag = Row.fee.tag
+                    $0.disabled = true
+                    $0.formatter = currencyFormatterGwie
+                }
+                <<< DecimalRow() {
+                    $0.title = Row.total.localized
+                    $0.value = nil
+                    $0.tag = Row.total.tag
+                    $0.disabled = true
+                    $0.formatter = currencyFormatter
+            }
+        }
+    }
 	
 	// MARK: - Form Events
 	
 	private func amountChanged(row: DecimalRow) {
-		guard let totalRow: DecimalRow = form.rowBy(tag: Row.total.tag), let account = account else {
+		guard let totalRow: DecimalRow = form.rowBy(tag: Row.total.tag), let sendButton: ButtonRow = form.rowBy(tag: Row.sendButton.tag), let account = accountService.account else {
 			return
 		}
 		
 		guard let amount = row.value else {
 			totalAmount = nil
-			sendButton.isEnabled = false
+            sendButton.disabled = true
 			row.cell.titleLabel?.textColor = .black
 			return
 		}
@@ -234,22 +333,64 @@ class TransferViewController: FormViewController {
 		if let totalAmount = totalAmount {
 			if amount > 0, AdamantUtilities.validateAmount(amount: Decimal(amount)),
 				totalAmount > 0.0 && totalAmount < (account.balance as NSDecimalNumber).doubleValue {
-				sendButton.isEnabled = true
+                sendButton.disabled = false
 				row.cell.titleLabel?.textColor = .black
 			} else {
-				sendButton.isEnabled = false
+                sendButton.disabled = true
 				row.cell.titleLabel?.textColor = .red
 			}
 		} else {
-			sendButton.isEnabled = false
+            sendButton.disabled = true
 			row.cell.titleLabel?.textColor = .black
 		}
 	}
+    
+    private func ethAmountChanged(row: DecimalRow) {
+        guard let totalRow: DecimalRow = form.rowBy(tag: Row.total.tag), let sendButton: ButtonRow = form.rowBy(tag: Row.sendButton.tag) else {
+            return
+        }
+        
+        guard let amount = row.value, let feeString = Web3.Utils.formatToEthereumUnits(BigInt(EthApiService.defaultGasPrice), toUnits: .eth, decimals: 8), let fee = Double(feeString) else {
+            totalAmount = nil
+            sendButton.disabled = true
+            row.cell.titleLabel?.textColor = .black
+            return
+        }
+        
+        totalAmount = amount + fee
+        totalRow.evaluateDisabled()
+        
+        totalRow.value = totalAmount
+        totalRow.evaluateDisabled()
+        
+        if let totalAmount = totalAmount {
+            if amount > 0, totalAmount > 0.0 && totalAmount < maxToTransfer {
+                sendButton.disabled = false
+                row.cell.titleLabel?.textColor = .black
+            } else {
+                sendButton.disabled = true
+                row.cell.titleLabel?.textColor = .red
+            }
+        } else {
+            sendButton.disabled = true
+            row.cell.titleLabel?.textColor = .black
+        }
+        sendButton.evaluateDisabled()
+    }
 	
 	
-	// MARK: - IBActions
+	// MARK: - Send Actions
 	
-	@IBAction func sendFunds(_ sender: Any) {
+    func sendFunds(_ sender: Any) {
+        switch token {
+        case .ADM:
+            sendADMFunds()
+        case .ETH:
+            sendETHFunds()
+        }
+    }
+    
+    func sendADMFunds() {
 		guard let dialogService = self.dialogService, let apiService = self.apiService else {
 			fatalError("Dependecies fatal error")
 		}
@@ -328,4 +469,8 @@ class TransferViewController: FormViewController {
 		
 		present(alert, animated: true, completion: nil)
 	}
+    
+    func sendETHFunds() {
+        // TODO: Add send eth funds
+    }
 }
