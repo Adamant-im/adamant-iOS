@@ -26,6 +26,8 @@ extension AdamantScene {
 			c.apiService = r.resolve(ApiService.self)
 			return c
 		})
+		
+		private init() {}
 	}
 }
 

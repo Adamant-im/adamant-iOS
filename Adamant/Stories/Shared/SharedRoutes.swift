@@ -15,5 +15,7 @@ extension AdamantScene {
 			controller.dialogService = r.resolve(DialogService.self)
 			return controller
 		})
+		
+		private init() {}
 	}
 }
