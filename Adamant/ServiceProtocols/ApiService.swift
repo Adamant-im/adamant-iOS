@@ -59,6 +59,12 @@ protocol ApiService: class {
     
     func updateServersList(servers:[String])
 	
+	
+	// MARK: - Peers
+	
+	func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void)
+	
+	
 	// MARK: - Accounts
 	
 	func newAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<Account>) -> Void)

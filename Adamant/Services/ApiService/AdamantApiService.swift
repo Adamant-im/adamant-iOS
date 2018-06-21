@@ -101,6 +101,17 @@ class AdamantApiService: ApiService {
 		return try components.asURL()
 	}
 	
+	func buildUrl(url: URL, subpath: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
+		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+			throw ApiServiceError.internalError(message: "Failed to build URL from \(url)", error: nil)
+		}
+		
+		components.path = subpath
+		components.queryItems = queryItems
+		
+		return try components.asURL()
+	}
+	
 	func sendRequest<T: Decodable>(url: URLConvertible,
 								   method: HTTPMethod = .get,
 								   parameters: [String:Any]? = nil,
