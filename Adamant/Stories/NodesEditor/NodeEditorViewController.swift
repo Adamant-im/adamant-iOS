@@ -12,6 +12,9 @@ import Eureka
 // MARK: - Localization
 extension String.adamantLocalized {
 	struct nodesEditor {
+		static let newNodeTitle = NSLocalizedString("NodesEditor.NewNodeTitle", comment: "NodesEditor: New node scene title")
+		static let deleteNodeAlert = NSLocalizedString("NodesEditor.DeleteNodeAlert", comment: "NodesEditor: Delete node confirmation message")
+		
 		static let testInProgressMessage = NSLocalizedString("NodesEditor.TestingInProgressMessage", comment: "NodesEditor: Testing in progress")
 		static func testFailedMessage(reason: String) -> String {
 			return String.localizedStringWithFormat(NSLocalizedString("NodesEditor.TestingFailedMessageFormat", comment: "NodesEditor: Testing failed message format. %@ for failure reason."), reason)
@@ -38,34 +41,35 @@ class NodeEditorViewController: FormViewController {
 	// MARK: - Rows
 	
 	private enum Rows {
-		case `protocol`, port, url
+		// Node properties
+		case host, port, scheme
+		
+		// Buttons
 		case testButton, deleteButton
 		
 		var localized: String {
 			switch self {
-			case .protocol: return "Protocol"
-			case .port: return "Port"
-			case .url: return "URL"
-			case .testButton: return "Test"
-			case .deleteButton: return "Delete node"
+			case .scheme: return NSLocalizedString("NodesEditor.SchemeRow", comment: "NodesEditor: Scheme row")
+			case .port: return NSLocalizedString("NodesEditor.PortRow", comment: "NodesEditor: Port row")
+			case .host: return NSLocalizedString("NodesEditor.HostRow", comment: "NodesEditor: Host row")
+			case .testButton: return NSLocalizedString("NodesEditor.TestButton", comment: "NodesEditor: Test button")
+			case .deleteButton: return NSLocalizedString("NodesEditor.DeleteNodeButton", comment: "NodesEditor: Delete node button")
 			}
 		}
 		
 		var placeholder: String? {
 			switch self {
-			case .protocol: return ""
-			case .port: return "port"
-			case .url: return "ip/url"
-			case .testButton: return nil
-			case .deleteButton: return nil
+			case .port: return NSLocalizedString("NodesEditor.PortRow.Placeholder", comment: "NodesEditor: Port row placeholder")
+			case .host: return NSLocalizedString("NodesEditor.HostRow.Placeholder", comment: "NodesEditor: Host row placeholder")
+			case .scheme, .testButton, .deleteButton: return nil
 			}
 		}
 		
 		var tag: String {
 			switch self {
-			case .protocol: return "prtcl"
+			case .scheme: return "prtcl"
 			case .port: return "prt"
-			case .url: return "url"
+			case .host: return "url"
 			case .testButton: return "test"
 			case .deleteButton: return "delete"
 			}
@@ -91,6 +95,8 @@ class NodeEditorViewController: FormViewController {
 		
 		if let node = node {
 			self.navigationItem.title = node.host
+		} else {
+			self.navigationItem.title = String.adamantLocalized.nodesEditor.newNodeTitle
 		}
 		
 		self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
@@ -101,9 +107,9 @@ class NodeEditorViewController: FormViewController {
 			
 		// URL
 		<<< TextRow() {
-			$0.title = Rows.url.localized
-			$0.tag = Rows.url.tag
-			$0.placeholder = Rows.url.placeholder
+			$0.title = Rows.host.localized
+			$0.tag = Rows.host.tag
+			$0.placeholder = Rows.host.placeholder
 			
 			$0.value = node?.host
 		}
@@ -119,8 +125,8 @@ class NodeEditorViewController: FormViewController {
 		
 		// Protocol
 		<<< PickerInlineRow<URLScheme>() {
-			$0.title = Rows.protocol.localized
-			$0.tag = Rows.protocol.tag
+			$0.title = Rows.scheme.localized
+			$0.tag = Rows.scheme.tag
 			$0.value = node?.scheme ?? URLScheme.https
 			$0.options = [.https, .http]
 		}.onExpandInlineRow({ (_, _, inlineRow) in
@@ -175,12 +181,12 @@ extension NodeEditorViewController {
 		var components = URLComponents()
 		
 		// Host
-		if let row: TextRow = form.rowBy(tag: Rows.url.tag), let host = row.value {
+		if let row: TextRow = form.rowBy(tag: Rows.host.tag), let host = row.value {
 			components.host = host
 		}
 		
 		// Scheme
-		if let row = form.rowBy(tag: Rows.protocol.tag), let pr = row.baseValue as? URLScheme {
+		if let row = form.rowBy(tag: Rows.scheme.tag), let pr = row.baseValue as? URLScheme {
 			components.scheme = pr.rawValue
 		} else {
 			components.scheme = "https"
@@ -200,13 +206,9 @@ extension NodeEditorViewController {
 		
 		dialogService.showProgress(withMessage: String.adamantLocalized.nodesEditor.testInProgressMessage, userInteractionEnable: false)
 		apiService.getNodeVersion(url: url) { [weak self] result in
-			defer {
-				self?.dialogService.dismissProgress()
-			}
-			
 			switch result {
 			case .success(_):
-				break
+				self?.dialogService.dismissProgress()
 				
 			case .failure(let error):
 				self?.dialogService.showWarning(withMessage: String.adamantLocalized.nodesEditor.testFailedMessage(reason: error.localized))
@@ -215,7 +217,7 @@ extension NodeEditorViewController {
 	}
 	
 	@objc func done() {
-		guard let row: TextRow = form.rowBy(tag: Rows.url.tag), let rawUrl = row.value else {
+		guard let row: TextRow = form.rowBy(tag: Rows.host.tag), let rawUrl = row.value else {
 			didCallDelegate = true
 			delegate?.nodeEditorViewController(self, didFinishEditingWithResult: .cancel)
 			return
@@ -224,7 +226,7 @@ extension NodeEditorViewController {
 		let url = rawUrl.trimmingCharacters(in: .whitespaces)
 		
 		let prot: URLScheme
-		if let row: PickerRow<URLScheme> = form.rowBy(tag: Rows.protocol.tag), let pr = row.value {
+		if let row: PickerRow<URLScheme> = form.rowBy(tag: Rows.scheme.tag), let pr = row.value {
 			prot = pr
 		} else {
 			prot = .https
@@ -256,12 +258,18 @@ extension NodeEditorViewController {
 	}
 	
 	func deleteNode() {
-		didCallDelegate = false
+		let alert = UIAlertController(title: String.adamantLocalized.nodesEditor.deleteNodeAlert, message: nil, preferredStyle: .alert)
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.delete, style: .destructive, handler: { _ in
+			self.didCallDelegate = false
+			
+			if let node = self.node, let tag = self.nodeTag {
+				self.delegate?.nodeEditorViewController(self, didFinishEditingWithResult: .delete(node: node, tag: tag))
+			} else {
+				self.delegate?.nodeEditorViewController(self, didFinishEditingWithResult: .cancel)
+			}
+		}))
 		
-		if let node = node, let tag = nodeTag {
-			delegate?.nodeEditorViewController(self, didFinishEditingWithResult: .delete(node: node, tag: tag))
-		} else {
-			delegate?.nodeEditorViewController(self, didFinishEditingWithResult: .cancel)
-		}
+		present(alert, animated: true, completion: nil)
 	}
 }

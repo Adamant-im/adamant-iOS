@@ -230,7 +230,7 @@
 "NodesList.NodesList" = "Список нод";
 
 /* NodesList: scene title */
-"NodesList.Title" = "Список используемых нод";
+"NodesList.Title" = "Список нод";
 
 /* NodesList: 'Saved' message */
 "NodesList.Saved" = "Сохранено";
@@ -239,13 +239,49 @@
 "NodesList.UnableToSave" = "Не удалось сохранить";
 
 /* NodesList: 'Add new node' button lable */
-"NodesList.AddNewNode" = "Добавить новую нода";
-
-/* NodesList: 'Node url' plaseholder */
-"NodesList.NodeUrl" = "Адрес ноды";
+"NodesList.AddNewNode" = "Добавить новую ноду";
 
 /* Notifications: scene title */
 "Notifications.Title" = "Уведомления";
+
+/* NodesList: Reset nodes alert title */
+"NodesList.ResetNodeListAlert" = "Сбросить список нод к списку по-умолчанию?";
+
+/* NodesList: 'Reset' button */
+"NodesList.ResetButton" = "Сбросить";
+
+/* NodesEditor: New node scene title */
+"NodesEditor.NewNodeTitle" = "Новая нода";
+
+/* NodesEditor: Delete node confirmation message */
+"NodesEditor.DeleteNodeAlert" = "Удалить эту ноду?";
+
+/* NodesEditor: Testing in progress */
+"NodesEditor.TestingInProgressMessage" = "Проверяем соединение";
+
+/* NodesEditor: Testing failed message format. %@ for failure reason. */
+"NodesEditor.TestingFailedMessageFormat" = "Ошибка: %@";
+
+/* NodesEditor: Scheme row */
+"NodesEditor.SchemeRow" = "Протокол";
+
+/* NodesEditor: Port row */
+"NodesEditor.PortRow" = "Порт";
+
+/* NodesEditor: Host row */
+"NodesEditor.HostRow" = "Хост";
+
+/* NodesEditor: Test button */
+"NodesEditor.TestButton" = "Тест ноды";
+
+/* NodesEditor: Delete node button */
+"NodesEditor.DeleteNodeButton" = "Удалить ноду";
+
+/* NodesEditor: Port row placeholder */
+"NodesEditor.PortRow.Placeholder" = "443";
+
+/* NodesEditor: Host row placeholder */
+"NodesEditor.HostRow.Placeholder" = "ip или имя хоста";
 
 /* Notifications: Modes description. Markdown supported. */
 "Notifications.ModesDescription" = "#### Режимы уведомлений\n\n#### Отключены\nНе присылать никаких уведомлений.\n\n#### Фоновое обновление\nПроверка новых сообщений производится самим устройством. Проверку инициирует iOS, и интервалы между проверками определяются системой на основании множества факторов, таких как доступность сотовой сети, заряд батареи, и использование приложения. Интервал может быть 20 минут, может быть 6 часов, может доходить и до нескольких дней. Однако, вы всегда можете открыть приложение и проверить новые сообщения вручную.\n\n#### Push\nУведомления о новых сообщениях присылаются сервисом ADAMANT Notification Service. Уведомления приходят практически мгновенно (несколько секунд), но необходима регистрация устройства в сервисе. Это безопасно и сохраняет высокий уровень секретности, для большинства пользователей это предпочтительный вариант.\n\nО регистрации устройств вы можете прочитать больше на странице проекта в Github.";

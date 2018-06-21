@@ -23,9 +23,8 @@ extension String.adamantLocalized {
         static let title = NSLocalizedString("NodesList.Title", comment: "NodesList: scene title")
         static let saved = NSLocalizedString("NodesList.Saved", comment: "NodesList: 'Saved' message")
         static let unableToSave = NSLocalizedString("NodesList.UnableToSave", comment: "NodesList: 'Unable To Save' message")
-        //static let nodeUrl = NSLocalizedString("NodesList.NodeUrl", comment: "NodesList: 'Node url' plaseholder")
 		
-		static let resetAlertTitle = NSLocalizedString("NodesList.ResetNodeList", comment: "NodesList: Reset nodes alert title")
+		static let resetAlertTitle = NSLocalizedString("NodesList.ResetNodeListAlert", comment: "NodesList: Reset nodes alert title")
 		
         private init() {}
     }
@@ -46,14 +45,6 @@ class NodesListViewController: FormViewController {
 			case .nodes: return "nds"
 			case .buttons: return "bttns"
 			case .reset: return "reset"
-			}
-		}
-		
-		var localized: String? {
-			switch self {
-			case .nodes: return nil
-			case .buttons: return nil
-			case .reset: return nil
 			}
 		}
 	}
@@ -141,7 +132,9 @@ class NodesListViewController: FormViewController {
 		
 		// MARK: Buttons
 		
-        +++ Section()
+		+++ Section() {
+			$0.tag = Sections.buttons.tag
+		}
 		
 		// Add node
 		<<< ButtonRow() {
@@ -174,7 +167,10 @@ class NodesListViewController: FormViewController {
 			
 		// MARK: Reset
 			
-		+++ Section()
+		+++ Section() {
+			$0.tag = Sections.reset.tag
+		}
+			
 		<<< ButtonRow() {
 			$0.title = Rows.reset.localized
 		}.onCellSelection({ [weak self] (_, _) in
