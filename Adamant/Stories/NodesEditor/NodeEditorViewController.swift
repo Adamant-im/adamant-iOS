@@ -231,7 +231,29 @@ class NodeEditorViewController: FormViewController {
 // MARK: - Actions
 extension NodeEditorViewController {
 	func testNode(completion: ((Bool) -> Void)? = nil) {
-		guard let url = node?.asURL() else {
+		var components = URLComponents()
+		
+		// Host
+		if let row: TextRow = form.rowBy(tag: Rows.host.tag), let host = row.value {
+			components.host = host
+		}
+		
+		// Scheme
+		if let row = form.rowBy(tag: Rows.scheme.tag), let scheme = row.baseValue as? URLScheme {
+			components.scheme = scheme.rawValue
+		} else {
+			components.scheme = "https"
+		}
+		
+		// Port
+		if let row: IntRow = form.rowBy(tag: Rows.port.tag), let port = row.value {
+			components.port = port
+		}
+		
+		let url: URL
+		do {
+			url = try components.asURL()
+		} catch {
 			testState = .failed
 			dialogService.showWarning(withMessage: String.adamantLocalized.nodesEditor.failedToBuildURL)
 			return
