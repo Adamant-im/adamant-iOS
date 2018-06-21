@@ -60,17 +60,18 @@ extension Container {
 			service.accountService = r.resolve(AccountService.self)
 		}.inObjectScope(.container)
 		
+		// MARK: NodesSource
+		self.register(NodesSource.self) { r in
+			let service = AdamantNodesSource(defaultNodes: AdamantResources.nodes)
+			service.securedStore = r.resolve(SecuredStore.self)
+			return service
+		}.inObjectScope(.container)
+		
 		// MARK: ApiService
 		self.register(ApiService.self) { r in
-            
-            let securedStore = r.resolve(SecuredStore.self)
-            var serverUrls = AdamantResources.servers
-            if let usersNodesString = securedStore?.get(StoreKey.nodesList.userNodes), let usersNodes = AdamantUtilities.toArray(text: usersNodesString) {
-                serverUrls = usersNodes
-            }
-            
-            let service = AdamantApiService(apiUrls: serverUrls)
-            service.adamantCore = r.resolve(AdamantCore.self)!
+            let service = AdamantApiService()
+			service.adamantCore = r.resolve(AdamantCore.self)
+			service.nodesSource = r.resolve(NodesSource.self)
             return service
 		}.inObjectScope(.container)
 		
@@ -124,12 +125,23 @@ extension Container {
 	}
 	
 	func registerAdamantBackgroundFetchServices() {
-		// MARK: Secured Store
+		// MARK: Secured store
 		self.register(SecuredStore.self) { r in KeychainStore() }.inObjectScope(.container)
+		
+		// MARK: NodesSource
+		self.register(NodesSource.self) { r in
+			let service = AdamantNodesSource(defaultNodes: AdamantResources.nodes)
+			service.securedStore = r.resolve(SecuredStore.self)
+			return service
+		}.inObjectScope(.container)
 		
 		// MARK: ApiService
 		// No need to init AdamantCore
-		self.register(ApiService.self) { r in AdamantApiService(apiUrls: AdamantResources.servers)}.inObjectScope(.container)
+		self.register(ApiService.self) { r in
+			let service = AdamantApiService()
+			service.nodesSource = r.resolve(NodesSource.self)
+			return service
+		}.inObjectScope(.container)
 		
 		// MARK: Notifications
 		self.register(NotificationsService.self) { r in

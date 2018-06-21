@@ -1,3 +1,6 @@
+/* System accounts: ADAMANT Tokens */
+"Accounts.AdamantTokens" = "ADAMANT Tokens";
+
 /* AccountsProvider: Address not valid error, %@ for address */
 "AccountsProvider.Error.AddressNotValidFormat" = "Invalid address: %@";
 
@@ -26,7 +29,7 @@
 "AccountTab.Row.Balance" = "Balance";
 
 /* Account tab: 'Join the ICO' button */
-"AccountTab.Row.JoinIco" = "Join the ICO";
+"AccountTab.Row.JoinIco" = "Buy Tokens";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Logout";
@@ -53,7 +56,7 @@
 "AccountTab.TransferBlocked.GoToPWA" = "msg.adamant.im";
 
 /* Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO */
-"AccountTab.TransferBlocked.Message" = "Due to Apple restrictions, sending tokens is not allowed until the end of the ICO. For now, you can send tokens using WebApp at msg.adamant.im";
+"AccountTab.TransferBlocked.Message" = "Due to Apple restrictions, sending tokens is not allowed until 07/01/2018. For now, you can send tokens using WebApp at msg.adamant.im";
 
 /* Account tab: 'Transfer not allowed' alert title */
 "AccountTab.TransferBlocked.Title" = "Sorry!";
@@ -86,7 +89,7 @@
 "ChatListPage.Title" = "Chats";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.NotEnoughtMoney" = "You don't have enough money to send a message";
+"ChatsProvider.Error.NotEnoughtMoney" = "You don't have enough tokens to send a message";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "Message with id %@ not found";
@@ -98,13 +101,13 @@
 "ChatsProvider.Validation.MessageTooLong" = "Message is too long";
 
 /* Known contacts: Adamant ICO message. Markdown supported. */
-"Chats.IcoMessage" = "You have a possibility to **Join the ICO** of ADAMANT, the most secure and anonymous messenger. Learn more on Adamant.im website or in the Whitepaper.\n\nPlease make sure your have saved the passphrase to this account — exit your account and open it again. Better save your password on a sheet of paper also. But remember, only **you are responsible for the passphrase safety**. It cannot be recovered. And if other person will get it, your money will be stolen. Treat this question as secure, as if tokens in your wallet will cost a billion dollars some time.\n\nTo buy ADM tokens, go to Wallet tab and click Join the ICO, or open the page Adamant.im/ico/ in the web browser. In the ICO form enter your ADAMANT address — you will receive ADM tokens there. If you moved from Messenger App, your ADM address will be filled already, other way go back to Messenger and click ADAMANT address to copy it to clipboard. Next, choose crypto you want to spend and its amount. You'll see how much ADM tokens you will receive, including volume bonus: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Click Buy ADAMANT tokens. You'll get unique address where you need to send crypto. As soon as your transaction will be confirmed, you'll receive ADM tokens. Transaction can be done **from any wallet or exchange**. It is not necessary to transfer exact amount including transaction fees, the payment will be processed anyway.\nAfter you receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users' wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.\n\nDo not reply to this message, it is a system account. If you still have any questions, contact account **U15677078342684640219**";
+"Chats.IcoMessage" = "Now you have a possibility to buy tokens of ADAMANT, the most secure and anonymous messenger, with the cheapest price.\n\nPlease make sure your have saved the passphrase for this account — exit your account and open it again. Better save your password on a sheet of paper also. But remember, only **you are responsible for the passphrase safety**. It cannot be recovered. And if other person will get it, your money will be stolen. Treat this question as secure, as if tokens in your wallet will cost a billion dollars some time.\n\nTo buy ADM tokens, go to Wallet tab and click Buy Tokens, or open the page Adamant.im/ico/ in the web browser. In the ICO form enter your ADAMANT address — you will receive ADM tokens there. If you moved from Messenger App, your ADM address will be filled already, other way go back to Messenger and click Account to copy it to clipboard. Next, choose crypto you want to spend and its amount. You'll see how much ADM tokens you will receive, including volume bonus: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Click Buy ADAMANT tokens. You'll get unique address where you need to send crypto. As soon as your transaction will be confirmed, you'll receive ADM tokens. Transaction can be done **from any wallet or exchange**. It is not necessary to transfer exact amount including transaction fees, the payment will be processed anyway.\n\nAfter you receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens will be distributed among users' wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.\n\nDo not reply to this message, it is a system account. If you still have any questions, contact account **U15677078342684640219**.";
 
 /* Known contacts: Adamant pre ICO message */
 "Chats.PreIcoMessage" = "You have a possibility to invest in ADAMANT, the most secure and anonymous messenger. Now is a Pre-ICO stage — the most profitable for investors. Learn more on Adamant.im website or in the Whitepaper. To participate just reply to this message and we will assist. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\nAfter you invest and receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.";
 
 /* Known contacts: Adamant welcome message. Markdown supported. */
-"Chats.WelcomeMessage" = "Welcome to ADAMANT, the most secure and anonymous messenger. Remember, your security and anonymity is up to you also. Do not follow links you receive, otherwise your IP can be compromised. Do not trust browser extensions. Better to share your ADM address personally, but not using other messengers. Keep your secret passphrase secure. Set a password on your device or logout before leaving.\nLearn more about security and anonymity at https://adamant.im/staysecured.\nAll the transactions within the blockchain do need to have their minimal fees. This is necessary to support the network infrastructure. To start messengning now, **get free tokens** — go to Wallet tab and click Free ADM tokens. Then click Start new chat on Chats tab and put your interlocutor's address. To copy your address, click on ADAMANT address on Wallet tab.\nDo not reply to this message, it is a system account. If you still have any questions, contact account U15677078342684640219";
+"Chats.WelcomeMessage" = "Welcome to ADAMANT, the most secure and anonymous messenger.\n\nRemember, your security and anonymity is up to you also. Do not follow links you receive, otherwise your IP can be compromised. Do not trust browser extensions. Better to share your ADM address personally, but not using other messengers. Keep your secret passphrase secure. Set a password on your device or logout before leaving.\n\nLearn more about security and anonymity at https://adamant.im/staysecured.\n\nAll the transactions within the blockchain do need to have their minimal fees. This is necessary to support the network infrastructure. To start messengning now, **get free tokens** — go to Wallet tab and click Free ADM tokens. Then click Start new chat on Chats tab and put your interlocutor's address. To copy your address, click on Account on Wallet tab.\n\nDo not reply to this message, it is a system account. If you still have any questions, contact account **U15677078342684640219**.";
 
 /* Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them */
 "Chats.RetryOrDelete.Title" = "Retry or delete?";
@@ -113,7 +116,7 @@
 "Chats.RetryOrDelete.Body" = "Do you whant to send message again or delete it?";
 
 /* Chat: inform user that he can't cancel transaction, that was sent */
-"ChatScene.Error.cancelError" = "Message already sended";
+"ChatScene.Error.cancelError" = "Message already sent";
 
 /* Chat: message input placeholder */
 "ChatScene.NewMessage.Placeholder" = "New message";
@@ -137,10 +140,10 @@
 "Error.Mail.Title" = "I have error in my iOS app";
 
 /* Error messge body for support email */
-"Error.Mail.Body" = "Hello,\nI have this error:\n\n%@\n\nMy device info:\n%@";
+"Error.Mail.Body" = "Hello,\n\nI have this error:\n\n%@\n\nMy device info:\n\n%@";
 
 /* Error messge body for support email, with detailed error description. Where first %@ - error's short message, second %@ - detailed description, third %@ - deviceInfo */
-"Error.Mail.Body.Detailed" = "Hello,\nI have this error:\n\n%@\n\n%@\n\nDevice:\n%@";
+"Error.Mail.Body.Detailed" = "Hello,\n\nI have this error:\n\n%@\n\n%@\n\nDevice:\n\n%@";
 
 /* Shared error: Network problems. In most cases - no connection */
 "Error.NoNetwork" = "No connection";
@@ -149,7 +152,7 @@
 "Error.RemoteServerErrorFormat" = "Blockchain Node error: %@";
 
 /* Shared error: User not logged */
-"Error.UserNotLogged" = "User not logged";
+"Error.UserNotLogged" = "User not logged in";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "LoginScene.Error.AuthorizeCamera" = "You need to authorize ADAMANT to use device's camera";
@@ -167,10 +170,10 @@
 "LoginScene.Error.NoQrOnPhoto" = "Selected image does not contain valid QR codes";
 
 /* Login: Notify user that device not supported by QR reader */
-"LoginScene.Error.QrNotSupported" = "QR code reading is not supported by the device";
+"LoginScene.Error.QrNotSupported" = "QR code reading is not supported on the device";
 
 /* Login: Notify user that scanned QR doesn't contains a passphrase. */
-"LoginScene.Error.WrongQr" = "QR code does not contains a valid passphrase";
+"LoginScene.Error.WrongQr" = "QR code does not contain a valid passphrase";
 
 /* Login: notify user that we are trying to log in */
 "LoginScene.LoggingInProgress" = "Logging in…";
@@ -230,22 +233,61 @@
 "NodesList.NodesList" = "Nodes list";
 
 /* NodesList: scene title */
-"NodesList.Title" = "List of used nodes";
-
-/* NodesList: 'Saved' message */
-"NodesList.Saved" = "Saved";
-
-/* NodesList: 'Unable To Save' message */
-"NodesList.UnableToSave" = "Unable to save";
+"NodesList.Title" = "List of nodes";
 
 /* NodesList: 'Add new node' button lable */
 "NodesList.AddNewNode" = "Add new node";
 
-/* NodesList: 'Node url' plaseholder */
-"NodesList.NodeUrl" = "Node url";
+/* NodesList: Reset nodes alert title */
+"NodesList.ResetNodeListAlert" = "Reset node list to default?";
+
+/* NodesList: 'Reset' button */
+"NodesList.ResetButton" = "Reset";
+
+/* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
+"NodeList.DefaultNodesLoaded" = "Default nodes was loaded";
+
+/* NodesEditor: New node scene title */
+"NodesEditor.NewNodeTitle" = "New node";
+
+/* NodesEditor: Delete node confirmation message */
+"NodesEditor.DeleteNodeAlert" = "Delete this node?";
+
+/* NodesEditor: Testing in progress */
+"NodesEditor.TestingInProgressMessage" = "Checking connection";
+
+/* NodesEditor: Scheme row */
+"NodesEditor.SchemeRow" = "Scheme";
+
+/* NodesEditor: Port row */
+"NodesEditor.PortRow" = "Port";
+
+/* NodesEditor: Host row */
+"NodesEditor.HostRow" = "Host";
+
+/* NodesEditor: Test button */
+"NodesEditor.TestButton" = "Test node";
+
+/* NodesEditor: Test passed */
+"NodesEditor.NodeTestPassed" = "Passed";
+
+/* NodesEditor: Test failed */
+"NodesEditor.NodeTestFailed" = "Failed";
+
+/* NodesEditor: Delete node button */
+"NodesEditor.DeleteNodeButton" = "Delete";
+
+/* NodesEditor: Port row placeholder */
+"NodesEditor.PortRow.Placeholder" = "443";
+
+/* NodesEditor: Host row placeholder */
+"NodesEditor.HostRow.Placeholder" = "ip or host name";
+
+/* NodesEditor: Failed to build URL alert */
+"NodesEditor.FailedToBuildURL" = "Invalid host";
 
 /* Notifications: Modes description. Markdown supported. */
-"Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. This can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You receive notification almost instantly after a message was sent and approved by the Blockchain - a few seconds delay. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.";
+"Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. It can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You receive notification almost instantly after a message was sent and approved by the Blockchain — a few seconds delay. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.";
 
 /* Notifications: Notifications update mode */
 "Notifications.Section.Settings" = "Notifications settings";

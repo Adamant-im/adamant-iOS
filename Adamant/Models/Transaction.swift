@@ -61,7 +61,7 @@ extension Transaction: Decodable {
 		self.timestamp = try container.decode(UInt64.self, forKey: .timestamp)
 		self.senderPublicKey = try container.decode(String.self, forKey: .senderPublicKey)
 		self.senderId = try container.decode(String.self, forKey: .senderId)
-		self.recipientId = try container.decode(String.self, forKey: .recipientId)
+		self.recipientId = (try? container.decode(String.self, forKey: .recipientId)) ?? ""
 		self.recipientPublicKey = try? container.decode(String.self, forKey: .recipientPublicKey)
 		self.signature = try container.decode(String.self, forKey: .signature)
 		self.confirmations = (try? container.decode(Int64.self, forKey: .confirmations)) ?? 0
@@ -137,6 +137,34 @@ extension Transaction: WrappableCollection {
 			"own_message": "",
 			"type": 0
 		}
+	}
+}
+*/
+
+/* State transaction
+{
+	"id": "",
+	"height": 0,
+	"blockId": "",
+	"type": 9,
+	"timestamp": 22645079,
+	"senderPublicKey": "",
+	"requesterPublicKey": null,
+	"senderId": "",
+	"recipientId": null,
+	"recipientPublicKey": null,
+	"amount": 0,
+	"fee": 100000,
+	"signature": "",
+	"signSignature": null,
+	"signatures": [
+	],
+	"confirmations": null,
+	"asset": {
+	"state": {
+		"value": "0",
+		"key": "eth:address",
+		"type": 0
 	}
 }
 */

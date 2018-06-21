@@ -24,14 +24,6 @@ extension AdamantScene {
 			c.dialogService = r.resolve(DialogService.self)
 			return c
 		})
-        
-        static let nodesList = AdamantScene(identifier: "NodesListViewController", factory: { r in
-            let c = NodesListViewController()
-            c.dialogService = r.resolve(DialogService.self)
-            c.securedStore = r.resolve(SecuredStore.self)
-            c.apiService = r.resolve(ApiService.self)
-            return c
-        })
 		
 		static let notifications = AdamantScene(identifier: "NotificationsViewController") { r -> UIViewController in
 			let c = NotificationsViewController()

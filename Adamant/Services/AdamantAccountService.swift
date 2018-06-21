@@ -8,7 +8,7 @@
 
 import Foundation
 
-class AdamantAccountService {
+class AdamantAccountService: AccountService {
 	
 	// MARK: Dependencies
 	
@@ -143,7 +143,7 @@ extension AdamantAccountService {
 
 
 // MARK: - AccountService
-extension AdamantAccountService: AccountService {
+extension AdamantAccountService {
 	// MARK: Update logged account info
     func update() {
         self.update(nil)

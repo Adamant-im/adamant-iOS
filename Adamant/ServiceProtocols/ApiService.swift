@@ -53,11 +53,20 @@ enum ApiServiceError: Error {
 protocol ApiService: class {
 	
 	/// Default is async queue with .utilities priority.
-	var defaultResponseDispatchQueue: DispatchQueue { get set }
+	var defaultResponseDispatchQueue: DispatchQueue { get }
     
     // MARK: - Servers list
-    
-    func updateServersList(servers:[String])
+	
+	/// Current node
+	var node: Node? { get }
+	
+	/// Request new node from source
+	func refreshNode()
+	
+	// MARK: - Peers
+	
+	func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void)
+	
 	
 	// MARK: - Accounts
 	
@@ -87,7 +96,7 @@ protocol ApiService: class {
 	
 	/// - Returns: Transaction ID
 	func store(key: String, value: String, type: StateType, sender: String, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
-	
+	func get(key: String, sender: String, completion: @escaping (ApiServiceResult<String?>) -> Void)
 	
 	// MARK: - Chats
 	

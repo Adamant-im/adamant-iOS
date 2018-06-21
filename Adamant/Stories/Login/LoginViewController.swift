@@ -68,6 +68,7 @@ class LoginViewController: FormViewController {
 		case saveYourPassphraseAlert
 		case tapToSaveHint
 		case generateNewPassphraseButton
+		case nodes
 		
 		var localized: String {
 			switch self {
@@ -94,6 +95,9 @@ class LoginViewController: FormViewController {
 				
 			case .newPassphrase:
 				return ""
+				
+			case .nodes:
+				return String.adamantLocalized.nodesList.nodesListButton
 			}
 		}
 		
@@ -107,6 +111,7 @@ class LoginViewController: FormViewController {
 			case .saveYourPassphraseAlert: return "alert"
 			case .generateNewPassphraseButton: return "generate"
 			case .tapToSaveHint: return "hint"
+			case .nodes: return "nodes"
 			}
 		}
 	}
@@ -280,12 +285,12 @@ class LoginViewController: FormViewController {
         // MARK: Nodes list settings
         form +++ Section()
             <<< ButtonRow() {
-                $0.title = String.adamantLocalized.nodesList.nodesListButton
-                $0.tag = "nodes"
+                $0.title = Rows.nodes.localized
+                $0.tag = Rows.nodes.tag
                 }.cellSetup({ (cell, _) in
                     cell.selectionStyle = .gray
                 }).onCellSelection({ [weak self] (_, _) in
-                    guard let vc = self?.router.get(scene: AdamantScene.Settings.nodesList) else {
+                    guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
                         return
                     }
                     
@@ -390,16 +395,7 @@ extension LoginViewController {
 				self?.dialogService.dismissProgress()
 				
 			case .failure(let error):
-				switch error {
-				case .invalidPassphrase, .wrongPassphrase, .userNotLogged:
-					self?.dialogService.showWarning(withMessage: error.localized)
-					
-				case .apiError(let apiError):
-					self?.dialogService.showError(withMessage: apiError.localized, error: apiError)
-					
-				case .internalError(let message, let internalError):
-					self?.dialogService.showError(withMessage: message, error: internalError)
-				}
+				self?.dialogService.showRichError(error: error)
 			}
 		})
 	}

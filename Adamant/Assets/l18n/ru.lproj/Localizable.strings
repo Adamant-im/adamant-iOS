@@ -1,5 +1,8 @@
+/* System accounts: ADAMANT Tokens */
+"Accounts.AdamantTokens" = "Токены АДАМАНТ";
+
 /* AccountsProvider: Address not valid error, %@ for address */
-"AccountsProvider.Error.AddressNotValidFormat" = "Invalid address: %@";
+"AccountsProvider.Error.AddressNotValidFormat" = "Неправильный адрес: %@";
 
 /* Login: user typed in invalid passphrase */
 "AccountServiceError.InvalidPassphrase" = "Неправильный пароль";
@@ -26,7 +29,7 @@
 "AccountTab.Row.Balance" = "Баланс";
 
 /* Account tab: 'Join the ICO' button */
-"AccountTab.Row.JoinIco" = "Участвовать в ICO";
+"AccountTab.Row.JoinIco" = "Купить токены";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Выход";
@@ -53,7 +56,7 @@
 "AccountTab.TransferBlocked.GoToPWA" = "msg.adamant.im";
 
 /* Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO */
-"AccountTab.TransferBlocked.Message" = "Ввиду ограничений Apple, отправка токенов отключена до конца ICO. В данный момент вы можете отправлять токены с помощью WebApp по адресу msg.adamant.im";
+"AccountTab.TransferBlocked.Message" = "Ввиду ограничений Apple, отправка токенов отключена до 1.07.2018. В данный момент вы можете отправлять токены с помощью WebApp по адресу msg.adamant.im";
 
 /* Account tab: 'Transfer not allowed' alert title */
 "AccountTab.TransferBlocked.Title" = "Ой!";
@@ -65,13 +68,13 @@
 "ApiService.Error.NoConnection" = "Нет соединения с сетью";
 
 /* Serious internal error: Failed to build endpoint url */
-"ApiService.InternalError.EndpointBuildFailed" = "Ошибка взаимодействия с блокчейном. Сообщите об ошибке";
+"ApiService.InternalError.EndpointBuildFailed" = "Ошибка взаимодействия с блокчейном. Сообщите разработчикам";
 
 /* Serious internal error: Failed to sign transaction */
 "ApiService.InternalError.FailedTransactionSigning" = "Ошибка создания транзакции";
 
 /* Serious internal error: Error parsing response */
-"ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите об ошибке";
+"ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите разработчикам";
 
 /* Unknown internal error */
 "ApiService.InternalError.UnknownError" = "Неизвестная ошибка";
@@ -98,13 +101,13 @@
 "ChatsProvider.Validation.MessageTooLong" = "Сообщение слишком длинное";
 
 /* Known contacts: Adamant ICO message. Markdown supported. */
-"Chats.IcoMessage" = "У вас есть возможность **принять участие в ICO** самого защищенного мессенджера АДАМАНТ. Подробная информация об условиях на сайте Adamant.im и в Белой книге проекта.\n\nВажно! Пожалуйста, убедитесь, что вы сохранили пароль к этому аккаунту — выйдите из аккаунта и войдите в него снова. Лучше всего иметь запись пароля и на бумаге. Однако помните, только **вы несете ответственность за сохранность вашего пароля**. Его невозможно восстановить. А если он попадет в другие руки, ваши деньги будут украдены. Отнеситесь к этому вопросу так серьезно, как если бы цена токенов на вашем кошельке когда-то станет равна миллиарду долларов.\n\nЧтобы купить токены ADM, перейдите в этом месседжере на вкладку Кошелек и нажмите кнопку Участвовать в ICO, или откройте в браузере веб-страницу Adamant.im/ico/. В форме покупки токенов укажите ваш адрес АДАМАНТа — на него будут перечислены токены ADM. При переходе из мессенджера он будет вставлен автоматически, в другом случае вернитесь в мессенджер и кликните на блок Идентификатор кошелька, он будет скопирован в буфер обмена. Укажите криптовалюту, в которой вы хотите произвести оплату, и какую сумму. Вы увидите сколько ADM-токенов вы получите, с учетом скидки за объем: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Нажмите кнопку Купить токены АДАМАНТ. Вы получите уникальный адрес, на который необходимо выполнить перевод. Как только на него поступит ожидаемая сумма и транзакция будет подтверждена, вы получите токены ADM. Транзакцию можно выполнить **с любого кошелька, включая биржи**. Необязятельно переводить точную сумму с учетом комиссии, платеж все равно будет засчитан.\nПосле того, как вы получите токены ADM, мы рекомендуем вам хранить их в кошельке как можно дольше. Ежемесячно все нераспроданные на ICO токены будут распределяться по кошелькам пользователей, увеличивая балансы на 5%. Подробную информацию можно получить на сайте Adamant.im и в Белой книге Проекта.\n\nНе отвечайте на это сообщение, этот адрес служебный. Если же у вас остались вопросы, напишите в аккаунт **U15677078342684640219**.";
+"Chats.IcoMessage" = "Сейчас у вас есть возможность купить токены самого защищенного мессенджера АДАМАНТ по низкой цене.\n\nВажно! Пожалуйста, убедитесь, что вы сохранили пароль к этому аккаунту — выйдите из аккаунта и войдите в него снова. Лучше всего иметь запись пароля и на бумаге. Однако помните, только **вы несете ответственность за сохранность вашего пароля**. Его невозможно восстановить. А если он попадет в другие руки, ваши деньги будут украдены. Отнеситесь к этому вопросу так серьезно, как если бы цена токенов на вашем кошельке когда-то станет равна миллиарду долларов.\n\nЧтобы купить токены ADM, перейдите в этом месседжере на вкладку Кошелек и нажмите кнопку Купить токены, или откройте в браузере веб-страницу Adamant.im/ico/. В форме покупки токенов укажите ваш адрес АДАМАНТа — на него будут перечислены токены ADM. При переходе из мессенджера он будет вставлен автоматически, в другом случае вернитесь в мессенджер и кликните на блок Аккаунт, адрес кошелька будет скопирован в буфер обмена. Укажите криптовалюту, в которой вы хотите произвести оплату, и какую сумму. Вы увидите сколько ADM-токенов вы получите, с учетом скидки за объем: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Нажмите кнопку Купить токены АДАМАНТ. Вы получите уникальный адрес, на который необходимо выполнить перевод. Как только на него поступит ожидаемая сумма и транзакция будет подтверждена, вы получите токены ADM. Транзакцию можно выполнить **с любого кошелька, включая биржи**. Необязятельно переводить точную сумму с учетом комиссии, платеж все равно будет засчитан.\nПосле того, как вы получите токены ADM, мы рекомендуем вам хранить их в кошельке как можно дольше. Ежемесячно все нераспроданные токены будут распределяться по кошелькам пользователей, увеличивая балансы на 5%. Подробную информацию можно получить на сайте Adamant.im и в Белой книге Проекта.\n\nНе отвечайте на это сообщение, этот адрес служебный. Если же у вас остались вопросы, напишите в аккаунт **U15677078342684640219**.";
 
 /* Known contacts: Adamant pre ICO message */
 "Chats.PreIcoMessage" = "Сегодня последний день, когда мы принимаем инвестиции по минимальной цене 0.001 ETH за токен ADM до начала публичного сейла ICO — 30.01. Это самые выгодные условия для инвесторов. Минимальная инвестиция — эквивалент 2 ETH (на этапе публичного сейла ограничений по минимальной сумме нет, но цена токена начинается с 0.002 ETH). Подробная информация о проекте АДАМАНТ на сайте Adamant.im и в Белой книге. Для участия достаточно ответить на это сообщение, и мы вам поможем.";
 
 /* Known contacts: Adamant welcome message. Markdown supported. */
-"Chats.WelcomeMessage" = "Добро пожаловать в самый анонимный и безопасный мессенджер АДАМАНТ. Помните, что безопасность и анонимность зависит и от вас самих. Не переходите по ссылкам, которые вы получаете в чатах, иначе ваш IP-адрес может быть определен. Не доверяйте расширениям браузера. Лучше всего передавать ваш ADM-адрес собеседникам лично, а не через другие мессенджеры. Храните вашу секретную фразу (пароль) от аккаунта в тайне. Установите на ваше устройство пароль или закрываете вкладку браузера после завершения диалогов.\n\nБолее полную информацию о безопасности и анонимности читайте на странице https://adamant.im/staysecured/\n\nВсе транзакции в блокчейне требуют минимальной комиссии. Это необходимо для поддержания инфраструктуры сети. Чтобы начать общаться, **получите бесплатные токены** — перейдите на вкладку Кошелек и нажмите Бесплатные токены. Затем на вкладке Диалоги нажмите Новый чат и введите адрес собеседника. Чтобы скопировать ваш адрес, нажмите Идентификатор кошелька на вкладке Кошелек.\n\nНе отвечайте на это сообщение, этот адрес служебный. Если же у вас остались вопросы, напишите в аккаунт **U15677078342684640219**.";
+"Chats.WelcomeMessage" = "Добро пожаловать в самый анонимный и безопасный мессенджер АДАМАНТ. Помните, что безопасность и анонимность зависит и от вас самих. Не переходите по ссылкам, которые вы получаете в чатах, иначе ваш IP-адрес может быть определен. Не доверяйте расширениям браузера. Лучше всего передавать ваш ADM-адрес собеседникам лично, а не через другие мессенджеры. Храните вашу секретную фразу (пароль) от аккаунта в тайне. Установите на ваше устройство пароль или закрываете вкладку браузера после завершения диалогов.\n\nБолее полную информацию о безопасности и анонимности читайте на странице https://adamant.im/staysecured/.\n\nВсе транзакции в блокчейне требуют минимальной комиссии. Это необходимо для поддержания инфраструктуры сети. Чтобы начать общаться, **получите бесплатные токены** — перейдите на вкладку Кошелек и нажмите Бесплатные токены. Затем на вкладке Диалоги нажмите Новый чат и введите адрес собеседника. Чтобы скопировать ваш адрес, нажмите Идентификатор кошелька на вкладке Кошелек.\n\nНе отвечайте на это сообщение, этот адрес служебный. Если же у вас остались вопросы, напишите в аккаунт **U15677078342684640219**."; 
 
 /* Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them */
 "Chats.RetryOrDelete.Title" = "Повторить или удалить?";
@@ -134,13 +137,13 @@
 "Error.InternalErrorFormat" = "Внутренняя ошибка: %@";
 
 /* Error messge title for support email */
-"Error.Mail.Title" = "У меня проблема с iOS приложением";
+"Error.Mail.Title" = "У меня проблема с iOS-приложением";
 
 /* Error messge body for support email */
-"Error.Mail.Body" = "Здравствуйте,\nУ меня вот такая ошибка:\n\n%@\n\nУстройство:\n%@";
+"Error.Mail.Body" = "Здравствуйте,\n\nУ меня вот такая ошибка:\n\n%@\n\nУстройство:\n\n%@";
 
 /* Error messge body for support email, with detailed error description. Where first %@ - error's short message, second %@ - detailed description, third %@ - deviceInfo */
-"Error.Mail.Body.Detailed" = "Привет, Адамант!\nУ меня вот такая ошибка:\n\n%@\n\n%@\n\nУстройство:\n%@";
+"Error.Mail.Body.Detailed" = "Привет, АДАМАНТ!\n\nУ меня вот такая ошибка:\n\n%@\n\n%@\n\nУстройство:\n\n%@";
 
 /* Shared error: Network problems. In most cases - no connection */
 "Error.NoNetwork" = "Нет соединения с сетью";
@@ -230,22 +233,61 @@
 "NodesList.NodesList" = "Список нод";
 
 /* NodesList: scene title */
-"NodesList.Title" = "Список используемых нод";
-
-/* NodesList: 'Saved' message */
-"NodesList.Saved" = "Сохранено";
-
-/* NodesList: 'Unable To Save' message */
-"NodesList.UnableToSave" = "Не удалось сохранить";
+"NodesList.Title" = "Список нод";
 
 /* NodesList: 'Add new node' button lable */
-"NodesList.AddNewNode" = "Добавить новую нода";
-
-/* NodesList: 'Node url' plaseholder */
-"NodesList.NodeUrl" = "Адрес ноды";
+"NodesList.AddNewNode" = "Добавить новую ноду";
 
 /* Notifications: scene title */
 "Notifications.Title" = "Уведомления";
+
+/* NodesList: Reset nodes alert title */
+"NodesList.ResetNodeListAlert" = "Сбросить список нод к списку по-умолчанию?";
+
+/* NodesList: 'Reset' button */
+"NodesList.ResetButton" = "Сбросить";
+
+/* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
+"NodeList.DefaultNodesLoaded" = "Был загружен список нод по-умолчанию";
+
+/* NodesEditor: New node scene title */
+"NodesEditor.NewNodeTitle" = "Новая нода";
+
+/* NodesEditor: Delete node confirmation message */
+"NodesEditor.DeleteNodeAlert" = "Удалить эту ноду?";
+
+/* NodesEditor: Testing in progress */
+"NodesEditor.TestingInProgressMessage" = "Проверяем соединение";
+
+/* NodesEditor: Scheme row */
+"NodesEditor.SchemeRow" = "Протокол";
+
+/* NodesEditor: Port row */
+"NodesEditor.PortRow" = "Порт";
+
+/* NodesEditor: Host row */
+"NodesEditor.HostRow" = "Хост";
+
+/* NodesEditor: Test button */
+"NodesEditor.TestButton" = "Тест ноды";
+
+/* NodesEditor: Test passed */
+"NodesEditor.NodeTestPassed" = "Пройден";
+
+/* NodesEditor: Test failed */
+"NodesEditor.NodeTestFailed" = "Ошибка";
+
+/* NodesEditor: Delete node button */
+"NodesEditor.DeleteNodeButton" = "Удалить ноду";
+
+/* NodesEditor: Port row placeholder */
+"NodesEditor.PortRow.Placeholder" = "443";
+
+/* NodesEditor: Host row placeholder */
+"NodesEditor.HostRow.Placeholder" = "ip или имя хоста";
+
+/* NodesEditor: Failed to build URL alert */
+"NodesEditor.FailedToBuildURL" = "Некорректный адрес хоста";
 
 /* Notifications: Modes description. Markdown supported. */
 "Notifications.ModesDescription" = "#### Режимы уведомлений\n\n#### Отключены\nНе присылать никаких уведомлений.\n\n#### Фоновое обновление\nПроверка новых сообщений производится самим устройством. Проверку инициирует iOS, и интервалы между проверками определяются системой на основании множества факторов, таких как доступность сотовой сети, заряд батареи, и использование приложения. Интервал может быть 20 минут, может быть 6 часов, может доходить и до нескольких дней. Однако, вы всегда можете открыть приложение и проверить новые сообщения вручную.\n\n#### Push\nУведомления о новых сообщениях присылаются сервисом ADAMANT Notification Service. Уведомления приходят практически мгновенно (несколько секунд), но необходима регистрация устройства в сервисе. Это безопасно и сохраняет высокий уровень секретности, для большинства пользователей это предпочтительный вариант.\n\nО регистрации устройств вы можете прочитать больше на странице проекта в Github.";
@@ -284,22 +326,22 @@
 "NotificationsService.Error.RegistrationRemotesFormat" = "Произошла ошибка при регистрации в ANS, попробуйте позже. Причина: %@";
 
 /* Notifications: New message notification title */
-"NotificationsService.NewMessage.Title" = "New Message";
+"NotificationsService.NewMessage.Title" = "Новое сообщение";
 
 /* Notifications: New single message notification body */
-"NotificationsService.NewMessage.BodySingle" = "You have new message";
+"NotificationsService.NewMessage.BodySingle" = "У вас новое сообщение";
 
 /* Notifications: New transfer transaction title */
-"NotificationsService.NewTransfer.Title" = "New Transfer";
+"NotificationsService.NewTransfer.Title" = "Новый перевод";
 
 /* Notifications: New single transfer transaction body */
-"NotificationsService.NewTransfer.BodySingle" = "You have new transfer";
+"NotificationsService.NewTransfer.BodySingle" = "У вас новый перевод";
 
 /* Notifications: User has disabled notifications. Head him into settings */
-"NotificationsService.NotificationsDisabled" = "Notifications disabled. You can enable notifications in Settings";
+"NotificationsService.NotificationsDisabled" = "Уведомления отключены. Вы можете включить их в Настройках";
 
 /* Notifications: New message notification title */
-"NotificationsService.NewMessage.Title" = "Новое Сообщение";
+"NotificationsService.NewMessage.Title" = "Новое сообщение";
 
 /* Notifications: New single message notification body */
 "NotificationsService.NewMessage.BodySingle" = "Новое сообщение";
@@ -335,7 +377,7 @@
 "QrGeneratorScene.Title" = "Генератор QR";
 
 /* Config: turn off 'Stay Logged In' confirmation */
-"SettingsPage.DoNotStayLoggedIn" = "Выходить из системы при закрытии приложения";
+"SettingsPage.DoNotStayLoggedIn" = "Выходить из аккаунта при закрытии приложения";
 
 /* Config: Authorization reason for turning biometry off */
 "SettingsPage.DoNotUseBiometry" = "Отключить вход с биометрией";
@@ -524,7 +566,7 @@
 "TransferScene.SendConfirmFormat" = "Отправить %1$@ получателю %2$@?";
 
 /* Transfer: Processing message */
-"TransferScene.SendingFundsProgress" = "Отправляем токены...";
+"TransferScene.SendingFundsProgress" = "Отправляем токены…";
 
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "Готово!";
