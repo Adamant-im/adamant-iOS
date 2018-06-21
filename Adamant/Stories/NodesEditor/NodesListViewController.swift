@@ -24,24 +24,82 @@ extension String.adamantLocalized {
         static let title = NSLocalizedString("NodesList.Title", comment: "NodesList: scene title")
         static let saved = NSLocalizedString("NodesList.Saved", comment: "NodesList: 'Saved' message")
         static let unableToSave = NSLocalizedString("NodesList.UnableToSave", comment: "NodesList: 'Unable To Save' message")
-        static let addNewNode = NSLocalizedString("NodesList.AddNewNode", comment: "NodesList: 'Add new node' button lable")
-        static let nodeUrl = NSLocalizedString("NodesList.NodeUrl", comment: "NodesList: 'Node url' plaseholder")
-        
+        //static let nodeUrl = NSLocalizedString("NodesList.NodeUrl", comment: "NodesList: 'Node url' plaseholder")
+		
+		static let resetAlertTitle = NSLocalizedString("NodesList.ResetNodeList", comment: "NodesList: Reset nodes alert title")
+		
         private init() {}
     }
 }
 
 class NodesListViewController: FormViewController {
-    
+	// Rows & Sections
+	
+	private enum Sections {
+		case nodes
+		case buttons
+		case reset
+		
+		var tag: String {
+			switch self {
+			case .nodes: return "nds"
+			case .buttons: return "bttns"
+			case .reset: return "reset"
+			}
+		}
+		
+		var localized: String? {
+			switch self {
+			case .nodes: return nil
+			case .buttons: return nil
+			case .reset: return nil
+			}
+		}
+	}
+	
+	private enum Rows {
+		case addNode
+		case save
+		case reset
+		
+		var localized: String {
+			switch self {
+			case .addNode:
+				return NSLocalizedString("NodesList.AddNewNode", comment: "NodesList: 'Add new node' button lable")
+				
+			case .save:
+				return String.adamantLocalized.alert.save
+				
+			case .reset:
+				return NSLocalizedString("NodesList.ResetButton", comment: "NodesList: 'Reset' button")
+			}
+		}
+	}
+	
+	
     // MARK: Dependencies
     var dialogService: DialogService!
     var securedStore: SecuredStore!
     var apiService: ApiService!
-    
-    // MARK: Lifetime
+	var router: Router!
+	
+	
+	// Properties
+	
+	private var nodes = [Node]()
+	
+	
+    // MARK: - Lifecycle
+	
+//	override func viewWillAppear(_ animated: Bool) {
+//		super.viewWillAppear(animated)
+//		tableView.setEditing(false, animated: false)
+//	}
+	
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.title = String.adamantLocalized.nodesList.title
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editModeStart))
+        navigationItem.title = String.adamantLocalized.nodesList.title
         navigationOptions = .Disabled
         
         if self.navigationController?.viewControllers.count == 1 {
@@ -49,82 +107,225 @@ class NodesListViewController: FormViewController {
             
             self.navigationItem.setLeftBarButton(cancelBtn, animated: false)
         }
-        
-        form +++
-            MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                               header: String.adamantLocalized.nodesList.title,
-                               footer: "") {
-                                $0.tag = "nodes"
-                                $0.addButtonProvider = { section in
-                                    return ButtonRow(){
-                                        $0.title = String.adamantLocalized.nodesList.addNewNode
-                                    }
-                                }
-                                
-                                $0.multivaluedRowToInsertAt = { index in
-                                    return TextRow() {
-                                        $0.placeholder = String.adamantLocalized.nodesList.nodeUrl
-                                    }
-                                }
-                                
-                                var serverUrls = AdamantResources.servers
-                                if let usersNodesString = self.securedStore.get(StoreKey.nodesList.userNodes), let usersNodes = AdamantUtilities.toArray(text: usersNodesString) {
-                                    serverUrls = usersNodes
-                                }
-                                
-                                for serverUrl in serverUrls {
-                                    $0 <<< TextRow() {
-                                        $0.value = serverUrl
-                                        $0.placeholder = String.adamantLocalized.nodesList.nodeUrl
-                                    }
-                                }
-        }
-        
-        form +++ Section()
-            <<< ButtonRow() {
-                $0.title = String.adamantLocalized.alert.save
-                }.cellSetup({ (cell, _) in
-                    cell.selectionStyle = .gray
-                }).onCellSelection({ [weak self] (_, _) in
-                    self?.save()
-                }).cellSetup({ (cell, row) in
-                    cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-                    cell.textLabel?.textColor = UIColor.adamantPrimary
-                }).cellUpdate({ (cell, _) in
-                    cell.textLabel?.textColor = UIColor.adamantPrimary
-                })
-        
-        
+		
+		
+		// MARK: Nodes
+		
+		let section = Section() {
+			$0.tag = Sections.nodes.tag
+		}
+		
+		let serverUrls: [String]
+		if let usersNodesString = self.securedStore.get(StoreKey.nodesList.userNodes), let usersNodes = AdamantUtilities.toArray(text: usersNodesString) {
+			serverUrls = usersNodes
+		} else {
+			serverUrls = AdamantResources.servers
+		}
+		
+		for url in serverUrls {
+			section <<< LabelRow() {
+				$0.title = url
+			}.cellUpdate({ (cell, _) in
+				if let label = cell.textLabel {
+					label.textColor = UIColor.adamantPrimary
+				}
+				
+				cell.accessoryType = .disclosureIndicator
+			}).onCellSelection { [weak self] (_, row) in
+				guard let tag = row.tag, let index = Int(tag) else {
+					return
+				}
+				
+				self?.editNode(at: index)
+			}
+		}
+		
+		form +++ section
+		
+		
+		// MARK: Buttons
+		
+        +++ Section()
+		
+		// Add node
+		<<< ButtonRow() {
+			$0.title = Rows.addNode.localized
+		}.cellSetup({ (cell, _) in
+			cell.selectionStyle = .gray
+		}).onCellSelection({ [weak self] (_, _) in
+			self?.createNewNode()
+		}).cellSetup({ (cell, row) in
+			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		}).cellUpdate({ (cell, _) in
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		})
+			
+		// Save
+		<<< ButtonRow() {
+			$0.title = Rows.save.localized
+		}.cellSetup({ (cell, _) in
+			cell.selectionStyle = .gray
+		}).onCellSelection({ [weak self] (_, _) in
+			self?.save()
+		}).cellSetup({ (cell, row) in
+			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		}).cellUpdate({ (cell, _) in
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		})
+			
+			
+		// MARK: Reset
+			
+		+++ Section()
+		<<< ButtonRow() {
+			$0.title = Rows.reset.localized
+		}.onCellSelection({ [weak self] (_, _) in
+			self?.resetToDefault()
+		}).cellSetup({ (cell, row) in
+			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		}).cellUpdate({ (cell, _) in
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		})
     }
-    
-    @objc func close() {
-        if self.navigationController?.viewControllers.count == 1 {
-            self.dismiss(animated: true, completion: nil)
-        } else {
-            self.navigationController?.popViewController(animated: true)
-        }
-    }
-    
-    func save() {
-        self.dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
-        let values = self.form.values()
-        if let nodes = values["nodes"] as? [String] {
-            
-            if let jsonNodesList = AdamantUtilities.json(from:nodes) {
-                self.securedStore.set(jsonNodesList, for: StoreKey.nodesList.userNodes)
-                print("\(jsonNodesList)")
-            } else {
-                self.dialogService.showError(withMessage: String.adamantLocalized.nodesList.unableToSave, error: nil)
-                return
-            }
-            self.apiService.updateServersList(servers: nodes)
-            
-            self.dialogService.showSuccess(withMessage: String.adamantLocalized.nodesList.saved)
-            self.dialogService.dismissProgress()
-            self.close()
-        } else {
-            self.dialogService.dismissProgress()
-            self.dialogService.showError(withMessage: String.adamantLocalized.nodesList.unableToSave, error: nil)
-        }
-    }
+	
+	@objc func editModeStart() {
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(editModeStop))
+		tableView.setEditing(true, animated: true)
+	}
+	
+	@objc func editModeStop() {
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editModeStart))
+		tableView.setEditing(false, animated: true)
+	}
+}
+
+
+// MARK: - Manipulating node list
+extension NodesListViewController {
+	func createNewNode() {
+		present(router.get(scene: AdamantScene.NodesEditor.nodeEditor), animated: true, completion: nil)
+	}
+	
+	func removeNode(at index: Int) {
+		nodes.remove(at: index)
+		
+		if let section = form.sectionBy(tag: Sections.nodes.tag) {
+			section.remove(at: index)
+		}
+	}
+	
+	func editNode(at index: Int) {
+		present(router.get(scene: AdamantScene.NodesEditor.nodeEditor), animated: true, completion: nil)
+	}
+	
+	@objc func close() {
+		if self.navigationController?.viewControllers.count == 1 {
+			self.dismiss(animated: true, completion: nil)
+		} else {
+			self.navigationController?.popViewController(animated: true)
+		}
+	}
+	
+	func save() {
+		for node in nodes {
+			print(node.toString())
+		}
+		
+//		self.dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+//		let values = self.form.values()
+//		if let nodes = values["nodes"] as? [String] {
+//
+//			if let jsonNodesList = AdamantUtilities.json(from:nodes) {
+//				self.securedStore.set(jsonNodesList, for: StoreKey.nodesList.userNodes)
+//				print("\(jsonNodesList)")
+//			} else {
+//				self.dialogService.showError(withMessage: String.adamantLocalized.nodesList.unableToSave, error: nil)
+//				return
+//			}
+//			self.apiService.updateServersList(servers: nodes)
+//
+//			self.dialogService.showSuccess(withMessage: String.adamantLocalized.nodesList.saved)
+//			self.dialogService.dismissProgress()
+//			self.close()
+//		} else {
+//			self.dialogService.dismissProgress()
+//			self.dialogService.showError(withMessage: String.adamantLocalized.nodesList.unableToSave, error: nil)
+//		}
+	}
+	
+	func resetToDefault() {
+		let alert = UIAlertController(title: String.adamantLocalized.nodesList.resetAlertTitle, message: nil, preferredStyle: .alert)
+		
+		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+		
+		alert.addAction(UIAlertAction(title: Rows.reset.localized, style: .destructive, handler: { [weak self] (_) in
+			let nodes: [Node] = [
+				Node(protocol: .https, url: "endless.adamant.im", port: nil),
+				Node(protocol: .https, url: "clown.adamant.im", port: nil),
+				Node(protocol: .https, url: "lake.adamant.im", port: nil)
+			]
+			
+			self?.setNodes(nodes: nodes)
+		}))
+		
+		present(alert, animated: true, completion: nil)
+	}
+	
+	func setNodes(nodes: [Node]) {
+		guard let section = form.sectionBy(tag: Sections.nodes.tag) else {
+			return
+		}
+		
+		section.removeAll()
+		
+		for (i, node) in nodes.enumerated() {
+			let row = createRowFor(node: node)
+			row.tag = String(i)
+			
+			section.append(row)
+		}
+		
+		self.nodes.append(contentsOf: nodes)
+	}
+}
+
+
+// MARK: - Tools
+extension NodesListViewController {
+	private func createRowFor(node: Node) -> BaseRow {
+		let row = NodeRow() {
+			$0.value = node
+			
+			let deleteAction = SwipeAction(style: .destructive, title: "Delete") { [weak self] (action, row, completionHandler) in
+				if let node = row.baseValue as? Node, let index = self?.nodes.index(of: node) {
+					self?.nodes.remove(at: index)
+					self?.save()
+				}
+				completionHandler?(true)
+			}
+			
+			$0.trailingSwipe.actions = [deleteAction]
+			
+			if #available(iOS 11,*) {
+				$0.trailingSwipe.performsFirstActionWithFullSwipe = true
+			}
+		}.cellUpdate({ (cell, _) in
+			if let label = cell.textLabel {
+				label.textColor = UIColor.adamantPrimary
+			}
+			
+			cell.accessoryType = .disclosureIndicator
+		}).onCellSelection { [weak self] (_, row) in
+			guard let tag = row.tag, let index = Int(tag) else {
+				return
+			}
+			
+			self?.editNode(at: index)
+		}
+		
+		return row
+	}
 }
