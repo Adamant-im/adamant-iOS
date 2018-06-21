@@ -122,6 +122,8 @@
 		E9A03FD220DBC0F2007653A1 /* NodeEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A03FD120DBC0F2007653A1 /* NodeEditorViewController.swift */; };
 		E9A03FD420DBC824007653A1 /* NodeVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A03FD320DBC824007653A1 /* NodeVersion.swift */; };
 		E9A03FD620DBC8E2007653A1 /* AdamantApi+Peers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A03FD520DBC8E2007653A1 /* AdamantApi+Peers.swift */; };
+		E9A03FD820DC0ABA007653A1 /* AdamantNodesSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A03FD720DC0ABA007653A1 /* AdamantNodesSource.swift */; };
+		E9A03FDA20DC0B14007653A1 /* NodesSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A03FD920DC0B14007653A1 /* NodesSource.swift */; };
 		E9A174B32057EC47003667CD /* BackgroundFetchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A174B22057EC47003667CD /* BackgroundFetchService.swift */; };
 		E9A174B52057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A174B42057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift */; };
 		E9A174B72057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A174B62057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift */; };
@@ -326,6 +328,8 @@
 		E9A03FD120DBC0F2007653A1 /* NodeEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeEditorViewController.swift; sourceTree = "<group>"; };
 		E9A03FD320DBC824007653A1 /* NodeVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeVersion.swift; sourceTree = "<group>"; };
 		E9A03FD520DBC8E2007653A1 /* AdamantApi+Peers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Peers.swift"; sourceTree = "<group>"; };
+		E9A03FD720DC0ABA007653A1 /* AdamantNodesSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantNodesSource.swift; sourceTree = "<group>"; };
+		E9A03FD920DC0B14007653A1 /* NodesSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodesSource.swift; sourceTree = "<group>"; };
 		E9A174B22057EC47003667CD /* BackgroundFetchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundFetchService.swift; sourceTree = "<group>"; };
 		E9A174B42057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantTransfersProvider+backgroundFetch.swift"; sourceTree = "<group>"; };
 		E9A174B62057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantChatsProvider+backgroundFetch.swift"; sourceTree = "<group>"; };
@@ -462,6 +466,7 @@
 				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
 				E905D39C204C13B900DDB504 /* SecuredStore.swift */,
 				E90A494C204DA932009F6A65 /* LocalAuthentication.swift */,
+				E9A03FD920DC0B14007653A1 /* NodesSource.swift */,
 				E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */,
 				E9A174B22057EC47003667CD /* BackgroundFetchService.swift */,
 				E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */,
@@ -478,6 +483,7 @@
 				E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */,
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
+				E9A03FD720DC0ABA007653A1 /* AdamantNodesSource.swift */,
 				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
 				E921597420611A6A0000CA5C /* AdamantReachability.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
@@ -496,6 +502,7 @@
 				E95F85862008FDBF0070534A /* ChatAsset.swift */,
 				E95F8588200900B10070534A /* ChatType.swift */,
 				E9204B5120C9762300F3B9AB /* MessageStatus.swift */,
+				E93EB0A220DA4CCA001F9601 /* Node.swift */,
 				E95F85682006AB9D0070534A /* NormalizedTransaction.swift */,
 				E965A53320B833A00041A3EA /* StateAsset.swift */,
 				E965A53120B82C850041A3EA /* StateType.swift */,
@@ -542,13 +549,13 @@
 		E919479920000FFD001362F8 /* Stories */ = {
 			isa = PBXGroup;
 			children = (
-				E93EB09D20DA3F3A001F9601 /* NodesEditor */,
-				E9FAE5DB203ECD41008D3A6B /* Shared */,
 				E9E7CDA52002AE1C00DFC4DB /* Account */,
-				E94E7B04205D48950042B639 /* Transactions */,
 				E95F857B2008C8B20070534A /* Chats */,
 				E919479A20001007001362F8 /* Login */,
+				E93EB09D20DA3F3A001F9601 /* NodesEditor */,
 				E982F69820235AF000566AC7 /* Settings */,
+				E9FAE5DB203ECD41008D3A6B /* Shared */,
+				E94E7B04205D48950042B639 /* Transactions */,
 			);
 			path = Stories;
 			sourceTree = "<group>";
@@ -584,7 +591,6 @@
 				E93EB09E20DA3FA4001F9601 /* NodesEditorRoutes.swift */,
 				64D059FE20D3116A003AD655 /* NodesListViewController.swift */,
 				E9A03FD120DBC0F2007653A1 /* NodeEditorViewController.swift */,
-				E93EB0A220DA4CCA001F9601 /* Node.swift */,
 				E91E5BF120DAF05500B06B3C /* EurekaNodeRow.swift */,
 				E91E5BF320DAF3AB00B06B3C /* NodeRow.xib */,
 			);
@@ -1052,6 +1058,7 @@
 				E9CAE8DA2018ACD300345E76 /* AdamantApi+Chats.swift in Sources */,
 				E91947B020002393001362F8 /* AdamantApiService.swift in Sources */,
 				E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */,
+				E9A03FD820DC0ABA007653A1 /* AdamantNodesSource.swift in Sources */,
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
 				E9E7CDB72003994E00DFC4DB /* AdamantUtilities.swift in Sources */,
 				E9147B6320505C7500145913 /* QRCodeReader+adamant.swift in Sources */,
@@ -1130,6 +1137,7 @@
 				E9150B982066DA210065A985 /* CoreDataAccount+CoreDataProperties.swift in Sources */,
 				E9B3D3A1201FA26B0019EB36 /* AdamantAccountsProvider.swift in Sources */,
 				E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */,
+				E9A03FDA20DC0B14007653A1 /* NodesSource.swift in Sources */,
 				E9150B972066DA210065A985 /* CoreDataAccount+CoreDataClass.swift in Sources */,
 				E95F857A2007F0260070534A /* ServerResponse.swift in Sources */,
 				E9A174B32057EC47003667CD /* BackgroundFetchService.swift in Sources */,

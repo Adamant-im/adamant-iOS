@@ -11,7 +11,7 @@ import Eureka
 
 class NodeCell: Cell<Node>, CellType {
 	public override func update() {
-		textLabel?.text = row.value?.toString()
+		textLabel?.text = row.value?.asString()
 	}
 }
 
