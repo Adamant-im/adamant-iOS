@@ -21,6 +21,8 @@ extension AdamantScene {
 		
 		static let nodeEditor = AdamantScene(identifier: "", factory: { r in
 			let c = NodeEditorViewController()
+			c.dialogService = r.resolve(DialogService.self)
+			c.apiService = r.resolve(ApiService.self)
 			return c
 		})
 	}

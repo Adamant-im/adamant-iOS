@@ -19,7 +19,6 @@ extension StoreKey {
 // MARK: - Localization
 extension String.adamantLocalized {
     struct nodesList {
-        
         static let nodesListButton = NSLocalizedString("NodesList.NodesList", comment: "NodesList: Button label")
         static let title = NSLocalizedString("NodesList.Title", comment: "NodesList: scene title")
         static let saved = NSLocalizedString("NodesList.Saved", comment: "NodesList: 'Saved' message")
@@ -32,6 +31,8 @@ extension String.adamantLocalized {
     }
 }
 
+
+// MARK: - NodesListViewController
 class NodesListViewController: FormViewController {
 	// Rows & Sections
 	

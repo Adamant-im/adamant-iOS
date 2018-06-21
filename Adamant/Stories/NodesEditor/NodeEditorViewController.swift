@@ -9,12 +9,19 @@
 import UIKit
 import Eureka
 
-//extension String.adamantLocalized {
-//	struct NodesEditor {
-//		
-//	}
-//}
+// MARK: - Localization
+extension String.adamantLocalized {
+	struct nodesEditor {
+		static let testInProgressMessage = NSLocalizedString("NodesEditor.TestingInProgressMessage", comment: "NodesEditor: Testing in progress")
+		static func testFailedMessage(reason: String) -> String {
+			return String.localizedStringWithFormat(NSLocalizedString("NodesEditor.TestingFailedMessageFormat", comment: "NodesEditor: Testing failed message format. %@ for failure reason."), reason)
+		}
 
+		private init() {}
+	}
+}
+
+// MARK: - Helpers
 enum NodeEditorResult {
 	case new(node: Node)
 	case done(node: Node, tag: String)
@@ -26,35 +33,31 @@ protocol NodeEditorDelegate: class {
 	func nodeEditorViewController(_ editor: NodeEditorViewController, didFinishEditingWithResult result: NodeEditorResult)
 }
 
+// MARK: - NodeEditorViewController
 class NodeEditorViewController: FormViewController {
 	// MARK: - Rows
 	
 	private enum Rows {
 		case `protocol`, port, url
+		case testButton, deleteButton
 		
 		var localized: String {
 			switch self {
-			case .protocol:
-				return "Protocol"
-				
-			case .port:
-				return "Port"
-				
-			case .url:
-				return "Url"
+			case .protocol: return "Protocol"
+			case .port: return "Port"
+			case .url: return "URL"
+			case .testButton: return "Test"
+			case .deleteButton: return "Delete node"
 			}
 		}
 		
-		var placeholder: String {
+		var placeholder: String? {
 			switch self {
-			case .protocol:
-				return ""
-				
-			case .port:
-				return "port"
-				
-			case .url:
-				return "ip/url"
+			case .protocol: return ""
+			case .port: return "port"
+			case .url: return "ip/url"
+			case .testButton: return nil
+			case .deleteButton: return nil
 			}
 		}
 		
@@ -63,12 +66,16 @@ class NodeEditorViewController: FormViewController {
 			case .protocol: return "prtcl"
 			case .port: return "prt"
 			case .url: return "url"
+			case .testButton: return "test"
+			case .deleteButton: return "delete"
 			}
 		}
 	}
 	
 	
 	// MARK: - Dependencies
+	var dialogService: DialogService!
+	var apiService: ApiService!
 	
 	
 	// MARK: - Properties
@@ -89,6 +96,7 @@ class NodeEditorViewController: FormViewController {
 		self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
 		self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
 		
+		// MARK: - Node properties
 		form +++ Section()
 			
 		// URL
@@ -118,6 +126,37 @@ class NodeEditorViewController: FormViewController {
 		}.onExpandInlineRow({ (_, _, inlineRow) in
 			inlineRow.cell.height = { 100 }
 		})
+		
+		
+		// MARK: - Buttons
+		
+		+++ Section()
+		<<< ButtonRow() {
+			$0.title = Rows.testButton.localized
+			$0.tag = Rows.testButton.tag
+		}.cellSetup({ (cell, row) in
+			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		}).cellUpdate({ (cell, _) in
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		}).onCellSelection({ [weak self] (_, _) in
+			self?.testNode()
+		})
+		
+		if node != nil {
+			form +++ Section()
+			<<< ButtonRow() {
+				$0.title = Rows.deleteButton.localized
+				$0.tag = Rows.deleteButton.tag
+			}.cellSetup({ (cell, row) in
+				cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+				cell.textLabel?.textColor = UIColor.adamantPrimary
+			}).cellUpdate({ (cell, _) in
+				cell.textLabel?.textColor = UIColor.adamantPrimary
+			}).onCellSelection({ [weak self] (_, _) in
+				self?.deleteNode()
+			})
+		}
     }
 	
 	override func viewDidDisappear(_ animated: Bool) {
@@ -132,6 +171,49 @@ class NodeEditorViewController: FormViewController {
 
 // MARK: - Actions
 extension NodeEditorViewController {
+	func testNode() {
+		var components = URLComponents()
+		
+		// Host
+		if let row: TextRow = form.rowBy(tag: Rows.url.tag), let host = row.value {
+			components.host = host
+		}
+		
+		// Scheme
+		if let row = form.rowBy(tag: Rows.protocol.tag), let pr = row.baseValue as? NodeProtocol {
+			components.scheme = pr.rawValue
+		} else {
+			components.scheme = "https"
+		}
+		
+		// Port
+		if let row: IntRow = form.rowBy(tag: Rows.port.tag), let port = row.value {
+			components.port = port
+		}
+		
+		let url: URL
+		do {
+			url = try components.asURL()
+		} catch {
+			return
+		}
+		
+		dialogService.showProgress(withMessage: String.adamantLocalized.nodesEditor.testInProgressMessage, userInteractionEnable: false)
+		apiService.getNodeVersion(url: url) { [weak self] result in
+			defer {
+				self?.dialogService.dismissProgress()
+			}
+			
+			switch result {
+			case .success(_):
+				break
+				
+			case .failure(let error):
+				self?.dialogService.showWarning(withMessage: String.adamantLocalized.nodesEditor.testFailedMessage(reason: error.localized))
+			}
+		}
+	}
+	
 	@objc func done() {
 		guard let row: TextRow = form.rowBy(tag: Rows.url.tag), let rawUrl = row.value else {
 			didCallDelegate = true
@@ -173,7 +255,7 @@ extension NodeEditorViewController {
 		delegate?.nodeEditorViewController(self, didFinishEditingWithResult: .cancel)
 	}
 	
-	func delete() {
+	func deleteNode() {
 		didCallDelegate = false
 		
 		if let node = node, let tag = nodeTag {
