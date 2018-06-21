@@ -259,9 +259,9 @@ extension NodesListViewController {
 		
 		alert.addAction(UIAlertAction(title: Rows.reset.localized, style: .destructive, handler: { [weak self] (_) in
 			let nodes: [Node] = [
-				Node(protocol: .https, url: "endless.adamant.im", port: nil),
-				Node(protocol: .https, url: "clown.adamant.im", port: nil),
-				Node(protocol: .https, url: "lake.adamant.im", port: nil)
+				Node(scheme: .https, host: "endless.adamant.im", port: nil),
+				Node(scheme: .https, host: "clown.adamant.im", port: nil),
+				Node(scheme: .https, host: "lake.adamant.im", port: nil)
 			]
 			
 			self?.setNodes(nodes: nodes)

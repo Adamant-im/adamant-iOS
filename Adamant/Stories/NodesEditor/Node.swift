@@ -8,20 +8,20 @@
 
 import Foundation
 
-enum NodeProtocol: String {
+enum URLScheme: String {
 	case http, https
 }
 
 struct Node: Equatable {
-	let `protocol`: NodeProtocol
-	let url: String
+	let scheme: URLScheme
+	let host: String
 	let port: Int?
 	
 	func toString() -> String {
 		if let port = port {
-			return "\(`protocol`):\\\\\(url):\(port)"
+			return "\(scheme):\\\\\(host):\(port)"
 		} else {
-			return "\(`protocol`):\\\\\(url)"
+			return "\(scheme):\\\\\(host)"
 		}
 	}
 }

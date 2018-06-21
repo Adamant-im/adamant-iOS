@@ -90,7 +90,7 @@ class NodeEditorViewController: FormViewController {
         super.viewDidLoad()
 		
 		if let node = node {
-			self.navigationItem.title = node.url
+			self.navigationItem.title = node.host
 		}
 		
 		self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
@@ -105,7 +105,7 @@ class NodeEditorViewController: FormViewController {
 			$0.tag = Rows.url.tag
 			$0.placeholder = Rows.url.placeholder
 			
-			$0.value = node?.url
+			$0.value = node?.host
 		}
 			
 		// Port
@@ -118,10 +118,10 @@ class NodeEditorViewController: FormViewController {
 		}
 		
 		// Protocol
-		<<< PickerInlineRow<NodeProtocol>() {
+		<<< PickerInlineRow<URLScheme>() {
 			$0.title = Rows.protocol.localized
 			$0.tag = Rows.protocol.tag
-			$0.value = node?.protocol ?? NodeProtocol.https
+			$0.value = node?.scheme ?? URLScheme.https
 			$0.options = [.https, .http]
 		}.onExpandInlineRow({ (_, _, inlineRow) in
 			inlineRow.cell.height = { 100 }
@@ -180,7 +180,7 @@ extension NodeEditorViewController {
 		}
 		
 		// Scheme
-		if let row = form.rowBy(tag: Rows.protocol.tag), let pr = row.baseValue as? NodeProtocol {
+		if let row = form.rowBy(tag: Rows.protocol.tag), let pr = row.baseValue as? URLScheme {
 			components.scheme = pr.rawValue
 		} else {
 			components.scheme = "https"
@@ -223,8 +223,8 @@ extension NodeEditorViewController {
 		
 		let url = rawUrl.trimmingCharacters(in: .whitespaces)
 		
-		let prot: NodeProtocol
-		if let row: PickerRow<NodeProtocol> = form.rowBy(tag: Rows.protocol.tag), let pr = row.value {
+		let prot: URLScheme
+		if let row: PickerRow<URLScheme> = form.rowBy(tag: Rows.protocol.tag), let pr = row.value {
 			prot = pr
 		} else {
 			prot = .https
@@ -237,7 +237,7 @@ extension NodeEditorViewController {
 			port = nil
 		}
 		
-		let node = Node(protocol: prot, url: url, port: port)
+		let node = Node(scheme: prot, host: url, port: port)
 		
 		let result: NodeEditorResult
 		if self.node != nil, let tag = nodeTag {
