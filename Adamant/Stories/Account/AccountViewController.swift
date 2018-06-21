@@ -279,14 +279,7 @@ class AccountViewController: FormViewController {
                     cell.accessoryType = .disclosureIndicator
                 })
                 .onCellSelection({ [weak self] (_, _) in
-                    self?.ethApiService.getTransactionsCount{ (result) in
-                        switch result {
-                        case .success(let count):
-                            print(count)
-                        case .failure(let error):
-                            print(error)
-                        }
-                    }
+                    // TODO: ETH Transaction list
                 })
             
 		// MARK: Send tokens
