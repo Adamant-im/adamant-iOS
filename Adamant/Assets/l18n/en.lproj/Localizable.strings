@@ -256,9 +256,6 @@
 /* NodesEditor: Testing in progress */
 "NodesEditor.TestingInProgressMessage" = "Checking connection";
 
-/* NodesEditor: Testing failed message format. %@ for failure reason. */
-"NodesEditor.TestingFailedMessageFormat" = "Connection failed: %@";
-
 /* NodesEditor: Scheme row */
 "NodesEditor.SchemeRow" = "Scheme";
 
@@ -270,6 +267,12 @@
 
 /* NodesEditor: Test button */
 "NodesEditor.TestButton" = "Test node";
+
+/* NodesEditor: Test passed */
+"NodesEditor.NodeTestPassed" = "Passed";
+
+/* NodesEditor: Test failed */
+"NodesEditor.NodeTestFailed" = "Failed";
 
 /* NodesEditor: Delete node button */
 "NodesEditor.DeleteNodeButton" = "Delete";

@@ -259,9 +259,6 @@
 /* NodesEditor: Testing in progress */
 "NodesEditor.TestingInProgressMessage" = "Проверяем соединение";
 
-/* NodesEditor: Testing failed message format. %@ for failure reason. */
-"NodesEditor.TestingFailedMessageFormat" = "Ошибка: %@";
-
 /* NodesEditor: Scheme row */
 "NodesEditor.SchemeRow" = "Протокол";
 
@@ -273,6 +270,12 @@
 
 /* NodesEditor: Test button */
 "NodesEditor.TestButton" = "Тест ноды";
+
+/* NodesEditor: Test passed */
+"NodesEditor.NodeTestPassed" = "Пройден";
+
+/* NodesEditor: Test failed */
+"NodesEditor.NodeTestFailed" = "Ошибка";
 
 /* NodesEditor: Delete node button */
 "NodesEditor.DeleteNodeButton" = "Удалить ноду";

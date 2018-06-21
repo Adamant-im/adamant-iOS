@@ -16,9 +16,7 @@ extension String.adamantLocalized {
 		static let deleteNodeAlert = NSLocalizedString("NodesEditor.DeleteNodeAlert", comment: "NodesEditor: Delete node confirmation message")
 		
 		static let testInProgressMessage = NSLocalizedString("NodesEditor.TestingInProgressMessage", comment: "NodesEditor: Testing in progress")
-		static func testFailedMessage(reason: String) -> String {
-			return String.localizedStringWithFormat(NSLocalizedString("NodesEditor.TestingFailedMessageFormat", comment: "NodesEditor: Testing failed message format. %@ for failure reason."), reason)
-		}
+		static let testPassed = NSLocalizedString("NodesEditor.Passed", comment: "NodesEditor: test 'Passed' message")
 
 		private init() {}
 	}
@@ -85,8 +83,52 @@ class NodeEditorViewController: FormViewController {
 	// MARK: - Properties
 	var node: Node?
 	var nodeTag: String?
+	
 	weak var delegate: NodeEditorDelegate?
 	private var didCallDelegate: Bool = false
+	
+	// MARK: Test state
+	enum TestState {
+		case notTested, failed, passed
+		
+		var localized: String? {
+			switch self {
+			case .notTested: return nil
+			case .failed: return NSLocalizedString("NodesEditor.NodeTestFailed", comment: "NodesEditor: Test failed")
+			case .passed: return NSLocalizedString("NodesEditor.NodeTestPassed", comment: "NodesEditor: Test passed")
+			}
+		}
+		
+		fileprivate var accessoryType: UITableViewCellAccessoryType {
+			switch self {
+			case .notTested, .failed: return .disclosureIndicator
+			case .passed: return .checkmark
+			}
+		}
+	}
+	
+	private (set) var testState: TestState = .notTested {
+		didSet {
+			guard testState != oldValue, let row = form.rowBy(tag: Rows.testButton.tag) else {
+				return
+			}
+			
+			let type = testState.accessoryType
+			let value = testState.localized
+			
+			if Thread.isMainThread {
+				row.baseCell.accessoryType = type
+				row.baseValue = value
+				row.updateCell()
+			} else {
+				DispatchQueue.main.async {
+					row.baseValue = value
+					row.updateCell()
+					row.baseCell.accessoryType = type
+				}
+			}
+		}
+	}
 	
 	// MARK: - Lifecycle
 	
@@ -112,7 +154,9 @@ class NodeEditorViewController: FormViewController {
 			$0.placeholder = Rows.host.placeholder
 			
 			$0.value = node?.host
-		}
+			}.onChange({ [weak self] (_) in
+				self?.testState = .notTested
+			})
 			
 		// Port
 		<<< IntRow() {
@@ -121,7 +165,9 @@ class NodeEditorViewController: FormViewController {
 			$0.placeholder = Rows.port.placeholder
 			
 			$0.value = node?.port
-		}
+		}.onChange({ [weak self] (_) in
+			self?.testState = .notTested
+		})
 		
 		// Protocol
 		<<< PickerInlineRow<URLScheme>() {
@@ -131,13 +177,17 @@ class NodeEditorViewController: FormViewController {
 			$0.options = [.https, .http]
 		}.onExpandInlineRow({ (_, _, inlineRow) in
 			inlineRow.cell.height = { 100 }
+		}).onChange({ [weak self] (_) in
+			self?.testState = .notTested
 		})
 		
 		
 		// MARK: - Buttons
 		
 		+++ Section()
-		<<< ButtonRow() {
+		
+		// Test
+		<<< LabelRow() {
 			$0.title = Rows.testButton.localized
 			$0.tag = Rows.testButton.tag
 		}.cellSetup({ (cell, row) in
@@ -145,10 +195,12 @@ class NodeEditorViewController: FormViewController {
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 		}).cellUpdate({ (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.accessoryType = .disclosureIndicator
 		}).onCellSelection({ [weak self] (_, _) in
 			self?.testNode()
 		})
 		
+		// Delete
 		if node != nil {
 			form +++ Section()
 			<<< ButtonRow() {
@@ -177,7 +229,7 @@ class NodeEditorViewController: FormViewController {
 
 // MARK: - Actions
 extension NodeEditorViewController {
-	func testNode() {
+	func testNode(completion: ((Bool) -> Void)? = nil) {
 		var components = URLComponents()
 		
 		// Host
@@ -209,14 +261,32 @@ extension NodeEditorViewController {
 			switch result {
 			case .success(_):
 				self?.dialogService.dismissProgress()
+				self?.testState = .passed
+				completion?(true)
 				
 			case .failure(let error):
-				self?.dialogService.showWarning(withMessage: String.adamantLocalized.nodesEditor.testFailedMessage(reason: error.localized))
+				self?.dialogService.showWarning(withMessage: error.localized)
+				self?.testState = .failed
+				completion?(false)
 			}
 		}
 	}
 	
 	@objc func done() {
+		switch testState {
+		case .notTested, .failed:
+			testNode { [weak self] success in
+				if success {
+					self?.saveNode()
+				}
+			}
+			
+		case .passed:
+			saveNode()
+		}
+	}
+	
+	private func saveNode() {
 		guard let row: TextRow = form.rowBy(tag: Rows.host.tag), let rawUrl = row.value else {
 			didCallDelegate = true
 			delegate?.nodeEditorViewController(self, didFinishEditingWithResult: .cancel)
