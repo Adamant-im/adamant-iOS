@@ -83,7 +83,7 @@ enum AdamantContacts {
 	var name: String {
 		switch self {
 		case .adamantBountyWallet: return "ADAMANT Bounty"
-		case .adamantIco: return "ADAMANT ICO"
+		case .adamantIco: return NSLocalizedString("Accounts.AdamantTokens", comment: "System accounts: ADAMANT Tokens")
 		}
 	}
 	

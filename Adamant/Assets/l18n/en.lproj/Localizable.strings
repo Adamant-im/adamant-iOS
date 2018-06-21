@@ -1,3 +1,6 @@
+/* System accounts: ADAMANT Tokens */
+"Accounts.AdamantTokens" = "ADAMANT Tokens";
+
 /* AccountsProvider: Address not valid error, %@ for address */
 "AccountsProvider.Error.AddressNotValidFormat" = "Invalid address: %@";
 
