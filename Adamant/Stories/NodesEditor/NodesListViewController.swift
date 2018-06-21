@@ -80,14 +80,12 @@ class NodesListViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editModeStart))
         navigationItem.title = String.adamantLocalized.nodesList.title
         navigationOptions = .Disabled
         
-        if self.navigationController?.viewControllers.count == 1 {
-            let cancelBtn = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(NodesListViewController.close))
-            
-            self.navigationItem.setLeftBarButton(cancelBtn, animated: false)
+        if navigationController?.viewControllers.count == 1 {
+            let done = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(NodesListViewController.close))
+            navigationItem.rightBarButtonItem = done
         }
 		
 		
@@ -154,6 +152,8 @@ class NodesListViewController: FormViewController {
 		}
 	}
 	
+	/*
+	Ячейки, удаляемые в режиме редактирования, никак не обрабатываются
 	@objc func editModeStart() {
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(editModeStop))
 		tableView.setEditing(true, animated: true)
@@ -163,6 +163,7 @@ class NodesListViewController: FormViewController {
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editModeStart))
 		tableView.setEditing(false, animated: true)
 	}
+	*/
 }
 
 
