@@ -71,56 +71,73 @@ class EthApiService: EthApiServiceProtocol {
     }
     
     func newAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<EthAccount>) -> Void) {
-        guard let keystore = try? BIP32Keystore(mnemonics: passphrase,
-                                                password: "",
-                                                mnemonicsPassword: "",
-                                                language: .english),
-            let wallet = keystore else {
-                completion(.failure(.internalError(message: "ETH Wallet: fail to create Keystore", error: nil)))
-                return
-        }
-        self.account = EthAccount(wallet: wallet, address: wallet.addresses?.first?.address, balance: nil, balanceString: nil)
-        if let account = self.account {
-            NotificationCenter.default.post(name: Notification.Name.EthApiService.userLoggedIn, object: self)
-            completion(.success(account))
+        DispatchQueue.global().async {
+            guard let keystore = try? BIP32Keystore(mnemonics: passphrase,
+                                                    password: "",
+                                                    mnemonicsPassword: "",
+                                                    language: .english),
+                let wallet = keystore else {
+                    DispatchQueue.main.async {
+                        completion(.failure(.internalError(message: "ETH Wallet: fail to create Keystore", error: nil)))
+                    }
+                    return
+            }
             
-            if let address = accountService.account?.address, let keypair = accountService.keypair {
-                self.getEthAddress(byAdamandAddress: address) { (result) in
-                    switch result {
-                    case .success(let value):
-                        if value == nil {
-                            guard let loggedAccount = self.accountService.account else {
-                                completion(.failure(.notLogged))
-                                return
-                            }
-                            
-                            guard loggedAccount.balance >= AdamantApiService.KVSfee else {
-                                completion(.failure(.internalError(message: "ETH Wallet: Not enought ADM to save address to KVS", error: nil)))
-                                return
-                            }
-                            
-                            self.apiService.store(key: EthApiService.kvsAddress, value: account.address!, type: StateType.keyValue, sender: address, keypair: keypair, completion: { (result) in
-                                switch result {
-                                case .success(let transactionId):
-                                    print("SAVED: \(transactionId)")
-                                    break
-                                case .failure(let error):
-                                    completion(.failure(.internalError(message: "ETH Wallet: fail to save address to KVS", error: error)))
-                                    break
+            self.account = EthAccount(wallet: wallet, address: wallet.addresses?.first?.address, balance: nil, balanceString: nil)
+            if let account = self.account {
+                NotificationCenter.default.post(name: Notification.Name.EthApiService.userLoggedIn, object: self)
+                DispatchQueue.main.async {
+                    completion(.success(account))
+                }
+                
+                if let address = self.accountService.account?.address, let keypair = self.accountService.keypair {
+                    self.getEthAddress(byAdamandAddress: address) { (result) in
+                        switch result {
+                        case .success(let value):
+                            if value == nil {
+                                guard let loggedAccount = self.accountService.account else {
+                                    DispatchQueue.main.async {
+                                        completion(.failure(.notLogged))
+                                    }
+                                    return
                                 }
-                            })
-                        } else {
-                            print("FOUND: \(value!)")
+                                
+                                guard loggedAccount.balance >= AdamantApiService.KVSfee else {
+                                    DispatchQueue.main.async {
+                                        completion(.failure(.internalError(message: "ETH Wallet: Not enought ADM to save address to KVS", error: nil)))
+                                    }
+                                    return
+                                }
+                                
+                                self.apiService.store(key: EthApiService.kvsAddress, value: account.address!, type: StateType.keyValue, sender: address, keypair: keypair, completion: { (result) in
+                                    switch result {
+                                    case .success(let transactionId):
+                                        print("SAVED: \(transactionId)")
+                                        break
+                                    case .failure(let error):
+                                        DispatchQueue.main.async {
+                                            completion(.failure(.internalError(message: "ETH Wallet: fail to save address to KVS", error: error)))
+                                        }
+                                        break
+                                    }
+                                })
+                            } else {
+                                print("FOUND: \(value!)")
+                            }
+                            break
+                        case .failure(let error):
+                            DispatchQueue.main.async {
+                                completion(.failure(.internalError(message: "ETH Wallet: fail to get address from KVS", error: error)))
+                            }
+                            break
                         }
-                        break
-                    case .failure(let error):
-                        completion(.failure(.internalError(message: "ETH Wallet: fail to get address from KVS", error: error)))
-                        break
                     }
                 }
+            } else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: fail to create Account", error: nil)))
+                }
             }
-        } else {
-            completion(.failure(.internalError(message: "ETH Wallet: fail to create Account", error: nil)))
         }
     }
     
@@ -171,6 +188,7 @@ class EthApiService: EthApiServiceProtocol {
             completion(.failure(.internalError(message: "ETH Wallet: not found", error: nil)))
         }
     }
+    
     func getEthAddress(byAdamandAddress address: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
         apiService.get(key: EthApiService.kvsAddress, sender: address) { (result) in
             switch result {
@@ -190,12 +208,18 @@ class EthApiService: EthApiServiceProtocol {
     
     // MARK: - Private
     func getBalance(byAddress address: EthereumAddress, completion: @escaping (ApiServiceResult<BigUInt>) -> Void) {
-        let balanceResult = web3.eth.getBalance(address: address)
-        guard case .success(let balance) = balanceResult else {
-            completion(.failure(.internalError(message: "ETH Wallet: fail to get balance", error: nil)))
-            return
+        DispatchQueue.global().async {
+            let balanceResult = self.web3.eth.getBalance(address: address)
+            guard case .success(let balance) = balanceResult else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: fail to get balance", error: nil)))
+                }
+                return
+            }
+            
+            DispatchQueue.main.async {
+                completion(.success(balance))
+            }
         }
-        
-        completion(.success(balance))
     }
 }
