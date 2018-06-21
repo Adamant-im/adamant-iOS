@@ -232,12 +232,6 @@
 /* NodesList: scene title */
 "NodesList.Title" = "Список нод";
 
-/* NodesList: 'Saved' message */
-"NodesList.Saved" = "Сохранено";
-
-/* NodesList: 'Unable To Save' message */
-"NodesList.UnableToSave" = "Не удалось сохранить";
-
 /* NodesList: 'Add new node' button lable */
 "NodesList.AddNewNode" = "Добавить новую ноду";
 
@@ -249,6 +243,9 @@
 
 /* NodesList: 'Reset' button */
 "NodesList.ResetButton" = "Сбросить";
+
+/* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
+"NodeList.DefaultNodesLoaded" = "Был загружен список нод по-умолчанию";
 
 /* NodesEditor: New node scene title */
 "NodesEditor.NewNodeTitle" = "Новая нода";
@@ -285,6 +282,9 @@
 
 /* NodesEditor: Host row placeholder */
 "NodesEditor.HostRow.Placeholder" = "ip или имя хоста";
+
+/* NodesEditor: Failed to build URL alert */
+"NodesEditor.FailedToBuildURL" = "Некорректный адрес хоста";
 
 /* Notifications: Modes description. Markdown supported. */
 "Notifications.ModesDescription" = "#### Режимы уведомлений\n\n#### Отключены\nНе присылать никаких уведомлений.\n\n#### Фоновое обновление\nПроверка новых сообщений производится самим устройством. Проверку инициирует iOS, и интервалы между проверками определяются системой на основании множества факторов, таких как доступность сотовой сети, заряд батареи, и использование приложения. Интервал может быть 20 минут, может быть 6 часов, может доходить и до нескольких дней. Однако, вы всегда можете открыть приложение и проверить новые сообщения вручную.\n\n#### Push\nУведомления о новых сообщениях присылаются сервисом ADAMANT Notification Service. Уведомления приходят практически мгновенно (несколько секунд), но необходима регистрация устройства в сервисе. Это безопасно и сохраняет высокий уровень секретности, для большинства пользователей это предпочтительный вариант.\n\nО регистрации устройств вы можете прочитать больше на странице проекта в Github.";

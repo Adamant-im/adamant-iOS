@@ -14,6 +14,7 @@ extension String.adamantLocalized {
 	struct nodesEditor {
 		static let newNodeTitle = NSLocalizedString("NodesEditor.NewNodeTitle", comment: "NodesEditor: New node scene title")
 		static let deleteNodeAlert = NSLocalizedString("NodesEditor.DeleteNodeAlert", comment: "NodesEditor: Delete node confirmation message")
+		static let failedToBuildURL = NSLocalizedString("NodesEditor.FailedToBuildURL", comment: "NodesEditor: Failed to build URL alert")
 		
 		static let testInProgressMessage = NSLocalizedString("NodesEditor.TestingInProgressMessage", comment: "NodesEditor: Testing in progress")
 		static let testPassed = NSLocalizedString("NodesEditor.Passed", comment: "NodesEditor: test 'Passed' message")
@@ -230,29 +231,9 @@ class NodeEditorViewController: FormViewController {
 // MARK: - Actions
 extension NodeEditorViewController {
 	func testNode(completion: ((Bool) -> Void)? = nil) {
-		var components = URLComponents()
-		
-		// Host
-		if let row: TextRow = form.rowBy(tag: Rows.host.tag), let host = row.value {
-			components.host = host
-		}
-		
-		// Scheme
-		if let row = form.rowBy(tag: Rows.scheme.tag), let pr = row.baseValue as? URLScheme {
-			components.scheme = pr.rawValue
-		} else {
-			components.scheme = "https"
-		}
-		
-		// Port
-		if let row: IntRow = form.rowBy(tag: Rows.port.tag), let port = row.value {
-			components.port = port
-		}
-		
-		let url: URL
-		do {
-			url = try components.asURL()
-		} catch {
+		guard let url = node?.asURL() else {
+			testState = .failed
+			dialogService.showWarning(withMessage: String.adamantLocalized.nodesEditor.failedToBuildURL)
 			return
 		}
 		
@@ -293,7 +274,7 @@ extension NodeEditorViewController {
 			return
 		}
 		
-		let url = rawUrl.trimmingCharacters(in: .whitespaces)
+		let host = rawUrl.trimmingCharacters(in: .whitespaces)
 		
 		let prot: URLScheme
 		if let row: PickerRow<URLScheme> = form.rowBy(tag: Rows.scheme.tag), let pr = row.value {
@@ -309,7 +290,7 @@ extension NodeEditorViewController {
 			port = nil
 		}
 		
-		let node = Node(scheme: prot, host: url, port: port)
+		let node = Node(scheme: prot, host: host, port: port)
 		
 		let result: NodeEditorResult
 		if self.node != nil, let tag = nodeTag {

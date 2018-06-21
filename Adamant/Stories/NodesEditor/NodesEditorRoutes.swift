@@ -16,6 +16,7 @@ extension AdamantScene {
 			c.securedStore = r.resolve(SecuredStore.self)
 			c.apiService = r.resolve(ApiService.self)
 			c.router = r.resolve(Router.self)
+			c.nodesSource = r.resolve(NodesSource.self)
 			return c
 		})
 		

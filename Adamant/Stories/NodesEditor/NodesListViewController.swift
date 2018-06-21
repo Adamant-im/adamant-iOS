@@ -9,20 +9,14 @@
 import UIKit
 import Eureka
 
-// MARK: - SecuredStore keys
-extension StoreKey {
-    struct nodesList {
-        static let userNodes = "nodesList.userNodes"
-    }
-}
 
 // MARK: - Localization
 extension String.adamantLocalized {
     struct nodesList {
+		static let title = NSLocalizedString("NodesList.Title", comment: "NodesList: scene title")
         static let nodesListButton = NSLocalizedString("NodesList.NodesList", comment: "NodesList: Button label")
-        static let title = NSLocalizedString("NodesList.Title", comment: "NodesList: scene title")
-        static let saved = NSLocalizedString("NodesList.Saved", comment: "NodesList: 'Saved' message")
-        static let unableToSave = NSLocalizedString("NodesList.UnableToSave", comment: "NodesList: 'Unable To Save' message")
+		
+		static let defaultNodesWasLoaded = NSLocalizedString("NodeList.DefaultNodesLoaded", comment: "NodeList: Inform that default nodes was loaded, if user deleted all nodes")
 		
 		static let resetAlertTitle = NSLocalizedString("NodesList.ResetNodeListAlert", comment: "NodesList: Reset nodes alert title")
 		
@@ -74,6 +68,7 @@ class NodesListViewController: FormViewController {
     var securedStore: SecuredStore!
     var apiService: ApiService!
 	var router: Router!
+	var nodesSource: NodesSource!
 	
 	
 	// Properties
@@ -102,30 +97,8 @@ class NodesListViewController: FormViewController {
 			$0.tag = Sections.nodes.tag
 		}
 		
-		let serverUrls: [String]
-		if let usersNodesString = self.securedStore.get(StoreKey.nodesList.userNodes), let usersNodes = AdamantUtilities.toArray(text: usersNodesString) {
-			serverUrls = usersNodes
-		} else {
-			serverUrls = AdamantResources.servers
-		}
-		
-		for url in serverUrls {
-			section <<< LabelRow() {
-				$0.title = url
-			}.cellUpdate({ (cell, _) in
-				if let label = cell.textLabel {
-					label.textColor = UIColor.adamantPrimary
-				}
-				
-				cell.accessoryType = .disclosureIndicator
-			}).onCellSelection { [weak self] (_, row) in
-//				guard let node = row.value, let tag = row.tag else {
-//					return
-//				}
-//
-//				self?.editNode(node, tag: tag)
-			}
-		}
+		nodes = nodesSource.nodes
+		nodes.forEach { section <<< createRowFor(node: $0, tag: generateRandomTag()) }
 		
 		form +++ section
 		
@@ -143,20 +116,6 @@ class NodesListViewController: FormViewController {
 			cell.selectionStyle = .gray
 		}).onCellSelection({ [weak self] (_, _) in
 			self?.createNewNode()
-		}).cellSetup({ (cell, row) in
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		}).cellUpdate({ (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		})
-			
-		// Save
-		<<< ButtonRow() {
-			$0.title = Rows.save.localized
-		}.cellSetup({ (cell, _) in
-			cell.selectionStyle = .gray
-		}).onCellSelection({ [weak self] (_, _) in
-			self?.save()
 		}).cellSetup({ (cell, row) in
 			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
 			cell.textLabel?.textColor = UIColor.adamantPrimary
@@ -182,6 +141,11 @@ class NodesListViewController: FormViewController {
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 		})
     }
+	
+	override func viewDidDisappear(_ animated: Bool) {
+		super.viewDidDisappear(animated)
+		saveNodes()
+	}
 	
 	@objc func editModeStart() {
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(editModeStop))
@@ -221,44 +185,20 @@ extension NodesListViewController {
 		}
 	}
 	
-	func save() {
-		for node in nodes {
-			print(node.toString())
+	func resetToDefault(silent: Bool = false) {
+		if silent {
+			setNodes(nodes: nodesSource.defaultNodes)
+			return
 		}
 		
-//		self.dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
-//		let values = self.form.values()
-//		if let nodes = values["nodes"] as? [String] {
-//
-//			if let jsonNodesList = AdamantUtilities.json(from:nodes) {
-//				self.securedStore.set(jsonNodesList, for: StoreKey.nodesList.userNodes)
-//				print("\(jsonNodesList)")
-//			} else {
-//				self.dialogService.showError(withMessage: String.adamantLocalized.nodesList.unableToSave, error: nil)
-//				return
-//			}
-//			self.apiService.updateServersList(servers: nodes)
-//
-//			self.dialogService.showSuccess(withMessage: String.adamantLocalized.nodesList.saved)
-//			self.dialogService.dismissProgress()
-//			self.close()
-//		} else {
-//			self.dialogService.dismissProgress()
-//			self.dialogService.showError(withMessage: String.adamantLocalized.nodesList.unableToSave, error: nil)
-//		}
-	}
-	
-	func resetToDefault() {
 		let alert = UIAlertController(title: String.adamantLocalized.nodesList.resetAlertTitle, message: nil, preferredStyle: .alert)
 		
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
 		
 		alert.addAction(UIAlertAction(title: Rows.reset.localized, style: .destructive, handler: { [weak self] (_) in
-			let nodes: [Node] = [
-				Node(scheme: .https, host: "endless.adamant.im", port: nil),
-				Node(scheme: .https, host: "clown.adamant.im", port: nil),
-				Node(scheme: .https, host: "lake.adamant.im", port: nil)
-			]
+			guard let nodes = self?.nodesSource.defaultNodes else {
+				return
+			}
 			
 			self?.setNodes(nodes: nodes)
 		}))
@@ -333,6 +273,22 @@ extension NodesListViewController: NodeEditorDelegate {
 }
 
 
+// MARK: - Loading & Saving nodes
+extension NodesListViewController {
+	func saveNodes() {
+		if nodes.count == 0 {
+			nodesSource.nodes = nodesSource.defaultNodes
+			dialogService.showWarning(withMessage: String.adamantLocalized.nodesList.defaultNodesWasLoaded)
+			return
+		} else {
+			nodesSource.nodes = nodes
+		}
+		
+		nodesSource.saveNodes()
+	}
+}
+
+
 // MARK: - Tools
 extension NodesListViewController {
 	private func createRowFor(node: Node, tag: String) -> BaseRow {
@@ -343,7 +299,6 @@ extension NodesListViewController {
 			let deleteAction = SwipeAction(style: .destructive, title: "Delete") { [weak self] (action, row, completionHandler) in
 				if let node = row.baseValue as? Node, let index = self?.nodes.index(of: node) {
 					self?.nodes.remove(at: index)
-					self?.save()
 				}
 				completionHandler?(true)
 			}
