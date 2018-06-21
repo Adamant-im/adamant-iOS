@@ -73,14 +73,16 @@ class ChatViewController: MessagesViewController {
                 self.dialogService.showSystemActionSheet(title: "Send", message: "", actions: [
                     UIAlertAction(title: "Ethereum", style: .default, handler: { (action) in
                     if let ethAddress = self.ethAddress {
-//                        self.dialogService.showSuccess(withMessage: ethAddress)
-                        // MARK: Show transfer details
+                        // MARK: Show ETH transfer details
                         guard let vc = self.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
                             fatalError("Can't get TransferViewController scene")
                         }
                         
                         vc.token = .ETH
                         vc.toAddress = ethAddress
+                        if let address = self.chatroom?.partner?.address {
+                            vc.reciverADMAddress = address
+                        }
                         
                         if let nav = self.navigationController {
                             nav.pushViewController(vc, animated: true)
@@ -92,6 +94,21 @@ class ChatViewController: MessagesViewController {
                     }
                 }),
                     UIAlertAction(title: "ADM", style: .default, handler: { [weak self] (_) in
+                        // MARK: Show ADM transfer details - DISABLED until end of ICO
+//                        if let address = self?.chatroom?.partner?.address {
+//                            guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
+//                                fatalError("Can't get TransferViewController scene")
+//                            }
+//
+//                            vc.token = .ADM
+//                            vc.toAddress = address
+//
+//                            if let nav = self?.navigationController {
+//                                nav.pushViewController(vc, animated: true)
+//                            } else {
+//                                self?.present(vc, animated: true, completion: nil)
+//                            }
+//                        }
                         let alert = UIAlertController(title: String.adamantLocalized.account.sorryAlert, message: String.adamantLocalized.account.transferNotAllowed, preferredStyle: .alert)
                         
                         let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { (_) in }

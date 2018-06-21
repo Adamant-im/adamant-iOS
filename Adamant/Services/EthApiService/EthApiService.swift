@@ -141,6 +141,81 @@ class EthApiService: EthApiServiceProtocol {
         }
     }
     
+    func sendFunds(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<[String: String]>) -> Void) {
+        DispatchQueue.global().async {
+            guard let destinationEthAddress = EthereumAddress(address) else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - invalid destination address", error: nil)))
+                }
+                return
+            }
+            guard let amount = Web3.Utils.parseToBigUInt("\(amount)", units: .eth) else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - invalid amount format", error: nil)))
+                }
+                return
+            }
+            
+            guard let ethAddressFrom = self.account?.wallet.addresses?.first else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - no address found", error: nil)))
+                }
+                return
+            }
+            
+            guard let keystore = self.account?.wallet else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - no keystore found", error: nil)))
+                }
+                return
+            }
+            
+            self.web3.addKeystoreManager(KeystoreManager([keystore]))
+            var options = Web3Options.defaultOptions()
+//            options.gasLimit = BigUInt(gasLimit)
+            options.from = ethAddressFrom
+            options.value = BigUInt(amount)
+            guard let contract = self.web3.contract(Web3.Utils.coldWalletABI, at: destinationEthAddress) else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - contract loading error", error: nil)))
+                }
+                return
+            }
+            
+            guard let estimatedGas = contract.method(options: options)?.estimateGas(options: nil).value else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - retrieving estimated gas error", error: nil)))
+                }
+                return
+            }
+            options.gasLimit = estimatedGas
+            guard let gasPrice = self.web3.eth.getGasPrice().value else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - retrieving gas price error", error: nil)))
+                }
+                return
+            }
+            options.gasPrice = gasPrice
+            guard let transaction = contract.method(options: options) else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - create transaction issue", error: nil)))
+                }
+                return
+            }
+            
+            guard let sendResult = transaction.send(password: "", options: nil).value else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - sending transaction error", error: nil)))
+                }
+                return
+            }
+            
+            DispatchQueue.main.async {
+                completion(.success(sendResult))
+            }
+        }
+    }
+    
     func getBalance(_ completion: @escaping (ApiServiceResult<String>) -> Void) {
         if let walletAddress = self.account?.wallet.addresses?.first {
             self.getBalance(byAddress: walletAddress) { (result) in
@@ -150,9 +225,9 @@ class EthApiService: EthApiServiceProtocol {
                     
                     if let formattedAmount = Web3.Utils.formatToEthereumUnits(balance,
                                                                               toUnits: .eth,
-                                                                              decimals: 5,
-                                                                              fallbackToScientific: true) {
-                        completion(.success("\(formattedAmount) ETH"))
+                                                                              decimals: 8,
+                                                                              fallbackToScientific: true), let amount = Double(formattedAmount) {
+                        completion(.success("\(amount) ETH"))
                     } else {
                         completion(.failure(.internalError(message: "ETH Wallet: fail to get balance amount", error: nil)))
                     }
@@ -173,9 +248,9 @@ class EthApiService: EthApiServiceProtocol {
                 case .success(let balance):
                     if let formattedAmount = Web3.Utils.formatToEthereumUnits(balance,
                                                                               toUnits: .eth,
-                                                                              decimals: 5,
-                                                                              fallbackToScientific: true) {
-                        completion(.success("\(formattedAmount) ETH"))
+                                                                              decimals: 8,
+                                                                              fallbackToScientific: true), let amount = Double(formattedAmount)  {
+                        completion(.success("\(amount) ETH"))
                     } else {
                         completion(.failure(.internalError(message: "ETH Wallet: fail to get balance amount", error: nil)))
                     }
