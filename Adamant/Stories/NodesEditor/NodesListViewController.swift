@@ -142,11 +142,6 @@ class NodesListViewController: FormViewController {
 		})
     }
 	
-	override func viewDidDisappear(_ animated: Bool) {
-		super.viewDidDisappear(animated)
-		saveNodes()
-	}
-	
 	@objc func editModeStart() {
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(editModeStop))
 		tableView.setEditing(true, animated: true)
@@ -237,6 +232,8 @@ extension NodesListViewController: NodeEditorDelegate {
 			let row = createRowFor(node: node, tag: generateRandomTag())
 			section <<< row
 			
+			saveNodes()
+			
 		case .done(let node, let tag):
 			guard let row: NodeRow = form.rowBy(tag: tag) else {
 				return
@@ -249,8 +246,7 @@ extension NodesListViewController: NodeEditorDelegate {
 			nodes.append(node)
 			row.value = node
 			
-		case .cancel:
-			break
+			saveNodes()
 			
 		case .delete(let editorNode, let tag):
 			guard let row: NodeRow = form.rowBy(tag: tag), let node = row.value else {
@@ -266,6 +262,11 @@ extension NodesListViewController: NodeEditorDelegate {
 			if let section = form.sectionBy(tag: Sections.nodes.tag), let index = section.index(of: row) {
 				section.remove(at: index)
 			}
+			
+			saveNodes()
+			
+		case .cancel:
+			break
 		}
 		
 		dismiss(animated: true, completion: nil)
