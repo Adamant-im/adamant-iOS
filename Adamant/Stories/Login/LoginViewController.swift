@@ -395,16 +395,7 @@ extension LoginViewController {
 				self?.dialogService.dismissProgress()
 				
 			case .failure(let error):
-				switch error {
-				case .invalidPassphrase, .wrongPassphrase, .userNotLogged:
-					self?.dialogService.showWarning(withMessage: error.localized)
-					
-				case .apiError(let apiError):
-					self?.dialogService.showError(withMessage: apiError.localized, error: apiError)
-					
-				case .internalError(let message, let internalError):
-					self?.dialogService.showError(withMessage: message, error: internalError)
-				}
+				self?.dialogService.showRichError(error: error)
 			}
 		})
 	}
