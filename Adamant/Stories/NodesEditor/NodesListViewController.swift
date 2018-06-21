@@ -142,6 +142,18 @@ class NodesListViewController: FormViewController {
 		})
     }
 	
+	override func viewWillDisappear(_ animated: Bool) {
+		super.viewWillDisappear(animated)
+		
+		// Top, not presented, and no nodes - reset to default and show alert
+		if let top = navigationController?.topViewController, top == self && presentedViewController == nil && nodes.count == 0 {
+			let nodes = nodesSource.defaultNodes
+			nodesSource.nodes = nodes
+			nodesSource.saveNodes()
+			dialogService.showSuccess(withMessage: String.adamantLocalized.nodesList.defaultNodesWasLoaded)
+		}
+	}
+	
 	@objc func editModeStart() {
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(editModeStop))
 		tableView.setEditing(true, animated: true)
@@ -182,14 +194,13 @@ extension NodesListViewController {
 	
 	func resetToDefault(silent: Bool = false) {
 		if silent {
-			setNodes(nodes: nodesSource.defaultNodes)
+			let nodes = nodesSource.defaultNodes
+			setNodes(nodes: nodes)
 			return
 		}
 		
 		let alert = UIAlertController(title: String.adamantLocalized.nodesList.resetAlertTitle, message: nil, preferredStyle: .alert)
-		
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-		
 		alert.addAction(UIAlertAction(title: Rows.reset.localized, style: .destructive, handler: { [weak self] (_) in
 			guard let nodes = self?.nodesSource.defaultNodes else {
 				return
@@ -213,7 +224,8 @@ extension NodesListViewController {
 			section.append(row)
 		}
 		
-		self.nodes.append(contentsOf: nodes)
+		self.nodes = nodes
+		nodesSource.nodes = nodes
 	}
 }
 
@@ -277,14 +289,11 @@ extension NodesListViewController: NodeEditorDelegate {
 // MARK: - Loading & Saving nodes
 extension NodesListViewController {
 	func saveNodes() {
-		if nodes.count == 0 {
-			nodesSource.nodes = nodesSource.defaultNodes
-			dialogService.showWarning(withMessage: String.adamantLocalized.nodesList.defaultNodesWasLoaded)
+		guard nodes.count > 0 else {
 			return
-		} else {
-			nodesSource.nodes = nodes
 		}
 		
+		nodesSource.nodes = nodes
 		nodesSource.saveNodes()
 	}
 }
@@ -300,6 +309,7 @@ extension NodesListViewController {
 			let deleteAction = SwipeAction(style: .destructive, title: "Delete") { [weak self] (action, row, completionHandler) in
 				if let node = row.baseValue as? Node, let index = self?.nodes.index(of: node) {
 					self?.nodes.remove(at: index)
+					self?.saveNodes()
 				}
 				completionHandler?(true)
 			}
