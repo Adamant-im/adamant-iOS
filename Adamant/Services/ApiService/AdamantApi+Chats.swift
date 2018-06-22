@@ -60,9 +60,7 @@ extension AdamantApiService {
         self.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: message, nonce: nonce, type: ChatType.messageSpecial, completion: completion)
     }
     
-    // MARK: - private
-    
-    private func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, type: ChatType, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
+    func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, type: ChatType, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
         // MARK: 1. Prepare params
         let params: [String : Any] = [
             "type": TransactionType.chatMessage.rawValue,

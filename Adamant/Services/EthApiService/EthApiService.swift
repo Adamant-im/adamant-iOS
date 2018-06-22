@@ -141,7 +141,7 @@ class EthApiService: EthApiServiceProtocol {
         }
     }
     
-    func sendFunds(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<[String: String]>) -> Void) {
+    func sendFunds(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<String>) -> Void) {
         DispatchQueue.global().async {
             guard let destinationEthAddress = EthereumAddress(address) else {
                 DispatchQueue.main.async {
@@ -210,8 +210,34 @@ class EthApiService: EthApiServiceProtocol {
                 return
             }
             
-            DispatchQueue.main.async {
-                completion(.success(sendResult))
+            guard let hash = sendResult["txhash"] else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - fail to get transaction hash", error: nil)))
+                }
+                return
+            }
+            guard let formattedAmount = Web3.Utils.formatToEthereumUnits(amount, toUnits: .wei) else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - fail to get transaction amount", error: nil)))
+                }
+                return
+            }
+            
+            let result = ["type": "eth_transaction", "amount": formattedAmount, "hash": hash, "comments":""]
+            
+            do {
+                let data = try JSONEncoder().encode(result)
+                guard let raw = String(data: data, encoding: String.Encoding.utf8) else {
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    completion(.success(raw))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - wrong data issue", error: nil)))
+                }
             }
         }
     }
