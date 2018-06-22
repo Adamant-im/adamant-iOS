@@ -260,12 +260,20 @@ extension ChatListViewController {
 				cell.lastMessageLabel.text = nil
 				break
 			}
-			
-			if message.isOutgoing {
-				cell.lastMessageLabel.text = String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, text)
-			} else {
-				cell.lastMessageLabel.text = text
-			}
+            
+            if message.type == ChatType.messageSpecial.rawValue {
+                guard let data = text.data(using: String.Encoding.utf8), let transfer = try? JSONDecoder().decode(ChatTransfer.self, from: data) else {
+                    cell.lastMessageLabel.text = nil
+                    break
+                }
+                cell.lastMessageLabel.text = transfer.renderPreview(isOutgoing: message.isOutgoing)
+            } else {
+                if message.isOutgoing {
+                    cell.lastMessageLabel.text = String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, text)
+                } else {
+                    cell.lastMessageLabel.text = text
+                }
+            }
 			
 		case let transfer as TransferTransaction:
 			cell.lastMessageLabel.text = formatTransferPreview(transfer)
