@@ -333,7 +333,7 @@ extension AdamantChatsProvider {
 		transaction.date = Date() as NSDate
 		transaction.recipientId = recipientId
 		transaction.senderId = senderId
-		transaction.type = ChatType.message.rawValue
+		transaction.type = Int16(ChatType.message.rawValue)
 		transaction.isOutgoing = true
 		transaction.message = text
 		
