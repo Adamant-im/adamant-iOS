@@ -382,6 +382,14 @@ extension MessageTransaction: MessageType {
 		guard let message = message else {
 			return MessageKind.text("")
 		}
+        
+        if type == ChatType.messageSpecial.rawValue {
+            guard let data = message.data(using: String.Encoding.utf8), let transfer = try? JSONDecoder().decode(ChatTransfer.self, from: data) else {
+                return MessageData.text("")
+            }
+
+            return MessageData.attributedText(transfer.render())
+        }
 		
 		if isMarkdown {
 			let parser = MarkdownParser(font: UIFont.adamantChatDefault)
