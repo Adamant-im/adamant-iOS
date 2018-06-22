@@ -256,38 +256,46 @@ extension AdamantChatsProvider {
 // MARK: - Sending messages {
 extension AdamantChatsProvider {
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
-		guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
-			completion(.failure(.notLogged))
-			return
-		}
-		
-		guard loggedAccount.balance >= message.fee else {
-			completion(.failure(.notEnoughtMoneyToSend))
-			return
-		}
-		
-		switch validateMessage(message) {
-		case .isValid:
-			break
-			
-		case .empty:
-			completion(.failure(.messageNotValid(.empty)))
-			return
-			
-		case .tooLong:
-			completion(.failure(.messageNotValid(.tooLong)))
-			return
-		}
-		
-		sendingQueue.async {
-			switch message {
-			case .text(let text), .markdownText(let text):
-				self.sendTextMessage(text: text, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, completion: completion)
-			}
-		}
+		sendMessage(message, recipientId: recipientId, type: .message, completion: completion)
 	}
+    
+    func sendSpecialMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+        sendMessage(message, recipientId: recipientId, type: .messageSpecial, completion: completion)
+    }
+    
+    private func sendMessage(_ message: AdamantMessage, recipientId: String, type: ChatType, completion: @escaping (ChatsProviderResult) -> Void) {
+        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+            completion(.failure(.notLogged))
+            return
+        }
+        
+        guard loggedAccount.balance >= message.fee else {
+            completion(.failure(.notEnoughtMoneyToSend))
+            return
+        }
+        
+        switch validateMessage(message) {
+        case .isValid:
+            break
+            
+        case .empty:
+            completion(.failure(.messageNotValid(.empty)))
+            return
+            
+        case .tooLong:
+            completion(.failure(.messageNotValid(.tooLong)))
+            return
+        }
+        
+        sendingQueue.async {
+            switch message {
+            case .text(let text), .markdownText(let text):
+                self.sendTextMessage(text: text, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: type, completion: completion)
+            }
+        }
+    }
 	
-	private func sendTextMessage(text: String, senderId: String, recipientId: String, keypair: Keypair, completion: @escaping (ChatsProviderResult) -> Void) {
+	private func sendTextMessage(text: String, senderId: String, recipientId: String, keypair: Keypair, type: ChatType, completion: @escaping (ChatsProviderResult) -> Void) {
 		// MARK: 0. Prepare
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = stack.container.viewContext
@@ -368,7 +376,7 @@ extension AdamantChatsProvider {
 		
 		
 		// MARK: 6. Send
-		sendTransaction(transaction, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
+        sendTransaction(transaction, keypair: keypair, recipientPublicKey: recipientPublicKey, type: type) { result in
 			switch result {
 			case .success:
 				do {
@@ -436,7 +444,7 @@ extension AdamantChatsProvider {
 		
 		
 		// MARK: 3. Send
-		sendTransaction(transaction, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
+        sendTransaction(transaction, keypair: keypair, recipientPublicKey: recipientPublicKey, type: .message) { result in
 			switch result {
 			case .success:
 				do {
@@ -488,7 +496,7 @@ extension AdamantChatsProvider {
 	///
 	/// If success - update transaction's id and add it to unconfirmed transactions.
 	/// If fails - set transaction status to .failed
-	private func sendTransaction(_ transaction: MessageTransaction, keypair: Keypair, recipientPublicKey: String, completion: @escaping (ChatsProviderResult) -> Void) {
+	private func sendTransaction(_ transaction: MessageTransaction, keypair: Keypair, recipientPublicKey: String, type: ChatType, completion: @escaping (ChatsProviderResult) -> Void) {
 		// MARK: 0. Prepare
 		guard let senderId = transaction.senderId,
 			let recipientId = transaction.recipientId else {
@@ -503,7 +511,7 @@ extension AdamantChatsProvider {
 		}
 		
 		// MARK: 2. Send
-		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { result in
+        apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce, type: type) { result in
 			switch result {
 			case .success(let id):
 				// Update ID with recieved, add to unconfirmed transactions.

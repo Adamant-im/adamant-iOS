@@ -34,6 +34,11 @@ fileprivate extension String.adamantLocalized.alert {
 	static let send = NSLocalizedString("TransferScene.Send", comment: "Transfer: Confirm transfer alert: Send tokens button")
 }
 
+// MARK: Transfer Delegate Protocol
+
+protocol TransferDelegate {
+    func transferFinished(with data:String)
+}
 
 // MARK: -
 class TransferViewController: FormViewController {
@@ -109,9 +114,10 @@ class TransferViewController: FormViewController {
 	
     var token: Token = .ADM
     var toAddress: String = ""
-    var reciverADMAddress: String = "" // ????
     
 	private(set) var totalAmount: Double? = nil
+    
+    var delegate: TransferDelegate?
 
 	
 	// MARK: - Lifecycle
@@ -242,12 +248,11 @@ class TransferViewController: FormViewController {
     
     private func createETHForm() {
         // MARK: - Wallet section
-        if let account = accountService.account, let ethAccount = ethApiService.account, let ethBalanceBigInt = ethAccount.balance, let ethBalanceString = Web3.Utils.formatToEthereumUnits(ethBalanceBigInt), let ethBalance = Double(ethBalanceString) {
-            let balance = (account.balance as NSDecimalNumber).doubleValue
+        if let ethAccount = ethApiService.account, let ethBalanceBigInt = ethAccount.balance, let ethBalanceString = Web3.Utils.formatToEthereumUnits(ethBalanceBigInt), let ethBalance = Double(ethBalanceString) {
             
             maxToTransfer = ethBalance
             
-            if let feeString = Web3.Utils.formatToEthereumUnits(BigInt(EthApiService.defaultGasPrice), toUnits: .Gwei), let fee = Double(feeString) {
+            if let feeString = Web3.Utils.formatToEthereumUnits(BigUInt(EthApiService.defaultGasPrice * EthApiService.transferGas), toUnits: .eth, decimals: 8), let fee = Double(feeString) {
                 defaultFee = fee
             }
             
@@ -255,11 +260,6 @@ class TransferViewController: FormViewController {
             currencyFormatter.numberStyle = .decimal
             currencyFormatter.roundingMode = .floor
             currencyFormatter.positiveFormat = "#.######## ETH"
-            
-            let currencyFormatterGwie = NumberFormatter()
-            currencyFormatterGwie.numberStyle = .decimal
-            currencyFormatterGwie.roundingMode = .floor
-            currencyFormatterGwie.positiveFormat = "#.######## Gwei"
             
             form +++ Section(Sections.wallet.localized)
                 <<< DecimalRow() {
@@ -310,7 +310,7 @@ class TransferViewController: FormViewController {
                     $0.value = defaultFee
                     $0.tag = Row.fee.tag
                     $0.disabled = true
-                    $0.formatter = currencyFormatterGwie
+                    $0.formatter = currencyFormatter
                 }
                 <<< DecimalRow() {
                     $0.title = Row.total.localized
@@ -362,14 +362,14 @@ class TransferViewController: FormViewController {
             return
         }
         
-        guard let amount = row.value, let feeString = Web3.Utils.formatToEthereumUnits(BigInt(EthApiService.defaultGasPrice), toUnits: .eth, decimals: 8), let fee = Double(feeString) else {
+        guard let amount = row.value else {
             totalAmount = nil
             sendButton.disabled = true
             row.cell.titleLabel?.textColor = .black
             return
         }
         
-        totalAmount = amount + fee
+        totalAmount = amount + defaultFee
         totalRow.evaluateDisabled()
         
         totalRow.value = totalAmount
@@ -456,11 +456,7 @@ class TransferViewController: FormViewController {
 								
 								self?.accountService.update()
 								
-								if let nav = self?.navigationController {
-									nav.popViewController(animated: true)
-								} else {
-									self?.dismiss(animated: true, completion: nil)
-								}
+								self?.close()
 							}
 							
 						case .failure(let error):
@@ -483,6 +479,48 @@ class TransferViewController: FormViewController {
 	}
     
     func sendETHFunds() {
-        // TODO: Add send eth funds
+        guard let recipientRow = form.rowBy(tag: Row.address.tag) as? TextRow,
+            let recipient = recipientRow.value,
+            let amountRow = form.rowBy(tag: Row.amount.tag) as? DecimalRow,
+            let amount = amountRow.value else {
+                return
+        }
+        
+        let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.confirmSendMessageFormat, "\(amount) ETH", recipient), message: "You can't undo this action.", preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: String.adamantLocalized.alert.cancel , style: .cancel, handler: nil)
+        let sendAction = UIAlertAction(title: String.adamantLocalized.alert.send, style: .default, handler: { _ in
+            self.sendEth(to: recipient, amount: amount)
+        })
+        
+        alert.addAction(cancelAction)
+        alert.addAction(sendAction)
+        
+        present(alert, animated: true, completion: nil)
+    }
+    
+    private func sendEth(to recipient: String, amount: Double) {
+        self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+        
+        self.ethApiService.sendFunds(toAddress: recipient, amount: amount) { (result) in
+            switch result {
+            case .success(let value):
+                print("Payload: \(value)")
+                
+                self.delegate?.transferFinished(with: value)
+                self.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                self.close()
+            
+            case .failure(let error):
+                self.dialogService.showError(withMessage: "Transrer issue", error: error)
+            }
+        }
+    }
+    
+    private func close() {
+        if let nav = self.navigationController {
+            nav.popViewController(animated: true)
+        } else {
+            self.dismiss(animated: true, completion: nil)
+        }
     }
 }

@@ -80,9 +80,7 @@ class ChatViewController: MessagesViewController {
                         
                         vc.token = .ETH
                         vc.toAddress = ethAddress
-                        if let address = self.chatroom?.partner?.address {
-                            vc.reciverADMAddress = address
-                        }
+                        vc.delegate = self
                         
                         if let nav = self.navigationController {
                             nav.pushViewController(vc, animated: true)
@@ -392,4 +390,40 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 			}
 		}
 	}
+}
+
+extension ChatViewController: TransferDelegate {
+    func transferFinished(with data: String) {
+        if let address = chatroom?.partner?.address {
+            self.sendChatMessage(text: data, to: address)
+        }
+    }
+    
+    // MARK: Send Chat message with ETH transaction
+    private func sendChatMessage(text: String, to address: String) {
+        let message = AdamantMessage.text(text)
+        let valid = chatsProvider.validateMessage(message)
+        switch valid {
+        case .isValid: break
+        default:
+            dialogService.showToastMessage(valid.localized)
+            return
+        }
+        
+        guard text.count > 0 else {
+            // TODO show warning
+            return
+        }
+        
+        chatsProvider.sendSpecialMessage(.text(text), recipientId: address, completion: { [weak self] result in
+            switch result {
+            case .success:
+//                self?.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                break
+                
+            case .failure(let error):
+                self?.dialogService.showRichError(error: error)
+            }
+        })
+    }
 }
