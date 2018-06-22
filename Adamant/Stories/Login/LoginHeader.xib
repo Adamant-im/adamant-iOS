@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_0" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -24,16 +24,16 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="15" translatesAutoresizingMaskIntoConstraints="NO" id="hUF-Ul-HEi">
-                    <rect key="frame" x="0.0" y="46.5" width="320" height="257"/>
+                    <rect key="frame" x="0.0" y="47.5" width="320" height="255.5"/>
                     <subviews>
-                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Adamant_Logo" translatesAutoresizingMaskIntoConstraints="NO" id="Ci1-bB-rdf">
-                            <rect key="frame" x="64" y="0.0" width="192" height="191.5"/>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Adamant-logo" translatesAutoresizingMaskIntoConstraints="NO" id="Ci1-bB-rdf">
+                            <rect key="frame" x="64" y="0.5" width="192" height="191.5"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="Ci1-bB-rdf" secondAttribute="height" multiplier="1:1" id="whs-kN-2Wa"/>
                             </constraints>
                         </imageView>
                         <label opaque="NO" userInteractionEnabled="NO" tag="888" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ADAMANT" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MaP-ZE-Rez">
-                            <rect key="frame" x="64" y="206.5" width="192.5" height="50.5"/>
+                            <rect key="frame" x="59" y="207" width="202.5" height="49"/>
                             <fontDescription key="fontDescription" name="Exo2-Thin" family="Exo 2 Thin" pointSize="42"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
@@ -56,6 +56,6 @@
         </view>
     </objects>
     <resources>
-        <image name="Adamant_Logo" width="1024" height="1024"/>
+        <image name="Adamant-logo" width="1024" height="1024"/>
     </resources>
 </document>
