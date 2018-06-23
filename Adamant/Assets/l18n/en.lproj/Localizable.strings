@@ -277,9 +277,6 @@
 /* NodesEditor: Delete node button */
 "NodesEditor.DeleteNodeButton" = "Delete";
 
-/* NodesEditor: Port row placeholder */
-"NodesEditor.PortRow.Placeholder" = "443";
-
 /* NodesEditor: Host row placeholder */
 "NodesEditor.HostRow.Placeholder" = "ip or host name";
 
