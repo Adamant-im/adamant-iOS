@@ -67,9 +67,6 @@
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
 "Application.deviceTokenErrorFormat" = "Failed to reginser in ANS: %@";
 
-/* ApiService: No connection message. Generally bad network. */
-"ApiService.Error.NoConnection" = "No connection to the Internet";
-
 /* Serious internal error: Failed to build endpoint url */
 "ApiService.InternalError.EndpointBuildFailed" = "Endpoint build failed. Report a bug";
 

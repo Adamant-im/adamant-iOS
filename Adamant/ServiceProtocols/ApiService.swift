@@ -28,8 +28,8 @@ enum ApiServiceError: Error {
 		case .accountNotFound:
 			return String.adamantLocalized.sharedErrors.accountNotFound
 			
-		case .serverError(error: let error):
-			return String.localizedStringWithFormat(NSLocalizedString("ApiService.Error.RemoteServerErrorFormat", comment: "ApiService: Remote server returned an error. Using %@ for error description"), error)
+		case .serverError(let error):
+			return String.adamantLocalized.sharedErrors.remoteServerError(message: error)
 			
 		case .internalError(let msg, let error):
 			let message: String

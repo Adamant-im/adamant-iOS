@@ -1,3 +1,6 @@
+/* System accounts: ADAMANT Tokens */
+"Accounts.AdamantTokens" = "ADAMANT Tokens";
+
 /* AccountsProvider: Address not valid error, %@ for address */
 "AccountsProvider.Error.AddressNotValidFormat" = "Ungültige Adresse: %@";
 
@@ -63,9 +66,6 @@
 
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
 "Application.deviceTokenErrorFormat" = "Failed to reginser in ANS: %@";
-
-/* ApiService: No connection message. Generally bad network. */
-"ApiService.Error.NoConnection" = "Keine Internetverbindung";
 
 /* Serious internal error: Failed to build endpoint url */
 "ApiService.InternalError.EndpointBuildFailed" = "Endpoint Build fehlgeschlagen. Bericht senden";
@@ -246,6 +246,9 @@
 
 /* NodesList: 'Node url' plaseholder */
 "NodesList.NodeUrl" = "Node-URL";
+
+/* Notifications: scene title */
+"Notifications.Title" = "Benachrichtigungen";
 
 /* Notifications: Modes description. Markdown supported. */
 "Notifications.ModesDescription" = "#### Benachrichtigungsmodi\n\n#### Deaktiviert\nKeine Benachrichtigungen.\n\n#### Hintergrundaktualisierung\nIhr Gerät erhält neue Nachrichteninformationen automatisch. Keine externen Aufrufe. Die Hintergrundaktualisierung wird von iOS verwaltet, die Zeit wird vom Betriebssystem bestimmt und ist von vielen Faktoren wie Akkustand, Netzwerkauslastung, Nutzungsmuster abhängig und kann nicht vorhergesagt werden. Es können 20 Minuten, 6 Stunden, oder ein Tag sein. Sie können die App trotzdem öffnen und nachschauen, ob eine Nachricht angekommen ist.\n\n#### Push\nBenachrichtigungen werden auf Ihr Gerät vom ADAMANT Benachrichtigungsservice gesendet. Sie erhalten eine Benachrichtigung umgehend, nachdem die Nachricht versendet und von der Blockchain bestätigt wurde - mit einer kleinen Verzögerung. Jedoch erfordert dieser Modus, dass der Gerätetoken Ihres Geräts in der Servicedatenbank registriert ist. Gerätetokens sind sicher, und diese Option ist zu empfehlen.\n\nSie können mehr über die Geräteregistrierung auf der ADAMANTs Github-Seite nachlesen.";
