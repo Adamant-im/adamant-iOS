@@ -19,6 +19,10 @@ extension String.adamantLocalized {
 		static let chats = NSLocalizedString("Tabs.Chats", comment: "Main tab bar: Chats page")
 		static let settings = NSLocalizedString("Tabs.Settings", comment: "Main tab bar: Settings page")
 	}
+	
+	struct application {
+		static let deviceTokenSendFailed = NSLocalizedString("Application.deviceTokenErrorFormat", comment: "Application: Failed to send deviceToken to ANS error format. %@ for error description")
+	}
 }
 
 extension StoreKey {
@@ -43,6 +47,10 @@ struct AdamantResources {
 	]
 	
 	static let iosAppSupportEmail = "ios@adamant.im"
+	
+	// ANS Contact
+	static let ansAddress = ""
+	static let ansPublicKey = ""
 	
 	private init() {}
 }
@@ -209,6 +217,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 // MARK: - Remote notifications
 extension AppDelegate {
+	private struct RegistrationPayload: Codable {
+		let token: String
+		let provider: String = "ans"
+	}
+	
 	func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
 		guard let address = accountService.account?.address, let keypair = accountService.keypair else {
 			print("Trying to register with no user logged")
@@ -218,7 +231,7 @@ extension AppDelegate {
 		
 		let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
 		
-		// Checking, if device token had not changed
+		// MARK: 1. Checking, if device token had not changed
 		guard let securedStore = container.resolve(SecuredStore.self) else {
 			fatalError("can't get secured store to get device token hash")
 		}
@@ -231,19 +244,48 @@ extension AppDelegate {
 			securedStore.set(tokenHash, for: StoreKey.application.deviceTokenHash)
 		}
 		
-		// Storing new token in blockchain
+		// MARK: 2. Preparing message
+		guard let adamantCore = container.resolve(AdamantCore.self) else {
+			fatalError("Can't get AdamantCore to register device token")
+		}
+		
+		let payload: String
+		do {
+			let data = try JSONEncoder().encode(RegistrationPayload(token: token))
+			payload = String(data: data, encoding: String.Encoding.utf8)!
+		} catch {
+			dialogService.showError(withMessage: "Failed to prepare ANS signal payload", error: error)
+			return
+		}
+		
+		guard let encodedPayload = adamantCore.encodeMessage(payload, recipientPublicKey: AdamantResources.ansPublicKey, privateKey: keypair.privateKey) else {
+			dialogService.showError(withMessage: "Failed to encode ANS signal. Payload: \(payload)", error: nil)
+			return
+		}
+		
+		// MARK: 3. Send signal to ANS
 		guard let apiService = container.resolve(ApiService.self) else {
 			fatalError("can't get api service to register device token")
 		}
 		
-		apiService.store(key: "deviceToken", value: token, type: StateType.keyValue, sender: address, keypair: keypair) { [weak self] result in
+		apiService.sendMessage(senderId: address, recipientId: AdamantResources.ansAddress, keypair: keypair, message: encodedPayload.message, type: ChatType.signal, nonce: encodedPayload.nonce) { [unowned self] result in
 			switch result {
 			case .success:
 				return
 				
 			case .failure(let error):
-				print("Failed to store device token: \(error)")
-				self?.notificationService?.setNotificationsMode(.disabled, completion: nil)
+				self.notificationService?.setNotificationsMode(.disabled, completion: nil)
+				
+				switch error {
+				case .networkError, .notLogged:
+					self.dialogService.showWarning(withMessage: String.localizedStringWithFormat(String.adamantLocalized.application.deviceTokenSendFailed, error.localized))
+					
+				case .accountNotFound, .serverError:
+					self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.application.deviceTokenSendFailed, error.localized), error: error)
+					 
+				case .internalError(let message, _):
+					self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.application.deviceTokenSendFailed, message), error: error)
+				}
 			}
 		}
 	}

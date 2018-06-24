@@ -64,6 +64,9 @@
 /* Product name */
 "ADAMANT" = "АДАМАНТ";
 
+/* Application: Failed to send deviceToken to ANS error format. %@ for error description */
+"Application.deviceTokenErrorFormat" = "Ошибка регистрации в ANS: %@";
+
 /* ApiService: No connection message. Generally bad network. */
 "ApiService.Error.NoConnection" = "Нет соединения с сетью";
 
