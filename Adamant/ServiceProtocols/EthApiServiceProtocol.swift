@@ -18,6 +18,8 @@ protocol EthApiServiceProtocol: class {
     
     // MARK: - Transactions
     func sendFunds(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<String>) -> Void)
+    
+    func getTransactions(_ completion: @escaping (ApiServiceResult<[EthTransaction]>) -> Void)
     // MARK: - Tools
     func getBalance(_ completion: @escaping (ApiServiceResult<String>) -> Void)
     func getBalance(byAddress address: String, completion: @escaping (ApiServiceResult<String>) -> Void)
