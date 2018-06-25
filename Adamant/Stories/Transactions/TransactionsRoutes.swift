@@ -11,7 +11,7 @@ import Foundation
 extension AdamantScene {
 	struct Transactions {
 		static let transactions = AdamantScene(identifier: "TransactionsViewController", factory: { r in
-			let c = TransactionsViewController(nibName: "TransactionsViewController", bundle: nil)
+			let c = ADMTransactionsViewController(nibName: "TransactionsViewController", bundle: nil)
 			c.accountService = r.resolve(AccountService.self)
 			c.transfersProvider = r.resolve(TransfersProvider.self)
 			c.dialogService = r.resolve(DialogService.self)
@@ -28,6 +28,14 @@ extension AdamantScene {
             c.router = r.resolve(Router.self)
 			return c
 		})
+        
+        static let ethTransactions = AdamantScene(identifier: "TransactionsViewController", factory: { r in
+            let c = ETHTransactionsViewController(nibName: "TransactionsViewController", bundle: nil)
+            c.ethApiService = r.resolve(EthApiServiceProtocol.self)
+            c.dialogService = r.resolve(DialogService.self)
+            c.router = r.resolve(Router.self)
+            return c
+        })
 		
 		private init() {}
 	}
