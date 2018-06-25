@@ -29,6 +29,7 @@
 		64D05A0220D51632003AD655 /* EthApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D05A0120D51632003AD655 /* EthApiServiceProtocol.swift */; };
 		64D05A0420D516B4003AD655 /* EthApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D05A0320D516B4003AD655 /* EthApiService.swift */; };
 		64FA53CD20E1300B006783C9 /* ETHTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CC20E1300A006783C9 /* ETHTransactionsViewController.swift */; };
+		64FA53CF20E15066006783C9 /* ETHTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CE20E15066006783C9 /* ETHTransactionDetailsViewController.swift */; };
 		E905D39B2048A9BD00DDB504 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39A2048A9BD00DDB504 /* KeychainStore.swift */; };
 		E905D39D204C13B900DDB504 /* SecuredStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39C204C13B900DDB504 /* SecuredStore.swift */; };
 		E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39E204C281400DDB504 /* LoginViewController.swift */; };
@@ -231,6 +232,7 @@
 		64D05A0120D51632003AD655 /* EthApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthApiServiceProtocol.swift; sourceTree = "<group>"; };
 		64D05A0320D516B4003AD655 /* EthApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthApiService.swift; sourceTree = "<group>"; };
 		64FA53CC20E1300A006783C9 /* ETHTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ETHTransactionsViewController.swift; sourceTree = "<group>"; };
+		64FA53CE20E15066006783C9 /* ETHTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ETHTransactionDetailsViewController.swift; sourceTree = "<group>"; };
 		871009461457F6B7B47D99C5 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
 		903AC078A8A55175A05E42D4 /* Pods-Adamant.testing.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.testing.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.testing.xcconfig"; sourceTree = "<group>"; };
 		C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -684,6 +686,7 @@
 				E9E7CDC12003F5A400DFC4DB /* TransactionsViewController.swift */,
 				64FA53CC20E1300A006783C9 /* ETHTransactionsViewController.swift */,
 				E94E7B0B205D5E4A0042B639 /* TransactionsViewController.xib */,
+				64FA53CE20E15066006783C9 /* ETHTransactionDetailsViewController.swift */,
 				E9EC34132005178500C0E546 /* TransactionDetailsViewController.swift */,
 				E94E7B0D205D5EA80042B639 /* TransactionDetailsViewController.xib */,
 				E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */,
@@ -1247,6 +1250,7 @@
 				E948E03B20235E2300975D6B /* SettingsRoutes.swift in Sources */,
 				E9CAE8D82018ACA700345E76 /* AdamantApi+Transfers.swift in Sources */,
 				E9E7CDCC20040FDC00DFC4DB /* TransactionType.swift in Sources */,
+				64FA53CF20E15066006783C9 /* ETHTransactionDetailsViewController.swift in Sources */,
 				E95F85852008CB3A0070534A /* ChatListViewController.swift in Sources */,
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,
 				E9150B9F2066DA210065A985 /* MessageTransaction+CoreDataClass.swift in Sources */,

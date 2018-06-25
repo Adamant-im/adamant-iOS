@@ -36,6 +36,13 @@ extension AdamantScene {
             c.router = r.resolve(Router.self)
             return c
         })
+        
+        static let ethTransactionDetails = AdamantScene(identifier: "TransactionDetailsViewController", factory: { r in
+            let c = ETHTransactionDetailsViewController()
+            c.dialogService = r.resolve(DialogService.self)
+            c.ethApiService = r.resolve(EthApiServiceProtocol.self)
+            return c
+        })
 		
 		private init() {}
 	}
