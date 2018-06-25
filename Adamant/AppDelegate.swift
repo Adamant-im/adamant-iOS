@@ -219,7 +219,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 extension AppDelegate {
 	private struct RegistrationPayload: Codable {
 		let token: String
-		let provider: String = "apns"
+		
+		#if DEBUG
+			let provider: String = "apns-sandbox"
+		#else
+			let provider: String = "apns"
+		#endif
 	}
 	
 	func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
