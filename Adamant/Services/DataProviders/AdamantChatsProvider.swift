@@ -259,8 +259,8 @@ extension AdamantChatsProvider {
 		sendMessage(message, recipientId: recipientId, type: .message, completion: completion)
 	}
     
-    func sendSpecialMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
-        sendMessage(message, recipientId: recipientId, type: .messageSpecial, completion: completion)
+    func sendRichMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+        sendMessage(message, recipientId: recipientId, type: .richMessage, completion: completion)
     }
     
     private func sendMessage(_ message: AdamantMessage, recipientId: String, type: ChatType, completion: @escaping (ChatsProviderResult) -> Void) {
