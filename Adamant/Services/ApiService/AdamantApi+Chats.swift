@@ -56,8 +56,8 @@ extension AdamantApiService {
 		self.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: message, nonce: nonce, type: ChatType.message, completion: completion)
 	}
     
-    func sendSpecialMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
-        self.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: message, nonce: nonce, type: ChatType.messageSpecial, completion: completion)
+    func sendRichMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
+        self.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: message, nonce: nonce, type: ChatType.richMessage, completion: completion)
     }
     
     func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, type: ChatType, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {

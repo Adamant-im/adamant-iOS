@@ -261,7 +261,7 @@ extension ChatListViewController {
 				break
 			}
             
-            if message.type == ChatType.messageSpecial.rawValue {
+            if message.type == Int16(ChatType.richMessage.rawValue) {
                 guard let data = text.data(using: String.Encoding.utf8), let transfer = try? JSONDecoder().decode(ChatTransfer.self, from: data) else {
                     cell.lastMessageLabel.text = nil
                     break

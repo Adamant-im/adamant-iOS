@@ -327,7 +327,7 @@ extension MessageTransaction: MessageType {
 			return MessageData.text("")
 		}
         
-        if type == ChatType.messageSpecial.rawValue {
+        if type == Int16(ChatType.richMessage.rawValue) {
             guard let data = message.data(using: String.Encoding.utf8), let transfer = try? JSONDecoder().decode(ChatTransfer.self, from: data) else {
                 return MessageData.text("")
             }

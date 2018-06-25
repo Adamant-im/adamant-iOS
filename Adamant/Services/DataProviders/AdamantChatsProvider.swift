@@ -259,8 +259,8 @@ extension AdamantChatsProvider {
 		sendMessage(message, recipientId: recipientId, type: .message, completion: completion)
 	}
     
-    func sendSpecialMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
-        sendMessage(message, recipientId: recipientId, type: .messageSpecial, completion: completion)
+    func sendRichMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+        sendMessage(message, recipientId: recipientId, type: .richMessage, completion: completion)
     }
     
     private func sendMessage(_ message: AdamantMessage, recipientId: String, type: ChatType, completion: @escaping (ChatsProviderResult) -> Void) {
@@ -341,7 +341,7 @@ extension AdamantChatsProvider {
 		transaction.date = Date() as NSDate
 		transaction.recipientId = recipientId
 		transaction.senderId = senderId
-		transaction.type = Int16(ChatType.message.rawValue)
+		transaction.type = Int16(type.rawValue)
 		transaction.isOutgoing = true
 		transaction.message = text
 		
@@ -442,9 +442,10 @@ extension AdamantChatsProvider {
 		
 		try? privateContext.save()
 		
-		
+		let type = ChatType.init(from: Int(message.type))
+        
 		// MARK: 3. Send
-        sendTransaction(transaction, keypair: keypair, recipientPublicKey: recipientPublicKey, type: .message) { result in
+        sendTransaction(transaction, keypair: keypair, recipientPublicKey: recipientPublicKey, type: type) { result in
 			switch result {
 			case .success:
 				do {

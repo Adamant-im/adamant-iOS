@@ -415,7 +415,7 @@ extension ChatViewController: TransferDelegate {
             return
         }
         
-        chatsProvider.sendSpecialMessage(.text(text), recipientId: address, completion: { [weak self] result in
+        chatsProvider.sendRichMessage(.text(text), recipientId: address, completion: { [weak self] result in
             switch result {
             case .success:
 //                self?.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
