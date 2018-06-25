@@ -95,14 +95,14 @@ extension ETHTransactionsViewController: UITableViewDataSource, UITableViewDeleg
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-//        let transaction = transactions[indexPath.row]
+        let transaction = transactions[indexPath.row]
         
-//        guard let controller = router.get(scene: AdamantScene.Transactions.transactionDetails) as? TransactionDetailsViewController else {
-//            return
-//        }
-//
-//        controller.transaction = transaction
-//        navigationController?.pushViewController(controller, animated: true)
+        guard let controller = router.get(scene: AdamantScene.Transactions.ethTransactionDetails) as? ETHTransactionDetailsViewController else {
+            return
+        }
+
+        controller.transaction = transaction
+        navigationController?.pushViewController(controller, animated: true)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
