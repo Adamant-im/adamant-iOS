@@ -17,21 +17,82 @@ extension String.adamantLocalized {
 	}
 }
 
+class ADMTransactionsViewController: TransactionsViewController {
+    // MARK: - Dependencies
+    var accountService: AccountService!
+    var transfersProvider: TransfersProvider!
+    var chatsProvider: ChatsProvider!
+    var dialogService: DialogService!
+    var router: Router!
+    
+    // MARK: - Properties
+    var controller: NSFetchedResultsController<TransferTransaction>?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        tableView.dataSource = self
+        tableView.delegate = self
+        
+        if accountService.account != nil {
+            initFetchedResultController(provider: transfersProvider)
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
+            self?.initFetchedResultController(provider: self?.transfersProvider)
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
+            self?.initFetchedResultController(provider: nil)
+        }
+    }
+    
+    /// - Parameter provider: nil to drop and reset
+    private func initFetchedResultController(provider: TransfersProvider?) {
+        controller = transfersProvider.transfersController()
+        controller?.delegate = self
+        
+        do {
+            try controller?.performFetch()
+        } catch {
+            print("There was an error performing fetch: \(error)")
+            controller = nil
+        }
+        
+        tableView.reloadData()
+    }
+    
+    override func handleRefresh(_ refreshControl: UIRefreshControl) {
+        self.transfersProvider.update { [weak self] (result) in
+            guard let result = result else {
+                DispatchQueue.main.async {
+                    refreshControl.endRefreshing()
+                }
+                return
+            }
+            
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    self?.tableView.reloadData()
+                }
+                break
+            case .failure(let error):
+                self?.dialogService.showRichError(error: error)
+            }
+            
+            DispatchQueue.main.async {
+                refreshControl.endRefreshing()
+            }
+        }
+    }
+}
+
 class TransactionsViewController: UIViewController {
 	let cellIdentifier = "cell"
 	let cellHeight: CGFloat = 90.0
-	
-	// MARK: - Dependencies
-	var accountService: AccountService!
-	var transfersProvider: TransfersProvider!
-  var chatsProvider: ChatsProvider!
-  var dialogService: DialogService!
-	var router: Router!
-	
-	// MARK: - Properties
-	var controller: NSFetchedResultsController<TransferTransaction>?
     
-    private lazy var refreshControl: UIRefreshControl = {
+    internal lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
@@ -52,22 +113,10 @@ class TransactionsViewController: UIViewController {
         super.viewDidLoad()
 		navigationItem.title = String.adamantLocalized.transactionList.title
 		
-		if accountService.account != nil {
-			initFetchedResultController(provider: transfersProvider)
-		}
-		
 		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
-		tableView.dataSource = self
-		tableView.delegate = self
+//        tableView.dataSource = self
+//        tableView.delegate = self
         tableView.addSubview(self.refreshControl)
-		
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
-			self?.initFetchedResultController(provider: self?.transfersProvider)
-		}
-		
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-			self?.initFetchedResultController(provider: nil)
-		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -81,50 +130,13 @@ class TransactionsViewController: UIViewController {
 		}
 	}
 	
-	
-	/// - Parameter provider: nil to drop and reset
-	private func initFetchedResultController(provider: TransfersProvider?) {
-		controller = transfersProvider.transfersController()
-		controller?.delegate = self
-		
-		do {
-			try controller?.performFetch()
-		} catch {
-			print("There was an error performing fetch: \(error)")
-			controller = nil
-		}
-		
-		tableView.reloadData()
-	}
-    
-    @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.transfersProvider.update { [weak self] (result) in
-            guard let result = result else {
-                DispatchQueue.main.async {
-                    refreshControl.endRefreshing()
-                }
-                return
-            }
-            
-            switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                }
-                break
-            case .failure(let error):
-				self?.dialogService.showRichError(error: error)
-            }
-            
-            DispatchQueue.main.async {
-                refreshControl.endRefreshing()
-            }
-        }
+    @objc internal func handleRefresh(_ refreshControl: UIRefreshControl) {
+        
     }
 }
 
 // MARK: - UITableView Cells
-extension TransactionsViewController {
+extension ADMTransactionsViewController {
 	private func configureCell(_ cell: TransactionTableViewCell, for transfer: TransferTransaction) {
 		cell.accountLabel.tintColor = UIColor.adamantPrimary
 		cell.ammountLabel.tintColor = UIColor.adamantPrimary
@@ -151,13 +163,13 @@ extension TransactionsViewController {
 
 
 // MARK: - UITableView
-extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate {
+extension ADMTransactionsViewController: UITableViewDataSource, UITableViewDelegate {
 	func numberOfSections(in tableView: UITableView) -> Int {
 		return 1
 	}
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		if let f = controller?.fetchedObjects {
+        if let f = controller?.fetchedObjects {
 			return f.count
 		} else {
 			return 0
@@ -279,7 +291,7 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
     }
 }
 
-extension TransactionsViewController: NSFetchedResultsControllerDelegate {
+extension ADMTransactionsViewController: NSFetchedResultsControllerDelegate {
 	func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
 		tableView.beginUpdates()
 	}

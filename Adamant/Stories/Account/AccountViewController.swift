@@ -279,7 +279,11 @@ class AccountViewController: FormViewController {
                     cell.accessoryType = .disclosureIndicator
                 })
                 .onCellSelection({ [weak self] (_, _) in
-                    // TODO: ETH Transaction list
+                    guard let vc = self?.router.get(scene: AdamantScene.Transactions.ethTransactions), let nav = self?.navigationController else {
+                        return
+                    }
+                    
+                    nav.pushViewController(vc, animated: true)
                 })
             
 		// MARK: Send tokens
