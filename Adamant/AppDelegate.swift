@@ -43,7 +43,8 @@ struct AdamantResources {
 	]
     
     static let ethServers = [
-        "https://api.myetherapi.com/eth"
+//        "https://api.myetherapi.com/eth"
+        "https://ropsten.infura.io/"  // test network
     ]
 	
 	static let iosAppSupportEmail = "ios@adamant.im"

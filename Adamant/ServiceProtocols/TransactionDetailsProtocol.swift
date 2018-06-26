@@ -56,6 +56,10 @@ protocol TransactionDetailsProtocol {
 
 extension TransactionDetailsProtocol {
     
+    func isOutgoing(_ address: String) -> Bool {
+        return senderAddress == address.lowercased() ? true : false
+    }
+    
     var haveChatroom: Bool {
         if let chatroom = self.chatroom, let transactions = chatroom.transactions  {
             let messeges = transactions.first (where: { (object) -> Bool in

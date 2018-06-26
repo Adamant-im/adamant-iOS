@@ -81,10 +81,6 @@ struct EthTransaction: Decodable {
         blockNumber = UInt((try? container.decode(String.self, forKey: .blockNumber)) ?? "0") ?? 0
     }
     
-    func isOutgoing(_ address: String) -> Bool {
-        return from == address.lowercased() ? true : false
-    }
-    
     func formattedValue() -> String {
         if let formattedAmount = Web3.Utils.formatToEthereumUnits(value,
                                                                   toUnits: .eth,

@@ -471,4 +471,7 @@ extension TransferTransaction: TransactionDetailsProtocol {
         return "ADM"
     }
     
+    func isOutgoing(_ address: String) -> Bool {
+        return self.isOutgoing
+    }
 }
