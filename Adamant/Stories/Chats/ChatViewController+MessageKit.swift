@@ -202,6 +202,36 @@ extension ChatViewController: MessageCellDelegate {
 		case let message as MessageTransaction:
 			// MARK: Show Retry/Cancel action sheet
 			guard message.messageStatus == .failed else {
+                
+                if message.type == UInt16(ChatType.richMessage.rawValue) {
+                    guard let data = message.message?.data(using: String.Encoding.utf8), let transfer = try? JSONDecoder().decode(ChatTransfer.self, from: data), transfer.type == .eth else {
+                        break
+                    }
+                    
+                    guard let vc = router.get(scene: AdamantScene.Transactions.transactionDetails) as? BaseTransactionDetailsViewController else {
+                        break
+                    }
+                    self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+
+                    self.ethApiService.getTransaction(byHash: transfer.hash) { (result) in
+                        switch result {
+                        case .success(let transaction):
+                            vc.set(transaction: transaction)
+                            self.dialogService.dismissProgress()
+                            break
+                        case .failure(let error):
+                            self.dialogService.showError(withMessage: "Transrer issue", error: error)
+                            break
+                        }
+                    }
+                    
+                    if let nav = navigationController {
+                        nav.pushViewController(vc, animated: true)
+                    } else {
+                        present(vc, animated: true, completion: nil)
+                    }
+                }
+                
 				break
 			}
 			
