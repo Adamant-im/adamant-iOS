@@ -397,6 +397,99 @@ class EthApiService: EthApiServiceProtocol {
     }
 }
 
+
+/// A standard protocol representing a Transaction details.
+protocol TransactionDetailsProtocol {
+    
+    /// The identifier of the transaction.
+    var id: String { get }
+    
+    /// The sender of the transaction.
+    var senderAddress: String { get }
+    
+    /// The reciver of the transaction.
+    var recipientAddress: String { get }
+    
+    /// The date the transaction was sent.
+    var sentDate: Date { get }
+    
+    /// The amount of currency that was sent.
+    var amountValue: Double { get }
+    
+    /// The amount of fee that taken for transaction process.
+    var feeValue: Double { get }
+    
+    /// The confirmations of the transaction.
+    var confirmationsValue: String { get }
+    
+    /// The block of the transaction.
+    var block: String { get }
+    
+    /// The show explorer button.
+    var showGoToExplorer: Bool { get }
+    
+    /// The explorer url.
+    var explorerUrl: URL? { get }
+    
+    /// The show go to button.
+    var showGoToChat: Bool { get }
+    
+    /// The show go to button.
+    var chatroom: Chatroom? { get }
+    
+    /// The currency of the transaction.
+    var currencyCode: String { get }
+    
+}
+
+extension TransactionDetailsProtocol {
+    
+    var haveChatroom: Bool {
+        if let chatroom = self.chatroom, let transactions = chatroom.transactions  {
+            let messeges = transactions.first (where: { (object) -> Bool in
+                return !(object is TransferTransaction)
+            })
+            
+            return (messeges != nil)
+        }
+        
+        return false
+    }
+    
+    var currencyFormatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.roundingMode = .floor
+        formatter.positiveFormat = "#.######## \(currencyCode)"
+        
+        return formatter
+    }
+    
+    func getSummary() -> String {
+        return """
+        Transaction #\(id)
+        
+        Summary
+        Sender: \(senderAddress)
+        Recipient: \(recipientAddress)
+        Date: \(DateFormatter.localizedString(from: sentDate, dateStyle: .short, timeStyle: .medium))
+        Amount: \(formattedAmount())
+        Fee: \(formattedFee())
+        Confirmations: \(String(confirmationsValue))
+        Block: \(block)
+        URL: \(explorerUrl?.absoluteString ?? "")
+        """
+    }
+    
+    func formattedAmount() -> String {
+        return currencyFormatter.string(from: NSNumber(value: amountValue)) ?? ""
+    }
+    
+    func formattedFee() -> String {
+        return currencyFormatter.string(from: NSNumber(value: feeValue)) ?? ""
+    }
+}
+
 //MARK: - Decodable Transaction structures
 struct Response: Decodable {
     enum CodingKeys: String, CodingKey {
@@ -430,6 +523,7 @@ struct EthTransaction: Decodable {
         case confirmations
         case isError
         case receiptStatus = "txreceipt_status"
+        case blockNumber
     }
     
     let date: Date
@@ -439,9 +533,10 @@ struct EthTransaction: Decodable {
     let to: String
     let gasUsed: BigUInt
     let gasPrice: BigUInt
-    let confirmations: String
+    let confirmationsValue: String
     let isError: Bool
-    let receiptStatus: Int
+    let receiptStatus: TransactionReceiptStatus
+    let blockNumber: UInt
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -454,10 +549,11 @@ struct EthTransaction: Decodable {
         to = (try? container.decode(String.self, forKey: .to)) ?? ""
         gasUsed = BigUInt((try? container.decode(String.self, forKey: .gasUsed)) ?? "0") ?? BigUInt(0)
         gasPrice = BigUInt((try? container.decode(String.self, forKey: .gasPrice)) ?? "0") ?? BigUInt(0)
-        confirmations = (try? container.decode(String.self, forKey: .confirmations)) ?? "0"
+        confirmationsValue = (try? container.decode(String.self, forKey: .confirmations)) ?? "0"
         let isErrorStatus = Int((try? container.decode(String.self, forKey: .isError)) ?? "0") ?? 0
         isError = isErrorStatus == 1 ? true : false
-        receiptStatus = Int((try? container.decode(String.self, forKey: .receiptStatus)) ?? "0") ?? 0
+        receiptStatus = (try? container.decode(TransactionReceiptStatus.self, forKey: .receiptStatus)) ?? .unknown
+        blockNumber = UInt((try? container.decode(String.self, forKey: .blockNumber)) ?? "0") ?? 0
     }
     
     func isOutgoing(_ address: String) -> Bool {
@@ -474,6 +570,72 @@ struct EthTransaction: Decodable {
             return "\(value)"
         }
     }
+}
+
+extension EthTransaction: TransactionDetailsProtocol {
+    
+    var id: String {
+        return self.hash
+    }
+    
+    var senderAddress: String {
+        return self.from
+    }
+    
+    var recipientAddress: String {
+        return self.to
+    }
+    
+    var sentDate: Date {
+        return self.date
+    }
+    
+    var amountValue: Double {
+        guard let string = Web3.Utils.formatToEthereumUnits(value, toUnits: .eth, decimals: 8), let value = Double(string) else {
+            return 0
+        }
+        
+        return value
+    }
+    
+    var feeValue: Double {
+        guard let string = Web3.Utils.formatToEthereumUnits((self.gasPrice * self.gasUsed), toUnits: .eth, decimals: 8), let value = Double(string) else {
+            return 0
+        }
+        
+        return value
+    }
+    
+    var block: String {
+        return "\(self.blockNumber)"
+    }
+    
+    var showGoToExplorer: Bool {
+        return false
+    }
+    
+    var explorerUrl: URL? {
+        return nil
+    }
+    
+    var showGoToChat: Bool {
+        return false
+    }
+    
+    var chatroom: Chatroom? {
+        return nil
+    }
+    
+    var currencyCode: String {
+        return "ETH"
+    }
+    
+}
+
+enum TransactionReceiptStatus: String, Decodable {
+    case fail = "0"
+    case pass = "1"
+    case unknown
 }
 
 /*
