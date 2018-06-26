@@ -21,9 +21,6 @@ class ETHTransactionsViewController: TransactionsViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView.dataSource = self
-        tableView.delegate = self
-        
         self.refreshControl.beginRefreshing()
         
         handleRefresh(self.refreshControl)
@@ -47,49 +44,20 @@ class ETHTransactionsViewController: TransactionsViewController {
             }
         })
     }
-}
-
-// MARK: - UITableView Cells
-extension ETHTransactionsViewController {
-    private func configureCell(_ cell: TransactionTableViewCell, for transfer: EthTransaction) {
-        cell.accountLabel.tintColor = UIColor.adamantPrimary
-        cell.ammountLabel.tintColor = UIColor.adamantPrimary
-        cell.dateLabel.tintColor = UIColor.adamantSecondary
-        cell.avatarImageView.tintColor = UIColor.adamantPrimary
-        
+    
+    override func currentAddress() -> String {
         guard let address = ethApiService.account?.address else {
-            return
+            return ""
         }
-        if transfer.isOutgoing(address) {
-            cell.transactionType = .outcome
-            cell.accountLabel.text = transfer.to
-        } else {
-            cell.transactionType = .income
-            cell.accountLabel.text = transfer.from
-        }
-        
-        cell.ammountLabel.text = transfer.formattedValue()
-        
-        cell.dateLabel.text = transfer.date.humanizedDateTime()
+        return address
     }
 }
 
 // MARK: - UITableView
-extension ETHTransactionsViewController: UITableViewDataSource, UITableViewDelegate {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+extension ETHTransactionsViewController {
+
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return transactions.count
-    }
-    
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        return UIView()
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return cellHeight
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -105,7 +73,7 @@ extension ETHTransactionsViewController: UITableViewDataSource, UITableViewDeleg
         navigationController?.pushViewController(controller, animated: true)
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? TransactionTableViewCell else {
                 // TODO: Display & Log error
                 return UITableViewCell(style: .default, reuseIdentifier: "cell")

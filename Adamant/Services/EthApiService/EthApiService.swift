@@ -46,7 +46,7 @@ class EthApiService: EthApiServiceProtocol {
     var apiUrl: String
     var web3: web3!
     
-    let transactionsHistoryService = TransactionsHistory()
+    var transactionsHistoryService: TransactionsHistory!
     
     private(set) var account: EthAccount?
     
@@ -54,9 +54,6 @@ class EthApiService: EthApiServiceProtocol {
     
     init(apiUrl: String) {
         self.apiUrl = apiUrl
-        
-        // test network
-        self.apiUrl = "https://ropsten.infura.io/"
         
         if let url = URL(string: self.apiUrl), let web3 = Web3.new(url) {
             self.web3 = web3
@@ -70,7 +67,14 @@ class EthApiService: EthApiServiceProtocol {
         
         print("ETH Server gas Price: \(gasPrice)")
         
-        if let network = self.web3.provider.network { print("ETH Server network: \(network)") }
+        guard let network = self.web3.provider.network else {
+            print("Unable get ETH Server network")
+            self.transactionsHistoryService = TransactionsHistory(network: "")
+            return
+        }
+        print("ETH Server network: \(network)")
+        
+        self.transactionsHistoryService = TransactionsHistory(network: "\(network)")
     }
     
     func newAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<EthAccount>) -> Void) {
@@ -376,8 +380,15 @@ class EthApiService: EthApiServiceProtocol {
 
 // MARK: - Transactions History API
 
- class TransactionsHistory {
-    private let baseUrl = "https://api-ropsten.etherscan.io/api"
+class TransactionsHistory {
+    private var networkSuffix = ""
+    private var baseUrl: String { return "https://api\(networkSuffix).etherscan.io/api" }
+    
+    init(network: String) {
+        if network != "\(Networks.Mainnet)" {
+            networkSuffix = "-\(network)"
+        }
+    }
     
     private let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility, attributes: [.concurrent])
     
