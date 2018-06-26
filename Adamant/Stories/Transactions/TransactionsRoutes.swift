@@ -21,7 +21,7 @@ extension AdamantScene {
 		})
 		
 		static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewController", factory: { r in
-			let c = TransactionDetailsViewController(nibName: "TransactionDetailsViewController", bundle: nil)
+            let c = ADMTransactionDetailsViewController()
             c.accountService = r.resolve(AccountService.self)
 			c.dialogService = r.resolve(DialogService.self)
             c.transfersProvider = r.resolve(TransfersProvider.self)
@@ -37,10 +37,9 @@ extension AdamantScene {
             return c
         })
         
-        static let ethTransactionDetails = AdamantScene(identifier: "TransactionDetailsViewController", factory: { r in
-            let c = ETHTransactionDetailsViewController()
+        static let ethTransactionDetails = AdamantScene(identifier: "BaseTransactionDetailsViewController", factory: { r in
+            let c = BaseTransactionDetailsViewController()
             c.dialogService = r.resolve(DialogService.self)
-            c.ethApiService = r.resolve(EthApiServiceProtocol.self)
             return c
         })
 		

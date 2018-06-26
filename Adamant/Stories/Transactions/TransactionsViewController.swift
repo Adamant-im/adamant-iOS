@@ -17,6 +17,51 @@ extension String.adamantLocalized {
 	}
 }
 
+class TransactionsViewController: UIViewController {
+    let cellIdentifier = "cell"
+    let cellHeight: CGFloat = 90.0
+    
+    internal lazy var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action:
+            #selector(self.handleRefresh(_:)),
+                                 for: UIControlEvents.valueChanged)
+        refreshControl.tintColor = UIColor.adamantPrimary
+        
+        return refreshControl
+    }()
+    
+    
+    // MARK: - IBOutlets
+    @IBOutlet weak var tableView: UITableView!
+    
+    
+    // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        navigationItem.title = String.adamantLocalized.transactionList.title
+        
+        tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
+        tableView.addSubview(self.refreshControl)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let indexPath = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: indexPath, animated: animated)
+        }
+        
+        if tableView.isEditing {
+            tableView.setEditing(false, animated: false)
+        }
+    }
+    
+    @objc internal func handleRefresh(_ refreshControl: UIRefreshControl) {
+        
+    }
+}
+
 class ADMTransactionsViewController: TransactionsViewController {
     // MARK: - Dependencies
     var accountService: AccountService!
@@ -88,53 +133,6 @@ class ADMTransactionsViewController: TransactionsViewController {
     }
 }
 
-class TransactionsViewController: UIViewController {
-	let cellIdentifier = "cell"
-	let cellHeight: CGFloat = 90.0
-    
-    internal lazy var refreshControl: UIRefreshControl = {
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action:
-            #selector(self.handleRefresh(_:)),
-                                 for: UIControlEvents.valueChanged)
-        refreshControl.tintColor = UIColor.adamantPrimary
-        
-        return refreshControl
-    }()
-	
-	
-	// MARK: - IBOutlets
-	@IBOutlet weak var tableView: UITableView!
-	
-	
-	// MARK: - Lifecycle
-	
-    override func viewDidLoad() {
-        super.viewDidLoad()
-		navigationItem.title = String.adamantLocalized.transactionList.title
-		
-		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
-//        tableView.dataSource = self
-//        tableView.delegate = self
-        tableView.addSubview(self.refreshControl)
-    }
-	
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-		if let indexPath = tableView.indexPathForSelectedRow {
-			tableView.deselectRow(at: indexPath, animated: animated)
-		}
-		
-		if tableView.isEditing {
-			tableView.setEditing(false, animated: false)
-		}
-	}
-	
-    @objc internal func handleRefresh(_ refreshControl: UIRefreshControl) {
-        
-    }
-}
-
 // MARK: - UITableView Cells
 extension ADMTransactionsViewController {
 	private func configureCell(_ cell: TransactionTableViewCell, for transfer: TransferTransaction) {
@@ -190,7 +188,7 @@ extension ADMTransactionsViewController: UITableViewDataSource, UITableViewDeleg
 			return
 		}
 		
-		guard let controller = router.get(scene: AdamantScene.Transactions.transactionDetails) as? TransactionDetailsViewController else {
+		guard let controller = router.get(scene: AdamantScene.Transactions.transactionDetails) as? BaseTransactionDetailsViewController else {
 			return
 		}
 		

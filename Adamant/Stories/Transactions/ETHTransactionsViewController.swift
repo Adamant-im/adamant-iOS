@@ -97,7 +97,7 @@ extension ETHTransactionsViewController: UITableViewDataSource, UITableViewDeleg
         
         let transaction = transactions[indexPath.row]
         
-        guard let controller = router.get(scene: AdamantScene.Transactions.ethTransactionDetails) as? ETHTransactionDetailsViewController else {
+        guard let controller = router.get(scene: AdamantScene.Transactions.ethTransactionDetails) as? BaseTransactionDetailsViewController else {
             return
         }
 
