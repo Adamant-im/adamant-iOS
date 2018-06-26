@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
 		649A694720DD427200D27E91 /* TransferType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A694620DD427200D27E91 /* TransferType.swift */; };
+		64BD2B7520E2814B00E2CD36 /* EthTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */; };
+		64BD2B7720E2820300E2CD36 /* TransactionDetailsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7620E2820300E2CD36 /* TransactionDetailsProtocol.swift */; };
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
 		64D05A0220D51632003AD655 /* EthApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D05A0120D51632003AD655 /* EthApiServiceProtocol.swift */; };
 		64D05A0420D516B4003AD655 /* EthApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D05A0320D516B4003AD655 /* EthApiService.swift */; };
@@ -195,6 +197,8 @@
 
 /* Begin PBXFileReference section */
 		649A694620DD427200D27E91 /* TransferType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferType.swift; sourceTree = "<group>"; };
+		64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransaction.swift; sourceTree = "<group>"; };
+		64BD2B7620E2820300E2CD36 /* TransactionDetailsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsProtocol.swift; sourceTree = "<group>"; };
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
 		64D05A0120D51632003AD655 /* EthApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthApiServiceProtocol.swift; sourceTree = "<group>"; };
 		64D05A0320D516B4003AD655 /* EthApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthApiService.swift; sourceTree = "<group>"; };
@@ -489,6 +493,7 @@
 				E9A174B22057EC47003667CD /* BackgroundFetchService.swift */,
 				E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */,
 				64D05A0120D51632003AD655 /* EthApiServiceProtocol.swift */,
+				64BD2B7620E2820300E2CD36 /* TransactionDetailsProtocol.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -531,6 +536,7 @@
 				E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */,
 				E9A03FD320DBC824007653A1 /* NodeVersion.swift */,
 				649A694620DD427200D27E91 /* TransferType.swift */,
+				64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1108,6 +1114,7 @@
 				E9150BA22066DA210065A985 /* ChatTransaction+CoreDataProperties.swift in Sources */,
 				E9204B5020C94C4A00F3B9AB /* Date+humanizedString.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
+				64BD2B7520E2814B00E2CD36 /* EthTransaction.swift in Sources */,
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				E9150B992066DA210065A985 /* TransferTransaction+CoreDataClass.swift in Sources */,
 				E9150BA02066DA210065A985 /* MessageTransaction+CoreDataProperties.swift in Sources */,
@@ -1198,6 +1205,7 @@
 				E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */,
 				E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */,
 				64FA53D120E24942006783C9 /* BaseTransactionDetailsViewController.swift in Sources */,
+				64BD2B7720E2820300E2CD36 /* TransactionDetailsProtocol.swift in Sources */,
 				E90A4943204C5ED6009F6A65 /* EurekaPassphraseRow.swift in Sources */,
 				E965A53420B833A00041A3EA /* StateAsset.swift in Sources */,
 				E9393FA82055C92700EE6F30 /* Decimal+adamant.swift in Sources */,
