@@ -10,19 +10,6 @@ import UIKit
 import SafariServices
 
 
-// MARK: - Localization
-extension String.adamantLocalized {
-	struct transactionDetails {
-		static let title = NSLocalizedString("TransactionDetailsScene.Title", comment: "Transaction details: scene title")
-	}
-}
-
-extension String.adamantLocalized.alert {
-	static let exportUrlButton = NSLocalizedString("TransactionDetailsScene.Share.URL", comment: "Export transaction: 'Share transaction URL' button")
-	static let exportSummaryButton = NSLocalizedString("TransactionDetailsScene.Share.Summary", comment: "Export transaction: 'Share transaction summary' button")
-}
-
-
 // MARK: - 
 class TransactionDetailsViewController: UIViewController {
 	// MARK: - Rows

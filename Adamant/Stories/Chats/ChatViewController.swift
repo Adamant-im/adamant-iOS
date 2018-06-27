@@ -70,7 +70,7 @@ class ChatViewController: MessagesViewController {
                 $0.setSize(CGSize(width: 36, height: 36), animated: false)
                 $0.image = #imageLiteral(resourceName: "attachment")
             }.onTouchUpInside { _ in
-                self.dialogService.showSystemActionSheet(title: "Send", message: "", actions: [
+                self.dialogService.showSystemActionSheet(title: String.adamantLocalized.transfer.send, message: "", actions: [
                     UIAlertAction(title: "Ethereum", style: .default, handler: { (action) in
                     if let ethAddress = self.ethAddress {
                         // MARK: Show ETH transfer details
