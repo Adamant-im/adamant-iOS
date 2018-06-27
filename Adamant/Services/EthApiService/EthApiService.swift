@@ -263,24 +263,27 @@ class EthApiService: EthApiServiceProtocol {
             switch result {
             case .success(let transaction):
                 if let number = transaction.blockNumber {
-//                    let resultReceipt = self.web3.eth.getTransactionReceipt(hash)
-//                    if case .success(let receipt) = resultReceipt {
-//                        print(receipt)
-//                    }
+                    let resultBlockNumber = self.web3.eth.getBlockNumber()
+                    guard case .success(let blockNumber) = resultBlockNumber else {
+                        DispatchQueue.main.async {
+                            completion(.success(web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil, lastBlockNumber: nil)))
+                        }
+                        return
+                    }
                     
                     let result = self.web3.eth.getBlockByNumber(number)
                     guard case .success(let block) = result else {
                         DispatchQueue.main.async {
-                            completion(.success(web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil)))
+                            completion(.success(web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil, lastBlockNumber: blockNumber)))
                         }
                         return
                     }
                     DispatchQueue.main.async {
-                        completion(.success(web3EthTransaction(transaction: transaction.transaction, transactionBlock: block)))
+                        completion(.success(web3EthTransaction(transaction: transaction.transaction, transactionBlock: block, lastBlockNumber: blockNumber)))
                     }
                 } else {
                     DispatchQueue.main.async {
-                        completion(.success(web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil)))
+                        completion(.success(web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil, lastBlockNumber: nil)))
                     }
                 }
                 break
