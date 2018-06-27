@@ -83,7 +83,6 @@
 		E94E7B08205D4CB80042B639 /* SharedRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94E7B07205D4CB80042B639 /* SharedRoutes.swift */; };
 		E94E7B0A205D59F50042B639 /* AccountViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E94E7B09205D59F50042B639 /* AccountViewController.xib */; };
 		E94E7B0C205D5E4A0042B639 /* TransactionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E94E7B0B205D5E4A0042B639 /* TransactionsViewController.xib */; };
-		E94E7B0E205D5EA80042B639 /* TransactionDetailsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E94E7B0D205D5EA80042B639 /* TransactionDetailsViewController.xib */; };
 		E9502740202E257E002C1098 /* RepeaterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E950273F202E257E002C1098 /* RepeaterService.swift */; };
 		E950652120404BF0008352E5 /* AdamantUriBuilding.swift in Sources */ = {isa = PBXBuildFile; fileRef = E950652020404BF0008352E5 /* AdamantUriBuilding.swift */; };
 		E950652320404C84008352E5 /* AdamantUriTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E950652220404C84008352E5 /* AdamantUriTools.swift */; };
@@ -167,7 +166,6 @@
 		E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */; };
 		E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDC920040CC200DFC4DB /* Transaction.swift */; };
 		E9E7CDCC20040FDC00DFC4DB /* TransactionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */; };
-		E9EC34142005178500C0E546 /* TransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC34132005178500C0E546 /* TransactionDetailsViewController.swift */; };
 		E9EC3415200524CA00C0E546 /* Exo+2_100_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A3200010DD001362F8 /* Exo+2_100_normal.ttf */; };
 		E9EC3416200524CA00C0E546 /* Exo+2_300_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A4200010DE001362F8 /* Exo+2_300_normal.ttf */; };
 		E9EC3417200524CA00C0E546 /* Exo+2_400_italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E919479F200010DC001362F8 /* Exo+2_400_italic.ttf */; };
@@ -294,7 +292,6 @@
 		E94E7B07205D4CB80042B639 /* SharedRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedRoutes.swift; sourceTree = "<group>"; };
 		E94E7B09205D59F50042B639 /* AccountViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AccountViewController.xib; sourceTree = "<group>"; };
 		E94E7B0B205D5E4A0042B639 /* TransactionsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransactionsViewController.xib; sourceTree = "<group>"; };
-		E94E7B0D205D5EA80042B639 /* TransactionDetailsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransactionDetailsViewController.xib; sourceTree = "<group>"; };
 		E950273F202E257E002C1098 /* RepeaterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeaterService.swift; sourceTree = "<group>"; };
 		E950652020404BF0008352E5 /* AdamantUriBuilding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantUriBuilding.swift; sourceTree = "<group>"; };
 		E950652220404C84008352E5 /* AdamantUriTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantUriTools.swift; sourceTree = "<group>"; };
@@ -381,7 +378,6 @@
 		E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransactionTableViewCell.xib; sourceTree = "<group>"; };
 		E9E7CDC920040CC200DFC4DB /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionType.swift; sourceTree = "<group>"; };
-		E9EC34132005178500C0E546 /* TransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewController.swift; sourceTree = "<group>"; };
 		E9EC342020052ABB00C0E546 /* TransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewController.swift; sourceTree = "<group>"; };
 		E9EC344420066D4A00C0E546 /* AdamantTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AdamantTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressValidationTests.swift; sourceTree = "<group>"; };
@@ -635,8 +631,6 @@
 				64FA53CC20E1300A006783C9 /* ETHTransactionsViewController.swift */,
 				E94E7B0B205D5E4A0042B639 /* TransactionsViewController.xib */,
 				64FA53D020E24941006783C9 /* BaseTransactionDetailsViewController.swift */,
-				E9EC34132005178500C0E546 /* TransactionDetailsViewController.swift */,
-				E94E7B0D205D5EA80042B639 /* TransactionDetailsViewController.xib */,
 				E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */,
 				E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */,
 			);
@@ -955,7 +949,6 @@
 				E94E7B0A205D59F50042B639 /* AccountViewController.xib in Resources */,
 				E95CB456205D77B500A7218E /* Localizable.strings in Resources */,
 				E95CB45E205D7F9600A7218E /* Localizable.stringsdict in Resources */,
-				E94E7B0E205D5EA80042B639 /* TransactionDetailsViewController.xib in Resources */,
 				E91E5BF420DAF3AB00B06B3C /* NodeRow.xib in Resources */,
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
 				E9A174B920587B84003667CD /* notification.mp3 in Resources */,
@@ -1218,7 +1211,6 @@
 				E9EC342120052ABB00C0E546 /* TransferViewController.swift in Sources */,
 				E9A03FD420DBC824007653A1 /* NodeVersion.swift in Sources */,
 				E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */,
-				E9EC34142005178500C0E546 /* TransactionDetailsViewController.swift in Sources */,
 				E948E04C2027679300975D6B /* AdamantFormattingTools.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,
 				E95F856B200789450070534A /* JSModels.swift in Sources */,
