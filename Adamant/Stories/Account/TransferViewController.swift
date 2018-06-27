@@ -25,7 +25,9 @@ extension String.adamantLocalized {
 		static let transferProcessingMessage = NSLocalizedString("TransferScene.SendingFundsProgress", comment: "Transfer: Processing message")
 		static let transferSuccess = NSLocalizedString("TransferScene.TransferSuccessMessage", comment: "Transfer: Tokens transfered successfully message")
         
-        static let send = NSLocalizedString("TransferScene.Row.Send", comment: "Transfer: Send button")
+        static let send = NSLocalizedString("TransferScene.Send", comment: "Transfer: Send button")
+        
+        static let cantUndo = NSLocalizedString("TransferScene.CantUndo", comment: "Transfer: Send button")
 		
 		private init() { }
 	}
@@ -355,6 +357,7 @@ class TransferViewController: FormViewController {
         guard let amount = row.value else {
             totalAmount = nil
             sendButton.disabled = true
+            sendButton.evaluateDisabled()
             row.cell.titleLabel?.textColor = .black
             return
         }
@@ -429,7 +432,7 @@ class TransferViewController: FormViewController {
 			return
 		}
 		
-		let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.confirmSendMessageFormat, "\(amount) \(AdamantUtilities.currencyCode)", recipient), message: "You can't undo this action.", preferredStyle: .alert)
+		let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.confirmSendMessageFormat, "\(amount) \(AdamantUtilities.currencyCode)", recipient), message: String.adamantLocalized.transfer.cantUndo, preferredStyle: .alert)
 		let cancelAction = UIAlertAction(title: String.adamantLocalized.alert.cancel , style: .cancel, handler: nil)
 		let sendAction = UIAlertAction(title: String.adamantLocalized.alert.send, style: .default, handler: { _ in
 			dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
@@ -476,7 +479,12 @@ class TransferViewController: FormViewController {
                 return
         }
         
-        let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.confirmSendMessageFormat, "\(amount) ETH", recipient), message: "You can't undo this action.", preferredStyle: .alert)
+        guard let totalAmount = totalAmount, totalAmount <= maxToTransfer else {
+            dialogService.showWarning(withMessage: String.adamantLocalized.transfer.amountTooHigh)
+            return
+        }
+        
+        let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.confirmSendMessageFormat, "\(amount) ETH", recipient), message: String.adamantLocalized.transfer.cantUndo, preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: String.adamantLocalized.alert.cancel , style: .cancel, handler: nil)
         let sendAction = UIAlertAction(title: String.adamantLocalized.alert.send, style: .default, handler: { _ in
             self.sendEth(to: recipient, amount: amount)

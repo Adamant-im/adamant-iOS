@@ -14,6 +14,7 @@ extension String.adamantLocalized {
 		static let title = NSLocalizedString("TransactionListScene.Title", comment: "TransactionList: scene title")
         static let toChat = NSLocalizedString("TransactionListScene.ToChat", comment: "TransactionList: To Chat button")
         static let startChat = NSLocalizedString("TransactionListScene.StartChat", comment: "TransactionList: Start Chat button")
+        static let notFound = NSLocalizedString("TransactionListScene.Error.NotFound", comment: "TransactionList: 'Transactions not found' message.")
 	}
 }
 
