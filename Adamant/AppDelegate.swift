@@ -47,8 +47,8 @@ struct AdamantResources {
 	]
     
     static let ethServers = [
-//        "https://api.myetherapi.com/eth"
-        "https://ropsten.infura.io/"  // test network
+        "https://api.myetherapi.com/eth"
+//        "https://ropsten.infura.io/"  // test network
     ]
 	
 	// Addresses
