@@ -24,6 +24,8 @@ extension String.adamantLocalized {
 		
 		static let transferProcessingMessage = NSLocalizedString("TransferScene.SendingFundsProgress", comment: "Transfer: Processing message")
 		static let transferSuccess = NSLocalizedString("TransferScene.TransferSuccessMessage", comment: "Transfer: Tokens transfered successfully message")
+        
+        static let send = NSLocalizedString("TransferScene.Row.Send", comment: "Transfer: Send button")
 		
 		private init() { }
 	}
@@ -74,7 +76,7 @@ class TransferViewController: FormViewController {
 			case .address: return NSLocalizedString("TransferScene.Row.Recipient", comment: "Transfer: recipient address")
 			case .fee: return NSLocalizedString("TransferScene.Row.TransactionFee", comment: "Transfer: transfer fee")
 			case .total: return NSLocalizedString("TransferScene.Row.Total", comment: "Transfer: total amount of transaction: money to transfer adding fee")
-			case .sendButton: return NSLocalizedString("TransferScene.Row.Send", comment: "Transfer: Send button")
+			case .sendButton: return String.adamantLocalized.transfer.send
 			}
 		}
 	}

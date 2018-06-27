@@ -211,7 +211,8 @@ extension ChatViewController: MessageCellDelegate {
                     guard let vc = router.get(scene: AdamantScene.Transactions.transactionDetails) as? BaseTransactionDetailsViewController else {
                         break
                     }
-                    self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+                    
+                    self.dialogService.showProgress(withMessage: String.adamantLocalized.transactionDetails.requestingDataProgressMessage, userInteractionEnable: false)
 
                     self.ethApiService.getTransaction(byHash: transfer.hash) { (result) in
                         switch result {
