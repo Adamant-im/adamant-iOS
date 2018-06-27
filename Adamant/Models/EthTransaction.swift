@@ -180,6 +180,7 @@ extension EthTransaction: TransactionDetailsProtocol {
 struct web3EthTransaction {
     let transaction: EthereumTransaction
     let transactionBlock: Block?
+    let lastBlockNumber: BigUInt?
 }
 
 extension web3EthTransaction: TransactionDetailsProtocol {
@@ -220,7 +221,12 @@ extension web3EthTransaction: TransactionDetailsProtocol {
     }
     
     var confirmationsValue: String {
-        return "--"
+        if let blockNumber = self.transactionBlock?.number, let lastBlockNumber = self.lastBlockNumber {
+            let confirmations = lastBlockNumber - blockNumber
+            return "\(confirmations)"
+        } else {
+            return "--"
+        }
     }
     
     var block: String {
