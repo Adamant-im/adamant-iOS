@@ -132,11 +132,11 @@ extension EthTransaction: TransactionDetailsProtocol {
     }
     
     var showGoToExplorer: Bool {
-        return false
+        return true
     }
     
     var explorerUrl: URL? {
-        return nil
+        return URL(string: "https://etherscan.io/tx/\(id)")
     }
     
     var showGoToChat: Bool {
