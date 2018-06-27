@@ -36,7 +36,12 @@ class ETHTransactionsViewController: TransactionsViewController {
                 }
                 break
             case .failure(let error):
-                self.dialogService.showError(withMessage: "", error: error)
+                if case .internalError(let message, _ ) = error {
+                    let localizedErrorMessage = NSLocalizedString(message, comment: "TransactionList: 'Transactions not found' message.")
+                    self.dialogService.showWarning(withMessage: localizedErrorMessage)
+                } else {
+                    self.dialogService.showError(withMessage: String.adamantLocalized.transactionList.notFound, error: error)
+                }
                 break
             }
             DispatchQueue.main.async {

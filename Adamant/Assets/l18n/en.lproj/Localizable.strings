@@ -454,6 +454,12 @@
 /* TransactionList: Start Chat button */
 "TransactionListScene.StartChat" = "Start Chat";
 
+/* TransactionList: 'Transactions not found' message. */
+"TransactionListScene.Error.NotFound" = "Transactions not found";
+
+/* TransactionList: 'Transactions not found' localize error message from API. */
+"No transactions found" = "Transactions not found";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";
 
@@ -543,6 +549,9 @@
 
 /* Transfer: Confirm transfer alert: Send tokens button */
 "TransferScene.Send" = "Send";
+
+/* Transfer: Confirm transfer alert: 'Can't Undo' message */
+"TransferScene.CantUndo" = "You can't undo this action.";
 
 /* Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
 "TransferScene.SendConfirmFormat" = "Send %1$@ to %2$@?";
