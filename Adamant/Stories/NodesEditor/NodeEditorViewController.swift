@@ -277,16 +277,16 @@ extension NodeEditorViewController {
 		}
 		
 		dialogService.showProgress(withMessage: String.adamantLocalized.nodesEditor.testInProgressMessage, userInteractionEnable: false)
-		apiService.getNodeVersion(url: url) { [weak self] result in
+		apiService.getNodeVersion(url: url) { result in
 			switch result {
 			case .success(_):
-				self?.dialogService.dismissProgress()
-				self?.testState = .passed
+				self.dialogService.dismissProgress()
+				self.testState = .passed
 				completion?(true)
 				
 			case .failure(let error):
-				self?.dialogService.showWarning(withMessage: error.localized)
-				self?.testState = .failed
+				self.dialogService.showWarning(withMessage: error.localized)
+				self.testState = .failed
 				completion?(false)
 			}
 		}
@@ -295,9 +295,9 @@ extension NodeEditorViewController {
 	@objc func done() {
 		switch testState {
 		case .notTested, .failed:
-			testNode { [weak self] success in
+			testNode { success in
 				if success {
-					self?.saveNode()
+					self.saveNode()
 				}
 			}
 			
@@ -351,7 +351,7 @@ extension NodeEditorViewController {
 		let alert = UIAlertController(title: String.adamantLocalized.nodesEditor.deleteNodeAlert, message: nil, preferredStyle: .alert)
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.delete, style: .destructive, handler: { _ in
-			self.didCallDelegate = false
+            self.didCallDelegate = true
 			
 			if let node = self.node, let tag = self.nodeTag {
 				self.delegate?.nodeEditorViewController(self, didFinishEditingWithResult: .delete(node: node, tag: tag))

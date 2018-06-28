@@ -14,6 +14,8 @@ extension String.adamantLocalized.alert {
 	static let share = NSLocalizedString("Shared.Share", comment: "Shared alert 'Share' button. Used anywhere for presenting standart iOS 'Share' menu.")
 	static let generateQr = NSLocalizedString("Shared.GenerateQRCode", comment: "Shared alert 'Generate QR' button. Used to generate QR codes with addresses and passphrases. Used with sharing and saving, anywhere.")
 	static let saveToPhotolibrary = NSLocalizedString("Shared.SaveToPhotolibrary", comment: "Shared alert 'Save to Photos'. Used with saving images to photolibrary")
+    
+    static let noMailService = NSLocalizedString("Shared.NoMail", comment: "Shared alert notification: message for no Mail services")
 }
 
 enum ShareType {
