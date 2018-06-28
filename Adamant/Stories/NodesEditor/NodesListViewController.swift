@@ -208,6 +208,7 @@ extension NodesListViewController {
 			}
 			
 			self?.setNodes(nodes: nodes)
+			self?.nodesSource.saveNodes()
 		}))
 		
 		present(alert, animated: true, completion: nil)
