@@ -553,7 +553,7 @@ extension AdamantChatsProvider {
 		let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
 		request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false),
 								   NSSortDescriptor(key: "title", ascending: true)]
-		request.predicate = NSPredicate(format: "partner!=nil")
+		request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [NSPredicate(format: "partner!=nil"), NSPredicate(format: "isHidden = false")])
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 		
 		return controller

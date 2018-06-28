@@ -98,6 +98,13 @@ enum AdamantContacts {
 		return true
 	}
 	
+	var isHidden: Bool {
+		switch self {
+		case .adamantBountyWallet: return true
+		case .adamantIco: return false
+		}
+	}
+	
 	var avatar: String {
 		return "avatar_bots"
 	}
