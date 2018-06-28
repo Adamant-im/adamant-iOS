@@ -52,7 +52,7 @@ extension AdamantApiService {
 		}
 	}
 	
-	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
+	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
 		// MARK: 1. Prepare params
 		let params: [String : Any] = [
 			"type": TransactionType.chatMessage.rawValue,
@@ -61,7 +61,7 @@ extension AdamantApiService {
 			"publicKey": keypair.publicKey,
 			"message": message,
 			"own_message": nonce,
-			"message_type": ChatType.message.rawValue
+			"message_type": type.rawValue
 		]
 		
 		let headers = [
@@ -112,7 +112,7 @@ extension AdamantApiService {
 						"chat": [
 							"message": message,
 							"own_message": nonce,
-							"type": ChatType.message.rawValue
+							"type": type.rawValue
 						]
 					]
 				]

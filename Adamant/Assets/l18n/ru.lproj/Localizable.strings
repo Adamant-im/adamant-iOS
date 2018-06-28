@@ -64,8 +64,8 @@
 /* Product name */
 "ADAMANT" = "АДАМАНТ";
 
-/* ApiService: No connection message. Generally bad network. */
-"ApiService.Error.NoConnection" = "Нет соединения с сетью";
+/* Application: Failed to send deviceToken to ANS error format. %@ for error description */
+"Application.deviceTokenErrorFormat" = "Ошибка регистрации в ANS: %@";
 
 /* Serious internal error: Failed to build endpoint url */
 "ApiService.InternalError.EndpointBuildFailed" = "Ошибка взаимодействия с блокчейном. Сообщите разработчикам";
@@ -333,21 +333,6 @@
 
 /* Notifications: New single transfer transaction body */
 "NotificationsService.NewTransfer.BodySingle" = "У вас новый перевод";
-
-/* Notifications: User has disabled notifications. Head him into settings */
-"NotificationsService.NotificationsDisabled" = "Уведомления отключены. Вы можете включить их в Настройках";
-
-/* Notifications: New message notification title */
-"NotificationsService.NewMessage.Title" = "Новое сообщение";
-
-/* Notifications: New single message notification body */
-"NotificationsService.NewMessage.BodySingle" = "Новое сообщение";
-
-/* Notifications: New transfer transaction title */
-"NotificationsService.NewTransfer.Title" = "Новый перевод";
-
-/* Notifications: New single transfer transaction body */
-"NotificationsService.NewTransfer.BodySingle" = "Новый перевод";
 
 /* Notifications: User has disabled notifications. Head him into settings */
 "NotificationsService.NotificationsDisabled" = "Уведомления отключены. Вы можете включить их в Настройках";
