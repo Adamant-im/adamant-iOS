@@ -17,12 +17,14 @@ class AdamantAccountsProvider: AccountsProvider {
 		let name: String
 		let avatar: String?
 		let isReadonly: Bool
+		let isHidden: Bool
 		
 		fileprivate init(contact: AdamantContacts) {
 			self.address = contact.address
 			self.name = contact.name
 			self.avatar = contact.avatar
 			self.isReadonly = contact.isReadonly
+			self.isHidden = contact.isHidden
 		}
 	}
 	
@@ -289,6 +291,7 @@ extension AdamantAccountsProvider {
 			coreAccount.avatar = acc.avatar
 			coreAccount.isSystem = true
 			chatroom.isReadonly = acc.isReadonly
+			chatroom.isHidden = acc.isHidden
 			chatroom.title = acc.name
 		}
 		
