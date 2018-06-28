@@ -63,17 +63,20 @@ extension Container {
 		// MARK: NodesSource
 		self.register(NodesSource.self) { r in
 			let service = AdamantNodesSource(defaultNodes: AdamantResources.nodes)
+            service.apiService = r.resolve(ApiService.self)!
 			service.securedStore = r.resolve(SecuredStore.self)
 			return service
-		}.inObjectScope(.container)
+        }.inObjectScope(.container)
 		
 		// MARK: ApiService
-		self.register(ApiService.self) { r in
+        self.register(ApiService.self) { r in
             let service = AdamantApiService()
-			service.adamantCore = r.resolve(AdamantCore.self)
-			service.nodesSource = r.resolve(NodesSource.self)
+            service.adamantCore = r.resolve(AdamantCore.self)
             return service
-		}.inObjectScope(.container)
+        }.initCompleted { (r, c) in    // Weak reference
+            let service = c as! AdamantApiService
+            service.nodesSource = r.resolve(NodesSource.self)
+        }.inObjectScope(.container)
 		
 		// MARK: AccountService
 		self.register(AccountService.self) { r in

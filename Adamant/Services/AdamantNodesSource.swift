@@ -10,6 +10,7 @@ import Foundation
 
 class AdamantNodesSource: NodesSource {
 	// MARK: - Dependencies
+    var apiService: ApiService!
 	var securedStore: SecuredStore! {
 		didSet {
 			reloadNodes()
@@ -22,6 +23,7 @@ class AdamantNodesSource: NodesSource {
 		didSet {
 			if nodes.count == 0 {
 				nodes = defaultNodes
+                currentNodes = nodes
 			}
 			
 			NotificationCenter.default.post(name: Notification.Name.NodesSource.nodesChanged, object: self, userInfo: [AdamantUserInfoKey.nodesSource.nodes: nodes])
@@ -29,6 +31,8 @@ class AdamantNodesSource: NodesSource {
 	}
 	
 	var defaultNodes: [Node]
+    
+    private var currentNodes: [Node] = [Node]()
 	
 	
 	// MARK: - Ctor
@@ -36,6 +40,7 @@ class AdamantNodesSource: NodesSource {
 	init(defaultNodes: [Node]) {
 		self.defaultNodes = defaultNodes
 		self.nodes = defaultNodes
+        self.currentNodes = defaultNodes
 	}
 	
 	
@@ -45,6 +50,26 @@ class AdamantNodesSource: NodesSource {
 		let index = Int(arc4random_uniform(UInt32(nodes.count)))
 		return nodes[index]
 	}
+    
+    func getValidNode(completion: @escaping ((Node?) -> Void)) {
+        if let node = currentNodes.first {
+            testNode(node: node) { (result) in
+                switch result {
+                case .passed:
+                    completion(node)
+                    break
+                case .failed, .notTested:
+                    if let index = self.currentNodes.index(of: node) {
+                        self.currentNodes.remove(at: index)
+                    }
+                    self.getValidNode(completion: completion)
+                    break
+                }
+            }
+        } else {
+            completion(nil)
+        }
+    }
 	
 	// MARK: - Tools
 	func saveNodes() {
@@ -74,4 +99,40 @@ class AdamantNodesSource: NodesSource {
 			print(error.localizedDescription)
 		}
 	}
+    
+    private func testNode(node: Node, completion: @escaping ((NodeEditorViewController.TestState) -> Void)) {
+        var components = URLComponents()
+        
+        components.host = node.host
+        components.scheme = node.scheme.rawValue
+        
+        var testState: NodeEditorViewController.TestState = .notTested
+        
+        if let port = node.port {
+            components.port = port
+        } else {
+            components.port = node.scheme.defaultPort
+        }
+        
+        let url: URL
+        do {
+            url = try components.asURL()
+        } catch {
+            testState = .failed
+            completion(testState)
+            return
+        }
+        
+        self.apiService.getNodeVersion(url: url) { result in
+            switch result {
+            case .success(_):
+                testState = .passed
+                
+            case .failure(let error):
+                print(error)
+                testState = .failed
+            }
+            completion(testState)
+        }
+    }
 }
