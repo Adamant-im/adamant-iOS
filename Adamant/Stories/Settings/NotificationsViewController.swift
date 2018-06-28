@@ -111,7 +111,6 @@ class NotificationsViewController: FormViewController {
 	// MARK: Properties
 	
 	private static let githubUrl = URL.init(string: "https://github.com/Adamant-im/AdamantNotificationService/blob/master/README.md")
-	private var notificationTypesHidden: Bool = true
 	
 	
 	// MARK: Lifecycle
@@ -120,6 +119,17 @@ class NotificationsViewController: FormViewController {
 		super.viewDidLoad()
 		self.navigationItem.title = String.adamantLocalized.notificationsScene.title
 		navigationOptions = .Disabled
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			guard let mode = self?.notificationsService.notificationsMode else {
+				return
+			}
+			
+			if let row: ActionSheetRow<NotificationsMode> = self?.form.rowBy(tag: Rows.notificationsMode.tag) {
+				row.value = mode
+				row.updateCell()
+			}
+		}
 		
 		// MARK: Modes
 		form +++ Section(Sections.settings.localized) {
@@ -130,37 +140,56 @@ class NotificationsViewController: FormViewController {
 			$0.tag = Rows.notificationsMode.tag
 			$0.title = Rows.notificationsMode.localized
 			$0.selectorTitle = Rows.notificationsMode.localized
-			$0.options = [.disabled, .backgroundFetch]
+			$0.options = [.disabled, .backgroundFetch, .push]
 			$0.value = notificationsService.notificationsMode
 		}.onChange({ [weak self] row in
-			guard let mode = row.value else {
-				return
+			if let mode = row.value {
+				self?.setNotificationMode(mode)
 			}
-			
-			self?.setNotificationMode(mode)
 		}).cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
 		})
+		
+			
+		// MARK: ANS
+		
+		+++ Section(Sections.ans.localized) {
+			$0.tag = Sections.ans.tag
+		}
+		
+		<<< TextAreaRow() {
+			$0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
+			$0.tag = Rows.description.tag
+		}.cellUpdate({ (cell, _) in
+			let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
+			cell.textView.attributedText = parser.parse(Rows.description.localized)
+			cell.textView.isSelectable = false
+			cell.textView.isEditable = false
+		})
+		
+		<<< LabelRow() {
+			$0.title = Rows.github.localized
+			$0.tag = Rows.github.tag
+		}.cellSetup({ (cell, _) in
+			cell.selectionStyle = .gray
+			cell.accessoryType = .disclosureIndicator
+		}).onCellSelection({ [weak self] (_, row) in
+			guard let url = NotificationsViewController.githubUrl else {
+				return
+			}
+			
+			let safari = SFSafariViewController(url: url)
+			safari.preferredControlTintColor = UIColor.adamantPrimary
+			self?.present(safari, animated: true, completion: nil)
+		})
 	}
+	
 	
 	// MARK: Logic
 	
 	func setNotificationMode(_ mode: NotificationsMode) {
 		guard mode != notificationsService.notificationsMode else {
 			return
-		}
-		
-		switch mode {
-		case .backgroundFetch:
-			notificationTypesHidden = false
-			
-			if let msgs: SwitchRow = form.rowBy(tag: Rows.messages.tag),
-				let tgs: SwitchRow = form.rowBy(tag: Rows.transfers.tag) {
-				msgs.value = true
-				tgs.value = true
-			}
-			
-		default: notificationTypesHidden = true
 		}
 		
 		notificationsService.setNotificationsMode(mode) { [weak self] result in
@@ -173,8 +202,6 @@ class NotificationsViewController: FormViewController {
 					row.value = false
 					row.updateCell()
 				}
-				
-				self?.notificationTypesHidden = true
 				
 				if let section = self?.form.sectionBy(tag: Sections.types.tag) {
 					section.evaluateHidden()

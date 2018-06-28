@@ -52,7 +52,7 @@ extension String {
 			}
 			
 			static func remoteServerError(message: String) -> String {
-				return String.localizedStringWithFormat(NSLocalizedString("Error.RemoteErrorFormat", comment: "Shared error: Remote error format, %@ for message"), message)
+				return String.localizedStringWithFormat(NSLocalizedString("Error.RemoteServerErrorFormat", comment: "Shared error: Remote error format, %@ for message"), message)
 			}
 		}
 		

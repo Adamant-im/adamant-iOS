@@ -417,7 +417,7 @@ extension ChatListViewController {
 	private func showNotification(for transaction: ChatTransaction) {
 		// MARK: 1. Show notification only for incomming transactions
 		guard !transaction.silentNotification, !transaction.isOutgoing,
-			let chatroom = transaction.chatroom, chatroom != presentedChatroom(),
+			let chatroom = transaction.chatroom, chatroom != presentedChatroom(), !chatroom.isHidden,
 			let partner = chatroom.partner else {
 			return
 		}

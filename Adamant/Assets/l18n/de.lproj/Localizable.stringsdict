@@ -5,7 +5,7 @@
 	<key>NotificationsService.NewMessage.BodyFormat</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>You have %#@messages@</string>
+		<string>Sie haben %#@messages@</string>
 		<key>messages</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -13,15 +13,15 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d new message</string>
+			<string>%d neue Nachricht</string>
 			<key>other</key>
-			<string>%d new messages</string>
+			<string>%d neue Nachrichten</string>
 		</dict>
 	</dict>
 	<key>NotificationsService.NewTransfer.BodyFormat</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>You have %#@transfers@</string>
+		<string>Sie haben %#@transfers@</string>
 		<key>transfers</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -29,9 +29,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d new transaction</string>
+			<string>%d neue Transaktion</string>
 			<key>other</key>
-			<string>%d new transactions</string>
+			<string>%d neue Transaktionen</string>
 		</dict>
 	</dict>
 </dict>

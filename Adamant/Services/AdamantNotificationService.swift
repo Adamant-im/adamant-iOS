@@ -89,21 +89,7 @@ extension AdamantNotificationsService {
 			completion?(.success)
 			return
 			
-		case .backgroundFetch:
-			authorizeNotifications { [weak self] (success, error) in
-				guard success else {
-					completion?(.denied(error: error))
-					return
-				}
-				
-				AdamantNotificationsService.configureUIApplicationFor(mode: mode)
-				self?.securedStore.set(mode.toRaw(), for: StoreKey.notificationsService.notificationsMode)
-				self?.notificationsMode = mode
-				NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: self)
-				completion?(.success)
-			}
-			
-		case .push:
+		case .backgroundFetch, .push:
 			authorizeNotifications { [weak self] (success, error) in
 				guard success else {
 					completion?(.denied(error: error))

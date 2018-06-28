@@ -21,6 +21,6 @@
     "author" : "xcode"
   },
   "properties" : {
-    "template-rendering-intent" : "template"
+    "template-rendering-intent" : "original"
   }
 }

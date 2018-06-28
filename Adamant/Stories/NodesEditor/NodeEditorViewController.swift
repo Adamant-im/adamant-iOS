@@ -58,9 +58,8 @@ class NodeEditorViewController: FormViewController {
 		
 		var placeholder: String? {
 			switch self {
-			case .port: return NSLocalizedString("NodesEditor.PortRow.Placeholder", comment: "NodesEditor: Port row placeholder")
 			case .host: return NSLocalizedString("NodesEditor.HostRow.Placeholder", comment: "NodesEditor: Host row placeholder")
-			case .scheme, .testButton, .deleteButton: return nil
+			case .port, .scheme, .testButton, .deleteButton: return nil
 			}
 		}
 		
@@ -163,23 +162,37 @@ class NodeEditorViewController: FormViewController {
 		<<< IntRow() {
 			$0.title = Rows.port.localized
 			$0.tag = Rows.port.tag
-			$0.placeholder = Rows.port.placeholder
 			
-			$0.value = node?.port
+			if let node = node {
+				$0.value = node.port
+				$0.placeholder = String(node.scheme.defaultPort)
+			} else {
+				$0.placeholder = String(URLScheme.default.defaultPort)
+			}
 		}.onChange({ [weak self] (_) in
 			self?.testState = .notTested
 		})
 		
-		// Protocol
+		// Scheme
 		<<< PickerInlineRow<URLScheme>() {
 			$0.title = Rows.scheme.localized
 			$0.tag = Rows.scheme.tag
-			$0.value = node?.scheme ?? URLScheme.https
+			$0.value = node?.scheme ?? URLScheme.default
 			$0.options = [.https, .http]
 		}.onExpandInlineRow({ (_, _, inlineRow) in
 			inlineRow.cell.height = { 100 }
-		}).onChange({ [weak self] (_) in
+		}).onChange({ [weak self] row in
 			self?.testState = .notTested
+			
+			if let portRow: IntRow = self?.form.rowBy(tag: Rows.port.tag) {
+				if let scheme = row.value {
+					portRow.placeholder = String(scheme.defaultPort)
+				} else {
+					portRow.placeholder = String(URLScheme.default.defaultPort)
+				}
+				
+				portRow.updateCell()
+			}
 		})
 		
 		
@@ -239,15 +252,19 @@ extension NodeEditorViewController {
 		}
 		
 		// Scheme
-		if let row = form.rowBy(tag: Rows.scheme.tag), let scheme = row.baseValue as? URLScheme {
-			components.scheme = scheme.rawValue
+		let scheme: URLScheme
+		if let row = form.rowBy(tag: Rows.scheme.tag), let value = row.baseValue as? URLScheme {
+			scheme = value
 		} else {
-			components.scheme = "https"
+			scheme = URLScheme.default
 		}
+		components.scheme = scheme.rawValue
 		
 		// Port
 		if let row: IntRow = form.rowBy(tag: Rows.port.tag), let port = row.value {
 			components.port = port
+		} else {
+			components.port = scheme.defaultPort
 		}
 		
 		let url: URL
@@ -260,16 +277,16 @@ extension NodeEditorViewController {
 		}
 		
 		dialogService.showProgress(withMessage: String.adamantLocalized.nodesEditor.testInProgressMessage, userInteractionEnable: false)
-		apiService.getNodeVersion(url: url) { [weak self] result in
+		apiService.getNodeVersion(url: url) { result in
 			switch result {
 			case .success(_):
-				self?.dialogService.dismissProgress()
-				self?.testState = .passed
+				self.dialogService.dismissProgress()
+				self.testState = .passed
 				completion?(true)
 				
 			case .failure(let error):
-				self?.dialogService.showWarning(withMessage: error.localized)
-				self?.testState = .failed
+				self.dialogService.showWarning(withMessage: error.localized)
+				self.testState = .failed
 				completion?(false)
 			}
 		}
@@ -278,9 +295,9 @@ extension NodeEditorViewController {
 	@objc func done() {
 		switch testState {
 		case .notTested, .failed:
-			testNode { [weak self] success in
+			testNode { success in
 				if success {
-					self?.saveNode()
+					self.saveNode()
 				}
 			}
 			
@@ -298,11 +315,11 @@ extension NodeEditorViewController {
 		
 		let host = rawUrl.trimmingCharacters(in: .whitespaces)
 		
-		let prot: URLScheme
-		if let row: PickerRow<URLScheme> = form.rowBy(tag: Rows.scheme.tag), let pr = row.value {
-			prot = pr
+		let scheme: URLScheme
+		if let row = form.rowBy(tag: Rows.scheme.tag), let value = row.baseValue as? URLScheme {
+			scheme = value
 		} else {
-			prot = .https
+			scheme = URLScheme.default
 		}
 		
 		let port: Int?
@@ -312,7 +329,7 @@ extension NodeEditorViewController {
 			port = nil
 		}
 		
-		let node = Node(scheme: prot, host: host, port: port)
+		let node = Node(scheme: scheme, host: host, port: port)
 		
 		let result: NodeEditorResult
 		if self.node != nil, let tag = nodeTag {
@@ -334,7 +351,7 @@ extension NodeEditorViewController {
 		let alert = UIAlertController(title: String.adamantLocalized.nodesEditor.deleteNodeAlert, message: nil, preferredStyle: .alert)
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.delete, style: .destructive, handler: { _ in
-			self.didCallDelegate = false
+            self.didCallDelegate = true
 			
 			if let node = self.node, let tag = self.nodeTag {
 				self.delegate?.nodeEditorViewController(self, didFinishEditingWithResult: .delete(node: node, tag: tag))

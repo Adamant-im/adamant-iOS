@@ -64,8 +64,8 @@
 /* Product name */
 "ADAMANT" = "ADAMANT";
 
-/* ApiService: No connection message. Generally bad network. */
-"ApiService.Error.NoConnection" = "No connection to the Internet";
+/* Application: Failed to send deviceToken to ANS error format. %@ for error description */
+"Application.deviceTokenErrorFormat" = "Failed to reginser in ANS: %@";
 
 /* Serious internal error: Failed to build endpoint url */
 "ApiService.InternalError.EndpointBuildFailed" = "Endpoint build failed. Report a bug";
@@ -277,9 +277,6 @@
 /* NodesEditor: Delete node button */
 "NodesEditor.DeleteNodeButton" = "Delete";
 
-/* NodesEditor: Port row placeholder */
-"NodesEditor.PortRow.Placeholder" = "443";
-
 /* NodesEditor: Host row placeholder */
 "NodesEditor.HostRow.Placeholder" = "ip or host name";
 
@@ -414,6 +411,9 @@
 
 /* Shared alert notification: body message for no internet connection. */
 "Shared.NoInternet.Body" = "Please check your internet connection and try again";
+
+/* Shared alert notification: message for no Mail services. */
+"Shared.NoMail" = "Mail services are not available";
 
 /* Shared alert 'Ok' button. Used anywhere */
 "Shared.Ok" = "Ok";

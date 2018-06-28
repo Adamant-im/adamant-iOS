@@ -329,11 +329,12 @@ extension AdamantChatsProvider {
 		
 		
 		// MARK: 3. Create chat transaction
+		let type = ChatType.message
 		let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: privateContext)
 		transaction.date = Date() as NSDate
 		transaction.recipientId = recipientId
 		transaction.senderId = senderId
-		transaction.type = ChatType.message.rawValue
+		transaction.type = Int16(type.rawValue)
 		transaction.isOutgoing = true
 		transaction.message = text
 		
@@ -368,7 +369,7 @@ extension AdamantChatsProvider {
 		
 		
 		// MARK: 6. Send
-		sendTransaction(transaction, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
+		sendTransaction(transaction, type: type, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
 			switch result {
 			case .success:
 				do {
@@ -436,7 +437,7 @@ extension AdamantChatsProvider {
 		
 		
 		// MARK: 3. Send
-		sendTransaction(transaction, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
+		sendTransaction(transaction, type: .message, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
 			switch result {
 			case .success:
 				do {
@@ -488,7 +489,7 @@ extension AdamantChatsProvider {
 	///
 	/// If success - update transaction's id and add it to unconfirmed transactions.
 	/// If fails - set transaction status to .failed
-	private func sendTransaction(_ transaction: MessageTransaction, keypair: Keypair, recipientPublicKey: String, completion: @escaping (ChatsProviderResult) -> Void) {
+	private func sendTransaction(_ transaction: MessageTransaction, type: ChatType, keypair: Keypair, recipientPublicKey: String, completion: @escaping (ChatsProviderResult) -> Void) {
 		// MARK: 0. Prepare
 		guard let senderId = transaction.senderId,
 			let recipientId = transaction.recipientId else {
@@ -503,7 +504,7 @@ extension AdamantChatsProvider {
 		}
 		
 		// MARK: 2. Send
-		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, nonce: encodedMessage.nonce) { result in
+		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, type: type, nonce: encodedMessage.nonce) { result in
 			switch result {
 			case .success(let id):
 				// Update ID with recieved, add to unconfirmed transactions.
@@ -552,7 +553,9 @@ extension AdamantChatsProvider {
 		let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
 		request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false),
 								   NSSortDescriptor(key: "title", ascending: true)]
-		request.predicate = NSPredicate(format: "partner!=nil")
+		request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+			NSPredicate(format: "partner!=nil"),
+			NSPredicate(format: "isHidden = false")])
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 		
 		return controller
@@ -574,7 +577,10 @@ extension AdamantChatsProvider {
 	
 	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction> {
 		let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
-		request.predicate = NSPredicate(format: "isUnread == true")
+		request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+			NSPredicate(format: "isUnread == true"),
+			NSPredicate(format: "chatroom.isHidden == false")])
+		
 		request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
 								   NSSortDescriptor(key: "transactionId", ascending: false)]
 		

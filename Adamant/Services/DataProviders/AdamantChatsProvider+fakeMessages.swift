@@ -95,7 +95,7 @@ extension AdamantChatsProvider {
 		transaction.date = date as NSDate
 		transaction.recipientId = recipient.address
 		transaction.senderId = loggedAddress
-		transaction.type = ChatType.message.rawValue
+		transaction.type = Int16(ChatType.message.rawValue)
 		transaction.isOutgoing = true
 		transaction.message = text
 		transaction.isUnread = false
@@ -131,7 +131,7 @@ extension AdamantChatsProvider {
 		transaction.date = date as NSDate
 		transaction.recipientId = loggedAddress
 		transaction.senderId = sender.address
-		transaction.type = ChatType.message.rawValue
+		transaction.type = Int16(ChatType.message.rawValue)
 		transaction.isOutgoing = false
 		transaction.message = text
 		transaction.isUnread = unread
