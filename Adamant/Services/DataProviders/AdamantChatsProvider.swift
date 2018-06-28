@@ -553,7 +553,9 @@ extension AdamantChatsProvider {
 		let request: NSFetchRequest<Chatroom> = NSFetchRequest(entityName: Chatroom.entityName)
 		request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false),
 								   NSSortDescriptor(key: "title", ascending: true)]
-		request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [NSPredicate(format: "partner!=nil"), NSPredicate(format: "isHidden = false")])
+		request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+			NSPredicate(format: "partner!=nil"),
+			NSPredicate(format: "isHidden = false")])
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 		
 		return controller
@@ -575,7 +577,10 @@ extension AdamantChatsProvider {
 	
 	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction> {
 		let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
-		request.predicate = NSPredicate(format: "isUnread == true")
+		request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+			NSPredicate(format: "isUnread == true"),
+			NSPredicate(format: "chatroom.isHidden == false")])
+		
 		request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
 								   NSSortDescriptor(key: "transactionId", ascending: false)]
 		
