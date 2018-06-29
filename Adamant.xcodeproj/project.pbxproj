@@ -73,7 +73,7 @@
 		E94E7B01205D3F090042B639 /* ChatListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E94E7B00205D3F090042B639 /* ChatListViewController.xib */; };
 		E94E7B06205D48B20042B639 /* TransactionsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94E7B05205D48B20042B639 /* TransactionsRoutes.swift */; };
 		E94E7B08205D4CB80042B639 /* SharedRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94E7B07205D4CB80042B639 /* SharedRoutes.swift */; };
-		E94E7B0A205D59F50042B639 /* AccountViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E94E7B09205D59F50042B639 /* AccountViewController.xib */; };
+		E94E7B0A205D59F50042B639 /* WalletViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E94E7B09205D59F50042B639 /* WalletViewController.xib */; };
 		E94E7B0C205D5E4A0042B639 /* TransactionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E94E7B0B205D5E4A0042B639 /* TransactionsViewController.xib */; };
 		E94E7B0E205D5EA80042B639 /* TransactionDetailsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E94E7B0D205D5EA80042B639 /* TransactionDetailsViewController.xib */; };
 		E9502740202E257E002C1098 /* RepeaterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E950273F202E257E002C1098 /* RepeaterService.swift */; };
@@ -114,6 +114,8 @@
 		E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */; };
 		E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E972206A201F44CA004F2AAD /* TransfersProvider.swift */; };
 		E982F69C20235B4D00566AC7 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E982F69B20235B4D00566AC7 /* SettingsViewController.swift */; };
+		E983AE1F20E6542100497E1A /* AccountHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = E983AE1E20E6542100497E1A /* AccountHeader.xib */; };
+		E983AE2120E655C500497E1A /* AccountHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E983AE2020E655C500497E1A /* AccountHeaderView.swift */; };
 		E987024920C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = E987024820C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift */; };
 		E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */; };
 		E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */; };
@@ -146,7 +148,7 @@
 		E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */; };
 		E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */; };
 		E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */; };
-		E9E7CDAC2002AFA500DFC4DB /* AccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDAA2002AFA500DFC4DB /* AccountViewController.swift */; };
+		E9E7CDAC2002AFA500DFC4DB /* WalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDAA2002AFA500DFC4DB /* WalletViewController.swift */; };
 		E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDAE2002B8A100DFC4DB /* Router.swift */; };
 		E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB02002B97B00DFC4DB /* AccountRoutes.swift */; };
 		E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */; };
@@ -276,7 +278,7 @@
 		E94E7B00205D3F090042B639 /* ChatListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatListViewController.xib; sourceTree = "<group>"; };
 		E94E7B05205D48B20042B639 /* TransactionsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsRoutes.swift; sourceTree = "<group>"; };
 		E94E7B07205D4CB80042B639 /* SharedRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedRoutes.swift; sourceTree = "<group>"; };
-		E94E7B09205D59F50042B639 /* AccountViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AccountViewController.xib; sourceTree = "<group>"; };
+		E94E7B09205D59F50042B639 /* WalletViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WalletViewController.xib; sourceTree = "<group>"; };
 		E94E7B0B205D5E4A0042B639 /* TransactionsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransactionsViewController.xib; sourceTree = "<group>"; };
 		E94E7B0D205D5EA80042B639 /* TransactionDetailsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransactionDetailsViewController.xib; sourceTree = "<group>"; };
 		E950273F202E257E002C1098 /* RepeaterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeaterService.swift; sourceTree = "<group>"; };
@@ -320,6 +322,8 @@
 		E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InMemoryCoreDataStack.swift; sourceTree = "<group>"; };
 		E972206A201F44CA004F2AAD /* TransfersProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransfersProvider.swift; sourceTree = "<group>"; };
 		E982F69B20235B4D00566AC7 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		E983AE1E20E6542100497E1A /* AccountHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AccountHeader.xib; sourceTree = "<group>"; };
+		E983AE2020E655C500497E1A /* AccountHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountHeaderView.swift; sourceTree = "<group>"; };
 		E987024820C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantChatsProvider+fakeMessages.swift"; sourceTree = "<group>"; };
 		E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRGeneratorViewController.swift; sourceTree = "<group>"; };
 		E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantQRTools.swift; sourceTree = "<group>"; };
@@ -352,7 +356,7 @@
 		E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
 		E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwinjectDependencies.swift; sourceTree = "<group>"; };
 		E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAccountService.swift; sourceTree = "<group>"; };
-		E9E7CDAA2002AFA500DFC4DB /* AccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewController.swift; sourceTree = "<group>"; };
+		E9E7CDAA2002AFA500DFC4DB /* WalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewController.swift; sourceTree = "<group>"; };
 		E9E7CDAE2002B8A100DFC4DB /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		E9E7CDB02002B97B00DFC4DB /* AccountRoutes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountRoutes.swift; sourceTree = "<group>"; };
 		E9E7CDB22002B9FB00DFC4DB /* LoginRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRoutes.swift; sourceTree = "<group>"; };
@@ -503,13 +507,13 @@
 				E95F8588200900B10070534A /* ChatType.swift */,
 				E9204B5120C9762300F3B9AB /* MessageStatus.swift */,
 				E93EB0A220DA4CCA001F9601 /* Node.swift */,
+				E9A03FD320DBC824007653A1 /* NodeVersion.swift */,
 				E95F85682006AB9D0070534A /* NormalizedTransaction.swift */,
 				E965A53320B833A00041A3EA /* StateAsset.swift */,
 				E965A53120B82C850041A3EA /* StateType.swift */,
 				E9E7CDC920040CC200DFC4DB /* Transaction.swift */,
 				E965A53520B8370C0041A3EA /* TransactionAsset.swift */,
 				E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */,
-				E9A03FD320DBC824007653A1 /* NodeVersion.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -755,9 +759,11 @@
 			isa = PBXGroup;
 			children = (
 				E9E7CDB02002B97B00DFC4DB /* AccountRoutes.swift */,
-				E9E7CDAA2002AFA500DFC4DB /* AccountViewController.swift */,
-				E94E7B09205D59F50042B639 /* AccountViewController.xib */,
+				E9E7CDAA2002AFA500DFC4DB /* WalletViewController.swift */,
+				E94E7B09205D59F50042B639 /* WalletViewController.xib */,
 				E9EC342020052ABB00C0E546 /* TransferViewController.swift */,
+				E983AE1E20E6542100497E1A /* AccountHeader.xib */,
+				E983AE2020E655C500497E1A /* AccountHeaderView.swift */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -911,6 +917,7 @@
 				E90A4945204C6204009F6A65 /* PassphraseCell.xib in Resources */,
 				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
 				E9EC3417200524CA00C0E546 /* Exo+2_400_italic.ttf in Resources */,
+				E983AE1F20E6542100497E1A /* AccountHeader.xib in Resources */,
 				E94E7B01205D3F090042B639 /* ChatListViewController.xib in Resources */,
 				E9EC341E200524CA00C0E546 /* Roboto_500_normal.ttf in Resources */,
 				E9EC3419200524CA00C0E546 /* Exo+2_500_normal.ttf in Resources */,
@@ -920,7 +927,7 @@
 				E94E7B0C205D5E4A0042B639 /* TransactionsViewController.xib in Resources */,
 				E9EC3415200524CA00C0E546 /* Exo+2_100_normal.ttf in Resources */,
 				E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */,
-				E94E7B0A205D59F50042B639 /* AccountViewController.xib in Resources */,
+				E94E7B0A205D59F50042B639 /* WalletViewController.xib in Resources */,
 				E95CB456205D77B500A7218E /* Localizable.strings in Resources */,
 				E95CB45E205D7F9600A7218E /* Localizable.stringsdict in Resources */,
 				E94E7B0E205D5EA80042B639 /* TransactionDetailsViewController.xib in Resources */,
@@ -1081,10 +1088,11 @@
 				E9147B6F205088DE00145913 /* LoginViewController+Pinpad.swift in Sources */,
 				E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */,
 				E94E7B06205D48B20042B639 /* TransactionsRoutes.swift in Sources */,
+				E983AE2120E655C500497E1A /* AccountHeaderView.swift in Sources */,
 				E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */,
 				E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */,
 				E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */,
-				E9E7CDAC2002AFA500DFC4DB /* AccountViewController.swift in Sources */,
+				E9E7CDAC2002AFA500DFC4DB /* WalletViewController.swift in Sources */,
 				E91947B420002809001362F8 /* Account.swift in Sources */,
 				E9E7CDC22003F5A400DFC4DB /* TransactionsViewController.swift in Sources */,
 				E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */,

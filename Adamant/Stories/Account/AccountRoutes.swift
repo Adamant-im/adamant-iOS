@@ -10,8 +10,8 @@ import Foundation
 
 extension AdamantScene {
 	struct Account {
-		static let account = AdamantScene(identifier: "AccountViewController", factory: { r in
-			let c = AccountViewController()
+		static let wallet = AdamantScene(identifier: "WalletViewController", factory: { r in
+			let c = WalletViewController()
 			c.accountService = r.resolve(AccountService.self)
 			c.dialogService = r.resolve(DialogService.self)
 			c.router = r.resolve(Router.self)

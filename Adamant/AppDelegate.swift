@@ -97,7 +97,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		// MARK: 4. Async prepare pages
 		if let tabbar = window?.rootViewController as? UITabBarController {
-			let accountRoot = router.get(scene: AdamantScene.Account.account)
+			let accountRoot = router.get(scene: AdamantScene.Account.wallet)
 			let account = UINavigationController(rootViewController: accountRoot)
 			account.tabBarItem.title = String.adamantLocalized.tabItems.account
 			account.tabBarItem.image = #imageLiteral(resourceName: "wallet_tab")

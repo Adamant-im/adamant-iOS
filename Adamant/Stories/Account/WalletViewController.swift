@@ -1,5 +1,5 @@
 //
-//  AccountViewController.swift
+//  WalletViewController.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 07.01.2018.
@@ -38,7 +38,7 @@ fileprivate extension String.adamantLocalized.alert {
 
 
 // MARK: -
-class AccountViewController: FormViewController {
+class WalletViewController: FormViewController {
 	// MARK: - Constants
 	private let webAppUrl = URL.init(string: "https://msg.adamant.im")
 	
@@ -129,7 +129,7 @@ class AccountViewController: FormViewController {
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action:
-            #selector(AccountViewController.handleRefresh(_:)),
+            #selector(WalletViewController.handleRefresh(_:)),
                                  for: UIControlEvents.valueChanged)
         refreshControl.tintColor = UIColor.adamantPrimary
         
@@ -386,7 +386,7 @@ class AccountViewController: FormViewController {
 
 
 // MARK: - Other
-extension AccountViewController {
+extension WalletViewController {
 	private func refreshBalanceCell() {
 		let address: String?
 		let balance: String?
