@@ -197,17 +197,15 @@ class TransferViewController: FormViewController {
                 $0.placeholder = String.adamantLocalized.transfer.addressPlaceholder
                 $0.tag = Row.address.tag
                 $0.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
-                    guard let value = value?.lowercased() else {
+                    guard let value = value?.uppercased() else {
                         return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
                     }
                     
-                    if let walletAddress = EthereumAddress(value) {
-                        if walletAddress.isValid {
-                            return nil
-                        } else {
-                            return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
-                        }
-                    } else {
+                    switch AdamantUtilities.validateAdamantAddress(address: value) {
+                    case .valid:
+                        return nil
+                        
+                    case .system, .invalid:
                         return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
                     }
                 }))
@@ -221,8 +219,8 @@ class TransferViewController: FormViewController {
                 $0.placeholder = String.adamantLocalized.transfer.amountPlaceholder
                 $0.tag = Row.amount.tag
                 $0.formatter = AdamantUtilities.currencyFormatter
-                //            $0.add(rule: RuleSmallerOrEqualThan<Double>(max: maxToTransfer))
-                //            $0.validationOptions = .validatesOnChange
+                $0.add(rule: RuleSmallerOrEqualThan<Double>(max: maxToTransfer))
+                $0.validationOptions = .validatesOnChange
                 }.onChange(amountChanged)
             <<< DecimalRow() {
                 $0.title = Row.fee.localized
@@ -273,15 +271,17 @@ class TransferViewController: FormViewController {
                     $0.tag = Row.address.tag
                     $0.value = toAddress
                     $0.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
-                        guard let value = value?.uppercased() else {
+                        guard let value = value?.lowercased() else {
                             return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
                         }
-
-                        switch AdamantUtilities.validateAdamantAddress(address: value) {
-                        case .valid:
-                            return nil
-
-                        case .system, .invalid:
+                        
+                        if let walletAddress = EthereumAddress(value) {
+                            if walletAddress.isValid {
+                                return nil
+                            } else {
+                                return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
+                            }
+                        } else {
                             return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
                         }
                     }))
@@ -324,6 +324,7 @@ class TransferViewController: FormViewController {
 		guard let amount = row.value else {
 			totalAmount = nil
             sendButton.disabled = true
+            sendButton.evaluateDisabled()
 			row.cell.titleLabel?.textColor = .black
 			return
 		}
@@ -347,6 +348,7 @@ class TransferViewController: FormViewController {
             sendButton.disabled = true
 			row.cell.titleLabel?.textColor = .black
 		}
+        sendButton.evaluateDisabled()
 	}
     
     private func ethAmountChanged(row: DecimalRow) {
