@@ -115,19 +115,24 @@ extension AdamantDialogService {
         
         let supportBtn = PMAlertAction(title: AdamantResources.iosAppSupportEmail, style: .default) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                guard let presenter = self else {
+                guard let dialogService = self, var presenter = dialogService.getTopmostViewController() else {
                     print("Lost connecting with dialog service")
-                    return
+					return
+				}
+                
+                // Fix issue when PMAlertController is still top ViewController
+                if presenter is PMAlertController, let vc = presenter.presentingViewController {
+                    presenter = vc
                 }
                 
                 if !MFMailComposeViewController.canSendMail() {
                     print("Mail services are not available")
-                    presenter.showWarning(withMessage: String.adamantLocalized.alert.noMailService)
+                    dialogService.showWarning(withMessage: String.adamantLocalized.alert.noMailService)
                     return
                 }
 				
                 let mailVC = MFMailComposeViewController()
-                mailVC.mailComposeDelegate = presenter.mailDelegate
+                mailVC.mailComposeDelegate = dialogService.mailDelegate
                 mailVC.setToRecipients([AdamantResources.iosAppSupportEmail])
                 mailVC.setSubject(String.adamantLocalized.alert.emailErrorMessageTitle)
                 
