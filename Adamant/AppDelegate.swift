@@ -80,6 +80,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
+		window!.rootViewController = AccountViewController()
+//		window!.rootViewController?.view.backgroundColor = .white
+		window!.makeKeyAndVisible()
+		window!.tintColor = UIColor.adamantPrimary
+		
+		/*
+		window = UIWindow(frame: UIScreen.main.bounds)
 		window!.rootViewController = UITabBarController()
 		window!.rootViewController?.view.backgroundColor = .white
 		window!.makeKeyAndVisible()
@@ -118,6 +125,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			
 			tabbar.setViewControllers([account, chatList, settings], animated: false)
 		}
+		*/
 		
 		// MARK: 5 Reachability & Autoupdate
 		repeater = RepeaterService()
