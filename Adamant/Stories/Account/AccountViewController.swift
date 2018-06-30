@@ -303,28 +303,40 @@ class AccountViewController: FormViewController {
 				cell.accessoryType = .disclosureIndicator
 			})
 			.onCellSelection({ [weak self] (_, row) in
-				let alert = UIAlertController(title: String.adamantLocalized.account.sorryAlert, message: String.adamantLocalized.account.transferNotAllowed, preferredStyle: .alert)
-				
-				let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { _ in
-					guard let indexPath = row.indexPath else {
-						return
-					}
-					
-					self?.tableView.deselectRow(at: indexPath, animated: true)
-				}
-				
-				alert.addAction(cancel)
-				
-				if let url = AdamantResources.webAppUrl {
-					let webApp = UIAlertAction(title: String.adamantLocalized.account.webApp, style: .default) { [weak self] _ in
-						let safari  = SFSafariViewController(url: url)
-						safari.preferredControlTintColor = UIColor.adamantPrimary
-						self?.present(safari, animated: true, completion: nil)
-					}
-					alert.addAction(webApp)
-				}
-				
-				self?.present(alert, animated: true, completion: nil)
+                guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
+                    fatalError("Can't get TransferViewController scene")
+                }
+                
+                vc.token = .ADM
+                
+                if let nav = self?.navigationController {
+                    nav.pushViewController(vc, animated: true)
+                } else {
+                    self?.present(vc, animated: true, completion: nil)
+                }
+                
+//                let alert = UIAlertController(title: String.adamantLocalized.account.sorryAlert, message: String.adamantLocalized.account.transferNotAllowed, preferredStyle: .alert)
+//
+//                let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { _ in
+//                    guard let indexPath = row.indexPath else {
+//                        return
+//                    }
+//
+//                    self?.tableView.deselectRow(at: indexPath, animated: true)
+//                }
+//
+//                alert.addAction(cancel)
+//
+//                if let url = AdamantResources.webAppUrl {
+//                    let webApp = UIAlertAction(title: String.adamantLocalized.account.webApp, style: .default) { [weak self] _ in
+//                        let safari  = SFSafariViewController(url: url)
+//                        safari.preferredControlTintColor = UIColor.adamantPrimary
+//                        self?.present(safari, animated: true, completion: nil)
+//                    }
+//                    alert.addAction(webApp)
+//                }
+//
+//                self?.present(alert, animated: true, completion: nil)
 			})
 		
 		// MARK: ICO

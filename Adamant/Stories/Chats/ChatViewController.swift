@@ -93,36 +93,36 @@ class ChatViewController: MessagesViewController {
                 }),
                     UIAlertAction(title: "ADM", style: .default, handler: { [weak self] (_) in
                         // MARK: Show ADM transfer details - DISABLED until end of ICO
-//                        if let address = self?.chatroom?.partner?.address {
-//                            guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
-//                                fatalError("Can't get TransferViewController scene")
-//                            }
-//
-//                            vc.token = .ADM
-//                            vc.toAddress = address
-//
-//                            if let nav = self?.navigationController {
-//                                nav.pushViewController(vc, animated: true)
-//                            } else {
-//                                self?.present(vc, animated: true, completion: nil)
-//                            }
-//                        }
-                        let alert = UIAlertController(title: String.adamantLocalized.account.sorryAlert, message: String.adamantLocalized.account.transferNotAllowed, preferredStyle: .alert)
-                        
-                        let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { (_) in }
-                        
-                        alert.addAction(cancel)
-                        
-                        if let url = AdamantResources.webAppUrl {
-                            let webApp = UIAlertAction(title: String.adamantLocalized.account.webApp, style: .default) { [weak self] _ in
-                                let safari  = SFSafariViewController(url: url)
-                                safari.preferredControlTintColor = UIColor.adamantPrimary
-                                self?.present(safari, animated: true, completion: nil)
+                        if let address = self?.chatroom?.partner?.address {
+                            guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
+                                fatalError("Can't get TransferViewController scene")
                             }
-                            alert.addAction(webApp)
+
+                            vc.token = .ADM
+                            vc.toAddress = address
+
+                            if let nav = self?.navigationController {
+                                nav.pushViewController(vc, animated: true)
+                            } else {
+                                self?.present(vc, animated: true, completion: nil)
+                            }
                         }
-                        
-                        self?.present(alert, animated: true, completion: nil)
+//                        let alert = UIAlertController(title: String.adamantLocalized.account.sorryAlert, message: String.adamantLocalized.account.transferNotAllowed, preferredStyle: .alert)
+//                        
+//                        let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { (_) in }
+//                        
+//                        alert.addAction(cancel)
+//                        
+//                        if let url = AdamantResources.webAppUrl {
+//                            let webApp = UIAlertAction(title: String.adamantLocalized.account.webApp, style: .default) { [weak self] _ in
+//                                let safari  = SFSafariViewController(url: url)
+//                                safari.preferredControlTintColor = UIColor.adamantPrimary
+//                                self?.present(safari, animated: true, completion: nil)
+//                            }
+//                            alert.addAction(webApp)
+//                        }
+//                        
+//                        self?.present(alert, animated: true, completion: nil)
                     })
                                                                                                ])
         }
