@@ -45,7 +45,7 @@
 		E91947B420002809001362F8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B320002809001362F8 /* Account.swift */; };
 		E91A063A209F05AA0018A102 /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91A0639209F05AA0018A102 /* NotificationsViewController.swift */; };
 		E91E5BF220DAF05500B06B3C /* EurekaNodeRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91E5BF120DAF05500B06B3C /* EurekaNodeRow.swift */; };
-		E91E5BF420DAF3AB00B06B3C /* NodeRow.xib in Resources */ = {isa = PBXBuildFile; fileRef = E91E5BF320DAF3AB00B06B3C /* NodeRow.xib */; };
+		E91E5BF420DAF3AB00B06B3C /* NodeCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E91E5BF320DAF3AB00B06B3C /* NodeCell.xib */; };
 		E9204B5020C94C4A00F3B9AB /* Date+humanizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9204B4F20C94C4A00F3B9AB /* Date+humanizedString.swift */; };
 		E9204B5220C9762400F3B9AB /* MessageStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9204B5120C9762300F3B9AB /* MessageStatus.swift */; };
 		E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */; };
@@ -250,7 +250,7 @@
 		E91947B320002809001362F8 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		E91A0639209F05AA0018A102 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		E91E5BF120DAF05500B06B3C /* EurekaNodeRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EurekaNodeRow.swift; sourceTree = "<group>"; };
-		E91E5BF320DAF3AB00B06B3C /* NodeRow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NodeRow.xib; sourceTree = "<group>"; };
+		E91E5BF320DAF3AB00B06B3C /* NodeCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NodeCell.xib; sourceTree = "<group>"; };
 		E9204B4F20C94C4A00F3B9AB /* Date+humanizedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+humanizedString.swift"; sourceTree = "<group>"; };
 		E9204B5120C9762300F3B9AB /* MessageStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageStatus.swift; sourceTree = "<group>"; };
 		E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachabilityMonitor.swift; sourceTree = "<group>"; };
@@ -596,7 +596,7 @@
 				64D059FE20D3116A003AD655 /* NodesListViewController.swift */,
 				E9A03FD120DBC0F2007653A1 /* NodeEditorViewController.swift */,
 				E91E5BF120DAF05500B06B3C /* EurekaNodeRow.swift */,
-				E91E5BF320DAF3AB00B06B3C /* NodeRow.xib */,
+				E91E5BF320DAF3AB00B06B3C /* NodeCell.xib */,
 			);
 			path = NodesEditor;
 			sourceTree = "<group>";
@@ -931,7 +931,7 @@
 				E95CB456205D77B500A7218E /* Localizable.strings in Resources */,
 				E95CB45E205D7F9600A7218E /* Localizable.stringsdict in Resources */,
 				E94E7B0E205D5EA80042B639 /* TransactionDetailsViewController.xib in Resources */,
-				E91E5BF420DAF3AB00B06B3C /* NodeRow.xib in Resources */,
+				E91E5BF420DAF3AB00B06B3C /* NodeCell.xib in Resources */,
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
 				E9A174B920587B84003667CD /* notification.mp3 in Resources */,
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
