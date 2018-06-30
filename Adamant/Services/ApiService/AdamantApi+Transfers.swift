@@ -10,10 +10,13 @@ import Foundation
 
 extension AdamantApiService {
 	func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void) {
+        
+        let amount = amount.shiftedToAdamant() * 100000000
+        
 		// MARK: 1. Prepare params
 		let params: [String : Any] = [
 			"type": TransactionType.send.rawValue,
-			"amount": amount.shiftedToAdamant(),
+			"amount": amount,//amount.shiftedToAdamant(),
 			"recipientId": recipient,
 			"senderId": sender,
 			"publicKey": keypair.publicKey
@@ -53,14 +56,14 @@ extension AdamantApiService {
 				
 				// MARK: 4.2. Create transaction
 				let transaction: [String: Any] = [
-					"type": TransactionType.send.rawValue,
-					"amount": amount.shiftedToAdamant(),
-					"senderPublicKey": keypair.publicKey,
-					"requesterPublicKey": normalizedTransaction.requesterPublicKey ?? NSNull(),
-					"timestamp": normalizedTransaction.timestamp,
-					"recipientId": recipient,
-					"senderId": sender,
-					"signature": signature
+                    "type": normalizedTransaction.type.rawValue,
+                    "amount": amount,
+                    "senderPublicKey": normalizedTransaction.senderPublicKey,
+                    "requesterPublicKey": normalizedTransaction.requesterPublicKey ?? NSNull(),
+                    "timestamp": normalizedTransaction.timestamp,
+                    "recipientId": normalizedTransaction.recipientId ?? NSNull(),
+                    "senderId": sender,
+                    "signature": signature
 				]
 				
 				let params: [String: Any] = [
@@ -70,8 +73,16 @@ extension AdamantApiService {
 				// MARK: 5. Send
 				self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: .json, headers: headers) { (response: ApiServiceResult<ServerResponse>) in
 					switch response {
-					case .success(_):
-						completion(.success(true))
+					case .success(let result):
+                        if result.success {
+                            completion(.success(true))
+                        } else {
+                            if let error = result.error {
+                                completion(.failure(.internalError(message: error, error: nil)))
+                            } else {
+                                completion(.failure(.internalError(message: "Unknown Error", error: nil)))
+                            }
+                        }
 						
 					case .failure(let error):
 						completion(.failure(error))
