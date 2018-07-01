@@ -9,6 +9,22 @@
 import UIKit
 import Eureka
 
+fileprivate extension Wallet {
+	var sectionTag: String {
+		switch self {
+		case .adamant: return "s_adm"
+		case .etherium: return "s_eth"
+		}
+	}
+	
+	var sectionTitle: String {
+		switch self {
+		case .adamant: return "ADAMANT Wallet"
+		case .etherium: return "Etherium Wallet"
+		}
+	}
+}
+
 class AccountViewController: FormViewController {
 	// MARK: - Rows & Sections
 	private enum Sections {
@@ -35,13 +51,14 @@ class AccountViewController: FormViewController {
 	
 	private enum Rows {
 		case account
-		case transfers, sendTokens, buyTokens, freeTokens // Wallet
+		case balance, transfers, sendTokens, buyTokens, freeTokens // Wallet
 		case stayLoggedIn, notifications, generateQr, logout // Security
 		case nodes, about // Application
 		
 		var tag: String {
 			switch self {
 			case .account: return "acc"
+			case .balance: return "blnc"
 			case .transfers: return "trsfrs"
 			case .sendTokens: return "sndTkns"
 			case .buyTokens: return "bTkns"
@@ -58,6 +75,7 @@ class AccountViewController: FormViewController {
 		var localized: String {
 			switch self {
 			case .account: return ""
+			case .balance: return "Balance"
 			case .transfers: return "Transfers"
 			case .sendTokens: return "Send Tokens"
 			case .buyTokens: return "Buy Tokens"
@@ -73,7 +91,7 @@ class AccountViewController: FormViewController {
 	}
 	
 	// MARK: - Wallets
-	
+	var selectedWalletIndex: Int = 0
 	
 	// MARK: - Properties
 	
@@ -81,6 +99,7 @@ class AccountViewController: FormViewController {
 	private (set) var accountHeaderView: AccountHeaderView!
 	var wallets: [Wallet]? {
 		didSet {
+			selectedWalletIndex = 0
 			accountHeaderView?.walletCollectionView.reloadData()
 		}
 	}
@@ -90,6 +109,8 @@ class AccountViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+		
+		wallets = [.adamant(balance: Decimal(floatLiteral: 100.001)), .etherium(balance: Decimal(floatLiteral: 105.5001))]
 
 		// MARK: Header&Footer
 		guard let header = UINib(nibName: "AccountHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? AccountHeaderView else {
@@ -108,47 +129,26 @@ class AccountViewController: FormViewController {
 		}
 		
 		
-		// MARK: Wallet
-		
-		form +++ Section(Sections.wallet.localized) {
-			$0.tag = Sections.wallet.tag
+		// MARK: Wallets
+		if let wallets = wallets {
+			for (walletIndex, wallet) in wallets.enumerated() {
+				let section = createSectionFor(wallet: wallet)
+				
+				section.hidden = Condition.function([], { [weak self] _ -> Bool in
+					guard let selectedIndex = self?.selectedWalletIndex else {
+						return true
+					}
+					
+					return walletIndex != selectedIndex
+				})
+				
+				form.append(section)
+			}
 		}
-		
-		// Transfers
-		<<< LabelRow() {
-			$0.title = Rows.transfers.localized
-			$0.tag = Rows.transfers.tag
-		}.cellSetup({ (cell, _) in
-			cell.accessoryType = .disclosureIndicator
-		})
-			
-		// Send Tokens
-		<<< LabelRow() {
-			$0.title = Rows.sendTokens.localized
-			$0.tag = Rows.sendTokens.tag
-		}.cellSetup({ (cell, _) in
-			cell.accessoryType = .disclosureIndicator
-		})
-		
-		// Buy tokens
-		<<< LabelRow() {
-			$0.title = Rows.buyTokens.localized
-			$0.tag = Rows.buyTokens.tag
-		}.cellSetup({ (cell, _) in
-			cell.accessoryType = .disclosureIndicator
-		})
-		
-		// Buy tokens
-		<<< LabelRow() {
-			$0.title = Rows.freeTokens.localized
-			$0.tag = Rows.freeTokens.tag
-		}.cellSetup({ (cell, _) in
-			cell.accessoryType = .disclosureIndicator
-		})
 		
 		
 		// MARK: Security
-		+++ Section(Sections.security.localized) {
+		form +++ Section(Sections.security.localized) {
 			$0.tag = Sections.security.tag
 		}
 		
@@ -200,8 +200,16 @@ class AccountViewController: FormViewController {
 			cell.accessoryType = .disclosureIndicator
 		})
 		
-		wallets = [.adamant(balance: Decimal(floatLiteral: 100.001)), .etherium(balance: Decimal(floatLiteral: 105.5001))]
+		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .centeredHorizontally)
     }
+	
+	override func insertAnimation(forSections sections: [Section]) -> UITableViewRowAnimation {
+		return .fade
+	}
+	
+	override func deleteAnimation(forSections sections: [Section]) -> UITableViewRowAnimation {
+		return .fade
+	}
 }
 
 
@@ -232,8 +240,7 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 			cell.balanceLabel.text = AdamantUtilities.currencyFormatter.string(from: balance as NSNumber)
 		}
 		
-		// TODO: check current selected cell
-		cell.setSelected(false, animated: false)
+		cell.setSelected(indexPath.row == selectedWalletIndex, animated: false)
 		return cell
 	}
 	
@@ -241,8 +248,76 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 		return true
 	}
 	
+	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+		selectedWalletIndex = indexPath.row
+		
+		form.allSections.filter { $0.hidden != nil }.forEach { $0.evaluateHidden() }
+	}
+	
 	// Flow delegate
 	func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
 		return CGSize(width: 110, height: 110)
+	}
+	
+	func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+		return UIEdgeInsets.zero
+	}
+}
+
+// MARK: - Tools
+extension AccountViewController {
+	func createSectionFor(wallet: Wallet) -> Section {
+		let section = Section(wallet.sectionTitle) {
+			$0.tag = wallet.sectionTag
+		}
+		
+		switch wallet {
+		case .adamant(let balance):
+			// Balance
+			section <<< LabelRow() {
+				$0.title = Rows.balance.localized
+				$0.tag = Rows.balance.tag
+				$0.value = AdamantUtilities.format(balance: balance)
+			}
+			
+			// Transfer tokens
+			<<< LabelRow() {
+				$0.title = Rows.transfers.localized
+				$0.tag = Rows.transfers.tag
+			}.cellSetup({ (cell, _) in
+				cell.accessoryType = .disclosureIndicator
+			})
+			
+			// Send Tokens
+			<<< LabelRow() {
+				$0.title = Rows.sendTokens.localized
+				$0.tag = Rows.sendTokens.tag
+			}.cellSetup({ (cell, _) in
+				cell.accessoryType = .disclosureIndicator
+			})
+			
+			// Buy tokens
+			<<< LabelRow() {
+				$0.title = Rows.buyTokens.localized
+				$0.tag = Rows.buyTokens.tag
+			}.cellSetup({ (cell, _) in
+				cell.accessoryType = .disclosureIndicator
+			})
+			
+			// Buy tokens
+			<<< LabelRow() {
+				$0.title = Rows.freeTokens.localized
+				$0.tag = Rows.freeTokens.tag
+			}.cellSetup({ (cell, _) in
+				cell.accessoryType = .disclosureIndicator
+			})
+			
+		case .etherium(_):
+			section <<< LabelRow() {
+				$0.title = "Soon..."
+			}
+		}
+		
+		return section
 	}
 }

@@ -47,11 +47,11 @@
                         </constraints>
                     </stackView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GLZ-IH-K8W">
-                        <rect key="frame" x="22" y="115" width="66" height="3"/>
-                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <rect key="frame" x="22" y="116" width="66" height="2"/>
+                        <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="66" id="Cc0-YC-IEo"/>
-                            <constraint firstAttribute="height" constant="3" id="HE7-Hg-rTU"/>
+                            <constraint firstAttribute="height" constant="2" id="HE7-Hg-rTU"/>
                         </constraints>
                     </view>
                 </subviews>
