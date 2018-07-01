@@ -15,7 +15,7 @@ class WalletCollectionViewCell: UICollectionViewCell {
 	@IBOutlet weak var markerView: UIView!
 	@IBOutlet weak var markerWidthConstraint: NSLayoutConstraint!
 	
-	var activeMarkerMultiplier: CGFloat = 0.6
+	var activeMarkerMultiplier: CGFloat = 0.68
 	var markerAnimationDuration: TimeInterval = 0.15
 	
 	override var isSelected: Bool {

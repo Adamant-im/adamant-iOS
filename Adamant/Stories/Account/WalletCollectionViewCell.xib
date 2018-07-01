@@ -72,6 +72,6 @@
         </collectionViewCell>
     </objects>
     <resources>
-        <image name="wallet_adm" width="65" height="65"/>
+        <image name="wallet_adm" width="55" height="55"/>
     </resources>
 </document>

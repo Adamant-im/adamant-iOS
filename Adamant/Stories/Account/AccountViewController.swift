@@ -233,14 +233,16 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 		}
 		
 		cell.currencyImageView.image = wallet.currencyLogo
+		cell.balanceLabel.text = wallet.fomattedShort
 		cell.currencySymbolLabel.text = wallet.currencySymbol
-		cell.balanceLabel.textColor = UIColor.adamantPrimary
-		cell.currencySymbolLabel.textColor = UIColor.adamantPrimary
 		
-		switch wallet {
-		case .adamant(let balance), .etherium(let balance):
-			cell.balanceLabel.text = AdamantUtilities.currencyFormatter.string(from: balance as NSNumber)
-		}
+		let color = UIColor.adamantPrimary
+		cell.balanceLabel.textColor = color
+		cell.currencySymbolLabel.textColor = color
+		
+		let font = UIFont.adamantPrimary(size: 17)
+		cell.balanceLabel.font = font
+		cell.currencySymbolLabel.font = font
 		
 		cell.setSelected(indexPath.row == selectedWalletIndex, animated: false)
 		return cell
