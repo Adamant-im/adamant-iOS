@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -19,33 +20,19 @@
                 <rect key="frame" x="0.0" y="0.0" width="110" height="118"/>
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
-                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="wMJ-yv-tKk">
-                        <rect key="frame" x="22.5" y="0.0" width="65" height="106"/>
-                        <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xZc-UL-00v">
-                                <rect key="frame" x="0.0" y="0.0" width="65" height="65"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="65" id="BYW-hx-Hql"/>
-                                    <constraint firstAttribute="width" constant="65" id="HIA-db-9U0"/>
-                                </constraints>
-                            </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NTG-ad-tJQ">
-                                <rect key="frame" x="11.5" y="65" width="42" height="20.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Via-ei-IpM">
-                                <rect key="frame" x="11.5" y="85.5" width="42" height="20.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="wallet_adm" translatesAutoresizingMaskIntoConstraints="NO" id="xZc-UL-00v">
+                        <rect key="frame" x="28" y="0.0" width="55" height="55"/>
                         <constraints>
-                            <constraint firstItem="NTG-ad-tJQ" firstAttribute="width" relation="lessThanOrEqual" secondItem="wMJ-yv-tKk" secondAttribute="width" id="nZM-5u-Ihe"/>
+                            <constraint firstAttribute="height" constant="55" id="BYW-hx-Hql"/>
+                            <constraint firstAttribute="width" secondItem="xZc-UL-00v" secondAttribute="height" multiplier="1:1" id="CwR-kR-kjO"/>
                         </constraints>
-                    </stackView>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Via-ei-IpM">
+                        <rect key="frame" x="34" y="84" width="42" height="20.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GLZ-IH-K8W">
                         <rect key="frame" x="22" y="116" width="66" height="2"/>
                         <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -54,14 +41,23 @@
                             <constraint firstAttribute="height" constant="2" id="HE7-Hg-rTU"/>
                         </constraints>
                     </view>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NTG-ad-tJQ">
+                        <rect key="frame" x="34" y="65" width="42" height="20.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                 </subviews>
             </view>
             <constraints>
-                <constraint firstItem="wMJ-yv-tKk" firstAttribute="top" secondItem="ZTg-uK-7eu" secondAttribute="top" id="BoT-uz-IIw"/>
+                <constraint firstItem="Via-ei-IpM" firstAttribute="centerX" secondItem="NTG-ad-tJQ" secondAttribute="centerX" id="Amy-2k-tDl"/>
+                <constraint firstItem="NTG-ad-tJQ" firstAttribute="top" secondItem="xZc-UL-00v" secondAttribute="bottom" constant="10" id="Oty-s9-Se5"/>
+                <constraint firstItem="Via-ei-IpM" firstAttribute="top" secondItem="NTG-ad-tJQ" secondAttribute="bottom" constant="-1.5" id="RwR-QC-WVd"/>
                 <constraint firstAttribute="bottom" secondItem="GLZ-IH-K8W" secondAttribute="bottom" id="b7C-Jo-oAh"/>
-                <constraint firstItem="wMJ-yv-tKk" firstAttribute="width" relation="lessThanOrEqual" secondItem="gTV-IL-0wX" secondAttribute="width" id="ceh-TG-KMD"/>
                 <constraint firstItem="GLZ-IH-K8W" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="db5-Qb-QFh"/>
-                <constraint firstItem="wMJ-yv-tKk" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="eVS-ga-FoL"/>
+                <constraint firstItem="xZc-UL-00v" firstAttribute="top" secondItem="ZTg-uK-7eu" secondAttribute="top" id="e2k-Wh-n8m"/>
+                <constraint firstItem="NTG-ad-tJQ" firstAttribute="centerX" secondItem="xZc-UL-00v" secondAttribute="centerX" id="fZP-wm-UD0"/>
+                <constraint firstItem="xZc-UL-00v" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="kLt-9y-aHy"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <size key="customSize" width="110" height="120"/>
@@ -75,4 +71,7 @@
             <point key="canvasLocation" x="64" y="89"/>
         </collectionViewCell>
     </objects>
+    <resources>
+        <image name="wallet_adm" width="65" height="65"/>
+    </resources>
 </document>

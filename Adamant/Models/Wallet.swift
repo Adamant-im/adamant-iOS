@@ -14,8 +14,8 @@ enum Wallet {
 	
 	var currencyLogo: UIImage {
 		switch self {
-		case .adamant: return UIImage()
-		case .etherium: return UIImage()
+		case .adamant: return #imageLiteral(resourceName: "wallet_adm")
+		case .etherium: return #imageLiteral(resourceName: "wallet_eth")
 		}
 	}
 	

@@ -234,6 +234,8 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 		
 		cell.currencyImageView.image = wallet.currencyLogo
 		cell.currencySymbolLabel.text = wallet.currencySymbol
+		cell.balanceLabel.textColor = UIColor.adamantPrimary
+		cell.currencySymbolLabel.textColor = UIColor.adamantPrimary
 		
 		switch wallet {
 		case .adamant(let balance), .etherium(let balance):
