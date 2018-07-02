@@ -18,6 +18,12 @@ class WalletCollectionViewCell: UICollectionViewCell {
 	var activeMarkerMultiplier: CGFloat = 0.68
 	var markerAnimationDuration: TimeInterval = 0.15
 	
+	override var tintColor: UIColor! {
+		didSet {
+			markerView.backgroundColor = tintColor
+		}
+	}
+	
 	override var isSelected: Bool {
 		didSet {
 			setSelected(isSelected, animated: true)

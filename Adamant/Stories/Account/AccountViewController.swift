@@ -51,7 +51,7 @@ class AccountViewController: FormViewController {
 	
 	private enum Rows {
 		case account
-		case balance, transfers, sendTokens, buyTokens, freeTokens // Wallet
+		case balance, sendTokens, buyTokens, freeTokens // Wallet
 		case stayLoggedIn, notifications, generateQr, logout // Security
 		case nodes, about // Application
 		
@@ -59,7 +59,6 @@ class AccountViewController: FormViewController {
 			switch self {
 			case .account: return "acc"
 			case .balance: return "blnc"
-			case .transfers: return "trsfrs"
 			case .sendTokens: return "sndTkns"
 			case .buyTokens: return "bTkns"
 			case .freeTokens: return "frrTkns"
@@ -76,7 +75,6 @@ class AccountViewController: FormViewController {
 			switch self {
 			case .account: return ""
 			case .balance: return "Balance"
-			case .transfers: return "Transfers"
 			case .sendTokens: return "Send Tokens"
 			case .buyTokens: return "Buy Tokens"
 			case .freeTokens: return "Free Tokens"
@@ -109,8 +107,9 @@ class AccountViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+		navigationController?.setNavigationBarHidden(true, animated: false)
 		
-		wallets = [.adamant(balance: Decimal(floatLiteral: 100.001)), .etherium(balance: Decimal(floatLiteral: 105.5001))]
+		wallets = [.adamant(balance: Decimal(floatLiteral: 100.001)), .etherium]
 
 		// MARK: Header&Footer
 		guard let header = UINib(nibName: "AccountHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? AccountHeaderView else {
@@ -156,7 +155,8 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.stayLoggedIn.localized
 			$0.tag = Rows.stayLoggedIn.tag
-		}.cellSetup({ (cell, _) in
+			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
 		})
 			
@@ -164,9 +164,10 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.notifications.localized
 			$0.tag = Rows.notifications.tag
+			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
 			
 			// TODO: Value
-		}.cellSetup({ (cell, _) in
+		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
 		})
 			
@@ -174,7 +175,8 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.generateQr.localized
 			$0.tag = Rows.generateQr.tag
-		}.cellSetup({ (cell, _) in
+			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
 		})
 		
@@ -188,20 +190,41 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.nodes.localized
 			$0.tag = Rows.nodes.tag
-		}.cellSetup({ (cell, _) in
+			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
+		}).onCellSelection({ (_, _) in
+			let viewController = UIViewController()
+			viewController.view.backgroundColor = UIColor.white
+			self.navigationController?.pushViewController(viewController, animated: true)
 		})
 		
 		// About
 		<<< LabelRow() {
 			$0.title = Rows.about.localized
 			$0.tag = Rows.about.tag
-		}.cellSetup({ (cell, _) in
+			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
 		})
 		
+		form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamantSecondary; }
+		
 		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .centeredHorizontally)
     }
+	
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		navigationController?.setNavigationBarHidden(true, animated: animated)
+	}
+	
+	override func viewWillDisappear(_ animated: Bool) {
+		super.viewWillDisappear(animated)
+		navigationController?.setNavigationBarHidden(false, animated: animated)
+	}
+	
+	
+	// TableView configuration
 	
 	override func insertAnimation(forSections sections: [Section]) -> UITableViewRowAnimation {
 		return .fade
@@ -232,6 +255,7 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 			fatalError("Wallets collectionView: Out of bounds row")
 		}
 		
+		cell.tintColor = UIColor.adamantSecondary
 		cell.currencyImageView.image = wallet.currencyLogo
 		cell.balanceLabel.text = wallet.fomattedShort
 		cell.currencySymbolLabel.text = wallet.currencySymbol
@@ -282,13 +306,8 @@ extension AccountViewController {
 				$0.title = Rows.balance.localized
 				$0.tag = Rows.balance.tag
 				$0.value = AdamantUtilities.format(balance: balance)
-			}
-			
-			// Transfer tokens
-			<<< LabelRow() {
-				$0.title = Rows.transfers.localized
-				$0.tag = Rows.transfers.tag
-			}.cellSetup({ (cell, _) in
+				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			}.cellUpdate({ (cell, _) in
 				cell.accessoryType = .disclosureIndicator
 			})
 			
@@ -296,7 +315,8 @@ extension AccountViewController {
 			<<< LabelRow() {
 				$0.title = Rows.sendTokens.localized
 				$0.tag = Rows.sendTokens.tag
-			}.cellSetup({ (cell, _) in
+				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			}.cellUpdate({ (cell, _) in
 				cell.accessoryType = .disclosureIndicator
 			})
 			
@@ -304,19 +324,21 @@ extension AccountViewController {
 			<<< LabelRow() {
 				$0.title = Rows.buyTokens.localized
 				$0.tag = Rows.buyTokens.tag
-			}.cellSetup({ (cell, _) in
+				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			}.cellUpdate({ (cell, _) in
 				cell.accessoryType = .disclosureIndicator
 			})
 			
-			// Buy tokens
+			// Get free tokens
 			<<< LabelRow() {
 				$0.title = Rows.freeTokens.localized
 				$0.tag = Rows.freeTokens.tag
-			}.cellSetup({ (cell, _) in
+				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			}.cellUpdate({ (cell, _) in
 				cell.accessoryType = .disclosureIndicator
 			})
 			
-		case .etherium(_):
+		case .etherium:
 			section <<< LabelRow() {
 				$0.title = "Soon..."
 			}

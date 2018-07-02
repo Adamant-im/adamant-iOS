@@ -80,7 +80,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
-		window!.rootViewController = AccountViewController()
+		window!.rootViewController = UINavigationController(rootViewController: AccountViewController())
 //		window!.rootViewController?.view.backgroundColor = .white
 		window!.makeKeyAndVisible()
 		window!.tintColor = UIColor.adamantPrimary
