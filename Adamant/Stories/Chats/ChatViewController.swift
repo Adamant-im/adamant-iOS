@@ -77,60 +77,44 @@ class ChatViewController: MessagesViewController {
                 $0.image = #imageLiteral(resourceName: "attachment")
             }.onTouchUpInside { _ in
                 self.dialogService.showSystemActionSheet(title: String.adamantLocalized.transfer.send, message: "", actions: [
-                    UIAlertAction(title: "Ethereum", style: .default, handler: { (action) in
-                    if let ethAddress = self.ethAddress {
-                        // MARK: Show ETH transfer details
-                        guard let vc = self.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
-                            fatalError("Can't get TransferViewController scene")
-                        }
-                        
-                        vc.token = .ETH
-                        vc.toAddress = ethAddress
-                        vc.delegate = self
-                        
-                        if let nav = self.navigationController {
-                            nav.pushViewController(vc, animated: true)
+                    UIAlertAction(title: "Ethereum", style: .default, handler: { [weak self] (_) in
+                        if let ethAddress = self?.ethAddress {
+                            // MARK: Show ETH transfer
+                            guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
+                                fatalError("Can't get TransferViewController scene")
+                            }
+                            
+                            vc.token = .ETH
+                            vc.toAddress = ethAddress
+                            vc.delegate = self
+                            
+                            if let nav = self?.navigationController {
+                                nav.pushViewController(vc, animated: true)
+                            } else {
+                                self?.present(vc, animated: true, completion: nil)
+                            }
                         } else {
-                            self.present(vc, animated: true, completion: nil)
+                            self?.dialogService.showWarning(withMessage: "User don't have public Eth wallet yet.")
                         }
-                    } else {
-                        self.dialogService.showWarning(withMessage: "User don't have public Eth wallet yet.")
-                    }
-                }),
+                    }),
                     UIAlertAction(title: "ADM", style: .default, handler: { [weak self] (_) in
-                        // MARK: Show ADM transfer details - DISABLED until end of ICO
+                        // MARK: Show ADM transfer details
                         if let address = self?.chatroom?.partner?.address {
                             guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
                                 fatalError("Can't get TransferViewController scene")
                             }
-
+                            
                             vc.token = .ADM
                             vc.toAddress = address
-
+                            
                             if let nav = self?.navigationController {
                                 nav.pushViewController(vc, animated: true)
                             } else {
                                 self?.present(vc, animated: true, completion: nil)
                             }
                         }
-//                        let alert = UIAlertController(title: String.adamantLocalized.account.sorryAlert, message: String.adamantLocalized.account.transferNotAllowed, preferredStyle: .alert)
-//                        
-//                        let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { (_) in }
-//                        
-//                        alert.addAction(cancel)
-//                        
-//                        if let url = AdamantResources.webAppUrl {
-//                            let webApp = UIAlertAction(title: String.adamantLocalized.account.webApp, style: .default) { [weak self] _ in
-//                                let safari  = SFSafariViewController(url: url)
-//                                safari.preferredControlTintColor = UIColor.adamantPrimary
-//                                self?.present(safari, animated: true, completion: nil)
-//                            }
-//                            alert.addAction(webApp)
-//                        }
-//                        
-//                        self?.present(alert, animated: true, completion: nil)
                     })
-                                                                                               ])
+                    ])
         }
     }()
 	
