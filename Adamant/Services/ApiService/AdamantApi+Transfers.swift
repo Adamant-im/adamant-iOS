@@ -11,12 +11,10 @@ import Foundation
 extension AdamantApiService {
 	func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void) {
         
-        let amount = amount.shiftedToAdamant() * 100000000
-        
-		// MARK: 1. Prepare params
+        // MARK: 1. Prepare params
 		let params: [String : Any] = [
 			"type": TransactionType.send.rawValue,
-			"amount": amount,//amount.shiftedToAdamant(),
+			"amount": amount.shiftedToAdamant(),
 			"recipientId": recipient,
 			"senderId": sender,
 			"publicKey": keypair.publicKey
@@ -57,7 +55,7 @@ extension AdamantApiService {
 				// MARK: 4.2. Create transaction
 				let transaction: [String: Any] = [
                     "type": normalizedTransaction.type.rawValue,
-                    "amount": amount,
+                    "amount": normalizedTransaction.amount.shiftedToAdamant(),
                     "senderPublicKey": normalizedTransaction.senderPublicKey,
                     "requesterPublicKey": normalizedTransaction.requesterPublicKey ?? NSNull(),
                     "timestamp": normalizedTransaction.timestamp,
