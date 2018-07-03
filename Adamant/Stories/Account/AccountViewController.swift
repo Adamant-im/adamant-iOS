@@ -190,8 +190,15 @@ class AccountViewController: FormViewController {
 			$0.title = Rows.generateQr.localized
 			$0.tag = Rows.generateQr.tag
 			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
+		}).onCellSelection({ [weak self] (_, _) in
+			guard let nav = self?.navigationController, let generator = self?.router.get(scene: AdamantScene.Settings.qRGenerator) else {
+				return
+			}
+			
+			nav.pushViewController(generator, animated: true)
 		})
 		
 		
