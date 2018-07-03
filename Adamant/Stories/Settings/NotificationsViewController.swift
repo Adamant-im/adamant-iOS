@@ -19,19 +19,6 @@ extension String.adamantLocalized {
 }
 
 extension NotificationsMode: CustomStringConvertible {
-	var localized: String {
-		switch self {
-		case .disabled:
-			return NSLocalizedString("Notifications.Mode.NotificationsDisabled", comment: "Notifications: Disable notifications")
-			
-		case .backgroundFetch:
-			return NSLocalizedString("Notifications.Mode.BackgroundFetch", comment: "Notifications: Use Background fetch notifications")
-			
-		case .push:
-			return NSLocalizedString("Notifications.Mode.ApplePush", comment: "Notifications: Use Apple Push notifications")
-		}
-	}
-	
 	var description: String {
 		return localized
 	}

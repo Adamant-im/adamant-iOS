@@ -93,6 +93,7 @@ class AccountViewController: FormViewController {
 	var accountService: AccountService!
 	var dialogService: DialogService!
 	var router: Router!
+	var notificationsService: NotificationsService!
 	
 	
 	// MARK: - Wallets
@@ -170,19 +171,26 @@ class AccountViewController: FormViewController {
 			$0.title = Rows.stayLoggedIn.localized
 			$0.tag = Rows.stayLoggedIn.tag
 			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
 		})
 			
 		// Notifications
-		<<< LabelRow() {
+		<<< LabelRow() { [weak self] in
 			$0.title = Rows.notifications.localized
 			$0.tag = Rows.notifications.tag
 			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
-			
-			// TODO: Value
+			$0.cell.selectionStyle = .gray
+			$0.value = self?.notificationsService.notificationsMode.localized
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
+		}).onCellSelection({ [weak self] (_, _) in
+			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.notifications) else {
+				return
+			}
+			
+			nav.pushViewController(vc, animated: true)
 		})
 			
 		// Generate QR
@@ -234,7 +242,7 @@ class AccountViewController: FormViewController {
 		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .centeredHorizontally)
 		
 		
-		// Notification Center
+		// MARK: Notification Center
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.refreshAccountInfo()
 		}
@@ -244,6 +252,18 @@ class AccountViewController: FormViewController {
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.refreshAccountInfo()
+		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
+			guard let modeRaw = notification.userInfo?[AdamantUserInfoKey.NotificationsService.newNotificationsMode], let mode = modeRaw as? NotificationsMode else {
+				return
+			}
+			
+			guard let row: LabelRow = self?.form.rowBy(tag: Rows.notifications.tag) else {
+				return
+			}
+			
+			row.value = mode.localized
 		}
     }
 	

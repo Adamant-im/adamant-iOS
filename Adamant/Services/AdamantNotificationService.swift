@@ -85,7 +85,11 @@ extension AdamantNotificationsService {
 			AdamantNotificationsService.configureUIApplicationFor(mode: mode)
 			securedStore.remove(StoreKey.notificationsService.notificationsMode)
 			notificationsMode = mode
-			NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: self)
+			
+			NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged,
+											object: self,
+											userInfo: [AdamantUserInfoKey.NotificationsService.newNotificationsMode: mode])
+			
 			completion?(.success)
 			return
 			
@@ -99,7 +103,9 @@ extension AdamantNotificationsService {
 				AdamantNotificationsService.configureUIApplicationFor(mode: mode)
 				self?.securedStore.set(mode.toRaw(), for: StoreKey.notificationsService.notificationsMode)
 				self?.notificationsMode = mode
-				NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: self)
+				NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged,
+												object: self,
+												userInfo: [AdamantUserInfoKey.NotificationsService.newNotificationsMode: mode])
 				completion?(.success)
 			}
 		}
