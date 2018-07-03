@@ -130,6 +130,12 @@
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Tap for details";
 
+/* Chat: status message for failed to send chat transaction */
+"ChatScene.MessageStatus.FailToSend" = "fail to send";
+
+/* Chat: status message for pending chat transaction */
+"ChatScene.MessageStatus.Pending" = "pending";
+
 /* Shared error: Account not found error. Using %@ for address. */
 "Error.AccountNotFoundFormat" = "Account not found: %@";
 

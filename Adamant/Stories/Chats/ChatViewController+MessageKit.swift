@@ -42,6 +42,27 @@ extension ChatViewController: MessagesDataSource {
         }
         return nil
     }
+    
+    func messageTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+        if isFromCurrentSender(message: message) {
+            guard let transaction = message as? ChatTransaction else {
+                return nil
+            }
+            
+            switch transaction.statusEnum {
+            case .failed:
+                return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedStringKey.foregroundColor: UIColor.darkText])
+                
+            case .pending:
+                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedStringKey.foregroundColor: UIColor.darkText])
+                
+            case .delivered:
+                return nil
+            }
+        } else {
+            return nil
+        }
+    }
 	
 	func messageBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
 		if message.sentDate == Date.adamantNullDate {
@@ -240,11 +261,47 @@ extension ChatViewController: MessagesLayoutDelegate {
     }
     
     func messageTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
-        return 0
+        if message is TransferTransaction {
+            return 0
+        }
+        
+        if isFromCurrentSender(message: message) {
+            guard let transaction = message as? ChatTransaction else {
+                return 0
+            }
+            
+            switch transaction.statusEnum {
+            case .failed, .pending:
+                return 16
+                
+            case .delivered:
+                return 0
+            }
+        } else {
+            return 0
+        }
     }
     
     func messageBottomLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
-        return 16
+        if message is TransferTransaction {
+            return 16
+        }
+        
+        if isFromCurrentSender(message: message) {
+            guard let transaction = message as? ChatTransaction else {
+                return 16
+            }
+            
+            switch transaction.statusEnum {
+            case .failed, .pending:
+                return 0
+                
+            case .delivered:
+                return 16
+            }
+        } else {
+            return 16
+        }
     }
 }
 

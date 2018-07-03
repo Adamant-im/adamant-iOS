@@ -16,6 +16,8 @@ extension String.adamantLocalized {
 		static let sendButton = NSLocalizedString("ChatScene.Send", comment: "Chat: Send message button")
 		static let messageInputPlaceholder = NSLocalizedString("ChatScene.NewMessage.Placeholder", comment: "Chat: message input placeholder")
 		static let cancelError = NSLocalizedString("ChatScene.Error.cancelError", comment: "Chat: inform user that he can't cancel transaction, that was sent")
+        static let failToSend = NSLocalizedString("ChatScene.MessageStatus.FailToSend", comment: "Chat: status message for failed to send chat transaction")
+        static let pending = NSLocalizedString("ChatScene.MessageStatus.Зending", comment: "Chat: status message for pending chat transaction")
 		
 		private init() { }
 	}
@@ -93,6 +95,7 @@ class ChatViewController: MessagesViewController {
                 messageSizeCalculator.incomingAvatarSize = .zero
                 messageSizeCalculator.outgoingMessageBottomLabelAlignment = LabelAlignment(textAlignment: .right, textInsets: UIEdgeInsets(top: 2, left: 0, bottom: 0, right: 16))
                 messageSizeCalculator.incomingMessageBottomLabelAlignment = LabelAlignment(textAlignment: .left, textInsets: UIEdgeInsets(top: 2, left: 16, bottom: 0, right: 0))
+                messageSizeCalculator.outgoingMessageTopLabelAlignment = LabelAlignment(textAlignment: .right, textInsets: UIEdgeInsets(top: 2, left: 0, bottom: 0, right: 16))
             }
         }
 		
