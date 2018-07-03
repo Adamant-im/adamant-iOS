@@ -23,7 +23,7 @@
 "AccountTab.FreeTokens.UrlFormat" = "https://adamant.im/free-adm-tokens/?wallet=%@";
 
 /* Account tab: A full 'Join ICO' link, with %@ as address */
-"AccountTab.JoinIco.UrlFormat" = "https://adamant.im/ico/?wallet=%@";
+"AccountTab.JoinIco.UrlFormat" = "https://adamant.im/de-buy-tokens/?wallet=%@";
 
 /* Account tab: Balance row title */
 "AccountTab.Row.Balance" = "Kontostand";
