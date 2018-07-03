@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import SafariServices
 
 fileprivate extension Wallet {
 	var sectionTag: String {
@@ -88,8 +89,15 @@ class AccountViewController: FormViewController {
 		}
 	}
 	
+	// MARK: - Dependencies
+	var accountService: AccountService!
+	var dialogService: DialogService!
+	var router: Router!
+	
+	
 	// MARK: - Wallets
 	var selectedWalletIndex: Int = 0
+	
 	
 	// MARK: - Properties
 	
@@ -107,9 +115,12 @@ class AccountViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+		
+		navigationOptions = .Disabled
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		
 		wallets = [.adamant(balance: Decimal(floatLiteral: 100.001)), .etherium]
+		
 
 		// MARK: Header&Footer
 		guard let header = UINib(nibName: "AccountHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? AccountHeaderView else {
@@ -117,9 +128,12 @@ class AccountViewController: FormViewController {
 		}
 		
 		accountHeaderView = header
+		accountHeaderView.delegate = self
 		accountHeaderView.walletCollectionView.delegate = self
 		accountHeaderView.walletCollectionView.dataSource = self
 		accountHeaderView.walletCollectionView.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: walletCellIdentifier)
+		
+		refreshAccountInfo()
 		
 		tableView.tableHeaderView = header
 		
@@ -211,16 +225,37 @@ class AccountViewController: FormViewController {
 		form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamantSecondary; }
 		
 		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .centeredHorizontally)
+		
+		
+		// Notification Center
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			self?.refreshAccountInfo()
+		}
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			self?.refreshAccountInfo()
+		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
+			self?.refreshAccountInfo()
+		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		navigationController?.setNavigationBarHidden(true, animated: animated)
+		
+		if let indexPath = tableView.indexPathForSelectedRow {
+			tableView.deselectRow(at: indexPath, animated: animated)
+		}
 	}
 	
 	override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
 		navigationController?.setNavigationBarHidden(false, animated: animated)
+	}
+	
+	deinit {
+		NotificationCenter.default.removeObserver(self)
 	}
 	
 	
@@ -232,6 +267,35 @@ class AccountViewController: FormViewController {
 	
 	override func deleteAnimation(forSections sections: [Section]) -> UITableViewRowAnimation {
 		return .fade
+	}
+	
+	func refreshAccountInfo() {
+		let address: String
+		let adamantWallet: Wallet
+		
+		if let account = accountService.account {
+			address = account.address
+			adamantWallet = Wallet.adamant(balance: account.balance)
+		} else {
+			address = ""
+			adamantWallet = Wallet.adamant(balance: 0)
+		}
+		
+		if wallets != nil {
+			wallets![0] = adamantWallet
+			accountHeaderView.walletCollectionView.reloadItems(at: [IndexPath(row: 0, section: 0)])
+		} else {
+			wallets = [adamantWallet, Wallet.etherium]
+			accountHeaderView.walletCollectionView.reloadData()
+		}
+		
+		if let row: LabelRow = form.rowBy(tag: Rows.balance.tag) {
+			row.value = adamantWallet.formattedShort
+			row.updateCell()
+		}
+		
+		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: selectedWalletIndex, section: 0), animated: false, scrollPosition: .centeredHorizontally)
+		accountHeaderView.addressButton.setTitle(address, for: .normal)
 	}
 }
 
@@ -257,7 +321,7 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 		
 		cell.tintColor = UIColor.adamantSecondary
 		cell.currencyImageView.image = wallet.currencyLogo
-		cell.balanceLabel.text = wallet.fomattedShort
+		cell.balanceLabel.text = wallet.formattedShort
 		cell.currencySymbolLabel.text = wallet.currencySymbol
 		
 		let color = UIColor.adamantPrimary
@@ -292,6 +356,14 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 	}
 }
 
+
+extension AccountViewController: AccountHeaderViewDelegate {
+	func addressLabelTapped() {
+		print("show share menu")
+	}
+}
+
+
 // MARK: - Tools
 extension AccountViewController {
 	func createSectionFor(wallet: Wallet) -> Section {
@@ -307,26 +379,51 @@ extension AccountViewController {
 				$0.tag = Rows.balance.tag
 				$0.value = AdamantUtilities.format(balance: balance)
 				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+				$0.cell.selectionStyle = .gray
 			}.cellUpdate({ (cell, _) in
 				cell.accessoryType = .disclosureIndicator
+			}).onCellSelection({ [weak self] (_, _) in
+				guard let vc = self?.router.get(scene: AdamantScene.Transactions.transactions), let nav = self?.navigationController else {
+					return
+				}
+				
+				nav.pushViewController(vc, animated: true)
 			})
 			
 			// Send Tokens
-			<<< LabelRow() {
-				$0.title = Rows.sendTokens.localized
-				$0.tag = Rows.sendTokens.tag
-				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
-			}.cellUpdate({ (cell, _) in
-				cell.accessoryType = .disclosureIndicator
-			})
+//			<<< LabelRow() {
+//				$0.title = Rows.sendTokens.localized
+//				$0.tag = Rows.sendTokens.tag
+//				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+//				$0.cell.selectionStyle = .gray
+//			}.cellUpdate({ (cell, _) in
+//				cell.accessoryType = .disclosureIndicator
+//			})
 			
 			// Buy tokens
 			<<< LabelRow() {
 				$0.title = Rows.buyTokens.localized
 				$0.tag = Rows.buyTokens.tag
 				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+				$0.cell.selectionStyle = .gray
 			}.cellUpdate({ (cell, _) in
 				cell.accessoryType = .disclosureIndicator
+			}).onCellSelection({ [weak self] (_, _) in
+				let urlOpt: URL?
+				if let address = self?.accountService.account?.address {
+					urlOpt = URL(string: String.localizedStringWithFormat(String.adamantLocalized.account.joinIcoUrlFormat, address))
+				} else {
+					urlOpt = URL(string: String.adamantLocalized.account.joinIcoUrlFormat)
+				}
+				
+				guard let url = urlOpt else {
+					self?.dialogService.showError(withMessage: "Failed to build 'Buy tokens' url, report a bug", error: nil)
+					return
+				}
+				
+				let safari = SFSafariViewController(url: url)
+				safari.preferredControlTintColor = UIColor.adamantPrimary
+				self?.present(safari, animated: true, completion: nil)
 			})
 			
 			// Get free tokens
@@ -334,8 +431,25 @@ extension AccountViewController {
 				$0.title = Rows.freeTokens.localized
 				$0.tag = Rows.freeTokens.tag
 				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+				$0.cell.selectionStyle = .gray
 			}.cellUpdate({ (cell, _) in
 				cell.accessoryType = .disclosureIndicator
+			}).onCellSelection({ [weak self] (_, _) in
+				let urlOpt: URL?
+				if let address = self?.accountService.account?.address {
+					urlOpt = URL(string: String.localizedStringWithFormat(String.adamantLocalized.account.getFreeTokensUrlFormat, address))
+				} else {
+					urlOpt = URL(string: String.adamantLocalized.account.getFreeTokensUrlFormat)
+				}
+				
+				guard let url = urlOpt else {
+					self?.dialogService.showError(withMessage: "Failed to build 'Free tokens' url, report a bug", error: nil)
+					return
+				}
+				
+				let safari = SFSafariViewController(url: url)
+				safari.preferredControlTintColor = UIColor.adamantPrimary
+				self?.present(safari, animated: true, completion: nil)
 			})
 			
 		case .etherium:

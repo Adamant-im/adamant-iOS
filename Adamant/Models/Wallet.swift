@@ -11,6 +11,13 @@ import UIKit
 enum Wallet {
 	case adamant(balance: Decimal)
 	case etherium
+	
+	var enabled: Bool {
+		switch self {
+		case .adamant: return true
+		case .etherium: return false
+		}
+	}
 }
 
 
@@ -41,7 +48,7 @@ extension Wallet {
 		return formatter
 	}()
 	
-	var fomattedShort: String? {
+	var formattedShort: String? {
 		switch self {
 		case .adamant(let balance): //, .etherium(let balance):
 			return Wallet.currencyFormatter.string(from: balance as NSNumber)!
@@ -51,7 +58,7 @@ extension Wallet {
 		}
 	}
 	
-	var fomattedFull: String? {
+	var formattedFull: String? {
 		switch self {
 		case .adamant(let balance): //, .etherium(let balance):
 			return "\(Wallet.currencyFormatter.string(from: balance as NSNumber)!) \(currencySymbol)"

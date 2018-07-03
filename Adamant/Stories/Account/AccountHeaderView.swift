@@ -8,10 +8,20 @@
 
 import UIKit
 
+protocol AccountHeaderViewDelegate: class {
+	func addressLabelTapped()
+}
+
 class AccountHeaderView: UIView {
 	
 	// MARK: - IBOutlets
 	@IBOutlet weak var avatarImageView: UIImageView!
-	@IBOutlet weak var addressLabel: UILabel!
 	@IBOutlet weak var walletCollectionView: UICollectionView!
+	@IBOutlet weak var addressButton: UIButton!
+	
+	weak var delegate: AccountHeaderViewDelegate?
+	
+	@IBAction func addressButtonTapped(_ sender: Any) {
+		delegate?.addressLabelTapped()
+	}
 }

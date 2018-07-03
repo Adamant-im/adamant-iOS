@@ -33,12 +33,14 @@
                         <constraint firstAttribute="width" constant="75" id="ElK-xR-5kx"/>
                     </constraints>
                 </imageView>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="U2222233445566778899" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jft-8f-bm2">
-                    <rect key="frame" x="41" y="120" width="296" height="31.5"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Iro-jA-X5P">
+                    <rect key="frame" x="41" y="113" width="296" height="44"/>
                     <fontDescription key="fontDescription" name="Exo2-Light" family="Exo 2 Light" pointSize="26"/>
-                    <nil key="textColor"/>
-                    <nil key="highlightedColor"/>
-                </label>
+                    <state key="normal" title="U2222233445566778899"/>
+                    <connections>
+                        <action selector="addressButtonTapped:" destination="iN0-l3-epB" eventType="touchUpInside" id="RF4-0U-fJX"/>
+                    </connections>
+                </button>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceHorizontal="YES" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="akZ-qC-jqo">
                     <rect key="frame" x="0.0" y="184" width="378" height="110"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -60,17 +62,17 @@
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="akZ-qC-jqo" secondAttribute="trailing" id="FfD-08-VTQ"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="h0z-DQ-dIb" secondAttribute="bottom" id="H33-40-4fD"/>
                 <constraint firstItem="akZ-qC-jqo" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="HOU-O7-aSL"/>
-                <constraint firstItem="Jft-8f-bm2" firstAttribute="centerX" secondItem="IVQ-4p-zci" secondAttribute="centerX" id="RVS-kl-Q4e"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="h0z-DQ-dIb" secondAttribute="trailing" id="UNg-Mk-F3h"/>
+                <constraint firstItem="Iro-jA-X5P" firstAttribute="centerX" secondItem="IVQ-4p-zci" secondAttribute="centerX" id="YUV-3q-LfW"/>
                 <constraint firstItem="IVQ-4p-zci" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="25" id="Z7D-Q0-s2x"/>
                 <constraint firstItem="h0z-DQ-dIb" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="Zka-iG-51c"/>
-                <constraint firstItem="Jft-8f-bm2" firstAttribute="top" secondItem="IVQ-4p-zci" secondAttribute="bottom" constant="20" id="bwS-eH-ucM"/>
+                <constraint firstItem="Iro-jA-X5P" firstAttribute="top" secondItem="IVQ-4p-zci" secondAttribute="bottom" constant="13" id="gQH-hl-GfG"/>
                 <constraint firstItem="IVQ-4p-zci" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="jUo-aI-jOv"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <connections>
-                <outlet property="addressLabel" destination="Jft-8f-bm2" id="gGl-gw-fOv"/>
+                <outlet property="addressButton" destination="Iro-jA-X5P" id="u6V-wQ-5UR"/>
                 <outlet property="avatarImageView" destination="IVQ-4p-zci" id="FoL-e1-OKu"/>
                 <outlet property="walletCollectionView" destination="akZ-qC-jqo" id="ncm-g3-NTf"/>
             </connections>
