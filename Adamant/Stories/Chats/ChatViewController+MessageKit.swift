@@ -28,15 +28,22 @@ extension ChatViewController: MessagesDataSource {
 		return message
 	}
 	
-	func numberOfMessages(in messagesCollectionView: MessagesCollectionView) -> Int {
+    func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
 		if let objects = chatController?.fetchedObjects {
 			return objects.count
 		} else {
 			return 0
 		}
 	}
+    
+    func cellTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+        if self.shouldDisplayHeader(for: message, at: indexPath, in: self.messagesCollectionView) {
+            return NSAttributedString(string: message.sentDate.humanizedDay(), attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedStringKey.foregroundColor: UIColor.gray])
+        }
+        return nil
+    }
 	
-	func cellBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+	func messageBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
 		if message.sentDate == Date.adamantNullDate {
 			return nil
 		}
@@ -128,13 +135,6 @@ extension ChatViewController: MessagesDisplayDelegate {
         }
     }
     
-    func messageHeaderView(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageHeaderView {
-        let header = messagesCollectionView.dequeueReusableHeaderView(MessageDateHeaderView.self, for: indexPath)
-        
-        header.dateLabel.text = message.sentDate.humanizedDay()
-        return header
-    }
-    
     func shouldDisplayHeader(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> Bool {
         if message.sentDate == Date.adamantNullDate {
             return false
@@ -152,7 +152,7 @@ extension ChatViewController: MessagesDisplayDelegate {
         let previousIndexPath = IndexPath(item: 0, section: previousSection)
         let previousMessage = dataSource.messageForItem(at: previousIndexPath, in: messagesCollectionView)
         let timeIntervalSinceLastMessage = message.sentDate.timeIntervalSince(previousMessage.sentDate)
-        return timeIntervalSinceLastMessage >= messagesCollectionView.showsDateHeaderAfterTimeInterval
+        return timeIntervalSinceLastMessage >= self.showsDateHeaderAfterTimeInterval
     }
 }
 
@@ -232,21 +232,20 @@ extension ChatViewController: MessageCellDelegate {
 
 // MARK: - MessagesLayoutDelegate
 extension ChatViewController: MessagesLayoutDelegate {
-	func heightForLocation(message: MessageType, at indexPath: IndexPath, with maxWidth: CGFloat, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
-		return 50
-	}
-	
-	func avatarSize(for: MessageType, at: IndexPath, in: MessagesCollectionView) -> CGSize {
-		return .zero
-	}
-	
-	func cellBottomLabelAlignment(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> LabelAlignment {
-		if isFromCurrentSender(message: message) {
-			return LabelAlignment.messageTrailing(UIEdgeInsets(top: 2, left: 0, bottom: 0, right: 16))
-		} else {
-			return LabelAlignment.messageLeading(UIEdgeInsets(top: 2, left: 16, bottom: 0, right: 0))
-		}
-	}
+    func cellTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
+        if self.shouldDisplayHeader(for: message, at: indexPath, in: messagesCollectionView) {
+            return 16
+        }
+        return 0
+    }
+    
+    func messageTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
+        return 0
+    }
+    
+    func messageBottomLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
+        return 16
+    }
 }
 
 
@@ -322,16 +321,16 @@ extension MessageTransaction: MessageType {
 		return self.date! as Date
 	}
 	
-	public var data: MessageData {
+	public var kind: MessageKind {
 		guard let message = message else {
-			return MessageData.text("")
+			return MessageKind.text("")
 		}
 		
 		if isMarkdown {
 			let parser = MarkdownParser(font: UIFont.adamantChatDefault)
-			return MessageData.attributedText(parser.parse(message))
+			return MessageKind.attributedText(parser.parse(message))
 		} else {
-			return MessageData.text(message)
+			return MessageKind.text(message)
 		}
 	}
     
@@ -355,7 +354,7 @@ extension TransferTransaction: MessageType {
 		return date! as Date
 	}
 	
-	public var data: MessageData {
-		return MessageData.attributedText(AdamantFormattingTools.formatTransferTransaction(self))
+	public var kind: MessageKind {
+		return MessageKind.attributedText(AdamantFormattingTools.formatTransferTransaction(self))
 	}
 }

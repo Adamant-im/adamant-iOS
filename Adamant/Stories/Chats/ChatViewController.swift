@@ -52,6 +52,8 @@ class ChatViewController: MessagesViewController {
 	
 	var cellUpdateTimers: [Timer] = [Timer]()
 	var cellsUpdating: [IndexPath] = [IndexPath]()
+    
+    internal var showsDateHeaderAfterTimeInterval: TimeInterval = 3600
 	
 	// MARK: Fee label
 	private var feeIsVisible: Bool = false
@@ -84,6 +86,13 @@ class ChatViewController: MessagesViewController {
 		messagesCollectionView.messagesLayoutDelegate = self
 		messagesCollectionView.messageCellDelegate = self
 		maintainPositionOnKeyboardFrameChanged = true
+        
+        if let layout = messagesCollectionView.collectionViewLayout as? MessagesCollectionViewFlowLayout {
+            for messageSizeCalculator in layout.messageSizeCalculators() {
+                messageSizeCalculator.outgoingAvatarSize = .zero
+                messageSizeCalculator.incomingAvatarSize = .zero
+            }
+        }
 		
 		DispatchQueue.global(qos: .userInitiated).async { [weak self] in
 			guard let chatroom = self?.chatroom, let controller = self?.chatsProvider.getChatController(for: chatroom) else {
