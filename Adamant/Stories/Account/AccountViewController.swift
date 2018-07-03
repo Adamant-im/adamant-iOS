@@ -29,62 +29,53 @@ fileprivate extension Wallet {
 class AccountViewController: FormViewController {
 	// MARK: - Rows & Sections
 	private enum Sections {
-		case account, wallet, security, application
+		case wallet, application, actions
 		
 		var tag: String {
 			switch self {
-			case .account: return "acc"
 			case .wallet: return "wllt"
-			case .security: return "scrt"
 			case .application: return "app"
+			case .actions: return "actns"
 			}
 		}
 		
 		var localized: String {
 			switch self {
-			case .account: return ""
 			case .wallet: return "Wallet"
-			case .security: return "Security"
 			case .application: return "Application"
+			case .actions: return "Actions"
 			}
 		}
 	}
 	
 	private enum Rows {
-		case account
 		case balance, sendTokens, buyTokens, freeTokens // Wallet
-		case stayLoggedIn, notifications, generateQr, logout // Security
-		case nodes, about // Application
+		case security, nodes, about // Application
+		case logout // Actions
 		
 		var tag: String {
 			switch self {
-			case .account: return "acc"
 			case .balance: return "blnc"
 			case .sendTokens: return "sndTkns"
 			case .buyTokens: return "bTkns"
 			case .freeTokens: return "frrTkns"
-			case .stayLoggedIn: return "stIn"
-			case .notifications: return "ntfctns"
-			case .generateQr: return "gnrtQr"
-			case .logout: return "lgt"
+			case .security: return "scrt"
 			case .nodes: return "nds"
 			case .about: return "bt"
+			case .logout: return "lgtrw"
 			}
 		}
 		
 		var localized: String {
 			switch self {
-			case .account: return ""
 			case .balance: return "Balance"
 			case .sendTokens: return "Send Tokens"
 			case .buyTokens: return "Buy Tokens"
 			case .freeTokens: return "Free Tokens"
-			case .stayLoggedIn: return "Stay Logged In"
-			case .notifications: return "Notifications"
-			case .generateQr: return "Generate Qr"
-			case .logout: return "Logout"
+			case .security: return "Security"
 			case .nodes: return "Nodes"
 			case .about: return "About"
+			case .logout: return "Logout"
 			}
 		}
 	}
@@ -161,71 +152,36 @@ class AccountViewController: FormViewController {
 		}
 		
 		
-		// MARK: Security
-		form +++ Section(Sections.security.localized) {
-			$0.tag = Sections.security.tag
-		}
-		
-		// Stay logged in
-		<<< LabelRow() {
-			$0.title = Rows.stayLoggedIn.localized
-			$0.tag = Rows.stayLoggedIn.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
-			$0.cell.selectionStyle = .gray
-		}.cellUpdate({ (cell, _) in
-			cell.accessoryType = .disclosureIndicator
-		})
-			
-		// Notifications
-		<<< LabelRow() { [weak self] in
-			$0.title = Rows.notifications.localized
-			$0.tag = Rows.notifications.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
-			$0.cell.selectionStyle = .gray
-			$0.value = self?.notificationsService.notificationsMode.localized
-		}.cellUpdate({ (cell, _) in
-			cell.accessoryType = .disclosureIndicator
-		}).onCellSelection({ [weak self] (_, _) in
-			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.notifications) else {
-				return
-			}
-			
-			nav.pushViewController(vc, animated: true)
-		})
-			
-		// Generate QR
-		<<< LabelRow() {
-			$0.title = Rows.generateQr.localized
-			$0.tag = Rows.generateQr.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
-			$0.cell.selectionStyle = .gray
-		}.cellUpdate({ (cell, _) in
-			cell.accessoryType = .disclosureIndicator
-		}).onCellSelection({ [weak self] (_, _) in
-			guard let nav = self?.navigationController, let generator = self?.router.get(scene: AdamantScene.Settings.qRGenerator) else {
-				return
-			}
-			
-			nav.pushViewController(generator, animated: true)
-		})
-		
-		
 		// MARK: Application
-		+++ Section(Sections.application.localized) {
+		form +++ Section(Sections.application.localized) {
 			$0.tag = Sections.application.tag
 		}
+			
+		// Security
+		<<< LabelRow() {
+			$0.title = Rows.security.localized
+			$0.tag = Rows.security.tag
+			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.selectionStyle = .gray
+		}.cellUpdate({ (cell, _) in
+			cell.accessoryType = .disclosureIndicator
+		}).onCellSelection({ [weak self] (_, _) in
+			
+		})
 		
 		// Node list
 		<<< LabelRow() {
 			$0.title = Rows.nodes.localized
 			$0.tag = Rows.nodes.tag
 			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}).onCellSelection({ (_, _) in
-			let viewController = UIViewController()
-			viewController.view.backgroundColor = UIColor.white
-			self.navigationController?.pushViewController(viewController, animated: true)
+		}).onCellSelection({ [weak self] (_, _) in
+			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
+				return
+			}
+			nav.pushViewController(vc, animated: true)
 		})
 		
 		// About
@@ -233,9 +189,50 @@ class AccountViewController: FormViewController {
 			$0.title = Rows.about.localized
 			$0.tag = Rows.about.tag
 			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
 		})
+		
+			
+		// MARK: Actions
+		+++ Section(Sections.actions.localized) {
+			$0.tag = Sections.actions.tag
+		}
+		
+		// Logout
+		<<< LabelRow() {
+			$0.title = Rows.logout.localized
+			$0.tag = Rows.logout.tag
+			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.selectionStyle = .gray
+		}.cellUpdate({ (cell, _) in
+			cell.accessoryType = .disclosureIndicator
+		}).onCellSelection({ [weak self] (_, row) in
+			guard let address = self?.accountService.account?.address else {
+				return
+			}
+			
+			let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.logoutMessageFormat, address), message: nil, preferredStyle: .alert)
+			let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { _ in
+				guard let indexPath = row.indexPath else {
+					return
+				}
+				
+				self?.tableView.deselectRow(at: indexPath, animated: true)
+			}
+			let logout = UIAlertAction(title: String.adamantLocalized.alert.logoutButton, style: .default) { [weak self] _ in
+				self?.accountService.logout()
+				if let vc = self?.router.get(scene: AdamantScene.Login.login) {
+					self?.dialogService.present(vc, animated: true, completion: nil)
+				}
+			}
+			
+			alert.addAction(cancel)
+			alert.addAction(logout)
+			self?.present(alert, animated: true, completion: nil)
+		})
+		
 		
 		form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamantSecondary; }
 		
@@ -252,18 +249,6 @@ class AccountViewController: FormViewController {
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.refreshAccountInfo()
-		}
-		
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
-			guard let modeRaw = notification.userInfo?[AdamantUserInfoKey.NotificationsService.newNotificationsMode], let mode = modeRaw as? NotificationsMode else {
-				return
-			}
-			
-			guard let row: LabelRow = self?.form.rowBy(tag: Rows.notifications.tag) else {
-				return
-			}
-			
-			row.value = mode.localized
 		}
     }
 	

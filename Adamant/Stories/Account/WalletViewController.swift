@@ -31,7 +31,7 @@ extension String.adamantLocalized {
 	}
 }
 
-fileprivate extension String.adamantLocalized.alert {
+extension String.adamantLocalized.alert {
 	static let logoutMessageFormat = NSLocalizedString("AccountTab.ConfirmLogout.MessageFormat", comment: "Account tab: Confirm logout alert")
 	static let logoutButton = NSLocalizedString("AccountTab.ConfirmLogout.Logout", comment: "Account tab: Confirm logout alert: Logout (Ok) button")
 }
