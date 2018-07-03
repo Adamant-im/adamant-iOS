@@ -74,6 +74,7 @@ class NodesListViewController: FormViewController {
 	// Properties
 	
 	private var nodes = [Node]()
+	private var didResetNodesOnDissapear = false
 	
 	
     // MARK: - Lifecycle
@@ -143,12 +144,17 @@ class NodesListViewController: FormViewController {
 	override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
 		
-		// Top, not presented, and no nodes - reset to default and show alert
 		if let top = navigationController?.topViewController, top == self && presentedViewController == nil && nodes.count == 0 {
-			let nodes = nodesSource.defaultNodes
-			nodesSource.nodes = nodes
-			nodesSource.saveNodes()
-			dialogService.showSuccess(withMessage: String.adamantLocalized.nodesList.defaultNodesWasLoaded)
+			didResetNodesOnDissapear = true
+			loadDefaultNodes(showAlert: true)
+		}
+	}
+	
+	override func viewDidDisappear(_ animated: Bool) {
+		super.viewDidDisappear(animated)
+		
+		if navigationController == nil && nodes.count == 0 && !didResetNodesOnDissapear {
+			loadDefaultNodes(showAlert: true)
 		}
 	}
 	
@@ -297,6 +303,16 @@ extension NodesListViewController {
 		
 		nodesSource.nodes = nodes
 		nodesSource.saveNodes()
+	}
+	
+	func loadDefaultNodes(showAlert: Bool) {
+		let nodes = nodesSource.defaultNodes
+		nodesSource.nodes = nodes
+		nodesSource.saveNodes()
+		
+		if showAlert {
+			dialogService.showSuccess(withMessage: String.adamantLocalized.nodesList.defaultNodesWasLoaded)
+		}
 	}
 }
 
