@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
+		E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */; };
 		E905D39B2048A9BD00DDB504 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39A2048A9BD00DDB504 /* KeychainStore.swift */; };
 		E905D39D204C13B900DDB504 /* SecuredStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39C204C13B900DDB504 /* SecuredStore.swift */; };
 		E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39E204C281400DDB504 /* LoginViewController.swift */; };
@@ -53,7 +54,7 @@
 		E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921597A206503000000CA5C /* ButtonsStripeView.swift */; };
 		E921597D2065031D0000CA5C /* ButtonsStripe.xib in Resources */ = {isa = PBXBuildFile; fileRef = E921597C2065031D0000CA5C /* ButtonsStripe.xib */; };
 		E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9256F5E2034C21100DE86E9 /* String+localized.swift */; };
-		E9256F6D20357B1700DE86E9 /* LoginHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9256F6C20357B1700DE86E9 /* LoginHeader.xib */; };
+		E9256F6D20357B1700DE86E9 /* LogoFullHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9256F6C20357B1700DE86E9 /* LogoFullHeader.xib */; };
 		E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */; };
 		E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927171D20C04613002BB9A6 /* UIColor+hex.swift */; };
 		E9393FA82055C92700EE6F30 /* Decimal+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */; };
@@ -71,7 +72,7 @@
 		E941CCDF20E7B70200C96220 /* WalletCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E941CCDD20E7B70200C96220 /* WalletCollectionViewCell.xib */; };
 		E94883E7203F07CD00F6E1B0 /* PassphraseValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */; };
 		E948E03B20235E2300975D6B /* SettingsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E948E03A20235E2300975D6B /* SettingsRoutes.swift */; };
-		E948E0482024F02700975D6B /* LoginFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = E948E0472024F02700975D6B /* LoginFooter.xib */; };
+		E948E0482024F02700975D6B /* VersionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = E948E0472024F02700975D6B /* VersionFooter.xib */; };
 		E948E04C2027679300975D6B /* AdamantFormattingTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E948E04B2027679300975D6B /* AdamantFormattingTools.swift */; };
 		E94E7B01205D3F090042B639 /* ChatListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E94E7B00205D3F090042B639 /* ChatListViewController.xib */; };
 		E94E7B06205D48B20042B639 /* TransactionsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94E7B05205D48B20042B639 /* TransactionsRoutes.swift */; };
@@ -120,7 +121,6 @@
 		E983AE2120E655C500497E1A /* AccountHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E983AE2020E655C500497E1A /* AccountHeaderView.swift */; };
 		E983AE2320E6568C00497E1A /* Wallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E983AE2220E6568C00497E1A /* Wallet.swift */; };
 		E983AE2A20E65F3200497E1A /* AccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E983AE2820E65F3200497E1A /* AccountViewController.swift */; };
-		E983AE2B20E65F3200497E1A /* AccountViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E983AE2920E65F3200497E1A /* AccountViewController.xib */; };
 		E983AE2D20E6720D00497E1A /* AccountFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = E983AE2C20E6720D00497E1A /* AccountFooter.xib */; };
 		E987024920C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = E987024820C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift */; };
 		E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */; };
@@ -203,6 +203,7 @@
 		C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1311CE46EB635FFC95BFEF4 /* Pods_Adamant_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D283570A539D864115735AAA /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
+		E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		E905D39A2048A9BD00DDB504 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		E905D39C204C13B900DDB504 /* SecuredStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuredStore.swift; sourceTree = "<group>"; };
 		E905D39E204C281400DDB504 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -264,7 +265,7 @@
 		E921597A206503000000CA5C /* ButtonsStripeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonsStripeView.swift; sourceTree = "<group>"; };
 		E921597C2065031D0000CA5C /* ButtonsStripe.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ButtonsStripe.xib; sourceTree = "<group>"; };
 		E9256F5E2034C21100DE86E9 /* String+localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+localized.swift"; sourceTree = "<group>"; };
-		E9256F6C20357B1700DE86E9 /* LoginHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoginHeader.xib; sourceTree = "<group>"; };
+		E9256F6C20357B1700DE86E9 /* LogoFullHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LogoFullHeader.xib; sourceTree = "<group>"; };
 		E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E927171D20C04613002BB9A6 /* UIColor+hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+hex.swift"; sourceTree = "<group>"; };
 		E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+adamant.swift"; sourceTree = "<group>"; };
@@ -282,7 +283,7 @@
 		E941CCDD20E7B70200C96220 /* WalletCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WalletCollectionViewCell.xib; sourceTree = "<group>"; };
 		E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassphraseValidation.swift; sourceTree = "<group>"; };
 		E948E03A20235E2300975D6B /* SettingsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRoutes.swift; sourceTree = "<group>"; };
-		E948E0472024F02700975D6B /* LoginFooter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoginFooter.xib; sourceTree = "<group>"; };
+		E948E0472024F02700975D6B /* VersionFooter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VersionFooter.xib; sourceTree = "<group>"; };
 		E948E04B2027679300975D6B /* AdamantFormattingTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantFormattingTools.swift; sourceTree = "<group>"; };
 		E94E7B00205D3F090042B639 /* ChatListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatListViewController.xib; sourceTree = "<group>"; };
 		E94E7B05205D48B20042B639 /* TransactionsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsRoutes.swift; sourceTree = "<group>"; };
@@ -334,7 +335,6 @@
 		E983AE2020E655C500497E1A /* AccountHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountHeaderView.swift; sourceTree = "<group>"; };
 		E983AE2220E6568C00497E1A /* Wallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wallet.swift; sourceTree = "<group>"; };
 		E983AE2820E65F3200497E1A /* AccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewController.swift; sourceTree = "<group>"; };
-		E983AE2920E65F3200497E1A /* AccountViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AccountViewController.xib; sourceTree = "<group>"; };
 		E983AE2C20E6720D00497E1A /* AccountFooter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AccountFooter.xib; sourceTree = "<group>"; };
 		E987024820C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantChatsProvider+fakeMessages.swift"; sourceTree = "<group>"; };
 		E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRGeneratorViewController.swift; sourceTree = "<group>"; };
@@ -459,7 +459,7 @@
 				E91947B72000326B001362F8 /* ServerResponses */,
 				E913C9041FFFA8FE001A83F7 /* ServiceProtocols */,
 				E913C9061FFFA92E001A83F7 /* Services */,
-				E9E7CDB82003AA8E00DFC4DB /* SharedCells */,
+				E9E7CDB82003AA8E00DFC4DB /* SharedViews */,
 				E919479920000FFD001362F8 /* Stories */,
 				E913C9111FFFAB05001A83F7 /* Assets */,
 				E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */,
@@ -584,8 +584,6 @@
 				E905D39E204C281400DDB504 /* LoginViewController.swift */,
 				E9147B602050599000145913 /* LoginViewController+QR.swift */,
 				E9147B6E205088DE00145913 /* LoginViewController+Pinpad.swift */,
-				E9256F6C20357B1700DE86E9 /* LoginHeader.xib */,
-				E948E0472024F02700975D6B /* LoginFooter.xib */,
 				E90A4942204C5ED6009F6A65 /* EurekaPassphraseRow.swift */,
 				E90A4944204C5F60009F6A65 /* PassphraseCell.xib */,
 			);
@@ -700,6 +698,7 @@
 		E982F69820235AF000566AC7 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */,
 				E948E03A20235E2300975D6B /* SettingsRoutes.swift */,
 				E982F69B20235B4D00566AC7 /* SettingsViewController.swift */,
 				E93D7AC12052EE21005D19DC /* SettingsViewController+StayIn.swift */,
@@ -773,7 +772,6 @@
 			children = (
 				E9E7CDB02002B97B00DFC4DB /* AccountRoutes.swift */,
 				E983AE2820E65F3200497E1A /* AccountViewController.swift */,
-				E983AE2920E65F3200497E1A /* AccountViewController.xib */,
 				E9E7CDAA2002AFA500DFC4DB /* WalletViewController.swift */,
 				E94E7B09205D59F50042B639 /* WalletViewController.xib */,
 				E9EC342020052ABB00C0E546 /* TransferViewController.swift */,
@@ -786,15 +784,17 @@
 			path = Account;
 			sourceTree = "<group>";
 		};
-		E9E7CDB82003AA8E00DFC4DB /* SharedCells */ = {
+		E9E7CDB82003AA8E00DFC4DB /* SharedViews */ = {
 			isa = PBXGroup;
 			children = (
 				E9942B86203D9E5100C163AF /* EurekaQRRow.swift */,
 				E9942B88203D9ECA00C163AF /* QrCell.xib */,
 				E95CB462205D8BBA00A7218E /* EurekaAccountRow.swift */,
 				E95CB463205D8BBA00A7218E /* AccountCell.xib */,
+				E9256F6C20357B1700DE86E9 /* LogoFullHeader.xib */,
+				E948E0472024F02700975D6B /* VersionFooter.xib */,
 			);
-			path = SharedCells;
+			path = SharedViews;
 			sourceTree = "<group>";
 		};
 		E9EC344520066D4A00C0E546 /* AdamantTests */ = {
@@ -922,7 +922,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E983AE2B20E65F3200497E1A /* AccountViewController.xib in Resources */,
 				E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */,
 				E95CB451205D77B200A7218E /* InfoPlist.strings in Resources */,
 				E983AE2D20E6720D00497E1A /* AccountFooter.xib in Resources */,
@@ -942,7 +941,7 @@
 				E941CCDB20E786D800C96220 /* AccountHeader.xib in Resources */,
 				E9EC341E200524CA00C0E546 /* Roboto_500_normal.ttf in Resources */,
 				E9EC3419200524CA00C0E546 /* Exo+2_500_normal.ttf in Resources */,
-				E9256F6D20357B1700DE86E9 /* LoginHeader.xib in Resources */,
+				E9256F6D20357B1700DE86E9 /* LogoFullHeader.xib in Resources */,
 				E9EC3416200524CA00C0E546 /* Exo+2_300_normal.ttf in Resources */,
 				E9EC341C200524CA00C0E546 /* Roboto_400_italic.ttf in Resources */,
 				E94E7B0C205D5E4A0042B639 /* TransactionsViewController.xib in Resources */,
@@ -956,7 +955,7 @@
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
 				E9A174B920587B84003667CD /* notification.mp3 in Resources */,
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
-				E948E0482024F02700975D6B /* LoginFooter.xib in Resources */,
+				E948E0482024F02700975D6B /* VersionFooter.xib in Resources */,
 				E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1162,6 +1161,7 @@
 				E95F85852008CB3A0070534A /* ChatListViewController.swift in Sources */,
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,
 				E9150B9F2066DA210065A985 /* MessageTransaction+CoreDataClass.swift in Sources */,
+				E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */,
 				E965A53020B594120041A3EA /* AdamantApi+States.swift in Sources */,
 				64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */,
 				E91E5BF220DAF05500B06B3C /* EurekaNodeRow.swift in Sources */,
