@@ -138,7 +138,7 @@ class LoginViewController: FormViewController {
 		navigationOptions = RowNavigationOptions.Disabled
 		
 		// MARK: Header & Footer
-		if let header = UINib(nibName: "LoginHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
+		if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
 			tableView.tableHeaderView = header
 			
 			if let label = header.viewWithTag(888) as? UILabel {
@@ -147,7 +147,7 @@ class LoginViewController: FormViewController {
 			}
 		}
 		
-		if let footer = UINib(nibName: "LoginFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
+		if let footer = UINib(nibName: "VersionFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
 			if let label = footer.viewWithTag(555) as? UILabel {
 				label.text = AdamantUtilities.applicationVersion
 				label.textColor = UIColor.adamantPrimary

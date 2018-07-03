@@ -14,8 +14,10 @@ import MessageUI
 class AdamantDialogService: DialogService {
 	// MARK: Dependencies
 	var router: Router!
-    
-    var mailDelegate = MailDelegate()
+	
+	fileprivate var mailDelegate: MailDelegate = {
+		MailDelegate()
+	}()
 	
 	// Configure notifications
 	init() {
@@ -113,7 +115,7 @@ extension AdamantDialogService {
         alertVC.alertDescription.font = UIFont.adamantPrimaryLight(size: 14)
         alertVC.headerViewHeightConstraint.constant = 50
         
-        let supportBtn = PMAlertAction(title: AdamantResources.iosAppSupportEmail, style: .default) {
+        let supportBtn = PMAlertAction(title: AdamantResources.supportEmail, style: .default) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                 guard let presenter = self else {
                     print("Lost connecting with dialog service")
@@ -128,7 +130,7 @@ extension AdamantDialogService {
 				
                 let mailVC = MFMailComposeViewController()
                 mailVC.mailComposeDelegate = presenter.mailDelegate
-                mailVC.setToRecipients([AdamantResources.iosAppSupportEmail])
+                mailVC.setToRecipients([AdamantResources.supportEmail])
                 mailVC.setSubject(String.adamantLocalized.alert.emailErrorMessageTitle)
                 
                 let systemVersion = UIDevice.current.systemVersion
@@ -346,10 +348,8 @@ extension AdamantDialogService {
     }
 }
 
-class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
-    
+fileprivate class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true, completion: nil)
     }
-
 }

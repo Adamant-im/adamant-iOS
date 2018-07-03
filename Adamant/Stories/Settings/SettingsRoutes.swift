@@ -31,6 +31,10 @@ extension AdamantScene {
 			return c
 		}
 		
+		static let about = AdamantScene(identifier: "About") { _ -> UIViewController in
+			AboutViewController()
+		}
+		
 		private init() {}
 	}
 }

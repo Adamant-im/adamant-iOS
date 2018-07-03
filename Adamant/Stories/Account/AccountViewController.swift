@@ -192,6 +192,12 @@ class AccountViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
+		}).onCellSelection({ [weak self] (_, _) in
+			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.about) else {
+				return
+			}
+			
+			nav.pushViewController(vc, animated: true)
 		})
 		
 			
