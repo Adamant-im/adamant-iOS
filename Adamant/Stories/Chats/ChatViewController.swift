@@ -91,6 +91,8 @@ class ChatViewController: MessagesViewController {
             for messageSizeCalculator in layout.messageSizeCalculators() {
                 messageSizeCalculator.outgoingAvatarSize = .zero
                 messageSizeCalculator.incomingAvatarSize = .zero
+                messageSizeCalculator.outgoingMessageBottomLabelAlignment = LabelAlignment(textAlignment: .right, textInsets: UIEdgeInsets(top: 2, left: 0, bottom: 0, right: 16))
+                messageSizeCalculator.incomingMessageBottomLabelAlignment = LabelAlignment(textAlignment: .left, textInsets: UIEdgeInsets(top: 2, left: 16, bottom: 0, right: 0))
             }
         }
 		
