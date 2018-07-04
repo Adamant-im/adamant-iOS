@@ -27,7 +27,7 @@ extension SecurityViewController {
 			pinpadRequest = .turnOffPin
 			let biometryButton: PinpadBiometryButtonType = accountService.useBiometry ? localAuth.biometryType.pinpadButtonType : .hidden
 			let pinpad = PinpadViewController.adamantPinpad(biometryButton: biometryButton)
-			pinpad.commentLabel.text = String.adamantLocalized.settings.stayInTurnOff
+			pinpad.commentLabel.text = String.adamantLocalized.security.stayInTurnOff
 			pinpad.commentLabel.isHidden = false
 			pinpad.delegate = self
 			
@@ -41,7 +41,7 @@ extension SecurityViewController {
 			return
 		}
 		
-		let reason = enabled ? String.adamantLocalized.settings.biometryOnReason : String.adamantLocalized.settings.biometryOffReason
+		let reason = enabled ? String.adamantLocalized.security.biometryOnReason : String.adamantLocalized.security.biometryOffReason
 		localAuth.authorizeUser(reason: reason) { [weak self] result in
 			switch result {
 			case .success:
@@ -60,10 +60,10 @@ extension SecurityViewController {
 				let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
 				
 				if enabled {
-					pinpad.commentLabel.text = String.adamantLocalized.settings.biometryOnReason
+					pinpad.commentLabel.text = String.adamantLocalized.security.biometryOnReason
 					self?.pinpadRequest = .turnOnBiometry
 				} else {
-					pinpad.commentLabel.text = String.adamantLocalized.settings.biometryOffReason
+					pinpad.commentLabel.text = String.adamantLocalized.security.biometryOffReason
 					self?.pinpadRequest = .turnOffBiometry
 				}
 				
@@ -201,7 +201,7 @@ extension SecurityViewController: PinpadViewControllerDelegate {
 			
 		// MARK: User wants to turn of StayIn with his face. Or finger.
 		case .turnOffPin?:
-			localAuth.authorizeUser(reason: String.adamantLocalized.settings.stayInTurnOff, completion: { [weak self] result in
+			localAuth.authorizeUser(reason: String.adamantLocalized.security.stayInTurnOff, completion: { [weak self] result in
 				switch result {
 				case .success:
 					self?.accountService.dropSavedAccount()

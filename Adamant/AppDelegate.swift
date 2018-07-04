@@ -46,18 +46,8 @@ struct AdamantResources {
 		Node(scheme: .http, host: "80.211.177.181", port: nil)
 	]
 	
+	// Addresses
 	static let supportEmail = "ios@adamant.im"
-	
-	static let adamantWebsite = "https://adamant.im"
-	static let adamantWhitepaper = "https://adamant.im/whitepaper/adamant-whitepaper-en.pdf"
-	static let adamantGithubPage = "https://github.com/Adamant-im"
-	static let adamantBlogPage = "https://medium.com/adamant-im"
-	static let adamantBitcointalkPage = "https://bitcointalk.org/index.php?topic=2626619"
-	static let adamantFacebookPage = "https://www.facebook.com/adamant.im/"
-	static let adamantTelegram = "https://t.me/adamant_eng"
-	static let adamantVk = "https://vk.com/adamant_im"
-	static let adamantTwitter = "https://twitter.com/adamant_im"
-	
 	static let ansReadmeUrl = "https://github.com/Adamant-im/AdamantNotificationService/blob/master/README.md"
 	
 	// ANS Contact

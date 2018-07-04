@@ -11,8 +11,23 @@ import Eureka
 import SafariServices
 import MessageUI
 
+// MARK: - Localization
+extension String.adamantLocalized {
+	struct about {
+		static let title = NSLocalizedString("About.Title", comment: "About page: scene title")
+		
+		// URLs
+//		static let getFreeTokensUrlFormat = NSLocalizedString("AccountTab.FreeTokens.UrlFormat", comment: "Account tab: A full 'Get free tokens' link, with %@ as address")
+//		static let buyTokensUrlFormat = NSLocalizedString("AccountTab.BuyTokens.UrlFormat", comment: "Account tab: A full 'Buy tokens' link, with %@ as address")
+		
+		private init() { }
+	}
+}
+
+
+// MARK: - AboutViewController
 class AboutViewController: FormViewController {
-	// MARK: - Section & Rows
+	// MARK: Section & Rows
 	
 	enum Sections {
 		case about
@@ -27,8 +42,8 @@ class AboutViewController: FormViewController {
 		
 		var localized: String {
 			switch self {
-			case .about: return "About"
-			case .contactUs: return "Contact us"
+			case .about: return NSLocalizedString("About.Section.About", comment: "About scene: 'Read about' section title.")
+			case .contactUs: return NSLocalizedString("About.Section.ContactUs", comment: "About scene: 'Contact us' section title.")
 			}
 		}
 	}
@@ -54,22 +69,37 @@ class AboutViewController: FormViewController {
 		
 		var localized: String {
 			switch self {
-			case .website: return "Website"
-			case .whitepaper: return "The Whitepaper"
-			case .github: return "Project's GitHub page"
-			case .email: return "Write us"
-			case .blog: return "Our blog"
-			case .bitcointalk: return "Bitcointalk.org"
-			case .facebook: return "Facebook"
-			case .telegram: return "Telegram"
-			case .vk: return "VK"
-			case .twitter: return "Twitter"
+			case .website: return NSLocalizedString("About.Row.Website", comment: "About scene: Website row")
+			case .whitepaper: return NSLocalizedString("About.Row.Whitepaper", comment: "About scene: The Whitepaper row")
+			case .github: return NSLocalizedString("About.Row.GitHub", comment: "About scene: Project's GitHub page row")
+			case .email: return NSLocalizedString("About.Row.WriteUs", comment: "About scene: Write us row")
+			case .blog: return NSLocalizedString("About.Row.Blog", comment: "About scene: Our blog row")
+			case .bitcointalk: return NSLocalizedString("About.Row.Bitcointalk", comment: "About scene: Bitcointalk.org row")
+			case .facebook: return NSLocalizedString("About.Row.Facebook", comment: "About scene: Facebook row")
+			case .telegram: return NSLocalizedString("About.Row.Telegram", comment: "About scene: Telegram row")
+			case .vk: return NSLocalizedString("About.Row.VK", comment: "About scene: VK row")
+			case .twitter: return NSLocalizedString("About.Row.Twitter", comment: "About scene: Twitter row")
+			}
+		}
+		
+		var localizedUrl: String {
+			switch self {
+			case .website: return NSLocalizedString("About.Row.Website.Url", comment: "About scene: Website localized url")
+			case .whitepaper: return NSLocalizedString("About.Row.Whitepaper.Url", comment: "About scene: The Whitepaper localized url")
+			case .github: return NSLocalizedString("About.Row.GitHub.Url", comment: "About scene: Project's GitHub page localized url")
+			case .email: return "" // no localized emails
+			case .blog: return NSLocalizedString("About.Row.Blog.Url", comment: "About scene: Our blog localized url")
+			case .bitcointalk: return NSLocalizedString("About.Row.Bitcointalk.Url", comment: "About scene: Bitcointalk.org localized url")
+			case .facebook: return NSLocalizedString("About.Row.Facebook.Url", comment: "About scene: Facebook localized url")
+			case .telegram: return NSLocalizedString("About.Row.Telegram.Url", comment: "About scene: Telegram localized url")
+			case .vk: return NSLocalizedString("About.Row.VK.Url", comment: "About scene: VK localized url")
+			case .twitter: return NSLocalizedString("About.Row.Twitter.Url", comment: "About scene: Twitter localized url")
 			}
 		}
 	}
 	
 	
-	// MARK: - Lifecycle
+	// MARK: Lifecycle
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -102,23 +132,23 @@ class AboutViewController: FormViewController {
 		
 		// Website
 		<<< buildUrlRow(title: Rows.website.localized,
-						value: AdamantResources.adamantWebsite,
+						value: "adamant.im",
 						tag: Rows.website.tag,
-						url: AdamantResources.adamantWebsite,
+						url: Rows.website.localizedUrl,
 						image: #imageLiteral(resourceName: "row_icon_placeholder"))
 			
 		// Whitepaper
 		<<< buildUrlRow(title: Rows.whitepaper.localized,
 						value: nil,
 						tag: Rows.whitepaper.tag,
-						url: AdamantResources.adamantWhitepaper,
+						url: Rows.whitepaper.localizedUrl,
 						image: #imageLiteral(resourceName: "row_icon_placeholder"))
 		
 		// Github
 		<<< buildUrlRow(title: Rows.github.localized,
 						value: nil,
 						tag: Rows.github.tag,
-						url: AdamantResources.adamantGithubPage,
+						url: Rows.github.localizedUrl,
 						image: #imageLiteral(resourceName: "row_icon_placeholder"))
 
 			
@@ -154,42 +184,42 @@ class AboutViewController: FormViewController {
 		<<< buildUrlRow(title: Rows.blog.localized,
 						value: nil,
 						tag: Rows.blog.tag,
-						url: AdamantResources.adamantBlogPage,
+						url: Rows.blog.localizedUrl,
 						image: #imageLiteral(resourceName: "row_icon_placeholder"))
 		
 		// Bitcointalk
 		<<< buildUrlRow(title: Rows.bitcointalk.localized,
 						value: nil,
 						tag: Rows.bitcointalk.tag,
-						url: AdamantResources.adamantBitcointalkPage,
+						url: Rows.bitcointalk.localizedUrl,
 						image: #imageLiteral(resourceName: "row_icon_placeholder"))
 		
 		// Facebook
 		<<< buildUrlRow(title: Rows.facebook.localized,
 						value: nil,
 						tag: Rows.facebook.tag,
-						url: AdamantResources.adamantFacebookPage,
+						url: Rows.facebook.localizedUrl,
 						image: #imageLiteral(resourceName: "row_icon_placeholder"))
 		
 		// Telegram
 		<<< buildUrlRow(title: Rows.telegram.localized,
 						value: nil,
 						tag: Rows.telegram.tag,
-						url: AdamantResources.adamantTelegram,
+						url: Rows.telegram.localizedUrl,
 						image: #imageLiteral(resourceName: "row_icon_placeholder"))
 		
 		// VK
 		<<< buildUrlRow(title: Rows.vk.localized,
 						value: nil,
 						tag: Rows.vk.tag,
-						url: AdamantResources.adamantVk,
+						url: Rows.vk.localizedUrl,
 						image: #imageLiteral(resourceName: "row_icon_placeholder"))
 		
 		// Twitter
 		<<< buildUrlRow(title: Rows.twitter.localized,
 						value: nil,
 						tag: Rows.twitter.tag,
-						url: AdamantResources.adamantTwitter,
+						url: Rows.twitter.localizedUrl,
 						image: #imageLiteral(resourceName: "row_icon_placeholder"))
 	}
 }

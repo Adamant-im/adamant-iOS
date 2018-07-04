@@ -100,14 +100,14 @@ class SecurityViewController: FormViewController {
 	
 	// MARK: - Properties
 	var showLoggedInOptions = false
-	var pinpadRequest: SettingsViewController.PinpadRequest?
+	var pinpadRequest: SecurityViewController.PinpadRequest?
 	
 	
 	// MARK: - Lifecycle
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		self.navigationItem.title = String.adamantLocalized.settings.title
+		self.navigationItem.title = String.adamantLocalized.security.title
 		navigationOptions = .Disabled
 		showLoggedInOptions = accountService.hasStayInAccount
 		

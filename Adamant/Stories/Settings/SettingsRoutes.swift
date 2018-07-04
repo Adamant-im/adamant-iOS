@@ -20,26 +20,11 @@ extension AdamantScene {
 			return c
 		}
 		
-		static let settings = AdamantScene(identifier: "SettingsTableViewController", factory: { r in
-			let c = SettingsViewController()
-			c.dialogService = r.resolve(DialogService.self)
-			c.accountService = r.resolve(AccountService.self)
-			c.localAuth = r.resolve(LocalAuthentication.self)
-			c.router = r.resolve(Router.self)
-			return c
-		})
-		
 		static let qRGenerator = AdamantScene(identifier: "QRGeneratorViewController", factory: { r in
 			let c = QRGeneratorViewController()
 			c.dialogService = r.resolve(DialogService.self)
 			return c
 		})
-		
-		static let notifications = AdamantScene(identifier: "NotificationsViewController") { r -> UIViewController in
-			let c = NotificationsViewController()
-			c.notificationsService = r.resolve(NotificationsService.self)
-			return c
-		}
 		
 		static let about = AdamantScene(identifier: "About") { _ -> UIViewController in
 			AboutViewController()
