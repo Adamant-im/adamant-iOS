@@ -58,6 +58,8 @@ struct AdamantResources {
 	static let adamantVk = "https://vk.com/adamant_im"
 	static let adamantTwitter = "https://twitter.com/adamant_im"
 	
+	static let ansReadmeUrl = "https://github.com/Adamant-im/AdamantNotificationService/blob/master/README.md"
+	
 	// ANS Contact
 	static let ansAddress = "U10629337621822775991"
 	static let ansPublicKey = "188b24bd116a556ac8ba905bbbdaa16e237dfb14269f5a4f9a26be77537d977c"

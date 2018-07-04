@@ -166,7 +166,11 @@ class AccountViewController: FormViewController {
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
 		}).onCellSelection({ [weak self] (_, _) in
+			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.security) else {
+				return
+			}
 			
+			nav.pushViewController(vc, animated: true)
 		})
 		
 		// Node list
@@ -181,6 +185,7 @@ class AccountViewController: FormViewController {
 			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
 				return
 			}
+			
 			nav.pushViewController(vc, animated: true)
 		})
 		

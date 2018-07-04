@@ -12,6 +12,8 @@ import SafariServices
 import MessageUI
 
 class AboutViewController: FormViewController {
+	// MARK: - Section & Rows
+	
 	enum Sections {
 		case about
 		case contactUs
@@ -65,6 +67,9 @@ class AboutViewController: FormViewController {
 			}
 		}
 	}
+	
+	
+	// MARK: - Lifecycle
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
