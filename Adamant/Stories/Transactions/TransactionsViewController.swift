@@ -59,7 +59,7 @@ class TransactionsViewController: UIViewController {
 		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
 		tableView.dataSource = self
 		tableView.delegate = self
-        tableView.addSubview(self.refreshControl)
+        tableView.refreshControl = refreshControl
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
 			self?.initFetchedResultController(provider: self?.transfersProvider)

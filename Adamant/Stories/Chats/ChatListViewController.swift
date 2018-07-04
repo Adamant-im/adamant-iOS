@@ -62,7 +62,7 @@ class ChatListViewController: UIViewController {
 		tableView.dataSource = self
 		tableView.delegate = self
 		tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
-        tableView.addSubview(self.refreshControl)
+        tableView.refreshControl = refreshControl
 		
 		if self.accountService.account != nil {
 			initFetchedRequestControllers(provider: chatsProvider)

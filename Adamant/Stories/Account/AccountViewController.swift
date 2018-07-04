@@ -104,6 +104,17 @@ class AccountViewController: FormViewController {
 		}
 	}
 	
+	// MARK: Refresh control
+	private lazy var refreshControl: UIRefreshControl = {
+		let refreshControl = UIRefreshControl()
+		refreshControl.addTarget(self,
+								 action: #selector(AccountViewController.handleRefresh(_:)),
+								 for: UIControlEvents.valueChanged)
+		refreshControl.tintColor = UIColor.adamantPrimary
+		
+		return refreshControl
+	}()
+	
 	
 	// MARK: - Lifecycle
 	
@@ -112,6 +123,8 @@ class AccountViewController: FormViewController {
 		
 		navigationOptions = .Disabled
 		navigationController?.setNavigationBarHidden(true, animated: false)
+		
+		tableView.refreshControl = refreshControl
 		
 		wallets = [.adamant(balance: Decimal(floatLiteral: 100.001)), .etherium]
 		
@@ -284,7 +297,7 @@ class AccountViewController: FormViewController {
 	}
 	
 	
-	// TableView configuration
+	// MARK: TableView configuration
 	
 	override func insertAnimation(forSections sections: [Section]) -> UITableViewRowAnimation {
 		return .fade
@@ -294,6 +307,8 @@ class AccountViewController: FormViewController {
 		return .fade
 	}
 	
+	
+	// MARK: Other
 	func updateAccountInfo() {
 		let address: String
 		let adamantWallet: Wallet
@@ -327,6 +342,24 @@ class AccountViewController: FormViewController {
 		
 		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: selectedWalletIndex, section: 0), animated: false, scrollPosition: .centeredHorizontally)
 		accountHeaderView.addressButton.setTitle(address, for: .normal)
+	}
+	
+	@objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
+		accountService.update { [weak self] result in
+			switch result {
+			case .success:
+				DispatchQueue.main.async {
+					self?.updateAccountInfo()
+				}
+				
+			case .failure(let error):
+				self?.dialogService.showRichError(error: error)
+			}
+			
+			DispatchQueue.main.async {
+				refreshControl.endRefreshing()
+			}
+		}
 	}
 }
 
@@ -388,6 +421,8 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 }
 
 
+
+// MARK: - AccountHeaderViewDelegate
 extension AccountViewController: AccountHeaderViewDelegate {
 	func addressLabelTapped() {
 		guard let address = accountService.account?.address else {
