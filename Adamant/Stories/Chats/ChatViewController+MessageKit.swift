@@ -223,9 +223,14 @@ extension ChatViewController: MessageCellDelegate {
 	}
 	
 	func didSelectURL(_ url: URL) {
-		let safari = SFSafariViewController(url: url)
-		safari.preferredControlTintColor = UIColor.adamantPrimary
-		present(safari, animated: true, completion: nil)
+        if url.scheme == "adm" {
+            print("GOTCHA!!!")
+            return
+        } else {
+            let safari = SFSafariViewController(url: url)
+            safari.preferredControlTintColor = UIColor.adamantPrimary
+            present(safari, animated: true, completion: nil)
+        }
 	}
 }
 
@@ -323,9 +328,17 @@ extension MessageTransaction: MessageType {
 	}
 	
 	public var data: MessageData {
-		guard let message = message else {
+		guard var message = message else {
 			return MessageData.text("")
 		}
+        
+        let pat = "U([0-9]{6,20})"
+        if let regex = try? NSRegularExpression(pattern: pat, options: []) {
+            message = regex.stringByReplacingMatches(in: message,
+                                                     options: [],
+                                                     range: NSRange(location: 0, length: message.count),
+                                                     withTemplate: "adm://U$1")
+        }
 		
 		if isMarkdown {
 			let parser = MarkdownParser(font: UIFont.adamantChatDefault)
