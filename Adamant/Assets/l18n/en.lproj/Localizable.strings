@@ -346,8 +346,8 @@
 /* Security: Selected notifications types */
 "SecurityPage.Section.NotificationsType" = "Notifications";
 
-/* Security: About ANS */
-"SecurityPage.Section.AboutANS" = "About ANS";
+/* Security: About Notification types */
+"SecurityPage.Section.AboutNotificationTypes" = "About ANS";
 
 /* Notifications: Disable notifications */
 "Notifications.Mode.NotificationsDisabled" = "Disabled";

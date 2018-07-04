@@ -310,8 +310,8 @@
 /* Notifications: Selected notifications types */
 "SecurityPage.Section.NotificationsType" = "Benachrichtigungen";
 
-/* Security: About ANS */
-"SecurityPage.Section.AboutANS" = "Über ANS";
+/* Security: About Notification types */
+"SecurityPage.Section.AboutNotificationTypes" = "About notification types";
 
 /* Notifications: Disable notifications */
 "Notifications.Mode.NotificationsDisabled" = "Deaktiviert";

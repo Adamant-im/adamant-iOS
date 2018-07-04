@@ -52,6 +52,7 @@ enum NotificationsMode: Int {
 	}
 }
 
+
 /// Supported notification types
 ///
 /// - message: text message

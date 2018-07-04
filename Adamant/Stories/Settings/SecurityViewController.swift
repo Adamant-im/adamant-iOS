@@ -24,6 +24,13 @@ extension String.adamantLocalized {
 	}
 }
 
+// Eureka uses CustomStringConvertible to represen enums as strings
+extension NotificationsMode: CustomStringConvertible {
+	var description: String {
+		return localized
+	}
+}
+
 
 // MARK: - SecurityViewController
 class SecurityViewController: FormViewController {
@@ -41,21 +48,21 @@ class SecurityViewController: FormViewController {
 	enum Sections {
 		case security
 		case notifications
-		case ansDescription
+		case aboutNotificationTypes
 		
 		var tag: String {
 			switch self {
 			case .security: return "ss"
 			case .notifications: return "st"
-			case .ansDescription: return "ans"
+			case .aboutNotificationTypes: return "ans"
 			}
 		}
 		
 		var localized: String {
 			switch self {
-			case .security: return NSLocalizedString("SecurityPage.Section.StayLoggedIn", comment: "Security: Stay logged section")
+			case .security: return NSLocalizedString("SecurityPage.Section.Security", comment: "Security: Security section")
 			case .notifications: return NSLocalizedString("SecurityPage.Section.NotificationsType", comment: "Security: Selected notifications types")
-			case .ansDescription: return NSLocalizedString("SecurityPage.Section.AboutANS", comment: "Security: About ANS")
+			case .aboutNotificationTypes: return NSLocalizedString("SecurityPage.Section.AboutNotificationTypes", comment: "Security: About Notification types")
 			}
 		}
 	}
@@ -78,7 +85,7 @@ class SecurityViewController: FormViewController {
 		
 		var localized: String {
 			switch self {
-			case .generateQr: return NSLocalizedString("AccountTab.Row.GenerateQr", comment: "Account tab: Generate QR with passphrase row")
+			case .generateQr: return NSLocalizedString("SecurityPage.Row.GenerateQr", comment: "Security: Generate QR with passphrase row")
 			case .stayIn: return NSLocalizedString("SecurityPage.Row.StayLoggedIn", comment: "Security: Stay logged option")
 			case .biometry: return "" // localAuth.biometryType.localized
 			case .notificationsMode: return NSLocalizedString("SecurityPage.Row.Notifications", comment: "Security: Show notifications")
@@ -117,7 +124,6 @@ class SecurityViewController: FormViewController {
 		let qrRow = LabelRow() {
 			$0.title = Rows.generateQr.localized
 			$0.tag = Rows.generateQr.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -229,7 +235,7 @@ class SecurityViewController: FormViewController {
 			self?.present(safari, animated: true, completion: nil)
 		}
 		
-		let ansSection = Section(Sections.ansDescription.localized) { $0.tag = Sections.ansDescription.tag }
+		let ansSection = Section(Sections.aboutNotificationTypes.localized) { $0.tag = Sections.aboutNotificationTypes.tag }
 		ansSection.append(contentsOf: [descriptionRow, githubRow])
 		form.append(ansSection)
 		

@@ -347,7 +347,7 @@
 "SecurityPage.Section.NotificationsType" = "Уведомления";
 
 /* Security: About ANS */
-"SecurityPage.Section.AboutANS" = "О службе ANS";
+"SecurityPage.Section.AboutNotificationTypes" = "О режимах уведомлений";
 
 /* Notifications: Disable notifications */
 "Notifications.Mode.NotificationsDisabled" = "Отключено";
