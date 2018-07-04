@@ -93,6 +93,8 @@ class AccountViewController: FormViewController {
 	
 	// MARK: - Properties
 	
+	var hideFreeTokensRow = false
+	
 	let walletCellIdentifier = "wllt"
 	private (set) var accountHeaderView: AccountHeaderView!
 	var wallets: [Wallet]? {
@@ -125,7 +127,7 @@ class AccountViewController: FormViewController {
 		accountHeaderView.walletCollectionView.dataSource = self
 		accountHeaderView.walletCollectionView.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: walletCellIdentifier)
 		
-		refreshAccountInfo()
+		updateAccountInfo()
 		
 		tableView.tableHeaderView = header
 		
@@ -252,14 +254,14 @@ class AccountViewController: FormViewController {
 		
 		// MARK: Notification Center
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			self?.refreshAccountInfo()
+			self?.updateAccountInfo()
 		}
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			self?.refreshAccountInfo()
+			self?.updateAccountInfo()
 		}
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			self?.refreshAccountInfo()
+			self?.updateAccountInfo()
 		}
     }
 	
@@ -292,16 +294,18 @@ class AccountViewController: FormViewController {
 		return .fade
 	}
 	
-	func refreshAccountInfo() {
+	func updateAccountInfo() {
 		let address: String
 		let adamantWallet: Wallet
 		
 		if let account = accountService.account {
 			address = account.address
 			adamantWallet = Wallet.adamant(balance: account.balance)
+			hideFreeTokensRow = account.balance > 0
 		} else {
 			address = ""
 			adamantWallet = Wallet.adamant(balance: 0)
+			hideFreeTokensRow = true
 		}
 		
 		if wallets != nil {
@@ -313,8 +317,12 @@ class AccountViewController: FormViewController {
 		}
 		
 		if let row: LabelRow = form.rowBy(tag: Rows.balance.tag) {
-			row.value = adamantWallet.formattedShort
+			row.value = adamantWallet.formattedFull
 			row.updateCell()
+		}
+		
+		if let row: LabelRow = form.rowBy(tag: Rows.freeTokens.tag) {
+			row.evaluateHidden()
 		}
 		
 		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: selectedWalletIndex, section: 0), animated: false, scrollPosition: .centeredHorizontally)
@@ -413,12 +421,12 @@ extension AccountViewController {
 		}
 		
 		switch wallet {
-		case .adamant(let balance):
+		case .adamant:
 			// Balance
 			section <<< LabelRow() {
 				$0.title = Rows.balance.localized
 				$0.tag = Rows.balance.tag
-				$0.value = AdamantUtilities.format(balance: balance)
+				$0.value = wallet.formattedFull
 				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
 				$0.cell.selectionStyle = .gray
 			}.cellUpdate({ (cell, _) in
@@ -473,6 +481,14 @@ extension AccountViewController {
 				$0.tag = Rows.freeTokens.tag
 				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
 				$0.cell.selectionStyle = .gray
+				
+				$0.hidden = Condition.function([], { [weak self] _ -> Bool in
+					guard let hideFreeTokensRow = self?.hideFreeTokensRow else {
+						return true
+					}
+					
+					return hideFreeTokensRow
+				})
 			}.cellUpdate({ (cell, _) in
 				cell.accessoryType = .disclosureIndicator
 			}).onCellSelection({ [weak self] (_, _) in
