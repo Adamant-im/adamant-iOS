@@ -82,6 +82,9 @@ class ShareQrViewController: FormViewController {
 	// MARK: - Lifecycle
 	override func viewDidLoad() {
 		super.viewDidLoad()
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = true
+		}
 		
 		// MARK: QR code
 		form +++ Section()

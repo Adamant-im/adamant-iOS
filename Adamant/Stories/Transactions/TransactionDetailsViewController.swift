@@ -79,6 +79,10 @@ class TransactionDetailsViewController: UIViewController {
 	// MARK: - Lifecycle
 	
 	override func viewDidLoad() {
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = true
+		}
+		
 		navigationItem.title = String.adamantLocalized.transactionDetails.title
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(share))
 		tableView.dataSource = self

@@ -16,10 +16,6 @@ extension String.adamantLocalized {
 	struct about {
 		static let title = NSLocalizedString("About.Title", comment: "About page: scene title")
 		
-		// URLs
-//		static let getFreeTokensUrlFormat = NSLocalizedString("AccountTab.FreeTokens.UrlFormat", comment: "Account tab: A full 'Get free tokens' link, with %@ as address")
-//		static let buyTokensUrlFormat = NSLocalizedString("AccountTab.BuyTokens.UrlFormat", comment: "Account tab: A full 'Buy tokens' link, with %@ as address")
-		
 		private init() { }
 	}
 }
@@ -104,7 +100,11 @@ class AboutViewController: FormViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		self.navigationItem.title = "About"
+		navigationItem.title = String.adamantLocalized.about.title
+		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = true
+		}
 		
 		// MARK: Header & Footer
 		if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {

@@ -82,6 +82,10 @@ class NodesListViewController: FormViewController {
         super.viewDidLoad()
         navigationItem.title = String.adamantLocalized.nodesList.title
         navigationOptions = .Disabled
+		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = true
+		}
         
         if navigationController?.viewControllers.count == 1 {
             let done = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(NodesListViewController.close))

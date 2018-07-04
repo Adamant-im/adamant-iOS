@@ -62,11 +62,16 @@ class QRGeneratorViewController: FormViewController {
 	// MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+		
 		navigationItem.title = String.adamantLocalized.qrGenerator.title
 		navigationOptions = .Disabled
 		
-		self.tableView.showsVerticalScrollIndicator = false
-		self.tableView.showsHorizontalScrollIndicator = false
+		tableView.showsVerticalScrollIndicator = false
+		tableView.showsHorizontalScrollIndicator = false
+		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = true
+		}
 		
 		// MARK: QR section
 		form +++ Section() { $0.tag = Sections.qr.tag }

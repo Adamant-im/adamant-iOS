@@ -114,10 +114,14 @@ class SecurityViewController: FormViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		self.navigationItem.title = String.adamantLocalized.security.title
+		
+		navigationItem.title = String.adamantLocalized.security.title
 		navigationOptions = .Disabled
 		showLoggedInOptions = accountService.hasStayInAccount
 		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = true
+		}
 		
 		// MARK: StayIn
 		// Generate QR

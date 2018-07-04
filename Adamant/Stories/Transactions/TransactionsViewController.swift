@@ -50,6 +50,11 @@ class TransactionsViewController: UIViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = false
+		}
+		
 		navigationItem.title = String.adamantLocalized.transactionList.title
 		
 		if accountService.account != nil {

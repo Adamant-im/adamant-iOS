@@ -82,6 +82,11 @@ class NewChatViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = true
+		}
+		
 		navigationItem.title = String.adamantLocalized.newChat.title
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
 		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))

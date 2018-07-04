@@ -55,8 +55,11 @@ class ChatListViewController: UIViewController {
 	// MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+		
 		navigationItem.title = String.adamantLocalized.chatList.title
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose,
+															target: self,
+															action: #selector(newChat))
 		
 		// MARK: TableView
 		tableView.dataSource = self
