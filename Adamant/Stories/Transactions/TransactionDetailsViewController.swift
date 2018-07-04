@@ -272,19 +272,13 @@ extension TransactionDetailsViewController {
 			return UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
 		}
 		
-		var cell: UITableViewCell
+		let cell: UITableViewCell
 		if let c = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
 			cell = c
 			cell.accessoryType = .none
             cell.imageView?.image = nil
 		} else {
 			cell = UITableViewCell(style: .value1, reuseIdentifier: cellIdentifier)
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-			cell.detailTextLabel?.textColor = UIColor.adamantSecondary
-			
-			let font = UIFont.adamantPrimary(size: 17)
-			cell.textLabel?.font = font
-			cell.detailTextLabel?.font = font
 		}
 		
 		cell.textLabel?.text = row.localized

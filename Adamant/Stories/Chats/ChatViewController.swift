@@ -138,7 +138,7 @@ class ChatViewController: MessagesViewController {
 		let feeLabel = InputBarButtonItem()
 		self.feeLabel = feeLabel
 		feeLabel.isEnabled = false
-		feeLabel.titleLabel?.font = UIFont.adamantPrimary(size: 12)
+		feeLabel.titleLabel?.font = UIFont.systemFont(ofSize: 12)
 		feeLabel.alpha = 0
 		
 		// Setup stack views

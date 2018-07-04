@@ -53,7 +53,7 @@ extension PinpadViewController {
 		pinpad.bordersColor = UIColor.adamantSecondary
 		pinpad.setColor(UIColor.adamantPrimary, for: .normal)
 		pinpad.buttonsHighlightedColor = UIColor.adamantPinpadHighlightButton
-		pinpad.buttonsFont = UIFont.adamantPrimaryLight(size: pinpad.buttonsFont.pointSize)
+		pinpad.buttonsFont = UIFont.adamantPrimary(ofSize: pinpad.buttonsFont.pointSize, weight: .light)
 		pinpad.buttonsSize = 75
 		pinpad.buttonsSpacing = 20
 		pinpad.placeholderViewHeight = 50

@@ -114,8 +114,6 @@ class NewChatViewController: FormViewController {
 			
 			let prefix = UILabel()
 			prefix.text = "U"
-			prefix.textColor = UIColor.adamantPrimary
-			prefix.font = UIFont.adamantPrimary(size: 17)
 			prefix.sizeToFit()
 			let view = UIView()
 			view.addSubview(prefix)
@@ -123,12 +121,7 @@ class NewChatViewController: FormViewController {
 			prefix.frame = prefix.frame.offsetBy(dx: 0, dy: -1)
 			$0.cell.textField.leftView = view
 			$0.cell.textField.leftViewMode = .always
-		}.cellSetup({ (cell, row) in
-			cell.textField.font = UIFont.adamantPrimary(size: 17)
-			cell.textField.textColor = UIColor.adamantPrimary
-		}).cellUpdate({ (cell, row) in
-			cell.textField.textColor = UIColor.adamantPrimary
-			
+		}.cellUpdate({ (cell, row) in
 			if let text = cell.textField.text {
 				cell.textField.text = text.components(separatedBy: NewChatViewController.invalidCharacters).joined()
 			}

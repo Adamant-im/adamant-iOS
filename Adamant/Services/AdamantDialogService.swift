@@ -111,8 +111,8 @@ extension AdamantDialogService {
         alertVC.gravityDismissAnimation = false
         alertVC.alertTitle.textColor = UIColor.adamantPrimary
         alertVC.alertDescription.textColor = .adamantSecondary
-        alertVC.alertTitle.font = UIFont.adamantPrimary(size: 20)
-        alertVC.alertDescription.font = UIFont.adamantPrimaryLight(size: 14)
+        alertVC.alertTitle.font = UIFont.systemFont(ofSize: 20)
+        alertVC.alertDescription.font = UIFont.systemFont(ofSize: 14, weight: .light)
         alertVC.headerViewHeightConstraint.constant = 50
         
         let supportBtn = PMAlertAction(title: AdamantResources.supportEmail, style: .default) {
@@ -152,7 +152,7 @@ extension AdamantDialogService {
             }
         }
         
-        supportBtn.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+        supportBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         supportBtn.setTitleColor(UIColor(hex: "#00B6FF"), for: .normal)
         supportBtn.separator.isHidden = true
         
@@ -160,7 +160,7 @@ extension AdamantDialogService {
         
         let okBtn = PMAlertAction(title: String.adamantLocalized.alert.ok, style: .default)
         
-        okBtn.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+        okBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         okBtn.setTitleColor(UIColor.white, for: .normal)
         okBtn.backgroundColor = UIColor.adamantSecondary
         alertVC.addAction(okBtn)
@@ -299,18 +299,18 @@ extension AdamantDialogService {
         alertVC.gravityDismissAnimation = false
         alertVC.alertTitle.textColor = UIColor.adamantPrimary
         alertVC.alertDescription.textColor = .adamantSecondary
-        alertVC.alertTitle.font = UIFont.adamantPrimary(size: 20)
-        alertVC.alertDescription.font = UIFont.adamantPrimaryLight(size: 14)
+        alertVC.alertTitle.font = UIFont.systemFont(ofSize: 20)
+		alertVC.alertDescription.font = UIFont.systemFont(ofSize: 14, weight: .light)
         
         if let actions = actions {
             for action in actions {
-                action.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+                action.titleLabel?.font = UIFont.systemFont(ofSize: 16)
                 action.setTitleColor(UIColor.adamantSecondary, for: .normal)
                 alertVC.addAction(action)
             }
             
             let cancelAction = PMAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
-            cancelAction.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+            cancelAction.titleLabel?.font = UIFont.systemFont(ofSize: 16)
             cancelAction.setTitleColor(UIColor.white, for: .normal)
             cancelAction.backgroundColor = UIColor.adamantSecondary
 
@@ -320,7 +320,7 @@ extension AdamantDialogService {
         } else {
             let okBtn = PMAlertAction(title: String.adamantLocalized.alert.ok, style: .default)
             
-            okBtn.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+            okBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
             okBtn.setTitleColor(UIColor.white, for: .normal)
             okBtn.backgroundColor = UIColor.adamantSecondary
             alertVC.addAction(okBtn)

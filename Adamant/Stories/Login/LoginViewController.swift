@@ -203,17 +203,15 @@ class LoginViewController: FormViewController {
 				}
 				return false
 			})
-		}.onCellSelection({ [weak self] (cell, row) in
+		}.onCellSelection { [weak self] (cell, row) in
 			guard let row: PasswordRow = self?.form.rowBy(tag: Rows.passphrase.tag), let passphrase = row.value else {
 				return
 			}
 			
 			self?.loginWith(passphrase: passphrase)
-		}).cellSetup({ (cell, row) in
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-		}).cellUpdate({ (cell, row) in
+		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
-		})
+		}
 		
 		
 		// MARK: New account section
@@ -229,13 +227,13 @@ class LoginViewController: FormViewController {
 			$0.hidden = Condition.function([], { [weak self] form -> Bool in
 				return self?.hideNewPassphrase ?? false
 			})
-		}.cellUpdate({ (cell, _) in
+		}.cellUpdate { (cell, _) in
 			cell.textView.textAlignment = .center
-			cell.textView.font = UIFont.adamantPrimary(size: 14)
+			cell.textView.font = UIFont.systemFont(ofSize: 14)
 			cell.textView.textColor = UIColor.adamantPrimary
 			cell.textView.isSelectable = false
 			cell.textView.isEditable = false
-		})
+		}
 		
 		// New genegated passphrase
 		<<< PassphraseRow() {
@@ -246,11 +244,11 @@ class LoginViewController: FormViewController {
 				return self?.hideNewPassphrase ?? true
 			})
 		}.cellUpdate({ (cell, row) in
-			cell.passphraseLabel.font = UIFont.adamantPrimary(size: 19)
+			cell.passphraseLabel.font = UIFont.systemFont(ofSize: 19)
 			cell.passphraseLabel.textColor = UIColor.adamantPrimary
 			cell.passphraseLabel.textAlignment = .center
 		
-			cell.tipLabel.font = UIFont.adamantPrimary(size: 12)
+			cell.tipLabel.font = UIFont.systemFont(ofSize: 12)
 			cell.tipLabel.textColor = UIColor.adamantSecondary
 			cell.tipLabel.textAlignment = .center
 		}).onCellSelection({ [weak self] (cell, row) in
@@ -273,35 +271,29 @@ class LoginViewController: FormViewController {
 		<<< ButtonRow() {
 			$0.tag = Rows.generateNewPassphraseButton.tag
 			$0.title = Rows.generateNewPassphraseButton.localized
-		}.onCellSelection({ [weak self] (cell, row) in
+		}.onCellSelection { [weak self] (cell, row) in
 			self?.generateNewPassphrase()
-		}).cellSetup({ (cell, row) in
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
-		}).cellUpdate({ (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		})
+		}
         
         // MARK: Nodes list settings
         form +++ Section()
-            <<< ButtonRow() {
-                $0.title = Rows.nodes.localized
-                $0.tag = Rows.nodes.tag
-                }.cellSetup({ (cell, _) in
-                    cell.selectionStyle = .gray
-                }).onCellSelection({ [weak self] (_, _) in
-                    guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
-                        return
-                    }
-                    
-                    let nav = UINavigationController(rootViewController: vc)
-                    self?.present(nav, animated: true, completion: nil)
-                }).cellSetup({ (cell, row) in
-                    cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-                    cell.textLabel?.textColor = UIColor.adamantPrimary
-                }).cellUpdate({ (cell, _) in
-                    cell.textLabel?.textColor = UIColor.adamantPrimary
-                })
+		<<< ButtonRow() {
+			$0.title = Rows.nodes.localized
+			$0.tag = Rows.nodes.tag
+		}.cellSetup { (cell, _) in
+			cell.selectionStyle = .gray
+		}.cellUpdate { (cell, _) in
+			cell.textLabel?.textColor = UIColor.adamantPrimary
+		}.onCellSelection { [weak self] (_, _) in
+			guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
+				return
+			}
+			
+			let nav = UINavigationController(rootViewController: vc)
+			self?.present(nav, animated: true, completion: nil)
+		}
 		
 		
 		// MARK: tableView position tuning

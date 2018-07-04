@@ -86,6 +86,15 @@ class TransactionsViewController: UIViewController {
 		}
 	}
 	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		
+		// TransactionDetails can reset this setting
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = false
+		}
+	}
+	
 	
 	/// - Parameter provider: nil to drop and reset
 	private func initFetchedResultController(provider: TransfersProvider?) {

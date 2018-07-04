@@ -114,16 +114,13 @@ class NodesListViewController: FormViewController {
 		// Add node
 		<<< ButtonRow() {
 			$0.title = Rows.addNode.localized
-		}.cellSetup({ (cell, _) in
+		}.cellSetup { (cell, _) in
 			cell.selectionStyle = .gray
-		}).onCellSelection({ [weak self] (_, _) in
+		}.onCellSelection { [weak self] (_, _) in
 			self?.createNewNode()
-		}).cellSetup({ (cell, row) in
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
-		}).cellUpdate({ (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		})
+		}
 			
 			
 		// MARK: Reset
@@ -134,14 +131,11 @@ class NodesListViewController: FormViewController {
 			
 		<<< ButtonRow() {
 			$0.title = Rows.reset.localized
-		}.onCellSelection({ [weak self] (_, _) in
+		}.onCellSelection { [weak self] (_, _) in
 			self?.resetToDefault()
-		}).cellSetup({ (cell, row) in
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
-		}).cellUpdate({ (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		})
+		}
     }
 	
 	override func viewWillDisappear(_ animated: Bool) {

@@ -135,10 +135,6 @@ class NodeEditorViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = true
-		}
-		
 		if let node = node {
 			self.navigationItem.title = node.host
 		} else {
@@ -208,15 +204,12 @@ class NodeEditorViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.testButton.localized
 			$0.tag = Rows.testButton.tag
-		}.cellSetup({ (cell, row) in
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		}).cellUpdate({ (cell, _) in
+		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
 			cell.accessoryType = .disclosureIndicator
-		}).onCellSelection({ [weak self] (_, _) in
+		}.onCellSelection { [weak self] (_, _) in
 			self?.testNode()
-		})
+		}
 		
 		// Delete
 		if node != nil {
@@ -224,14 +217,11 @@ class NodeEditorViewController: FormViewController {
 			<<< ButtonRow() {
 				$0.title = Rows.deleteButton.localized
 				$0.tag = Rows.deleteButton.tag
-			}.cellSetup({ (cell, row) in
-				cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+			}.cellUpdate { (cell, _) in
 				cell.textLabel?.textColor = UIColor.adamantPrimary
-			}).cellUpdate({ (cell, _) in
-				cell.textLabel?.textColor = UIColor.adamantPrimary
-			}).onCellSelection({ [weak self] (_, _) in
+			}.onCellSelection { [weak self] (_, _) in
 				self?.deleteNode()
-			})
+			}
 		}
     }
 	

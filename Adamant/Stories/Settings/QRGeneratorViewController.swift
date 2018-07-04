@@ -77,10 +77,8 @@ class QRGeneratorViewController: FormViewController {
 		form +++ Section() { $0.tag = Sections.qr.tag }
 		<<< QrRow() {
 			$0.tag = Rows.qr.tag
-			$0.cell.tipLabel.font = UIFont.adamantPrimary(size: 14)
-			$0.cell.tipLabel.textColor = UIColor.adamantSecondary
 			$0.cell.tipLabel.text = String.adamantLocalized.qrGenerator.tapToSaveTip
-		}.onCellSelection({ [weak self] (cell, row) in
+		}.onCellSelection { [weak self] (cell, row) in
 			if let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow {
 				tableView.deselectRow(at: indexPath, animated: true)
 			}
@@ -123,7 +121,7 @@ class QRGeneratorViewController: FormViewController {
 			alert.addAction(share)
 			alert.addAction(cancel)
 			self?.present(alert, animated: true, completion: nil)
-		})
+		}
 		
 		if let section = form.sectionBy(tag: Sections.qr.tag) {
 			section.hidden = Condition.predicate(NSPredicate(format: "$\(Rows.qr.tag) == nil"))
@@ -136,25 +134,18 @@ class QRGeneratorViewController: FormViewController {
 			$0.placeholder = String.adamantLocalized.qrGenerator.passphrasePlaceholder
 			$0.tag = Rows.passphrase.tag
 			$0.textAreaHeight = .dynamic(initialTextViewHeight: 28.0) // 28 for textView and 8+8 for insets
-		}.cellSetup({ (cell, row) in
-			cell.textView?.textColor = UIColor.adamantPrimary
-			cell.textView?.font = UIFont.adamantPrimary(size: 17)
-			cell.placeholderLabel?.font = UIFont.adamantPrimary(size: 17)
-		}).cellUpdate({ (cell, row) in
+		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
-		})
+		}
 		
 		<<< ButtonRow() {
 			$0.title = String.adamantLocalized.alert.generateQr
 			$0.tag = Rows.generateButton.tag
-		}.onCellSelection({ [weak self] (cell, row) in
+		}.onCellSelection { [weak self] (cell, row) in
 			self?.generateQr()
-		}).cellSetup({ (cell, row) in
+		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
-		}).cellUpdate({ (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		})
+		}
     }
 	
 	override func insertAnimation(forSections sections: [Section]) -> UITableViewRowAnimation {
