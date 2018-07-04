@@ -20,6 +20,7 @@ PODS:
   - QRCodeReader.swift (8.2.0)
   - ReachabilitySwift (4.1.0)
   - RNCryptor (5.0.3)
+  - SPLPing (1.1.8)
   - Swinject (2.4.1)
 
 DEPENDENCIES:
@@ -38,6 +39,7 @@ DEPENDENCIES:
   - QRCodeReader.swift
   - ReachabilitySwift
   - RNCryptor
+  - SPLPing
   - Swinject
 
 SPEC REPOS:
@@ -56,6 +58,7 @@ SPEC REPOS:
     - QRCodeReader.swift
     - ReachabilitySwift
     - RNCryptor
+    - SPLPing
     - Swinject
 
 EXTERNAL SOURCES:
@@ -84,8 +87,9 @@ SPEC CHECKSUMS:
   QRCodeReader.swift: 003eb32f18a5a675b936ec82ba0ff368cddbff45
   ReachabilitySwift: 6849231cd4e06559f3b9ef4a97a0a0f96d41e09f
   RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
+  SPLPing: 420837fae1e19bba0a8360e91e7a384f22509663
   Swinject: f7f15a9672e99328c1f07f277091087917215700
 
-PODFILE CHECKSUM: 0e5d9be873127d2eb44d7e7ce759b6583feccb21
+PODFILE CHECKSUM: 1801f2aec2f82718474f7885de8c1cac3166c4e9
 
 COCOAPODS: 1.5.3

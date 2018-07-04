@@ -41,7 +41,7 @@ protocol NodesSource {
 	var defaultNodes: [Node] { get }
 	
 	func getNewNode() -> Node
-    func getValidNode(completion: @escaping ((Node?) -> Void))
+    func getValidNode(_ completion: @escaping ((Node?) -> Void))
 	
 	func saveNodes()
 	func reloadNodes()

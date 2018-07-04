@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SPLPing
 
 class AdamantNodesSource: NodesSource {
 	// MARK: - Dependencies
@@ -51,7 +52,7 @@ class AdamantNodesSource: NodesSource {
 		return nodes[index]
 	}
     
-    func getValidNode(completion: @escaping ((Node?) -> Void)) {
+    func getValidNode(_ completion: @escaping ((Node?) -> Void)) {
         if let node = currentNodes.first {
             testNode(node: node) { (result) in
                 switch result {
@@ -62,12 +63,27 @@ class AdamantNodesSource: NodesSource {
                     if let index = self.currentNodes.index(of: node) {
                         self.currentNodes.remove(at: index)
                     }
-                    self.getValidNode(completion: completion)
+                    self.getValidNode(completion)
                     break
                 }
             }
         } else {
             completion(nil)
+        }
+    }
+    
+    func pingNodes() {
+        for index in 0..<self.nodes.count {
+            if let address = self.nodes[index].hostAddress() {
+                SPLPing.pingOnce(address, configuration: SPLPingConfiguration(pingInterval: 1, timeoutInterval: 1, timeToLive: 1)) { response in
+                    let latency = Int((response.duration.truncatingRemainder(dividingBy: 1)) * 1000)
+                    self.nodes[index].latency = latency
+                    
+                    self.currentNodes = self.nodes.sorted(by: { (n1, n2) -> Bool in
+                        return n1.latency > n2.latency
+                    })
+                }
+            }
         }
     }
 	
@@ -88,6 +104,8 @@ class AdamantNodesSource: NodesSource {
 	func reloadNodes() {
 		guard let raw = securedStore.get(StoreKey.nodesSource.nodes), let data = raw.data(using: String.Encoding.utf8) else {
 			nodes = defaultNodes
+            currentNodes = nodes
+            pingNodes()
 			return
 		}
 		
@@ -98,6 +116,8 @@ class AdamantNodesSource: NodesSource {
 			nodes = defaultNodes
 			print(error.localizedDescription)
 		}
+        currentNodes = nodes
+        pingNodes()
 	}
     
     private func testNode(node: Node, completion: @escaping ((NodeEditorViewController.TestState) -> Void)) {

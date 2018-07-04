@@ -11,7 +11,11 @@ import Eureka
 
 class NodeCell: Cell<Node>, CellType {
 	public override func update() {
-		textLabel?.text = row.value?.asString()
+        if let node = row.value {
+            textLabel?.text = node.asString()
+            if node.latency != Int.max { textLabel?.text = "\(textLabel?.text ?? "") \(node.latency) ms" }
+        }
+        
 	}
 }
 

@@ -25,6 +25,21 @@ struct Node: Equatable, Codable {
 	let scheme: URLScheme
 	let host: String
 	let port: Int?
+    
+    var latency: Int = Int.max
+    var tested: Bool = false
+    
+    private enum CodingKeys: String, CodingKey {
+        case scheme
+        case host
+        case port
+    }
+    
+    init(scheme: URLScheme, host: String, port: Int?) {
+        self.scheme = scheme
+        self.host = host
+        self.port = port
+    }
 	
 	func asString() -> String {
 		if let url = asURL(forcePort: scheme != URLScheme.default) {
@@ -41,6 +56,14 @@ struct Node: Equatable, Codable {
 	func asURL() -> URL? {
 		return asURL(forcePort: true)
 	}
+    
+    func hostAddress() -> String? {
+        var components = URLComponents()
+        components.scheme = scheme.rawValue
+        components.host = host
+        
+        return try? components.asURL().absoluteString
+    }
 	
 	private func asURL(forcePort: Bool) -> URL? {
 		var components = URLComponents()

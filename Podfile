@@ -12,6 +12,7 @@ target 'Adamant' do
   pod 'ReachabilitySwift' # Network status
   pod 'Haring' # Markdown parser
   pod 'DateToolsSwift' # Date formatter tools
+  pod 'SPLPing' # Ping tool
   
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars

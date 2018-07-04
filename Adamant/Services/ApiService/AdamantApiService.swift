@@ -83,7 +83,9 @@ class AdamantApiService: ApiService {
 	// MARK: - Tools
 	
 	func refreshNode() {
-		node = nodesSource?.getNewNode()
+        nodesSource?.getValidNode({ node  in
+            self.node = node
+        })
 	}
 	
 	func buildUrl(path: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
