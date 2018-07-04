@@ -11,6 +11,21 @@ import Eureka
 import SafariServices
 import Haring
 
+// MARK: - Localization
+extension String.adamantLocalized {
+	struct security {
+		static let title = NSLocalizedString("SecurityPage.Title", comment: "Security: scene title")
+		
+		static let stayInTurnOff = NSLocalizedString("SecurityPage.DoNotStayLoggedIn", comment: "Security: turn off 'Stay Logged In' confirmation")
+		static let biometryOnReason = NSLocalizedString("SecurityPage.UseBiometry", comment: "Security: Authorization reason for turning biometry on")
+		static let biometryOffReason = NSLocalizedString("SecurityPage.DoNotUseBiometry", comment: "Security: Authorization reason for turning biometry off")
+		
+		private init() {}
+	}
+}
+
+
+// MARK: - SecurityViewController
 class SecurityViewController: FormViewController {
 	
 	enum PinpadRequest {
@@ -24,13 +39,13 @@ class SecurityViewController: FormViewController {
 	// MARK: - Section & Rows
 	
 	enum Sections {
-		case stayIn
+		case security
 		case notifications
 		case ansDescription
 		
 		var tag: String {
 			switch self {
-			case .stayIn: return "ss"
+			case .security: return "ss"
 			case .notifications: return "st"
 			case .ansDescription: return "ans"
 			}
@@ -38,20 +53,21 @@ class SecurityViewController: FormViewController {
 		
 		var localized: String {
 			switch self {
-			case .stayIn: return "Stay in"
-			case .notifications: return "Notifications type"
-			case .ansDescription: return "About ANS"
+			case .security: return NSLocalizedString("SecurityPage.Section.StayLoggedIn", comment: "Security: Stay logged section")
+			case .notifications: return NSLocalizedString("SecurityPage.Section.NotificationsType", comment: "Security: Selected notifications types")
+			case .ansDescription: return NSLocalizedString("SecurityPage.Section.AboutANS", comment: "Security: About ANS")
 			}
 		}
 	}
 	
 	enum Rows {
-		case stayIn, biometry
+		case generateQr, stayIn, biometry
 		case notificationsMode
 		case description, github
 		
 		var tag: String {
 			switch self {
+			case .generateQr: return "qr"
 			case .stayIn: return "rs"
 			case .biometry: return "rb"
 			case .notificationsMode: return "rn"
@@ -62,11 +78,12 @@ class SecurityViewController: FormViewController {
 		
 		var localized: String {
 			switch self {
-			case .stayIn: return "Stay logged in"
-			case .biometry: return "Biometry"
-			case .notificationsMode: return "Notifications"
-			case .description: return "Description"
-			case .github: return "Visit GitHub"
+			case .generateQr: return NSLocalizedString("AccountTab.Row.GenerateQr", comment: "Account tab: Generate QR with passphrase row")
+			case .stayIn: return NSLocalizedString("SecurityPage.Row.StayLoggedIn", comment: "Security: Stay logged option")
+			case .biometry: return "" // localAuth.biometryType.localized
+			case .notificationsMode: return NSLocalizedString("SecurityPage.Row.Notifications", comment: "Security: Show notifications")
+			case .description: return NSLocalizedString("SecurityPage.Row.Notifications.ModesDescription", comment: "Security: Notification modes description. Markdown supported.")
+			case .github: return NSLocalizedString("SecurityPage.Row.VisitGithub", comment: "Security: Visit Github")
 			}
 		}
 	}
@@ -96,6 +113,22 @@ class SecurityViewController: FormViewController {
 		
 		
 		// MARK: StayIn
+		// Generate QR
+		let qrRow = LabelRow() {
+			$0.title = Rows.generateQr.localized
+			$0.tag = Rows.generateQr.tag
+			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.selectionStyle = .gray
+		}.cellUpdate({ (cell, _) in
+			cell.accessoryType = .disclosureIndicator
+		}).onCellSelection { [weak self] (_, _) in
+			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.qRGenerator) else {
+				return
+			}
+			
+			nav.pushViewController(vc, animated: true)
+		}
+		
 		// Stay logged in
 		let stayInRow = SwitchRow() {
 			$0.tag = Rows.stayIn.tag
@@ -127,11 +160,11 @@ class SecurityViewController: FormViewController {
 			self?.setBiometry(enabled: value)
 		}
 		
-		let stayInSection = Section(Sections.stayIn.localized) {
-			$0.tag = Sections.stayIn.tag
+		let stayInSection = Section(Sections.security.localized) {
+			$0.tag = Sections.security.tag
 		}
 		
-		stayInSection.append(contentsOf: [stayInRow, biometryRow])
+		stayInSection.append(contentsOf: [qrRow, stayInRow, biometryRow])
 		form.append(stayInSection)
 		
 		

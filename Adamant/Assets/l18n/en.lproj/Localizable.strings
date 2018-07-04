@@ -16,23 +16,23 @@
 /* Account tab: Confirm logout alert */
 "AccountTab.ConfirmLogout.MessageFormat" = "Logout from %@?";
 
-/* Account tab: Failed to update account message. %@ for error message */
-"AccountTab.Error.FailedToUpdateAccountFormat" = "Failed to update account: %@";
-
-/* Account atb: A full 'Get free tokens' link, with %@ as address */
+/* Account tab: A full 'Get free tokens' link, with %@ as address */
 "AccountTab.FreeTokens.UrlFormat" = "https://adamant.im/free-adm-tokens/?wallet=%@";
 
-/* Account tab: A full 'Join ICO' link, with %@ as address */
-"AccountTab.JoinIco.UrlFormat" = "https://adamant.im/ico/?wallet=%@";
+/* Account tab: A full 'Buy tokens' link, with %@ as address */
+"AccountTab.BuyTokens.UrlFormat" = "https://adamant.im/buy-tokens/?wallet=%@";
 
 /* Account tab: Balance row title */
 "AccountTab.Row.Balance" = "Balance";
 
-/* Account tab: 'Join the ICO' button */
-"AccountTab.Row.JoinIco" = "Buy Tokens";
+/* Account tab: 'Buy tokens' button */
+"AccountTab.Row.BuyTokens" = "Buy tokens";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Logout";
+
+/* Account tab: 'Security' row */
+"AccountTab.Row.Security" = "Security";
 
 /* Account tab: 'Send tokens' button */
 "AccountTab.Row.SendTokens" = "Send Tokens";
@@ -40,26 +40,17 @@
 /* Account tab: 'Get free tokens' button */
 "AccountTab.Row.FreeTokens" = "Free ADM tokens";
 
-/* Account tab: Account section title. */
-"AccountTab.Section.Account" = "Account";
+/* Account tab: 'About' row */
+"AccountTab.Row.About" = "About";
 
 /* Account tab: Actions section title */
 "AccountTab.Section.Actions" = "Actions";
 
-/* Account tab: Wallet section title */
-"AccountTab.Section.Wallet" = "Wallet";
+/* Account tab: Application section title */
+"AccountTab.Section.Application" = "Application";
 
 /* Account page: scene title */
 "AccountTab.Title" = "Account";
-
-/* Account tab: 'Transfer not allowed' alert 'go to WebApp button' */
-"AccountTab.TransferBlocked.GoToPWA" = "msg.adamant.im";
-
-/* Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO */
-"AccountTab.TransferBlocked.Message" = "Due to Apple restrictions, sending tokens is not allowed until 07/01/2018. For now, you can send tokens using WebApp at msg.adamant.im";
-
-/* Account tab: 'Transfer not allowed' alert title */
-"AccountTab.TransferBlocked.Title" = "Sorry!";
 
 /* Product name */
 "ADAMANT" = "ADAMANT";
@@ -283,17 +274,14 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
-/* Notifications: Modes description. Markdown supported. */
-"Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. It can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You receive notification almost instantly after a message was sent and approved by the Blockchain — a few seconds delay. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.";
+/* Security: Notification modes description. Markdown supported. */
+"SecurityPage.Row.Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. It can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You receive notification almost instantly after a message was sent and approved by the Blockchain — a few seconds delay. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.";
 
-/* Notifications: Notifications update mode */
-"Notifications.Section.Settings" = "Notifications settings";
+/* Security: Selected notifications types */
+"SecurityPage.Section.NotificationsType" = "Notifications";
 
-/* Notifications: Selected notifications types */
-"Notifications.Section.NotificationsType" = "Notifications";
-
-/* Notifications: About ANS */
-"Notifications.Section.AboutANS" = "About ANS";
+/* Security: About ANS */
+"SecurityPage.Section.AboutANS" = "About ANS";
 
 /* Notifications: Disable notifications */
 "Notifications.Mode.NotificationsDisabled" = "Disabled";
@@ -304,17 +292,8 @@
 /* Notifications: Use Apple Push notifications */
 "Notifications.Mode.ApplePush" = "Push";
 
-/* Notifications: Visit Github */
-"Notifications.Row.VisitGithub" = "Visit Github";
-
-/* Notifications: Mode */
-"Notifications.Row.Mode" = "Notifications mode";
-
-/* Notifications: Send new messages notifications */
-"Notifications.Row.Messages" = "Messages";
-
-/* Notifications: Send new transfers notifications */
-"Notifications.Row.Transfers" = "Transfers";
+/* Security: Visit Github */
+"SecurityPage.Row.VisitGithub" = "Visit Github";
 
 /* Notifications: Something went wrong while registering remote notifications. %@ for description */
 "NotificationsService.Error.RegistrationRemotesFormat" = "Registration in ANS failed. Please, try again later. Reason %@";
@@ -355,38 +334,32 @@
 /* QRGenerator: scene title */
 "QrGeneratorScene.Title" = "QR Generator";
 
-/* Config: turn off 'Stay Logged In' confirmation */
-"SettingsPage.DoNotStayLoggedIn" = "Do not stay logged in";
+/* Security: scene title */
+"SecurityPage.Title" = "Security";
+
+/* Security: turn off 'Stay Logged In' confirmation */
+"SecurityPage.DoNotStayLoggedIn" = "Do not stay logged in";
 
 /* Config: Authorization reason for turning biometry off */
-"SettingsPage.DoNotUseBiometry" = "Do not use biometry to log in";
+"SecurityPage.DoNotUseBiometry" = "Do not use biometry to log in";
 
-/* Config: Generate QR with passphrase row */
-"SettingsPage.Row.GenerateQr" = "Generate QR with passphrase";
+/* Security: Generate QR with passphrase row */
+"SecurityPage.Row.GenerateQr" = "Generate QR with passphrase";
 
-/* Config: Show notifications */
-"SettingsPage.Row.Notifications" = "Notifications";
+/* Security: Show notifications */
+"SecurityPage.Row.Notifications" = "Notifications";
 
-/* Config: Stay logged option */
-"SettingsPage.Row.StayLoggedIn" = "Stay logged in";
+/* Security: Stay logged row */
+"SecurityPage.Row.StayLoggedIn" = "Stay logged in";
 
-/* Config: Version row */
-"SettingsPage.Row.Version" = "Version";
-
-/* Config: Application Info section */
-"SettingsPage.Section.ApplicationInfo" = "Application";
-
-/* Config: Settings section */
-"SettingsPage.Section.Settings" = "Settings";
-
-/* Config: Utilities section */
-"SettingsPage.Section.Utilities" = "Utilities";
+/* Security: Security section */
+"SecurityPage.Section.Security" = "Security";
 
 /* Config: scene title */
 "SettingsPage.Title" = "Settings";
 
-/* Config: Authorization reason for turning biometry on */
-"SettingsPage.UseBiometry" = "Use biometry";
+/* Security: Authorization reason for turning biometry on */
+"SecurityPage.UseBiometry" = "Use biometry";
 
 /* Shared alert 'Cancel' button. Used anywhere */
 "Shared.Cancel" = "Cancel";

@@ -10,6 +10,27 @@ import UIKit
 import Eureka
 import SafariServices
 
+
+// MARK: - Localization
+extension String.adamantLocalized {
+	struct account {
+		static let title = NSLocalizedString("AccountTab.Title", comment: "Account page: scene title")
+		
+		// URLs
+		static let getFreeTokensUrlFormat = NSLocalizedString("AccountTab.FreeTokens.UrlFormat", comment: "Account tab: A full 'Get free tokens' link, with %@ as address")
+		static let buyTokensUrlFormat = NSLocalizedString("AccountTab.BuyTokens.UrlFormat", comment: "Account tab: A full 'Buy tokens' link, with %@ as address")
+		
+		private init() { }
+	}
+}
+
+extension String.adamantLocalized.alert {
+	static let logoutMessageFormat = NSLocalizedString("AccountTab.ConfirmLogout.MessageFormat", comment: "Account tab: Confirm logout alert")
+	static let logoutButton = NSLocalizedString("AccountTab.ConfirmLogout.Logout", comment: "Account tab: Confirm logout alert: Logout (Ok) button")
+}
+
+
+// MARK: - Wallet extension
 fileprivate extension Wallet {
 	var sectionTag: String {
 		switch self {
@@ -26,6 +47,8 @@ fileprivate extension Wallet {
 	}
 }
 
+
+// MARK: AccountViewController
 class AccountViewController: FormViewController {
 	// MARK: - Rows & Sections
 	private enum Sections {
@@ -42,8 +65,8 @@ class AccountViewController: FormViewController {
 		var localized: String {
 			switch self {
 			case .wallet: return "Wallet"
-			case .application: return "Application"
-			case .actions: return "Actions"
+			case .application: return NSLocalizedString("AccountTab.Section.Application", comment: "Account tab: Application section title")
+			case .actions: return NSLocalizedString("AccountTab.Section.Actions", comment: "Account tab: Actions section title")
 			}
 		}
 	}
@@ -68,14 +91,15 @@ class AccountViewController: FormViewController {
 		
 		var localized: String {
 			switch self {
-			case .balance: return "Balance"
-			case .sendTokens: return "Send Tokens"
-			case .buyTokens: return "Buy Tokens"
-			case .freeTokens: return "Free Tokens"
-			case .security: return "Security"
-			case .nodes: return "Nodes"
-			case .about: return "About"
-			case .logout: return "Logout"
+			case .balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
+			case .sendTokens: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
+			case .buyTokens: return NSLocalizedString("AccountTab.Row.BuyTokens", comment: "Account tab: 'Buy tokens' button")
+			case .freeTokens: return NSLocalizedString("AccountTab.Row.FreeTokens", comment: "Account tab: 'Get free tokens' button")
+			case .security: return NSLocalizedString("AccountTab.Row.Security", comment: "Account tab: 'Security' row")
+			case .nodes: return String.adamantLocalized.nodesList.nodesListButton
+			case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
+			case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
+			
 			}
 		}
 	}
@@ -495,9 +519,9 @@ extension AccountViewController {
 			}).onCellSelection({ [weak self] (_, _) in
 				let urlOpt: URL?
 				if let address = self?.accountService.account?.address {
-					urlOpt = URL(string: String.localizedStringWithFormat(String.adamantLocalized.account.joinIcoUrlFormat, address))
+					urlOpt = URL(string: String.localizedStringWithFormat(String.adamantLocalized.account.buyTokensUrlFormat, address))
 				} else {
-					urlOpt = URL(string: String.adamantLocalized.account.joinIcoUrlFormat)
+					urlOpt = nil
 				}
 				
 				guard let url = urlOpt else {
@@ -527,14 +551,14 @@ extension AccountViewController {
 			}.cellUpdate({ (cell, _) in
 				cell.accessoryType = .disclosureIndicator
 			}).onCellSelection({ [weak self] (_, _) in
-				let urlOpt: URL?
+				let raw: URL?
 				if let address = self?.accountService.account?.address {
-					urlOpt = URL(string: String.localizedStringWithFormat(String.adamantLocalized.account.getFreeTokensUrlFormat, address))
+					raw = URL(string: String.localizedStringWithFormat(String.adamantLocalized.account.getFreeTokensUrlFormat, address))
 				} else {
-					urlOpt = URL(string: String.adamantLocalized.account.getFreeTokensUrlFormat)
+					raw = URL(string: String.adamantLocalized.account.getFreeTokensUrlFormat)
 				}
 				
-				guard let url = urlOpt else {
+				guard let url = raw else {
 					self?.dialogService.showError(withMessage: "Failed to build 'Free tokens' url, report a bug", error: nil)
 					return
 				}

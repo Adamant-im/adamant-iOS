@@ -16,23 +16,23 @@
 /* Account tab: Confirm logout alert */
 "AccountTab.ConfirmLogout.MessageFormat" = "Выйти из %@?";
 
-/* Account tab: Failed to update account message. %@ for error message */
-"AccountTab.Error.FailedToUpdateAccountFormat" = "Возникла ошибка обновления аккаунта: %@";
-
-/* Account atb: A full 'Get free tokens' link, with %@ as address */
+/* Account tab: A full 'Get free tokens' link, with %@ as address */
 "AccountTab.FreeTokens.UrlFormat" = "https://adamant.im/ru-free-adm-tokens/?wallet=%@";
 
-/* Account tab: A full 'Join ICO' link, with %@ as address */
-"AccountTab.JoinIco.UrlFormat" = "https://adamant.im/ru-ico/?wallet=%@";
+/* Account tab: A full 'Buy tokens' link, with %@ as address */
+"AccountTab.BuyTokens.UrlFormat" = "https://adamant.im/ru-buy-tokens/?wallet=%@";
 
 /* Account tab: Balance row title */
 "AccountTab.Row.Balance" = "Баланс";
 
-/* Account tab: 'Join the ICO' button */
-"AccountTab.Row.JoinIco" = "Купить токены";
+/* Account tab: 'Buy tokens' button */
+"AccountTab.Row.BuyTokens" = "Купить токены";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Выход";
+
+/* Account tab: 'Security' row */
+"AccountTab.Row.Security" = "Безопасность";
 
 /* Account tab: 'Send tokens' button */
 "AccountTab.Row.SendTokens" = "Отправить токены";
@@ -40,26 +40,17 @@
 /* Account tab: 'Get free tokens' button */
 "AccountTab.Row.FreeTokens" = "Бесплатные ADM-токены";
 
-/* Account tab: Account section title. */
-"AccountTab.Section.Account" = "Аккаунт";
+/* Account tab: 'About' row */
+"AccountTab.Row.About" = "О нас";
 
 /* Account tab: Actions section title */
 "AccountTab.Section.Actions" = "Действия";
 
-/* Account tab: Wallet section title */
-"AccountTab.Section.Wallet" = "Кошелёк";
+/* Account tab: Application section title */
+"AccountTab.Section.Application" = "Приложение";
 
 /* Account page: scene title */
 "AccountTab.Title" = "Аккаунт";
-
-/* Account tab: 'Transfer not allowed' alert 'go to WebApp button' */
-"AccountTab.TransferBlocked.GoToPWA" = "msg.adamant.im";
-
-/* Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO */
-"AccountTab.TransferBlocked.Message" = "Ввиду ограничений Apple, отправка токенов отключена до 1.07.2018. В данный момент вы можете отправлять токены с помощью WebApp по адресу msg.adamant.im";
-
-/* Account tab: 'Transfer not allowed' alert title */
-"AccountTab.TransferBlocked.Title" = "Ой!";
 
 /* Product name */
 "ADAMANT" = "АДАМАНТ";
@@ -238,9 +229,6 @@
 /* NodesList: 'Add new node' button lable */
 "NodesList.AddNewNode" = "Добавить новую ноду";
 
-/* Notifications: scene title */
-"Notifications.Title" = "Уведомления";
-
 /* NodesList: Reset nodes alert title */
 "NodesList.ResetNodeListAlert" = "Сбросить список нод к списку по-умолчанию?";
 
@@ -286,17 +274,14 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Некорректный адрес хоста";
 
-/* Notifications: Modes description. Markdown supported. */
-"Notifications.ModesDescription" = "#### Режимы уведомлений\n\n#### Отключены\nНе присылать никаких уведомлений.\n\n#### Фоновое обновление\nПроверка новых сообщений производится самим устройством. Проверку инициирует iOS, и интервалы между проверками определяются системой на основании множества факторов, таких как доступность сотовой сети, заряд батареи, и использование приложения. Интервал может быть 20 минут, может быть 6 часов, может доходить и до нескольких дней. Однако, вы всегда можете открыть приложение и проверить новые сообщения вручную.\n\n#### Push\nУведомления о новых сообщениях присылаются сервисом ADAMANT Notification Service. Уведомления приходят практически мгновенно (несколько секунд), но необходима регистрация устройства в сервисе. Это безопасно и сохраняет высокий уровень секретности, для большинства пользователей это предпочтительный вариант.\n\nО регистрации устройств вы можете прочитать больше на странице проекта в Github.";
-
-/* Notifications: Notifications update mode */
-"Notifications.Section.Settings" = "Настройки уведомлений";
+/* Security: Notification modes description. Markdown supported. */
+"SecurityPage.Row.Notifications.ModesDescription" = "#### Режимы уведомлений\n\n#### Отключены\nНе присылать никаких уведомлений.\n\n#### Фоновое обновление\nПроверка новых сообщений производится самим устройством. Проверку инициирует iOS, и интервалы между проверками определяются системой на основании множества факторов, таких как доступность сотовой сети, заряд батареи, и использование приложения. Интервал может быть 20 минут, может быть 6 часов, может доходить и до нескольких дней. Однако, вы всегда можете открыть приложение и проверить новые сообщения вручную.\n\n#### Push\nУведомления о новых сообщениях присылаются сервисом ADAMANT Notification Service. Уведомления приходят практически мгновенно (несколько секунд), но необходима регистрация устройства в сервисе. Это безопасно и сохраняет высокий уровень секретности, для большинства пользователей это предпочтительный вариант.\n\nО регистрации устройств вы можете прочитать больше на странице проекта в Github.";
 
 /* Notifications: Selected notifications types */
-"Notifications.Section.NotificationsType" = "Уведомления";
+"SecurityPage.Section.NotificationsType" = "Уведомления";
 
-/* Notifications: About ANS */
-"Notifications.Section.AboutANS" = "О службе ANS";
+/* Security: About ANS */
+"SecurityPage.Section.AboutANS" = "О службе ANS";
 
 /* Notifications: Disable notifications */
 "Notifications.Mode.NotificationsDisabled" = "Отключено";
@@ -307,17 +292,8 @@
 /* Notifications: Use Apple Push notifications */
 "Notifications.Mode.ApplePush" = "Push";
 
-/* Notifications: Visit Github */
-"Notifications.Row.VisitGithub" = "Посетить Github";
-
-/* Notifications: Mode */
-"Notifications.Row.Mode" = "Режим уведомлений";
-
-/* Notifications: Send new messages notifications */
-"Notifications.Row.Messages" = "Сообщения";
-
-/* Notifications: Send new transfers notifications */
-"Notifications.Row.Transfers" = "Переводы";
+/* Security: Visit Github */
+"SecurityPage.Row.VisitGithub" = "Посетить Github";
 
 /* Notifications: Something went wrong while registering remote notifications. %@ for description */
 "NotificationsService.Error.RegistrationRemotesFormat" = "Произошла ошибка при регистрации в ANS, попробуйте позже. Причина: %@";
@@ -358,38 +334,32 @@
 /* QRGenerator: scene title */
 "QrGeneratorScene.Title" = "Генератор QR";
 
-/* Config: turn off 'Stay Logged In' confirmation */
-"SettingsPage.DoNotStayLoggedIn" = "Выходить из аккаунта при закрытии приложения";
+/* Security: scene title */
+"SecurityPage.Title" = "Безопасность";
 
-/* Config: Authorization reason for turning biometry off */
-"SettingsPage.DoNotUseBiometry" = "Отключить вход с биометрией";
+/* Security: turn off 'Stay Logged In' confirmation */
+"SecurityPage.DoNotStayLoggedIn" = "Выходить из аккаунта при закрытии приложения";
 
-/* Config: Generate QR with passphrase row */
-"SettingsPage.Row.GenerateQr" = "Создать QR-код с паролем";
+/* Security: Authorization reason for turning biometry off */
+"SecurityPage.DoNotUseBiometry" = "Отключить вход с биометрией";
 
-/* Config: Show notifications */
-"SettingsPage.Row.Notifications" = "Уведомления";
+/* Security: Generate QR with passphrase row */
+"SecurityPage.Row.GenerateQr" = "Создать QR-код с паролем";
 
-/* Config: Stay logged option */
-"SettingsPage.Row.StayLoggedIn" = "Оставаться в системе";
+/* Security: Show notifications */
+"SecurityPage.Row.Notifications" = "Уведомления";
 
-/* Config: Version row */
-"SettingsPage.Row.Version" = "Версия";
+/* Security: Stay logged row */
+"SecurityPage.Row.StayLoggedIn" = "Оставаться в системе";
 
-/* Config: Application Info section */
-"SettingsPage.Section.ApplicationInfo" = "Приложение";
-
-/* Config: Settings section */
-"SettingsPage.Section.Settings" = "Безопасность";
-
-/* Config: Utilities section */
-"SettingsPage.Section.Utilities" = "Утилиты";
+/* Security: Security section */
+"SecurityPage.Section.Security" = "Безопасность";
 
 /* Config: scene title */
 "SettingsPage.Title" = "Настройки";
 
-/* Config: Authorization reason for turning biometry on */
-"SettingsPage.UseBiometry" = "Использовать биометрию для входа в систему";
+/* Security: Authorization reason for turning biometry on */
+"SecurityPage.UseBiometry" = "Использовать биометрию для входа в систему";
 
 /* Shared alert 'Cancel' button. Used anywhere */
 "Shared.Cancel" = "Отмена";
