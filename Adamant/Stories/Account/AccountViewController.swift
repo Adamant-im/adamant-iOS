@@ -382,7 +382,25 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 
 extension AccountViewController: AccountHeaderViewDelegate {
 	func addressLabelTapped() {
-		print("show share menu")
+		guard let address = accountService.account?.address else {
+			return
+		}
+		
+		let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+		
+		let completion = { [weak self] in
+			guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
+				return
+			}
+			
+			tableView.deselectRow(at: indexPath, animated: true)
+		}
+		
+		dialogService.presentShareAlertFor(string: encodedAddress,
+										   types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+										   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+										   animated: true,
+										   completion: completion)
 	}
 }
 
