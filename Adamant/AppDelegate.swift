@@ -109,32 +109,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		// MARK: 4. Prepare pages
 		if let tabbar = window?.rootViewController as? UITabBarController {
-			let walletRoot = router.get(scene: AdamantScene.Account.wallet)
-			let wallet = UINavigationController(rootViewController: walletRoot)
-			wallet.tabBarItem.title = String.adamantLocalized.tabItems.account
-			wallet.tabBarItem.image = #imageLiteral(resourceName: "wallet_tab")
-			
 			let chatListRoot = router.get(scene: AdamantScene.Chats.chatList)
 			let chatList = UINavigationController(rootViewController: chatListRoot)
 			chatList.tabBarItem.title = String.adamantLocalized.tabItems.chats
 			chatList.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
-			
-			let settingsRoot = router.get(scene: AdamantScene.Settings.settings)
-			let settings = UINavigationController(rootViewController: settingsRoot)
-			settings.tabBarItem.title = String.adamantLocalized.tabItems.settings
-			settings.tabBarItem.image = #imageLiteral(resourceName: "settings_tab")
 			
 			let accountRoot = router.get(scene: AdamantScene.Account.account)
 			let account = UINavigationController(rootViewController: accountRoot)
 			account.tabBarItem.title = String.adamantLocalized.tabItems.account
 			account.tabBarItem.image = #imageLiteral(resourceName: "wallet_tab")
 			
-			wallet.tabBarItem.badgeColor = UIColor.adamantPrimary
 			chatList.tabBarItem.badgeColor = UIColor.adamantPrimary
-			settings.tabBarItem.badgeColor = UIColor.adamantPrimary
 			account.tabBarItem.badgeColor = UIColor.adamantPrimary
 			
-			tabbar.setViewControllers([wallet, chatList, settings, account], animated: false)
+			tabbar.setViewControllers([chatList, account], animated: false)
 		}
 		
 		
