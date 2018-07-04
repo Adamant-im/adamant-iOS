@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import SafariServices
+import FreakingSimpleRoundImageView
 
 
 // MARK: - Localization
@@ -383,6 +384,12 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 		let color = UIColor.adamantPrimary
 		cell.balanceLabel.textColor = color
 		cell.currencySymbolLabel.textColor = color
+		
+		cell.accessoryContainerView.accessoriesBackgroundColor = UIColor.adamantPrimary
+		cell.accessoryContainerView.accessoriesBorderColor = UIColor.white
+		cell.accessoryContainerView.accessoriesBorderWidth = 2
+		cell.accessoryContainerView.accessoriesContentInsets = UIEdgeInsets(top: 2, left: 4, bottom: 2, right: 4)
+		cell.accessoryContainerView.accessoriesContainerInsets = UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
 		
 		cell.setSelected(indexPath.row == selectedWalletIndex, animated: false)
 		return cell

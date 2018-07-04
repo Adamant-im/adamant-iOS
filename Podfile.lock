@@ -4,7 +4,7 @@ PODS:
   - DateToolsSwift (4.0.0)
   - EFQRCode (4.2.2)
   - Eureka (4.1.1)
-  - FreakingSimpleRoundImageView (1.1)
+  - FreakingSimpleRoundImageView (1.2.1)
   - FTIndicator (1.2.9):
     - FTIndicator/FTNotificationIndicator (= 1.2.9)
     - FTIndicator/FTProgressIndicator (= 1.2.9)
@@ -74,7 +74,7 @@ SPEC CHECKSUMS:
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   EFQRCode: 203846c7b135b5f7c1d18bb7923bc32a74c8b363
   Eureka: b88fb930e42c79f8c03c373d0fcdc28c1d6c50ed
-  FreakingSimpleRoundImageView: 4a3a1cb1347beb247f8c63b5b5cae9d770b431ee
+  FreakingSimpleRoundImageView: ff1334734da88a61b10cf29db3616c15c228f4cc
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   Haring: d2a4cfc00dfb63836dffc93e45919369f850e134
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3

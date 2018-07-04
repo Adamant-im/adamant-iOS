@@ -27,6 +27,9 @@
                             <constraint firstAttribute="width" secondItem="xZc-UL-00v" secondAttribute="height" multiplier="1:1" id="CwR-kR-kjO"/>
                         </constraints>
                     </imageView>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1Vy-Ac-hig" customClass="AccessoryContainerView" customModule="FreakingSimpleRoundImageView">
+                        <rect key="frame" x="27.5" y="0.0" width="55" height="55"/>
+                    </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ADM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Via-ei-IpM">
                         <rect key="frame" x="36.5" y="84" width="37.5" height="20.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -51,17 +54,22 @@
             </view>
             <constraints>
                 <constraint firstItem="Via-ei-IpM" firstAttribute="centerX" secondItem="NTG-ad-tJQ" secondAttribute="centerX" id="Amy-2k-tDl"/>
+                <constraint firstItem="1Vy-Ac-hig" firstAttribute="width" secondItem="xZc-UL-00v" secondAttribute="width" id="HtU-AB-LDY"/>
                 <constraint firstItem="NTG-ad-tJQ" firstAttribute="top" secondItem="xZc-UL-00v" secondAttribute="bottom" constant="10" id="Oty-s9-Se5"/>
                 <constraint firstItem="Via-ei-IpM" firstAttribute="top" secondItem="NTG-ad-tJQ" secondAttribute="bottom" constant="-1.5" id="RwR-QC-WVd"/>
+                <constraint firstItem="1Vy-Ac-hig" firstAttribute="centerY" secondItem="xZc-UL-00v" secondAttribute="centerY" id="UwT-ig-FG9"/>
+                <constraint firstItem="1Vy-Ac-hig" firstAttribute="centerX" secondItem="xZc-UL-00v" secondAttribute="centerX" id="WH1-1C-whk"/>
                 <constraint firstAttribute="bottom" secondItem="GLZ-IH-K8W" secondAttribute="bottom" id="b7C-Jo-oAh"/>
                 <constraint firstItem="GLZ-IH-K8W" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="db5-Qb-QFh"/>
                 <constraint firstItem="xZc-UL-00v" firstAttribute="top" secondItem="ZTg-uK-7eu" secondAttribute="top" id="e2k-Wh-n8m"/>
                 <constraint firstItem="NTG-ad-tJQ" firstAttribute="centerX" secondItem="xZc-UL-00v" secondAttribute="centerX" id="fZP-wm-UD0"/>
                 <constraint firstItem="xZc-UL-00v" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="kLt-9y-aHy"/>
+                <constraint firstItem="1Vy-Ac-hig" firstAttribute="height" secondItem="xZc-UL-00v" secondAttribute="height" id="rIy-ts-KAr"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <size key="customSize" width="110" height="120"/>
             <connections>
+                <outlet property="accessoryContainerView" destination="1Vy-Ac-hig" id="leG-zZ-To4"/>
                 <outlet property="balanceLabel" destination="NTG-ad-tJQ" id="nXx-aw-hsd"/>
                 <outlet property="currencyImageView" destination="xZc-UL-00v" id="2YU-Ic-NLF"/>
                 <outlet property="currencySymbolLabel" destination="Via-ei-IpM" id="5kQ-ob-ug6"/>

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FreakingSimpleRoundImageView
 
 class WalletCollectionViewCell: UICollectionViewCell {
 	@IBOutlet weak var currencyImageView: UIImageView!
@@ -14,6 +15,7 @@ class WalletCollectionViewCell: UICollectionViewCell {
 	@IBOutlet weak var currencySymbolLabel: UILabel!
 	@IBOutlet weak var markerView: UIView!
 	@IBOutlet weak var markerWidthConstraint: NSLayoutConstraint!
+	@IBOutlet weak var accessoryContainerView: AccessoryContainerView!
 	
 	var activeMarkerMultiplier: CGFloat = 0.68
 	var markerAnimationDuration: TimeInterval = 0.15
