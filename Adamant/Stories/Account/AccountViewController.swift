@@ -358,7 +358,7 @@ class AccountViewController: FormViewController {
 			accountHeaderView.walletCollectionView.reloadData()
 		}
 		
-		if let row: LabelRow = form.rowBy(tag: Rows.balance.tag) {
+		if let row: AlertLabelRow = form.rowBy(tag: Rows.balance.tag) {
 			row.value = adamantWallet.formattedFull
 			row.updateCell()
 		}
