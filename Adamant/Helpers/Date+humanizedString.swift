@@ -38,15 +38,15 @@ extension Date {
 	func humanizedDay() -> String {
 		let dateString: String
 		
-		if daysAgo < 7 {
-			if isToday {
-				dateString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
-			} else if daysAgo < 2 {
-				dateString = self.timeAgoSinceNow
-			} else {
-				dateString = self.format(with: "EEEE")
-			}
-		} else {
+		if isToday { // Today
+			dateString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
+		} else if daysAgo < 2 { // Yesterday
+			dateString = self.timeAgoSinceNow
+		} else if weeksAgo < 1 { // This week, show weekday, month and date
+			dateString = Date.formatterWeekDayMonth.string(from: self)
+		} else if yearsAgo < 1 { // This year, long ago: show month and date
+			dateString = Date.formatterDayMonth.string(from: self)
+		} else { // Show full date
 			dateString = DateFormatter.localizedString(from: self, dateStyle: .medium, timeStyle: .none)
 		}
 		
@@ -79,4 +79,19 @@ extension Date {
 		
 		return (timeString, expire)
 	}
+	
+	
+	// MARK: Formatters
+	
+	private static let formatterWeekDayMonth: DateFormatter = {
+		let formatter = DateFormatter()
+		formatter.setLocalizedDateFormatFromTemplate("MMMMEEEEd")
+		return formatter
+	}()
+	
+	private static let formatterDayMonth: DateFormatter = {
+		let formatter = DateFormatter()
+		formatter.setLocalizedDateFormatFromTemplate("MMMMd")
+		return formatter
+	}()
 }
