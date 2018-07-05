@@ -3,7 +3,7 @@ PODS:
   - CryptoSwift (0.10.0)
   - DateToolsSwift (4.0.0)
   - EFQRCode (4.2.2)
-  - Eureka (4.1.1)
+  - Eureka (4.2.0)
   - FreakingSimpleRoundImageView (1.1)
   - FTIndicator (1.2.9):
     - FTIndicator/FTNotificationIndicator (= 1.2.9)
@@ -14,7 +14,7 @@ PODS:
   - FTIndicator/FTToastIndicator (1.2.9)
   - Haring (2.0.8)
   - KeychainAccess (3.1.1)
-  - MessageKit (0.13.5)
+  - MessageKit (1.0.0)
   - MyLittlePinpad (0.2.4)
   - PMAlertController (3.4.0)
   - QRCodeReader.swift (8.2.0)
@@ -32,7 +32,7 @@ DEPENDENCIES:
   - FTIndicator
   - Haring
   - KeychainAccess
-  - MessageKit (from `https://github.com/boyarkin-anton/MessageKit.git`, branch `develop`)
+  - MessageKit
   - MyLittlePinpad
   - PMAlertController
   - QRCodeReader.swift
@@ -51,6 +51,7 @@ SPEC REPOS:
     - FTIndicator
     - Haring
     - KeychainAccess
+    - MessageKit
     - MyLittlePinpad
     - PMAlertController
     - QRCodeReader.swift
@@ -58,27 +59,17 @@ SPEC REPOS:
     - RNCryptor
     - Swinject
 
-EXTERNAL SOURCES:
-  MessageKit:
-    :branch: develop
-    :git: https://github.com/boyarkin-anton/MessageKit.git
-
-CHECKOUT OPTIONS:
-  MessageKit:
-    :commit: e2364d2394eddc211be6957893fbd0f726c233f0
-    :git: https://github.com/boyarkin-anton/MessageKit.git
-
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
   CryptoSwift: 6c778d69282bed3b4e975ff97a79d074f20bb011
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   EFQRCode: 203846c7b135b5f7c1d18bb7923bc32a74c8b363
-  Eureka: b88fb930e42c79f8c03c373d0fcdc28c1d6c50ed
+  Eureka: 0748c7bbb2560130e43c7bfa83e99c98854a1f42
   FreakingSimpleRoundImageView: 4a3a1cb1347beb247f8c63b5b5cae9d770b431ee
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   Haring: d2a4cfc00dfb63836dffc93e45919369f850e134
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
-  MessageKit: c4bd50e285a0f0761bc23a2e982aa7840873c4f5
+  MessageKit: 16160036b16476b04bd0e9f2c7ce67e662e503e4
   MyLittlePinpad: dc5f8a7fc13a4ad6fc9dc8d3359d91f1b5b1c7e8
   PMAlertController: efb781925d741d50e0200018a00c53cecb8b4910
   QRCodeReader.swift: 003eb32f18a5a675b936ec82ba0ff368cddbff45
@@ -86,6 +77,6 @@ SPEC CHECKSUMS:
   RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
   Swinject: f7f15a9672e99328c1f07f277091087917215700
 
-PODFILE CHECKSUM: 0e5d9be873127d2eb44d7e7ce759b6583feccb21
+PODFILE CHECKSUM: 47458667dcefc7a2cd5b86348cb9ae0488970106
 
 COCOAPODS: 1.5.3
