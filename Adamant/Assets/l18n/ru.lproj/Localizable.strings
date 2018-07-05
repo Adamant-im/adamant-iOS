@@ -64,8 +64,14 @@
 /* "About scene: Twitter localized url" */
 "About.Row.Twitter.Url" = "https://twitter.com/adamant_im";
 
+/* About scene: Write to Adamant row */
+"About.Row.Adamant" = "АДАМАНТ";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Токены АДАМАНТ";
+
+/* System accounts: ADAMANT iOS Support */
+"Accounts.iOSSupport" = "Техподдержка iOS ADAMANT";
 
 /* AccountsProvider: Address not valid error, %@ for address */
 "AccountsProvider.Error.AddressNotValidFormat" = "Неправильный адрес: %@";

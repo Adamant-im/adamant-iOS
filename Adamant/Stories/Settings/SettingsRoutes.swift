@@ -10,7 +10,7 @@ import UIKit
 
 extension AdamantScene {
 	struct Settings {
-		static let security = AdamantScene(identifier: "SecurityViewController") { r -> UIViewController in
+		static let security = AdamantScene(identifier: "SecurityViewController") { r in
 			let c = SecurityViewController()
 			c.accountService = r.resolve(AccountService.self)
 			c.dialogService = r.resolve(DialogService.self)
@@ -26,8 +26,13 @@ extension AdamantScene {
 			return c
 		})
 		
-		static let about = AdamantScene(identifier: "About") { _ -> UIViewController in
-			AboutViewController()
+		static let about = AdamantScene(identifier: "About") { r in
+			let c = AboutViewController()
+			c.accountService = r.resolve(AccountService.self)
+			c.accountsProvider = r.resolve(AccountsProvider.self)
+			c.dialogService = r.resolve(DialogService.self)
+			c.router = r.resolve(Router.self)
+			return c
 		}
 		
 		private init() {}

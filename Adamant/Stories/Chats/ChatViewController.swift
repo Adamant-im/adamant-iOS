@@ -69,6 +69,10 @@ class ChatViewController: MessagesViewController {
 			return
 		}
 		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = false
+		}
+		
 		// MARK: 1. Initial configuration
 		
 		if let partner = chatroom.partner {

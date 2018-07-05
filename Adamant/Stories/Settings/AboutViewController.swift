@@ -45,14 +45,15 @@ class AboutViewController: FormViewController {
 	}
 	
 	enum Rows {
-		case website, whitepaper, github
-		case email, blog, bitcointalk, facebook, telegram, vk, twitter
+		case website, whitepaper, blog, github
+		case adm, email, bitcointalk, facebook, telegram, vk, twitter
 		
 		var tag: String {
 			switch self {
 			case .website: return "www"
 			case .whitepaper: return "whtpaper"
 			case .github: return "git"
+			case .adm: return "amd"
 			case .email: return "email"
 			case .blog: return "blog"
 			case .bitcointalk: return "bittlk"
@@ -68,6 +69,7 @@ class AboutViewController: FormViewController {
 			case .website: return NSLocalizedString("About.Row.Website", comment: "About scene: Website row")
 			case .whitepaper: return NSLocalizedString("About.Row.Whitepaper", comment: "About scene: The Whitepaper row")
 			case .github: return NSLocalizedString("About.Row.GitHub", comment: "About scene: Project's GitHub page row")
+			case .adm: return NSLocalizedString("About.Row.Adamant", comment: "About scene: Write to Adamant row")
 			case .email: return NSLocalizedString("About.Row.WriteUs", comment: "About scene: Write us row")
 			case .blog: return NSLocalizedString("About.Row.Blog", comment: "About scene: Our blog row")
 			case .bitcointalk: return NSLocalizedString("About.Row.Bitcointalk", comment: "About scene: Bitcointalk.org row")
@@ -83,6 +85,7 @@ class AboutViewController: FormViewController {
 			case .website: return NSLocalizedString("About.Row.Website.Url", comment: "About scene: Website localized url")
 			case .whitepaper: return NSLocalizedString("About.Row.Whitepaper.Url", comment: "About scene: The Whitepaper localized url")
 			case .github: return NSLocalizedString("About.Row.GitHub.Url", comment: "About scene: Project's GitHub page localized url")
+			case .adm: return "" // no localized adamant chat
 			case .email: return "" // no localized emails
 			case .blog: return NSLocalizedString("About.Row.Blog.Url", comment: "About scene: Our blog localized url")
 			case .bitcointalk: return NSLocalizedString("About.Row.Bitcointalk.Url", comment: "About scene: Bitcointalk.org localized url")
@@ -93,6 +96,16 @@ class AboutViewController: FormViewController {
 			}
 		}
 	}
+	
+	
+	// MARK: Dependencies
+	var accountService: AccountService!
+	var accountsProvider: AccountsProvider!
+	var dialogService: DialogService!
+	var router: Router!
+	
+	// MARK: Properties
+	private var storedIOSSupportMessage: String?
 	
 	
 	// MARK: Lifecycle
@@ -143,6 +156,13 @@ class AboutViewController: FormViewController {
 						tag: Rows.whitepaper.tag,
 						url: Rows.whitepaper.localizedUrl,
 						image: #imageLiteral(resourceName: "row_icon_placeholder"))
+			
+		// Blog
+		<<< buildUrlRow(title: Rows.blog.localized,
+						value: nil,
+						tag: Rows.blog.tag,
+						url: Rows.blog.localizedUrl,
+						image: #imageLiteral(resourceName: "row_icon_placeholder"))
 		
 		// Github
 		<<< buildUrlRow(title: Rows.github.localized,
@@ -157,6 +177,55 @@ class AboutViewController: FormViewController {
 			$0.tag = Sections.contactUs.tag
 		}
 			
+		// Adamant
+		<<< LabelRow() {
+			$0.title = Rows.adm.localized
+			$0.tag = Rows.adm.tag
+			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.selectionStyle = .gray
+		}.cellUpdate { (cell, _) in
+			cell.accessoryType = .disclosureIndicator
+		}.onCellSelection { [weak self] (_, _) in
+			guard let accountsProvider = self?.accountsProvider, let router = self?.router else {
+				return
+			}
+			
+			let dialogService = self?.dialogService
+			dialogService?.showProgress(withMessage: nil, userInteractionEnable: false)
+			
+			accountsProvider.getAccount(byAddress: AdamantContacts.iosSupport.address) { result in
+				switch result {
+				case .success(let account):
+					DispatchQueue.main.async {
+						guard let chatroom = account.chatroom,
+							let nav = self?.navigationController,
+							let account = self?.accountService.account,
+							let chat = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
+								return
+						}
+						
+						chat.account = account
+						chat.hidesBottomBarWhenPushed = true
+						chat.chatroom = chatroom
+						chat.delegate = self
+						
+						nav.pushViewController(chat, animated: true)
+						
+						dialogService?.dismissProgress()
+					}
+					
+				case .invalidAddress, .notFound:
+					dialogService?.dismissProgress()
+					
+				case .networkError:
+					dialogService?.showWarning(withMessage: String.adamantLocalized.sharedErrors.networkError)
+					
+				case .serverError(let error):
+					dialogService?.showError(withMessage: String.adamantLocalized.sharedErrors.remoteServerError(message: error.localizedDescription), error: error)
+				}
+			}
+		}
+			
 		// E-mail
 		<<< LabelRow() {
 			$0.title = Rows.email.localized
@@ -164,9 +233,9 @@ class AboutViewController: FormViewController {
 			$0.tag = Rows.email.tag
 			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
 			$0.cell.selectionStyle = .gray
-		}.cellUpdate({ (cell, _) in
+		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}).onCellSelection({ [weak self] (_, _) in
+		}.onCellSelection { [weak self] (_, _) in
 			let mailVC = MFMailComposeViewController()
 			mailVC.mailComposeDelegate = self
 			mailVC.setToRecipients([AdamantResources.supportEmail])
@@ -178,14 +247,7 @@ class AboutViewController: FormViewController {
 			mailVC.setSubject("ADAMANT iOS")
 			mailVC.setMessageBody(deviceInfo, isHTML: false)
 			self?.present(mailVC, animated: true, completion: nil)
-		})
-		
-		// Blog
-		<<< buildUrlRow(title: Rows.blog.localized,
-						value: nil,
-						tag: Rows.blog.tag,
-						url: Rows.blog.localizedUrl,
-						image: #imageLiteral(resourceName: "row_icon_placeholder"))
+		}
 		
 		// Bitcointalk
 		<<< buildUrlRow(title: Rows.bitcointalk.localized,
@@ -222,6 +284,14 @@ class AboutViewController: FormViewController {
 						url: Rows.twitter.localizedUrl,
 						image: #imageLiteral(resourceName: "row_icon_placeholder"))
 	}
+	
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		
+		if let indexPath = tableView.indexPathForSelectedRow {
+			tableView.deselectRow(at: indexPath, animated: animated)
+		}
+	}
 }
 
 
@@ -234,9 +304,9 @@ extension AboutViewController {
 			$0.value = value
 			$0.cell.imageView?.image = image
 			$0.cell.selectionStyle = .gray
-		}.cellUpdate({ (cell, _) in
+		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}).onCellSelection({ [weak self] (_, _) in
+		}.onCellSelection { [weak self] (_, _) in
 			guard let url = URL(string: urlRaw) else {
 				fatalError("Failed to build page url: \(urlRaw)")
 			}
@@ -244,7 +314,7 @@ extension AboutViewController {
 			let safari = SFSafariViewController(url: url)
 			safari.preferredControlTintColor = UIColor.adamantPrimary
 			self?.present(safari, animated: true, completion: nil)
-		})
+		}
 		
 		return row
 	}
@@ -255,5 +325,23 @@ extension AboutViewController {
 extension AboutViewController: MFMailComposeViewControllerDelegate {
 	func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
 		controller.dismiss(animated: true, completion: nil)
+	}
+}
+
+
+// MARK: - ChatViewControllerDelegate
+extension AboutViewController: ChatViewControllerDelegate {
+	func preserveMessage(_ message: String, forAddress address: String) {
+		storedIOSSupportMessage = message
+	}
+	
+	func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String? {
+		if thenRemoveIt {
+			let message = storedIOSSupportMessage
+			storedIOSSupportMessage = nil
+			return message
+		} else {
+			return storedIOSSupportMessage
+		}
 	}
 }

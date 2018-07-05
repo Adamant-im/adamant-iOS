@@ -79,11 +79,13 @@ enum AdamantContacts {
 	
 	case adamantBountyWallet
 	case adamantIco
+	case iosSupport
 	
 	var name: String {
 		switch self {
 		case .adamantBountyWallet: return "ADAMANT Bounty"
 		case .adamantIco: return NSLocalizedString("Accounts.AdamantTokens", comment: "System accounts: ADAMANT Tokens")
+		case .iosSupport: return NSLocalizedString("Accounts.iOSSupport", comment: "System accounts: ADAMANT iOS Support")
 		}
 	}
 	
@@ -91,17 +93,21 @@ enum AdamantContacts {
 		switch self {
 		case .adamantBountyWallet: return "U15423595369615486571"
 		case .adamantIco: return "U7047165086065693428"
+		case .iosSupport: return "U10390552418447879704"
 		}
 	}
 	
 	var isReadonly: Bool {
-		return true
+		switch self {
+		case .adamantBountyWallet, .adamantIco: return true
+		case .iosSupport: return false
+		}
 	}
 	
 	var isHidden: Bool {
 		switch self {
 		case .adamantBountyWallet: return true
-		case .adamantIco: return false
+		case .adamantIco, .iosSupport: return false
 		}
 	}
 	
@@ -122,6 +128,9 @@ enum AdamantContacts {
 				"chats.ico_message": SystemMessage(message: AdamantMessage.markdownText(NSLocalizedString("Chats.IcoMessage", comment: "Known contacts: Adamant ICO message. Markdown supported.")),
 												   silentNotification: true)
 			]
+			
+		case .iosSupport:
+			return [:]
 		}
 	}
 }
