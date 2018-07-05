@@ -51,6 +51,8 @@
 		E91E5BF420DAF3AB00B06B3C /* NodeCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E91E5BF320DAF3AB00B06B3C /* NodeCell.xib */; };
 		E9204B5020C94C4A00F3B9AB /* Date+humanizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9204B4F20C94C4A00F3B9AB /* Date+humanizedString.swift */; };
 		E9204B5220C9762400F3B9AB /* MessageStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9204B5120C9762300F3B9AB /* MessageStatus.swift */; };
+		E921534E20EE1E8700C0843F /* EurekaAlertLabelRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921534C20EE1E8700C0843F /* EurekaAlertLabelRow.swift */; };
+		E921534F20EE1E8700C0843F /* AlertLabelCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E921534D20EE1E8700C0843F /* AlertLabelCell.xib */; };
 		E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */; };
 		E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921597420611A6A0000CA5C /* AdamantReachability.swift */; };
 		E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921597A206503000000CA5C /* ButtonsStripeView.swift */; };
@@ -258,6 +260,8 @@
 		E91E5BF320DAF3AB00B06B3C /* NodeCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NodeCell.xib; sourceTree = "<group>"; };
 		E9204B4F20C94C4A00F3B9AB /* Date+humanizedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+humanizedString.swift"; sourceTree = "<group>"; };
 		E9204B5120C9762300F3B9AB /* MessageStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageStatus.swift; sourceTree = "<group>"; };
+		E921534C20EE1E8700C0843F /* EurekaAlertLabelRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EurekaAlertLabelRow.swift; sourceTree = "<group>"; };
+		E921534D20EE1E8700C0843F /* AlertLabelCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AlertLabelCell.xib; sourceTree = "<group>"; };
 		E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachabilityMonitor.swift; sourceTree = "<group>"; };
 		E921597420611A6A0000CA5C /* AdamantReachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantReachability.swift; sourceTree = "<group>"; };
 		E921597A206503000000CA5C /* ButtonsStripeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonsStripeView.swift; sourceTree = "<group>"; };
@@ -781,6 +785,8 @@
 				E9942B88203D9ECA00C163AF /* QrCell.xib */,
 				E9256F6C20357B1700DE86E9 /* LogoFullHeader.xib */,
 				E948E0472024F02700975D6B /* VersionFooter.xib */,
+				E921534C20EE1E8700C0843F /* EurekaAlertLabelRow.swift */,
+				E921534D20EE1E8700C0843F /* AlertLabelCell.xib */,
 			);
 			path = SharedViews;
 			sourceTree = "<group>";
@@ -943,6 +949,7 @@
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
 				E948E0482024F02700975D6B /* VersionFooter.xib in Resources */,
 				E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */,
+				E921534F20EE1E8700C0843F /* AlertLabelCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1177,6 +1184,7 @@
 				E95F8589200900B10070534A /* ChatType.swift in Sources */,
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
 				E9EC342120052ABB00C0E546 /* TransferViewController.swift in Sources */,
+				E921534E20EE1E8700C0843F /* EurekaAlertLabelRow.swift in Sources */,
 				E9A03FD420DBC824007653A1 /* NodeVersion.swift in Sources */,
 				E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */,
 				E9EC34142005178500C0E546 /* TransactionDetailsViewController.swift in Sources */,

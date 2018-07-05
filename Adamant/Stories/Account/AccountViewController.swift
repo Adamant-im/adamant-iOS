@@ -470,6 +470,15 @@ extension AccountViewController: AccountHeaderViewDelegate {
 extension AccountViewController: NSFetchedResultsControllerDelegate {
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 		accountHeaderView.walletCollectionView.reloadItems(at: [IndexPath(row: 0, section: 0)])
+		
+		if let row: AlertLabelRow = form.rowBy(tag: Rows.balance.tag), let alertLabel = row.cell.alertLabel, let count = controller.fetchedObjects?.count {
+			if count > 0 {
+				alertLabel.isHidden = false
+				alertLabel.text = String(count)
+			} else {
+				alertLabel.isHidden = true
+			}
+		}
 	}
 }
 
@@ -484,12 +493,25 @@ extension AccountViewController {
 		switch wallet {
 		case .adamant:
 			// Balance
-			section <<< LabelRow() {
+			section <<< AlertLabelRow() { [weak self] in
 				$0.title = Rows.balance.localized
 				$0.tag = Rows.balance.tag
 				$0.value = wallet.formattedFull
 				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
 				$0.cell.selectionStyle = .gray
+				
+				if let alertLabel = $0.cell.alertLabel {
+					alertLabel.backgroundColor = UIColor.adamantPrimary
+					alertLabel.textColor = UIColor.white
+					alertLabel.clipsToBounds = true
+					alertLabel.textInsets = UIEdgeInsets(top: 1, left: 5, bottom: 1, right: 5)
+					
+					if let count = self?.transfersController?.fetchedObjects?.count, count > 0 {
+						alertLabel.text = String(count)
+					} else {
+						alertLabel.isHidden = true
+					}
+				}
 			}.cellUpdate({ (cell, _) in
 				cell.accessoryType = .disclosureIndicator
 			}).onCellSelection({ [weak self] (_, _) in
