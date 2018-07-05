@@ -447,8 +447,6 @@ extension AccountViewController: AccountHeaderViewDelegate {
 			return
 		}
 		
-		let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
-		
 		let completion = { [weak self] in
 			guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
 				return
@@ -457,7 +455,7 @@ extension AccountViewController: AccountHeaderViewDelegate {
 			tableView.deselectRow(at: indexPath, animated: true)
 		}
 		
-		dialogService.presentShareAlertFor(string: encodedAddress,
+		dialogService.presentShareAlertFor(string: address,
 										   types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
 										   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 										   animated: true,
