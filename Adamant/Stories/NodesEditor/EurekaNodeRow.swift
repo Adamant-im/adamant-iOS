@@ -10,10 +10,17 @@ import UIKit
 import Eureka
 
 class NodeCell: Cell<Node>, CellType {
+    @IBOutlet weak var latencyLabel: UILabel?
+    
 	public override func update() {
         if let node = row.value {
             textLabel?.text = node.asString()
-            if node.latency != Int.max { textLabel?.text = "\(textLabel?.text ?? "") \(node.latency) ms" }
+            if node.latency != Int.max {
+                latencyLabel?.text = "◉\(node.latency) ms"
+                latencyLabel?.textColor = node.latencyColor()
+            } else {
+                latencyLabel?.text = ""
+            }
         }
         
 	}
@@ -24,4 +31,17 @@ final class NodeRow: Row<NodeCell>, RowType {
 		super.init(tag: tag)
 		cellProvider = CellProvider<NodeCell>(nibName: "NodeRow")
 	}
+}
+
+extension Node {
+    func latencyColor() -> UIColor {
+        switch latency {
+        case 0..<50:
+            return UIColor.green
+        case 50..<100:
+            return UIColor.orange
+        default:
+            return UIColor.red
+        }
+    }
 }

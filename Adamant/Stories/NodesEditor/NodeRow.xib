@@ -17,7 +17,22 @@
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="JdO-av-LNf" id="v9c-dl-EHG">
                 <rect key="frame" x="0.0" y="0.0" width="341" height="43.5"/>
                 <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LAZ-LK-Sbz">
+                        <rect key="frame" x="305.5" y="13.5" width="35.5" height="17"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="LAZ-LK-Sbz" secondAttribute="trailing" id="aZV-ZL-71I"/>
+                    <constraint firstItem="LAZ-LK-Sbz" firstAttribute="centerY" secondItem="v9c-dl-EHG" secondAttribute="centerY" id="gQ4-0C-mRD"/>
+                </constraints>
             </tableViewCellContentView>
+            <connections>
+                <outlet property="latencyLabel" destination="LAZ-LK-Sbz" id="53d-jF-ALc"/>
+            </connections>
             <point key="canvasLocation" x="-21" y="19"/>
         </tableViewCell>
     </objects>
