@@ -16,6 +16,7 @@ extension AdamantScene {
 			c.dialogService = r.resolve(DialogService.self)
 			c.router = r.resolve(Router.self)
 			c.notificationsService = r.resolve(NotificationsService.self)
+			c.transfersProvider = r.resolve(TransfersProvider.self)
 			return c
 		}
 		

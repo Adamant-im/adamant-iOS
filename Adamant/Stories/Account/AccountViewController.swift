@@ -10,6 +10,7 @@ import UIKit
 import Eureka
 import SafariServices
 import FreakingSimpleRoundImageView
+import CoreData
 
 
 // MARK: - Localization
@@ -110,6 +111,7 @@ class AccountViewController: FormViewController {
 	var dialogService: DialogService!
 	var router: Router!
 	var notificationsService: NotificationsService!
+	var transfersProvider: TransfersProvider!
 	
 	
 	// MARK: - Wallets
@@ -129,6 +131,9 @@ class AccountViewController: FormViewController {
 		}
 	}
 	
+	private var transfersController: NSFetchedResultsController<TransferTransaction>?
+	
+	
 	// MARK: - Lifecycle
 	
     override func viewDidLoad() {
@@ -139,7 +144,18 @@ class AccountViewController: FormViewController {
 		
 		wallets = [.adamant(balance: Decimal(floatLiteral: 100.001)), .etherium]
 		
+		// MARK: Transfers controller
+		let controller = transfersProvider.unreadTransfersController()
+		controller.delegate = self
+		transfersController = controller
+		
+		do {
+			try controller.performFetch()
+		} catch {
+			dialogService.showError(withMessage: "Error fetching transfers: report a bug", error: error)
+		}
 
+		
 		// MARK: Header&Footer
 		guard let header = UINib(nibName: "AccountHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? AccountHeaderView else {
 			fatalError("Can't load AccountHeaderView")
@@ -391,6 +407,13 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 		cell.accessoryContainerView.accessoriesContentInsets = UIEdgeInsets(top: 2, left: 4, bottom: 2, right: 4)
 		cell.accessoryContainerView.accessoriesContainerInsets = UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
 		
+		if indexPath.row == 0, let count = transfersController?.fetchedObjects?.count, count > 0 {
+			let accessory = AccessoryType.label(text: String(count))
+			cell.accessoryContainerView.setAccessory(accessory, at: AccessoryPosition.topRight)
+		} else {
+			cell.accessoryContainerView.setAccessory(nil, at: AccessoryPosition.topRight)
+		}
+		
 		cell.setSelected(indexPath.row == selectedWalletIndex, animated: false)
 		return cell
 	}
@@ -439,6 +462,14 @@ extension AccountViewController: AccountHeaderViewDelegate {
 										   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 										   animated: true,
 										   completion: completion)
+	}
+}
+
+
+// MARK: - NSFetchedResultsControllerDelegate
+extension AccountViewController: NSFetchedResultsControllerDelegate {
+	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+		accountHeaderView.walletCollectionView.reloadItems(at: [IndexPath(row: 0, section: 0)])
 	}
 }
 
