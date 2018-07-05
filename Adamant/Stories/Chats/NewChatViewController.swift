@@ -60,7 +60,7 @@ class NewChatViewController: FormViewController {
 	var accountsProvider: AccountsProvider!
 	
 	// MARK: Properties
-	weak var accountTextField: UITextField!
+	private var skipValueChange = false
 	
 	weak var delegate: NewChatViewControllerDelegate?
 	var addressFormatter = NumberFormatter()
@@ -107,6 +107,7 @@ class NewChatViewController: FormViewController {
 				return footer
 				}()
 		}
+		
 		<<< TextRow() {
 			$0.tag = Rows.addressField.tag
 			$0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
@@ -121,11 +122,29 @@ class NewChatViewController: FormViewController {
 			prefix.frame = prefix.frame.offsetBy(dx: 0, dy: -1)
 			$0.cell.textField.leftView = view
 			$0.cell.textField.leftViewMode = .always
-		}.cellUpdate({ (cell, row) in
+		}.cellUpdate { (cell, row) in
 			if let text = cell.textField.text {
 				cell.textField.text = text.components(separatedBy: NewChatViewController.invalidCharacters).joined()
 			}
-		})
+		}.onChange { [weak self] row in
+			if let skip = self?.skipValueChange, skip {
+				self?.skipValueChange = false
+				return
+			}
+			
+			if let text = row.value {
+				let trimmed = text.components(separatedBy: NewChatViewController.invalidCharacters).joined()
+				
+				if text != trimmed {
+					self?.skipValueChange = true
+					
+					DispatchQueue.main.async {
+						row.value = trimmed
+						row.updateCell()
+					}
+				}
+			}
+		}
 		
 		if let row: TextRow = form.rowBy(tag: Rows.addressField.tag) {
 			row.cell.textField.becomeFirstResponder()
