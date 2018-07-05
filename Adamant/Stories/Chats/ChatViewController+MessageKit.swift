@@ -224,8 +224,9 @@ extension ChatViewController: MessageCellDelegate {
 	
 	func didSelectURL(_ url: URL) {
         if url.scheme == "adm" {
-            print("GOTCHA!!!")
-            return
+            if let address = url.host {
+                self.startNewChat(with: address)
+            }
         } else {
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamantPrimary
