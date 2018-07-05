@@ -76,14 +76,50 @@ class AdamantNodesSource: NodesSource {
         for index in 0..<self.nodes.count {
             if let address = self.nodes[index].hostAddress() {
                 SPLPing.pingOnce(address, configuration: SPLPingConfiguration(pingInterval: 1, timeoutInterval: 1, timeToLive: 1)) { response in
-                    let latency = Int((response.duration.truncatingRemainder(dividingBy: 1)) * 1000)
-                    self.nodes[index].latency = latency
+                    let latency = Int(response.duration * 1000)
                     
-                    self.currentNodes = self.nodes.sorted(by: { (n1, n2) -> Bool in
-                        return n1.latency > n2.latency
-                    })
+                    SPLPing.pingOnce(address, configuration: SPLPingConfiguration(pingInterval: 1, timeoutInterval: 1, timeToLive: 1)) { response in
+                        let latency = Int(response.duration * 1000)
+                        
+                        SPLPing.pingOnce(address, configuration: SPLPingConfiguration(pingInterval: 1, timeoutInterval: 1, timeToLive: 1)) { response in
+                            let latency = Int(response.duration * 1000)
+                            
+                            self.nodes[index].latency = latency
+                            
+                            self.currentNodes = self.nodes.sorted(by: { (n1, n2) -> Bool in
+                                return n1.latency > n2.latency
+                            })
+                        }
+                    }
                 }
             }
+        }
+    }
+    
+    func ping(node: Node, completion: @escaping ((Int) -> Void)) {
+        if let address = node.hostAddress() {
+            SPLPing.pingOnce(address, configuration: SPLPingConfiguration(pingInterval: 1, timeoutInterval: 1, timeToLive: 1)) { response in
+                let latency = Int(response.duration * 1000)
+                
+                SPLPing.pingOnce(address, configuration: SPLPingConfiguration(pingInterval: 1, timeoutInterval: 1, timeToLive: 1)) { response in
+                    let latency = Int(response.duration * 1000)
+                    
+                    SPLPing.pingOnce(address, configuration: SPLPingConfiguration(pingInterval: 1, timeoutInterval: 1, timeToLive: 1)) { response in
+                        let latency = Int(response.duration * 1000)
+                        completion(latency)
+                        
+                        if let index = self.nodes.index(of: node) {
+                            self.nodes[index].latency = latency
+                        }
+                        
+                        self.currentNodes = self.nodes.sorted(by: { (n1, n2) -> Bool in
+                            return n1.latency > n2.latency
+                        })
+                    }
+                }
+            }
+        } else {
+            completion(Int.max)
         }
     }
 	

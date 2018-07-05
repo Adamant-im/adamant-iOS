@@ -253,6 +253,14 @@ extension NodesListViewController: NodeEditorDelegate {
 			section <<< row
 			
 			saveNodes()
+            
+            nodesSource.ping(node: node) { (latency) in
+                if let index = self.nodes.index(of: node), let tag = row.tag, let row: NodeRow = self.form.rowBy(tag: tag) {
+                    self.nodes[index].latency = latency
+                    row.value = self.nodes[index]
+                    row.reload()
+                }
+            }
 			
 		case .done(let node, let tag):
 			guard let row: NodeRow = form.rowBy(tag: tag) else {
@@ -267,6 +275,14 @@ extension NodesListViewController: NodeEditorDelegate {
 			row.value = node
 			
 			saveNodes()
+            
+            nodesSource.ping(node: node) { (latency) in
+                if let index = self.nodes.index(of: node), let tag = row.tag, let row: NodeRow = self.form.rowBy(tag: tag) {
+                    self.nodes[index].latency = latency
+                    row.value = self.nodes[index]
+                    row.reload()
+                }
+            }
 			
 		case .delete(let editorNode, let tag):
 			guard let row: NodeRow = form.rowBy(tag: tag), let node = row.value else {

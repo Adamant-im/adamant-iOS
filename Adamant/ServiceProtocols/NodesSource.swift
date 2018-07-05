@@ -42,6 +42,9 @@ protocol NodesSource {
 	
 	func getNewNode() -> Node
     func getValidNode(_ completion: @escaping ((Node?) -> Void))
+    
+    func pingNodes()
+    func ping(node: Node, completion: @escaping ((Int) -> Void))
 	
 	func saveNodes()
 	func reloadNodes()

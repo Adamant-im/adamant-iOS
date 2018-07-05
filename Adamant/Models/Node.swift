@@ -27,7 +27,6 @@ struct Node: Equatable, Codable {
 	let port: Int?
     
     var latency: Int = Int.max
-    var tested: Bool = false
     
     private enum CodingKeys: String, CodingKey {
         case scheme

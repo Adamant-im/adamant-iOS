@@ -9,14 +9,24 @@
 import UIKit
 import Eureka
 
+// MARK: - Localization
+extension String.adamantLocalized {
+    struct units {
+        static let latency = NSLocalizedString("Shared.Unit.ms", comment: "Shared Ping latency unit")
+        
+        private init() {}
+    }
+}
+
 class NodeCell: Cell<Node>, CellType {
+    @IBOutlet weak var hostLabel: UILabel?
     @IBOutlet weak var latencyLabel: UILabel?
     
 	public override func update() {
         if let node = row.value {
-            textLabel?.text = node.asString()
+            hostLabel?.text = node.asString()
             if node.latency != Int.max {
-                latencyLabel?.text = "◉\(node.latency) ms"
+                latencyLabel?.text = "◉ \(node.latency) \(String.adamantLocalized.units.latency)"
                 latencyLabel?.textColor = node.latencyColor()
             } else {
                 latencyLabel?.text = ""

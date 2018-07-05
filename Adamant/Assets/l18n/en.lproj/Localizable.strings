@@ -436,6 +436,9 @@
 /* Shared alert 'Delete' button. Used anywhere. */
 "Shared.Delete" = "Delete";
 
+/* Shared Ping latency unit */
+"Shared.Unit.ms" = "ms";
+
 /* ShareQR scene: User had not authorized access to write images to photolibrary */
 "ShareQR.photolibraryNotAuthorized" = "You need to authorize ADAMANT to use your Photo library";
 

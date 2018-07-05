@@ -18,22 +18,33 @@
                 <rect key="frame" x="0.0" y="0.0" width="341" height="43.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3ha-sn-WXy">
+                        <rect key="frame" x="16" y="2" width="325" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LAZ-LK-Sbz">
-                        <rect key="frame" x="305.5" y="13.5" width="35.5" height="17"/>
+                        <rect key="frame" x="16" y="24.5" width="325" height="17"/>
                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="trailing" secondItem="LAZ-LK-Sbz" secondAttribute="trailing" id="aZV-ZL-71I"/>
-                    <constraint firstItem="LAZ-LK-Sbz" firstAttribute="centerY" secondItem="v9c-dl-EHG" secondAttribute="centerY" id="gQ4-0C-mRD"/>
+                    <constraint firstAttribute="bottom" secondItem="LAZ-LK-Sbz" secondAttribute="bottom" constant="2" id="Aws-x1-e7c"/>
+                    <constraint firstItem="3ha-sn-WXy" firstAttribute="top" secondItem="v9c-dl-EHG" secondAttribute="top" constant="2" id="BUq-jX-Z5w"/>
+                    <constraint firstAttribute="trailing" secondItem="LAZ-LK-Sbz" secondAttribute="trailing" id="GGK-Ny-jOP"/>
+                    <constraint firstItem="LAZ-LK-Sbz" firstAttribute="leading" secondItem="v9c-dl-EHG" secondAttribute="leading" constant="16" id="fiq-fY-drV"/>
+                    <constraint firstAttribute="trailing" secondItem="3ha-sn-WXy" secondAttribute="trailing" id="jiD-Zp-0E7"/>
+                    <constraint firstItem="3ha-sn-WXy" firstAttribute="leading" secondItem="v9c-dl-EHG" secondAttribute="leading" constant="16" id="mpf-pu-Heb"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
+                <outlet property="hostLabel" destination="3ha-sn-WXy" id="FVT-Se-Ha5"/>
                 <outlet property="latencyLabel" destination="LAZ-LK-Sbz" id="53d-jF-ALc"/>
             </connections>
-            <point key="canvasLocation" x="-21" y="19"/>
+            <point key="canvasLocation" x="-21.5" y="19"/>
         </tableViewCell>
     </objects>
 </document>
