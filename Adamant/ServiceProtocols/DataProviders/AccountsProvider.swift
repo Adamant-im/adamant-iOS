@@ -91,9 +91,9 @@ enum AdamantContacts {
 	
 	var address: String {
 		switch self {
-		case .adamantBountyWallet: return "U15423595369615486571"
-		case .adamantIco: return "U7047165086065693428"
-		case .iosSupport: return "U10390552418447879704"
+		case .adamantBountyWallet: return AdamantResources.contacts.adamantBountyWallet
+		case .adamantIco: return AdamantResources.contacts.adamantIco
+		case .iosSupport: return AdamantResources.contacts.iosSupport
 		}
 	}
 	

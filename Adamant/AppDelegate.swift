@@ -50,9 +50,17 @@ struct AdamantResources {
 	static let supportEmail = "ios@adamant.im"
 	static let ansReadmeUrl = "https://github.com/Adamant-im/AdamantNotificationService/blob/master/README.md"
 	
-	// ANS Contact
-	static let ansAddress = "U10629337621822775991"
-	static let ansPublicKey = "188b24bd116a556ac8ba905bbbdaa16e237dfb14269f5a4f9a26be77537d977c"
+	// Contacts
+	struct contacts {
+		static let adamantBountyWallet = "U15423595369615486571"
+		static let adamantIco = "U7047165086065693428"
+		static let iosSupport = "U15738334853882270577"
+		
+		static let ansAddress = "U10629337621822775991"
+		static let ansPublicKey = "188b24bd116a556ac8ba905bbbdaa16e237dfb14269f5a4f9a26be77537d977c"
+		
+		private init() {}
+	}
 	
 	private init() {}
 }
@@ -260,7 +268,7 @@ extension AppDelegate {
 			return
 		}
 		
-		guard let encodedPayload = adamantCore.encodeMessage(payload, recipientPublicKey: AdamantResources.ansPublicKey, privateKey: keypair.privateKey) else {
+		guard let encodedPayload = adamantCore.encodeMessage(payload, recipientPublicKey: AdamantResources.contacts.ansPublicKey, privateKey: keypair.privateKey) else {
 			dialogService.showError(withMessage: "Failed to encode ANS signal. Payload: \(payload)", error: nil)
 			return
 		}
@@ -270,7 +278,7 @@ extension AppDelegate {
 			fatalError("can't get api service to register device token")
 		}
 		
-		apiService.sendMessage(senderId: address, recipientId: AdamantResources.ansAddress, keypair: keypair, message: encodedPayload.message, type: ChatType.signal, nonce: encodedPayload.nonce) { [unowned self] result in
+		apiService.sendMessage(senderId: address, recipientId: AdamantResources.contacts.ansAddress, keypair: keypair, message: encodedPayload.message, type: ChatType.signal, nonce: encodedPayload.nonce) { [unowned self] result in
 			switch result {
 			case .success:
 				return
