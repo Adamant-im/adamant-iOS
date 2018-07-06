@@ -54,10 +54,21 @@ extension PinpadViewController {
 		pinpad.setColor(UIColor.adamantPrimary, for: .normal)
 		pinpad.buttonsHighlightedColor = UIColor.adamantPinpadHighlightButton
 		pinpad.buttonsFont = UIFont.adamantPrimary(ofSize: pinpad.buttonsFont.pointSize, weight: .light)
-		pinpad.buttonsSize = 75
-		pinpad.buttonsSpacing = 20
-		pinpad.placeholderViewHeight = 50
+		
 		pinpad.placeholdersSize = 15
+		
+		if pinpad.view.frame.height > 600 {
+			pinpad.buttonsSize = 75
+			pinpad.buttonsSpacing = 20
+			pinpad.placeholderViewHeight = 50
+		} else {// iPhone 5
+			pinpad.buttonsSize = 70
+			pinpad.buttonsSpacing = 15
+			pinpad.placeholderViewHeight = 25
+			pinpad.bottomSpacing = 24
+			pinpad.pinpadToCancelSpacing = 14
+		}
+		
 		pinpad.placeholderActiveColor = UIColor.adamantPinpadHighlightButton
 		pinpad.biometryButtonType = biometryButton
 		pinpad.cancelButton.setTitle(String.adamantLocalized.alert.cancel, for: .normal)

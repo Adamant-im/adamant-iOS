@@ -15,7 +15,7 @@ PODS:
   - Haring (2.0.8)
   - KeychainAccess (3.1.1)
   - MessageKit (0.13.5)
-  - MyLittlePinpad (0.2.4)
+  - MyLittlePinpad (0.2.5)
   - PMAlertController (3.4.0)
   - QRCodeReader.swift (8.2.0)
   - ReachabilitySwift (4.1.0)
@@ -79,7 +79,7 @@ SPEC CHECKSUMS:
   Haring: d2a4cfc00dfb63836dffc93e45919369f850e134
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
   MessageKit: c4bd50e285a0f0761bc23a2e982aa7840873c4f5
-  MyLittlePinpad: dc5f8a7fc13a4ad6fc9dc8d3359d91f1b5b1c7e8
+  MyLittlePinpad: ec1d9990d9715eab48205ecc08f4ff359ead521b
   PMAlertController: efb781925d741d50e0200018a00c53cecb8b4910
   QRCodeReader.swift: 003eb32f18a5a675b936ec82ba0ff368cddbff45
   ReachabilitySwift: 6849231cd4e06559f3b9ef4a97a0a0f96d41e09f
