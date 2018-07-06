@@ -259,7 +259,7 @@
 /* Login: Login with QR button. */
 "LoginScene.Row.Qr" = "Войти с QR-кодом";
 
-/* Login: security alert, notify user that he must save his new passphrase */
+/* Login: security alert, notify user that he must save his new passphrase. Markdown supported, center aligned. */
 "LoginScene.Row.SavePassphraseAlert" = "Это пароль для нового Кошелька и Мессенджера. **Сохраните его!** Для входа в Кошелек не нужно логина, только этот пароль. **Восстановление пароля невозможно**.";
 
 /* Login: a small hint for a user, that he can tap on passphrase to save it */

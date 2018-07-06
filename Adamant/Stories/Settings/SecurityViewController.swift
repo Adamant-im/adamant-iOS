@@ -216,10 +216,11 @@ class SecurityViewController: FormViewController {
 			$0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
 			$0.tag = Rows.description.tag
 		}.cellUpdate { (cell, _) in
-			let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
-			cell.textView.attributedText = parser.parse(Rows.description.localized)
 			cell.textView.isSelectable = false
 			cell.textView.isEditable = false
+			
+			let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
+			cell.textView.attributedText = parser.parse(Rows.description.localized)
 		}
 		
 		// Github readme

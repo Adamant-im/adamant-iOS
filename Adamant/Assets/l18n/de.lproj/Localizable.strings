@@ -259,7 +259,7 @@
 /* Login: Login with QR button. */
 "LoginScene.Row.Qr" = "Mit dem QR-Code einloggen";
 
-/* Login: security alert, notify user that he must save his new passphrase */
+/* Login: security alert, notify user that he must save his new passphrase. Markdown supported, center aligned. */
 "LoginScene.Row.SavePassphraseAlert" = "Speichern Sie die Passphrase für die neue Wallet und das Messenger-Konto. Es gibt keinen Login für die Wallet, nur die Passphrase wird benötigt. Wenn Sie verloren geht, kann sie nicht wiederhergestellt werden.";
 
 /* Login: a small hint for a user, that he can tap on passphrase to save it */

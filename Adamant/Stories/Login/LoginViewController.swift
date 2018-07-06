@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import Haring
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -85,7 +86,7 @@ class LoginViewController: FormViewController {
 				return NSLocalizedString("LoginScene.Row.Pincode", comment: "Login: Login with pincode button")
 				
 			case .saveYourPassphraseAlert:
-				return NSLocalizedString("LoginScene.Row.SavePassphraseAlert", comment: "Login: security alert, notify user that he must save his new passphrase")
+				return NSLocalizedString("LoginScene.Row.SavePassphraseAlert", comment: "Login: security alert, notify user that he must save his new passphrase. Markdown supported, center aligned.")
 				
 			case .generateNewPassphraseButton:
 				return NSLocalizedString("LoginScene.Row.Generate", comment: "Login: generate new passphrase button")
@@ -223,16 +224,23 @@ class LoginViewController: FormViewController {
 		<<< TextAreaRow() {
 			$0.tag = Rows.saveYourPassphraseAlert.tag
 			$0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
-			$0.value = Rows.saveYourPassphraseAlert.localized
 			$0.hidden = Condition.function([], { [weak self] form -> Bool in
 				return self?.hideNewPassphrase ?? false
 			})
 		}.cellUpdate { (cell, _) in
 			cell.textView.textAlignment = .center
-			cell.textView.font = UIFont.systemFont(ofSize: 14)
-			cell.textView.textColor = UIColor.adamantPrimary
 			cell.textView.isSelectable = false
 			cell.textView.isEditable = false
+			
+			let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize), color: UIColor.adamantPrimary)
+			
+			let style = NSMutableParagraphStyle()
+			style.alignment = NSTextAlignment.center
+			
+			let mutableText = NSMutableAttributedString(attributedString: parser.parse(Rows.saveYourPassphraseAlert.localized))
+			mutableText.addAttribute(NSAttributedStringKey.paragraphStyle, value: style, range: NSRange(location: 0, length: mutableText.length))
+			
+			cell.textView.attributedText = mutableText
 		}
 		
 		// New genegated passphrase
