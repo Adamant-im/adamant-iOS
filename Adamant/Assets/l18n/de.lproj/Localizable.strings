@@ -121,6 +121,12 @@
 /* Account tab: Application section title */
 "AccountTab.Section.Application" = "Application";
 
+/* Account tab: Adamant wallet section */
+"AccountTab.Sections.adamant_wallet" = "ADAMANT Wallet";
+
+/* Account tab: Ethereum wallet section */
+"AccountTab.Sections.ethereum_wallet" = "Ethereum Wallet";
+
 /* Account page: scene title */
 "AccountTab.Title" = "Konto";
 

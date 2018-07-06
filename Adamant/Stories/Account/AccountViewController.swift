@@ -43,8 +43,8 @@ fileprivate extension Wallet {
 	
 	var sectionTitle: String {
 		switch self {
-		case .adamant: return "ADAMANT Wallet"
-		case .ethereum: return "Etherium Wallet"
+		case .adamant: return NSLocalizedString("AccountTab.Sections.adamant_wallet", comment: "Account tab: Adamant wallet section")
+		case .ethereum: return NSLocalizedString("AccountTab.Sections.ethereum_wallet", comment: "Account tab: Ethereum wallet section")
 		}
 	}
 }
