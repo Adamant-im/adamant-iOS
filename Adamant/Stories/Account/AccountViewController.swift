@@ -37,14 +37,14 @@ fileprivate extension Wallet {
 	var sectionTag: String {
 		switch self {
 		case .adamant: return "s_adm"
-		case .etherium: return "s_eth"
+		case .ethereum: return "s_eth"
 		}
 	}
 	
 	var sectionTitle: String {
 		switch self {
 		case .adamant: return "ADAMANT Wallet"
-		case .etherium: return "Etherium Wallet"
+		case .ethereum: return "Etherium Wallet"
 		}
 	}
 }
@@ -142,7 +142,7 @@ class AccountViewController: FormViewController {
 		navigationOptions = .Disabled
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		
-		wallets = [.adamant(balance: Decimal(floatLiteral: 100.001)), .etherium]
+		wallets = [.adamant(balance: Decimal(floatLiteral: 100.001)), .ethereum]
 		
 		// MARK: Transfers controller
 		let controller = transfersProvider.unreadTransfersController()
@@ -358,7 +358,7 @@ class AccountViewController: FormViewController {
 			wallets![0] = adamantWallet
 			accountHeaderView.walletCollectionView.reloadItems(at: [IndexPath(row: 0, section: 0)])
 		} else {
-			wallets = [adamantWallet, Wallet.etherium]
+			wallets = [adamantWallet, Wallet.ethereum]
 			accountHeaderView.walletCollectionView.reloadData()
 		}
 		
@@ -594,7 +594,7 @@ extension AccountViewController {
 				self?.present(safari, animated: true, completion: nil)
 			})
 			
-		case .etherium:
+		case .ethereum:
 			section <<< LabelRow() {
 				$0.title = "Soon..."
 			}
