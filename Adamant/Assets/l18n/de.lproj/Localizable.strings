@@ -292,6 +292,9 @@
 /* New chat: scene title */
 "NewChatScene.Title" = "Neuer Chat";
 
+/* New chat: Show QR for my address button */
+"NewChatScene.MyQr" = "Show my QR";
+
 /* NodesList: Button label */
 "NodesList.NodesList" = "Node-Liste";
 
