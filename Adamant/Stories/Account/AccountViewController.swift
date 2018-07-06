@@ -54,6 +54,7 @@ fileprivate extension Wallet {
 class AccountViewController: FormViewController {
 	// MARK: - Rows & Sections
 	private enum Sections {
+        case delegates
 		case wallet, application, actions
 		
 		var tag: String {
@@ -69,6 +70,8 @@ class AccountViewController: FormViewController {
 			case .wallet: return "Wallet"
 			case .application: return NSLocalizedString("AccountTab.Section.Application", comment: "Account tab: Application section title")
 			case .actions: return NSLocalizedString("AccountTab.Section.Actions", comment: "Account tab: Actions section title")
+            case .delegates:
+                return NSLocalizedString("AccountTab.Section.Delegates", comment: "Account tab: Delegates section title")
 			}
 		}
 	}
@@ -77,6 +80,8 @@ class AccountViewController: FormViewController {
 		case balance, sendTokens, buyTokens, freeTokens // Wallet
 		case security, nodes, about // Application
 		case logout // Actions
+        
+        case votesForDelegates
 		
 		var tag: String {
 			switch self {
@@ -88,6 +93,9 @@ class AccountViewController: FormViewController {
 			case .nodes: return "nds"
 			case .about: return "bt"
 			case .logout: return "lgtrw"
+                
+            case .votesForDelegates:
+                return "votesForDelegates"
 			}
 		}
 		
@@ -102,6 +110,9 @@ class AccountViewController: FormViewController {
 			case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
 			case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
 			
+                
+            case .votesForDelegates:
+                return NSLocalizedString("AccountTab.Row.VotesForDelegates", comment: "Account tab: 'Votes for delegates' button")
 			}
 		}
 	}

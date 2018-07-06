@@ -8,6 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
+		644EC34D20EFA60900F40C73 /* AdamantApi+Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC34C20EFA60900F40C73 /* AdamantApi+Delegates.swift */; };
+		644EC34F20EFA77A00F40C73 /* Delegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC34E20EFA77A00F40C73 /* Delegate.swift */; };
+		644EC35220EFA9A300F40C73 /* DelegateRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35120EFA9A300F40C73 /* DelegateRoutes.swift */; };
+		644EC35720EFAAB700F40C73 /* DelegatesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35520EFAAB700F40C73 /* DelegatesListViewController.swift */; };
+		644EC35820EFAAB700F40C73 /* DelegatesListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 644EC35620EFAAB700F40C73 /* DelegatesListViewController.xib */; };
+		644EC35B20EFB8E900F40C73 /* DelegateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35920EFB8E900F40C73 /* DelegateCell.swift */; };
+		644EC35C20EFB8E900F40C73 /* DelegateCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 644EC35A20EFB8E900F40C73 /* DelegateCell.xib */; };
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
 		E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */; };
 		E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F620EC200900D0CB2D /* SecurityViewController.swift */; };
@@ -195,6 +202,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		644EC34C20EFA60900F40C73 /* AdamantApi+Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Delegates.swift"; sourceTree = "<group>"; };
+		644EC34E20EFA77A00F40C73 /* Delegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Delegate.swift; sourceTree = "<group>"; };
+		644EC35120EFA9A300F40C73 /* DelegateRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateRoutes.swift; sourceTree = "<group>"; };
+		644EC35520EFAAB700F40C73 /* DelegatesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegatesListViewController.swift; sourceTree = "<group>"; };
+		644EC35620EFAAB700F40C73 /* DelegatesListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DelegatesListViewController.xib; sourceTree = "<group>"; };
+		644EC35920EFB8E900F40C73 /* DelegateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateCell.swift; sourceTree = "<group>"; };
+		644EC35A20EFB8E900F40C73 /* DelegateCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DelegateCell.xib; sourceTree = "<group>"; };
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
 		871009461457F6B7B47D99C5 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
 		903AC078A8A55175A05E42D4 /* Pods-Adamant.testing.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.testing.xcconfig"; path = "Pods/Target Support Files/Pods-Adamant/Pods-Adamant.testing.xcconfig"; sourceTree = "<group>"; };
@@ -415,6 +429,18 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		644EC35020EFA96700F40C73 /* Delegates */ = {
+			isa = PBXGroup;
+			children = (
+				644EC35120EFA9A300F40C73 /* DelegateRoutes.swift */,
+				644EC35520EFAAB700F40C73 /* DelegatesListViewController.swift */,
+				644EC35620EFAAB700F40C73 /* DelegatesListViewController.xib */,
+				644EC35920EFB8E900F40C73 /* DelegateCell.swift */,
+				644EC35A20EFB8E900F40C73 /* DelegateCell.xib */,
+			);
+			path = Delegates;
+			sourceTree = "<group>";
+		};
 		E59396A8E0053F21F768E69B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -515,7 +541,6 @@
 				E95F8588200900B10070534A /* ChatType.swift */,
 				E9204B5120C9762300F3B9AB /* MessageStatus.swift */,
 				E93EB0A220DA4CCA001F9601 /* Node.swift */,
-				E9A03FD320DBC824007653A1 /* NodeVersion.swift */,
 				E95F85682006AB9D0070534A /* NormalizedTransaction.swift */,
 				E965A53320B833A00041A3EA /* StateAsset.swift */,
 				E965A53120B82C850041A3EA /* StateType.swift */,
@@ -523,6 +548,8 @@
 				E965A53520B8370C0041A3EA /* TransactionAsset.swift */,
 				E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */,
 				E983AE2220E6568C00497E1A /* Wallet.swift */,
+				E9A03FD320DBC824007653A1 /* NodeVersion.swift */,
+				644EC34E20EFA77A00F40C73 /* Delegate.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -564,6 +591,7 @@
 			children = (
 				E9E7CDA52002AE1C00DFC4DB /* Account */,
 				E95F857B2008C8B20070534A /* Chats */,
+				644EC35020EFA96700F40C73 /* Delegates */,
 				E919479A20001007001362F8 /* Login */,
 				E93EB09D20DA3F3A001F9601 /* NodesEditor */,
 				E982F69820235AF000566AC7 /* Settings */,
@@ -741,6 +769,7 @@
 				E9CAE8D72018ACA700345E76 /* AdamantApi+Transfers.swift */,
 				E965A52F20B594120041A3EA /* AdamantApi+States.swift */,
 				E9A03FD520DBC8E2007653A1 /* AdamantApi+Peers.swift */,
+				644EC34C20EFA60900F40C73 /* AdamantApi+Delegates.swift */,
 			);
 			path = ApiService;
 			sourceTree = "<group>";
@@ -923,6 +952,7 @@
 				E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
 				E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */,
+				644EC35C20EFB8E900F40C73 /* DelegateCell.xib in Resources */,
 				E9942B89203D9ECA00C163AF /* QrCell.xib in Resources */,
 				E921597D2065031D0000CA5C /* ButtonsStripe.xib in Resources */,
 				E9C51EED2011416E00385EB7 /* adamant-core.js in Resources */,
@@ -950,6 +980,7 @@
 				E948E0482024F02700975D6B /* VersionFooter.xib in Resources */,
 				E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */,
 				E921534F20EE1E8700C0843F /* AlertLabelCell.xib in Resources */,
+				644EC35820EFAAB700F40C73 /* DelegatesListViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1102,6 +1133,8 @@
 				E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */,
 				E94E7B06205D48B20042B639 /* TransactionsRoutes.swift in Sources */,
 				E983AE2120E655C500497E1A /* AccountHeaderView.swift in Sources */,
+				644EC35220EFA9A300F40C73 /* DelegateRoutes.swift in Sources */,
+				644EC35B20EFB8E900F40C73 /* DelegateCell.swift in Sources */,
 				E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */,
 				E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */,
 				E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */,
@@ -1115,6 +1148,7 @@
 				E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */,
 				E90A494D204DA932009F6A65 /* LocalAuthentication.swift in Sources */,
 				E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */,
+				644EC34D20EFA60900F40C73 /* AdamantApi+Delegates.swift in Sources */,
 				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
 				E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */,
 				E9B3D3A9202082450019EB36 /* AdamantTransfersProvider.swift in Sources */,
@@ -1170,7 +1204,9 @@
 				E93D7ABE2052CEE1005D19DC /* NotificationsService.swift in Sources */,
 				E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */,
 				E9A03FD620DBC8E2007653A1 /* AdamantApi+Peers.swift in Sources */,
+				644EC34F20EFA77A00F40C73 /* Delegate.swift in Sources */,
 				E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */,
+				644EC35720EFAAB700F40C73 /* DelegatesListViewController.swift in Sources */,
 				E9C51EF12013F18000385EB7 /* NewChatViewController.swift in Sources */,
 				E913C9171FFFAF76001A83F7 /* JSAdamantCore.swift in Sources */,
 				E95F856520067A030070534A /* GlobalConstants.swift in Sources */,

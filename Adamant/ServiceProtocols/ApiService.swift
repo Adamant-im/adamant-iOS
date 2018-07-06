@@ -110,4 +110,9 @@ protocol ApiService: class {
 	/// Send text message
 	///   - completion: Contains processed transactionId, if success, or AdamantError, if fails.
 	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
+    
+    // MARK: - Delegates
+    
+    /// Get delegates
+    func getDelegates(limit: Int, offset: Int, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void)
 }
