@@ -167,6 +167,10 @@ class AccountViewController: FormViewController {
 		accountHeaderView.walletCollectionView.dataSource = self
 		accountHeaderView.walletCollectionView.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: walletCellIdentifier)
 		
+		if #available(iOS 11.0, *), let topInset = UIApplication.shared.keyWindow?.safeAreaInsets.top, topInset > 0 {
+			accountHeaderView.backgroundTopConstraint.constant = -topInset
+		}
+		
 		updateAccountInfo()
 		
 		tableView.tableHeaderView = header

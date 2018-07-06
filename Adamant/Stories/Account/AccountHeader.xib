@@ -72,6 +72,7 @@
             <connections>
                 <outlet property="addressButton" destination="Iro-jA-X5P" id="u6V-wQ-5UR"/>
                 <outlet property="avatarImageView" destination="IVQ-4p-zci" id="FoL-e1-OKu"/>
+                <outlet property="backgroundTopConstraint" destination="ARS-YV-qkz" id="dqA-Yk-Y1H"/>
                 <outlet property="walletCollectionView" destination="akZ-qC-jqo" id="ncm-g3-NTf"/>
             </connections>
             <point key="canvasLocation" x="35" y="-156"/>

@@ -18,6 +18,7 @@ class AccountHeaderView: UIView {
 	@IBOutlet weak var avatarImageView: UIImageView!
 	@IBOutlet weak var walletCollectionView: UICollectionView!
 	@IBOutlet weak var addressButton: UIButton!
+	@IBOutlet weak var backgroundTopConstraint: NSLayoutConstraint!
 	
 	weak var delegate: AccountHeaderViewDelegate?
 	
