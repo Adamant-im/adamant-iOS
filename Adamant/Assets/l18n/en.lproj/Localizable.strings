@@ -17,7 +17,7 @@
 "About.Row.GitHub" = "Project's GitHub page";
 
 /* About scene: Write us row */
-"About.Row.WriteUs" = "Write us";
+"About.Row.WriteUs" = "Email";
 
 /* About scene: Our blog row */
 "About.Row.Blog" = "Our blog";
@@ -128,7 +128,7 @@
 "ADAMANT" = "ADAMANT";
 
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
-"Application.deviceTokenErrorFormat" = "Failed to reginser in ANS: %@";
+"Application.deviceTokenErrorFormat" = "Failed to register in ANS: %@";
 
 /* Serious internal error: Failed to build endpoint url */
 "ApiService.InternalError.EndpointBuildFailed" = "Endpoint build failed. Report a bug";
@@ -164,10 +164,10 @@
 "ChatsProvider.Validation.MessageTooLong" = "Message is too long";
 
 /* Known contacts: Adamant ICO message. Markdown supported. */
-"Chats.IcoMessage" = "Now you have a possibility to buy tokens of ADAMANT, the most secure and anonymous messenger, with the cheapest price.\n\nPlease make sure your have saved the passphrase for this account — exit your account and open it again. Better save your password on a sheet of paper also. But remember, only **you are responsible for the passphrase safety**. It cannot be recovered. And if other person will get it, your money will be stolen. Treat this question as secure, as if tokens in your wallet will cost a billion dollars some time.\n\nTo buy ADM tokens, go to Wallet tab and click Buy Tokens, or open the page Adamant.im/ico/ in the web browser. In the ICO form enter your ADAMANT address — you will receive ADM tokens there. If you moved from Messenger App, your ADM address will be filled already, other way go back to Messenger and click Account to copy it to clipboard. Next, choose crypto you want to spend and its amount. You'll see how much ADM tokens you will receive, including volume bonus: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Click Buy ADAMANT tokens. You'll get unique address where you need to send crypto. As soon as your transaction will be confirmed, you'll receive ADM tokens. Transaction can be done **from any wallet or exchange**. It is not necessary to transfer exact amount including transaction fees, the payment will be processed anyway.\n\nAfter you receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens will be distributed among users' wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.\n\nDo not reply to this message, it is a system account. If you still have any questions, contact account **U15677078342684640219**.";
+"Chats.IcoMessage" = "Now you have a possibility to buy tokens of ADAMANT, the most secure and anonymous messenger, with the cheapest price.\n\nPlease make sure your have saved the passphrase for this account — exit your account and open it again. Better save your password on a sheet of paper also. But remember, only **you are responsible for the passphrase safety**. It cannot be recovered. And if other person will get it, your money will be stolen. Treat this question as secure, as if tokens in your wallet will cost a billion dollars some time.\n\nTo buy ADM tokens, go to Wallet tab and click Buy Tokens, or open the page https://adamant.im/buy-tokens/ in the web browser. In the form enter your ADAMANT address — you will receive ADM tokens there. If you moved from Messenger App, your ADM address will be filled already. Next, choose crypto you want to spend and its amount. You'll see how much ADM tokens you will receive, including volume bonus: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Click Buy ADAMANT tokens. You'll get unique address where you need to send crypto. As soon as your transaction will be confirmed, you'll receive ADM tokens. Transaction can be done **from any wallet or exchange**. It is not necessary to transfer exact amount including transaction fees, the payment will be processed anyway.\n\nAfter you receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens will be distributed among users' wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.\n\nDo not reply to this message, it is a system account. If you still have any questions, contact account **U15677078342684640219**.";
 
 /* Known contacts: Adamant pre ICO message */
-"Chats.PreIcoMessage" = "You have a possibility to invest in ADAMANT, the most secure and anonymous messenger. Now is a Pre-ICO stage — the most profitable for investors. Learn more on Adamant.im website or in the Whitepaper. To participate just reply to this message and we will assist. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\nAfter you invest and receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.";
+"Chats.PreIcoMessage" = "Null";
 
 /* Known contacts: Adamant welcome message. Markdown supported. */
 "Chats.WelcomeMessage" = "Welcome to ADAMANT, the most secure and anonymous messenger.\n\nRemember, your security and anonymity is up to you also. Do not follow links you receive, otherwise your IP can be compromised. Do not trust browser extensions. Better to share your ADM address personally, but not using other messengers. Keep your secret passphrase secure. Set a password on your device or logout before leaving.\n\nLearn more about security and anonymity at https://adamant.im/staysecured.\n\nAll the transactions within the blockchain do need to have their minimal fees. This is necessary to support the network infrastructure. To start messengning now, **get free tokens** — go to Wallet tab and click Free ADM tokens. Then click Start new chat on Chats tab and put your interlocutor's address. To copy your address, click on Account on Wallet tab.\n\nDo not reply to this message, it is a system account. If you still have any questions, contact account **U15677078342684640219**.";
@@ -215,7 +215,7 @@
 "Error.RemoteServerErrorFormat" = "Blockchain Node error: %@";
 
 /* Shared error: User not logged */
-"Error.UserNotLogged" = "User not logged in";
+"Error.UserNotLogged" = "User is not logged in";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "LoginScene.Error.AuthorizeCamera" = "You need to authorize ADAMANT to use device's camera";
@@ -260,7 +260,7 @@
 "LoginScene.Row.Qr" = "Login with QR code";
 
 /* Login: security alert, notify user that he must save his new passphrase */
-"LoginScene.Row.SavePassphraseAlert" = "Save the passphrase for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. If lost, no way to recover it.";
+"LoginScene.Row.SavePassphraseAlert" = "**Save the passphrase** for new Wallet and Messenger account. There is no login to enter Wallet, only the passphrase needed. **If lost, no way to recover it**.";
 
 /* Login: a small hint for a user, that he can tap on passphrase to save it */
 "LoginScene.Row.TapToSave" = "Tap to save";
@@ -311,7 +311,7 @@
 "NodesList.ResetButton" = "Reset";
 
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
-"NodeList.DefaultNodesLoaded" = "Default nodes was loaded";
+"NodeList.DefaultNodesLoaded" = "Default node list was loaded";
 
 /* NodesEditor: New node scene title */
 "NodesEditor.NewNodeTitle" = "New node";
@@ -320,7 +320,7 @@
 "NodesEditor.DeleteNodeAlert" = "Delete this node?";
 
 /* NodesEditor: Testing in progress */
-"NodesEditor.TestingInProgressMessage" = "Checking connection";
+"NodesEditor.TestingInProgressMessage" = "Checking connection…";
 
 /* NodesEditor: Scheme row */
 "NodesEditor.SchemeRow" = "Scheme";
@@ -350,7 +350,7 @@
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
 /* Security: Notification modes description. Markdown supported. */
-"SecurityPage.Row.Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. It can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You receive notification almost instantly after a message was sent and approved by the Blockchain — a few seconds delay. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.";
+"SecurityPage.Row.Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. **Important: you will not receive notifications, if Messenger is not running**. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. It can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You will receive notification almost instantly after a message was sent and approved by the Blockchain — a few seconds delay. **Notifications will be received even if Messenger is not running**. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.\n\n";
 
 /* Security: Selected notifications types */
 "SecurityPage.Section.NotificationsType" = "Notifications";
