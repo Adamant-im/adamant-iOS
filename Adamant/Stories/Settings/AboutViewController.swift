@@ -249,6 +249,8 @@ class AboutViewController: FormViewController {
 			self?.present(mailVC, animated: true, completion: nil)
 		}
 		
+			
+		/*
 		// Bitcointalk
 		<<< buildUrlRow(title: Rows.bitcointalk.localized,
 						value: nil,
@@ -283,6 +285,7 @@ class AboutViewController: FormViewController {
 						tag: Rows.twitter.tag,
 						url: Rows.twitter.localizedUrl,
 						image: #imageLiteral(resourceName: "row_icon_placeholder"))
+		*/
 	}
 	
 	override func viewWillAppear(_ animated: Bool) {
