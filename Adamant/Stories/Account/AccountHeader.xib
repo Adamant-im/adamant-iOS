@@ -32,14 +32,30 @@
                         <constraint firstAttribute="width" constant="75" id="ElK-xR-5kx"/>
                     </constraints>
                 </imageView>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Iro-jA-X5P">
-                    <rect key="frame" x="41" y="113" width="296" height="44"/>
-                    <fontDescription key="fontDescription" name="Exo2-Light" family="Exo 2 Light" pointSize="26"/>
-                    <state key="normal" title="U2222233445566778899"/>
-                    <connections>
-                        <action selector="addressButtonTapped:" destination="iN0-l3-epB" eventType="touchUpInside" id="RF4-0U-fJX"/>
-                    </connections>
-                </button>
+                <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="6hF-gW-1fF">
+                    <rect key="frame" x="33" y="113" width="312" height="43"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Iro-jA-X5P">
+                            <rect key="frame" x="0.0" y="0.0" width="285" height="43"/>
+                            <fontDescription key="fontDescription" name="Exo2-Light" family="Exo 2 Light" pointSize="25"/>
+                            <state key="normal" title="U2222233445566778899"/>
+                            <connections>
+                                <action selector="addressButtonTapped:" destination="iN0-l3-epB" eventType="touchUpInside" id="RF4-0U-fJX"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UI0-TW-nhe">
+                            <rect key="frame" x="297" y="11.5" width="15" height="20"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="15" id="68w-PH-I3v"/>
+                                <constraint firstAttribute="height" constant="20" id="pRZ-ke-YvN"/>
+                            </constraints>
+                            <state key="normal" image="Share_button_small"/>
+                            <connections>
+                                <action selector="addressButtonTapped:" destination="iN0-l3-epB" eventType="touchUpInside" id="tcS-hm-gxu"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                </stackView>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceHorizontal="YES" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="akZ-qC-jqo">
                     <rect key="frame" x="0.0" y="184" width="378" height="110"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -58,14 +74,14 @@
             <constraints>
                 <constraint firstItem="h0z-DQ-dIb" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="-20" id="ARS-YV-qkz"/>
                 <constraint firstAttribute="bottom" secondItem="akZ-qC-jqo" secondAttribute="bottom" id="EMy-bD-kSw"/>
+                <constraint firstItem="6hF-gW-1fF" firstAttribute="top" secondItem="IVQ-4p-zci" secondAttribute="bottom" constant="13" id="EN0-a5-cHs"/>
                 <constraint firstAttribute="trailing" secondItem="akZ-qC-jqo" secondAttribute="trailing" id="FfD-08-VTQ"/>
                 <constraint firstAttribute="bottom" secondItem="h0z-DQ-dIb" secondAttribute="bottom" id="H33-40-4fD"/>
                 <constraint firstItem="akZ-qC-jqo" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="HOU-O7-aSL"/>
                 <constraint firstAttribute="trailing" secondItem="h0z-DQ-dIb" secondAttribute="trailing" id="UNg-Mk-F3h"/>
-                <constraint firstItem="Iro-jA-X5P" firstAttribute="centerX" secondItem="IVQ-4p-zci" secondAttribute="centerX" id="YUV-3q-LfW"/>
                 <constraint firstItem="IVQ-4p-zci" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="25" id="Z7D-Q0-s2x"/>
                 <constraint firstItem="h0z-DQ-dIb" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Zka-iG-51c"/>
-                <constraint firstItem="Iro-jA-X5P" firstAttribute="top" secondItem="IVQ-4p-zci" secondAttribute="bottom" constant="13" id="gQH-hl-GfG"/>
+                <constraint firstItem="6hF-gW-1fF" firstAttribute="centerX" secondItem="IVQ-4p-zci" secondAttribute="centerX" id="gMH-Q7-bMw"/>
                 <constraint firstItem="IVQ-4p-zci" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="jUo-aI-jOv"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
@@ -79,6 +95,7 @@
         </view>
     </objects>
     <resources>
+        <image name="Share_button_small" width="15" height="20"/>
         <image name="avatar_placeholder" width="75" height="75"/>
     </resources>
 </document>
