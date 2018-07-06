@@ -119,7 +119,6 @@ class NewChatViewController: FormViewController {
 			let view = UIView()
 			view.addSubview(prefix)
 			view.frame = prefix.frame
-			prefix.frame = prefix.frame.offsetBy(dx: 0, dy: -1)
 			$0.cell.textField.leftView = view
 			$0.cell.textField.leftViewMode = .always
 		}.cellUpdate { (cell, row) in
