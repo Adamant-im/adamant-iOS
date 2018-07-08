@@ -1,26 +1,26 @@
 /* About page: scene title */
-"About.Title" = "About";
+"About.Title" = "Über uns";
 
 /* About scene: 'Read about' section title. */
-"About.Section.About" = "About ADAMANT";
+"About.Section.About" = "Über ADAMANT";
 
 /* About scene: 'Contact us' section title. */
-"About.Section.ContactUs" = "Contact us";
+"About.Section.ContactUs" = "Kontaktieren Sie uns";
 
 /* About scene: Website row */
-"About.Row.Website" = "Website";
+"About.Row.Website" = "Webseite";
 
 /* About scene: The Whitepaper row */
-"About.Row.Whitepaper" = "The Whitepaper";
+"About.Row.Whitepaper" = "Das Whitepaper";
 
 /* About scene: Project's GitHub page row */
-"About.Row.GitHub" = "Project's GitHub page";
+"About.Row.GitHub" = "Seite des Projekts auf GitHub";
 
 /* About scene: Write us row */
-"About.Row.WriteUs" = "Write us";
+"About.Row.WriteUs" = "Schreiben Sie uns";
 
 /* About scene: Our blog row */
-"About.Row.Blog" = "Our blog";
+"About.Row.Blog" = "Unser Blog";
 
 /* About scene: Bitcointalk.org row */
 "About.Row.Bitcointalk" = "Bitcointalk.org";
@@ -134,7 +134,7 @@
 "ADAMANT" = "ADAMANT";
 
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
-"Application.deviceTokenErrorFormat" = "Failed to reginser in ANS: %@";
+"Application.deviceTokenErrorFormat" = "Anmeldefehler in ANS: %@";
 
 /* Serious internal error: Failed to build endpoint url */
 "ApiService.InternalError.EndpointBuildFailed" = "Endpoint Build fehlgeschlagen. Bericht senden";
@@ -218,7 +218,7 @@
 "Error.NoNetwork" = "Keine Verbindung";
 
 /* Shared error: Remote error format, %@ for message */
-"Error.RemoteServerErrorFormat" = "Blockchain Node Fehler: %@";
+"Error.RemoteServerErrorFormat" = "Blockchain-Node Fehler: %@";
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "Sie sind nicht eingeloggt";
@@ -326,7 +326,7 @@
 "SecurityPage.Section.NotificationsType" = "Benachrichtigungen";
 
 /* Security: About Notification types */
-"SecurityPage.Section.AboutNotificationTypes" = "About notification types";
+"SecurityPage.Section.AboutNotificationTypes" = "Über Benachrichtigungsoptionen";
 
 /* Notifications: Disable notifications */
 "Notifications.Mode.NotificationsDisabled" = "Deaktiviert";
@@ -338,7 +338,7 @@
 "Notifications.Mode.ApplePush" = "Push";
 
 /* Security: Visit Github */
-"SecurityPage.Row.VisitGithub" = "Github besuchen";
+"SecurityPage.Row.VisitGithub" = "Zu GitHub";
 
 /* Notifications: Something went wrong while registering remote notifications. %@ for description */
 "NotificationsService.Error.RegistrationRemotesFormat" = "Registrierung in ANS fehlgeschlagen. Bitte erneut versuchen. Ursache %@";
