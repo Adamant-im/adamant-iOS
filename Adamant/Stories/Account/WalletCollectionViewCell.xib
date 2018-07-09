@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="WalletCollectionViewCell" customModule="Adamant" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="110" height="118"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="110" height="118"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="wallet_adm" translatesAutoresizingMaskIntoConstraints="NO" id="xZc-UL-00v">
+                        <rect key="frame" x="28" y="0.0" width="55" height="55"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="55" id="BYW-hx-Hql"/>
+                            <constraint firstAttribute="width" secondItem="xZc-UL-00v" secondAttribute="height" multiplier="1:1" id="CwR-kR-kjO"/>
+                        </constraints>
+                    </imageView>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1Vy-Ac-hig" customClass="AccessoryContainerView" customModule="FreakingSimpleRoundImageView">
+                        <rect key="frame" x="27.5" y="0.0" width="55" height="55"/>
+                    </view>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ADM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Via-ei-IpM">
+                        <rect key="frame" x="36.5" y="84" width="37.5" height="20.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GLZ-IH-K8W">
+                        <rect key="frame" x="22" y="116" width="66" height="2"/>
+                        <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="66" id="Cc0-YC-IEo"/>
+                            <constraint firstAttribute="height" constant="2" id="HE7-Hg-rTU"/>
+                        </constraints>
+                    </view>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100000000" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NTG-ad-tJQ">
+                        <rect key="frame" x="10" y="65" width="90.5" height="20.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstItem="Via-ei-IpM" firstAttribute="centerX" secondItem="NTG-ad-tJQ" secondAttribute="centerX" id="Amy-2k-tDl"/>
+                <constraint firstItem="1Vy-Ac-hig" firstAttribute="width" secondItem="xZc-UL-00v" secondAttribute="width" id="HtU-AB-LDY"/>
+                <constraint firstItem="NTG-ad-tJQ" firstAttribute="top" secondItem="xZc-UL-00v" secondAttribute="bottom" constant="10" id="Oty-s9-Se5"/>
+                <constraint firstItem="Via-ei-IpM" firstAttribute="top" secondItem="NTG-ad-tJQ" secondAttribute="bottom" constant="-1.5" id="RwR-QC-WVd"/>
+                <constraint firstItem="1Vy-Ac-hig" firstAttribute="centerY" secondItem="xZc-UL-00v" secondAttribute="centerY" id="UwT-ig-FG9"/>
+                <constraint firstItem="1Vy-Ac-hig" firstAttribute="centerX" secondItem="xZc-UL-00v" secondAttribute="centerX" id="WH1-1C-whk"/>
+                <constraint firstAttribute="bottom" secondItem="GLZ-IH-K8W" secondAttribute="bottom" id="b7C-Jo-oAh"/>
+                <constraint firstItem="GLZ-IH-K8W" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="db5-Qb-QFh"/>
+                <constraint firstItem="xZc-UL-00v" firstAttribute="top" secondItem="ZTg-uK-7eu" secondAttribute="top" id="e2k-Wh-n8m"/>
+                <constraint firstItem="NTG-ad-tJQ" firstAttribute="centerX" secondItem="xZc-UL-00v" secondAttribute="centerX" id="fZP-wm-UD0"/>
+                <constraint firstItem="xZc-UL-00v" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="kLt-9y-aHy"/>
+                <constraint firstItem="1Vy-Ac-hig" firstAttribute="height" secondItem="xZc-UL-00v" secondAttribute="height" id="rIy-ts-KAr"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <size key="customSize" width="110" height="120"/>
+            <connections>
+                <outlet property="accessoryContainerView" destination="1Vy-Ac-hig" id="leG-zZ-To4"/>
+                <outlet property="balanceLabel" destination="NTG-ad-tJQ" id="nXx-aw-hsd"/>
+                <outlet property="currencyImageView" destination="xZc-UL-00v" id="2YU-Ic-NLF"/>
+                <outlet property="currencySymbolLabel" destination="Via-ei-IpM" id="5kQ-ob-ug6"/>
+                <outlet property="markerView" destination="GLZ-IH-K8W" id="mrr-Um-Woe"/>
+                <outlet property="markerWidthConstraint" destination="Cc0-YC-IEo" id="P0s-Jl-5GU"/>
+            </connections>
+            <point key="canvasLocation" x="64" y="89"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="wallet_adm" width="55" height="55"/>
+    </resources>
+</document>

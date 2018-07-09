@@ -1,8 +1,8 @@
 //
-//  SettingsViewController+Pinpad.swift
+//  SecurityViewController+StayIn.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 09.03.2018.
+//  Created by Anokhov Pavel on 04.07.2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
@@ -10,17 +10,7 @@ import Foundation
 import Eureka
 import MyLittlePinpad
 
-// MARK: - Properties
-extension SettingsViewController {
-	enum PinpadRequest {
-		case createPin
-		case reenterPin(pin: String)
-		case turnOffPin
-		case turnOnBiometry
-		case turnOffBiometry
-	}
-	
-	// MARK: Stay in
+extension SecurityViewController {
 	func setStayLoggedIn(enabled: Bool) {
 		guard accountService.hasStayInAccount != enabled else {
 			return
@@ -34,10 +24,10 @@ extension SettingsViewController {
 			pinpad.delegate = self
 			present(pinpad, animated: true, completion: nil)
 		} else { // Validate pin and turn off Stay In
-			pinpadRequest = PinpadRequest.turnOffPin
+			pinpadRequest = .turnOffPin
 			let biometryButton: PinpadBiometryButtonType = accountService.useBiometry ? localAuth.biometryType.pinpadButtonType : .hidden
 			let pinpad = PinpadViewController.adamantPinpad(biometryButton: biometryButton)
-			pinpad.commentLabel.text = String.adamantLocalized.settings.stayInTurnOff
+			pinpad.commentLabel.text = String.adamantLocalized.security.stayInTurnOff
 			pinpad.commentLabel.isHidden = false
 			pinpad.delegate = self
 			
@@ -51,7 +41,7 @@ extension SettingsViewController {
 			return
 		}
 		
-		let reason = enabled ? String.adamantLocalized.settings.biometryOnReason : String.adamantLocalized.settings.biometryOffReason
+		let reason = enabled ? String.adamantLocalized.security.biometryOnReason : String.adamantLocalized.security.biometryOffReason
 		localAuth.authorizeUser(reason: reason) { [weak self] result in
 			switch result {
 			case .success:
@@ -70,11 +60,11 @@ extension SettingsViewController {
 				let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
 				
 				if enabled {
-					pinpad.commentLabel.text = String.adamantLocalized.settings.biometryOnReason
-					self?.pinpadRequest = PinpadRequest.turnOnBiometry
+					pinpad.commentLabel.text = String.adamantLocalized.security.biometryOnReason
+					self?.pinpadRequest = .turnOnBiometry
 				} else {
-					pinpad.commentLabel.text = String.adamantLocalized.settings.biometryOffReason
-					self?.pinpadRequest = PinpadRequest.turnOffBiometry
+					pinpad.commentLabel.text = String.adamantLocalized.security.biometryOffReason
+					self?.pinpadRequest = .turnOffBiometry
 				}
 				
 				pinpad.commentLabel.isHidden = false
@@ -97,8 +87,8 @@ extension SettingsViewController {
 						row.evaluateHidden()
 					}
 					
-					if let row: LabelRow = self?.form.rowBy(tag: Rows.notifications.tag) {
-						row.evaluateHidden()
+					if let section = self?.form.sectionBy(tag: Sections.notifications.tag) {
+						section.evaluateHidden()
 					}
 				}
 			}
@@ -108,20 +98,20 @@ extension SettingsViewController {
 
 
 // MARK: - PinpadViewControllerDelegate
-extension SettingsViewController: PinpadViewControllerDelegate {
+extension SecurityViewController: PinpadViewControllerDelegate {
 	func pinpad(_ pinpad: PinpadViewController, didEnterPin pin: String) {
 		switch pinpadRequest {
 			
 		// MARK: User has entered new pin first time. Request re-enter pin
-		case PinpadRequest.createPin?:
-			pinpadRequest = PinpadRequest.reenterPin(pin: pin)
+		case .createPin?:
+			pinpadRequest = .reenterPin(pin: pin)
 			pinpad.commentLabel.text = String.adamantLocalized.pinpad.reenterPin
 			pinpad.clearPin()
 			return
 			
 			
 		// MARK: User has reentered pin. Save pin.
-		case PinpadRequest.reenterPin(let pinToVerify)?:
+		case .reenterPin(let pinToVerify)?:
 			guard pin == pinToVerify else {
 				pinpad.playWrongPinAnimation()
 				pinpad.clearPin()
@@ -142,8 +132,8 @@ extension SettingsViewController: PinpadViewControllerDelegate {
 							row.evaluateHidden()
 						}
 						
-						if let row: LabelRow = self?.form.rowBy(tag: Rows.notifications.tag) {
-							row.evaluateHidden()
+						if let section = self?.form.sectionBy(tag: Sections.notifications.tag) {
+							section.evaluateHidden()
 						}
 						
 						pinpad.dismiss(animated: true, completion: nil)
@@ -156,7 +146,7 @@ extension SettingsViewController: PinpadViewControllerDelegate {
 			
 			
 		// MARK: Users want to turn off the pin. Validate and turn off.
-		case PinpadRequest.turnOffPin?:
+		case .turnOffPin?:
 			guard accountService.validatePin(pin) else {
 				pinpad.playWrongPinAnimation()
 				pinpad.clearPin()
@@ -171,15 +161,15 @@ extension SettingsViewController: PinpadViewControllerDelegate {
 				row.evaluateHidden()
 			}
 			
-			if let row: LabelRow = form.rowBy(tag: Rows.notifications.tag) {
-				row.evaluateHidden()
+			if let section = form.sectionBy(tag: Sections.notifications.tag) {
+				section.evaluateHidden()
 			}
 			
 			pinpad.dismiss(animated: true, completion: nil)
 			
 			
 		// MARK: User wants to turn on biometry
-		case PinpadRequest.turnOnBiometry?:
+		case .turnOnBiometry?:
 			guard accountService.validatePin(pin) else {
 				pinpad.playWrongPinAnimation()
 				pinpad.clearPin()
@@ -191,7 +181,7 @@ extension SettingsViewController: PinpadViewControllerDelegate {
 			
 			
 		// MARK: User wants to turn off biometry
-		case PinpadRequest.turnOffBiometry?:
+		case .turnOffBiometry?:
 			guard accountService.validatePin(pin) else {
 				pinpad.playWrongPinAnimation()
 				pinpad.clearPin()
@@ -210,8 +200,8 @@ extension SettingsViewController: PinpadViewControllerDelegate {
 		switch pinpadRequest {
 			
 		// MARK: User wants to turn of StayIn with his face. Or finger.
-		case PinpadRequest.turnOffPin?:
-			localAuth.authorizeUser(reason: String.adamantLocalized.settings.stayInTurnOff, completion: { [weak self] result in
+		case .turnOffPin?:
+			localAuth.authorizeUser(reason: String.adamantLocalized.security.stayInTurnOff, completion: { [weak self] result in
 				switch result {
 				case .success:
 					self?.accountService.dropSavedAccount()
@@ -224,8 +214,8 @@ extension SettingsViewController: PinpadViewControllerDelegate {
 							row.evaluateHidden()
 						}
 						
-						if let row: LabelRow = self?.form.rowBy(tag: Rows.notifications.tag) {
-							row.evaluateHidden()
+						if let section = self?.form.sectionBy(tag: Sections.notifications.tag) {
+							section.evaluateHidden()
 						}
 						
 						pinpad.dismiss(animated: true, completion: nil)
@@ -246,29 +236,28 @@ extension SettingsViewController: PinpadViewControllerDelegate {
 		switch pinpadRequest {
 			
 		// MARK: User canceled turning on StayIn
-		case PinpadRequest.createPin?,
-			 PinpadRequest.reenterPin(pin: _)?:
-			if let row: SwitchRow = form.rowBy(tag: Rows.stayLoggedIn.tag) {
+		case .createPin?, .reenterPin(pin: _)?:
+			if let row: SwitchRow = form.rowBy(tag: Rows.stayIn.tag) {
 				row.value = false
 				row.updateCell()
 			}
 			
 		// MARK: User canceled turning off StayIn
-		case PinpadRequest.turnOffPin?:
-			if let row: SwitchRow = form.rowBy(tag: Rows.stayLoggedIn.tag) {
+		case .turnOffPin?:
+			if let row: SwitchRow = form.rowBy(tag: Rows.stayIn.tag) {
 				row.value = true
 				row.updateCell()
 			}
 			
 		// MARK: User canceled Biometry On
-		case PinpadRequest.turnOnBiometry?:
+		case .turnOnBiometry?:
 			if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
 				row.value = false
 				row.updateCell()
 			}
 			
 		// MARK: User canceled Biometry Off
-		case PinpadRequest.turnOffBiometry?:
+		case .turnOffBiometry?:
 			if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
 				row.value = true
 				row.updateCell()

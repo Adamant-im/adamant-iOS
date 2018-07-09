@@ -73,6 +73,10 @@ class ChatViewController: MessagesViewController {
 			return
 		}
 		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = false
+		}
+		
 		// MARK: 1. Initial configuration
 		
 		if let partner = chatroom.partner {
@@ -152,7 +156,7 @@ class ChatViewController: MessagesViewController {
 		let feeLabel = InputBarButtonItem()
 		self.feeLabel = feeLabel
 		feeLabel.isEnabled = false
-		feeLabel.titleLabel?.font = UIFont.adamantPrimary(size: 12)
+		feeLabel.titleLabel?.font = UIFont.systemFont(ofSize: 12)
 		feeLabel.alpha = 0
 		
 		// Setup stack views

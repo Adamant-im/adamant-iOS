@@ -55,14 +55,17 @@ class ChatListViewController: UIViewController {
 	// MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+		
 		navigationItem.title = String.adamantLocalized.chatList.title
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose,
+															target: self,
+															action: #selector(newChat))
 		
 		// MARK: TableView
 		tableView.dataSource = self
 		tableView.delegate = self
 		tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
-        tableView.addSubview(self.refreshControl)
+        tableView.refreshControl = refreshControl
 		
 		if self.accountService.account != nil {
 			initFetchedRequestControllers(provider: chatsProvider)

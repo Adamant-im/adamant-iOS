@@ -46,11 +46,21 @@ struct AdamantResources {
 		Node(scheme: .http, host: "80.211.177.181", port: nil)
 	]
 	
-	static let iosAppSupportEmail = "ios@adamant.im"
+	// Addresses
+	static let supportEmail = "ios@adamant.im"
+	static let ansReadmeUrl = "https://github.com/Adamant-im/AdamantNotificationService/blob/master/README.md"
 	
-	// ANS Contact
-	static let ansAddress = "U10629337621822775991"
-	static let ansPublicKey = "188b24bd116a556ac8ba905bbbdaa16e237dfb14269f5a4f9a26be77537d977c"
+	// Contacts
+	struct contacts {
+		static let adamantBountyWallet = "U15423595369615486571"
+		static let adamantIco = "U7047165086065693428"
+		static let iosSupport = "U15738334853882270577"
+		
+		static let ansAddress = "U10629337621822775991"
+		static let ansPublicKey = "188b24bd116a556ac8ba905bbbdaa16e237dfb14269f5a4f9a26be77537d977c"
+		
+		private init() {}
+	}
 	
 	private init() {}
 }
@@ -95,29 +105,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let login = router.get(scene: AdamantScene.Login.login)
 		window!.rootViewController?.present(login, animated: false, completion: nil)
 		
-		// MARK: 4. Async prepare pages
+		// MARK: 4. Prepare pages
 		if let tabbar = window?.rootViewController as? UITabBarController {
-			let accountRoot = router.get(scene: AdamantScene.Account.account)
-			let account = UINavigationController(rootViewController: accountRoot)
-			account.tabBarItem.title = String.adamantLocalized.tabItems.account
-			account.tabBarItem.image = #imageLiteral(resourceName: "wallet_tab")
-			
 			let chatListRoot = router.get(scene: AdamantScene.Chats.chatList)
 			let chatList = UINavigationController(rootViewController: chatListRoot)
 			chatList.tabBarItem.title = String.adamantLocalized.tabItems.chats
 			chatList.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
 			
-			let settingsRoot = router.get(scene: AdamantScene.Settings.settings)
-			let settings = UINavigationController(rootViewController: settingsRoot)
-			settings.tabBarItem.title = String.adamantLocalized.tabItems.settings
-			settings.tabBarItem.image = #imageLiteral(resourceName: "settings_tab")
+			let accountRoot = router.get(scene: AdamantScene.Account.account)
+			let account = UINavigationController(rootViewController: accountRoot)
+			account.tabBarItem.title = String.adamantLocalized.tabItems.account
+			account.tabBarItem.image = #imageLiteral(resourceName: "wallet_tab")
 			
-			account.tabBarItem.badgeColor = UIColor.adamantPrimary
 			chatList.tabBarItem.badgeColor = UIColor.adamantPrimary
-			settings.tabBarItem.badgeColor = UIColor.adamantPrimary
+			account.tabBarItem.badgeColor = UIColor.adamantPrimary
 			
-			tabbar.setViewControllers([account, chatList, settings], animated: false)
+			tabbar.setViewControllers([chatList, account], animated: false)
 		}
+		
 		
 		// MARK: 5 Reachability & Autoupdate
 		repeater = RepeaterService()
@@ -263,7 +268,7 @@ extension AppDelegate {
 			return
 		}
 		
-		guard let encodedPayload = adamantCore.encodeMessage(payload, recipientPublicKey: AdamantResources.ansPublicKey, privateKey: keypair.privateKey) else {
+		guard let encodedPayload = adamantCore.encodeMessage(payload, recipientPublicKey: AdamantResources.contacts.ansPublicKey, privateKey: keypair.privateKey) else {
 			dialogService.showError(withMessage: "Failed to encode ANS signal. Payload: \(payload)", error: nil)
 			return
 		}
@@ -273,7 +278,7 @@ extension AppDelegate {
 			fatalError("can't get api service to register device token")
 		}
 		
-		apiService.sendMessage(senderId: address, recipientId: AdamantResources.ansAddress, keypair: keypair, message: encodedPayload.message, type: ChatType.signal, nonce: encodedPayload.nonce) { [unowned self] result in
+		apiService.sendMessage(senderId: address, recipientId: AdamantResources.contacts.ansAddress, keypair: keypair, message: encodedPayload.message, type: ChatType.signal, nonce: encodedPayload.nonce) { [unowned self] result in
 			switch result {
 			case .success:
 				return

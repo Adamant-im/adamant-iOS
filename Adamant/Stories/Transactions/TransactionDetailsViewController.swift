@@ -79,6 +79,10 @@ class TransactionDetailsViewController: UIViewController {
 	// MARK: - Lifecycle
 	
 	override func viewDidLoad() {
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = true
+		}
+		
 		navigationItem.title = String.adamantLocalized.transactionDetails.title
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(share))
 		tableView.dataSource = self
@@ -268,19 +272,13 @@ extension TransactionDetailsViewController {
 			return UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
 		}
 		
-		var cell: UITableViewCell
+		let cell: UITableViewCell
 		if let c = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
 			cell = c
 			cell.accessoryType = .none
             cell.imageView?.image = nil
 		} else {
 			cell = UITableViewCell(style: .value1, reuseIdentifier: cellIdentifier)
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-			cell.detailTextLabel?.textColor = UIColor.adamantSecondary
-			
-			let font = UIFont.adamantPrimary(size: 17)
-			cell.textLabel?.font = font
-			cell.detailTextLabel?.font = font
 		}
 		
 		cell.textLabel?.text = row.localized

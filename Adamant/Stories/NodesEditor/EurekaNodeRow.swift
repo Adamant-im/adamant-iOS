@@ -18,6 +18,6 @@ class NodeCell: Cell<Node>, CellType {
 final class NodeRow: Row<NodeCell>, RowType {
 	required public init(tag: String?) {
 		super.init(tag: tag)
-		cellProvider = CellProvider<NodeCell>(nibName: "NodeRow")
+		cellProvider = CellProvider<NodeCell>(nibName: "NodeCell")
 	}
 }

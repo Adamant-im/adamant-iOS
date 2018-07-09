@@ -37,7 +37,21 @@ enum NotificationsMode: Int {
 	case disabled
 	case backgroundFetch
 	case push
+	
+	var localized: String {
+		switch self {
+		case .disabled:
+			return NSLocalizedString("Notifications.Mode.NotificationsDisabled", comment: "Notifications: Disable notifications")
+			
+		case .backgroundFetch:
+			return NSLocalizedString("Notifications.Mode.BackgroundFetch", comment: "Notifications: Use Background fetch notifications")
+			
+		case .push:
+			return NSLocalizedString("Notifications.Mode.ApplePush", comment: "Notifications: Use Apple Push notifications")
+		}
+	}
 }
+
 
 /// Supported notification types
 ///
@@ -81,6 +95,15 @@ extension Notification.Name {
 	struct AdamantNotificationService {
 		/// Raised when user has logged out.
 		static let notificationsModeChanged = Notification.Name("adamant.notificationService.notificationsMode")
+		
+		private init() {}
+	}
+}
+
+
+extension AdamantUserInfoKey {
+	struct NotificationsService {
+		static let newNotificationsMode = "adamant.notificationsService.notificationsMode"
 		
 		private init() {}
 	}
