@@ -88,14 +88,12 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let delegate = delegates[indexPath.row]
-        
-        // TODO: Show delegate details
-//        guard let controller = router.get(scene: AdamantScene.Delegates.delegatesDetails) as? DelegatesDetailsViewController else {
-//            return
-//        }
-//
-//        controller.delegate = delegate
-//        navigationController?.pushViewController(controller, animated: true)
+        guard let controller = router.get(scene: AdamantScene.Delegates.delegateDetails) as? DelegateDetailsViewController else {
+            return
+        }
+
+        controller.delegate = delegate
+        navigationController?.pushViewController(controller, animated: true)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

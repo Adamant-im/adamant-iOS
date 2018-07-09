@@ -19,6 +19,14 @@ extension AdamantScene {
             return c
         })
         
+        static let delegateDetails = AdamantScene(identifier: "DelegateDetailsViewController", factory: { r in
+            let c = DelegateDetailsViewController()
+            c.apiService = r.resolve(ApiService.self)
+            c.accountService = r.resolve(AccountService.self)
+            c.dialogService = r.resolve(DialogService.self)
+            return c
+        })
+        
         private init() {}
     }
 }

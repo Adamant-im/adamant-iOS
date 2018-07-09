@@ -17,8 +17,8 @@ struct Delegate: Decodable {
     let missedblocks: Int
     let rate: Int
     let rank: Int
-    let approval: Float
-    let productivity: Float
+    let approval: Double
+    let productivity: Double
 }
 
 extension Delegate: WrappableModel {
