@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import M13Checkbox
 
 class DelegatesListViewController: UIViewController {
     
@@ -22,6 +23,7 @@ class DelegatesListViewController: UIViewController {
     // MARK: - Properties
     let activeDelegates: Int = 101
     var delegates: [Delegate] = [Delegate]()
+    var newVotesDelegates: [Delegate] = [Delegate]()
     
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -35,6 +37,11 @@ class DelegatesListViewController: UIViewController {
     
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
+    
+    @IBOutlet weak var upVotesLabel: UILabel!
+    @IBOutlet weak var downVotesLabel: UILabel!
+    @IBOutlet weak var newVotesLabel: UILabel!
+    @IBOutlet weak var totalVotesLabel: UILabel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,27 +49,115 @@ class DelegatesListViewController: UIViewController {
         tableView.register(UINib.init(nibName: "DelegateCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         tableView.addSubview(self.refreshControl)
         
+        self.upVotesLabel.text = ""
+        self.downVotesLabel.text = ""
+        self.newVotesLabel.text = ""
+        self.totalVotesLabel.text = ""
+        
         self.refreshControl.beginRefreshing()
         handleRefresh(self.refreshControl)
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantDelegate.stateChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
+            guard let address = notification.userInfo?[AdamantUserInfoKey.Delegate.address] as? String, let state = notification.userInfo?[AdamantUserInfoKey.Delegate.newState] as? Bool else {
+                return
+            }
+            
+            guard var delegate = self?.delegates.first(where: { (delegate) -> Bool in
+                delegate.address == address
+            }) else {
+                return
+            }
+            
+            if let index = self?.newVotesDelegates.index(where: { (delegate) -> Bool in
+                delegate.address == address
+            }) {
+                self?.newVotesDelegates.remove(at: index)
+            } else {
+                delegate.voted = state
+                self?.newVotesDelegates.append(delegate)
+            }
+            
+            self?.updateVotePanel()
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        apiService.getDelegates(limit: activeDelegates, offset: 0) { (result) in
-            switch result {
-            case .success(let delegates):
-                print(delegates)
-                self.delegates = delegates
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
+        if let address = accountService.account?.address {
+            apiService.getDelegatesWithVotes(for: "U8607002570607148960", limit: activeDelegates) { (result) in
+                switch result {
+                case .success(let delegates):
+                    print(delegates)
+                    self.delegates = delegates
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                case .failure(let error):
+                    print(error)
+                    self.dialogService.showError(withMessage: error.localized, error: error)
                 }
-            case .failure(let error):
-                print(error)
-                self.dialogService.showError(withMessage: error.localized, error: error)
+                
+                DispatchQueue.main.async {
+                    refreshControl.endRefreshing()
+                    self.updateVotePanel()
+                }
             }
+        } else {
+            refreshControl.endRefreshing()
+            self.dialogService.showRichError(error: AccountServiceError.userNotLogged)
+        }
+    }
+    
+    private func updateVotePanel() {
+        DispatchQueue.global().async {
+            let voted = self.delegates.filter({ (delegate) -> Bool in
+                return delegate.voted
+            })
+            
+            let upVoted = self.newVotesDelegates.filter({ (delegate) -> Bool in
+                return delegate.voted == true
+            })
+            
+            let downVoted = self.newVotesDelegates.filter({ (delegate) -> Bool in
+                return delegate.voted == false
+            })
             
             DispatchQueue.main.async {
-                refreshControl.endRefreshing()
+                self.upVotesLabel.text = "\(upVoted.count)"
+                self.downVotesLabel.text = "\(downVoted.count)"
+                self.newVotesLabel.text = "\(self.newVotesDelegates.count)/30"
+                self.totalVotesLabel.text = "\(voted.count)/\(self.delegates.count)"
             }
+        }
+    }
+    
+    @IBAction func vote(_ sender: Any) {
+        // TODO: Action for vote
+        if let account = accountService.account {
+            let balance = (account.balance as NSDecimalNumber).doubleValue
+            if balance > 50 {
+                let voted = self.newVotesDelegates.sorted(by: { (item1, item2) -> Bool in
+                    var check1: Int = 0
+                    var check2: Int = 0
+                    if item1.voted == true {
+                        check1 = 1
+                    }
+                    if item2.voted == true {
+                        check2 = 1
+                    }
+                    return check1 < check2
+                }).map({ (delegate) -> String in
+                    return delegate.voted ? "+\(delegate.publicKey)" : "-\(delegate.publicKey)"
+                })
+                print(voted)
+            } else {
+                self.dialogService.showRichError(error: ChatsProviderError.notEnoughtMoneyToSend)
+            }
+        } else {
+            self.dialogService.showRichError(error: AccountServiceError.userNotLogged)
         }
     }
 }
@@ -82,7 +177,7 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 45
+        return 50
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -105,7 +200,16 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
         
         cell.nameLabel.text = delegate.username
         cell.rankLabel.text = "#\(delegate.rank)"
-        cell.upTimeLabel.text = "\(delegate.productivity)%"
+        cell.addressLabel.text = delegate.address
+        cell.statusLabel.text = delegate.rank < activeDelegates ? "●" : "○"
+        
+        if let delegate = self.newVotesDelegates.first(where: { (vote) -> Bool in
+            return vote.address == delegate.address
+        }) {
+            cell.checkbox.checkState = delegate.voted ? .checked : .unchecked
+        } else {
+            cell.checkbox.checkState = delegate.voted ? .checked : .unchecked
+        }
         
         cell.accessoryType = .disclosureIndicator
         

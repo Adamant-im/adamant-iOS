@@ -114,5 +114,11 @@ protocol ApiService: class {
     // MARK: - Delegates
     
     /// Get delegates
-    func getDelegates(limit: Int, offset: Int, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void)
+    func getDelegates(limit: Int, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void)
+    func getDelegatesWithVotes(for address: String, limit: Int, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void)
+    
+    /// Get delegate forge details
+    func getForgedByAccount(publicKey: String, completion: @escaping (ApiServiceResult<DelegateForgeDetails>) -> Void)
+    /// Get delegate forgeing time
+    func getForgingTime(for delegate: Delegate, completion: @escaping (ApiServiceResult<Int>) -> Void)
 }

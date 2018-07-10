@@ -24,6 +24,8 @@ class DelegateDetailsViewController: FormViewController {
         case rank
         case approval
         case productivity
+        case forgetingTime
+        case forged
         case openInExplorer
         
         var tag: String {
@@ -48,6 +50,10 @@ class DelegateDetailsViewController: FormViewController {
                 return "approval"
             case .productivity:
                 return "productivity"
+            case .forgetingTime:
+                return "forgetingTime"
+            case .forged:
+                return "forged"
                 
             case .openInExplorer: return "openInExplorer"
 
@@ -79,6 +85,10 @@ class DelegateDetailsViewController: FormViewController {
                 return "Approval"
             case .productivity:
                 return "Productivity"
+            case .forgetingTime:
+                return "Forgeting time"
+            case .forged:
+                return "Forged"
                 
             case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
                 
@@ -109,6 +119,12 @@ class DelegateDetailsViewController: FormViewController {
         formatter.roundingMode = .floor
         formatter.positiveFormat = "#.##"
         formatter.positiveSuffix = "%"
+        
+        let currencyFormatter = NumberFormatter()
+        currencyFormatter.numberStyle = .decimal
+        currencyFormatter.roundingMode = .floor
+        currencyFormatter.positiveFormat = "#.########"
+        currencyFormatter.positiveSuffix = " \(AdamantUtilities.currencyCode)"
         
         form +++ Section()
             
@@ -154,11 +170,7 @@ class DelegateDetailsViewController: FormViewController {
                 $0.title = Row.vote.localized
                 }.cellUpdate { cell, row in
                     self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.value {
-                        self.shareValue(text)
-                    }
-                })
+                }
         
             <<< IntRow() {
                 $0.disabled = true
@@ -166,11 +178,7 @@ class DelegateDetailsViewController: FormViewController {
                 $0.title = Row.producedblocks.localized
                 }.cellUpdate { cell, row in
                     self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.displayValueFor?(row.value) {
-                        self.shareValue(text)
-                    }
-                })
+                }
         
             <<< IntRow() {
                 $0.disabled = true
@@ -178,11 +186,7 @@ class DelegateDetailsViewController: FormViewController {
                 $0.title = Row.missedblocks.localized
                 }.cellUpdate { cell, row in
                     self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.displayValueFor?(row.value) {
-                        self.shareValue(text)
-                    }
-                })
+                }
         
             <<< IntRow() {
                 $0.disabled = true
@@ -190,11 +194,7 @@ class DelegateDetailsViewController: FormViewController {
                 $0.title = Row.rate.localized
                 }.cellUpdate { cell, row in
                     self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.displayValueFor?(row.value) {
-                        self.shareValue(text)
-                    }
-                })
+                }
         
             <<< IntRow() {
                 $0.disabled = true
@@ -202,11 +202,7 @@ class DelegateDetailsViewController: FormViewController {
                 $0.title = Row.rank.localized
                 }.cellUpdate { cell, row in
                     self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.displayValueFor?(row.value) {
-                        self.shareValue(text)
-                    }
-                })
+                }
         
             <<< DecimalRow() {
                 $0.disabled = true
@@ -215,11 +211,7 @@ class DelegateDetailsViewController: FormViewController {
                 $0.formatter = formatter
                 }.cellUpdate { cell, row in
                     self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.displayValueFor?(row.value) {
-                        self.shareValue(text)
-                    }
-                })
+                }
         
             <<< DecimalRow() {
                 $0.disabled = true
@@ -228,11 +220,24 @@ class DelegateDetailsViewController: FormViewController {
                 $0.formatter = formatter
                 }.cellUpdate { cell, row in
                     self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.displayValueFor?(row.value) {
-                        self.shareValue(text)
-                    }
-                })
+                }
+            
+            <<< TextRow() {
+                $0.disabled = true
+                $0.tag = Row.forgetingTime.tag
+                $0.title = Row.forgetingTime.localized
+                }.cellUpdate { cell, row in
+                    self.updateCell(cell)
+                }
+            
+            <<< DecimalRow() {
+                $0.disabled = true
+                $0.tag = Row.forged.tag
+                $0.title = Row.forged.localized
+                $0.formatter = currencyFormatter
+                }.cellUpdate { cell, row in
+                    self.updateCell(cell)
+                }
         
             <<< LabelRow() {
                 $0.hidden = true
@@ -264,11 +269,6 @@ class DelegateDetailsViewController: FormViewController {
     }
     
     private func updateDetails(with delegate: Delegate) {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.roundingMode = .floor
-        formatter.positiveFormat = "#.##"
-        formatter.positiveSuffix = "%"
 
         if let row: TextRow = self.form.rowBy(tag: Row.username.tag) {
             row.value = delegate.username
@@ -322,8 +322,56 @@ class DelegateDetailsViewController: FormViewController {
         
         if let row: LabelRow = self.form.rowBy(tag: Row.openInExplorer.tag) {
             row.hidden = false
-//            row.reload()
             row.evaluateHidden()
+        }
+        
+        self.apiService.getForgedByAccount(publicKey: delegate.publicKey) { (result) in
+            switch result {
+            case .success(let details):
+                print(details)
+                
+                DispatchQueue.main.async {
+                    if let row: DecimalRow = self.form.rowBy(tag: Row.forged.tag) {
+                        row.value = (details.forged as NSDecimalNumber).doubleValue
+                        row.reload()
+                    }
+                }
+            case .failure(let error):
+                print(error)
+                self.dialogService.showError(withMessage: error.localized, error: error)
+            }
+        }
+        
+        self.apiService.getForgingTime(for: delegate) { result in
+            switch result {
+            case .success(let seconds):
+                print(seconds)
+                if let row: TextRow = self.form.rowBy(tag: Row.forgetingTime.tag) {
+                    if seconds < 0 {
+                        row.value = "..."
+                    } else if seconds == 0 {
+                        row.value = "Now!"
+                    } else {
+                        let minutes = floor(Double(seconds) / 60)
+                        let seconds = Double(seconds) - (minutes * 60)
+                        if minutes > 0 && seconds > 0 {
+                            row.value = "\(Int(minutes)) min \(Int(seconds)) sec"
+                        } else if minutes > 0 {
+                            row.value = "\(Int(minutes)) min"
+                        } else {
+                            row.value = "\(Int(seconds)) sec"
+                        }
+                    }
+                    
+                    DispatchQueue.main.async {
+                        row.reload()
+                    }
+                }
+                
+            case .failure(let error):
+                print(error)
+                self.dialogService.showError(withMessage: error.localized, error: error)
+            }
         }
     }
     
