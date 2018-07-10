@@ -17,7 +17,7 @@ extension String.adamantLocalized {
 		static let messageInputPlaceholder = NSLocalizedString("ChatScene.NewMessage.Placeholder", comment: "Chat: message input placeholder")
 		static let cancelError = NSLocalizedString("ChatScene.Error.cancelError", comment: "Chat: inform user that he can't cancel transaction, that was sent")
         static let failToSend = NSLocalizedString("ChatScene.MessageStatus.FailToSend", comment: "Chat: status message for failed to send chat transaction")
-        static let pending = NSLocalizedString("ChatScene.MessageStatus.Зending", comment: "Chat: status message for pending chat transaction")
+        static let pending = NSLocalizedString("ChatScene.MessageStatus.Pending", comment: "Chat: status message for pending chat transaction")
 		
 		private init() { }
 	}
@@ -56,6 +56,8 @@ class ChatViewController: MessagesViewController {
 	var cellsUpdating: [IndexPath] = [IndexPath]()
     
     internal var showsDateHeaderAfterTimeInterval: TimeInterval = 3600
+	
+	private var isFirstLayout = true
 	
 	// MARK: Fee label
 	private var feeIsVisible: Bool = false
@@ -102,28 +104,6 @@ class ChatViewController: MessagesViewController {
                 messageSizeCalculator.outgoingMessageTopLabelAlignment = LabelAlignment(textAlignment: .right, textInsets: UIEdgeInsets(top: 2, left: 0, bottom: 0, right: 16))
             }
         }
-		
-		DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-			guard let chatroom = self?.chatroom, let controller = self?.chatsProvider.getChatController(for: chatroom) else {
-				return
-			}
-			
-			controller.delegate = self
-			self?.chatController = controller
-			
-			do {
-				try controller.performFetch()
-			} catch {
-				print("There was an error performing fetch: \(error)")
-			}
-
-			if let collection = self?.messagesCollectionView {
-				DispatchQueue.main.async {
-					collection.reloadData()
-					collection.scrollToBottom(animated: true)
-				}
-			}
-		}
 		
 		
 		// MARK: 2. InputBar configuration
@@ -185,7 +165,19 @@ class ChatViewController: MessagesViewController {
 			messageInputBar.inputTextView.isEditable = false
 			messageInputBar.sendButton.isEnabled = false
 		}
-    }
+		
+		
+		// MARK: 4. Data
+		let controller = chatsProvider.getChatController(for: chatroom)
+		chatController = controller
+		controller.delegate = self
+		
+		do {
+			try controller.performFetch()
+		} catch {
+			print("There was an error performing fetch: \(error)")
+		}
+	}
 	
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
@@ -206,6 +198,15 @@ class ChatViewController: MessagesViewController {
 		
 		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.partner?.address {
 			delegate.preserveMessage(message, forAddress: address)
+		}
+	}
+	
+	override func viewDidLayoutSubviews() {
+		super.viewDidLayoutSubviews()
+		
+		if isFirstLayout {
+			isFirstLayout = false
+			messagesCollectionView.scrollToBottom(animated: false)
 		}
 	}
 	
