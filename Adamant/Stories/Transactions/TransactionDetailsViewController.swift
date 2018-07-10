@@ -36,7 +36,7 @@ class TransactionDetailsViewController: UIViewController {
 		case confirmations
 		case block
 		case openInExplorer
-        case openChat
+        case openChat	// if transaction.chatroom.isHidden, numberOfRowsInSection will return total-1
 		
 		static let total = 10
 		
@@ -185,6 +185,10 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		if transaction != nil {
+			guard let hidden = transaction?.chatroom?.isHidden, !hidden else {
+				return Row.total - 1
+			}
+			
 			return Row.total
 		} else {
 			return 0
