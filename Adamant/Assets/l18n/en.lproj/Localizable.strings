@@ -200,10 +200,10 @@
 "ChatScene.tapForDetails" = "Tap for details";
 
 /* Chat: status message for failed to send chat transaction */
-"ChatScene.MessageStatus.FailToSend" = "fail to send";
+"ChatScene.MessageStatus.FailToSend" = "Failed to send";
 
 /* Chat: status message for pending chat transaction */
-"ChatScene.MessageStatus.Pending" = "pending";
+"ChatScene.MessageStatus.Pending" = "Pending";
 
 /* Shared error: Account not found error. Using %@ for address. */
 "Error.AccountNotFoundFormat" = "Account not found: %@";

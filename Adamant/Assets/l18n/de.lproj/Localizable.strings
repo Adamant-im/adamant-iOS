@@ -199,6 +199,12 @@
 /* Chat: 'Sent funds' bubble title */
 "ChatScene.Sent" = "Versendet";
 
+/* Chat: status message for failed to send chat transaction */
+"ChatScene.MessageStatus.FailToSend" = "Fehler beim Senden";
+
+/* Chat: status message for pending chat transaction */
+"ChatScene.MessageStatus.Pending" = "Ausstehend";
+
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Tippen Sie für Details";
 

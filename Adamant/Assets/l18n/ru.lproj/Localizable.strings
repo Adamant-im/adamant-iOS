@@ -197,10 +197,10 @@
 "ChatScene.Sent" = "Отправлено";
 
 /* Chat: status message for failed to send chat transaction */
-"ChatScene.MessageStatus.FailToSend" = "не удалось отправить";
+"ChatScene.MessageStatus.FailToSend" = "Не удалось отправить";
 
 /* Chat: status message for pending chat transaction */
-"ChatScene.MessageStatus.Pending" = "отправка";
+"ChatScene.MessageStatus.Pending" = "Отправка";
 
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Подробнее…";
