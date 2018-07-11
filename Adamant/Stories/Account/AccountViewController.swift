@@ -62,6 +62,7 @@ class AccountViewController: FormViewController {
 			case .wallet: return "wllt"
 			case .application: return "app"
 			case .actions: return "actns"
+            case .delegates: return "dlgts"
 			}
 		}
 		
@@ -70,8 +71,7 @@ class AccountViewController: FormViewController {
 			case .wallet: return "Wallet"
 			case .application: return NSLocalizedString("AccountTab.Section.Application", comment: "Account tab: Application section title")
 			case .actions: return NSLocalizedString("AccountTab.Section.Actions", comment: "Account tab: Actions section title")
-            case .delegates:
-                return NSLocalizedString("AccountTab.Section.Delegates", comment: "Account tab: Delegates section title")
+            case .delegates: return NSLocalizedString("AccountTab.Section.Delegates", comment: "Account tab: Delegates section title")
 			}
 		}
 	}
@@ -262,6 +262,31 @@ class AccountViewController: FormViewController {
 			nav.pushViewController(vc, animated: true)
 		})
 		
+        // MARK: Delegates section
+        +++ Section(Sections.delegates.localized)
+            
+        <<< LabelRow() {
+            $0.tag = Rows.votesForDelegates.tag
+            $0.title = Rows.votesForDelegates.localized
+            }
+            .cellSetup({ (cell, _) in
+                cell.selectionStyle = .gray
+            })
+            .cellUpdate({ (cell, _) in
+                if let label = cell.textLabel {
+                    label.font = UIFont.adamantPrimary(ofSize: 17)
+                    label.textColor = UIColor.adamantPrimary
+                }
+                
+                cell.accessoryType = .disclosureIndicator
+            })
+            .onCellSelection({ [weak self] (_, row) in
+                guard let vc = self?.router.get(scene: AdamantScene.Delegates.delegates), let nav = self?.navigationController else {
+                    return
+                }
+                
+                nav.pushViewController(vc, animated: true)
+            })
 			
 		// MARK: Actions
 		+++ Section(Sections.actions.localized) {
