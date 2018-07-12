@@ -9,6 +9,21 @@
 import UIKit
 import M13Checkbox
 
+// MARK: - Localization
+extension String.adamantLocalized {
+    struct delegates {
+        static let title = NSLocalizedString("Delegates.Title", comment: "Delegates page: scene title")
+        
+        static let notEnoughtTokensForVote = NSLocalizedString("Delegates.NotEnoughtTokensForVote", comment: "Delegates tab: Message about 50 ADM fee for vote")
+        
+        static let now = NSLocalizedString("Delegates.Now", comment: "Delegates: 'Now!' label")
+        static let unitMinutes = NSLocalizedString("Delegates.Units.Minutes", comment: "Delegates: Units 'Minutes'")
+        static let unitSeconds = NSLocalizedString("Delegates.Units.Seconds", comment: "Delegates: Units 'Seconds'")
+        
+        private init() { }
+    }
+}
+
 class DelegatesListViewController: UIViewController {
     
     let cellIdentifier = "cell"
@@ -47,6 +62,11 @@ class DelegatesListViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = false
+        }
+        
+        navigationItem.title = String.adamantLocalized.delegates.title
         
         tableView.register(UINib.init(nibName: "DelegateCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         tableView.addSubview(self.refreshControl)
@@ -175,7 +195,7 @@ class DelegatesListViewController: UIViewController {
                     }
                 }
             } else {
-                self.dialogService.showRichError(error: ChatsProviderError.notEnoughtMoneyToSend)
+                self.dialogService.showWarning(withMessage: String.adamantLocalized.delegates.notEnoughtTokensForVote)
             }
         } else {
             self.dialogService.showRichError(error: AccountServiceError.userNotLogged)
@@ -220,7 +240,7 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
         let delegate = delegates[indexPath.row]
         
         cell.nameLabel.text = delegate.username
-        cell.rankLabel.text = "#\(delegate.rank)"
+        cell.rankLabel.text = "\(delegate.rank)"
         cell.addressLabel.text = delegate.address
         cell.statusLabel.text = delegate.rank <= activeDelegates ? "●" : "○"
         

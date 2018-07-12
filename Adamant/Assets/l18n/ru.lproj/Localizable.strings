@@ -115,6 +115,9 @@
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "О нас";
 
+/* Account tab: 'Vote for delegates' button */
+"AccountTab.Row.VoteForDelegates" = "Проголосовать за делегатов";
+
 /* Account tab: Actions section title */
 "AccountTab.Section.Actions" = "Действия";
 
@@ -126,6 +129,9 @@
 
 /* Account tab: Ethereum wallet section */
 "AccountTab.Sections.ethereum_wallet" = "Ethereum кошелёк";
+
+/* Account tab: Delegates section title */
+"AccountTab.Section.Delegates" = "Делегаты";
 
 /* Account page: scene title */
 "AccountTab.Title" = "Аккаунт";
@@ -204,6 +210,47 @@
 
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Подробнее…";
+
+/* Delegates page: scene title */
+"Delegates.Title" = "Делегаты";
+
+/* Delegates tab: Message about 50 ADM fee for vote */
+"Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Вам нужно иметь 50 ADM на счете вашего акаунта";
+
+/* Delegate Details Screen: Rows titles */
+"Delegates.Row.Username" = "Имя";
+"Delegates.Row.Address" = "Адрес";
+"Delegates.Row.PublicKey" = "Публичный ключ";
+"Delegates.Row.VoteWeight" = "Вес голоса";
+"Delegates.Row.ProducedBlocks" = "Обработано";
+"Delegates.Row.MissedBlocks" = "Пропущено";
+"Delegates.Row.Rate" = "Позиция";
+"Delegates.Row.Rank" = "Ранг";
+"Delegates.Row.Approval" = "Блоков";
+"Delegates.Row.Productivity" = "Аптайм";
+"Delegates.Row.ForgetingTime" = "Время форжинга";
+"Delegates.Row.Forged" = "Сфоржено";
+
+/* Delegates: 'Now!' label */
+"Delegates.Now" = "Сейчас!";
+
+/* Delegates: Units 'Minutes' */
+"Delegates.Units.Minutes" = "мин";
+
+/* Delegates: Units 'Seconds' */
+"Delegates.Units.Seconds" = "сек";
+
+/* Storybard - Delegate vote panel: 'Upvotes' label */
+"Delegates.VotePanel.Upvotes" = "Повышены:";
+
+/* Storybard - Delegate vote panel: 'Downvotes' label */
+"Delegates.VotePanel.Downvotes" = "Понижены:";
+
+/* Storybard - Delegate vote panel: 'New' label */
+"Delegates.VotePanel.New" = "Новые:";
+
+/* Storybard - Delegate vote panel: 'Total' label */
+"Delegates.VotePanel.Total" = "Всего:";
 
 /* Shared error: Account not found error. Using %@ for address. */
 "Error.AccountNotFoundFormat" = "Аккаун не найден: %@";

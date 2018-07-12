@@ -35,12 +35,16 @@
                         <outlet property="delegate" destination="-1" id="kki-Ii-HOI"/>
                     </connections>
                 </tableView>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QBi-WG-wpC">
-                    <rect key="frame" x="272" y="521.5" width="32" height="30"/>
-                    <state key="normal" title="Vote">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QBi-WG-wpC">
+                    <rect key="frame" x="262" y="531.5" width="50" height="30"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="Eb7-31-cAy"/>
+                        <constraint firstAttribute="width" constant="50" id="Wet-RN-yTr"/>
+                    </constraints>
+                    <state key="normal" image="Arrow">
                         <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </state>
-                    <state key="disabled">
+                    <state key="disabled" image="Arrow_innactive">
                         <color key="titleColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </state>
                     <connections>
@@ -48,31 +52,43 @@
                     </connections>
                 </button>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lsq-Yh-Tht">
-                    <rect key="frame" x="0.0" y="505" width="256" height="63"/>
+                    <rect key="frame" x="0.0" y="505" width="254" height="63"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Upvotes:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TYr-G3-5pk">
                             <rect key="frame" x="8" y="8" width="65" height="19.5"/>
                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="string" keyPath="xibLocKey" value="Delegates.VotePanel.Upvotes"/>
+                            </userDefinedRuntimeAttributes>
                         </label>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Total:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zqu-7r-qQ5">
-                            <rect key="frame" x="128" y="35.5" width="40" height="19.5"/>
+                            <rect key="frame" x="127" y="35.5" width="40" height="19.5"/>
                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="string" keyPath="xibLocKey" value="Delegates.VotePanel.Total"/>
+                            </userDefinedRuntimeAttributes>
                         </label>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="New:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZVY-aN-pmE">
-                            <rect key="frame" x="128" y="8" width="37" height="19.5"/>
+                            <rect key="frame" x="127" y="8" width="37" height="19.5"/>
                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="string" keyPath="xibLocKey" value="Delegates.VotePanel.New"/>
+                            </userDefinedRuntimeAttributes>
                         </label>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Downvotes:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="imt-ab-neh">
                             <rect key="frame" x="8" y="35.5" width="85" height="19.5"/>
                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="string" keyPath="xibLocKey" value="Delegates.VotePanel.Downvotes"/>
+                            </userDefinedRuntimeAttributes>
                         </label>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="30" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CVw-tR-gHb">
                             <rect key="frame" x="81" y="8" width="19.5" height="19.5"/>
@@ -87,13 +103,13 @@
                             <nil key="highlightedColor"/>
                         </label>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="30/30" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hbh-ol-eRD">
-                            <rect key="frame" x="173" y="8" width="44" height="19.5"/>
+                            <rect key="frame" x="172" y="8" width="44" height="19.5"/>
                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="9999/9999" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QeM-gf-SAn">
-                            <rect key="frame" x="176" y="35.5" width="84.5" height="19.5"/>
+                            <rect key="frame" x="175" y="35.5" width="84.5" height="19.5"/>
                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
@@ -121,7 +137,7 @@
                     </constraints>
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="50 ADM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hkB-PI-SFR">
-                    <rect key="frame" x="265.5" y="507" width="46" height="14.5"/>
+                    <rect key="frame" x="264" y="509" width="46" height="14.5"/>
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -131,18 +147,22 @@
             <constraints>
                 <constraint firstItem="lsq-Yh-Tht" firstAttribute="top" secondItem="13c-Yn-994" secondAttribute="bottom" id="5vF-os-V1N"/>
                 <constraint firstItem="13c-Yn-994" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="6Md-GT-hDa"/>
-                <constraint firstItem="QBi-WG-wpC" firstAttribute="leading" secondItem="lsq-Yh-Tht" secondAttribute="trailing" constant="16" id="7u5-gX-C9Q"/>
+                <constraint firstItem="QBi-WG-wpC" firstAttribute="leading" secondItem="lsq-Yh-Tht" secondAttribute="trailing" constant="8" id="7u5-gX-C9Q"/>
                 <constraint firstItem="lsq-Yh-Tht" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="BCv-vW-kv7"/>
                 <constraint firstItem="13c-Yn-994" firstAttribute="trailing" secondItem="fnl-2z-Ty3" secondAttribute="trailing" id="Vxt-Jg-T3s"/>
-                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="QBi-WG-wpC" secondAttribute="trailing" constant="16" id="WaO-5h-MHG"/>
-                <constraint firstItem="QBi-WG-wpC" firstAttribute="centerY" secondItem="lsq-Yh-Tht" secondAttribute="centerY" id="f50-Wk-hbx"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="QBi-WG-wpC" secondAttribute="trailing" constant="8" id="WaO-5h-MHG"/>
+                <constraint firstItem="QBi-WG-wpC" firstAttribute="centerY" secondItem="lsq-Yh-Tht" secondAttribute="centerY" constant="10" id="f50-Wk-hbx"/>
                 <constraint firstItem="13c-Yn-994" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="nYB-vr-goo"/>
                 <constraint firstItem="lsq-Yh-Tht" firstAttribute="bottom" secondItem="fnl-2z-Ty3" secondAttribute="bottom" id="p59-eT-9Pd"/>
                 <constraint firstItem="hkB-PI-SFR" firstAttribute="centerX" secondItem="QBi-WG-wpC" secondAttribute="centerX" id="zXK-ff-cG5"/>
-                <constraint firstItem="QBi-WG-wpC" firstAttribute="top" secondItem="hkB-PI-SFR" secondAttribute="bottom" id="zgh-L5-NS1"/>
+                <constraint firstItem="QBi-WG-wpC" firstAttribute="top" secondItem="hkB-PI-SFR" secondAttribute="bottom" constant="8" id="zgh-L5-NS1"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <point key="canvasLocation" x="31" y="69"/>
         </view>
     </objects>
+    <resources>
+        <image name="Arrow" width="27" height="19"/>
+        <image name="Arrow_innactive" width="27" height="19"/>
+    </resources>
 </document>

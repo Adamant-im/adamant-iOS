@@ -81,7 +81,7 @@ class AccountViewController: FormViewController {
 		case security, nodes, about // Application
 		case logout // Actions
         
-        case votesForDelegates
+        case voteForDelegates
 		
 		var tag: String {
 			switch self {
@@ -94,8 +94,8 @@ class AccountViewController: FormViewController {
 			case .about: return "bt"
 			case .logout: return "lgtrw"
                 
-            case .votesForDelegates:
-                return "votesForDelegates"
+            case .voteForDelegates:
+                return "vtFrDlgts"
 			}
 		}
 		
@@ -111,8 +111,8 @@ class AccountViewController: FormViewController {
 			case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
 			
                 
-            case .votesForDelegates:
-                return NSLocalizedString("AccountTab.Row.VotesForDelegates", comment: "Account tab: 'Votes for delegates' button")
+            case .voteForDelegates:
+                return NSLocalizedString("AccountTab.Row.VoteForDelegates", comment: "Account tab: 'Votes for delegates' button")
 			}
 		}
 	}
@@ -266,8 +266,8 @@ class AccountViewController: FormViewController {
         +++ Section(Sections.delegates.localized)
             
         <<< LabelRow() {
-            $0.tag = Rows.votesForDelegates.tag
-            $0.title = Rows.votesForDelegates.localized
+            $0.tag = Rows.voteForDelegates.tag
+            $0.title = Rows.voteForDelegates.localized
             }
             .cellSetup({ (cell, _) in
                 cell.selectionStyle = .gray

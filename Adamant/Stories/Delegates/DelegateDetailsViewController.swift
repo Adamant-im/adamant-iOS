@@ -66,29 +66,29 @@ class DelegateDetailsViewController: FormViewController {
         var localized: String {
             switch self {
             case .username:
-                return "Username"
+                return NSLocalizedString("Delegates.Row.Username", comment: "Delegate Details Screen: Rows title for 'Username'")
             case .address:
-                return "Address"
+                return NSLocalizedString("Delegates.Row.Address", comment: "Delegate Details Screen: Rows title for 'Address'")
             case .publicKey:
-                return "Public Key"
+                return NSLocalizedString("Delegates.Row.PublicKey", comment: "Delegate Details Screen: Rows title for 'Public Key'")
             case .vote:
-                return "Vote"
+                return NSLocalizedString("Delegates.Row.VoteWeight", comment: "Delegate Details Screen: Rows title for 'Vote weight'")
             case .producedblocks:
-                return "Produced blocks"
+                return NSLocalizedString("Delegates.Row.ProducedBlocks", comment: "Delegate Details Screen: Rows title for 'Produced blocks'")
             case .missedblocks:
-                return "Missed blocks"
+                return NSLocalizedString("Delegates.Row.MissedBlocks", comment: "Delegate Details Screen: Rows title for 'Missed blocks'")
             case .rate:
-                return "Rate"
+                return NSLocalizedString("Delegates.Row.Rate", comment: "Delegate Details Screen: Rows title for 'Rate'")
             case .rank:
-                return "Rank"
+                return NSLocalizedString("Delegates.Row.Rank", comment: "Delegate Details Screen: Rows title for 'Rank'")
             case .approval:
-                return "Approval"
+                return NSLocalizedString("Delegates.Row.Approval", comment: "Delegate Details Screen: Rows title for 'Approval'")
             case .productivity:
-                return "Productivity"
+                return NSLocalizedString("Delegates.Row.Productivity", comment: "Delegate Details Screen: Rows title for 'Productivity'")
             case .forgetingTime:
-                return "Forgeting time"
+                return NSLocalizedString("Delegates.Row.ForgetingTime", comment: "Delegate Details Screen: Rows title for 'Forgeting time'")
             case .forged:
-                return "Forged"
+                return NSLocalizedString("Delegates.Row.Forged", comment: "Delegate Details Screen: Rows title for 'Forged'")
                 
             case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
                 
@@ -113,6 +113,12 @@ class DelegateDetailsViewController: FormViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = true
+        }
+        
+        navigationItem.title = String.adamantLocalized.transactionDetails.title
         
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -352,16 +358,16 @@ class DelegateDetailsViewController: FormViewController {
                     if seconds < 0 {
                         row.value = "..."
                     } else if seconds == 0 {
-                        row.value = "Now!"
+                        row.value = String.adamantLocalized.delegates.now
                     } else {
                         let minutes = floor(Double(seconds) / 60)
                         let seconds = Double(seconds) - (minutes * 60)
                         if minutes > 0 && seconds > 0 {
-                            row.value = "\(Int(minutes)) min \(Int(seconds)) sec"
+                            row.value = "\(Int(minutes)) \(String.adamantLocalized.delegates.unitMinutes) \(Int(seconds)) \(String.adamantLocalized.delegates.unitSeconds)"
                         } else if minutes > 0 {
-                            row.value = "\(Int(minutes)) min"
+                            row.value = "\(Int(minutes)) \(String.adamantLocalized.delegates.unitMinutes)"
                         } else {
-                            row.value = "\(Int(seconds)) sec"
+                            row.value = "\(Int(seconds)) \(String.adamantLocalized.delegates.unitSeconds)"
                         }
                     }
                     
