@@ -16,6 +16,8 @@ extension String.adamantLocalized {
         
         static let notEnoughtTokensForVote = NSLocalizedString("Delegates.NotEnoughtTokensForVote", comment: "Delegates tab: Message about 50 ADM fee for vote")
         
+        static let success = NSLocalizedString("Delegates.Vote.Success", comment: "Delegates: Message for Successfull voting")
+        
         static let now = NSLocalizedString("Delegates.Now", comment: "Delegates: 'Now!' label")
         static let unitMinutes = NSLocalizedString("Delegates.Units.Minutes", comment: "Delegates: Units 'Minutes'")
         static let unitSeconds = NSLocalizedString("Delegates.Units.Seconds", comment: "Delegates: Units 'Seconds'")
@@ -186,8 +188,10 @@ class DelegatesListViewController: UIViewController {
                 
                 self.apiService.voteForDelegates(from: account.address, keypair: keypair, votes: voted) { (result) in
                     switch result {
-                    case .success(let transactionId):
-                        print("Vote transaction ID: \(transactionId)")
+                    case .success(_):
+                        self.refreshControl.beginRefreshing()
+                        self.handleRefresh(self.refreshControl)
+                        self.dialogService.showSuccess(withMessage: String.adamantLocalized.delegates.success)
                         break
                         
                     case .failure(let error):

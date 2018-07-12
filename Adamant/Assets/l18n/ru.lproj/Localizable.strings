@@ -240,6 +240,9 @@
 /* Delegates: Units 'Seconds' */
 "Delegates.Units.Seconds" = "сек";
 
+/* Delegates: Message for Successfull voting */
+"Delegates.Vote.Success" = "Ваш голос отправлен";
+
 /* Storybard - Delegate vote panel: 'Upvotes' label */
 "Delegates.VotePanel.Upvotes" = "Повышены:";
 
