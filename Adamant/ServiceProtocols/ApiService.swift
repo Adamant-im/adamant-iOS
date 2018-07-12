@@ -121,4 +121,7 @@ protocol ApiService: class {
     func getForgedByAccount(publicKey: String, completion: @escaping (ApiServiceResult<DelegateForgeDetails>) -> Void)
     /// Get delegate forgeing time
     func getForgingTime(for delegate: Delegate, completion: @escaping (ApiServiceResult<Int>) -> Void)
+    
+    /// Send vote transaction for delegates
+    func voteForDelegates(from address: String, keypair: Keypair, votes: [String], completion: @escaping (ApiServiceResult<UInt64>) -> Void)
 }

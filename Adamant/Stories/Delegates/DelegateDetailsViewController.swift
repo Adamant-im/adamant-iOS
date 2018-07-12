@@ -164,10 +164,11 @@ class DelegateDetailsViewController: FormViewController {
                     }
                 })
         
-            <<< TextRow() {
+            <<< DecimalRow() {
                 $0.disabled = true
                 $0.tag = Row.vote.tag
                 $0.title = Row.vote.localized
+                $0.formatter = currencyFormatter
                 }.cellUpdate { cell, row in
                     self.updateCell(cell)
                 }
@@ -285,8 +286,9 @@ class DelegateDetailsViewController: FormViewController {
             row.reload()
         }
         
-        if let row: TextRow = self.form.rowBy(tag: Row.vote.tag) {
-            row.value = delegate.vote
+        if let row: DecimalRow = self.form.rowBy(tag: Row.vote.tag) {
+            let votesWeight = Decimal(string: delegate.vote) ?? 0
+            row.value = (votesWeight.shiftedFromAdamant() as NSDecimalNumber).doubleValue
             row.reload()
         }
         

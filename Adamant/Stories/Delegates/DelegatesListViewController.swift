@@ -42,6 +42,8 @@ class DelegatesListViewController: UIViewController {
     @IBOutlet weak var downVotesLabel: UILabel!
     @IBOutlet weak var newVotesLabel: UILabel!
     @IBOutlet weak var totalVotesLabel: UILabel!
+    
+    @IBOutlet weak var voteBtn: UIButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -87,7 +89,7 @@ class DelegatesListViewController: UIViewController {
 
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
         if let address = accountService.account?.address {
-            apiService.getDelegatesWithVotes(for: "U8607002570607148960", limit: activeDelegates) { (result) in
+            apiService.getDelegatesWithVotes(for: address, limit: activeDelegates) { (result) in
                 switch result {
                 case .success(let delegates):
                     print(delegates)
@@ -112,6 +114,12 @@ class DelegatesListViewController: UIViewController {
     }
     
     private func updateVotePanel() {
+        if self.newVotesDelegates.count > 0 {
+            voteBtn.isEnabled = true
+        } else {
+            voteBtn.isEnabled = false
+        }
+        
         DispatchQueue.global().async {
             let voted = self.delegates.filter({ (delegate) -> Bool in
                 return delegate.voted
@@ -135,8 +143,11 @@ class DelegatesListViewController: UIViewController {
     }
     
     @IBAction func vote(_ sender: Any) {
-        // TODO: Action for vote
-        if let account = accountService.account {
+        guard self.newVotesDelegates.count > 0 else {
+            // TODO: Show error message
+            return
+        }
+        if let account = accountService.account, let keypair = accountService.keypair {
             let balance = (account.balance as NSDecimalNumber).doubleValue
             if balance > 50 {
                 let voted = self.newVotesDelegates.sorted(by: { (item1, item2) -> Bool in
@@ -152,7 +163,17 @@ class DelegatesListViewController: UIViewController {
                 }).map({ (delegate) -> String in
                     return delegate.voted ? "+\(delegate.publicKey)" : "-\(delegate.publicKey)"
                 })
-                print(voted)
+                
+                self.apiService.voteForDelegates(from: account.address, keypair: keypair, votes: voted) { (result) in
+                    switch result {
+                    case .success(let transactionId):
+                        print("Vote transaction ID: \(transactionId)")
+                        break
+                        
+                    case .failure(let error):
+                        self.dialogService.showRichError(error: TransfersProviderError.serverError(error))
+                    }
+                }
             } else {
                 self.dialogService.showRichError(error: ChatsProviderError.notEnoughtMoneyToSend)
             }
@@ -201,7 +222,7 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
         cell.nameLabel.text = delegate.username
         cell.rankLabel.text = "#\(delegate.rank)"
         cell.addressLabel.text = delegate.address
-        cell.statusLabel.text = delegate.rank < activeDelegates ? "●" : "○"
+        cell.statusLabel.text = delegate.rank <= activeDelegates ? "●" : "○"
         
         if let delegate = self.newVotesDelegates.first(where: { (vote) -> Bool in
             return vote.address == delegate.address

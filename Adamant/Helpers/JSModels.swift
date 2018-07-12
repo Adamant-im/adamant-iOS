@@ -38,11 +38,13 @@ import JavaScriptCore
 @objc protocol JSAssetProtocol: JSExport {
 	var chat: JSChat? { get set }
 	var state: JSState? { get set }
+    var votes: [String]? { get set }
 }
 
 @objc class JSAsset: NSObject, JSAssetProtocol {
 	dynamic var chat: JSChat?
 	dynamic var state: JSState?
+    dynamic var votes: [String]?
 }
 
 

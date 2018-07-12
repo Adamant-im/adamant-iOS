@@ -12,7 +12,7 @@ extension AdamantApiService.ApiCommands {
     static let Delegates = (
         root: "/api/delegates",
         getDelegates: "/api/delegates",
-        getVotes: "/api/accounts/delegates",
+        votes: "/api/accounts/delegates",
         getDelegatesCount: "/api/delegates/count",
         getForgedByAccount: "/api/delegates/forging/getForgedByAccount",
         getNextForgers: "/api/delegates/getNextForgers",
@@ -186,7 +186,7 @@ extension AdamantApiService {
         // MARK: 1. Prepare
         let endpoint: URL
         do {
-            endpoint = try buildUrl(path: ApiCommands.Delegates.getVotes, queryItems: [URLQueryItem(name: "address", value: address)])
+            endpoint = try buildUrl(path: ApiCommands.Delegates.votes, queryItems: [URLQueryItem(name: "address", value: address)])
         } catch {
             let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
             completion(.failure(err))
@@ -212,6 +212,67 @@ extension AdamantApiService {
             }
         }
     }
+    
+    func voteForDelegates(from address: String, keypair: Keypair, votes: [String], completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
+        // MARK: 1. Create and sign transaction
+        let asset = TransactionAsset(votes: VotesAsset(votes: votes))
+        let transaction = NormalizedTransaction(type: .vote,
+                                                amount: 0,
+                                                senderPublicKey: keypair.publicKey,
+                                                requesterPublicKey: nil,
+                                                date: Date(),
+                                                recipientId: address,
+                                                asset: asset)
+        guard let signature = adamantCore.sign(transaction: transaction, senderId: address, keypair: keypair) else {
+            completion(.failure(.internalError(message: "Failed to sign transaction", error: nil)))
+            return
+        }
+        
+        // MARK: 2. Prepare params
+        let params: [String: Any] = [
+            "type": transaction.type.rawValue,
+            "amount": 0,
+            "senderPublicKey": transaction.senderPublicKey,
+            "senderId": transaction.recipientId ?? NSNull(),
+            "timestamp": transaction.timestamp,
+            "signature": signature,
+            "recipientId": transaction.recipientId ?? NSNull(),
+            "asset": [
+                "votes": votes
+            ]
+        ]
+        
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        
+        // MARK: 3. Build endpoints
+        let endpoint: URL
+        do {
+            endpoint = try buildUrl(path: ApiCommands.Delegates.votes)
+        } catch {
+            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+            completion(.failure(err))
+            return
+        }
+        
+        // MARK: 4. Send
+        sendRequest(url: endpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerResponse>) in
+            switch serverResponse {
+            case .success(let response):
+                if response.success {
+                    completion(.success(1))
+                } else {
+                    completion(.failure(.serverError(error: response.error ?? "")))
+                }
+                
+            case .failure(let error):
+                completion(.failure(.networkError(error: error)))
+            }
+        }
+    }
+    
+    // MARK: - Private methods
     
     private func getBlocks(completion: @escaping (ApiServiceResult<[Block]>) -> Void) {
         // MARK: 1. Prepare
