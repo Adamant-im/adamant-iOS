@@ -27,6 +27,7 @@ class AdamantDelegateCell: UITableViewCell {
     @IBOutlet weak var statusLabel: UILabel!
 	@IBOutlet weak var votedLabel: UILabel!
 
+	@IBOutlet weak var checkboxExpander: UIView!
 	
 	// MARK: Properties
 	
@@ -53,7 +54,7 @@ class AdamantDelegateCell: UITableViewCell {
 	
 	var isUpvoted: Bool = false {
 		didSet {
-			votedLabel.text = isUpvoted ? "●" : ""
+			votedLabel.text = isUpvoted ? "⬆︎" : ""
 		}
 	}
 	
@@ -72,7 +73,10 @@ class AdamantDelegateCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         
-        checkbox.addTarget(self, action: #selector(self.onSelectChanged), for: UIControlEvents.valueChanged)
+		// To avoid too many missclicks, we create a bigger view to catch taps
+		checkboxExpander.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onExpanderTap)))
+		
+		checkbox.addTarget(self, action: #selector(self.onSelectChanged), for: UIControlEvents.valueChanged)
     }
 
     @objc func onSelectChanged() {
@@ -81,4 +85,10 @@ class AdamantDelegateCell: UITableViewCell {
 			delegate.delegateCell(self, didChangeCheckedStateTo: state)
 		}
     }
+	
+	@objc func onExpanderTap() {
+		let state = !isChecked
+		setIsChecked(state, animated: true)
+		delegate?.delegateCell(self, didChangeCheckedStateTo: state)
+	}
 }

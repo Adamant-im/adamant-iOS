@@ -20,26 +20,38 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="47.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qCL-kD-ydl" customClass="M13Checkbox" customModule="M13Checkbox">
-                        <rect key="frame" x="15" y="13" width="22" height="22"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wwq-Oq-wET">
+                        <rect key="frame" x="5" y="5" width="38" height="38"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qCL-kD-ydl" customClass="M13Checkbox" customModule="M13Checkbox">
+                                <rect key="frame" x="7" y="7" width="24" height="24"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="24" id="ax5-Dn-rmp"/>
+                                    <constraint firstAttribute="width" secondItem="qCL-kD-ydl" secondAttribute="height" multiplier="1:1" id="mCN-8R-zhv"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="_IBStateChangeAnimation" value="Fill"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="hideBox" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="secondaryTintColor">
+                                        <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="secondaryCheckmarkTintColor">
+                                        <color key="value" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <gestureRecognizers/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="24" id="ax5-Dn-rmp"/>
-                            <constraint firstAttribute="width" secondItem="qCL-kD-ydl" secondAttribute="height" multiplier="1:1" id="mCN-8R-zhv"/>
+                            <constraint firstAttribute="width" secondItem="wwq-Oq-wET" secondAttribute="height" multiplier="1:1" id="9DF-hI-dtU"/>
+                            <constraint firstItem="qCL-kD-ydl" firstAttribute="centerX" secondItem="wwq-Oq-wET" secondAttribute="centerX" id="jVf-U7-mHS"/>
+                            <constraint firstItem="qCL-kD-ydl" firstAttribute="centerY" secondItem="wwq-Oq-wET" secondAttribute="centerY" id="jqu-fR-P9N"/>
                         </constraints>
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="string" keyPath="_IBStateChangeAnimation" value="Fill"/>
-                            <userDefinedRuntimeAttribute type="boolean" keyPath="hideBox" value="NO"/>
-                            <userDefinedRuntimeAttribute type="color" keyPath="secondaryTintColor">
-                                <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            </userDefinedRuntimeAttribute>
-                            <userDefinedRuntimeAttribute type="color" keyPath="secondaryCheckmarkTintColor">
-                                <color key="value" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                            </userDefinedRuntimeAttribute>
-                        </userDefinedRuntimeAttributes>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="999" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ifk-Jp-eUp">
-                        <rect key="frame" x="54" y="4" width="32" height="20.5"/>
+                        <rect key="frame" x="52" y="4" width="32" height="20.5"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="32" id="7UG-qE-v2a"/>
                         </constraints>
@@ -48,25 +60,25 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="delegate label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wDJ-jW-F39">
-                        <rect key="frame" x="98" y="3" width="107.5" height="21"/>
+                        <rect key="frame" x="96" y="3" width="107.5" height="21"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="○" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Twt-VT-UQZ">
-                        <rect key="frame" x="70.5" y="23" width="15" height="21"/>
+                        <rect key="frame" x="68.5" y="23" width="15" height="21"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="U12345678901234567890" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pGm-UP-A4U">
-                        <rect key="frame" x="98" y="26" width="154.5" height="14.5"/>
+                        <rect key="frame" x="96" y="26" width="154.5" height="14.5"/>
                         <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="○" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E6f-1V-fbU">
-                        <rect key="frame" x="52" y="23" width="15" height="21"/>
+                        <rect key="frame" x="50" y="23" width="15" height="21"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
@@ -76,16 +88,17 @@
                     <constraint firstItem="Twt-VT-UQZ" firstAttribute="trailing" secondItem="Ifk-Jp-eUp" secondAttribute="trailing" id="8MK-hG-7IU"/>
                     <constraint firstItem="E6f-1V-fbU" firstAttribute="centerY" secondItem="Twt-VT-UQZ" secondAttribute="centerY" id="98W-Cu-3TS"/>
                     <constraint firstItem="Ifk-Jp-eUp" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="4" id="ASo-gO-hV5"/>
-                    <constraint firstItem="qCL-kD-ydl" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="Ly4-7e-d0u"/>
                     <constraint firstItem="wDJ-jW-F39" firstAttribute="leading" secondItem="Ifk-Jp-eUp" secondAttribute="trailing" constant="12" id="MZK-Ij-ckO"/>
+                    <constraint firstItem="Ifk-Jp-eUp" firstAttribute="leading" secondItem="wwq-Oq-wET" secondAttribute="trailing" constant="6" id="N3C-eO-9y8"/>
+                    <constraint firstItem="wwq-Oq-wET" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="2" id="PCs-jF-zQe"/>
                     <constraint firstItem="Twt-VT-UQZ" firstAttribute="centerY" secondItem="pGm-UP-A4U" secondAttribute="centerY" id="QcJ-zp-cf8"/>
+                    <constraint firstItem="wwq-Oq-wET" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="2" id="b50-QI-lep"/>
                     <constraint firstItem="wDJ-jW-F39" firstAttribute="bottom" secondItem="Ifk-Jp-eUp" secondAttribute="bottom" id="cT8-Yc-l3B"/>
-                    <constraint firstItem="Ifk-Jp-eUp" firstAttribute="leading" secondItem="qCL-kD-ydl" secondAttribute="trailing" constant="13" id="dwt-Sx-A6h"/>
                     <constraint firstItem="Twt-VT-UQZ" firstAttribute="leading" secondItem="E6f-1V-fbU" secondAttribute="trailing" constant="3.5" id="e0A-Uo-bLl"/>
-                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="wDJ-jW-F39" secondAttribute="trailing" constant="8" id="gFT-ez-bWt"/>
-                    <constraint firstItem="qCL-kD-ydl" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="gjc-0k-xeV"/>
+                    <constraint firstAttribute="bottom" secondItem="wwq-Oq-wET" secondAttribute="bottom" constant="2" id="gC6-3N-eOR"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="wDJ-jW-F39" secondAttribute="trailing" priority="750" constant="8" id="gFT-ez-bWt"/>
                     <constraint firstItem="pGm-UP-A4U" firstAttribute="top" secondItem="wDJ-jW-F39" secondAttribute="bottom" constant="2" id="lAz-LY-3Wn"/>
-                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="pGm-UP-A4U" secondAttribute="trailing" constant="8" id="oGq-L1-rzs"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="pGm-UP-A4U" secondAttribute="trailing" priority="750" constant="8" id="oGq-L1-rzs"/>
                     <constraint firstItem="pGm-UP-A4U" firstAttribute="leading" secondItem="wDJ-jW-F39" secondAttribute="leading" id="t4Y-he-xXK"/>
                 </constraints>
             </tableViewCellContentView>
@@ -93,6 +106,7 @@
             <connections>
                 <outlet property="addressLabel" destination="pGm-UP-A4U" id="AvR-oD-jQh"/>
                 <outlet property="checkbox" destination="qCL-kD-ydl" id="B2a-9T-Sgp"/>
+                <outlet property="checkboxExpander" destination="wwq-Oq-wET" id="Nal-Wi-Dwt"/>
                 <outlet property="nameLabel" destination="wDJ-jW-F39" id="fUF-BM-8o1"/>
                 <outlet property="rankLabel" destination="Ifk-Jp-eUp" id="mQd-T8-DuX"/>
                 <outlet property="statusLabel" destination="Twt-VT-UQZ" id="iw2-vT-0eh"/>
