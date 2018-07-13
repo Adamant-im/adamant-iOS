@@ -18,22 +18,10 @@ struct TransactionAsset: Codable {
         self.state = nil
         self.votes = nil
     }
-    
-    init(chat: ChatAsset) {
+	
+	init(chat: ChatAsset? = nil, state: StateAsset? = nil, votes: VotesAsset? = nil) {
         self.chat = chat
-        self.state = nil
-        self.votes = nil
-    }
-    
-    init(state: StateAsset) {
-        self.chat = nil
         self.state = state
-        self.votes = nil
-    }
-    
-    init(votes: VotesAsset) {
-        self.chat = nil
-        self.state = nil
         self.votes = votes
     }
 }
