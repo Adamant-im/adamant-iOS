@@ -13,8 +13,8 @@
 		644EC35220EFA9A300F40C73 /* DelegateRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35120EFA9A300F40C73 /* DelegateRoutes.swift */; };
 		644EC35720EFAAB700F40C73 /* DelegatesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35520EFAAB700F40C73 /* DelegatesListViewController.swift */; };
 		644EC35820EFAAB700F40C73 /* DelegatesListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 644EC35620EFAAB700F40C73 /* DelegatesListViewController.xib */; };
-		644EC35B20EFB8E900F40C73 /* DelegateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35920EFB8E900F40C73 /* DelegateCell.swift */; };
-		644EC35C20EFB8E900F40C73 /* DelegateCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 644EC35A20EFB8E900F40C73 /* DelegateCell.xib */; };
+		644EC35B20EFB8E900F40C73 /* AdamantDelegateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35920EFB8E900F40C73 /* AdamantDelegateCell.swift */; };
+		644EC35C20EFB8E900F40C73 /* AdamantDelegateCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 644EC35A20EFB8E900F40C73 /* AdamantDelegateCell.xib */; };
 		644EC35E20F34F1E00F40C73 /* DelegateDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */; };
 		64A223D620F760BB005157CB /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D520F760BB005157CB /* Localization.swift */; };
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
@@ -212,8 +212,8 @@
 		644EC35120EFA9A300F40C73 /* DelegateRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateRoutes.swift; sourceTree = "<group>"; };
 		644EC35520EFAAB700F40C73 /* DelegatesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegatesListViewController.swift; sourceTree = "<group>"; };
 		644EC35620EFAAB700F40C73 /* DelegatesListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DelegatesListViewController.xib; sourceTree = "<group>"; };
-		644EC35920EFB8E900F40C73 /* DelegateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateCell.swift; sourceTree = "<group>"; };
-		644EC35A20EFB8E900F40C73 /* DelegateCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DelegateCell.xib; sourceTree = "<group>"; };
+		644EC35920EFB8E900F40C73 /* AdamantDelegateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantDelegateCell.swift; sourceTree = "<group>"; };
+		644EC35A20EFB8E900F40C73 /* AdamantDelegateCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AdamantDelegateCell.xib; sourceTree = "<group>"; };
 		644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateDetailsViewController.swift; sourceTree = "<group>"; };
 		64A223D520F760BB005157CB /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
@@ -445,8 +445,8 @@
 				644EC35120EFA9A300F40C73 /* DelegateRoutes.swift */,
 				644EC35520EFAAB700F40C73 /* DelegatesListViewController.swift */,
 				644EC35620EFAAB700F40C73 /* DelegatesListViewController.xib */,
-				644EC35920EFB8E900F40C73 /* DelegateCell.swift */,
-				644EC35A20EFB8E900F40C73 /* DelegateCell.xib */,
+				644EC35920EFB8E900F40C73 /* AdamantDelegateCell.swift */,
+				644EC35A20EFB8E900F40C73 /* AdamantDelegateCell.xib */,
 				644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */,
 			);
 			path = Delegates;
@@ -967,7 +967,7 @@
 				E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
 				E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */,
-				644EC35C20EFB8E900F40C73 /* DelegateCell.xib in Resources */,
+				644EC35C20EFB8E900F40C73 /* AdamantDelegateCell.xib in Resources */,
 				E9942B89203D9ECA00C163AF /* QrCell.xib in Resources */,
 				E921597D2065031D0000CA5C /* ButtonsStripe.xib in Resources */,
 				E9C51EED2011416E00385EB7 /* adamant-core.js in Resources */,
@@ -1154,7 +1154,7 @@
 				E983AE2120E655C500497E1A /* AccountHeaderView.swift in Sources */,
 				64E8305020F5FEEF006FA590 /* VotesAsset.swift in Sources */,
 				644EC35220EFA9A300F40C73 /* DelegateRoutes.swift in Sources */,
-				644EC35B20EFB8E900F40C73 /* DelegateCell.swift in Sources */,
+				644EC35B20EFB8E900F40C73 /* AdamantDelegateCell.swift in Sources */,
 				E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */,
 				E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */,
 				E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */,
