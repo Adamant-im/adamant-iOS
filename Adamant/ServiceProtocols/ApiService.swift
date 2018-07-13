@@ -123,5 +123,5 @@ protocol ApiService: class {
     func getForgingTime(for delegate: Delegate, completion: @escaping (ApiServiceResult<Int>) -> Void)
     
     /// Send vote transaction for delegates
-    func voteForDelegates(from address: String, keypair: Keypair, votes: [String], completion: @escaping (ApiServiceResult<UInt64>) -> Void)
+    func voteForDelegates(from address: String, keypair: Keypair, votes: [DelegateVote], completion: @escaping (ApiServiceResult<UInt64>) -> Void)
 }

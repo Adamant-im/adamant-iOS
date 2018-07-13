@@ -213,9 +213,19 @@ extension AdamantApiService {
         }
     }
     
-    func voteForDelegates(from address: String, keypair: Keypair, votes: [String], completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
+	func voteForDelegates(from address: String, keypair: Keypair, votes: [DelegateVote], completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
+		// MARK: 0. Prepare
+		var votesOrdered = votes
+		_ = votesOrdered.partition {
+			switch $0 {
+			case .upvote: return false
+			case .downvote: return true
+			}
+		}
+		
+		
         // MARK: 1. Create and sign transaction
-        let asset = TransactionAsset(votes: VotesAsset(votes: votes))
+		let asset = TransactionAsset(votes: VotesAsset(votes: votesOrdered))
         let transaction = NormalizedTransaction(type: .vote,
                                                 amount: 0,
                                                 senderPublicKey: keypair.publicKey,

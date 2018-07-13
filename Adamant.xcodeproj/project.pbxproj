@@ -134,6 +134,7 @@
 		E98FC34220F9209900032D65 /* UIColor+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98FC34120F9209900032D65 /* UIColor+adamant.swift */; };
 		E98FC34420F920BD00032D65 /* UIFont+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98FC34320F920BD00032D65 /* UIFont+adamant.swift */; };
 		E98FC34620F9210100032D65 /* Date+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98FC34520F9210100032D65 /* Date+adamant.swift */; };
+		E98FC34820F921EA00032D65 /* DelegateVote.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98FC34720F921EA00032D65 /* DelegateVote.swift */; };
 		E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */; };
 		E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */; };
 		E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B86203D9E5100C163AF /* EurekaQRRow.swift */; };
@@ -358,6 +359,7 @@
 		E98FC34120F9209900032D65 /* UIColor+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+adamant.swift"; sourceTree = "<group>"; };
 		E98FC34320F920BD00032D65 /* UIFont+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+adamant.swift"; sourceTree = "<group>"; };
 		E98FC34520F9210100032D65 /* Date+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+adamant.swift"; sourceTree = "<group>"; };
+		E98FC34720F921EA00032D65 /* DelegateVote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateVote.swift; sourceTree = "<group>"; };
 		E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRGeneratorViewController.swift; sourceTree = "<group>"; };
 		E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantQRTools.swift; sourceTree = "<group>"; };
 		E9942B86203D9E5100C163AF /* EurekaQRRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EurekaQRRow.swift; sourceTree = "<group>"; };
@@ -584,6 +586,7 @@
 				E98FC34320F920BD00032D65 /* UIFont+adamant.swift */,
 				E9147B5E20500E9300145913 /* MyLittlePinpad+adamant.swift */,
 				E9147B6220505C7500145913 /* QRCodeReader+adamant.swift */,
+				E98FC34720F921EA00032D65 /* DelegateVote.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -1252,6 +1255,7 @@
 				E9147B5F20500E9300145913 /* MyLittlePinpad+adamant.swift in Sources */,
 				E98FC34620F9210100032D65 /* Date+adamant.swift in Sources */,
 				E905D39D204C13B900DDB504 /* SecuredStore.swift in Sources */,
+				E98FC34820F921EA00032D65 /* DelegateVote.swift in Sources */,
 				E90055FB20ECE78A00D0CB2D /* SecurityViewController+notifications.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

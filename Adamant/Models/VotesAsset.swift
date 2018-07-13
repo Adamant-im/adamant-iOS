@@ -10,4 +10,12 @@ import Foundation
 
 struct VotesAsset: Codable {
     let votes: [String]
+	
+	init(votes: [String]) {
+		self.votes = votes
+	}
+	
+	init(votes: [DelegateVote]) {
+		self.votes = votes.map { $0.asString() }
+	}
 }
