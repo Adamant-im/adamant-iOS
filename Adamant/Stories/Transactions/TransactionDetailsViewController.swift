@@ -148,32 +148,7 @@ class TransactionDetailsViewController: UIViewController {
 	}
 	
 	
-	// MARK: - Autoupdate
 	
-    func startUpdate() {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-			guard let id = self?.transaction?.transactionId else {
-				return
-			}
-			
-			self?.transfersProvider.refreshTransfer(id: id) { result in
-				switch result {
-				case .success:
-					DispatchQueue.main.async {
-						self?.tableView.reloadData()
-					}
-					
-				case .failure:
-					return
-				}
-			}
-        }
-    }
-    
-    func stopUpdate() {
-        timer?.invalidate()
-    }
 }
 
 
@@ -331,5 +306,34 @@ extension TransactionDetailsViewController {
         }
 		
 		return cell
+	}
+}
+
+
+// MARK: - Autoupdate
+extension TransactionDetailsViewController {
+	func startUpdate() {
+		timer?.invalidate()
+		timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
+			guard let id = self?.transaction?.transactionId else {
+				return
+			}
+			
+			self?.transfersProvider.refreshTransfer(id: id) { result in
+				switch result {
+				case .success:
+					DispatchQueue.main.async {
+						self?.tableView.reloadData()
+					}
+					
+				case .failure:
+					return
+				}
+			}
+		}
+	}
+	
+	func stopUpdate() {
+		timer?.invalidate()
 	}
 }

@@ -17,11 +17,7 @@ extension String.adamantLocalized {
         static let notEnoughtTokensForVote = NSLocalizedString("Delegates.NotEnoughtTokensForVote", comment: "Delegates tab: Message about 50 ADM fee for vote")
         
         static let success = NSLocalizedString("Delegates.Vote.Success", comment: "Delegates: Message for Successfull voting")
-        
-        static let now = NSLocalizedString("Delegates.Now", comment: "Delegates: 'Now!' label")
-        static let unitMinutes = NSLocalizedString("Delegates.Units.Minutes", comment: "Delegates: Units 'Minutes'")
-        static let unitSeconds = NSLocalizedString("Delegates.Units.Seconds", comment: "Delegates: Units 'Seconds'")
-        
+		
         private init() { }
     }
 }
@@ -108,6 +104,14 @@ class DelegatesListViewController: UIViewController {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
+	
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = false
+		}
+	}
 
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
         if let address = accountService.account?.address {

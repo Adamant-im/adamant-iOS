@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Delegate.swift
 //  Adamant
 //
 //  Created by Anton Boyarkin on 06/07/2018.

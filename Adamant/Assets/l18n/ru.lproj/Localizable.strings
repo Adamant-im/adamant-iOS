@@ -217,28 +217,44 @@
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Вам нужно иметь 50 ADM на счете вашего акаунта";
 
-/* Delegate Details Screen: Rows titles */
-"Delegates.Row.Username" = "Имя";
-"Delegates.Row.Address" = "Адрес";
-"Delegates.Row.PublicKey" = "Публичный ключ";
-"Delegates.Row.VoteWeight" = "Вес голоса";
-"Delegates.Row.ProducedBlocks" = "Обработано";
-"Delegates.Row.MissedBlocks" = "Пропущено";
-"Delegates.Row.Rate" = "Позиция";
-"Delegates.Row.Rank" = "Ранг";
-"Delegates.Row.Approval" = "Блоков";
-"Delegates.Row.Productivity" = "Аптайм";
-"Delegates.Row.ForgetingTime" = "Время форжинга";
-"Delegates.Row.Forged" = "Сфоржено";
+/* Delegate details: scene title */
+"DelegateDetails.Title" = "Подробности";
 
-/* Delegates: 'Now!' label */
-"Delegates.Now" = "Сейчас!";
+/* Delegate Details Screen: Rows title for 'Username'" */
+"DelegateDetails.Row.Username" = "Имя";
 
-/* Delegates: Units 'Minutes' */
-"Delegates.Units.Minutes" = "мин";
+/* Delegate Details Screen: Rows title for 'Address'" */
+"DelegateDetails.Row.Address" = "Адрес";
 
-/* Delegates: Units 'Seconds' */
-"Delegates.Units.Seconds" = "сек";
+/* Delegate Details Screen: Rows title for 'Public Key'" */
+"DelegateDetails.Row.PublicKey" = "Публичный ключ";
+
+/* Delegate Details Screen: Rows title for 'Vote weight'" */
+"DelegateDetails.Row.VoteWeight" = "Вес голоса";
+
+/* Delegate Details Screen: Rows title for 'Produced blocks'" */
+"DelegateDetails.Row.ProducedBlocks" = "Обработано";
+
+/* Delegate Details Screen: Rows title for 'Missed blocks'" */
+"DelegateDetails.Row.MissedBlocks" = "Пропущено";
+
+/* Delegate Details Screen: Rows title for 'Rate'" */
+"DelegateDetails.Row.Rate" = "Позиция";
+
+/* Delegate Details Screen: Rows title for 'Rank'" */
+"DelegateDetails.Row.Rank" = "Ранг";
+
+/* Delegate Details Screen: Rows title for 'Approval'" */
+"DelegateDetails.Row.Approval" = "Блоков";
+
+/* Delegate Details Screen: Rows title for 'Productivity'" */
+"DelegateDetails.Row.Productivity" = "Аптайм";
+
+/* Delegate Details Screen: Rows title for 'Forging time'" */
+"DelegateDetails.Row.ForgingTime" = "Время форжинга";
+
+/* Delegate Details Screen: Rows title for 'Forged'" */
+"DelegateDetails.Row.Forged" = "Сфоржено";
 
 /* Delegates: Message for Successfull voting */
 "Delegates.Vote.Success" = "Ваш голос отправлен";

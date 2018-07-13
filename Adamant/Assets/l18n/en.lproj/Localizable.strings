@@ -217,28 +217,44 @@
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Not enought tokens for vote. You need to have 50 ADM on your account balance";
 
-/* Delegate Details Screen: Rows titles */
-"Delegates.Row.Username" = "Username";
-"Delegates.Row.Address" = "Address";
-"Delegates.Row.PublicKey" = "Public Key";
-"Delegates.Row.VoteWeight" = "Vote weight";
-"Delegates.Row.ProducedBlocks" = "Produced blocks";
-"Delegates.Row.MissedBlocks" = "Missed blocks";
-"Delegates.Row.Rate" = "Rate";
-"Delegates.Row.Rank" = "Rank";
-"Delegates.Row.Approval" = "Approval";
-"Delegates.Row.Productivity" = "Productivity";
-"Delegates.Row.ForgetingTime" = "Forgeting time";
-"Delegates.Row.Forged" = "Forged";
+/* Delegate details: scene title */
+"DelegateDetails.Title" = "Details";
 
-/* Delegates: 'Now!' label */
-"Delegates.Now" = "Now!";
+/* Delegate Details Screen: Rows title for 'Username'" */
+"DelegateDetails.Row.Username" = "Username";
 
-/* Delegates: Units 'Minutes' */
-"Delegates.Units.Minutes" = "min";
+/* Delegate Details Screen: Rows title for 'Address'" */
+"DelegateDetails.Row.Address" = "Address";
 
-/* Delegates: Units 'Seconds' */
-"Delegates.Units.Seconds" = "sec";
+/* Delegate Details Screen: Rows title for 'Public Key'" */
+"DelegateDetails.Row.PublicKey" = "Public Key";
+
+/* Delegate Details Screen: Rows title for 'Vote weight'" */
+"DelegateDetails.Row.VoteWeight" = "Vote weight";
+
+/* Delegate Details Screen: Rows title for 'Produced blocks'" */
+"DelegateDetails.Row.ProducedBlocks" = "Produced blocks";
+
+/* Delegate Details Screen: Rows title for 'Missed blocks'" */
+"DelegateDetails.Row.MissedBlocks" = "Missed blocks";
+
+/* Delegate Details Screen: Rows title for 'Rate'" */
+"DelegateDetails.Row.Rate" = "Rate";
+
+/* Delegate Details Screen: Rows title for 'Rank'" */
+"DelegateDetails.Row.Rank" = "Rank";
+
+/* Delegate Details Screen: Rows title for 'Approval'" */
+"DelegateDetails.Row.Approval" = "Approval";
+
+/* Delegate Details Screen: Rows title for 'Productivity'" */
+"DelegateDetails.Row.Productivity" = "Productivity";
+
+/* Delegate Details Screen: Rows title for 'Forging time'" */
+"DelegateDetails.Row.ForgingTime" = "Forging time";
+
+/* Delegate Details Screen: Rows title for 'Forged'" */
+"DelegateDetails.Row.Forged" = "Forged";
 
 /* Delegates: Message for Successfull voting */
 "Delegates.Vote.Success" = "Your vote has been sent";

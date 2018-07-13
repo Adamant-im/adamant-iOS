@@ -7,10 +7,19 @@
 //
 
 import UIKit
-import Eureka
 import SafariServices
+import DateToolsSwift
 
-class DelegateDetailsViewController: FormViewController {
+// MARK: - Localization
+extension String.adamantLocalized {
+	struct delegateDetails {
+		static let title = NSLocalizedString("DelegateDetails.Title", comment: "Delegate details: scene title")
+	}
+}
+
+
+// MARK: -
+class DelegateDetailsViewController: UITableViewController {
     
     // MARK: - Rows
     fileprivate enum Row: Int {
@@ -24,79 +33,33 @@ class DelegateDetailsViewController: FormViewController {
         case rank
         case approval
         case productivity
-        case forgetingTime
+        case forgingTime
         case forged
         case openInExplorer
-        
-        var tag: String {
-            switch self {
-            case .username:
-                return "username"
-            case .address:
-                return "address"
-            case .publicKey:
-                return "publicKey"
-            case .vote:
-                return "vote"
-            case .producedblocks:
-                return "producedblocks"
-            case .missedblocks:
-                return "missedblocks"
-            case .rate:
-                return "rate"
-            case .rank:
-                return "rank"
-            case .approval:
-                return "approval"
-            case .productivity:
-                return "productivity"
-            case .forgetingTime:
-                return "forgetingTime"
-            case .forged:
-                return "forged"
-                
-            case .openInExplorer: return "openInExplorer"
-
-                
-            default:
-                return ""
-            }
-        }
-        
+		
+		static let total = 13
+		
         var localized: String {
             switch self {
-            case .username:
-                return NSLocalizedString("Delegates.Row.Username", comment: "Delegate Details Screen: Rows title for 'Username'")
-            case .address:
-                return NSLocalizedString("Delegates.Row.Address", comment: "Delegate Details Screen: Rows title for 'Address'")
-            case .publicKey:
-                return NSLocalizedString("Delegates.Row.PublicKey", comment: "Delegate Details Screen: Rows title for 'Public Key'")
-            case .vote:
-                return NSLocalizedString("Delegates.Row.VoteWeight", comment: "Delegate Details Screen: Rows title for 'Vote weight'")
-            case .producedblocks:
-                return NSLocalizedString("Delegates.Row.ProducedBlocks", comment: "Delegate Details Screen: Rows title for 'Produced blocks'")
-            case .missedblocks:
-                return NSLocalizedString("Delegates.Row.MissedBlocks", comment: "Delegate Details Screen: Rows title for 'Missed blocks'")
-            case .rate:
-                return NSLocalizedString("Delegates.Row.Rate", comment: "Delegate Details Screen: Rows title for 'Rate'")
-            case .rank:
-                return NSLocalizedString("Delegates.Row.Rank", comment: "Delegate Details Screen: Rows title for 'Rank'")
-            case .approval:
-                return NSLocalizedString("Delegates.Row.Approval", comment: "Delegate Details Screen: Rows title for 'Approval'")
-            case .productivity:
-                return NSLocalizedString("Delegates.Row.Productivity", comment: "Delegate Details Screen: Rows title for 'Productivity'")
-            case .forgetingTime:
-                return NSLocalizedString("Delegates.Row.ForgetingTime", comment: "Delegate Details Screen: Rows title for 'Forgeting time'")
-            case .forged:
-                return NSLocalizedString("Delegates.Row.Forged", comment: "Delegate Details Screen: Rows title for 'Forged'")
-                
-            case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
-                
-                
-            default:
-                return ""
+			case .username: return NSLocalizedString("DelegateDetails.Row.Username", comment: "Delegate Details Screen: Rows title for 'Username'")
+			case .address: return NSLocalizedString("DelegateDetails.Row.Address", comment: "Delegate Details Screen: Rows title for 'Address'")
+			case .publicKey: return NSLocalizedString("DelegateDetails.Row.PublicKey", comment: "Delegate Details Screen: Rows title for 'Public Key'")
+			case .vote: return NSLocalizedString("DelegateDetails.Row.VoteWeight", comment: "Delegate Details Screen: Rows title for 'Vote weight'")
+			case .producedblocks: return NSLocalizedString("DelegateDetails.Row.ProducedBlocks", comment: "Delegate Details Screen: Rows title for 'Produced blocks'")
+			case .missedblocks: return NSLocalizedString("DelegateDetails.Row.MissedBlocks", comment: "Delegate Details Screen: Rows title for 'Missed blocks'")
+			case .rate: return NSLocalizedString("DelegateDetails.Row.Rate", comment: "Delegate Details Screen: Rows title for 'Rate'")
+			case .rank: return NSLocalizedString("DelegateDetails.Row.Rank", comment: "Delegate Details Screen: Rows title for 'Rank'")
+			case .approval: return NSLocalizedString("DelegateDetails.Row.Approval", comment: "Delegate Details Screen: Rows title for 'Approval'")
+			case .productivity: return NSLocalizedString("DelegateDetails.Row.Productivity", comment: "Delegate Details Screen: Rows title for 'Productivity'")
+			case .forgingTime: return NSLocalizedString("DelegateDetails.Row.ForgingTime", comment: "Delegate Details Screen: Rows title for 'Forging time'")
+			case .forged: return NSLocalizedString("DelegateDetails.Row.Forged", comment: "Delegate Details Screen: Rows title for 'Forged'")
+			case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
             }
         }
+		
+		func indexPathFor(section: Int) -> IndexPath {
+			return IndexPath(item: rawValue, section: section)
+		}
     }
     
     // MARK: - Dependencies
@@ -105,298 +68,244 @@ class DelegateDetailsViewController: FormViewController {
     var dialogService: DialogService!
     
     // MARK: - Properties
+	private let delegateUrl = "https://explorer.adamant.im/delegate/"
+	private let cellIdentifier = "cell"
+	
     var delegate: Delegate?
     
     private let autoupdateInterval: TimeInterval = 5.0
     
     weak var timer: Timer?
 
+	lazy var percentFormatter: NumberFormatter = {
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .percent
+		formatter.minimumFractionDigits = 0
+		formatter.maximumFractionDigits = 2
+		return formatter
+	}()
+	
+	lazy var durationFormatter: DateComponentsFormatter = {
+		let formatter = DateComponentsFormatter()
+		formatter.allowedUnits = [ .hour, .minute, .second ]
+		formatter.unitsStyle = .brief
+		formatter.zeroFormattingBehavior = .dropLeading
+
+		return formatter
+	}()
+	
+	private var forged: Decimal? = nil
+	private var forgingTime: TimeInterval? = nil
+	
+	
+	// MARK: - Lifecycle
+	
     override func viewDidLoad() {
         super.viewDidLoad()
         
         if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = true
+            navigationController?.navigationBar.prefersLargeTitles = false
         }
         
-        navigationItem.title = String.adamantLocalized.transactionDetails.title
-        
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.roundingMode = .floor
-        formatter.positiveFormat = "#.##"
-        formatter.positiveSuffix = "%"
-        
-        let currencyFormatter = NumberFormatter()
-        currencyFormatter.numberStyle = .decimal
-        currencyFormatter.roundingMode = .floor
-        currencyFormatter.positiveFormat = "#.########"
-        currencyFormatter.positiveSuffix = " \(AdamantUtilities.currencyCode)"
-        
-        form +++ Section()
-            
-            <<< TextRow() {
-                $0.disabled = true
-                $0.tag = Row.username.tag
-                $0.title = Row.username.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.value {
-                        self.shareValue(text)
-                    }
-                })
-        
-            <<< TextRow() {
-                $0.disabled = true
-                $0.tag = Row.address.tag
-                $0.title = Row.address.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.value {
-                        self.shareValue(text)
-                    }
-                })
-        
-            <<< TextRow() {
-                $0.disabled = true
-                $0.tag = Row.publicKey.tag
-                $0.title = Row.publicKey.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.value {
-                        self.shareValue(text)
-                    }
-                })
-        
-            <<< DecimalRow() {
-                $0.disabled = true
-                $0.tag = Row.vote.tag
-                $0.title = Row.vote.localized
-                $0.formatter = currencyFormatter
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }
-        
-            <<< IntRow() {
-                $0.disabled = true
-                $0.tag = Row.producedblocks.tag
-                $0.title = Row.producedblocks.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }
-        
-            <<< IntRow() {
-                $0.disabled = true
-                $0.tag = Row.missedblocks.tag
-                $0.title = Row.missedblocks.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }
-        
-            <<< IntRow() {
-                $0.disabled = true
-                $0.tag = Row.rate.tag
-                $0.title = Row.rate.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }
-        
-            <<< IntRow() {
-                $0.disabled = true
-                $0.tag = Row.rank.tag
-                $0.title = Row.rank.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }
-        
-            <<< DecimalRow() {
-                $0.disabled = true
-                $0.tag = Row.approval.tag
-                $0.title = Row.approval.localized
-                $0.formatter = formatter
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }
-        
-            <<< DecimalRow() {
-                $0.disabled = true
-                $0.tag = Row.productivity.tag
-                $0.title = Row.productivity.localized
-                $0.formatter = formatter
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }
-            
-            <<< TextRow() {
-                $0.disabled = true
-                $0.tag = Row.forgetingTime.tag
-                $0.title = Row.forgetingTime.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }
-            
-            <<< DecimalRow() {
-                $0.disabled = true
-                $0.tag = Row.forged.tag
-                $0.title = Row.forged.localized
-                $0.formatter = currencyFormatter
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }
-        
-            <<< LabelRow() {
-                $0.hidden = true
-                $0.tag = Row.openInExplorer.tag
-                $0.title = Row.openInExplorer.localized
-                }
-                .cellSetup({ (cell, _) in
-                    cell.selectionStyle = .gray
-                })
-                .cellUpdate({ (cell, _) in
-                    if let label = cell.textLabel {
-                        label.font = UIFont.adamantPrimary(ofSize: 17)
-                        label.textColor = UIColor.adamantPrimary
-                    }
-                    
-                    cell.accessoryType = .disclosureIndicator
-                })
-                .onCellSelection({ [weak self] (_, row) in
-                    if let address = self?.delegate?.address, let url = URL(string: "https://explorer.adamant.im/delegate/\(address)") {
-                        let safari = SFSafariViewController(url: url)
-                        safari.preferredControlTintColor = UIColor.adamantPrimary
-                        self?.present(safari, animated: true, completion: nil)
-                    }
-                })
+        navigationItem.title = String.adamantLocalized.delegateDetails.title
         
         if let delegate = delegate {
-            updateDetails(with: delegate)
+			refreshData(with: delegate)
         }
     }
-    
-    private func updateDetails(with delegate: Delegate) {
+	
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		
+		if let indexPath = tableView.indexPathForSelectedRow {
+			tableView.deselectRow(at: indexPath, animated: true)
+		}
+		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = false
+		}
+	}
+}
 
-        if let row: TextRow = self.form.rowBy(tag: Row.username.tag) {
-            row.value = delegate.username
-            row.reload()
-        }
 
-        if let row: TextRow = self.form.rowBy(tag: Row.address.tag) {
-            row.value = delegate.address
-            row.reload()
-        }
+// MARK: - TableView data & delegate
+extension DelegateDetailsViewController {
+	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+		if delegate != nil {
+			return Row.total
+		} else {
+			return 0
+		}
+	}
+	
+	override func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+		return true
+	}
+	
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		guard let row = Row(rawValue: indexPath.row) else {
+			return
+		}
+		
+		switch row {
+		case .openInExplorer:
+			guard let address = delegate?.address, let url = URL(string: delegateUrl + address) else {
+				return
+			}
+			
+			let safari = SFSafariViewController(url: url)
+			safari.preferredControlTintColor = UIColor.adamantPrimary
+			present(safari, animated: true, completion: nil)
+			
+		default:
+			guard let cell = tableView.cellForRow(at: indexPath), let value = cell.detailTextLabel?.text else {
+				return
+			}
+			
+			let completion = { [weak self] in
+				guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
+					return
+				}
+				tableView.deselectRow(at: indexPath, animated: true)
+			}
+			
+			dialogService.presentShareAlertFor(string: value,
+											   types: [.copyToPasteboard, .share],
+											   excludedActivityTypes: nil,
+											   animated: true,
+											   completion: completion)
+		}
+	}
+}
 
-        if let row: TextRow = self.form.rowBy(tag: Row.publicKey.tag) {
-            row.value = delegate.publicKey
-            row.reload()
-        }
-        
-        if let row: DecimalRow = self.form.rowBy(tag: Row.vote.tag) {
-            let votesWeight = Decimal(string: delegate.vote) ?? 0
-            row.value = (votesWeight.shiftedFromAdamant() as NSDecimalNumber).doubleValue
-            row.reload()
-        }
-        
-        if let row: IntRow = self.form.rowBy(tag: Row.producedblocks.tag) {
-            row.value = delegate.producedblocks
-            row.reload()
-        }
-        
-        if let row: IntRow = self.form.rowBy(tag: Row.missedblocks.tag) {
-            row.value = delegate.missedblocks
-            row.reload()
-        }
-        
-        if let row: IntRow = self.form.rowBy(tag: Row.rate.tag) {
-            row.value = delegate.rate
-            row.reload()
-        }
-        
-        if let row: IntRow = self.form.rowBy(tag: Row.rank.tag) {
-            row.value = delegate.rank
-            row.reload()
-        }
 
-        if let row: DecimalRow = self.form.rowBy(tag: Row.approval.tag) {
-            row.value = delegate.approval
-            row.reload()
-        }
-        
-        if let row: DecimalRow = self.form.rowBy(tag: Row.productivity.tag) {
-            row.value = delegate.productivity
-            row.reload()
-        }
-        
-        if let row: LabelRow = self.form.rowBy(tag: Row.openInExplorer.tag) {
-            row.hidden = false
-            row.evaluateHidden()
-        }
-        
-        self.apiService.getForgedByAccount(publicKey: delegate.publicKey) { (result) in
-            switch result {
-            case .success(let details):
-                print(details)
-                
-                DispatchQueue.main.async {
-                    if let row: DecimalRow = self.form.rowBy(tag: Row.forged.tag) {
-                        row.value = (details.forged as NSDecimalNumber).doubleValue
-                        row.reload()
-                    }
-                }
-            case .failure(let error):
-                print(error)
-                self.dialogService.showError(withMessage: error.localized, error: error)
-            }
-        }
-        
-        self.apiService.getForgingTime(for: delegate) { result in
-            switch result {
-            case .success(let seconds):
-                print(seconds)
-                if let row: TextRow = self.form.rowBy(tag: Row.forgetingTime.tag) {
-                    if seconds < 0 {
-                        row.value = "..."
-                    } else if seconds == 0 {
-                        row.value = String.adamantLocalized.delegates.now
-                    } else {
-                        let minutes = floor(Double(seconds) / 60)
-                        let seconds = Double(seconds) - (minutes * 60)
-                        if minutes > 0 && seconds > 0 {
-                            row.value = "\(Int(minutes)) \(String.adamantLocalized.delegates.unitMinutes) \(Int(seconds)) \(String.adamantLocalized.delegates.unitSeconds)"
-                        } else if minutes > 0 {
-                            row.value = "\(Int(minutes)) \(String.adamantLocalized.delegates.unitMinutes)"
-                        } else {
-                            row.value = "\(Int(seconds)) \(String.adamantLocalized.delegates.unitSeconds)"
-                        }
-                    }
-                    
-                    DispatchQueue.main.async {
-                        row.reload()
-                    }
-                }
-                
-            case .failure(let error):
-                print(error)
-                self.dialogService.showError(withMessage: error.localized, error: error)
-            }
-        }
-    }
-    
-    // MARK: - Privare tools
-    private func updateCell(_ cell: BaseCell) {
-        cell.textLabel?.textColor = UIColor.adamantPrimary
-        cell.detailTextLabel?.textColor = UIColor.adamantSecondary
-        
-        let font = UIFont.adamantPrimary(ofSize: 17)
-        cell.textLabel?.font = font
-        cell.detailTextLabel?.font = font
-    }
-    
-    private func shareValue( _ value: String) {
-        dialogService.presentShareAlertFor(string: value,
-                                           types: [.copyToPasteboard, .share],
-                                           excludedActivityTypes: nil,
-                                           animated: true, completion: nil)
-    }
+// MARK: - Cells
+extension DelegateDetailsViewController {
+	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		guard let delegate = delegate, let row = Row(rawValue: indexPath.row) else {
+			return UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
+		}
+		
+		let cell: UITableViewCell
+		if let c = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
+			cell = c
+			cell.accessoryType = .none
+		} else {
+			cell = UITableViewCell(style: .value1, reuseIdentifier: cellIdentifier)
+		}
+		
+		cell.textLabel?.text = row.localized
+		cell.accessoryType = .none
+		
+		switch row {
+		case .username:
+			cell.detailTextLabel?.text = delegate.username
+			
+		case .address:
+			cell.detailTextLabel?.text = delegate.address
+			
+		case .publicKey:
+			cell.detailTextLabel?.text = delegate.publicKey
+			
+		case .vote:
+			let text: String?
+			if let voteRaw = Decimal(string: delegate.vote) {
+				text = AdamantUtilities.currencyFormatter.string(for: voteRaw.shiftedFromAdamant())
+			} else {
+				text = AdamantUtilities.currencyFormatter.string(from: 0)
+			}
+			
+			cell.detailTextLabel?.text = text
+			
+		case .producedblocks:
+			cell.detailTextLabel?.text = String(delegate.producedblocks)
+			
+		case .missedblocks:
+			cell.detailTextLabel?.text = String(delegate.missedblocks)
+			
+		case .rate:
+			cell.detailTextLabel?.text = String(delegate.rate)
+			
+		case .rank:
+			cell.detailTextLabel?.text = String(delegate.rank)
+			
+		case .approval:
+			let text = percentFormatter.string(for: (delegate.approval / 100.0))
+			cell.detailTextLabel?.text = text
+			
+		case .productivity:
+			let text = percentFormatter.string(for: (delegate.productivity / 100.0))
+			cell.detailTextLabel?.text = text
+			
+		case .openInExplorer:
+			cell.accessoryType = .disclosureIndicator
+			cell.detailTextLabel?.text = nil
+			
+		case .forgingTime:
+			if let forgingTime = forgingTime {
+				if forgingTime > 0 {
+					cell.detailTextLabel?.text = durationFormatter.string(from: forgingTime)
+				} else {
+					cell.detailTextLabel?.text = NSLocalizedString("Just now", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
+				}
+				
+			} else {
+				cell.detailTextLabel?.text = "..."
+			}
+			
+		case .forged:
+			cell.detailTextLabel?.text = AdamantUtilities.currencyFormatter.string(for: forged)
+		}
+		
+		return cell
+	}
+}
+
+
+// MARK: - Tools
+extension DelegateDetailsViewController {
+	private func refreshData(with delegate: Delegate) {
+		// Get forged amount
+		self.apiService.getForgedByAccount(publicKey: delegate.publicKey) { [weak self] result in
+			switch result {
+			case .success(let details):
+				self?.forged = details.forged
+				
+				DispatchQueue.main.async {
+					guard let tableView = self?.tableView else {
+						return
+					}
+					
+					let indexPath = Row.forged.indexPathFor(section: 0)
+					tableView.reloadRows(at: [indexPath], with: .none)
+				}
+			case .failure(let error):
+				self?.dialogService.showError(withMessage: error.localized, error: error)
+			}
+		}
+		
+		// Get forging time
+		self.apiService.getForgingTime(for: delegate) { [weak self] result in
+			switch result {
+			case .success(let seconds):
+				if seconds >= 0 {
+					self?.forgingTime = TimeInterval(exactly: seconds)
+				} else {
+					self?.forgingTime = nil
+				}
+				
+				DispatchQueue.main.async {
+					guard let tableView = self?.tableView else {
+						return
+					}
+					
+					let indexPath = Row.forgingTime.indexPathFor(section: 0)
+					tableView.reloadRows(at: [indexPath], with: .none)
+				}
+				
+			case .failure(let error):
+				self?.dialogService.showError(withMessage: error.localized, error: error)
+			}
+		}
+	}
 }
