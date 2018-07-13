@@ -1,8 +1,8 @@
 //
-//  GlobalConstants.swift
+//  UIColor+adamant.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 10.01.2018.
+//  Created by Anokhov Pavel on 13.07.2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
@@ -25,8 +25,8 @@ extension UIColor {
 	
 	/// User chat bubble background, ~4% gray
 	static let adamantChatRecipientBackground = UIColor(red: 0.965, green: 0.973, blue: 0.981, alpha: 1)
-    static let adamantPendingChatBackground = UIColor(white: 0.98, alpha: 1.0)
-    static let adamantFailChatBackground = UIColor(white: 0.8, alpha: 1.0)
+	static let adamantPendingChatBackground = UIColor(white: 0.98, alpha: 1.0)
+	static let adamantFailChatBackground = UIColor(white: 0.8, alpha: 1.0)
 	
 	/// Partner chat bubble background, ~8% gray
 	static let adamantChatSenderBackground = UIColor(red: 0.925, green: 0.925, blue: 0.925, alpha: 1)
@@ -35,39 +35,4 @@ extension UIColor {
 	// MARK: Pinpad
 	/// Pinpad highligh button background, 12% gray
 	static let adamantPinpadHighlightButton = UIColor(red: 0.88, green: 0.88, blue: 0.88, alpha: 1)
-}
-
-extension UIFont {
-	static func adamantPrimary(ofSize size: CGFloat) -> UIFont {
-		return UIFont(name: "Exo 2", size: size)!
-	}
-	
-	static func adamantPrimary(ofSize size: CGFloat, weight: UIFont.Weight) -> UIFont {
-		let name: String
-		
-		switch weight {
-		case UIFont.Weight.bold:
-			name = "Exo 2 Bold"
-			
-		case UIFont.Weight.medium:
-			name = "Exo 2 Medium"
-			
-		case UIFont.Weight.thin:
-			name = "Exo 2 Thin"
-			
-		case UIFont.Weight.light:
-			name = "Exo 2 Light"
-			
-		default:
-			name = "Exo 2"
-		}
-		
-		return UIFont(name: name, size: size)!
-	}
-	
-	static var adamantChatDefault = UIFont.systemFont(ofSize: 17)
-}
-
-extension Date {
-	static let adamantNullDate = Date(timeIntervalSince1970: 0)
 }
