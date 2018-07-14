@@ -140,9 +140,13 @@ class ShareQrViewController: FormViewController {
 				vc.excludedActivityTypes = excludedActivityTypes
 			}
 			
-			vc.completionWithItemsHandler = { [weak self] (_, success: Bool, _, _) in
-				if success {
-					self?.dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
+			vc.completionWithItemsHandler = { [weak self] (type: UIActivityType?, completed: Bool, _, error: Error?) in
+				if completed {
+					if let error = error {
+						self?.dialogService.showWarning(withMessage: error.localizedDescription)
+					} else {
+						self?.dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
+					}
 					self?.close()
 				}
 			}
