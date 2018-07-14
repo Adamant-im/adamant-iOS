@@ -86,6 +86,7 @@ class DelegatesListViewController: UIViewController {
         downVotesLabel.text = ""
         newVotesLabel.text = ""
         totalVotesLabel.text = ""
+		voteBtn.isEnabled = false
         
         refreshControl.beginRefreshing()
         handleRefresh(refreshControl)
@@ -303,7 +304,7 @@ extension DelegatesListViewController {
 		
 		let totalVoted = delegates.reduce(0) { $0 + ($1.voted ? 1 : 0) } + upvoted - downvoted
 		
-		let votingEnabled = delegatesChanges.count <= maxVotes && totalVoted <= maxTotalVotes
+		let votingEnabled = delegatesChanges.count > 0 && delegatesChanges.count <= maxVotes && totalVoted <= maxTotalVotes
 		let newVotesColor = delegatesChanges.count > maxVotes ? UIColor.red : UIColor.darkText
 		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.red : UIColor.darkText
 		

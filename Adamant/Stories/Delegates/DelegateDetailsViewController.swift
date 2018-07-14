@@ -24,20 +24,20 @@ class DelegateDetailsViewController: UITableViewController {
     // MARK: - Rows
     fileprivate enum Row: Int {
         case username = 0
+		case rank
         case address
         case publicKey
         case vote
         case producedblocks
         case missedblocks
-        case rate
-        case rank
+//        case rate
         case approval
         case productivity
         case forgingTime
         case forged
         case openInExplorer
 		
-		static let total = 13
+		static let total = 12
 		
         var localized: String {
             switch self {
@@ -47,13 +47,13 @@ class DelegateDetailsViewController: UITableViewController {
 			case .vote: return NSLocalizedString("DelegateDetails.Row.VoteWeight", comment: "Delegate Details Screen: Rows title for 'Vote weight'")
 			case .producedblocks: return NSLocalizedString("DelegateDetails.Row.ProducedBlocks", comment: "Delegate Details Screen: Rows title for 'Produced blocks'")
 			case .missedblocks: return NSLocalizedString("DelegateDetails.Row.MissedBlocks", comment: "Delegate Details Screen: Rows title for 'Missed blocks'")
-			case .rate: return NSLocalizedString("DelegateDetails.Row.Rate", comment: "Delegate Details Screen: Rows title for 'Rate'")
 			case .rank: return NSLocalizedString("DelegateDetails.Row.Rank", comment: "Delegate Details Screen: Rows title for 'Rank'")
 			case .approval: return NSLocalizedString("DelegateDetails.Row.Approval", comment: "Delegate Details Screen: Rows title for 'Approval'")
 			case .productivity: return NSLocalizedString("DelegateDetails.Row.Productivity", comment: "Delegate Details Screen: Rows title for 'Productivity'")
 			case .forgingTime: return NSLocalizedString("DelegateDetails.Row.ForgingTime", comment: "Delegate Details Screen: Rows title for 'Forging time'")
 			case .forged: return NSLocalizedString("DelegateDetails.Row.Forged", comment: "Delegate Details Screen: Rows title for 'Forged'")
 			case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
+//			case .rate: return NSLocalizedString("DelegateDetails.Row.Rate", comment: "Delegate Details Screen: Rows title for 'Rate'")
             }
         }
 		
@@ -166,7 +166,8 @@ extension DelegateDetailsViewController {
 			present(safari, animated: true, completion: nil)
 			
 		default:
-			guard let cell = tableView.cellForRow(at: indexPath), let value = cell.detailTextLabel?.text else {
+			guard let cell = tableView.cellForRow(at: indexPath), let value = cell.detailTextLabel?.text, value.count > 0 else {
+				tableView.deselectRow(at: indexPath, animated: true)
 				return
 			}
 			
@@ -217,23 +218,14 @@ extension DelegateDetailsViewController {
 			cell.detailTextLabel?.text = delegate.publicKey
 			
 		case .vote:
-			let text: String?
-			if let voteRaw = Decimal(string: delegate.vote) {
-				text = AdamantUtilities.currencyFormatter.string(for: voteRaw.shiftedFromAdamant())
-			} else {
-				text = AdamantUtilities.currencyFormatter.string(from: 0)
-			}
-			
-			cell.detailTextLabel?.text = text
+			let weight = Decimal(string: delegate.vote)?.shiftedFromAdamant() ?? 0
+			cell.detailTextLabel?.text = AdamantUtilities.currencyFormatterShort.string(for: weight)
 			
 		case .producedblocks:
 			cell.detailTextLabel?.text = String(delegate.producedblocks)
 			
 		case .missedblocks:
 			cell.detailTextLabel?.text = String(delegate.missedblocks)
-			
-		case .rate:
-			cell.detailTextLabel?.text = String(delegate.rate)
 			
 		case .rank:
 			cell.detailTextLabel?.text = String(delegate.rank)
@@ -263,7 +255,7 @@ extension DelegateDetailsViewController {
 			}
 			
 		case .forged:
-			cell.detailTextLabel?.text = AdamantUtilities.currencyFormatter.string(for: forged)
+			cell.detailTextLabel?.text = AdamantUtilities.currencyFormatterShort.string(for: forged)
 		}
 		
 		return cell
