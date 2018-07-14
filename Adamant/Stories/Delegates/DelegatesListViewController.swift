@@ -188,9 +188,13 @@ extension DelegatesListViewController: AdamantDelegateCellDelegate {
 			return
 		}
 		
-		var delegate = delegates[indexPath.row]
-		delegate.voted = state
-		delegatesChanges.append(indexPath)
+		if state {
+			if !delegatesChanges.contains(indexPath) {
+				delegatesChanges.append(indexPath)
+			}
+		} else if let index = delegatesChanges.index(of: indexPath) {
+			delegatesChanges.remove(at: index)
+		}
 		
 		updateVotePanel()
 	}
@@ -231,13 +235,20 @@ extension DelegatesListViewController {
 		
 		dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
 		
-		self.apiService.voteForDelegates(from: account.address, keypair: keypair, votes: votes) { [weak self] result in
+		apiService.voteForDelegates(from: account.address, keypair: keypair, votes: votes) { [weak self] result in
 			switch result {
 			case .success:
 				self?.dialogService.showSuccess(withMessage: String.adamantLocalized.delegates.success)
 				
 				if let refreshControl = self?.refreshControl {
-					refreshControl.beginRefreshing()
+					if Thread.isMainThread {
+						refreshControl.beginRefreshing()
+					} else {
+						DispatchQueue.main.async {
+							refreshControl.beginRefreshing()
+						}
+					}
+					
 					self?.handleRefresh(refreshControl)
 				}
 				

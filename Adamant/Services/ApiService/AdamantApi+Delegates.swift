@@ -223,9 +223,10 @@ extension AdamantApiService {
 			}
 		}
 		
+		let votesAsset = VotesAsset(votes: votesOrdered)
 		
         // MARK: 1. Create and sign transaction
-		let asset = TransactionAsset(votes: VotesAsset(votes: votesOrdered))
+		let asset = TransactionAsset(votes: votesAsset)
         let transaction = NormalizedTransaction(type: .vote,
                                                 amount: 0,
                                                 senderPublicKey: keypair.publicKey,
@@ -237,7 +238,7 @@ extension AdamantApiService {
             completion(.failure(.internalError(message: "Failed to sign transaction", error: nil)))
             return
         }
-        
+		
         // MARK: 2. Prepare params
         let params: [String: Any] = [
             "type": transaction.type.rawValue,
@@ -248,7 +249,7 @@ extension AdamantApiService {
             "signature": signature,
             "recipientId": transaction.recipientId ?? NSNull(),
             "asset": [
-                "votes": votes
+                "votes": votesAsset.votes
             ]
         ]
         
@@ -265,7 +266,7 @@ extension AdamantApiService {
             completion(.failure(err))
             return
         }
-        
+		
         // MARK: 4. Send
         sendRequest(url: endpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerResponse>) in
             switch serverResponse {

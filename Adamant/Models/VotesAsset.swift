@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct VotesAsset: Codable {
+struct VotesAsset {
     let votes: [String]
 	
 	init(votes: [String]) {
@@ -17,5 +17,19 @@ struct VotesAsset: Codable {
 	
 	init(votes: [DelegateVote]) {
 		self.votes = votes.map { $0.asString() }
+	}
+}
+
+extension VotesAsset: Decodable {
+	init(from decoder: Decoder) throws {
+		let container = try decoder.singleValueContainer()
+		self.votes = try container.decode([String].self)
+	}
+}
+
+extension VotesAsset: Encodable {
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.singleValueContainer()
+		try container.encode(votes)
 	}
 }
