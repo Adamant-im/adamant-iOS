@@ -280,7 +280,7 @@ extension TransactionDetailsViewController {
 			
 		case .date:
 			if let date = transaction.date as Date? {
-				cell.detailTextLabel?.text = date.humanizedDateTime()
+				cell.detailTextLabel?.text = date.humanizedDateTimeFull()
 			}
 			
 		case .confirmations:

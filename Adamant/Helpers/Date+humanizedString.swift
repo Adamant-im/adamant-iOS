@@ -12,25 +12,31 @@ import DateToolsSwift
 extension Date {
 	/// Returns readable date with time.
 	func humanizedDateTime() -> String {
-		if daysAgo < 7 {
-			let dayString: String
+		if yearsAgo < 1 {
+			let dateString: String
 			if isToday {
-				dayString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
+				dateString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
 			} else if daysAgo < 2 {
 				/*
 					We can't use 'self.timeAgoSinceNow' here, because after midnight, when it is already not 'isToday',
 					but less than 24 hours has passed, so it is technically not 'Yesterday' yet,
 					it will display something like '6 hours ago'
 				*/
-				dayString = NSLocalizedString("Yesterday", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
-			} else {
-				dayString = format(with: "EEEE") // weekday
+				dateString = NSLocalizedString("Yesterday", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
+			} else if weeksAgo < 1 { // This week, show weekday, month and date
+				dateString = Date.formatterWeekDayMonth.string(from: self)
+			} else { // This year, long ago: show month and date
+				dateString = Date.formatterDayMonth.string(from: self)
 			}
 			
-			return "\(dayString), \(DateFormatter.localizedString(from: self, dateStyle: .none, timeStyle: .short))"
+			return "\(dateString), \(DateFormatter.localizedString(from: self, dateStyle: .none, timeStyle: .short))"
 		} else {
 			return DateFormatter.localizedString(from: self, dateStyle: .medium, timeStyle: .short)
 		}
+	}
+	
+	func humanizedDateTimeFull() -> String {
+		return DateFormatter.localizedString(from: self, dateStyle: .long, timeStyle: .short)
 	}
 	
 	
