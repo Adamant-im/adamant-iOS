@@ -54,6 +54,15 @@ class TransactionDetailsViewController: UIViewController {
             case .openChat: return ""
 			}
 		}
+		
+		var image: UIImage? {
+			switch self {
+			case .openInExplorer: return #imageLiteral(resourceName: "row_icon_placeholder")
+			case .openChat: return #imageLiteral(resourceName: "row_icon_placeholder")
+				
+			default: return nil
+			}
+		}
 	}
 	
 	// MARK: - Dependencies
@@ -261,6 +270,7 @@ extension TransactionDetailsViewController {
 		}
 		
 		cell.textLabel?.text = row.localized
+		cell.imageView?.image = row.image
 		
 		switch row {
 		case .amount:

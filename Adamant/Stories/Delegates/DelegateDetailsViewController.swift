@@ -60,6 +60,14 @@ class DelegateDetailsViewController: UITableViewController {
 		func indexPathFor(section: Int) -> IndexPath {
 			return IndexPath(item: rawValue, section: section)
 		}
+		
+		var image: UIImage? {
+			switch self {
+			case .openInExplorer: return #imageLiteral(resourceName: "row_icon_placeholder")
+				
+			default: return nil
+			}
+		}
     }
     
     // MARK: - Dependencies
@@ -196,6 +204,7 @@ extension DelegateDetailsViewController {
 		
 		cell.textLabel?.text = row.localized
 		cell.accessoryType = .none
+		cell.imageView?.image = row.image
 		
 		switch row {
 		case .username:
