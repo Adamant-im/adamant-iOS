@@ -35,7 +35,7 @@ class DelegatesListViewController: UIViewController {
 	
 	let votingCost: Decimal = Decimal(integerLiteral: 50)
 	let activeDelegates = 101
-	let maxVotes = 30
+	let maxVotes = 33
 	private let cellIdentifier = "cell"
 	
     // MARK: - Properties
@@ -52,6 +52,8 @@ class DelegatesListViewController: UIViewController {
         
         return refreshControl
     }()
+	
+	private var forcedUpdateTimer: Timer? = nil
 	
 	
     // MARK: - IBOutlets
@@ -90,6 +92,11 @@ class DelegatesListViewController: UIViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+		
+		if let timer = forcedUpdateTimer {
+			timer.invalidate()
+			forcedUpdateTimer = nil
+		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -189,6 +196,14 @@ extension DelegatesListViewController: AdamantDelegateCellDelegate {
 		}
 		
 		if state {
+			if delegatesChanges.count >= maxVotes {
+				DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.milliseconds(200)) {
+					cell.setIsChecked(false, animated: true)
+				}
+				
+				return
+			}
+			
 			if !delegatesChanges.contains(indexPath) {
 				delegatesChanges.append(indexPath)
 			}
@@ -220,7 +235,7 @@ extension DelegatesListViewController {
 		}
 		
 		
-		// MARK: Build
+		// MARK: Build request and update UI
 		
 		var votes = [DelegateVote]()
 		
@@ -230,30 +245,33 @@ extension DelegatesListViewController {
 			votes.append(vote)
 		}
 		
+		let indicies = delegatesChanges
 		
 		// MARK: Send
 		
 		dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
 		
-		apiService.voteForDelegates(from: account.address, keypair: keypair, votes: votes) { [weak self] result in
+		apiService.voteForDelegates(from: account.address, keypair: keypair, votes: votes) { result in
 			switch result {
 			case .success:
-				self?.dialogService.showSuccess(withMessage: String.adamantLocalized.delegates.success)
+				self.dialogService.showSuccess(withMessage: String.adamantLocalized.delegates.success)
 				
-				if let refreshControl = self?.refreshControl {
-					if Thread.isMainThread {
-						refreshControl.beginRefreshing()
-					} else {
-						DispatchQueue.main.async {
-							refreshControl.beginRefreshing()
-						}
+				DispatchQueue.main.async {
+					for indexPath in indicies {
+						var delegate = self.delegates[indexPath.row]
+						delegate.voted = !delegate.voted
+						self.delegates[indexPath.row] = delegate
 					}
 					
-					self?.handleRefresh(refreshControl)
+					self.delegatesChanges.removeAll()
+					self.updateVotePanel()
+					self.tableView.reloadRows(at: indicies, with: .none)
+					
+					self.scheduleUpdate() // schedule on main
 				}
 				
 			case .failure(let error):
-				self?.dialogService.showRichError(error: TransfersProviderError.serverError(error))
+				self.dialogService.showRichError(error: TransfersProviderError.serverError(error))
 			}
 		}
 	}
@@ -262,6 +280,21 @@ extension DelegatesListViewController {
 
 // MARK: - Private
 extension DelegatesListViewController {
+	private func scheduleUpdate() {
+		if let timer = forcedUpdateTimer {
+			timer.invalidate()
+			forcedUpdateTimer = nil
+		}
+		
+		let timer = Timer.scheduledTimer(timeInterval: 10.0, target: self, selector: #selector(updateTimerCallback), userInfo: nil, repeats: false)
+		forcedUpdateTimer = timer
+	}
+	
+	@objc private func updateTimerCallback(_ timer: Timer) {
+		handleRefresh(refreshControl)
+		forcedUpdateTimer = nil
+	}
+	
 	private func updateVotePanel() {
 		if delegatesChanges.count > 0 {
 			voteBtn.isEnabled = true
