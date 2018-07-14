@@ -11,4 +11,17 @@ import Foundation
 struct TransactionAsset: Codable {
 	let chat: ChatAsset?
 	let state: StateAsset?
+    let votes: VotesAsset?
+    
+    init() {
+        self.chat = nil
+        self.state = nil
+        self.votes = nil
+    }
+	
+	init(chat: ChatAsset? = nil, state: StateAsset? = nil, votes: VotesAsset? = nil) {
+        self.chat = chat
+        self.state = state
+        self.votes = votes
+    }
 }

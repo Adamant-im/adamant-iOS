@@ -54,21 +54,23 @@ fileprivate extension Wallet {
 class AccountViewController: FormViewController {
 	// MARK: - Rows & Sections
 	private enum Sections {
-		case wallet, application, actions
+		case wallet, application, delegates, actions
 		
 		var tag: String {
 			switch self {
 			case .wallet: return "wllt"
 			case .application: return "app"
 			case .actions: return "actns"
+            case .delegates: return "dlgts"
 			}
 		}
 		
 		var localized: String {
 			switch self {
-			case .wallet: return "Wallet"
+			case .wallet: return "Wallet"	// Depends on selected wallet
 			case .application: return NSLocalizedString("AccountTab.Section.Application", comment: "Account tab: Application section title")
 			case .actions: return NSLocalizedString("AccountTab.Section.Actions", comment: "Account tab: Actions section title")
+            case .delegates: return NSLocalizedString("AccountTab.Section.Delegates", comment: "Account tab: Delegates section title")
 			}
 		}
 	}
@@ -76,6 +78,7 @@ class AccountViewController: FormViewController {
 	private enum Rows {
 		case balance, sendTokens, buyTokens, freeTokens // Wallet
 		case security, nodes, about // Application
+		case voteForDelegates // Delegates
 		case logout // Actions
 		
 		var tag: String {
@@ -88,6 +91,8 @@ class AccountViewController: FormViewController {
 			case .nodes: return "nds"
 			case .about: return "bt"
 			case .logout: return "lgtrw"
+            case .voteForDelegates:
+                return "vtFrDlgts"
 			}
 		}
 		
@@ -101,7 +106,7 @@ class AccountViewController: FormViewController {
 			case .nodes: return String.adamantLocalized.nodesList.nodesListButton
 			case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
 			case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
-			
+			case .voteForDelegates: return NSLocalizedString("AccountTab.Row.VoteForDelegates", comment: "Account tab: 'Votes for delegates' button")
 			}
 		}
 	}
@@ -256,6 +261,23 @@ class AccountViewController: FormViewController {
 		+++ Section(Sections.actions.localized) {
 			$0.tag = Sections.actions.tag
 		}
+		
+		// Delegates
+		<<< LabelRow() {
+			$0.tag = Rows.voteForDelegates.tag
+			$0.title = Rows.voteForDelegates.localized
+			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+		}.cellSetup({ (cell, _) in
+			cell.selectionStyle = .gray
+		}).cellUpdate({ (cell, _) in
+			cell.accessoryType = .disclosureIndicator
+		}).onCellSelection({ [weak self] (_, row) in
+			guard let vc = self?.router.get(scene: AdamantScene.Delegates.delegates), let nav = self?.navigationController else {
+				return
+			}
+			
+			nav.pushViewController(vc, animated: true)
+		})
 		
 		// Logout
 		<<< LabelRow() {

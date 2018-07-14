@@ -115,6 +115,9 @@
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "О нас";
 
+/* Account tab: 'Vote for delegates' button */
+"AccountTab.Row.VoteForDelegates" = "Проголосовать за делегатов";
+
 /* Account tab: Actions section title */
 "AccountTab.Section.Actions" = "Действия";
 
@@ -126,6 +129,9 @@
 
 /* Account tab: Ethereum wallet section */
 "AccountTab.Sections.ethereum_wallet" = "Ethereum кошелёк";
+
+/* Account tab: Delegates section title */
+"AccountTab.Section.Delegates" = "Делегаты";
 
 /* Account page: scene title */
 "AccountTab.Title" = "Аккаунт";
@@ -204,6 +210,66 @@
 
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Подробнее…";
+
+/* Delegates page: scene title */
+"Delegates.Title" = "Делегаты";
+
+/* Delegates tab: Message about 50 ADM fee for vote */
+"Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Вам нужно иметь 50 ADM на счете вашего акаунта";
+
+/* Delegate details: scene title */
+"DelegateDetails.Title" = "Подробности";
+
+/* Delegate Details Screen: Rows title for 'Username'" */
+"DelegateDetails.Row.Username" = "Имя";
+
+/* Delegate Details Screen: Rows title for 'Address'" */
+"DelegateDetails.Row.Address" = "Адрес";
+
+/* Delegate Details Screen: Rows title for 'Public Key'" */
+"DelegateDetails.Row.PublicKey" = "Публичный ключ";
+
+/* Delegate Details Screen: Rows title for 'Vote weight'" */
+"DelegateDetails.Row.VoteWeight" = "Вес голоса";
+
+/* Delegate Details Screen: Rows title for 'Produced blocks'" */
+"DelegateDetails.Row.ProducedBlocks" = "Обработано";
+
+/* Delegate Details Screen: Rows title for 'Missed blocks'" */
+"DelegateDetails.Row.MissedBlocks" = "Пропущено";
+
+/* Delegate Details Screen: Rows title for 'Rate'" */
+"DelegateDetails.Row.Rate" = "Позиция";
+
+/* Delegate Details Screen: Rows title for 'Rank'" */
+"DelegateDetails.Row.Rank" = "Ранг";
+
+/* Delegate Details Screen: Rows title for 'Approval'" */
+"DelegateDetails.Row.Approval" = "Блоков";
+
+/* Delegate Details Screen: Rows title for 'Productivity'" */
+"DelegateDetails.Row.Productivity" = "Аптайм";
+
+/* Delegate Details Screen: Rows title for 'Forging time'" */
+"DelegateDetails.Row.ForgingTime" = "Время форжинга";
+
+/* Delegate Details Screen: Rows title for 'Forged'" */
+"DelegateDetails.Row.Forged" = "Сфоржено";
+
+/* Delegates: Message for Successfull voting */
+"Delegates.Vote.Success" = "Ваш голос отправлен";
+
+/* Storybard - Delegate vote panel: 'Upvotes' label */
+"Delegates.VotePanel.Upvotes" = "Повышены:";
+
+/* Storybard - Delegate vote panel: 'Downvotes' label */
+"Delegates.VotePanel.Downvotes" = "Понижены:";
+
+/* Storybard - Delegate vote panel: 'New' label */
+"Delegates.VotePanel.New" = "Новые:";
+
+/* Storybard - Delegate vote panel: 'Total' label */
+"Delegates.VotePanel.Total" = "Всего:";
 
 /* Shared error: Account not found error. Using %@ for address. */
 "Error.AccountNotFoundFormat" = "Аккаун не найден: %@";

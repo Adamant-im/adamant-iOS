@@ -115,6 +115,9 @@
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "About";
 
+/* Account tab: 'Vote for delegates' button */
+"AccountTab.Row.VoteForDelegates" = "Vote for delegates";
+
 /* Account tab: Actions section title */
 "AccountTab.Section.Actions" = "Actions";
 
@@ -129,6 +132,9 @@
 
 /* Account page: scene title */
 "AccountTab.Title" = "Account";
+
+/* Account tab: Delegates section title */
+"AccountTab.Section.Delegates" = "Delegates";
 
 /* Product name */
 "ADAMANT" = "ADAMANT";
@@ -204,6 +210,66 @@
 
 /* Chat: status message for pending chat transaction */
 "ChatScene.MessageStatus.Pending" = "Pending";
+
+/* Delegates page: scene title */
+"Delegates.Title" = "Delegates";
+
+/* Delegates tab: Message about 50 ADM fee for vote */
+"Delegates.NotEnoughtTokensForVote" = "Not enought tokens for vote. You need to have 50 ADM on your account balance";
+
+/* Delegate details: scene title */
+"DelegateDetails.Title" = "Details";
+
+/* Delegate Details Screen: Rows title for 'Username'" */
+"DelegateDetails.Row.Username" = "Username";
+
+/* Delegate Details Screen: Rows title for 'Address'" */
+"DelegateDetails.Row.Address" = "Address";
+
+/* Delegate Details Screen: Rows title for 'Public Key'" */
+"DelegateDetails.Row.PublicKey" = "Public Key";
+
+/* Delegate Details Screen: Rows title for 'Vote weight'" */
+"DelegateDetails.Row.VoteWeight" = "Vote weight";
+
+/* Delegate Details Screen: Rows title for 'Produced blocks'" */
+"DelegateDetails.Row.ProducedBlocks" = "Produced blocks";
+
+/* Delegate Details Screen: Rows title for 'Missed blocks'" */
+"DelegateDetails.Row.MissedBlocks" = "Missed blocks";
+
+/* Delegate Details Screen: Rows title for 'Rate'" */
+"DelegateDetails.Row.Rate" = "Rate";
+
+/* Delegate Details Screen: Rows title for 'Rank'" */
+"DelegateDetails.Row.Rank" = "Rank";
+
+/* Delegate Details Screen: Rows title for 'Approval'" */
+"DelegateDetails.Row.Approval" = "Approval";
+
+/* Delegate Details Screen: Rows title for 'Productivity'" */
+"DelegateDetails.Row.Productivity" = "Productivity";
+
+/* Delegate Details Screen: Rows title for 'Forging time'" */
+"DelegateDetails.Row.ForgingTime" = "Forging time";
+
+/* Delegate Details Screen: Rows title for 'Forged'" */
+"DelegateDetails.Row.Forged" = "Forged";
+
+/* Delegates: Message for Successfull voting */
+"Delegates.Vote.Success" = "Your vote has been sent";
+
+/* Storybard - Delegate vote panel: 'Upvotes' label */
+"Delegates.VotePanel.Upvotes" = "Upvotes:";
+
+/* Storybard - Delegate vote panel: 'Downvotes' label */
+"Delegates.VotePanel.Downvotes" = "Downvotes:";
+
+/* Storybard - Delegate vote panel: 'New' label */
+"Delegates.VotePanel.New" = "New:";
+
+/* Storybard - Delegate vote panel: 'Total' label */
+"Delegates.VotePanel.Total" = "Total:";
 
 /* Shared error: Account not found error. Using %@ for address. */
 "Error.AccountNotFoundFormat" = "Account not found: %@";
@@ -612,4 +678,3 @@
 
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "Done!";
-

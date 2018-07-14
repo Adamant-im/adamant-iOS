@@ -110,4 +110,18 @@ protocol ApiService: class {
 	/// Send text message
 	///   - completion: Contains processed transactionId, if success, or AdamantError, if fails.
 	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
+    
+    // MARK: - Delegates
+    
+    /// Get delegates
+    func getDelegates(limit: Int, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void)
+    func getDelegatesWithVotes(for address: String, limit: Int, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void)
+    
+    /// Get delegate forge details
+    func getForgedByAccount(publicKey: String, completion: @escaping (ApiServiceResult<DelegateForgeDetails>) -> Void)
+    /// Get delegate forgeing time
+    func getForgingTime(for delegate: Delegate, completion: @escaping (ApiServiceResult<Int>) -> Void)
+    
+    /// Send vote transaction for delegates
+    func voteForDelegates(from address: String, keypair: Keypair, votes: [DelegateVote], completion: @escaping (ApiServiceResult<UInt64>) -> Void)
 }

@@ -42504,6 +42504,11 @@ class Adamant {
       case 0: // Send
         break
 
+      case 3: // Votes
+        assetBytes = this.voteGetBytes(transaction)
+        assetSize = assetBytes.length
+        break
+
       case 8: // Chat message
         assetBytes = this.chatGetBytes(transaction)
         assetSize = assetBytes.length
@@ -42609,6 +42614,22 @@ class Adamant {
       throw e
     }
 
+    return buf
+  }
+
+  static voteGetBytes (trs) {
+    if (!trs.asset.votes || trs.asset.votes.length === 0) {
+      return null
+    }
+    var buf
+    try {
+      buf = Buffer.from([])
+      for (let i in trs.asset.votes) {
+        buf = Buffer.concat([buf, Buffer.from(trs.asset.votes[i], 'utf8')])
+      }
+    } catch (e) {
+      throw e
+    }
     return buf
   }
 

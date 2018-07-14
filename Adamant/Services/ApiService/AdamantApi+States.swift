@@ -20,7 +20,7 @@ extension AdamantApiService {
 	func store(key: String, value: String, type: StateType, sender: String, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
 		
 		// MARK: 1. Create and sign transaction
-		let asset = TransactionAsset(chat: nil, state: StateAsset(key: key, value: value, type: .keyValue))
+        let asset = TransactionAsset(state: StateAsset(key: key, value: value, type: .keyValue))
 		let transaction = NormalizedTransaction(type: .state,
 												amount: 0,
 												senderPublicKey: keypair.publicKey,
