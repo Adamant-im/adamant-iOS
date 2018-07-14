@@ -36,6 +36,7 @@ class DelegatesListViewController: UIViewController {
 	let votingCost: Decimal = Decimal(integerLiteral: 50)
 	let activeDelegates = 101
 	let maxVotes = 33
+	let maxTotalVotes = 101
 	private let cellIdentifier = "cell"
 	
     // MARK: - Properties
@@ -54,7 +55,7 @@ class DelegatesListViewController: UIViewController {
     }()
 	
 	private var forcedUpdateTimer: Timer? = nil
-	
+
 	
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
@@ -196,14 +197,6 @@ extension DelegatesListViewController: AdamantDelegateCellDelegate {
 		}
 		
 		if state {
-			if delegatesChanges.count >= maxVotes {
-				DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.milliseconds(200)) {
-					cell.setIsChecked(false, animated: true)
-				}
-				
-				return
-			}
-			
 			if !delegatesChanges.contains(indexPath) {
 				delegatesChanges.append(indexPath)
 			}
@@ -296,12 +289,6 @@ extension DelegatesListViewController {
 	}
 	
 	private func updateVotePanel() {
-		if delegatesChanges.count > 0 {
-			voteBtn.isEnabled = true
-		} else {
-			voteBtn.isEnabled = false
-		}
-		
 		let changes = delegatesChanges.map { delegates[$0.row] }
 		
 		var upvoted = 0
@@ -314,22 +301,36 @@ extension DelegatesListViewController {
 			}
 		}
 		
-		let totalDelegates = delegates.count
-		let totalChanges = delegatesChanges.count
-		let totalVoted = delegates.reduce(0) { $0 + ($1.voted ? 1 : 0) }
+		let totalVoted = delegates.reduce(0) { $0 + ($1.voted ? 1 : 0) } + upvoted - downvoted
+		
+		let votingEnabled = delegatesChanges.count <= maxVotes && totalVoted <= maxTotalVotes
+		let newVotesColor = delegatesChanges.count > maxVotes ? UIColor.red : UIColor.darkText
+		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.red : UIColor.darkText
+		
 		
 		if Thread.isMainThread {
 			upVotesLabel.text = String(upvoted)
 			downVotesLabel.text = String(downvoted)
-			newVotesLabel.text = "\(totalChanges)/\(maxVotes)"
-			totalVotesLabel.text = "\(totalVoted)/\(totalDelegates)"
+			newVotesLabel.text = "\(delegatesChanges.count)/\(maxVotes)"
+			totalVotesLabel.text = "\(totalVoted)/\(maxTotalVotes)"
+			
+			voteBtn.isEnabled = votingEnabled
+			newVotesLabel.textColor = newVotesColor
+			totalVotesLabel.textColor = totalVotesColor
 		} else {
+			let changes = delegatesChanges.count
 			let max = maxVotes
-			DispatchQueue.main.async {
+			let totalMax = maxTotalVotes
+			
+			DispatchQueue.main.async { [unowned self] in
 				self.upVotesLabel.text = "\(upvoted)"
 				self.downVotesLabel.text = "\(downvoted)"
-				self.newVotesLabel.text = "\(totalChanges)/\(max)"
-				self.totalVotesLabel.text = "\(totalVoted)/\(totalDelegates)"
+				self.newVotesLabel.text = "\(changes)/\(max)"
+				self.totalVotesLabel.text = "\(totalVoted)/\(totalMax)"
+				
+				self.voteBtn.isEnabled = votingEnabled
+				self.newVotesLabel.textColor = newVotesColor
+				self.totalVotesLabel.textColor = totalVotesColor
 			}
 		}
 	}
