@@ -50,6 +50,35 @@ enum ApiServiceError: Error {
 	}
 }
 
+extension ApiServiceError: RichError {
+	var message: String {
+		return localized
+	}
+	
+	var level: ErrorLevel {
+		switch self {
+		case .accountNotFound, .notLogged, .networkError:
+			return .warning
+			
+		case .internalError, .serverError:
+			return .error
+		}
+	}
+	
+	var internalError: Error? {
+		switch self {
+		case .accountNotFound, .notLogged, .serverError:
+			return nil
+			
+		case .internalError(_, let error):
+			return error
+			
+		case .networkError(let error):
+			return error
+		}
+	}
+}
+
 protocol ApiService: class {
 	
 	/// Default is async queue with .utilities priority.

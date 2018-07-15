@@ -281,7 +281,7 @@ extension DelegateDetailsViewController {
 					tableView.reloadRows(at: [indexPath], with: .none)
 				}
 			case .failure(let error):
-				self?.dialogService.showError(withMessage: error.localized, error: error)
+				self?.dialogService.showRichError(error: error)
 			}
 		}
 		
@@ -305,7 +305,7 @@ extension DelegateDetailsViewController {
 				}
 				
 			case .failure(let error):
-				self?.dialogService.showError(withMessage: error.localized, error: error)
+				self?.dialogService.showRichError(error: error)
 			}
 		}
 	}

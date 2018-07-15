@@ -140,7 +140,7 @@ extension SecurityViewController: PinpadViewControllerDelegate {
 					}
 					
 				case .failure(let error):
-					self?.dialogService.showError(withMessage: error.localized, error: error)
+					self?.dialogService.showRichError(error: error)
 				}
 			}
 			

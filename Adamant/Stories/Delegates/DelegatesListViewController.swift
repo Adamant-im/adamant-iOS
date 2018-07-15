@@ -128,7 +128,7 @@ class DelegatesListViewController: UIViewController {
 					self.tableView.reloadData()
 				}
 			case .failure(let error):
-				self.dialogService.showError(withMessage: error.localized, error: error)
+				self.dialogService.showRichError(error: error)
 			}
 			
 			DispatchQueue.main.async {
