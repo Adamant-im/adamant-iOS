@@ -251,7 +251,7 @@ extension DelegateDetailsViewController {
 				}
 				
 			} else {
-				cell.detailTextLabel?.text = "..."
+				cell.detailTextLabel?.text = ""
 			}
 			
 		case .forged:
@@ -267,7 +267,7 @@ extension DelegateDetailsViewController {
 extension DelegateDetailsViewController {
 	private func refreshData(with delegate: Delegate) {
 		// Get forged amount
-		self.apiService.getForgedByAccount(publicKey: delegate.publicKey) { [weak self] result in
+		apiService.getForgedByAccount(publicKey: delegate.publicKey) { [weak self] result in
 			switch result {
 			case .success(let details):
 				self?.forged = details.forged
@@ -286,7 +286,7 @@ extension DelegateDetailsViewController {
 		}
 		
 		// Get forging time
-		self.apiService.getForgingTime(for: delegate) { [weak self] result in
+		apiService.getForgingTime(for: delegate) { [weak self] result in
 			switch result {
 			case .success(let seconds):
 				if seconds >= 0 {
