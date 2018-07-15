@@ -43,4 +43,6 @@ class WalletCollectionViewCell: UICollectionViewCell {
 			markerWidthConstraint.constant = width
 		}
 	}
+	
+	var isInitialized = false
 }

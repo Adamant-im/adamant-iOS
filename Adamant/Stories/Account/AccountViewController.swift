@@ -138,6 +138,8 @@ class AccountViewController: FormViewController {
 	
 	private var transfersController: NSFetchedResultsController<TransferTransaction>?
 	
+	private let accessoryContentInsets = UIEdgeInsets(top: 2, left: 4, bottom: 2, right: 4)
+	private let accessoryContainerInsets = UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
 	
 	// MARK: - Lifecycle
 	
@@ -418,20 +420,30 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 			fatalError("Wallets collectionView: Out of bounds row")
 		}
 		
-		cell.tintColor = UIColor.adamantSecondary
+		if !cell.isInitialized {
+			cell.tintColor = UIColor.adamantSecondary
+			
+			cell.balanceLabel.textColor = UIColor.adamantPrimary
+			cell.currencySymbolLabel.textColor = UIColor.adamantPrimary
+			
+			cell.accessoryContainerView.accessoriesBackgroundColor = UIColor.adamantPrimary
+			cell.accessoryContainerView.accessoriesBorderColor = UIColor.white
+			cell.accessoryContainerView.accessoriesBorderWidth = 2
+			
+			if cell.accessoryContainerView.accessoriesContentInsets != accessoryContentInsets {
+				cell.accessoryContainerView.accessoriesContentInsets = accessoryContentInsets
+			}
+			
+			if cell.accessoryContainerView.accessoriesContainerInsets == accessoryContainerInsets {
+				cell.accessoryContainerView.accessoriesContainerInsets = accessoryContainerInsets
+			}
+			
+			cell.isInitialized = true
+		}
+		
 		cell.currencyImageView.image = wallet.currencyLogo
 		cell.balanceLabel.text = wallet.formattedShort
 		cell.currencySymbolLabel.text = wallet.currencySymbol
-		
-		let color = UIColor.adamantPrimary
-		cell.balanceLabel.textColor = color
-		cell.currencySymbolLabel.textColor = color
-		
-		cell.accessoryContainerView.accessoriesBackgroundColor = UIColor.adamantPrimary
-		cell.accessoryContainerView.accessoriesBorderColor = UIColor.white
-		cell.accessoryContainerView.accessoriesBorderWidth = 2
-		cell.accessoryContainerView.accessoriesContentInsets = UIEdgeInsets(top: 2, left: 4, bottom: 2, right: 4)
-		cell.accessoryContainerView.accessoriesContainerInsets = UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
 		
 		if indexPath.row == 0, let count = transfersController?.fetchedObjects?.count, count > 0 {
 			let accessory = AccessoryType.label(text: String(count))
