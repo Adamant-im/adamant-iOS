@@ -63,8 +63,10 @@ class AccountViewController: FormViewController {
 	private enum Rows {
 		case account
         case ethAccount
+        case lskAccount
 		case balance
         case ethBalance
+        case lskBalance
 		case sendTokens
 		case invest
 		case logout
@@ -77,12 +79,18 @@ class AccountViewController: FormViewController {
                 
             case .ethAccount:
                 return "ethAccount"
+                
+            case .lskAccount:
+                return "lskAccount"
 				
 			case .balance:
 				return "balance"
                 
             case .ethBalance:
                 return "ethBalance"
+                
+            case .lskBalance:
+                return "lskBalance"
 				
 			case .sendTokens:
 				return "sendTokens"
@@ -105,12 +113,18 @@ class AccountViewController: FormViewController {
                 
             case .ethAccount:
                 return ""
+                
+            case .lskAccount:
+                return ""
 				
 			case .balance:
 				return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
                 
             case .ethBalance:
                 return "ETH \(NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title"))"
+                
+            case .lskBalance:
+                return "LSK \(NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title"))"
 				
 			case .sendTokens:
 				return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
@@ -133,6 +147,7 @@ class AccountViewController: FormViewController {
 	var dialogService: DialogService!
 	var router: Router!
     var ethApiService: EthApiServiceProtocol!
+    var lskApiService: LskApiServiceProtocol!
 	
 	// MARK: - Properties
 	var hideFreeTokensRow = false
@@ -225,6 +240,38 @@ class AccountViewController: FormViewController {
                                                                 self?.tableView.deselectRow(at: indexPath, animated: true)
                     })
                 })
+            
+            // LSK Account
+            <<< AccountRow() {
+                $0.tag = Rows.lskAccount.tag
+                $0.cell.height = {65}
+                }
+                .cellUpdate({ [weak self] (cell, row) in
+                    cell.avatarImageView.tintColor = UIColor.adamantChatIcons
+                    if let label = cell.addressLabel {
+                        label.font = UIFont.adamantPrimary(size: 17)
+                        label.textColor = UIColor.adamantPrimary
+                    }
+                    cell.avatarImageView.image = #imageLiteral(resourceName: "account")
+                    row.value = self?.lskApiService.account?.address
+                    cell.accessoryType = .disclosureIndicator
+                })
+                .onCellSelection({ [weak self] (_, row) in
+                    guard let address = self?.lskApiService.account?.address else {
+                        return
+                    }
+                    
+                    self?.dialogService.presentShareAlertFor(string: address,
+                                                             types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+                                                             excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                                                             animated: true,
+                                                             completion: {
+                                                                guard let indexPath = row.indexPath else {
+                                                                    return
+                                                                }
+                                                                self?.tableView.deselectRow(at: indexPath, animated: true)
+                    })
+                })
 		
 		// MARK: Wallet section
 		+++ Section(Sections.wallet.localized)
@@ -286,6 +333,36 @@ class AccountViewController: FormViewController {
                     nav.pushViewController(vc, animated: true)
                 })
             
+            // MARK: LSK Balance
+            <<< LabelRow() { [weak self] in
+                $0.tag = Rows.lskBalance.tag
+                $0.title = Rows.lskBalance.localized
+                
+                if let balanceString = self?.lskApiService?.account?.balanceString, let balance = Double(balanceString) {
+                    $0.value = "\(balance) LSK"
+                } else {
+                    $0.value = "-- LSK"
+                }
+                }
+                .cellSetup({ (cell, _) in
+                    cell.selectionStyle = .gray
+                })
+                .cellUpdate({ (cell, _) in
+                    if let label = cell.textLabel {
+                        label.font = UIFont.adamantPrimary(size: 17)
+                        label.textColor = UIColor.adamantPrimary
+                    }
+                    
+                    cell.accessoryType = .disclosureIndicator
+                })
+                .onCellSelection({ [weak self] (_, _) in
+//                    guard let vc = self?.router.get(scene: AdamantScene.Transactions.ethTransactions), let nav = self?.navigationController else {
+//                        return
+//                    }
+//
+//                    nav.pushViewController(vc, animated: true)
+                })
+            
 		// MARK: Send tokens
 			<<< LabelRow() {
 				$0.tag = Rows.sendTokens.tag
@@ -304,6 +381,20 @@ class AccountViewController: FormViewController {
 			})
 			.onCellSelection({ [weak self] (_, row) in
                 self?.dialogService.showSystemActionSheet(title: String.adamantLocalized.transfer.send, message: "", actions: [
+                    UIAlertAction(title: "ADM", style: .default, handler: { [weak self] (_) in
+                        // MARK: Show ADM transfer
+                        guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
+                            fatalError("Can't get TransferViewController scene")
+                        }
+                        
+                        vc.token = .ADM
+                        
+                        if let nav = self?.navigationController {
+                            nav.pushViewController(vc, animated: true)
+                        } else {
+                            self?.present(vc, animated: true, completion: nil)
+                        }
+                    }),
                     UIAlertAction(title: "Ethereum", style: .default, handler: { [weak self] (_) in
                         // MARK: Show ETH transfer
                         guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
@@ -318,13 +409,13 @@ class AccountViewController: FormViewController {
                             self?.present(vc, animated: true, completion: nil)
                         }
                     }),
-                    UIAlertAction(title: "ADM", style: .default, handler: { [weak self] (_) in
-                        // MARK: Show ADM transfer
+                    UIAlertAction(title: "Lisk", style: .default, handler: { [weak self] (_) in
+                        // MARK: Show ETH transfer
                         guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
                             fatalError("Can't get TransferViewController scene")
                         }
                         
-                        vc.token = .ADM
+                        vc.token = .LSK
                         
                         if let nav = self?.navigationController {
                             nav.pushViewController(vc, animated: true)
@@ -455,6 +546,10 @@ class AccountViewController: FormViewController {
         NotificationCenter.default.addObserver(forName: Notification.Name.EthApiService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.refreshEthCells()
         }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.LskApiService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.refreshLskCells()
+        }
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -520,6 +615,25 @@ extension AccountViewController {
         }
 	}
     
+    func refreshLskCells() {
+        if let row: AccountRow = form.rowBy(tag: Rows.lskAccount.tag) {
+            row.value = self.lskApiService.account?.address
+            row.reload()
+        }
+        
+        self.lskApiService.getBalance { (result) in
+            switch result {
+            case .success(let balance):
+                if let row: LabelRow = self.form.rowBy(tag: Rows.lskBalance.tag) {
+                    row.value = balance
+                    row.reload()
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
         accountService.update { [weak self] (result) in
             switch result {
@@ -545,6 +659,18 @@ extension AccountViewController {
             switch result {
             case .success(let balance):
                 if let row: LabelRow = self.form.rowBy(tag: Rows.ethBalance.tag) {
+                    row.value = balance
+                    row.reload()
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+        
+        self.lskApiService.getBalance { (result) in
+            switch result {
+            case .success(let balance):
+                if let row: LabelRow = self.form.rowBy(tag: Rows.lskBalance.tag) {
                     row.value = balance
                     row.reload()
                 }

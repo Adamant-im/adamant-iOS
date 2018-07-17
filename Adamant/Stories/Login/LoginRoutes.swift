@@ -18,6 +18,7 @@ extension AdamantScene {
 			c.localAuth = r.resolve(LocalAuthentication.self)
             c.router = r.resolve(Router.self)
             c.ethAPiService = r.resolve(EthApiServiceProtocol.self)
+            c.lskAPiService = r.resolve(LskApiServiceProtocol.self)
 			return c
 		})
 		

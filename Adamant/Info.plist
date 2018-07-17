@@ -22,6 +22,11 @@
 	<string>32</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>The camera needed to scan QR codes for addresses and passphrases</string>
 	<key>NSFaceIDUsageDescription</key>

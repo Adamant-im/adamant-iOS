@@ -6,6 +6,8 @@ PODS:
     - SipHash (~> 1.2)
   - CryptoSwift (0.10.0)
   - DateToolsSwift (4.0.0)
+  - Ed25519 (1.1.0):
+    - libCEd25519 (~> 1.1.0)
   - EFQRCode (4.2.2)
   - Eureka (4.1.1)
   - FreakingSimpleRoundImageView (1.1)
@@ -18,7 +20,10 @@ PODS:
   - FTIndicator/FTToastIndicator (1.2.9)
   - Haring (2.0.8)
   - KeychainAccess (3.1.1)
+  - libCEd25519 (1.1.0)
   - libsodium (1.0.12)
+  - Lisk (1.0.0):
+    - Ed25519 (~> 1.1.0)
   - MessageKit (0.13.5)
   - MyLittlePinpad (0.2.4)
   - PMAlertController (3.4.0)
@@ -48,6 +53,7 @@ DEPENDENCIES:
   - FTIndicator
   - Haring
   - KeychainAccess
+  - Lisk (from `https://github.com/boyarkin-anton/lisk-swift.git`, branch `dev`)
   - MessageKit (from `https://github.com/boyarkin-anton/MessageKit.git`, branch `develop`)
   - MyLittlePinpad
   - PMAlertController
@@ -64,12 +70,14 @@ SPEC REPOS:
     - BigInt
     - CryptoSwift
     - DateToolsSwift
+    - Ed25519
     - EFQRCode
     - Eureka
     - FreakingSimpleRoundImageView
     - FTIndicator
     - Haring
     - KeychainAccess
+    - libCEd25519
     - libsodium
     - MyLittlePinpad
     - PMAlertController
@@ -83,11 +91,17 @@ SPEC REPOS:
     - web3swift
 
 EXTERNAL SOURCES:
+  Lisk:
+    :branch: dev
+    :git: https://github.com/boyarkin-anton/lisk-swift.git
   MessageKit:
     :branch: develop
     :git: https://github.com/boyarkin-anton/MessageKit.git
 
 CHECKOUT OPTIONS:
+  Lisk:
+    :commit: cfc6aaa0a1713dcab0e96cd7f6a7e17c7f85f9fa
+    :git: https://github.com/boyarkin-anton/lisk-swift.git
   MessageKit:
     :commit: e2364d2394eddc211be6957893fbd0f726c233f0
     :git: https://github.com/boyarkin-anton/MessageKit.git
@@ -98,13 +112,16 @@ SPEC CHECKSUMS:
   BigInt: 8e8a52161c745cd3ab78e3dc346a9fbee51e6cf6
   CryptoSwift: 6c778d69282bed3b4e975ff97a79d074f20bb011
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
+  Ed25519: d84c847d8ffbb2f6fec71479abbb8fa3dfe12578
   EFQRCode: 203846c7b135b5f7c1d18bb7923bc32a74c8b363
   Eureka: b88fb930e42c79f8c03c373d0fcdc28c1d6c50ed
   FreakingSimpleRoundImageView: 4a3a1cb1347beb247f8c63b5b5cae9d770b431ee
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   Haring: d2a4cfc00dfb63836dffc93e45919369f850e134
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
+  libCEd25519: 45de00a0944cb2d51e64fcef67bd9989c42d20ca
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
+  Lisk: a900424110c208c425102ee8b6fd60d9b6b878c3
   MessageKit: c4bd50e285a0f0761bc23a2e982aa7840873c4f5
   MyLittlePinpad: dc5f8a7fc13a4ad6fc9dc8d3359d91f1b5b1c7e8
   PMAlertController: efb781925d741d50e0200018a00c53cecb8b4910
@@ -117,6 +134,6 @@ SPEC CHECKSUMS:
   Swinject: f7f15a9672e99328c1f07f277091087917215700
   web3swift: 79f72b48005f1b28e73191eaf78194d6cf5f8a35
 
-PODFILE CHECKSUM: 982f53dbc54c6aa3ca1ce0750bf6f1448a4f1684
+PODFILE CHECKSUM: ff39280a050c4af02c429afa499fcfae47a49cf2
 
 COCOAPODS: 1.5.3
