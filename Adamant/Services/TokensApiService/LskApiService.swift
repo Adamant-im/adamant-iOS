@@ -120,7 +120,7 @@ class LskApiService: LskApiServiceProtocol {
     
     func sendFunds(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<String>) -> Void) {
         if let keys = self.account?.keys {
-            Transactions(client: .testnet).transfer(lsk: amount, to: address, keyPair: keys) { response in
+            transactionApi.transfer(lsk: amount, to: address, keyPair: keys) { response in
                 switch response {
                 case .success(let result):
                     print(result.data.hashValue)
@@ -129,6 +129,22 @@ class LskApiService: LskApiServiceProtocol {
                 case .error(let error):
                     print("ERROR: " + error.message)
                     completion(.failure(.internalError(message: error.message, error: nil)))
+                }
+            }
+        }
+    }
+    
+    func getTransactions(_ completion: @escaping (ApiServiceResult<[Transactions.TransactionModel]>) -> Void) {
+        if let address = self.account?.address {
+            transactionApi.transactions(senderIdOrRecipientId: address, limit: 100, offset: 0) { (response) in
+                switch response {
+                case .success(response: let result):
+                    completion(.success(result.data))
+                    break
+                case .error(response: let error):
+                    print("ERROR: " + error.message)
+                    completion(.failure(.internalError(message: error.message, error: nil)))
+                    break
                 }
             }
         }

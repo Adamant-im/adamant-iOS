@@ -17,6 +17,7 @@
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
 		64D05A0220D51632003AD655 /* EthApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D05A0120D51632003AD655 /* EthApiServiceProtocol.swift */; };
 		64D05A0420D516B4003AD655 /* EthApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D05A0320D516B4003AD655 /* EthApiService.swift */; };
+		64EE46B220FE0C8D00194DDA /* LSKTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64EE46B120FE0C8D00194DDA /* LSKTransactionsViewController.swift */; };
 		64F085D920E2D7600006DE68 /* ADMTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F085D820E2D7600006DE68 /* ADMTransactionsViewController.swift */; };
 		64FA53CD20E1300B006783C9 /* ETHTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CC20E1300A006783C9 /* ETHTransactionsViewController.swift */; };
 		64FA53D120E24942006783C9 /* BaseTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53D020E24941006783C9 /* BaseTransactionDetailsViewController.swift */; };
@@ -207,6 +208,7 @@
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
 		64D05A0120D51632003AD655 /* EthApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthApiServiceProtocol.swift; sourceTree = "<group>"; };
 		64D05A0320D516B4003AD655 /* EthApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthApiService.swift; sourceTree = "<group>"; };
+		64EE46B120FE0C8D00194DDA /* LSKTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LSKTransactionsViewController.swift; sourceTree = "<group>"; };
 		64F085D820E2D7600006DE68 /* ADMTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADMTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53CC20E1300A006783C9 /* ETHTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ETHTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53D020E24941006783C9 /* BaseTransactionDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseTransactionDetailsViewController.swift; sourceTree = "<group>"; };
@@ -638,6 +640,7 @@
 				E9E7CDC12003F5A400DFC4DB /* TransactionsViewController.swift */,
 				64F085D820E2D7600006DE68 /* ADMTransactionsViewController.swift */,
 				64FA53CC20E1300A006783C9 /* ETHTransactionsViewController.swift */,
+				64EE46B120FE0C8D00194DDA /* LSKTransactionsViewController.swift */,
 				E94E7B0B205D5E4A0042B639 /* TransactionsViewController.xib */,
 				64FA53D020E24941006783C9 /* BaseTransactionDetailsViewController.swift */,
 				E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */,
@@ -1228,6 +1231,7 @@
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
 				E9EC342120052ABB00C0E546 /* TransferViewController.swift in Sources */,
 				E9A03FD420DBC824007653A1 /* NodeVersion.swift in Sources */,
+				64EE46B220FE0C8D00194DDA /* LSKTransactionsViewController.swift in Sources */,
 				E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */,
 				E948E04C2027679300975D6B /* AdamantFormattingTools.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,

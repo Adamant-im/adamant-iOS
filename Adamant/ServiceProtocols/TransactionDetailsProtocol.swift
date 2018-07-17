@@ -57,7 +57,7 @@ protocol TransactionDetailsProtocol {
 extension TransactionDetailsProtocol {
     
     func isOutgoing(_ address: String) -> Bool {
-        return senderAddress == address.lowercased() ? true : false
+        return senderAddress.lowercased() == address.lowercased() ? true : false
     }
     
     var haveChatroom: Bool {

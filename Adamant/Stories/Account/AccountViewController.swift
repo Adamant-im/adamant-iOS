@@ -356,11 +356,11 @@ class AccountViewController: FormViewController {
                     cell.accessoryType = .disclosureIndicator
                 })
                 .onCellSelection({ [weak self] (_, _) in
-//                    guard let vc = self?.router.get(scene: AdamantScene.Transactions.ethTransactions), let nav = self?.navigationController else {
-//                        return
-//                    }
-//
-//                    nav.pushViewController(vc, animated: true)
+                    guard let vc = self?.router.get(scene: AdamantScene.Transactions.lskTransactions), let nav = self?.navigationController else {
+                        return
+                    }
+
+                    nav.pushViewController(vc, animated: true)
                 })
             
 		// MARK: Send tokens
