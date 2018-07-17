@@ -116,6 +116,7 @@ class AccountViewController: FormViewController {
 	var dialogService: DialogService!
 	var router: Router!
     var ethApiService: EthApiServiceProtocol!
+    var lskApiService: LskApiServiceProtocol!
 	var notificationsService: NotificationsService!
 	var transfersProvider: TransfersProvider!
 	
@@ -333,6 +334,10 @@ class AccountViewController: FormViewController {
         
         NotificationCenter.default.addObserver(forName: Notification.Name.EthApiService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.refreshEthCells()
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.LskApiService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.refreshLskCells()
         }
     }
 	

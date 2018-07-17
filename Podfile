@@ -28,5 +28,8 @@ target 'Adamant' do
   
   # ETH
   pod 'web3swift', '~> 0.8.0' # Web3 Swift Port
+  
+  # LSK
+  pod 'Lisk', :git => 'https://github.com/boyarkin-anton/lisk-swift.git', :branch => 'dev'
 
 end

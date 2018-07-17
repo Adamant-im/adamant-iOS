@@ -6,6 +6,8 @@ PODS:
     - SipHash (~> 1.2)
   - CryptoSwift (0.10.0)
   - DateToolsSwift (4.0.0)
+  - Ed25519 (1.1.0):
+    - libCEd25519 (~> 1.1.0)
   - EFQRCode (4.2.2)
   - Eureka (4.2.0)
   - FreakingSimpleRoundImageView (1.2.3)
@@ -18,7 +20,10 @@ PODS:
   - FTIndicator/FTToastIndicator (1.2.9)
   - Haring (2.0.8)
   - KeychainAccess (3.1.1)
+  - libCEd25519 (1.1.0)
   - libsodium (1.0.12)
+  - Lisk (1.0.0):
+    - Ed25519 (~> 1.1.0)
   - M13Checkbox (3.2.2)
   - MessageKit (1.0.0)
   - MyLittlePinpad (0.2.5)
@@ -49,6 +54,7 @@ DEPENDENCIES:
   - FTIndicator
   - Haring
   - KeychainAccess
+  - Lisk (from `https://github.com/boyarkin-anton/lisk-swift.git`, branch `dev`)
   - M13Checkbox
   - MessageKit
   - MyLittlePinpad
@@ -66,12 +72,14 @@ SPEC REPOS:
     - BigInt
     - CryptoSwift
     - DateToolsSwift
+    - Ed25519
     - EFQRCode
     - Eureka
     - FreakingSimpleRoundImageView
     - FTIndicator
     - Haring
     - KeychainAccess
+    - libCEd25519
     - libsodium
     - M13Checkbox
     - MessageKit
@@ -87,11 +95,17 @@ SPEC REPOS:
     - web3swift
 
 EXTERNAL SOURCES:
+  Lisk:
+    :branch: dev
+    :git: https://github.com/boyarkin-anton/lisk-swift.git
   MessageKit:
     :branch: develop
     :git: https://github.com/boyarkin-anton/MessageKit.git
 
 CHECKOUT OPTIONS:
+  Lisk:
+    :commit: cfc6aaa0a1713dcab0e96cd7f6a7e17c7f85f9fa
+    :git: https://github.com/boyarkin-anton/lisk-swift.git
   MessageKit:
     :commit: e2364d2394eddc211be6957893fbd0f726c233f0
     :git: https://github.com/boyarkin-anton/MessageKit.git
@@ -102,13 +116,16 @@ SPEC CHECKSUMS:
   BigInt: 8e8a52161c745cd3ab78e3dc346a9fbee51e6cf6
   CryptoSwift: 6c778d69282bed3b4e975ff97a79d074f20bb011
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
+  Ed25519: d84c847d8ffbb2f6fec71479abbb8fa3dfe12578
   EFQRCode: 203846c7b135b5f7c1d18bb7923bc32a74c8b363
   Eureka: 0748c7bbb2560130e43c7bfa83e99c98854a1f42
   FreakingSimpleRoundImageView: 66a0f0fa1722faf63b662ba61f8441b09436a428
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   Haring: d2a4cfc00dfb63836dffc93e45919369f850e134
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
+  libCEd25519: 45de00a0944cb2d51e64fcef67bd9989c42d20ca
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
+  Lisk: a900424110c208c425102ee8b6fd60d9b6b878c3
   M13Checkbox: a8c2491cfbbca10797925fd0b9154a782bf40d89
   MessageKit: 16160036b16476b04bd0e9f2c7ce67e662e503e4
   MyLittlePinpad: ec1d9990d9715eab48205ecc08f4ff359ead521b
@@ -122,6 +139,6 @@ SPEC CHECKSUMS:
   Swinject: f7f15a9672e99328c1f07f277091087917215700
   web3swift: 79f72b48005f1b28e73191eaf78194d6cf5f8a35
 
-PODFILE CHECKSUM: 982f53dbc54c6aa3ca1ce0750bf6f1448a4f1684
+PODFILE CHECKSUM: ff39280a050c4af02c429afa499fcfae47a49cf2
 
 COCOAPODS: 1.5.3

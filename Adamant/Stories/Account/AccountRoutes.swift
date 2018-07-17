@@ -18,6 +18,7 @@ extension AdamantScene {
 			c.notificationsService = r.resolve(NotificationsService.self)
 			c.transfersProvider = r.resolve(TransfersProvider.self)
             c.ethApiService = r.resolve(EthApiServiceProtocol.self)
+            c.lskApiService = r.resolve(LskApiServiceProtocol.self)
 			return c
 		}
 		
@@ -27,6 +28,7 @@ extension AdamantScene {
 			c.accountService = r.resolve(AccountService.self)
 			c.dialogService = r.resolve(DialogService.self)
             c.ethApiService = r.resolve(EthApiServiceProtocol.self)
+            c.lskApiService = r.resolve(LskApiServiceProtocol.self)
 			return c
 		}
 		
