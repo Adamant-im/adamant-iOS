@@ -105,6 +105,9 @@ class DelegateDetailsViewController: UITableViewController {
 	private var forged: Decimal? = nil
 	private var forgingTime: TimeInterval? = nil
 	
+	// Double error fix
+	private var prevApiError: (date: Date, error: ApiServiceError)? = nil
+	
 	
 	// MARK: - Lifecycle
 	
@@ -281,7 +284,7 @@ extension DelegateDetailsViewController {
 					tableView.reloadRows(at: [indexPath], with: .none)
 				}
 			case .failure(let error):
-				self?.dialogService.showRichError(error: error)
+				self?.apiServiceFailed(with: error)
 			}
 		}
 		
@@ -305,8 +308,19 @@ extension DelegateDetailsViewController {
 				}
 				
 			case .failure(let error):
-				self?.dialogService.showRichError(error: error)
+				self?.apiServiceFailed(with: error)
 			}
+		}
+	}
+	
+	private func apiServiceFailed(with error: ApiServiceError) {
+		DispatchQueue.main.async { [unowned self] in
+			if let prevApiError = self.prevApiError, Date().timeIntervalSince(prevApiError.date) < 1, prevApiError.error == error { // if less than a second ago, return
+				return
+			}
+			
+			self.prevApiError = (date: Date(), error: error)
+			self.dialogService.showRichError(error: error)
 		}
 	}
 }

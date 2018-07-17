@@ -13,6 +13,7 @@ enum ApiServiceResult<T> {
 	case failure(ApiServiceError)
 }
 
+// MARK: - Error
 enum ApiServiceError: Error {
 	case notLogged
 	case accountNotFound
@@ -79,6 +80,32 @@ extension ApiServiceError: RichError {
 	}
 }
 
+extension ApiServiceError: Equatable {
+	static func == (lhs: ApiServiceError, rhs: ApiServiceError) -> Bool {
+		switch (lhs, rhs) {
+		case (.notLogged, .notLogged):
+			return true
+			
+		case (.accountNotFound, .accountNotFound):
+			return true
+			
+		case (.serverError(let le), .serverError(let re)):
+			return le == re
+			
+		case (.internalError(let lm, _), .internalError(let rm, _)):
+			return lm == rm
+			
+		case (.networkError, .networkError):
+			return true
+			
+		default:
+			return false
+		}
+	}
+}
+
+
+// - MARK: ApiService
 protocol ApiService: class {
 	
 	/// Default is async queue with .utilities priority.
