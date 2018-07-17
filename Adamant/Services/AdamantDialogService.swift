@@ -98,16 +98,21 @@ extension AdamantDialogService {
 	}
 	
 	func showError(withMessage message: String, error: Error? = nil) {
+		// Init from nib from main thread, otherwise background threads can crash app
+		let alertVC: PMAlertController
+		
 		if Thread.isMainThread {
 			FTIndicator.dismissProgress()
+			alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
 		} else {
+			var vc: PMAlertController! = nil
 			DispatchQueue.main.sync {
 				FTIndicator.dismissProgress()
+				vc = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
 			}
+			alertVC = vc
 		}
 		
-		let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
-        
         alertVC.gravityDismissAnimation = false
         alertVC.alertTitle.textColor = UIColor.adamantPrimary
         alertVC.alertDescription.textColor = .adamantSecondary
@@ -173,8 +178,14 @@ extension AdamantDialogService {
         alertVC.alertActionStackView.axis = .vertical
         alertVC.alertActionStackView.spacing = 0
         alertVC.alertActionStackViewHeightConstraint.constant = 100
-        
-        self.present(alertVC, animated: true, completion: nil)
+		
+		if Thread.isMainThread {
+			present(alertVC, animated: true, completion: nil)
+		} else {
+			DispatchQueue.main.async { [weak self] in
+				self?.present(alertVC, animated: true, completion: nil)
+			}
+		}
 	}
 	
 	func showRichError(error: RichError) {
