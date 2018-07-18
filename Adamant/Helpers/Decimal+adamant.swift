@@ -14,6 +14,6 @@ extension Decimal {
 	}
 	
 	func shiftedToAdamant() -> Decimal {
-		return Decimal(sign: self.isSignMinus ? .minus : .plus, exponent: 0, significand: self)
+        return self * 100000000
 	}
 }

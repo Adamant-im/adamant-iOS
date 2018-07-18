@@ -265,6 +265,7 @@ extension JSAdamantCore {
 			asset.state = JSState(key: state.key, value: state.value, type: Int(state.type.rawValue))
 		}
 		
+        let amount = NSDecimalNumber(decimal:t.amount.shiftedToAdamant()).uint64Value
 		let jsTransaction = JSTransaction(id: 0,
 										  height: 0,
 										  blockId: 0,
@@ -274,7 +275,7 @@ extension JSAdamantCore {
 										  senderId: senderId,
 										  recipientId: t.recipientId,
 										  recipientPublicKey: t.requesterPublicKey,
-										  amount: (t.amount.shiftedToAdamant() as NSDecimalNumber).uint64Value,
+										  amount: amount,
 										  fee: 0,
 										  signature: "",
 										  confirmations: 0,
