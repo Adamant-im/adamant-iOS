@@ -136,7 +136,7 @@ class LskApiService: LskApiServiceProtocol {
     
     func getTransactions(_ completion: @escaping (ApiServiceResult<[Transactions.TransactionModel]>) -> Void) {
         if let address = self.account?.address {
-            transactionApi.transactions(senderIdOrRecipientId: address, limit: 100, offset: 0) { (response) in
+            transactionApi.transactions(senderIdOrRecipientId: address, limit: 100, offset: 0, sort: APIRequest.Sort("timestamp", direction: .descending)) { (response) in
                 switch response {
                 case .success(response: let result):
                     completion(.success(result.data))
