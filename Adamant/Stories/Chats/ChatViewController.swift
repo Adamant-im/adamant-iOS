@@ -39,6 +39,7 @@ class ChatViewController: MessagesViewController {
 	var dialogService: DialogService!
 	var router: Router!
     var ethApiService: EthApiServiceProtocol!
+    var lskApiService: LskApiServiceProtocol!
 	
 	// MARK: Properties
 	weak var delegate: ChatViewControllerDelegate?
@@ -52,6 +53,7 @@ class ChatViewController: MessagesViewController {
 	}
     
     private var ethAddress: String?
+    private var lskAddress: String?
 	
 	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
 	private var controllerChanges: [NSFetchedResultsChangeType:[(indexPath: IndexPath?, newIndexPath: IndexPath?)]] = [:]
@@ -77,6 +79,23 @@ class ChatViewController: MessagesViewController {
                 $0.image = #imageLiteral(resourceName: "attachment")
             }.onTouchUpInside { _ in
                 self.dialogService.showSystemActionSheet(title: String.adamantLocalized.transfer.send, message: "", actions: [
+                    UIAlertAction(title: "ADM", style: .default, handler: { [weak self] (_) in
+                        // MARK: Show ADM transfer details
+                        if let address = self?.chatroom?.partner?.address {
+                            guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
+                                fatalError("Can't get TransferViewController scene")
+                            }
+                            
+                            vc.token = .ADM
+                            vc.toAddress = address
+                            
+                            if let nav = self?.navigationController {
+                                nav.pushViewController(vc, animated: true)
+                            } else {
+                                self?.present(vc, animated: true, completion: nil)
+                            }
+                        }
+                    }),
                     UIAlertAction(title: "Ethereum", style: .default, handler: { [weak self] (_) in
                         if let ethAddress = self?.ethAddress {
                             // MARK: Show ETH transfer
@@ -97,21 +116,24 @@ class ChatViewController: MessagesViewController {
                             self?.dialogService.showWarning(withMessage: "User don't have public Eth wallet yet.")
                         }
                     }),
-                    UIAlertAction(title: "ADM", style: .default, handler: { [weak self] (_) in
-                        // MARK: Show ADM transfer details
-                        if let address = self?.chatroom?.partner?.address {
+                    UIAlertAction(title: "Lisk", style: .default, handler: { [weak self] (_) in
+                        if let address = self?.lskAddress {
+                            // MARK: Show ETH transfer
                             guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
                                 fatalError("Can't get TransferViewController scene")
                             }
                             
-                            vc.token = .ADM
+                            vc.token = .LSK
                             vc.toAddress = address
+                            vc.delegate = self
                             
                             if let nav = self?.navigationController {
                                 nav.pushViewController(vc, animated: true)
                             } else {
                                 self?.present(vc, animated: true, completion: nil)
                             }
+                        } else {
+                            self?.dialogService.showWarning(withMessage: "User don't have public Lisk wallet yet.")
                         }
                     })
                     ])
@@ -218,17 +240,20 @@ class ChatViewController: MessagesViewController {
 			messageInputBar.inputTextView.backgroundColor = UIColor.adamantChatSenderBackground
 			messageInputBar.inputTextView.isEditable = false
 			messageInputBar.sendButton.isEnabled = false
-} else {
-// MARK: 4. Check partner for Eth Address
-
-if let address = chatroom.partner?.address {
-ethApiService.getEthAddress(byAdamandAddress: address) { (result) in
-guard case .success(let address) = result, let ethAddress = address else { return }
-self.ethAddress = ethAddress
-}
-}
-}
-
+        } else {
+            // MARK: 4. Check partner for Eth Address
+            
+            if let address = chatroom.partner?.address {
+                ethApiService.getEthAddress(byAdamandAddress: address) { (result) in
+                    guard case .success(let address) = result, let ethAddress = address else { return }
+                    self.ethAddress = ethAddress
+                }
+                lskApiService.getLskAddress(byAdamandAddress: address) { (result) in
+                    guard case .success(let address) = result, let lskAddress = address else { return }
+                    self.lskAddress = lskAddress
+                }
+            }
+        }
 
 		// MARK: 4. Data
 		let controller = chatsProvider.getChatController(for: chatroom)

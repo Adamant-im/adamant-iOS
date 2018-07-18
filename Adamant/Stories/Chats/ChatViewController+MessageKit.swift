@@ -204,7 +204,7 @@ extension ChatViewController: MessageCellDelegate {
 			guard message.messageStatus == .failed else {
                 
                 if message.type == UInt16(ChatType.richMessage.rawValue) {
-                    guard let data = message.message?.data(using: String.Encoding.utf8), let transfer = try? JSONDecoder().decode(ChatTransfer.self, from: data), transfer.type == .eth else {
+                    guard let data = message.message?.data(using: String.Encoding.utf8), let transfer = try? JSONDecoder().decode(ChatTransfer.self, from: data), transfer.type != .unknown else {
                         break
                     }
                     
@@ -213,17 +213,36 @@ extension ChatViewController: MessageCellDelegate {
                     }
                     
                     self.dialogService.showProgress(withMessage: String.adamantLocalized.transactionDetails.requestingDataProgressMessage, userInteractionEnable: false)
-
-                    self.ethApiService.getTransaction(byHash: transfer.hash) { (result) in
-                        switch result {
-                        case .success(let transaction):
-                            vc.set(transaction: transaction)
-                            self.dialogService.dismissProgress()
-                            break
-                        case .failure(let error):
-                            self.dialogService.showError(withMessage: "Transrer issue", error: error)
-                            break
+                    
+                    switch transfer.type {
+                    case .eth:
+                        self.ethApiService.getTransaction(byHash: transfer.hash) { (result) in
+                            switch result {
+                            case .success(let transaction):
+                                vc.set(transaction: transaction)
+                                self.dialogService.dismissProgress()
+                                break
+                            case .failure(let error):
+                                self.dialogService.showError(withMessage: "Transrer issue", error: error)
+                                break
+                            }
                         }
+                        break
+                        
+                    case .lsk:
+                        self.lskApiService.getTransaction(byHash: transfer.hash) { (result) in
+                            switch result {
+                            case .success(let transaction):
+                                vc.set(transaction: transaction)
+                                self.dialogService.dismissProgress()
+                                break
+                            case .failure(let error):
+                                self.dialogService.showError(withMessage: "Transrer issue", error: error)
+                                break
+                            }
+                        }
+                        break
+                    default: break
                     }
                     
                     if let nav = navigationController {

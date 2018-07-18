@@ -61,7 +61,7 @@ class LskApiService: LskApiServiceProtocol {
         do {
             let keys = try Crypto.keyPair(fromPassphrase: passphrase)
             let address = Crypto.address(fromPublicKey: keys.publicKeyString)
-            let account = LskAccount(keys: keys, address: address, balance: BigUInt(0), balanceString: "0 LSK")
+            let account = LskAccount(keys: keys, address: address, balance: BigUInt(0), balanceString: "0")
             self.account = account
 //            print(address)
             completion(.success(account))
@@ -120,16 +120,43 @@ class LskApiService: LskApiServiceProtocol {
     
     func sendFunds(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<String>) -> Void) {
         if let keys = self.account?.keys {
-            transactionApi.transfer(lsk: amount, to: address, keyPair: keys) { response in
-                switch response {
-                case .success(let result):
-                    print(result.data.hashValue)
-                    print(result.data.message)
-                    completion(.success(result.data.message))
-                case .error(let error):
-                    print("ERROR: " + error.message)
-                    completion(.failure(.internalError(message: error.message, error: nil)))
+            
+            do {
+                let transaction = LocalTransaction(.transfer, lsk: amount, recipientId: address)
+                let signedTransaction = try transaction.signed(keyPair: keys)
+                
+                transactionApi.submit(signedTransaction: signedTransaction) { response in
+                    switch response {
+                    case .success(let result):
+                        print(result.data.hashValue)
+                        print(result.data.message)
+                        
+                        let amount = self.toRawLsk(value: amount)
+                        
+                        if let id = signedTransaction.id {
+                            let result = ["type": "lsk_transaction", "amount": amount, "hash": id, "comments":""]
+                            
+                            do {
+                                let data = try JSONEncoder().encode(result)
+                                guard let raw = String(data: data, encoding: String.Encoding.utf8) else {
+                                    return
+                                }
+                                completion(.success(raw))
+                            } catch {
+                                completion(.failure(.internalError(message: "LSK Wallet: Send - wrong data issue", error: nil)))
+                            }
+                        } else {
+                            completion(.failure(.internalError(message: "LSK Wallet: Send - wrong data issue", error: nil)))
+                        }
+                        
+                        
+                    case .error(let error):
+                        print("ERROR: " + error.message)
+                        completion(.failure(.internalError(message: error.message, error: nil)))
+                    }
                 }
+            } catch {
+                completion(.failure(.internalError(message: error.localizedDescription, error: error)))
             }
         }
     }
@@ -146,6 +173,24 @@ class LskApiService: LskApiServiceProtocol {
                     completion(.failure(.internalError(message: error.message, error: nil)))
                     break
                 }
+            }
+        }
+    }
+    
+    func getTransaction(byHash hash: String, completion: @escaping (ApiServiceResult<Transactions.TransactionModel>) -> Void) {
+        transactionApi.transactions(id: hash, limit: 1, offset: 0) { (response) in
+            switch response {
+            case .success(response: let result):
+                if let transaction = result.data.first {
+                    completion(.success(transaction))
+                } else {
+                    completion(.failure(.internalError(message: "No transaction", error: nil)))
+                }
+                break
+            case .error(response: let error):
+                print("ERROR: " + error.message)
+                completion(.failure(.internalError(message: error.message, error: nil)))
+                break
             }
         }
     }
@@ -193,8 +238,12 @@ class LskApiService: LskApiServiceProtocol {
         }
     }
     
-    func toRawLsk(value: Double) -> BigInt {
-        return BigInt(value) * BigInt(10).power(8)
+    func toRawLsk(value: Double) -> String {
+        if let formattedAmount = Web3.Utils.parseToBigUInt("\(value)", decimals: 8) {
+            return "\(formattedAmount)"
+        } else {
+            return "--"
+        }
     }
     
     private static let addressRegexString = "^([0-9]{2,22})L$"
