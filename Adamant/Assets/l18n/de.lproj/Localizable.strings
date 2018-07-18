@@ -118,6 +118,9 @@
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "Über ADAMANT";
 
+/* Account tab: 'Vote for delegates' button */
+"AccountTab.Row.VoteForDelegates" = "Delegate wählen";
+
 /* Account tab: Actions section title */
 "AccountTab.Section.Actions" = "Aktionen";
 
@@ -132,6 +135,9 @@
 
 /* Account page: scene title */
 "AccountTab.Title" = "Konto";
+
+/* Account tab: Delegates section title */
+"AccountTab.Section.Delegates" = "Delegate";
 
 /* Product name */
 "ADAMANT" = "ADAMANT";
@@ -207,6 +213,66 @@
 
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Tippen Sie für Details";
+
+/* Delegates page: scene title */
+"Delegates.Title" = "Delegate";
+
+/* Delegates tab: Message about 50 ADM fee for vote */
+"Delegates.NotEnoughtTokensForVote" = "Nicht genug Tokens für die Abstimmung. Sie brauchen mindestens 50 ADM auf Ihrem Konto";
+
+/* Delegate details: scene title */
+"DelegateDetails.Title" = "Details";
+
+/* Delegate Details Screen: Rows title for 'Username'" */
+"DelegateDetails.Row.Username" = "Benutzername";
+
+/* Delegate Details Screen: Rows title for 'Address'" */
+"DelegateDetails.Row.Address" = "Addresse";
+
+/* Delegate Details Screen: Rows title for 'Public Key'" */
+"DelegateDetails.Row.PublicKey" = "Öffentlicher Schlüssel";
+
+/* Delegate Details Screen: Rows title for 'Vote weight'" */
+"DelegateDetails.Row.VoteWeight" = "Stimmgewicht";
+
+/* Delegate Details Screen: Rows title for 'Produced blocks'" */
+"DelegateDetails.Row.ProducedBlocks" = "Produzierte Blöcke";
+
+/* Delegate Details Screen: Rows title for 'Missed blocks'" */
+"DelegateDetails.Row.MissedBlocks" = "Verpasste Blöcke";
+
+/* Delegate Details Screen: Rows title for 'Rate'" */
+"DelegateDetails.Row.Rate" = "Rate";
+
+/* Delegate Details Screen: Rows title for 'Rank'" */
+"DelegateDetails.Row.Rank" = "Rang";
+
+/* Delegate Details Screen: Rows title for 'Approval'" */
+"DelegateDetails.Row.Approval" = "Bestätigung";
+
+/* Delegate Details Screen: Rows title for 'Productivity'" */
+"DelegateDetails.Row.Productivity" = "Produktivität";
+
+/* Delegate Details Screen: Rows title for 'Forging time'" */
+"DelegateDetails.Row.ForgingTime" = "Forging-Zeit";
+
+/* Delegate Details Screen: Rows title for 'Forged'" */
+"DelegateDetails.Row.Forged" = "Geforged";
+
+/* Delegates: Message for Successfull voting */
+"Delegates.Vote.Success" = "Ihre Stimme wurde versendet";
+
+/* Storybard - Delegate vote panel: 'Upvotes' label */
+"Delegates.VotePanel.Upvotes" = "Upvotes:";
+
+/* Storybard - Delegate vote panel: 'Downvotes' label */
+"Delegates.VotePanel.Downvotes" = "Downvotes:";
+
+/* Storybard - Delegate vote panel: 'New' label */
+"Delegates.VotePanel.New" = "Neue:";
+
+/* Storybard - Delegate vote panel: 'Total' label */
+"Delegates.VotePanel.Total" = "Gesamt:";
 
 /* Shared error: Account not found error. Using %@ for address. */
 "Error.AccountNotFoundFormat" = "Konto nicht gefunden: %@";
