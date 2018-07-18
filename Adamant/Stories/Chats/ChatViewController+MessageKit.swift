@@ -435,10 +435,10 @@ extension MessageTransaction: MessageType {
         
         if type == Int16(ChatType.richMessage.rawValue) {
             guard let data = message.data(using: String.Encoding.utf8), let transfer = try? JSONDecoder().decode(ChatTransfer.self, from: data) else {
-                return MessageData.text("")
+                return MessageKind.text("")
             }
 
-            return MessageData.attributedText(transfer.render())
+            return MessageKind.attributedText(transfer.render())
         }
 		
 		if isMarkdown {

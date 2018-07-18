@@ -191,7 +191,7 @@ class BaseTransactionDetailsViewController: FormViewController {
                 })
                 .cellUpdate({ (cell, _) in
                     if let label = cell.textLabel {
-                        label.font = UIFont.adamantPrimary(size: 17)
+                        label.font = UIFont.adamantPrimary(ofSize: 17)
                         label.textColor = UIColor.adamantPrimary
                     }
                     
@@ -216,7 +216,7 @@ class BaseTransactionDetailsViewController: FormViewController {
                 })
                 .cellUpdate({ (cell, _) in
                     if let label = cell.textLabel {
-                        label.font = UIFont.adamantPrimary(size: 17)
+                        label.font = UIFont.adamantPrimary(ofSize: 17)
                         label.textColor = UIColor.adamantPrimary
                     }
                     
@@ -354,7 +354,7 @@ class BaseTransactionDetailsViewController: FormViewController {
         cell.textLabel?.textColor = UIColor.adamantPrimary
         cell.detailTextLabel?.textColor = UIColor.adamantSecondary
         
-        let font = UIFont.adamantPrimary(size: 17)
+        let font = UIFont.adamantPrimary(ofSize: 17)
         cell.textLabel?.font = font
         cell.detailTextLabel?.font = font
     }

@@ -51,16 +51,16 @@ extension AdamantApiService {
 			}
 		}
 	}
-	
+    
 	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
-		self.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: message, nonce: nonce, type: ChatType.message, completion: completion)
+        self.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: message, type: ChatType.message, nonce: nonce, completion: completion)
 	}
     
     func sendRichMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
-        self.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: message, nonce: nonce, type: ChatType.richMessage, completion: completion)
+        self.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: message, type: ChatType.richMessage, nonce: nonce, completion: completion)
     }
     
-    func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, nonce: String, type: ChatType, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
+    func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
         // MARK: 1. Prepare params
         let params: [String : Any] = [
             "type": TransactionType.chatMessage.rawValue,

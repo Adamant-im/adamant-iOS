@@ -93,8 +93,8 @@ struct ChatTransfer: Decodable {
         let sentRange = rangeReference.range(of: sent)
         let amountRange = rangeReference.range(of: balance)
         
-        attributedString.setAttributes([.font: UIFont.adamantPrimary(size: 14)], range: sentRange)
-        attributedString.setAttributes([.font: UIFont.adamantPrimary(size: 28)], range: amountRange)
+        attributedString.setAttributes([.font: UIFont.adamantPrimary(ofSize: 14)], range: sentRange)
+        attributedString.setAttributes([.font: UIFont.adamantPrimary(ofSize: 28)], range: amountRange)
         
         return attributedString
     }
@@ -120,8 +120,8 @@ struct ChatTransfer: Decodable {
         let sentRange = rangeReference.range(of: sent)
         let amountRange = rangeReference.range(of: balance)
         
-        attributedString.setAttributes([.font: UIFont.adamantPrimary(size: 14)], range: sentRange)
-        attributedString.setAttributes([.font: UIFont.adamantPrimary(size: 28)], range: amountRange)
+        attributedString.setAttributes([.font: UIFont.adamantPrimary(ofSize: 14)], range: sentRange)
+        attributedString.setAttributes([.font: UIFont.adamantPrimary(ofSize: 28)], range: amountRange)
         
         return attributedString
     }

@@ -98,20 +98,14 @@ EXTERNAL SOURCES:
   Lisk:
     :branch: dev
     :git: https://github.com/boyarkin-anton/lisk-swift.git
-  MessageKit:
-    :branch: develop
-    :git: https://github.com/boyarkin-anton/MessageKit.git
 
 CHECKOUT OPTIONS:
   Lisk:
     :commit: 952fea02d6076668f68eb252ec5bd8bf4e656960
     :git: https://github.com/boyarkin-anton/lisk-swift.git
-  MessageKit:
-    :commit: e2364d2394eddc211be6957893fbd0f726c233f0
-    :git: https://github.com/boyarkin-anton/MessageKit.git
 
 SPEC CHECKSUMS:
-  Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
+  Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
   Alamofire-Synchronous: eedf1e6e961c3795a63c74990b3f7d9fbfac7e50
   BigInt: 8e8a52161c745cd3ab78e3dc346a9fbee51e6cf6
   CryptoSwift: 6c778d69282bed3b4e975ff97a79d074f20bb011
@@ -139,6 +133,6 @@ SPEC CHECKSUMS:
   Swinject: f7f15a9672e99328c1f07f277091087917215700
   web3swift: 79f72b48005f1b28e73191eaf78194d6cf5f8a35
 
-PODFILE CHECKSUM: ff39280a050c4af02c429afa499fcfae47a49cf2
+PODFILE CHECKSUM: f167498be8316d6db16767ee403235192ed374dd
 
 COCOAPODS: 1.5.3

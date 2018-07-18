@@ -90,23 +90,6 @@ extension TransactionsViewController {
         
         cell.dateLabel.text = transfer.sentDate.humanizedDateTime()
     }
-	
-	private func markTransfersAsRead() {
-		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-		privateContext.parent = stack.container.viewContext
-		
-		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
-		request.predicate = NSPredicate(format: "isUnread == true")
-		request.sortDescriptors = [NSSortDescriptor(key: "transactionId", ascending: false)]
-		
-		if let result = try? privateContext.fetch(request) {
-			result.forEach { $0.isUnread = false }
-			
-			if privateContext.hasChanges {
-				try? privateContext.save()
-			}
-		}
-	}
 }
 
 // MARK: - UITableView
