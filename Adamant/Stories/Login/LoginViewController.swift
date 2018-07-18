@@ -125,7 +125,7 @@ class LoginViewController: FormViewController {
 	var localAuth: LocalAuthentication!
     var router: Router!
     var ethAPiService: EthApiServiceProtocol!
-	
+	var lskAPiService: LskApiServiceProtocol!
 	
 	// MARK: Properties
 	private var hideNewPassphrase: Bool = true
@@ -402,6 +402,16 @@ extension LoginViewController {
                         self?.dismiss(animated: true, completion: nil)
                     }
                     self?.dialogService.dismissProgress()
+                })
+                
+                self?.lskAPiService.newAccount(byPassphrase: passphrase, completion: { (result) in
+                    switch result {
+                    case .success(_):
+                        break
+                    case .failure(let error):
+                        print(error)
+                        break
+                    }
                 })
 				
 			case .failure(let error):

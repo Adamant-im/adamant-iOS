@@ -10,11 +10,14 @@
 		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
 		642361BE20E3869D0061559E /* eth_l18n.strings in Resources */ = {isa = PBXBuildFile; fileRef = 642361BD20E3869D0061559E /* eth_l18n.strings */; };
 		649A694720DD427200D27E91 /* TransferType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A694620DD427200D27E91 /* TransferType.swift */; };
+		64A223D820F7A08E005157CB /* LskApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D720F7A08E005157CB /* LskApiServiceProtocol.swift */; };
+		64A223DA20F7A14B005157CB /* LskApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D920F7A14B005157CB /* LskApiService.swift */; };
 		64BD2B7520E2814B00E2CD36 /* EthTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */; };
 		64BD2B7720E2820300E2CD36 /* TransactionDetailsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7620E2820300E2CD36 /* TransactionDetailsProtocol.swift */; };
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
 		64D05A0220D51632003AD655 /* EthApiServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D05A0120D51632003AD655 /* EthApiServiceProtocol.swift */; };
 		64D05A0420D516B4003AD655 /* EthApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D05A0320D516B4003AD655 /* EthApiService.swift */; };
+		64EE46B220FE0C8D00194DDA /* LSKTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64EE46B120FE0C8D00194DDA /* LSKTransactionsViewController.swift */; };
 		64F085D920E2D7600006DE68 /* ADMTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F085D820E2D7600006DE68 /* ADMTransactionsViewController.swift */; };
 		64FA53CD20E1300B006783C9 /* ETHTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CC20E1300A006783C9 /* ETHTransactionsViewController.swift */; };
 		64FA53D120E24942006783C9 /* BaseTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53D020E24941006783C9 /* BaseTransactionDetailsViewController.swift */; };
@@ -198,11 +201,14 @@
 /* Begin PBXFileReference section */
 		642361BD20E3869D0061559E /* eth_l18n.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = eth_l18n.strings; sourceTree = "<group>"; };
 		649A694620DD427200D27E91 /* TransferType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferType.swift; sourceTree = "<group>"; };
+		64A223D720F7A08E005157CB /* LskApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskApiServiceProtocol.swift; sourceTree = "<group>"; };
+		64A223D920F7A14B005157CB /* LskApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskApiService.swift; sourceTree = "<group>"; };
 		64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransaction.swift; sourceTree = "<group>"; };
 		64BD2B7620E2820300E2CD36 /* TransactionDetailsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsProtocol.swift; sourceTree = "<group>"; };
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
 		64D05A0120D51632003AD655 /* EthApiServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthApiServiceProtocol.swift; sourceTree = "<group>"; };
 		64D05A0320D516B4003AD655 /* EthApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthApiService.swift; sourceTree = "<group>"; };
+		64EE46B120FE0C8D00194DDA /* LSKTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LSKTransactionsViewController.swift; sourceTree = "<group>"; };
 		64F085D820E2D7600006DE68 /* ADMTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADMTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53CC20E1300A006783C9 /* ETHTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ETHTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53D020E24941006783C9 /* BaseTransactionDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseTransactionDetailsViewController.swift; sourceTree = "<group>"; };
@@ -417,12 +423,13 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		64D05A0020D515CA003AD655 /* EthApiService */ = {
+		64D05A0020D515CA003AD655 /* TokensApiService */ = {
 			isa = PBXGroup;
 			children = (
 				64D05A0320D516B4003AD655 /* EthApiService.swift */,
+				64A223D920F7A14B005157CB /* LskApiService.swift */,
 			);
-			path = EthApiService;
+			path = TokensApiService;
 			sourceTree = "<group>";
 		};
 		E59396A8E0053F21F768E69B /* Pods */ = {
@@ -493,6 +500,7 @@
 				E9A174B22057EC47003667CD /* BackgroundFetchService.swift */,
 				E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */,
 				64D05A0120D51632003AD655 /* EthApiServiceProtocol.swift */,
+				64A223D720F7A08E005157CB /* LskApiServiceProtocol.swift */,
 				64BD2B7620E2820300E2CD36 /* TransactionDetailsProtocol.swift */,
 			);
 			path = ServiceProtocols;
@@ -501,7 +509,7 @@
 		E913C9061FFFA92E001A83F7 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				64D05A0020D515CA003AD655 /* EthApiService */,
+				64D05A0020D515CA003AD655 /* TokensApiService */,
 				E9CAE8D02018AA5000345E76 /* ApiService */,
 				E9B3D39F201FA2090019EB36 /* DataProviders */,
 				E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */,
@@ -632,6 +640,7 @@
 				E9E7CDC12003F5A400DFC4DB /* TransactionsViewController.swift */,
 				64F085D820E2D7600006DE68 /* ADMTransactionsViewController.swift */,
 				64FA53CC20E1300A006783C9 /* ETHTransactionsViewController.swift */,
+				64EE46B120FE0C8D00194DDA /* LSKTransactionsViewController.swift */,
 				E94E7B0B205D5E4A0042B639 /* TransactionsViewController.xib */,
 				64FA53D020E24941006783C9 /* BaseTransactionDetailsViewController.swift */,
 				E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */,
@@ -990,11 +999,13 @@
 				"${BUILT_PRODUCTS_DIR}/CryptoSwift/CryptoSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/DateToolsSwift/DateToolsSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/EFQRCode/EFQRCode.framework",
+				"${BUILT_PRODUCTS_DIR}/Ed25519/Ed25519.framework",
 				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
 				"${BUILT_PRODUCTS_DIR}/FTIndicator/FTIndicator.framework",
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
 				"${BUILT_PRODUCTS_DIR}/Haring/Haring.framework",
 				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
+				"${BUILT_PRODUCTS_DIR}/Lisk/Lisk.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
 				"${BUILT_PRODUCTS_DIR}/MyLittlePinpad/MyLittlePinpad.framework",
 				"${BUILT_PRODUCTS_DIR}/PMAlertController/PMAlertController.framework",
@@ -1004,6 +1015,7 @@
 				"${BUILT_PRODUCTS_DIR}/Result/Result.framework",
 				"${BUILT_PRODUCTS_DIR}/SipHash/SipHash.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
+				"${BUILT_PRODUCTS_DIR}/libCEd25519/CEd25519.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium/libsodium.framework",
 				"${BUILT_PRODUCTS_DIR}/secp256k1_ios/secp256k1_ios.framework",
 				"${BUILT_PRODUCTS_DIR}/web3swift/web3swift.framework",
@@ -1016,11 +1028,13 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CryptoSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DateToolsSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/EFQRCode.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Ed25519.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Eureka.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FTIndicator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Haring.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lisk.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MyLittlePinpad.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PMAlertController.framework",
@@ -1030,6 +1044,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Result.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SipHash.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CEd25519.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/secp256k1_ios.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/web3swift.framework",
@@ -1098,6 +1113,7 @@
 				E987024920C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift in Sources */,
 				E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */,
 				649A694720DD427200D27E91 /* TransferType.swift in Sources */,
+				64A223D820F7A08E005157CB /* LskApiServiceProtocol.swift in Sources */,
 				E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */,
 				E9CAE8DA2018ACD300345E76 /* AdamantApi+Chats.swift in Sources */,
 				E91947B020002393001362F8 /* AdamantApiService.swift in Sources */,
@@ -1111,6 +1127,7 @@
 				E9150B9D2066DA210065A985 /* Chatroom+CoreDataClass.swift in Sources */,
 				E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */,
 				E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */,
+				64A223DA20F7A14B005157CB /* LskApiService.swift in Sources */,
 				E9150BA22066DA210065A985 /* ChatTransaction+CoreDataProperties.swift in Sources */,
 				E9204B5020C94C4A00F3B9AB /* Date+humanizedString.swift in Sources */,
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
@@ -1214,6 +1231,7 @@
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
 				E9EC342120052ABB00C0E546 /* TransferViewController.swift in Sources */,
 				E9A03FD420DBC824007653A1 /* NodeVersion.swift in Sources */,
+				64EE46B220FE0C8D00194DDA /* LSKTransactionsViewController.swift in Sources */,
 				E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */,
 				E948E04C2027679300975D6B /* AdamantFormattingTools.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,
