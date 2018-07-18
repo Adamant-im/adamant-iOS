@@ -12,12 +12,14 @@ import BigInt
 
 enum TransferType: String, Decodable {
     case eth = "eth_transaction"
+    case lsk = "lsk_transaction"
     case unknown
     
     init(from decoder: Decoder) throws {
         let label = try decoder.singleValueContainer().decode(String.self)
         switch label {
         case "eth_transaction": self = .eth
+        case "lsk_transaction": self = .lsk
         default: self = .unknown
         }
     }
@@ -48,6 +50,7 @@ struct ChatTransfer: Decodable {
         switch type {
         case .eth:
             return renderETH()
+        case .lsk: return renderLSK()
         default:
             return NSAttributedString(string: "")
         }
@@ -57,11 +60,12 @@ struct ChatTransfer: Decodable {
         switch type {
         case .eth:
             return renderETHPreview(isOutgoing: isOutgoing)
+        case .lsk:
+            return renderLSKPreview(isOutgoing: isOutgoing)
         default:
             return ""
         }
     }
-    
     
     // MARK: - Chat renderers
     
@@ -95,6 +99,33 @@ struct ChatTransfer: Decodable {
         return attributedString
     }
     
+    func renderLSK() -> NSAttributedString {
+        guard let amount = BigUInt(amount) else {
+            return NSAttributedString(string: "")
+        }
+        
+        let balance: String
+        
+        if let formattedAmount = Web3.Utils.formatToPrecision(amount, numberDecimals: 8, formattingDecimals: 8), let amount = Double(formattedAmount) {
+            balance = "\(amount) LSK"
+        } else {
+            balance = "-- LSK"
+        }
+        
+        let sent = String.adamantLocalized.chat.sent
+        
+        let attributedString = NSMutableAttributedString(string: "\(sent)\n\(balance)\n\n\(String.adamantLocalized.chat.tapForDetails)")
+        
+        let rangeReference = attributedString.string as NSString
+        let sentRange = rangeReference.range(of: sent)
+        let amountRange = rangeReference.range(of: balance)
+        
+        attributedString.setAttributes([.font: UIFont.adamantPrimary(size: 14)], range: sentRange)
+        attributedString.setAttributes([.font: UIFont.adamantPrimary(size: 28)], range: amountRange)
+        
+        return attributedString
+    }
+    
     // MARK: - Preview renderers
     
     func renderETHPreview(isOutgoing: Bool) -> String {
@@ -111,6 +142,26 @@ struct ChatTransfer: Decodable {
             balance = "\(amount) ETH"
         } else {
             balance = "-- ETH"
+        }
+        
+        if isOutgoing {
+            return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(balance)")
+        } else {
+            return "➡️  \(balance)"
+        }
+    }
+    
+    func renderLSKPreview(isOutgoing: Bool) -> String {
+        guard let amount = BigUInt(amount) else {
+            return ""
+        }
+        
+        let balance: String
+        
+        if let formattedAmount = Web3.Utils.formatToPrecision(amount, numberDecimals: 8, formattingDecimals: 8), let amount = Double(formattedAmount) {
+            balance = "\(amount) LSK"
+        } else {
+            balance = "-- LSK"
         }
         
         if isOutgoing {
