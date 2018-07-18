@@ -104,7 +104,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   Lisk:
-    :commit: e2014efcdd81d4c58db0c8887f97dd786de6470f
+    :commit: 952fea02d6076668f68eb252ec5bd8bf4e656960
     :git: https://github.com/boyarkin-anton/lisk-swift.git
   MessageKit:
     :commit: e2364d2394eddc211be6957893fbd0f726c233f0
