@@ -117,12 +117,13 @@ class DelegateDetailsViewController: UITableViewController {
         if #available(iOS 11.0, *) {
             navigationController?.navigationBar.prefersLargeTitles = false
         }
-        
-        navigationItem.title = String.adamantLocalized.delegateDetails.title
-        
+		
         if let delegate = delegate {
 			refreshData(with: delegate)
-        }
+			navigationItem.title = delegate.username
+		} else {
+			navigationItem.title = String.adamantLocalized.delegateDetails.title
+		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
