@@ -63,7 +63,7 @@ class DelegateDetailsViewController: UITableViewController {
 		
 		var image: UIImage? {
 			switch self {
-			case .openInExplorer: return #imageLiteral(resourceName: "row_icon_placeholder")
+			case .openInExplorer: return #imageLiteral(resourceName: "row_explorer")
 				
 			default: return nil
 			}

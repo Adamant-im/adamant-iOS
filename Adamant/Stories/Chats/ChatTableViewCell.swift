@@ -10,6 +10,9 @@ import UIKit
 import FreakingSimpleRoundImageView
 
 class ChatTableViewCell: UITableViewCell {
+	
+	static var defaultAvatar: UIImage = #imageLiteral(resourceName: "avatar-chat-placeholder")
+	
 	// MARK: - IBOutlets
 	@IBOutlet weak var avatarImageView: RoundImageView!
 	@IBOutlet weak var accountLabel: UILabel!
@@ -29,7 +32,7 @@ class ChatTableViewCell: UITableViewCell {
 			if let avatarImage = newValue {
 				avatarImageView.image = avatarImage
 			} else {
-				avatarImageView.image = #imageLiteral(resourceName: "Chat")
+				avatarImageView.image = ChatTableViewCell.defaultAvatar
 			}
 		}
 	}

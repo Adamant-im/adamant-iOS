@@ -57,8 +57,8 @@ class TransactionDetailsViewController: UIViewController {
 		
 		var image: UIImage? {
 			switch self {
-			case .openInExplorer: return #imageLiteral(resourceName: "row_icon_placeholder")
-			case .openChat: return #imageLiteral(resourceName: "row_icon_placeholder")
+			case .openInExplorer: return #imageLiteral(resourceName: "row_explorer")
+			case .openChat: return #imageLiteral(resourceName: "row_chat")
 				
 			default: return nil
 			}

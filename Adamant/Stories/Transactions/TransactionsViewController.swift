@@ -162,7 +162,7 @@ extension TransactionsViewController {
 		cell.accountLabel.tintColor = UIColor.adamantPrimary
 		cell.ammountLabel.tintColor = UIColor.adamantPrimary
 		cell.dateLabel.tintColor = UIColor.adamantSecondary
-		cell.avatarImageView.tintColor = UIColor.adamantPrimary
+		cell.topImageView.tintColor = UIColor.black
 		
 		if transfer.isOutgoing {
 			cell.transactionType = .outcome

@@ -115,7 +115,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			let accountRoot = router.get(scene: AdamantScene.Account.account)
 			let account = UINavigationController(rootViewController: accountRoot)
 			account.tabBarItem.title = String.adamantLocalized.tabItems.account
-			account.tabBarItem.image = #imageLiteral(resourceName: "wallet_tab")
+			account.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
 			
 			chatList.tabBarItem.badgeColor = UIColor.adamantPrimary
 			account.tabBarItem.badgeColor = UIColor.adamantPrimary

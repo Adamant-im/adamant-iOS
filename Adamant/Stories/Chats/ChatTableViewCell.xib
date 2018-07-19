@@ -20,7 +20,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="375" height="73.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Chat" translatesAutoresizingMaskIntoConstraints="NO" id="aVv-ww-kYa" customClass="RoundImageView" customModule="FreakingSimpleRoundImageView">
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="avatar-chat-placeholder" translatesAutoresizingMaskIntoConstraints="NO" id="aVv-ww-kYa" customClass="RoundImageView" customModule="FreakingSimpleRoundImageView">
                         <rect key="frame" x="14" y="11.5" width="50" height="50"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="50" id="TUg-9Q-Uxu"/>
@@ -84,6 +84,6 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="Chat" width="48" height="48"/>
+        <image name="avatar-chat-placeholder" width="50" height="50"/>
     </resources>
 </document>
