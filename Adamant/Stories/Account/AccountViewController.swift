@@ -466,17 +466,40 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 		}
 		
 		cell.setSelected(indexPath.row == selectedWalletIndex, animated: false)
+		
+		if wallet.enabled {
+			cell.currencyImageView.alpha = 1
+			cell.currencySymbolLabel.alpha = 1
+		} else {
+			cell.currencyImageView.alpha = 0.3
+			cell.currencySymbolLabel.alpha = 0.3
+		}
+		
 		return cell
 	}
 	
 	func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-		return true
+		guard let wallet = wallets?[indexPath.row] else {
+			return false
+		}
+		
+		return wallet.enabled
 	}
 	
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 		selectedWalletIndex = indexPath.row
-		
+
 		form.allSections.filter { $0.hidden != nil }.forEach { $0.evaluateHidden() }
+
+		if let cell = collectionView.cellForItem(at: indexPath) as? WalletCollectionViewCell {
+			cell.setSelected(true, animated: true)
+		}
+	}
+	
+	func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+		if let cell = collectionView.cellForItem(at: indexPath) as? WalletCollectionViewCell {
+			cell.setSelected(false, animated: true)
+		}
 	}
 	
 	// Flow delegate

@@ -26,12 +26,6 @@ class WalletCollectionViewCell: UICollectionViewCell {
 		}
 	}
 	
-	override var isSelected: Bool {
-		didSet {
-			setSelected(isSelected, animated: true)
-		}
-	}
-	
 	func setSelected(_ selected: Bool, animated: Bool) {
 		let width = selected ? frame.width * activeMarkerMultiplier : 0.0
 		if animated {
