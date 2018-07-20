@@ -20,7 +20,6 @@ target 'Adamant' do
   pod 'MessageKit' # Chat UI
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
-  pod 'M13Checkbox' # Checkbox control
 
   # QR
   pod 'EFQRCode' # QR generator

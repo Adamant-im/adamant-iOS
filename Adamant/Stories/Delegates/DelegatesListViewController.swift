@@ -228,6 +228,7 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
 		cell.accessoryType = .disclosureIndicator
 		cell.delegate = self
 		cell.checkmarkColor = UIColor.adamantPrimary
+		cell.checkmarkBorderColor = UIColor.adamantSecondary
 		
 		cell.isUpvoted = delegate.voted
 		

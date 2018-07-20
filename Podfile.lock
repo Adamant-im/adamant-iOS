@@ -14,7 +14,6 @@ PODS:
   - FTIndicator/FTToastIndicator (1.2.9)
   - Haring (2.0.8)
   - KeychainAccess (3.1.1)
-  - M13Checkbox (3.2.2)
   - MessageKit (1.0.0)
   - MyLittlePinpad (0.2.5)
   - PMAlertController (3.4.0)
@@ -33,7 +32,6 @@ DEPENDENCIES:
   - FTIndicator
   - Haring
   - KeychainAccess
-  - M13Checkbox
   - MessageKit
   - MyLittlePinpad
   - PMAlertController
@@ -53,7 +51,6 @@ SPEC REPOS:
     - FTIndicator
     - Haring
     - KeychainAccess
-    - M13Checkbox
     - MessageKit
     - MyLittlePinpad
     - PMAlertController
@@ -72,7 +69,6 @@ SPEC CHECKSUMS:
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   Haring: d2a4cfc00dfb63836dffc93e45919369f850e134
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
-  M13Checkbox: a8c2491cfbbca10797925fd0b9154a782bf40d89
   MessageKit: 16160036b16476b04bd0e9f2c7ce67e662e503e4
   MyLittlePinpad: ec1d9990d9715eab48205ecc08f4ff359ead521b
   PMAlertController: efb781925d741d50e0200018a00c53cecb8b4910
@@ -81,6 +77,6 @@ SPEC CHECKSUMS:
   RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
   Swinject: f7f15a9672e99328c1f07f277091087917215700
 
-PODFILE CHECKSUM: 6e128978754d16ff0e2de713d72463d4309871f9
+PODFILE CHECKSUM: f67d1a6da7c5c7cb8488f31020118ab127b6f016
 
 COCOAPODS: 1.5.3
