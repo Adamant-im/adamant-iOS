@@ -328,7 +328,7 @@ class AccountViewController: FormViewController {
 		})
 		
 		
-		form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamantPrimary; }
+		form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamantTableRowIcons }
 		
 		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .centeredHorizontally)
 		

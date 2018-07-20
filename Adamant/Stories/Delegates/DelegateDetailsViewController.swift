@@ -210,6 +210,7 @@ extension DelegateDetailsViewController {
 		cell.textLabel?.text = row.localized
 		cell.accessoryType = .none
 		cell.imageView?.image = row.image
+		cell.imageView?.tintColor = UIColor.adamantTableRowIcons
 		
 		switch row {
 		case .username:

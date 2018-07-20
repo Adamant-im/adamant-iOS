@@ -228,6 +228,7 @@ class SecurityViewController: FormViewController {
 			$0.tag = Rows.github.tag
 			$0.title = Rows.github.localized
 			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_github")
+			$0.cell.imageView?.tintColor = UIColor.adamantTableRowIcons
 		}.cellSetup { (cell, _) in
 			cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in

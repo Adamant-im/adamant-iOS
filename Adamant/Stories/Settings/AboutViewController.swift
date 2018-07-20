@@ -194,6 +194,7 @@ class AboutViewController: FormViewController {
 			$0.title = Rows.adm.localized
 			$0.tag = Rows.adm.tag
 			$0.cell.imageView?.image = Rows.adm.image
+			$0.cell.imageView?.tintColor = UIColor.adamantTableRowIcons
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -244,6 +245,7 @@ class AboutViewController: FormViewController {
 			$0.value = AdamantResources.supportEmail
 			$0.tag = Rows.email.tag
 			$0.cell.imageView?.image = Rows.email.image
+			$0.cell.imageView?.tintColor = UIColor.adamantTableRowIcons
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -318,7 +320,7 @@ extension AboutViewController {
 			$0.title = title
 			$0.value = value
 			$0.cell.imageView?.image = image
-			$0.cell.imageView?.contentMode = UIViewContentMode.center
+			$0.cell.imageView?.tintColor = UIColor.adamantTableRowIcons
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator

@@ -271,6 +271,7 @@ extension TransactionDetailsViewController {
 		
 		cell.textLabel?.text = row.localized
 		cell.imageView?.image = row.image
+		cell.imageView?.tintColor = UIColor.adamantTableRowIcons
 		
 		switch row {
 		case .amount:
