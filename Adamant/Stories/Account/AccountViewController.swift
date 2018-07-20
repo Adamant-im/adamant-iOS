@@ -336,6 +336,7 @@ class AccountViewController: FormViewController {
 		// MARK: Notification Center
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.updateAccountInfo()
+			self?.tableView.setContentOffset(CGPoint.zero, animated: false)
 		}
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.updateAccountInfo()
