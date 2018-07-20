@@ -21,7 +21,7 @@ extension UIColor {
 	static let adamantChatIcons = UIColor(red: 0.62, green: 0.62, blue: 0.62, alpha: 1)
 	
 	/// Table row icons color, ~45% gray
-	static let adamantTableRowIcons = UIColor(red: 0.55, green: 0.55, blue: 0.55, alpha: 1)
+	static let adamantTableRowIcons = UIColor(red: 0.45, green: 0.45, blue: 0.45, alpha: 1)
 	
 	
 	// MARK: Chat colors
