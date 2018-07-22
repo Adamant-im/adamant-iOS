@@ -130,6 +130,9 @@
 /* Account tab: Ethereum wallet section */
 "AccountTab.Sections.ethereum_wallet" = "Ethereum кошелёк";
 
+/* Account tab: Lisk wallet section */
+"AccountTab.Sections.lisk_wallet" = "Lisk кошелёк";
+
 /* Account tab: Delegates section title */
 "AccountTab.Section.Delegates" = "Делегаты";
 

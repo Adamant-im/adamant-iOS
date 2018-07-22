@@ -90,7 +90,7 @@ class EthApiService: EthApiServiceProtocol {
                     return
             }
             
-            self.account = EthAccount(wallet: wallet, address: wallet.addresses?.first?.address, balance: nil, balanceString: nil)
+            self.account = EthAccount(wallet: wallet, address: wallet.addresses?.first?.address, balance: BigUInt(0), balanceString: "0")
             if let account = self.account {
                 NotificationCenter.default.post(name: Notification.Name.EthApiService.userLoggedIn, object: self)
                 DispatchQueue.main.async {
@@ -309,6 +309,7 @@ class EthApiService: EthApiServiceProtocol {
                                                                               toUnits: .eth,
                                                                               decimals: 8,
                                                                               fallbackToScientific: true), let amount = Double(formattedAmount) {
+                        self.account?.balanceString = formattedAmount
                         completion(.success("\(amount) ETH"))
                     } else {
                         completion(.failure(.internalError(message: "ETH Wallet: fail to get balance amount", error: nil)))

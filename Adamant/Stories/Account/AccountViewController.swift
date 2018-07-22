@@ -38,6 +38,7 @@ fileprivate extension Wallet {
 		switch self {
 		case .adamant: return "s_adm"
 		case .ethereum: return "s_eth"
+        case .lisk: return "s_lsk"
 		}
 	}
 	
@@ -45,6 +46,7 @@ fileprivate extension Wallet {
 		switch self {
 		case .adamant: return NSLocalizedString("AccountTab.Sections.adamant_wallet", comment: "Account tab: Adamant wallet section")
 		case .ethereum: return NSLocalizedString("AccountTab.Sections.ethereum_wallet", comment: "Account tab: Ethereum wallet section")
+        case .lisk: return NSLocalizedString("AccountTab.Sections.lisk_wallet", comment: "Account tab: Lisk wallet section")
 		}
 	}
 }
@@ -76,7 +78,7 @@ class AccountViewController: FormViewController {
 	}
 	
 	private enum Rows {
-		case balance, sendTokens, buyTokens, freeTokens // Wallet
+		case balance, balanceEth, balanceLsk, sendTokens, buyTokens, freeTokens // Wallet
 		case security, nodes, about // Application
 		case voteForDelegates // Delegates
 		case logout // Actions
@@ -84,6 +86,8 @@ class AccountViewController: FormViewController {
 		var tag: String {
 			switch self {
 			case .balance: return "blnc"
+            case .balanceEth: return "blncEth"
+            case .balanceLsk: return "blncLsk"
 			case .sendTokens: return "sndTkns"
 			case .buyTokens: return "bTkns"
 			case .freeTokens: return "frrTkns"
@@ -98,7 +102,7 @@ class AccountViewController: FormViewController {
 		
 		var localized: String {
 			switch self {
-			case .balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
+			case .balance, .balanceEth, .balanceLsk: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
 			case .sendTokens: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
 			case .buyTokens: return NSLocalizedString("AccountTab.Row.BuyTokens", comment: "Account tab: 'Buy tokens' button")
 			case .freeTokens: return NSLocalizedString("AccountTab.Row.FreeTokens", comment: "Account tab: 'Get free tokens' button")
@@ -149,7 +153,9 @@ class AccountViewController: FormViewController {
 		navigationOptions = .Disabled
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		
-		wallets = [.adamant(balance: Decimal(floatLiteral: 100.001)), .ethereum]
+		wallets = [.adamant(balance: 0),
+                   .ethereum(balance: Decimal(Double(self.ethApiService.account?.balanceString ?? "0") ?? 0)),
+                   .lisk(balance: Decimal(Double(self.lskApiService.account?.balanceString ?? "0") ?? 0))]
 		
 		// MARK: Transfers controller
 		let controller = transfersProvider.unreadTransfersController()
@@ -337,7 +343,7 @@ class AccountViewController: FormViewController {
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.LskApiService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-//            self?.refreshLskCells()
+            self?.refreshLskCells()
         }
     }
 	
@@ -390,7 +396,7 @@ class AccountViewController: FormViewController {
 			wallets![0] = adamantWallet
 			accountHeaderView.walletCollectionView.reloadItems(at: [IndexPath(row: 0, section: 0)])
 		} else {
-			wallets = [adamantWallet, Wallet.ethereum]
+			wallets = [adamantWallet, Wallet.ethereum(balance: 0), Wallet.lisk(balance: 0)]
 			accountHeaderView.walletCollectionView.reloadData()
 		}
 		
@@ -405,6 +411,9 @@ class AccountViewController: FormViewController {
 		
 		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: selectedWalletIndex, section: 0), animated: false, scrollPosition: .centeredHorizontally)
 		accountHeaderView.addressButton.setTitle(address, for: .normal)
+        
+        refreshEthCells()
+        refreshLskCells()
 	}
 }
 
@@ -557,14 +566,27 @@ extension AccountViewController {
 			})
 			
 			// Send Tokens
-//			<<< LabelRow() {
-//				$0.title = Rows.sendTokens.localized
-//				$0.tag = Rows.sendTokens.tag
-//				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
-//				$0.cell.selectionStyle = .gray
-//			}.cellUpdate({ (cell, _) in
-//				cell.accessoryType = .disclosureIndicator
-//			})
+            <<< LabelRow() {
+                $0.title = Rows.sendTokens.localized
+                $0.tag = Rows.sendTokens.tag
+                $0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+                $0.cell.selectionStyle = .gray
+            }.cellUpdate({ (cell, _) in
+                cell.accessoryType = .disclosureIndicator
+            }).onCellSelection({ [weak self] (_, row) in
+                guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
+                    fatalError("Can't get TransferViewController scene")
+                }
+                
+                vc.token = .ADM
+                
+                if let nav = self?.navigationController {
+                    nav.pushViewController(vc, animated: true)
+                } else {
+                    self?.present(vc, animated: true, completion: nil)
+                }
+            })
+
 			
 			// Buy tokens
 			<<< LabelRow() {
@@ -627,30 +649,221 @@ extension AccountViewController {
 			})
 			
 		case .ethereum:
-			section <<< LabelRow() {
-				$0.title = "Soon..."
-			}
+            // Account
+            section <<< LabelRow() {
+                $0.title = ""
+                }.cellUpdate({ [weak self] (cell, row) in
+                    row.title = self?.ethApiService.account?.address
+                    cell.accessoryType = .disclosureIndicator
+                }).onCellSelection({ [weak self] (_, row) in
+                    guard let address = self?.ethApiService.account?.address else {
+                        return
+                    }
+                    
+                    self?.dialogService.presentShareAlertFor(string: address,
+                                                             types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+                                                             excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                                                             animated: true,
+                                                             completion: {
+                                                                guard let indexPath = row.indexPath else {
+                                                                    return
+                                                                }
+                                                                self?.tableView.deselectRow(at: indexPath, animated: true)
+                    })
+                })
+            
+            // Balance
+            section <<< AlertLabelRow() { [weak self] in
+                $0.title = Rows.balance.localized
+                $0.tag = Rows.balanceEth.tag
+                $0.value = wallet.formattedFull
+                $0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+                $0.cell.selectionStyle = .gray
+                
+                if let alertLabel = $0.cell.alertLabel {
+                    alertLabel.backgroundColor = UIColor.adamantPrimary
+                    alertLabel.textColor = UIColor.white
+                    alertLabel.clipsToBounds = true
+                    alertLabel.textInsets = UIEdgeInsets(top: 1, left: 5, bottom: 1, right: 5)
+                    
+                    if let count = self?.transfersController?.fetchedObjects?.count, count > 0 {
+                        alertLabel.text = String(count)
+                    } else {
+                        alertLabel.isHidden = true
+                    }
+                }
+                }.cellUpdate({ (cell, _) in
+                    cell.accessoryType = .disclosureIndicator
+                }).onCellSelection({ [weak self] (_, _) in
+                    guard let vc = self?.router.get(scene: AdamantScene.Transactions.ethTransactions), let nav = self?.navigationController else {
+                        return
+                    }
+                    
+                    nav.pushViewController(vc, animated: true)
+                })
+                
+                // Send Tokens
+                <<< LabelRow() {
+                    $0.title = Rows.sendTokens.localized
+                    $0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+                    $0.cell.selectionStyle = .gray
+                    }.cellUpdate({ (cell, _) in
+                        cell.accessoryType = .disclosureIndicator
+                    })
+                    .onCellSelection({ [weak self] (_, row) in
+                        guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
+                            fatalError("Can't get TransferViewController scene")
+                        }
+                        
+                        vc.token = .ETH
+                        
+                        if let nav = self?.navigationController {
+                            nav.pushViewController(vc, animated: true)
+                        } else {
+                            self?.present(vc, animated: true, completion: nil)
+                        }
+                    })
+            
+        case .lisk:
+            // Account
+            section <<< LabelRow() {
+                $0.title = ""
+                }.cellUpdate({ [weak self] (cell, row) in
+                    row.title = self?.lskApiService.account?.address
+                    cell.accessoryType = .disclosureIndicator
+                }).onCellSelection({ [weak self] (_, row) in
+                    guard let address = self?.lskApiService.account?.address else {
+                        return
+                    }
+                    
+                    self?.dialogService.presentShareAlertFor(string: address,
+                                                             types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+                                                             excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                                                             animated: true,
+                                                             completion: {
+                                                                guard let indexPath = row.indexPath else {
+                                                                    return
+                                                                }
+                                                                self?.tableView.deselectRow(at: indexPath, animated: true)
+                    })
+                })
+            
+            // Balance
+            section <<< AlertLabelRow() { [weak self] in
+                $0.title = Rows.balanceLsk.localized
+                $0.tag = Rows.balanceLsk.tag
+                $0.value = wallet.formattedFull
+                $0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+                $0.cell.selectionStyle = .gray
+                
+                if let alertLabel = $0.cell.alertLabel {
+                    alertLabel.backgroundColor = UIColor.adamantPrimary
+                    alertLabel.textColor = UIColor.white
+                    alertLabel.clipsToBounds = true
+                    alertLabel.textInsets = UIEdgeInsets(top: 1, left: 5, bottom: 1, right: 5)
+                    
+                    if let count = self?.transfersController?.fetchedObjects?.count, count > 0 {
+                        alertLabel.text = String(count)
+                    } else {
+                        alertLabel.isHidden = true
+                    }
+                }
+                }.cellUpdate({ (cell, _) in
+                    cell.accessoryType = .disclosureIndicator
+                }).onCellSelection({ [weak self] (_, _) in
+                    guard let vc = self?.router.get(scene: AdamantScene.Transactions.lskTransactions), let nav = self?.navigationController else {
+                        return
+                    }
+                    
+                    nav.pushViewController(vc, animated: true)
+                })
+                
+                // Send Tokens
+                <<< LabelRow() {
+                    $0.title = Rows.sendTokens.localized
+//                    $0.tag = Rows.sendTokens.tag
+                    $0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+                    $0.cell.selectionStyle = .gray
+                    }.cellUpdate({ (cell, _) in
+                        cell.accessoryType = .disclosureIndicator
+                    })
+                    .onCellSelection({ [weak self] (_, row) in
+                        guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
+                            fatalError("Can't get TransferViewController scene")
+                        }
+                        
+                        vc.token = .LSK
+                        
+                        if let nav = self?.navigationController {
+                            nav.pushViewController(vc, animated: true)
+                        } else {
+                            self?.present(vc, animated: true, completion: nil)
+                        }
+                    })
 		}
 		
 		return section
 	}
 
     func refreshEthCells() {
-//        if let row: AccountRow = form.rowBy(tag: Rows.ethAccount.tag) {
-//            row.value = self.ethApiService.account?.address
-//            row.reload()
-//        }
-//
-//        ethApiService.getBalance { (result) in
-//            switch result {
-//            case .success(let balance):
-//                if let row: LabelRow = self.form.rowBy(tag: Rows.ethBalance.tag) {
-//                    row.value = balance
-//                    row.reload()
-//                }
-//            case .failure(let error):
-//                print(error)
-//            }
-//        }
+        ethApiService.getBalance { (result) in
+            switch result {
+            case .success(_):
+                if let wallets = self.wallets, let balanceString = self.ethApiService.account?.balanceString, let balance = Double(balanceString) {
+                    
+                    for i in 0..<wallets.count {
+                        let wallet = wallets[i]
+                        
+                        switch wallet {
+                        case .ethereum(_):
+                            self.wallets![i] = Wallet.ethereum(balance: Decimal(balance))
+                            self.accountHeaderView.walletCollectionView.reloadItems(at: [IndexPath(row: i, section: 0)])
+                            
+                            if let row: AlertLabelRow = self.form.rowBy(tag: Rows.balanceEth.tag) {
+                                row.value = self.wallets![i].formattedFull
+                                row.updateCell()
+                            }
+                            
+                            self.accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: self.selectedWalletIndex, section: 0), animated: false, scrollPosition: .centeredHorizontally)
+                            
+                            break
+                        default: continue
+                        }
+                    }
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
+    func refreshLskCells() {
+        lskApiService.getBalance { (result) in
+            switch result {
+            case .success(_):
+                if let wallets = self.wallets, let balanceString = self.lskApiService.account?.balanceString, let balance = Double(balanceString) {
+                    for i in 0..<wallets.count {
+                        let wallet = wallets[i]
+                        
+                        switch wallet {
+                        case .lisk(_):
+                            self.wallets![i] = Wallet.lisk(balance: Decimal(balance))
+                            self.accountHeaderView.walletCollectionView.reloadItems(at: [IndexPath(row: i, section: 0)])
+                            
+                            if let row: AlertLabelRow = self.form.rowBy(tag: Rows.balanceLsk.tag) {
+                                row.value = self.wallets![i].formattedFull
+                                row.updateCell()
+                            }
+                            
+                            self.accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: self.selectedWalletIndex, section: 0), animated: false, scrollPosition: .centeredHorizontally)
+                            break
+                        default: continue
+                        }
+                    }
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
 }

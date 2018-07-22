@@ -130,6 +130,9 @@
 /* Account tab: Ethereum wallet section */
 "AccountTab.Sections.ethereum_wallet" = "Ethereum Wallet";
 
+/* Account tab: Lisk wallet section */
+"AccountTab.Sections.lisk_wallet" = "Lisk Wallet";
+
 /* Account page: scene title */
 "AccountTab.Title" = "Konto";
 

@@ -10,12 +10,14 @@ import UIKit
 
 enum Wallet {
 	case adamant(balance: Decimal)
-	case ethereum
+	case ethereum(balance: Decimal)
+    case lisk(balance: Decimal)
 	
 	var enabled: Bool {
 		switch self {
 		case .adamant: return true
-		case .ethereum: return false
+		case .ethereum: return true
+        case .lisk: return true
 		}
 	}
 }
@@ -27,6 +29,7 @@ extension Wallet {
 		switch self {
 		case .adamant: return #imageLiteral(resourceName: "wallet_adm")
 		case .ethereum: return #imageLiteral(resourceName: "wallet_eth")
+        case .lisk: return #imageLiteral(resourceName: "wallet_lsk")
 		}
 	}
 	
@@ -34,6 +37,7 @@ extension Wallet {
 		switch self {
 		case .adamant: return "ADM"
 		case .ethereum: return "ETH"
+        case .lisk: return "LSK"
 		}
 	}
 }
@@ -50,21 +54,27 @@ extension Wallet {
 	
 	var formattedShort: String? {
 		switch self {
-		case .adamant(let balance): //, .ethereum(let balance):
+		case .adamant(let balance):
 			return Wallet.currencyFormatter.string(from: balance as NSNumber)!
 			
-		case .ethereum:
-			return nil
+        case .ethereum(let balance):
+            return Wallet.currencyFormatter.string(from: balance as NSNumber)!
+            
+        case .lisk(let balance):
+            return Wallet.currencyFormatter.string(from: balance as NSNumber)!
 		}
 	}
 	
 	var formattedFull: String? {
 		switch self {
-		case .adamant(let balance): //, .ethereum(let balance):
+		case .adamant(let balance):
 			return "\(Wallet.currencyFormatter.string(from: balance as NSNumber)!) \(currencySymbol)"
 			
-		case .ethereum:
-			return nil
+        case .ethereum(let balance):
+            return "\(Wallet.currencyFormatter.string(from: balance as NSNumber)!) \(currencySymbol)"
+            
+        case .lisk(let balance):
+            return "\(Wallet.currencyFormatter.string(from: balance as NSNumber)!) \(currencySymbol)"
 		}
 	}
 }
