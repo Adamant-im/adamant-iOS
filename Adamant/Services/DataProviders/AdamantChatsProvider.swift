@@ -337,7 +337,6 @@ extension AdamantChatsProvider {
 		
 		
 		// MARK: 3. Create chat transaction
-		let type = ChatType.message
 		let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: privateContext)
 		transaction.date = Date() as NSDate
 		transaction.recipientId = recipientId

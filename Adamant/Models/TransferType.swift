@@ -23,6 +23,14 @@ enum TransferType: String, Decodable {
         default: self = .unknown
         }
     }
+    
+    var currencySymbol: String {
+        switch self {
+        case .eth: return "ETH"
+        case .lsk: return "LSK"
+        default: return ""
+        }
+    }
 }
 
 struct ChatTransfer: Decodable {
@@ -47,122 +55,34 @@ struct ChatTransfer: Decodable {
     }
     
     func render() -> NSAttributedString {
-        switch type {
-        case .eth:
-            return renderETH()
-        case .lsk: return renderLSK()
-        default:
+        guard type != .unknown else {
             return NSAttributedString(string: "")
         }
+        
+        let balance = "\(amount) \(type.currencySymbol)"
+        
+        let sent = String.adamantLocalized.chat.sent
+        
+        var attributedString = NSMutableAttributedString(string: "\(sent)\n\(balance)")
+        
+        if comments != "" {
+            attributedString.append(NSAttributedString(string: "\n\(comments)"))
+        }
+        
+        attributedString.append(NSAttributedString(string: "\n\n\(String.adamantLocalized.chat.tapForDetails)"))
+        
+        let rangeReference = attributedString.string as NSString
+        let sentRange = rangeReference.range(of: sent)
+        let amountRange = rangeReference.range(of: balance)
+        
+        attributedString.setAttributes([.font: UIFont.adamantPrimary(ofSize: 14)], range: sentRange)
+        attributedString.setAttributes([.font: UIFont.adamantPrimary(ofSize: 28)], range: amountRange)
+        
+        return attributedString
     }
     
     func renderPreview(isOutgoing: Bool) -> String {
-        switch type {
-        case .eth:
-            return renderETHPreview(isOutgoing: isOutgoing)
-        case .lsk:
-            return renderLSKPreview(isOutgoing: isOutgoing)
-        default:
-            return ""
-        }
-    }
-    
-    // MARK: - Chat renderers
-    
-    private func renderETH() -> NSAttributedString {
-        guard let amount = BigUInt(amount) else {
-            return NSAttributedString(string: "")
-        }
-        
-        let balance: String
-        
-        if let formattedAmount = Web3.Utils.formatToEthereumUnits(amount,
-                                                                  toUnits: .eth,
-                                                                  decimals: 8,
-                                                                  fallbackToScientific: true), let amount = Double(formattedAmount) {
-            balance = "\(amount) ETH"
-        } else {
-            balance = "-- ETH"
-        }
-        
-        let sent = String.adamantLocalized.chat.sent
-        
-        let attributedString = NSMutableAttributedString(string: "\(sent)\n\(balance)\n\n\(String.adamantLocalized.chat.tapForDetails)")
-        
-        let rangeReference = attributedString.string as NSString
-        let sentRange = rangeReference.range(of: sent)
-        let amountRange = rangeReference.range(of: balance)
-        
-        attributedString.setAttributes([.font: UIFont.adamantPrimary(ofSize: 14)], range: sentRange)
-        attributedString.setAttributes([.font: UIFont.adamantPrimary(ofSize: 28)], range: amountRange)
-        
-        return attributedString
-    }
-    
-    func renderLSK() -> NSAttributedString {
-        guard let amount = BigUInt(amount) else {
-            return NSAttributedString(string: "")
-        }
-        
-        let balance: String
-        
-        if let formattedAmount = Web3.Utils.formatToPrecision(amount, numberDecimals: 8, formattingDecimals: 8), let amount = Double(formattedAmount) {
-            balance = "\(amount) LSK"
-        } else {
-            balance = "-- LSK"
-        }
-        
-        let sent = String.adamantLocalized.chat.sent
-        
-        let attributedString = NSMutableAttributedString(string: "\(sent)\n\(balance)\n\n\(String.adamantLocalized.chat.tapForDetails)")
-        
-        let rangeReference = attributedString.string as NSString
-        let sentRange = rangeReference.range(of: sent)
-        let amountRange = rangeReference.range(of: balance)
-        
-        attributedString.setAttributes([.font: UIFont.adamantPrimary(ofSize: 14)], range: sentRange)
-        attributedString.setAttributes([.font: UIFont.adamantPrimary(ofSize: 28)], range: amountRange)
-        
-        return attributedString
-    }
-    
-    // MARK: - Preview renderers
-    
-    func renderETHPreview(isOutgoing: Bool) -> String {
-        guard let amount = BigUInt(amount) else {
-            return ""
-        }
-        
-        let balance: String
-        
-        if let formattedAmount = Web3.Utils.formatToEthereumUnits(amount,
-                                                                  toUnits: .eth,
-                                                                  decimals: 8,
-                                                                  fallbackToScientific: true), let amount = Double(formattedAmount) {
-            balance = "\(amount) ETH"
-        } else {
-            balance = "-- ETH"
-        }
-        
-        if isOutgoing {
-            return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(balance)")
-        } else {
-            return "➡️  \(balance)"
-        }
-    }
-    
-    func renderLSKPreview(isOutgoing: Bool) -> String {
-        guard let amount = BigUInt(amount) else {
-            return ""
-        }
-        
-        let balance: String
-        
-        if let formattedAmount = Web3.Utils.formatToPrecision(amount, numberDecimals: 8, formattingDecimals: 8), let amount = Double(formattedAmount) {
-            balance = "\(amount) LSK"
-        } else {
-            balance = "-- LSK"
-        }
+        let balance = "\(amount) \(type.currencySymbol)"
         
         if isOutgoing {
             return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(balance)")

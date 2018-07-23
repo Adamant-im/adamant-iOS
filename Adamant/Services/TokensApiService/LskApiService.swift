@@ -73,6 +73,8 @@ class LskApiService: LskApiServiceProtocol {
         
         NotificationCenter.default.post(name: Notification.Name.LskApiService.userLoggedIn, object: self)
         
+        self.getBalance({ _ in })
+        
         if let account = self.account, let address = self.accountService.account?.address, let keypair = self.accountService.keypair {
             self.getLskAddress(byAdamandAddress: address) { (result) in
                 switch result {
@@ -118,6 +120,34 @@ class LskApiService: LskApiServiceProtocol {
         }
     }
     
+    func createTransaction(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<LocalTransaction>) -> Void) {
+        if let keys = self.account?.keys {
+            do {
+                let transaction = LocalTransaction(.transfer, lsk: amount, recipientId: address)
+                let signedTransaction = try transaction.signed(keyPair: keys)
+                
+                completion(.success(signedTransaction))
+            } catch {
+                completion(.failure(.internalError(message: error.localizedDescription, error: error)))
+            }
+        }
+    }
+    
+    func sendTransaction(transaction: LocalTransaction, completion: @escaping (ApiServiceResult<String>) -> Void) {
+        transactionApi.submit(signedTransaction: transaction) { response in
+            switch response {
+            case .success(let result):
+                print(result.data.hashValue)
+                print(result.data.message)
+                
+                completion(.success(transaction.id ?? ""))
+            case .error(let error):
+                print("ERROR: " + error.message)
+                completion(.failure(.internalError(message: error.message, error: nil)))
+            }
+        }
+    }
+    
     func sendFunds(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<String>) -> Void) {
         if let keys = self.account?.keys {
             
@@ -131,10 +161,8 @@ class LskApiService: LskApiServiceProtocol {
                         print(result.data.hashValue)
                         print(result.data.message)
                         
-                        let amount = self.toRawLsk(value: amount)
-                        
                         if let id = signedTransaction.id {
-                            let result = ["type": "lsk_transaction", "amount": amount, "hash": id, "comments":""]
+                            let result = ["type": "lsk_transaction", "amount": "\(amount)", "hash": id, "comments":""]
                             
                             do {
                                 let data = try JSONEncoder().encode(result)

@@ -17,6 +17,9 @@ protocol EthApiServiceProtocol: class {
     func newAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<EthAccount>) -> Void)
     
     // MARK: - Transactions
+    func createTransaction(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<TransactionIntermediate>) -> Void)
+    func sendTransaction(transaction: TransactionIntermediate, completion: @escaping (ApiServiceResult<String>) -> Void)
+    
     func sendFunds(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<String>) -> Void)
     
     func getTransactions(_ completion: @escaping (ApiServiceResult<[EthTransaction]>) -> Void)

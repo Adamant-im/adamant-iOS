@@ -56,6 +56,7 @@ class TransferViewController: FormViewController {
 		case address
 		case fee
 		case total
+        case comments
 		case sendButton
 		
 		var tag: String {
@@ -66,6 +67,7 @@ class TransferViewController: FormViewController {
 			case .address: return "recipient"
 			case .fee: return "fee"
 			case .total: return "total"
+            case .comments: return "comments"
 			case .sendButton: return "send"
 			}
 		}
@@ -78,6 +80,7 @@ class TransferViewController: FormViewController {
 			case .address: return NSLocalizedString("TransferScene.Row.Recipient", comment: "Transfer: recipient address")
 			case .fee: return NSLocalizedString("TransferScene.Row.TransactionFee", comment: "Transfer: transfer fee")
 			case .total: return NSLocalizedString("TransferScene.Row.Total", comment: "Transfer: total amount of transaction: money to transfer adding fee")
+            case .comments: return NSLocalizedString("TransferScene.Row.Comments", comment: "Transfer: total amount of transaction: money to transfer adding fee")
 			case .sendButton: return String.adamantLocalized.transfer.send
 			}
 		}
@@ -138,6 +141,15 @@ class TransferViewController: FormViewController {
             createETHForm()
         case .LSK:
             createLSKForm()
+        }
+        
+        if delegate != nil {
+            form +++ Section(Row.comments.localized)
+                <<< TextAreaRow() {
+                    $0.title = Row.comments.localized
+                    $0.tag = Row.comments.tag
+                    $0.placeholder = Row.comments.localized
+            }
         }
 		
         // MARK: - Transfer section
@@ -611,17 +623,51 @@ class TransferViewController: FormViewController {
     private func sendEth(to recipient: String, amount: Double) {
         self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
         
-        self.ethApiService.sendFunds(toAddress: recipient, amount: amount) { (result) in
+        self.ethApiService.createTransaction(toAddress: recipient, amount: amount) { (result) in
             switch result {
-            case .success(let value):
-                print("Payload: \(value)")
-                
-                self.delegate?.transferFinished(with: value)
-                self.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                self.close()
-            
+            case .success(let transaction):
+                self.ethApiService.sendTransaction(transaction: transaction, completion: { (result) in
+                    switch result {
+                    case .success(let txHash):
+                        DispatchQueue.global().async {
+                            print("TxHash: \(txHash)")
+                            
+                            var message = ["type": "eth_transaction", "amount": "\(amount)", "hash": txHash, "comments":""]
+                            
+                            if let commentsRow = self.form.rowBy(tag: Row.comments.tag) as? TextAreaRow,
+                                let comments = commentsRow.value {
+                                message["comments"] = comments
+                            }
+                            
+                            do {
+                                let data = try JSONEncoder().encode(message)
+                                guard let raw = String(data: data, encoding: String.Encoding.utf8) else {
+                                    return
+                                }
+                                
+                                print("Payload: \(raw)")
+                                DispatchQueue.main.async {
+                                    self.delegate?.transferFinished(with: raw)
+                                    self.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                                    self.close()
+                                }
+                            } catch {
+                                DispatchQueue.main.async {
+                                    self.dialogService.showError(withMessage: "ETH Wallet: Send - wrong data issue", error: nil)
+                                }
+                            }
+                        }
+                        
+                        break
+                    case .failure(let error):
+                        self.dialogService.showError(withMessage: "Transrer issue", error: error)
+                        break
+                    }
+                })
+                break
             case .failure(let error):
                 self.dialogService.showError(withMessage: "Transrer issue", error: error)
+                break
             }
         }
     }
@@ -629,17 +675,46 @@ class TransferViewController: FormViewController {
     private func sendLsk(to recipient: String, amount: Double) {
         self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
         
-        self.lskApiService.sendFunds(toAddress: recipient, amount: amount) { (result) in
+        self.lskApiService.createTransaction(toAddress: recipient, amount: amount) { (result) in
             switch result {
-            case .success(let value):
-                print("Payload: \(value)")
+            case .success(let transaction):
+                if let id = transaction.id {
+                    var message = ["type": "lsk_transaction", "amount": "\(amount)", "hash": id, "comments":""]
+                    
+                    if let commentsRow = self.form.rowBy(tag: Row.comments.tag) as? TextAreaRow,
+                        let comments = commentsRow.value {
+                        message["comments"] = comments
+                    }
+                    
+                    do {
+                        let data = try JSONEncoder().encode(message)
+                        guard let raw = String(data: data, encoding: String.Encoding.utf8) else {
+                            return
+                        }
+                        print("Payload: \(raw)")
+                        self.delegate?.transferFinished(with: raw)
+                        
+                        self.lskApiService.sendTransaction(transaction: transaction, completion: { (result) in
+                            switch result {
+                            case .success(let hash):
+                                print("Hash: \(hash)")
+                                self.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                                self.close()
+                            case .failure(let error):
+                                self.dialogService.showError(withMessage: "Transrer issue", error: error)
+                            }
+                        })
+                    } catch {
+                        self.dialogService.showError(withMessage: "Transrer issue", error: nil)
+                    }
+                } else {
+                    self.dialogService.showError(withMessage: "Transrer issue", error: nil)
+                }
                 
-                self.delegate?.transferFinished(with: value)
-                self.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                self.close()
-                
+                break
             case .failure(let error):
                 self.dialogService.showError(withMessage: "Transrer issue", error: error)
+                break
             }
         }
     }

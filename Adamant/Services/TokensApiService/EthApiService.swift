@@ -97,6 +97,8 @@ class EthApiService: EthApiServiceProtocol {
                     completion(.success(account))
                 }
                 
+                self.getBalance({ _ in })
+                
                 if let address = self.accountService.account?.address, let keypair = self.accountService.keypair {
                     self.getEthAddress(byAdamandAddress: address) { (result) in
                         switch result {
@@ -144,6 +146,97 @@ class EthApiService: EthApiServiceProtocol {
                 DispatchQueue.main.async {
                     completion(.failure(.internalError(message: "ETH Wallet: fail to create Account", error: nil)))
                 }
+            }
+        }
+    }
+    func createTransaction(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<TransactionIntermediate>) -> Void) {
+        DispatchQueue.global().async {
+            guard let destinationEthAddress = EthereumAddress(address) else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - invalid destination address", error: nil)))
+                }
+                return
+            }
+            guard let amount = Web3.Utils.parseToBigUInt("\(amount)", units: .eth) else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - invalid amount format", error: nil)))
+                }
+                return
+            }
+            
+            guard let ethAddressFrom = self.account?.wallet.addresses?.first else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - no address found", error: nil)))
+                }
+                return
+            }
+            
+            guard let keystore = self.account?.wallet else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - no keystore found", error: nil)))
+                }
+                return
+            }
+            
+            self.web3.addKeystoreManager(KeystoreManager([keystore]))
+            var options = Web3Options.defaultOptions()
+            //            options.gasLimit = BigUInt(gasLimit)
+            options.from = ethAddressFrom
+            options.value = BigUInt(amount)
+            guard let contract = self.web3.contract(Web3.Utils.coldWalletABI, at: destinationEthAddress) else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - contract loading error", error: nil)))
+                }
+                return
+            }
+            
+            guard let estimatedGas = contract.method(options: options)?.estimateGas(options: nil).value else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - retrieving estimated gas error", error: nil)))
+                }
+                return
+            }
+            options.gasLimit = estimatedGas
+            guard let gasPrice = self.web3.eth.getGasPrice().value else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - retrieving gas price error", error: nil)))
+                }
+                return
+            }
+            options.gasPrice = gasPrice
+            guard var intermediate = contract.method(options: options) else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - create transaction issue", error: nil)))
+                }
+                return
+            }
+            
+            
+            DispatchQueue.main.async {
+                completion(.success(intermediate))
+            }
+        }
+    }
+    
+    func sendTransaction(transaction: TransactionIntermediate, completion: @escaping (ApiServiceResult<String>) -> Void) {
+        DispatchQueue.global().async {
+            let sendResult = transaction.send(password: "", options: nil)
+            
+            guard let sendValue = sendResult.value else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - sending transaction error", error: nil)))
+                }
+                return
+            }
+            
+            guard let hash = sendValue["txhash"] else {
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - fail to get transaction hash", error: nil)))
+                }
+                return
+            }
+            DispatchQueue.main.async {
+                completion(.success(hash))
             }
         }
     }
@@ -223,14 +316,8 @@ class EthApiService: EthApiServiceProtocol {
                 }
                 return
             }
-            guard let formattedAmount = Web3.Utils.formatToEthereumUnits(amount, toUnits: .wei) else {
-                DispatchQueue.main.async {
-                    completion(.failure(.internalError(message: "ETH Wallet: Send - fail to get transaction amount", error: nil)))
-                }
-                return
-            }
             
-            let result = ["type": "eth_transaction", "amount": formattedAmount, "hash": hash, "comments":""]
+            let result = ["type": "eth_transaction", "amount": "\(amount)", "hash": hash, "comments":""]
             
             do {
                 let data = try JSONEncoder().encode(result)
@@ -412,7 +499,7 @@ class TransactionsHistory {
                                           URLQueryItem(name: "address", value: address),
                                           URLQueryItem(name: "page", value: "\(page)"),
                                           URLQueryItem(name: "offset", value: "\(size)"),
-                                          URLQueryItem(name: "sort", value: "asc")
+                                          URLQueryItem(name: "sort", value: "desc")
 //            ,URLQueryItem(name: "apikey", value: "YourApiKeyToken")
         ]
         
