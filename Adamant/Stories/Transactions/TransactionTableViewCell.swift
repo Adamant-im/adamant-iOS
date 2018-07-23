@@ -9,24 +9,35 @@
 import UIKit
 
 class TransactionTableViewCell: UITableViewCell {
-	
 	enum TransactionType {
 		case income, outcome
 		
-		var image: UIImage {
+		var imageTop: UIImage {
 			switch self {
-			case .income:
-				return #imageLiteral(resourceName: "income")
-				
-			case .outcome:
-				return #imageLiteral(resourceName: "outcome")
+			case .income: return #imageLiteral(resourceName: "transfer-in_top")
+			case .outcome: return #imageLiteral(resourceName: "transfer-out_top")
+			}
+		}
+		
+		var imageBottom: UIImage {
+			switch self {
+			case .income: return #imageLiteral(resourceName: "transfer-in_bot")
+			case .outcome: return #imageLiteral(resourceName: "transfer-out_bot")
+			}
+		}
+		
+		var bottomTintColor: UIColor {
+			switch self {
+			case .income: return UIColor.adamantTransferIncomeIconBackground
+			case .outcome: return UIColor.adamantTransferOutcomeIconBackground
 			}
 		}
 	}
 	
 	// MARK: - IBOutlets
 	
-	@IBOutlet weak var avatarImageView: UIImageView!
+	@IBOutlet weak var topImageView: UIImageView!
+	@IBOutlet weak var bottomImageView: UIImageView!
 	@IBOutlet weak var accountLabel: UILabel!
 	@IBOutlet weak var ammountLabel: UILabel!
 	@IBOutlet weak var dateLabel: UILabel!
@@ -36,7 +47,9 @@ class TransactionTableViewCell: UITableViewCell {
 	
 	var transactionType: TransactionType = .income {
 		didSet {
-			avatarImageView.image = transactionType.image
+			topImageView.image = transactionType.imageTop
+			bottomImageView.image = transactionType.imageBottom
+			bottomImageView.tintColor = transactionType.bottomTintColor
 		}
 	}
 	
@@ -45,6 +58,5 @@ class TransactionTableViewCell: UITableViewCell {
 	
 	override func awakeFromNib() {
 		transactionType = .income
-		avatarImageView?.image = transactionType.image
 	}
 }

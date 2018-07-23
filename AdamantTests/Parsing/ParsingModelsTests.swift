@@ -38,7 +38,7 @@ class ParsingModelsTests: XCTestCase {
 		XCTAssertEqual(t.id, 16214962152767034408)
 		XCTAssertEqual(t.height, 857385)
 		XCTAssertEqual(t.blockId, "11054360802486546958")
-		XCTAssertEqual(t.type, TransactionType(rawValue: 8))
+		XCTAssertEqual(t.type, TransactionType.chatMessage)
 		XCTAssertEqual(t.timestamp, 11138999)
 		XCTAssertEqual(t.senderPublicKey, "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f")
 		XCTAssertNil(t.requesterPublicKey)
@@ -80,7 +80,7 @@ class ParsingModelsTests: XCTestCase {
 
 	func testNormalizedTransaction() {
 		let t: NormalizedTransaction = TestTools.LoadJsonAndDecode(filename: "NormalizedTransaction")
-
+		
 		XCTAssertEqual(t.type, TransactionType.send)
 		XCTAssertEqual(t.amount, Decimal(505.05050505))
 		XCTAssertEqual(t.senderPublicKey, "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f")

@@ -14,8 +14,10 @@ import MessageUI
 class AdamantDialogService: DialogService {
 	// MARK: Dependencies
 	var router: Router!
-    
-    var mailDelegate = MailDelegate()
+	
+	fileprivate var mailDelegate: MailDelegate = {
+		MailDelegate()
+	}()
 	
 	// Configure notifications
 	init() {
@@ -44,7 +46,11 @@ extension AdamantDialogService {
 			}
 			
 			if let nav = topController as? UINavigationController, let visible = nav.visibleViewController {
-				return visible
+				if let presented = visible.presentedViewController {
+					return presented
+				} else {
+					return visible
+				}
 			}
 			
 			while let presentedViewController = topController.presentedViewController {
@@ -97,23 +103,27 @@ extension AdamantDialogService {
 	
 	func showError(withMessage message: String, error: Error? = nil) {
 		if Thread.isMainThread {
-			FTIndicator.dismissProgress()
+			internalShowError(withMessage: message, error: error)
 		} else {
-			DispatchQueue.main.sync {
-				FTIndicator.dismissProgress()
+			DispatchQueue.main.async {
+				self.internalShowError(withMessage: message, error: error)
 			}
 		}
-		
+	}
+	
+	/// Must be called from main thread only
+	private func internalShowError(withMessage message: String, error: Error? = nil) {
 		let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
-        
+		FTIndicator.dismissProgress()
+		
         alertVC.gravityDismissAnimation = false
         alertVC.alertTitle.textColor = UIColor.adamantPrimary
         alertVC.alertDescription.textColor = .adamantSecondary
-        alertVC.alertTitle.font = UIFont.adamantPrimary(size: 20)
-        alertVC.alertDescription.font = UIFont.adamantPrimaryLight(size: 14)
+        alertVC.alertTitle.font = UIFont.systemFont(ofSize: 20)
+        alertVC.alertDescription.font = UIFont.systemFont(ofSize: 14, weight: .light)
         alertVC.headerViewHeightConstraint.constant = 50
         
-        let supportBtn = PMAlertAction(title: AdamantResources.iosAppSupportEmail, style: .default) {
+        let supportBtn = PMAlertAction(title: AdamantResources.supportEmail, style: .default) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                 guard let dialogService = self, var presenter = dialogService.getTopmostViewController() else {
                     print("Lost connecting with dialog service")
@@ -133,7 +143,7 @@ extension AdamantDialogService {
 				
                 let mailVC = MFMailComposeViewController()
                 mailVC.mailComposeDelegate = dialogService.mailDelegate
-                mailVC.setToRecipients([AdamantResources.iosAppSupportEmail])
+                mailVC.setToRecipients([AdamantResources.supportEmail])
                 mailVC.setSubject(String.adamantLocalized.alert.emailErrorMessageTitle)
                 
                 let systemVersion = UIDevice.current.systemVersion
@@ -155,7 +165,7 @@ extension AdamantDialogService {
             }
         }
         
-        supportBtn.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+        supportBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         supportBtn.setTitleColor(UIColor(hex: "#00B6FF"), for: .normal)
         supportBtn.separator.isHidden = true
         
@@ -163,7 +173,7 @@ extension AdamantDialogService {
         
         let okBtn = PMAlertAction(title: String.adamantLocalized.alert.ok, style: .default)
         
-        okBtn.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+        okBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         okBtn.setTitleColor(UIColor.white, for: .normal)
         okBtn.backgroundColor = UIColor.adamantSecondary
         alertVC.addAction(okBtn)
@@ -171,8 +181,8 @@ extension AdamantDialogService {
         alertVC.alertActionStackView.axis = .vertical
         alertVC.alertActionStackView.spacing = 0
         alertVC.alertActionStackViewHeightConstraint.constant = 100
-        
-        self.present(alertVC, animated: true, completion: nil)
+		
+		present(alertVC, animated: true, completion: nil)
 	}
 	
 	func showRichError(error: RichError) {
@@ -302,18 +312,18 @@ extension AdamantDialogService {
         alertVC.gravityDismissAnimation = false
         alertVC.alertTitle.textColor = UIColor.adamantPrimary
         alertVC.alertDescription.textColor = .adamantSecondary
-        alertVC.alertTitle.font = UIFont.adamantPrimary(size: 20)
-        alertVC.alertDescription.font = UIFont.adamantPrimaryLight(size: 14)
+        alertVC.alertTitle.font = UIFont.systemFont(ofSize: 20)
+		alertVC.alertDescription.font = UIFont.systemFont(ofSize: 14, weight: .light)
         
         if let actions = actions {
             for action in actions {
-                action.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+                action.titleLabel?.font = UIFont.systemFont(ofSize: 16)
                 action.setTitleColor(UIColor.adamantSecondary, for: .normal)
                 alertVC.addAction(action)
             }
             
             let cancelAction = PMAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
-            cancelAction.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+            cancelAction.titleLabel?.font = UIFont.systemFont(ofSize: 16)
             cancelAction.setTitleColor(UIColor.white, for: .normal)
             cancelAction.backgroundColor = UIColor.adamantSecondary
 
@@ -323,7 +333,7 @@ extension AdamantDialogService {
         } else {
             let okBtn = PMAlertAction(title: String.adamantLocalized.alert.ok, style: .default)
             
-            okBtn.titleLabel?.font = UIFont.adamantPrimary(size: 16)
+            okBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
             okBtn.setTitleColor(UIColor.white, for: .normal)
             okBtn.backgroundColor = UIColor.adamantSecondary
             alertVC.addAction(okBtn)
@@ -351,10 +361,8 @@ extension AdamantDialogService {
     }
 }
 
-class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
-    
+fileprivate class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true, completion: nil)
     }
-
 }

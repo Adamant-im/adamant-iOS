@@ -85,7 +85,11 @@ extension AdamantNotificationsService {
 			AdamantNotificationsService.configureUIApplicationFor(mode: mode)
 			securedStore.remove(StoreKey.notificationsService.notificationsMode)
 			notificationsMode = mode
-			NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: self)
+			
+			NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged,
+											object: self,
+											userInfo: [AdamantUserInfoKey.NotificationsService.newNotificationsMode: mode])
+			
 			completion?(.success)
 			return
 			
@@ -99,7 +103,9 @@ extension AdamantNotificationsService {
 				AdamantNotificationsService.configureUIApplicationFor(mode: mode)
 				self?.securedStore.set(mode.toRaw(), for: StoreKey.notificationsService.notificationsMode)
 				self?.notificationsMode = mode
-				NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: self)
+				NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsModeChanged,
+												object: self,
+												userInfo: [AdamantUserInfoKey.NotificationsService.newNotificationsMode: mode])
 				completion?(.success)
 			}
 		}
@@ -194,14 +200,24 @@ extension AdamantNotificationsService {
 			}
 		}
 		
+		let appIconBadgeNumber: Int
+		
 		if let number = number {
 			customBadgeNumber = number
-			UIApplication.shared.applicationIconBadgeNumber = number
+			appIconBadgeNumber = number
 			securedStore.set(String(number), for: StoreKey.notificationsService.customBadgeNumber)
 		} else {
 			customBadgeNumber = 0
-			UIApplication.shared.applicationIconBadgeNumber = 0
+			appIconBadgeNumber = 0
 			securedStore.remove(StoreKey.notificationsService.customBadgeNumber)
+		}
+		
+		if Thread.isMainThread {
+			UIApplication.shared.applicationIconBadgeNumber = appIconBadgeNumber
+		} else {
+			DispatchQueue.main.async {
+				UIApplication.shared.applicationIconBadgeNumber = appIconBadgeNumber
+			}
 		}
 	}
 	

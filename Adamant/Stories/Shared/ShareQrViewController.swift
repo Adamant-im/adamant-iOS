@@ -82,6 +82,9 @@ class ShareQrViewController: FormViewController {
 	// MARK: - Lifecycle
 	override func viewDidLoad() {
 		super.viewDidLoad()
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = true
+		}
 		
 		// MARK: QR code
 		form +++ Section()
@@ -95,12 +98,7 @@ class ShareQrViewController: FormViewController {
 			} else {
 				$0.cell.tipLabelIsHidden = true
 			}
-		}.cellSetup({ (cell, row) in
-			cell.tipLabel.font = UIFont.adamantPrimary(size: 17)
-			cell.tipLabel.textColor = UIColor.adamantPrimary
-		}).cellUpdate({ (cell, row) in
-			cell.tipLabel.textColor = UIColor.adamantPrimary
-		})
+		}
 		
 		// MARK: Buttons
 		+++ Section()
@@ -109,7 +107,7 @@ class ShareQrViewController: FormViewController {
 		<<< ButtonRow() {
 			$0.tag = Rows.saveToPhotos.tag
 			$0.title = Rows.saveToPhotos.localized
-		}.onCellSelection({ [weak self] (cell, row) in
+		}.onCellSelection { [weak self] (cell, row) in
 			guard let row: QrRow = self?.form.rowBy(tag: Rows.qr.tag), let qrCode = row.value else {
 				return
 			}
@@ -124,18 +122,15 @@ class ShareQrViewController: FormViewController {
 			case .restricted, .denied:
 				self?.dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.shared.photolibraryNotAuthorized)
 			}
-		}).cellSetup({ (cell, row) in
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
-		}).cellUpdate({ (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		})
+		}
 			
 		// Share
 		<<< ButtonRow() {
 			$0.tag = Rows.shareButton.tag
 			$0.title = Rows.shareButton.localized
-		}.onCellSelection({ [weak self] (cell, row) in
+		}.onCellSelection { [weak self] (cell, row) in
 			guard let row: QrRow = self?.form.rowBy(tag: Rows.qr.tag), let qrCode = row.value else {
 				return
 			}
@@ -145,32 +140,30 @@ class ShareQrViewController: FormViewController {
 				vc.excludedActivityTypes = excludedActivityTypes
 			}
 			
-			vc.completionWithItemsHandler = { [weak self] (_, success: Bool, _, _) in
-				if success {
-					self?.dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
+			vc.completionWithItemsHandler = { [weak self] (type: UIActivityType?, completed: Bool, _, error: Error?) in
+				if completed {
+					if let error = error {
+						self?.dialogService.showWarning(withMessage: error.localizedDescription)
+					} else {
+						self?.dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
+					}
 					self?.close()
 				}
 			}
 			
 			self?.present(vc, animated: true, completion: nil)
-		}).cellSetup({ (cell, row) in
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
-		}).cellUpdate({ (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		})
+		}
 		
 		<<< ButtonRow() {
 			$0.tag = Rows.cancelButton.tag
 			$0.title = Rows.cancelButton.localized
-		}.onCellSelection({ [weak self] (cell, row) in
+		}.onCellSelection { [weak self] (cell, row) in
 			self?.close()
-		}).cellSetup({ (cell, row) in
-			cell.textLabel?.font = UIFont.adamantPrimary(size: 17)
+		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamantPrimary
-		}).cellUpdate({ (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-		})
+		}
 	}
 	
 	func close() {

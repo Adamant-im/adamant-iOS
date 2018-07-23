@@ -1,5 +1,77 @@
+/* About page: scene title */
+"About.Title" = "О приложении";
+
+/* About scene: 'Read about' section title. */
+"About.Section.About" = "Об АДАМАНТе";
+
+/* About scene: 'Contact us' section title. */
+"About.Section.ContactUs" = "Пишите нам";
+
+/* About scene: Website row */
+"About.Row.Website" = "Вебсайт";
+
+/* About scene: The Whitepaper row */
+"About.Row.Whitepaper" = "Белая Книга";
+
+/* About scene: Project's GitHub page row */
+"About.Row.GitHub" = "Страница проекта на GitHub";
+
+/* About scene: Write us row */
+"About.Row.WriteUs" = "Написать письмо";
+
+/* About scene: Our blog row */
+"About.Row.Blog" = "Наш блог";
+
+/* About scene: Bitcointalk.org row */
+"About.Row.Bitcointalk" = "Bitcointalk.org";
+
+/* About scene: Facebook row */
+"About.Row.Facebook" = "Facebook";
+
+/* About scene: Telegram row */
+"About.Row.Telegram" = "Telegram";
+
+/* About scene: VK row */
+"About.Row.VK" = "VK";
+
+/* About scene: Twitter row */
+"About.Row.Twitter" = "Twitter";
+
+/* "About scene: Website localized url" */
+"About.Row.Website.Url" = "https://adamant.im/ru/";
+
+/* "About scene: The Whitepaper localized url" */
+"About.Row.Whitepaper.Url" = "https://adamant.im/whitepaper/adamant-whitepaper-ru.pdf";
+
+/* "About scene: Project's GitHub page localized url" */
+"About.Row.GitHub.Url" = "https://github.com/Adamant-im";
+
+/* "About scene: Our blog localized url" */
+"About.Row.Blog.Url" = "https://medium.com/adamant-im";
+
+/* "About scene: Bitcointalk.org localized url" */
+"About.Row.Bitcointalk.Url" = "https://bitcointalk.org/index.php?topic=2626754";
+
+/* "About scene: Facebook localized url" */
+"About.Row.Facebook.Url" = "https://www.facebook.com/adamant.im/";
+
+/* "About scene: Telegram localized url" */
+"About.Row.Telegram.Url" = "https://t.me/adamant_im";
+
+/* "About scene: VK localized url" */
+"About.Row.VK.Url" = "https://vk.com/adamant_im";
+
+/* "About scene: Twitter localized url" */
+"About.Row.Twitter.Url" = "https://twitter.com/adamant_im";
+
+/* About scene: Write to Adamant row */
+"About.Row.Adamant" = "АДАМАНТ";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Токены АДАМАНТ";
+
+/* System accounts: ADAMANT iOS Support */
+"Accounts.iOSSupport" = "Техподдержка iOS ADAMANT";
 
 /* AccountsProvider: Address not valid error, %@ for address */
 "AccountsProvider.Error.AddressNotValidFormat" = "Неправильный адрес: %@";
@@ -16,23 +88,23 @@
 /* Account tab: Confirm logout alert */
 "AccountTab.ConfirmLogout.MessageFormat" = "Выйти из %@?";
 
-/* Account tab: Failed to update account message. %@ for error message */
-"AccountTab.Error.FailedToUpdateAccountFormat" = "Возникла ошибка обновления аккаунта: %@";
-
-/* Account atb: A full 'Get free tokens' link, with %@ as address */
+/* Account tab: A full 'Get free tokens' link, with %@ as address */
 "AccountTab.FreeTokens.UrlFormat" = "https://adamant.im/ru-free-adm-tokens/?wallet=%@";
 
-/* Account tab: A full 'Join ICO' link, with %@ as address */
-"AccountTab.JoinIco.UrlFormat" = "https://adamant.im/ru-buy-tokens/?wallet=%@";
+/* Account tab: A full 'Buy tokens' link, with %@ as address */
+"AccountTab.BuyTokens.UrlFormat" = "https://adamant.im/ru-buy-tokens/?wallet=%@";
 
 /* Account tab: Balance row title */
 "AccountTab.Row.Balance" = "Баланс";
 
-/* Account tab: 'Join the ICO' button */
-"AccountTab.Row.JoinIco" = "Купить токены";
+/* Account tab: 'Buy tokens' button */
+"AccountTab.Row.BuyTokens" = "Купить токены";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Выход";
+
+/* Account tab: 'Security' row */
+"AccountTab.Row.Security" = "Безопасность";
 
 /* Account tab: 'Send tokens' button */
 "AccountTab.Row.SendTokens" = "Отправить токены";
@@ -40,26 +112,29 @@
 /* Account tab: 'Get free tokens' button */
 "AccountTab.Row.FreeTokens" = "Бесплатные ADM-токены";
 
-/* Account tab: Account section title. */
-"AccountTab.Section.Account" = "Аккаунт";
+/* Account tab: 'About' row */
+"AccountTab.Row.About" = "О нас";
+
+/* Account tab: 'Vote for delegates' button */
+"AccountTab.Row.VoteForDelegates" = "Проголосовать за делегатов";
 
 /* Account tab: Actions section title */
 "AccountTab.Section.Actions" = "Действия";
 
-/* Account tab: Wallet section title */
-"AccountTab.Section.Wallet" = "Кошелёк";
+/* Account tab: Application section title */
+"AccountTab.Section.Application" = "Приложение";
+
+/* Account tab: Adamant wallet section */
+"AccountTab.Sections.adamant_wallet" = "ADAMANT кошелёк";
+
+/* Account tab: Ethereum wallet section */
+"AccountTab.Sections.ethereum_wallet" = "Ethereum кошелёк";
+
+/* Account tab: Delegates section title */
+"AccountTab.Section.Delegates" = "Делегаты";
 
 /* Account page: scene title */
 "AccountTab.Title" = "Аккаунт";
-
-/* Account tab: 'Transfer not allowed' alert 'go to WebApp button' */
-"AccountTab.TransferBlocked.GoToPWA" = "msg.adamant.im";
-
-/* Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO */
-"AccountTab.TransferBlocked.Message" = "Ввиду ограничений Apple, отправка токенов отключена до 1.07.2018. В данный момент вы можете отправлять токены с помощью WebApp по адресу msg.adamant.im";
-
-/* Account tab: 'Transfer not allowed' alert title */
-"AccountTab.TransferBlocked.Title" = "Ой!";
 
 /* Product name */
 "ADAMANT" = "АДАМАНТ";
@@ -101,10 +176,10 @@
 "ChatsProvider.Validation.MessageTooLong" = "Сообщение слишком длинное";
 
 /* Known contacts: Adamant ICO message. Markdown supported. */
-"Chats.IcoMessage" = "Сейчас у вас есть возможность купить токены самого защищенного мессенджера АДАМАНТ по низкой цене.\n\nВажно! Пожалуйста, убедитесь, что вы сохранили пароль к этому аккаунту — выйдите из аккаунта и войдите в него снова. Лучше всего иметь запись пароля и на бумаге. Однако помните, только **вы несете ответственность за сохранность вашего пароля**. Его невозможно восстановить. А если он попадет в другие руки, ваши деньги будут украдены. Отнеситесь к этому вопросу так серьезно, как если бы цена токенов на вашем кошельке когда-то станет равна миллиарду долларов.\n\nЧтобы купить токены ADM, перейдите в этом месседжере на вкладку Кошелек и нажмите кнопку Купить токены, или откройте в браузере веб-страницу Adamant.im/ico/. В форме покупки токенов укажите ваш адрес АДАМАНТа — на него будут перечислены токены ADM. При переходе из мессенджера он будет вставлен автоматически, в другом случае вернитесь в мессенджер и кликните на блок Аккаунт, адрес кошелька будет скопирован в буфер обмена. Укажите криптовалюту, в которой вы хотите произвести оплату, и какую сумму. Вы увидите сколько ADM-токенов вы получите, с учетом скидки за объем: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Нажмите кнопку Купить токены АДАМАНТ. Вы получите уникальный адрес, на который необходимо выполнить перевод. Как только на него поступит ожидаемая сумма и транзакция будет подтверждена, вы получите токены ADM. Транзакцию можно выполнить **с любого кошелька, включая биржи**. Необязятельно переводить точную сумму с учетом комиссии, платеж все равно будет засчитан.\nПосле того, как вы получите токены ADM, мы рекомендуем вам хранить их в кошельке как можно дольше. Ежемесячно все нераспроданные токены будут распределяться по кошелькам пользователей, увеличивая балансы на 5%. Подробную информацию можно получить на сайте Adamant.im и в Белой книге Проекта.\n\nНе отвечайте на это сообщение, этот адрес служебный. Если же у вас остались вопросы, напишите в аккаунт **U15677078342684640219**.";
+"Chats.IcoMessage" = "Сейчас у вас есть возможность купить токены самого защищенного мессенджера АДАМАНТ по низкой цене.\n\nВажно! Пожалуйста, убедитесь, что вы сохранили пароль к этому аккаунту — выйдите из аккаунта и войдите в него снова. Лучше всего иметь запись пароля и на бумаге. Однако помните, только **вы несете ответственность за сохранность вашего пароля**. Его невозможно восстановить. А если он попадет в другие руки, ваши деньги будут украдены. Отнеситесь к этому вопросу так серьезно, как если бы цена токенов на вашем кошельке когда-то станет равна миллиарду долларов.\n\nЧтобы купить токены ADM, перейдите в этом месседжере на вкладку Кошелек и нажмите кнопку Купить токены, или откройте в браузере веб-страницу https://adamant.im/ru-buy-tokens/. В форме покупки токенов укажите ваш адрес АДАМАНТа — на него будут перечислены токены ADM. При переходе из мессенджера он будет вставлен автоматически. Укажите криптовалюту, в которой вы хотите произвести оплату, и какую сумму. Вы увидите сколько ADM-токенов вы получите, с учетом скидки за объем: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Нажмите кнопку Купить токены АДАМАНТ. Вы получите уникальный адрес, на который необходимо выполнить перевод. Как только на него поступит ожидаемая сумма и транзакция будет подтверждена, вы получите токены ADM. Транзакцию можно выполнить **с любого кошелька, включая биржи**. Необязятельно переводить точную сумму с учетом комиссии, платеж все равно будет засчитан.\nПосле того, как вы получите токены ADM, мы рекомендуем вам хранить их в кошельке как можно дольше. Ежемесячно все нераспроданные токены будут распределяться по кошелькам пользователей, увеличивая балансы на 5%. Подробную информацию можно получить на сайте Adamant.im и в Белой книге Проекта.\n\nНе отвечайте на это сообщение, этот адрес служебный. Если же у вас остались вопросы, напишите в аккаунт **U15677078342684640219**.";
 
 /* Known contacts: Adamant pre ICO message */
-"Chats.PreIcoMessage" = "Сегодня последний день, когда мы принимаем инвестиции по минимальной цене 0.001 ETH за токен ADM до начала публичного сейла ICO — 30.01. Это самые выгодные условия для инвесторов. Минимальная инвестиция — эквивалент 2 ETH (на этапе публичного сейла ограничений по минимальной сумме нет, но цена токена начинается с 0.002 ETH). Подробная информация о проекте АДАМАНТ на сайте Adamant.im и в Белой книге. Для участия достаточно ответить на это сообщение, и мы вам поможем.";
+"Chats.PreIcoMessage" = "Null";
 
 /* Known contacts: Adamant welcome message. Markdown supported. */
 "Chats.WelcomeMessage" = "Добро пожаловать в самый анонимный и безопасный мессенджер АДАМАНТ. Помните, что безопасность и анонимность зависит и от вас самих. Не переходите по ссылкам, которые вы получаете в чатах, иначе ваш IP-адрес может быть определен. Не доверяйте расширениям браузера. Лучше всего передавать ваш ADM-адрес собеседникам лично, а не через другие мессенджеры. Храните вашу секретную фразу (пароль) от аккаунта в тайне. Установите на ваше устройство пароль или закрываете вкладку браузера после завершения диалогов.\n\nБолее полную информацию о безопасности и анонимности читайте на странице https://adamant.im/staysecured/.\n\nВсе транзакции в блокчейне требуют минимальной комиссии. Это необходимо для поддержания инфраструктуры сети. Чтобы начать общаться, **получите бесплатные токены** — перейдите на вкладку Кошелек и нажмите Бесплатные токены. Затем на вкладке Диалоги нажмите Новый чат и введите адрес собеседника. Чтобы скопировать ваш адрес, нажмите Идентификатор кошелька на вкладке Кошелек.\n\nНе отвечайте на это сообщение, этот адрес служебный. Если же у вас остались вопросы, напишите в аккаунт **U15677078342684640219**."; 
@@ -127,8 +202,74 @@
 /* Chat: 'Sent funds' bubble title */
 "ChatScene.Sent" = "Отправлено";
 
+/* Chat: status message for failed to send chat transaction */
+"ChatScene.MessageStatus.FailToSend" = "Не удалось отправить";
+
+/* Chat: status message for pending chat transaction */
+"ChatScene.MessageStatus.Pending" = "Отправка";
+
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Подробнее…";
+
+/* Delegates page: scene title */
+"Delegates.Title" = "Делегаты";
+
+/* Delegates tab: Message about 50 ADM fee for vote */
+"Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Вам нужно иметь 50 ADM на счете вашего акаунта";
+
+/* Delegate details: scene title */
+"DelegateDetails.Title" = "Подробности";
+
+/* Delegate Details Screen: Rows title for 'Username'" */
+"DelegateDetails.Row.Username" = "Имя";
+
+/* Delegate Details Screen: Rows title for 'Address'" */
+"DelegateDetails.Row.Address" = "Адрес";
+
+/* Delegate Details Screen: Rows title for 'Public Key'" */
+"DelegateDetails.Row.PublicKey" = "Публичный ключ";
+
+/* Delegate Details Screen: Rows title for 'Vote weight'" */
+"DelegateDetails.Row.VoteWeight" = "Вес голоса";
+
+/* Delegate Details Screen: Rows title for 'Produced blocks'" */
+"DelegateDetails.Row.ProducedBlocks" = "Обработано";
+
+/* Delegate Details Screen: Rows title for 'Missed blocks'" */
+"DelegateDetails.Row.MissedBlocks" = "Пропущено";
+
+/* Delegate Details Screen: Rows title for 'Rate'" */
+"DelegateDetails.Row.Rate" = "Позиция";
+
+/* Delegate Details Screen: Rows title for 'Rank'" */
+"DelegateDetails.Row.Rank" = "Ранг";
+
+/* Delegate Details Screen: Rows title for 'Approval'" */
+"DelegateDetails.Row.Approval" = "Блоков";
+
+/* Delegate Details Screen: Rows title for 'Productivity'" */
+"DelegateDetails.Row.Productivity" = "Аптайм";
+
+/* Delegate Details Screen: Rows title for 'Forging time'" */
+"DelegateDetails.Row.ForgingTime" = "Время форжинга";
+
+/* Delegate Details Screen: Rows title for 'Forged'" */
+"DelegateDetails.Row.Forged" = "Сфоржено";
+
+/* Delegates: Message for Successfull voting */
+"Delegates.Vote.Success" = "Ваш голос отправлен";
+
+/* Storybard - Delegate vote panel: 'Upvotes' label */
+"Delegates.VotePanel.Upvotes" = "Повышены:";
+
+/* Storybard - Delegate vote panel: 'Downvotes' label */
+"Delegates.VotePanel.Downvotes" = "Понижены:";
+
+/* Storybard - Delegate vote panel: 'New' label */
+"Delegates.VotePanel.New" = "Новые:";
+
+/* Storybard - Delegate vote panel: 'Total' label */
+"Delegates.VotePanel.Total" = "Всего:";
 
 /* Shared error: Account not found error. Using %@ for address. */
 "Error.AccountNotFoundFormat" = "Аккаун не найден: %@";
@@ -196,8 +337,8 @@
 /* Login: Login with QR button. */
 "LoginScene.Row.Qr" = "Войти с QR-кодом";
 
-/* Login: security alert, notify user that he must save his new passphrase */
-"LoginScene.Row.SavePassphraseAlert" = "Это пароль для нового Кошелька и Мессенджера. Сохраните его! Для входа в Кошелек не нужно логина, только этот пароль. Восстановление пароля невозможно.";
+/* Login: security alert, notify user that he must save his new passphrase. Markdown supported, center aligned. */
+"LoginScene.Row.SavePassphraseAlert" = "Это пароль для нового Кошелька и Мессенджера. **Сохраните его!** Для входа в Кошелек не нужно логина, только этот пароль. **Восстановление пароля невозможно**.";
 
 /* Login: a small hint for a user, that he can tap on passphrase to save it */
 "LoginScene.Row.TapToSave" = "Нажмите, чтобы сохранить";
@@ -229,6 +370,9 @@
 /* New chat: scene title */
 "NewChatScene.Title" = "Новый Чат";
 
+/* New chat: Show QR for my address button */
+"NewChatScene.MyQr" = "Показать мой QR";
+
 /* NodesList: Button label */
 "NodesList.NodesList" = "Список нод";
 
@@ -237,9 +381,6 @@
 
 /* NodesList: 'Add new node' button lable */
 "NodesList.AddNewNode" = "Добавить новую ноду";
-
-/* Notifications: scene title */
-"Notifications.Title" = "Уведомления";
 
 /* NodesList: Reset nodes alert title */
 "NodesList.ResetNodeListAlert" = "Сбросить список нод к списку по-умолчанию?";
@@ -257,7 +398,7 @@
 "NodesEditor.DeleteNodeAlert" = "Удалить эту ноду?";
 
 /* NodesEditor: Testing in progress */
-"NodesEditor.TestingInProgressMessage" = "Проверяем соединение";
+"NodesEditor.TestingInProgressMessage" = "Проверяем соединение…";
 
 /* NodesEditor: Scheme row */
 "NodesEditor.SchemeRow" = "Протокол";
@@ -286,17 +427,14 @@
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Некорректный адрес хоста";
 
-/* Notifications: Modes description. Markdown supported. */
-"Notifications.ModesDescription" = "#### Режимы уведомлений\n\n#### Отключены\nНе присылать никаких уведомлений.\n\n#### Фоновое обновление\nПроверка новых сообщений производится самим устройством. Проверку инициирует iOS, и интервалы между проверками определяются системой на основании множества факторов, таких как доступность сотовой сети, заряд батареи, и использование приложения. Интервал может быть 20 минут, может быть 6 часов, может доходить и до нескольких дней. Однако, вы всегда можете открыть приложение и проверить новые сообщения вручную.\n\n#### Push\nУведомления о новых сообщениях присылаются сервисом ADAMANT Notification Service. Уведомления приходят практически мгновенно (несколько секунд), но необходима регистрация устройства в сервисе. Это безопасно и сохраняет высокий уровень секретности, для большинства пользователей это предпочтительный вариант.\n\nО регистрации устройств вы можете прочитать больше на странице проекта в Github.";
-
-/* Notifications: Notifications update mode */
-"Notifications.Section.Settings" = "Настройки уведомлений";
+/* Security: Notification modes description. Markdown supported. */
+"SecurityPage.Row.Notifications.ModesDescription" = "#### Режимы уведомлений\n\n#### Отключены\nНе присылать никаких уведомлений.\n\n#### Фоновое обновление\nПроверка новых сообщений производится самим устройством. **Важно: если приложение не запущено, вы не будете получать уведомлений**. Проверку инициирует iOS, и интервалы между проверками определяются системой на основании множества факторов, таких как доступность сотовой сети, заряд батареи, и использование приложения. Интервал может быть 20 минут, может быть 6 часов, может доходить и до нескольких дней. Однако, вы всегда можете открыть приложение и проверить новые сообщения вручную.\n\n#### Push\nУведомления о новых сообщениях присылаются сервисом ADAMANT Notification Service. **Уведомления работают, даже если приложение не запущено**. Уведомления приходят практически мгновенно (несколько секунд), но необходима регистрация устройства в сервисе. Это безопасно и сохраняет высокий уровень секретности, для большинства пользователей это предпочтительный вариант.\n\nО регистрации устройств вы можете прочитать больше на странице проекта в Github.\n\n";
 
 /* Notifications: Selected notifications types */
-"Notifications.Section.NotificationsType" = "Уведомления";
+"SecurityPage.Section.NotificationsType" = "Уведомления";
 
-/* Notifications: About ANS */
-"Notifications.Section.AboutANS" = "О службе ANS";
+/* Security: About ANS */
+"SecurityPage.Section.AboutNotificationTypes" = "О режимах уведомлений";
 
 /* Notifications: Disable notifications */
 "Notifications.Mode.NotificationsDisabled" = "Отключено";
@@ -307,17 +445,8 @@
 /* Notifications: Use Apple Push notifications */
 "Notifications.Mode.ApplePush" = "Push";
 
-/* Notifications: Visit Github */
-"Notifications.Row.VisitGithub" = "Посетить Github";
-
-/* Notifications: Mode */
-"Notifications.Row.Mode" = "Режим уведомлений";
-
-/* Notifications: Send new messages notifications */
-"Notifications.Row.Messages" = "Сообщения";
-
-/* Notifications: Send new transfers notifications */
-"Notifications.Row.Transfers" = "Переводы";
+/* Security: Visit Github */
+"SecurityPage.Row.VisitGithub" = "Посетить Github";
 
 /* Notifications: Something went wrong while registering remote notifications. %@ for description */
 "NotificationsService.Error.RegistrationRemotesFormat" = "Произошла ошибка при регистрации в ANS, попробуйте позже. Причина: %@";
@@ -358,38 +487,32 @@
 /* QRGenerator: scene title */
 "QrGeneratorScene.Title" = "Генератор QR";
 
-/* Config: turn off 'Stay Logged In' confirmation */
-"SettingsPage.DoNotStayLoggedIn" = "Выходить из аккаунта при закрытии приложения";
+/* Security: scene title */
+"SecurityPage.Title" = "Безопасность";
 
-/* Config: Authorization reason for turning biometry off */
-"SettingsPage.DoNotUseBiometry" = "Отключить вход с биометрией";
+/* Security: turn off 'Stay Logged In' confirmation */
+"SecurityPage.DoNotStayLoggedIn" = "Выходить из аккаунта при закрытии приложения";
 
-/* Config: Generate QR with passphrase row */
-"SettingsPage.Row.GenerateQr" = "Создать QR-код с паролем";
+/* Security: Authorization reason for turning biometry off */
+"SecurityPage.DoNotUseBiometry" = "Отключить вход с биометрией";
 
-/* Config: Show notifications */
-"SettingsPage.Row.Notifications" = "Уведомления";
+/* Security: Generate QR with passphrase row */
+"SecurityPage.Row.GenerateQr" = "Создать QR-код с паролем";
 
-/* Config: Stay logged option */
-"SettingsPage.Row.StayLoggedIn" = "Оставаться в системе";
+/* Security: Show notifications */
+"SecurityPage.Row.Notifications" = "Уведомления";
 
-/* Config: Version row */
-"SettingsPage.Row.Version" = "Версия";
+/* Security: Stay logged row */
+"SecurityPage.Row.StayLoggedIn" = "Оставаться в системе";
 
-/* Config: Application Info section */
-"SettingsPage.Section.ApplicationInfo" = "Приложение";
-
-/* Config: Settings section */
-"SettingsPage.Section.Settings" = "Безопасность";
-
-/* Config: Utilities section */
-"SettingsPage.Section.Utilities" = "Утилиты";
+/* Security: Security section */
+"SecurityPage.Section.Security" = "Безопасность";
 
 /* Config: scene title */
 "SettingsPage.Title" = "Настройки";
 
-/* Config: Authorization reason for turning biometry on */
-"SettingsPage.UseBiometry" = "Использовать биометрию для входа в систему";
+/* Security: Authorization reason for turning biometry on */
+"SecurityPage.UseBiometry" = "Использовать биометрию для входа в систему";
 
 /* Shared alert 'Cancel' button. Used anywhere */
 "Shared.Cancel" = "Отмена";
@@ -416,7 +539,7 @@
 "Shared.NoInternet.Body" = "Проверьте соединение и повторите попытку";
 
 /* Shared alert notification: message for no Mail services. */
-"Shared.NoMail" = "Оправка почты не доступна";
+"Shared.NoMail" = "Отправка почты недоступна";
 
 /* Shared alert 'Ok' button. Used anywhere */
 "Shared.Ok" = "Ок";

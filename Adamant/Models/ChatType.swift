@@ -49,6 +49,12 @@ extension ChatType: Codable {
 	}
 }
 
+extension ChatType: Equatable {
+	static func == (lhs: ChatType, rhs: ChatType) -> Bool {
+		return lhs.rawValue == rhs.rawValue
+	}
+}
+
 fileprivate extension Int {
 	func toChatType() -> ChatType {
 		switch self {

@@ -177,7 +177,7 @@ extension ButtonsStripeView {
 			fatalError("Can't get UINib")
 		}
 		
-		view.buttonsBorderColor = UIColor.adamantSecondary
+		view.buttonsBorderColor = UIColor.adamantPrimary
 		view.buttonsBorderWidth = 1
 		view.buttonsSize = 50
 		view.buttonsRoundingMode = .customRadius(radius: 13)

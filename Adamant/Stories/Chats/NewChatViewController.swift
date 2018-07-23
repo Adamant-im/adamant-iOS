@@ -19,7 +19,6 @@ extension String.adamantLocalized {
 		static let title = NSLocalizedString("NewChatScene.Title", comment: "New chat: scene title")
 		
 		static let addressPlaceholder = NSLocalizedString("NewChatScene.Address.Placeholder", comment: "New chat: Recipient address placeholder. Note that address text field always shows U letter, so you can left this line blank.")
-		static let scanQrButton = NSLocalizedString("NewChatScene.ScanQr", comment: "New chat: Scan QR with address button")
 		
 		static let specifyValidAddressMessage = NSLocalizedString("NewChatScene.Error.InvalidAddress", comment: "New chat: Notify user that he did enter invalid address")
 		static let loggedUserAddressMessage = NSLocalizedString("NewChatScene.Error.OwnAddress", comment: "New chat: Notify user that he can't start chat with himself")
@@ -42,6 +41,7 @@ class NewChatViewController: FormViewController {
 	private enum Rows {
 		case addressField
 		case scanQr
+		case myQr
 		
 		var tag: String {
 			switch self {
@@ -50,6 +50,17 @@ class NewChatViewController: FormViewController {
 				
 			case .scanQr:
 				return "b"
+				
+			case .myQr:
+				return "m"
+			}
+		}
+		
+		var localized: String? {
+			switch self {
+			case .addressField: return nil
+			case .scanQr: return NSLocalizedString("NewChatScene.ScanQr", comment: "New chat: Scan QR with address button")
+			case .myQr: return NSLocalizedString("NewChatScene.MyQr", comment: "New chat: Show QR for my address button")
 			}
 		}
 	}
@@ -58,9 +69,10 @@ class NewChatViewController: FormViewController {
 	var dialogService: DialogService!
 	var accountService: AccountService!
 	var accountsProvider: AccountsProvider!
+	var router: Router!
 	
 	// MARK: Properties
-	weak var accountTextField: UITextField!
+	private var skipValueChange = false
 	
 	weak var delegate: NewChatViewControllerDelegate?
 	var addressFormatter = NumberFormatter()
@@ -82,8 +94,17 @@ class NewChatViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+		
+		tableView.keyboardDismissMode = .none
+		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = true
+		}
+		
 		navigationItem.title = String.adamantLocalized.newChat.title
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+		let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+		doneButton.isEnabled = false
+		navigationItem.rightBarButtonItem = doneButton
 		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
 		
 		navigationOptions = .Disabled
@@ -100,8 +121,9 @@ class NewChatViewController: FormViewController {
 				footer.height = { ButtonsStripeView.adamantDefaultHeight }
 				
 				return footer
-				}()
+			}()
 		}
+		
 		<<< TextRow() {
 			$0.tag = Rows.addressField.tag
 			$0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
@@ -109,28 +131,76 @@ class NewChatViewController: FormViewController {
 			
 			let prefix = UILabel()
 			prefix.text = "U"
-			prefix.textColor = UIColor.adamantPrimary
-			prefix.font = UIFont.adamantPrimary(size: 17)
 			prefix.sizeToFit()
 			let view = UIView()
 			view.addSubview(prefix)
 			view.frame = prefix.frame
-			prefix.frame = prefix.frame.offsetBy(dx: 0, dy: -1)
 			$0.cell.textField.leftView = view
 			$0.cell.textField.leftViewMode = .always
-		}.cellSetup({ (cell, row) in
-			cell.textField.font = UIFont.adamantPrimary(size: 17)
-			cell.textField.textColor = UIColor.adamantPrimary
-		}).cellUpdate({ (cell, row) in
-			cell.textField.textColor = UIColor.adamantPrimary
-			
+		}.cellUpdate { (cell, row) in
 			if let text = cell.textField.text {
 				cell.textField.text = text.components(separatedBy: NewChatViewController.invalidCharacters).joined()
 			}
-		})
+		}.onChange { [weak self] row in
+			if let skip = self?.skipValueChange, skip {
+				self?.skipValueChange = false
+				return
+			}
+			
+			if let text = row.value {
+				let trimmed = text.components(separatedBy: NewChatViewController.invalidCharacters).joined()
+				
+				if text != trimmed {
+					self?.skipValueChange = true
+					
+					DispatchQueue.main.async {
+						row.value = trimmed
+						row.updateCell()
+					}
+				}
+				
+				if let done = self?.navigationItem.rightBarButtonItem {
+					if Thread.isMainThread {
+						done.isEnabled = text.count > 6
+					} else {
+						DispatchQueue.main.async {
+							done.isEnabled = text.count > 6
+						}
+					}
+				}
+			} else {
+				self?.navigationItem.rightBarButtonItem?.isEnabled = false
+			}
+		}
 		
-		if let row: TextRow = form.rowBy(tag: Rows.addressField.tag) {
-			row.cell.textField.becomeFirstResponder()
+		// MARK: My qr
+		if let address = accountService.account?.address {
+			let myQrSection = Section()
+			
+			let button = ButtonRow() {
+				$0.tag = Rows.myQr.tag
+				$0.title = Rows.myQr.localized
+			}.cellUpdate { (cell, _) in
+				cell.textLabel?.textColor = UIColor.adamantPrimary
+			}.onCellSelection { [weak self] (cell, row) in
+				switch AdamantQRTools.generateQrFrom(string: address) {
+				case .success(let qr):
+					guard let vc = self?.router.get(scene: AdamantScene.Shared.shareQr) as? ShareQrViewController else {
+						fatalError("Can't find ShareQrViewController")
+					}
+					
+					vc.qrCode = qr
+					vc.sharingTip = address
+					vc.excludedActivityTypes = ShareContentType.address.excludedActivityTypes
+					self?.present(vc, animated: true, completion: nil)
+					
+				case .failure(error: let error):
+					self?.dialogService.showError(withMessage: error.localizedDescription, error: error)
+				}
+			}
+			
+			myQrSection.append(button)
+			form.append(myQrSection)
 		}
     }
 	
@@ -139,6 +209,14 @@ class NewChatViewController: FormViewController {
 		
 		if let row: TextRow = form.rowBy(tag: Rows.addressField.tag) {
 			row.cell.textField.resignFirstResponder()
+		}
+	}
+	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		
+		if let row: TextRow = form.rowBy(tag: Rows.addressField.tag) {
+			row.cell.textField.becomeFirstResponder()
 		}
 	}
 	

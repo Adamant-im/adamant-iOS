@@ -13,6 +13,7 @@ enum ApiServiceResult<T> {
 	case failure(ApiServiceError)
 }
 
+// MARK: - Error
 enum ApiServiceError: Error {
 	case notLogged
 	case accountNotFound
@@ -50,6 +51,61 @@ enum ApiServiceError: Error {
 	}
 }
 
+extension ApiServiceError: RichError {
+	var message: String {
+		return localized
+	}
+	
+	var level: ErrorLevel {
+		switch self {
+		case .accountNotFound, .notLogged, .networkError:
+			return .warning
+			
+		case .internalError, .serverError:
+			return .error
+		}
+	}
+	
+	var internalError: Error? {
+		switch self {
+		case .accountNotFound, .notLogged, .serverError:
+			return nil
+			
+		case .internalError(_, let error):
+			return error
+			
+		case .networkError(let error):
+			return error
+		}
+	}
+}
+
+extension ApiServiceError: Equatable {
+	static func == (lhs: ApiServiceError, rhs: ApiServiceError) -> Bool {
+		switch (lhs, rhs) {
+		case (.notLogged, .notLogged):
+			return true
+			
+		case (.accountNotFound, .accountNotFound):
+			return true
+			
+		case (.serverError(let le), .serverError(let re)):
+			return le == re
+			
+		case (.internalError(let lm, _), .internalError(let rm, _)):
+			return lm == rm
+			
+		case (.networkError, .networkError):
+			return true
+			
+		default:
+			return false
+		}
+	}
+}
+
+
+// - MARK: ApiService
 protocol ApiService: class {
 	
 	/// Default is async queue with .utilities priority.
@@ -110,4 +166,18 @@ protocol ApiService: class {
 	/// Send text message
 	///   - completion: Contains processed transactionId, if success, or AdamantError, if fails.
 	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
+    
+    // MARK: - Delegates
+    
+    /// Get delegates
+    func getDelegates(limit: Int, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void)
+    func getDelegatesWithVotes(for address: String, limit: Int, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void)
+    
+    /// Get delegate forge details
+    func getForgedByAccount(publicKey: String, completion: @escaping (ApiServiceResult<DelegateForgeDetails>) -> Void)
+    /// Get delegate forgeing time
+    func getForgingTime(for delegate: Delegate, completion: @escaping (ApiServiceResult<Int>) -> Void)
+    
+    /// Send vote transaction for delegates
+    func voteForDelegates(from address: String, keypair: Keypair, votes: [DelegateVote], completion: @escaping (ApiServiceResult<UInt64>) -> Void)
 }

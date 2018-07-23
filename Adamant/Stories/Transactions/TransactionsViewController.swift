@@ -24,8 +24,8 @@ class TransactionsViewController: UIViewController {
 	// MARK: - Dependencies
 	var accountService: AccountService!
 	var transfersProvider: TransfersProvider!
-  var chatsProvider: ChatsProvider!
-  var dialogService: DialogService!
+	var dialogService: DialogService!
+	var stack: CoreDataStack!
 	var router: Router!
 	
 	// MARK: - Properties
@@ -50,6 +50,11 @@ class TransactionsViewController: UIViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = false
+		}
+		
 		navigationItem.title = String.adamantLocalized.transactionList.title
 		
 		if accountService.account != nil {
@@ -59,7 +64,7 @@ class TransactionsViewController: UIViewController {
 		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
 		tableView.dataSource = self
 		tableView.delegate = self
-        tableView.addSubview(self.refreshControl)
+        tableView.refreshControl = refreshControl
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
 			self?.initFetchedResultController(provider: self?.transfersProvider)
@@ -79,6 +84,17 @@ class TransactionsViewController: UIViewController {
 		if tableView.isEditing {
 			tableView.setEditing(false, animated: false)
 		}
+	}
+	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		
+		// TransactionDetails can reset this setting
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = false
+		}
+		
+		markTransfersAsRead()
 	}
 	
 	
@@ -121,6 +137,23 @@ class TransactionsViewController: UIViewController {
             }
         }
     }
+	
+	private func markTransfersAsRead() {
+		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+		privateContext.parent = stack.container.viewContext
+		
+		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+		request.predicate = NSPredicate(format: "isUnread == true")
+		request.sortDescriptors = [NSSortDescriptor(key: "transactionId", ascending: false)]
+		
+		if let result = try? privateContext.fetch(request) {
+			result.forEach { $0.isUnread = false }
+			
+			if privateContext.hasChanges {
+				try? privateContext.save()
+			}
+		}
+	}
 }
 
 // MARK: - UITableView Cells
@@ -129,7 +162,7 @@ extension TransactionsViewController {
 		cell.accountLabel.tintColor = UIColor.adamantPrimary
 		cell.ammountLabel.tintColor = UIColor.adamantPrimary
 		cell.dateLabel.tintColor = UIColor.adamantSecondary
-		cell.avatarImageView.tintColor = UIColor.adamantPrimary
+		cell.topImageView.tintColor = UIColor.black
 		
 		if transfer.isOutgoing {
 			cell.transactionType = .outcome

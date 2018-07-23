@@ -1,5 +1,77 @@
+/* About page: scene title */
+"About.Title" = "Über uns";
+
+/* About scene: 'Read about' section title. */
+"About.Section.About" = "Über ADAMANT";
+
+/* About scene: 'Contact us' section title. */
+"About.Section.ContactUs" = "Kontaktieren Sie uns";
+
+/* About scene: Website row */
+"About.Row.Website" = "Webseite";
+
+/* About scene: The Whitepaper row */
+"About.Row.Whitepaper" = "Das Whitepaper";
+
+/* About scene: Project's GitHub page row */
+"About.Row.GitHub" = "Seite des Projekts auf GitHub";
+
+/* About scene: Write us row */
+"About.Row.WriteUs" = "Schreiben Sie uns";
+
+/* About scene: Our blog row */
+"About.Row.Blog" = "Unser Blog";
+
+/* About scene: Bitcointalk.org row */
+"About.Row.Bitcointalk" = "Bitcointalk.org";
+
+/* About scene: Facebook row */
+"About.Row.Facebook" = "Facebook";
+
+/* About scene: Telegram row */
+"About.Row.Telegram" = "Telegram";
+
+/* About scene: VK row */
+"About.Row.VK" = "VK";
+
+/* About scene: Twitter row */
+"About.Row.Twitter" = "Twitter";
+
+/* "About scene: Website localized url" */
+"About.Row.Website.Url" = "https://adamant.im/de";
+
+/* "About scene: The Whitepaper localized url" */
+"About.Row.Whitepaper.Url" = "https://adamant.im/whitepaper/adamant-whitepaper-de.pdf";
+
+/* "About scene: Project's GitHub page localized url" */
+"About.Row.GitHub.Url" = "https://github.com/Adamant-im";
+
+/* "About scene: Our blog localized url" */
+"About.Row.Blog.Url" = "https://medium.com/adamant-im";
+
+/* "About scene: Bitcointalk.org localized url" */
+"About.Row.Bitcointalk.Url" = "https://bitcointalk.org/index.php?topic=2626619";
+
+/* "About scene: Facebook localized url" */
+"About.Row.Facebook.Url" = "https://www.facebook.com/adamant.im/";
+
+/* "About scene: Telegram localized url" */
+"About.Row.Telegram.Url" = "https://t.me/adamant_eng";
+
+/* "About scene: VK localized url" */
+"About.Row.VK.Url" = "https://vk.com/adamant_im";
+
+/* "About scene: Twitter localized url" */
+"About.Row.Twitter.Url" = "https://twitter.com/adamant_im";
+
+/* About scene: Write to Adamant row */
+"About.Row.Adamant" = "ADAMANT";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "ADAMANT Tokens";
+
+/* System accounts: ADAMANT iOS Support */
+"Accounts.iOSSupport" = "ADAMANT iOS Support";
 
 /* AccountsProvider: Address not valid error, %@ for address */
 "AccountsProvider.Error.AddressNotValidFormat" = "Ungültige Adresse: %@";
@@ -19,20 +91,23 @@
 /* Account tab: Failed to update account message. %@ for error message */
 "AccountTab.Error.FailedToUpdateAccountFormat" = "Fehler beim Aktualisieren des Konto: %@";
 
-/* Account atb: A full 'Get free tokens' link, with %@ as address */
-"AccountTab.FreeTokens.UrlFormat" = "https://adamant.im/free-adm-tokens/?wallet=%@";
+/* Account tab: A full 'Get free tokens' link, with %@ as address */
+"AccountTab.FreeTokens.UrlFormat" = "https://adamant.im/de-free-adm-tokens/?wallet=%@";
 
-/* Account tab: A full 'Join ICO' link, with %@ as address */
-"AccountTab.JoinIco.UrlFormat" = "https://adamant.im/de-buy-tokens/?wallet=%@";
+/* Account tab: A full 'Buy tokens' link, with %@ as address */
+"AccountTab.BuyTokens.UrlFormat" = "https://adamant.im/de-buy-tokens/?wallet=%@";
 
 /* Account tab: Balance row title */
 "AccountTab.Row.Balance" = "Kontostand";
 
-/* Account tab: 'Join the ICO' button */
-"AccountTab.Row.JoinIco" = "Zum ICO";
+/* Account tab: 'Buy tokens' button */
+"AccountTab.Row.BuyTokens" = "Kaufe token";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Ausloggen";
+
+/* Account tab: 'Security' row */
+"AccountTab.Row.Security" = "Sicherheit";
 
 /* Account tab: 'Send tokens' button */
 "AccountTab.Row.SendTokens" = "Tokens senden";
@@ -40,32 +115,35 @@
 /* Account tab: 'Get free tokens' button */
 "AccountTab.Row.FreeTokens" = "Kostenlose ADM Tokens";
 
-/* Account tab: Account section title. */
-"AccountTab.Section.Account" = "Konto";
+/* Account tab: 'About' row */
+"AccountTab.Row.About" = "Über ADAMANT";
+
+/* Account tab: 'Vote for delegates' button */
+"AccountTab.Row.VoteForDelegates" = "Delegate wählen";
 
 /* Account tab: Actions section title */
-"AccountTab.Section.Actions" = "Optionen";
+"AccountTab.Section.Actions" = "Aktionen";
 
-/* Account tab: Wallet section title */
-"AccountTab.Section.Wallet" = "Wallet";
+/* Account tab: Application section title */
+"AccountTab.Section.Application" = "Application";
+
+/* Account tab: Adamant wallet section */
+"AccountTab.Sections.adamant_wallet" = "ADAMANT Wallet";
+
+/* Account tab: Ethereum wallet section */
+"AccountTab.Sections.ethereum_wallet" = "Ethereum Wallet";
 
 /* Account page: scene title */
 "AccountTab.Title" = "Konto";
 
-/* Account tab: 'Transfer not allowed' alert 'go to WebApp button' */
-"AccountTab.TransferBlocked.GoToPWA" = "msg.adamant.im";
-
-/* Account tab: Inform user that sending tokens not allowed by Apple until the end of ICO */
-"AccountTab.TransferBlocked.Message" = "Aufgrund von Richtlinien von Apple, Versenden von Tokens ist während des ICOs nicht möglich. Zurzeit können Sie Tokens mit der WebApp unter msg.adamant.im versenden";
-
-/* Account tab: 'Transfer not allowed' alert title */
-"AccountTab.TransferBlocked.Title" = "Sorry!";
+/* Account tab: Delegates section title */
+"AccountTab.Section.Delegates" = "Delegate";
 
 /* Product name */
 "ADAMANT" = "ADAMANT";
 
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
-"Application.deviceTokenErrorFormat" = "Failed to reginser in ANS: %@";
+"Application.deviceTokenErrorFormat" = "Anmeldefehler in ANS: %@";
 
 /* Serious internal error: Failed to build endpoint url */
 "ApiService.InternalError.EndpointBuildFailed" = "Endpoint Build fehlgeschlagen. Bericht senden";
@@ -127,8 +205,74 @@
 /* Chat: 'Sent funds' bubble title */
 "ChatScene.Sent" = "Versendet";
 
+/* Chat: status message for failed to send chat transaction */
+"ChatScene.MessageStatus.FailToSend" = "Fehler beim Senden";
+
+/* Chat: status message for pending chat transaction */
+"ChatScene.MessageStatus.Pending" = "Ausstehend";
+
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Tippen Sie für Details";
+
+/* Delegates page: scene title */
+"Delegates.Title" = "Delegate";
+
+/* Delegates tab: Message about 50 ADM fee for vote */
+"Delegates.NotEnoughtTokensForVote" = "Nicht genug Tokens für die Abstimmung. Sie brauchen mindestens 50 ADM auf Ihrem Konto";
+
+/* Delegate details: scene title */
+"DelegateDetails.Title" = "Details";
+
+/* Delegate Details Screen: Rows title for 'Username'" */
+"DelegateDetails.Row.Username" = "Benutzername";
+
+/* Delegate Details Screen: Rows title for 'Address'" */
+"DelegateDetails.Row.Address" = "Addresse";
+
+/* Delegate Details Screen: Rows title for 'Public Key'" */
+"DelegateDetails.Row.PublicKey" = "Öffentlicher Schlüssel";
+
+/* Delegate Details Screen: Rows title for 'Vote weight'" */
+"DelegateDetails.Row.VoteWeight" = "Stimmgewicht";
+
+/* Delegate Details Screen: Rows title for 'Produced blocks'" */
+"DelegateDetails.Row.ProducedBlocks" = "Produzierte Blöcke";
+
+/* Delegate Details Screen: Rows title for 'Missed blocks'" */
+"DelegateDetails.Row.MissedBlocks" = "Verpasste Blöcke";
+
+/* Delegate Details Screen: Rows title for 'Rate'" */
+"DelegateDetails.Row.Rate" = "Rate";
+
+/* Delegate Details Screen: Rows title for 'Rank'" */
+"DelegateDetails.Row.Rank" = "Rang";
+
+/* Delegate Details Screen: Rows title for 'Approval'" */
+"DelegateDetails.Row.Approval" = "Bestätigung";
+
+/* Delegate Details Screen: Rows title for 'Productivity'" */
+"DelegateDetails.Row.Productivity" = "Produktivität";
+
+/* Delegate Details Screen: Rows title for 'Forging time'" */
+"DelegateDetails.Row.ForgingTime" = "Forging-Zeit";
+
+/* Delegate Details Screen: Rows title for 'Forged'" */
+"DelegateDetails.Row.Forged" = "Geforged";
+
+/* Delegates: Message for Successfull voting */
+"Delegates.Vote.Success" = "Ihre Stimme wurde versendet";
+
+/* Storybard - Delegate vote panel: 'Upvotes' label */
+"Delegates.VotePanel.Upvotes" = "Upvotes:";
+
+/* Storybard - Delegate vote panel: 'Downvotes' label */
+"Delegates.VotePanel.Downvotes" = "Downvotes:";
+
+/* Storybard - Delegate vote panel: 'New' label */
+"Delegates.VotePanel.New" = "Neue:";
+
+/* Storybard - Delegate vote panel: 'Total' label */
+"Delegates.VotePanel.Total" = "Gesamt:";
 
 /* Shared error: Account not found error. Using %@ for address. */
 "Error.AccountNotFoundFormat" = "Konto nicht gefunden: %@";
@@ -149,7 +293,7 @@
 "Error.NoNetwork" = "Keine Verbindung";
 
 /* Shared error: Remote error format, %@ for message */
-"Error.RemoteServerErrorFormat" = "Blockchain Node Fehler: %@";
+"Error.RemoteServerErrorFormat" = "Blockchain-Node Fehler: %@";
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "Sie sind nicht eingeloggt";
@@ -196,7 +340,7 @@
 /* Login: Login with QR button. */
 "LoginScene.Row.Qr" = "Mit dem QR-Code einloggen";
 
-/* Login: security alert, notify user that he must save his new passphrase */
+/* Login: security alert, notify user that he must save his new passphrase. Markdown supported, center aligned. */
 "LoginScene.Row.SavePassphraseAlert" = "Speichern Sie die Passphrase für die neue Wallet und das Messenger-Konto. Es gibt keinen Login für die Wallet, nur die Passphrase wird benötigt. Wenn Sie verloren geht, kann sie nicht wiederhergestellt werden.";
 
 /* Login: a small hint for a user, that he can tap on passphrase to save it */
@@ -229,6 +373,9 @@
 /* New chat: scene title */
 "NewChatScene.Title" = "Neuer Chat";
 
+/* New chat: Show QR for my address button */
+"NewChatScene.MyQr" = "Show my QR";
+
 /* NodesList: Button label */
 "NodesList.NodesList" = "Node-Liste";
 
@@ -247,20 +394,14 @@
 /* NodesList: 'Node url' plaseholder */
 "NodesList.NodeUrl" = "Node-URL";
 
-/* Notifications: scene title */
-"Notifications.Title" = "Benachrichtigungen";
-
-/* Notifications: Modes description. Markdown supported. */
-"Notifications.ModesDescription" = "#### Benachrichtigungsmodi\n\n#### Deaktiviert\nKeine Benachrichtigungen.\n\n#### Hintergrundaktualisierung\nIhr Gerät erhält neue Nachrichteninformationen automatisch. Keine externen Aufrufe. Die Hintergrundaktualisierung wird von iOS verwaltet, die Zeit wird vom Betriebssystem bestimmt und ist von vielen Faktoren wie Akkustand, Netzwerkauslastung, Nutzungsmuster abhängig und kann nicht vorhergesagt werden. Es können 20 Minuten, 6 Stunden, oder ein Tag sein. Sie können die App trotzdem öffnen und nachschauen, ob eine Nachricht angekommen ist.\n\n#### Push\nBenachrichtigungen werden auf Ihr Gerät vom ADAMANT Benachrichtigungsservice gesendet. Sie erhalten eine Benachrichtigung umgehend, nachdem die Nachricht versendet und von der Blockchain bestätigt wurde - mit einer kleinen Verzögerung. Jedoch erfordert dieser Modus, dass der Gerätetoken Ihres Geräts in der Servicedatenbank registriert ist. Gerätetokens sind sicher, und diese Option ist zu empfehlen.\n\nSie können mehr über die Geräteregistrierung auf der ADAMANTs Github-Seite nachlesen.";
-
-/* Notifications: Notifications update mode */
-"Notifications.Section.Settings" = "Benachrichtigungseinstellungen";
+/* Security: Notification modes description. Markdown supported. */
+"SecurityPage.Row.Notifications.ModesDescription" = "#### Benachrichtigungsmodi\n\n#### Deaktiviert\nKeine Benachrichtigungen.\n\n#### Hintergrundaktualisierung\nIhr Gerät erhält neue Nachrichteninformationen automatisch. Keine externen Aufrufe. Die Hintergrundaktualisierung wird von iOS verwaltet, die Zeit wird vom Betriebssystem bestimmt und ist von vielen Faktoren wie Akkustand, Netzwerkauslastung, Nutzungsmuster abhängig und kann nicht vorhergesagt werden. Es können 20 Minuten, 6 Stunden, oder ein Tag sein. Sie können die App trotzdem öffnen und nachschauen, ob eine Nachricht angekommen ist.\n\n#### Push\nBenachrichtigungen werden auf Ihr Gerät vom ADAMANT Benachrichtigungsservice gesendet. Sie erhalten eine Benachrichtigung umgehend, nachdem die Nachricht versendet und von der Blockchain bestätigt wurde - mit einer kleinen Verzögerung. Jedoch erfordert dieser Modus, dass der Gerätetoken Ihres Geräts in der Servicedatenbank registriert ist. Gerätetokens sind sicher, und diese Option ist zu empfehlen.\n\nSie können mehr über die Geräteregistrierung auf der ADAMANTs Github-Seite nachlesen.";
 
 /* Notifications: Selected notifications types */
-"Notifications.Section.NotificationsType" = "Benachrichtigungen";
+"SecurityPage.Section.NotificationsType" = "Benachrichtigungen";
 
-/* Notifications: About ANS */
-"Notifications.Section.AboutANS" = "Über ANS";
+/* Security: About Notification types */
+"SecurityPage.Section.AboutNotificationTypes" = "Über Benachrichtigungsoptionen";
 
 /* Notifications: Disable notifications */
 "Notifications.Mode.NotificationsDisabled" = "Deaktiviert";
@@ -271,17 +412,8 @@
 /* Notifications: Use Apple Push notifications */
 "Notifications.Mode.ApplePush" = "Push";
 
-/* Notifications: Visit Github */
-"Notifications.Row.VisitGithub" = "Github besuchen";
-
-/* Notifications: Mode */
-"Notifications.Row.Mode" = "Benachrichtigungsoption";
-
-/* Notifications: Send new messages notifications */
-"Notifications.Row.Messages" = "Nachrichten";
-
-/* Notifications: Send new transfers notifications */
-"Notifications.Row.Transfers" = "Transaktionen";
+/* Security: Visit Github */
+"SecurityPage.Row.VisitGithub" = "Zu GitHub";
 
 /* Notifications: Something went wrong while registering remote notifications. %@ for description */
 "NotificationsService.Error.RegistrationRemotesFormat" = "Registrierung in ANS fehlgeschlagen. Bitte erneut versuchen. Ursache %@";
@@ -322,38 +454,32 @@
 /* QRGenerator: scene title */
 "QrGeneratorScene.Title" = "QR-Generator";
 
-/* Config: turn off 'Stay Logged In' confirmation */
-"SettingsPage.DoNotStayLoggedIn" = "Nicht eingeloggt bleiben";
+/* Security: scene title */
+"SecurityPage.Title" = "Sicherheit";
 
-/* Config: Authorization reason for turning biometry off */
-"SettingsPage.DoNotUseBiometry" = "Benutzen Sie keine Biometrie für die Anmeldung";
+/* Security: turn off 'Stay Logged In' confirmation */
+"SecurityPage.DoNotStayLoggedIn" = "Nicht eingeloggt bleiben";
 
-/* Config: Generate QR with passphrase row */
-"SettingsPage.Row.GenerateQr" = "Einen QR-Code mit der Passphrase generieren";
+/* Security: Authorization reason for turning biometry off */
+"SecurityPage.DoNotUseBiometry" = "Benutzen Sie keine Biometrie für die Anmeldung";
 
-/* Config: Show notifications */
-"SettingsPage.Row.Notifications" = "Benachrichtigungen";
+/* Security: Generate QR with passphrase row */
+"SecurityPage.Row.GenerateQr" = "Einen QR-Code mit der Passphrase generieren";
 
-/* Config: Stay logged option */
-"SettingsPage.Row.StayLoggedIn" = "Eingeloggt bleiben";
+/* Security: Show notifications */
+"SecurityPage.Row.Notifications" = "Benachrichtigungen";
 
-/* Config: Version row */
-"SettingsPage.Row.Version" = "Version";
+/* Security: Stay logged row */
+"SecurityPage.Row.StayLoggedIn" = "Eingeloggt bleiben";
 
-/* Config: Application Info section */
-"SettingsPage.Section.ApplicationInfo" = "App Info";
-
-/* Config: Settings section */
-"SettingsPage.Section.Settings" = "Einstellungen";
-
-/* Config: Utilities section */
-"SettingsPage.Section.Utilities" = "Werkzeuge";
+/* Security: Security section */
+"SecurityPage.Section.Security" = "Sicherheit";
 
 /* Config: scene title */
 "SettingsPage.Title" = "Einstellungen";
 
-/* Config: Authorization reason for turning biometry on */
-"SettingsPage.UseBiometry" = "Biometrie verwenden";
+/* Security: Authorization reason for turning biometry on */
+"SecurityPage.UseBiometry" = "Biometrie verwenden";
 
 /* Shared alert 'Cancel' button. Used anywhere */
 "Shared.Cancel" = "Abbrechen";

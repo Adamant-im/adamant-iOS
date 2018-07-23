@@ -10,14 +10,15 @@ import UIKit
 
 extension AdamantScene {
 	struct Settings {
-		static let settings = AdamantScene(identifier: "SettingsTableViewController", factory: { r in
-			let c = SettingsViewController()
-			c.dialogService = r.resolve(DialogService.self)
+		static let security = AdamantScene(identifier: "SecurityViewController") { r in
+			let c = SecurityViewController()
 			c.accountService = r.resolve(AccountService.self)
+			c.dialogService = r.resolve(DialogService.self)
+			c.notificationsService = r.resolve(NotificationsService.self)
 			c.localAuth = r.resolve(LocalAuthentication.self)
 			c.router = r.resolve(Router.self)
 			return c
-		})
+		}
 		
 		static let qRGenerator = AdamantScene(identifier: "QRGeneratorViewController", factory: { r in
 			let c = QRGeneratorViewController()
@@ -25,9 +26,12 @@ extension AdamantScene {
 			return c
 		})
 		
-		static let notifications = AdamantScene(identifier: "NotificationsViewController") { r -> UIViewController in
-			let c = NotificationsViewController()
-			c.notificationsService = r.resolve(NotificationsService.self)
+		static let about = AdamantScene(identifier: "About") { r in
+			let c = AboutViewController()
+			c.accountService = r.resolve(AccountService.self)
+			c.accountsProvider = r.resolve(AccountsProvider.self)
+			c.dialogService = r.resolve(DialogService.self)
+			c.router = r.resolve(Router.self)
 			return c
 		}
 		

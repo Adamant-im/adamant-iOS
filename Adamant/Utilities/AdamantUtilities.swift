@@ -50,6 +50,14 @@ extension AdamantUtilities {
 		return formatter
 	}()
 	
+	static var currencyFormatterShort: NumberFormatter = {
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .decimal
+		formatter.roundingMode = .floor
+		formatter.positiveFormat = "#.## \(currencyCode)"
+		return formatter
+	}()
+	
 	static func format(balance: Decimal) -> String {
 		return currencyFormatter.string(from: balance as NSNumber)!
 	}

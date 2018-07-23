@@ -14,9 +14,9 @@ extension AdamantScene {
 			let c = TransactionsViewController(nibName: "TransactionsViewController", bundle: nil)
 			c.accountService = r.resolve(AccountService.self)
 			c.transfersProvider = r.resolve(TransfersProvider.self)
-			c.chatsProvider = r.resolve(ChatsProvider.self)
 			c.dialogService = r.resolve(DialogService.self)
 			c.router = r.resolve(Router.self)
+			c.stack = r.resolve(CoreDataStack.self)
 			return c
 		})
 		

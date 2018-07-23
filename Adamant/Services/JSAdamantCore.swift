@@ -264,6 +264,9 @@ extension JSAdamantCore {
 		if let state = t.asset.state {
 			asset.state = JSState(key: state.key, value: state.value, type: Int(state.type.rawValue))
 		}
+        if let vote = t.asset.votes {
+            asset.votes = vote.votes
+        }
 		
 		let jsTransaction = JSTransaction(id: 0,
 										  height: 0,

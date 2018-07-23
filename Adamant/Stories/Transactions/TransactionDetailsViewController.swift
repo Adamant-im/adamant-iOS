@@ -36,7 +36,7 @@ class TransactionDetailsViewController: UIViewController {
 		case confirmations
 		case block
 		case openInExplorer
-        case openChat
+        case openChat	// if transaction.chatroom.isHidden, numberOfRowsInSection will return total-1
 		
 		static let total = 10
 		
@@ -52,6 +52,15 @@ class TransactionDetailsViewController: UIViewController {
 			case .block: return NSLocalizedString("TransactionDetailsScene.Row.Block", comment: "Transaction details: Block id row.")
 			case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
             case .openChat: return ""
+			}
+		}
+		
+		var image: UIImage? {
+			switch self {
+			case .openInExplorer: return #imageLiteral(resourceName: "row_explorer")
+			case .openChat: return #imageLiteral(resourceName: "row_chat")
+				
+			default: return nil
 			}
 		}
 	}
@@ -79,6 +88,10 @@ class TransactionDetailsViewController: UIViewController {
 	// MARK: - Lifecycle
 	
 	override func viewDidLoad() {
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = true
+		}
+		
 		navigationItem.title = String.adamantLocalized.transactionDetails.title
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(share))
 		tableView.dataSource = self
@@ -144,32 +157,7 @@ class TransactionDetailsViewController: UIViewController {
 	}
 	
 	
-	// MARK: - Autoupdate
 	
-    func startUpdate() {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-			guard let id = self?.transaction?.transactionId else {
-				return
-			}
-			
-			self?.transfersProvider.refreshTransfer(id: id) { result in
-				switch result {
-				case .success:
-					DispatchQueue.main.async {
-						self?.tableView.reloadData()
-					}
-					
-				case .failure:
-					return
-				}
-			}
-        }
-    }
-    
-    func stopUpdate() {
-        timer?.invalidate()
-    }
 }
 
 
@@ -181,6 +169,10 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		if transaction != nil {
+			guard let hidden = transaction?.chatroom?.isHidden, !hidden else {
+				return Row.total - 1
+			}
+			
 			return Row.total
 		} else {
 			return 0
@@ -268,22 +260,18 @@ extension TransactionDetailsViewController {
 			return UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
 		}
 		
-		var cell: UITableViewCell
+		let cell: UITableViewCell
 		if let c = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
 			cell = c
 			cell.accessoryType = .none
             cell.imageView?.image = nil
 		} else {
 			cell = UITableViewCell(style: .value1, reuseIdentifier: cellIdentifier)
-			cell.textLabel?.textColor = UIColor.adamantPrimary
-			cell.detailTextLabel?.textColor = UIColor.adamantSecondary
-			
-			let font = UIFont.adamantPrimary(size: 17)
-			cell.textLabel?.font = font
-			cell.detailTextLabel?.font = font
 		}
 		
 		cell.textLabel?.text = row.localized
+		cell.imageView?.image = row.image
+		cell.imageView?.tintColor = UIColor.adamantTableRowIcons
 		
 		switch row {
 		case .amount:
@@ -293,7 +281,7 @@ extension TransactionDetailsViewController {
 			
 		case .date:
 			if let date = transaction.date as Date? {
-				cell.detailTextLabel?.text = date.humanizedDateTime()
+				cell.detailTextLabel?.text = date.humanizedDateTimeFull()
 			}
 			
 		case .confirmations:
@@ -329,5 +317,34 @@ extension TransactionDetailsViewController {
         }
 		
 		return cell
+	}
+}
+
+
+// MARK: - Autoupdate
+extension TransactionDetailsViewController {
+	func startUpdate() {
+		timer?.invalidate()
+		timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
+			guard let id = self?.transaction?.transactionId else {
+				return
+			}
+			
+			self?.transfersProvider.refreshTransfer(id: id) { result in
+				switch result {
+				case .success:
+					DispatchQueue.main.async {
+						self?.tableView.reloadData()
+					}
+					
+				case .failure:
+					return
+				}
+			}
+		}
+	}
+	
+	func stopUpdate() {
+		timer?.invalidate()
 	}
 }

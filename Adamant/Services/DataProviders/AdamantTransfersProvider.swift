@@ -129,7 +129,7 @@ extension AdamantTransfersProvider {
         
         // MARK: 3. Get transactions
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        privateContext.parent = self.stack.container.viewContext
+        privateContext.parent = stack.container.viewContext
         let processingGroup = DispatchGroup()
         let cms = DispatchSemaphore(value: 1)
         let prevHeight = receivedLastHeight

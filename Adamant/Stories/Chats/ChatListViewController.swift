@@ -40,8 +40,8 @@ class ChatListViewController: UIViewController {
 	
 	private var preservedMessagess = [String:String]()
 	
-	private lazy var defaultAvatar: UIImage = { #imageLiteral(resourceName: "account") }()
-    
+	let defaultAvatar = #imageLiteral(resourceName: "avatar-chat-placeholder")
+	
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action:
@@ -55,14 +55,21 @@ class ChatListViewController: UIViewController {
 	// MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = false
+		}
+
 		navigationItem.title = String.adamantLocalized.chatList.title
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat))
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose,
+															target: self,
+															action: #selector(newChat))
 		
 		// MARK: TableView
 		tableView.dataSource = self
 		tableView.delegate = self
 		tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
-        tableView.addSubview(self.refreshControl)
+        tableView.refreshControl = refreshControl
 		
 		if self.accountService.account != nil {
 			initFetchedRequestControllers(provider: chatsProvider)
@@ -85,6 +92,10 @@ class ChatListViewController: UIViewController {
 		super.viewWillAppear(animated)
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
+		}
+		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = false
 		}
 	}
 	
@@ -217,9 +228,10 @@ extension ChatListViewController {
 		cell.accessoryType = .disclosureIndicator
 		cell.accountLabel.textColor = UIColor.adamantPrimary
 		cell.dateLabel.textColor = UIColor.adamantSecondary
-		cell.avatarImageView.tintColor = UIColor.adamantChatIcons
+		cell.avatarImageView.tintColor = UIColor.adamantPrimary
 		cell.borderColor = UIColor.adamantPrimary
 		cell.badgeColor = UIColor.adamantPrimary
+		cell.borderWidth = 1
 		
 		return cell
 	}
@@ -243,10 +255,8 @@ extension ChatListViewController {
 			if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
 				cell.avatarImage = avatar
 				cell.avatarImageView.tintColor = UIColor.adamantPrimary
-				cell.borderWidth = 1
 			} else {
 				cell.avatarImage = nil
-				cell.borderWidth = 0
 			}
 		} else if let title = chatroom.title {
 			cell.accountLabel.text = title
@@ -275,7 +285,7 @@ extension ChatListViewController {
 		}
 		
 		if let date = chatroom.updatedAt as Date?, date != Date.adamantNullDate {
-			cell.dateLabel.text = date.humanizedDateTime()
+			cell.dateLabel.text = date.humanizedDay()
 		} else {
 			cell.dateLabel.text = nil
 		}

@@ -56,6 +56,12 @@ extension TransactionType: Codable {
 	}
 }
 
+extension TransactionType: Equatable {
+	static func == (lhs: TransactionType, rhs: TransactionType) -> Bool {
+		return lhs.rawValue == rhs.rawValue
+	}
+}
+
 fileprivate extension Int {
 	func toTransactionType() -> TransactionType {
 		switch self {
