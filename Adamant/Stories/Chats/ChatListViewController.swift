@@ -40,8 +40,8 @@ class ChatListViewController: UIViewController {
 	
 	private var preservedMessagess = [String:String]()
 	
-	private lazy var defaultAvatar: UIImage = { #imageLiteral(resourceName: "account") }()
-    
+	let defaultAvatar = #imageLiteral(resourceName: "avatar-chat-placeholder")
+	
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action:
@@ -228,9 +228,10 @@ extension ChatListViewController {
 		cell.accessoryType = .disclosureIndicator
 		cell.accountLabel.textColor = UIColor.adamantPrimary
 		cell.dateLabel.textColor = UIColor.adamantSecondary
-		cell.avatarImageView.tintColor = UIColor.adamantChatIcons
+		cell.avatarImageView.tintColor = UIColor.adamantPrimary
 		cell.borderColor = UIColor.adamantPrimary
 		cell.badgeColor = UIColor.adamantPrimary
+		cell.borderWidth = 1
 		
 		return cell
 	}
@@ -254,10 +255,8 @@ extension ChatListViewController {
 			if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
 				cell.avatarImage = avatar
 				cell.avatarImageView.tintColor = UIColor.adamantPrimary
-				cell.borderWidth = 1
 			} else {
 				cell.avatarImage = nil
-				cell.borderWidth = 0
 			}
 		} else if let title = chatroom.title {
 			cell.accountLabel.text = title

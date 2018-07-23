@@ -102,7 +102,9 @@ class NewChatViewController: FormViewController {
 		}
 		
 		navigationItem.title = String.adamantLocalized.newChat.title
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+		let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+		doneButton.isEnabled = false
+		navigationItem.rightBarButtonItem = doneButton
 		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
 		
 		navigationOptions = .Disabled
@@ -156,6 +158,18 @@ class NewChatViewController: FormViewController {
 						row.updateCell()
 					}
 				}
+				
+				if let done = self?.navigationItem.rightBarButtonItem {
+					if Thread.isMainThread {
+						done.isEnabled = text.count > 6
+					} else {
+						DispatchQueue.main.async {
+							done.isEnabled = text.count > 6
+						}
+					}
+				}
+			} else {
+				self?.navigationItem.rightBarButtonItem?.isEnabled = false
 			}
 		}
 		

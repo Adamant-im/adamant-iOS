@@ -20,6 +20,9 @@ extension UIColor {
 	/// Chat icons color, ~40% gray
 	static let adamantChatIcons = UIColor(red: 0.62, green: 0.62, blue: 0.62, alpha: 1)
 	
+	/// Table row icons color, ~45% gray
+	static let adamantTableRowIcons = UIColor(red: 0.45, green: 0.45, blue: 0.45, alpha: 1)
+	
 	
 	// MARK: Chat colors
 	
@@ -35,4 +38,12 @@ extension UIColor {
 	// MARK: Pinpad
 	/// Pinpad highligh button background, 12% gray
 	static let adamantPinpadHighlightButton = UIColor(red: 0.88, green: 0.88, blue: 0.88, alpha: 1)
+	
+	
+	// MARK: Transfers
+	/// Income transfer icon background, light green
+	static let adamantTransferIncomeIconBackground = UIColor(red: 0.7, green: 0.93, blue: 0.55, alpha: 1)
+	
+	// Outcome transfer icon background, light red
+	static let adamantTransferOutcomeIconBackground = UIColor(red: 0.94, green: 0.52, blue: 0.53, alpha: 1)
 }

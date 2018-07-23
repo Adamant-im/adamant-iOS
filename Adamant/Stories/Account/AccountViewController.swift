@@ -109,6 +109,19 @@ class AccountViewController: FormViewController {
 			case .voteForDelegates: return NSLocalizedString("AccountTab.Row.VoteForDelegates", comment: "Account tab: 'Votes for delegates' button")
 			}
 		}
+		
+		var image: UIImage? {
+			switch self {
+			case .security: return #imageLiteral(resourceName: "row_security")
+			case .about: return #imageLiteral(resourceName: "row_about")
+			case .nodes: return #imageLiteral(resourceName: "row_nodes")
+			case .balance: return #imageLiteral(resourceName: "row_balance")
+			case .buyTokens: return #imageLiteral(resourceName: "row_buy-coins")
+			case .voteForDelegates: return #imageLiteral(resourceName: "row_vote-delegates")
+			case .logout: return #imageLiteral(resourceName: "row_logout")
+			default: return #imageLiteral(resourceName: "row_icon_placeholder")
+			}
+		}
 	}
 	
 	// MARK: - Dependencies
@@ -138,6 +151,8 @@ class AccountViewController: FormViewController {
 	
 	private var transfersController: NSFetchedResultsController<TransferTransaction>?
 	
+	private let accessoryContentInsets = UIEdgeInsets(top: 2, left: 4, bottom: 2, right: 4)
+	private let accessoryContainerInsets = UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
 	
 	// MARK: - Lifecycle
 	
@@ -212,7 +227,7 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.security.localized
 			$0.tag = Rows.security.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.imageView?.image = Rows.security.image
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -228,7 +243,7 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.nodes.localized
 			$0.tag = Rows.nodes.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.imageView?.image = Rows.nodes.image
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -244,7 +259,7 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.about.localized
 			$0.tag = Rows.about.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.imageView?.image = Rows.about.image
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -266,7 +281,7 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.tag = Rows.voteForDelegates.tag
 			$0.title = Rows.voteForDelegates.localized
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.imageView?.image = Rows.voteForDelegates.image
 		}.cellSetup({ (cell, _) in
 			cell.selectionStyle = .gray
 		}).cellUpdate({ (cell, _) in
@@ -283,7 +298,7 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.logout.localized
 			$0.tag = Rows.logout.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.imageView?.image = Rows.logout.image
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -313,7 +328,7 @@ class AccountViewController: FormViewController {
 		})
 		
 		
-		form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamantSecondary; }
+		form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamantTableRowIcons }
 		
 		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .centeredHorizontally)
 		
@@ -321,6 +336,7 @@ class AccountViewController: FormViewController {
 		// MARK: Notification Center
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.updateAccountInfo()
+			self?.tableView.setContentOffset(CGPoint.zero, animated: false)
 		}
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.updateAccountInfo()
@@ -337,6 +353,14 @@ class AccountViewController: FormViewController {
 		
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
+		}
+	}
+	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = false
 		}
 	}
 	
@@ -418,20 +442,30 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 			fatalError("Wallets collectionView: Out of bounds row")
 		}
 		
-		cell.tintColor = UIColor.adamantSecondary
+		if !cell.isInitialized {
+			cell.tintColor = UIColor.adamantSecondary
+			
+			cell.balanceLabel.textColor = UIColor.adamantPrimary
+			cell.currencySymbolLabel.textColor = UIColor.adamantPrimary
+			
+			cell.accessoryContainerView.accessoriesBackgroundColor = UIColor.adamantPrimary
+			cell.accessoryContainerView.accessoriesBorderColor = UIColor.white
+			cell.accessoryContainerView.accessoriesBorderWidth = 2
+			
+			if cell.accessoryContainerView.accessoriesContentInsets != accessoryContentInsets {
+				cell.accessoryContainerView.accessoriesContentInsets = accessoryContentInsets
+			}
+			
+			if cell.accessoryContainerView.accessoriesContainerInsets == accessoryContainerInsets {
+				cell.accessoryContainerView.accessoriesContainerInsets = accessoryContainerInsets
+			}
+			
+			cell.isInitialized = true
+		}
+		
 		cell.currencyImageView.image = wallet.currencyLogo
 		cell.balanceLabel.text = wallet.formattedShort
 		cell.currencySymbolLabel.text = wallet.currencySymbol
-		
-		let color = UIColor.adamantPrimary
-		cell.balanceLabel.textColor = color
-		cell.currencySymbolLabel.textColor = color
-		
-		cell.accessoryContainerView.accessoriesBackgroundColor = UIColor.adamantPrimary
-		cell.accessoryContainerView.accessoriesBorderColor = UIColor.white
-		cell.accessoryContainerView.accessoriesBorderWidth = 2
-		cell.accessoryContainerView.accessoriesContentInsets = UIEdgeInsets(top: 2, left: 4, bottom: 2, right: 4)
-		cell.accessoryContainerView.accessoriesContainerInsets = UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
 		
 		if indexPath.row == 0, let count = transfersController?.fetchedObjects?.count, count > 0 {
 			let accessory = AccessoryType.label(text: String(count))
@@ -441,17 +475,40 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 		}
 		
 		cell.setSelected(indexPath.row == selectedWalletIndex, animated: false)
+		
+		if wallet.enabled {
+			cell.currencyImageView.alpha = 1
+			cell.currencySymbolLabel.alpha = 1
+		} else {
+			cell.currencyImageView.alpha = 0.3
+			cell.currencySymbolLabel.alpha = 0.3
+		}
+		
 		return cell
 	}
 	
 	func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-		return true
+		guard let wallet = wallets?[indexPath.row] else {
+			return false
+		}
+		
+		return wallet.enabled
 	}
 	
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 		selectedWalletIndex = indexPath.row
-		
+
 		form.allSections.filter { $0.hidden != nil }.forEach { $0.evaluateHidden() }
+
+		if let cell = collectionView.cellForItem(at: indexPath) as? WalletCollectionViewCell {
+			cell.setSelected(true, animated: true)
+		}
+	}
+	
+	func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+		if let cell = collectionView.cellForItem(at: indexPath) as? WalletCollectionViewCell {
+			cell.setSelected(false, animated: true)
+		}
 	}
 	
 	// Flow delegate
@@ -521,7 +578,7 @@ extension AccountViewController {
 				$0.title = Rows.balance.localized
 				$0.tag = Rows.balance.tag
 				$0.value = wallet.formattedFull
-				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+				$0.cell.imageView?.image = Rows.balance.image
 				$0.cell.selectionStyle = .gray
 				
 				if let alertLabel = $0.cell.alertLabel {
@@ -550,7 +607,7 @@ extension AccountViewController {
 //			<<< LabelRow() {
 //				$0.title = Rows.sendTokens.localized
 //				$0.tag = Rows.sendTokens.tag
-//				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+//				$0.cell.imageView?.image = Rows.sendTokens.image
 //				$0.cell.selectionStyle = .gray
 //			}.cellUpdate({ (cell, _) in
 //				cell.accessoryType = .disclosureIndicator
@@ -560,7 +617,7 @@ extension AccountViewController {
 			<<< LabelRow() {
 				$0.title = Rows.buyTokens.localized
 				$0.tag = Rows.buyTokens.tag
-				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+				$0.cell.imageView?.image = Rows.buyTokens.image
 				$0.cell.selectionStyle = .gray
 			}.cellUpdate({ (cell, _) in
 				cell.accessoryType = .disclosureIndicator
@@ -586,7 +643,7 @@ extension AccountViewController {
 			<<< LabelRow() {
 				$0.title = Rows.freeTokens.localized
 				$0.tag = Rows.freeTokens.tag
-				$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+				$0.cell.imageView?.image = Rows.freeTokens.image
 				$0.cell.selectionStyle = .gray
 				
 				$0.hidden = Condition.function([], { [weak self] _ -> Bool in

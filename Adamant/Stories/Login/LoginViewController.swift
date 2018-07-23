@@ -377,7 +377,7 @@ extension LoginViewController {
 				self?.loginIntoExistingAccount(passphrase: passphrase)
 				
 			case .failure(let error):
-				self?.dialogService.showError(withMessage: error.localized, error: error)
+				self?.dialogService.showRichError(error: error)
 			}
 		})
 	}

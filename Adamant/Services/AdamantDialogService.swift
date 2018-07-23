@@ -46,7 +46,11 @@ extension AdamantDialogService {
 			}
 			
 			if let nav = topController as? UINavigationController, let visible = nav.visibleViewController {
-				return visible
+				if let presented = visible.presentedViewController {
+					return presented
+				} else {
+					return visible
+				}
 			}
 			
 			while let presentedViewController = topController.presentedViewController {
@@ -99,15 +103,19 @@ extension AdamantDialogService {
 	
 	func showError(withMessage message: String, error: Error? = nil) {
 		if Thread.isMainThread {
-			FTIndicator.dismissProgress()
+			internalShowError(withMessage: message, error: error)
 		} else {
-			DispatchQueue.main.sync {
-				FTIndicator.dismissProgress()
+			DispatchQueue.main.async {
+				self.internalShowError(withMessage: message, error: error)
 			}
 		}
-		
+	}
+	
+	/// Must be called from main thread only
+	private func internalShowError(withMessage message: String, error: Error? = nil) {
 		let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
-        
+		FTIndicator.dismissProgress()
+		
         alertVC.gravityDismissAnimation = false
         alertVC.alertTitle.textColor = UIColor.adamantPrimary
         alertVC.alertDescription.textColor = .adamantSecondary
@@ -173,8 +181,8 @@ extension AdamantDialogService {
         alertVC.alertActionStackView.axis = .vertical
         alertVC.alertActionStackView.spacing = 0
         alertVC.alertActionStackViewHeightConstraint.constant = 100
-        
-        self.present(alertVC, animated: true, completion: nil)
+		
+		present(alertVC, animated: true, completion: nil)
 	}
 	
 	func showRichError(error: RichError) {

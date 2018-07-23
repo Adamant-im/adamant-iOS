@@ -115,7 +115,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			let accountRoot = router.get(scene: AdamantScene.Account.account)
 			let account = UINavigationController(rootViewController: accountRoot)
 			account.tabBarItem.title = String.adamantLocalized.tabItems.account
-			account.tabBarItem.image = #imageLiteral(resourceName: "wallet_tab")
+			account.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
 			
 			chatList.tabBarItem.badgeColor = UIColor.adamantPrimary
 			account.tabBarItem.badgeColor = UIColor.adamantPrimary
@@ -285,17 +285,7 @@ extension AppDelegate {
 				
 			case .failure(let error):
 				self.notificationService?.setNotificationsMode(.disabled, completion: nil)
-				
-				switch error {
-				case .networkError, .notLogged:
-					self.dialogService.showWarning(withMessage: String.localizedStringWithFormat(String.adamantLocalized.application.deviceTokenSendFailed, error.localized))
-					
-				case .accountNotFound, .serverError:
-					self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.application.deviceTokenSendFailed, error.localized), error: error)
-					 
-				case .internalError(let message, _):
-					self.dialogService.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.application.deviceTokenSendFailed, message), error: error)
-				}
+				self.dialogService.showRichError(error: error)
 			}
 		}
 	}

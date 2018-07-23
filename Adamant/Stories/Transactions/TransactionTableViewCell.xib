@@ -19,12 +19,15 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="85.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="income" translatesAutoresizingMaskIntoConstraints="NO" id="448-mx-6O4">
+                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="transfer-in_bot" translatesAutoresizingMaskIntoConstraints="NO" id="448-mx-6O4">
                         <rect key="frame" x="16" y="19" width="48" height="48"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="48" id="auR-TF-3o7"/>
                             <constraint firstAttribute="height" constant="48" id="puJ-tH-dxq"/>
                         </constraints>
+                    </imageView>
+                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="transfer-in_top" translatesAutoresizingMaskIntoConstraints="NO" id="eMN-5A-9EK">
+                        <rect key="frame" x="16" y="19" width="48" height="48"/>
                     </imageView>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="SXp-rd-UrY">
                         <rect key="frame" x="80" y="10.5" width="167.5" height="65"/>
@@ -52,10 +55,14 @@
                 </subviews>
                 <constraints>
                     <constraint firstItem="448-mx-6O4" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="9xw-o2-lSS"/>
+                    <constraint firstItem="eMN-5A-9EK" firstAttribute="centerY" secondItem="448-mx-6O4" secondAttribute="centerY" id="Xpb-tN-lr1"/>
                     <constraint firstItem="SXp-rd-UrY" firstAttribute="centerY" secondItem="448-mx-6O4" secondAttribute="centerY" id="auy-HH-S7h"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="SXp-rd-UrY" secondAttribute="trailing" constant="16" id="dQy-dl-LJ8"/>
                     <constraint firstItem="SXp-rd-UrY" firstAttribute="leading" secondItem="448-mx-6O4" secondAttribute="trailing" constant="16" id="fUG-ct-kzU"/>
+                    <constraint firstItem="eMN-5A-9EK" firstAttribute="centerX" secondItem="448-mx-6O4" secondAttribute="centerX" id="k91-eB-LBD"/>
+                    <constraint firstItem="eMN-5A-9EK" firstAttribute="height" secondItem="448-mx-6O4" secondAttribute="height" id="v9W-ZY-A8y"/>
                     <constraint firstItem="448-mx-6O4" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="wtM-F1-gcf"/>
+                    <constraint firstItem="eMN-5A-9EK" firstAttribute="width" secondItem="448-mx-6O4" secondAttribute="width" id="x2R-qd-9Xz"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
@@ -63,13 +70,15 @@
             <connections>
                 <outlet property="accountLabel" destination="2lX-Ur-HbP" id="x5u-4k-a5Y"/>
                 <outlet property="ammountLabel" destination="2PE-tm-CaZ" id="SJH-IZ-6mf"/>
-                <outlet property="avatarImageView" destination="448-mx-6O4" id="Ugh-36-rmZ"/>
+                <outlet property="bottomImageView" destination="448-mx-6O4" id="nOW-S6-p7L"/>
                 <outlet property="dateLabel" destination="tj3-KB-8BU" id="0Gz-76-jR8"/>
+                <outlet property="topImageView" destination="eMN-5A-9EK" id="Brg-aa-VvB"/>
             </connections>
             <point key="canvasLocation" x="34" y="114"/>
         </tableViewCell>
     </objects>
     <resources>
-        <image name="income" width="27" height="27"/>
+        <image name="transfer-in_bot" width="32" height="32"/>
+        <image name="transfer-in_top" width="32" height="32"/>
     </resources>
 </document>

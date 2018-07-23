@@ -95,6 +95,18 @@ class AboutViewController: FormViewController {
 			case .twitter: return NSLocalizedString("About.Row.Twitter.Url", comment: "About scene: Twitter localized url")
 			}
 		}
+		
+		var image: UIImage? {
+			switch self {
+			case .whitepaper: return #imageLiteral(resourceName: "row_whitepapper")
+			case .email: return #imageLiteral(resourceName: "row_email")
+			case .github: return #imageLiteral(resourceName: "row_github")
+			case .blog: return #imageLiteral(resourceName: "row_blog")
+			case .adm: return #imageLiteral(resourceName: "row_chat_adamant")
+			case .website: return #imageLiteral(resourceName: "row_website")
+			default: return #imageLiteral(resourceName: "row_icon_placeholder")
+			}
+		}
 	}
 	
 	
@@ -148,28 +160,28 @@ class AboutViewController: FormViewController {
 						value: "adamant.im",
 						tag: Rows.website.tag,
 						url: Rows.website.localizedUrl,
-						image: #imageLiteral(resourceName: "row_icon_placeholder"))
+						image: Rows.website.image)
 			
 		// Whitepaper
 		<<< buildUrlRow(title: Rows.whitepaper.localized,
 						value: nil,
 						tag: Rows.whitepaper.tag,
 						url: Rows.whitepaper.localizedUrl,
-						image: #imageLiteral(resourceName: "row_icon_placeholder"))
+						image: Rows.whitepaper.image)
 			
 		// Blog
 		<<< buildUrlRow(title: Rows.blog.localized,
 						value: nil,
 						tag: Rows.blog.tag,
 						url: Rows.blog.localizedUrl,
-						image: #imageLiteral(resourceName: "row_icon_placeholder"))
+						image: Rows.blog.image)
 		
 		// Github
 		<<< buildUrlRow(title: Rows.github.localized,
 						value: nil,
 						tag: Rows.github.tag,
 						url: Rows.github.localizedUrl,
-						image: #imageLiteral(resourceName: "row_icon_placeholder"))
+						image: Rows.github.image)
 
 			
 		// MARK: Contact
@@ -181,7 +193,8 @@ class AboutViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.adm.localized
 			$0.tag = Rows.adm.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.imageView?.image = Rows.adm.image
+			$0.cell.imageView?.tintColor = UIColor.adamantTableRowIcons
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -231,7 +244,8 @@ class AboutViewController: FormViewController {
 			$0.title = Rows.email.localized
 			$0.value = AdamantResources.supportEmail
 			$0.tag = Rows.email.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.imageView?.image = Rows.email.image
+			$0.cell.imageView?.tintColor = UIColor.adamantTableRowIcons
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -256,35 +270,35 @@ class AboutViewController: FormViewController {
 						value: nil,
 						tag: Rows.bitcointalk.tag,
 						url: Rows.bitcointalk.localizedUrl,
-						image: #imageLiteral(resourceName: "row_icon_placeholder"))
+						image: Rows.bitcointalk.image)
 		
 		// Facebook
 		<<< buildUrlRow(title: Rows.facebook.localized,
 						value: nil,
 						tag: Rows.facebook.tag,
 						url: Rows.facebook.localizedUrl,
-						image: #imageLiteral(resourceName: "row_icon_placeholder"))
+						image: Rows.facebook.image)
 		
 		// Telegram
 		<<< buildUrlRow(title: Rows.telegram.localized,
 						value: nil,
 						tag: Rows.telegram.tag,
 						url: Rows.telegram.localizedUrl,
-						image: #imageLiteral(resourceName: "row_icon_placeholder"))
+						image: Rows.telegram.image)
 		
 		// VK
 		<<< buildUrlRow(title: Rows.vk.localized,
 						value: nil,
 						tag: Rows.vk.tag,
 						url: Rows.vk.localizedUrl,
-						image: #imageLiteral(resourceName: "row_icon_placeholder"))
+						image: Rows.vk.image)
 		
 		// Twitter
 		<<< buildUrlRow(title: Rows.twitter.localized,
 						value: nil,
 						tag: Rows.twitter.tag,
 						url: Rows.twitter.localizedUrl,
-						image: #imageLiteral(resourceName: "row_icon_placeholder"))
+						image: Rows.twitter.image)
 		*/
 	}
 	
@@ -306,6 +320,7 @@ extension AboutViewController {
 			$0.title = title
 			$0.value = value
 			$0.cell.imageView?.image = image
+			$0.cell.imageView?.tintColor = UIColor.adamantTableRowIcons
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
