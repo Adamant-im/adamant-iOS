@@ -54,11 +54,51 @@ class AdamantAddressBookService: AddressBookService {
         }
     }
     
+    func saveAddressBook(completion: @escaping (ApiServiceResult<String>) -> Void) {
+        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+            completion(.failure(.notLogged))
+            return
+        }
+        let address = loggedAccount.address
+        
+        // MARK: 1. Pack and ecode address book
+        let packed = self.packAddressBook(book: self.addressBook)
+        if let encodeResult = self.adamantCore.encodeValue(packed, privateKey: keypair.privateKey) {
+            print(encodeResult)
+            
+            let value = JSONStringify(value: ["message": encodeResult.message,
+                                      "nonce": encodeResult.nonce] as AnyObject)
+            
+            // MARK: 2. Submit to KVS
+            self.apiService.store(key: addressBookKey, value: value, type: StateType.keyValue, sender: address, keypair: keypair) { (result) in
+                switch result {
+                case .success(let id):
+                    print(id)
+                    completion(.success("1"))
+                    break
+                case .failure(let error):
+                    print(error)
+                    completion(.failure(.internalError(message: error.localizedDescription, error: error)))
+                }
+            }
+        }
+    }
+    
     private func processAddressBook(rawBook: [String:Any]) -> [String:String] {
         var processedBook = [String:String]()
         for key in rawBook.keys {
             if let value = rawBook[key] as? [String:Any], let displayName = value["displayName"] as? String {
                 processedBook[key] = displayName
+            }
+        }
+        return processedBook
+    }
+    
+    private func packAddressBook(book: [String:String]) -> [String:Any] {
+        var processedBook = [String:Any]()
+        for key in book.keys {
+            if let value = book[key] {
+                processedBook[key] = ["displayName": value]
             }
         }
         return processedBook

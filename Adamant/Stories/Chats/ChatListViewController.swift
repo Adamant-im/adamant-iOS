@@ -81,7 +81,13 @@ class ChatListViewController: UIViewController {
 			self?.initFetchedRequestControllers(provider: self?.chatsProvider)
             
             self?.addressBookService.getAddressBook(completion: { (result) in
-                ///
+                switch result {
+                case .success(let addressBook):
+//                    print(addressBook)
+                    break
+                case .failure(let error):
+                    print(error)
+                }
             })
 		}
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
