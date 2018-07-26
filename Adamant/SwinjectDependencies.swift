@@ -87,7 +87,15 @@ extension Container {
 			service.notificationsService = r.resolve(NotificationsService.self)!
 			return service
 		}.inObjectScope(.container)
-		
+        
+        // MARK: AddressBookServeice
+        self.register(AddressBookService.self) { r in
+            let service = AdamantAddressBookService()
+            service.apiService = r.resolve(ApiService.self)!
+            service.adamantCore = r.resolve(AdamantCore.self)!
+            service.accountService = r.resolve(AccountService.self)!
+            return service
+        }.inObjectScope(.container)
 		
 		// MARK: - Data Providers
 		// MARK: CoreData Stack

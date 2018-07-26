@@ -25,4 +25,7 @@ target 'Adamant' do
   pod 'EFQRCode' # QR generator
   pod 'QRCodeReader.swift' # QR reader
   
+  # Crypto
+  pod 'libsodium'
+
 end

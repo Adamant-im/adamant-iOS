@@ -20,6 +20,8 @@ protocol AdamantCore: class {
 	// MARK: - Encoding messages
 	func encodeMessage(_ message: String, recipientPublicKey: String, privateKey: String) -> (message: String, nonce: String)?
 	func decodeMessage(rawMessage: String, rawNonce: String, senderPublicKey: String, privateKey: String) -> String?
+    
+    func decodeValue(rawMessage: String, rawNonce: String, privateKey privateKeyHex: String) -> String?
 }
 
 protocol SignableTransaction {

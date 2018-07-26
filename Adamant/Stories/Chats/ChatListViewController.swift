@@ -29,6 +29,7 @@ class ChatListViewController: UIViewController {
 	var router: Router!
 	var notificationsService: NotificationsService!
 	var dialogService: DialogService!
+    var addressBookService: AddressBookService!
 	
 	// MARK: IBOutlet
 	@IBOutlet weak var tableView: UITableView!
@@ -78,6 +79,10 @@ class ChatListViewController: UIViewController {
 		// MARK: Login/Logout
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.initFetchedRequestControllers(provider: self?.chatsProvider)
+            
+            self?.addressBookService.getAddressBook(completion: { (result) in
+                ///
+            })
 		}
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.initFetchedRequestControllers(provider: nil)
@@ -251,6 +256,10 @@ extension ChatListViewController {
 			} else {
 				cell.accountLabel.text = partner.address
 			}
+            
+            if let address = partner.address, let name = self.addressBookService.addressBook[address] {
+                cell.accountLabel.text = name
+            }
 			
 			if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
 				cell.avatarImage = avatar
