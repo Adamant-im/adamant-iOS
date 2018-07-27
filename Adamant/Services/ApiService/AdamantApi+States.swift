@@ -88,7 +88,9 @@ extension AdamantApiService {
     
     func get(key: String, sender: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
         // MARK: 1. Prepare
-        let queryItems = [URLQueryItem(name: "senderId", value: sender)]
+        let queryItems = [URLQueryItem(name: "senderId", value: sender),
+                          URLQueryItem(name: "orderBy", value: "timestamp:desc"),
+                          URLQueryItem(name: "key", value: key)]
         
         // MARK: 2. Build endpoints
         let endpoint: URL
@@ -106,9 +108,7 @@ extension AdamantApiService {
             switch serverResponse {
             case .success(let response):
                 if let collection = response.collection {
-                    if collection.count > 0, let value = collection.first(where: { (transaction) -> Bool in
-                        return transaction.asset.state?.key == key
-                    })?.asset.state?.value {
+                    if collection.count > 0, let value = collection.first?.asset.state?.value {
                         completion(.success(value))
                     } else {
                         completion(.success(nil))
