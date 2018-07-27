@@ -94,6 +94,7 @@ extension Container {
             service.apiService = r.resolve(ApiService.self)!
             service.adamantCore = r.resolve(AdamantCore.self)!
             service.accountService = r.resolve(AccountService.self)!
+			service.dialogService = r.resolve(DialogService.self)!
             return service
         }.inObjectScope(.container)
 		
@@ -108,6 +109,7 @@ extension Container {
 			let provider = AdamantAccountsProvider()
 			provider.stack = r.resolve(CoreDataStack.self)
 			provider.apiService = r.resolve(ApiService.self)
+			provider.addressBookService = r.resolve(AddressBookService.self)
 			return provider
 		}.inObjectScope(.container)
 		
