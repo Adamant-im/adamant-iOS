@@ -8,6 +8,19 @@
 
 import Foundation
 
+// MARK: - Notifications
+
+extension Notification.Name {
+	struct AdamantAddressBookService {
+		/// Raised when user rename accounts in chat
+		static let updated = Notification.Name("adamant.addressBookService.updated")
+		
+		private init() {}
+	}
+}
+
+
+// MARK: -
 protocol AddressBookService: class {
     
     var addressBook: [String:String] { get }

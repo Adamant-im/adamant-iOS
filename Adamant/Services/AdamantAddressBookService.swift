@@ -9,16 +9,6 @@
 import Foundation
 import libsodium
 
-// MARK: - Notifications
-extension Notification.Name {
-    struct AdamantAddressBookService {
-        /// Raised when user rename accounts in chat
-        static let updated = Notification.Name("adamant.addressBookService.updated")
-        
-        private init() {}
-    }
-}
-
 class AdamantAddressBookService: AddressBookService {
     
     let addressBookKey = "contact_list"
@@ -139,6 +129,7 @@ class AdamantAddressBookService: AddressBookService {
                     print("SAVED AddresBook: \(id)")
                     completion(.success("1"))
                     break
+					
                 case .failure(let error):
                     print(error)
                     completion(.failure(.internalError(message: error.localizedDescription, error: error)))
@@ -146,24 +137,28 @@ class AdamantAddressBookService: AddressBookService {
             }
         }
     }
-    
-    private func processAddressBook(rawBook: [String:Any]) -> [String:String] {
-        var processedBook = [String:String]()
-        for key in rawBook.keys {
-            if let value = rawBook[key] as? [String:Any], let displayName = value["displayName"] as? String {
-                processedBook[key] = displayName
-            }
-        }
-        return processedBook
-    }
-    
-    private func packAddressBook(book: [String:String]) -> [String:Any] {
-        var processedBook = [String:Any]()
-        for key in book.keys {
-            if let value = book[key] {
-                processedBook[key] = ["displayName": value]
-            }
-        }
-        return processedBook
-    }
+}
+
+
+// MARK: - Tools
+extension AdamantAddressBookService {
+	private func processAddressBook(rawBook: [String:Any]) -> [String:String] {
+		var processedBook = [String:String]()
+		for key in rawBook.keys {
+			if let value = rawBook[key] as? [String:Any], let displayName = value["displayName"] as? String {
+				processedBook[key] = displayName
+			}
+		}
+		return processedBook
+	}
+	
+	private func packAddressBook(book: [String:String]) -> [String:Any] {
+		var processedBook = [String:Any]()
+		for key in book.keys {
+			if let value = book[key] {
+				processedBook[key] = ["displayName": value]
+			}
+		}
+		return processedBook
+	}
 }
