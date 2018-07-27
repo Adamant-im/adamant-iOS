@@ -9,6 +9,16 @@
 import Foundation
 import libsodium
 
+// MARK: - Notifications
+extension Notification.Name {
+    struct AdamantAddressBookService {
+        /// Raised when user rename accounts in chat
+        static let updated = Notification.Name("adamant.addressBookService.updated")
+        
+        private init() {}
+    }
+}
+
 class AdamantAddressBookService: AddressBookService {
     
     let addressBookKey = "contact_list"
@@ -50,6 +60,20 @@ class AdamantAddressBookService: AddressBookService {
             case .failure(let error):
                 print(error)
                 completion(.failure(.internalError(message: error.localizedDescription, error: error)))
+            }
+        }
+    }
+    
+    func set(name: String, for address: String) {
+        if name != "" { self.addressBook[address] = name }
+        else { self.addressBook.removeValue(forKey: address) }
+        
+        NotificationCenter.default.post(name: Notification.Name.AdamantAddressBookService.updated, object: self)
+        
+        saveAddressBook { (result) in
+            switch result {
+            case .success(_): break
+            case .failure(let error): print(error)
             }
         }
     }

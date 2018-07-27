@@ -82,9 +82,7 @@ class ChatListViewController: UIViewController {
             
             self?.addressBookService.getAddressBook(completion: { (result) in
                 switch result {
-                case .success(let addressBook):
-//                    print(addressBook)
-                    break
+                case .success(_): break
                 case .failure(let error):
                     print(error)
                 }
@@ -93,6 +91,10 @@ class ChatListViewController: UIViewController {
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.initFetchedRequestControllers(provider: nil)
 		}
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.updated, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.tableView.reloadData()
+        }
     }
 	
 	deinit {

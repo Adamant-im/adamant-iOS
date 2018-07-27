@@ -211,6 +211,18 @@
 /* Chat: status message for pending chat transaction */
 "ChatScene.MessageStatus.Pending" = "Pending";
 
+/* Chat: title for actions menu */
+"ChatScene.Actions.Title" = "Actions";
+
+/* Chat: Body for actions menu */
+"ChatScene.Actions.Body" = "Enter new name for %@";
+
+/* Chat: 'Rename' action in actions menu */
+"ChatScene.Actions.Rename" = "Rename";
+
+/* Chat: 'Name' field in actions menu */
+"ChatScene.Actions.Name" = "Name";
+
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegates";
 

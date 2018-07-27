@@ -211,6 +211,18 @@
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Подробнее…";
 
+/* Chat: title for actions menu */
+"ChatScene.Actions.Title" = "Действия";
+
+/* Chat: Body for actions menu */
+"ChatScene.Actions.Body" = "Введите новое имя для %@";
+
+/* Chat: 'Rename' action in actions menu */
+"ChatScene.Actions.Rename" = "Переименовать";
+
+/* Chat: 'Name' field in actions menu */
+"ChatScene.Actions.Name" = "Имя";
+
 /* Delegates page: scene title */
 "Delegates.Title" = "Делегаты";
 

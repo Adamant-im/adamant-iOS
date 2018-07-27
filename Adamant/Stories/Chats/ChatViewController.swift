@@ -18,6 +18,11 @@ extension String.adamantLocalized {
 		static let cancelError = NSLocalizedString("ChatScene.Error.cancelError", comment: "Chat: inform user that he can't cancel transaction, that was sent")
         static let failToSend = NSLocalizedString("ChatScene.MessageStatus.FailToSend", comment: "Chat: status message for failed to send chat transaction")
         static let pending = NSLocalizedString("ChatScene.MessageStatus.Pending", comment: "Chat: status message for pending chat transaction")
+        
+        static let actionsTitle = NSLocalizedString("ChatScene.Actions.Title", comment: "Chat: Title for actions menu")
+        static let actionsBody = NSLocalizedString("ChatScene.Actions.Body", comment: "Chat: Body for actions menu")
+        static let rename = NSLocalizedString("ChatScene.Actions.Rename", comment: "Chat: 'Rename' action in actions menu")
+        static let name = NSLocalizedString("ChatScene.Actions.Name", comment: "Chat: 'Name' field in actions menu")
 		
 		private init() { }
 	}
@@ -37,6 +42,7 @@ class ChatViewController: MessagesViewController {
 	var chatsProvider: ChatsProvider!
 	var dialogService: DialogService!
 	var router: Router!
+    var addressBookService: AddressBookService!
 	
 	// MARK: Properties
 	weak var delegate: ChatViewControllerDelegate?
@@ -87,8 +93,12 @@ class ChatViewController: MessagesViewController {
 			} else {
 				self.navigationItem.title = partner.address
 			}
+            
+            if let address = partner.address, let name = self.addressBookService.addressBook[address] {
+                self.navigationItem.title = name
+            }
 		}
-		
+        
 		messagesCollectionView.messagesDataSource = self
 		messagesCollectionView.messagesDisplayDelegate = self
 		messagesCollectionView.messagesLayoutDelegate = self
@@ -225,11 +235,34 @@ class ChatViewController: MessagesViewController {
 		if let address = chatroom?.partner?.address {
 			let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
 			
-			dialogService.presentShareAlertFor(string: encodedAddress,
-				types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
-											   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-											   animated: true,
-											   completion: nil)
+            dialogService.showSystemActionSheet(title: String.adamantLocalized.chat.actionsTitle, message: "", actions: [
+                UIAlertAction(title: ShareType.share.localized, style: .default, handler: { (action) in
+                    self.dialogService.presentShareAlertFor(string: encodedAddress,
+                                                       types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+                                                       excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                                                       animated: true,
+                                                       completion: nil)
+                }),
+                UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default, handler: { (action) in
+                    let alert = UIAlertController(title: String.adamantLocalized.chat.rename, message: String(format: String.adamantLocalized.chat.actionsBody, address), preferredStyle: .alert)
+                    
+                    alert.addTextField { (textField) in
+                        textField.placeholder = String.adamantLocalized.chat.name
+                        if let name = self.addressBookService.addressBook[address] {
+                            textField.text = name
+                        }
+                    }
+                    
+                    alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default, handler: { [weak alert] (_) in
+                        if let textField = alert?.textFields?.first, let newName = textField.text {
+                            self.addressBookService.set(name: newName, for: address)
+                            self.title = newName
+                        }
+                    }))
+                    alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
+                })
+                ])
 		}
 	}
 }
