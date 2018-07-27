@@ -139,6 +139,9 @@
 /* Product name */
 "ADAMANT" = "АДАМАНТ";
 
+/* AddressBookService: Not enought money to save address into blockchain */
+"AddressBookService.Error.NotEnoughtMoney" = "Недостаточно средств для сохранения информации в блокчейне";
+
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
 "Application.deviceTokenErrorFormat" = "Ошибка регистрации в ANS: %@";
 
@@ -210,6 +213,15 @@
 
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Подробнее…";
+
+/* Chat: Body for actions menu */
+"ChatScene.Actions.Body" = "Новое имя для %@";
+
+/* Chat: 'Rename' action in actions menu */
+"ChatScene.Actions.Rename" = "Переименовать";
+
+/* Chat: 'Name' field in actions menu */
+"ChatScene.Actions.NamePlaceholder" = "Имя";
 
 /* Delegates page: scene title */
 "Delegates.Title" = "Делегаты";

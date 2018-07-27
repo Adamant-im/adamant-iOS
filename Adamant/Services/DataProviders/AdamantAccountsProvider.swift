@@ -31,6 +31,7 @@ class AdamantAccountsProvider: AccountsProvider {
 	// MARK: Dependencies
 	var stack: CoreDataStack!
 	var apiService: ApiService!
+	var addressBookService: AddressBookService!
 	
 	
 	// MARK: Properties
@@ -50,6 +51,44 @@ class AdamantAccountsProvider: AccountsProvider {
 			AdamantContacts.adamantBountyWallet.name: bounty,
 			AdamantContacts.iosSupport.address: iosSupport
 		]
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.AddressBookService.addressBookUpdated, object: nil, queue: nil) { [weak self] _ in
+			guard let book = self?.addressBookService.addressBook,
+				let viewContext = self?.stack.container.viewContext else {
+				return
+			}
+			
+			DispatchQueue.global(qos: .utility).async {
+				let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+				context.parent = viewContext
+				
+				let request = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
+				request.fetchLimit = 1
+				
+				for (address, name) in book {
+					let predicate = NSPredicate(format: "address == %@", address)
+					request.predicate = predicate
+					
+					guard let account = (try? context.fetch(request))?.first else {
+						continue
+					}
+					
+					if account.name != name {
+						account.name = name
+						
+						if let chatroom = account.chatroom {
+							chatroom.title = name
+						}
+					}
+				}
+				
+				if context.hasChanges {
+					DispatchQueue.main.async {
+						try? context.save()
+					}
+				}
+			}
+		}
 	}
 	
 	
@@ -295,6 +334,11 @@ extension AdamantAccountsProvider {
 			chatroom.isReadonly = acc.isReadonly
 			chatroom.isHidden = acc.isHidden
 			chatroom.title = acc.name
+		}
+		
+		if let address = coreAccount.address, let name = addressBookService.addressBook[address] {
+			coreAccount.name = name
+			chatroom.title = name
 		}
 		
 		return coreAccount
