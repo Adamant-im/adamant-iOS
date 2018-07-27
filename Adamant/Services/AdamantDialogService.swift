@@ -344,7 +344,7 @@ extension AdamantDialogService {
         self.present(alertVC, animated: true, completion: nil)
     }
     
-    func showSystemActionSheet(title: String, message: String, actions: [UIAlertAction]?) {
+    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?) {
         guard let actions = actions, actions.count > 0 else {
             return
         }

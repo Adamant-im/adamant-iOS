@@ -235,38 +235,55 @@ class ChatViewController: MessagesViewController {
 	// MARK: IBAction
 	
 	@IBAction func properties(_ sender: Any) {
-		if let address = chatroom?.partner?.address {
-			let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
-			
-            dialogService.showSystemActionSheet(title: String.adamantLocalized.chat.actionsTitle, message: "", actions: [
-                UIAlertAction(title: ShareType.share.localized, style: .default, handler: { (action) in
-                    self.dialogService.presentShareAlertFor(string: encodedAddress,
-                                                       types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
-                                                       excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                                       animated: true,
-                                                       completion: nil)
-                }),
-                UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default, handler: { (action) in
-                    let alert = UIAlertController(title: String.adamantLocalized.chat.rename, message: String(format: String.adamantLocalized.chat.actionsBody, address), preferredStyle: .alert)
-                    
-                    alert.addTextField { (textField) in
-                        textField.placeholder = String.adamantLocalized.chat.name
-                        if let name = self.addressBookService.addressBook[address] {
-                            textField.text = name
-                        }
-                    }
-                    
-                    alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default, handler: { [weak alert] (_) in
-                        if let textField = alert?.textFields?.first, let newName = textField.text {
-                            self.addressBookService.set(name: newName, for: address)
-                            self.updateTitle()
-                        }
-                    }))
-                    alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-                    self.present(alert, animated: true, completion: nil)
-                })
-                ])
+		guard let partner = chatroom?.partner, let address = partner.address else {
+			return
 		}
+		
+		let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+		
+		if partner.isSystem {
+			dialogService.presentShareAlertFor(string: encodedAddress,
+											   types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+											   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+											   animated: true,
+											   completion: nil)
+			
+			return
+		}
+		
+		let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
+			self?.dialogService.presentShareAlertFor(string: encodedAddress,
+													types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+													excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+													animated: true,
+													completion: nil)
+		}
+		
+		let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] action in
+			let alert = UIAlertController(title: String.adamantLocalized.chat.rename, message: String(format: String.adamantLocalized.chat.actionsBody, address), preferredStyle: .alert)
+			
+			alert.addTextField { (textField) in
+				textField.placeholder = String.adamantLocalized.chat.name
+				textField.autocapitalizationType = .words
+				
+				if let name = self?.addressBookService.addressBook[address] {
+					textField.text = name
+				}
+			}
+			
+			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default) { [weak alert] (_) in
+				if let textField = alert?.textFields?.first, let newName = textField.text {
+					self?.addressBookService.set(name: newName, for: address)
+					self?.updateTitle()
+				}
+			})
+			
+			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+			
+			self?.present(alert, animated: true, completion: nil)
+		}
+		
+		dialogService.showSystemActionSheet(title: nil, message: nil, actions: [share, rename])
 	}
 }
 
