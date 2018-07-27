@@ -85,6 +85,13 @@ class AdamantAddressBookService: AddressBookService {
         }
         let address = loggedAccount.address
         
+        guard loggedAccount.balance >= AdamantApiService.KVSfee else {
+            DispatchQueue.main.async {
+                completion(.failure(.internalError(message: "ETH Wallet: Not enought ADM to save address to KVS", error: nil)))
+            }
+            return
+        }
+        
         // MARK: 1. Pack and ecode address book
         let packed = self.packAddressBook(book: self.addressBook)
         if let encodeResult = self.adamantCore.encodeValue(packed, privateKey: keypair.privateKey) {
