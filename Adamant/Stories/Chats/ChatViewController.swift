@@ -87,17 +87,7 @@ class ChatViewController: MessagesViewController {
 		
 		// MARK: 1. Initial configuration
 		
-		if let partner = chatroom.partner {
-			if let name = partner.name {
-				self.navigationItem.title = name
-			} else {
-				self.navigationItem.title = partner.address
-			}
-            
-            if let address = partner.address, let name = self.addressBookService.addressBook[address] {
-                self.navigationItem.title = name
-            }
-		}
+        updateTitle()
         
 		messagesCollectionView.messagesDataSource = self
 		messagesCollectionView.messagesDisplayDelegate = self
@@ -228,6 +218,19 @@ class ChatViewController: MessagesViewController {
 		cellUpdateTimers.removeAll()
 	}
 	
+    func updateTitle() {
+        if let partner = chatroom?.partner {
+            if let name = partner.name {
+                self.navigationItem.title = name
+            } else {
+                self.navigationItem.title = partner.address
+            }
+            
+            if let address = partner.address, let name = self.addressBookService.addressBook[address] {
+                self.navigationItem.title = name
+            }
+        }
+    }
 	
 	// MARK: IBAction
 	
@@ -256,7 +259,7 @@ class ChatViewController: MessagesViewController {
                     alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default, handler: { [weak alert] (_) in
                         if let textField = alert?.textFields?.first, let newName = textField.text {
                             self.addressBookService.set(name: newName, for: address)
-                            self.title = newName
+                            self.updateTitle()
                         }
                     }))
                     alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))

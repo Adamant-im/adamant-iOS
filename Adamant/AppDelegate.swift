@@ -77,6 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var accountService: AccountService!
 	var notificationService: NotificationsService!
     var dialogService: DialogService!
+    var addressBookService: AddressBookService!
 
 	// MARK: - Lifecycle
 	
@@ -87,6 +88,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		accountService = container.resolve(AccountService.self)
 		notificationService = container.resolve(NotificationsService.self)
         dialogService = container.resolve(DialogService.self)
+        addressBookService = container.resolve(AddressBookService.self)
 		
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
@@ -194,7 +196,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func applicationWillResignActive(_ application: UIApplication) {
 		repeater.pauseAll()
 	}
-	
+    
+    func applicationWillEnterForeground(_ application: UIApplication) {
+        addressBookService.saveIfNeeded()
+    }
+    
 	func applicationDidEnterBackground(_ application: UIApplication) {
 		repeater.pauseAll()
 	}

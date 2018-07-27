@@ -15,5 +15,7 @@ protocol AddressBookService: class {
     func getAddressBook(completion: @escaping (ApiServiceResult<[String:String]>) -> Void)
     
     func set(name: String, for: String)
+    
+    func saveIfNeeded()
 
 }

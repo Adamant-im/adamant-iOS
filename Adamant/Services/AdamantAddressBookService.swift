@@ -22,6 +22,7 @@ extension Notification.Name {
 class AdamantAddressBookService: AddressBookService {
     
     let addressBookKey = "contact_list"
+    let waitTime: TimeInterval = 60.0 // in sec
     
     // MARK: Dependencies
     var apiService: ApiService!
@@ -30,6 +31,9 @@ class AdamantAddressBookService: AddressBookService {
     
     // MARK: Properties
     var addressBook: [String:String] = [String:String]()
+    
+    private var isChanged = false
+    private var timer: Timer?
     
     func getAddressBook(completion: @escaping (ApiServiceResult<[String:String]>) -> Void) {
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
@@ -68,17 +72,47 @@ class AdamantAddressBookService: AddressBookService {
         if name != "" { self.addressBook[address] = name }
         else { self.addressBook.removeValue(forKey: address) }
         
+        self.isChanged = true
+        
         NotificationCenter.default.post(name: Notification.Name.AdamantAddressBookService.updated, object: self)
         
-        saveAddressBook { (result) in
-            switch result {
-            case .success(_): break
-            case .failure(let error): print(error)
+        if timer != nil {
+            timer?.invalidate()
+            timer = nil
+        }
+        
+        self.timer = Timer.scheduledTimer(withTimeInterval: waitTime, repeats: false) { _ in
+            self.saveAddressBook { (result) in
+                switch result {
+                case .success(_):
+                    self.isChanged = false
+                    break
+                case .failure(let error): print(error)
+                }
+                self.timer = nil
             }
         }
     }
     
-    func saveAddressBook(completion: @escaping (ApiServiceResult<String>) -> Void) {
+    func saveIfNeeded() {
+        if isChanged {
+            timer?.invalidate()
+            timer = nil
+            
+            self.saveAddressBook { (result) in
+                switch result {
+                case .success(_):
+                    self.isChanged = false
+                    break
+                case .failure(let error): print(error)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Private
+    
+    private func saveAddressBook(completion: @escaping (ApiServiceResult<String>) -> Void) {
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
             completion(.failure(.notLogged))
             return
@@ -87,7 +121,7 @@ class AdamantAddressBookService: AddressBookService {
         
         guard loggedAccount.balance >= AdamantApiService.KVSfee else {
             DispatchQueue.main.async {
-                completion(.failure(.internalError(message: "ETH Wallet: Not enought ADM to save address to KVS", error: nil)))
+                completion(.failure(.internalError(message: "AddressBook: Not enought ADM to save address to KVS", error: nil)))
             }
             return
         }
@@ -95,8 +129,6 @@ class AdamantAddressBookService: AddressBookService {
         // MARK: 1. Pack and ecode address book
         let packed = self.packAddressBook(book: self.addressBook)
         if let encodeResult = self.adamantCore.encodeValue(packed, privateKey: keypair.privateKey) {
-            print(encodeResult)
-            
             let value = JSONStringify(value: ["message": encodeResult.message,
                                       "nonce": encodeResult.nonce] as AnyObject)
             
@@ -104,7 +136,7 @@ class AdamantAddressBookService: AddressBookService {
             self.apiService.store(key: addressBookKey, value: value, type: StateType.keyValue, sender: address, keypair: keypair) { (result) in
                 switch result {
                 case .success(let id):
-                    print(id)
+                    print("SAVED AddresBook: \(id)")
                     completion(.success("1"))
                     break
                 case .failure(let error):
