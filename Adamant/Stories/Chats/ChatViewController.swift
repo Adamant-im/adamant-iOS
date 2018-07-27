@@ -18,11 +18,10 @@ extension String.adamantLocalized {
 		static let cancelError = NSLocalizedString("ChatScene.Error.cancelError", comment: "Chat: inform user that he can't cancel transaction, that was sent")
         static let failToSend = NSLocalizedString("ChatScene.MessageStatus.FailToSend", comment: "Chat: status message for failed to send chat transaction")
         static let pending = NSLocalizedString("ChatScene.MessageStatus.Pending", comment: "Chat: status message for pending chat transaction")
-        
-        static let actionsTitle = NSLocalizedString("ChatScene.Actions.Title", comment: "Chat: Title for actions menu")
+		
         static let actionsBody = NSLocalizedString("ChatScene.Actions.Body", comment: "Chat: Body for actions menu")
         static let rename = NSLocalizedString("ChatScene.Actions.Rename", comment: "Chat: 'Rename' action in actions menu")
-        static let name = NSLocalizedString("ChatScene.Actions.Name", comment: "Chat: 'Name' field in actions menu")
+        static let name = NSLocalizedString("ChatScene.Actions.NamePlaceholder", comment: "Chat: 'Name' field in actions menu")
 		
 		private init() { }
 	}
@@ -260,7 +259,7 @@ class ChatViewController: MessagesViewController {
 		}
 		
 		let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] action in
-			let alert = UIAlertController(title: String.adamantLocalized.chat.rename, message: String(format: String.adamantLocalized.chat.actionsBody, address), preferredStyle: .alert)
+			let alert = UIAlertController(title: String(format: String.adamantLocalized.chat.actionsBody, address), message: nil, preferredStyle: .alert)
 			
 			alert.addTextField { (textField) in
 				textField.placeholder = String.adamantLocalized.chat.name
@@ -271,7 +270,7 @@ class ChatViewController: MessagesViewController {
 				}
 			}
 			
-			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default) { [weak alert] (_) in
+			alert.addAction(UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak alert] (_) in
 				if let textField = alert?.textFields?.first, let newName = textField.text {
 					self?.addressBookService.set(name: newName, for: address)
 					self?.updateTitle()

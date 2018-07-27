@@ -139,6 +139,9 @@
 /* Product name */
 "ADAMANT" = "ADAMANT";
 
+/* AddressBookService: Not enought money to save address into blockchain */
+"AddressBookService.Error.NotEnoughtMoney" = "Not enought tokens to store data in Blockchain";
+
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
 "Application.deviceTokenErrorFormat" = "Failed to register in ANS: %@";
 
@@ -211,17 +214,14 @@
 /* Chat: status message for pending chat transaction */
 "ChatScene.MessageStatus.Pending" = "Pending";
 
-/* Chat: title for actions menu */
-"ChatScene.Actions.Title" = "Actions";
-
 /* Chat: Body for actions menu */
-"ChatScene.Actions.Body" = "Enter new name for %@";
+"ChatScene.Actions.Body" = "New name for %@";
 
 /* Chat: 'Rename' action in actions menu */
 "ChatScene.Actions.Rename" = "Rename";
 
 /* Chat: 'Name' field in actions menu */
-"ChatScene.Actions.Name" = "Name";
+"ChatScene.Actions.NamePlaceholder" = "Name";
 
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegates";
