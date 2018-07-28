@@ -29,6 +29,7 @@ class ChatListViewController: UIViewController {
 	var router: Router!
 	var notificationsService: NotificationsService!
 	var dialogService: DialogService!
+	var addressBook: AddressBookService!
 	
 	// MARK: IBOutlet
 	@IBOutlet weak var tableView: UITableView!
@@ -509,6 +510,98 @@ extension ChatListViewController {
 		} else {
 			return "➡️  \(AdamantUtilities.format(balance: balance))"
 		}
+	}
+}
+
+
+// MARK: - Swipe actions
+extension ChatListViewController {
+	@available(iOS 11.0, *)
+	func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+		guard let chatroom = chatsController?.object(at: indexPath) else {
+			return nil
+		}
+		
+		let actions: [UIContextualAction]
+		
+		// More
+		let more = UIContextualAction(style: .normal, title: nil) { [weak self] (_, _, completionHandler: (Bool) -> Void) in
+			guard let partner = chatroom.partner, let address = partner.address else {
+				completionHandler(false)
+				return
+			}
+			
+			let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+			
+			if partner.isSystem {
+				self?.dialogService.presentShareAlertFor(string: encodedAddress,
+												   types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+												   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+												   animated: true,
+												   completion: nil)
+			} else {
+				let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
+					self?.dialogService.presentShareAlertFor(string: encodedAddress,
+															 types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+															 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+															 animated: true,
+															 completion: nil)
+				}
+				
+				let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] action in
+					let alert = UIAlertController(title: String(format: String.adamantLocalized.chat.actionsBody, address), message: nil, preferredStyle: .alert)
+					
+					alert.addTextField { (textField) in
+						textField.placeholder = String.adamantLocalized.chat.name
+						textField.autocapitalizationType = .words
+						
+						if let name = partner.name {
+							textField.text = name
+						}
+					}
+					 
+					alert.addAction(UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak alert] (_) in
+						if let textField = alert?.textFields?.first, let newName = textField.text {
+							self?.addressBook.set(name: newName, for: address)
+						}
+					})
+					
+					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+					
+					self?.present(alert, animated: true, completion: nil)
+				}
+				
+				self?.dialogService.showSystemActionSheet(title: nil, message: nil, actions: [share, rename])
+			}
+			
+			completionHandler(true)
+		}
+		
+		more.image = #imageLiteral(resourceName: "swipe_more")
+		more.backgroundColor = UIColor.adamant.primary
+		
+		// Mark as read
+		if chatroom.hasUnreadMessages {
+			let markAsRead = UIContextualAction(style: .normal, title: nil) { [weak self] (_, _, completionHandler: (Bool) -> Void) in
+				guard let chatroom = self?.chatsController?.object(at: indexPath) else {
+					completionHandler(false)
+					return
+				}
+				
+				chatroom.markAsReaded()
+				try? chatroom.managedObjectContext?.save()
+				completionHandler(true)
+			}
+			
+			markAsRead.image = #imageLiteral(resourceName: "swipe_mark-as-read")
+			markAsRead.backgroundColor = UIColor.adamant.primary
+			
+			actions = [markAsRead, more]
+		} else {
+			actions = [more]
+		}
+		
+		return UISwipeActionsConfiguration(actions: actions)
 	}
 }
 

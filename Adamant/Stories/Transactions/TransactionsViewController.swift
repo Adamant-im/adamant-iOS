@@ -245,8 +245,7 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
         
         let toChat = UITableViewRowAction(style: .normal, title: title) { action, index in
             guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
-				// TODO: Log this
-                return
+				fatalError("Failed to get ChatViewController")
             }
 			
 			guard let account = self.accountService.account else {
@@ -275,23 +274,19 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
     
     @available(iOS 11.0, *)
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let transfer = controller?.object(at: indexPath), let chatroom = transfer.partner?.chatroom, let transactions = chatroom.transactions  else {
+        guard let transfer = controller?.object(at: indexPath), let chatroom = transfer.partner?.chatroom else {
             return nil
         }
 
-        let messeges = transactions.first (where: { (object) -> Bool in
-            return !(object is TransferTransaction)
-        })
+        let title = String.adamantLocalized.transactionList.toChat
 
-        let title = (messeges != nil) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
-
-        let toChat = UIContextualAction(style: .normal, title:  title, handler: { (ac:UIContextualAction, view:UIView, success:(Bool) -> Void) in
-			guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
-				// TODO: Log this
-				return
+        let toChat = UIContextualAction(style: .normal, title:  title) { [weak self] (ac: UIContextualAction, view: UIView, completionHandler: (Bool) -> Void) in
+			guard let vc = self?.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
+				fatalError("Failed to get ChatViewController")
 			}
 			
-			guard let account = self.accountService.account else {
+			guard let account = self?.accountService.account else {
+				completionHandler(false)
 				return
 			}
 			
@@ -299,15 +294,18 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 			vc.chatroom = chatroom
 			vc.hidesBottomBarWhenPushed = true
 			
-			if let nav = self.navigationController {
+			if let nav = self?.navigationController {
 				nav.pushViewController(vc, animated: true)
 			} else {
-				self.present(vc, animated: true)
+				self?.present(vc, animated: true)
 			}
-        })
+			
+			completionHandler(true)
+        }
 
-        toChat.image = (messeges != nil) ? #imageLiteral(resourceName: "chats_tab") : #imageLiteral(resourceName: "Chat")
+        toChat.image = #imageLiteral(resourceName: "chats_tab")
         toChat.backgroundColor = UIColor.adamant.primary
+		
         return UISwipeActionsConfiguration(actions: [toChat])
     }
 }
