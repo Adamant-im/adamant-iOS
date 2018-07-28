@@ -106,7 +106,20 @@ class SecurityViewController: FormViewController {
 	
 	
 	// MARK: - Properties
-	var showLoggedInOptions = false
+	var showLoggedInOptions: Bool {
+		return accountService.hasStayInAccount
+	}
+	
+	var showBiometryOptions: Bool {
+		switch localAuth.biometryType {
+		case .none:
+			return false
+			
+		case .touchID, .faceID:
+			return showLoggedInOptions
+		}
+	}
+	
 	var pinpadRequest: SecurityViewController.PinpadRequest?
 	
 	
@@ -117,7 +130,6 @@ class SecurityViewController: FormViewController {
 		
 		navigationItem.title = String.adamantLocalized.security.title
 		navigationOptions = .Disabled
-		showLoggedInOptions = accountService.hasStayInAccount
 		
 		if #available(iOS 11.0, *) {
 			navigationController?.navigationBar.prefersLargeTitles = true
@@ -159,7 +171,7 @@ class SecurityViewController: FormViewController {
 			$0.value = accountService.useBiometry
 			
 			$0.hidden = Condition.function([], { [weak self] _ -> Bool in
-				guard let showBiometry = self?.showLoggedInOptions else {
+				guard let showBiometry = self?.showBiometryOptions else {
 					return true
 				}
 				
@@ -243,7 +255,18 @@ class SecurityViewController: FormViewController {
 			self?.present(safari, animated: true, completion: nil)
 		}
 		
-		let ansSection = Section(Sections.aboutNotificationTypes.localized) { $0.tag = Sections.aboutNotificationTypes.tag }
+		let ansSection = Section(Sections.aboutNotificationTypes.localized) {
+			$0.tag = Sections.aboutNotificationTypes.tag
+			
+			$0.hidden = Condition.function([], { [weak self] _ -> Bool in
+				guard let showNotifications = self?.showLoggedInOptions else {
+					return true
+				}
+				
+				return !showNotifications
+			})
+		}
+		
 		ansSection.append(contentsOf: [descriptionRow, githubRow])
 		form.append(ansSection)
 		
@@ -254,7 +277,6 @@ class SecurityViewController: FormViewController {
 		}
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
-			
 			self?.reloadForm()
 		}
 		
@@ -280,9 +302,6 @@ class SecurityViewController: FormViewController {
 	}
 	
 	private func reloadForm() {
-		showLoggedInOptions = accountService.hasStayInAccount
-		tableView.reloadData()
-		
 		if let row: SwitchRow = form.rowBy(tag: Rows.stayIn.tag) {
 			row.value = accountService.hasStayInAccount
 		}
@@ -293,6 +312,10 @@ class SecurityViewController: FormViewController {
 		}
 		
 		if let section = form.sectionBy(tag: Sections.notifications.tag) {
+			section.evaluateHidden()
+		}
+		
+		if let section = form.sectionBy(tag: Sections.aboutNotificationTypes.tag) {
 			section.evaluateHidden()
 		}
 	}
