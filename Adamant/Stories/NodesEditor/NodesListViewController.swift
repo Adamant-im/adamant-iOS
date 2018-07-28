@@ -120,7 +120,7 @@ class NodesListViewController: FormViewController {
 		}.onCellSelection { [weak self] (_, _) in
 			self?.createNewNode()
 		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
 			
 			
@@ -135,7 +135,7 @@ class NodesListViewController: FormViewController {
 		}.onCellSelection { [weak self] (_, _) in
 			self?.resetToDefault()
 		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
     }
 	
@@ -337,7 +337,7 @@ extension NodesListViewController {
 			}
 		}.cellUpdate({ (cell, _) in
 			if let label = cell.textLabel {
-				label.textColor = UIColor.adamantPrimary
+				label.textColor = UIColor.adamant.primary
 			}
 			
 			cell.accessoryType = .disclosureIndicator

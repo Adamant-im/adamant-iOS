@@ -204,7 +204,7 @@ class TransferViewController: FormViewController {
 		
 		
 		// MARK: - UI
-		navigationAccessoryView.tintColor = UIColor.adamantPrimary
+		navigationAccessoryView.tintColor = UIColor.adamant.primary
 		
 		let button: ButtonRow? = form.rowBy(tag: Row.sendButton.tag)
 		button?.evaluateDisabled()

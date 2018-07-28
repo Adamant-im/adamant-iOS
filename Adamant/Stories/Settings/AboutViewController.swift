@@ -137,14 +137,14 @@ class AboutViewController: FormViewController {
 			
 			if let label = header.viewWithTag(888) as? UILabel {
 				label.text = String.adamantLocalized.shared.productName
-				label.textColor = UIColor.adamantPrimary
+				label.textColor = UIColor.adamant.primary
 			}
 		}
 		
 		if let footer = UINib(nibName: "VersionFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
 			if let label = footer.viewWithTag(555) as? UILabel {
 				label.text = AdamantUtilities.applicationVersion
-				label.textColor = UIColor.adamantPrimary
+				label.textColor = UIColor.adamant.primary
 				tableView.tableFooterView = footer
 			}
 		}
@@ -194,7 +194,7 @@ class AboutViewController: FormViewController {
 			$0.title = Rows.adm.localized
 			$0.tag = Rows.adm.tag
 			$0.cell.imageView?.image = Rows.adm.image
-			$0.cell.imageView?.tintColor = UIColor.adamantTableRowIcons
+			$0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -245,7 +245,7 @@ class AboutViewController: FormViewController {
 			$0.value = AdamantResources.supportEmail
 			$0.tag = Rows.email.tag
 			$0.cell.imageView?.image = Rows.email.image
-			$0.cell.imageView?.tintColor = UIColor.adamantTableRowIcons
+			$0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -320,7 +320,7 @@ extension AboutViewController {
 			$0.title = title
 			$0.value = value
 			$0.cell.imageView?.image = image
-			$0.cell.imageView?.tintColor = UIColor.adamantTableRowIcons
+			$0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -330,7 +330,7 @@ extension AboutViewController {
 			}
 			
 			let safari = SFSafariViewController(url: url)
-			safari.preferredControlTintColor = UIColor.adamantPrimary
+			safari.preferredControlTintColor = UIColor.adamant.primary
 			self?.present(safari, animated: true, completion: nil)
 		}
 		

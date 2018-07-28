@@ -160,7 +160,7 @@ class ChatViewController: MessagesViewController {
 		// MARK: 3. Readonly chat
 		
 		if chatroom.isReadonly {
-			messageInputBar.inputTextView.backgroundColor = UIColor.adamantChatSenderBackground
+			messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
 			messageInputBar.inputTextView.isEditable = false
 			messageInputBar.sendButton.isEnabled = false
 		}

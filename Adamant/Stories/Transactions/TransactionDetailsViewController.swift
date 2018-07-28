@@ -202,7 +202,7 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 		case .openInExplorer:
 			if let url = explorerUrl {
 				let safari = SFSafariViewController(url: url)
-				safari.preferredControlTintColor = UIColor.adamantPrimary
+				safari.preferredControlTintColor = UIColor.adamant.primary
 				present(safari, animated: true, completion: nil)
 			}
 			
@@ -276,7 +276,7 @@ extension TransactionDetailsViewController {
 		
 		cell.textLabel?.text = row.localized
 		cell.imageView?.image = row.image
-		cell.imageView?.tintColor = UIColor.adamantTableRowIcons
+		cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
 		
 		switch row {
 		case .amount:

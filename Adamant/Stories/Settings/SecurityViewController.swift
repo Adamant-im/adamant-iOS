@@ -240,7 +240,7 @@ class SecurityViewController: FormViewController {
 			$0.tag = Rows.github.tag
 			$0.title = Rows.github.localized
 			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_github")
-			$0.cell.imageView?.tintColor = UIColor.adamantTableRowIcons
+			$0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
 		}.cellSetup { (cell, _) in
 			cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
@@ -251,7 +251,7 @@ class SecurityViewController: FormViewController {
 			}
 			
 			let safari = SFSafariViewController(url: url)
-			safari.preferredControlTintColor = UIColor.adamantPrimary
+			safari.preferredControlTintColor = UIColor.adamant.primary
 			self?.present(safari, animated: true, completion: nil)
 		}
 		

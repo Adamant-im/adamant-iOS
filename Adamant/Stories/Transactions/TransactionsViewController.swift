@@ -36,7 +36,7 @@ class TransactionsViewController: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControlEvents.valueChanged)
-        refreshControl.tintColor = UIColor.adamantPrimary
+        refreshControl.tintColor = UIColor.adamant.primary
         
         return refreshControl
     }()
@@ -159,9 +159,9 @@ class TransactionsViewController: UIViewController {
 // MARK: - UITableView Cells
 extension TransactionsViewController {
 	private func configureCell(_ cell: TransactionTableViewCell, for transfer: TransferTransaction) {
-		cell.accountLabel.tintColor = UIColor.adamantPrimary
-		cell.ammountLabel.tintColor = UIColor.adamantPrimary
-		cell.dateLabel.tintColor = UIColor.adamantSecondary
+		cell.accountLabel.tintColor = UIColor.adamant.primary
+		cell.ammountLabel.tintColor = UIColor.adamant.primary
+		cell.dateLabel.tintColor = UIColor.adamant.secondary
 		cell.topImageView.tintColor = UIColor.black
 		
 		if transfer.isOutgoing {
@@ -264,7 +264,7 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
             }
         }
         
-        toChat.backgroundColor = UIColor.adamantPrimary
+        toChat.backgroundColor = UIColor.adamant.primary
         
         return [toChat]
     }
@@ -307,7 +307,7 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
         })
 
         toChat.image = (messeges != nil) ? #imageLiteral(resourceName: "chats_tab") : #imageLiteral(resourceName: "Chat")
-        toChat.backgroundColor = UIColor.adamantPrimary
+        toChat.backgroundColor = UIColor.adamant.primary
         return UISwipeActionsConfiguration(actions: [toChat])
     }
 }

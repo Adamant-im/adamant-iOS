@@ -328,7 +328,7 @@ class AccountViewController: FormViewController {
 		})
 		
 		
-		form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamantTableRowIcons }
+		form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamant.tableRowIcons }
 		
 		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .centeredHorizontally)
 		
@@ -443,12 +443,12 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 		}
 		
 		if !cell.isInitialized {
-			cell.tintColor = UIColor.adamantSecondary
+			cell.tintColor = UIColor.adamant.secondary
 			
-			cell.balanceLabel.textColor = UIColor.adamantPrimary
-			cell.currencySymbolLabel.textColor = UIColor.adamantPrimary
+			cell.balanceLabel.textColor = UIColor.adamant.primary
+			cell.currencySymbolLabel.textColor = UIColor.adamant.primary
 			
-			cell.accessoryContainerView.accessoriesBackgroundColor = UIColor.adamantPrimary
+			cell.accessoryContainerView.accessoriesBackgroundColor = UIColor.adamant.primary
 			cell.accessoryContainerView.accessoriesBorderColor = UIColor.white
 			cell.accessoryContainerView.accessoriesBorderWidth = 2
 			
@@ -582,7 +582,7 @@ extension AccountViewController {
 				$0.cell.selectionStyle = .gray
 				
 				if let alertLabel = $0.cell.alertLabel {
-					alertLabel.backgroundColor = UIColor.adamantPrimary
+					alertLabel.backgroundColor = UIColor.adamant.primary
 					alertLabel.textColor = UIColor.white
 					alertLabel.clipsToBounds = true
 					alertLabel.textInsets = UIEdgeInsets(top: 1, left: 5, bottom: 1, right: 5)
@@ -635,7 +635,7 @@ extension AccountViewController {
 				}
 				
 				let safari = SFSafariViewController(url: url)
-				safari.preferredControlTintColor = UIColor.adamantPrimary
+				safari.preferredControlTintColor = UIColor.adamant.primary
 				self?.present(safari, animated: true, completion: nil)
 			})
 			
@@ -669,7 +669,7 @@ extension AccountViewController {
 				}
 				
 				let safari = SFSafariViewController(url: url)
-				safari.preferredControlTintColor = UIColor.adamantPrimary
+				safari.preferredControlTintColor = UIColor.adamant.primary
 				self?.present(safari, animated: true, completion: nil)
 			})
 			

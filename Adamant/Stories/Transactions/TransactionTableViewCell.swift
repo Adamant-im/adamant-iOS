@@ -28,8 +28,8 @@ class TransactionTableViewCell: UITableViewCell {
 		
 		var bottomTintColor: UIColor {
 			switch self {
-			case .income: return UIColor.adamantTransferIncomeIconBackground
-			case .outcome: return UIColor.adamantTransferOutcomeIconBackground
+			case .income: return UIColor.adamant.transferIncomeIconBackground
+			case .outcome: return UIColor.adamant.transferOutcomeIconBackground
 			}
 		}
 	}

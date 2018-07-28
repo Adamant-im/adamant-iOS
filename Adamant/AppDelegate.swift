@@ -96,7 +96,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		window!.rootViewController = UITabBarController()
 		window!.rootViewController?.view.backgroundColor = .white
 		window!.makeKeyAndVisible()
-		window!.tintColor = UIColor.adamantPrimary
+		window!.tintColor = UIColor.adamant.primary
 		
 		
 		// MARK: 3. Show login
@@ -120,8 +120,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			account.tabBarItem.title = String.adamantLocalized.tabItems.account
 			account.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
 			
-			chatList.tabBarItem.badgeColor = UIColor.adamantPrimary
-			account.tabBarItem.badgeColor = UIColor.adamantPrimary
+			chatList.tabBarItem.badgeColor = UIColor.adamant.primary
+			account.tabBarItem.badgeColor = UIColor.adamant.primary
 			
 			tabbar.setViewControllers([chatList, account], animated: false)
 		}

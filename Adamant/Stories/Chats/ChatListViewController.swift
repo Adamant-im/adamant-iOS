@@ -47,7 +47,7 @@ class ChatListViewController: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControlEvents.valueChanged)
-        refreshControl.tintColor = UIColor.adamantPrimary
+        refreshControl.tintColor = UIColor.adamant.primary
         
         return refreshControl
     }()
@@ -226,11 +226,11 @@ extension ChatListViewController {
 		let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! ChatTableViewCell
 		
 		cell.accessoryType = .disclosureIndicator
-		cell.accountLabel.textColor = UIColor.adamantPrimary
-		cell.dateLabel.textColor = UIColor.adamantSecondary
-		cell.avatarImageView.tintColor = UIColor.adamantPrimary
-		cell.borderColor = UIColor.adamantPrimary
-		cell.badgeColor = UIColor.adamantPrimary
+		cell.accountLabel.textColor = UIColor.adamant.primary
+		cell.dateLabel.textColor = UIColor.adamant.secondary
+		cell.avatarImageView.tintColor = UIColor.adamant.primary
+		cell.borderColor = UIColor.adamant.primary
+		cell.badgeColor = UIColor.adamant.primary
 		cell.borderWidth = 1
 		
 		return cell
@@ -254,7 +254,7 @@ extension ChatListViewController {
 			
 			if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
 				cell.avatarImage = avatar
-				cell.avatarImageView.tintColor = UIColor.adamantPrimary
+				cell.avatarImageView.tintColor = UIColor.adamant.primary
 			} else {
 				cell.avatarImage = nil
 			}
