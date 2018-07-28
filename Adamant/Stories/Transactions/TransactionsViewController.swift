@@ -18,8 +18,8 @@ extension String.adamantLocalized {
 }
 
 class TransactionsViewController: UIViewController {
-	let cellIdentifier = "cell"
-	let cellHeight: CGFloat = 90.0
+	let cellIdentifierFull = "cf"
+	let cellIdentifierCompact = "cc"
 	
 	// MARK: - Dependencies
 	var accountService: AccountService!
@@ -61,7 +61,8 @@ class TransactionsViewController: UIViewController {
 			initFetchedResultController(provider: transfersProvider)
 		}
 		
-		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
+		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifierFull)
+		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifierCompact)
 		tableView.dataSource = self
 		tableView.delegate = self
         tableView.refreshControl = refreshControl
@@ -166,10 +167,29 @@ extension TransactionsViewController {
 		
 		if transfer.isOutgoing {
 			cell.transactionType = .outcome
-			cell.accountLabel.text = transfer.recipientId
 		} else {
 			cell.transactionType = .income
+		}
+		
+		if let partner = transfer.chatroom?.partner, let name = partner.name {
+			cell.accountLabel.text = name
+			cell.addressLabel.text = partner.address
+			
+			if cell.addressLabel.isHidden {
+				cell.addressLabel.isHidden = false
+			}
+		} else if transfer.isOutgoing {
+			cell.accountLabel.text = transfer.recipientId
+			
+			if !cell.addressLabel.isHidden {
+				cell.addressLabel.isHidden = true
+			}
+		} else {
 			cell.accountLabel.text = transfer.senderId
+			
+			if !cell.addressLabel.isHidden {
+				cell.addressLabel.isHidden = true
+			}
 		}
 		
 		if let amount = transfer.amount {
@@ -202,7 +222,11 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 	}
 	
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-		return cellHeight
+		if let transfer = controller?.object(at: indexPath), transfer.chatroom?.partner?.name != nil {
+			return TransactionTableViewCell.cellHeightFull
+		} else {
+			return TransactionTableViewCell.cellHeightCompact
+		}
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -220,8 +244,13 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? TransactionTableViewCell,
-			let transfer = controller?.object(at: indexPath) else {
+		guard let transfer = controller?.object(at: indexPath) else {
+			return UITableViewCell(style: .default, reuseIdentifier: "cell")
+		}
+		
+		let identifier = transfer.chatroom?.partner?.name != nil ? cellIdentifierFull : cellIdentifierCompact
+		
+		guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as? TransactionTableViewCell else {
 				// TODO: Display & Log error
 				return UITableViewCell(style: .default, reuseIdentifier: "cell")
 		}
