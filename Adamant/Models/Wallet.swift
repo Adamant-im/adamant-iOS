@@ -40,7 +40,26 @@ extension Wallet {
 
 // MARK: - Formatter
 extension Wallet {
-	static var currencyFormatter: NumberFormatter = {
+	
+	// MARK: Formatters
+	
+	/// Number formatters
+	/// - full: 8 decimal digits
+	/// - compact: 4 decimal digits
+	/// - short: 2 decimal digits
+	enum NumberFormat {
+		case full, compact, short
+		
+		var formatter: NumberFormatter {
+			switch self {
+			case .short: return Wallet.currencyFormatterShort
+			case .compact: return Wallet.currencyFormatterCompact
+			case .full: return Wallet.currencyFormatterFull
+			}
+		}
+	}
+	
+	static var currencyFormatterFull: NumberFormatter = {
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .decimal
 		formatter.roundingMode = .floor
@@ -48,23 +67,39 @@ extension Wallet {
 		return formatter
 	}()
 	
-	var formattedShort: String? {
-		switch self {
-		case .adamant(let balance): //, .ethereum(let balance):
-			return Wallet.currencyFormatter.string(from: balance as NSNumber)!
-			
-		case .ethereum:
-			return nil
-		}
-	}
+	static var currencyFormatterCompact: NumberFormatter = {
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .decimal
+		formatter.roundingMode = .floor
+		formatter.positiveFormat = "#.####"
+		return formatter
+	}()
 	
-	var formattedFull: String? {
+	static var currencyFormatterShort: NumberFormatter = {
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .decimal
+		formatter.roundingMode = .floor
+		formatter.positiveFormat = "#.##"
+		return formatter
+	}()
+	
+	
+	// MARK: Methods
+	
+	func format(numberFormat: NumberFormat, includeCurrencySymbol: Bool) -> String {
+		let balance: String
 		switch self {
-		case .adamant(let balance): //, .ethereum(let balance):
-			return "\(Wallet.currencyFormatter.string(from: balance as NSNumber)!) \(currencySymbol)"
+		case .adamant(let b):
+			balance = numberFormat.formatter.string(from: b as NSNumber)!
 			
 		case .ethereum:
-			return nil
+			balance = ""
+		}
+		
+		if includeCurrencySymbol {
+			return "\(balance) \(currencySymbol)"
+		} else {
+			return balance
 		}
 	}
 }

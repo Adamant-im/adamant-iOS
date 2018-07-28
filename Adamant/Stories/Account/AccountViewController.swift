@@ -409,7 +409,7 @@ class AccountViewController: FormViewController {
 		}
 		
 		if let row: AlertLabelRow = form.rowBy(tag: Rows.balance.tag) {
-			row.value = adamantWallet.formattedFull
+			row.value = adamantWallet.format(numberFormat: .full, includeCurrencySymbol: true)
 			row.updateCell()
 		}
 		
@@ -464,7 +464,7 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 		}
 		
 		cell.currencyImageView.image = wallet.currencyLogo
-		cell.balanceLabel.text = wallet.formattedShort
+		cell.balanceLabel.text = wallet.format(numberFormat: .compact, includeCurrencySymbol: false)
 		cell.currencySymbolLabel.text = wallet.currencySymbol
 		
 		if indexPath.row == 0, let count = transfersController?.fetchedObjects?.count, count > 0 {
@@ -577,7 +577,7 @@ extension AccountViewController {
 			section <<< AlertLabelRow() { [weak self] in
 				$0.title = Rows.balance.localized
 				$0.tag = Rows.balance.tag
-				$0.value = wallet.formattedFull
+				$0.value = wallet.format(numberFormat: .full, includeCurrencySymbol: true)
 				$0.cell.imageView?.image = Rows.balance.image
 				$0.cell.selectionStyle = .gray
 				

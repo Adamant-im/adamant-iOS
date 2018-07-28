@@ -11,7 +11,7 @@ import libsodium
 
 class AdamantAddressBookService: AddressBookService {
 	let addressBookKey = "contact_list"
-    let waitTime: TimeInterval = 5.0 // in sec
+    let waitTime: TimeInterval = 60.0 // in sec
 	
 	
     // MARK: - Dependencies
