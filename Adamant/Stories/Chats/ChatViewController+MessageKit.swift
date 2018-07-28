@@ -192,6 +192,7 @@ extension ChatViewController: MessageCellDelegate {
 			}
 			
 			vc.transaction = transfer
+			vc.showToChatRow = false
 			
 			if let nav = navigationController {
 				nav.pushViewController(vc, animated: true)

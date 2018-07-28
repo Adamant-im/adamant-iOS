@@ -76,6 +76,7 @@ class TransactionDetailsViewController: UIViewController {
 	var transaction: TransferTransaction?
 	var explorerUrl: URL!
     var haveChatroom = false
+	var showToChatRow = true
 	
 	private let autoupdateInterval: TimeInterval = 5.0
     
@@ -168,15 +169,19 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 	}
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		if transaction != nil {
-			guard let hidden = transaction?.chatroom?.isHidden, !hidden else {
-				return Row.total - 1
-			}
-			
-			return Row.total
-		} else {
+		guard let transaction = transaction else {
 			return 0
 		}
+		
+		var total = Row.total
+		
+		if let hidden = transaction.chatroom?.isHidden, hidden {
+			total -= 1
+		} else if !showToChatRow {
+			total -= 1
+		}
+		
+		return total
 	}
 	
 	func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
