@@ -119,7 +119,8 @@ class AccountViewController: FormViewController {
 			case .buyTokens: return #imageLiteral(resourceName: "row_buy-coins")
 			case .voteForDelegates: return #imageLiteral(resourceName: "row_vote-delegates")
 			case .logout: return #imageLiteral(resourceName: "row_logout")
-			default: return #imageLiteral(resourceName: "row_icon_placeholder")
+			case .freeTokens: return #imageLiteral(resourceName: "row_free-tokens")
+			case .sendTokens: return #imageLiteral(resourceName: "row_icon_placeholder") // TODO:
 			}
 		}
 	}
