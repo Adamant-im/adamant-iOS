@@ -72,7 +72,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var window: UIWindow?
 	var repeater: RepeaterService!
 	var container: Container!
-	var backgroundTaskID: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
 	
 	// MARK: Dependencies
 	var accountService: AccountService!
@@ -214,16 +213,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
 	func applicationDidEnterBackground(_ application: UIApplication) {
 		repeater.pauseAll()
-		
-		// MARK: Save KVS data
-		backgroundTaskID = UIApplication.shared.beginBackgroundTask { [unowned self] in
-			UIApplication.shared.endBackgroundTask(self.backgroundTaskID)
-			self.backgroundTaskID = UIBackgroundTaskInvalid
-		}
-		
 		addressBookService.saveIfNeeded()
-		UIApplication.shared.endBackgroundTask(backgroundTaskID)
-		self.backgroundTaskID = UIBackgroundTaskInvalid
 	}
 	
 	// MARK: Notifications

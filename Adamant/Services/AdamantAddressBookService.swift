@@ -28,33 +28,75 @@ class AdamantAddressBookService: AddressBookService {
     
     private(set) var hasChanges = false
     private var timer: Timer?
-	private var isChangedSemaphore = DispatchSemaphore(value: 1)
 	
+	private var removedNames = [String:String]()
+	
+	private var isChangingSemaphore = DispatchSemaphore(value: 1)
+	private var isSavingSemaphore = DispatchSemaphore(value: 1)
+	
+	private var savingBookTaskId: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
+	private var savingBookOnLogoutTaskId: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
 	
 	// MARK: - Lifecycle
 	init() {
+		// Update on login
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
 			self?.update(nil)
 		}
 		
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-			self?.addressBook.removeAll()
+		// Save on logout
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userWillLogOut, object: nil, queue: nil) { [unowned self] _ in
+			self.isSavingSemaphore.wait()
 			
-			let semaphore = self?.isChangedSemaphore // Hold reference
-			semaphore?.wait()
+			defer {
+				self.isSavingSemaphore.signal()
+			}
 			
-			self?.hasChanges = false
-			self?.timer?.invalidate()
-			self?.timer = nil
+			guard self.hasChanges else {
+				return
+			}
 			
-			semaphore?.signal()
+			self.savingBookOnLogoutTaskId = UIApplication.shared.beginBackgroundTask { [unowned self] in
+				UIApplication.shared.endBackgroundTask(self.savingBookOnLogoutTaskId)
+				self.savingBookOnLogoutTaskId = UIBackgroundTaskInvalid
+			}
+			
+			self.saveAddressBook(self.addressBook) { _ in
+				UIApplication.shared.endBackgroundTask(self.savingBookOnLogoutTaskId)
+				self.savingBookOnLogoutTaskId = UIBackgroundTaskInvalid
+			}
 		}
+		
+		// Clean on logout
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { _ in
+			self.isChangingSemaphore.wait()
+			
+			defer {
+				self.isChangingSemaphore.signal()
+			}
+			
+			self.hasChanges = false
+			if let timer = self.timer {
+				timer.invalidate()
+				self.timer = nil
+			}
+			
+			self.addressBook.removeAll()
+		}
+	}
+	
+	deinit {
+		NotificationCenter.default.removeObserver(self)
 	}
 	
 	// MARK: - Setting
 	
 	func set(name: String, for address: String) {
-		isChangedSemaphore.wait()
+		isChangingSemaphore.wait()
+		
+		defer {
+			isChangingSemaphore.signal()
+		}
 		
 		guard addressBook[address] == nil || addressBook[address] != name else {
 			return
@@ -74,9 +116,12 @@ class AdamantAddressBookService: AddressBookService {
 			}
 			
 			addressBook[address] = name
-		} else {
+		} else if let prevName = addressBook[address] {
 			addressBook.removeValue(forKey: address)
+			removedNames[address] = prevName
 			changes = [AddressBookChange.removed(address: address)]
+		} else {
+			return
 		}
 		
 		hasChanges = true
@@ -87,20 +132,8 @@ class AdamantAddressBookService: AddressBookService {
 		}
 		
 		timer = Timer.scheduledTimer(withTimeInterval: waitTime, repeats: false) { [weak self] _ in
-			self?.saveAddressBook { result in
-				switch result {
-				case .success:
-					self?.hasChanges = false
-					
-				case .failure(let error):
-					self?.dialogService.showRichError(error: error)
-				}
-				
-				self?.timer = nil
-			}
+			self?.saveIfNeeded()
 		}
-		
-		isChangedSemaphore.signal()
 		
 		NotificationCenter.default.post(name: Notification.Name.AdamantAddressBookService.addressBookUpdated,
 										object: self,
@@ -115,11 +148,17 @@ class AdamantAddressBookService: AddressBookService {
 	}
 	
 	func update(_ completion: ((AddressBookServiceResult) -> Void)?) {
+		isSavingSemaphore.wait()
+		
 		getAddressBook { result in
+			defer {
+				self.isSavingSemaphore.signal()
+			}
+			
 			switch result {
 			case .success(let book):
 				if self.addressBook != book {
-					self.isChangedSemaphore.wait()
+					self.isChangingSemaphore.wait()
 					
 					var localBook = self.addressBook
 					var changes = [AddressBookChange]()
@@ -131,6 +170,10 @@ class AdamantAddressBookService: AddressBookService {
 								changes.append(AddressBookChange.updated(address: address, name: name))
 							}
 						} else {
+							if let removedName = self.removedNames[address], removedName == name {
+								continue
+							}
+							
 							localBook[address] = name
 							changes.append(AddressBookChange.newName(address: address, name: name))
 						}
@@ -138,7 +181,7 @@ class AdamantAddressBookService: AddressBookService {
 					
 					self.addressBook = localBook
 					
-					self.isChangedSemaphore.signal()
+					self.isChangingSemaphore.signal()
 					
 					NotificationCenter.default.post(name: Notification.Name.AdamantAddressBookService.addressBookUpdated,
 													object: self,
@@ -157,26 +200,38 @@ class AdamantAddressBookService: AddressBookService {
 	// MARK: - Saving
 	
 	func saveIfNeeded() {
-		isChangedSemaphore.wait()
+		isChangingSemaphore.wait()
 		
 		guard hasChanges else {
-			isChangedSemaphore.signal()
+			isChangingSemaphore.signal()
 			return
 		}
 		
-		isChangedSemaphore.signal()
+		isChangingSemaphore.signal()
 		
-		if let timer = timer {
-			timer.invalidate()
-			self.timer = nil
+		isSavingSemaphore.wait()
+		
+		// Background task
+		savingBookTaskId = UIApplication.shared.beginBackgroundTask {
+			UIApplication.shared.endBackgroundTask(self.savingBookTaskId)
+			self.savingBookTaskId = UIBackgroundTaskInvalid
 		}
 		
-		saveAddressBook { [unowned self] result in
+		saveAddressBook(addressBook) { result in
+			defer {
+				self.isSavingSemaphore.signal()
+				
+				UIApplication.shared.endBackgroundTask(self.savingBookTaskId)
+				self.savingBookTaskId = UIBackgroundTaskInvalid
+			}
+			
 			switch result {
 			case .success:
-				self.isChangedSemaphore.wait()
+				self.isChangingSemaphore.wait()
 				self.hasChanges = false
-				self.isChangedSemaphore.signal()
+				self.isChangingSemaphore.signal()
+				
+				self.removedNames.removeAll()
 				
 			case .failure(let error):
 				self.dialogService.showRichError(error: error)
@@ -184,7 +239,7 @@ class AdamantAddressBookService: AddressBookService {
 		}
 	}
 	
-	private func saveAddressBook(completion: @escaping (AddressBookServiceResult) -> Void) {
+	private func saveAddressBook(_ book: [String: String], completion: @escaping (AddressBookServiceResult) -> Void) {
 		guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
 			completion(.failure(.notLogged))
 			return
@@ -198,7 +253,7 @@ class AdamantAddressBookService: AddressBookService {
 		let address = loggedAccount.address
 		
 		// MARK: 1. Pack and ecode address book
-		let packed = AdamantAddressBookService.packAddressBook(book: self.addressBook)
+		let packed = AdamantAddressBookService.packAddressBook(book: book)
 		if let encodeResult = adamantCore.encodeValue(packed, privateKey: keypair.privateKey) {
 			let value = JSONStringify(value: ["message": encodeResult.message,
 											  "nonce": encodeResult.nonce] as AnyObject)
