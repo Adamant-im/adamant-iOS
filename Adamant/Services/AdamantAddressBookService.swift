@@ -31,6 +31,26 @@ class AdamantAddressBookService: AddressBookService {
 	private var isChangedSemaphore = DispatchSemaphore(value: 1)
 	
 	
+	// MARK: - Lifecycle
+	init() {
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
+			self?.update(nil)
+		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
+			self?.addressBook.removeAll()
+			
+			let semaphore = self?.isChangedSemaphore // Hold reference
+			semaphore?.wait()
+			
+			self?.hasChanges = false
+			self?.timer?.invalidate()
+			self?.timer = nil
+			
+			semaphore?.signal()
+		}
+	}
+	
 	// MARK: - Setting
 	
 	func set(name: String, for address: String) {
@@ -40,10 +60,23 @@ class AdamantAddressBookService: AddressBookService {
 			return
 		}
 		
+		let changes: [AddressBookChange]
+		
 		if name.count > 0 {
+			if let prevName = addressBook[address] {
+				if prevName == name {
+					return
+				}
+				
+				changes = [AddressBookChange.updated(address: address, name: name)]
+			} else {
+				changes = [AddressBookChange.newName(address: address, name: name)]
+			}
+			
 			addressBook[address] = name
 		} else {
 			addressBook.removeValue(forKey: address)
+			changes = [AddressBookChange.removed(address: address)]
 		}
 		
 		hasChanges = true
@@ -69,7 +102,9 @@ class AdamantAddressBookService: AddressBookService {
 		
 		isChangedSemaphore.signal()
 		
-		NotificationCenter.default.post(name: Notification.Name.AddressBookService.addressBookUpdated, object: self)
+		NotificationCenter.default.post(name: Notification.Name.AdamantAddressBookService.addressBookUpdated,
+										object: self,
+										userInfo: [AdamantUserInfoKey.AddressBook.changes: changes])
 	}
 	
 	
@@ -86,17 +121,28 @@ class AdamantAddressBookService: AddressBookService {
 				if self.addressBook != book {
 					self.isChangedSemaphore.wait()
 					
-					if self.hasChanges {
-						// Merging new keys from server, keeping our values.
-						// If contact had a name, but was renamed on different device - we will drop it. That's fiiiine
-						self.addressBook = self.addressBook.merging(book) { (c, _) in c }
-					} else {
-						self.addressBook = book
+					var localBook = self.addressBook
+					var changes = [AddressBookChange]()
+					
+					for (address, name) in book {
+						if let localName = localBook[address] {
+							if localName != name {
+								localBook[address] = name
+								changes.append(AddressBookChange.updated(address: address, name: name))
+							}
+						} else {
+							localBook[address] = name
+							changes.append(AddressBookChange.newName(address: address, name: name))
+						}
 					}
+					
+					self.addressBook = localBook
 					
 					self.isChangedSemaphore.signal()
 					
-					NotificationCenter.default.post(name: Notification.Name.AddressBookService.addressBookUpdated, object: self)
+					NotificationCenter.default.post(name: Notification.Name.AdamantAddressBookService.addressBookUpdated,
+													object: self,
+													userInfo: [AdamantUserInfoKey.AddressBook.changes: changes])
 				}
 				
 				completion?(.success)

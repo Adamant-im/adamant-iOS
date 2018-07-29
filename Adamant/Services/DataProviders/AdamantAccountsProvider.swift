@@ -52,8 +52,8 @@ class AdamantAccountsProvider: AccountsProvider {
 			AdamantContacts.iosSupport.address: iosSupport
 		]
 		
-		NotificationCenter.default.addObserver(forName: Notification.Name.AddressBookService.addressBookUpdated, object: nil, queue: nil) { [weak self] _ in
-			guard let book = self?.addressBookService.addressBook,
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.addressBookUpdated, object: nil, queue: nil) { [weak self] notification in
+			guard let changes = notification.userInfo?[AdamantUserInfoKey.AddressBook.changes] as? [AddressBookChange],
 				let viewContext = self?.stack.container.viewContext else {
 				return
 			}
@@ -62,23 +62,33 @@ class AdamantAccountsProvider: AccountsProvider {
 				let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 				context.parent = viewContext
 				
-				let request = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
-				request.fetchLimit = 1
+				let requestSingle = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
+				requestSingle.fetchLimit = 1
 				
-				for (address, name) in book {
-					let predicate = NSPredicate(format: "address == %@", address)
-					request.predicate = predicate
-					
-					guard let account = (try? context.fetch(request))?.first else {
-						continue
-					}
-					
-					if account.name != name {
-						account.name = name
+				// Process changes
+				for change in changes {
+					switch change {
+					case .newName(let address, let name), .updated(let address, let name):
+						let predicate = NSPredicate(format: "address == %@", address)
+						requestSingle.predicate = predicate
 						
-						if let chatroom = account.chatroom {
-							chatroom.title = name
+						guard let result = try? context.fetch(requestSingle), let account = result.first else {
+							continue
 						}
+						
+						account.name = name
+						account.chatroom?.title = name
+						
+					case .removed(let address):
+						let predicate = NSPredicate(format: "address == %@", address)
+						requestSingle.predicate = predicate
+						
+						guard let result = try? context.fetch(requestSingle), let account = result.first else {
+							continue
+						}
+						
+						account.name = nil
+						account.chatroom?.title = nil
 					}
 				}
 				

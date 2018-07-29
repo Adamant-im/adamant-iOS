@@ -11,9 +11,25 @@ import Foundation
 // MARK: - Notifications
 
 extension Notification.Name {
-	struct AddressBookService {
+	struct AdamantAddressBookService {
 		/// Raised when user rename accounts in chat
 		static let addressBookUpdated = Notification.Name("adamant.addressBookService.updated")
+		
+		private init() {}
+	}
+}
+
+enum AddressBookChange {
+	case newName(address: String, name: String)
+	case updated(address: String, name: String)
+	case removed(address: String)
+}
+
+extension AdamantUserInfoKey {
+	struct AddressBook {
+		
+		/// Array of AddressBookChangeType
+		static let changes = "adamant.addressBook.changes"
 		
 		private init() {}
 	}
