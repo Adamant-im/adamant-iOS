@@ -1,5 +1,8 @@
 PODS:
   - Alamofire (4.7.3)
+  - BigInt (3.1.0):
+    - SipHash (~> 1.2)
+  - ByteBackpacker (1.2.1)
   - CryptoSwift (0.10.0)
   - DateToolsSwift (4.0.0)
   - EFQRCode (4.2.2)
@@ -21,10 +24,13 @@ PODS:
   - QRCodeReader.swift (8.2.0)
   - ReachabilitySwift (4.1.0)
   - RNCryptor (5.0.3)
+  - SipHash (1.2.2)
   - Swinject (2.4.1)
 
 DEPENDENCIES:
   - Alamofire
+  - BigInt
+  - ByteBackpacker
   - CryptoSwift
   - DateToolsSwift
   - EFQRCode
@@ -45,6 +51,8 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
+    - BigInt
+    - ByteBackpacker
     - CryptoSwift
     - DateToolsSwift
     - EFQRCode
@@ -60,10 +68,13 @@ SPEC REPOS:
     - QRCodeReader.swift
     - ReachabilitySwift
     - RNCryptor
+    - SipHash
     - Swinject
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
+  BigInt: 76b5dfdfa3e2e478d4ffdf161aeede5502e2742f
+  ByteBackpacker: df001da117faacdbf09b69a116ec480f6651c9ec
   CryptoSwift: 6c778d69282bed3b4e975ff97a79d074f20bb011
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   EFQRCode: 203846c7b135b5f7c1d18bb7923bc32a74c8b363
@@ -79,8 +90,9 @@ SPEC CHECKSUMS:
   QRCodeReader.swift: 003eb32f18a5a675b936ec82ba0ff368cddbff45
   ReachabilitySwift: 6849231cd4e06559f3b9ef4a97a0a0f96d41e09f
   RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
+  SipHash: fad90a4683e420c52ef28063063dbbce248ea6d4
   Swinject: f7f15a9672e99328c1f07f277091087917215700
 
-PODFILE CHECKSUM: fde2e99336bc59c015a61b7d2cb1ac5b48462187
+PODFILE CHECKSUM: 0944be8d3423ca0ce3da6f94bdfcfb0eaf7cf75b
 
 COCOAPODS: 1.5.3

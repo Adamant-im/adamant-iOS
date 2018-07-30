@@ -8,8 +8,56 @@
 
 import Foundation
 import libsodium
+import BigInt
+import CryptoSwift
 
 extension JSAdamantCore {
+    
+    func createKeypairFor(rawHash: [UInt8]) -> Keypair? {
+        guard let keypair = makeKeypairFrom(seed: rawHash) else {
+            print("Unable create Keypair from seed")
+            return nil
+        }
+        
+        return Keypair(publicKey: keypair.publicKey.hexString(), privateKey: keypair.privateKey.hexString())
+    }
+    
+    func createHashFor(passphrase: String) -> String? {
+        guard let hash = createPassPhraseHash(passphrase: passphrase) else {
+            print("Unable create hash from passphrase")
+            return nil
+        }
+        
+        return hash.hexString()
+    }
+    
+    func createKeypairFor(passphrase: String) -> Keypair? {
+        guard let hash = createPassPhraseHash(passphrase: passphrase) else {
+            print("Unable create hash from passphrase")
+            return nil
+        }
+        
+        guard let keypair = makeKeypairFrom(seed: hash) else {
+            print("Unable create Keypair from seed")
+            return nil
+        }
+        
+        return Keypair(publicKey: keypair.publicKey.hexString(), privateKey: keypair.privateKey.hexString())
+    }
+    
+    func createPassPhraseHash(passphrase: String) -> [UInt8]? {
+        guard let seed = createSeed(passphrase) else {
+            print("FAIL to create Seed from passphrase bytes")
+            return nil
+        }
+        
+        guard let hash = hashSHA256(seed) else {
+            print("FAIL to create SHA256 from seed")
+            return nil
+        }
+        
+        return hash
+    }
     func encodeValue(_ value: [String: Any], privateKey privateKeyHex: String) -> (message: String, nonce: String)? {
         let data = ["payload": value]
         
@@ -18,7 +66,7 @@ extension JSAdamantCore {
         let message = padded.bytes
         let privateKey = privateKeyHex.hexBytes()
         
-        guard let hash = hashSHA256(privateKey: privateKey) else {
+        guard let hash = hashSHA256(privateKey) else {
             print("FAIL to create SHA256 of private key")
             return nil
         }
@@ -44,7 +92,7 @@ extension JSAdamantCore {
         let nonce = rawNonce.hexBytes()
         let privateKey = privateKeyHex.hexBytes()
         
-        guard let hash = hashSHA256(privateKey: privateKey) else {
+        guard let hash = hashSHA256(privateKey) else {
             print("FAIL to create SHA256 of private key")
             return nil
         }
@@ -91,19 +139,19 @@ extension JSAdamantCore {
         return message
     }
     
-    private func hashSHA256(privateKey: Bytes) -> Bytes? {
+    private func hashSHA256(_ input: Bytes) -> Bytes? {
         var hash = Bytes(count: HashSHA256Bytes)
         
         guard .SUCCESS == crypto_hash_sha256(
             &hash,
-            privateKey, UInt64(privateKey.count)
+            input, UInt64(input.count)
             ).exitCode else { return nil }
         
         return hash
     }
     
     private func ed2curve(privateKey: Bytes) -> Bytes? {
-        var secretKey = Bytes(count: SecretKeyBytes)
+        var secretKey = Bytes(count: SecretCurveKeyBytes)
         
         guard .SUCCESS == crypto_sign_ed25519_sk_to_curve25519(
             &secretKey,
@@ -118,14 +166,41 @@ extension JSAdamantCore {
         randombytes_buf(&nonce, NonceBytes)
         return nonce
     }
+    
+    private func createSeed(_ passphrase: String) -> [UInt8]? {
+        let password = passphrase.decomposedStringWithCompatibilityMapping
+        let salt = ("mnemonic").decomposedStringWithCompatibilityMapping
+        
+        if let seed = try? PKCS5.PBKDF2(password: password.bytes, salt: salt.bytes, iterations: 2048, keyLength: 64, variant: HMAC.Variant.sha512).calculate() {
+            return seed
+        } else {
+            return nil
+        }
+    }
+    
+    private func makeKeypairFrom(seed: Bytes) -> (publicKey: Bytes, privateKey: Bytes)? {
+        var publicKey = Bytes(count: PublicKeyBytes)
+        var privateKey = Bytes(count: SecretKeyBytes)
+        
+        guard .SUCCESS == crypto_sign_seed_keypair(
+            &publicKey,
+            &privateKey,
+            seed
+            ).exitCode else { return nil }
+        
+        return (publicKey: publicKey, privateKey: privateKey)
+    }
 }
 
 // MARK:- Helpers
 public let HashSHA256Bytes = Int(crypto_hash_sha256_bytes())
-public let SecretKeyBytes = Int(crypto_scalarmult_curve25519_bytes())
+public let SecretCurveKeyBytes = Int(crypto_scalarmult_curve25519_bytes())
 public let MacBytes = Int(crypto_secretbox_macbytes())
 public let NonceBytes = Int(crypto_secretbox_noncebytes())
-public var KeyBytes = Int(crypto_secretbox_keybytes())
+public let KeyBytes = Int(crypto_secretbox_keybytes())
+public let SeedBytes = Int(crypto_sign_seedbytes())
+public let PublicKeyBytes = Int(crypto_sign_publickeybytes())
+public let SecretKeyBytes = Int(crypto_sign_secretkeybytes())
 
 public typealias Bytes = Array<UInt8>
 

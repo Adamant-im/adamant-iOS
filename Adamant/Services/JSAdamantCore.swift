@@ -203,7 +203,7 @@ extension JSAdamantCore {
 
 // MARK: - Keys
 extension JSAdamantCore {
-	func createKeypairFor(rawHash: [UInt8]) -> Keypair? {
+	func js_createKeypairFor(rawHash: [UInt8]) -> Keypair? {
 		let jsHash = convertToJsHash(rawHash)
 		
 		if let keypairRaw = call(function: .makeKeypair, with: [jsHash]),
@@ -218,15 +218,15 @@ extension JSAdamantCore {
 		}
 	}
 	
-	func createKeypairFor(passphrase: String) -> Keypair? {
-		guard let hash = createHashFor(passphrase: passphrase), hash.count > 0 else {
-			return nil
-		}
-		
-		return createKeypairFor(rawHash: AdamantUtilities.getBytes(from: hash))
-	}
+    func js_createKeypairFor(passphrase: String) -> Keypair? {
+        guard let hash = js_createHashFor(passphrase: passphrase), hash.count > 0 else {
+            return nil
+        }
+
+        return createKeypairFor(rawHash: AdamantUtilities.getBytes(from: hash))
+    }
 	
-	func createHashFor(passphrase: String) -> String? {
+	func js_createHashFor(passphrase: String) -> String? {
 		let hash: String?
 		
 		if let jsHash = call(function: .createPassPhraseHash, with: [passphrase]), !jsHash.isUndefined,
