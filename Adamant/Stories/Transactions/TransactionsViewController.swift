@@ -74,6 +74,10 @@ class TransactionsViewController: UIViewController {
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.initFetchedResultController(provider: nil)
 		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.addressBookUpdated, object: nil, queue: OperationQueue.main) { [weak self] notification in
+			self?.tableView.reloadData()
+		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {

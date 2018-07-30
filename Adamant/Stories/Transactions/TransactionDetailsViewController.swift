@@ -122,7 +122,34 @@ class TransactionDetailsViewController: UIViewController {
 		} else {
 			self.navigationItem.rightBarButtonItems = nil
 		}
-        
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.addressBookUpdated, object: nil, queue: nil) { [weak self] notification in
+			guard let partner = self?.transaction?.partner?.address else {
+				return
+			}
+			
+			guard let changes = notification.userInfo?[AdamantUserInfoKey.AddressBook.changes] as? [AddressBookChange] else {
+				return
+			}
+			
+			for change in changes {
+				switch change {
+				case .newName(let address, _), .updated(let address, _), .removed(let address):
+					if partner == address {
+						if Thread.isMainThread {
+							self?.tableView.reloadData()
+						} else {
+							DispatchQueue.main.async {
+								self?.tableView.reloadData()
+							}
+						}
+						
+						return
+					}
+				}
+			}
+		}
+		
         startUpdate()
 	}
 	
