@@ -589,6 +589,9 @@
 /* Export transaction: 'Share transaction URL' button */
 "TransactionDetailsScene.Share.URL" = "URL";
 
+/* Transaction details: 'Your address' flag. */
+"TransactionDetailsScene.YourAddress" = "You";
+
 /* TransfersProvider: Transaction not found error. %@ for transaction's ID */
 "TransfersProvider.Error.TransactionNotFoundFormat" = "Transaktion mit der ID %@ nicht gefunden";
 
