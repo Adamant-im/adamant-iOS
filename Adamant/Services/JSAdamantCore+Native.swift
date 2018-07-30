@@ -58,6 +58,30 @@ extension JSAdamantCore {
         
         return hash
     }
+    func decodeMessage(rawMessage: String, rawNonce: String, senderPublicKey senderKeyHex: String, privateKey privateKeyHex: String) -> String? {
+        let message = rawMessage.hexBytes()
+        let nonce = rawNonce.hexBytes()
+        let senderKey = senderKeyHex.hexBytes()
+        let privateKey = privateKeyHex.hexBytes()
+        
+        guard let publicKey = ed2curve(publicKey: senderKey) else {
+            print("FAIL to create ed2curve publick key from SHA256")
+            return nil
+        }
+        
+        guard let secretKey = ed2curve(privateKey: privateKey) else {
+            print("FAIL to create ed2curve secret key from SHA256")
+            return nil
+        }
+        
+        guard let decrepted = open(authenticatedCipherText: message, senderPublicKey: publicKey, recipientSecretKey: secretKey, nonce: nonce) else {
+            print("FAIL to decrypt")
+            return nil
+        }
+        
+        return decrepted.utf8String
+    }
+    
     func encodeValue(_ value: [String: Any], privateKey privateKeyHex: String) -> (message: String, nonce: String)? {
         let data = ["payload": value]
         
@@ -125,6 +149,26 @@ extension JSAdamantCore {
         return (authenticatedCipherText: authenticatedCipherText, nonce: nonce)
     }
     
+    private func open(authenticatedCipherText: Bytes, senderPublicKey: Bytes, recipientSecretKey: Bytes, nonce: Bytes) -> Bytes? {
+        guard nonce.count == BoxNonceBytes,
+            authenticatedCipherText.count >= BoxMacBytes,
+            senderPublicKey.count == BoxPublicKeyBytes,
+            recipientSecretKey.count == BoxSecretKeyBytes
+            else { return nil }
+        
+        var message = Bytes(count: authenticatedCipherText.count - BoxMacBytes)
+        
+        guard .SUCCESS == crypto_box_open_easy(
+            &message,
+            authenticatedCipherText, UInt64(authenticatedCipherText.count),
+            nonce,
+            senderPublicKey,
+            recipientSecretKey
+            ).exitCode else { return nil }
+        
+        return message
+    }
+    
     private func open(authenticatedCipherText: Bytes, secretKey: Bytes, nonce: Bytes) -> Bytes? {
         guard authenticatedCipherText.count >= MacBytes else { return nil }
         var message = Bytes(count: authenticatedCipherText.count - MacBytes)
@@ -148,6 +192,17 @@ extension JSAdamantCore {
             ).exitCode else { return nil }
         
         return hash
+    }
+    
+    private func ed2curve(publicKey: Bytes) -> Bytes? {
+        var publicED2Key = Bytes(count: SecretCurveKeyBytes)
+        
+        guard .SUCCESS == crypto_sign_ed25519_pk_to_curve25519(
+            &publicED2Key,
+            publicKey
+            ).exitCode else { return nil }
+        
+        return publicED2Key
     }
     
     private func ed2curve(privateKey: Bytes) -> Bytes? {
@@ -196,11 +251,15 @@ extension JSAdamantCore {
 public let HashSHA256Bytes = Int(crypto_hash_sha256_bytes())
 public let SecretCurveKeyBytes = Int(crypto_scalarmult_curve25519_bytes())
 public let MacBytes = Int(crypto_secretbox_macbytes())
+public let BoxMacBytes = Int(crypto_box_macbytes())
 public let NonceBytes = Int(crypto_secretbox_noncebytes())
+public var BoxNonceBytes = Int(crypto_box_noncebytes())
 public let KeyBytes = Int(crypto_secretbox_keybytes())
 public let SeedBytes = Int(crypto_sign_seedbytes())
 public let PublicKeyBytes = Int(crypto_sign_publickeybytes())
 public let SecretKeyBytes = Int(crypto_sign_secretkeybytes())
+public let BoxPublicKeyBytes = Int(crypto_box_publickeybytes())
+public let BoxSecretKeyBytes = Int(crypto_box_secretkeybytes())
 
 public typealias Bytes = Array<UInt8>
 

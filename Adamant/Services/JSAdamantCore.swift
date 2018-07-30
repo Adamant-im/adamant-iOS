@@ -314,7 +314,7 @@ extension JSAdamantCore {
 		return encodedMessage
 	}
 	
-	func decodeMessage(rawMessage: String, rawNonce: String, senderPublicKey senderKeyHex: String, privateKey privateKeyHex: String) -> String? {
+	func js_decodeMessage(rawMessage: String, rawNonce: String, senderPublicKey senderKeyHex: String, privateKey privateKeyHex: String) -> String? {
 		let message = convertToJsHash(AdamantUtilities.getBytes(from: rawMessage))
 		let nonce = convertToJsHash(AdamantUtilities.getBytes(from: rawNonce))
 		let senderKey = convertToJsHash(AdamantUtilities.getBytes(from: senderKeyHex))
