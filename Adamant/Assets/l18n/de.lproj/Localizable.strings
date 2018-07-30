@@ -590,7 +590,7 @@
 "TransactionDetailsScene.Share.URL" = "URL";
 
 /* Transaction details: 'Your address' flag. */
-"TransactionDetailsScene.YourAddress" = "You";
+"TransactionDetailsScene.YourAddress" = "Sie";
 
 /* TransfersProvider: Transaction not found error. %@ for transaction's ID */
 "TransfersProvider.Error.TransactionNotFoundFormat" = "Transaktion mit der ID %@ nicht gefunden";
