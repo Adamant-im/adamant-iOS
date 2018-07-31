@@ -256,7 +256,7 @@ extension JSAdamantCore {
 
 // MARK: - Transactions
 extension JSAdamantCore {
-	func sign(transaction t: SignableTransaction, senderId: String, keypair: Keypair) -> String? {
+	func js_sign(transaction t: SignableTransaction, senderId: String, keypair: Keypair) -> String? {
 		let asset = JSAsset()
 		if let chat = t.asset.chat {
 			asset.chat = JSChat(type: Int(chat.type.rawValue), message: chat.message, own_message: chat.ownMessage)

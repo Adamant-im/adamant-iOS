@@ -8,8 +8,8 @@
 
 import Foundation
 import libsodium
-import BigInt
 import CryptoSwift
+import ByteBackpacker
 
 extension JSAdamantCore {
     
@@ -57,6 +57,37 @@ extension JSAdamantCore {
         }
         
         return hash
+    }
+    
+    func sign(transaction: SignableTransaction, senderId: String, keypair: Keypair) -> String? {
+        let privateKey = keypair.privateKey.hexBytes()
+        
+        let data = transaction.bytes
+        guard let hash = hashSHA256(data) else {
+            print("FAIL to create SHA256 of transaction")
+            return nil
+        }
+        
+        guard let signature = signature(message: hash, secretKey: privateKey) else {
+            print("FAIL to sign of transaction")
+            return nil
+        }
+        
+        return signature.hexString()
+    }
+    
+    public func signature(message: Bytes, secretKey: Bytes) -> Bytes? {
+        guard secretKey.count == SecretKeyBytes else { return nil }
+        var signature = Array<UInt8>(count: SignBytes)
+        
+        guard .SUCCESS == crypto_sign_detached (
+            &signature,
+            nil,
+            message, UInt64(message.count),
+            secretKey
+            ).exitCode else { return nil }
+        
+        return signature
     }
     
     func encodeMessage(_ message: String, recipientPublicKey publicKey: String, privateKey privateKeyHex: String) -> (message: String, nonce: String)? {
@@ -307,6 +338,7 @@ public let PublicKeyBytes = Int(crypto_sign_publickeybytes())
 public let SecretKeyBytes = Int(crypto_sign_secretkeybytes())
 public let BoxPublicKeyBytes = Int(crypto_box_publickeybytes())
 public let BoxSecretKeyBytes = Int(crypto_box_secretkeybytes())
+public let SignBytes = Int(crypto_sign_bytes())
 
 public typealias Bytes = Array<UInt8>
 
@@ -419,4 +451,86 @@ func JSONStringify(value: AnyObject, prettyPrinted: Bool = false) -> String {
     }
     
     return ""
+}
+
+// MARK: - Bytes
+extension SignableTransaction {
+    
+    var bytes: [UInt8] {
+        return
+            typeBytes +
+                timestampBytes +
+                senderPublicKeyBytes +
+                requesterPublicKeyBytes +
+                recipientIdBytes +
+                amountBytes +
+                assetBytes +
+                signatureBytes +
+        signSignatureBytes
+    }
+    
+    var typeBytes: [UInt8] {
+        return [UInt8(type.rawValue)]
+    }
+    
+    var timestampBytes: [UInt8] {
+        return ByteBackpacker.pack(UInt32(timestamp), byteOrder: .littleEndian)
+    }
+    
+    var senderPublicKeyBytes: [UInt8] {
+        return senderPublicKey.hexBytes()
+    }
+    
+    var requesterPublicKeyBytes: [UInt8] {
+        return requesterPublicKey?.hexBytes() ?? []
+    }
+    
+    var recipientIdBytes: [UInt8] {
+        guard
+            let value = recipientId?.replacingOccurrences(of: "U", with: ""),
+            let number = UInt64(value) else { return Bytes(count: 8) }
+        return ByteBackpacker.pack(number, byteOrder: .bigEndian)
+    }
+    
+    var amountBytes: [UInt8] {
+        let value = (self.amount.shiftedToAdamant() as NSDecimalNumber).uint64Value
+        let bytes = ByteBackpacker.pack(value, byteOrder: .littleEndian)
+        return bytes
+    }
+    
+    var signatureBytes: [UInt8] {
+        return []
+    }
+    
+    var signSignatureBytes: [UInt8] {
+        return []
+    }
+    
+    var assetBytes: [UInt8] {
+        switch type {
+        case .chatMessage:
+            guard let msg = asset.chat?.message, let own = asset.chat?.ownMessage, let type = asset.chat?.type else { return [] }
+            
+            return msg.hexBytes() + own.hexBytes() + ByteBackpacker.pack(UInt32(type.rawValue), byteOrder: .littleEndian)
+            
+        case .state:
+            // TODO: ____
+            return []
+            
+        case .vote:
+            guard
+                let votes = asset.votes?.votes
+                else { return [] }
+            
+            var bytes = [UInt8]()
+            for vote in votes {
+                bytes += vote.bytes
+            }
+            
+            return bytes
+            
+        default:
+            return []
+        }
+    }
 }

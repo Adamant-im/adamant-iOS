@@ -30,6 +30,5 @@ target 'Adamant' do
   
   # Utility
   pod 'ByteBackpacker' # Utility to pack value types into a Byte array
-  pod 'BigInt' # Big integer number lib
 
 end
