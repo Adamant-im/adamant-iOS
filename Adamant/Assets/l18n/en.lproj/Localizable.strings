@@ -140,7 +140,7 @@
 "ADAMANT" = "ADAMANT";
 
 /* AddressBookService: Not enought money to save address into blockchain */
-"AddressBookService.Error.NotEnoughtMoney" = "Nicht genug Tokens, um Daten auf der Blockchain zu speichern";
+"AddressBookService.Error.NotEnoughtMoney" = "Not enought tokens to store data in Blockchain";
 
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
 "Application.deviceTokenErrorFormat" = "Failed to register in ANS: %@";
@@ -215,10 +215,10 @@
 "ChatScene.MessageStatus.Pending" = "Pending";
 
 /* Chat: Body for actions menu */
-"ChatScene.Actions.Body" = "Neuer Name für %@";
+"ChatScene.Actions.Body" = "New name for %@";
 
 /* Chat: 'Rename' action in actions menu */
-"ChatScene.Actions.Rename" = "Umbenennen";
+"ChatScene.Actions.Rename" = "Rename";
 
 /* Chat: 'Name' field in actions menu */
 "ChatScene.Actions.NamePlaceholder" = "Name";
@@ -630,6 +630,9 @@
 
 /* Export transaction: 'Share transaction URL' button */
 "TransactionDetailsScene.Share.URL" = "URL";
+
+/* Transaction details: 'Your address' flag. */
+"TransactionDetailsScene.YourAddress" = "You";
 
 /* TransfersProvider: Transaction not found error. %@ for transaction's ID */
 "TransfersProvider.Error.TransactionNotFoundFormat" = "Transaction with id %@ not found";
