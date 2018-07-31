@@ -300,7 +300,7 @@ extension JSAdamantCore {
 
 // MARK: - Messages
 extension JSAdamantCore {
-	func encodeMessage(_ message: String, recipientPublicKey publicKey: String, privateKey privateKeyHex: String) -> (message: String, nonce: String)? {
+	func js_encodeMessage(_ message: String, recipientPublicKey publicKey: String, privateKey privateKeyHex: String) -> (message: String, nonce: String)? {
 		let privateKey = AdamantUtilities.getBytes(from: privateKeyHex)
 		
 		let encodedMessage: (String, String)?

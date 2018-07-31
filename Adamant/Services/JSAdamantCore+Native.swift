@@ -58,6 +58,33 @@ extension JSAdamantCore {
         
         return hash
     }
+    
+    func encodeMessage(_ message: String, recipientPublicKey publicKey: String, privateKey privateKeyHex: String) -> (message: String, nonce: String)? {
+        let message = message.bytes
+        let recipientKey = publicKey.hexBytes()
+        let privateKey = privateKeyHex.hexBytes()
+        
+        guard let publicKey = ed2curve(publicKey: recipientKey) else {
+            print("FAIL to create ed2curve publick key from SHA256")
+            return nil
+        }
+        
+        guard let secretKey = ed2curve(privateKey: privateKey) else {
+            print("FAIL to create ed2curve secret key from SHA256")
+            return nil
+        }
+        
+        guard let encrypted = seal(message: message, recipientPublicKey: publicKey, senderSecretKey: secretKey) else {
+            print("FAIL to encrypt")
+            return nil
+        }
+        
+        let encryptedMessage = encrypted.authenticatedCipherText.hexString()
+        let nonce = encrypted.nonce.hexString()
+        
+        return (message: encryptedMessage, nonce: nonce)
+    }
+    
     func decodeMessage(rawMessage: String, rawNonce: String, senderPublicKey senderKeyHex: String, privateKey privateKeyHex: String) -> String? {
         let message = rawMessage.hexBytes()
         let nonce = rawNonce.hexBytes()
@@ -134,10 +161,30 @@ extension JSAdamantCore {
         return decrepted.utf8String
     }
     
+    private func seal(message: Bytes, recipientPublicKey: Bytes, senderSecretKey: Bytes) -> (authenticatedCipherText: Bytes, nonce: Bytes)? {
+        guard recipientPublicKey.count == BoxPublicKeyBytes,
+            senderSecretKey.count == BoxSecretKeyBytes
+            else { return nil }
+        
+        var authenticatedCipherText = Bytes(count: message.count + BoxMacBytes)
+        let nonce = self.nonce(BoxNonceBytes)
+        
+        guard .SUCCESS == crypto_box_easy(
+            &authenticatedCipherText,
+            message,
+            CUnsignedLongLong(message.count),
+            nonce,
+            recipientPublicKey,
+            senderSecretKey
+            ).exitCode else { return nil }
+        
+        return (authenticatedCipherText: authenticatedCipherText, nonce: nonce)
+    }
+    
     private func seal(message: Bytes, secretKey: Bytes) -> (authenticatedCipherText: Bytes, nonce: Bytes)? {
         guard secretKey.count == KeyBytes else { return nil }
         var authenticatedCipherText = Bytes(count: message.count + MacBytes)
-        let nonce = self.nonce()
+        let nonce = self.nonce(NonceBytes)
         
         guard .SUCCESS == crypto_secretbox_easy (
             &authenticatedCipherText,
@@ -216,9 +263,9 @@ extension JSAdamantCore {
         return secretKey
     }
     
-    private func nonce() -> Bytes {
-        var nonce = Bytes(count: NonceBytes)
-        randombytes_buf(&nonce, NonceBytes)
+    private func nonce(_ count: Int) -> Bytes {
+        var nonce = Bytes(count: count)
+        randombytes_buf(&nonce, count)
         return nonce
     }
     
