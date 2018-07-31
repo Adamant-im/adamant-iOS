@@ -60,7 +60,7 @@ class DelegatesListViewController: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControlEvents.valueChanged)
-        refreshControl.tintColor = UIColor.adamantPrimary
+        refreshControl.tintColor = UIColor.adamant.primary
         
         return refreshControl
     }()
@@ -227,8 +227,8 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
         cell.delegateIsActive = delegate.rank <= activeDelegates
 		cell.accessoryType = .disclosureIndicator
 		cell.delegate = self
-		cell.checkmarkColor = UIColor.adamantPrimary
-		cell.checkmarkBorderColor = UIColor.adamantSecondary
+		cell.checkmarkColor = UIColor.adamant.primary
+		cell.checkmarkBorderColor = UIColor.adamant.secondary
 		
 		cell.isUpvoted = delegate.voted
 		

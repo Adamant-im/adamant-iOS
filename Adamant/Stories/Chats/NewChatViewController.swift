@@ -181,7 +181,7 @@ class NewChatViewController: FormViewController {
 				$0.tag = Rows.myQr.tag
 				$0.title = Rows.myQr.localized
 			}.cellUpdate { (cell, _) in
-				cell.textLabel?.textColor = UIColor.adamantPrimary
+				cell.textLabel?.textColor = UIColor.adamant.primary
 			}.onCellSelection { [weak self] (cell, row) in
 				switch AdamantQRTools.generateQrFrom(string: address) {
 				case .success(let qr):

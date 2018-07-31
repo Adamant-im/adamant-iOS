@@ -18,8 +18,8 @@ extension String.adamantLocalized {
 }
 
 class TransactionsViewController: UIViewController {
-	let cellIdentifier = "cell"
-	let cellHeight: CGFloat = 90.0
+	let cellIdentifierFull = "cf"
+	let cellIdentifierCompact = "cc"
 	
 	// MARK: - Dependencies
 	var accountService: AccountService!
@@ -36,7 +36,7 @@ class TransactionsViewController: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControlEvents.valueChanged)
-        refreshControl.tintColor = UIColor.adamantPrimary
+        refreshControl.tintColor = UIColor.adamant.primary
         
         return refreshControl
     }()
@@ -61,7 +61,8 @@ class TransactionsViewController: UIViewController {
 			initFetchedResultController(provider: transfersProvider)
 		}
 		
-		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
+		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifierFull)
+		tableView.register(UINib.init(nibName: "TransactionTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifierCompact)
 		tableView.dataSource = self
 		tableView.delegate = self
         tableView.refreshControl = refreshControl
@@ -72,6 +73,10 @@ class TransactionsViewController: UIViewController {
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.initFetchedResultController(provider: nil)
+		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.addressBookUpdated, object: nil, queue: OperationQueue.main) { [weak self] notification in
+			self?.tableView.reloadData()
 		}
     }
 	
@@ -159,17 +164,36 @@ class TransactionsViewController: UIViewController {
 // MARK: - UITableView Cells
 extension TransactionsViewController {
 	private func configureCell(_ cell: TransactionTableViewCell, for transfer: TransferTransaction) {
-		cell.accountLabel.tintColor = UIColor.adamantPrimary
-		cell.ammountLabel.tintColor = UIColor.adamantPrimary
-		cell.dateLabel.tintColor = UIColor.adamantSecondary
+		cell.accountLabel.tintColor = UIColor.adamant.primary
+		cell.ammountLabel.tintColor = UIColor.adamant.primary
+		cell.dateLabel.tintColor = UIColor.adamant.secondary
 		cell.topImageView.tintColor = UIColor.black
 		
 		if transfer.isOutgoing {
 			cell.transactionType = .outcome
-			cell.accountLabel.text = transfer.recipientId
 		} else {
 			cell.transactionType = .income
+		}
+		
+		if let partner = transfer.chatroom?.partner, let name = partner.name {
+			cell.accountLabel.text = name
+			cell.addressLabel.text = partner.address
+			
+			if cell.addressLabel.isHidden {
+				cell.addressLabel.isHidden = false
+			}
+		} else if transfer.isOutgoing {
+			cell.accountLabel.text = transfer.recipientId
+			
+			if !cell.addressLabel.isHidden {
+				cell.addressLabel.isHidden = true
+			}
+		} else {
 			cell.accountLabel.text = transfer.senderId
+			
+			if !cell.addressLabel.isHidden {
+				cell.addressLabel.isHidden = true
+			}
 		}
 		
 		if let amount = transfer.amount {
@@ -202,7 +226,11 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 	}
 	
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-		return cellHeight
+		if let transfer = controller?.object(at: indexPath), transfer.chatroom?.partner?.name != nil {
+			return TransactionTableViewCell.cellHeightFull
+		} else {
+			return TransactionTableViewCell.cellHeightCompact
+		}
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -220,8 +248,13 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? TransactionTableViewCell,
-			let transfer = controller?.object(at: indexPath) else {
+		guard let transfer = controller?.object(at: indexPath) else {
+			return UITableViewCell(style: .default, reuseIdentifier: "cell")
+		}
+		
+		let identifier = transfer.chatroom?.partner?.name != nil ? cellIdentifierFull : cellIdentifierCompact
+		
+		guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as? TransactionTableViewCell else {
 				// TODO: Display & Log error
 				return UITableViewCell(style: .default, reuseIdentifier: "cell")
 		}
@@ -245,8 +278,7 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
         
         let toChat = UITableViewRowAction(style: .normal, title: title) { action, index in
             guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
-				// TODO: Log this
-                return
+				fatalError("Failed to get ChatViewController")
             }
 			
 			guard let account = self.accountService.account else {
@@ -264,7 +296,7 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
             }
         }
         
-        toChat.backgroundColor = UIColor.adamantPrimary
+        toChat.backgroundColor = UIColor.adamant.primary
         
         return [toChat]
     }
@@ -275,23 +307,19 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
     
     @available(iOS 11.0, *)
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let transfer = controller?.object(at: indexPath), let chatroom = transfer.partner?.chatroom, let transactions = chatroom.transactions  else {
+        guard let transfer = controller?.object(at: indexPath), let chatroom = transfer.partner?.chatroom else {
             return nil
         }
 
-        let messeges = transactions.first (where: { (object) -> Bool in
-            return !(object is TransferTransaction)
-        })
+        let title = String.adamantLocalized.transactionList.toChat
 
-        let title = (messeges != nil) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
-
-        let toChat = UIContextualAction(style: .normal, title:  title, handler: { (ac:UIContextualAction, view:UIView, success:(Bool) -> Void) in
-			guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
-				// TODO: Log this
-				return
+        let toChat = UIContextualAction(style: .normal, title:  title) { [weak self] (ac: UIContextualAction, view: UIView, completionHandler: (Bool) -> Void) in
+			guard let vc = self?.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
+				fatalError("Failed to get ChatViewController")
 			}
 			
-			guard let account = self.accountService.account else {
+			guard let account = self?.accountService.account else {
+				completionHandler(false)
 				return
 			}
 			
@@ -299,15 +327,18 @@ extension TransactionsViewController: UITableViewDataSource, UITableViewDelegate
 			vc.chatroom = chatroom
 			vc.hidesBottomBarWhenPushed = true
 			
-			if let nav = self.navigationController {
+			if let nav = self?.navigationController {
 				nav.pushViewController(vc, animated: true)
 			} else {
-				self.present(vc, animated: true)
+				self?.present(vc, animated: true)
 			}
-        })
+			
+			completionHandler(true)
+        }
 
-        toChat.image = (messeges != nil) ? #imageLiteral(resourceName: "chats_tab") : #imageLiteral(resourceName: "Chat")
-        toChat.backgroundColor = UIColor.adamantPrimary
+        toChat.image = #imageLiteral(resourceName: "chats_tab")
+        toChat.backgroundColor = UIColor.adamant.primary
+		
         return UISwipeActionsConfiguration(actions: [toChat])
     }
 }

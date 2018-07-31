@@ -28,17 +28,25 @@ class TransactionTableViewCell: UITableViewCell {
 		
 		var bottomTintColor: UIColor {
 			switch self {
-			case .income: return UIColor.adamantTransferIncomeIconBackground
-			case .outcome: return UIColor.adamantTransferOutcomeIconBackground
+			case .income: return UIColor.adamant.transferIncomeIconBackground
+			case .outcome: return UIColor.adamant.transferOutcomeIconBackground
 			}
 		}
 	}
+	
+	
+	// MARK: - Constants
+	
+	static let cellHeightCompact: CGFloat = 90.0
+	static let cellHeightFull: CGFloat = 100.0
+	
 	
 	// MARK: - IBOutlets
 	
 	@IBOutlet weak var topImageView: UIImageView!
 	@IBOutlet weak var bottomImageView: UIImageView!
 	@IBOutlet weak var accountLabel: UILabel!
+	@IBOutlet weak var addressLabel: UILabel!
 	@IBOutlet weak var ammountLabel: UILabel!
 	@IBOutlet weak var dateLabel: UILabel!
 	

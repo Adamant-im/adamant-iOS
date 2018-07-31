@@ -123,7 +123,7 @@ class ShareQrViewController: FormViewController {
 				self?.dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.shared.photolibraryNotAuthorized)
 			}
 		}.cellUpdate { (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
 			
 		// Share
@@ -153,7 +153,7 @@ class ShareQrViewController: FormViewController {
 			
 			self?.present(vc, animated: true, completion: nil)
 		}.cellUpdate { (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
 		
 		<<< ButtonRow() {
@@ -162,7 +162,7 @@ class ShareQrViewController: FormViewController {
 		}.onCellSelection { [weak self] (cell, row) in
 			self?.close()
 		}.cellUpdate { (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
 	}
 	

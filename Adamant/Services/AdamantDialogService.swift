@@ -117,8 +117,8 @@ extension AdamantDialogService {
 		FTIndicator.dismissProgress()
 		
         alertVC.gravityDismissAnimation = false
-        alertVC.alertTitle.textColor = UIColor.adamantPrimary
-        alertVC.alertDescription.textColor = .adamantSecondary
+        alertVC.alertTitle.textColor = UIColor.adamant.primary
+        alertVC.alertDescription.textColor = UIColor.adamant.secondary
         alertVC.alertTitle.font = UIFont.systemFont(ofSize: 20)
         alertVC.alertDescription.font = UIFont.systemFont(ofSize: 14, weight: .light)
         alertVC.headerViewHeightConstraint.constant = 50
@@ -175,7 +175,7 @@ extension AdamantDialogService {
         
         okBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         okBtn.setTitleColor(UIColor.white, for: .normal)
-        okBtn.backgroundColor = UIColor.adamantSecondary
+        okBtn.backgroundColor = UIColor.adamant.secondary
         alertVC.addAction(okBtn)
         
         alertVC.alertActionStackView.axis = .vertical
@@ -310,22 +310,22 @@ extension AdamantDialogService {
         let alertVC = PMAlertController(title: title, description: message, image: nil, style: .alert)
         
         alertVC.gravityDismissAnimation = false
-        alertVC.alertTitle.textColor = UIColor.adamantPrimary
-        alertVC.alertDescription.textColor = .adamantSecondary
+        alertVC.alertTitle.textColor = UIColor.adamant.primary
+        alertVC.alertDescription.textColor = UIColor.adamant.secondary
         alertVC.alertTitle.font = UIFont.systemFont(ofSize: 20)
 		alertVC.alertDescription.font = UIFont.systemFont(ofSize: 14, weight: .light)
         
         if let actions = actions {
             for action in actions {
                 action.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-                action.setTitleColor(UIColor.adamantSecondary, for: .normal)
+                action.setTitleColor(UIColor.adamant.secondary, for: .normal)
                 alertVC.addAction(action)
             }
             
             let cancelAction = PMAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
             cancelAction.titleLabel?.font = UIFont.systemFont(ofSize: 16)
             cancelAction.setTitleColor(UIColor.white, for: .normal)
-            cancelAction.backgroundColor = UIColor.adamantSecondary
+            cancelAction.backgroundColor = UIColor.adamant.secondary
 
             alertVC.addAction(cancelAction)
             
@@ -335,7 +335,7 @@ extension AdamantDialogService {
             
             okBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
             okBtn.setTitleColor(UIColor.white, for: .normal)
-            okBtn.backgroundColor = UIColor.adamantSecondary
+            okBtn.backgroundColor = UIColor.adamant.secondary
             alertVC.addAction(okBtn)
             
             alertVC.alertActionStackViewHeightConstraint.constant = 50
@@ -344,7 +344,7 @@ extension AdamantDialogService {
         self.present(alertVC, animated: true, completion: nil)
     }
     
-    func showSystemActionSheet(title: String, message: String, actions: [UIAlertAction]?) {
+    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?) {
         guard let actions = actions, actions.count > 0 else {
             return
         }

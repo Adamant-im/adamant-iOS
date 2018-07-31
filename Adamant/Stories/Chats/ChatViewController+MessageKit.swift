@@ -110,21 +110,21 @@ extension ChatViewController: MessagesDisplayDelegate {
 	func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
 		if isFromCurrentSender(message: message) {
             guard let transaction = message as? ChatTransaction else {
-                return UIColor.adamantChatSenderBackground
+                return UIColor.adamant.chatSenderBackground
             }
             
             switch transaction.statusEnum {
             case .failed:
-                return UIColor.adamantFailChatBackground
+                return UIColor.adamant.failChatBackground
 				
 			case .pending:
-				return UIColor.adamantPendingChatBackground
+				return UIColor.adamant.pendingChatBackground
 				
             case .delivered:
-                return UIColor.adamantChatSenderBackground
+                return UIColor.adamant.chatSenderBackground
             }
 		} else {
-			return UIColor.adamantChatRecipientBackground
+			return UIColor.adamant.chatRecipientBackground
 		}
 	}
 	
@@ -192,6 +192,7 @@ extension ChatViewController: MessageCellDelegate {
 			}
 			
 			vc.transaction = transfer
+			vc.showToChatRow = false
 			
 			if let nav = navigationController {
 				nav.pushViewController(vc, animated: true)
@@ -245,7 +246,7 @@ extension ChatViewController: MessageCellDelegate {
 	
 	func didSelectURL(_ url: URL) {
 		let safari = SFSafariViewController(url: url)
-		safari.preferredControlTintColor = UIColor.adamantPrimary
+		safari.preferredControlTintColor = UIColor.adamant.primary
 		present(safari, animated: true, completion: nil)
 	}
 }

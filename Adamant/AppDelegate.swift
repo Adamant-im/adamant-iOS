@@ -77,6 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var accountService: AccountService!
 	var notificationService: NotificationsService!
     var dialogService: DialogService!
+    var addressBookService: AddressBookService!
 
 	// MARK: - Lifecycle
 	
@@ -87,13 +88,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		accountService = container.resolve(AccountService.self)
 		notificationService = container.resolve(NotificationsService.self)
         dialogService = container.resolve(DialogService.self)
+        addressBookService = container.resolve(AddressBookService.self)
 		
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
 		window!.rootViewController = UITabBarController()
 		window!.rootViewController?.view.backgroundColor = .white
 		window!.makeKeyAndVisible()
-		window!.tintColor = UIColor.adamantPrimary
+		window!.tintColor = UIColor.adamant.primary
 		
 		
 		// MARK: 3. Show login
@@ -117,8 +119,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			account.tabBarItem.title = String.adamantLocalized.tabItems.account
 			account.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
 			
-			chatList.tabBarItem.badgeColor = UIColor.adamantPrimary
-			account.tabBarItem.badgeColor = UIColor.adamantPrimary
+			chatList.tabBarItem.badgeColor = UIColor.adamant.primary
+			account.tabBarItem.badgeColor = UIColor.adamant.primary
 			
 			tabbar.setViewControllers([chatList, account], animated: false)
 		}
@@ -160,14 +162,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		// Register repeater services
-		if let chatsProvider = container.resolve(ChatsProvider.self),
-			let transfersProvider = container.resolve(TransfersProvider.self),
-			let accountService = container.resolve(AccountService.self) {
+		if let chatsProvider = container.resolve(ChatsProvider.self) {
 			repeater.registerForegroundCall(label: "chatsProvider", interval: 3, queue: .global(qos: .utility), callback: chatsProvider.update)
+		} else {
+			dialogService.showError(withMessage: "Failed to register ChatsProvider autoupdate. Please, report a bug", error: nil)
+		}
+		
+		if let transfersProvider = container.resolve(TransfersProvider.self) {
 			repeater.registerForegroundCall(label: "transfersProvider", interval: 15, queue: .global(qos: .utility), callback: transfersProvider.update)
+		} else {
+			dialogService.showError(withMessage: "Failed to register TransfersProvider autoupdate. Please, report a bug", error: nil)
+		}
+		
+		if let accountService = container.resolve(AccountService.self) {
 			repeater.registerForegroundCall(label: "accountService", interval: 15, queue: .global(qos: .utility), callback: accountService.update)
 		} else {
-			fatalError("Failed to get chatsProvider")
+			dialogService.showError(withMessage: "Failed to register AccountService autoupdate. Please, report a bug", error: nil)
+		}
+		
+		if let addressBookService = container.resolve(AddressBookService.self) {
+			repeater.registerForegroundCall(label: "addressBookService", interval: 15, queue: .global(qos: .utility), callback: addressBookService.update)
+		} else {
+			dialogService.showError(withMessage: "Failed to register AddressBookService autoupdate. Please, report a bug", error: nil)
 		}
 		
 		
@@ -194,9 +210,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func applicationWillResignActive(_ application: UIApplication) {
 		repeater.pauseAll()
 	}
-	
+    
 	func applicationDidEnterBackground(_ application: UIApplication) {
 		repeater.pauseAll()
+		addressBookService.saveIfNeeded()
 	}
 	
 	// MARK: Notifications

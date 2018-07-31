@@ -349,6 +349,10 @@ extension AdamantAccountService {
 	}
 	
 	private func logout(lockSemaphore: Bool) {
+		if account != nil {
+			NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userWillLogOut, object: self)
+		}
+		
 		dropSavedAccount()
 		
 		let wasLogged = account != nil
