@@ -1,5 +1,5 @@
 //
-//  JSAdamantCore+Native.swift
+//  AdamantCoreService.swift
 //  Adamant
 //
 //  Created by Anton Boyarkin on 26/07/2018.
@@ -11,7 +11,7 @@ import libsodium
 import CryptoSwift
 import ByteBackpacker
 
-extension JSAdamantCore {
+class AdamantCoreService : AdamantCore {
     
     func createKeypairFor(rawHash: [UInt8]) -> Keypair? {
         guard let keypair = makeKeypairFrom(seed: rawHash) else {
@@ -51,12 +51,7 @@ extension JSAdamantCore {
             return nil
         }
         
-        guard let hash = hashSHA256(seed) else {
-            print("FAIL to create SHA256 from seed")
-            return nil
-        }
-        
-        return hash
+        return seed.sha256()
     }
     
     func generateNewPassphrase() -> String {
@@ -68,12 +63,7 @@ extension JSAdamantCore {
     
     func sign(transaction: SignableTransaction, senderId: String, keypair: Keypair) -> String? {
         let privateKey = keypair.privateKey.hexBytes()
-        
-        let data = transaction.bytes
-        guard let hash = hashSHA256(data) else {
-            print("FAIL to create SHA256 of transaction")
-            return nil
-        }
+        let hash = transaction.bytes.sha256()
         
         guard let signature = signature(message: hash, secretKey: privateKey) else {
             print("FAIL to sign of transaction")
@@ -154,11 +144,7 @@ extension JSAdamantCore {
 
         let message = padded.bytes
         let privateKey = privateKeyHex.hexBytes()
-        
-        guard let hash = hashSHA256(privateKey) else {
-            print("FAIL to create SHA256 of private key")
-            return nil
-        }
+        let hash = privateKey.sha256()
         
         guard let secretKey = ed2curve(privateKey: hash) else {
             print("FAIL to create ed2curve secret key from SHA256")
@@ -180,11 +166,7 @@ extension JSAdamantCore {
         let message = rawMessage.hexBytes()
         let nonce = rawNonce.hexBytes()
         let privateKey = privateKeyHex.hexBytes()
-        
-        guard let hash = hashSHA256(privateKey) else {
-            print("FAIL to create SHA256 of private key")
-            return nil
-        }
+        let hash = privateKey.sha256()
         
         guard let secretKey = ed2curve(privateKey: hash) else {
             print("FAIL to create ed2curve secret key from SHA256")
@@ -266,17 +248,6 @@ extension JSAdamantCore {
             ).exitCode else { return nil }
         
         return message
-    }
-    
-    private func hashSHA256(_ input: Bytes) -> Bytes? {
-        var hash = Bytes(count: HashSHA256Bytes)
-        
-        guard .SUCCESS == crypto_hash_sha256(
-            &hash,
-            input, UInt64(input.count)
-            ).exitCode else { return nil }
-        
-        return hash
     }
     
     private func ed2curve(publicKey: Bytes) -> Bytes? {

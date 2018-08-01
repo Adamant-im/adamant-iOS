@@ -15,10 +15,7 @@ extension Container {
 		// MARK: - Standalone services
 		// MARK: AdamantCore
 		self.register(AdamantCore.self) { _ in
-			let core = JSAdamantCore()
-			core.loadJs(from: AdamantResources.jsCore, queue: DispatchQueue.global(qos: .background)) { result in
-				if case .error(let e) = result { fatalError(e.localizedDescription) }
-			}
+			let core = AdamantCoreService()
 			return core
 		}.inObjectScope(.container)
 		
