@@ -514,8 +514,9 @@ extension SignableTransaction {
             return msg.hexBytes() + own.hexBytes() + ByteBackpacker.pack(UInt32(type.rawValue), byteOrder: .littleEndian)
             
         case .state:
-            // TODO: ____
-            return []
+            guard let key = asset.state?.key, let value = asset.state?.value, let type = asset.state?.type else { return [] }
+            
+            return value.bytes + key.bytes + ByteBackpacker.pack(UInt32(type.rawValue), byteOrder: .littleEndian)
             
         case .vote:
             guard
