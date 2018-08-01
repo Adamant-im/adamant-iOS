@@ -7,23 +7,13 @@
 //
 
 import Foundation
-import libsodium
 import CryptoSwift
 import ByteBackpacker
 
 class AdamantCoreService : AdamantCore {
     
-    func createKeypairFor(rawHash: [UInt8]) -> Keypair? {
-        guard let keypair = makeKeypairFrom(seed: rawHash) else {
-            print("Unable create Keypair from seed")
-            return nil
-        }
-        
-        return Keypair(publicKey: keypair.publicKey.hexString(), privateKey: keypair.privateKey.hexString())
-    }
-    
     func createHashFor(passphrase: String) -> String? {
-        guard let hash = createPassPhraseHash(passphrase: passphrase) else {
+        guard let hash = createRawHashFor(passphrase: passphrase) else {
             print("Unable create hash from passphrase")
             return nil
         }
@@ -32,26 +22,17 @@ class AdamantCoreService : AdamantCore {
     }
     
     func createKeypairFor(passphrase: String) -> Keypair? {
-        guard let hash = createPassPhraseHash(passphrase: passphrase) else {
+        guard let hash = createRawHashFor(passphrase: passphrase) else {
             print("Unable create hash from passphrase")
             return nil
         }
         
-        guard let keypair = makeKeypairFrom(seed: hash) else {
+        guard let keypair = Crypto.sign.keypair(from: hash) else {
             print("Unable create Keypair from seed")
             return nil
         }
         
         return Keypair(publicKey: keypair.publicKey.hexString(), privateKey: keypair.privateKey.hexString())
-    }
-    
-    func createPassPhraseHash(passphrase: String) -> [UInt8]? {
-        guard let seed = createSeed(passphrase) else {
-            print("FAIL to create Seed from passphrase bytes")
-            return nil
-        }
-        
-        return seed.sha256()
     }
     
     func generateNewPassphrase() -> String {
@@ -65,7 +46,7 @@ class AdamantCoreService : AdamantCore {
         let privateKey = keypair.privateKey.hexBytes()
         let hash = transaction.bytes.sha256()
         
-        guard let signature = signature(message: hash, secretKey: privateKey) else {
+        guard let signature = Crypto.sign.signature(message: hash, secretKey: privateKey) else {
             print("FAIL to sign of transaction")
             return nil
         }
@@ -73,36 +54,22 @@ class AdamantCoreService : AdamantCore {
         return signature.hexString()
     }
     
-    public func signature(message: Bytes, secretKey: Bytes) -> Bytes? {
-        guard secretKey.count == SecretKeyBytes else { return nil }
-        var signature = Array<UInt8>(count: SignBytes)
-        
-        guard .SUCCESS == crypto_sign_detached (
-            &signature,
-            nil,
-            message, UInt64(message.count),
-            secretKey
-            ).exitCode else { return nil }
-        
-        return signature
-    }
-    
     func encodeMessage(_ message: String, recipientPublicKey publicKey: String, privateKey privateKeyHex: String) -> (message: String, nonce: String)? {
         let message = message.bytes
         let recipientKey = publicKey.hexBytes()
         let privateKey = privateKeyHex.hexBytes()
         
-        guard let publicKey = ed2curve(publicKey: recipientKey) else {
+        guard let publicKey = Crypto.ed2Curve.publicKey(recipientKey) else {
             print("FAIL to create ed2curve publick key from SHA256")
             return nil
         }
         
-        guard let secretKey = ed2curve(privateKey: privateKey) else {
+        guard let secretKey = Crypto.ed2Curve.privateKey(privateKey) else {
             print("FAIL to create ed2curve secret key from SHA256")
             return nil
         }
         
-        guard let encrypted = seal(message: message, recipientPublicKey: publicKey, senderSecretKey: secretKey) else {
+        guard let encrypted = Crypto.box.seal(message: message, recipientPublicKey: publicKey, senderSecretKey: secretKey) else {
             print("FAIL to encrypt")
             return nil
         }
@@ -119,17 +86,17 @@ class AdamantCoreService : AdamantCore {
         let senderKey = senderKeyHex.hexBytes()
         let privateKey = privateKeyHex.hexBytes()
         
-        guard let publicKey = ed2curve(publicKey: senderKey) else {
+        guard let publicKey = Crypto.ed2Curve.publicKey(senderKey) else {
             print("FAIL to create ed2curve publick key from SHA256")
             return nil
         }
         
-        guard let secretKey = ed2curve(privateKey: privateKey) else {
+        guard let secretKey = Crypto.ed2Curve.privateKey(privateKey) else {
             print("FAIL to create ed2curve secret key from SHA256")
             return nil
         }
         
-        guard let decrepted = open(authenticatedCipherText: message, senderPublicKey: publicKey, recipientSecretKey: secretKey, nonce: nonce) else {
+        guard let decrepted = Crypto.box.open(authenticatedCipherText: message, senderPublicKey: publicKey, recipientSecretKey: secretKey, nonce: nonce) else {
             print("FAIL to decrypt")
             return nil
         }
@@ -146,12 +113,12 @@ class AdamantCoreService : AdamantCore {
         let privateKey = privateKeyHex.hexBytes()
         let hash = privateKey.sha256()
         
-        guard let secretKey = ed2curve(privateKey: hash) else {
+        guard let secretKey = Crypto.ed2Curve.privateKey(hash) else {
             print("FAIL to create ed2curve secret key from SHA256")
             return nil
         }
         
-        guard let encrypted = seal(message: message, secretKey: secretKey) else {
+        guard let encrypted = Crypto.secretBox.seal(message: message, secretKey: secretKey) else {
             print("FAIL to encrypt")
             return nil
         }
@@ -168,245 +135,27 @@ class AdamantCoreService : AdamantCore {
         let privateKey = privateKeyHex.hexBytes()
         let hash = privateKey.sha256()
         
-        guard let secretKey = ed2curve(privateKey: hash) else {
+        guard let secretKey = Crypto.ed2Curve.privateKey(hash) else {
             print("FAIL to create ed2curve secret key from SHA256")
             return nil
         }
         
-        guard let decrepted = open(authenticatedCipherText: message, secretKey: secretKey, nonce: nonce) else {
+        guard let decrepted = Crypto.secretBox.open(authenticatedCipherText: message, secretKey: secretKey, nonce: nonce) else {
             print("FAIL to decrypt")
             return nil
         }
         
         return decrepted.utf8String
     }
-    
-    private func seal(message: Bytes, recipientPublicKey: Bytes, senderSecretKey: Bytes) -> (authenticatedCipherText: Bytes, nonce: Bytes)? {
-        guard recipientPublicKey.count == BoxPublicKeyBytes,
-            senderSecretKey.count == BoxSecretKeyBytes
-            else { return nil }
-        
-        var authenticatedCipherText = Bytes(count: message.count + BoxMacBytes)
-        let nonce = self.nonce(BoxNonceBytes)
-        
-        guard .SUCCESS == crypto_box_easy(
-            &authenticatedCipherText,
-            message,
-            CUnsignedLongLong(message.count),
-            nonce,
-            recipientPublicKey,
-            senderSecretKey
-            ).exitCode else { return nil }
-        
-        return (authenticatedCipherText: authenticatedCipherText, nonce: nonce)
-    }
-    
-    private func seal(message: Bytes, secretKey: Bytes) -> (authenticatedCipherText: Bytes, nonce: Bytes)? {
-        guard secretKey.count == KeyBytes else { return nil }
-        var authenticatedCipherText = Bytes(count: message.count + MacBytes)
-        let nonce = self.nonce(NonceBytes)
-        
-        guard .SUCCESS == crypto_secretbox_easy (
-            &authenticatedCipherText,
-            message, UInt64(message.count),
-            nonce,
-            secretKey
-            ).exitCode else { return nil }
-        
-        return (authenticatedCipherText: authenticatedCipherText, nonce: nonce)
-    }
-    
-    private func open(authenticatedCipherText: Bytes, senderPublicKey: Bytes, recipientSecretKey: Bytes, nonce: Bytes) -> Bytes? {
-        guard nonce.count == BoxNonceBytes,
-            authenticatedCipherText.count >= BoxMacBytes,
-            senderPublicKey.count == BoxPublicKeyBytes,
-            recipientSecretKey.count == BoxSecretKeyBytes
-            else { return nil }
-        
-        var message = Bytes(count: authenticatedCipherText.count - BoxMacBytes)
-        
-        guard .SUCCESS == crypto_box_open_easy(
-            &message,
-            authenticatedCipherText, UInt64(authenticatedCipherText.count),
-            nonce,
-            senderPublicKey,
-            recipientSecretKey
-            ).exitCode else { return nil }
-        
-        return message
-    }
-    
-    private func open(authenticatedCipherText: Bytes, secretKey: Bytes, nonce: Bytes) -> Bytes? {
-        guard authenticatedCipherText.count >= MacBytes else { return nil }
-        var message = Bytes(count: authenticatedCipherText.count - MacBytes)
-        
-        guard .SUCCESS == crypto_secretbox_open_easy (
-            &message,
-            authenticatedCipherText, UInt64(authenticatedCipherText.count),
-            nonce,
-            secretKey
-            ).exitCode else { return nil }
-        
-        return message
-    }
-    
-    private func ed2curve(publicKey: Bytes) -> Bytes? {
-        var publicED2Key = Bytes(count: SecretCurveKeyBytes)
-        
-        guard .SUCCESS == crypto_sign_ed25519_pk_to_curve25519(
-            &publicED2Key,
-            publicKey
-            ).exitCode else { return nil }
-        
-        return publicED2Key
-    }
-    
-    private func ed2curve(privateKey: Bytes) -> Bytes? {
-        var secretKey = Bytes(count: SecretCurveKeyBytes)
-        
-        guard .SUCCESS == crypto_sign_ed25519_sk_to_curve25519(
-            &secretKey,
-            privateKey
-            ).exitCode else { return nil }
-        
-        return secretKey
-    }
-    
-    private func nonce(_ count: Int) -> Bytes {
-        var nonce = Bytes(count: count)
-        randombytes_buf(&nonce, count)
-        return nonce
-    }
-    
-    private func createSeed(_ passphrase: String) -> [UInt8]? {
-        return Mnemonic.seed(passphrase: passphrase)
-    }
-    
-    private func makeKeypairFrom(seed: Bytes) -> (publicKey: Bytes, privateKey: Bytes)? {
-        var publicKey = Bytes(count: PublicKeyBytes)
-        var privateKey = Bytes(count: SecretKeyBytes)
-        
-        guard .SUCCESS == crypto_sign_seed_keypair(
-            &publicKey,
-            &privateKey,
-            seed
-            ).exitCode else { return nil }
-        
-        return (publicKey: publicKey, privateKey: privateKey)
-    }
-}
 
-// MARK:- Helpers
-public let HashSHA256Bytes = Int(crypto_hash_sha256_bytes())
-public let SecretCurveKeyBytes = Int(crypto_scalarmult_curve25519_bytes())
-public let MacBytes = Int(crypto_secretbox_macbytes())
-public let BoxMacBytes = Int(crypto_box_macbytes())
-public let NonceBytes = Int(crypto_secretbox_noncebytes())
-public var BoxNonceBytes = Int(crypto_box_noncebytes())
-public let KeyBytes = Int(crypto_secretbox_keybytes())
-public let SeedBytes = Int(crypto_sign_seedbytes())
-public let PublicKeyBytes = Int(crypto_sign_publickeybytes())
-public let SecretKeyBytes = Int(crypto_sign_secretkeybytes())
-public let BoxPublicKeyBytes = Int(crypto_box_publickeybytes())
-public let BoxSecretKeyBytes = Int(crypto_box_secretkeybytes())
-public let SignBytes = Int(crypto_sign_bytes())
-
-public typealias Bytes = Array<UInt8>
-
-extension Data {
-    func toString() -> String? {
-        return String(data: self, encoding: .utf8)
-    }
-}
-
-extension Array where Element == UInt8 {
-    init (count bytes: Int) {
-        self.init(repeating: 0, count: bytes)
-    }
-    
-    public var utf8String: String? {
-        return String(data: Data(bytes: self), encoding: .utf8)
-    }
-    
-    func toData() -> Data {
-        return Data(bytes: self)
-    }
-}
-
-extension ArraySlice where Element == UInt8 {
-    var bytes: Bytes { return Bytes(self) }
-}
-
-extension String {
-    var bytes: Bytes { return Bytes(self.utf8) }
-    
-    func hexBytes() -> [UInt8] {
-        return (0..<count/2).reduce([]) { res, i in
-            let indexStart = index(startIndex, offsetBy: i * 2)
-            let indexEnd = index(indexStart, offsetBy: 2)
-            let substring = self[indexStart..<indexEnd]
-            return res + [UInt8(substring, radix: 16) ?? 0]
+    // MARK: - Private tools
+    private func createRawHashFor(passphrase: String) -> [UInt8]? {
+        guard let seed = Mnemonic.seed(passphrase: passphrase) else {
+            print("FAIL to create Seed from passphrase bytes")
+            return nil
         }
-    }
-    
-    func toDictionary() -> [String: Any]? {
-        if let data = self.data(using: .utf8) {
-            do {
-                return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
-        return nil
-    }
-    
-    func matches(for regex: String) -> [String] {
-        do {
-            let regex = try NSRegularExpression(pattern: regex)
-            let results = regex.matches(in: self,
-                                        range: NSRange(self.startIndex..., in: self))
-            return results.map {
-                String(self[Range($0.range, in: self)!])
-            }
-        } catch let error {
-            print("invalid regex: \(error.localizedDescription)")
-            return []
-        }
-    }
-    
-    subscript (i: Int) -> Character
-    {
-        return self[index(startIndex, offsetBy:i)]
-    }
-    
-    static func random(length: Int = 32, alphabet: String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") -> String
-    {
-        let upperBound = UInt32(alphabet.count)
-        return String((0..<length).map { _ -> Character in
-            return alphabet[Int(arc4random_uniform(upperBound))]
-        })
-    }
-}
-
-enum ExitCode {
-    case SUCCESS
-    case FAILURE
-    
-    init (from int: Int32) {
-        switch int {
-        case 0:  self = .SUCCESS
-        default: self = .FAILURE
-        }
-    }
-}
-
-extension Int32 {
-    var exitCode: ExitCode { return ExitCode(from: self) }
-}
-
-extension Sequence where Self.Element == UInt8 {
-    internal func hexString() -> String {
-        return map { String(format: "%02hhx", $0) }.joined()
+        
+        return seed.sha256()
     }
 }
 

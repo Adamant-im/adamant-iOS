@@ -19,6 +19,7 @@
 		644EC35E20F34F1E00F40C73 /* DelegateDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */; };
 		6455E9F121075D3600B2E94C /* AddressBookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6455E9F021075D3600B2E94C /* AddressBookService.swift */; };
 		6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */; };
+		645E7B062111DF3A006CC9FD /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645E7B052111DF3A006CC9FD /* Crypto.swift */; };
 		649E9A152111B3C200686B01 /* Mnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649E9A142111B3C200686B01 /* Mnemonic.swift */; };
 		64A223D620F760BB005157CB /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D520F760BB005157CB /* Localization.swift */; };
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
@@ -221,6 +222,7 @@
 		644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateDetailsViewController.swift; sourceTree = "<group>"; };
 		6455E9F021075D3600B2E94C /* AddressBookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBookService.swift; sourceTree = "<group>"; };
 		6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAddressBookService.swift; sourceTree = "<group>"; };
+		645E7B052111DF3A006CC9FD /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
 		649E9A142111B3C200686B01 /* Mnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mnemonic.swift; sourceTree = "<group>"; };
 		64A223D520F760BB005157CB /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
@@ -681,6 +683,7 @@
 				E9E7CDB62003994E00DFC4DB /* AdamantUtilities.swift */,
 				E950652220404C84008352E5 /* AdamantUriTools.swift */,
 				649E9A142111B3C200686B01 /* Mnemonic.swift */,
+				645E7B052111DF3A006CC9FD /* Crypto.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -1196,6 +1199,7 @@
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
 				643ED0B12109F4BD005A9FDA /* AdamantCoreService.swift in Sources */,
 				E93EB0A320DA4CCA001F9601 /* Node.swift in Sources */,
+				645E7B062111DF3A006CC9FD /* Crypto.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
 				E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */,
 				E9150BA12066DA210065A985 /* ChatTransaction+CoreDataClass.swift in Sources */,
