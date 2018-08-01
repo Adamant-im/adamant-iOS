@@ -59,6 +59,13 @@ extension JSAdamantCore {
         return hash
     }
     
+    func generateNewPassphrase() -> String {
+        if let passphrase = try? Mnemonic.generate().joined(separator: " ") {
+            return passphrase
+        }
+        return ""
+    }
+    
     func sign(transaction: SignableTransaction, senderId: String, keypair: Keypair) -> String? {
         let privateKey = keypair.privateKey.hexBytes()
         
@@ -301,14 +308,7 @@ extension JSAdamantCore {
     }
     
     private func createSeed(_ passphrase: String) -> [UInt8]? {
-        let password = passphrase.decomposedStringWithCompatibilityMapping
-        let salt = ("mnemonic").decomposedStringWithCompatibilityMapping
-        
-        if let seed = try? PKCS5.PBKDF2(password: password.bytes, salt: salt.bytes, iterations: 2048, keyLength: 64, variant: HMAC.Variant.sha512).calculate() {
-            return seed
-        } else {
-            return nil
-        }
+        return Mnemonic.seed(passphrase: passphrase)
     }
     
     private func makeKeypairFrom(seed: Bytes) -> (publicKey: Bytes, privateKey: Bytes)? {
