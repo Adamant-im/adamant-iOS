@@ -256,14 +256,6 @@ extension AdamantChatsProvider {
 // MARK: - Sending messages {
 extension AdamantChatsProvider {
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
-		sendMessage(message, recipientId: recipientId, type: .message, completion: completion)
-	}
-	
-	func sendRichMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
-		sendMessage(message, recipientId: recipientId, type: .richMessage, completion: completion)
-	}
-	
-    private func sendMessage(_ message: AdamantMessage, recipientId: String, type: ChatType, completion: @escaping (ChatsProviderResult) -> Void) {
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
             completion(.failure(.notLogged))
             return
@@ -289,9 +281,9 @@ extension AdamantChatsProvider {
         
         sendingQueue.async {
             switch message {
-			case .text(let text), .markdownText(let text):
-                self.sendTextMessage(text: text, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: type, completion: completion)
-            }
+			case .text(let text), .markdownText(let text), .richMessage(let text):
+				self.sendTextMessage(text: text, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
+			}
         }
     }
 	
@@ -786,7 +778,7 @@ extension AdamantChatsProvider {
 							let systemMessage = messages.first(where: { key.range(of: $0.key) != nil })?.value {
 							
 							switch systemMessage.message {
-							case .text(let text):
+							case .text(let text), .richMessage(let text):
 								messageTransaction.message = text
 								
 							case .markdownText(let text):
@@ -878,7 +870,7 @@ extension AdamantChatsProvider {
 	/// Check if message is valid for sending
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult {
 		switch message {
-		case .text(let text), .markdownText(let text):
+		case .text(let text), .markdownText(let text), .richMessage(let text):
 			if text.count == 0 {
 				return .empty
 			}

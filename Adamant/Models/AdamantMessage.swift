@@ -28,3 +28,15 @@ extension AdamantMessage {
 		}
 	}
 }
+
+extension AdamantMessage {
+	var chatType: ChatType {
+		switch self {
+		case .text, .markdownText:
+			return .message
+			
+		case .richMessage:
+			return .richMessage
+		}
+	}
+}

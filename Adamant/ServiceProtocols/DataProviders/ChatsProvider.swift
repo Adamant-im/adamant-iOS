@@ -172,7 +172,6 @@ protocol ChatsProvider: DataProvider {
 	
 	// MARK: - Sending messages
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
-    func sendRichMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void)
 	func retrySendMessage(_ message: MessageTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void)
     
     // MARK: - Delete local message

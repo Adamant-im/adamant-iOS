@@ -430,28 +430,22 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 
 extension ChatViewController: TransferDelegate {
     func transferFinished(with data: String) {
-        if let address = chatroom?.partner?.address {
-            self.sendChatMessage(text: data, to: address)
-        }
-    }
-    
-    // MARK: Send Chat message with ETH transaction
-    private func sendChatMessage(text: String, to address: String) {
-        let message = AdamantMessage.text(text)
+		guard let address = chatroom?.partner?.address else {
+			return
+		}
+		
+        let message = AdamantMessage.richMessage(data)
         let valid = chatsProvider.validateMessage(message)
-        switch valid {
+		
+		switch valid {
         case .isValid: break
-        default:
+			
+		case .empty, .tooLong:
             dialogService.showToastMessage(valid.localized)
             return
         }
         
-        guard text.count > 0 else {
-            // TODO show warning
-            return
-        }
-        
-        chatsProvider.sendRichMessage(.text(text), recipientId: address, completion: { [weak self] result in
+        chatsProvider.sendMessage(message, recipientId: address, completion: { [weak self] result in
             switch result {
             case .success:
 //                self?.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)

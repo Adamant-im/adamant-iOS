@@ -16,7 +16,7 @@ extension AdamantChatsProvider {
 			switch result {
 			case .success(let loggedAddress, let partner):
 				switch message {
-				case .text(let text):
+				case .text(let text), .richMessage(let text):
 					self?.fakeSent(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, status: status, markdown: false, completion: completion)
 					
 				case .markdownText(let text):
@@ -34,7 +34,7 @@ extension AdamantChatsProvider {
 			switch result {
 			case .success(let loggedAccount, let partner):
 				switch message {
-				case .text(let text):
+				case .text(let text), .richMessage(let text):
 					self?.fakeReceived(text: text, loggedAddress: loggedAccount, sender: partner, date: date, unread: unread, silent: silent, markdown: false, completion: completion)
 					
 				case .markdownText(let text):
