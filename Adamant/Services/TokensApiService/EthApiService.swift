@@ -344,7 +344,7 @@ class EthApiService: EthApiServiceProtocol {
         }
     }
     
-    func getTransaction(byHash hash: String, completion: @escaping (ApiServiceResult<web3EthTransaction>) -> Void) {
+    func getTransaction(byHash hash: String, completion: @escaping (ApiServiceResult<Web3EthTransaction>) -> Void) {
         DispatchQueue.global().async {
             let result = self.web3.eth.getTransactionDetails(hash)
             switch result {
@@ -353,7 +353,7 @@ class EthApiService: EthApiServiceProtocol {
                     let resultBlockNumber = self.web3.eth.getBlockNumber()
                     guard case .success(let blockNumber) = resultBlockNumber else {
                         DispatchQueue.main.async {
-                            completion(.success(web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil, lastBlockNumber: nil)))
+                            completion(.success(Web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil, lastBlockNumber: nil)))
                         }
                         return
                     }
@@ -361,16 +361,16 @@ class EthApiService: EthApiServiceProtocol {
                     let result = self.web3.eth.getBlockByNumber(number)
                     guard case .success(let block) = result else {
                         DispatchQueue.main.async {
-                            completion(.success(web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil, lastBlockNumber: blockNumber)))
+                            completion(.success(Web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil, lastBlockNumber: blockNumber)))
                         }
                         return
                     }
                     DispatchQueue.main.async {
-                        completion(.success(web3EthTransaction(transaction: transaction.transaction, transactionBlock: block, lastBlockNumber: blockNumber)))
+                        completion(.success(Web3EthTransaction(transaction: transaction.transaction, transactionBlock: block, lastBlockNumber: blockNumber)))
                     }
                 } else {
                     DispatchQueue.main.async {
-                        completion(.success(web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil, lastBlockNumber: nil)))
+                        completion(.success(Web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil, lastBlockNumber: nil)))
                     }
                 }
                 break
@@ -516,7 +516,7 @@ class TransactionsHistory {
                 switch response.result {
                 case .success(let data):
                     do {
-                        let model: Response = try JSONDecoder().decode(Response.self, from: data)
+                        let model: EthResponse = try JSONDecoder().decode(EthResponse.self, from: data)
                         
                         if model.status == 1 {
                             completion(.success(model.result))

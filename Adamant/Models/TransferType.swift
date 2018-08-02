@@ -33,27 +33,12 @@ enum TransferType: String, Decodable {
     }
 }
 
-struct ChatTransfer: Decodable {
-    enum CodingKeys: String, CodingKey {
-        case amount
-        case hash
-        case type
-        case comments
-    }
-    let amount: String
+struct ChatTransfer {
+	let amount: String
     let hash: String
     let type: TransferType
     let comments: String
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        
-        amount = (try? container.decode(String.self, forKey: .amount)) ?? "0"
-        hash = (try? container.decode(String.self, forKey: .hash)) ?? ""
-        type = (try? container.decode(TransferType.self, forKey: .type)) ?? .unknown
-        comments = (try? container.decode(String.self, forKey: .comments)) ?? ""
-    }
-    
+	
     func render() -> NSAttributedString {
         guard type != .unknown else {
             return NSAttributedString(string: "")
@@ -63,7 +48,7 @@ struct ChatTransfer: Decodable {
         
         let sent = String.adamantLocalized.chat.sent
         
-        var attributedString = NSMutableAttributedString(string: "\(sent)\n\(balance)")
+        let attributedString = NSMutableAttributedString(string: "\(sent)\n\(balance)")
         
         if comments != "" {
             attributedString.append(NSAttributedString(string: "\n\(comments)"))
@@ -90,4 +75,22 @@ struct ChatTransfer: Decodable {
             return "➡️  \(balance)"
         }
     }
+}
+
+extension ChatTransfer: Decodable {
+	enum CodingKeys: String, CodingKey {
+		case amount
+		case hash
+		case type
+		case comments
+	}
+	
+	init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		
+		amount = (try? container.decode(String.self, forKey: .amount)) ?? "0"
+		hash = (try? container.decode(String.self, forKey: .hash)) ?? ""
+		type = (try? container.decode(TransferType.self, forKey: .type)) ?? .unknown
+		comments = (try? container.decode(String.self, forKey: .comments)) ?? ""
+	}
 }

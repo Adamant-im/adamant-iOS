@@ -15,6 +15,7 @@ import Foundation
 enum AdamantMessage {
 	case text(String)
 	case markdownText(String)
+	case richMessage(String)
 }
 
 extension AdamantMessage {
@@ -22,7 +23,7 @@ extension AdamantMessage {
 	
 	var fee: Decimal {
 		switch self {
-		case .text(let message), .markdownText(let message):
+		case .text(let message), .markdownText(let message), .richMessage(let message):
 			return Decimal(ceil(Double(message.count) / 255.0)) * AdamantMessage.textFee
 		}
 	}

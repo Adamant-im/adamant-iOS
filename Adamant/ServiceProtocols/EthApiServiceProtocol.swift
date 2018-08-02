@@ -23,7 +23,7 @@ protocol EthApiServiceProtocol: class {
     func sendFunds(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<String>) -> Void)
     
     func getTransactions(_ completion: @escaping (ApiServiceResult<[EthTransaction]>) -> Void)
-    func getTransaction(byHash hash: String, completion: @escaping (ApiServiceResult<web3EthTransaction>) -> Void)
+    func getTransaction(byHash hash: String, completion: @escaping (ApiServiceResult<Web3EthTransaction>) -> Void)
     
     // MARK: - Tools
     func getBalance(_ completion: @escaping (ApiServiceResult<String>) -> Void)

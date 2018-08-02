@@ -258,11 +258,11 @@ extension AdamantChatsProvider {
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
 		sendMessage(message, recipientId: recipientId, type: .message, completion: completion)
 	}
-    
-    func sendRichMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
-        sendMessage(message, recipientId: recipientId, type: .richMessage, completion: completion)
-    }
-    
+	
+	func sendRichMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+		sendMessage(message, recipientId: recipientId, type: .richMessage, completion: completion)
+	}
+	
     private func sendMessage(_ message: AdamantMessage, recipientId: String, type: ChatType, completion: @escaping (ChatsProviderResult) -> Void) {
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
             completion(.failure(.notLogged))
@@ -289,7 +289,7 @@ extension AdamantChatsProvider {
         
         sendingQueue.async {
             switch message {
-            case .text(let text), .markdownText(let text):
+			case .text(let text), .markdownText(let text):
                 self.sendTextMessage(text: text, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: type, completion: completion)
             }
         }

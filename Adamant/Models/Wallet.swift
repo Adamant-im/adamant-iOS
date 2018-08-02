@@ -67,13 +67,7 @@ extension Wallet {
 	
 	var formattedFull: String? {
 		switch self {
-		case .adamant(let balance):
-			return "\(Wallet.currencyFormatter.string(from: balance as NSNumber)!) \(currencySymbol)"
-			
-        case .ethereum(let balance):
-            return "\(Wallet.currencyFormatter.string(from: balance as NSNumber)!) \(currencySymbol)"
-            
-        case .lisk(let balance):
+		case .adamant(let balance), .ethereum(let balance), .lisk(let balance):
             return "\(Wallet.currencyFormatter.string(from: balance as NSNumber)!) \(currencySymbol)"
 		}
 	}
