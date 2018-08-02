@@ -68,7 +68,7 @@
 		E91947AC20001A9A001362F8 /* ApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AB20001A9A001362F8 /* ApiService.swift */; };
 		E91947B020002393001362F8 /* AdamantApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947AF20002393001362F8 /* AdamantApiService.swift */; };
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
-		E91947B420002809001362F8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B320002809001362F8 /* Account.swift */; };
+		E91947B420002809001362F8 /* AdamantAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B320002809001362F8 /* AdamantAccount.swift */; };
 		E91E5BF220DAF05500B06B3C /* EurekaNodeRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91E5BF120DAF05500B06B3C /* EurekaNodeRow.swift */; };
 		E91E5BF420DAF3AB00B06B3C /* NodeCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E91E5BF320DAF3AB00B06B3C /* NodeCell.xib */; };
 		E9204B5020C94C4A00F3B9AB /* Date+humanizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9204B4F20C94C4A00F3B9AB /* Date+humanizedString.swift */; };
@@ -300,7 +300,7 @@
 		E91947AB20001A9A001362F8 /* ApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiService.swift; sourceTree = "<group>"; };
 		E91947AF20002393001362F8 /* AdamantApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantApiService.swift; sourceTree = "<group>"; };
 		E91947B12000246A001362F8 /* AdamantError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantError.swift; sourceTree = "<group>"; };
-		E91947B320002809001362F8 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
+		E91947B320002809001362F8 /* AdamantAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAccount.swift; sourceTree = "<group>"; };
 		E91E5BF120DAF05500B06B3C /* EurekaNodeRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EurekaNodeRow.swift; sourceTree = "<group>"; };
 		E91E5BF320DAF3AB00B06B3C /* NodeCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NodeCell.xib; sourceTree = "<group>"; };
 		E9204B4F20C94C4A00F3B9AB /* Date+humanizedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+humanizedString.swift"; sourceTree = "<group>"; };
@@ -581,7 +581,7 @@
 		E913C9091FFFA95A001A83F7 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				E91947B320002809001362F8 /* Account.swift */,
+				E91947B320002809001362F8 /* AdamantAccount.swift */,
 				E9393FA92055D03300EE6F30 /* AdamantMessage.swift */,
 				E95F85862008FDBF0070534A /* ChatAsset.swift */,
 				E95F8588200900B10070534A /* ChatType.swift */,
@@ -1227,7 +1227,7 @@
 				E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */,
 				E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */,
 				E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */,
-				E91947B420002809001362F8 /* Account.swift in Sources */,
+				E91947B420002809001362F8 /* AdamantAccount.swift in Sources */,
 				E9E7CDC22003F5A400DFC4DB /* TransactionsViewController.swift in Sources */,
 				E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */,
 				E9150B9C2066DA210065A985 /* BaseTransaction+CoreDataProperties.swift in Sources */,

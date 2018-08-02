@@ -262,7 +262,7 @@ extension AdamantAccountsProvider {
 		return coreAccount
 	}
 	
-	private func createCoreDataAccount(from account: Account) -> CoreDataAccount {
+	private func createCoreDataAccount(from account: AdamantAccount) -> CoreDataAccount {
 		let coreAccount: CoreDataAccount
 		if Thread.isMainThread {
 			coreAccount = createCoreDataAccount(from: account, context: stack.container.viewContext)
@@ -277,7 +277,7 @@ extension AdamantAccountsProvider {
 		return coreAccount
 	}
 	
-	private func createCoreDataAccount(from account: Account, context: NSManagedObjectContext) -> CoreDataAccount {
+	private func createCoreDataAccount(from account: AdamantAccount, context: NSManagedObjectContext) -> CoreDataAccount {
 		let coreAccount = CoreDataAccount(entity: CoreDataAccount.entity(), insertInto: context)
 		coreAccount.address = account.address
 		coreAccount.publicKey = account.publicKey

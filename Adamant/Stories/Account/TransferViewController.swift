@@ -119,7 +119,7 @@ class TransferViewController: FormViewController {
 	// MARK: - Properties
 	
 	var defaultFee = 0.5
-	var account: Account?
+	var account: AdamantAccount?
 	
     var token: Token = .ADM
     var toAddress: String = ""

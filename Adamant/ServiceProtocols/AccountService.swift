@@ -52,7 +52,7 @@ enum AccountServiceState {
 }
 
 enum AccountServiceResult {
-	case success(account: Account)
+	case success(account: AdamantAccount)
 	case failure(AccountServiceError)
 }
 
@@ -124,7 +124,7 @@ protocol AccountService: class {
 	// MARK: State
 	
 	var state: AccountServiceState { get }
-	var account: Account? { get }
+	var account: AdamantAccount? { get }
 	var keypair: Keypair? { get }
 	
 	

@@ -43,7 +43,7 @@ class ChatViewController: MessagesViewController {
 	
 	// MARK: Properties
 	weak var delegate: ChatViewControllerDelegate?
-	var account: Account?
+	var account: AdamantAccount?
 	var chatroom: Chatroom?
 	var dateFormatter: DateFormatter {
 		let formatter = DateFormatter()

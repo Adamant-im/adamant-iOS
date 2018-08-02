@@ -57,7 +57,7 @@ class ParsingModelsTests: XCTestCase {
 	}
 
 	func testAccount() {
-		let t: Account = TestTools.LoadJsonAndDecode(filename: "Account")
+		let t: AdamantAccount = TestTools.LoadJsonAndDecode(filename: "Account")
 
 		XCTAssertEqual(t.address, "U2279741505997340299")
 		XCTAssertEqual(t.unconfirmedBalance, Decimal(0.345))

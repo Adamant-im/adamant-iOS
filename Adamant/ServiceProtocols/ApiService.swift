@@ -70,10 +70,10 @@ protocol ApiService: class {
 	
 	// MARK: - Accounts
 	
-	func newAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<Account>) -> Void)
-	func getAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<Account>) -> Void)
-	func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<Account>) -> Void)
-	func getAccount(byAddress address: String, completion: @escaping (ApiServiceResult<Account>) -> Void)
+	func newAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
+	func getAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
+	func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
+	func getAccount(byAddress address: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
 	
 	
 	// MARK: - Keys

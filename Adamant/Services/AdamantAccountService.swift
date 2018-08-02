@@ -42,7 +42,7 @@ class AdamantAccountService: AccountService {
 	private let stateSemaphore = DispatchSemaphore(value: 1)
 	private let securedStoreSemaphore = DispatchSemaphore(value: 1)
 	
-	private(set) var account: Account?
+	private(set) var account: AdamantAccount?
 	private(set) var keypair: Keypair?
 	
 	private func setState(_ state: AccountServiceState) {
