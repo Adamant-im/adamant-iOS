@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension AdamantApiService.ApiCommands {
 	static let Chats = (
@@ -53,6 +54,12 @@ extension AdamantApiService {
 	}
 	
 	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
+        // Background task
+        self.sendingMsgTaskId = UIApplication.shared.beginBackgroundTask {
+            UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+            self.sendingMsgTaskId = UIBackgroundTaskInvalid
+        }
+        
 		// MARK: 1. Prepare params
 		let params: [String : Any] = [
 			"type": TransactionType.chatMessage.rawValue,
@@ -135,6 +142,11 @@ extension AdamantApiService {
 					case .failure(let error):
 						completion(.failure(.networkError(error: error)))
 					}
+                    
+                    defer {
+                        UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+                        self.sendingMsgTaskId = UIBackgroundTaskInvalid
+                    }
 				}
 				
 				
