@@ -8,7 +8,7 @@
 
 import UIKit
 
-enum Wallet {
+enum WalletEnum {
 	case adamant(balance: Decimal)
 	case ethereum(balance: Decimal)
     case lisk(balance: Decimal)
@@ -24,7 +24,7 @@ enum Wallet {
 
 
 // MARK: - Resources
-extension Wallet {
+extension WalletEnum {
 	var currencyLogo: UIImage {
 		switch self {
 		case .adamant: return #imageLiteral(resourceName: "wallet_adm")
@@ -43,7 +43,7 @@ extension Wallet {
 }
 
 // MARK: - Formatter
-extension Wallet {
+extension WalletEnum {
 	static var currencyFormatter: NumberFormatter = {
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .decimal
@@ -55,20 +55,20 @@ extension Wallet {
 	var formattedShort: String? {
 		switch self {
 		case .adamant(let balance):
-			return Wallet.currencyFormatter.string(from: balance as NSNumber)!
+			return WalletEnum.currencyFormatter.string(from: balance as NSNumber)!
 			
         case .ethereum(let balance):
-            return Wallet.currencyFormatter.string(from: balance as NSNumber)!
+            return WalletEnum.currencyFormatter.string(from: balance as NSNumber)!
             
         case .lisk(let balance):
-            return Wallet.currencyFormatter.string(from: balance as NSNumber)!
+            return WalletEnum.currencyFormatter.string(from: balance as NSNumber)!
 		}
 	}
 	
 	var formattedFull: String? {
 		switch self {
 		case .adamant(let balance), .ethereum(let balance), .lisk(let balance):
-            return "\(Wallet.currencyFormatter.string(from: balance as NSNumber)!) \(currencySymbol)"
+            return "\(WalletEnum.currencyFormatter.string(from: balance as NSNumber)!) \(currencySymbol)"
 		}
 	}
 }

@@ -33,7 +33,7 @@ extension String.adamantLocalized.alert {
 
 
 // MARK: - Wallet extension
-fileprivate extension Wallet {
+fileprivate extension WalletEnum {
 	var sectionTag: String {
 		switch self {
 		case .adamant: return "s_adm"
@@ -135,7 +135,7 @@ class AccountViewController: FormViewController {
 	
 	let walletCellIdentifier = "wllt"
 	private (set) var accountHeaderView: AccountHeaderView!
-	var wallets: [Wallet]? {
+	var wallets: [WalletEnum]? {
 		didSet {
 			selectedWalletIndex = 0
 			accountHeaderView?.walletCollectionView.reloadData()
@@ -380,15 +380,15 @@ class AccountViewController: FormViewController {
 	// MARK: Other
 	func updateAccountInfo() {
 		let address: String
-		let adamantWallet: Wallet
+		let adamantWallet: WalletEnum
 		
 		if let account = accountService.account {
 			address = account.address
-			adamantWallet = Wallet.adamant(balance: account.balance)
+			adamantWallet = WalletEnum.adamant(balance: account.balance)
 			hideFreeTokensRow = account.balance > 0
 		} else {
 			address = ""
-			adamantWallet = Wallet.adamant(balance: 0)
+			adamantWallet = WalletEnum.adamant(balance: 0)
 			hideFreeTokensRow = true
 		}
 		
@@ -396,7 +396,7 @@ class AccountViewController: FormViewController {
 			wallets![0] = adamantWallet
 			accountHeaderView.walletCollectionView.reloadItems(at: [IndexPath(row: 0, section: 0)])
 		} else {
-			wallets = [adamantWallet, Wallet.ethereum(balance: 0), Wallet.lisk(balance: 0)]
+			wallets = [adamantWallet, WalletEnum.ethereum(balance: 0), WalletEnum.lisk(balance: 0)]
 			accountHeaderView.walletCollectionView.reloadData()
 		}
 		
@@ -528,7 +528,7 @@ extension AccountViewController: NSFetchedResultsControllerDelegate {
 
 // MARK: - Tools
 extension AccountViewController {
-	func createSectionFor(wallet: Wallet) -> Section {
+	func createSectionFor(wallet: WalletEnum) -> Section {
 		let section = Section(wallet.sectionTitle) {
 			$0.tag = wallet.sectionTag
 		}
@@ -816,7 +816,7 @@ extension AccountViewController {
                         
                         switch wallet {
                         case .ethereum(_):
-                            self.wallets![i] = Wallet.ethereum(balance: Decimal(balance))
+                            self.wallets![i] = WalletEnum.ethereum(balance: Decimal(balance))
                             self.accountHeaderView.walletCollectionView.reloadItems(at: [IndexPath(row: i, section: 0)])
                             
                             if let row: AlertLabelRow = self.form.rowBy(tag: Rows.balanceEth.tag) {
@@ -847,7 +847,7 @@ extension AccountViewController {
                         
                         switch wallet {
                         case .lisk(_):
-                            self.wallets![i] = Wallet.lisk(balance: Decimal(balance))
+                            self.wallets![i] = WalletEnum.lisk(balance: Decimal(balance))
                             self.accountHeaderView.walletCollectionView.reloadItems(at: [IndexPath(row: i, section: 0)])
                             
                             if let row: AlertLabelRow = self.form.rowBy(tag: Rows.balanceLsk.tag) {
