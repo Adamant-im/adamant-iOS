@@ -7,9 +7,16 @@
 //
 
 import Foundation
+import UIKit
 
 extension AdamantApiService {
 	func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void) {
+        // Background task
+        self.sendingMsgTaskId = UIApplication.shared.beginBackgroundTask {
+            UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+            self.sendingMsgTaskId = UIBackgroundTaskInvalid
+        }
+        
 		// MARK: 1. Prepare params
 		let params: [String : Any] = [
 			"type": TransactionType.send.rawValue,
@@ -76,6 +83,11 @@ extension AdamantApiService {
 					case .failure(let error):
 						completion(.failure(error))
 					}
+                    
+                    defer {
+                        UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+                        self.sendingMsgTaskId = UIBackgroundTaskInvalid
+                    }
 				}
 				
 			case .failure(let error):
