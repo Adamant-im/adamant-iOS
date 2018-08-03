@@ -120,6 +120,7 @@ class QRGeneratorViewController: FormViewController {
 			alert.addAction(save)
 			alert.addAction(share)
 			alert.addAction(cancel)
+            alert.popoverPresentationController?.sourceView = cell
 			self?.present(alert, animated: true, completion: nil)
 		}
 		

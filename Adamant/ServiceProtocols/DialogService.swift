@@ -111,11 +111,13 @@ protocol DialogService: class {
 	func dismissNotification()
 	
 	// MARK: - ActivityControllers
-	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, completion: (() -> Void)?)
+	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?)
+    func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, from: UIBarButtonItem?, completion: (() -> Void)?)
 	
 	func presentGoToSettingsAlert(title: String?, message: String?)
     
     // MARK: - Alerts
     func showAlert(title:String, message: String, actions: [PMAlertAction]?)
-    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?)
+    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?, from: UIView?)
+    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?, from: UIBarButtonItem?)
 }

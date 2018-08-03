@@ -272,7 +272,7 @@ class LoginViewController: FormViewController {
 			dialogService.presentShareAlertFor(string: encodedPassphrase,
 											   types: [.copyToPasteboard, .share, .generateQr(sharingTip: nil)],
 											   excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
-											   animated: true,
+                                               animated: true, from: cell,
 											   completion: nil)
 		})
 		

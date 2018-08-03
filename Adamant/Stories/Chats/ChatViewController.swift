@@ -233,7 +233,7 @@ class ChatViewController: MessagesViewController {
 	
 	// MARK: IBAction
 	
-	@IBAction func properties(_ sender: Any) {
+	@IBAction func properties(_ sender: UIBarButtonItem) {
 		guard let partner = chatroom?.partner, let address = partner.address else {
 			return
 		}
@@ -244,7 +244,7 @@ class ChatViewController: MessagesViewController {
 			dialogService.presentShareAlertFor(string: encodedAddress,
 											   types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
 											   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-											   animated: true,
+                                               animated: true, from: sender,
 											   completion: nil)
 			
 			return
@@ -254,7 +254,7 @@ class ChatViewController: MessagesViewController {
 			self?.dialogService.presentShareAlertFor(string: encodedAddress,
 													types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
 													excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-													animated: true,
+                                                    animated: true, from: sender,
 													completion: nil)
 		}
 		
@@ -282,7 +282,7 @@ class ChatViewController: MessagesViewController {
 			self?.present(alert, animated: true, completion: nil)
 		}
 		
-		dialogService.showSystemActionSheet(title: nil, message: nil, actions: [share, rename])
+        dialogService.showSystemActionSheet(title: nil, message: nil, actions: [share, rename], from: sender)
 	}
 }
 

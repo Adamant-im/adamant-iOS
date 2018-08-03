@@ -346,6 +346,10 @@ class AccountViewController: FormViewController {
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.updateAccountInfo()
 		}
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            layoutTableHeaderView()
+        }
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -369,6 +373,12 @@ class AccountViewController: FormViewController {
 		super.viewWillDisappear(animated)
 		navigationController?.setNavigationBarHidden(false, animated: animated)
 	}
+    
+    override func viewDidLayoutSubviews() {
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            layoutTableFooterView()
+        }
+    }
 	
 	deinit {
 		NotificationCenter.default.removeObserver(self)
@@ -421,6 +431,56 @@ class AccountViewController: FormViewController {
 		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: selectedWalletIndex, section: 0), animated: false, scrollPosition: .centeredHorizontally)
 		accountHeaderView.addressButton.setTitle(address, for: .normal)
 	}
+    
+    func layoutTableHeaderView() {
+        guard let view = tableView.tableHeaderView else { return }
+        view.translatesAutoresizingMaskIntoConstraints = false
+
+        let width = view.bounds.size.width;
+        let temporaryWidthConstraints = NSLayoutConstraint.constraints(withVisualFormat: "[headerView(width)]", options: NSLayoutFormatOptions(rawValue: UInt(0)), metrics: ["width": width], views: ["headerView": view])
+
+        view.addConstraints(temporaryWidthConstraints)
+
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+
+        let size = view.systemLayoutSizeFitting(UILayoutFittingCompressedSize)
+        let height = size.height
+        var frame = view.frame
+
+        frame.size.height = height
+        view.frame = frame
+
+        self.tableView.tableHeaderView = view
+
+        view.removeConstraints(temporaryWidthConstraints)
+        view.translatesAutoresizingMaskIntoConstraints = true
+    }
+    
+    func layoutTableFooterView() {
+        guard let view = tableView.tableFooterView else { return }
+        view.translatesAutoresizingMaskIntoConstraints = false
+
+        let width = view.bounds.size.width;
+        let temporaryWidthConstraints = NSLayoutConstraint.constraints(withVisualFormat: "[footerView(width)]", options: NSLayoutFormatOptions(rawValue: UInt(0)), metrics: ["width": width], views: ["footerView": view])
+
+        view.addConstraints(temporaryWidthConstraints)
+
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+
+        let size = view.systemLayoutSizeFitting(UILayoutFittingCompressedSize)
+        let height = size.height
+        var frame = view.frame
+
+        frame.size.height = height
+        view.frame = frame
+
+        self.tableView.tableFooterView = view
+
+        view.removeConstraints(temporaryWidthConstraints)
+        view.translatesAutoresizingMaskIntoConstraints = true
+    }
 }
 
 
@@ -526,7 +586,7 @@ extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataS
 
 // MARK: - AccountHeaderViewDelegate
 extension AccountViewController: AccountHeaderViewDelegate {
-	func addressLabelTapped() {
+    func addressLabelTapped(from: UIView) {
 		guard let address = accountService.account?.address else {
 			return
 		}
@@ -542,7 +602,7 @@ extension AccountViewController: AccountHeaderViewDelegate {
 		dialogService.presentShareAlertFor(string: address,
 										   types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
 										   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-										   animated: true,
+                                           animated: true, from: from,
 										   completion: completion)
 	}
 }

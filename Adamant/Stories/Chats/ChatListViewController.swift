@@ -525,7 +525,7 @@ extension ChatListViewController {
 		let actions: [UIContextualAction]
 		
 		// More
-		let more = UIContextualAction(style: .normal, title: nil) { [weak self] (_, _, completionHandler: (Bool) -> Void) in
+		let more = UIContextualAction(style: .normal, title: nil) { [weak self] (_, view, completionHandler: (Bool) -> Void) in
 			guard let partner = chatroom.partner, let address = partner.address else {
 				completionHandler(false)
 				return
@@ -537,14 +537,14 @@ extension ChatListViewController {
 				self?.dialogService.presentShareAlertFor(string: encodedAddress,
 												   types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
 												   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-												   animated: true,
+                                                   animated: true, from: view,
 												   completion: nil)
 			} else {
 				let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
 					self?.dialogService.presentShareAlertFor(string: encodedAddress,
 															 types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
 															 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-															 animated: true,
+                                                             animated: true, from: view,
 															 completion: nil)
 				}
 				
@@ -571,7 +571,7 @@ extension ChatListViewController {
 					self?.present(alert, animated: true, completion: nil)
 				}
 				
-				self?.dialogService.showSystemActionSheet(title: nil, message: nil, actions: [share, rename])
+                self?.dialogService.showSystemActionSheet(title: nil, message: nil, actions: [share, rename], from: view)
 			}
 			
 			completionHandler(true)

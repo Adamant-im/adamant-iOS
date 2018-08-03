@@ -167,7 +167,7 @@ class TransactionDetailsViewController: UIViewController {
 	
 	// MARK: - IBActions
 	
-	@IBAction func share(_ sender: Any) {
+	@IBAction func share(_ sender: UIBarButtonItem) {
 		guard let transaction = transaction, let url = explorerUrl else {
 			return
 		}
@@ -187,7 +187,7 @@ class TransactionDetailsViewController: UIViewController {
 			let alert = UIActivityViewController(activityItems: [text], applicationActivities: nil)
 			self?.present(alert, animated: true, completion: nil)
 		}))
-		
+		alert.popoverPresentationController?.barButtonItem = sender
 		present(alert, animated: true, completion: nil)
 	}
 	
@@ -254,7 +254,7 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 	}
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		guard let row = Row(rawValue: indexPath.row) else {
+		guard let row = Row(rawValue: indexPath.row), let cell = tableView.cellForRow(at: indexPath) else {
 			tableView.deselectRow(at: indexPath, animated: true)
 			return
 		}
@@ -310,24 +310,23 @@ extension TransactionDetailsViewController: UITableViewDataSource, UITableViewDe
 				share = address
 			}
 			
-			dialogService.presentShareAlertFor(string: share, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true) {
+            dialogService.presentShareAlertFor(string: share, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: cell) {
 				tableView.deselectRow(at: indexPath, animated: true)
 			}
 			
 		default:
 			let share: String
-			
+            
 			if row == .date, let date = transaction?.date as Date? {
 				share = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .medium)
-				
-			} else if let cell = tableView.cellForRow(at: indexPath), let details = cell.detailTextLabel?.text {
+			} else if let details = cell.detailTextLabel?.text {
 				share = details
 			} else {
 				tableView.deselectRow(at: indexPath, animated: true)
 				break
 			}
 			
-			dialogService.presentShareAlertFor(string: share, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true) {
+            dialogService.presentShareAlertFor(string: share, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: cell) {
 				tableView.deselectRow(at: indexPath, animated: true)
 			}
 		}

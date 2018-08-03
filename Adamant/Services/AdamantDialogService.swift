@@ -223,55 +223,75 @@ extension AdamantDialogService {
 
 // MAKR: - Activity controllers
 extension AdamantDialogService {
-	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, completion: (() -> Void)?) {
-		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-		
-		for type in types {
-			switch type {
-			case .copyToPasteboard:
-				alert.addAction(UIAlertAction(title: type.localized , style: .default) { [weak self] _ in
-					UIPasteboard.general.string = string
-					self?.showToastMessage(String.adamantLocalized.alert.copiedToPasteboardNotification)
-				})
-				
-			case .share:
-				alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-					let vc = UIActivityViewController(activityItems: [string], applicationActivities: nil)
-					vc.excludedActivityTypes = excludedActivityTypes
-					self?.present(vc, animated: true, completion: completion)
-				})
-				
-			case .generateQr(let sharingTip):
-				alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-					switch AdamantQRTools.generateQrFrom(string: string) {
-					case .success(let qr):
-						guard let vc = self?.router.get(scene: AdamantScene.Shared.shareQr) as? ShareQrViewController else {
-							fatalError("Can't find ShareQrViewController")
-						}
-						
-						vc.qrCode = qr
-						vc.sharingTip = sharingTip
-						vc.excludedActivityTypes = excludedActivityTypes
-						self?.present(vc, animated: true, completion: completion)
-						
-					case .failure(error: let error):
-						self?.showError(withMessage: error.localizedDescription, error: error)
-					}
-				})
-				
-			case .saveToPhotolibrary(let image):
-				let action = UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-					UIImageWriteToSavedPhotosAlbum(image, self, #selector(self?.image(_:didFinishSavingWithError:contextInfo:)), nil)
-				}
-				
-				alert.addAction(action)
-			}
-		}
-		
-		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+    func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
+		let alert = createShareAlertFor(string: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, completion: completion)
+        
+        if let sourceView = from {
+            alert.popoverPresentationController?.sourceView = sourceView
+            alert.popoverPresentationController?.sourceRect = sourceView.bounds
+            alert.popoverPresentationController?.canOverlapSourceViewRect = false
+        }
 		
 		present(alert, animated: animated, completion: completion)
 	}
+    
+    func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, from: UIBarButtonItem?, completion: (() -> Void)?) {
+        let alert = createShareAlertFor(string: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, completion: completion)
+        
+        if let sourceView = from { alert.popoverPresentationController?.barButtonItem = sourceView }
+        
+        present(alert, animated: animated, completion: completion)
+    }
+    
+    private func createShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, completion: (() -> Void)?) -> UIAlertController {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        for type in types {
+            switch type {
+            case .copyToPasteboard:
+                alert.addAction(UIAlertAction(title: type.localized , style: .default) { [weak self] _ in
+                    UIPasteboard.general.string = string
+                    self?.showToastMessage(String.adamantLocalized.alert.copiedToPasteboardNotification)
+                })
+                
+            case .share:
+                alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
+                    let vc = UIActivityViewController(activityItems: [string], applicationActivities: nil)
+                    vc.excludedActivityTypes = excludedActivityTypes
+                    self?.present(vc, animated: true, completion: completion)
+                })
+                
+            case .generateQr(let sharingTip):
+                alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
+                    switch AdamantQRTools.generateQrFrom(string: string) {
+                    case .success(let qr):
+                        guard let vc = self?.router.get(scene: AdamantScene.Shared.shareQr) as? ShareQrViewController else {
+                            fatalError("Can't find ShareQrViewController")
+                        }
+                        
+                        vc.qrCode = qr
+                        vc.sharingTip = sharingTip
+                        vc.excludedActivityTypes = excludedActivityTypes
+                        self?.present(vc, animated: true, completion: completion)
+                        
+                    case .failure(error: let error):
+                        self?.showError(withMessage: error.localizedDescription, error: error)
+                    }
+                })
+                
+            case .saveToPhotolibrary(let image):
+                let action = UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
+                    UIImageWriteToSavedPhotosAlbum(image, self, #selector(self?.image(_:didFinishSavingWithError:contextInfo:)), nil)
+                }
+                
+                alert.addAction(action)
+            }
+        }
+        
+        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        
+        return alert
+    }
 	
 	@objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
 		if let error = error {
@@ -344,7 +364,7 @@ extension AdamantDialogService {
         self.present(alertVC, animated: true, completion: nil)
     }
     
-    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?) {
+    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?, from: UIBarButtonItem?) {
         guard let actions = actions, actions.count > 0 else {
             return
         }
@@ -356,6 +376,30 @@ extension AdamantDialogService {
         }
         
         alertVC.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel))
+        
+        if let barButtonItem = from { alertVC.popoverPresentationController?.barButtonItem = barButtonItem }
+        
+        self.present(alertVC, animated: true, completion: nil)
+    }
+    
+    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?, from: UIView?) {
+        guard let actions = actions, actions.count > 0 else {
+            return
+        }
+        
+        let alertVC = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+        
+        for action in actions {
+            alertVC.addAction(action)
+        }
+        
+        alertVC.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel))
+        
+        if let sourceView = from {
+            alertVC.popoverPresentationController?.sourceView = sourceView
+            alertVC.popoverPresentationController?.sourceRect = sourceView.bounds
+            alertVC.popoverPresentationController?.canOverlapSourceViewRect = false
+        }
         
         self.present(alertVC, animated: true, completion: nil)
     }
