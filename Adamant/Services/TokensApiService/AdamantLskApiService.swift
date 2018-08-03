@@ -12,27 +12,7 @@ import Lisk
 import Ed25519
 import web3swift
 
-// MARK: - Notifications
-extension Notification.Name {
-    struct LskApiService {
-        /// Raised when user has logged out.
-        static let userLoggedOut = Notification.Name("adamant.lskApiService.userHasLoggedOut")
-        
-        /// Raised when user has successfully logged in.
-        static let userLoggedIn = Notification.Name("adamant.lskApiService.userHasLoggedIn")
-        
-        private init() {}
-    }
-}
-
-struct LskAccount {
-    let keys: KeyPair
-    let address: String
-    var balance: BigUInt?
-    var balanceString: String?
-}
-
-class LskApiService: LskApiServiceProtocol {
+class AdamantLskApiService: LskApiService {
     
     // MARK: - Constans
     static let kvsAddress = "lsk:address"
@@ -87,14 +67,14 @@ class LskApiService: LskApiServiceProtocol {
                             return
                         }
                         
-                        guard loggedAccount.balance >= AdamantApiService.KVSfee else {
+                        guard loggedAccount.balance >= AdamantApiService.KvsFee else {
                             DispatchQueue.main.async {
                                 completion(.failure(.internalError(message: "LSK Wallet: Not enought ADM to save address to KVS", error: nil)))
                             }
                             return
                         }
                         
-                        self.apiService.store(key: LskApiService.kvsAddress, value: account.address, type: StateType.keyValue, sender: address, keypair: keypair, completion: { (result) in
+                        self.apiService.store(key: AdamantLskApiService.kvsAddress, value: account.address, type: StateType.keyValue, sender: address, keypair: keypair, completion: { (result) in
                             switch result {
                             case .success(let transactionId):
                                 print("SAVED LSK in KVS: \(transactionId)")
@@ -255,7 +235,7 @@ class LskApiService: LskApiServiceProtocol {
     }
     
     func getLskAddress(byAdamandAddress address: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
-        apiService.get(key: LskApiService.kvsAddress, sender: address, completion: completion)
+        apiService.get(key: AdamantLskApiService.kvsAddress, sender: address, completion: completion)
     }
     
     func fromRawLsk(value: BigUInt) -> String {

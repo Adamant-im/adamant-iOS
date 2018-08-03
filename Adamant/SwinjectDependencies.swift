@@ -79,16 +79,16 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: Ethereum ApiService
-        self.register(EthApiServiceProtocol.self) { r in
-            let service = EthApiService(apiUrl: AdamantResources.ethServers.first!)
+        self.register(EthApiService.self) { r in
+            let service = AdamantEthApiService(apiUrl: AdamantResources.ethServers.first!)
             service.apiService = r.resolve(ApiService.self)!
             service.accountService = r.resolve(AccountService.self)
             return service
         }.inObjectScope(.container)
         
         // MARK: Lisk ApiService
-        self.register(LskApiServiceProtocol.self) { r in
-            let service = LskApiService()
+        self.register(LskApiService.self) { r in
+            let service = AdamantLskApiService()
             service.apiService = r.resolve(ApiService.self)!
             service.accountService = r.resolve(AccountService.self)
             return service

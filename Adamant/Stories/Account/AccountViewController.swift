@@ -119,8 +119,8 @@ class AccountViewController: FormViewController {
 	var accountService: AccountService!
 	var dialogService: DialogService!
 	var router: Router!
-    var ethApiService: EthApiServiceProtocol!
-    var lskApiService: LskApiServiceProtocol!
+    var ethApiService: EthApiService!
+    var lskApiService: LskApiService!
 	var notificationsService: NotificationsService!
 	var transfersProvider: TransfersProvider!
 	

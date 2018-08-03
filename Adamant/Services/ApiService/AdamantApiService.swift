@@ -10,7 +10,6 @@ import Foundation
 import Alamofire
 
 class AdamantApiService: ApiService {
-    
 	// MARK: - Shared constants
 	
 	struct ApiCommands {

@@ -17,8 +17,8 @@ extension AdamantScene {
 			c.dialogService = r.resolve(DialogService.self)
 			c.localAuth = r.resolve(LocalAuthentication.self)
             c.router = r.resolve(Router.self)
-            c.ethAPiService = r.resolve(EthApiServiceProtocol.self)
-            c.lskAPiService = r.resolve(LskApiServiceProtocol.self)
+            c.ethAPiService = r.resolve(EthApiService.self)
+            c.lskAPiService = r.resolve(LskApiService.self)
 			return c
 		})
 		

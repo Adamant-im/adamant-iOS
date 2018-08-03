@@ -11,7 +11,7 @@ import UIKit
 class ETHTransactionsViewController: TransactionsViewController {
     
     // MARK: - Dependencies
-    var ethApiService: EthApiServiceProtocol!
+    var ethApiService: EthApiService!
     var dialogService: DialogService!
     var router: Router!
     

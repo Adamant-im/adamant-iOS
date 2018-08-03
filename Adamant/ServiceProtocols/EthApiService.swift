@@ -9,8 +9,20 @@
 import Foundation
 import web3swift
 
-protocol EthApiServiceProtocol: class {
-    
+// MARK: - Notifications
+extension Notification.Name {
+	struct EthApiService {
+		/// Raised when user has logged out.
+		static let userLoggedOut = Notification.Name("adamant.ethApiService.userHasLoggedOut")
+		
+		/// Raised when user has successfully logged in.
+		static let userLoggedIn = Notification.Name("adamant.ethApiService.userHasLoggedIn")
+		
+		private init() {}
+	}
+}
+
+protocol EthApiService: class {
     var account: EthAccount? { get }
     
     // MARK: - Accounts

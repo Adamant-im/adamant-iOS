@@ -11,27 +11,7 @@ import web3swift
 import BigInt
 import Alamofire
 
-// MARK: - Notifications
-extension Notification.Name {
-    struct EthApiService {
-        /// Raised when user has logged out.
-        static let userLoggedOut = Notification.Name("adamant.ethApiService.userHasLoggedOut")
-        
-        /// Raised when user has successfully logged in.
-        static let userLoggedIn = Notification.Name("adamant.ethApiService.userHasLoggedIn")
-        
-        private init() {}
-    }
-}
-
-struct EthAccount {
-    let wallet: BIP32Keystore
-    let address: String?
-    var balance: BigUInt?
-    var balanceString: String?
-}
-
-class EthApiService: EthApiServiceProtocol {
+class AdamantEthApiService: EthApiService {
     
     // MARK: - Constans
     static let transferGas = 21000
@@ -90,7 +70,7 @@ class EthApiService: EthApiServiceProtocol {
                     return
             }
             
-            self.account = EthAccount(wallet: wallet, address: wallet.addresses?.first?.address, balance: BigUInt(0), balanceString: "0")
+			self.account = EthAccount(wallet: wallet, address: wallet.addresses?.first?.address, balance: BigUInt(0), balanceString: "0")
             if let account = self.account {
                 NotificationCenter.default.post(name: Notification.Name.EthApiService.userLoggedIn, object: self)
                 DispatchQueue.main.async {
@@ -111,14 +91,14 @@ class EthApiService: EthApiServiceProtocol {
                                     return
                                 }
                                 
-                                guard loggedAccount.balance >= AdamantApiService.KVSfee else {
+                                guard loggedAccount.balance >= AdamantApiService.KvsFee else {
                                     DispatchQueue.main.async {
                                         completion(.failure(.internalError(message: "ETH Wallet: Not enought ADM to save address to KVS", error: nil)))
                                     }
                                     return
                                 }
                                 
-                                self.apiService.store(key: EthApiService.kvsAddress, value: account.address!, type: StateType.keyValue, sender: address, keypair: keypair, completion: { (result) in
+                                self.apiService.store(key: AdamantEthApiService.kvsAddress, value: account.address!, type: StateType.keyValue, sender: address, keypair: keypair, completion: { (result) in
                                     switch result {
                                     case .success(let transactionId):
                                         print("SAVED: \(transactionId)")
@@ -204,7 +184,7 @@ class EthApiService: EthApiServiceProtocol {
                 return
             }
             options.gasPrice = gasPrice
-            guard var intermediate = contract.method(options: options) else {
+            guard let intermediate = contract.method(options: options) else {
                 DispatchQueue.main.async {
                     completion(.failure(.internalError(message: "ETH Wallet: Send - create transaction issue", error: nil)))
                 }
@@ -435,7 +415,7 @@ class EthApiService: EthApiServiceProtocol {
     }
     
     func getEthAddress(byAdamandAddress address: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
-        apiService.get(key: EthApiService.kvsAddress, sender: address) { (result) in
+        apiService.get(key: AdamantEthApiService.kvsAddress, sender: address) { (result) in
             switch result {
             case .success(let value):
                 if let value = value {

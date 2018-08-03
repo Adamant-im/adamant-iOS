@@ -14,7 +14,7 @@ import BigInt
 class LSKTransactionsViewController: TransactionsViewController {
     
     // MARK: - Dependencies
-    var lskApiService: LskApiServiceProtocol!
+    var lskApiService: LskApiService!
     var dialogService: DialogService!
     var router: Router!
     

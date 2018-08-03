@@ -26,8 +26,8 @@ extension AdamantScene {
 			c.chatsProvider = r.resolve(ChatsProvider.self)
 			c.dialogService = r.resolve(DialogService.self)
 			c.router = r.resolve(Router.self)
-            c.ethApiService = r.resolve(EthApiServiceProtocol.self)
-            c.lskApiService = r.resolve(LskApiServiceProtocol.self)
+            c.ethApiService = r.resolve(EthApiService.self)
+            c.lskApiService = r.resolve(LskApiService.self)
 			return c
 		})
 		

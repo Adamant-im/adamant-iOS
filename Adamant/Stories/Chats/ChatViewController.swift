@@ -38,8 +38,8 @@ class ChatViewController: MessagesViewController {
 	var chatsProvider: ChatsProvider!
 	var dialogService: DialogService!
 	var router: Router!
-    var ethApiService: EthApiServiceProtocol!
-    var lskApiService: LskApiServiceProtocol!
+    var ethApiService: EthApiService!
+    var lskApiService: LskApiService!
 	
 	// MARK: Properties
 	weak var delegate: ChatViewControllerDelegate?

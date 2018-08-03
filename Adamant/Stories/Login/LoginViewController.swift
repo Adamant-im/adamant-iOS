@@ -125,8 +125,8 @@ class LoginViewController: FormViewController {
 	var dialogService: DialogService!
 	var localAuth: LocalAuthentication!
     var router: Router!
-    var ethAPiService: EthApiServiceProtocol!
-	var lskAPiService: LskApiServiceProtocol!
+    var ethAPiService: EthApiService!
+	var lskAPiService: LskApiService!
 	
 	// MARK: Properties
 	private var hideNewPassphrase: Bool = true

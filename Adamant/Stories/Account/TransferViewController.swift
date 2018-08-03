@@ -110,8 +110,8 @@ class TransferViewController: FormViewController {
 	var apiService: ApiService!
 	var accountService: AccountService!
 	var dialogService: DialogService!
-    var ethApiService: EthApiServiceProtocol!
-    var lskApiService: LskApiServiceProtocol!
+    var ethApiService: EthApiService!
+    var lskApiService: LskApiService!
 	
 	private(set) var maxToTransfer: Double = 0.0
 	
@@ -259,7 +259,7 @@ class TransferViewController: FormViewController {
             
             maxToTransfer = ethBalance
             
-            if let feeString = Web3.Utils.formatToEthereumUnits(BigUInt(EthApiService.defaultGasPrice * EthApiService.transferGas), toUnits: .eth, decimals: 8), let fee = Double(feeString) {
+            if let feeString = Web3.Utils.formatToEthereumUnits(BigUInt(AdamantEthApiService.defaultGasPrice * AdamantEthApiService.transferGas), toUnits: .eth, decimals: 8), let fee = Double(feeString) {
                 defaultFee = fee
             }
             
@@ -333,7 +333,7 @@ class TransferViewController: FormViewController {
         if let account = lskApiService.account, let balanceString = account.balanceString, let balance = Double(balanceString) {
             
             maxToTransfer = balance
-            defaultFee = LskApiService.defaultFee
+            defaultFee = AdamantLskApiService.defaultFee
             
             let currencyFormatter = NumberFormatter()
             currencyFormatter.numberStyle = .decimal
@@ -361,7 +361,7 @@ class TransferViewController: FormViewController {
                         guard let value = value?.uppercased() else {
                             return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
                         }
-                        switch LskApiService.validateAddress(address: value) {
+                        switch AdamantLskApiService.validateAddress(address: value) {
                         case .valid:
                             return nil
                             
