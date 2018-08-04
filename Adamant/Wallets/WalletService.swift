@@ -17,14 +17,18 @@ protocol WalletService {
 	// MARK: Accounts
 	func getAccountInfo(for address: String) -> wallet?
 	
+	// MARK: Constants
+	var transactionFee: Decimal { get }
+	
 	// MARK: Tools
-	func format(wallet: wallet, as format: BalanceFormat, includeCurrencySymbol: Bool) -> String
+	func formatBalance(wallet: wallet, as format: BalanceFormat, includeCurrencySymbol: Bool) -> String
+	func validate(address: String) -> AddressValidationResult
 }
 
 
 // MARK: Default Format function
 extension WalletService {
-	func format(wallet: wallet, as format: BalanceFormat, includeCurrencySymbol: Bool) -> String {
+	func formatBalance(wallet: wallet, as format: BalanceFormat, includeCurrencySymbol: Bool) -> String {
 		if includeCurrencySymbol {
 			return "\(format.defaultFormatter.string(from: wallet.balance as NSNumber)!) \(type(of: wallet).currencySymbol)"
 		} else {
