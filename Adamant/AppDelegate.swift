@@ -94,7 +94,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		window = UIWindow(frame: UIScreen.main.bounds)
 		window!.rootViewController = UITabBarController()
 		window!.rootViewController?.view.backgroundColor = .white
-		window!.makeKeyAndVisible()
 		window!.tintColor = UIColor.adamant.primary
 		
 		
@@ -104,27 +103,43 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			fatalError("Failed to get Router")
 		}
 		
-		let login = router.get(scene: AdamantScene.Login.login)
-		window!.rootViewController?.present(login, animated: false, completion: nil)
-		
 		// MARK: 4. Prepare pages
 		if let tabbar = window?.rootViewController as? UITabBarController {
-			let chatListRoot = router.get(scene: AdamantScene.Chats.chatList)
-			let chatList = UINavigationController(rootViewController: chatListRoot)
-			chatList.tabBarItem.title = String.adamantLocalized.tabItems.chats
-			chatList.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
-			
-			let accountRoot = router.get(scene: AdamantScene.Account.account)
-			let account = UINavigationController(rootViewController: accountRoot)
-			account.tabBarItem.title = String.adamantLocalized.tabItems.account
-			account.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
-			
-			chatList.tabBarItem.badgeColor = UIColor.adamant.primary
-			account.tabBarItem.badgeColor = UIColor.adamant.primary
-			
-			tabbar.setViewControllers([chatList, account], animated: false)
+            let chats = UISplitViewController()
+            chats.tabBarItem.title = String.adamantLocalized.tabItems.chats
+            chats.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
+            
+            if let chatListRoot = router.get(scene: AdamantScene.Chats.chatList) as? ChatListViewController {
+                let chatList = UINavigationController(rootViewController: chatListRoot)
+                
+                if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+                    let dummyRoot = UIViewController()
+                    dummyRoot.view.backgroundColor = UIColor.white
+                    
+                    let dummy = UINavigationController(rootViewController:dummyRoot)
+                    chats.viewControllers = [chatList, dummy]
+                } else {
+                    chats.viewControllers = [chatList]
+                }
+                
+                chats.preferredDisplayMode = .allVisible
+                chats.tabBarItem.badgeColor = UIColor.adamant.primary
+                
+                let accountRoot = router.get(scene: AdamantScene.Account.account)
+                let account = UINavigationController(rootViewController: accountRoot)
+                account.tabBarItem.title = String.adamantLocalized.tabItems.account
+                account.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
+                
+                account.tabBarItem.badgeColor = UIColor.adamant.primary
+                
+                tabbar.setViewControllers([chats, account], animated: false)
+            }
 		}
-		
+        
+        window!.makeKeyAndVisible()
+        
+        let login = router.get(scene: AdamantScene.Login.login)
+        window!.rootViewController?.present(login, animated: false, completion: nil)
 		
 		// MARK: 5 Reachability & Autoupdate
 		repeater = RepeaterService()

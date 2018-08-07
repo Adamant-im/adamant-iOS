@@ -13,6 +13,7 @@ PODS:
   - FTIndicator/FTProgressIndicator (1.2.9)
   - FTIndicator/FTToastIndicator (1.2.9)
   - Haring (2.0.8)
+  - InputBarAccessoryView (2.2.2)
   - KeychainAccess (3.1.1)
   - libsodium (1.0.12)
   - MessageKit (1.0.0)
@@ -32,6 +33,7 @@ DEPENDENCIES:
   - FreakingSimpleRoundImageView
   - FTIndicator
   - Haring
+  - InputBarAccessoryView
   - KeychainAccess
   - libsodium
   - MessageKit
@@ -52,6 +54,7 @@ SPEC REPOS:
     - FreakingSimpleRoundImageView
     - FTIndicator
     - Haring
+    - InputBarAccessoryView
     - KeychainAccess
     - libsodium
     - MessageKit
@@ -71,6 +74,7 @@ SPEC CHECKSUMS:
   FreakingSimpleRoundImageView: 66a0f0fa1722faf63b662ba61f8441b09436a428
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   Haring: d2a4cfc00dfb63836dffc93e45919369f850e134
+  InputBarAccessoryView: 1f7bd07d111815afabaa2c11085a741378bfb247
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   MessageKit: 16160036b16476b04bd0e9f2c7ce67e662e503e4
@@ -81,6 +85,6 @@ SPEC CHECKSUMS:
   RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
   Swinject: f7f15a9672e99328c1f07f277091087917215700
 
-PODFILE CHECKSUM: fde2e99336bc59c015a61b7d2cb1ac5b48462187
+PODFILE CHECKSUM: 79a618b45da6ef40e1e4b14cb6521e1d3abebc4b
 
 COCOAPODS: 1.5.3

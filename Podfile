@@ -18,6 +18,7 @@ target 'Adamant' do
   pod 'FTIndicator' # Notifications and activity indicator
   pod 'Eureka' # Forms
   pod 'MessageKit' # Chat UI
+  pod 'InputBarAccessoryView' # Input view for chat
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
 

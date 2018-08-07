@@ -209,13 +209,16 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		if let chatroom = chatsController?.object(at: indexPath) {
-			let vc = chatViewController(for: chatroom)
-			
-			if let nav = navigationController {
-				nav.pushViewController(vc, animated: true)
-			} else {
-				present(vc, animated: true)
-			}
+            let vc = chatViewController(for: chatroom)
+            
+            if let split = self.splitViewController {
+                let chat = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(chat, sender: self)
+            } else if let nav = navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                present(vc, animated: true)
+            }
 		}
 	}
 }
@@ -371,26 +374,32 @@ extension ChatListViewController: NewChatViewControllerDelegate {
 		}
 		
 		DispatchQueue.main.async { [weak self] in
-			guard let vc = self?.chatViewController(for: chatroom) else {
-				return
-			}
-			
-			self?.navigationController?.pushViewController(vc, animated: false)
-			
-			let nvc: UIViewController
-			if let nav = controller.navigationController {
-				nvc = nav
-			} else {
-				nvc = controller
-			}
-			
-			nvc.dismiss(animated: true) {
-				vc.becomeFirstResponder()
-				
-				if let count = vc.chatroom?.transactions?.count, count == 0 {
-					vc.messageInputBar.inputTextView.becomeFirstResponder()
-				}
-			}
+            guard let vc = self?.chatViewController(for: chatroom) else {
+                return
+            }
+            
+            if let split = self?.splitViewController {
+                let chat = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(chat, sender: self)
+            } else {
+                self?.navigationController?.pushViewController(vc, animated: false)
+            }
+
+            let nvc: UIViewController
+            if let nav = controller.navigationController {
+                nvc = nav
+            } else {
+                nvc = controller
+            }
+
+            nvc.dismiss(animated: true) {
+                vc.becomeFirstResponder()
+
+                if let count = vc.chatroom?.transactions?.count, count == 0 {
+                    vc.messageInputBar.inputTextView.becomeFirstResponder()
+                }
+            }
+            
 		}
 		
 		// Select row after awhile
@@ -475,29 +484,33 @@ extension ChatListViewController {
 	
 	private func presentChatroom(_ chatroom: Chatroom) {
 		// MARK: 1. Create and config ViewController
-		let vc = chatViewController(for: chatroom)
-		
-		
-		// MARK: 2. Config TabBarController
-		let animated: Bool
-		if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController {
-			if let navigator = navigationController, selectedView != navigator, let index = tabVC.viewControllers?.index(of: navigator) {
-				animated = false
-				tabVC.selectedIndex = index
-			} else {
-				animated = true
-			}
-		} else {
-			animated = true
-		}
-		
-		
-		// MARK: 3. Present ViewController
-		if let nav = navigationController {
-			nav.pushViewController(vc, animated: animated)
-		} else {
-			present(vc, animated: true)
-		}
+        let vc = chatViewController(for: chatroom)
+        
+        if let split = self.splitViewController {
+            let chat = UINavigationController(rootViewController:vc)
+            split.showDetailViewController(chat, sender: self)
+        } else {
+            // MARK: 2. Config TabBarController
+            let animated: Bool
+            if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController {
+                if let navigator = navigationController, selectedView != navigator, let index = tabVC.viewControllers?.index(of: navigator) {
+                    animated = false
+                    tabVC.selectedIndex = index
+                } else {
+                    animated = true
+                }
+            } else {
+                animated = true
+            }
+            
+            
+            // MARK: 3. Present ViewController
+            if let nav = navigationController {
+                nav.pushViewController(vc, animated: animated)
+            } else {
+                present(vc, animated: true)
+            }
+        }
 	}
 	
 	private func formatTransferPreview(_ transfer: TransferTransaction) -> String? {
