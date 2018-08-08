@@ -55,14 +55,34 @@ extension LoginViewController {
 		
 		accountService.loginWithStoredAccount { [weak self] result in
 			switch result {
-			case .success(account: _):
+			case .success(_, let alert):
 				self?.dialogService.dismissProgress()
 				
+				guard let presenter = self?.presentingViewController else {
+					return
+				}
+				
+				let alertVc: UIAlertController?
+				if let alert = alert {
+					alertVc = UIAlertController(title: alert.title, message: alert.message, preferredStyle: .alert)
+					alertVc!.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default))
+				} else {
+					alertVc = nil
+				}
+				
 				if Thread.isMainThread {
-					self?.presentingViewController?.dismiss(animated: true, completion: nil)
+					presenter.dismiss(animated: true, completion: nil)
+					
+					if let alertVc = alertVc {
+						presenter.present(alertVc, animated: true, completion: nil)
+					}
 				} else {
 					DispatchQueue.main.async {
-						self?.presentingViewController?.dismiss(animated: true, completion: nil)
+						presenter.dismiss(animated: true, completion: nil)
+						
+						if let alertVc = alertVc {
+							presenter.present(alertVc, animated: true, completion: nil)
+						}
 					}
 				}
 				

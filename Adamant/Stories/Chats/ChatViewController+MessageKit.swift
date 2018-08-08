@@ -286,7 +286,9 @@ extension ChatViewController: MessageCellDelegate {
 				}
 			})
 			
-			dialogService.showSystemActionSheet(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, actions: [retry, cancelMessage])
+			let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
+			
+			dialogService.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, style: .actionSheet, actions: [retry, cancelMessage, cancel])
 			
 		default:
 			break

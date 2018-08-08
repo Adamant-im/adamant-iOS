@@ -78,7 +78,7 @@ class ChatViewController: MessagesViewController {
                 $0.setSize(CGSize(width: 36, height: 36), animated: false)
                 $0.image = #imageLiteral(resourceName: "attachment")
             }.onTouchUpInside { _ in
-                self.dialogService.showSystemActionSheet(title: String.adamantLocalized.transfer.send, message: "", actions: [
+				self.dialogService.showAlert(title: String.adamantLocalized.transfer.send, message: "", style: .actionSheet, actions: [
                     UIAlertAction(title: "ADM", style: .default, handler: { [weak self] (_) in
                         // MARK: Show ADM transfer details
                         if let address = self?.chatroom?.partner?.address {
@@ -135,8 +135,9 @@ class ChatViewController: MessagesViewController {
                         } else {
                             self?.dialogService.showWarning(withMessage: "User don't have public Lisk wallet yet.")
                         }
-                    })
-                    ])
+                    }),
+					UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
+				])
         }
     }()
 	

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import PMAlertController
 
 extension String.adamantLocalized.alert {
 	static let copyToPasteboard = NSLocalizedString("Shared.CopyToPasteboard", comment: "Shared alert 'Copy' button. Used anywhere. Used for copy-paste info.")
@@ -83,6 +82,16 @@ protocol RichError: Error {
 	var level: ErrorLevel { get }
 }
 
+enum AdamantAlertStyle {
+	case alert, actionSheet, richNotification
+}
+
+struct AdamantAlertAction {
+	let title: String
+	let style: UIAlertActionStyle
+	let handler: (() -> Void)?
+}
+
 protocol DialogService: class {
 	
 	func getTopmostViewController() -> UIViewController?
@@ -116,6 +125,6 @@ protocol DialogService: class {
 	func presentGoToSettingsAlert(title: String?, message: String?)
     
     // MARK: - Alerts
-    func showAlert(title:String, message: String, actions: [PMAlertAction]?)
-    func showSystemActionSheet(title: String, message: String, actions: [UIAlertAction]?)
+	func showAlert(title: String, message: String, style: UIAlertControllerStyle, actions: [UIAlertAction]?)
+	func showAlert(title: String, message: String, style: AdamantAlertStyle, actions: [AdamantAlertAction]?)
 }

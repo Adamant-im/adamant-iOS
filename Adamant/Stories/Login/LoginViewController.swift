@@ -374,12 +374,8 @@ extension LoginViewController {
 	private func createAccountAndLogin(passphrase: String) {
 		accountService.createAccountWith(passphrase: passphrase, completion: { [weak self] result in
 			switch result {
-			case .success(account: _, let alert):
+			case .success:
 				self?.loginIntoExistingAccount(passphrase: passphrase)
-				
-				if let alert = alert {
-					self?.dialogService.showSystemActionSheet(title: alert.title, message: alert.message, actions: nil)
-				}
 				
 			case .failure(let error):
 				self?.dialogService.showError(withMessage: error.localized, error: error)
@@ -400,7 +396,7 @@ extension LoginViewController {
 				self?.dialogService.dismissProgress()
 				
 				if let alert = alert {
-					self?.dialogService.showSystemActionSheet(title: alert.title, message: alert.message, actions: nil)
+					self?.dialogService.showAlert(title: alert.title, message: alert.message, style: UIAlertControllerStyle.alert, actions: nil)
 				}
 				
 			case .failure(let error):

@@ -107,8 +107,14 @@ extension AdamantAccountService {
 		}
 		
 		securedStore.set(pin, for: .pin)
-		securedStore.set(keypair.publicKey, for: .publicKey)
-		securedStore.set(keypair.privateKey, for: .privateKey)
+		
+		if let passphrase = passphrase {
+			securedStore.set(passphrase, for: .passphrase)
+		} else {
+			securedStore.set(keypair.publicKey, for: .publicKey)
+			securedStore.set(keypair.privateKey, for: .privateKey)
+		}
+		
 		hasStayInAccount = true
 		NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.stayInChanged, object: self, userInfo: [AdamantUserInfoKey.AccountService.newStayInState : true])
 		completion(.success(account: account, alert: nil))
