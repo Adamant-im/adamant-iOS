@@ -1,5 +1,5 @@
 //
-//  EthWallet.swift
+//  AdamantWallet.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 03.08.2018.
@@ -7,13 +7,10 @@
 //
 
 import Foundation
-import web3swift
 
-struct EthWallet: WalletAccount {
+struct AdamantWallet: WalletAccount {
 	let address: String
 	let balance: Decimal
-	
-	let ethAddress: EthereumAddress
 	
 	func formatBalance(format: BalanceFormat, includeCurrencySymbol: Bool) -> String {
 		if includeCurrencySymbol {

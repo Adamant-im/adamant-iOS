@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import UIKit
 
 // MARK: - Wallet Account
 protocol WalletAccount {
@@ -15,7 +14,6 @@ protocol WalletAccount {
 	var address: String { get }
 	var balance: Decimal { get }
 	
-	// MARK: Currency
-	static var currencySymbol: String { get }
-	static var currencyLogo: UIImage { get }
+	// MARK: Format
+	func formatBalance(format: BalanceFormat, includeCurrencySymbol: Bool) -> String
 }

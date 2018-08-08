@@ -83,42 +83,40 @@ class AdamantEthApiService: EthApiService {
                     self.getEthAddress(byAdamandAddress: address) { (result) in
                         switch result {
                         case .success(let value):
-                            if value == nil {
-                                guard let loggedAccount = self.accountService.account else {
-                                    DispatchQueue.main.async {
-                                        completion(.failure(.notLogged))
-                                    }
-                                    return
-                                }
-                                
-                                guard loggedAccount.balance >= AdamantApiService.KvsFee else {
-                                    DispatchQueue.main.async {
-                                        completion(.failure(.internalError(message: "ETH Wallet: Not enought ADM to save address to KVS", error: nil)))
-                                    }
-                                    return
-                                }
-                                
-                                self.apiService.store(key: AdamantEthApiService.kvsAddress, value: account.address!, type: StateType.keyValue, sender: address, keypair: keypair, completion: { (result) in
-                                    switch result {
-                                    case .success(let transactionId):
-                                        print("SAVED: \(transactionId)")
-                                        break
-                                    case .failure(let error):
-                                        DispatchQueue.main.async {
-                                            completion(.failure(.internalError(message: "ETH Wallet: fail to save address to KVS", error: error)))
-                                        }
-                                        break
-                                    }
-                                })
-                            } else {
-                                print("FOUND: \(value!)")
-                            }
-                            break
+							guard value == nil else { // value already saved in KVS
+								return
+							}
+							
+							guard let loggedAccount = self.accountService.account else {
+								DispatchQueue.main.async {
+									completion(.failure(.notLogged))
+								}
+								return
+							}
+							
+							guard loggedAccount.balance >= AdamantApiService.KvsFee else {
+								DispatchQueue.main.async {
+									completion(.failure(.internalError(message: "ETH Wallet: Not enought ADM to save address to KVS", error: nil)))
+								}
+								return
+							}
+							
+							self.apiService.store(key: AdamantEthApiService.kvsAddress, value: account.address!, type: StateType.keyValue, sender: address, keypair: keypair, completion: { (result) in
+								switch result {
+								case .success(let transactionId):
+									print("SAVED: \(transactionId)")
+									break
+								case .failure(let error):
+									DispatchQueue.main.async {
+										completion(.failure(.internalError(message: "ETH Wallet: fail to save address to KVS", error: error)))
+									}
+								}
+							})
+							
                         case .failure(let error):
                             DispatchQueue.main.async {
                                 completion(.failure(.internalError(message: "ETH Wallet: fail to get address from KVS", error: error)))
                             }
-                            break
                         }
                     }
                 }
@@ -366,6 +364,11 @@ class AdamantEthApiService: EthApiService {
     // MARK: - Tools
     
     func getBalance(_ completion: @escaping (ApiServiceResult<String>) -> Void) {
+		guard let account = account, let walletAddress = account.wallet.addresses?.first else {
+			completion(.failure(.internalError(message: "ETH Wallet: not found", error: nil)))
+			return
+		}
+		
         if let walletAddress = self.account?.wallet.addresses?.first {
             self.getBalance(byAddress: walletAddress) { (result) in
                 switch result {

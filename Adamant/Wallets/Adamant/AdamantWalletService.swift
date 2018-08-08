@@ -7,20 +7,36 @@
 //
 
 import Foundation
+import UIKit
 
 class AdamantWalletService: WalletService {
+	static var walletUpdatedNotification = Notification.Name("adm.update")
+	static let serviceEnabledChanged = Notification.Name("adm.enabledChanged")
+	
 	// MARK: - Constants
-	typealias wallet = EthWallet
 	let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$", options: [])
 	let transactionFee: Decimal = 0.5
 	
+	static var currencySymbol = "ADM"
+	static var currencyLogo = #imageLiteral(resourceName: "wallet_adm")
+	
+	
 	// MARK: - Properties
-	let enabled = true
+	let enabled: Bool = true
+	
+	
+	// MARK: - State
+	private (set) var state: WalletServiceState = .notInitiated
+	private (set) var wallet: WalletAccount? = nil
 	
 	
 	// MARK: - Logic
-	func getAccountInfo(for address: String) -> EthWallet? {
-		return nil
+	func initWallet(withPassphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+		
+	}
+	
+	func update() {
+		
 	}
 	
 	

@@ -7,21 +7,39 @@
 //
 
 import Foundation
+import UIKit
 
 class LskWalletService: WalletService {
+	static var walletUpdatedNotification = Notification.Name("lsk.update")
+	static let serviceEnabledChanged = Notification.Name("lsk.enabledChanged")
+	
 	// MARK: - Constants
-	typealias wallet = LskWallet
 	let addressRegex = try! NSRegularExpression(pattern: "^([0-9]{2,22})L$", options: [])
 	let transactionFee: Decimal = 0.1
+	let enabled: Bool = true
+	
+	static var currencySymbol = "LSK"
+	static var currencyLogo = #imageLiteral(resourceName: "wallet_lsk")
 	
 	
 	// MARK: - Properties
-	let enabled = true
+	let transferAvailable: Bool = true
+	
+	
+	// MARK: - State
+	private (set) var state: WalletServiceState = .notInitiated
+	private (set) var wallet: WalletAccount? = nil
+	
 	
 	// MARK: - Logic
-	func getAccountInfo(for address: String) -> LskWallet? {
-		return nil
+	func initWallet(withPassphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+		
 	}
+	
+	func update() {
+		
+	}
+	
 	
 	// MARK: - Tools
 	func validate(address: String) -> AddressValidationResult {

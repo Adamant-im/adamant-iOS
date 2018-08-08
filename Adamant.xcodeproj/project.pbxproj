@@ -105,6 +105,7 @@
 		E94008872114F05B00CD2D67 /* AddressValidationResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94008862114F05B00CD2D67 /* AddressValidationResult.swift */; };
 		E94008892114F0F700CD2D67 /* AdamantWalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94008882114F0F700CD2D67 /* AdamantWalletService.swift */; };
 		E940088B2114F63000CD2D67 /* NSRegularExpression+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E940088A2114F63000CD2D67 /* NSRegularExpression+adamant.swift */; };
+		E940088F2119A9E800CD2D67 /* BigInt+Decimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = E940088E2119A9E800CD2D67 /* BigInt+Decimal.swift */; };
 		E941CCDB20E786D800C96220 /* AccountHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = E941CCDA20E786D700C96220 /* AccountHeader.xib */; };
 		E941CCDE20E7B70200C96220 /* WalletCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E941CCDC20E7B70200C96220 /* WalletCollectionViewCell.swift */; };
 		E941CCDF20E7B70200C96220 /* WalletCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E941CCDD20E7B70200C96220 /* WalletCollectionViewCell.xib */; };
@@ -344,12 +345,13 @@
 		E94008712114EACF00CD2D67 /* WalletAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletAccount.swift; sourceTree = "<group>"; };
 		E940087A2114ED0600CD2D67 /* EthWalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthWalletService.swift; sourceTree = "<group>"; };
 		E940087C2114EDEE00CD2D67 /* EthWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthWallet.swift; sourceTree = "<group>"; };
-		E940087F2114EE2000CD2D67 /* AdamantWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AdamantWallet.swift; path = Adamant/Wallets/Ethereum/AdamantWallet.swift; sourceTree = SOURCE_ROOT; };
+		E940087F2114EE2000CD2D67 /* AdamantWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AdamantWallet.swift; path = Adamant/Wallets/Adamant/AdamantWallet.swift; sourceTree = SOURCE_ROOT; };
 		E94008822114EE4700CD2D67 /* LskWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskWallet.swift; sourceTree = "<group>"; };
 		E94008842114EE7500CD2D67 /* LskWalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskWalletService.swift; sourceTree = "<group>"; };
 		E94008862114F05B00CD2D67 /* AddressValidationResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressValidationResult.swift; sourceTree = "<group>"; };
-		E94008882114F0F700CD2D67 /* AdamantWalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AdamantWalletService.swift; path = Adamant/Helpers/AdamantWalletService.swift; sourceTree = SOURCE_ROOT; };
+		E94008882114F0F700CD2D67 /* AdamantWalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AdamantWalletService.swift; path = Adamant/Wallets/Adamant/AdamantWalletService.swift; sourceTree = SOURCE_ROOT; };
 		E940088A2114F63000CD2D67 /* NSRegularExpression+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSRegularExpression+adamant.swift"; sourceTree = "<group>"; };
+		E940088E2119A9E800CD2D67 /* BigInt+Decimal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BigInt+Decimal.swift"; sourceTree = "<group>"; };
 		E941CCDA20E786D700C96220 /* AccountHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AccountHeader.xib; sourceTree = "<group>"; };
 		E941CCDC20E7B70200C96220 /* WalletCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCollectionViewCell.swift; sourceTree = "<group>"; };
 		E941CCDD20E7B70200C96220 /* WalletCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WalletCollectionViewCell.xib; sourceTree = "<group>"; };
@@ -654,6 +656,7 @@
 				E98FC34320F920BD00032D65 /* UIFont+adamant.swift */,
 				E94008862114F05B00CD2D67 /* AddressValidationResult.swift */,
 				E940088A2114F63000CD2D67 /* NSRegularExpression+adamant.swift */,
+				E940088E2119A9E800CD2D67 /* BigInt+Decimal.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -725,7 +728,7 @@
 		E940086C2114A8FD00CD2D67 /* Wallets */ = {
 			isa = PBXGroup;
 			children = (
-				E940087E2114EDFD00CD2D67 /* Adamant */,
+				E94008902119D22400CD2D67 /* Adamant */,
 				E94008792114ECF100CD2D67 /* Ethereum */,
 				E94008812114EE3900CD2D67 /* Lisk */,
 				E94008712114EACF00CD2D67 /* WalletAccount.swift */,
@@ -743,16 +746,6 @@
 			path = Ethereum;
 			sourceTree = "<group>";
 		};
-		E940087E2114EDFD00CD2D67 /* Adamant */ = {
-			isa = PBXGroup;
-			children = (
-				E940087F2114EE2000CD2D67 /* AdamantWallet.swift */,
-				E94008882114F0F700CD2D67 /* AdamantWalletService.swift */,
-			);
-			name = Adamant;
-			path = "New Group";
-			sourceTree = "<group>";
-		};
 		E94008812114EE3900CD2D67 /* Lisk */ = {
 			isa = PBXGroup;
 			children = (
@@ -760,6 +753,15 @@
 				E94008842114EE7500CD2D67 /* LskWalletService.swift */,
 			);
 			path = Lisk;
+			sourceTree = "<group>";
+		};
+		E94008902119D22400CD2D67 /* Adamant */ = {
+			isa = PBXGroup;
+			children = (
+				E940087F2114EE2000CD2D67 /* AdamantWallet.swift */,
+				E94008882114F0F700CD2D67 /* AdamantWalletService.swift */,
+			);
+			path = Adamant;
 			sourceTree = "<group>";
 		};
 		E94E7B04205D48950042B639 /* Transactions */ = {
@@ -1314,6 +1316,7 @@
 				E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */,
 				644EC34D20EFA60900F40C73 /* AdamantApi+Delegates.swift in Sources */,
 				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
+				E940088F2119A9E800CD2D67 /* BigInt+Decimal.swift in Sources */,
 				E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */,
 				E940088B2114F63000CD2D67 /* NSRegularExpression+adamant.swift in Sources */,
 				E9B3D3A9202082450019EB36 /* AdamantTransfersProvider.swift in Sources */,

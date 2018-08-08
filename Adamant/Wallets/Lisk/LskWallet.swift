@@ -7,13 +7,16 @@
 //
 
 import Foundation
-import UIKit
 
 struct LskWallet: WalletAccount {
 	let address: String
 	let balance: Decimal
 	
-	// MARK: Currency
-	static var currencySymbol = "LSK"
-	static var currencyLogo = #imageLiteral(resourceName: "wallet_lsk")
+	func formatBalance(format: BalanceFormat, includeCurrencySymbol: Bool) -> String {
+		if includeCurrencySymbol {
+			return "\(format.defaultFormatter.string(from: balance as NSNumber)!) \(LskWalletService.currencySymbol)"
+		} else {
+			return format.defaultFormatter.string(from: balance as NSNumber)!
+		}
+	}
 }
