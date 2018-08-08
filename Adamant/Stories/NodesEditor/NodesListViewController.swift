@@ -87,7 +87,7 @@ class NodesListViewController: FormViewController {
 		if #available(iOS 11.0, *) {
 			navigationController?.navigationBar.prefersLargeTitles = true
 		}
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .phone && navigationController?.viewControllers.count == 1 {
+        if splitViewController == nil, navigationController?.viewControllers.count == 1 {
             let done = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(NodesListViewController.close))
             navigationItem.rightBarButtonItem = done
         }
