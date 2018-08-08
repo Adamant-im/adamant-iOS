@@ -44,14 +44,13 @@ class AdamantAccountService: AccountService {
 	
 	private(set) var account: AdamantAccount?
 	private(set) var keypair: Keypair?
+	private var passphrase: String?
 	
 	private func setState(_ state: AccountServiceState) {
 		stateSemaphore.wait()
 		self.state = state
 		stateSemaphore.signal()
 	}
-	
-	
 	
 	private(set) var hasStayInAccount: Bool = false
 	
@@ -80,6 +79,13 @@ class AdamantAccountService: AccountService {
 			}
 		}
 	}
+	
+	// MARK: Wallets
+	var wallets: [WalletService] = [
+//		AdamantWalletService(),
+		EthWalletService(),
+//		LskWalletService()
+	]
 }
 
 // MARK: - Saved data
@@ -105,7 +111,7 @@ extension AdamantAccountService {
 		securedStore.set(keypair.privateKey, for: .privateKey)
 		hasStayInAccount = true
 		NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.stayInChanged, object: self, userInfo: [AdamantUserInfoKey.AccountService.newStayInState : true])
-		completion(.success(account: account))
+		completion(.success(account: account, alert: nil))
 	}
 	
 	func validatePin(_ pin: String) -> Bool {
@@ -124,6 +130,10 @@ extension AdamantAccountService {
 		return nil
 	}
 	
+	private func getSavedPassphrase() -> String? {
+		return securedStore.get(.passphrase)
+	}
+	
 	func dropSavedAccount() {
 		securedStoreSemaphore.wait()
 		defer {
@@ -135,6 +145,7 @@ extension AdamantAccountService {
 		securedStore.remove(.publicKey)
 		securedStore.remove(.privateKey)
 		securedStore.remove(.useBiometry)
+		securedStore.remove(.passphrase)
 		hasStayInAccount = false
 		NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.stayInChanged, object: self, userInfo: [AdamantUserInfoKey.AccountService.newStayInState : false])
 		notificationsService.setNotificationsMode(.disabled, completion: nil)
@@ -184,7 +195,7 @@ extension AdamantAccountService {
 				}
 				
 				self?.setState(.loggedIn)
-                completion?(.success(account: account))
+				completion?(.success(account: account, alert: nil))
 				
 			case .failure(let error):
                 completion?(.failure(.apiError(error: error)))
@@ -219,7 +230,7 @@ extension AdamantAccountService {
 					apiService.newAccount(byPublicKey: publicKey) { result in
 						switch result {
 						case .success(let account):
-							completion(.success(account: account))
+							completion(.success(account: account, alert: nil))
 							
 						case .failure(let error):
 							completion(.failure(.apiError(error: error)))
@@ -247,22 +258,33 @@ extension AdamantAccountService {
 			return
 		}
 		
-		if let savedKeypair = getSavedKeypair() {
-			loginWith(keypair: keypair) { [weak self] result in
-				switch result {
-				case .success(_):
-					if let newKeypair = self?.keypair, newKeypair != savedKeypair {
-						self?.dropSavedAccount()
-					}
-					
-				default:
-					break
-				}
-				
+		loginWith(keypair: keypair) { [weak self] result in
+			guard case .success = result else {
 				completion(result)
+				return
 			}
-		} else {
-			loginWith(keypair: keypair, completion: completion)
+			
+			// MARK: Drop saved accs
+			if let storedPassphrase = self?.getSavedPassphrase(), storedPassphrase != passphrase {
+				self?.dropSavedAccount()
+			}
+			
+			if let storedKeypair = self?.getSavedKeypair(), storedKeypair != self?.keypair {
+				self?.dropSavedAccount()
+			}
+			
+			// Update and initiate wallet services
+			self?.passphrase = passphrase
+			
+			/*
+			if let wallets = self?.wallets {
+				for wallet in wallets {
+					wallet.initWallet(withPassphrase: passphrase, completion: { _ in })
+				}
+			}
+			*/
+			
+			completion(result)
 		}
 	}
 	
@@ -283,12 +305,27 @@ extension AdamantAccountService {
 	
 	// MARK: Biometry
 	func loginWithStoredAccount(completion: @escaping (AccountServiceResult) -> Void) {
-		guard let keypair = getSavedKeypair() else {
-			completion(.failure(.invalidPassphrase))
+		if let passphrase = getSavedPassphrase() {
+			loginWith(passphrase: passphrase, completion: completion)
 			return
 		}
 		
-		loginWith(keypair: keypair, completion: completion)
+		if let keypair = getSavedKeypair() {
+			loginWith(keypair: keypair) { result in
+				switch result {
+				case .success(let account, _):
+					completion(.success(account: account,
+										alert: (title: String.adamantLocalized.accountService.updateAlertTitleV12,
+												message: String.adamantLocalized.accountService.updateAlertMessageV12)))
+					
+				default:
+					completion(result)
+				}
+			}
+			return
+		}
+		
+		completion(.failure(.invalidPassphrase))
 	}
 	
 	
@@ -325,7 +362,8 @@ extension AdamantAccountService {
 				let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress:account.address]
 				NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userLoggedIn, object: self, userInfo: userInfo)
 				self.setState(.loggedIn)
-				completion(.success(account: account))
+				
+				completion(.success(account: account, alert: nil))
 				
 			case .failure(let error):
 				self.setState(.notLogged)
@@ -354,6 +392,7 @@ extension AdamantAccountService {
 		let wasLogged = account != nil
 		account = nil
 		keypair = nil
+		passphrase = nil
 		
 		if lockSemaphore {
 			setState(.notLogged)
@@ -375,6 +414,7 @@ extension StoreKey {
 		static let privateKey = "accountService.privateKey"
 		static let pin = "accountService.pin"
 		static let useBiometry = "accountService.useBiometry"
+		static let passphrase = "accountService.passphrase"
 		
 		private init() {}
 	}
@@ -385,6 +425,7 @@ fileprivate enum Key {
 	case privateKey
 	case pin
 	case useBiometry
+	case passphrase
 	
 	var stringValue: String {
 		switch self {
@@ -392,6 +433,7 @@ fileprivate enum Key {
 		case .privateKey: return StoreKey.accountService.privateKey
 		case .pin: return StoreKey.accountService.pin
 		case .useBiometry: return StoreKey.accountService.useBiometry
+		case .passphrase: return StoreKey.accountService.passphrase
 		}
 	}
 }
@@ -408,4 +450,10 @@ fileprivate extension SecuredStore {
 	func remove(_ key: Key) {
 		remove(key.stringValue)
 	}
+}
+
+
+// MARK: - Wallets
+extension AdamantAccountService {
+	
 }

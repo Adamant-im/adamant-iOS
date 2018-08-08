@@ -374,8 +374,12 @@ extension LoginViewController {
 	private func createAccountAndLogin(passphrase: String) {
 		accountService.createAccountWith(passphrase: passphrase, completion: { [weak self] result in
 			switch result {
-			case .success:
+			case .success(account: _, let alert):
 				self?.loginIntoExistingAccount(passphrase: passphrase)
+				
+				if let alert = alert {
+					self?.dialogService.showSystemActionSheet(title: alert.title, message: alert.message, actions: nil)
+				}
 				
 			case .failure(let error):
 				self?.dialogService.showError(withMessage: error.localized, error: error)
@@ -386,33 +390,18 @@ extension LoginViewController {
 	private func loginIntoExistingAccount(passphrase: String) {
 		accountService.loginWith(passphrase: passphrase, completion: { [weak self] result in
 			switch result {
-			case .success(_):
-                self?.ethAPiService.newAccount(byPassphrase: passphrase, completion: { (result) in
-                    switch result {
-                    case .success(_):
-                        break
-                    case .failure(let error):
-                        print(error)
-                        break
-                    }
-                    
-                    if let nav = self?.navigationController {
-                        nav.popViewController(animated: true)
-                    } else {
-                        self?.dismiss(animated: true, completion: nil)
-                    }
-                    self?.dialogService.dismissProgress()
-                })
-                
-                self?.lskAPiService.newAccount(byPassphrase: passphrase, completion: { (result) in
-                    switch result {
-                    case .success(_):
-                        break
-                    case .failure(let error):
-                        print(error)
-                        break
-                    }
-                })
+			case .success(_, let alert):
+				if let nav = self?.navigationController {
+					nav.popViewController(animated: true)
+				} else {
+					self?.dismiss(animated: true, completion: nil)
+				}
+				
+				self?.dialogService.dismissProgress()
+				
+				if let alert = alert {
+					self?.dialogService.showSystemActionSheet(title: alert.title, message: alert.message, actions: nil)
+				}
 				
 			case .failure(let error):
 				self?.dialogService.showRichError(error: error)

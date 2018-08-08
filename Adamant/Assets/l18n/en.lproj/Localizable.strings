@@ -76,6 +76,12 @@
 /* AccountsProvider: Address not valid error, %@ for address */
 "AccountsProvider.Error.AddressNotValidFormat" = "Invalid address: %@";
 
+/* AccountService: Alert title. Changes in version 1.2 */
+"AccountService.update.v12.title" = "Version 1.2 update: Cryptowallets";
+
+/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets */
+"AccountService.update.v12.message" = "You need to relogin to initiate Ethereum and Lisk wallets";
+
 /* Login: user typed in invalid passphrase */
 "AccountServiceError.InvalidPassphrase" = "Wrong passphrase";
 
