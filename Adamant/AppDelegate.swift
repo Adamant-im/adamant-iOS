@@ -124,15 +124,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let account = UINavigationController(rootViewController: accountRoot)
             
             if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-                let chatDetailsRoot = UIViewController()
-                chatDetailsRoot.view.backgroundColor = UIColor.white
-                
-                let chatDetails = UINavigationController(rootViewController:chatDetailsRoot)
-                
-                let accountDetailsRoot = UIViewController()
-                accountDetailsRoot.view.backgroundColor = UIColor.white
-                
-                let accountDetails = UINavigationController(rootViewController: accountDetailsRoot)
+                let chatDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
+                let accountDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
                 
                 chats.viewControllers = [chatList, chatDetails]
                 accounts.viewControllers = [account, accountDetails]
