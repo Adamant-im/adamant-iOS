@@ -100,6 +100,13 @@ class ChatListViewController: UIViewController {
 		}
 	}
 	
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
+        }
+    }
 	
 	// MARK: IB Actions
 	@IBAction func newChat(sender: Any) {

@@ -87,8 +87,7 @@ class NodesListViewController: FormViewController {
 		if #available(iOS 11.0, *) {
 			navigationController?.navigationBar.prefersLargeTitles = true
 		}
-        
-        if navigationController?.viewControllers.count == 1 {
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .phone && navigationController?.viewControllers.count == 1 {
             let done = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(NodesListViewController.close))
             navigationItem.rightBarButtonItem = done
         }
@@ -286,8 +285,14 @@ extension NodesListViewController: NodeEditorDelegate {
 		case .cancel:
 			break
 		}
-		
-		dismiss(animated: true, completion: nil)
+        
+        DispatchQueue.main.async {
+            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+                self.navigationController?.popToViewController(self, animated: true)
+            } else {
+                self.dismiss(animated: true, completion: nil)
+            }
+        }
 	}
 }
 
@@ -360,9 +365,12 @@ extension NodesListViewController {
 		editor.delegate = self
 		editor.node = node
 		editor.nodeTag = tag
-		
-		let navigator = UINavigationController(rootViewController: editor)
-		present(navigator, animated: true, completion: nil)
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            self.navigationController?.pushViewController(editor, animated: true)
+        } else {
+            let navigator = UINavigationController(rootViewController: editor)
+            present(navigator, animated: true, completion: nil)
+        }
 	}
 	
 	private func generateRandomTag() -> String {

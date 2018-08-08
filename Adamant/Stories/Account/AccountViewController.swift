@@ -236,8 +236,13 @@ class AccountViewController: FormViewController {
 			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.security) else {
 				return
 			}
-			
-			nav.pushViewController(vc, animated: true)
+            
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                nav.pushViewController(vc, animated: true)
+            }
 		})
 		
 		// Node list
@@ -253,7 +258,12 @@ class AccountViewController: FormViewController {
 				return
 			}
 			
-			nav.pushViewController(vc, animated: true)
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                nav.pushViewController(vc, animated: true)
+            }
 		})
 		
 		// About
@@ -269,7 +279,12 @@ class AccountViewController: FormViewController {
 				return
 			}
 			
-			nav.pushViewController(vc, animated: true)
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                nav.pushViewController(vc, animated: true)
+            }
 		})
 		
 			
@@ -292,7 +307,12 @@ class AccountViewController: FormViewController {
 				return
 			}
 			
-			nav.pushViewController(vc, animated: true)
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                nav.pushViewController(vc, animated: true)
+            }
 		})
 		
 		// Logout
@@ -346,10 +366,6 @@ class AccountViewController: FormViewController {
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.updateAccountInfo()
 		}
-        
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-            layoutTableHeaderView()
-        }
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -375,7 +391,14 @@ class AccountViewController: FormViewController {
 	}
     
     override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
+        }
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            layoutTableHeaderView()
             layoutTableFooterView()
         }
     }
@@ -434,27 +457,12 @@ class AccountViewController: FormViewController {
     
     func layoutTableHeaderView() {
         guard let view = tableView.tableHeaderView else { return }
-        view.translatesAutoresizingMaskIntoConstraints = false
-
-        let width = view.bounds.size.width;
-        let temporaryWidthConstraints = NSLayoutConstraint.constraints(withVisualFormat: "[headerView(width)]", options: NSLayoutFormatOptions(rawValue: UInt(0)), metrics: ["width": width], views: ["headerView": view])
-
-        view.addConstraints(temporaryWidthConstraints)
-
-        view.setNeedsLayout()
-        view.layoutIfNeeded()
-
-        let size = view.systemLayoutSizeFitting(UILayoutFittingCompressedSize)
-        let height = size.height
         var frame = view.frame
 
-        frame.size.height = height
+        frame.size.height = 300
         view.frame = frame
 
         self.tableView.tableHeaderView = view
-
-        view.removeConstraints(temporaryWidthConstraints)
-        view.translatesAutoresizingMaskIntoConstraints = true
     }
     
     func layoutTableFooterView() {
@@ -661,7 +669,12 @@ extension AccountViewController {
 					return
 				}
 				
-				nav.pushViewController(vc, animated: true)
+                if let split = self?.splitViewController {
+                    let details = UINavigationController(rootViewController:vc)
+                    split.showDetailViewController(details, sender: self)
+                } else {
+                    nav.pushViewController(vc, animated: true)
+                }
 			})
 			
 			// Send Tokens
