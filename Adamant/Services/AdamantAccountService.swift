@@ -282,13 +282,11 @@ extension AdamantAccountService {
 			// Update and initiate wallet services
 			self?.passphrase = passphrase
 			
-			/*
 			if let wallets = self?.wallets {
-				for wallet in wallets {
+				for case let wallet as WalletInitiatedWithPassphrase in wallets {
 					wallet.initWallet(withPassphrase: passphrase, completion: { _ in })
 				}
 			}
-			*/
 			
 			completion(result)
 		}

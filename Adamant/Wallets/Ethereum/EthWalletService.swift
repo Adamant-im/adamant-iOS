@@ -42,7 +42,48 @@ class EthWalletService: WalletService {
 	var wallet: WalletAccount? { return ethWallet }
 	
 	
-	// MARK: - Init
+	// MARK: - Update
+	func update() {
+		guard let wallet = ethWallet else {
+			return
+		}
+		
+		defer { stateSemaphore.signal() }
+		stateSemaphore.wait()
+		
+		switch state {
+		case .notInitiated, .updating:
+			return
+			
+		case .initiated, .updated:
+			break
+		}
+		
+		state = .updating
+		
+		getBalance(forAddress: wallet.ethAddress) { result in
+			switch result {
+			case .success(let balance):
+				if wallet.balance != balance {
+					defer { self.stateSemaphore.signal() }
+					self.stateSemaphore.wait()
+					
+					let newWallet = EthWallet(address: wallet.address, balance: balance, ethAddress: wallet.ethAddress)
+					self.ethWallet = newWallet
+					
+					NotificationCenter.default.post(name: EthWalletService.walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: newWallet])
+				}
+				
+			case .failure(let error):
+				self.dialogService.showRichError(error: error)
+			}
+		}
+	}
+}
+
+
+// MARK: - WalletInitiatedWithPassphrase
+extension EthWalletService: WalletInitiatedWithPassphrase {
 	func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
 		// MARK: 1. Prepare
 		defer { stateSemaphore.signal() }
@@ -96,45 +137,6 @@ class EthWalletService: WalletService {
 		
 		// MARK: 5. Initiate update
 		update()
-	}
-	
-	
-	// MARK: - Update
-	func update() {
-		guard let wallet = ethWallet else {
-			return
-		}
-		
-		defer { stateSemaphore.signal() }
-		stateSemaphore.wait()
-		
-		switch state {
-		case .notInitiated, .updating:
-			return
-			
-		case .initiated, .updated:
-			break
-		}
-		
-		state = .updating
-		
-		getBalance(forAddress: wallet.ethAddress) { result in
-			switch result {
-			case .success(let balance):
-				if wallet.balance != balance {
-					defer { self.stateSemaphore.signal() }
-					self.stateSemaphore.wait()
-					
-					let newWallet = EthWallet(address: wallet.address, balance: balance, ethAddress: wallet.ethAddress)
-					self.ethWallet = newWallet
-					
-					NotificationCenter.default.post(name: EthWalletService.walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: newWallet])
-				}
-				
-			case .failure(let error):
-				self.dialogService.showRichError(error: error)
-			}
-		}
 	}
 }
 

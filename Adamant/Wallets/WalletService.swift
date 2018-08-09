@@ -99,8 +99,6 @@ protocol WalletService: class {
 	static var currencySymbol: String { get }
 	static var currencyLogo: UIImage { get }
 	
-	var transactionFee: Decimal { get }
-	
 	// MARK: Notifications
 	
 	/// Wallet updated.
@@ -119,6 +117,14 @@ protocol WalletService: class {
 	func update()
 	
 	// MARK: Tools
-	func initWallet(withPassphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void)
 	func validate(address: String) -> AddressValidationResult
+}
+
+protocol WalletInitiatedWithPassphrase: WalletService {
+	func initWallet(withPassphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void)
+}
+
+protocol WalletWithTransfers: WalletService {
+	var transactionFee: Decimal { get }
+	func transfer()
 }

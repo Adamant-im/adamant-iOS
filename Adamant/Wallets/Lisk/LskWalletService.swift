@@ -32,10 +32,6 @@ class LskWalletService: WalletService {
 	
 	
 	// MARK: - Logic
-	func initWallet(withPassphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
-		
-	}
-	
 	func update() {
 		
 	}
