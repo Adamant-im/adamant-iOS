@@ -27,6 +27,7 @@ PODS:
   - M13Checkbox (3.2.2)
   - MessageKit (1.0.0)
   - MyLittlePinpad (0.2.5)
+  - Parchment (1.3.0)
   - PMAlertController (3.4.0)
   - QRCodeReader.swift (8.2.0)
   - ReachabilitySwift (4.1.0)
@@ -58,6 +59,7 @@ DEPENDENCIES:
   - M13Checkbox
   - MessageKit
   - MyLittlePinpad
+  - Parchment (from `https://github.com/RealBonus/Parchment`)
   - PMAlertController
   - QRCodeReader.swift
   - ReachabilitySwift
@@ -98,11 +100,16 @@ EXTERNAL SOURCES:
   Lisk:
     :branch: dev
     :git: https://github.com/boyarkin-anton/lisk-swift.git
+  Parchment:
+    :git: https://github.com/RealBonus/Parchment
 
 CHECKOUT OPTIONS:
   Lisk:
     :commit: 952fea02d6076668f68eb252ec5bd8bf4e656960
     :git: https://github.com/boyarkin-anton/lisk-swift.git
+  Parchment:
+    :commit: 8eaec56607bfcff6eb24d5814f45f3957827d818
+    :git: https://github.com/RealBonus/Parchment
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
@@ -123,6 +130,7 @@ SPEC CHECKSUMS:
   M13Checkbox: a8c2491cfbbca10797925fd0b9154a782bf40d89
   MessageKit: 16160036b16476b04bd0e9f2c7ce67e662e503e4
   MyLittlePinpad: ec1d9990d9715eab48205ecc08f4ff359ead521b
+  Parchment: 3c84b1fd55182e91b2e0f3bf1e4034c387151a46
   PMAlertController: efb781925d741d50e0200018a00c53cecb8b4910
   QRCodeReader.swift: 003eb32f18a5a675b936ec82ba0ff368cddbff45
   ReachabilitySwift: 6849231cd4e06559f3b9ef4a97a0a0f96d41e09f
@@ -133,6 +141,6 @@ SPEC CHECKSUMS:
   Swinject: f7f15a9672e99328c1f07f277091087917215700
   web3swift: 79f72b48005f1b28e73191eaf78194d6cf5f8a35
 
-PODFILE CHECKSUM: f167498be8316d6db16767ee403235192ed374dd
+PODFILE CHECKSUM: d0741d9974187d7d12fa165c3232ee37f1f5c33d
 
 COCOAPODS: 1.5.3

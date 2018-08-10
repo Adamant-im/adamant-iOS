@@ -95,7 +95,7 @@
 		E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EFE12200D1156000BB482 /* ChatViewController.swift */; };
 		E940086B2114A70600CD2D67 /* LskAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E940086A2114A70600CD2D67 /* LskAccount.swift */; };
 		E940086E2114AA2E00CD2D67 /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E940086D2114AA2E00CD2D67 /* WalletService.swift */; };
-		E94008702114EA6800CD2D67 /* BalanceFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = E940086F2114EA6800CD2D67 /* BalanceFormat.swift */; };
+		E94008702114EA6800CD2D67 /* AdamantBalanceFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = E940086F2114EA6800CD2D67 /* AdamantBalanceFormat.swift */; };
 		E94008722114EACF00CD2D67 /* WalletAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94008712114EACF00CD2D67 /* WalletAccount.swift */; };
 		E940087B2114ED0600CD2D67 /* EthWalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E940087A2114ED0600CD2D67 /* EthWalletService.swift */; };
 		E940087D2114EDEE00CD2D67 /* EthWallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E940087C2114EDEE00CD2D67 /* EthWallet.swift */; };
@@ -186,6 +186,8 @@
 		E9CAE8D62018AC5300345E76 /* AdamantApi+Transactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CAE8D52018AC5300345E76 /* AdamantApi+Transactions.swift */; };
 		E9CAE8D82018ACA700345E76 /* AdamantApi+Transfers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CAE8D72018ACA700345E76 /* AdamantApi+Transfers.swift */; };
 		E9CAE8DA2018ACD300345E76 /* AdamantApi+Chats.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CAE8D92018ACD300345E76 /* AdamantApi+Chats.swift */; };
+		E9D1BE1A211DA25300E86B72 /* UIView+constraints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D1BE19211DA25300E86B72 /* UIView+constraints.swift */; };
+		E9D1BE1C211DABE100E86B72 /* WalletPagingItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D1BE1B211DABE100E86B72 /* WalletPagingItem.swift */; };
 		E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* AccountService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
 		E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */; };
@@ -341,7 +343,7 @@
 		E93EFE12200D1156000BB482 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		E940086A2114A70600CD2D67 /* LskAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskAccount.swift; sourceTree = "<group>"; };
 		E940086D2114AA2E00CD2D67 /* WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletService.swift; sourceTree = "<group>"; };
-		E940086F2114EA6800CD2D67 /* BalanceFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceFormat.swift; sourceTree = "<group>"; };
+		E940086F2114EA6800CD2D67 /* AdamantBalanceFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantBalanceFormat.swift; sourceTree = "<group>"; };
 		E94008712114EACF00CD2D67 /* WalletAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletAccount.swift; sourceTree = "<group>"; };
 		E940087A2114ED0600CD2D67 /* EthWalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthWalletService.swift; sourceTree = "<group>"; };
 		E940087C2114EDEE00CD2D67 /* EthWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthWallet.swift; sourceTree = "<group>"; };
@@ -435,6 +437,8 @@
 		E9CAE8D52018AC5300345E76 /* AdamantApi+Transactions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Transactions.swift"; sourceTree = "<group>"; };
 		E9CAE8D72018ACA700345E76 /* AdamantApi+Transfers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Transfers.swift"; sourceTree = "<group>"; };
 		E9CAE8D92018ACD300345E76 /* AdamantApi+Chats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Chats.swift"; sourceTree = "<group>"; };
+		E9D1BE19211DA25300E86B72 /* UIView+constraints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+constraints.swift"; sourceTree = "<group>"; };
+		E9D1BE1B211DABE100E86B72 /* WalletPagingItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletPagingItem.swift; sourceTree = "<group>"; };
 		E9E7CD8A20026B0600DFC4DB /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 		E9E7CD8C20026B6600DFC4DB /* DialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogService.swift; sourceTree = "<group>"; };
 		E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
@@ -639,8 +643,10 @@
 			children = (
 				E91947B12000246A001362F8 /* AdamantError.swift */,
 				E9061B96207501E40011F104 /* AdamantUserInfoKey.swift */,
+				E94008862114F05B00CD2D67 /* AddressValidationResult.swift */,
+				E940086F2114EA6800CD2D67 /* AdamantBalanceFormat.swift */,
+				E940088E2119A9E800CD2D67 /* BigInt+Decimal.swift */,
 				E9FAE5D9203DBFEF008D3A6B /* Comparable+clamped.swift */,
-				E940086F2114EA6800CD2D67 /* BalanceFormat.swift */,
 				E98FC34520F9210100032D65 /* Date+adamant.swift */,
 				E9204B4F20C94C4A00F3B9AB /* Date+humanizedString.swift */,
 				E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */,
@@ -649,14 +655,13 @@
 				E913C90C1FFFA99B001A83F7 /* Keypair.swift */,
 				64A223D520F760BB005157CB /* Localization.swift */,
 				E9147B5E20500E9300145913 /* MyLittlePinpad+adamant.swift */,
+				E940088A2114F63000CD2D67 /* NSRegularExpression+adamant.swift */,
 				E9147B6220505C7500145913 /* QRCodeReader+adamant.swift */,
 				E9256F5E2034C21100DE86E9 /* String+localized.swift */,
 				E98FC34120F9209900032D65 /* UIColor+adamant.swift */,
 				E927171D20C04613002BB9A6 /* UIColor+hex.swift */,
 				E98FC34320F920BD00032D65 /* UIFont+adamant.swift */,
-				E94008862114F05B00CD2D67 /* AddressValidationResult.swift */,
-				E940088A2114F63000CD2D67 /* NSRegularExpression+adamant.swift */,
-				E940088E2119A9E800CD2D67 /* BigInt+Decimal.swift */,
+				E9D1BE19211DA25300E86B72 /* UIView+constraints.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -933,6 +938,7 @@
 				E983AE2C20E6720D00497E1A /* AccountFooter.xib */,
 				E941CCDC20E7B70200C96220 /* WalletCollectionViewCell.swift */,
 				E941CCDD20E7B70200C96220 /* WalletCollectionViewCell.xib */,
+				E9D1BE1B211DABE100E86B72 /* WalletPagingItem.swift */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -1154,6 +1160,7 @@
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
 				"${BUILT_PRODUCTS_DIR}/MyLittlePinpad/MyLittlePinpad.framework",
 				"${BUILT_PRODUCTS_DIR}/PMAlertController/PMAlertController.framework",
+				"${BUILT_PRODUCTS_DIR}/Parchment/Parchment.framework",
 				"${BUILT_PRODUCTS_DIR}/QRCodeReader.swift/QRCodeReader.framework",
 				"${BUILT_PRODUCTS_DIR}/RNCryptor/RNCryptor.framework",
 				"${BUILT_PRODUCTS_DIR}/ReachabilitySwift/Reachability.framework",
@@ -1184,6 +1191,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MyLittlePinpad.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PMAlertController.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Parchment.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCodeReader.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCryptor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
@@ -1262,7 +1270,7 @@
 				E94008872114F05B00CD2D67 /* AddressValidationResult.swift in Sources */,
 				649A694720DD427200D27E91 /* TransferType.swift in Sources */,
 				64A223D820F7A08E005157CB /* LskApiService.swift in Sources */,
-				E94008702114EA6800CD2D67 /* BalanceFormat.swift in Sources */,
+				E94008702114EA6800CD2D67 /* AdamantBalanceFormat.swift in Sources */,
 				E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */,
 				E9CAE8DA2018ACD300345E76 /* AdamantApi+Chats.swift in Sources */,
 				E91947B020002393001362F8 /* AdamantApiService.swift in Sources */,
@@ -1284,6 +1292,7 @@
 				64BD2B7520E2814B00E2CD36 /* EthTransaction.swift in Sources */,
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				64F085D920E2D7600006DE68 /* ADMTransactionsViewController.swift in Sources */,
+				E9D1BE1C211DABE100E86B72 /* WalletPagingItem.swift in Sources */,
 				E9150B992066DA210065A985 /* TransferTransaction+CoreDataClass.swift in Sources */,
 				E940086E2114AA2E00CD2D67 /* WalletService.swift in Sources */,
 				E9150BA02066DA210065A985 /* MessageTransaction+CoreDataProperties.swift in Sources */,
@@ -1332,6 +1341,7 @@
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
 				E93EB0A320DA4CCA001F9601 /* Node.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
+				E9D1BE1A211DA25300E86B72 /* UIView+constraints.swift in Sources */,
 				E94008722114EACF00CD2D67 /* WalletAccount.swift in Sources */,
 				E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */,
 				E9150BA12066DA210065A985 /* ChatTransaction+CoreDataClass.swift in Sources */,
