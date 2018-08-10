@@ -13,7 +13,4 @@ protocol WalletAccount {
 	// MARK: Account
 	var address: String { get }
 	var balance: Decimal { get }
-	
-	// MARK: Format
-	func formatBalance(format: BalanceFormat, includeCurrencySymbol: Bool) -> String
 }

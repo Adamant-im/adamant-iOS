@@ -1,5 +1,5 @@
 //
-//  BalanceFormat.swift
+//  AdamantBalanceFormat.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 03.08.2018.
@@ -9,8 +9,13 @@
 import Foundation
 
 /// MARK: - Formatters
-enum BalanceFormat {
+enum AdamantBalanceFormat {
+	// MARK: Styles
+	
 	case full, compact, short
+	
+	
+	// MARK: Formatters
 	
 	static var currencyFormatterFull: NumberFormatter = {
 		let formatter = NumberFormatter()
@@ -36,11 +41,18 @@ enum BalanceFormat {
 		return formatter
 	}()
 	
+	
+	// MARK: Methods
+	
 	var defaultFormatter: NumberFormatter {
 		switch self {
-		case .full: return BalanceFormat.currencyFormatterFull
-		case .compact: return BalanceFormat.currencyFormatterCompact
-		case .short: return BalanceFormat.currencyFormatterShort
+		case .full: return AdamantBalanceFormat.currencyFormatterFull
+		case .compact: return AdamantBalanceFormat.currencyFormatterCompact
+		case .short: return AdamantBalanceFormat.currencyFormatterShort
 		}
+	}
+	
+	func format(balance: Decimal) -> String {
+		return defaultFormatter.string(from: balance as NSNumber)!
 	}
 }

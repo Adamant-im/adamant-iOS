@@ -14,12 +14,4 @@ struct EthWallet: WalletAccount {
 	let balance: Decimal
 	
 	let ethAddress: EthereumAddress
-	
-	func formatBalance(format: BalanceFormat, includeCurrencySymbol: Bool) -> String {
-		if includeCurrencySymbol {
-			return "\(format.defaultFormatter.string(from: balance as NSNumber)!) \(LskWalletService.currencySymbol)"
-		} else {
-			return format.defaultFormatter.string(from: balance as NSNumber)!
-		}
-	}
 }
