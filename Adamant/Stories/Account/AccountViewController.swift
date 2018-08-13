@@ -65,10 +65,6 @@ class AccountViewController: FormViewController {
 	var transfersProvider: TransfersProvider!
 	
 	
-	// MARK: - Wallets
-	var selectedWalletIndex: Int = 0
-	
-	
 	// MARK: - Properties
 	
 	var hideFreeTokensRow = false
@@ -360,39 +356,40 @@ extension AccountViewController: NSFetchedResultsControllerDelegate {
 
 
 // MARK: - PagingViewControllerDataSource
-extension AccountViewController: PagingViewControllerDataSource {
+extension AccountViewController: PagingViewControllerDataSource, PagingViewControllerDelegate {
 	func numberOfViewControllers<T>(in pagingViewController: PagingViewController<T>) -> Int {
-		return 3
+		return accountService.wallets.count
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
-		return UIViewController()
+		return accountService.wallets[index].walletViewController.viewController
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, pagingItemForIndex index: Int) -> T {
-		switch index {
-		case 0:
-			let item = WalletPagingItem(index: 0, currencySymbol: "ADM", currencyImage: #imageLiteral(resourceName: "wallet_adm"))
-			item.balance = 12.5
-			item.notifications = 2
-			return item as! T
-			
-		case 1:
-			let item = WalletPagingItem(index: 1, currencySymbol: "ETH", currencyImage: #imageLiteral(resourceName: "wallet_eth"))
-			item.balance = 100500
-			item.notifications = 0
-			return item as! T
-			
-		case 2:
-			let item = WalletPagingItem(index: 2, currencySymbol: "LSK", currencyImage: #imageLiteral(resourceName: "wallet_lsk"))
-			item.balance = 0
-			item.notifications = 5
-			return item as! T
-			
-		default:
-			fatalError()
+		let service = accountService.wallets[index]
+		
+		guard let wallet = service.wallet else {
+			return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm")) as! T
 		}
+		
+		let serviceType = type(of: service)
+		
+		let item = WalletPagingItem(index: index, currencySymbol: serviceType.currencySymbol, currencyImage: serviceType.currencyLogo)
+		item.balance = wallet.balance
+		
+		return item as! T
 	}
+	
+//	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, didScrollToItem pagingItem: T, startingViewController: UIViewController?, destinationViewController: UIViewController, transitionSuccessful: Bool) {
+//		guard transitionSuccessful,
+//			let walletVC = destinationViewController as? WalletViewController else {
+//			return
+//		}
+//
+//		guard case let .fixed(_, height) = pagingViewController.menuItemSize else {
+//			return
+//		}
+//	}
 }
 
 

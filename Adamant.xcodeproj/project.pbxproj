@@ -70,7 +70,6 @@
 		E91947B22000246A001362F8 /* AdamantError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B12000246A001362F8 /* AdamantError.swift */; };
 		E91947B420002809001362F8 /* AdamantAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91947B320002809001362F8 /* AdamantAccount.swift */; };
 		E91E5BF220DAF05500B06B3C /* EurekaNodeRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91E5BF120DAF05500B06B3C /* EurekaNodeRow.swift */; };
-		E91E5BF420DAF3AB00B06B3C /* NodeCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E91E5BF320DAF3AB00B06B3C /* NodeCell.xib */; };
 		E9204B5020C94C4A00F3B9AB /* Date+humanizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9204B4F20C94C4A00F3B9AB /* Date+humanizedString.swift */; };
 		E9204B5220C9762400F3B9AB /* MessageStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9204B5120C9762300F3B9AB /* MessageStatus.swift */; };
 		E921534E20EE1E8700C0843F /* EurekaAlertLabelRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921534C20EE1E8700C0843F /* EurekaAlertLabelRow.swift */; };
@@ -164,6 +163,10 @@
 		E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */; };
 		E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B86203D9E5100C163AF /* EurekaQRRow.swift */; };
 		E9942B89203D9ECA00C163AF /* QrCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9942B88203D9ECA00C163AF /* QrCell.xib */; };
+		E9981892212088DE0018C84C /* NodeCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E91E5BF320DAF3AB00B06B3C /* NodeCell.xib */; };
+		E99818942120892F0018C84C /* WalletViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99818932120892F0018C84C /* WalletViewControllerBase.swift */; };
+		E9981896212095CA0018C84C /* EthWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9981895212095CA0018C84C /* EthWalletViewController.swift */; };
+		E9981898212096ED0018C84C /* WalletViewControllerBase.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9981897212096ED0018C84C /* WalletViewControllerBase.xib */; };
 		E9A03FD220DBC0F2007653A1 /* NodeEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A03FD120DBC0F2007653A1 /* NodeEditorViewController.swift */; };
 		E9A03FD420DBC824007653A1 /* NodeVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A03FD320DBC824007653A1 /* NodeVersion.swift */; };
 		E9A03FD620DBC8E2007653A1 /* AdamantApi+Peers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A03FD520DBC8E2007653A1 /* AdamantApi+Peers.swift */; };
@@ -415,6 +418,9 @@
 		E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantQRTools.swift; sourceTree = "<group>"; };
 		E9942B86203D9E5100C163AF /* EurekaQRRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EurekaQRRow.swift; sourceTree = "<group>"; };
 		E9942B88203D9ECA00C163AF /* QrCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = QrCell.xib; sourceTree = "<group>"; };
+		E99818932120892F0018C84C /* WalletViewControllerBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewControllerBase.swift; sourceTree = "<group>"; };
+		E9981895212095CA0018C84C /* EthWalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthWalletViewController.swift; sourceTree = "<group>"; };
+		E9981897212096ED0018C84C /* WalletViewControllerBase.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WalletViewControllerBase.xib; sourceTree = "<group>"; };
 		E9A03FD120DBC0F2007653A1 /* NodeEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeEditorViewController.swift; sourceTree = "<group>"; };
 		E9A03FD320DBC824007653A1 /* NodeVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeVersion.swift; sourceTree = "<group>"; };
 		E9A03FD520DBC8E2007653A1 /* AdamantApi+Peers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Peers.swift"; sourceTree = "<group>"; };
@@ -747,6 +753,7 @@
 			children = (
 				E940087C2114EDEE00CD2D67 /* EthWallet.swift */,
 				E940087A2114ED0600CD2D67 /* EthWalletService.swift */,
+				E9981895212095CA0018C84C /* EthWalletViewController.swift */,
 			);
 			path = Ethereum;
 			sourceTree = "<group>";
@@ -939,6 +946,8 @@
 				E941CCDC20E7B70200C96220 /* WalletCollectionViewCell.swift */,
 				E941CCDD20E7B70200C96220 /* WalletCollectionViewCell.xib */,
 				E9D1BE1B211DABE100E86B72 /* WalletPagingItem.swift */,
+				E99818932120892F0018C84C /* WalletViewControllerBase.swift */,
+				E9981897212096ED0018C84C /* WalletViewControllerBase.xib */,
 			);
 			path = Account;
 			sourceTree = "<group>";
@@ -1034,7 +1043,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = Adamant;
 				TargetAttributes = {
 					E913C8ED1FFFA51D001A83F7 = {
@@ -1083,6 +1092,7 @@
 			files = (
 				E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */,
 				E95CB451205D77B200A7218E /* InfoPlist.strings in Resources */,
+				E9981898212096ED0018C84C /* WalletViewControllerBase.xib in Resources */,
 				E983AE2D20E6720D00497E1A /* AccountFooter.xib in Resources */,
 				E9EC341B200524CA00C0E546 /* Roboto_300_normal.ttf in Resources */,
 				E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */,
@@ -1109,8 +1119,7 @@
 				E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */,
 				E95CB456205D77B500A7218E /* Localizable.strings in Resources */,
 				E95CB45E205D7F9600A7218E /* Localizable.stringsdict in Resources */,
-				E91E5BF420DAF3AB00B06B3C /* NodeCell.xib in Resources */,
-				E91E5BF420DAF3AB00B06B3C /* NodeCell.xib in Resources */,
+				E9981892212088DE0018C84C /* NodeCell.xib in Resources */,
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
 				E9A174B920587B84003667CD /* notification.mp3 in Resources */,
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
@@ -1338,6 +1347,7 @@
 				E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */,
 				E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */,
 				E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */,
+				E99818942120892F0018C84C /* WalletViewControllerBase.swift in Sources */,
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
 				E93EB0A320DA4CCA001F9601 /* Node.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
@@ -1420,6 +1430,7 @@
 				E95F856B200789450070534A /* JSModels.swift in Sources */,
 				E9A174B52057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift in Sources */,
 				E9147B5F20500E9300145913 /* MyLittlePinpad+adamant.swift in Sources */,
+				E9981896212095CA0018C84C /* EthWalletViewController.swift in Sources */,
 				E98FC34620F9210100032D65 /* Date+adamant.swift in Sources */,
 				E905D39D204C13B900DDB504 /* SecuredStore.swift in Sources */,
 				E98FC34820F921EA00032D65 /* DelegateVote.swift in Sources */,

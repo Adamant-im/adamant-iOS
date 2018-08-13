@@ -102,7 +102,11 @@ extension Container {
 			service.securedStore = r.resolve(SecuredStore.self)!
 			service.notificationsService = r.resolve(NotificationsService.self)!
 			return service
-		}.inObjectScope(.container)
+		}.inObjectScope(.container).initCompleted { (r, service) in
+			for case let wallet as SwinjectDependentService in service.wallets {
+				wallet.injectDependencies(from: self)
+			}
+		}
 		
 		
 		// MARK: - Data Providers

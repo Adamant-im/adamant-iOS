@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import Swinject
 
 enum WalletServiceState {
 	case notInitiated, initiated, updated, updating
@@ -93,6 +94,12 @@ extension AdamantUserInfoKey {
 }
 
 
+// MARK: - UI
+protocol WalletViewController {
+	var viewController: UIViewController { get }
+	var height: CGFloat { get }
+}
+
 // MARK: - Wallet Service
 protocol WalletService: class {
 	// MARK: Currency
@@ -116,8 +123,15 @@ protocol WalletService: class {
 	// MARK: Logic
 	func update()
 	
+	// MARK: Account UI
+	var walletViewController: WalletViewController { get }
+	
 	// MARK: Tools
 	func validate(address: String) -> AddressValidationResult
+}
+
+protocol SwinjectDependentService: WalletService {
+	func injectDependencies(from container: Container)
 }
 
 protocol WalletInitiatedWithPassphrase: WalletService {

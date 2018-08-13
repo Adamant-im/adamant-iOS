@@ -21,7 +21,7 @@ target 'Adamant' do
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
   pod 'M13Checkbox' # Checkbox control
-  pod 'Parchment', :git => 'https://github.com/RealBonus/Parchment' # Paging menu
+  pod 'Parchment' # Paging menu
 
   # QR
   pod 'EFQRCode' # QR generator

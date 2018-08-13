@@ -10,6 +10,8 @@ import Foundation
 import UIKit
 
 class LskWalletService: WalletService {
+	var walletViewController: WalletViewController { fatalError() }
+	
 	static var walletUpdatedNotification = Notification.Name("lsk.update")
 	static let serviceEnabledChanged = Notification.Name("lsk.enabledChanged")
 	

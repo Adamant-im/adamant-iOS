@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import web3swift
 import BigInt
+import Swinject
 
 class EthWalletService: WalletService {
 	// MARK: - Constants
@@ -34,6 +35,17 @@ class EthWalletService: WalletService {
 	private (set) var enabled = false
 	
 	let stateSemaphore = DispatchSemaphore(value: 1)
+	
+	var walletViewController: WalletViewController {
+		let vc = EthWalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
+//		let vc = EthWalletViewController()
+		vc.service = self
+		
+//		let nib = UINib(nibName: "WalletViewControllerBase", bundle: nil)
+//		nib.instantiate(withOwner: vc, options: nil)
+		
+		return vc
+	}
 	
 	// MARK: - State
 	private (set) var state: WalletServiceState = .notInitiated
@@ -86,7 +98,6 @@ class EthWalletService: WalletService {
 extension EthWalletService: WalletInitiatedWithPassphrase {
 	func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
 		// MARK: 1. Prepare
-		defer { stateSemaphore.signal() }
 		stateSemaphore.wait()
 		
 		state = .notInitiated
@@ -101,17 +112,20 @@ extension EthWalletService: WalletInitiatedWithPassphrase {
 		do {
 			guard let store = try BIP32Keystore(mnemonics: passphrase, password: "", mnemonicsPassword: "", language: .english) else {
 				completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
+				stateSemaphore.signal()
 				return
 			}
 			
 			keystore = store
 		} catch {
 			completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: error)))
+			stateSemaphore.signal()
 			return
 		}
 		
 		guard let ethAddress = keystore.addresses?.first else {
 			completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
+			stateSemaphore.signal()
 			return
 		}
 		
@@ -134,6 +148,8 @@ extension EthWalletService: WalletInitiatedWithPassphrase {
 				self?.dialogService.showRichError(error: error)
 			}
 		}
+		
+		stateSemaphore.signal()
 		
 		// MARK: 5. Initiate update
 		update()
@@ -195,6 +211,16 @@ extension EthWalletService {
 				completion(.failure(error: .internalError(message: "ETH Wallet: fail to get address from KVS", error: error)))
 			}
 		}
+	}
+}
+
+
+// MARK: - Dependencies
+extension EthWalletService: SwinjectDependentService {
+	func injectDependencies(from container: Container) {
+		accountService = container.resolve(AccountService.self)
+		apiService = container.resolve(ApiService.self)
+		dialogService = container.resolve(DialogService.self)
 	}
 }
 
