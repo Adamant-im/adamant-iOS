@@ -17,6 +17,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="WalletViewControllerBase" customModule="Adamant" customModuleProvider="target">
             <connections>
+                <outlet property="tableView" destination="ds2-xE-YVe" id="OrF-Js-fVI"/>
                 <outlet property="view" destination="iN0-l3-epB" id="Xst-LY-XhU"/>
                 <outlet property="walletTitleLabel" destination="Hcx-tx-ZRm" id="O0Y-kF-52z"/>
             </connections>
@@ -27,19 +28,27 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Adamant Wallet" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hcx-tx-ZRm">
-                    <rect key="frame" x="8" y="8" width="125" height="20"/>
+                    <rect key="frame" x="16" y="12" width="125" height="20.5"/>
                     <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="ds2-xE-YVe">
+                    <rect key="frame" x="0.0" y="40.5" width="375" height="189.5"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </tableView>
             </subviews>
             <constraints>
-                <constraint firstItem="Hcx-tx-ZRm" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="8" id="Ctj-D3-QR3"/>
-                <constraint firstItem="Hcx-tx-ZRm" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="8" id="Vlb-if-mIc"/>
+                <constraint firstItem="ds2-xE-YVe" firstAttribute="top" secondItem="Hcx-tx-ZRm" secondAttribute="bottom" constant="8" id="Alh-1J-BAu"/>
+                <constraint firstItem="Hcx-tx-ZRm" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="16" id="Ctj-D3-QR3"/>
+                <constraint firstItem="Hcx-tx-ZRm" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="12" id="Vlb-if-mIc"/>
+                <constraint firstItem="ds2-xE-YVe" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" id="Wev-Lp-6fy"/>
+                <constraint firstItem="ds2-xE-YVe" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="cht-bL-gtw"/>
+                <constraint firstItem="ds2-xE-YVe" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" id="qq5-un-b6u"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
-            <point key="canvasLocation" x="38" y="-164"/>
+            <point key="canvasLocation" x="37.5" y="-164"/>
         </view>
     </objects>
 </document>

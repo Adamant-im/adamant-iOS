@@ -9,12 +9,6 @@
 import UIKit
 
 class EthWalletViewController: WalletViewControllerBase {
-	// MARK: - Properties
-	
-	var service: EthWalletService!
-	override var height: CGFloat { return 100 }
-	
-	
 	// MARK: Lifecycle
 	
 	override func viewDidLoad() {

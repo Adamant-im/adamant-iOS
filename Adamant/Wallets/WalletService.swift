@@ -95,10 +95,20 @@ extension AdamantUserInfoKey {
 
 
 // MARK: - UI
+extension Notification.Name {
+	struct WalletViewController {
+		static let heightUpdated = Notification.Name("adamant.walletViewController")
+		
+		private init() {}
+	}
+}
+
 protocol WalletViewController {
 	var viewController: UIViewController { get }
 	var height: CGFloat { get }
+	var service: WalletService? { get }
 }
+
 
 // MARK: - Wallet Service
 protocol WalletService: class {
@@ -139,6 +149,10 @@ protocol WalletInitiatedWithPassphrase: WalletService {
 }
 
 protocol WalletWithTransfers: WalletService {
+	func showTransfers()
+}
+
+protocol WalletWithSend: WalletService {
 	var transactionFee: Decimal { get }
-	func transfer()
+	func showTransfer(recipient: String?)
 }

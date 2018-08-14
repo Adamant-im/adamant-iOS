@@ -38,12 +38,7 @@ class EthWalletService: WalletService {
 	
 	var walletViewController: WalletViewController {
 		let vc = EthWalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
-//		let vc = EthWalletViewController()
 		vc.service = self
-		
-//		let nib = UINib(nibName: "WalletViewControllerBase", bundle: nil)
-//		nib.instantiate(withOwner: vc, options: nil)
-		
 		return vc
 	}
 	
@@ -153,6 +148,19 @@ extension EthWalletService: WalletInitiatedWithPassphrase {
 		
 		// MARK: 5. Initiate update
 		update()
+	}
+}
+
+
+extension EthWalletService: WalletWithTransfers {
+	func showTransfers() {
+		print("Show transfers")
+	}
+}
+
+extension EthWalletService: WalletWithSend {
+	func showTransfer(recipient: String?) {
+		print("Transfer money to \(recipient ?? "nil")")
 	}
 }
 

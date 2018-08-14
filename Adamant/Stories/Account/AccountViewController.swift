@@ -75,6 +75,7 @@ class AccountViewController: FormViewController {
 	private var transfersController: NSFetchedResultsController<TransferTransaction>?
 	private var pagingViewController: PagingViewController<WalletPagingItem>!
 	
+	private var initiated = false
 	
 	// MARK: - Lifecycle
 	
@@ -252,6 +253,19 @@ class AccountViewController: FormViewController {
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.updateAccountInfo()
 		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.WalletViewController.heightUpdated, object: nil, queue: OperationQueue.main) { [weak self] notification in
+			if let vc = notification.object as? WalletViewController,
+				let cvc = self?.pagingViewController.pageViewController.selectedViewController,
+				vc.viewController == cvc {
+				
+				if let initiated = self?.initiated {
+					self?.updateHeaderSize(with: vc, animated: initiated)
+				} else {
+					self?.updateHeaderSize(with: vc, animated: false)
+				}
+			}
+		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -266,6 +280,14 @@ class AccountViewController: FormViewController {
 	override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
 		navigationController?.setNavigationBarHidden(false, animated: animated)
+	}
+	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		
+		if !initiated {
+			initiated = true
+		}
 	}
 	
 	deinit {
@@ -380,16 +402,40 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 		return item as! T
 	}
 	
-//	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, didScrollToItem pagingItem: T, startingViewController: UIViewController?, destinationViewController: UIViewController, transitionSuccessful: Bool) {
-//		guard transitionSuccessful,
-//			let walletVC = destinationViewController as? WalletViewController else {
-//			return
-//		}
-//
-//		guard case let .fixed(_, height) = pagingViewController.menuItemSize else {
-//			return
-//		}
-//	}
+	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, didScrollToItem pagingItem: T, startingViewController: UIViewController?, destinationViewController: UIViewController, transitionSuccessful: Bool) {
+		guard transitionSuccessful,
+			let first = startingViewController as? WalletViewController,
+			let second = destinationViewController as? WalletViewController,
+			first.height != second.height else {
+			return
+		}
+
+		updateHeaderSize(with: second, animated: true)
+	}
+	
+	func updateHeaderSize(with walletViewController: WalletViewController, animated: Bool) {
+		guard case let .fixed(_, menuHeight) = pagingViewController.menuItemSize else {
+			return
+		}
+		
+		let pagingHeight = menuHeight + walletViewController.height
+		
+		var headerBounds = accountHeaderView.bounds
+		headerBounds.size.height = accountHeaderView.walletViewContainer.frame.origin.y + pagingHeight
+		accountHeaderView.bounds = headerBounds
+		
+		var pagingBounds = pagingViewController.view.bounds
+		pagingBounds.size.height = pagingHeight
+		pagingViewController.view.bounds = pagingBounds
+		
+		if animated {
+			tableView.beginUpdates()
+			tableView.tableHeaderView = accountHeaderView
+			tableView.endUpdates()
+		} else {
+			tableView.tableHeaderView = accountHeaderView
+		}
+	}
 }
 
 
