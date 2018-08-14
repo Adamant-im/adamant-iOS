@@ -24,6 +24,7 @@ class EthWalletService: WalletService {
 	weak var accountService: AccountService!
 	var apiService: ApiService!
 	var dialogService: DialogService!
+	var router: Router!
 	
 	var web3: web3!
 	
@@ -37,7 +38,10 @@ class EthWalletService: WalletService {
 	let stateSemaphore = DispatchSemaphore(value: 1)
 	
 	var walletViewController: WalletViewController {
-		let vc = EthWalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
+		guard let vc = router.get(scene: AdamantScene.Wallets.EthereumWallet) as? EthWalletViewController else {
+			fatalError("Can't get EthWalletViewController")
+		}
+		
 		vc.service = self
 		return vc
 	}
@@ -229,6 +233,7 @@ extension EthWalletService: SwinjectDependentService {
 		accountService = container.resolve(AccountService.self)
 		apiService = container.resolve(ApiService.self)
 		dialogService = container.resolve(DialogService.self)
+		router = container.resolve(Router.self)
 	}
 }
 

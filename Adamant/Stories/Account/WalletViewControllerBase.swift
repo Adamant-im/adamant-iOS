@@ -33,6 +33,12 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 	
 	private let cellIdentifier = "cell"
 	
+	
+	// MARK: - Dependencies
+	
+	var dialogService: DialogService!
+	
+	
 	// MARK: - Properties, WalletViewController
 	
 	var viewController: UIViewController { return self }
@@ -63,8 +69,24 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}.onCellSelection { (_, _) in
-			print("Share address")
+		}.onCellSelection { [weak self] (_, _) in
+			let completion = { [weak self] in
+				guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
+					return
+				}
+				
+				tableView.deselectRow(at: indexPath, animated: true)
+			}
+			
+			if let address = self?.service?.wallet?.address {
+				
+				let contentType = ShareContentType.address
+				self?.dialogService.presentShareAlertFor(string: address,
+														 types: contentType.shareTypes(sharingTip: address),
+														 excludedActivityTypes: contentType.excludedActivityTypes,
+														 animated: true,
+														 completion: completion)
+			}
 		}
 		
 		section.append(addressRow)

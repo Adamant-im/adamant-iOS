@@ -44,6 +44,20 @@ enum ShareContentType {
 	case passphrase
 	case address
 	
+	func shareTypes(sharingTip: String?) -> [ShareType] {
+		switch self {
+		case .address:
+			return [.copyToPasteboard,
+					.share,
+					.generateQr(sharingTip: sharingTip)]
+			
+		case .passphrase:
+			return [.copyToPasteboard,
+					.share,
+					.generateQr(sharingTip: sharingTip)]
+		}
+	}
+	
 	var excludedActivityTypes: [UIActivityType]? {
 		switch self {
 		case .passphrase:
