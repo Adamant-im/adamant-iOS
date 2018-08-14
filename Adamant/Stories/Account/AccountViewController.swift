@@ -539,7 +539,8 @@ extension AccountViewController: AccountHeaderViewDelegate {
 			tableView.deselectRow(at: indexPath, animated: true)
 		}
 		
-		dialogService.presentShareAlertFor(string: address,
+		let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+		dialogService.presentShareAlertFor(string: encodedAddress,
 										   types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
 										   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 										   animated: true,

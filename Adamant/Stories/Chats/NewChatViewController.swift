@@ -183,7 +183,8 @@ class NewChatViewController: FormViewController {
 			}.cellUpdate { (cell, _) in
 				cell.textLabel?.textColor = UIColor.adamant.primary
 			}.onCellSelection { [weak self] (cell, row) in
-				switch AdamantQRTools.generateQrFrom(string: address) {
+				let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+				switch AdamantQRTools.generateQrFrom(string: encodedAddress) {
 				case .success(let qr):
 					guard let vc = self?.router.get(scene: AdamantScene.Shared.shareQr) as? ShareQrViewController else {
 						fatalError("Can't find ShareQrViewController")
@@ -385,15 +386,39 @@ extension NewChatViewController {
 // MARK: - QRCodeReaderViewControllerDelegate
 extension NewChatViewController: QRCodeReaderViewControllerDelegate {
 	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-		guard let uri = AdamantUriTools.decode(uri: result.value) else {
-			dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-				reader.startScanning()
+		let address: String?
+		var name: String? = nil
+		
+		if let uri = AdamantUriTools.decode(uri: result.value) {
+			switch uri {
+			case .address(address: let addr, params: let params):
+				address = addr
+				
+				if let params = params {
+					for param in params {
+						switch param {
+						case .label(let label):
+							name = label
+							break
+						}
+					}
+				}
+				
+			case .passphrase(_):
+				address = nil
 			}
-			return
+		} else {
+			switch AdamantUtilities.validateAdamantAddress(address: result.value) {
+			case .valid, .system:
+				address = result.value
+				
+			case .invalid:
+				address = nil
+			}
 		}
 		
-		if startNewChat(with: uri) {
+		if let address = address {
+			startNewChat(with: address, name: name)
 			dismiss(animated: true, completion: nil)
 		} else {
 			dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
