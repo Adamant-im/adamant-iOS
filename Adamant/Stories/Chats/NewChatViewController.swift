@@ -449,6 +449,15 @@ extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerCo
 					if startNewChat(with: uri) {
 						return
 					}
+				} else {
+					switch AdamantUtilities.validateAdamantAddress(address: aCode) {
+					case .valid, .system:
+						startNewChat(with: aCode, name: nil)
+						return
+						
+					case .invalid:
+						break
+					}
 				}
 			}
 			
