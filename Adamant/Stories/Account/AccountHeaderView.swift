@@ -15,10 +15,8 @@ protocol AccountHeaderViewDelegate: class {
 class AccountHeaderView: UIView {
 	
 	// MARK: - IBOutlets
-	@IBOutlet weak var backgroundView: UIView!
 	@IBOutlet weak var avatarImageView: UIImageView!
 	@IBOutlet weak var addressButton: UIButton!
-	@IBOutlet weak var backgroundTopConstraint: NSLayoutConstraint!
 	@IBOutlet weak var walletViewContainer: UIView!
 	
 	weak var delegate: AccountHeaderViewDelegate?

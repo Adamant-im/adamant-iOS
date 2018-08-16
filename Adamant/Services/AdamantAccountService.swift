@@ -82,7 +82,7 @@ class AdamantAccountService: AccountService {
 	
 	// MARK: Wallets
 	var wallets: [WalletService] = [
-//		AdamantWalletService(),
+		AdamantWalletService(),
 		EthWalletService(),
 //		LskWalletService()
 	]
@@ -283,7 +283,7 @@ extension AdamantAccountService {
 			self?.passphrase = passphrase
 			
 			if let wallets = self?.wallets {
-				for case let wallet as WalletInitiatedWithPassphrase in wallets {
+				for case let wallet as InitiatedWithPassphraseService in wallets {
 					wallet.initWallet(withPassphrase: passphrase, completion: { _ in })
 				}
 			}

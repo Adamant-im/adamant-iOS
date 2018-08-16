@@ -144,12 +144,12 @@ protocol SwinjectDependentService: WalletService {
 	func injectDependencies(from container: Container)
 }
 
-protocol WalletInitiatedWithPassphrase: WalletService {
+protocol InitiatedWithPassphraseService: WalletService {
 	func initWallet(withPassphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void)
 }
 
 protocol WalletWithTransfers: WalletService {
-	func showTransfers()
+	func transferListViewController() -> UIViewController
 }
 
 protocol WalletWithSend: WalletService {

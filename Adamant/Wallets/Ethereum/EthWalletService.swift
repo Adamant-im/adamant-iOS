@@ -33,7 +33,7 @@ class EthWalletService: WalletService {
 	static let serviceEnabledChanged = Notification.Name("adamant.ethWalletService.enabledChanged")
 	
 	// MARK: - Properties
-	private (set) var enabled = false
+	private (set) var enabled = true
 	
 	let stateSemaphore = DispatchSemaphore(value: 1)
 	
@@ -94,7 +94,7 @@ class EthWalletService: WalletService {
 
 
 // MARK: - WalletInitiatedWithPassphrase
-extension EthWalletService: WalletInitiatedWithPassphrase {
+extension EthWalletService: InitiatedWithPassphraseService {
 	func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
 		// MARK: 1. Prepare
 		stateSemaphore.wait()
@@ -157,8 +157,8 @@ extension EthWalletService: WalletInitiatedWithPassphrase {
 
 
 extension EthWalletService: WalletWithTransfers {
-	func showTransfers() {
-		print("Show transfers")
+	func transferListViewController() -> UIViewController {
+		fatalError()
 	}
 }
 

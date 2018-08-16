@@ -110,7 +110,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 					return
 				}
 				
-				service.showTransfers()
+				self?.navigationController?.pushViewController(service.transferListViewController(), animated: true )
 			}
 		}
 		
@@ -149,5 +149,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 	
 	override func viewDidLayoutSubviews() {
 		NotificationCenter.default.post(name: Notification.Name.WalletViewController.heightUpdated, object: self)
+	}
+	
+	override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+		return UIView()
 	}
 }

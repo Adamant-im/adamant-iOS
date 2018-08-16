@@ -85,6 +85,11 @@ class AccountViewController: FormViewController {
 		navigationOptions = .Disabled
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		
+		// MARK: Status Bar
+		let statusBarView = UIView(frame: UIApplication.shared.statusBarFrame)
+		statusBarView.backgroundColor = UIColor.white
+		view.addSubview(statusBarView)
+		
 		// MARK: Transfers controller
 		let controller = transfersProvider.unreadTransfersController()
 		controller.delegate = self
@@ -105,10 +110,6 @@ class AccountViewController: FormViewController {
 		accountHeaderView = header
 		accountHeaderView.delegate = self
 		
-		if #available(iOS 11.0, *), let topInset = UIApplication.shared.keyWindow?.safeAreaInsets.top, topInset > 0 {
-			accountHeaderView.backgroundTopConstraint.constant = -topInset
-		}
-		
 		updateAccountInfo()
 		
 		tableView.tableHeaderView = header
@@ -123,7 +124,9 @@ class AccountViewController: FormViewController {
 		pagingViewController.menuItemSource = .nib(nib: UINib(nibName: "WalletCollectionViewCell", bundle: nil))
 		pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
 		pagingViewController.indicatorColor = UIColor.adamantPrimary
+		pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
 		pagingViewController.dataSource = self
+		pagingViewController.delegate = self
 		pagingViewController.select(index: 0)
 		accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
 		accountHeaderView.walletViewContainer.constrainToEdges(pagingViewController.view)
@@ -275,6 +278,10 @@ class AccountViewController: FormViewController {
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
+		
+		for vc in pagingViewController.pageViewController.childViewControllers {
+			vc.viewWillAppear(animated)
+		}
 	}
 	
 	override func viewWillDisappear(_ animated: Bool) {
@@ -330,7 +337,6 @@ class AccountViewController: FormViewController {
 			row.evaluateHidden()
 		}
 		
-//		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: selectedWalletIndex, section: 0), animated: false, scrollPosition: .centeredHorizontally)
 		accountHeaderView.addressButton.setTitle(address, for: .normal)
 	}
 }
@@ -363,8 +369,6 @@ extension AccountViewController: AccountHeaderViewDelegate {
 // MARK: - NSFetchedResultsControllerDelegate
 extension AccountViewController: NSFetchedResultsControllerDelegate {
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-//		accountHeaderView.walletCollectionView.reloadItems(at: [IndexPath(row: 0, section: 0)])
-		
 		if let row: AlertLabelRow = form.rowBy(tag: Rows.balance.tag), let alertLabel = row.cell.alertLabel, let count = controller.fetchedObjects?.count {
 			if count > 0 {
 				alertLabel.isHidden = false
@@ -422,17 +426,14 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 		
 		var headerBounds = accountHeaderView.bounds
 		headerBounds.size.height = accountHeaderView.walletViewContainer.frame.origin.y + pagingHeight
-		accountHeaderView.bounds = headerBounds
-		
-		var pagingBounds = pagingViewController.view.bounds
-		pagingBounds.size.height = pagingHeight
-		pagingViewController.view.bounds = pagingBounds
 		
 		if animated {
-			tableView.beginUpdates()
-			tableView.tableHeaderView = accountHeaderView
-			tableView.endUpdates()
+			UIView.animate(withDuration: 0.2) { [unowned self] in
+				self.accountHeaderView.bounds = headerBounds
+				self.tableView.tableHeaderView = self.accountHeaderView
+			}
 		} else {
+			accountHeaderView.frame = headerBounds
 			tableView.tableHeaderView = accountHeaderView
 		}
 	}
