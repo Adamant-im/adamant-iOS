@@ -9,11 +9,6 @@
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <customFonts key="customFonts">
-        <array key="Exo+2_400_normal.ttf">
-            <string>Exo2-Regular</string>
-        </array>
-    </customFonts>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="WalletViewControllerBase" customModule="Adamant" customModuleProvider="target">
             <connections>
@@ -28,20 +23,20 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Adamant Wallet" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hcx-tx-ZRm">
-                    <rect key="frame" x="16" y="12" width="125" height="20.5"/>
-                    <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="17"/>
-                    <nil key="textColor"/>
+                    <rect key="frame" x="16" y="20" width="126" height="20.5"/>
+                    <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                    <color key="textColor" red="0.56000000000000005" green="0.56000000000000005" blue="0.57999999999999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="ds2-xE-YVe">
-                    <rect key="frame" x="0.0" y="40.5" width="375" height="189.5"/>
+                    <rect key="frame" x="0.0" y="42.5" width="375" height="187.5"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </tableView>
             </subviews>
             <constraints>
-                <constraint firstItem="ds2-xE-YVe" firstAttribute="top" secondItem="Hcx-tx-ZRm" secondAttribute="bottom" constant="8" id="Alh-1J-BAu"/>
+                <constraint firstItem="ds2-xE-YVe" firstAttribute="top" secondItem="Hcx-tx-ZRm" secondAttribute="bottom" constant="2" id="Alh-1J-BAu"/>
                 <constraint firstItem="Hcx-tx-ZRm" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="16" id="Ctj-D3-QR3"/>
-                <constraint firstItem="Hcx-tx-ZRm" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="12" id="Vlb-if-mIc"/>
+                <constraint firstItem="Hcx-tx-ZRm" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="20" id="Vlb-if-mIc"/>
                 <constraint firstItem="ds2-xE-YVe" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" id="Wev-Lp-6fy"/>
                 <constraint firstItem="ds2-xE-YVe" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="cht-bL-gtw"/>
                 <constraint firstItem="ds2-xE-YVe" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" id="qq5-un-b6u"/>

@@ -92,12 +92,15 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 		section.append(addressRow)
 		
 		// MARK: Balance
-		let balanceRow = LabelRow() {
+		let balanceRow = AlertLabelRow() { [weak self] in
 			$0.tag = BaseRows.balance.tag
 			$0.title = BaseRows.balance.localized
 			
-			if let wallet = service?.wallet {
-				$0.value = AdamantBalanceFormat.full.format(balance: wallet.balance)
+			if let service = self?.service, let wallet = service.wallet {
+				let symbol = type(of: service).currencySymbol
+				$0.value = AdamantBalanceFormat.full.format(balance: wallet.balance, withCurrencySymbol: symbol)
+			} else {
+				$0.value = "0"
 			}
 		}
 		
