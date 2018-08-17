@@ -60,7 +60,7 @@ class TransactionsViewController: UIViewController {
             tableView.setEditing(false, animated: false)
         }
     }
-    
+	
     @objc internal func handleRefresh(_ refreshControl: UIRefreshControl) {
         
     }

@@ -269,6 +269,14 @@ class AccountViewController: FormViewController {
 				}
 			}
 		}
+		
+		for (index, service) in accountService.wallets.enumerated() {
+			NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,
+												   object: service,
+												   queue: OperationQueue.main) { [weak self] _ in
+													self?.pagingViewController.collectionView.reloadItems(at: [IndexPath(row: index, section: 0)])
+			}
+		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {

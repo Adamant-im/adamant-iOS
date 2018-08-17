@@ -120,10 +120,10 @@ protocol WalletService: class {
 	
 	/// Wallet updated.
 	/// UserInfo contains new wallet at AdamantUserInfoKey.WalletService.wallet
-	static var walletUpdatedNotification: Notification.Name { get }
+	var walletUpdatedNotification: Notification.Name { get }
 	
 	/// Enabled state changed
-	static var serviceEnabledChanged: Notification.Name { get }
+	var serviceEnabledChanged: Notification.Name { get }
 	
 	// MARK: State
 	var wallet: WalletAccount? { get }

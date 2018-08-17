@@ -8,7 +8,12 @@
 
 import Foundation
 
-struct AdamantWallet: WalletAccount {
+class AdamantWallet: WalletAccount {
 	let address: String
-	let balance: Decimal
+	var balance: Decimal = 0
+	var notifications: Int = 0
+	
+	init(address: String) {
+		self.address = address
+	}
 }

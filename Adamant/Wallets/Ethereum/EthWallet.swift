@@ -9,9 +9,15 @@
 import Foundation
 import web3swift
 
-struct EthWallet: WalletAccount {
+class EthWallet: WalletAccount {
 	let address: String
-	let balance: Decimal
-	
 	let ethAddress: EthereumAddress
+	
+	var balance: Decimal = 0
+	var notifications: Int = 0
+	
+	init(address: String, ethAddress: EthereumAddress) {
+		self.address = address
+		self.ethAddress = ethAddress
+	}
 }

@@ -36,6 +36,12 @@ class ADMTransactionsViewController: TransactionsViewController {
             self?.initFetchedResultController(provider: nil)
         }
     }
+	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		
+		markTransfersAsRead()
+	}
     
     /// - Parameter provider: nil to drop and reset
     private func initFetchedResultController(provider: TransfersProvider?) {

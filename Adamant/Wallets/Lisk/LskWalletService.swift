@@ -12,8 +12,8 @@ import UIKit
 class LskWalletService: WalletService {
 	var walletViewController: WalletViewController { fatalError() }
 	
-	static var walletUpdatedNotification = Notification.Name("lsk.update")
-	static let serviceEnabledChanged = Notification.Name("lsk.enabledChanged")
+	let walletUpdatedNotification = Notification.Name("lsk.update")
+	let serviceEnabledChanged = Notification.Name("lsk.enabledChanged")
 	
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^([0-9]{2,22})L$", options: [])

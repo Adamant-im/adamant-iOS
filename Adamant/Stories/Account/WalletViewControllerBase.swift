@@ -96,6 +96,19 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			$0.tag = BaseRows.balance.tag
 			$0.title = BaseRows.balance.localized
 			
+			if let alertLabel = $0.cell.alertLabel {
+				alertLabel.backgroundColor = UIColor.adamantPrimary
+				alertLabel.textColor = UIColor.white
+				alertLabel.clipsToBounds = true
+				alertLabel.textInsets = UIEdgeInsets(top: 1, left: 5, bottom: 1, right: 5)
+				
+				if let count = self?.service?.wallet?.notifications, count > 0 {
+					alertLabel.text = String(count)
+				} else {
+					alertLabel.isHidden = true
+				}
+			}
+			
 			if let service = self?.service, let wallet = service.wallet {
 				let symbol = type(of: service).currencySymbol
 				$0.value = AdamantBalanceFormat.full.format(balance: wallet.balance, withCurrencySymbol: symbol)
@@ -138,8 +151,38 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			section.append(sendRow)
 		}
 		
-		
 		form.append(section)
+		
+		// MARK: Notification
+		if let service = service {
+			let callback = { [weak self] (notification: Notification) in
+				guard let wallet = notification.userInfo?[AdamantUserInfoKey.WalletService.wallet] as? WalletAccount else {
+					return
+				}
+				
+				if let row: AlertLabelRow = self?.form.rowBy(tag: BaseRows.balance.tag) {
+					let symbol = type(of: service).currencySymbol
+					row.value = AdamantBalanceFormat.full.format(balance: wallet.balance, withCurrencySymbol: symbol)
+					
+					if wallet.notifications > 0 {
+						row.cell.alertLabel.text = String(wallet.notifications)
+						
+						if row.cell.alertLabel.isHidden {
+							row.cell.alertLabel.isHidden = false
+						}
+					} else {
+						row.cell.alertLabel.isHidden = true
+					}
+					
+					row.updateCell()
+				}
+			}
+			
+			NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,
+												   object: service,
+												   queue: OperationQueue.main,
+												   using: callback)
+		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {

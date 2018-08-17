@@ -29,8 +29,8 @@ class EthWalletService: WalletService {
 	var web3: web3!
 	
 	// MARK: - Notifications
-	static let walletUpdatedNotification = Notification.Name("adamant.ethWalletService.walletUpdated")
-	static let serviceEnabledChanged = Notification.Name("adamant.ethWalletService.enabledChanged")
+	let walletUpdatedNotification = Notification.Name("adamant.ethWalletService.walletUpdated")
+	let serviceEnabledChanged = Notification.Name("adamant.ethWalletService.enabledChanged")
 	
 	// MARK: - Properties
 	private (set) var enabled = true
@@ -53,7 +53,21 @@ class EthWalletService: WalletService {
 	var wallet: WalletAccount? { return ethWallet }
 	
 	
-	// MARK: - Update
+	// MARK: - Logic
+	init() {
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
+			self?.update()
+		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
+			self?.update()
+		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
+			self?.ethWallet = nil
+		}
+	}
+	
 	func update() {
 		guard let wallet = ethWallet else {
 			return
@@ -79,10 +93,8 @@ class EthWalletService: WalletService {
 					defer { self.stateSemaphore.signal() }
 					self.stateSemaphore.wait()
 					
-					let newWallet = EthWallet(address: wallet.address, balance: balance, ethAddress: wallet.ethAddress)
-					self.ethWallet = newWallet
-					
-					NotificationCenter.default.post(name: EthWalletService.walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: newWallet])
+					wallet.balance = balance
+					NotificationCenter.default.post(name: self.walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
 				}
 				
 			case .failure(let error):
@@ -103,7 +115,7 @@ extension EthWalletService: InitiatedWithPassphraseService {
 		
 		if enabled {
 			enabled = false
-			NotificationCenter.default.post(name: EthWalletService.serviceEnabledChanged, object: self)
+			NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
 		}
 		
 		// MARK: 2. Create keys and addresses
@@ -129,12 +141,12 @@ extension EthWalletService: InitiatedWithPassphraseService {
 		}
 		
 		// MARK: 3. Update
-		ethWallet = EthWallet(address: ethAddress.address, balance: 0, ethAddress: ethAddress)
+		ethWallet = EthWallet(address: ethAddress.address, ethAddress: ethAddress)
 		state = .initiated
 		
 		if !enabled {
 			enabled = true
-			NotificationCenter.default.post(name: EthWalletService.serviceEnabledChanged, object: self)
+			NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
 		}
 		
 		// MARK: 4. Save into KVS

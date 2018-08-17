@@ -9,8 +9,9 @@
 import Foundation
 import UIKit
 import Swinject
+import CoreData
 
-class AdamantWalletService: WalletService {
+class AdamantWalletService: NSObject, WalletService {
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$", options: [])
 	
@@ -21,12 +22,13 @@ class AdamantWalletService: WalletService {
 	
 	// MARK: - Dependencies
 	weak var accountService: AccountService!
+	var transfersProvider: TransfersProvider!
 	var router: Router!
 	
 	
 	// MARK: - Notifications
-	static var walletUpdatedNotification = Notification.Name("adm.update")
-	static let serviceEnabledChanged = Notification.Name("adm.enabledChanged")
+	let walletUpdatedNotification = Notification.Name("adm.update")
+	let serviceEnabledChanged = Notification.Name("adm.enabledChanged")
 	
 	
 	// MARK: - Properties
@@ -41,13 +43,18 @@ class AdamantWalletService: WalletService {
 		return vc
 	}
 	
+	private var transfersController: NSFetchedResultsController<TransferTransaction>?
+	
 	// MARK: - State
 	private (set) var state: WalletServiceState = .notInitiated
 	private (set) var wallet: WalletAccount? = nil
 	
 	
 	// MARK: - Logic
-	init() {
+	override init() {
+		super.init()
+		
+		// MARK: Notifications
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
 			self?.update()
 		}
@@ -67,22 +74,24 @@ class AdamantWalletService: WalletService {
 			return
 		}
 		
-		let newWallet: WalletAccount?
-		
-		if let wallet = wallet {
+		let notify: Bool
+		if let wallet = wallet as? AdamantWallet {
 			if wallet.balance != account.balance {
-				newWallet = AdamantWallet(address: account.address, balance: account.balance)
-				self.wallet = newWallet
+				wallet.balance = account.balance
+				notify = true
 			} else {
-				newWallet = nil
+				notify = false
 			}
 		} else {
-			newWallet = AdamantWallet(address: account.address, balance: account.balance)
-			self.wallet = newWallet
+			let wallet = AdamantWallet(address: account.address)
+			wallet.balance = account.balance
+			
+			self.wallet = wallet
+			notify = true
 		}
 		
-		if let newWallet = newWallet {
-			NotificationCenter.default.post(name: AdamantWalletService.walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: newWallet])
+		if notify, let wallet = wallet {
+			postUpdateNotification(with: wallet)
 		}
 	}
 	
@@ -95,6 +104,10 @@ class AdamantWalletService: WalletService {
 		
 		return addressRegex.perfectMatch(with: address) ? .valid : .invalid
 	}
+	
+	private func postUpdateNotification(with wallet: WalletAccount) {
+		NotificationCenter.default.post(name: walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+	}
 }
 
 extension AdamantWalletService: WalletWithTransfers {
@@ -104,10 +117,37 @@ extension AdamantWalletService: WalletWithTransfers {
 }
 
 
+// MARK: - NSFetchedResultsControllerDelegate
+extension AdamantWalletService: NSFetchedResultsControllerDelegate {
+	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+		guard let newCount = controller.fetchedObjects?.count, let wallet = wallet as? AdamantWallet else {
+			return
+		}
+		
+		if newCount != wallet.notifications {
+			wallet.notifications = newCount
+			postUpdateNotification(with: wallet)
+		}
+	}
+}
+
+
 // MARK: - Dependencies
 extension AdamantWalletService: SwinjectDependentService {
 	func injectDependencies(from container: Container) {
 		accountService = container.resolve(AccountService.self)
+		transfersProvider = container.resolve(TransfersProvider.self)
 		router = container.resolve(Router.self)
+		
+		let controller = transfersProvider.unreadTransfersController()
+		
+		do {
+			try controller.performFetch()
+		} catch {
+			print("AdamantWalletService: Error performing fetch: \(error)")
+		}
+		
+		controller.delegate = self
+		transfersController = controller
 	}
 }
