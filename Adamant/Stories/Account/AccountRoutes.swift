@@ -22,13 +22,9 @@ extension AdamantScene {
 			return c
 		}
 		
-		static let transfer = AdamantScene(identifier: "TransferViewController") { r in
-			let c = TransferViewController()
-			c.apiService = r.resolve(ApiService.self)
-			c.accountService = r.resolve(AccountService.self)
+		static let admTransfer = AdamantScene(identifier: "AdmTransferViewController") { r in
+			let c = AdmTransferViewController()
 			c.dialogService = r.resolve(DialogService.self)
-            c.ethApiService = r.resolve(EthApiService.self)
-            c.lskApiService = r.resolve(LskApiService.self)
 			return c
 		}
 		

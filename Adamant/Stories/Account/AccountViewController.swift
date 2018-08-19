@@ -132,6 +132,12 @@ class AccountViewController: FormViewController {
 		accountHeaderView.walletViewContainer.constrainToEdges(pagingViewController.view)
 		addChildViewController(pagingViewController)
 		
+		for wallet in accountService.wallets {
+			NotificationCenter.default.addObserver(forName: wallet.walletUpdatedNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+				self?.pagingViewController.reloadData()
+			}
+		}
+		
 		// MARK: Application
 		form +++ Section(Sections.application.localized) {
 			$0.tag = Sections.application.tag
@@ -410,6 +416,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 		
 		let item = WalletPagingItem(index: index, currencySymbol: serviceType.currencySymbol, currencyImage: serviceType.currencyLogo)
 		item.balance = wallet.balance
+		item.notifications = wallet.notifications
 		
 		return item as! T
 	}

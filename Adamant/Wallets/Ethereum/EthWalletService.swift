@@ -168,17 +168,17 @@ extension EthWalletService: InitiatedWithPassphraseService {
 }
 
 
-extension EthWalletService: WalletWithTransfers {
-	func transferListViewController() -> UIViewController {
-		fatalError()
-	}
-}
+//extension EthWalletService: WalletServiceWithTransfers {
+//	func transferListViewController() -> UIViewController {
+//		fatalError()
+//	}
+//}
 
-extension EthWalletService: WalletWithSend {
-	func showTransfer(recipient: String?) {
-		print("Transfer money to \(recipient ?? "nil")")
-	}
-}
+//extension EthWalletService: WalletWithSend {
+//	func sendViewController(recipient: String?) -> UIViewController {
+//		fatalError()
+//	}
+//}
 
 
 // MARK: - Tools

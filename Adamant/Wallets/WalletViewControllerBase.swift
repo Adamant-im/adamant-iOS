@@ -117,12 +117,12 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}
 		}
 		
-		if service is WalletWithTransfers {
+		if service is WalletServiceWithTransfers {
 			balanceRow.cell.selectionStyle = .gray
 			balanceRow.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
 			}.onCellSelection { [weak self] (_, _) in
-				guard let service = self?.service as? WalletWithTransfers else {
+				guard let service = self?.service as? WalletServiceWithTransfers else {
 					return
 				}
 				
@@ -133,7 +133,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 		section.append(balanceRow)
 		
 		// MARK: Send
-		if service is WalletWithSend {
+		if service is WalletServiceWithSend {
 			let sendRow = LabelRow() {
 				$0.tag = BaseRows.send.tag
 				$0.title = BaseRows.send.localized
@@ -141,11 +141,20 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
 			}.onCellSelection { [weak self] (_, _) in
-				guard let service = self?.service as? WalletWithSend else {
+				guard let service = self?.service as? WalletServiceWithSend else {
 					return
 				}
 				
-				service.showTransfer(recipient: nil)
+				let vc = service.sendViewController(recipient: nil)
+				if let v = vc as? TransferViewControllerBase {
+					v.delegate = self
+				}
+				
+				if let nav = self?.navigationController {
+					nav.pushViewController(vc, animated: true)
+				} else {
+					self?.present(vc, animated: true)
+				}
 			}
 			
 			section.append(sendRow)
@@ -199,5 +208,20 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 	
 	override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
 		return UIView()
+	}
+}
+
+
+extension WalletViewControllerBase: TransferViewControllerDelegate {
+	func transferViewController(_ viewController: TransferViewControllerBase, didFinishWith _: String?) {
+		if let nav = navigationController, nav.topViewController == viewController {
+			DispatchQueue.main.async {
+				nav.popViewController(animated: true)
+			}
+		} else if presentedViewController == viewController {
+			DispatchQueue.main.async { [weak self] in
+				self?.dismiss(animated: true, completion: nil)
+			}
+		}
 	}
 }

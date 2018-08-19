@@ -10,8 +10,8 @@ import Foundation
 
 extension AdamantScene {
 	struct Wallets {
-		static let AdamantWallet = AdamantScene(identifier: "AdamantWalletViewController") { r in
-			let c = AdamantWalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
+		static let AdamantWallet = AdamantScene(identifier: "AdmWalletViewController") { r in
+			let c = AdmWalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
 			c.dialogService = r.resolve(DialogService.self)
 			return c
 		}

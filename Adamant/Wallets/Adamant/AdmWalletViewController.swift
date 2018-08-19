@@ -1,5 +1,5 @@
 //
-//  AdamantWalletViewController.swift
+//  AdmWalletViewController.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 12.08.2018.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AdamantWalletViewController: WalletViewControllerBase {
+class AdmWalletViewController: WalletViewControllerBase {
 	// MARK: Lifecycle
 	
 	override func viewDidLoad() {

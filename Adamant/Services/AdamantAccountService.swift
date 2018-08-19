@@ -82,7 +82,7 @@ class AdamantAccountService: AccountService {
 	
 	// MARK: Wallets
 	var wallets: [WalletService] = [
-		AdamantWalletService(),
+		AdmWalletService(),
 		EthWalletService(),
 //		LskWalletService()
 	]

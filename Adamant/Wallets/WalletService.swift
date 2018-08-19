@@ -24,10 +24,13 @@ enum WalletServiceResult<T> {
 	case failure(error: WalletServiceError)
 }
 
+// MARK: - Errors
+
 enum WalletServiceError: Error {
 	case notLogged
 	case notEnoughtMoney
 	case networkError
+	case accountNotFound
 	case remoteServiceError(message: String)
 	case apiError(ApiServiceError)
 	case internalError(message: String, error: Error?)
@@ -44,6 +47,9 @@ extension WalletServiceError: RichError {
 			
 		case .networkError:
 			return String.adamantLocalized.sharedErrors.networkError
+			
+		case .accountNotFound:
+			return String.adamantLocalized.transfer.accountNotFound
 			
 		case .remoteServiceError(let message):
 			return String.adamantLocalized.sharedErrors.remoteServerError(message: message)
@@ -65,7 +71,7 @@ extension WalletServiceError: RichError {
 	
 	var level: ErrorLevel {
 		switch self {
-		case .notLogged, .notEnoughtMoney, .networkError:
+		case .notLogged, .notEnoughtMoney, .networkError, .accountNotFound:
 			return .warning
 			
 		case .remoteServiceError, .internalError:
@@ -79,6 +85,24 @@ extension WalletServiceError: RichError {
 			case .serverError, .internalError:
 				return .error
 			}
+		}
+	}
+}
+
+extension ApiServiceError {
+	func asWalletServiceError() -> WalletServiceError {
+		switch self {
+		case .accountNotFound:
+			return .accountNotFound
+			
+		case .networkError:
+			return .networkError
+			
+		case .notLogged:
+			return .notLogged
+			
+		case .serverError, .internalError:
+			return .apiError(self)
 		}
 	}
 }
@@ -148,11 +172,14 @@ protocol InitiatedWithPassphraseService: WalletService {
 	func initWallet(withPassphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void)
 }
 
-protocol WalletWithTransfers: WalletService {
+protocol WalletServiceWithTransfers: WalletService {
 	func transferListViewController() -> UIViewController
 }
 
-protocol WalletWithSend: WalletService {
+// MARK: Send
+
+protocol WalletServiceWithSend: WalletService {
 	var transactionFee: Decimal { get }
-	func showTransfer(recipient: String?)
+	func sendViewController(recipient: String?) -> UIViewController
+	func sendMoney(recipient: String, amount: Decimal, completion: @escaping (WalletServiceSimpleResult) -> Void)
 }

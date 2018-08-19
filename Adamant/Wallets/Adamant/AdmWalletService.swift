@@ -1,5 +1,5 @@
 //
-//  AdamantWalletService.swift
+//  AdmWalletService.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 03.08.2018.
@@ -11,7 +11,7 @@ import UIKit
 import Swinject
 import CoreData
 
-class AdamantWalletService: NSObject, WalletService {
+class AdmWalletService: NSObject, WalletService {
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$", options: [])
 	
@@ -22,6 +22,7 @@ class AdamantWalletService: NSObject, WalletService {
 	
 	// MARK: - Dependencies
 	weak var accountService: AccountService!
+	var apiService: ApiService!
 	var transfersProvider: TransfersProvider!
 	var router: Router!
 	
@@ -35,8 +36,8 @@ class AdamantWalletService: NSObject, WalletService {
 	let enabled: Bool = true
 	
 	var walletViewController: WalletViewController {
-		guard let vc = router.get(scene: AdamantScene.Wallets.AdamantWallet) as? AdamantWalletViewController else {
-			fatalError("Can't get AdamantWalletViewController")
+		guard let vc = router.get(scene: AdamantScene.Wallets.AdamantWallet) as? AdmWalletViewController else {
+			fatalError("Can't get AdmWalletViewController")
 		}
 		
 		vc.service = self
@@ -75,7 +76,7 @@ class AdamantWalletService: NSObject, WalletService {
 		}
 		
 		let notify: Bool
-		if let wallet = wallet as? AdamantWallet {
+		if let wallet = wallet as? AdmWallet {
 			if wallet.balance != account.balance {
 				wallet.balance = account.balance
 				notify = true
@@ -83,7 +84,7 @@ class AdamantWalletService: NSObject, WalletService {
 				notify = false
 			}
 		} else {
-			let wallet = AdamantWallet(address: account.address)
+			let wallet = AdmWallet(address: account.address)
 			wallet.balance = account.balance
 			
 			self.wallet = wallet
@@ -110,17 +111,61 @@ class AdamantWalletService: NSObject, WalletService {
 	}
 }
 
-extension AdamantWalletService: WalletWithTransfers {
+extension AdmWalletService: WalletServiceWithTransfers {
 	func transferListViewController() -> UIViewController {
 		return router.get(scene: AdamantScene.Transactions.transactions)
 	}
 }
 
+extension AdmWalletService: WalletServiceWithSend {
+	func sendViewController(recipient: String?) -> UIViewController {
+		guard let vc = router.get(scene: AdamantScene.Account.admTransfer) as? AdmTransferViewController else {
+			fatalError("Can't get AdmTransferViewController")
+		}
+		
+		vc.service = self
+		vc.recipient = recipient
+		
+		return vc
+	}
+	
+	func sendMoney(recipient: String, amount: Decimal, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+		
+		
+		guard let apiService = apiService else { // Hold reference
+			fatalError("AdmWalletService: Dependency failed: ApiService")
+		}
+		
+		guard let account = accountService.account, let keypair = accountService.keypair else {
+			completion(.failure(error: .notLogged))
+			return
+		}
+		
+		apiService.getPublicKey(byAddress: recipient) { result in
+			switch result {
+			case .success:
+				apiService.transferFunds(sender: account.address, recipient: recipient, amount: amount, keypair: keypair) { result in
+					switch result {
+					case .success:
+						completion(.success)
+						
+					case .failure(let error):
+						completion(.failure(error: error.asWalletServiceError()))
+					}
+				}
+				
+			case .failure(let error):
+				completion(.failure(error: error.asWalletServiceError()))
+			}
+		}
+	}
+}
+
 
 // MARK: - NSFetchedResultsControllerDelegate
-extension AdamantWalletService: NSFetchedResultsControllerDelegate {
+extension AdmWalletService: NSFetchedResultsControllerDelegate {
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-		guard let newCount = controller.fetchedObjects?.count, let wallet = wallet as? AdamantWallet else {
+		guard let newCount = controller.fetchedObjects?.count, let wallet = wallet as? AdmWallet else {
 			return
 		}
 		
@@ -133,9 +178,10 @@ extension AdamantWalletService: NSFetchedResultsControllerDelegate {
 
 
 // MARK: - Dependencies
-extension AdamantWalletService: SwinjectDependentService {
+extension AdmWalletService: SwinjectDependentService {
 	func injectDependencies(from container: Container) {
 		accountService = container.resolve(AccountService.self)
+		apiService = container.resolve(ApiService.self)
 		transfersProvider = container.resolve(TransfersProvider.self)
 		router = container.resolve(Router.self)
 		
@@ -144,7 +190,7 @@ extension AdamantWalletService: SwinjectDependentService {
 		do {
 			try controller.performFetch()
 		} catch {
-			print("AdamantWalletService: Error performing fetch: \(error)")
+			print("AdmWalletService: Error performing fetch: \(error)")
 		}
 		
 		controller.delegate = self

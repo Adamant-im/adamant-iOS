@@ -16,4 +16,8 @@ extension Decimal {
 	func shiftedToAdamant() -> Decimal {
         return self * 100000000
 	}
+	
+	var doubleValue: Double {
+		return (self as NSNumber).doubleValue
+	}
 }

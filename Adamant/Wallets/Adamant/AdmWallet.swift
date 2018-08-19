@@ -1,5 +1,5 @@
 //
-//  AdamantWallet.swift
+//  AdmWallet.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 03.08.2018.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-class AdamantWallet: WalletAccount {
+class AdmWallet: WalletAccount {
 	let address: String
 	var balance: Decimal = 0
 	var notifications: Int = 0

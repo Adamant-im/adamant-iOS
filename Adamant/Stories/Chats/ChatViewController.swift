@@ -82,13 +82,13 @@ class ChatViewController: MessagesViewController {
                     UIAlertAction(title: "ADM", style: .default, handler: { [weak self] (_) in
                         // MARK: Show ADM transfer details
                         if let address = self?.chatroom?.partner?.address {
-                            guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
-                                fatalError("Can't get TransferViewController scene")
+                            guard let vc = self?.router.get(scene: AdamantScene.Account.admTransfer) as? TransferViewControllerBase else {
+                                fatalError("Can't get TransferViewControllerBase scene")
                             }
                             
-                            vc.token = .ADM
-                            vc.toAddress = address
-                            
+//                            vc.token = .ADM
+//                            vc.toAddress = address
+							
                             if let nav = self?.navigationController {
                                 nav.pushViewController(vc, animated: true)
                             } else {
@@ -99,14 +99,15 @@ class ChatViewController: MessagesViewController {
                     UIAlertAction(title: "Ethereum", style: .default, handler: { [weak self] (_) in
                         if let ethAddress = self?.ethAddress {
                             // MARK: Show ETH transfer
-                            guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
-                                fatalError("Can't get TransferViewController scene")
-                            }
-                            
-                            vc.token = .ETH
-                            vc.toAddress = ethAddress
-                            vc.delegate = self
-                            
+//                            guard let vc = self?.router.get(scene: AdamantScene.Account.admTransfer) as? TransferViewControllerBase else {
+//                                fatalError("Can't get TransferViewControllerBase scene")
+//                            }
+							
+//                            vc.token = .ETH
+//                            vc.toAddress = ethAddress
+//                            vc.delegate = self
+							
+							let vc = UIViewController()
                             if let nav = self?.navigationController {
                                 nav.pushViewController(vc, animated: true)
                             } else {
@@ -119,14 +120,15 @@ class ChatViewController: MessagesViewController {
                     UIAlertAction(title: "Lisk", style: .default, handler: { [weak self] (_) in
                         if let address = self?.lskAddress {
                             // MARK: Show ETH transfer
-                            guard let vc = self?.router.get(scene: AdamantScene.Account.transfer) as? TransferViewController else {
-                                fatalError("Can't get TransferViewController scene")
-                            }
-                            
-                            vc.token = .LSK
-                            vc.toAddress = address
-                            vc.delegate = self
-                            
+//                            guard let vc = self?.router.get(scene: AdamantScene.Account.admTransfer) as? TransferViewControllerBase else {
+//                                fatalError("Can't get TransferViewControllerBase scene")
+//                            }
+							
+//                            vc.token = .LSK
+//                            vc.toAddress = address
+//                            vc.delegate = self
+							let vc = UIViewController()
+							
                             if let nav = self?.navigationController {
                                 nav.pushViewController(vc, animated: true)
                             } else {
@@ -429,9 +431,9 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	}
 }
 
-extension ChatViewController: TransferDelegate {
-    func transferFinished(with data: String) {
-		guard let address = chatroom?.partner?.address else {
+extension ChatViewController: TransferViewControllerDelegate {
+	func transferViewController(_ viewController: TransferViewControllerBase, didFinishWith data: String?) {
+		guard let address = chatroom?.partner?.address, let data = data else {
 			return
 		}
 		
@@ -446,7 +448,7 @@ extension ChatViewController: TransferDelegate {
             return
         }
         
-        chatsProvider.sendMessage(message, recipientId: address, completion: { [weak self] result in
+        chatsProvider.sendMessage(message, recipientId: address) { [weak self] result in
             switch result {
             case .success:
 //                self?.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
@@ -455,6 +457,6 @@ extension ChatViewController: TransferDelegate {
             case .failure(let error):
                 self?.dialogService.showRichError(error: error)
             }
-        })
+        }
     }
 }
