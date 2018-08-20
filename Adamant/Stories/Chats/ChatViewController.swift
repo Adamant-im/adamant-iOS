@@ -65,6 +65,9 @@ class ChatViewController: MessagesViewController {
 	
 	private var isFirstLayout = true
 	
+	// Content insets are broken after modal view dissapears
+	private var fixKeyboardInsets = false
+	
 	// MARK: Fee label
 	private var feeIsVisible: Bool = false
 	private var feeTimer: Timer?
@@ -77,7 +80,18 @@ class ChatViewController: MessagesViewController {
             .configure {
                 $0.setSize(CGSize(width: 36, height: 36), animated: false)
                 $0.image = #imageLiteral(resourceName: "attachment")
-            }.onTouchUpInside { _ in
+            }.onTouchUpInside { [weak self] _ in
+				guard let vc = self?.router.get(scene: AdamantScene.Chats.complexTransfer) as? ComplexTransferViewController else {
+					return
+				}
+				
+				vc.partner = self?.chatroom?.partner
+				vc.transferDelegate = self
+				
+				let navigator = UINavigationController(rootViewController: vc)
+				self?.present(navigator, animated: true, completion: nil)
+				
+				/*
 				self.dialogService.showAlert(title: String.adamantLocalized.transfer.send, message: "", style: .actionSheet, actions: [
                     UIAlertAction(title: "ADM", style: .default, handler: { [weak self] (_) in
                         // MARK: Show ADM transfer details
@@ -140,6 +154,7 @@ class ChatViewController: MessagesViewController {
                     }),
 					UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
 				])
+*/
         }
     }()
 	
@@ -258,7 +273,7 @@ class ChatViewController: MessagesViewController {
             }
         }
 
-		// MARK: 4. Data
+		// MARK: 5. Data
 		let controller = chatsProvider.getChatController(for: chatroom)
 		chatController = controller
 		controller.delegate = self
@@ -267,6 +282,31 @@ class ChatViewController: MessagesViewController {
 			try controller.performFetch()
 		} catch {
 			print("There was an error performing fetch: \(error)")
+		}
+		
+		// MARK: 6. Notifications
+		// Fixing content insets after modal window
+		NotificationCenter.default.addObserver(forName: NSNotification.Name.UIKeyboardWillShow, object: nil, queue: OperationQueue.main) { [weak self] notification in
+			guard let fixIt = self?.fixKeyboardInsets, fixIt else {
+				return
+			}
+			
+			guard let frame = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect,
+				let scrollView = self?.messagesCollectionView else {
+				return
+			}
+			
+			var contentInsets = scrollView.contentInset
+			contentInsets.bottom = frame.size.height
+			scrollView.contentInset = contentInsets
+			
+			var scrollIndicatorInsets = scrollView.scrollIndicatorInsets
+			scrollIndicatorInsets.bottom = frame.size.height
+			scrollView.scrollIndicatorInsets = scrollIndicatorInsets
+			
+			scrollView.scrollToBottom(animated: true)
+			
+			self?.fixKeyboardInsets = false
 		}
 	}
 	
@@ -459,4 +499,18 @@ extension ChatViewController: TransferViewControllerDelegate {
             }
         }
     }
+}
+
+extension ChatViewController: ComplexTransferViewControllerDelegate {
+	func complexTransferViewControllerDidFinish(_ viewController: ComplexTransferViewController) {
+		fixKeyboardInsets = true
+		
+		if Thread.isMainThread {
+			dismiss(animated: true, completion: nil)
+		} else {
+			DispatchQueue.main.async { [weak self] in
+				self?.dismiss(animated: true, completion: nil)
+			}
+		}
+	}
 }

@@ -55,26 +55,34 @@ extension UIView {
 			widthContraint])
 	}
 	
-	func constrainToEdges(_ subview: UIView) {
+	func constrainToEdges(_ subview: UIView, relativeToSafeArea: Bool = false) {
 		subview.translatesAutoresizingMaskIntoConstraints = false
 		
-		let topContraint = NSLayoutConstraint(
-			item: subview,
-			attribute: .top,
-			relatedBy: .equal,
-			toItem: self,
-			attribute: .top,
-			multiplier: 1.0,
-			constant: 0)
+		let topContraint: NSLayoutConstraint
+		let bottomConstraint: NSLayoutConstraint
 		
-		let bottomConstraint = NSLayoutConstraint(
-			item: subview,
-			attribute: .bottom,
-			relatedBy: .equal,
-			toItem: self,
-			attribute: .bottom,
-			multiplier: 1.0,
-			constant: 0)
+		if relativeToSafeArea, #available(iOS 11, *) {
+			topContraint = subview.topAnchor.constraintEqualToSystemSpacingBelow(safeAreaLayoutGuide.topAnchor, multiplier: 1.0)
+			bottomConstraint = safeAreaLayoutGuide.bottomAnchor.constraintEqualToSystemSpacingBelow(subview.bottomAnchor, multiplier: 1.0)
+		} else {
+			topContraint = NSLayoutConstraint(
+				item: subview,
+				attribute: .top,
+				relatedBy: .equal,
+				toItem: self,
+				attribute: .top,
+				multiplier: 1.0,
+				constant: 0)
+			
+			bottomConstraint = NSLayoutConstraint(
+				item: subview,
+				attribute: .bottom,
+				relatedBy: .equal,
+				toItem: self,
+				attribute: .bottom,
+				multiplier: 1.0,
+				constant: 0)
+		}
 		
 		let leadingContraint = NSLayoutConstraint(
 			item: subview,

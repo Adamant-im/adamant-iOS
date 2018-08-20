@@ -39,8 +39,13 @@ extension AdamantScene {
 			c.router = r.resolve(Router.self)
 			
 			let navigator = UINavigationController(rootViewController: c)
-			
 			return navigator
+		})
+		
+		static let complexTransfer = AdamantScene(identifier: "ComplexTransferViewController", factory: { r in
+			let c = ComplexTransferViewController()
+			c.accountService = r.resolve(AccountService.self)
+			return c
 		})
 		
 		private init() {}

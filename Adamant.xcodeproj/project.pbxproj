@@ -176,6 +176,7 @@
 		E9A174B52057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A174B42057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift */; };
 		E9A174B72057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A174B62057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift */; };
 		E9A174B920587B84003667CD /* notification.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E9A174B820587B83003667CD /* notification.mp3 */; };
+		E9AA8BF82129F13000F9249F /* ComplexTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA8BF72129F13000F9249F /* ComplexTransferViewController.swift */; };
 		E9B1AA572121ACC000080A2A /* AdmWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B1AA562121ACBF00080A2A /* AdmWalletViewController.swift */; };
 		E9B1AA592122D59600080A2A /* WalletsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B1AA582122D59600080A2A /* WalletsRoutes.swift */; };
 		E9B1AA5B21283E0F00080A2A /* AdmTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B1AA5A21283E0F00080A2A /* AdmTransferViewController.swift */; };
@@ -433,6 +434,7 @@
 		E9A174B42057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantTransfersProvider+backgroundFetch.swift"; sourceTree = "<group>"; };
 		E9A174B62057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantChatsProvider+backgroundFetch.swift"; sourceTree = "<group>"; };
 		E9A174B820587B83003667CD /* notification.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = notification.mp3; sourceTree = "<group>"; };
+		E9AA8BF72129F13000F9249F /* ComplexTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplexTransferViewController.swift; sourceTree = "<group>"; };
 		E9B1AA562121ACBF00080A2A /* AdmWalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmWalletViewController.swift; sourceTree = "<group>"; };
 		E9B1AA582122D59600080A2A /* WalletsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletsRoutes.swift; sourceTree = "<group>"; };
 		E9B1AA5A21283E0F00080A2A /* AdmTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmTransferViewController.swift; sourceTree = "<group>"; };
@@ -834,6 +836,7 @@
 				E93EFE12200D1156000BB482 /* ChatViewController.swift */,
 				E9150B7F2066861D0065A985 /* ChatViewController+MessageKit.swift */,
 				E9C51EF02013F18000385EB7 /* NewChatViewController.swift */,
+				E9AA8BF72129F13000F9249F /* ComplexTransferViewController.swift */,
 				E95F85C5200A9B070070534A /* ChatTableViewCell.swift */,
 				E95F85C6200A9B070070534A /* ChatTableViewCell.xib */,
 			);
@@ -1440,6 +1443,7 @@
 				E948E04C2027679300975D6B /* AdamantFormattingTools.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,
 				E95F856B200789450070534A /* JSModels.swift in Sources */,
+				E9AA8BF82129F13000F9249F /* ComplexTransferViewController.swift in Sources */,
 				E9A174B52057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift in Sources */,
 				E9147B5F20500E9300145913 /* MyLittlePinpad+adamant.swift in Sources */,
 				E9981896212095CA0018C84C /* EthWalletViewController.swift in Sources */,

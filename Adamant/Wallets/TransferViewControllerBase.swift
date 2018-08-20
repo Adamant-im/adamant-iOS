@@ -129,6 +129,8 @@ class TransferViewControllerBase: FormViewController {
 	var recipient: String? = nil
 	var amount: Decimal? = nil
 	
+	var recipientIsReadonly = false
+	
 	var maxToTransfer: Decimal {
 		guard let service = service, let balance = service.wallet?.balance else {
 			return 0

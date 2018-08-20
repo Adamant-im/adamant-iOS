@@ -180,6 +180,6 @@ protocol WalletServiceWithTransfers: WalletService {
 
 protocol WalletServiceWithSend: WalletService {
 	var transactionFee: Decimal { get }
-	func sendViewController(recipient: String?) -> UIViewController
+	func transferViewController() -> UIViewController
 	func sendMoney(recipient: String, amount: Decimal, completion: @escaping (WalletServiceSimpleResult) -> Void)
 }

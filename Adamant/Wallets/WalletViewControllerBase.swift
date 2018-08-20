@@ -145,7 +145,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 					return
 				}
 				
-				let vc = service.sendViewController(recipient: nil)
+				let vc = service.transferViewController()
 				if let v = vc as? TransferViewControllerBase {
 					v.delegate = self
 				}

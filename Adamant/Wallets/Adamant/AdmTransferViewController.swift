@@ -55,8 +55,10 @@ class AdmTransferViewController: TransferViewControllerBase {
 		
 		let recipientSection = Section(Sections.recipient.localized) {
 			$0.tag = Sections.recipient.tag
+		}
 			
-			$0.footer = { [weak self] in
+		if !recipientIsReadonly {
+			recipientSection.footer = { [weak self] in
 				var footer = HeaderFooterView<UIView>(.callback {
 					let view = ButtonsStripeView.adamantConfigured()
 					view.stripe = [.qrCameraReader, .qrPhotoReader]
@@ -71,10 +73,15 @@ class AdmTransferViewController: TransferViewControllerBase {
 		}
 		
 		// MARK: address field
-		<<< TextRow() {
+		let addressRow = TextRow() {
 			$0.tag = BaseRows.address.tag
 			$0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
 			$0.cell.textField.keyboardType = .numberPad
+			
+			if let recipient = recipient {
+				let trimmed = recipient.components(separatedBy: NewChatViewController.invalidCharacters).joined()
+				$0.value = trimmed
+			}
 			
 			let prefix = UILabel()
 			prefix.text = "U"
@@ -84,6 +91,11 @@ class AdmTransferViewController: TransferViewControllerBase {
 			view.frame = prefix.frame
 			$0.cell.textField.leftView = view
 			$0.cell.textField.leftViewMode = .always
+			
+			if recipientIsReadonly {
+				$0.disabled = true
+				prefix.isEnabled = false
+			}
 		}.cellUpdate { (cell, row) in
 			if let text = cell.textField.text {
 				cell.textField.text = text.components(separatedBy: NewChatViewController.invalidCharacters).joined()
@@ -109,6 +121,8 @@ class AdmTransferViewController: TransferViewControllerBase {
 			
 			self?.validateForm()
 		}
+		
+		recipientSection.append(addressRow)
 		
 		
 		// MARK: - Info section

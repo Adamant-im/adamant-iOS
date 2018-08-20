@@ -118,14 +118,12 @@ extension AdmWalletService: WalletServiceWithTransfers {
 }
 
 extension AdmWalletService: WalletServiceWithSend {
-	func sendViewController(recipient: String?) -> UIViewController {
+	func transferViewController() -> UIViewController {
 		guard let vc = router.get(scene: AdamantScene.Account.admTransfer) as? AdmTransferViewController else {
 			fatalError("Can't get AdmTransferViewController")
 		}
 		
 		vc.service = self
-		vc.recipient = recipient
-		
 		return vc
 	}
 	
