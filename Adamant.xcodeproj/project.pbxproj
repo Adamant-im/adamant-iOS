@@ -24,8 +24,6 @@
 		64BD2B7520E2814B00E2CD36 /* EthTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */; };
 		64BD2B7720E2820300E2CD36 /* TransactionDetailsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7620E2820300E2CD36 /* TransactionDetailsProtocol.swift */; };
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
-		64D05A0220D51632003AD655 /* EthApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D05A0120D51632003AD655 /* EthApiService.swift */; };
-		64D05A0420D516B4003AD655 /* AdamantEthApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D05A0320D516B4003AD655 /* AdamantEthApiService.swift */; };
 		64E8305020F5FEEF006FA590 /* VotesAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E8304F20F5FEEF006FA590 /* VotesAsset.swift */; };
 		64EE46B220FE0C8D00194DDA /* LSKTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64EE46B120FE0C8D00194DDA /* LSKTransactionsViewController.swift */; };
 		64F085D920E2D7600006DE68 /* ADMTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F085D820E2D7600006DE68 /* ADMTransactionsViewController.swift */; };
@@ -177,6 +175,10 @@
 		E9A174B72057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A174B62057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift */; };
 		E9A174B920587B84003667CD /* notification.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E9A174B820587B83003667CD /* notification.mp3 */; };
 		E9AA8BF82129F13000F9249F /* ComplexTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA8BF72129F13000F9249F /* ComplexTransferViewController.swift */; };
+		E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA8BF9212C166600F9249F /* EthWalletService+Send.swift */; };
+		E9AA8BFC212C169200F9249F /* EthWalletService+Transfers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA8BFB212C169200F9249F /* EthWalletService+Transfers.swift */; };
+		E9AA8BFE212C373000F9249F /* EthTransactionRichMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA8BFD212C373000F9249F /* EthTransactionRichMessage.swift */; };
+		E9AA8C02212C5BF500F9249F /* AdmWalletService+Send.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA8C01212C5BF500F9249F /* AdmWalletService+Send.swift */; };
 		E9B1AA572121ACC000080A2A /* AdmWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B1AA562121ACBF00080A2A /* AdmWalletViewController.swift */; };
 		E9B1AA592122D59600080A2A /* WalletsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B1AA582122D59600080A2A /* WalletsRoutes.swift */; };
 		E9B1AA5B21283E0F00080A2A /* AdmTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B1AA5A21283E0F00080A2A /* AdmTransferViewController.swift */; };
@@ -257,8 +259,6 @@
 		64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransaction.swift; sourceTree = "<group>"; };
 		64BD2B7620E2820300E2CD36 /* TransactionDetailsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsProtocol.swift; sourceTree = "<group>"; };
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
-		64D05A0120D51632003AD655 /* EthApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthApiService.swift; sourceTree = "<group>"; };
-		64D05A0320D516B4003AD655 /* AdamantEthApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantEthApiService.swift; sourceTree = "<group>"; };
 		64E8304F20F5FEEF006FA590 /* VotesAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotesAsset.swift; sourceTree = "<group>"; };
 		64EE46B120FE0C8D00194DDA /* LSKTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LSKTransactionsViewController.swift; sourceTree = "<group>"; };
 		64F085D820E2D7600006DE68 /* ADMTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADMTransactionsViewController.swift; sourceTree = "<group>"; };
@@ -435,6 +435,10 @@
 		E9A174B62057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantChatsProvider+backgroundFetch.swift"; sourceTree = "<group>"; };
 		E9A174B820587B83003667CD /* notification.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = notification.mp3; sourceTree = "<group>"; };
 		E9AA8BF72129F13000F9249F /* ComplexTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplexTransferViewController.swift; sourceTree = "<group>"; };
+		E9AA8BF9212C166600F9249F /* EthWalletService+Send.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EthWalletService+Send.swift"; sourceTree = "<group>"; };
+		E9AA8BFB212C169200F9249F /* EthWalletService+Transfers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EthWalletService+Transfers.swift"; sourceTree = "<group>"; };
+		E9AA8BFD212C373000F9249F /* EthTransactionRichMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionRichMessage.swift; sourceTree = "<group>"; };
+		E9AA8C01212C5BF500F9249F /* AdmWalletService+Send.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdmWalletService+Send.swift"; sourceTree = "<group>"; };
 		E9B1AA562121ACBF00080A2A /* AdmWalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmWalletViewController.swift; sourceTree = "<group>"; };
 		E9B1AA582122D59600080A2A /* WalletsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletsRoutes.swift; sourceTree = "<group>"; };
 		E9B1AA5A21283E0F00080A2A /* AdmTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmTransferViewController.swift; sourceTree = "<group>"; };
@@ -523,7 +527,6 @@
 		64D05A0020D515CA003AD655 /* TokensApiService */ = {
 			isa = PBXGroup;
 			children = (
-				64D05A0320D516B4003AD655 /* AdamantEthApiService.swift */,
 				64A223D920F7A14B005157CB /* AdamantLskApiService.swift */,
 			);
 			path = TokensApiService;
@@ -597,7 +600,6 @@
 				E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */,
 				E9A174B22057EC47003667CD /* BackgroundFetchService.swift */,
 				E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */,
-				64D05A0120D51632003AD655 /* EthApiService.swift */,
 				64A223D720F7A08E005157CB /* LskApiService.swift */,
 				64BD2B7620E2820300E2CD36 /* TransactionDetailsProtocol.swift */,
 			);
@@ -648,6 +650,7 @@
 				64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */,
 				E923222521135F9000A7E5AF /* EthAccount.swift */,
 				E940086A2114A70600CD2D67 /* LskAccount.swift */,
+				E9AA8BFD212C373000F9249F /* EthTransactionRichMessage.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -765,6 +768,8 @@
 			children = (
 				E940087C2114EDEE00CD2D67 /* EthWallet.swift */,
 				E940087A2114ED0600CD2D67 /* EthWalletService.swift */,
+				E9AA8BF9212C166600F9249F /* EthWalletService+Send.swift */,
+				E9AA8BFB212C169200F9249F /* EthWalletService+Transfers.swift */,
 				E9981895212095CA0018C84C /* EthWalletViewController.swift */,
 			);
 			path = Ethereum;
@@ -784,6 +789,7 @@
 			children = (
 				E940087F2114EE2000CD2D67 /* AdmWallet.swift */,
 				E94008882114F0F700CD2D67 /* AdmWalletService.swift */,
+				E9AA8C01212C5BF500F9249F /* AdmWalletService+Send.swift */,
 				E9B1AA562121ACBF00080A2A /* AdmWalletViewController.swift */,
 				E9B1AA5A21283E0F00080A2A /* AdmTransferViewController.swift */,
 			);
@@ -1298,7 +1304,6 @@
 				E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */,
 				E9A03FD820DC0ABA007653A1 /* AdamantNodesSource.swift in Sources */,
 				E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */,
-				64D05A0420D516B4003AD655 /* AdamantEthApiService.swift in Sources */,
 				E9E7CDB72003994E00DFC4DB /* AdamantUtilities.swift in Sources */,
 				E9147B6320505C7500145913 /* QRCodeReader+adamant.swift in Sources */,
 				E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */,
@@ -1355,10 +1360,12 @@
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E941CCDE20E7B70200C96220 /* WalletCollectionViewCell.swift in Sources */,
 				E9150B9E2066DA210065A985 /* Chatroom+CoreDataProperties.swift in Sources */,
+				E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */,
 				E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */,
 				E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */,
+				E9AA8C02212C5BF500F9249F /* AdmWalletService+Send.swift in Sources */,
 				E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */,
 				E99818942120892F0018C84C /* WalletViewControllerBase.swift in Sources */,
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
@@ -1369,12 +1376,12 @@
 				E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */,
 				E9150BA12066DA210065A985 /* ChatTransaction+CoreDataClass.swift in Sources */,
 				E9CAE8D42018AC1800345E76 /* AdamantApi+Keys.swift in Sources */,
-				64D05A0220D51632003AD655 /* EthApiService.swift in Sources */,
 				E9C51EEF20139DC600385EB7 /* TransactionIdResponse.swift in Sources */,
 				E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E905D39B2048A9BD00DDB504 /* KeychainStore.swift in Sources */,
 				E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */,
+				E9AA8BFC212C169200F9249F /* EthWalletService+Transfers.swift in Sources */,
 				E95F85692006AB9D0070534A /* NormalizedTransaction.swift in Sources */,
 				E9150B9B2066DA210065A985 /* BaseTransaction+CoreDataClass.swift in Sources */,
 				E9150B9A2066DA210065A985 /* TransferTransaction+CoreDataProperties.swift in Sources */,
@@ -1424,6 +1431,7 @@
 				E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */,
 				E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */,
 				E983AE2320E6568C00497E1A /* WalletEnum.swift in Sources */,
+				E9AA8BFE212C373000F9249F /* EthTransactionRichMessage.swift in Sources */,
 				64FA53D120E24942006783C9 /* BaseTransactionDetailsViewController.swift in Sources */,
 				64BD2B7720E2820300E2CD36 /* TransactionDetailsProtocol.swift in Sources */,
 				E94008852114EE7500CD2D67 /* LskWalletService.swift in Sources */,

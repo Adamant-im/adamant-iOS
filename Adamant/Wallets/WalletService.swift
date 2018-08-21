@@ -31,6 +31,7 @@ enum WalletServiceError: Error {
 	case notEnoughtMoney
 	case networkError
 	case accountNotFound
+	case invalidAmount(Decimal)
 	case remoteServiceError(message: String)
 	case apiError(ApiServiceError)
 	case internalError(message: String, error: Error?)
@@ -59,6 +60,9 @@ extension WalletServiceError: RichError {
 			
 		case .internalError(let message, _):
 			return String.adamantLocalized.sharedErrors.internalError(message: message)
+			
+		case .invalidAmount(let amount):
+			return "Неверное количество для перевода: \(amount)"
 		}
 	}
 	
@@ -71,7 +75,7 @@ extension WalletServiceError: RichError {
 	
 	var level: ErrorLevel {
 		switch self {
-		case .notLogged, .notEnoughtMoney, .networkError, .accountNotFound:
+		case .notLogged, .notEnoughtMoney, .networkError, .accountNotFound, .invalidAmount:
 			return .warning
 			
 		case .remoteServiceError, .internalError:
@@ -182,4 +186,9 @@ protocol WalletServiceWithSend: WalletService {
 	var transactionFee: Decimal { get }
 	func transferViewController() -> UIViewController
 	func sendMoney(recipient: String, amount: Decimal, completion: @escaping (WalletServiceSimpleResult) -> Void)
+}
+
+protocol WalletServiceWithSendExtended: WalletServiceWithSend {
+	associatedtype T
+	func sendMoney(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<T>) -> Void)
 }

@@ -11,7 +11,7 @@ import UIKit
 class ETHTransactionsViewController: TransactionsViewController {
     
     // MARK: - Dependencies
-    var ethApiService: EthApiService!
+//    var ethApiService: EthApiService!
     var dialogService: DialogService!
     var router: Router!
     
@@ -26,6 +26,7 @@ class ETHTransactionsViewController: TransactionsViewController {
         handleRefresh(self.refreshControl)
     }
     
+	/*
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
         self.ethApiService.getTransactions({ (result) in
             switch result {
@@ -56,6 +57,7 @@ class ETHTransactionsViewController: TransactionsViewController {
         }
         return address
     }
+*/
 }
 
 // MARK: - UITableView

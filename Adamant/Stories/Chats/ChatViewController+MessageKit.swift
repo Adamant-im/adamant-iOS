@@ -214,36 +214,36 @@ extension ChatViewController: MessageCellDelegate {
                     
                     self.dialogService.showProgress(withMessage: String.adamantLocalized.transactionDetails.requestingDataProgressMessage, userInteractionEnable: false)
                     
-                    switch transfer.type {
-                    case .eth:
-                        self.ethApiService.getTransaction(byHash: transfer.hash) { (result) in
-                            switch result {
-                            case .success(let transaction):
-                                vc.set(transaction: transaction)
-                                self.dialogService.dismissProgress()
-                                break
-                            case .failure(let error):
-                                self.dialogService.showError(withMessage: "Transrer issue", error: error)
-                                break
-                            }
-                        }
-                        break
-                        
-                    case .lsk:
-                        self.lskApiService.getTransaction(byHash: transfer.hash) { (result) in
-                            switch result {
-                            case .success(let transaction):
-                                vc.set(transaction: transaction)
-                                self.dialogService.dismissProgress()
-                                break
-                            case .failure(let error):
-                                self.dialogService.showError(withMessage: "Transrer issue", error: error)
-                                break
-                            }
-                        }
-                        break
-                    default: break
-                    }
+//                    switch transfer.type {
+//                    case .eth:
+//                        self.ethApiService.getTransaction(byHash: transfer.hash) { (result) in
+//                            switch result {
+//                            case .success(let transaction):
+//                                vc.set(transaction: transaction)
+//                                self.dialogService.dismissProgress()
+//                                break
+//                            case .failure(let error):
+//                                self.dialogService.showError(withMessage: "Transrer issue", error: error)
+//                                break
+//                            }
+//                        }
+//                        break
+//
+//                    case .lsk:
+//                        self.lskApiService.getTransaction(byHash: transfer.hash) { (result) in
+//                            switch result {
+//                            case .success(let transaction):
+//                                vc.set(transaction: transaction)
+//                                self.dialogService.dismissProgress()
+//                                break
+//                            case .failure(let error):
+//                                self.dialogService.showError(withMessage: "Transrer issue", error: error)
+//                                break
+//                            }
+//                        }
+//                        break
+//                    default: break
+//                    }
                     
                     if let nav = navigationController {
                         nav.pushViewController(vc, animated: true)

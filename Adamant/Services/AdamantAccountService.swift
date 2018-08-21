@@ -83,7 +83,7 @@ class AdamantAccountService: AccountService {
 	// MARK: Wallets
 	var wallets: [WalletService] = [
 		AdmWalletService(),
-		EthWalletService(),
+		try! EthWalletService(apiUrl: AdamantResources.ethServers.first!),
 //		LskWalletService()
 	]
 }

@@ -38,8 +38,6 @@ class ChatViewController: MessagesViewController {
 	var chatsProvider: ChatsProvider!
 	var dialogService: DialogService!
 	var router: Router!
-    var ethApiService: EthApiService!
-    var lskApiService: LskApiService!
 	
 	// MARK: Properties
 	weak var delegate: ChatViewControllerDelegate?
@@ -51,9 +49,6 @@ class ChatViewController: MessagesViewController {
 		formatter.timeStyle = .short
 		return formatter
 	}
-    
-    private var ethAddress: String?
-    private var lskAddress: String?
 	
 	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
 	private var controllerChanges: [NSFetchedResultsChangeType:[(indexPath: IndexPath?, newIndexPath: IndexPath?)]] = [:]
@@ -258,22 +253,9 @@ class ChatViewController: MessagesViewController {
 			messageInputBar.inputTextView.backgroundColor = UIColor.adamantChatSenderBackground
 			messageInputBar.inputTextView.isEditable = false
 			messageInputBar.sendButton.isEnabled = false
-        } else {
-            // MARK: 4. Check partner for Eth Address
-            
-            if let address = chatroom.partner?.address {
-                ethApiService.getEthAddress(byAdamandAddress: address) { (result) in
-                    guard case .success(let address) = result, let ethAddress = address else { return }
-                    self.ethAddress = ethAddress
-                }
-                lskApiService.getLskAddress(byAdamandAddress: address) { (result) in
-                    guard case .success(let address) = result, let lskAddress = address else { return }
-                    self.lskAddress = lskAddress
-                }
-            }
         }
-
-		// MARK: 5. Data
+		
+		// MARK: 4. Data
 		let controller = chatsProvider.getChatController(for: chatroom)
 		chatController = controller
 		controller.delegate = self
@@ -284,7 +266,7 @@ class ChatViewController: MessagesViewController {
 			print("There was an error performing fetch: \(error)")
 		}
 		
-		// MARK: 6. Notifications
+		// MARK: 5. Notifications
 		// Fixing content insets after modal window
 		NotificationCenter.default.addObserver(forName: NSNotification.Name.UIKeyboardWillShow, object: nil, queue: OperationQueue.main) { [weak self] notification in
 			guard let fixIt = self?.fixKeyboardInsets, fixIt else {

@@ -31,7 +31,6 @@ extension AdamantScene {
         
         static let ethTransactions = AdamantScene(identifier: "ETHTransactionsViewController", factory: { r in
             let c = ETHTransactionsViewController(nibName: "TransactionsViewController", bundle: nil)
-            c.ethApiService = r.resolve(EthApiService.self)
             c.dialogService = r.resolve(DialogService.self)
             c.router = r.resolve(Router.self)
             return c
