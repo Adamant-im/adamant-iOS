@@ -10,23 +10,23 @@ import Foundation
 import BigInt
 
 extension BigInt {
-	func asDecimal() -> Decimal {
+	func asDecimal(exponent: Int) -> Decimal {
 		let raw = self.description
 		guard let decim = Decimal(string: raw) else {
 			return 0
 		}
 		
-		return Decimal(sign: decim.sign, exponent: 8, significand: decim)
+		return Decimal(sign: decim.sign, exponent: exponent, significand: decim)
 	}
 }
 
 extension BigUInt {
-	func asDecimal() -> Decimal {
+	func asDecimal(exponent: Int) -> Decimal {
 		let raw = self.description
 		guard let decim = Decimal(string: raw) else {
 			return 0
 		}
 		
-		return Decimal(sign: .plus, exponent: 8, significand: decim)
+		return Decimal(sign: .plus, exponent: exponent, significand: decim)
 	}
 }

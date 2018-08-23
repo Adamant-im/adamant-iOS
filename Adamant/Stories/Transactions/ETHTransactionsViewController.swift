@@ -11,7 +11,7 @@ import UIKit
 class ETHTransactionsViewController: TransactionsViewController {
     
     // MARK: - Dependencies
-//    var ethApiService: EthApiService!
+    var ethWalletService: EthWalletService!
     var dialogService: DialogService!
     var router: Router!
     
@@ -25,44 +25,44 @@ class ETHTransactionsViewController: TransactionsViewController {
         
         handleRefresh(self.refreshControl)
     }
-    
-	/*
+	
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.ethApiService.getTransactions({ (result) in
-            switch result {
-            case .success(let transactions):
-                self.transactions = transactions
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-                break
-            case .failure(let error):
-                if case .internalError(let message, _ ) = error {
-                    let localizedErrorMessage = NSLocalizedString(message, comment: "TransactionList: 'Transactions not found' message.")
-                    self.dialogService.showWarning(withMessage: localizedErrorMessage)
-                } else {
-                    self.dialogService.showError(withMessage: String.adamantLocalized.transactionList.notFound, error: error)
-                }
-                break
-            }
-            DispatchQueue.main.async {
-                self.refreshControl.endRefreshing()
-            }
-        })
+		guard let address = ethWalletService.wallet?.address else {
+			transactions = []
+			return
+		}
+		
+		ethWalletService.getTransactionsHistory(address: address) { [weak self] result in
+			guard let vc = self else {
+				return
+			}
+
+			switch result {
+			case .success(let transactions):
+				vc.transactions = transactions
+
+			case .failure(let error):
+				vc.transactions = []
+				vc.dialogService.showRichError(error: error)
+			}
+
+			DispatchQueue.main.async {
+				vc.tableView.reloadData()
+				vc.refreshControl.endRefreshing()
+			}
+		}
     }
     
     override func currentAddress() -> String {
-        guard let address = ethApiService.account?.address else {
+        guard let address = ethWalletService.wallet?.address else {
             return ""
         }
         return address
     }
-*/
 }
 
 // MARK: - UITableView
 extension ETHTransactionsViewController {
-
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return transactions.count
     }

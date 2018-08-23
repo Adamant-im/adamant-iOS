@@ -10,6 +10,11 @@ import UIKit
 
 extension EthWalletService: WalletServiceWithTransfers {
 	func transferListViewController() -> UIViewController {
-		fatalError()
+		guard let vc = router.get(scene: AdamantScene.Transactions.ethTransactions) as? ETHTransactionsViewController else {
+			fatalError("Can't get EthTransactionsViewController")
+		}
+		
+		vc.ethWalletService = self
+		return vc
 	}
 }

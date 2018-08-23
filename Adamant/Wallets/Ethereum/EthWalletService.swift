@@ -284,7 +284,7 @@ extension EthWalletService {
 			
 			switch result {
 			case .success(let balance):
-				completion(.success(result: balance.asDecimal()))
+				completion(.success(result: balance.asDecimal(exponent: -18)))
 				
 			case .failure(let error):
 				completion(.failure(error: error.asWalletServiceError()))
