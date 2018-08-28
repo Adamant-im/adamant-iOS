@@ -89,39 +89,55 @@ class EthTransferViewController: TransferViewControllerBase {
 				$0.disabled = true
 				prefix.isEnabled = false
 			}
-			}.cellUpdate { (cell, row) in
-				if let text = cell.textField.text {
-					cell.textField.text = text.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
-				}
-			}.onChange { [weak self] row in
-				if let skip = self?.skipValueChange, skip {
-					self?.skipValueChange = false
-					return
+		}.cellUpdate { (cell, row) in
+			if let text = cell.textField.text {
+				cell.textField.text = text.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
+			}
+		}.onChange { [weak self] row in
+			if let skip = self?.skipValueChange, skip {
+				self?.skipValueChange = false
+				return
+			}
+			
+			if let text = row.value {
+				var trimmed = text.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
+				if trimmed.starts(with: "0x") {
+					let i = trimmed.index(trimmed.startIndex, offsetBy: 2)
+					trimmed = String(trimmed[i...])
 				}
 				
-				if let text = row.value {
-					let trimmed = text.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
+				if text != trimmed {
+					self?.skipValueChange = true
 					
-					if text != trimmed {
-						self?.skipValueChange = true
-						
-						DispatchQueue.main.async {
-							row.value = trimmed
-							row.updateCell()
-						}
+					DispatchQueue.main.async {
+						row.value = trimmed
+						row.updateCell()
 					}
 				}
-				
-				self?.validateForm()
+			}
+			
+			self?.validateForm()
 		}
 		
 		return row
 	}
 	
 	override func handleRawAddress(_ address: String) -> Bool {
-		return false
-	}
-	
-	override func sendFunds() {
+		guard let service = service else {
+			return false
+		}
+		
+		switch service.validate(address: address) {
+		case .valid:
+			if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
+				row.value = address
+				row.updateCell()
+			}
+			
+			return true
+			
+		default:
+			return false
+		}
 	}
 }

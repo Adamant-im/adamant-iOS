@@ -203,10 +203,18 @@ extension AdamantAccountService {
 				self?.setState(.loggedIn)
 				completion?(.success(account: account, alert: nil))
 				
+				if let adm = self?.wallets.first(where: { $0 is AdmWalletService }) {
+					adm.update()
+				}
+				
 			case .failure(let error):
                 completion?(.failure(.apiError(error: error)))
 				self?.setState(prevState)
 			}
+		}
+		
+		for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
+			wallet.update()
 		}
 	}
 }
@@ -454,10 +462,4 @@ fileprivate extension SecuredStore {
 	func remove(_ key: Key) {
 		remove(key.stringValue)
 	}
-}
-
-
-// MARK: - Wallets
-extension AdamantAccountService {
-	
 }

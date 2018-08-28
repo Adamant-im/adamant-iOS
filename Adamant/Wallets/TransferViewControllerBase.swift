@@ -45,6 +45,9 @@ extension String.adamantLocalized {
 
 fileprivate extension String.adamantLocalized.alert {
 	static let confirmSendMessageFormat = NSLocalizedString("TransferScene.SendConfirmFormat", comment: "Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'.")
+	static func confirmSendMessage(formattedAmount amount: String, recipient: String) -> String {
+		return String.localizedStringWithFormat(String.adamantLocalized.alert.confirmSendMessageFormat, "\(amount)", recipient)
+	}
 	static let send = NSLocalizedString("TransferScene.Send", comment: "Transfer: Confirm transfer alert: Send tokens button")
 }
 
@@ -543,6 +546,37 @@ class TransferViewControllerBase: FormViewController {
 		return balance > total
 	}
 	
+	/// Send funds to recipient after validations
+	/// You can override this to provide custom logic
+	func sendFunds() {
+		guard let service = service, let recipient = recipient, let amount = amount else {
+			return
+		}
+		
+		guard let dialogService = dialogService else {
+			return
+		}
+		
+		dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+		
+		service.sendMoney(recipient: recipient, amount: amount) { [weak self] result in
+			switch result {
+			case .success:
+				dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+				
+				if let vc = self, let delegate = vc.delegate {
+					delegate.transferViewController(vc, didFinishWith: nil)
+				}
+				
+				service.update()
+				
+			case .failure(let error):
+				dialogService.dismissProgress()
+				dialogService.showRichError(error: error)
+			}
+		}
+	}
+	
 	
 	/// Validate recipient's address
 	/// You must override this method
@@ -556,12 +590,6 @@ class TransferViewControllerBase: FormViewController {
 		} else {
 			return false
 		}
-	}
-	
-	/// Send funds to recipient
-	/// You must override this method
-	func sendFunds() {
-		fatalError("You must implement send logic")
 	}
 	
 	
@@ -606,7 +634,10 @@ class TransferViewControllerBase: FormViewController {
 			return
 		}
 		
-		let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.confirmSendMessageFormat, "\(amount) \(AdamantUtilities.currencyCode)", recipient), message: String.adamantLocalized.transfer.cantUndo, preferredStyle: .alert)
+		let formattedAmount = balanceFormatter.string(from: amount as NSDecimalNumber)!
+		let title = String.adamantLocalized.alert.confirmSendMessage(formattedAmount: formattedAmount, recipient: recipient)
+		
+		let alert = UIAlertController(title: title, message: String.adamantLocalized.transfer.cantUndo, preferredStyle: .alert)
 		let cancelAction = UIAlertAction(title: String.adamantLocalized.alert.cancel , style: .cancel, handler: nil)
 		let sendAction = UIAlertAction(title: String.adamantLocalized.alert.send, style: .default) { [weak self] _ in
 			self?.sendFunds()

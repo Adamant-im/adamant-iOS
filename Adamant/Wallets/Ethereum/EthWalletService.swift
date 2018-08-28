@@ -70,7 +70,7 @@ class EthWalletService: WalletService {
 	
 	let web3: web3
 	private let baseUrl: String
-	private let defaultDispatchQueue = DispatchQueue(label: "im.adamant.ethWalletService", qos: .utility, attributes: [.concurrent])
+	let defaultDispatchQueue = DispatchQueue(label: "im.adamant.ethWalletService", qos: .utility, attributes: [.concurrent])
 	private (set) var enabled = true
 	
 	let stateSemaphore = DispatchSemaphore(value: 1)
@@ -134,12 +134,15 @@ class EthWalletService: WalletService {
 		state = .updating
 		
 		getBalance(forAddress: wallet.ethAddress) { result in
+			defer {
+				self.stateSemaphore.signal()
+			}
+			self.stateSemaphore.wait()
+			self.state = .updated
+			
 			switch result {
 			case .success(let balance):
 				if wallet.balance != balance {
-					defer { self.stateSemaphore.signal() }
-					self.stateSemaphore.wait()
-					
 					wallet.balance = balance
 					NotificationCenter.default.post(name: self.walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
 				}

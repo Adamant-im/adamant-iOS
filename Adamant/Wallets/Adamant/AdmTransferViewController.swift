@@ -126,33 +126,4 @@ class AdmTransferViewController: TransferViewControllerBase {
 			return false
 		}
 	}
-	
-	override func sendFunds() {
-		guard let service = service, let recipient = recipient, let amount = amount else {
-			return
-		}
-		
-		guard let dialogService = dialogService else {
-			return
-		}
-		
-		dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
-		
-		service.sendMoney(recipient: recipient, amount: amount) { [weak self] result in
-			switch result {
-			case .success:
-				dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-				
-				if let vc = self, let delegate = vc.delegate {
-					delegate.transferViewController(vc, didFinishWith: nil)
-				}
-				
-				service.update()
-				
-			case .failure(let error):
-				dialogService.dismissProgress()
-				dialogService.showRichError(error: error)
-			}
-		}
-	}
 }

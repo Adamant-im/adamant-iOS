@@ -48,8 +48,8 @@ struct AdamantResources {
 	]
     
     static let ethServers = [
-        "https://ethnode1.adamant.im/"
-//        "https://ropsten.infura.io/"  // test network
+//        "https://ethnode1.adamant.im/"
+        "https://ropsten.infura.io/"  // test network
     ]
 	
 	// Addresses
