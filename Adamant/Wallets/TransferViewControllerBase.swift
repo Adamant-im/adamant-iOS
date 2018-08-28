@@ -8,8 +8,11 @@
 
 import UIKit
 import Eureka
-import web3swift
-import BigInt
+import QRCodeReader
+import EFQRCode
+import AVFoundation
+import Photos
+
 
 // MARK: - Transfer Delegate Protocol
 
@@ -123,7 +126,34 @@ class TransferViewControllerBase: FormViewController {
 	
 	// MARK: - Properties
 	
-	var service: WalletServiceWithSend?
+	var service: WalletServiceWithSend? {
+		didSet {
+			if let prev = oldValue {
+				NotificationCenter.default.removeObserver(self, name: prev.transactionFeeUpdated, object: prev)
+			}
+			
+			if let new = service {
+				NotificationCenter.default.addObserver(forName: new.transactionFeeUpdated, object: new, queue: OperationQueue.main) { [weak self] _ in
+					guard let fee = self?.service?.transactionFee, let form = self?.form else {
+						return
+					}
+					
+					if let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
+						row.value = fee.doubleValue
+						row.updateCell()
+					}
+					
+					if let row: DecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
+						row.updateCell()
+					}
+					
+					self?.validateForm()
+				}
+			}
+		}
+	}
+	
+	
 	weak var delegate: TransferViewControllerDelegate?
 	
 	var recipient: String? = nil
@@ -145,19 +175,36 @@ class TransferViewControllerBase: FormViewController {
 		}
 	}
 	
+	
+	// MARK: - QR Reader
+	
+	lazy var qrReader: QRCodeReaderViewController = {
+		let builder = QRCodeReaderViewControllerBuilder {
+			$0.reader = QRCodeReader(metadataObjectTypes: [.qr ], captureDevicePosition: .back)
+			$0.cancelButtonTitle = String.adamantLocalized.alert.cancel
+			$0.showSwitchCameraButton = false
+		}
+		
+		let vc = QRCodeReaderViewController(builder: builder)
+		vc.delegate = self
+		return vc
+	}()
+	
+	
 	// MARK: - Lifecycle
 	
     override func viewDidLoad() {
         super.viewDidLoad()
 		
-		// MARK: - UI
+		// MARK: UI
 		navigationAccessoryView.tintColor = UIColor.adamantPrimary
 		
-		// MARK: - Sections
+		// MARK: Sections
 		form.append(walletSection())
-		form.append(contentsOf: customSections())
+		form.append(recipientSection())
+		form.append(transactionInfoSection())
 		
-        // MARK: - Transfer section
+        // MARK: - Button section
 		form +++ Section()
 		<<< ButtonRow() { [weak self] in
 			$0.title = BaseRows.sendButton.localized
@@ -186,38 +233,50 @@ class TransferViewControllerBase: FormViewController {
 			$0.tag = Sections.wallet.tag
 		}
 		
-		// MARK: Balance
-		<<< DecimalRow() { [weak self] in
-			$0.title = BaseRows.balance.localized
-			$0.tag = BaseRows.balance.tag
-			$0.disabled = true
-			$0.formatter = self?.balanceFormatter
-			
-			if let wallet = self?.service?.wallet {
-				$0.value = wallet.balance.doubleValue
-			} else {
-				$0.value = 0
-			}
+		section.append(defaultRowFor(baseRow: BaseRows.balance))
+		section.append(defaultRowFor(baseRow: BaseRows.maxToTransfer))
+		
+		return section
+	}
+	
+	func recipientSection() -> Section {
+		let section = Section(Sections.recipient.localized) {
+			$0.tag = Sections.recipient.tag
 		}
+		
+		section.append(defaultRowFor(baseRow: BaseRows.address))
+		
+		if !recipientIsReadonly, let stripe = recipientStripe() {
+			var footer = HeaderFooterView<UIView>(.callback {
+				let view = ButtonsStripeView.adamantConfigured()
+				view.stripe = stripe
+				view.delegate = self
+				return view
+			})
+				
+			footer.height = { ButtonsStripeView.adamantDefaultHeight }
 			
-		// MARK: Max to transfer
-		<<< DecimalRow() { [weak self] in
-			$0.title = BaseRows.maxToTransfer.localized
-			$0.tag = BaseRows.maxToTransfer.tag
-			$0.disabled = true
-			$0.formatter = AdamantUtilities.currencyFormatter
-			
-			if let maxToTransfer = self?.maxToTransfer {
-				$0.value = maxToTransfer.doubleValue
-			}
+			section.footer = footer
 		}
 		
 		return section
 	}
 	
+	func transactionInfoSection() -> Section {
+		let section = Section(Sections.transferInfo.localized) {
+			$0.tag = Sections.transferInfo.tag
+		}
+		
+		section.append(defaultRowFor(baseRow: .amount))
+		section.append(defaultRowFor(baseRow: .fee))
+		section.append(defaultRowFor(baseRow: .total))
+		
+		return section
+	}
 	
 	
-    /*
+	/*
+	
     private func createETHForm() {
         if let ethAccount = ethApiService.account, let ethBalanceBigInt = ethAccount.balance, let ethBalanceString = Web3.Utils.formatToEthereumUnits(ethBalanceBigInt), let ethBalance = Double(ethBalanceString) {
             
@@ -463,10 +522,6 @@ class TransferViewControllerBase: FormViewController {
 	
 	// MARK: - Abstract
 	
-	func customSections() -> [Section] {
-		fatalError()
-	}
-	
 	/// Override this to provide custom balance formatter
 	var balanceFormatter: NumberFormatter {
 		return AdamantBalanceFormat.full.defaultFormatter
@@ -489,9 +544,10 @@ class TransferViewControllerBase: FormViewController {
 	}
 	
 	
-	/// You must implement validation logic
+	/// Validate recipient's address
+	/// You must override this method
 	func validateRecipient(_ address: String) -> Bool {
-		fatalError()
+		fatalError("You must implement recipient addres validation logic")
 	}
 	
 	func formIsValid() -> Bool {
@@ -502,9 +558,37 @@ class TransferViewControllerBase: FormViewController {
 		}
 	}
 	
+	/// Send funds to recipient
+	/// You must override this method
 	func sendFunds() {
 		fatalError("You must implement send logic")
 	}
+	
+	
+	/// Build recipient address row
+	/// You must override this method
+	func recipientRow() -> BaseRow {
+		fatalError("You must implement recipient row")
+	}
+	
+	
+	/// Recipient section footer. You can override this to provide custom set of elements.
+	/// You can also override ButtonsStripeViewDelegate implementation
+	/// nil for no stripe
+	func recipientStripe() -> Stripe? {
+		return [.qrCameraReader, .qrPhotoReader]
+	}
+	
+	
+	/// User loaded address from QR (camera or library)
+	/// You must override this method
+	///
+	/// - Parameter address: raw readed address
+	/// - Returns: string was successfully handled
+	func handleRawAddress(_ address: String) -> Bool {
+		fatalError("You must implement raw address handling")
+	}
+	
 	
 	// MARK: - Send Actions
 	private func confirmSendFunds() {
@@ -700,4 +784,239 @@ class TransferViewControllerBase: FormViewController {
         }
     }
 */
+}
+
+
+// MARK: - QR
+extension TransferViewControllerBase {
+	func scanQr() {
+		switch AVCaptureDevice.authorizationStatus(for: .video) {
+		case .authorized:
+			present(qrReader, animated: true, completion: nil)
+			
+		case .notDetermined:
+			AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
+				if granted, let qrReader = self?.qrReader {
+					if Thread.isMainThread {
+						self?.present(qrReader, animated: true, completion: nil)
+					} else {
+						DispatchQueue.main.async {
+							self?.present(qrReader, animated: true, completion: nil)
+						}
+					}
+				} else {
+					return
+				}
+			}
+			
+		case .restricted:
+			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
+			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+			present(alert, animated: true, completion: nil)
+			
+		case .denied:
+			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized, preferredStyle: .alert)
+			
+			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
+				DispatchQueue.main.async {
+					if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
+						UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+					}
+				}
+			})
+			
+			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+			
+			present(alert, animated: true, completion: nil)
+		}
+	}
+	
+	func loadQr() {
+		let presenter: () -> Void = { [weak self] in
+			let picker = UIImagePickerController()
+			picker.delegate = self
+			picker.allowsEditing = false
+			picker.sourceType = .photoLibrary
+			self?.present(picker, animated: true, completion: nil)
+		}
+		
+		if #available(iOS 11.0, *) {
+			presenter()
+		} else {
+			switch PHPhotoLibrary.authorizationStatus() {
+			case .authorized:
+				presenter()
+				
+			case .notDetermined:
+				PHPhotoLibrary.requestAuthorization { status in
+					if status == .authorized {
+						presenter()
+					}
+				}
+				
+			case .restricted, .denied:
+				dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.login.photolibraryNotAuthorized)
+			}
+		}
+	}
+}
+
+
+// MARK: - UIImagePickerControllerDelegate
+extension TransferViewControllerBase: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+		dismiss(animated: true, completion: nil)
+		
+		guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else {
+			return
+		}
+		
+		if let cgImage = image.toCGImage(), let codes = EFQRCode.recognize(image: cgImage), codes.count > 0 {
+			for aCode in codes {
+				if handleRawAddress(aCode) {
+					return
+				}
+			}
+			
+			dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
+		} else {
+			dialogService.showWarning(withMessage: String.adamantLocalized.login.noQrError)
+		}
+	}
+}
+
+
+// MARK: - QRCodeReaderViewControllerDelegate
+extension TransferViewControllerBase: QRCodeReaderViewControllerDelegate {
+	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
+		if handleRawAddress(result.value) {
+			dismiss(animated: true, completion: nil)
+		} else {
+			dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+				reader.startScanning()
+			}
+		}
+	}
+	
+	func readerDidCancel(_ reader: QRCodeReaderViewController) {
+		reader.dismiss(animated: true, completion: nil)
+	}
+}
+
+
+// MARK: - ButtonsStripeViewDelegate
+extension TransferViewControllerBase: ButtonsStripeViewDelegate {
+	func buttonsStripe(_ stripe: ButtonsStripeView, didTapButton button: StripeButtonType) {
+		switch button {
+		case .qrCameraReader:
+			scanQr()
+			
+		case .qrPhotoReader:
+			loadQr()
+			
+		default:
+			return
+		}
+	}
+}
+
+// MARK: - Default rows
+extension TransferViewControllerBase {
+	func defaultRowFor(baseRow: BaseRows) -> BaseRow {
+		switch baseRow {
+		case .balance:
+			return DecimalRow() { [weak self] in
+				$0.title = BaseRows.balance.localized
+				$0.tag = BaseRows.balance.tag
+				$0.disabled = true
+				$0.formatter = self?.balanceFormatter
+				
+				if let wallet = self?.service?.wallet {
+					$0.value = wallet.balance.doubleValue
+				} else {
+					$0.value = 0
+				}
+			}
+			
+		case .address:
+			return recipientRow()
+			
+		case .maxToTransfer:
+			return DecimalRow() { [weak self] in
+				$0.title = BaseRows.maxToTransfer.localized
+				$0.tag = BaseRows.maxToTransfer.tag
+				$0.disabled = true
+				$0.formatter = self?.balanceFormatter
+				
+				if let maxToTransfer = self?.maxToTransfer {
+					$0.value = maxToTransfer.doubleValue
+				}
+			}
+			
+		case .amount:
+			return DecimalRow { [weak self] in
+				$0.title = BaseRows.amount.localized
+				$0.placeholder = String.adamantLocalized.transfer.amountPlaceholder
+				$0.tag = BaseRows.amount.tag
+				$0.formatter = self?.balanceFormatter
+				
+				if let amount = self?.amount {
+					$0.value = amount.doubleValue
+				}
+			}.onChange { [weak self] (row) in
+				self?.validateForm()
+			}
+		
+		case .fee:
+			return DecimalRow() { [weak self] in
+				$0.tag = BaseRows.fee.tag
+				$0.title = BaseRows.fee.localized
+				$0.disabled = true
+				$0.formatter = self?.balanceFormatter
+			
+				if let fee = self?.service?.transactionFee {
+					$0.value = fee.doubleValue
+				} else {
+					$0.value = 0
+				}
+			}
+			
+		case .total:
+			return DecimalRow() { [weak self] in
+				$0.tag = BaseRows.total.tag
+				$0.title = BaseRows.total.localized
+				$0.value = nil
+				$0.disabled = true
+				$0.formatter = self?.balanceFormatter
+				
+				if let balance = self?.service?.wallet?.balance {
+					$0.add(rule: RuleSmallerOrEqualThan<Double>(max: balance.doubleValue))
+				}
+			}
+		
+		case .comments:
+			fatalError()
+			
+		case .sendButton:
+			return ButtonRow() { [weak self] in
+				$0.title = BaseRows.sendButton.localized
+				$0.tag = BaseRows.sendButton.tag
+				
+				$0.disabled = Condition.function([BaseRows.address.tag, BaseRows.amount.tag]) { [weak self] form -> Bool in
+					guard let service = self?.service, let wallet = service.wallet, wallet.balance > service.transactionFee else {
+						return true
+					}
+					
+					guard let isValid = self?.formIsValid() else {
+						return true
+					}
+					
+					return !isValid
+				}
+			}.onCellSelection { [weak self] (cell, row) in
+				self?.confirmSendFunds()
+			}
+		}
+	}
 }

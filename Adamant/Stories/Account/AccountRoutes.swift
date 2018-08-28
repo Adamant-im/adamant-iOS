@@ -20,12 +20,6 @@ extension AdamantScene {
 			return c
 		}
 		
-		static let admTransfer = AdamantScene(identifier: "AdmTransferViewController") { r in
-			let c = AdmTransferViewController()
-			c.dialogService = r.resolve(DialogService.self)
-			return c
-		}
-		
 		private init() {}
 	}
 }

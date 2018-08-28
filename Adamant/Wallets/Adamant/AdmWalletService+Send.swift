@@ -13,7 +13,7 @@ extension AdmWalletService: WalletServiceWithSend {
 	typealias T = Int
 	
 	func transferViewController() -> UIViewController {
-		guard let vc = router.get(scene: AdamantScene.Account.admTransfer) as? AdmTransferViewController else {
+		guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.transfer) as? AdmTransferViewController else {
 			fatalError("Can't get AdmTransferViewController")
 		}
 		

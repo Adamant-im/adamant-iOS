@@ -11,22 +11,24 @@ import BigInt
 
 extension BigInt {
 	func asDecimal(exponent: Int) -> Decimal {
-		let raw = self.description
-		guard let decim = Decimal(string: raw) else {
-			return 0
-		}
+		let decim = Decimal(floatLiteral: Double(self))
 		
-		return Decimal(sign: decim.sign, exponent: exponent, significand: decim)
+		if exponent != 0 {
+			return Decimal(sign: decim.sign, exponent: exponent, significand: decim)
+		} else {
+			return decim
+		}
 	}
 }
 
 extension BigUInt {
 	func asDecimal(exponent: Int) -> Decimal {
-		let raw = self.description
-		guard let decim = Decimal(string: raw) else {
-			return 0
-		}
+		let decim = Decimal(floatLiteral: Double(self))
 		
-		return Decimal(sign: .plus, exponent: exponent, significand: decim)
+		if exponent != 0 {
+			return Decimal(sign: .plus, exponent: exponent, significand: decim)
+		} else {
+			return decim
+		}
 	}
 }

@@ -11,10 +11,16 @@ import web3swift
 import BigInt
 
 extension EthWalletService: WalletServiceWithSendExtended {
+	
 	typealias T = String
 	
 	func transferViewController() -> UIViewController {
-		return UIViewController()
+		guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.transfer) as? EthTransferViewController else {
+			fatalError("Can't get EthTransferViewController")
+		}
+		
+		vc.service = self
+		return vc
 	}
 	
 	func sendMoney(recipient: String, amount: Decimal, completion: @escaping (WalletServiceSimpleResult) -> Void) {

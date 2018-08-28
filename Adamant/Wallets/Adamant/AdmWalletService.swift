@@ -13,7 +13,7 @@ import CoreData
 
 class AdmWalletService: NSObject, WalletService {
 	// MARK: - Constants
-	let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$", options: [])
+	let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
 	
 	let transactionFee: Decimal = 0.5
 	static var currencySymbol = "ADM"
@@ -28,15 +28,15 @@ class AdmWalletService: NSObject, WalletService {
 	
 	
 	// MARK: - Notifications
-	let walletUpdatedNotification = Notification.Name("adm.update")
-	let serviceEnabledChanged = Notification.Name("adm.enabledChanged")
-	
+	let walletUpdatedNotification = Notification.Name("adamant.admWallet.updated")
+	let serviceEnabledChanged = Notification.Name("adamant.admWallet.enabledChanged")
+	let transactionFeeUpdated: Notification.Name = Notification.Name("adamant.admWallet.feeUpdated")
 	
 	// MARK: - Properties
 	let enabled: Bool = true
 	
 	var walletViewController: WalletViewController {
-		guard let vc = router.get(scene: AdamantScene.Wallets.AdamantWallet) as? AdmWalletViewController else {
+		guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.wallet) as? AdmWalletViewController else {
 			fatalError("Can't get AdmWalletViewController")
 		}
 		
@@ -113,7 +113,7 @@ class AdmWalletService: NSObject, WalletService {
 
 extension AdmWalletService: WalletServiceWithTransfers {
 	func transferListViewController() -> UIViewController {
-		return router.get(scene: AdamantScene.Transactions.transactions)
+		return router.get(scene: AdamantScene.Wallets.Adamant.transactionsList)
 	}
 }
 

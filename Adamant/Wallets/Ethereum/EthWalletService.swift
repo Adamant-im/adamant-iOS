@@ -11,7 +11,7 @@ import UIKit
 import web3swift
 import Swinject
 import Alamofire
-
+import BigInt
 
 extension Web3Error {
 	func asWalletServiceError() -> WalletServiceError {
@@ -41,12 +41,15 @@ extension Web3Error {
 
 class EthWalletService: WalletService {
 	// MARK: - Constants
-	static var currencySymbol = "ETH"
-	static var currencyLogo = #imageLiteral(resourceName: "wallet_eth")
+	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
 	
-	let transactionFee: Decimal = 0.0
+	static let currencySymbol = "ETH"
+	static let currencyLogo = #imageLiteral(resourceName: "wallet_eth")
+	static let currencyExponent = -18
 	
-	static let transferGas = 21000
+	private (set) var transactionFee: Decimal = 0.0
+	
+	static let transferGas: Decimal = 21000
 	static let kvsAddress = "eth:address"
 	static let defaultGasPrice = 20000000000 // 20 Gwei
 	
@@ -59,9 +62,9 @@ class EthWalletService: WalletService {
 	
 	
 	// MARK: - Notifications
-	let walletUpdatedNotification = Notification.Name("adamant.ethWalletService.walletUpdated")
-	let serviceEnabledChanged = Notification.Name("adamant.ethWalletService.enabledChanged")
-
+	let walletUpdatedNotification = Notification.Name("adamant.ethWallet.walletUpdated")
+	let serviceEnabledChanged = Notification.Name("adamant.ethWallet.enabledChanged")
+	let transactionFeeUpdated: Notification.Name = Notification.Name("adamant.ethWallet.feeUpdated")
 	
 	// MARK: - Properties
 	
@@ -73,7 +76,7 @@ class EthWalletService: WalletService {
 	let stateSemaphore = DispatchSemaphore(value: 1)
 	
 	var walletViewController: WalletViewController {
-		guard let vc = router.get(scene: AdamantScene.Wallets.EthereumWallet) as? EthWalletViewController else {
+		guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.wallet) as? EthWalletViewController else {
 			fatalError("Can't get EthWalletViewController")
 		}
 		
@@ -145,19 +148,46 @@ class EthWalletService: WalletService {
 				self.dialogService.showRichError(error: error)
 			}
 		}
+		
+		getGasPrices { [weak self] result in
+			switch result {
+			case .success(let price):
+				guard let fee = self?.transactionFee else {
+					return
+				}
+				
+				let newFee = price * EthWalletService.transferGas
+				
+				if fee != newFee {
+					self?.transactionFee = newFee
+					
+					if let notification = self?.transactionFeeUpdated {
+						NotificationCenter.default.post(name: notification, object: self, userInfo: nil)
+					}
+				}
+				
+			case .failure:
+				break
+			}
+		}
 	}
 	
 	// MARK: - Tools
 	
 	func validate(address: String) -> AddressValidationResult {
-		return .valid
+		return addressRegex.perfectMatch(with: address) ? .valid : .invalid
 	}
 	
 	func getGasPrices(completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
 		web3.eth.getGasPrice(callback: { result in
 			switch result {
 			case .success(let price):
-				completion(.success(result: Decimal(price.doubleValue!)))
+				guard let p = price as? BigUInt else {
+					completion(.failure(error: WalletServiceError.internalError(message: "EthWalletService: Type error, expected BigUInt, received: \(type(of: price))", error: nil)))
+					break
+				}
+				
+				completion(.success(result: p.asDecimal(exponent: EthWalletService.currencyExponent)))
 				
 			case .failure(let error):
 				completion(.failure(error: error.asWalletServiceError()))
@@ -284,7 +314,7 @@ extension EthWalletService {
 			
 			switch result {
 			case .success(let balance):
-				completion(.success(result: balance.asDecimal(exponent: -18)))
+				completion(.success(result: balance.asDecimal(exponent: EthWalletService.currencyExponent)))
 				
 			case .failure(let error):
 				completion(.failure(error: error.asWalletServiceError()))

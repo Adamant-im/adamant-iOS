@@ -183,6 +183,8 @@ protocol WalletServiceWithTransfers: WalletService {
 // MARK: Send
 
 protocol WalletServiceWithSend: WalletService {
+	var transactionFeeUpdated: Notification.Name { get }
+	
 	var transactionFee: Decimal { get }
 	func transferViewController() -> UIViewController
 	func sendMoney(recipient: String, amount: Decimal, completion: @escaping (WalletServiceSimpleResult) -> Void)

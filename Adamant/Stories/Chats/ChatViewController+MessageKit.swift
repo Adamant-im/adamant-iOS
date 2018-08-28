@@ -187,7 +187,7 @@ extension ChatViewController: MessageCellDelegate {
 		switch message {
 		case let transfer as TransferTransaction:
 			// MARK: Show transfer details
-			guard let vc = router.get(scene: AdamantScene.Transactions.transactionDetails) as? BaseTransactionDetailsViewController else {
+			guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? BaseTransactionDetailsViewController else {
 				fatalError("Can't get TransactionDetails scene")
 			}
 			
@@ -208,7 +208,7 @@ extension ChatViewController: MessageCellDelegate {
                         break
                     }
                     
-                    guard let vc = router.get(scene: AdamantScene.Transactions.transactionDetails) as? BaseTransactionDetailsViewController else {
+                    guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? BaseTransactionDetailsViewController else {
                         break
                     }
                     

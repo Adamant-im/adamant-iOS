@@ -118,7 +118,7 @@ extension ADMTransactionsViewController {
             return
         }
         
-        guard let controller = router.get(scene: AdamantScene.Transactions.transactionDetails) as? BaseTransactionDetailsViewController else {
+        guard let controller = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? BaseTransactionDetailsViewController else {
             return
         }
         

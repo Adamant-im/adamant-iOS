@@ -17,28 +17,38 @@ enum AdamantBalanceFormat {
 	
 	// MARK: Formatters
 	
-	static var currencyFormatterFull: NumberFormatter = {
+	static func currencyFormatter(format: AdamantBalanceFormat, currencySymbol symbol: String?) -> NumberFormatter {
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .decimal
 		formatter.roundingMode = .floor
-		formatter.positiveFormat = "#.########"
+		
+		let positiveFormat: String
+		
+		switch format {
+		case .full: positiveFormat = "#.########"
+		case .compact: positiveFormat = "#.####"
+		case .short: positiveFormat = "#.##"
+		}
+		
+		if let symbol = symbol {
+			formatter.positiveFormat = "\(positiveFormat) \(symbol)"
+		} else {
+			formatter.positiveFormat = positiveFormat
+		}
+		
 		return formatter
+	}
+	
+	static var currencyFormatterFull: NumberFormatter = {
+		return currencyFormatter(format: .full, currencySymbol: nil)
 	}()
 	
 	static var currencyFormatterCompact: NumberFormatter = {
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .decimal
-		formatter.roundingMode = .floor
-		formatter.positiveFormat = "#.####"
-		return formatter
+		return currencyFormatter(format: .compact, currencySymbol: nil)
 	}()
 	
 	static var currencyFormatterShort: NumberFormatter = {
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .decimal
-		formatter.roundingMode = .floor
-		formatter.positiveFormat = "#.##"
-		return formatter
+		return currencyFormatter(format: .short, currencySymbol: nil)
 	}()
 	
 	
