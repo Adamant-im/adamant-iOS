@@ -8,11 +8,21 @@
 
 import Foundation
 
-/// MARK: - Formatters
+// MARK: - Formatters
+
+/// - full: 8 digits after the decimal point
+/// - compact: 4 digits after the decimal point
+/// - short: 2 digits after the decimal point
 enum AdamantBalanceFormat {
 	// MARK: Styles
+	/// 8 digits after the decimal point
+	case full
 	
-	case full, compact, short
+	/// 4 digits after the decimal point
+	case compact
+	
+	/// 2 digits after the decimal point
+	case short
 	
 	
 	// MARK: Formatters
