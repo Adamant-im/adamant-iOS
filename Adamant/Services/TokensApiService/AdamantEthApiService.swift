@@ -8,8 +8,9 @@
 
 import Foundation
 import web3swift
-import BigInt
+import struct BigInt.BigUInt
 import Alamofire
+import PromiseKit
 
 class AdamantEthApiService: EthApiService {
     
@@ -129,7 +130,7 @@ class AdamantEthApiService: EthApiService {
             }
         }
     }
-    func createTransaction(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<TransactionIntermediate>) -> Void) {
+    func createTransaction(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<EthereumTransaction>) -> Void) {
         DispatchQueue.global().async {
             guard let destinationEthAddress = EthereumAddress(address) else {
                 DispatchQueue.main.async {
@@ -191,16 +192,39 @@ class AdamantEthApiService: EthApiService {
                 return
             }
             
-            
-            DispatchQueue.main.async {
-                completion(.success(intermediate))
+            do {
+                let queue = self.web3.requestDispatcher.queue
+                let result = try intermediate.assemblePromise(options: nil).then(on: queue) { transaction throws -> Promise<EthereumTransaction> in
+                    guard let mergedOptions = Web3Options.merge(intermediate.options, with: nil) else {
+                        throw Web3Error.inputError("Provided options are invalid")
+                    }
+                    var cleanedOptions = Web3Options()
+                    cleanedOptions.from = mergedOptions.from
+                    cleanedOptions.to = mergedOptions.to
+                    return self.signTransactionPromise(transaction, options: cleanedOptions, password: "")
+                    }.wait()
+                
+                DispatchQueue.main.async {
+                    completion(.success(result))
+                }
+            } catch {
+                if let err = error as? Web3Error {
+                    DispatchQueue.main.async {
+                        completion(.failure(.internalError(message: "ETH Wallet: Send - signing transaction error", error: err)))
+                    }
+                    return
+                }
+                DispatchQueue.main.async {
+                    completion(.failure(.internalError(message: "ETH Wallet: Send - signing transaction error", error: error)))
+                }
+                return
             }
         }
     }
     
-    func sendTransaction(transaction: TransactionIntermediate, completion: @escaping (ApiServiceResult<String>) -> Void) {
+    func sendTransaction(transaction: EthereumTransaction, completion: @escaping (ApiServiceResult<String>) -> Void) {
         DispatchQueue.global().async {
-            let sendResult = transaction.send(password: "", options: nil)
+            let sendResult = self.web3.eth.sendRawTransaction(transaction)
             
             guard let sendValue = sendResult.value else {
                 DispatchQueue.main.async {
@@ -208,16 +232,39 @@ class AdamantEthApiService: EthApiService {
                 }
                 return
             }
-            
-            guard let hash = sendValue["txhash"] else {
-                DispatchQueue.main.async {
-                    completion(.failure(.internalError(message: "ETH Wallet: Send - fail to get transaction hash", error: nil)))
-                }
-                return
-            }
             DispatchQueue.main.async {
-                completion(.success(hash))
+                completion(.success(sendValue.hash))
             }
+        }
+    }
+    
+    func signTransactionPromise(_ transaction: EthereumTransaction, options: Web3Options, password:String = "") -> Promise<EthereumTransaction> {
+        var assembledTransaction : EthereumTransaction = transaction.mergedWithOptions(options)
+        let queue = web3.requestDispatcher.queue
+        do {
+            if self.web3.provider.attachedKeystoreManager == nil {
+                throw Web3Error.processingError("Failed to create a request to send transaction")
+            }
+            guard let from = options.from else {
+                throw Web3Error.inputError("No 'from' field provided")
+            }
+            do {
+                try Web3Signer.signTX(transaction: &assembledTransaction, keystore: self.web3.provider.attachedKeystoreManager!, account: from, password: password)
+            } catch {
+                throw Web3Error.inputError("Failed to locally sign a transaction")
+            }
+            
+            let returnPromise = Promise<EthereumTransaction>.pending()
+            queue.async {
+                returnPromise.resolver.fulfill(assembledTransaction)
+            }
+            return returnPromise.promise
+        } catch {
+            let returnPromise = Promise<EthereumTransaction>.pending()
+            queue.async {
+                returnPromise.resolver.reject(error)
+            }
+            return returnPromise.promise
         }
     }
     
@@ -290,12 +337,7 @@ class AdamantEthApiService: EthApiService {
                 return
             }
             
-            guard let hash = sendResult["txhash"] else {
-                DispatchQueue.main.async {
-                    completion(.failure(.internalError(message: "ETH Wallet: Send - fail to get transaction hash", error: nil)))
-                }
-                return
-            }
+            let hash = sendResult.hash
             
             let result = ["type": "eth_transaction", "amount": "\(amount)", "hash": hash, "comments":""]
             

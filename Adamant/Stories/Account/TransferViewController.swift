@@ -626,44 +626,43 @@ class TransferViewController: FormViewController {
         self.ethApiService.createTransaction(toAddress: recipient, amount: amount) { (result) in
             switch result {
             case .success(let transaction):
-                self.ethApiService.sendTransaction(transaction: transaction, completion: { (result) in
-                    switch result {
-                    case .success(let txHash):
-                        DispatchQueue.global().async {
-                            print("TxHash: \(txHash)")
-                            
-                            var message = ["type": "eth_transaction", "amount": "\(amount)", "hash": txHash, "comments":""]
-                            
-                            if let commentsRow = self.form.rowBy(tag: Row.comments.tag) as? TextAreaRow,
-                                let comments = commentsRow.value {
-                                message["comments"] = comments
-                            }
-                            
-                            do {
-                                let data = try JSONEncoder().encode(message)
-                                guard let raw = String(data: data, encoding: String.Encoding.utf8) else {
-                                    return
-                                }
-                                
-                                print("Payload: \(raw)")
-                                DispatchQueue.main.async {
-                                    self.delegate?.transferFinished(with: raw)
-                                    self.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                                    self.close()
-                                }
-                            } catch {
-                                DispatchQueue.main.async {
-                                    self.dialogService.showError(withMessage: "ETH Wallet: Send - wrong data issue", error: nil)
-                                }
-                            }
+                if let txHash = transaction.txhash {
+                    DispatchQueue.global().async {
+                        var message = ["type": "eth_transaction", "amount": "\(amount)", "hash": txHash, "comments":""]
+                        
+                        if let commentsRow = self.form.rowBy(tag: Row.comments.tag) as? TextAreaRow,
+                            let comments = commentsRow.value {
+                            message["comments"] = comments
                         }
                         
-                        break
-                    case .failure(let error):
-                        self.dialogService.showError(withMessage: "Transrer issue", error: error)
-                        break
+                        do {
+                            let data = try JSONEncoder().encode(message)
+                            guard let raw = String(data: data, encoding: String.Encoding.utf8) else {
+                                return
+                            }
+                            
+                            DispatchQueue.main.async {
+                                self.delegate?.transferFinished(with: raw)
+                            }
+                            
+                            self.ethApiService.sendTransaction(transaction: transaction, completion: { (result) in
+                                switch result {
+                                case .success(let _):
+                                    DispatchQueue.main.async {
+                                        self.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                                        self.close()
+                                    }
+                                case .failure(let error):
+                                    self.dialogService.showError(withMessage: "Transrer issue", error: error)
+                                }
+                            })
+                        } catch {
+                            DispatchQueue.main.async {
+                                self.dialogService.showError(withMessage: "ETH Wallet: Send - wrong data issue", error: nil)
+                            }
+                        }
                     }
-                })
+                }
                 break
             case .failure(let error):
                 self.dialogService.showError(withMessage: "Transrer issue", error: error)
@@ -691,13 +690,12 @@ class TransferViewController: FormViewController {
                         guard let raw = String(data: data, encoding: String.Encoding.utf8) else {
                             return
                         }
-                        print("Payload: \(raw)")
+                        
                         self.delegate?.transferFinished(with: raw)
                         
                         self.lskApiService.sendTransaction(transaction: transaction, completion: { (result) in
                             switch result {
-                            case .success(let hash):
-                                print("Hash: \(hash)")
+                            case .success(let _):
                                 self.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
                                 self.close()
                             case .failure(let error):
