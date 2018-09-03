@@ -113,7 +113,7 @@ class AccountViewController: FormViewController {
 	var router: Router!
 	var notificationsService: NotificationsService!
 	var transfersProvider: TransfersProvider!
-	
+    var avatarService: AvatarService!
 	
 	// MARK: - Properties
 	
@@ -399,6 +399,13 @@ class AccountViewController: FormViewController {
 		}
 		
 		accountHeaderView.addressButton.setTitle(address, for: .normal)
+        
+        DispatchQueue.global().async {
+            let image = self.avatarService.avatar(for: address, size: 200)
+            DispatchQueue.main.async {
+                self.accountHeaderView.avatarImageView.image = image
+            }
+        }
 	}
 }
 

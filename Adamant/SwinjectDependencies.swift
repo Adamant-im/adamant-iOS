@@ -102,6 +102,11 @@ extension Container {
             return service
         }.inObjectScope(.container)
 		
+        // MARK: AdamantAvatarService
+        self.register(AvatarService.self) { r in
+            return AdamantAvatarService()
+        }
+
 		// MARK: - Data Providers
 		// MARK: CoreData Stack
 		self.register(CoreDataStack.self) { _ in
