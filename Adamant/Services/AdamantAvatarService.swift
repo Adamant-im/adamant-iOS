@@ -9,14 +9,29 @@
 import UIKit
 import CoreGraphics
 import CryptoSwift
+import GameplayKit
 
 class AdamantAvatarService: AvatarService {
     
-    private let colors: [UIColor] = [
-        UIColor(red: 255.0 / 255.0, green: 255.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0), //background
-        UIColor(red: 255.0 / 255.0, green: 135.0 / 255.0, blue: 134.0 / 255.0, alpha: 1.0), // main
-        UIColor(red: 119.0 / 255.0, green: 136.0 / 255.0, blue: 250.0 / 255.0, alpha: 1.0), // 2dary
-        UIColor(red: 255.0 / 255.0, green: 207.0 / 255.0, blue: 155.0 / 255.0, alpha: 1.0)  // 2dary
+    private let colors: [[UIColor]] = [
+        [
+            UIColor(red: 255.0 / 255.0, green: 255.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0), //background
+            UIColor(red: 255.0 / 255.0, green: 135.0 / 255.0, blue: 134.0 / 255.0, alpha: 1.0), // main
+            UIColor(red: 119.0 / 255.0, green: 136.0 / 255.0, blue: 250.0 / 255.0, alpha: 1.0), // 2dary
+            UIColor(red: 255.0 / 255.0, green: 207.0 / 255.0, blue: 155.0 / 255.0, alpha: 1.0)  // 2dary
+        ],
+        [
+            UIColor(red: 255.0 / 255.0, green: 255.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0), //background
+            UIColor(red: 119.0 / 255.0, green: 136.0 / 255.0, blue: 250.0 / 255.0, alpha: 1.0), // main
+            UIColor(red: 81.0 / 255.0, green: 181.0 / 255.0, blue: 241.0 / 255.0, alpha: 1.0), // 2dary
+            UIColor(red: 168.0 / 255.0, green: 217.0 / 255.0, blue: 247.0 / 255.0, alpha: 1.0)  // 2dary
+        ],
+        [
+            UIColor(red: 255.0 / 255.0, green: 255.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0), //background
+            UIColor(red: 124.0 / 255.0, green: 227.0 / 255.0, blue: 216.0 / 255.0, alpha: 1.0), // main
+            UIColor(red: 255.0 / 255.0, green: 219.0 / 255.0, blue: 180.0 / 255.0, alpha: 1.0), // 2dary
+            UIColor(red: 195.0 / 255.0, green: 196.0 / 255.0, blue: 203.0 / 255.0, alpha: 1.0)  // 2dary
+        ]
     ]
     
     private var cache: [String: UIImage] = [String: UIImage]()
@@ -40,7 +55,7 @@ class AdamantAvatarService: AvatarService {
         }
     }
     
-    func Hexa16(key: String, colors: [UIColor], size: Double) {
+    func Hexa16(key: String, colors: [[UIColor]], size: Double) {
         let fringeSize = size / 6
         let distance = distanceTo3rdPoint(fringeSize)
         let lines = size / fringeSize
@@ -222,8 +237,20 @@ class AdamantAvatarService: AvatarService {
         return xsMirror
     }
     
-    func triangleColors(_ id: Int, _ key: String, _ colors: [UIColor], _ lines: Int) -> [UIColor] {
+    func triangleColors(_ id: Int, _ key: String, _ colors: [[UIColor]], _ lines: Int) -> [UIColor] {
         var tColors = [UIColor]()
+        
+        var seed: UInt64 = 0
+        for u in key.unicodeScalars {
+            seed += UInt64(u)
+        }
+        
+        let rnd = GKMersenneTwisterRandomSource(seed: seed)
+        let colId = GKRandomDistribution(randomSource: rnd,
+                                         lowestValue: 0,
+                                         highestValue: colors.count-1).nextInt()
+        let colors = colors[colId]
+        
         for t in Triangle.triangles[id] {
             let x = t.x
             let y = t.y
