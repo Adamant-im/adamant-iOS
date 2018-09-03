@@ -241,20 +241,21 @@ class AdamantAvatarService: AvatarService {
         var tColors = [UIColor]()
         
         var seed: UInt64 = 0
-        for u in key.unicodeScalars {
+        for u in key.md5().unicodeScalars {
             seed += UInt64(u)
         }
         
-        let rnd = GKMersenneTwisterRandomSource(seed: seed)
-        let colId = GKRandomDistribution(randomSource: rnd,
+        let rndSrc = GKMersenneTwisterRandomSource(seed: seed)
+        let rnd = GKRandomDistribution(randomSource: rndSrc,
                                          lowestValue: 0,
-                                         highestValue: colors.count-1).nextInt()
-        let colors = colors[colId]
+                                         highestValue: Int.max/2)
+        
+        let colors = colors[rnd.nextInt() % colors.count]
         
         for t in Triangle.triangles[id] {
             let x = t.x
             let y = t.y
-            let index = (x + 3 * y + lines) % 15
+            let index = (x + 3 * y + lines + rnd.nextInt()) % 15
             let color = PickColor(key, colors, index: index)
             tColors.append(color)
         }
