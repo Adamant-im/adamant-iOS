@@ -693,3 +693,36 @@
 
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "Готово!";
+
+/* Welcome: Skip button */
+"WelcomeScene.Skip" = "пропустить";
+
+/* Welcome: Slide 1 Title */
+"WelcomeScene.Title.Slide1" = "АБСОЛЮТНО АНОНИМНЫЙ";
+
+/* Welcome: Slide 1 Description */
+"WelcomeScene.Description.Slide1" = "Не надо регистрироваться\n\n• Ни почты, ни телефонных номеров\n• Никакого доступа к информации (вроде адресной книги или локации)\n• Ваш IP скрыт от собеседников\n• Анонимность и шифрование";
+
+/* Welcome: Slide 2 Title */
+"WelcomeScene.Title.Slide2" = "СИЛА СЕТИ BLOCKCHAIN";
+
+/* Welcome: Slide 2 Description */
+"WelcomeScene.Description.Slide2" = "Гарантия конфиденциальности и защищенности\n\nВаше устройство не хранит ничего. Оно напрямую взаимодействует с Blockchain, где каждый байт всецело зашифрован. Сообщения не могут быть прочитаны третьими лицами (разработчиками или кем-либо ещё).";
+
+/* Welcome: Slide 3 Title */
+"WelcomeScene.Title.Slide3" = "ПЕРЕВОДЫ ETH/BTC/… В ЧАТАХ";
+
+/* Welcome: Slide 3 Description */
+"WelcomeScene.Description.Slide3" = "Удобные переводы криптовалют\n\nПолучайте платежи и делайте переводы прямо в процессе общения. Хотите сделать перевод родственникам? Или продаете старый ноутбук? Может быть оказываете анонимные медицинские консультации? — Уже сейчас поддерживаются ADM и ETH, и список будет расширяться";
+
+/* Welcome: Slide 4 Title */
+"WelcomeScene.Title.Slide4" = "ОТКРЫТЫЙ КОД: ДОВЕРИЕ";
+
+/* Welcome: Slide 4 Description */
+"WelcomeScene.Description.Slide4" = "АДАМАНТ по лицензии GPLv3\n\nСвободно разворачивайте пакеты и проверяйте код, в т. ч. серверную часть ноды Blockchain, протокол передачи и клиентское приложение. Вы можете доверять АДАМАНТу";
+
+/* Welcome: Slide 5 Title */
+"WelcomeScene.Title.Slide5" = "ЧЕСТНАЯ СИСТЕМА DPOS";
+
+/* Welcome: Slide 5 Description */
+"WelcomeScene.Description.Slide5" = "Реальная децентрализация\n\nАДАМАНТ предлагает быструю и реально децентрализованную среду для отправки сообщений благодаря Честной системе делегатов. Она позволяет подключиться к форжингу с относительно малыми вложениями, а список активных делегатов динамически перестраивается";

@@ -693,3 +693,36 @@
 
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "Done!";
+
+/* Welcome: Skip button */
+"WelcomeScene.Skip" = "skip";
+
+/* Welcome: Slide 1 Title */
+"WelcomeScene.Title.Slide1" = "ABSOLUTELY ANONYMOUS";
+
+/* Welcome: Slide 1 Description */
+"WelcomeScene.Description.Slide1" = "No need to register or enter any info\n\n• No emails, no phone numbers\n• No access to user device’s data (like address book or location)\n• Your IP is hidden for interlocutors\n• Privacy and top-level encryption";
+
+/* Welcome: Slide 2 Title */
+"WelcomeScene.Title.Slide2" = "BLOCKCHAIN-POWERED";
+
+/* Welcome: Slide 2 Description */
+"WelcomeScene.Description.Slide2" = "Unprecedented Privacy and Security\n\nYour device does not store any info. It directly interacts with the Blockchain, where every byte is fully-encrypted. Your End-to-End encrypted messages can never be read by third parties (including developers or anyone else).";
+
+/* Welcome: Slide 3 Title */
+"WelcomeScene.Title.Slide3" = "TRANSFER ETH/BTC/… IN CHATS";
+
+/* Welcome: Slide 3 Description */
+"WelcomeScene.Description.Slide3" = "Convenient crypto transfers\n\nReceive and make payments directly while communicating. Willing to make a transfer to relatives? Or are you selling an old laptop? May be you provide anonymous medical advice? — ADM and ETH are already supported, and the list will be expanded";
+
+/* Welcome: Slide 4 Title */
+"WelcomeScene.Title.Slide4" = "OPEN SOURCE AND TRUSTED";
+
+/* Welcome: Slide 4 Description */
+"WelcomeScene.Description.Slide4" = "We use GPLv3 license for ADAMANT\n\nFeel free to deploy packages and revise the Code — including server-side Blockchain node, communication protocol and a client messenger app. You have reasons to trust ADAMANT";
+
+/* Welcome: Slide 5 Title */
+"WelcomeScene.Title.Slide5" = "FAIR DPOS";
+
+/* Welcome: Slide 5 Description */
+"WelcomeScene.Description.Slide5" = "True decentralization is here\n\nADAMANT offers Fast and true Decentralized messaging due to brand new Fair Delegate System. It allows to join forging blocks with relatively low investments, and active delegate list is dynamically reordered";

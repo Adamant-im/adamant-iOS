@@ -19,6 +19,8 @@
 		644EC35E20F34F1E00F40C73 /* DelegateDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */; };
 		6455E9F121075D3600B2E94C /* AddressBookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6455E9F021075D3600B2E94C /* AddressBookService.swift */; };
 		6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */; };
+		645FEB34213E72C100D6BA2D /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645FEB32213E72C100D6BA2D /* WelcomeViewController.swift */; };
+		645FEB35213E72C100D6BA2D /* WelcomeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 645FEB33213E72C100D6BA2D /* WelcomeViewController.xib */; };
 		64A223D620F760BB005157CB /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D520F760BB005157CB /* Localization.swift */; };
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
 		64E8305020F5FEEF006FA590 /* VotesAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E8304F20F5FEEF006FA590 /* VotesAsset.swift */; };
@@ -224,6 +226,8 @@
 		644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateDetailsViewController.swift; sourceTree = "<group>"; };
 		6455E9F021075D3600B2E94C /* AddressBookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBookService.swift; sourceTree = "<group>"; };
 		6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAddressBookService.swift; sourceTree = "<group>"; };
+		645FEB32213E72C100D6BA2D /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
+		645FEB33213E72C100D6BA2D /* WelcomeViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WelcomeViewController.xib; sourceTree = "<group>"; };
 		64A223D520F760BB005157CB /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
 		64E8304F20F5FEEF006FA590 /* VotesAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotesAsset.swift; sourceTree = "<group>"; };
@@ -641,6 +645,8 @@
 				E9147B6E205088DE00145913 /* LoginViewController+Pinpad.swift */,
 				E90A4942204C5ED6009F6A65 /* EurekaPassphraseRow.swift */,
 				E90A4944204C5F60009F6A65 /* PassphraseCell.xib */,
+				645FEB32213E72C100D6BA2D /* WelcomeViewController.swift */,
+				645FEB33213E72C100D6BA2D /* WelcomeViewController.xib */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -1011,6 +1017,7 @@
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
 				E9A174B920587B84003667CD /* notification.mp3 in Resources */,
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
+				645FEB35213E72C100D6BA2D /* WelcomeViewController.xib in Resources */,
 				E948E0482024F02700975D6B /* VersionFooter.xib in Resources */,
 				E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */,
 				E921534F20EE1E8700C0843F /* AlertLabelCell.xib in Resources */,
@@ -1057,6 +1064,7 @@
 				"${BUILT_PRODUCTS_DIR}/ReachabilitySwift/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium/libsodium.framework",
+				"${BUILT_PRODUCTS_DIR}/paper-onboarding/paper_onboarding.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -1077,6 +1085,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/paper_onboarding.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1161,6 +1170,7 @@
 				E9E7CD9120026FA100DFC4DB /* SwinjectDependencies.swift in Sources */,
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				E9150B992066DA210065A985 /* TransferTransaction+CoreDataClass.swift in Sources */,
+				645FEB34213E72C100D6BA2D /* WelcomeViewController.swift in Sources */,
 				E9150BA02066DA210065A985 /* MessageTransaction+CoreDataProperties.swift in Sources */,
 				E9B3D39A201F90570019EB36 /* AccountsProvider.swift in Sources */,
 				E950652320404C84008352E5 /* AdamantUriTools.swift in Sources */,
