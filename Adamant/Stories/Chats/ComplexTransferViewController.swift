@@ -79,8 +79,22 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 		let vc = services[index].transferViewController()
 		if let v = vc as? TransferViewControllerBase {
 			if let address = partner?.address {
-				v.recipient = address
+				v.admReportRecipient = address
 				v.recipientIsReadonly = true
+				v.showProgressView(animated: false)
+				
+				services[index].getWalletAddress(byAdamantAddress: address) { result in
+					switch result {
+					case .success(let walletAddress):
+						DispatchQueue.main.async {
+							v.recipient = walletAddress
+							v.hideProgress(animated: true)
+						}
+						
+					case .failure(let error):
+						v.showAlertView(title: nil, message: error.message, animated: true)
+					}
+				}
 			}
 			
 			v.delegate = self

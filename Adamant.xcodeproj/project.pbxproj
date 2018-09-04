@@ -80,6 +80,9 @@
 		E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9256F5E2034C21100DE86E9 /* String+localized.swift */; };
 		E9256F6D20357B1700DE86E9 /* LogoFullHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9256F6C20357B1700DE86E9 /* LogoFullHeader.xib */; };
 		E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */; };
+		E926E02E213EAABF005E536B /* TransferViewControllerBase+Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = E926E02D213EAABF005E536B /* TransferViewControllerBase+Alert.swift */; };
+		E926E032213EC43B005E536B /* FullscreenAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E926E031213EC43B005E536B /* FullscreenAlertView.swift */; };
+		E926E034213EC454005E536B /* FullscreenAlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = E926E033213EC454005E536B /* FullscreenAlertView.xib */; };
 		E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927171D20C04613002BB9A6 /* UIColor+hex.swift */; };
 		E9393FA82055C92700EE6F30 /* Decimal+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */; };
 		E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA92055D03300EE6F30 /* AdamantMessage.swift */; };
@@ -343,6 +346,9 @@
 		E9256F5E2034C21100DE86E9 /* String+localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+localized.swift"; sourceTree = "<group>"; };
 		E9256F6C20357B1700DE86E9 /* LogoFullHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LogoFullHeader.xib; sourceTree = "<group>"; };
 		E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		E926E02D213EAABF005E536B /* TransferViewControllerBase+Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransferViewControllerBase+Alert.swift"; sourceTree = "<group>"; };
+		E926E031213EC43B005E536B /* FullscreenAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenAlertView.swift; sourceTree = "<group>"; };
+		E926E033213EC454005E536B /* FullscreenAlertView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FullscreenAlertView.xib; sourceTree = "<group>"; };
 		E927171D20C04613002BB9A6 /* UIColor+hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+hex.swift"; sourceTree = "<group>"; };
 		E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+adamant.swift"; sourceTree = "<group>"; };
 		E9393FA92055D03300EE6F30 /* AdamantMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantMessage.swift; sourceTree = "<group>"; };
@@ -771,6 +777,7 @@
 				E9981897212096ED0018C84C /* WalletViewControllerBase.xib */,
 				E9EC342020052ABB00C0E546 /* TransferViewControllerBase.swift */,
 				E99330252136B0E500CD5200 /* TransferViewControllerBase+QR.swift */,
+				E926E02D213EAABF005E536B /* TransferViewControllerBase+Alert.swift */,
 			);
 			path = Wallets;
 			sourceTree = "<group>";
@@ -994,6 +1001,8 @@
 				E948E0472024F02700975D6B /* VersionFooter.xib */,
 				E921534C20EE1E8700C0843F /* EurekaAlertLabelRow.swift */,
 				E921534D20EE1E8700C0843F /* AlertLabelCell.xib */,
+				E926E031213EC43B005E536B /* FullscreenAlertView.swift */,
+				E926E033213EC454005E536B /* FullscreenAlertView.xib */,
 			);
 			path = SharedViews;
 			sourceTree = "<group>";
@@ -1139,6 +1148,7 @@
 				E941CCDF20E7B70200C96220 /* WalletCollectionViewCell.xib in Resources */,
 				642361BE20E3869D0061559E /* eth_l18n.strings in Resources */,
 				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
+				E926E034213EC454005E536B /* FullscreenAlertView.xib in Resources */,
 				E9EC3417200524CA00C0E546 /* Exo+2_400_italic.ttf in Resources */,
 				E94E7B01205D3F090042B639 /* ChatListViewController.xib in Resources */,
 				E941CCDB20E786D800C96220 /* AccountHeader.xib in Resources */,
@@ -1351,6 +1361,7 @@
 				E983AE2120E655C500497E1A /* AccountHeaderView.swift in Sources */,
 				64E8305020F5FEEF006FA590 /* VotesAsset.swift in Sources */,
 				644EC35220EFA9A300F40C73 /* DelegateRoutes.swift in Sources */,
+				E926E032213EC43B005E536B /* FullscreenAlertView.swift in Sources */,
 				644EC35B20EFB8E900F40C73 /* AdamantDelegateCell.swift in Sources */,
 				E95F85B3200954D00070534A /* ChatModels.xcdatamodeld in Sources */,
 				E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */,
@@ -1427,6 +1438,7 @@
 				E94008802114EE2000CD2D67 /* AdmWallet.swift in Sources */,
 				E9A03FDA20DC0B14007653A1 /* NodesSource.swift in Sources */,
 				E9150B972066DA210065A985 /* CoreDataAccount+CoreDataClass.swift in Sources */,
+				E926E02E213EAABF005E536B /* TransferViewControllerBase+Alert.swift in Sources */,
 				E9B1AA572121ACC000080A2A /* AdmWalletViewController.swift in Sources */,
 				E95F857A2007F0260070534A /* ServerResponse.swift in Sources */,
 				E9A174B32057EC47003667CD /* BackgroundFetchService.swift in Sources */,

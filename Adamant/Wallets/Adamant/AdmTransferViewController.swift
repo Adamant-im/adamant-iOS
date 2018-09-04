@@ -32,6 +32,11 @@ class AdmTransferViewController: TransferViewControllerBase {
 			} else {
 				_recipient = newValue
 			}
+			
+			if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
+				row.value = _recipient
+				row.updateCell()
+			}
 		}
 		get {
 			return _recipient

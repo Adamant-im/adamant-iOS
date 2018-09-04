@@ -45,4 +45,8 @@ class LskWalletService: WalletService {
 		
 		return addressRegex.perfectMatch(with: value) ? .valid : .invalid
 	}
+	
+	func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
+		completion(.failure(error: .internalError(message: "Not implemented", error: nil)))
+	}
 }

@@ -31,6 +31,7 @@ enum WalletServiceError: Error {
 	case notEnoughtMoney
 	case networkError
 	case accountNotFound
+	case walletNotInitiated
 	case invalidAmount(Decimal)
 	case remoteServiceError(message: String)
 	case apiError(ApiServiceError)
@@ -51,6 +52,9 @@ extension WalletServiceError: RichError {
 			
 		case .accountNotFound:
 			return String.adamantLocalized.transfer.accountNotFound
+			
+		case .walletNotInitiated:
+			return "Кошелёк ещё не создан для этого аккаунта"
 			
 		case .remoteServiceError(let message):
 			return String.adamantLocalized.sharedErrors.remoteServerError(message: message)
@@ -75,7 +79,7 @@ extension WalletServiceError: RichError {
 	
 	var level: ErrorLevel {
 		switch self {
-		case .notLogged, .notEnoughtMoney, .networkError, .accountNotFound, .invalidAmount:
+		case .notLogged, .notEnoughtMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated:
 			return .warning
 			
 		case .remoteServiceError, .internalError:
@@ -166,6 +170,7 @@ protocol WalletService: class {
 	
 	// MARK: Tools
 	func validate(address: String) -> AddressValidationResult
+	func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void)
 }
 
 protocol SwinjectDependentService: WalletService {

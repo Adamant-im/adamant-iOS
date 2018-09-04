@@ -156,7 +156,15 @@ class TransferViewControllerBase: FormViewController {
 	
 	weak var delegate: TransferViewControllerDelegate?
 	
-	var recipient: String? = nil
+	var recipient: String? = nil {
+		didSet {
+			if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
+				row.value = recipient
+				row.updateCell()
+			}
+		}
+	}
+	
 	var admReportRecipient: String? = nil
 	var amount: Decimal? = nil
 	
@@ -190,6 +198,11 @@ class TransferViewControllerBase: FormViewController {
 		vc.delegate = self
 		return vc
 	}()
+	
+	
+	// MARK: - Alert
+	var progressView: UIView? = nil
+	var alertView: UIView? = nil
 	
 	
 	// MARK: - Lifecycle

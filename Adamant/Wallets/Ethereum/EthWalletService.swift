@@ -330,11 +330,16 @@ extension EthWalletService {
 		}
 	}
 	
-	func getEthAddress(byAdamandAddress address: String, completion: @escaping (WalletServiceResult<String?>) -> Void) {
+	
+	func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
 		apiService.get(key: EthWalletService.kvsAddress, sender: address) { (result) in
 			switch result {
 			case .success(let value):
-				completion(.success(result: value))
+				if let address = value {
+					completion(.success(result: address))
+				} else {
+					completion(.failure(error: .walletNotInitiated))
+				}
 				
 			case .failure(let error):
 				completion(.failure(error: .internalError(message: "ETH Wallet: fail to get address from KVS", error: error)))
@@ -358,7 +363,7 @@ extension EthWalletService {
 		
 		let api = apiService
 		
-		getEthAddress(byAdamandAddress: adamant.address) { result in
+		getWalletAddress(byAdamantAddress: adamant.address) { result in
 			switch result {
 			case .success(let address):
 				guard address == ethAddress else {
