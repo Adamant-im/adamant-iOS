@@ -21,7 +21,9 @@ extension AdmWalletService: WalletServiceWithSend {
 		return vc
 	}
 	
-	func sendMoney(recipient: String, amount: Decimal, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+	
+	/// Comments not implemented
+	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<String?>) -> Void) {
 		guard let apiService = apiService else { // Hold reference
 			fatalError("AdmWalletService: Dependency failed: ApiService")
 		}
@@ -37,7 +39,7 @@ extension AdmWalletService: WalletServiceWithSend {
 				apiService.transferFunds(sender: account.address, recipient: recipient, amount: amount, keypair: keypair) { result in
 					switch result {
 					case .success:
-						completion(.success)
+						completion(.success(result: nil))
 						
 					case .failure(let error):
 						completion(.failure(error: error.asWalletServiceError()))

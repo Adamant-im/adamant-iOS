@@ -453,38 +453,16 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	}
 }
 
-extension ChatViewController: TransferViewControllerDelegate {
-	func transferViewController(_ viewController: TransferViewControllerBase, didFinishWith data: String?) {
-		guard let address = chatroom?.partner?.address, let data = data else {
-			return
-		}
-		
-        let message = AdamantMessage.richMessage(data)
-        let valid = chatsProvider.validateMessage(message)
-		
-		switch valid {
-        case .isValid: break
-			
-		case .empty, .tooLong:
-            dialogService.showToastMessage(valid.localized)
-            return
-        }
-        
-        chatsProvider.sendMessage(message, recipientId: address) { [weak self] result in
-            switch result {
-            case .success:
-//                self?.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                break
-                
-            case .failure(let error):
-                self?.dialogService.showRichError(error: error)
-            }
-        }
+extension ChatViewController: TransferViewControllerDelegate, ComplexTransferViewControllerDelegate {
+	func transferViewController(_ viewController: TransferViewControllerBase) {
+		dismissTransferViewController()
     }
-}
-
-extension ChatViewController: ComplexTransferViewControllerDelegate {
+	
 	func complexTransferViewControllerDidFinish(_ viewController: ComplexTransferViewController) {
+		dismissTransferViewController()
+	}
+	
+	private func dismissTransferViewController() {
 		fixKeyboardInsets = true
 		
 		if Thread.isMainThread {

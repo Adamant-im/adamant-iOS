@@ -281,8 +281,11 @@ extension AdamantChatsProvider {
         
         sendingQueue.async {
             switch message {
-			case .text(let text), .markdownText(let text), .richMessage(let text):
+			case .text(let text), .markdownText(let text):
 				self.sendTextMessage(text: text, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
+				
+			case .richMessage(let payload):
+				self.sendTextMessage(text: payload.serialized(), senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
 			}
         }
     }
@@ -778,12 +781,15 @@ extension AdamantChatsProvider {
 							let systemMessage = messages.first(where: { key.range(of: $0.key) != nil })?.value {
 							
 							switch systemMessage.message {
-							case .text(let text), .richMessage(let text):
+							case .text(let text):
 								messageTransaction.message = text
 								
 							case .markdownText(let text):
 								messageTransaction.message = text
 								messageTransaction.isMarkdown = true
+								
+							case .richMessage(let payload):
+								messageTransaction.message = payload.serialized()
 							}
 							
 							messageTransaction.silentNotification = systemMessage.silentNotification
@@ -870,7 +876,20 @@ extension AdamantChatsProvider {
 	/// Check if message is valid for sending
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult {
 		switch message {
-		case .text(let text), .markdownText(let text), .richMessage(let text):
+		case .text(let text), .markdownText(let text):
+			if text.count == 0 {
+				return .empty
+			}
+			
+			if Double(text.count) * 1.5 > 20000.0 {
+				return .tooLong
+			}
+			
+			return .isValid
+			
+		case .richMessage(let payload):
+			let text = payload.serialized()
+			
 			if text.count == 0 {
 				return .empty
 			}

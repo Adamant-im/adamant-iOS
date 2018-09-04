@@ -10,6 +10,12 @@ import UIKit
 import Eureka
 
 class EthTransferViewController: TransferViewControllerBase {
+	
+	// MARK: Dependencies
+	
+	var chatsProvider: ChatsProvider!
+	
+	
 	// MARK: Properties
 	
 	override var balanceFormatter: NumberFormatter {
@@ -138,6 +144,21 @@ class EthTransferViewController: TransferViewControllerBase {
 			
 		default:
 			return false
+		}
+	}
+	
+	override func reportTransferTo(admAddress: String, transferRecipient: String, amount: Decimal, comments: String, hash: String) {
+		let payload = RichMessageTransfer(type: RichMessageType.ethTransfer, amount: amount, hash: hash, comments: comments)
+		let message = AdamantMessage.richMessage(payload: payload)
+		
+		chatsProvider.sendMessage(message, recipientId: admAddress) { [weak self] result in
+			switch result {
+			case .success:
+				break
+				
+			case .failure(let error):
+				self?.dialogService.showRichError(error: error)
+			}
 		}
 	}
 }

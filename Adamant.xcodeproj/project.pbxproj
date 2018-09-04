@@ -160,6 +160,8 @@
 		E993301E212EF39700CD5200 /* EthTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E993301D212EF39700CD5200 /* EthTransferViewController.swift */; };
 		E993302021354B1800CD5200 /* AdmWalletRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E993301F21354B1800CD5200 /* AdmWalletRoutes.swift */; };
 		E993302221354BC300CD5200 /* EthWalletRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E993302121354BC300CD5200 /* EthWalletRoutes.swift */; };
+		E993302421369B8A00CD5200 /* RichMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E993302321369B8A00CD5200 /* RichMessage.swift */; };
+		E99330262136B0E500CD5200 /* TransferViewControllerBase+QR.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99330252136B0E500CD5200 /* TransferViewControllerBase+QR.swift */; };
 		E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */; };
 		E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */; };
 		E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B86203D9E5100C163AF /* EurekaQRRow.swift */; };
@@ -424,6 +426,8 @@
 		E993301D212EF39700CD5200 /* EthTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransferViewController.swift; sourceTree = "<group>"; };
 		E993301F21354B1800CD5200 /* AdmWalletRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmWalletRoutes.swift; sourceTree = "<group>"; };
 		E993302121354BC300CD5200 /* EthWalletRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthWalletRoutes.swift; sourceTree = "<group>"; };
+		E993302321369B8A00CD5200 /* RichMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichMessage.swift; sourceTree = "<group>"; };
+		E99330252136B0E500CD5200 /* TransferViewControllerBase+QR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransferViewControllerBase+QR.swift"; sourceTree = "<group>"; };
 		E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRGeneratorViewController.swift; sourceTree = "<group>"; };
 		E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantQRTools.swift; sourceTree = "<group>"; };
 		E9942B86203D9E5100C163AF /* EurekaQRRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EurekaQRRow.swift; sourceTree = "<group>"; };
@@ -657,6 +661,7 @@
 				E923222521135F9000A7E5AF /* EthAccount.swift */,
 				E940086A2114A70600CD2D67 /* LskAccount.swift */,
 				E9AA8BFD212C373000F9249F /* EthTransactionRichMessage.swift */,
+				E993302321369B8A00CD5200 /* RichMessage.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -765,6 +770,7 @@
 				E99818932120892F0018C84C /* WalletViewControllerBase.swift */,
 				E9981897212096ED0018C84C /* WalletViewControllerBase.xib */,
 				E9EC342020052ABB00C0E546 /* TransferViewControllerBase.swift */,
+				E99330252136B0E500CD5200 /* TransferViewControllerBase+QR.swift */,
 			);
 			path = Wallets;
 			sourceTree = "<group>";
@@ -1399,6 +1405,7 @@
 				E9150B802066861D0065A985 /* ChatViewController+MessageKit.swift in Sources */,
 				E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */,
 				E9204B5220C9762400F3B9AB /* MessageStatus.swift in Sources */,
+				E993302421369B8A00CD5200 /* RichMessage.swift in Sources */,
 				E940087B2114ED0600CD2D67 /* EthWalletService.swift in Sources */,
 				E948E03B20235E2300975D6B /* SettingsRoutes.swift in Sources */,
 				E9CAE8D82018ACA700345E76 /* AdamantApi+Transfers.swift in Sources */,
@@ -1411,6 +1418,7 @@
 				E965A53020B594120041A3EA /* AdamantApi+States.swift in Sources */,
 				64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */,
 				E91E5BF220DAF05500B06B3C /* EurekaNodeRow.swift in Sources */,
+				E99330262136B0E500CD5200 /* TransferViewControllerBase+QR.swift in Sources */,
 				E9150B982066DA210065A985 /* CoreDataAccount+CoreDataProperties.swift in Sources */,
 				E9B1AA5B21283E0F00080A2A /* AdmTransferViewController.swift in Sources */,
 				E940086B2114A70600CD2D67 /* LskAccount.swift in Sources */,

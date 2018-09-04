@@ -187,10 +187,5 @@ protocol WalletServiceWithSend: WalletService {
 	
 	var transactionFee: Decimal { get }
 	func transferViewController() -> UIViewController
-	func sendMoney(recipient: String, amount: Decimal, completion: @escaping (WalletServiceSimpleResult) -> Void)
-}
-
-protocol WalletServiceWithSendExtended: WalletServiceWithSend {
-	associatedtype T
-	func sendMoney(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<T>) -> Void)
+	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<String?>) -> Void)
 }

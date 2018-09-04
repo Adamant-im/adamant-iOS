@@ -38,6 +38,10 @@ extension Web3Error {
 	}
 }
 
+extension RichMessageType {
+	static let ethTransfer = RichMessageType(stringValue: EthWalletService.richMessageType)
+}
+
 
 class EthWalletService: WalletService {
 	// MARK: - Constants
@@ -50,8 +54,9 @@ class EthWalletService: WalletService {
 	private (set) var transactionFee: Decimal = 0.0
 	
 	static let transferGas: Decimal = 21000
-	static let kvsAddress = "eth:address"
 	static let defaultGasPrice = 20000000000 // 20 Gwei
+	static let kvsAddress = "eth:address"
+	static let richMessageType = "eth_transaction"
 	
 	
 	// MARK: - Dependencies

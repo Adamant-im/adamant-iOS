@@ -9,15 +9,12 @@
 import UIKit
 import Eureka
 import QRCodeReader
-import EFQRCode
-import AVFoundation
-import Photos
 
 
 // MARK: - Transfer Delegate Protocol
 
 protocol TransferViewControllerDelegate: class {
-	func transferViewController(_ viewController: TransferViewControllerBase, didFinishWith data: String?)
+	func transferViewController(_ viewController: TransferViewControllerBase)
 }
 
 
@@ -160,6 +157,7 @@ class TransferViewControllerBase: FormViewController {
 	weak var delegate: TransferViewControllerDelegate?
 	
 	var recipient: String? = nil
+	var admReportRecipient: String? = nil
 	var amount: Decimal? = nil
 	
 	var recipientIsReadonly = false
@@ -486,139 +484,8 @@ class TransferViewControllerBase: FormViewController {
 	}
 	
 	
-	/*
-    private func ethAmountChanged(row: DecimalRow) {
-        guard let totalRow: DecimalRow = form.rowBy(tag: Row.total.tag), let sendButton: ButtonRow = form.rowBy(tag: Row.sendButton.tag) else {
-            return
-        }
-        
-        guard let amount = row.value else {
-            totalAmount = nil
-            sendButton.disabled = true
-            sendButton.evaluateDisabled()
-            row.cell.titleLabel?.textColor = .black
-            return
-        }
-        
-//        totalAmount = amount + defaultFee
-        totalRow.evaluateDisabled()
-        
-        totalRow.value = totalAmount
-        totalRow.evaluateDisabled()
-        
-        if let totalAmount = totalAmount {
-            if amount > 0, totalAmount > 0.0 && totalAmount < maxToTransfer {
-                sendButton.disabled = false
-                row.cell.titleLabel?.textColor = .black
-            } else {
-                sendButton.disabled = true
-                row.cell.titleLabel?.textColor = .red
-            }
-        } else {
-            sendButton.disabled = true
-            row.cell.titleLabel?.textColor = .black
-        }
-        sendButton.evaluateDisabled()
-    }
-	*/
-	
-	
-	// MARK: - Abstract
-	
-	/// Override this to provide custom balance formatter
-	var balanceFormatter: NumberFormatter {
-		return AdamantBalanceFormat.full.defaultFormatter
-	}
-	
-	/// Override this to provide custom validation logic
-	/// Default - positive number, amount + fee less than or equal to wallet balance
-	func validateAmount(_ amount: Decimal, withFee: Bool = true) -> Bool {
-		guard amount > 0 else {
-			return false
-		}
-		
-		guard let service = service, let balance = service.wallet?.balance else {
-			return false
-		}
-		
-		let total = withFee ? amount + service.transactionFee : amount
-		
-		return balance > total
-	}
-	
-	/// Send funds to recipient after validations
-	/// You can override this to provide custom logic
-	func sendFunds() {
-		guard let service = service, let recipient = recipient, let amount = amount else {
-			return
-		}
-		
-		guard let dialogService = dialogService else {
-			return
-		}
-		
-		dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
-		
-		service.sendMoney(recipient: recipient, amount: amount) { [weak self] result in
-			switch result {
-			case .success:
-				dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-				
-				if let vc = self, let delegate = vc.delegate {
-					delegate.transferViewController(vc, didFinishWith: nil)
-				}
-				
-				service.update()
-				
-			case .failure(let error):
-				dialogService.dismissProgress()
-				dialogService.showRichError(error: error)
-			}
-		}
-	}
-	
-	
-	/// Validate recipient's address
-	/// You must override this method
-	func validateRecipient(_ address: String) -> Bool {
-		fatalError("You must implement recipient addres validation logic")
-	}
-	
-	func formIsValid() -> Bool {
-		if let recipient = recipient, validateRecipient(recipient), let amount = amount, validateAmount(amount) {
-			return true
-		} else {
-			return false
-		}
-	}
-	
-	
-	/// Build recipient address row
-	/// You must override this method
-	func recipientRow() -> BaseRow {
-		fatalError("You must implement recipient row")
-	}
-	
-	
-	/// Recipient section footer. You can override this to provide custom set of elements.
-	/// You can also override ButtonsStripeViewDelegate implementation
-	/// nil for no stripe
-	func recipientStripe() -> Stripe? {
-		return [.qrCameraReader, .qrPhotoReader]
-	}
-	
-	
-	/// User loaded address from QR (camera or library)
-	/// You must override this method
-	///
-	/// - Parameter address: raw readed address
-	/// - Returns: string was successfully handled
-	func handleRawAddress(_ address: String) -> Bool {
-		fatalError("You must implement raw address handling")
-	}
-	
-	
 	// MARK: - Send Actions
+	
 	private func confirmSendFunds() {
 		guard let recipient = recipient, let amount = amount else {
 			return
@@ -649,6 +516,110 @@ class TransferViewControllerBase: FormViewController {
 		present(alert, animated: true, completion: nil)
 	}
 	
+	
+	
+	// MARK: - 'Virtual' methods with basic implementation
+	
+	/// Override this to provide custom balance formatter
+	var balanceFormatter: NumberFormatter {
+		return AdamantBalanceFormat.full.defaultFormatter
+	}
+	
+	/// Override this to provide custom validation logic
+	/// Default - positive number, amount + fee less than or equal to wallet balance
+	func validateAmount(_ amount: Decimal, withFee: Bool = true) -> Bool {
+		guard amount > 0 else {
+			return false
+		}
+		
+		guard let service = service, let balance = service.wallet?.balance else {
+			return false
+		}
+		
+		let total = withFee ? amount + service.transactionFee : amount
+		
+		return balance > total
+	}
+	
+	func formIsValid() -> Bool {
+		if let recipient = recipient, validateRecipient(recipient), let amount = amount, validateAmount(amount) {
+			return true
+		} else {
+			return false
+		}
+	}
+	
+	/// Recipient section footer. You can override this to provide custom set of elements.
+	/// You can also override ButtonsStripeViewDelegate implementation
+	/// nil for no stripe
+	func recipientStripe() -> Stripe? {
+		return [.qrCameraReader, .qrPhotoReader]
+	}
+	
+	func reportTransferTo(admAddress: String, transferRecipient: String, amount: Decimal, comments: String, hash: String) {
+		
+	}
+	
+	/// Send funds to recipient after validations
+	/// You can override this to provide custom logic
+	func sendFunds() {
+		guard let service = service, let recipient = recipient, let amount = amount else {
+			return
+		}
+		
+		guard let dialogService = dialogService else {
+			return
+		}
+		
+		dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+		
+		service.sendMoney(recipient: recipient, amount: amount, comments: "") { [weak self] result in
+			switch result {
+			case .success(let result):
+				if let hash = result, let report = self?.admReportRecipient {
+					self?.reportTransferTo(admAddress: report, transferRecipient: recipient, amount: amount, comments: "", hash: hash)
+				}
+				
+				dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+				
+				if let vc = self, let delegate = vc.delegate {
+					delegate.transferViewController(vc)
+				}
+				
+				service.update()
+				
+			case .failure(let error):
+				dialogService.dismissProgress()
+				dialogService.showRichError(error: error)
+			}
+		}
+	}
+	
+	
+	/// MARK: - Abstract
+	
+	/// User loaded address from QR (camera or library)
+	/// You must override this method
+	///
+	/// - Parameter address: raw readed address
+	/// - Returns: string was successfully handled
+	func handleRawAddress(_ address: String) -> Bool {
+		fatalError("You must implement raw address handling")
+	}
+	
+	
+	/// Build recipient address row
+	/// You must override this method
+	func recipientRow() -> BaseRow {
+		fatalError("You must implement recipient row")
+	}
+	
+	
+	/// Validate recipient's address
+	/// You must override this method
+	func validateRecipient(_ address: String) -> Bool {
+		fatalError("You must implement recipient addres validation logic")
+	}
 	
 	/*
     func sendETHFunds() {
@@ -817,140 +788,6 @@ class TransferViewControllerBase: FormViewController {
 */
 }
 
-
-// MARK: - QR
-extension TransferViewControllerBase {
-	func scanQr() {
-		switch AVCaptureDevice.authorizationStatus(for: .video) {
-		case .authorized:
-			present(qrReader, animated: true, completion: nil)
-			
-		case .notDetermined:
-			AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
-				if granted, let qrReader = self?.qrReader {
-					if Thread.isMainThread {
-						self?.present(qrReader, animated: true, completion: nil)
-					} else {
-						DispatchQueue.main.async {
-							self?.present(qrReader, animated: true, completion: nil)
-						}
-					}
-				} else {
-					return
-				}
-			}
-			
-		case .restricted:
-			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
-			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
-			present(alert, animated: true, completion: nil)
-			
-		case .denied:
-			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized, preferredStyle: .alert)
-			
-			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
-				DispatchQueue.main.async {
-					if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
-						UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
-					}
-				}
-			})
-			
-			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-			
-			present(alert, animated: true, completion: nil)
-		}
-	}
-	
-	func loadQr() {
-		let presenter: () -> Void = { [weak self] in
-			let picker = UIImagePickerController()
-			picker.delegate = self
-			picker.allowsEditing = false
-			picker.sourceType = .photoLibrary
-			self?.present(picker, animated: true, completion: nil)
-		}
-		
-		if #available(iOS 11.0, *) {
-			presenter()
-		} else {
-			switch PHPhotoLibrary.authorizationStatus() {
-			case .authorized:
-				presenter()
-				
-			case .notDetermined:
-				PHPhotoLibrary.requestAuthorization { status in
-					if status == .authorized {
-						presenter()
-					}
-				}
-				
-			case .restricted, .denied:
-				dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.login.photolibraryNotAuthorized)
-			}
-		}
-	}
-}
-
-
-// MARK: - UIImagePickerControllerDelegate
-extension TransferViewControllerBase: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-		dismiss(animated: true, completion: nil)
-		
-		guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else {
-			return
-		}
-		
-		if let cgImage = image.toCGImage(), let codes = EFQRCode.recognize(image: cgImage), codes.count > 0 {
-			for aCode in codes {
-				if handleRawAddress(aCode) {
-					return
-				}
-			}
-			
-			dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
-		} else {
-			dialogService.showWarning(withMessage: String.adamantLocalized.login.noQrError)
-		}
-	}
-}
-
-
-// MARK: - QRCodeReaderViewControllerDelegate
-extension TransferViewControllerBase: QRCodeReaderViewControllerDelegate {
-	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-		if handleRawAddress(result.value) {
-			dismiss(animated: true, completion: nil)
-		} else {
-			dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-				reader.startScanning()
-			}
-		}
-	}
-	
-	func readerDidCancel(_ reader: QRCodeReaderViewController) {
-		reader.dismiss(animated: true, completion: nil)
-	}
-}
-
-
-// MARK: - ButtonsStripeViewDelegate
-extension TransferViewControllerBase: ButtonsStripeViewDelegate {
-	func buttonsStripe(_ stripe: ButtonsStripeView, didTapButton button: StripeButtonType) {
-		switch button {
-		case .qrCameraReader:
-			scanQr()
-			
-		case .qrPhotoReader:
-			loadQr()
-			
-		default:
-			return
-		}
-	}
-}
 
 // MARK: - Default rows
 extension TransferViewControllerBase {

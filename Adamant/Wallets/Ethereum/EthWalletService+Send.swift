@@ -10,10 +10,7 @@ import UIKit
 import web3swift
 import BigInt
 
-extension EthWalletService: WalletServiceWithSendExtended {
-	
-	typealias T = String
-	
+extension EthWalletService: WalletServiceWithSend {
 	func transferViewController() -> UIViewController {
 		guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.transfer) as? EthTransferViewController else {
 			fatalError("Can't get EthTransferViewController")
@@ -23,20 +20,8 @@ extension EthWalletService: WalletServiceWithSendExtended {
 		return vc
 	}
 	
-	func sendMoney(recipient: String, amount: Decimal, completion: @escaping (WalletServiceSimpleResult) -> Void) {
-		sendFunds(toEthRecipient: recipient, amount: amount) { result in
-			switch result {
-			case .success:
-				completion(.success)
-				
-			case .failure(let error):
-				completion(.failure(error: error))
-			}
-		}
-	}
-	
-	func sendMoney(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<String>) -> Void) {
-		sendFunds(toEthRecipient: recipient, amount: amount) { result in
+	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<String?>) -> Void) {
+		sendFunds(toEthRecipient: recipient, amount: amount, comments: comments) { result in
 			switch result {
 			case .success(let hash):
 				completion(.success(result: hash))
@@ -51,7 +36,7 @@ extension EthWalletService: WalletServiceWithSendExtended {
 	// MARK: - Tools
 	
 	/// Create intermediate transaction
-	private func sendFunds(toEthRecipient recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<String>) -> Void) {
+	private func sendFunds(toEthRecipient recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
 		// MARK: 1. Prepare
 		
 		guard let ethWallet = ethWallet else {
