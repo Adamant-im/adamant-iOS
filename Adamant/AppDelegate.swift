@@ -106,6 +106,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		let login = router.get(scene: AdamantScene.Login.login)
 		window!.rootViewController?.present(login, animated: false, completion: nil)
+        
+        let welcomeIsShown = UserDefaults.standard.bool(forKey: "welcomeIsShown")
+        if !welcomeIsShown {
+            let welcome = router.get(scene: AdamantScene.Login.welcome)
+            login.present(welcome, animated: false, completion: nil)
+        }
 		
 		// MARK: 4. Prepare pages
 		if let tabbar = window?.rootViewController as? UITabBarController {

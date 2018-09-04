@@ -652,3 +652,35 @@
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "Fertig!";
 
+/* Welcome: Skip button */
+"WelcomeScene.Skip" = "überspringen";
+
+/* Welcome: Slide 1 Title */
+"WelcomeScene.Title.Slide1" = "ABSOLUT ANONYM";
+
+/* Welcome: Slide 1 Description */
+"WelcomeScene.Description.Slide1" = "Ohne Registrierung\n\n• Keine E-Mail-Adressen, keine Handynummern\n• Kein Zugriff auf vertrauliche Informationen wie Kontakte oder Standort\n• Ihre IP-Adresse bleibt immer verborgen\n• Anonymität und Verschlüsselung";
+
+/* Welcome: Slide 2 Title */
+"WelcomeScene.Title.Slide2" = "DIE MACHT DER BLOCKCHAIN";
+
+/* Welcome: Slide 2 Description */
+"WelcomeScene.Description.Slide2" = "Ihr Gerät speichert keine Informationen ab\n\nDer Messenger interagiert unmittelbar mit der Blockchain, in der jeder Byte vollständig verschlüsselt ist. Keine Nachricht kann von Dritten oder Entwicklern gelesen werden";
+
+/* Welcome: Slide 3 Title */
+"WelcomeScene.Title.Slide3" = "ETH/BTC/… IN CHATS SENDEN";
+
+/* Welcome: Slide 3 Description */
+"WelcomeScene.Description.Slide3" = "Bequeme Überweisungen der Kryptowährungen\n\nErhalten Sie Zahlungen und tätigen Sie Überweisungen direkt im Chat. Wollen Sie Geld Ihren Eltern schicken? Oder verkaufen Sie Ihren alten Laptop? Vielleicht führen Sie eine anonyme medizinische Beratung? — Schon heute werden ADM und ETH unterstützt, und die Liste wird erweitert";
+
+/* Welcome: Slide 4 Title */
+"WelcomeScene.Title.Slide4" = "OPEN SOURCE";
+
+/* Welcome: Slide 4 Description */
+"WelcomeScene.Description.Slide4" = "Wir benutzen GPLv3-Lizenz für ADAMANT\n\nSie können den Code frei untersuchen, einschließlich der Serverteile der Blockchain-Nodes, Vermittlungsprotokolle und des Clients. Sie können ADAMANT vertrauen";
+
+/* Welcome: Slide 5 Title */
+"WelcomeScene.Title.Slide5" = "EIN EHRLICHES DPOS-SYSTEM";
+
+/* Welcome: Slide 5 Description */
+"WelcomeScene.Description.Slide5" = "Echte Dezentralisierung\n\nADAMANT bietet eine schnelle und wirklich dezentrale Umgebung zum Versenden von Nachrichten dank eines ehrlichen Systems von Delegierten. Sie können eine Verbindung zu einem Vordergrund mit relativ kleinen Anhängen herstellen, und die Liste der aktiven Delegaten wird dynamisch neu konfiguriert";
