@@ -8,9 +8,18 @@
 
 import UIKit
 import web3swift
-import BigInt
+import struct BigInt.BigUInt
+import PromiseKit
 
-extension EthWalletService: WalletServiceWithSend {
+extension EthereumTransaction: RawTransaction {
+	var txHash: String? {
+		return txhash
+	}
+}
+
+extension EthWalletService: WalletServiceTwoStepSend {
+	typealias T = EthereumTransaction
+	
 	func transferViewController() -> UIViewController {
 		guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.transfer) as? EthTransferViewController else {
 			fatalError("Can't get EthTransferViewController")
@@ -20,25 +29,10 @@ extension EthWalletService: WalletServiceWithSend {
 		return vc
 	}
 	
-	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<String?>) -> Void) {
-		sendFunds(toEthRecipient: recipient, amount: amount, comments: comments) { result in
-			switch result {
-			case .success(let hash):
-				completion(.success(result: hash))
-				
-			case .failure(let error):
-				completion(.failure(error: error))
-			}
-		}
-	}
 	
-	
-	// MARK: - Tools
-	
-	/// Create intermediate transaction
-	private func sendFunds(toEthRecipient recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
+	// MARK: Create & Send
+	func createTransaction(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<EthereumTransaction>) -> Void) {
 		// MARK: 1. Prepare
-		
 		guard let ethWallet = ethWallet else {
 			completion(.failure(error: .notLogged))
 			return
@@ -49,8 +43,13 @@ extension EthWalletService: WalletServiceWithSend {
 			return
 		}
 		
-		guard let bigUIntAmount = Web3.Utils.parseToBigUInt("\(amount)", units: .eth) else {
+		guard let bigUIntAmount = Web3.Utils.parseToBigUInt(String(format: "%.18f", amount.doubleValue), units: .eth) else {
 			completion(.failure(error: .invalidAmount(amount)))
+			return
+		}
+		
+		guard let keystoreManager = web3.provider.attachedKeystoreManager else {
+			completion(.failure(error: .internalError(message: "Failed to get web3.provider.KeystoreManager", error: nil)))
 			return
 		}
 		
@@ -86,18 +85,27 @@ extension EthWalletService: WalletServiceWithSend {
 				return
 			}
 			
-			
-			// MARK: 3. Send
-			
-			let result = intermediate.send(password: "", options: nil)
-			
-			switch result {
+			do {
+				let transaction = try intermediate.assemblePromise().then { transaction throws -> Promise<EthereumTransaction> in
+					var trs = transaction
+					try Web3Signer.signTX(transaction: &trs, keystore: keystoreManager, account: ethWallet.ethAddress, password: "")
+					let promise = Promise<EthereumTransaction>.pending()
+					promise.resolver.fulfill(trs)
+					return promise.promise
+				}.wait()
+				
+				completion(.success(result: transaction))
+			} catch {
+				completion(.failure(error: WalletServiceError.internalError(message: "Transaction sign error", error: error)))
+			}
+		}
+	}
+	
+	func sendTransaction(_ transaction: EthereumTransaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
+		defaultDispatchQueue.async {
+			switch self.web3.eth.sendRawTransaction(transaction) {
 			case .success(let result):
-				if let hash = result["txhash"] {
-					completion(.success(result: hash))
-				} else {
-					completion(.failure(error: .internalError(message: "Failed to get transaction hash", error: nil)))
-				}
+				completion(.success(result: result.hash))
 				
 			case .failure(let error):
 				completion(.failure(error: error.asWalletServiceError()))

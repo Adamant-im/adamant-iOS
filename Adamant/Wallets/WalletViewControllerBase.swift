@@ -213,7 +213,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 
 
 extension WalletViewControllerBase: TransferViewControllerDelegate {
-	func transferViewController(_ viewController: TransferViewControllerBase) {
+	func transferViewControllerDidFinishTransfer(_ viewController: TransferViewControllerBase) {
 		if let nav = navigationController, nav.topViewController == viewController {
 			DispatchQueue.main.async {
 				nav.popViewController(animated: true)

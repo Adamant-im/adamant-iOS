@@ -120,7 +120,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 }
 
 extension ComplexTransferViewController: TransferViewControllerDelegate {
-	func transferViewController(_ viewController: TransferViewControllerBase) {
+	func transferViewControllerDidFinishTransfer(_ viewController: TransferViewControllerBase) {
 		transferDelegate?.complexTransferViewControllerDidFinish(self)
 	}
 }

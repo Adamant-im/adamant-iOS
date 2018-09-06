@@ -33,6 +33,66 @@ class EthTransferViewController: TransferViewControllerBase {
 	}()
 	
 	
+	// MARK: Send
+	
+	override func sendFunds() {
+		let comments = "" // TODO:
+		
+		guard let service = service as? EthWalletService, let recipient = recipient, let amount = amount else {
+			return
+		}
+		
+		guard let dialogService = dialogService else {
+			return
+		}
+		
+		dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+		
+		service.createTransaction(recipient: recipient, amount: amount, comments: comments) { [weak self] result in
+			switch result {
+			case .success(let transaction):
+				// MARK: 1. Send adm report
+				if let reportRecipient = self?.admReportRecipient, let hash = transaction.txhash {
+					let payload = RichMessageTransfer(type: .ethTransfer, amount: amount, hash: hash, comments: comments)
+					let message = AdamantMessage.richMessage(payload: payload)
+					
+					self?.chatsProvider.sendMessage(message, recipientId: reportRecipient) { result in
+						if case .failure(let error) = result {
+							self?.dialogService.showRichError(error: error)
+						}
+					}
+				}
+				
+				// MARK: 2. Send eth transaction
+				service.sendTransaction(transaction) { result in
+					switch result {
+					case .success(_):
+						service.update()
+						
+						guard let vc = self else {
+							break
+						}
+						
+						vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+						vc.delegate?.transferViewControllerDidFinishTransfer(vc)
+						
+					case .failure(let error):
+						self?.dialogService.showRichError(error: error)
+					}
+				}
+				
+			case .failure(let error):
+				guard let dialogService = self?.dialogService else {
+					break
+				}
+				
+				dialogService.dismissProgress()
+				dialogService.showRichError(error: error)
+			}
+		}
+	}
+	
+	
 	// MARK: Overrides
 	
 	private var _recipient: String?

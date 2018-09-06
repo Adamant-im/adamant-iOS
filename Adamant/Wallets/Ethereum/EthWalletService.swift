@@ -26,7 +26,7 @@ extension Web3Error {
 			 .keystoreError(let error as Error):
 			return .internalError(message: error.localizedDescription, error: error)
 			
-		case .inputError(let message):
+		case .inputError(let message), .processingError(let message):
 			return .internalError(message: message, error: nil)
 			
 		case .transactionSerializationError,
@@ -187,20 +187,13 @@ class EthWalletService: WalletService {
 	}
 	
 	func getGasPrices(completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-		web3.eth.getGasPrice(callback: { result in
-			switch result {
-			case .success(let price):
-				guard let p = price as? BigUInt else {
-					completion(.failure(error: WalletServiceError.internalError(message: "EthWalletService: Type error, expected BigUInt, received: \(type(of: price))", error: nil)))
-					break
-				}
-				
-				completion(.success(result: p.asDecimal(exponent: EthWalletService.currencyExponent)))
-				
-			case .failure(let error):
-				completion(.failure(error: error.asWalletServiceError()))
-			}
-		})
+		switch web3.eth.getGasPrice() {
+		case .success(let price):
+			completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
+			
+		case .failure(let error):
+			completion(.failure(error: error.asWalletServiceError()))
+		}
 	}
 	
 	private static func buildBaseUrl(for network: Networks?) -> String {

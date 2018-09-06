@@ -454,7 +454,7 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 }
 
 extension ChatViewController: TransferViewControllerDelegate, ComplexTransferViewControllerDelegate {
-	func transferViewController(_ viewController: TransferViewControllerBase) {
+	func transferViewControllerDidFinishTransfer(_ viewController: TransferViewControllerBase) {
 		dismissTransferViewController()
     }
 	

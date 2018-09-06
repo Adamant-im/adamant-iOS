@@ -185,7 +185,6 @@
 		E9AA8BF82129F13000F9249F /* ComplexTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA8BF72129F13000F9249F /* ComplexTransferViewController.swift */; };
 		E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA8BF9212C166600F9249F /* EthWalletService+Send.swift */; };
 		E9AA8BFC212C169200F9249F /* EthWalletService+Transfers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA8BFB212C169200F9249F /* EthWalletService+Transfers.swift */; };
-		E9AA8BFE212C373000F9249F /* EthTransactionRichMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA8BFD212C373000F9249F /* EthTransactionRichMessage.swift */; };
 		E9AA8C02212C5BF500F9249F /* AdmWalletService+Send.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA8C01212C5BF500F9249F /* AdmWalletService+Send.swift */; };
 		E9B1AA572121ACC000080A2A /* AdmWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B1AA562121ACBF00080A2A /* AdmWalletViewController.swift */; };
 		E9B1AA592122D59600080A2A /* WalletsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B1AA582122D59600080A2A /* WalletsRoutes.swift */; };
@@ -453,7 +452,6 @@
 		E9AA8BF72129F13000F9249F /* ComplexTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplexTransferViewController.swift; sourceTree = "<group>"; };
 		E9AA8BF9212C166600F9249F /* EthWalletService+Send.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EthWalletService+Send.swift"; sourceTree = "<group>"; };
 		E9AA8BFB212C169200F9249F /* EthWalletService+Transfers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EthWalletService+Transfers.swift"; sourceTree = "<group>"; };
-		E9AA8BFD212C373000F9249F /* EthTransactionRichMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionRichMessage.swift; sourceTree = "<group>"; };
 		E9AA8C01212C5BF500F9249F /* AdmWalletService+Send.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdmWalletService+Send.swift"; sourceTree = "<group>"; };
 		E9B1AA562121ACBF00080A2A /* AdmWalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmWalletViewController.swift; sourceTree = "<group>"; };
 		E9B1AA582122D59600080A2A /* WalletsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletsRoutes.swift; sourceTree = "<group>"; };
@@ -666,7 +664,6 @@
 				64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */,
 				E923222521135F9000A7E5AF /* EthAccount.swift */,
 				E940086A2114A70600CD2D67 /* LskAccount.swift */,
-				E9AA8BFD212C373000F9249F /* EthTransactionRichMessage.swift */,
 				E993302321369B8A00CD5200 /* RichMessage.swift */,
 			);
 			path = Models;
@@ -1196,7 +1193,6 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
-				"${BUILT_PRODUCTS_DIR}/Alamofire-Synchronous/Alamofire_Synchronous.framework",
 				"${BUILT_PRODUCTS_DIR}/BigInt/BigInt.framework",
 				"${BUILT_PRODUCTS_DIR}/CryptoSwift/CryptoSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/DateToolsSwift/DateToolsSwift.framework",
@@ -1213,6 +1209,7 @@
 				"${BUILT_PRODUCTS_DIR}/MyLittlePinpad/MyLittlePinpad.framework",
 				"${BUILT_PRODUCTS_DIR}/PMAlertController/PMAlertController.framework",
 				"${BUILT_PRODUCTS_DIR}/Parchment/Parchment.framework",
+				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/QRCodeReader.swift/QRCodeReader.framework",
 				"${BUILT_PRODUCTS_DIR}/RNCryptor/RNCryptor.framework",
 				"${BUILT_PRODUCTS_DIR}/ReachabilitySwift/Reachability.framework",
@@ -1227,7 +1224,6 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire_Synchronous.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BigInt.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CryptoSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DateToolsSwift.framework",
@@ -1244,6 +1240,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MyLittlePinpad.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PMAlertController.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Parchment.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCodeReader.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCryptor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
@@ -1463,7 +1460,6 @@
 				E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */,
 				E993302021354B1800CD5200 /* AdmWalletRoutes.swift in Sources */,
 				E983AE2320E6568C00497E1A /* WalletEnum.swift in Sources */,
-				E9AA8BFE212C373000F9249F /* EthTransactionRichMessage.swift in Sources */,
 				64FA53D120E24942006783C9 /* BaseTransactionDetailsViewController.swift in Sources */,
 				64BD2B7720E2820300E2CD36 /* TransactionDetailsProtocol.swift in Sources */,
 				E94008852114EE7500CD2D67 /* LskWalletService.swift in Sources */,

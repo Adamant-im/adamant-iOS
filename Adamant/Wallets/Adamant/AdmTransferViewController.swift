@@ -20,6 +20,38 @@ class AdmTransferViewController: TransferViewControllerBase {
 	
 	static let invalidCharactersSet = CharacterSet.decimalDigits.inverted
 	
+	// MARK: Sending
+	
+	override func sendFunds() {
+		guard let service = service as? AdmWalletService, let recipient = recipient, let amount = amount else {
+			return
+		}
+		
+		dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+		
+		service.sendMoney(recipient: recipient, amount: amount, comments: "") { [weak self] result in
+			switch result {
+			case .success:
+				service.update()
+				
+				guard let vc = self else {
+					break
+				}
+				
+				vc.dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+				vc.delegate?.transferViewControllerDidFinishTransfer(vc)
+				
+			case .failure(let error):
+				guard let dialogService = self?.dialogService else {
+					break
+				}
+				
+				dialogService.dismissProgress()
+				dialogService.showRichError(error: error)
+			}
+		}
+	}
+	
 	
 	// MARK: Overrides
 	

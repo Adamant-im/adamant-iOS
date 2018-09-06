@@ -1,8 +1,6 @@
 PODS:
   - Alamofire (4.7.3)
-  - Alamofire-Synchronous (4.0.0):
-    - Alamofire (~> 4.0)
-  - BigInt (3.0.1):
+  - BigInt (3.1.0):
     - SipHash (~> 1.2)
   - CryptoSwift (0.10.0)
   - DateToolsSwift (4.0.0)
@@ -29,6 +27,15 @@ PODS:
   - MyLittlePinpad (0.2.5)
   - Parchment (1.4.0)
   - PMAlertController (3.4.0)
+  - PromiseKit (6.3.5):
+    - PromiseKit/CorePromise (= 6.3.5)
+    - PromiseKit/Foundation (= 6.3.5)
+    - PromiseKit/UIKit (= 6.3.5)
+  - PromiseKit/CorePromise (6.3.5)
+  - PromiseKit/Foundation (6.3.5):
+    - PromiseKit/CorePromise
+  - PromiseKit/UIKit (6.3.5):
+    - PromiseKit/CorePromise
   - QRCodeReader.swift (8.2.0)
   - ReachabilitySwift (4.1.0)
   - Result (3.0.0)
@@ -36,12 +43,11 @@ PODS:
   - secp256k1_ios (0.1.3)
   - SipHash (1.2.2)
   - Swinject (2.4.1)
-  - web3swift (0.8.1):
-    - Alamofire (~> 4.7)
-    - Alamofire-Synchronous (~> 4.0)
-    - BigInt (~> 3.0.1)
+  - web3swift (1.1.1):
+    - BigInt (~> 3.1.0)
     - CryptoSwift (~> 0.10.0)
     - libsodium (~> 1.0.12)
+    - PromiseKit (~> 6.3.0)
     - Result (~> 3.0.0)
     - secp256k1_ios (~> 0.1.3)
 
@@ -65,12 +71,11 @@ DEPENDENCIES:
   - ReachabilitySwift
   - RNCryptor
   - Swinject
-  - web3swift (~> 0.8.0)
+  - web3swift
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
-    - Alamofire-Synchronous
     - BigInt
     - CryptoSwift
     - DateToolsSwift
@@ -88,6 +93,7 @@ SPEC REPOS:
     - MyLittlePinpad
     - Parchment
     - PMAlertController
+    - PromiseKit
     - QRCodeReader.swift
     - ReachabilitySwift
     - Result
@@ -109,8 +115,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
-  Alamofire-Synchronous: eedf1e6e961c3795a63c74990b3f7d9fbfac7e50
-  BigInt: 8e8a52161c745cd3ab78e3dc346a9fbee51e6cf6
+  BigInt: 76b5dfdfa3e2e478d4ffdf161aeede5502e2742f
   CryptoSwift: 6c778d69282bed3b4e975ff97a79d074f20bb011
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   Ed25519: d84c847d8ffbb2f6fec71479abbb8fa3dfe12578
@@ -128,6 +133,7 @@ SPEC CHECKSUMS:
   MyLittlePinpad: ec1d9990d9715eab48205ecc08f4ff359ead521b
   Parchment: 3ff467cea1e214ae2ce84f83aa738ecaab8057eb
   PMAlertController: efb781925d741d50e0200018a00c53cecb8b4910
+  PromiseKit: 32c36425387e9cfc7f1206f27bfd906d0b53c0d6
   QRCodeReader.swift: 003eb32f18a5a675b936ec82ba0ff368cddbff45
   ReachabilitySwift: 6849231cd4e06559f3b9ef4a97a0a0f96d41e09f
   Result: 1b3e431f37cbcd3ad89c6aa9ab0ae55515fae3b6
@@ -135,8 +141,8 @@ SPEC CHECKSUMS:
   secp256k1_ios: ac9ef04e761f43c58012b28548afa91493761f17
   SipHash: fad90a4683e420c52ef28063063dbbce248ea6d4
   Swinject: f7f15a9672e99328c1f07f277091087917215700
-  web3swift: 79f72b48005f1b28e73191eaf78194d6cf5f8a35
+  web3swift: 4b4e4a0dd16e7081b7190bf8596c5638f313a498
 
-PODFILE CHECKSUM: 4803e7e6dc124b2ebe0e287cd9c927e1e6eb1540
+PODFILE CHECKSUM: 0c023cfbb470964a4ee718e78829834866a63d09
 
 COCOAPODS: 1.5.3

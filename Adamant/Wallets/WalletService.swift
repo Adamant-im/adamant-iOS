@@ -190,7 +190,21 @@ protocol WalletServiceWithTransfers: WalletService {
 protocol WalletServiceWithSend: WalletService {
 	var transactionFeeUpdated: Notification.Name { get }
 	
-	var transactionFee: Decimal { get }
+	var transactionFee : Decimal { get }
 	func transferViewController() -> UIViewController
-	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<String?>) -> Void)
+}
+
+protocol WalletServiceSimpleSend: WalletServiceWithSend {
+	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceSimpleResult) -> Void)
+}
+
+protocol WalletServiceTwoStepSend: WalletServiceWithSend {
+	associatedtype T: RawTransaction
+	
+	func createTransaction(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<T>) -> Void)
+	func sendTransaction(_ transaction: T, completion: @escaping (WalletServiceResult<String>) -> Void)
+}
+
+protocol RawTransaction {
+	var txHash: String? { get }
 }

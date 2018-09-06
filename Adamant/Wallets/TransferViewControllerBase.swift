@@ -14,7 +14,7 @@ import QRCodeReader
 // MARK: - Transfer Delegate Protocol
 
 protocol TransferViewControllerDelegate: class {
-	func transferViewController(_ viewController: TransferViewControllerBase)
+	func transferViewControllerDidFinishTransfer(_ viewController: TransferViewControllerBase)
 }
 
 
@@ -121,6 +121,7 @@ class TransferViewControllerBase: FormViewController {
 	
 	// MARK: - Dependencies
 	
+	var accountService: AccountService!
 	var dialogService: DialogService!
 	
 	
@@ -288,84 +289,6 @@ class TransferViewControllerBase: FormViewController {
 		return section
 	}
 	
-	
-	/*
-	
-    private func createETHForm() {
-        if let ethAccount = ethApiService.account, let ethBalanceBigInt = ethAccount.balance, let ethBalanceString = Web3.Utils.formatToEthereumUnits(ethBalanceBigInt), let ethBalance = Double(ethBalanceString) {
-            
-            maxToTransfer = ethBalance
-            
-            if let feeString = Web3.Utils.formatToEthereumUnits(BigUInt(AdamantEthApiService.defaultGasPrice * AdamantEthApiService.transferGas), toUnits: .eth, decimals: 8), let fee = Double(feeString) {
-//                defaultFee = fee
-            }
-            
-            let currencyFormatter = NumberFormatter()
-            currencyFormatter.numberStyle = .decimal
-            currencyFormatter.roundingMode = .floor
-            currencyFormatter.positiveFormat = "#.######## ETH"
-            
-            form +++ Section(Sections.wallet.localized)
-                <<< DecimalRow() {
-                    $0.title = Row.balance.localized
-                    $0.value = ethBalance
-                    $0.tag = Row.balance.tag
-                    $0.disabled = true
-                    $0.formatter = currencyFormatter
-                }
-            
-            // MARK: - Transfer section
-            form +++ Section(Sections.transferInfo.localized)
-                
-                <<< TextRow() {
-                    $0.title = Row.address.localized
-                    $0.placeholder = String.adamantLocalized.transfer.addressPlaceholder
-                    $0.tag = Row.address.tag
-//                    $0.value = toAddress
-                    $0.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
-                        guard let value = value?.lowercased() else {
-                            return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
-                        }
-                        
-                        if let walletAddress = EthereumAddress(value) {
-                            if walletAddress.isValid {
-                                return nil
-                            } else {
-                                return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
-                            }
-                        } else {
-                            return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
-                        }
-                    }))
-                    $0.validationOptions = .validatesOnBlur
-                    }.cellUpdate({ (cell, row) in
-                        cell.titleLabel?.textColor = row.isValid ? .black : .red
-                    })
-                <<< DecimalRow() {
-                    $0.title = Row.amount.localized
-                    $0.placeholder = String.adamantLocalized.transfer.amountPlaceholder
-                    $0.tag = Row.amount.tag
-                    $0.formatter = currencyFormatter
-                    $0.add(rule: RuleSmallerOrEqualThan<Double>(max: maxToTransfer))
-                    $0.validationOptions = .validatesOnChange
-                    }.onChange(ethAmountChanged)
-                <<< DecimalRow() {
-                    $0.title = Row.fee.localized
-//                    $0.value = defaultFee
-                    $0.tag = Row.fee.tag
-                    $0.disabled = true
-                    $0.formatter = currencyFormatter
-                }
-                <<< DecimalRow() {
-                    $0.title = Row.total.localized
-                    $0.value = nil
-                    $0.tag = Row.total.tag
-                    $0.disabled = true
-                    $0.formatter = currencyFormatter
-            }
-        }
-    }
-*/
 
 /*
     private func createLSKForm() {
@@ -514,6 +437,11 @@ class TransferViewControllerBase: FormViewController {
 			return
 		}
 		
+		if admReportRecipient != nil, let account = accountService.account, account.balance < 0.001 {
+			dialogService.showWarning(withMessage: "Not enought money to send report")
+			return
+		}
+		
 		let formattedAmount = balanceFormatter.string(from: amount as NSDecimalNumber)!
 		let title = String.adamantLocalized.alert.confirmSendMessage(formattedAmount: formattedAmount, recipient: recipient)
 		
@@ -574,38 +502,10 @@ class TransferViewControllerBase: FormViewController {
 	}
 	
 	/// Send funds to recipient after validations
-	/// You can override this to provide custom logic
+	/// You must override this method
+	/// Don't forget to call delegate.transferViewControllerDidFinishTransfer(self) after successfull transfer
 	func sendFunds() {
-		guard let service = service, let recipient = recipient, let amount = amount else {
-			return
-		}
-		
-		guard let dialogService = dialogService else {
-			return
-		}
-		
-		dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
-		
-		service.sendMoney(recipient: recipient, amount: amount, comments: "") { [weak self] result in
-			switch result {
-			case .success(let result):
-				if let hash = result, let report = self?.admReportRecipient {
-					self?.reportTransferTo(admAddress: report, transferRecipient: recipient, amount: amount, comments: "", hash: hash)
-				}
-				
-				dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-				
-				if let vc = self, let delegate = vc.delegate {
-					delegate.transferViewController(vc)
-				}
-				
-				service.update()
-				
-			case .failure(let error):
-				dialogService.dismissProgress()
-				dialogService.showRichError(error: error)
-			}
-		}
+		fatalError("You must implement sending logic")
 	}
 	
 	
@@ -633,38 +533,6 @@ class TransferViewControllerBase: FormViewController {
 	func validateRecipient(_ address: String) -> Bool {
 		fatalError("You must implement recipient addres validation logic")
 	}
-	
-	/*
-    func sendETHFunds() {
-        guard let recipientRow = form.rowBy(tag: Row.address.tag) as? TextRow,
-            let recipient = recipientRow.value,
-            let amountRow = form.rowBy(tag: Row.amount.tag) as? DecimalRow,
-            let amount = amountRow.value else {
-                return
-        }
-        
-        guard recipientRow.isValid else {
-            dialogService.showWarning(withMessage: (recipientRow.validationErrors.first?.msg) ?? "Invalid Address")
-            return
-        }
-        
-        guard let totalAmount = totalAmount, totalAmount <= maxToTransfer else {
-            dialogService.showWarning(withMessage: String.adamantLocalized.transfer.amountTooHigh)
-            return
-        }
-        
-        let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.confirmSendMessageFormat, "\(amount) ETH", recipient), message: String.adamantLocalized.transfer.cantUndo, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: String.adamantLocalized.alert.cancel , style: .cancel, handler: nil)
-        let sendAction = UIAlertAction(title: String.adamantLocalized.alert.send, style: .default, handler: { _ in
-            self.sendEth(to: recipient, amount: amount)
-        })
-        
-        alert.addAction(cancelAction)
-        alert.addAction(sendAction)
-        
-        present(alert, animated: true, completion: nil)
-    }
-*/
 	
 	/*
     func sendLSKFunds() {
@@ -700,57 +568,7 @@ class TransferViewControllerBase: FormViewController {
     
     // MARK: - Private
 	/*
-    private func sendEth(to recipient: String, amount: Double) {
-        self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
-        
-        self.ethApiService.createTransaction(toAddress: recipient, amount: amount) { (result) in
-            switch result {
-            case .success(let transaction):
-                self.ethApiService.sendTransaction(transaction: transaction, completion: { (result) in
-                    switch result {
-                    case .success(let txHash):
-                        DispatchQueue.global().async {
-                            print("TxHash: \(txHash)")
-                            
-                            var message = ["type": "eth_transaction", "amount": "\(amount)", "hash": txHash, "comments":""]
-                            
-                            if let commentsRow = self.form.rowBy(tag: Row.comments.tag) as? TextAreaRow,
-                                let comments = commentsRow.value {
-                                message["comments"] = comments
-                            }
-                            
-                            do {
-                                let data = try JSONEncoder().encode(message)
-                                guard let raw = String(data: data, encoding: String.Encoding.utf8) else {
-                                    return
-                                }
-                                
-                                print("Payload: \(raw)")
-                                DispatchQueue.main.async {
-                                    self.delegate?.transferFinished(with: raw)
-                                    self.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                                    self.close()
-                                }
-                            } catch {
-                                DispatchQueue.main.async {
-                                    self.dialogService.showError(withMessage: "ETH Wallet: Send - wrong data issue", error: nil)
-                                }
-                            }
-                        }
-                        
-                        break
-                    case .failure(let error):
-                        self.dialogService.showError(withMessage: "Transrer issue", error: error)
-                        break
-                    }
-                })
-                break
-            case .failure(let error):
-                self.dialogService.showError(withMessage: "Transrer issue", error: error)
-                break
-            }
-        }
-    }
+	
     
     private func sendLsk(to recipient: String, amount: Double) {
         self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)

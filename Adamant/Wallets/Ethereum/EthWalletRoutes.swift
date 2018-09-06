@@ -22,6 +22,8 @@ extension AdamantScene.Wallets {
 		static let transfer = AdamantScene(identifier: "EthTransferViewController") { r in
 			let c = EthTransferViewController()
 			c.dialogService = r.resolve(DialogService.self)
+			c.chatsProvider = r.resolve(ChatsProvider.self)
+			c.accountService = r.resolve(AccountService.self)
 			return c
 		}
 		

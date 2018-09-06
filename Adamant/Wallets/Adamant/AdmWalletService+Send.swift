@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension AdmWalletService: WalletServiceWithSend {
+extension AdmWalletService: WalletServiceSimpleSend {
 	/// Transaction ID
 	typealias T = Int
 	
@@ -23,7 +23,7 @@ extension AdmWalletService: WalletServiceWithSend {
 	
 	
 	/// Comments not implemented
-	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<String?>) -> Void) {
+	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
 		guard let apiService = apiService else { // Hold reference
 			fatalError("AdmWalletService: Dependency failed: ApiService")
 		}
@@ -39,7 +39,7 @@ extension AdmWalletService: WalletServiceWithSend {
 				apiService.transferFunds(sender: account.address, recipient: recipient, amount: amount, keypair: keypair) { result in
 					switch result {
 					case .success:
-						completion(.success(result: nil))
+						completion(.success)
 						
 					case .failure(let error):
 						completion(.failure(error: error.asWalletServiceError()))
