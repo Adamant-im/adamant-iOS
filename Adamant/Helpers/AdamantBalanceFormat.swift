@@ -74,9 +74,17 @@ enum AdamantBalanceFormat {
 	
 	func format(balance: Decimal, withCurrencySymbol symbol: String? = nil) -> String {
 		if let symbol = symbol {
-			return "\(defaultFormatter.string(from: balance as NSNumber)!) \(symbol)"
+			return "\(defaultFormatter.string(fromDecimal: balance)!) \(symbol)"
 		} else {
-			return defaultFormatter.string(from: balance as NSNumber)!
+			return defaultFormatter.string(fromDecimal: balance)!
 		}
+	}
+}
+
+
+// MARK: - Helper
+extension NumberFormatter {
+	func string(fromDecimal decimal: Decimal) -> String? {
+		return string(from: decimal as NSNumber)
 	}
 }
