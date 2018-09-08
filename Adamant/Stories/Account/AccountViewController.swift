@@ -131,7 +131,7 @@ class AccountViewController: FormViewController {
 	var router: Router!
 	var notificationsService: NotificationsService!
 	var transfersProvider: TransfersProvider!
-	
+    var avatarService: AvatarService!
 	
 	// MARK: - Wallets
 	var selectedWalletIndex: Int = 0
@@ -420,6 +420,13 @@ class AccountViewController: FormViewController {
 		
 		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: selectedWalletIndex, section: 0), animated: false, scrollPosition: .centeredHorizontally)
 		accountHeaderView.addressButton.setTitle(address, for: .normal)
+        
+        DispatchQueue.global().async {
+            let image = self.avatarService.avatar(for: address, size: 200)
+            DispatchQueue.main.async {
+                self.accountHeaderView.avatarImageView.image = image
+            }
+        }
 	}
 }
 

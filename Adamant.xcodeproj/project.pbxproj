@@ -19,6 +19,8 @@
 		644EC35E20F34F1E00F40C73 /* DelegateDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */; };
 		6455E9F121075D3600B2E94C /* AddressBookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6455E9F021075D3600B2E94C /* AddressBookService.swift */; };
 		6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */; };
+		648BCA6B213D37A900875EB5 /* AdamantAvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */; };
+		648BCA6D213D384F00875EB5 /* AvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648BCA6C213D384F00875EB5 /* AvatarService.swift */; };
 		64A223D620F760BB005157CB /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D520F760BB005157CB /* Localization.swift */; };
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
 		64E8305020F5FEEF006FA590 /* VotesAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E8304F20F5FEEF006FA590 /* VotesAsset.swift */; };
@@ -224,6 +226,8 @@
 		644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateDetailsViewController.swift; sourceTree = "<group>"; };
 		6455E9F021075D3600B2E94C /* AddressBookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBookService.swift; sourceTree = "<group>"; };
 		6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAddressBookService.swift; sourceTree = "<group>"; };
+		648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantAvatarService.swift; sourceTree = "<group>"; };
+		648BCA6C213D384F00875EB5 /* AvatarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarService.swift; sourceTree = "<group>"; };
 		64A223D520F760BB005157CB /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
 		64E8304F20F5FEEF006FA590 /* VotesAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotesAsset.swift; sourceTree = "<group>"; };
@@ -520,6 +524,7 @@
 			children = (
 				E9B3D398201F90320019EB36 /* DataProviders */,
 				E9E7CD8A20026B0600DFC4DB /* AccountService.swift */,
+				648BCA6C213D384F00875EB5 /* AvatarService.swift */,
 				E913C9071FFFA943001A83F7 /* AdamantCore.swift */,
 				6455E9F021075D3600B2E94C /* AddressBookService.swift */,
 				E91947AB20001A9A001362F8 /* ApiService.swift */,
@@ -549,6 +554,7 @@
 				E9A03FD720DC0ABA007653A1 /* AdamantNodesSource.swift */,
 				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
 				E921597420611A6A0000CA5C /* AdamantReachability.swift */,
+				648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */,
 				E913C9161FFFAF76001A83F7 /* JSAdamantCore.swift */,
 				643ED0B02109F4BD005A9FDA /* JSAdamantCore+Native.swift */,
 				E905D39A2048A9BD00DDB504 /* KeychainStore.swift */,
@@ -1188,11 +1194,13 @@
 				E9A03FD220DBC0F2007653A1 /* NodeEditorViewController.swift in Sources */,
 				E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */,
 				E90A494D204DA932009F6A65 /* LocalAuthentication.swift in Sources */,
+				648BCA6D213D384F00875EB5 /* AvatarService.swift in Sources */,
 				E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */,
 				644EC34D20EFA60900F40C73 /* AdamantApi+Delegates.swift in Sources */,
 				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
 				E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */,
 				E9B3D3A9202082450019EB36 /* AdamantTransfersProvider.swift in Sources */,
+				648BCA6B213D37A900875EB5 /* AdamantAvatarService.swift in Sources */,
 				E9A174B72057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift in Sources */,
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E941CCDE20E7B70200C96220 /* WalletCollectionViewCell.swift in Sources */,
