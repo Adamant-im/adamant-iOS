@@ -224,6 +224,22 @@ class AccountViewController: FormViewController {
 			
 			nav.pushViewController(vc, animated: true)
 		})
+            
+        // Theme select
+        <<< AlertRow<Theme>() {
+            $0.title = "Theme"
+            $0.cancelTitle = "Dismiss"
+            $0.selectorTitle = "Theme"
+            $0.options = [Theme.light, Theme.dark]
+            $0.value = ThemeManager.currentTheme()
+            }.onChange { row in
+                print(row.value ?? "No Value")
+                if let theme = row.value {
+                    ThemeManager.applyTheme(theme: theme)
+                }
+            }.cellUpdate({ (cell, _) in
+                cell.accessoryType = .disclosureIndicator
+            })
 		
 		// About
 		<<< LabelRow() {
