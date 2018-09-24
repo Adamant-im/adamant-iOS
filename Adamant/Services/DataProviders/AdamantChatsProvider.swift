@@ -735,14 +735,14 @@ extension AdamantChatsProvider {
 		var height: Int64 = 0
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = context
-		var newMessageTransactions = [MessageTransaction]()
+		var newMessageTransactions = [ChatTransaction]()
 		
 		for (account, transactions) in partners {
 			// We can't save whole context while we are mass creating MessageTransactions.
 			let privateChatroom = privateContext.object(with: account.chatroom!.objectID) as! Chatroom
 			
 			// MARK: Transactions
-			var messages = Set<MessageTransaction>()
+			var messages = Set<ChatTransaction>()
 			
 			for trs in transactions {
 				unconfirmedsSemaphore.wait()
@@ -766,18 +766,19 @@ extension AdamantChatsProvider {
 					publicKey = trs.transaction.senderPublicKey
 				}
 				
-				if let messageTransaction = messageTransaction(from: trs.transaction, isOutgoing: trs.isOut, publicKey: publicKey, privateKey: privateKey, context: privateContext) {
-					if height < messageTransaction.height {
-						height = messageTransaction.height
+				if let chatTransaction = chatTransaction(from: trs.transaction, isOutgoing: trs.isOut, publicKey: publicKey, privateKey: privateKey, context: privateContext) {
+					if height < chatTransaction.height {
+						height = chatTransaction.height
 					}
 					
 					if !trs.isOut {
-						newMessageTransactions.append(messageTransaction)
+						newMessageTransactions.append(chatTransaction)
 						
 						// Preset messages
 						if account.isSystem, let address = account.address,
 							let messages = AdamantContacts.messagesFor(address: address),
-							let key = messageTransaction.message,
+							let messageTransaction = chatTransaction as? MessageTransaction,
+                            let key = messageTransaction.message,
 							let systemMessage = messages.first(where: { key.range(of: $0.key) != nil })?.value {
 							
 							switch systemMessage.message {
@@ -796,7 +797,7 @@ extension AdamantChatsProvider {
 						}
 					}
 					
-					messages.insert(messageTransaction)
+					messages.insert(chatTransaction)
 				}
 			}
 			
@@ -807,7 +808,7 @@ extension AdamantChatsProvider {
 		// MARK: 4. Unread messagess
 		if let readedLastHeight = readedLastHeight {
 			let unreadTransactions = newMessageTransactions.filter { $0.height > readedLastHeight }
-			let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: MessageTransaction) -> Chatroom in t.chatroom! }))
+			let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom! }))
 			
 			for (chatroom, trs) in chatrooms {
 				chatroom.hasUnreadMessages = true
@@ -910,28 +911,46 @@ extension AdamantChatsProvider {
 	///   - privateKey: logged account private key
 	///   - context: context to insert parsed transaction to
 	/// - Returns: New parsed transaction
-	private func messageTransaction(from transaction: Transaction, isOutgoing: Bool, publicKey: String, privateKey: String, context: NSManagedObjectContext) -> MessageTransaction? {
+	private func chatTransaction(from transaction: Transaction, isOutgoing: Bool, publicKey: String, privateKey: String, context: NSManagedObjectContext) -> ChatTransaction? {
 		guard let chat = transaction.asset.chat else {
 			return nil
 		}
 		
-		let messageTransaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+        let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)
+        
+        let messageTransaction: ChatTransaction
+        switch chat.type {
+        case .message, .messageOld, .signal, .unknown:
+            let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+            transaction.message = decodedMessage
+            messageTransaction = transaction
+            
+        case .richMessage:
+            let transaction = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
+            
+            if let decodedMessage = decodedMessage,
+                let data = decodedMessage.data(using: String.Encoding.utf8),
+                let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: String],
+                let type = json["type"] {
+                transaction.richType = type
+                transaction.richContent = json
+            }
+            
+            messageTransaction = transaction
+        }
+        
 		messageTransaction.date = transaction.date as NSDate
 		messageTransaction.recipientId = transaction.recipientId
 		messageTransaction.senderId = transaction.senderId
 		messageTransaction.transactionId = String(transaction.id)
 		messageTransaction.type = Int16(chat.type.rawValue)
 		messageTransaction.height = Int64(transaction.height)
-		messageTransaction.isConfirmed = true
+        messageTransaction.isConfirmed = true
 		messageTransaction.isOutgoing = isOutgoing
 		messageTransaction.blockId = transaction.blockId
 		messageTransaction.confirmations = transaction.confirmations
         
         messageTransaction.statusEnum = MessageStatus.delivered
-		
-		if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey) {
-			messageTransaction.message = decodedMessage
-		}
 		
 		return messageTransaction
 	}
