@@ -26,7 +26,17 @@ extension AdamantScene {
 			c.chatsProvider = r.resolve(ChatsProvider.self)
 			c.dialogService = r.resolve(DialogService.self)
 			c.router = r.resolve(Router.self)
-			return c
+            
+            // MARK: - RichMessage handlers
+            
+            // Transfer handlers from accountService' wallet services
+            if let accountService = r.resolve(AccountService.self) {
+                for case let provider as RichMessageProvider in accountService.wallets {
+                    c.richMessageProviders[type(of: provider).richMessageType] = provider
+                }
+            }
+			
+            return c
 		})
 		
 		static let newChat = AdamantScene(identifier: "NewChatViewController", factory: { r in

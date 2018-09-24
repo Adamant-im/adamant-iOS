@@ -11,6 +11,24 @@ import MessageKit
 import SafariServices
 import Haring
 
+
+// MARK: - Tools
+extension ChatViewController {
+    private func getRichMessageType(of message: MessageType) -> String? {
+        guard case .custom(let dataRaw) = message.kind, let data = (dataRaw as? String)?.data(using: String.Encoding.utf8) else {
+            return nil
+        }
+        
+        guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String:Any],
+            let type = json["type"] as? String else {
+            return nil
+        }
+        
+        return type
+    }
+}
+
+
 // MARK: - MessagesDataSource
 extension ChatViewController: MessagesDataSource {
 	func currentSender() -> Sender {
@@ -97,6 +115,14 @@ extension ChatViewController: MessagesDataSource {
 		
 		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
 	}
+    
+    func customCell(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
+        guard let type = getRichMessageType(of: message), let handler = richMessageProviders[type] else {
+            fatalError("Tried to render wrong messagetype: \(message.kind)")
+        }
+        
+        return handler.cell(for: message, at: indexPath, in: messagesCollectionView)
+    }
 }
 
 
@@ -355,6 +381,22 @@ extension ChatViewController: MessagesLayoutDelegate {
             return 16
         }
     }
+    
+    func cellSizeCalculator(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CellSizeCalculator {
+        guard let type = getRichMessageType(of: message) else {
+            return (messagesCollectionView.collectionViewLayout as! MessagesCollectionViewFlowLayout).textMessageSizeCalculator
+        }
+        
+        if let calculator = cellCalculators[type] {
+            return calculator
+        } else if let handler = richMessageProviders[type] {
+            let calculator = handler.cellSizeCalculator(for: messagesCollectionView.collectionViewLayout as! MessagesCollectionViewFlowLayout)
+            cellCalculators[type] = calculator
+            return calculator
+        } else {
+            return (messagesCollectionView.collectionViewLayout as! MessagesCollectionViewFlowLayout).textMessageSizeCalculator
+        }
+    }
 }
 
 
@@ -434,25 +476,33 @@ extension MessageTransaction: MessageType {
 		guard let message = message else {
 			return MessageKind.text("")
 		}
-        
-        if type == Int16(ChatType.richMessage.rawValue) {
-            guard let data = message.data(using: String.Encoding.utf8), let transfer = try? JSONDecoder().decode(ChatTransfer.self, from: data) else {
-                return MessageKind.text("")
-            }
-
-            return MessageKind.attributedText(transfer.render())
-        }
 		
-		if isMarkdown {
-			let parser = MarkdownParser(font: UIFont.adamantChatDefault)
-			return MessageKind.attributedText(parser.parse(message))
-		} else {
-			return MessageKind.text(message)
-		}
+        if isMarkdown {
+            let parser = MarkdownParser(font: UIFont.adamantChatDefault)
+            return MessageKind.attributedText(parser.parse(message))
+        } else {
+            return MessageKind.text(message)
+        }
 	}
     
     public var messageStatus: MessageStatus {
         return self.statusEnum
+    }
+}
+
+// MARK: - RichMessageTransaction
+extension RichMessageTransaction: MessageType {
+    public var sender: Sender {
+        let id = self.senderId!
+        return Sender(id: id, displayName: id)
+    }
+    
+    public var messageId: String {
+        return self.transactionId!
+    }
+    
+    public var sentDate: Date {
+        return self.date! as Date
     }
 }
 

@@ -63,6 +63,10 @@ class ChatViewController: MessagesViewController {
 	// Content insets are broken after modal view dissapears
 	private var fixKeyboardInsets = false
 	
+    // MARK: Rich Messages
+    var richMessageProviders = [String:RichMessageProvider]()
+    var cellCalculators = [String:CellSizeCalculator]()
+    
 	// MARK: Fee label
 	private var feeIsVisible: Bool = false
 	private var feeTimer: Timer?
@@ -265,6 +269,13 @@ class ChatViewController: MessagesViewController {
 		} catch {
 			print("There was an error performing fetch: \(error)")
 		}
+        
+        // MARK: 4.1 Rich messages
+        if let fetched = controller.fetchedObjects {
+            for case let rich as RichMessageTransaction in fetched {
+                rich.kind = messageKind(for: rich)
+            }
+        }
 		
 		// MARK: 5. Notifications
 		// Fixing content insets after modal window
@@ -290,6 +301,19 @@ class ChatViewController: MessagesViewController {
 			
 			self?.fixKeyboardInsets = false
 		}
+        
+        // MARK: 6. RichMessage handlers
+        for handler in richMessageProviders.values {
+            if let source = handler.cellSource {
+                switch source {
+                case .class(let type):
+                    messagesCollectionView.register(type, forCellWithReuseIdentifier: handler.cellIdentifier)
+                    
+                case .nib(let nib):
+                    messagesCollectionView.register(nib, forCellWithReuseIdentifier: handler.cellIdentifier)
+                }
+            }
+        }
 	}
 	
 	override func viewDidAppear(_ animated: Bool) {
@@ -345,6 +369,26 @@ class ChatViewController: MessagesViewController {
 											   completion: nil)
 		}
 	}
+    
+    
+    // MARK: Tools
+    private func messageKind(for richMessage: RichMessageTransaction) -> MessageKind {
+        if let type = richMessage.richType, richMessageProviders[type] != nil {
+            return MessageKind.custom(richMessage.richContent)
+        } else if var richContent = richMessage.richContent {
+            if let type = richMessage.richType {
+                richContent[RichMessageTransfer.CodingKeys.type.stringValue] = type
+            }
+                
+            if let data = try? JSONSerialization.data(withJSONObject: richContent, options: .prettyPrinted), let string = String(data: data, encoding: String.Encoding.utf8) {
+                return MessageKind.text(string)
+            } else {
+                return MessageKind.text(richMessage.richType ?? "")
+            }
+        } else {
+            return MessageKind.text(richMessage.richType ?? "")
+        }
+    }
 }
 
 
@@ -404,9 +448,16 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 		
-		if type == .insert, let trs = anObject as? MessageTransaction {
-			trs.isUnread = false
-			chatroom?.hasUnreadMessages = false
+        if type == .insert {
+            if let trs = anObject as? MessageTransaction {
+                trs.isUnread = false
+                chatroom?.hasUnreadMessages = false
+            } else if let trs = anObject as? RichMessageTransaction {
+                trs.isUnread = false
+                chatroom?.hasUnreadMessages = false
+                
+                trs.kind = messageKind(for: trs)
+            }
 		}
 		
 		if controllerChanges[type] == nil {

@@ -56,7 +56,6 @@ class EthWalletService: WalletService {
 	static let transferGas: Decimal = 21000
 	static let defaultGasPrice = 20000000000 // 20 Gwei
 	static let kvsAddress = "eth:address"
-	static let richMessageType = "eth_transaction"
 	
 	
 	// MARK: - Dependencies
@@ -71,6 +70,13 @@ class EthWalletService: WalletService {
 	let serviceEnabledChanged = Notification.Name("adamant.ethWallet.enabledChanged")
 	let transactionFeeUpdated: Notification.Name = Notification.Name("adamant.ethWallet.feeUpdated")
 	
+    
+    // MARK: RichMessageHandler properties
+    static let richMessageType = "eth_transaction"
+    let cellIdentifier = "ethTransfer"
+    let cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
+    
+    
 	// MARK: - Properties
 	
 	let web3: web3

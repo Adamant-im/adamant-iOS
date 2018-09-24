@@ -9,8 +9,13 @@
 
 import Foundation
 import CoreData
+import MessageKit
 
 @objc(RichMessageTransaction)
 public class RichMessageTransaction: ChatTransaction {
     static let entityName = "RichMessageTransaction"
+    
+    
+    // Hack? Yes. So?
+    public var kind: MessageKind = .text("")
 }
