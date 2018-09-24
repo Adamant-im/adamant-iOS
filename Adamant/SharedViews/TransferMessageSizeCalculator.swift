@@ -14,17 +14,11 @@ class TransferMessageSizeCalculator: MessageSizeCalculator {
     var font: UIFont! = nil
     
     override func messageContainerSize(for message: MessageType) -> CGSize {
-        guard case MessageKind.custom(let dataRaw) = message.kind, let data = (dataRaw as? String)?.data(using: String.Encoding.utf8) else {
+        guard case MessageKind.custom(let raw) = message.kind, let richContent = raw as? [String:String] else {
             fatalError("messageContainerSize received unhandled MessageDataType: \(message.kind)")
         }
         
-        let amount: String
-        if let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String:Any],
-            let a = json["amount"] as? String {
-            amount = a
-        } else {
-            amount = "NaN"
-        }
+        let amount = richContent[RichContentKeys.transfer.amount] ?? "NaN"
         
         var messageContainerSize = CGSize(width: cellWidth, height: 129)
         

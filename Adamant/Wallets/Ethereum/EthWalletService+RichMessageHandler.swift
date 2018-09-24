@@ -21,7 +21,7 @@ extension EthWalletService: RichMessageProvider {
     }
     
     func cell(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
-        guard case .custom(let dataRaw) = message.kind else {
+        guard case .custom(let raw) = message.kind, let richContent = raw as? [String:String] else {
             fatalError("ETH service tried to render wrong message kind: \(message.kind)")
         }
         
@@ -32,14 +32,7 @@ extension EthWalletService: RichMessageProvider {
         cell.currencyLogoImageView.image = EthWalletService.currencyLogo
         cell.currencySymbolLabel.text = EthWalletService.currencySymbol
         
-        if let string = dataRaw as? String,
-            let data = string.data(using: String.Encoding.utf8),
-            let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any],
-            let amount = json[RichMessageTransfer.CodingKeys.amount.stringValue] as? String {
-            cell.amountLabel.text = amount
-        } else {
-            cell.amountLabel.text = "NaN"
-        }
+        cell.amountLabel.text = richContent[RichContentKeys.transfer.amount] ?? "NaN"
         
         return cell
     }

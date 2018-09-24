@@ -8,6 +8,8 @@
 
 import Foundation
 
+// MARK: - RichMessage
+
 struct RichMessageType {
 	let stringValue: String
 }
@@ -28,11 +30,30 @@ extension RichMessage {
 	}
 }
 
+struct RichContentKeys {
+    static let type = "type"
+    
+    private init() {}
+}
+
+
+// MARK: - RichMessageTransfer
+
 struct RichMessageTransfer: RichMessage {
 	let type: RichMessageType
 	let amount: Decimal
 	let hash: String
 	let comments: String
+}
+
+extension RichContentKeys {
+    struct transfer {
+        static let amount = "amount"
+        static let hash = "hash"
+        static let comments = "comments"
+        
+        private init() {}
+    }
 }
 
 extension RichMessageTransfer {

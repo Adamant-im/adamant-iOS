@@ -15,16 +15,11 @@ import Haring
 // MARK: - Tools
 extension ChatViewController {
     private func getRichMessageType(of message: MessageType) -> String? {
-        guard case .custom(let dataRaw) = message.kind, let data = (dataRaw as? String)?.data(using: String.Encoding.utf8) else {
+        guard case .custom(let raw) = message.kind, let richContent = raw as? [String:String] else {
             return nil
         }
         
-        guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String:Any],
-            let type = json["type"] as? String else {
-            return nil
-        }
-        
-        return type
+        return richContent[RichContentKeys.type]
     }
 }
 
@@ -117,11 +112,11 @@ extension ChatViewController: MessagesDataSource {
 	}
     
     func customCell(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
-        guard let type = getRichMessageType(of: message), let handler = richMessageProviders[type] else {
+        guard let type = getRichMessageType(of: message), let provider = richMessageProviders[type] else {
             fatalError("Tried to render wrong messagetype: \(message.kind)")
         }
         
-        return handler.cell(for: message, at: indexPath, in: messagesCollectionView)
+        return provider.cell(for: message, at: indexPath, in: messagesCollectionView)
     }
 }
 
@@ -389,8 +384,8 @@ extension ChatViewController: MessagesLayoutDelegate {
         
         if let calculator = cellCalculators[type] {
             return calculator
-        } else if let handler = richMessageProviders[type] {
-            let calculator = handler.cellSizeCalculator(for: messagesCollectionView.collectionViewLayout as! MessagesCollectionViewFlowLayout)
+        } else if let provider = richMessageProviders[type] {
+            let calculator = provider.cellSizeCalculator(for: messagesCollectionView.collectionViewLayout as! MessagesCollectionViewFlowLayout)
             cellCalculators[type] = calculator
             return calculator
         } else {

@@ -377,7 +377,7 @@ class ChatViewController: MessagesViewController {
             return MessageKind.custom(richMessage.richContent)
         } else if var richContent = richMessage.richContent {
             if let type = richMessage.richType {
-                richContent[RichMessageTransfer.CodingKeys.type.stringValue] = type
+                richContent[RichContentKeys.type] = type
             }
                 
             if let data = try? JSONSerialization.data(withJSONObject: richContent, options: .prettyPrinted), let string = String(data: data, encoding: String.Encoding.utf8) {
