@@ -11,6 +11,7 @@ import Swinject
 import CryptoSwift
 import CoreData
 
+import Stylist
 
 // MARK: - Constants
 extension String.adamantLocalized {
@@ -89,6 +90,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var notificationService: NotificationsService!
     var dialogService: DialogService!
     var addressBookService: AddressBookService!
+    
+    var themes: [String: Theme] = [:]
 
 	// MARK: - Lifecycle
 	
@@ -108,6 +111,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		window!.makeKeyAndVisible()
 		window!.tintColor = UIColor.adamant.primary
 		
+        print("Strat loading themes")
+        if let path = Bundle.main.path(forResource: "ThemeLight", ofType: "yaml") {
+            do {
+                let theme = try Theme(path: path)
+                self.themes["light"] = theme
+            } catch {
+                print("\(error)")
+            }
+        }
+        
+        if let path = Bundle.main.path(forResource: "ThemeDark", ofType: "yaml") {
+            do {
+                let theme = try Theme(path: path)
+                self.themes["dark"] = theme
+            } catch {
+                print("\(error)")
+            }
+        }
+        print("Stop loading themes")
+        
+        let property = StyleProperty(name: "separatorColor") { (view: UITableView, value: PropertyValue<UIColor>) in
+            view.separatorColor = value.value
+        }
+        
+        // adds the custom property to Stylist
+        Stylist.shared.addProperty(property)
+        
+        self.observeThemeChange()
 		
 		// MARK: 3. Show login
 		
@@ -420,4 +451,15 @@ extension AppDelegate {
 									  completion: { _ in })
 		}
 	}
+}
+
+
+extension AppDelegate: Themeable {
+    func apply(theme: BaseTheme) {
+        let name = theme.name
+        print("Apply \(name) theme")
+        if let theme = self.themes[theme.name] {
+            Stylist.shared.addTheme(theme, name: "main")
+        }
+    }
 }

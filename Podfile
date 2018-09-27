@@ -22,6 +22,7 @@ target 'Adamant' do
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
   pod 'Parchment' # Paging menu
+  pod 'Stylist' # Style tool
 
   # QR
   pod 'EFQRCode' # QR generator

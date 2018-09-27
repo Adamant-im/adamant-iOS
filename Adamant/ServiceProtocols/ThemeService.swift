@@ -9,11 +9,11 @@
 import Foundation
 import UIKit
 
-enum Theme: Int, Codable {
+enum ADMTheme: Int, Codable {
     case light = 0
     case dark = 1
 
-    static let `default`: Theme = .light
+    static let `default`: ADMTheme = .light
 
     var theme: BaseTheme {
         switch self {
@@ -33,6 +33,8 @@ enum Theme: Int, Codable {
 }
 
 public protocol BaseTheme {
+    var name: String { get }
+    
     // MARK: Global colors
 
     /// Main color
@@ -48,6 +50,7 @@ public protocol BaseTheme {
     var tableRowIcons: UIColor { get }
 
     var background: UIColor { get }
+    var secondaryBackground: UIColor { get }
 
     // MARK: Chat colors
 
@@ -71,9 +74,14 @@ public protocol BaseTheme {
 
     // Outcome transfer icon background
     var transferOutcomeIconBackground: UIColor { get }
+    
+    // Status bar
+    var statusBar : UIStatusBarStyle { get }
 }
 
 struct LightTheme: BaseTheme {
+    let name = "light"
+    
     // MARK: Global colors
 
     /// Main dark gray, ~70% gray
@@ -89,6 +97,7 @@ struct LightTheme: BaseTheme {
     let tableRowIcons = UIColor(red: 0.45, green: 0.45, blue: 0.45, alpha: 1)
 
     let background = UIColor(hex: "#ffffff")
+    let secondaryBackground = UIColor.groupTableViewBackground
 
     // MARK: Chat colors
 
@@ -112,9 +121,13 @@ struct LightTheme: BaseTheme {
 
     // Outcome transfer icon background, light red
     let transferOutcomeIconBackground = UIColor(red: 0.94, green: 0.52, blue: 0.53, alpha: 1)
+    
+    let statusBar = UIStatusBarStyle.default
 }
 
 struct DarkTheme: BaseTheme {
+    let name = "dark"
+    
     let primary = UIColor.white
 
     let secondary = UIColor(hex: "#297BED")
@@ -124,6 +137,7 @@ struct DarkTheme: BaseTheme {
     let tableRowIcons = UIColor(hex: "")
 
     let background = UIColor.black
+    var secondaryBackground = UIColor.black
 
     let chatRecipientBackground = UIColor(hex: "")
 
@@ -139,11 +153,9 @@ struct DarkTheme: BaseTheme {
 
     let transferOutcomeIconBackground = UIColor(hex: "")
 
+    let statusBar = UIStatusBarStyle.lightContent
+    
 }
-
-//protocol ThemeService {
-//    func change(to theme: Theme)
-//}
 
 public class ThemeManager {
     
@@ -174,17 +186,17 @@ public class ThemeManager {
         #endif
     }
 
-    static func currentTheme() -> Theme {
+    static func currentTheme() -> ADMTheme {
         let storedTheme = UserDefaults.standard.integer(forKey: SelectedThemeKey)
 
-        if let theme = Theme(rawValue: storedTheme) {
+        if let theme = ADMTheme(rawValue: storedTheme) {
             return theme
         } else {
             return .default
         }
     }
 
-    static func applyTheme(theme: Theme) {
+    static func applyTheme(theme: ADMTheme) {
         UserDefaults.standard.set(theme.rawValue, forKey: SelectedThemeKey)
         UserDefaults.standard.synchronize()
         

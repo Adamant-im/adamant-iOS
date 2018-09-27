@@ -1,0 +1,31 @@
+variables:
+  primaryColor: "#FFFFFF"
+  secondaryColor: "#297BED"
+  primaryBackgroundColor: "#000000"
+  secondaryBackgroundColor: white:0.3 # "#000000"
+styles:
+  mainBackground:
+    backgroundColor: $primaryBackgroundColor
+  loginTableView:
+    backgroundColor: $primaryBackgroundColor
+    separatorColor: $primaryBackgroundColor
+  plain:
+    textColor: $primaryColor
+  plainSecondary:
+    textColor: $secondaryColor
+  input:
+    textColor: $primaryColor
+    tintColor: $primaryColor
+    textAlignment: center
+  login:
+    textColor: $primaryColor
+    backgroundColor: $secondaryColor
+    layoutMargins: [40,0]
+    cornerRadius: 20
+    clipsToBounds: true
+  biometricButton:
+    backgroundColor: $primaryBackgroundColor
+    tintColor: $primaryColor
+    borderColor: $primaryBackgroundColor
+  logo:
+    image: "DarkLogo"

@@ -9,6 +9,7 @@
 import UIKit
 import Eureka
 import Haring
+import Stylist
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -135,7 +136,12 @@ class LoginViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.observeThemeChange()
+        
 		navigationOptions = RowNavigationOptions.Disabled
+        
+        self.tableView.styles = ["loginTableView"]
 		
 		// MARK: Header & Footer
 		if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
@@ -144,6 +150,7 @@ class LoginViewController: FormViewController {
 			if let label = header.viewWithTag(888) as? UILabel {
 				label.text = String.adamantLocalized.shared.productName
 				label.textColor = UIColor.adamant.primary
+                label.style = "plain"
 			}
 		}
 		
@@ -152,6 +159,7 @@ class LoginViewController: FormViewController {
 				label.text = AdamantUtilities.applicationVersion
 				label.textColor = UIColor.adamant.primary
 				tableView.tableFooterView = footer
+                label.style = "plain"
 			}
 		}
 		
@@ -190,8 +198,13 @@ class LoginViewController: FormViewController {
 		<<< PasswordRow() {
 			$0.tag = Rows.passphrase.tag
 			$0.placeholder = Rows.passphrase.localized
+            $0.placeholderColor = UIColor.adamant.primary
 			$0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
-		}
+            }.cellUpdate({ (cell, _) in
+                cell.textField.textColor = UIColor.adamant.primary
+                cell.textField?.style = "input"
+                cell.style = "mainBackground"
+                })
 			
 		// Login with passphrase row
 		<<< ButtonRow() {
@@ -211,6 +224,8 @@ class LoginViewController: FormViewController {
 			self?.loginWith(passphrase: passphrase)
 		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
+            cell.style = "mainBackground"
+            cell.textLabel?.style = "login"
 		}
 		
 		
@@ -240,6 +255,9 @@ class LoginViewController: FormViewController {
 			mutableText.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: NSRange(location: 0, length: mutableText.length))
 			
 			cell.textView.attributedText = mutableText
+            
+            cell.textView?.style = "mainBackground,plain"
+            cell.style = "mainBackground"
 		}
 		
 		// New genegated passphrase
@@ -258,6 +276,10 @@ class LoginViewController: FormViewController {
 			cell.tipLabel.font = UIFont.systemFont(ofSize: 12)
 			cell.tipLabel.textColor = UIColor.adamant.secondary
 			cell.tipLabel.textAlignment = .center
+            
+            cell.passphraseLabel?.style = "mainBackground,plain"
+            cell.tipLabel?.style = "plainSecondary"
+            cell.style = "mainBackground"
 		}).onCellSelection({ [weak self] (cell, row) in
 			guard let passphrase = self?.generatedPassphrases.last, let dialogService = self?.dialogService else {
 				return
@@ -282,6 +304,8 @@ class LoginViewController: FormViewController {
 			self?.generateNewPassphrase()
 		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
+            cell.textLabel?.style = "plain"
+            cell.style = "mainBackground"
 		}
         
         // MARK: Nodes list settings
@@ -293,6 +317,8 @@ class LoginViewController: FormViewController {
 			cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
+            cell.textLabel?.style = "plain"
+            cell.style = "mainBackground"
 		}.onCellSelection { [weak self] (_, _) in
 			guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
 				return
@@ -302,6 +328,24 @@ class LoginViewController: FormViewController {
 			self?.present(nav, animated: true, completion: nil)
 		}
 		
+        // Theme select
+        <<< AlertRow<ADMTheme>() {
+            $0.title = "Theme"
+            $0.cancelTitle = "Dismiss"
+            $0.selectorTitle = "Theme"
+            $0.options = [ADMTheme.light, ADMTheme.dark]
+            $0.value = ThemeManager.currentTheme()
+        }.onChange { row in
+            print(row.value ?? "No Value")
+            if let theme = row.value {
+                ThemeManager.applyTheme(theme: theme)
+            }
+        }.cellUpdate({ (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+            cell.textLabel?.style = "plain"
+            cell.detailTextLabel?.style = "plain"
+            cell.style = "mainBackground"
+        })
 		
 		// MARK: tableView position tuning
 		if let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
@@ -422,4 +466,14 @@ extension LoginViewController: ButtonsStripeViewDelegate {
 			loginWithQrFromLibrary()
 		}
 	}
+}
+
+extension LoginViewController: Themeable {
+    func apply(theme: BaseTheme) {
+        setNeedsStatusBarAppearanceUpdate()
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return UIColor.adamantTheme.statusBar
+    }
 }

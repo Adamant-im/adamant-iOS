@@ -226,11 +226,11 @@ class AccountViewController: FormViewController {
 		})
             
         // Theme select
-        <<< AlertRow<Theme>() {
+        <<< AlertRow<ADMTheme>() {
             $0.title = "Theme"
             $0.cancelTitle = "Dismiss"
             $0.selectorTitle = "Theme"
-            $0.options = [Theme.light, Theme.dark]
+            $0.options = [ADMTheme.light, ADMTheme.dark]
             $0.value = ThemeManager.currentTheme()
             }.onChange { row in
                 print(row.value ?? "No Value")

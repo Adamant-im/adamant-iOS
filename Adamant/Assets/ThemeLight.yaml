@@ -1,0 +1,31 @@
+variables:
+  primaryColor: "#4A4A4A" # ~ 70% grey
+  secondaryColor: "#7A7A7A" # ~50% grey
+  primaryBackgroundColor: "#FFFFFF"
+  secondaryBackgroundColor: "#EFEFF4"
+styles:
+  mainBackground:
+    backgroundColor: $primaryBackgroundColor
+  loginTableView:
+    backgroundColor: $secondaryBackgroundColor
+    separatorColor: "#C8C8CD"
+  plain:
+    textColor: $primaryColor
+  plainSecondary:
+    textColor: $secondaryColor
+  input:
+    textColor: $primaryColor
+    tintColor: $primaryColor
+    textAlignment: left
+  login:
+    textColor: $primaryColor
+    backgroundColor: $primaryBackgroundColor
+    layoutMargins: [0,0]
+    cornerRadius: 0
+    clipsToBounds: false
+  biometricButton:
+    backgroundColor: $primaryBackgroundColor
+    tintColor: $primaryColor
+    borderColor: $primaryColor
+  logo:
+    image: "Adamant-logo"
