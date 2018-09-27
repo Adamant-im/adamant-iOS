@@ -32,6 +32,11 @@ class AdmWalletService: NSObject, WalletService {
 	let serviceEnabledChanged = Notification.Name("adamant.admWallet.enabledChanged")
 	let transactionFeeUpdated: Notification.Name = Notification.Name("adamant.admWallet.feeUpdated")
 	
+    // MARK: RichMessageProvider properties
+    static let richMessageType = "adm_transaction" // not used
+    let cellIdentifier = "admTransfer"
+    var cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
+    
 	// MARK: - Properties
 	let enabled: Bool = true
 	

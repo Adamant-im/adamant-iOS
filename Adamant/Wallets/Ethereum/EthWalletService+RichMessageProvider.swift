@@ -1,5 +1,5 @@
 //
-//  EthWalletService+RichMessageHandler.swift
+//  EthWalletService+RichMessageProvider.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 08.09.2018.
@@ -20,7 +20,7 @@ extension EthWalletService: RichMessageProvider {
         return calculator
     }
     
-    func cell(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
+    func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
         guard case .custom(let raw) = message.kind, let richContent = raw as? [String:String] else {
             fatalError("ETH service tried to render wrong message kind: \(message.kind)")
         }
@@ -33,6 +33,9 @@ extension EthWalletService: RichMessageProvider {
         cell.currencySymbolLabel.text = EthWalletService.currencySymbol
         
         cell.amountLabel.text = richContent[RichContentKeys.transfer.amount] ?? "NaN"
+        cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
+        
+        cell.isAlignedRight = isFromCurrentSender
         
         return cell
     }

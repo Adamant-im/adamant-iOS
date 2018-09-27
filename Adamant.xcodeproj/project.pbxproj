@@ -77,6 +77,7 @@
 		E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921597A206503000000CA5C /* ButtonsStripeView.swift */; };
 		E921597D2065031D0000CA5C /* ButtonsStripe.xib in Resources */ = {isa = PBXBuildFile; fileRef = E921597C2065031D0000CA5C /* ButtonsStripe.xib */; };
 		E923222621135F9000A7E5AF /* EthAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E923222521135F9000A7E5AF /* EthAccount.swift */; };
+		E9240BF5215D686500187B09 /* AdmWalletService+RichMessageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9240BF4215D686500187B09 /* AdmWalletService+RichMessageProvider.swift */; };
 		E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9256F5E2034C21100DE86E9 /* String+localized.swift */; };
 		E9256F6D20357B1700DE86E9 /* LogoFullHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9256F6C20357B1700DE86E9 /* LogoFullHeader.xib */; };
 		E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */; };
@@ -151,6 +152,7 @@
 		E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722065201F42BB004F2AAD /* CoreDataStack.swift */; };
 		E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */; };
 		E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E972206A201F44CA004F2AAD /* TransfersProvider.swift */; };
+		E974D168215D033C003AD7E8 /* ChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E974D167215D033C003AD7E8 /* ChatCell.swift */; };
 		E983AE2120E655C500497E1A /* AccountHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E983AE2020E655C500497E1A /* AccountHeaderView.swift */; };
 		E983AE2320E6568C00497E1A /* WalletEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = E983AE2220E6568C00497E1A /* WalletEnum.swift */; };
 		E983AE2A20E65F3200497E1A /* AccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E983AE2820E65F3200497E1A /* AccountViewController.swift */; };
@@ -240,7 +242,7 @@
 		E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */; };
 		E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */; };
 		E9FEECA421413659007DD7C8 /* RichMessageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FEECA321413659007DD7C8 /* RichMessageProvider.swift */; };
-		E9FEECA62143C300007DD7C8 /* EthWalletService+RichMessageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FEECA52143C300007DD7C8 /* EthWalletService+RichMessageHandler.swift */; };
+		E9FEECA62143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FEECA52143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift */; };
 		E9FEECA92143C371007DD7C8 /* TransferCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FEECA72143C371007DD7C8 /* TransferCollectionViewCell.swift */; };
 		E9FEECAA2143C371007DD7C8 /* TransferCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9FEECA82143C371007DD7C8 /* TransferCollectionViewCell.xib */; };
 		E9FEECAC2143CEED007DD7C8 /* TransferMessageSizeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FEECAB2143CEED007DD7C8 /* TransferMessageSizeCalculator.swift */; };
@@ -349,6 +351,7 @@
 		E921597A206503000000CA5C /* ButtonsStripeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonsStripeView.swift; sourceTree = "<group>"; };
 		E921597C2065031D0000CA5C /* ButtonsStripe.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ButtonsStripe.xib; sourceTree = "<group>"; };
 		E923222521135F9000A7E5AF /* EthAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthAccount.swift; sourceTree = "<group>"; };
+		E9240BF4215D686500187B09 /* AdmWalletService+RichMessageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdmWalletService+RichMessageProvider.swift"; sourceTree = "<group>"; };
 		E9256F5E2034C21100DE86E9 /* String+localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+localized.swift"; sourceTree = "<group>"; };
 		E9256F6C20357B1700DE86E9 /* LogoFullHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LogoFullHeader.xib; sourceTree = "<group>"; };
 		E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -426,6 +429,7 @@
 		E9722065201F42BB004F2AAD /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InMemoryCoreDataStack.swift; sourceTree = "<group>"; };
 		E972206A201F44CA004F2AAD /* TransfersProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransfersProvider.swift; sourceTree = "<group>"; };
+		E974D167215D033C003AD7E8 /* ChatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCell.swift; sourceTree = "<group>"; };
 		E983AE2020E655C500497E1A /* AccountHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountHeaderView.swift; sourceTree = "<group>"; };
 		E983AE2220E6568C00497E1A /* WalletEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletEnum.swift; sourceTree = "<group>"; };
 		E983AE2820E65F3200497E1A /* AccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewController.swift; sourceTree = "<group>"; };
@@ -505,7 +509,7 @@
 		E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareQrViewController.swift; sourceTree = "<group>"; };
 		E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShareQrViewController.xib; sourceTree = "<group>"; };
 		E9FEECA321413659007DD7C8 /* RichMessageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichMessageProvider.swift; sourceTree = "<group>"; };
-		E9FEECA52143C300007DD7C8 /* EthWalletService+RichMessageHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EthWalletService+RichMessageHandler.swift"; sourceTree = "<group>"; };
+		E9FEECA52143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EthWalletService+RichMessageProvider.swift"; sourceTree = "<group>"; };
 		E9FEECA72143C371007DD7C8 /* TransferCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferCollectionViewCell.swift; sourceTree = "<group>"; };
 		E9FEECA82143C371007DD7C8 /* TransferCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TransferCollectionViewCell.xib; sourceTree = "<group>"; };
 		E9FEECAB2143CEED007DD7C8 /* TransferMessageSizeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferMessageSizeCalculator.swift; sourceTree = "<group>"; };
@@ -802,7 +806,7 @@
 				E940087A2114ED0600CD2D67 /* EthWalletService.swift */,
 				E9AA8BF9212C166600F9249F /* EthWalletService+Send.swift */,
 				E9AA8BFB212C169200F9249F /* EthWalletService+Transfers.swift */,
-				E9FEECA52143C300007DD7C8 /* EthWalletService+RichMessageHandler.swift */,
+				E9FEECA52143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift */,
 				E9981895212095CA0018C84C /* EthWalletViewController.swift */,
 				E993301D212EF39700CD5200 /* EthTransferViewController.swift */,
 			);
@@ -825,6 +829,7 @@
 				E940087F2114EE2000CD2D67 /* AdmWallet.swift */,
 				E94008882114F0F700CD2D67 /* AdmWalletService.swift */,
 				E9AA8C01212C5BF500F9249F /* AdmWalletService+Send.swift */,
+				E9240BF4215D686500187B09 /* AdmWalletService+RichMessageProvider.swift */,
 				E9B1AA562121ACBF00080A2A /* AdmWalletViewController.swift */,
 				E9B1AA5A21283E0F00080A2A /* AdmTransferViewController.swift */,
 			);
@@ -880,6 +885,7 @@
 				E9AA8BF72129F13000F9249F /* ComplexTransferViewController.swift */,
 				E95F85C5200A9B070070534A /* ChatTableViewCell.swift */,
 				E95F85C6200A9B070070534A /* ChatTableViewCell.xib */,
+				E974D167215D033C003AD7E8 /* ChatCell.swift */,
 			);
 			path = Chats;
 			sourceTree = "<group>";
@@ -1341,6 +1347,7 @@
 				E9AD78812158EED300742061 /* RichMessageTransaction+CoreDataClass.swift in Sources */,
 				E94008872114F05B00CD2D67 /* AddressValidationResult.swift in Sources */,
 				649A694720DD427200D27E91 /* TransferType.swift in Sources */,
+				E974D168215D033C003AD7E8 /* ChatCell.swift in Sources */,
 				64A223D820F7A08E005157CB /* LskApiService.swift in Sources */,
 				E94008702114EA6800CD2D67 /* AdamantBalanceFormat.swift in Sources */,
 				E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */,
@@ -1444,7 +1451,7 @@
 				E9CAE8D82018ACA700345E76 /* AdamantApi+Transfers.swift in Sources */,
 				E9E7CDCC20040FDC00DFC4DB /* TransactionType.swift in Sources */,
 				E95F85852008CB3A0070534A /* ChatListViewController.swift in Sources */,
-				E9FEECA62143C300007DD7C8 /* EthWalletService+RichMessageHandler.swift in Sources */,
+				E9FEECA62143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift in Sources */,
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,
 				E993302221354BC300CD5200 /* EthWalletRoutes.swift in Sources */,
 				E9150B9F2066DA210065A985 /* MessageTransaction+CoreDataClass.swift in Sources */,
@@ -1464,6 +1471,7 @@
 				E926E02E213EAABF005E536B /* TransferViewControllerBase+Alert.swift in Sources */,
 				E9B1AA572121ACC000080A2A /* AdmWalletViewController.swift in Sources */,
 				E95F857A2007F0260070534A /* ServerResponse.swift in Sources */,
+				E9240BF5215D686500187B09 /* AdmWalletService+RichMessageProvider.swift in Sources */,
 				E9A174B32057EC47003667CD /* BackgroundFetchService.swift in Sources */,
 				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
 				E965A53220B82C850041A3EA /* StateType.swift in Sources */,

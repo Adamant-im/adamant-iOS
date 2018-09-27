@@ -17,7 +17,7 @@ target 'Adamant' do
   pod 'FreakingSimpleRoundImageView' # Round avatars
   pod 'FTIndicator' # Notifications and activity indicator
   pod 'Eureka' # Forms
-  pod 'MessageKit' # Chat UI
+  pod 'MessageKit', :git => 'https://github.com/RealBonus/MessageKit', :branch => 'enhancement/customMessageKind' # Chat UI
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
   pod 'M13Checkbox' # Checkbox control

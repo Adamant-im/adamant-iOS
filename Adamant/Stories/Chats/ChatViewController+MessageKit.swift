@@ -116,7 +116,17 @@ extension ChatViewController: MessagesDataSource {
             fatalError("Tried to render wrong messagetype: \(message.kind)")
         }
         
-        return provider.cell(for: message, at: indexPath, in: messagesCollectionView)
+        let fromCurrent = isFromCurrentSender(message: message)
+        
+        let cell = provider.cell(for: message, isFromCurrentSender: fromCurrent, at: indexPath, in: messagesCollectionView)
+        
+        if let chatCell = cell as? ChatCell {
+//            let corner: MessageStyle.TailCorner = fromCurrent ? .bottomRight : .bottomLeft
+//            chatCell.bubbleStyle = .bubbleTail(corner, .curved)
+            chatCell.bubbleBackgroundColor = fromCurrent ? UIColor.adamantChatSenderBackground : UIColor.adamantChatRecipientBackground
+        }
+        
+        return cell
     }
 }
 
@@ -503,6 +513,8 @@ extension RichMessageTransaction: MessageType {
 
 // MARK: TransferTransaction
 extension TransferTransaction: MessageType {
+    static let messageKindContent: [String: String] = ["type": AdmWalletService.richMessageType]
+    
 	public var sender: Sender {
 		let id = self.senderId!
 		return Sender(id: id, displayName: id)
@@ -517,6 +529,15 @@ extension TransferTransaction: MessageType {
 	}
 	
 	public var kind: MessageKind {
-		return MessageKind.attributedText(AdamantFormattingTools.formatTransferTransaction(self))
+        guard let amount = amount as Decimal? else {
+            return MessageKind.custom(TransferTransaction.messageKindContent)
+        }
+        
+        let content = [
+            "type": AdmWalletService.richMessageType,
+            RichContentKeys.transfer.amount: AdamantBalanceFormat.full.format(balance: amount)
+        ]
+        
+        return MessageKind.custom(content)
 	}
 }

@@ -63,7 +63,7 @@ DEPENDENCIES:
   - KeychainAccess
   - Lisk (from `https://github.com/boyarkin-anton/lisk-swift.git`, branch `dev`)
   - M13Checkbox
-  - MessageKit
+  - MessageKit (from `https://github.com/RealBonus/MessageKit`, branch `enhancement/customMessageKind`)
   - MyLittlePinpad
   - Parchment
   - PMAlertController
@@ -89,7 +89,6 @@ SPEC REPOS:
     - libCEd25519
     - libsodium
     - M13Checkbox
-    - MessageKit
     - MyLittlePinpad
     - Parchment
     - PMAlertController
@@ -107,11 +106,17 @@ EXTERNAL SOURCES:
   Lisk:
     :branch: dev
     :git: https://github.com/boyarkin-anton/lisk-swift.git
+  MessageKit:
+    :branch: enhancement/customMessageKind
+    :git: https://github.com/RealBonus/MessageKit
 
 CHECKOUT OPTIONS:
   Lisk:
     :commit: 952fea02d6076668f68eb252ec5bd8bf4e656960
     :git: https://github.com/boyarkin-anton/lisk-swift.git
+  MessageKit:
+    :commit: fe0a000fc536ec46efe1a4e49af6ad39e27cfed3
+    :git: https://github.com/RealBonus/MessageKit
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
@@ -143,6 +148,6 @@ SPEC CHECKSUMS:
   Swinject: f7f15a9672e99328c1f07f277091087917215700
   web3swift: 4b4e4a0dd16e7081b7190bf8596c5638f313a498
 
-PODFILE CHECKSUM: 0c023cfbb470964a4ee718e78829834866a63d09
+PODFILE CHECKSUM: cfd2838f8f1dc168ff67bd1b77a253dc69d0cc8d
 
 COCOAPODS: 1.5.3

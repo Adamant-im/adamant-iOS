@@ -89,71 +89,6 @@ class ChatViewController: MessagesViewController {
 				
 				let navigator = UINavigationController(rootViewController: vc)
 				self?.present(navigator, animated: true, completion: nil)
-				
-				/*
-				self.dialogService.showAlert(title: String.adamantLocalized.transfer.send, message: "", style: .actionSheet, actions: [
-                    UIAlertAction(title: "ADM", style: .default, handler: { [weak self] (_) in
-                        // MARK: Show ADM transfer details
-                        if let address = self?.chatroom?.partner?.address {
-                            guard let vc = self?.router.get(scene: AdamantScene.Account.admTransfer) as? TransferViewControllerBase else {
-                                fatalError("Can't get TransferViewControllerBase scene")
-                            }
-                            
-//                            vc.token = .ADM
-//                            vc.toAddress = address
-							
-                            if let nav = self?.navigationController {
-                                nav.pushViewController(vc, animated: true)
-                            } else {
-                                self?.present(vc, animated: true, completion: nil)
-                            }
-                        }
-                    }),
-                    UIAlertAction(title: "Ethereum", style: .default, handler: { [weak self] (_) in
-                        if let ethAddress = self?.ethAddress {
-                            // MARK: Show ETH transfer
-//                            guard let vc = self?.router.get(scene: AdamantScene.Account.admTransfer) as? TransferViewControllerBase else {
-//                                fatalError("Can't get TransferViewControllerBase scene")
-//                            }
-							
-//                            vc.token = .ETH
-//                            vc.toAddress = ethAddress
-//                            vc.delegate = self
-							
-							let vc = UIViewController()
-                            if let nav = self?.navigationController {
-                                nav.pushViewController(vc, animated: true)
-                            } else {
-                                self?.present(vc, animated: true, completion: nil)
-                            }
-                        } else {
-                            self?.dialogService.showWarning(withMessage: "User don't have public Eth wallet yet.")
-                        }
-                    }),
-                    UIAlertAction(title: "Lisk", style: .default, handler: { [weak self] (_) in
-                        if let address = self?.lskAddress {
-                            // MARK: Show ETH transfer
-//                            guard let vc = self?.router.get(scene: AdamantScene.Account.admTransfer) as? TransferViewControllerBase else {
-//                                fatalError("Can't get TransferViewControllerBase scene")
-//                            }
-							
-//                            vc.token = .LSK
-//                            vc.toAddress = address
-//                            vc.delegate = self
-							let vc = UIViewController()
-							
-                            if let nav = self?.navigationController {
-                                nav.pushViewController(vc, animated: true)
-                            } else {
-                                self?.present(vc, animated: true, completion: nil)
-                            }
-                        } else {
-                            self?.dialogService.showWarning(withMessage: "User don't have public Lisk wallet yet.")
-                        }
-                    }),
-					UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
-				])
-*/
         }
     }()
 	
@@ -180,6 +115,7 @@ class ChatViewController: MessagesViewController {
 			}
 		}
 		
+        // Flow layout extended with Transfer custom messagess
 		messagesCollectionView.messagesDataSource = self
 		messagesCollectionView.messagesDisplayDelegate = self
 		messagesCollectionView.messagesLayoutDelegate = self

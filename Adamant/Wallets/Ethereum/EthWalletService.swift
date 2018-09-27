@@ -71,7 +71,7 @@ class EthWalletService: WalletService {
 	let transactionFeeUpdated: Notification.Name = Notification.Name("adamant.ethWallet.feeUpdated")
 	
     
-    // MARK: RichMessageHandler properties
+    // MARK: RichMessageProvider properties
     static let richMessageType = "eth_transaction"
     let cellIdentifier = "ethTransfer"
     let cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))

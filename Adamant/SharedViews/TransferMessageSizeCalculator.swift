@@ -9,28 +9,35 @@
 import UIKit
 import MessageKit
 
-class TransferMessageSizeCalculator: MessageSizeCalculator {
+open class TransferMessageSizeCalculator: MessageSizeCalculator {
     let cellWidth: CGFloat = 87
+    let cellHeight: CGFloat = 145
     var font: UIFont! = nil
     
-    override func messageContainerSize(for message: MessageType) -> CGSize {
+    override open func messageContainerSize(for message: MessageType) -> CGSize {
         guard case MessageKind.custom(let raw) = message.kind, let richContent = raw as? [String:String] else {
             fatalError("messageContainerSize received unhandled MessageDataType: \(message.kind)")
         }
         
         let amount = richContent[RichContentKeys.transfer.amount] ?? "NaN"
         
-        var messageContainerSize = CGSize(width: cellWidth, height: 129)
+        var messageContainerSize = CGSize(width: cellWidth, height: cellHeight)
         
         let maxWidth = messageContainerMaxWidth(for: message)
         let attributedText = NSAttributedString(string: amount, attributes: [.font: font])
         let constraintBox = CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
         let rect = attributedText.boundingRect(with: constraintBox, options: [.usesLineFragmentOrigin, .usesFontLeading], context: nil).integral
         
-//        messageContainerSize.width += rect.width
+        messageContainerSize.width += rect.width
         
         return messageContainerSize
     }
+    
+    open override func cellContentHeight(for message: MessageType, at indexPath: IndexPath) -> CGFloat {
+        return cellHeight
+    }
+    
+    
 }
 
 extension NSAttributedString {
