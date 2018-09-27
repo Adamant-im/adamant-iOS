@@ -16,7 +16,8 @@ struct RichMessageType {
 
 protocol RichMessage: Codable {
 	var type: RichMessageType { get }
-	
+    
+    func content() -> [String:String]
 	func serialized() -> String
 }
 
@@ -44,6 +45,22 @@ struct RichMessageTransfer: RichMessage {
 	let amount: Decimal
 	let hash: String
 	let comments: String
+    
+    func content() -> [String : String] {
+        let amountRaw: String
+        if let raw = RichMessageTransfer.formatter.string(fromDecimal: amount) {
+            amountRaw = raw
+        } else {
+            amountRaw = String(format: "%f", amount as NSNumber)
+        }
+        
+        return [
+            CodingKeys.type.stringValue: type.stringValue,
+            CodingKeys.amount.stringValue: amountRaw,
+            CodingKeys.hash.stringValue: hash,
+            CodingKeys.comments.stringValue: comments
+        ]
+    }
 }
 
 extension RichContentKeys {

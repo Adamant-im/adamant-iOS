@@ -448,15 +448,12 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 		
-        if type == .insert {
-            if let trs = anObject as? MessageTransaction {
-                trs.isUnread = false
-                chatroom?.hasUnreadMessages = false
-            } else if let trs = anObject as? RichMessageTransaction {
-                trs.isUnread = false
-                chatroom?.hasUnreadMessages = false
-                
-                trs.kind = messageKind(for: trs)
+        if type == .insert, let trs = anObject as? ChatTransaction {
+            trs.isUnread = false
+            chatroom?.hasUnreadMessages = false
+            
+            if let rich = anObject as? RichMessageTransaction {
+                rich.kind = messageKind(for: rich)
             }
 		}
 		
