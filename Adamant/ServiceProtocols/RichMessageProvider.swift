@@ -21,7 +21,7 @@ protocol RichMessageProvider {
     var cellSource: CellSource? { get }
 	
     // MARK: Events
-    func richMessageTapped(message: MessageTransaction, in chat: ChatViewController)
+    func richMessageTapped(_ message: MessageType, at indexPath: IndexPath, in chat: ChatViewController)
     
     // MARK: MessageKit
     func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator

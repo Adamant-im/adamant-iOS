@@ -9,7 +9,7 @@
 import UIKit
 //import MessageKit
 
-class TransferCollectionViewCell: UICollectionViewCell, ChatCell {
+class TransferCollectionViewCell: UICollectionViewCell, ChatCell, TapRecognizerCustomCell {
     @IBOutlet weak var sentLabel: UILabel!
     @IBOutlet weak var amountLabel: UILabel!
     @IBOutlet weak var currencySymbolLabel: UILabel!
@@ -23,29 +23,23 @@ class TransferCollectionViewCell: UICollectionViewCell, ChatCell {
     @IBOutlet weak var leadingConstraint: NSLayoutConstraint?
     @IBOutlet weak var trailingConstraint: NSLayoutConstraint?
     
+    weak var delegate: CustomCellDelegate? = nil
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
         
         bubbleView.layer.cornerRadius = 16.0
+        bubbleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTap)))
     }
     
-//    override var frame: CGRect {
-//        didSet {
-//            bubbleImageView?.setNeedsDisplay()
-//        }
-//    }
-//
-//    override var bounds: CGRect {
-//        didSet {
-//            bubbleImageView?.setNeedsDisplay()
-//        }
-//    }
+    // MARK: - Tap
     
-//    var bubbleStyle: MessageStyle {
-//        get { return bubbleImageView.style }
-//        set { bubbleImageView.style = newValue }
-//    }
+    @objc func didTap(sender: UITapGestureRecognizer) {
+        delegate?.didTapCustomCell(self)
+    }
+    
+    // MARK: - Appearance
     
     var bubbleBackgroundColor: UIColor? {
         get { return bubbleView.backgroundColor }

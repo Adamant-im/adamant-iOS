@@ -126,6 +126,10 @@ extension ChatViewController: MessagesDataSource {
             chatCell.bubbleBackgroundColor = fromCurrent ? UIColor.adamantChatSenderBackground : UIColor.adamantChatRecipientBackground
         }
         
+        if let customCell = cell as? TapRecognizerCustomCell {
+            customCell.delegate = self
+        }
+        
         return cell
     }
 }
@@ -333,6 +337,21 @@ extension ChatViewController: MessageCellDelegate {
 	}
 }
 
+// MARK: - TransferCollectionViewCellDelegate
+extension ChatViewController: CustomCellDelegate {
+    func didTapCustomCell(_ cell: TapRecognizerCustomCell) {
+        guard let c = cell as? UICollectionViewCell, let indexPath = messagesCollectionView.indexPath(for: c),
+            let message = messagesCollectionView.messagesDataSource?.messageForItem(at: indexPath, in: messagesCollectionView) else {
+                return
+        }
+        
+        guard case .custom(let rawContent) = message.kind, let richContent = rawContent as? [String:String], let type = richContent[RichContentKeys.type], let provider = richMessageProviders[type] else {
+            return
+        }
+        
+        provider.richMessageTapped(message, at: indexPath, in: self)
+    }
+}
 
 // MARK: - MessagesLayoutDelegate
 extension ChatViewController: MessagesLayoutDelegate {

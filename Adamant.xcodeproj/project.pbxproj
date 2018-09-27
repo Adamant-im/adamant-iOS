@@ -78,6 +78,7 @@
 		E921597D2065031D0000CA5C /* ButtonsStripe.xib in Resources */ = {isa = PBXBuildFile; fileRef = E921597C2065031D0000CA5C /* ButtonsStripe.xib */; };
 		E923222621135F9000A7E5AF /* EthAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E923222521135F9000A7E5AF /* EthAccount.swift */; };
 		E9240BF5215D686500187B09 /* AdmWalletService+RichMessageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9240BF4215D686500187B09 /* AdmWalletService+RichMessageProvider.swift */; };
+		E9240BF9215D813A00187B09 /* CustomCellDeleage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9240BF8215D813A00187B09 /* CustomCellDeleage.swift */; };
 		E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9256F5E2034C21100DE86E9 /* String+localized.swift */; };
 		E9256F6D20357B1700DE86E9 /* LogoFullHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9256F6C20357B1700DE86E9 /* LogoFullHeader.xib */; };
 		E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */; };
@@ -352,6 +353,7 @@
 		E921597C2065031D0000CA5C /* ButtonsStripe.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ButtonsStripe.xib; sourceTree = "<group>"; };
 		E923222521135F9000A7E5AF /* EthAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthAccount.swift; sourceTree = "<group>"; };
 		E9240BF4215D686500187B09 /* AdmWalletService+RichMessageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdmWalletService+RichMessageProvider.swift"; sourceTree = "<group>"; };
+		E9240BF8215D813A00187B09 /* CustomCellDeleage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCellDeleage.swift; sourceTree = "<group>"; };
 		E9256F5E2034C21100DE86E9 /* String+localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+localized.swift"; sourceTree = "<group>"; };
 		E9256F6C20357B1700DE86E9 /* LogoFullHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LogoFullHeader.xib; sourceTree = "<group>"; };
 		E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -886,6 +888,7 @@
 				E95F85C5200A9B070070534A /* ChatTableViewCell.swift */,
 				E95F85C6200A9B070070534A /* ChatTableViewCell.xib */,
 				E974D167215D033C003AD7E8 /* ChatCell.swift */,
+				E9240BF8215D813A00187B09 /* CustomCellDeleage.swift */,
 			);
 			path = Chats;
 			sourceTree = "<group>";
@@ -1515,6 +1518,7 @@
 				E948E04C2027679300975D6B /* AdamantFormattingTools.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,
 				E95F856B200789450070534A /* JSModels.swift in Sources */,
+				E9240BF9215D813A00187B09 /* CustomCellDeleage.swift in Sources */,
 				E9AA8BF82129F13000F9249F /* ComplexTransferViewController.swift in Sources */,
 				E9A174B52057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift in Sources */,
 				E9147B5F20500E9300145913 /* MyLittlePinpad+adamant.swift in Sources */,

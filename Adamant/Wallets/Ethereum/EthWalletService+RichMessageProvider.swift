@@ -10,7 +10,7 @@ import Foundation
 import MessageKit
 
 extension EthWalletService: RichMessageProvider {
-    func richMessageTapped(message: MessageTransaction, in chat: ChatViewController) {
+    func richMessageTapped(_ message: MessageType, at indexPath: IndexPath, in chat: ChatViewController) {
         print("tap!")
     }
     

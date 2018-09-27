@@ -10,8 +10,22 @@ import Foundation
 import MessageKit
 
 extension AdmWalletService: RichMessageProvider {
-    func richMessageTapped(message: MessageTransaction, in chat: ChatViewController) {
-        print("tap!")
+    func richMessageTapped(_ message: MessageType, at indexPath: IndexPath, in chat: ChatViewController) {
+        guard let transaction = message as? TransferTransaction else {
+            return
+        }
+        
+        guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? BaseTransactionDetailsViewController else {
+            fatalError("Can't get TransactionDetails scene")
+        }
+        
+        vc.transaction = transaction
+        
+        if let nav = chat.navigationController {
+            nav.pushViewController(vc, animated: true)
+        } else {
+            chat.present(vc, animated: true, completion: nil)
+        }
     }
     
     func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator {
