@@ -51,8 +51,17 @@ class ChatViewController: MessagesViewController {
 	}
 	
 	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
-	private var controllerChanges: [NSFetchedResultsChangeType:[(indexPath: IndexPath?, newIndexPath: IndexPath?)]] = [:]
+    
+    // Batch changes
+    private struct ControllerChange {
+        let type: NSFetchedResultsChangeType
+        let indexPath: IndexPath?
+        let newIndexPath: IndexPath?
+    }
+    
+	private var controllerChanges: [ControllerChange] = []
 	
+    // Cell update timing
 	var cellUpdateTimers: [Timer] = [Timer]()
 	var cellsUpdating: [IndexPath] = [IndexPath]()
     
@@ -115,7 +124,6 @@ class ChatViewController: MessagesViewController {
 			}
 		}
 		
-        // Flow layout extended with Transfer custom messagess
 		messagesCollectionView.messagesDataSource = self
 		messagesCollectionView.messagesDisplayDelegate = self
 		messagesCollectionView.messagesLayoutDelegate = self
@@ -383,7 +391,6 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	}
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-		
         if type == .insert, let trs = anObject as? ChatTransaction {
             trs.isUnread = false
             chatroom?.hasUnreadMessages = false
@@ -393,45 +400,38 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
             }
 		}
 		
-		if controllerChanges[type] == nil {
-			controllerChanges[type] = [(IndexPath?, IndexPath?)]()
-		}
-		controllerChanges[type]!.append((indexPath, newIndexPath))
+        controllerChanges.append(ControllerChange(type: type, indexPath: indexPath, newIndexPath: newIndexPath))
 	}
 	
-	private func performBatchChanges(_ changes: [NSFetchedResultsChangeType:[(indexPath: IndexPath?, newIndexPath: IndexPath?)]]) {
-		for (type, change) in changes {
-			switch type {
+	private func performBatchChanges(_ changes: [ControllerChange]) {
+        for change in changes {
+            switch change.type {
 			case .insert:
-				let sections = IndexSet(change.compactMap {$0.newIndexPath?.row})
-				if sections.count > 0 {
-					messagesCollectionView.insertSections(sections)
-					messagesCollectionView.scrollToBottom(animated: true)
-				}
+                guard let newIndexPath = change.newIndexPath else {
+                    continue
+                }
+                
+                messagesCollectionView.insertSections(IndexSet(integer: newIndexPath.row))
+                messagesCollectionView.scrollToBottom(animated: true)
 				
 			case .delete:
-				let sections = IndexSet(change.compactMap {$0.indexPath?.row})
-				if sections.count > 0 {
-					messagesCollectionView.deleteSections(sections)
-				}
+				guard let indexPath = change.indexPath else {
+                    continue
+                }
+                
+                messagesCollectionView.deleteSections(IndexSet(integer: indexPath.row))
 				
 			case .move:
-				for paths in change {
-					if let section = paths.indexPath?.row, let newSection = paths.newIndexPath?.row {
-						messagesCollectionView.moveSection(section, toSection: newSection)
-					}
-				}
+                if let section = change.indexPath?.row, let newSection = change.newIndexPath?.row {
+                    messagesCollectionView.moveSection(section, toSection: newSection)
+                }
 				
 			case .update:
-				let indexes = change.compactMap { (indexPath: IndexPath?, _) -> IndexPath? in
-					if let row = indexPath?.row {
-						return IndexPath(row: 0, section: row)
-					} else {
-						return nil
-					}
-				}
-				messagesCollectionView.reloadItems(at: indexes)
-				return
+                guard let section = change.indexPath?.row else {
+                    continue
+                }
+                
+                messagesCollectionView.reloadItems(at: [IndexPath(row: 0, section: section)])
 			}
 		}
 	}
