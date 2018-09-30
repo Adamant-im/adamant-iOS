@@ -15,11 +15,11 @@ import Haring
 // MARK: - Tools
 extension ChatViewController {
     private func getRichMessageType(of message: MessageType) -> String? {
-        guard case .custom(let raw) = message.kind, let richContent = raw as? [String:String] else {
+        guard case .custom(let raw) = message.kind, let transfer = raw as? RichMessageTransfer else {
             return nil
         }
         
-        return richContent[RichContentKeys.type]
+        return transfer.type
     }
 }
 
@@ -345,7 +345,7 @@ extension ChatViewController: CustomCellDelegate {
                 return
         }
         
-        guard case .custom(let rawContent) = message.kind, let richContent = rawContent as? [String:String], let type = richContent[RichContentKeys.type], let provider = richMessageProviders[type] else {
+        guard case .custom(let raw) = message.kind, let richMessage = raw as? RichMessage, let provider = richMessageProviders[richMessage.type] else {
             return
         }
         
@@ -548,15 +548,16 @@ extension TransferTransaction: MessageType {
 	}
 	
 	public var kind: MessageKind {
-        guard let amount = amount as Decimal? else {
-            return MessageKind.custom(TransferTransaction.messageKindContent)
+        let amountString: String
+        if let a = amount as Decimal? {
+            amountString = AdamantBalanceFormat.full.format(balance: a)
+        } else {
+            amountString = "0"
         }
         
-        let content = [
-            "type": AdmWalletService.richMessageType,
-            RichContentKeys.transfer.amount: AdamantBalanceFormat.full.format(balance: amount)
-        ]
-        
-        return MessageKind.custom(content)
+        return MessageKind.custom(RichMessageTransfer(type: AdmWalletService.richMessageType,
+                                                      amount: amountString,
+                                                      hash: "",
+                                                      comments: ""))
 	}
 }

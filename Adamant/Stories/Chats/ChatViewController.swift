@@ -309,8 +309,8 @@ class ChatViewController: MessagesViewController {
     
     // MARK: Tools
     private func messageKind(for richMessage: RichMessageTransaction) -> MessageKind {
-        if let type = richMessage.richType, richMessageProviders[type] != nil {
-            return MessageKind.custom(richMessage.richContent)
+        if let type = richMessage.richType, richMessageProviders[type] != nil, let richContent = richMessage.richContent, let richMessageTransfer = RichMessageTransfer(content: richContent) {
+            return MessageKind.custom(richMessageTransfer)
         } else if var richContent = richMessage.richContent {
             if let type = richMessage.richType {
                 richContent[RichContentKeys.type] = type

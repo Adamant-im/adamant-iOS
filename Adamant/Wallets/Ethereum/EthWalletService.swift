@@ -38,11 +38,6 @@ extension Web3Error {
 	}
 }
 
-extension RichMessageType {
-	static let ethTransfer = RichMessageType(stringValue: EthWalletService.richMessageType)
-}
-
-
 class EthWalletService: WalletService {
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")

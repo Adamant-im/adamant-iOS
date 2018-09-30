@@ -53,7 +53,7 @@ class EthTransferViewController: TransferViewControllerBase {
 			case .success(let transaction):
 				// MARK: 1. Send adm report
 				if let reportRecipient = self?.admReportRecipient, let hash = transaction.txhash {
-					let payload = RichMessageTransfer(type: .ethTransfer, amount: amount, hash: hash, comments: comments)
+					let payload = RichMessageTransfer(type: EthWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
 					let message = AdamantMessage.richMessage(payload: payload)
 					
 					self?.chatsProvider.sendMessage(message, recipientId: reportRecipient) { result in
@@ -213,7 +213,8 @@ class EthTransferViewController: TransferViewControllerBase {
 	}
 	
 	override func reportTransferTo(admAddress: String, transferRecipient: String, amount: Decimal, comments: String, hash: String) {
-		let payload = RichMessageTransfer(type: RichMessageType.ethTransfer, amount: amount, hash: hash, comments: comments)
+		let payload = RichMessageTransfer(type: EthWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
+        
 		let message = AdamantMessage.richMessage(payload: payload)
 		
 		chatsProvider.sendMessage(message, recipientId: admAddress) { [weak self] result in

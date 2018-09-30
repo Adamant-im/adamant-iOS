@@ -10,12 +10,8 @@ import Foundation
 
 // MARK: - RichMessage
 
-struct RichMessageType {
-	let stringValue: String
-}
-
 protocol RichMessage: Codable {
-	var type: RichMessageType { get }
+	var type: String { get }
     
     func content() -> [String:String]
 	func serialized() -> String
@@ -41,25 +37,57 @@ struct RichContentKeys {
 // MARK: - RichMessageTransfer
 
 struct RichMessageTransfer: RichMessage {
-	let type: RichMessageType
-	let amount: Decimal
+	let type: String
+	let amount: String
 	let hash: String
 	let comments: String
     
-    func content() -> [String : String] {
-        let amountRaw: String
-        if let raw = RichMessageTransfer.formatter.string(fromDecimal: amount) {
-            amountRaw = raw
-        } else {
-            amountRaw = String(format: "%f", amount as NSNumber)
-        }
-        
+    func content() -> [String:String] {
         return [
-            CodingKeys.type.stringValue: type.stringValue,
-            CodingKeys.amount.stringValue: amountRaw,
+            CodingKeys.type.stringValue: type,
+            CodingKeys.amount.stringValue: amount,
             CodingKeys.hash.stringValue: hash,
             CodingKeys.comments.stringValue: comments
         ]
+    }
+    
+    init(type: String, amount: Decimal, hash: String, comments: String) {
+        self.type = type
+        self.amount = RichMessageTransfer.serialize(balance: amount)
+        self.hash = hash
+        self.comments = comments
+    }
+    
+    init(type: String, amount: String, hash: String, comments: String) {
+        self.type = type
+        self.amount = amount
+        self.hash = hash
+        self.comments = comments
+    }
+    
+    init?(content: [String:String]) {
+        guard let type = content[CodingKeys.type.stringValue] else {
+            return nil
+        }
+        
+        guard let hash = content[CodingKeys.hash.stringValue] else {
+            return nil
+        }
+        
+        self.type = type
+        self.hash = hash
+        
+        if let amount = content[CodingKeys.amount.stringValue] {
+            self.amount = amount
+        } else {
+            self.amount = "0"
+        }
+        
+        if let comments = content[CodingKeys.comments.stringValue] {
+            self.comments = comments
+        } else {
+            self.comments = ""
+        }
     }
 }
 
@@ -74,44 +102,39 @@ extension RichContentKeys {
 }
 
 extension RichMessageTransfer {
-	private static var formatter: NumberFormatter = {
-		let f = NumberFormatter()
-		f.numberStyle = .decimal
-		f.roundingMode = .floor
-		f.decimalSeparator = "."
-		f.minimumFractionDigits = 0
-		f.maximumFractionDigits = 18
-		return f
-	}()
-	
-	enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
 		case type, amount, hash, comments
 	}
 	
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(type.stringValue, forKey: .type)
+		try container.encode(type, forKey: .type)
 		try container.encode(hash, forKey: .hash)
 		try container.encode(comments, forKey: .comments)
-		
-		if let amountRaw = RichMessageTransfer.formatter.string(fromDecimal: amount) {
-			try container.encode(amountRaw, forKey: .amount)
-		} else {
-			try container.encode(String(format: "%f", amount as NSNumber), forKey: .amount)
-		}
+        try container.encode(amount, forKey: .amount)
 	}
 	
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let typeRaw = try container.decode(String.self, forKey: .type)
-		self.type = RichMessageType(stringValue: typeRaw)
+		self.type = try container.decode(String.self, forKey: .type)
 		self.hash = try container.decode(String.self, forKey: .hash)
-		self.comments = try container.decode(String.self, forKey: .comments)
-		
-		if let amountRaw = try? container.decode(String.self, forKey: .amount), let amount = RichMessageTransfer.formatter.number(from: amountRaw)?.decimalValue {
-			self.amount = amount
-		} else {
-			self.amount = 0
-		}
+        self.comments = try container.decode(String.self, forKey: .comments)
+        self.amount = try container.decode(String.self, forKey: .amount)
 	}
+}
+
+extension RichMessageTransfer {
+    static var formatter: NumberFormatter = {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.roundingMode = .floor
+        f.decimalSeparator = "."
+        f.minimumFractionDigits = 0
+        f.maximumFractionDigits = 18
+        return f
+    }()
+    
+    static func serialize(balance: Decimal) -> String {
+        return formatter.string(fromDecimal: balance) ?? "0"
+    }
 }

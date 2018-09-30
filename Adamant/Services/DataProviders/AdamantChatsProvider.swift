@@ -285,7 +285,7 @@ extension AdamantChatsProvider {
                 self.sendTextMessage(text: text, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
 				
 			case .richMessage(let payload):
-                self.sendRichMessage(richContent: payload.content(), richType: payload.type.stringValue, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, completion: completion)
+                self.sendRichMessage(richContent: payload.content(), richType: payload.type, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, completion: completion)
 			}
         }
     }

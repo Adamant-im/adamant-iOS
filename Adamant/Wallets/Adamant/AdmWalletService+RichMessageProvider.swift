@@ -35,7 +35,7 @@ extension AdmWalletService: RichMessageProvider {
     }
     
     func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
-        guard case .custom(let raw) = message.kind, let richContent = raw as? [String:String] else {
+        guard case .custom(let raw) = message.kind, let richMessage = raw as? RichMessageTransfer else {
             fatalError("ADM service tried to render wrong message kind: \(message.kind)")
         }
         
@@ -46,7 +46,7 @@ extension AdmWalletService: RichMessageProvider {
         cell.currencyLogoImageView.image = AdmWalletService.currencyLogo
         cell.currencySymbolLabel.text = AdmWalletService.currencySymbol
         
-        cell.amountLabel.text = richContent[RichContentKeys.transfer.amount] ?? "NaN"
+        cell.amountLabel.text = richMessage.amount
         cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
         
         cell.isAlignedRight = isFromCurrentSender
