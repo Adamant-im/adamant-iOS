@@ -32,27 +32,6 @@ extension String.adamantLocalized.alert {
 	static let logoutButton = NSLocalizedString("AccountTab.ConfirmLogout.Logout", comment: "Account tab: Confirm logout alert: Logout (Ok) button")
 }
 
-
-// MARK: - Wallet extension
-fileprivate extension WalletEnum {
-	var sectionTag: String {
-		switch self {
-		case .adamant: return "s_adm"
-		case .ethereum: return "s_eth"
-        case .lisk: return "s_lsk"
-		}
-	}
-	
-	var sectionTitle: String {
-		switch self {
-		case .adamant: return NSLocalizedString("AccountTab.Sections.adamant_wallet", comment: "Account tab: Adamant wallet section")
-		case .ethereum: return NSLocalizedString("AccountTab.Sections.ethereum_wallet", comment: "Account tab: Ethereum wallet section")
-        case .lisk: return NSLocalizedString("AccountTab.Sections.lisk_wallet", comment: "Account tab: Lisk wallet section")
-		}
-	}
-}
-
-
 // MARK: AccountViewController
 class AccountViewController: FormViewController {
 	// MARK: - Dependencies
@@ -328,21 +307,13 @@ class AccountViewController: FormViewController {
 	// MARK: Other
 	func updateAccountInfo() {
 		let address: String
-		let adamantWallet: WalletEnum
 		
 		if let account = accountService.account {
 			address = account.address
-			adamantWallet = WalletEnum.adamant(balance: account.balance)
 			hideFreeTokensRow = account.balance > 0
 		} else {
 			address = ""
-			adamantWallet = WalletEnum.adamant(balance: 0)
 			hideFreeTokensRow = true
-		}
-		
-		if let row: AlertLabelRow = form.rowBy(tag: Rows.balance.tag) {
-			row.value = adamantWallet.formattedFull
-			row.updateCell()
 		}
 		
 		if let row: LabelRow = form.rowBy(tag: Rows.freeTokens.tag) {
