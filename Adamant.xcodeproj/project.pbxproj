@@ -17,7 +17,6 @@
 		644EC35B20EFB8E900F40C73 /* AdamantDelegateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35920EFB8E900F40C73 /* AdamantDelegateCell.swift */; };
 		644EC35C20EFB8E900F40C73 /* AdamantDelegateCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 644EC35A20EFB8E900F40C73 /* AdamantDelegateCell.xib */; };
 		644EC35E20F34F1E00F40C73 /* DelegateDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */; };
-		649A694720DD427200D27E91 /* TransferType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A694620DD427200D27E91 /* TransferType.swift */; };
 		64A223D620F760BB005157CB /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D520F760BB005157CB /* Localization.swift */; };
 		64A223D820F7A08E005157CB /* LskApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D720F7A08E005157CB /* LskApiService.swift */; };
 		64A223DA20F7A14B005157CB /* AdamantLskApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D920F7A14B005157CB /* AdamantLskApiService.swift */; };
@@ -269,7 +268,6 @@
 		644EC35920EFB8E900F40C73 /* AdamantDelegateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantDelegateCell.swift; sourceTree = "<group>"; };
 		644EC35A20EFB8E900F40C73 /* AdamantDelegateCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AdamantDelegateCell.xib; sourceTree = "<group>"; };
 		644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateDetailsViewController.swift; sourceTree = "<group>"; };
-		649A694620DD427200D27E91 /* TransferType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferType.swift; sourceTree = "<group>"; };
 		64A223D520F760BB005157CB /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		64A223D720F7A08E005157CB /* LskApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskApiService.swift; sourceTree = "<group>"; };
 		64A223D920F7A14B005157CB /* AdamantLskApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantLskApiService.swift; sourceTree = "<group>"; };
@@ -681,7 +679,6 @@
 				E9A03FD320DBC824007653A1 /* NodeVersion.swift */,
 				644EC34E20EFA77A00F40C73 /* Delegate.swift */,
 				64E8304F20F5FEEF006FA590 /* VotesAsset.swift */,
-				649A694620DD427200D27E91 /* TransferType.swift */,
 				64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */,
 				E923222521135F9000A7E5AF /* EthAccount.swift */,
 				E940086A2114A70600CD2D67 /* LskAccount.swift */,
@@ -1349,7 +1346,6 @@
 				E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */,
 				E9AD78812158EED300742061 /* RichMessageTransaction+CoreDataClass.swift in Sources */,
 				E94008872114F05B00CD2D67 /* AddressValidationResult.swift in Sources */,
-				649A694720DD427200D27E91 /* TransferType.swift in Sources */,
 				E974D168215D033C003AD7E8 /* ChatCell.swift in Sources */,
 				64A223D820F7A08E005157CB /* LskApiService.swift in Sources */,
 				E94008702114EA6800CD2D67 /* AdamantBalanceFormat.swift in Sources */,

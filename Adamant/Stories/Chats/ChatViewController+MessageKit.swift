@@ -236,19 +236,19 @@ extension ChatViewController: MessageCellDelegate {
 			
 		case let message as MessageTransaction:
 			// MARK: Show Retry/Cancel action sheet
-			guard message.messageStatus == .failed else {
-                
-                if message.type == UInt16(ChatType.richMessage.rawValue) {
-                    guard let data = message.message?.data(using: String.Encoding.utf8), let transfer = try? JSONDecoder().decode(ChatTransfer.self, from: data), transfer.type != .unknown else {
-                        break
-                    }
-                    
-                    guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? BaseTransactionDetailsViewController else {
-                        break
-                    }
-                    
-                    self.dialogService.showProgress(withMessage: String.adamantLocalized.transactionDetails.requestingDataProgressMessage, userInteractionEnable: false)
-                    
+            guard message.messageStatus == .failed else {
+            
+//                if message.type == UInt16(ChatType.richMessage.rawValue) {
+//                    guard let data = message.message?.data(using: String.Encoding.utf8), let transfer = try? JSONDecoder().decode(ChatTransfer.self, from: data), transfer.type != .unknown else {
+//                        break
+//                    }
+//
+//                    guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? BaseTransactionDetailsViewController else {
+//                        break
+//                    }
+//
+//                    self.dialogService.showProgress(withMessage: String.adamantLocalized.transactionDetails.requestingDataProgressMessage, userInteractionEnable: false)
+//
 //                    switch transfer.type {
 //                    case .eth:
 //                        self.ethApiService.getTransaction(byHash: transfer.hash) { (result) in
@@ -280,15 +280,15 @@ extension ChatViewController: MessageCellDelegate {
 //                    default: break
 //                    }
                     
-                    if let nav = navigationController {
-                        nav.pushViewController(vc, animated: true)
-                    } else {
-                        present(vc, animated: true, completion: nil)
-                    }
-                }
-                
-				break
-			}
+//                    if let nav = navigationController {
+//                        nav.pushViewController(vc, animated: true)
+//                    } else {
+//                        present(vc, animated: true, completion: nil)
+//                    }
+//                }
+//
+                break
+            }
 			
 			let retry = UIAlertAction(title: String.adamantLocalized.alert.retry, style: .default, handler: { [weak self] action in
 				self?.chatsProvider.retrySendMessage(message) { result in

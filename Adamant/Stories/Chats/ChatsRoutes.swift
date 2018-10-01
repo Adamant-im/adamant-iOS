@@ -18,6 +18,16 @@ extension AdamantScene {
 			c.router = r.resolve(Router.self)
 			c.notificationsService = r.resolve(NotificationsService.self)
 			c.dialogService = r.resolve(DialogService.self)
+            
+            // MARK: - RichMessage handlers
+            
+            // Transfer handlers from accountService' wallet services
+            if let accountService = r.resolve(AccountService.self) {
+                for case let provider as RichMessageProvider in accountService.wallets {
+                    c.richMessageProviders[type(of: provider).richMessageType] = provider
+                }
+            }
+            
 			return c
 		})
 		

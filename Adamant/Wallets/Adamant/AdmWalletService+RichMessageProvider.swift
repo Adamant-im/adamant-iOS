@@ -10,6 +10,9 @@ import Foundation
 import MessageKit
 
 extension AdmWalletService: RichMessageProvider {
+    
+    // MARK: Events
+    
     func richMessageTapped(_ message: MessageType, at indexPath: IndexPath, in chat: ChatViewController) {
         guard let transaction = message as? TransferTransaction else {
             return
@@ -27,6 +30,8 @@ extension AdmWalletService: RichMessageProvider {
             chat.present(vc, animated: true, completion: nil)
         }
     }
+    
+    // MARK: Cells
     
     func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator {
         let calculator = TransferMessageSizeCalculator(layout: messagesCollectionViewFlowLayout)
@@ -52,5 +57,35 @@ extension AdmWalletService: RichMessageProvider {
         cell.isAlignedRight = isFromCurrentSender
         
         return cell
+    }
+    
+    // MARK: Short description
+    private static var formatter: NumberFormatter = {
+        return AdamantBalanceFormat.currencyFormatter(format: .full, currencySymbol: currencySymbol)
+    }()
+    
+    func shortDescription(for transaction: RichMessageTransaction) -> String {
+        guard let balance = transaction.amount as Decimal? else {
+            return ""
+        }
+        
+        return shortDescription(isOutgoing: transaction.isOutgoing, balance: balance)
+    }
+    
+    /// For ADM transfers
+    func shortDescription(for transaction: TransferTransaction) -> String {
+        guard let balance = transaction.amount as Decimal? else {
+            return ""
+        }
+        
+        return shortDescription(isOutgoing: transaction.isOutgoing, balance: balance)
+    }
+    
+    private func shortDescription(isOutgoing: Bool, balance: Decimal) -> String {
+        if isOutgoing {
+            return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(AdmWalletService.formatter.string(fromDecimal: balance)!)")
+        } else {
+            return "➡️  \(AdmWalletService.formatter.string(fromDecimal: balance)!)"
+        }
     }
 }

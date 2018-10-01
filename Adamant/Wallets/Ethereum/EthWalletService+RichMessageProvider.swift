@@ -10,9 +10,14 @@ import Foundation
 import MessageKit
 
 extension EthWalletService: RichMessageProvider {
+    
+    // MARK: Events
+    
     func richMessageTapped(_ message: MessageType, at indexPath: IndexPath, in chat: ChatViewController) {
         print("tap!")
     }
+    
+    // MARK: Cells
     
     func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator {
         let calculator = TransferMessageSizeCalculator(layout: messagesCollectionViewFlowLayout)
@@ -38,5 +43,23 @@ extension EthWalletService: RichMessageProvider {
         cell.isAlignedRight = isFromCurrentSender
         
         return cell
+    }
+    
+    // MARK: Short description
+    
+    private static var formatter: NumberFormatter = {
+        return AdamantBalanceFormat.currencyFormatter(format: .full, currencySymbol: currencySymbol)
+    }()
+    
+    func shortDescription(for transaction: RichMessageTransaction) -> String {
+        guard let amount = transaction.richContent?[RichContentKeys.transfer.amount] else {
+            return ""
+        }
+        
+        if transaction.isOutgoing {
+            return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(amount) \(EthWalletService.currencySymbol)")
+        } else {
+            return "➡️  \(amount) \(EthWalletService.currencySymbol)"
+        }
     }
 }
