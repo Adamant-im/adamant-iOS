@@ -201,6 +201,7 @@ class ChatViewController: MessagesViewController {
 			messageInputBar.inputTextView.backgroundColor = UIColor.adamantChatSenderBackground
 			messageInputBar.inputTextView.isEditable = false
 			messageInputBar.sendButton.isEnabled = false
+            attachmentButton.isEnabled = false
         }
 		
 		// MARK: 4. Data
