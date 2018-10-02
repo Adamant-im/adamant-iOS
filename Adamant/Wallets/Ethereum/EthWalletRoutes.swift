@@ -36,8 +36,8 @@ extension AdamantScene.Wallets {
 		}
 		
 		/// Ethereum transaction details
-		static let transactionDetails = AdamantScene(identifier: "BaseTransactionDetailsViewController") { r in
-			let c = BaseTransactionDetailsViewController()
+		static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewControllerBase") { r in
+			let c = TransactionDetailsViewControllerBase()
 			c.dialogService = r.resolve(DialogService.self)
 			return c
 		}

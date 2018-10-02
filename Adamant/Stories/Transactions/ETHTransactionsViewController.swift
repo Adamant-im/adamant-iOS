@@ -72,7 +72,7 @@ extension ETHTransactionsViewController {
         
         let transaction = transactions[indexPath.row]
         
-        guard let controller = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? BaseTransactionDetailsViewController else {
+        guard let controller = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? TransactionDetailsViewControllerBase else {
             return
         }
 

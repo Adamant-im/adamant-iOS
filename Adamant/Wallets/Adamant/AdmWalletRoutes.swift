@@ -38,7 +38,7 @@ extension AdamantScene.Wallets {
 		
 		/// Adamant transaction details
 		static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewController", factory: { r in
-			let c = ADMTransactionDetailsViewController()
+			let c = AdmTransactionDetailsViewController()
 			c.accountService = r.resolve(AccountService.self)
 			c.dialogService = r.resolve(DialogService.self)
 			c.transfersProvider = r.resolve(TransfersProvider.self)

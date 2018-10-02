@@ -220,73 +220,10 @@ extension ChatViewController: MessageCellDelegate {
 		}
 		
 		switch message {
-		case let transfer as TransferTransaction:
-			// MARK: Show transfer details
-			guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? BaseTransactionDetailsViewController else {
-				fatalError("Can't get TransactionDetails scene")
-			}
-			
-			vc.transaction = transfer
-			
-			if let nav = navigationController {
-				nav.pushViewController(vc, animated: true)
-			} else {
-				present(vc, animated: true, completion: nil)
-			}
-			
-		case let message as MessageTransaction:
-			// MARK: Show Retry/Cancel action sheet
+        // MARK: Show Retry/Cancel action sheet
+        case let message as MessageTransaction:
+            // Only for failed messages
             guard message.messageStatus == .failed else {
-            
-//                if message.type == UInt16(ChatType.richMessage.rawValue) {
-//                    guard let data = message.message?.data(using: String.Encoding.utf8), let transfer = try? JSONDecoder().decode(ChatTransfer.self, from: data), transfer.type != .unknown else {
-//                        break
-//                    }
-//
-//                    guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? BaseTransactionDetailsViewController else {
-//                        break
-//                    }
-//
-//                    self.dialogService.showProgress(withMessage: String.adamantLocalized.transactionDetails.requestingDataProgressMessage, userInteractionEnable: false)
-//
-//                    switch transfer.type {
-//                    case .eth:
-//                        self.ethApiService.getTransaction(byHash: transfer.hash) { (result) in
-//                            switch result {
-//                            case .success(let transaction):
-//                                vc.set(transaction: transaction)
-//                                self.dialogService.dismissProgress()
-//                                break
-//                            case .failure(let error):
-//                                self.dialogService.showError(withMessage: "Transrer issue", error: error)
-//                                break
-//                            }
-//                        }
-//                        break
-//
-//                    case .lsk:
-//                        self.lskApiService.getTransaction(byHash: transfer.hash) { (result) in
-//                            switch result {
-//                            case .success(let transaction):
-//                                vc.set(transaction: transaction)
-//                                self.dialogService.dismissProgress()
-//                                break
-//                            case .failure(let error):
-//                                self.dialogService.showError(withMessage: "Transrer issue", error: error)
-//                                break
-//                            }
-//                        }
-//                        break
-//                    default: break
-//                    }
-                    
-//                    if let nav = navigationController {
-//                        nav.pushViewController(vc, animated: true)
-//                    } else {
-//                        present(vc, animated: true, completion: nil)
-//                    }
-//                }
-//
                 break
             }
 			
@@ -325,6 +262,23 @@ extension ChatViewController: MessageCellDelegate {
 			
 			dialogService.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, style: .actionSheet, actions: [retry, cancelMessage, cancel])
 			
+            
+        // MARK: Show ADM transfer details
+        case let transfer as TransferTransaction:
+            guard let provider = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService else {
+                return
+            }
+            
+            provider.richMessageTapped(for: transfer, at: indexPath, in: self)
+            
+        // MARK: Pass event to rich message provider
+        case let richMessage as RichMessageTransaction:
+            guard let type = richMessage.richType, let provider = richMessageProviders[type] else {
+                break
+            }
+            
+            provider.richMessageTapped(for: richMessage, at: indexPath, in: self)
+            
 		default:
 			break
 		}
@@ -340,16 +294,30 @@ extension ChatViewController: MessageCellDelegate {
 // MARK: - TransferCollectionViewCellDelegate
 extension ChatViewController: CustomCellDelegate {
     func didTapCustomCell(_ cell: TapRecognizerCustomCell) {
-        guard let c = cell as? UICollectionViewCell, let indexPath = messagesCollectionView.indexPath(for: c),
-            let message = messagesCollectionView.messagesDataSource?.messageForItem(at: indexPath, in: messagesCollectionView) else {
-                return
-        }
-        
-        guard case .custom(let raw) = message.kind, let richMessage = raw as? RichMessage, let provider = richMessageProviders[richMessage.type] else {
+        guard let c = cell as? UICollectionViewCell,
+            let indexPath = messagesCollectionView.indexPath(for: c),
+            let transaction = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) else {
             return
         }
         
-        provider.richMessageTapped(message, at: indexPath, in: self)
+        switch transaction {
+        case let transfer as TransferTransaction:
+            guard let provider = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService else {
+                break
+            }
+            
+            provider.richMessageTapped(for: transfer, at: indexPath, in: self)
+            
+        case let richTransaction as RichMessageTransaction:
+            guard let type = richTransaction.richType, let provider = richMessageProviders[type] else {
+                break
+            }
+            
+            provider.richMessageTapped(for: richTransaction, at: indexPath, in: self)
+            
+        default:
+            return
+        }
     }
 }
 

@@ -13,7 +13,7 @@ extension EthWalletService: RichMessageProvider {
     
     // MARK: Events
     
-    func richMessageTapped(_ message: MessageType, at indexPath: IndexPath, in chat: ChatViewController) {
+    func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
         print("tap!")
     }
     
