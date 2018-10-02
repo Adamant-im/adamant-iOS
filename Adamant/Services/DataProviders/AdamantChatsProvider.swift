@@ -24,7 +24,7 @@ class AdamantChatsProvider: ChatsProvider {
 	private(set) var receivedLastHeight: Int64?
 	private(set) var readedLastHeight: Int64?
 	private let apiTransactions = 100
-	private var unconfirmedTransactions: [UInt64:ChatTransaction] = [:]
+	private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
 	
 	private let processingQueue = DispatchQueue(label: "im.adamant.processing.chat", qos: .utility, attributes: [.concurrent])
 	private let sendingQueue = DispatchQueue(label: "im.adamant.sending.chat", qos: .utility, attributes: [.concurrent])
@@ -294,7 +294,7 @@ extension AdamantChatsProvider {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = stack.container.viewContext
         
-        let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+        let transaction = MessageTransaction(context: context)
         transaction.date = Date() as NSDate
         transaction.recipientId = recipientId
         transaction.senderId = senderId
@@ -312,7 +312,7 @@ extension AdamantChatsProvider {
         
         let type = ChatType.richMessage
         
-        let transaction = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
+        let transaction = RichMessageTransaction(context: context)
         transaction.date = Date() as NSDate
         transaction.recipientId = recipientId
         transaction.senderId = senderId
@@ -538,10 +538,9 @@ extension AdamantChatsProvider {
 				// Update ID with recieved, add to unconfirmed transactions.
 				transaction.transactionId = String(id)
 				
-				// If we will save transaction from privateContext, we will hold strong reference to whole context, and we won't ever save it.
 				self.unconfirmedsSemaphore.wait()
 				DispatchQueue.main.sync {
-					self.unconfirmedTransactions[id] = self.stack.container.viewContext.object(with: transaction.objectID) as? ChatTransaction
+					self.unconfirmedTransactions[id] = transaction.objectID
 				}
 				self.unconfirmedsSemaphore.signal()
 				
@@ -772,7 +771,7 @@ extension AdamantChatsProvider {
 			
 			for trs in transactions {
 				unconfirmedsSemaphore.wait()
-				if unconfirmedTransactions.count > 0, let unconfirmed = unconfirmedTransactions[trs.transaction.id] {
+				if let objectId = unconfirmedTransactions[trs.transaction.id], let unconfirmed = context.object(with: objectId) as? ChatTransaction {
 					confirmTransaction(unconfirmed, id: trs.transaction.id, height: Int64(trs.transaction.height), blockId: trs.transaction.blockId, confirmations: trs.transaction.confirmations)
 					let h = Int64(trs.transaction.height)
 					if height < h {

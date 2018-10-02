@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdamantApiService {
-	func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void) {
+	func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
         
         // MARK: 1. Prepare params
 		let params: [String : Any] = [
@@ -69,11 +69,11 @@ extension AdamantApiService {
 				]
 				
 				// MARK: 5. Send
-				self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: .json, headers: headers) { (response: ApiServiceResult<ServerResponse>) in
+				self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: .json, headers: headers) { (response: ApiServiceResult<TransactionIdResponse>) in
 					switch response {
 					case .success(let result):
-                        if result.success {
-                            completion(.success(true))
+                        if let id = result.transactionId {
+                            completion(.success(id))
                         } else {
                             if let error = result.error {
                                 completion(.failure(.internalError(message: error, error: nil)))

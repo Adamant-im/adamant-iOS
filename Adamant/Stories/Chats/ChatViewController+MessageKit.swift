@@ -123,7 +123,23 @@ extension ChatViewController: MessagesDataSource {
         if let chatCell = cell as? ChatCell {
 //            let corner: MessageStyle.TailCorner = fromCurrent ? .bottomRight : .bottomLeft
 //            chatCell.bubbleStyle = .bubbleTail(corner, .curved)
-            chatCell.bubbleBackgroundColor = fromCurrent ? UIColor.adamantChatSenderBackground : UIColor.adamantChatRecipientBackground
+            
+            let bgColor: UIColor
+            if fromCurrent {
+                if let transaction = message as? ChatTransaction {
+                    switch transaction.statusEnum {
+                    case .failed: bgColor = .adamantFailChatBackground
+                    case .pending: bgColor = .adamantPendingChatBackground
+                    case .delivered: bgColor = .adamantChatSenderBackground
+                    }
+                } else {
+                    bgColor = UIColor.adamantChatSenderBackground
+                }
+            } else {
+                bgColor = UIColor.adamantChatRecipientBackground
+            }
+            
+            chatCell.bubbleBackgroundColor = bgColor
         }
         
         if let customCell = cell as? TapRecognizerCustomCell {

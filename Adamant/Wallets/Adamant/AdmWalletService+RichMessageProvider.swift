@@ -19,7 +19,7 @@ extension AdmWalletService: RichMessageProvider {
     }
     
     func richMessageTapped(for transaction: TransferTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
-        guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? BaseTransactionDetailsViewController else {
+        guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? TransactionDetailsViewControllerBase else {
             fatalError("Can't get TransactionDetails scene")
         }
         
