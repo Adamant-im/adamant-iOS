@@ -81,7 +81,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	// MARK: - Lifecycle
 	
-	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// MARK: 1. Initiating Swinject
 		container = Container()
 		container.registerAdamantServices()
@@ -322,7 +322,7 @@ extension AppDelegate {
 		container.registerAdamantBackgroundFetchServices()
 		
 		guard let notificationsService = container.resolve(NotificationsService.self) else {
-				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)
 				completionHandler(.failed)
 				return
 		}

@@ -61,7 +61,7 @@ class RepeaterService {
 			let timer = Timer(timeInterval: interval, target: self, selector: #selector(timerFired), userInfo: client, repeats: true)
 			client.timer = timer
 			
-			RunLoop.main.add(timer, forMode: .commonModes)
+			RunLoop.main.add(timer, forMode: .common)
 		}
 	}
 	
@@ -106,7 +106,7 @@ class RepeaterService {
 			let timer = Timer(timeInterval: client.interval, target: self, selector: #selector(timerFired), userInfo: client, repeats: true)
 			client.timer = timer
 			
-			RunLoop.main.add(timer, forMode: .commonModes)
+			RunLoop.main.add(timer, forMode: .common)
 		}
 		
 		isPaused = false

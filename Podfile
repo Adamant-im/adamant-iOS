@@ -17,7 +17,7 @@ target 'Adamant' do
   pod 'FreakingSimpleRoundImageView' # Round avatars
   pod 'FTIndicator' # Notifications and activity indicator
   pod 'Eureka' # Forms
-  pod 'MessageKit' # Chat UI
+  pod 'MessageKit', :git => 'https://github.com/MessageKit/MessageKit', :branch => 'development' # Chat UI. development branch for Swift 4.2
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
 

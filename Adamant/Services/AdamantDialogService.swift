@@ -223,7 +223,7 @@ extension AdamantDialogService {
 
 // MAKR: - Activity controllers
 extension AdamantDialogService {
-	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, completion: (() -> Void)?) {
+	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, completion: (() -> Void)?) {
 		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 		
 		for type in types {
@@ -286,7 +286,7 @@ extension AdamantDialogService {
 		
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
 			DispatchQueue.main.async {
-				if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
+				if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
 					UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
 				}
 			}

@@ -45,22 +45,22 @@ enum ShareContentType {
 	case passphrase
 	case address
 	
-	var excludedActivityTypes: [UIActivityType]? {
+	var excludedActivityTypes: [UIActivity.ActivityType]? {
 		switch self {
 		case .passphrase:
-			var types: [UIActivityType] = [.postToFacebook,
-										   .postToTwitter,
-										   .postToWeibo,
-										   .message,
-										   .mail,
-										   .assignToContact,
-										   .saveToCameraRoll,
-										   .addToReadingList,
-										   .postToFlickr,
-										   .postToVimeo,
-										   .postToTencentWeibo,
-										   .airDrop,
-										   .openInIBooks]
+			var types: [UIActivity.ActivityType] = [.postToFacebook,
+                                                    .postToTwitter,
+                                                    .postToWeibo,
+                                                    .message,
+                                                    .mail,
+                                                    .assignToContact,
+                                                    .saveToCameraRoll,
+                                                    .addToReadingList,
+                                                    .postToFlickr,
+                                                    .postToVimeo,
+                                                    .postToTencentWeibo,
+                                                    .airDrop,
+                                                    .openInIBooks]
 			
 			if #available(iOS 11.0, *) { types.append(.markupAsPDF) }
 			return types
@@ -111,7 +111,7 @@ protocol DialogService: class {
 	func dismissNotification()
 	
 	// MARK: - ActivityControllers
-	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, completion: (() -> Void)?)
+	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, completion: (() -> Void)?)
 	
 	func presentGoToSettingsAlert(title: String?, message: String?)
     

@@ -38,8 +38,8 @@ extension SecurityViewController {
 		
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
 			DispatchQueue.main.async {
-				if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
-					UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+				if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+					UIApplication.shared.open(settingsURL)
 				}
 			}
 		})

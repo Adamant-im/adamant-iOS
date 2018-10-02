@@ -8,6 +8,7 @@
 
 import UIKit
 import MessageKit
+import MessageInputBar
 import CoreData
 
 // MARK: - Localization
@@ -149,7 +150,7 @@ class ChatViewController: MessagesViewController {
 			$0.setSize(CGSize(width: buttonWidth, height: buttonHeight), animated: false)
 			$0.title = nil
 			$0.image = #imageLiteral(resourceName: "Arrow")
-			$0.setImage(#imageLiteral(resourceName: "Arrow_innactive"), for: UIControlState.disabled)
+			$0.setImage(#imageLiteral(resourceName: "Arrow_innactive"), for: UIControl.State.disabled)
 		}
 		
 		if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {

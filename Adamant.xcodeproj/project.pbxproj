@@ -936,6 +936,7 @@
 				TargetAttributes = {
 					E913C8ED1FFFA51D001A83F7 = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
@@ -948,6 +949,7 @@
 					};
 					E9EC344320066D4A00C0E546 = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 						TestTargetID = E913C8ED1FFFA51D001A83F7;
 					};
@@ -1049,6 +1051,7 @@
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
 				"${BUILT_PRODUCTS_DIR}/Haring/Haring.framework",
 				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
+				"${BUILT_PRODUCTS_DIR}/MessageInputBar/MessageInputBar.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
 				"${BUILT_PRODUCTS_DIR}/MyLittlePinpad/MyLittlePinpad.framework",
 				"${BUILT_PRODUCTS_DIR}/PMAlertController/PMAlertController.framework",
@@ -1069,6 +1072,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Haring.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageInputBar.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MyLittlePinpad.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PMAlertController.framework",
@@ -1471,7 +1475,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "e4233bbf-3705-44fe-95b0-e77475672c60";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Debug Dev";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -1494,7 +1498,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "bedd1b75-2f23-4a85-a0b2-14c424fcff42";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
@@ -1511,7 +1515,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = im.adamant.AdamantTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Adamant.app/Adamant";
 			};
@@ -1529,7 +1533,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = im.adamant.AdamantTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Adamant.app/Adamant";
 			};

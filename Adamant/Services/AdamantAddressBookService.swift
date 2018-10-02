@@ -34,8 +34,8 @@ class AdamantAddressBookService: AddressBookService {
 	private var isChangingSemaphore = DispatchSemaphore(value: 1)
 	private var isSavingSemaphore = DispatchSemaphore(value: 1)
 	
-	private var savingBookTaskId: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
-	private var savingBookOnLogoutTaskId: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
+	private var savingBookTaskId = UIBackgroundTaskIdentifier.invalid
+	private var savingBookOnLogoutTaskId = UIBackgroundTaskIdentifier.invalid
 	
 	// MARK: - Lifecycle
 	init() {
@@ -58,12 +58,12 @@ class AdamantAddressBookService: AddressBookService {
 			
 			self.savingBookOnLogoutTaskId = UIApplication.shared.beginBackgroundTask { [unowned self] in
 				UIApplication.shared.endBackgroundTask(self.savingBookOnLogoutTaskId)
-				self.savingBookOnLogoutTaskId = UIBackgroundTaskInvalid
+				self.savingBookOnLogoutTaskId = .invalid
 			}
 			
 			self.saveAddressBook(self.addressBook) { _ in
 				UIApplication.shared.endBackgroundTask(self.savingBookOnLogoutTaskId)
-				self.savingBookOnLogoutTaskId = UIBackgroundTaskInvalid
+				self.savingBookOnLogoutTaskId = .invalid
 			}
 		}
 		
@@ -214,7 +214,7 @@ class AdamantAddressBookService: AddressBookService {
 		// Background task
 		savingBookTaskId = UIApplication.shared.beginBackgroundTask {
 			UIApplication.shared.endBackgroundTask(self.savingBookTaskId)
-			self.savingBookTaskId = UIBackgroundTaskInvalid
+			self.savingBookTaskId = .invalid
 		}
 		
 		saveAddressBook(addressBook) { result in
@@ -222,7 +222,7 @@ class AdamantAddressBookService: AddressBookService {
 				self.isSavingSemaphore.signal()
 				
 				UIApplication.shared.endBackgroundTask(self.savingBookTaskId)
-				self.savingBookTaskId = UIBackgroundTaskInvalid
+				self.savingBookTaskId = .invalid
 			}
 			
 			switch result {

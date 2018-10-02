@@ -377,11 +377,11 @@ class AccountViewController: FormViewController {
 	
 	// MARK: TableView configuration
 	
-	override func insertAnimation(forSections sections: [Section]) -> UITableViewRowAnimation {
+	override func insertAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
 		return .fade
 	}
 	
-	override func deleteAnimation(forSections sections: [Section]) -> UITableViewRowAnimation {
+	override func deleteAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
 		return .fade
 	}
 	

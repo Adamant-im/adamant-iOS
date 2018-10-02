@@ -8,6 +8,7 @@
 
 import Foundation
 import MessageKit
+import MessageInputBar
 import SafariServices
 import Haring
 
@@ -38,7 +39,7 @@ extension ChatViewController: MessagesDataSource {
     
     func cellTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
         if self.shouldDisplayHeader(for: message, at: indexPath, in: self.messagesCollectionView) {
-            return NSAttributedString(string: message.sentDate.humanizedDay(), attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedStringKey.foregroundColor: UIColor.gray])
+            return NSAttributedString(string: message.sentDate.humanizedDay(), attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.gray])
         }
         return nil
     }
@@ -51,10 +52,10 @@ extension ChatViewController: MessagesDataSource {
             
             switch transaction.statusEnum {
             case .failed:
-                return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedStringKey.foregroundColor: UIColor.darkText])
+                return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.darkText])
                 
             case .pending:
-                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedStringKey.foregroundColor: UIColor.darkText])
+                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.darkText])
                 
             case .delivered:
                 return nil
@@ -95,7 +96,7 @@ extension ChatViewController: MessagesDataSource {
 			}
 		}
 		
-		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
+		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption2)])
 	}
 }
 

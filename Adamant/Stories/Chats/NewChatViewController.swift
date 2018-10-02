@@ -340,8 +340,8 @@ extension NewChatViewController {
 			
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
 				DispatchQueue.main.async {
-					if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
-						UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+					if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+						UIApplication.shared.open(settingsURL)
 					}
 				}
 			})
@@ -436,10 +436,10 @@ extension NewChatViewController: QRCodeReaderViewControllerDelegate {
 
 // MARK: - UIImagePickerControllerDelegate
 extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-		dismiss(animated: true, completion: nil)
+	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        dismiss(animated: true, completion: nil)
 		
-		guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else {
+		guard let image = info[.originalImage] as? UIImage else {
 			return
 		}
 		
