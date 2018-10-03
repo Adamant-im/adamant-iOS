@@ -97,7 +97,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			$0.title = BaseRows.balance.localized
 			
 			if let alertLabel = $0.cell.alertLabel {
-				alertLabel.backgroundColor = UIColor.adamantPrimary
+				alertLabel.backgroundColor = UIColor.adamant.primary
 				alertLabel.textColor = UIColor.white
 				alertLabel.clipsToBounds = true
 				alertLabel.textInsets = UIEdgeInsets(top: 1, left: 5, bottom: 1, right: 5)

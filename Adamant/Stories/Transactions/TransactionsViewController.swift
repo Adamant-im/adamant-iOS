@@ -26,8 +26,8 @@ class TransactionsViewController: UIViewController {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
-                                 for: UIControlEvents.valueChanged)
-        refreshControl.tintColor = UIColor.adamantPrimary
+                                 for: UIControl.Event.valueChanged)
+        refreshControl.tintColor = UIColor.adamant.primary
         
         return refreshControl
     }()
@@ -73,10 +73,10 @@ class TransactionsViewController: UIViewController {
 // MARK: - UITableView Cells
 extension TransactionsViewController {
     internal func configureCell(_ cell: TransactionTableViewCell, for transfer: TransactionDetailsProtocol) {
-        cell.accountLabel.tintColor = UIColor.adamantPrimary
-        cell.ammountLabel.tintColor = UIColor.adamantPrimary
-        cell.dateLabel.tintColor = UIColor.adamantSecondary
-        cell.avatarImageView.tintColor = UIColor.adamantPrimary
+        cell.accountLabel.tintColor = UIColor.adamant.primary
+        cell.ammountLabel.tintColor = UIColor.adamant.primary
+        cell.dateLabel.tintColor = UIColor.adamant.secondary
+//        cell.avatarImageView.tintColor = UIColor.adamantPrimary
         
         if transfer.isOutgoing(currentAddress()) {
             cell.transactionType = .outcome

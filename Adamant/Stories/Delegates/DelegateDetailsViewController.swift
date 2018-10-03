@@ -24,20 +24,20 @@ class DelegateDetailsViewController: UITableViewController {
     // MARK: - Rows
     fileprivate enum Row: Int {
         case username = 0
+		case rank
         case address
         case publicKey
         case vote
         case producedblocks
         case missedblocks
-        case rate
-        case rank
+//        case rate
         case approval
         case productivity
         case forgingTime
         case forged
         case openInExplorer
 		
-		static let total = 13
+		static let total = 12
 		
         var localized: String {
             switch self {
@@ -47,13 +47,13 @@ class DelegateDetailsViewController: UITableViewController {
 			case .vote: return NSLocalizedString("DelegateDetails.Row.VoteWeight", comment: "Delegate Details Screen: Rows title for 'Vote weight'")
 			case .producedblocks: return NSLocalizedString("DelegateDetails.Row.ProducedBlocks", comment: "Delegate Details Screen: Rows title for 'Produced blocks'")
 			case .missedblocks: return NSLocalizedString("DelegateDetails.Row.MissedBlocks", comment: "Delegate Details Screen: Rows title for 'Missed blocks'")
-			case .rate: return NSLocalizedString("DelegateDetails.Row.Rate", comment: "Delegate Details Screen: Rows title for 'Rate'")
 			case .rank: return NSLocalizedString("DelegateDetails.Row.Rank", comment: "Delegate Details Screen: Rows title for 'Rank'")
 			case .approval: return NSLocalizedString("DelegateDetails.Row.Approval", comment: "Delegate Details Screen: Rows title for 'Approval'")
 			case .productivity: return NSLocalizedString("DelegateDetails.Row.Productivity", comment: "Delegate Details Screen: Rows title for 'Productivity'")
 			case .forgingTime: return NSLocalizedString("DelegateDetails.Row.ForgingTime", comment: "Delegate Details Screen: Rows title for 'Forging time'")
 			case .forged: return NSLocalizedString("DelegateDetails.Row.Forged", comment: "Delegate Details Screen: Rows title for 'Forged'")
 			case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
+//			case .rate: return NSLocalizedString("DelegateDetails.Row.Rate", comment: "Delegate Details Screen: Rows title for 'Rate'")
             }
         }
 		
@@ -63,7 +63,7 @@ class DelegateDetailsViewController: UITableViewController {
 		
 		var image: UIImage? {
 			switch self {
-			case .openInExplorer: return #imageLiteral(resourceName: "row_icon_placeholder")
+			case .openInExplorer: return #imageLiteral(resourceName: "row_explorer")
 				
 			default: return nil
 			}
@@ -105,6 +105,9 @@ class DelegateDetailsViewController: UITableViewController {
 	private var forged: Decimal? = nil
 	private var forgingTime: TimeInterval? = nil
 	
+	// Double error fix
+	private var prevApiError: (date: Date, error: ApiServiceError)? = nil
+	
 	
 	// MARK: - Lifecycle
 	
@@ -114,12 +117,13 @@ class DelegateDetailsViewController: UITableViewController {
         if #available(iOS 11.0, *) {
             navigationController?.navigationBar.prefersLargeTitles = false
         }
-        
-        navigationItem.title = String.adamantLocalized.delegateDetails.title
-        
+		
         if let delegate = delegate {
 			refreshData(with: delegate)
-        }
+			navigationItem.title = delegate.username
+		} else {
+			navigationItem.title = String.adamantLocalized.delegateDetails.title
+		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -146,6 +150,10 @@ extension DelegateDetailsViewController {
 		}
 	}
 	
+	override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+		return UIView()
+	}
+	
 	override func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
 		return true
 	}
@@ -162,11 +170,12 @@ extension DelegateDetailsViewController {
 			}
 			
 			let safari = SFSafariViewController(url: url)
-			safari.preferredControlTintColor = UIColor.adamantPrimary
+			safari.preferredControlTintColor = UIColor.adamant.primary
 			present(safari, animated: true, completion: nil)
 			
 		default:
-			guard let cell = tableView.cellForRow(at: indexPath), let value = cell.detailTextLabel?.text else {
+			guard let cell = tableView.cellForRow(at: indexPath), let value = cell.detailTextLabel?.text, value.count > 0 else {
+				tableView.deselectRow(at: indexPath, animated: true)
 				return
 			}
 			
@@ -205,6 +214,7 @@ extension DelegateDetailsViewController {
 		cell.textLabel?.text = row.localized
 		cell.accessoryType = .none
 		cell.imageView?.image = row.image
+		cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
 		
 		switch row {
 		case .username:
@@ -217,23 +227,14 @@ extension DelegateDetailsViewController {
 			cell.detailTextLabel?.text = delegate.publicKey
 			
 		case .vote:
-			let text: String?
-			if let voteRaw = Decimal(string: delegate.vote) {
-				text = AdamantUtilities.currencyFormatter.string(for: voteRaw.shiftedFromAdamant())
-			} else {
-				text = AdamantUtilities.currencyFormatter.string(from: 0)
-			}
-			
-			cell.detailTextLabel?.text = text
+			let weight = Decimal(string: delegate.vote)?.shiftedFromAdamant() ?? 0
+			cell.detailTextLabel?.text = AdamantBalanceFormat.currencyFormatterShort.string(for: weight)
 			
 		case .producedblocks:
 			cell.detailTextLabel?.text = String(delegate.producedblocks)
 			
 		case .missedblocks:
 			cell.detailTextLabel?.text = String(delegate.missedblocks)
-			
-		case .rate:
-			cell.detailTextLabel?.text = String(delegate.rate)
 			
 		case .rank:
 			cell.detailTextLabel?.text = String(delegate.rank)
@@ -259,11 +260,11 @@ extension DelegateDetailsViewController {
 				}
 				
 			} else {
-				cell.detailTextLabel?.text = "..."
+				cell.detailTextLabel?.text = ""
 			}
 			
 		case .forged:
-			cell.detailTextLabel?.text = AdamantUtilities.currencyFormatter.string(for: forged)
+			cell.detailTextLabel?.text = AdamantBalanceFormat.currencyFormatterShort.string(for: forged)
 		}
 		
 		return cell
@@ -275,7 +276,7 @@ extension DelegateDetailsViewController {
 extension DelegateDetailsViewController {
 	private func refreshData(with delegate: Delegate) {
 		// Get forged amount
-		self.apiService.getForgedByAccount(publicKey: delegate.publicKey) { [weak self] result in
+		apiService.getForgedByAccount(publicKey: delegate.publicKey) { [weak self] result in
 			switch result {
 			case .success(let details):
 				self?.forged = details.forged
@@ -289,12 +290,12 @@ extension DelegateDetailsViewController {
 					tableView.reloadRows(at: [indexPath], with: .none)
 				}
 			case .failure(let error):
-				self?.dialogService.showError(withMessage: error.localized, error: error)
+				self?.apiServiceFailed(with: error)
 			}
 		}
 		
 		// Get forging time
-		self.apiService.getForgingTime(for: delegate) { [weak self] result in
+		apiService.getForgingTime(for: delegate) { [weak self] result in
 			switch result {
 			case .success(let seconds):
 				if seconds >= 0 {
@@ -313,8 +314,19 @@ extension DelegateDetailsViewController {
 				}
 				
 			case .failure(let error):
-				self?.dialogService.showError(withMessage: error.localized, error: error)
+				self?.apiServiceFailed(with: error)
 			}
+		}
+	}
+	
+	private func apiServiceFailed(with error: ApiServiceError) {
+		DispatchQueue.main.async { [unowned self] in
+			if let prevApiError = self.prevApiError, Date().timeIntervalSince(prevApiError.date) < 1, prevApiError.error == error { // if less than a second ago, return
+				return
+			}
+			
+			self.prevApiError = (date: Date(), error: error)
+			self.dialogService.showRichError(error: error)
 		}
 	}
 }

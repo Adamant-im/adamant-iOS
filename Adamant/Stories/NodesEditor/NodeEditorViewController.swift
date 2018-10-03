@@ -99,7 +99,7 @@ class NodeEditorViewController: FormViewController {
 			}
 		}
 		
-		fileprivate var accessoryType: UITableViewCellAccessoryType {
+		fileprivate var accessoryType: UITableViewCell.AccessoryType {
 			switch self {
 			case .notTested, .failed: return .disclosureIndicator
 			case .passed: return .checkmark
@@ -205,7 +205,7 @@ class NodeEditorViewController: FormViewController {
 			$0.title = Rows.testButton.localized
 			$0.tag = Rows.testButton.tag
 		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.textLabel?.textColor = UIColor.adamant.primary
 			cell.accessoryType = .disclosureIndicator
 		}.onCellSelection { [weak self] (_, _) in
 			self?.testNode()
@@ -218,7 +218,7 @@ class NodeEditorViewController: FormViewController {
 				$0.title = Rows.deleteButton.localized
 				$0.tag = Rows.deleteButton.tag
 			}.cellUpdate { (cell, _) in
-				cell.textLabel?.textColor = UIColor.adamantPrimary
+				cell.textLabel?.textColor = UIColor.adamant.primary
 			}.onCellSelection { [weak self] (_, _) in
 				self?.deleteNode()
 			}

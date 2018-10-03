@@ -102,7 +102,9 @@ class NewChatViewController: FormViewController {
 		}
 		
 		navigationItem.title = String.adamantLocalized.newChat.title
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+		let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
+		doneButton.isEnabled = false
+		navigationItem.rightBarButtonItem = doneButton
 		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
 		
 		navigationOptions = .Disabled
@@ -156,6 +158,18 @@ class NewChatViewController: FormViewController {
 						row.updateCell()
 					}
 				}
+				
+				if let done = self?.navigationItem.rightBarButtonItem {
+					if Thread.isMainThread {
+						done.isEnabled = text.count > 6
+					} else {
+						DispatchQueue.main.async {
+							done.isEnabled = text.count > 6
+						}
+					}
+				}
+			} else {
+				self?.navigationItem.rightBarButtonItem?.isEnabled = false
 			}
 		}
 		
@@ -167,9 +181,10 @@ class NewChatViewController: FormViewController {
 				$0.tag = Rows.myQr.tag
 				$0.title = Rows.myQr.localized
 			}.cellUpdate { (cell, _) in
-				cell.textLabel?.textColor = UIColor.adamantPrimary
+				cell.textLabel?.textColor = UIColor.adamant.primary
 			}.onCellSelection { [weak self] (cell, row) in
-				switch AdamantQRTools.generateQrFrom(string: address) {
+				let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+				switch AdamantQRTools.generateQrFrom(string: encodedAddress) {
 				case .success(let qr):
 					guard let vc = self?.router.get(scene: AdamantScene.Shared.shareQr) as? ShareQrViewController else {
 						fatalError("Can't find ShareQrViewController")
@@ -325,8 +340,8 @@ extension NewChatViewController {
 			
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
 				DispatchQueue.main.async {
-					if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
-						UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+					if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+						UIApplication.shared.open(settingsURL)
 					}
 				}
 			})
@@ -371,15 +386,39 @@ extension NewChatViewController {
 // MARK: - QRCodeReaderViewControllerDelegate
 extension NewChatViewController: QRCodeReaderViewControllerDelegate {
 	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-		guard let uri = AdamantUriTools.decode(uri: result.value) else {
-			dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-				reader.startScanning()
+		let address: String?
+		var name: String? = nil
+		
+		if let uri = AdamantUriTools.decode(uri: result.value) {
+			switch uri {
+			case .address(address: let addr, params: let params):
+				address = addr
+				
+				if let params = params {
+					for param in params {
+						switch param {
+						case .label(let label):
+							name = label
+							break
+						}
+					}
+				}
+				
+			case .passphrase(_):
+				address = nil
 			}
-			return
+		} else {
+			switch AdamantUtilities.validateAdamantAddress(address: result.value) {
+			case .valid, .system:
+				address = result.value
+				
+			case .invalid:
+				address = nil
+			}
 		}
 		
-		if startNewChat(with: uri) {
+		if let address = address {
+			startNewChat(with: address, name: name)
 			dismiss(animated: true, completion: nil)
 		} else {
 			dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
@@ -397,10 +436,10 @@ extension NewChatViewController: QRCodeReaderViewControllerDelegate {
 
 // MARK: - UIImagePickerControllerDelegate
 extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-		dismiss(animated: true, completion: nil)
+	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        dismiss(animated: true, completion: nil)
 		
-		guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else {
+		guard let image = info[.originalImage] as? UIImage else {
 			return
 		}
 		
@@ -409,6 +448,15 @@ extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerCo
 				if let uri = AdamantUriTools.decode(uri: aCode) {
 					if startNewChat(with: uri) {
 						return
+					}
+				} else {
+					switch AdamantUtilities.validateAdamantAddress(address: aCode) {
+					case .valid, .system:
+						startNewChat(with: aCode, name: nil)
+						return
+						
+					case .invalid:
+						break
 					}
 				}
 			}

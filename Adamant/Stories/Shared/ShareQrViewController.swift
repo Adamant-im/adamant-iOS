@@ -77,7 +77,7 @@ class ShareQrViewController: FormViewController {
 		}
 	}
 	
-	var excludedActivityTypes: [UIActivityType]?
+	var excludedActivityTypes: [UIActivity.ActivityType]?
 	
 	// MARK: - Lifecycle
 	override func viewDidLoad() {
@@ -123,7 +123,7 @@ class ShareQrViewController: FormViewController {
 				self?.dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.shared.photolibraryNotAuthorized)
 			}
 		}.cellUpdate { (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
 			
 		// Share
@@ -140,7 +140,7 @@ class ShareQrViewController: FormViewController {
 				vc.excludedActivityTypes = excludedActivityTypes
 			}
 			
-			vc.completionWithItemsHandler = { [weak self] (type: UIActivityType?, completed: Bool, _, error: Error?) in
+			vc.completionWithItemsHandler = { [weak self] (type: UIActivity.ActivityType?, completed: Bool, _, error: Error?) in
 				if completed {
 					if let error = error {
 						self?.dialogService.showWarning(withMessage: error.localizedDescription)
@@ -153,7 +153,7 @@ class ShareQrViewController: FormViewController {
 			
 			self?.present(vc, animated: true, completion: nil)
 		}.cellUpdate { (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
 		
 		<<< ButtonRow() {
@@ -162,7 +162,7 @@ class ShareQrViewController: FormViewController {
 		}.onCellSelection { [weak self] (cell, row) in
 			self?.close()
 		}.cellUpdate { (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
 	}
 	

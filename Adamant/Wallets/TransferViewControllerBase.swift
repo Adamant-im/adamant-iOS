@@ -212,7 +212,7 @@ class TransferViewControllerBase: FormViewController {
         super.viewDidLoad()
 		
 		// MARK: UI
-		navigationAccessoryView.tintColor = UIColor.adamantPrimary
+		navigationAccessoryView.tintColor = UIColor.adamant.primary
 		
 		// MARK: Sections
 		form.append(walletSection())

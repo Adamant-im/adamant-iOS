@@ -2,13 +2,13 @@ PODS:
   - Alamofire (4.7.3)
   - BigInt (3.1.0):
     - SipHash (~> 1.2)
-  - CryptoSwift (0.10.0)
+  - CryptoSwift (0.12.0)
   - DateToolsSwift (4.0.0)
   - Ed25519 (1.1.0):
     - libCEd25519 (~> 1.1.0)
-  - EFQRCode (4.2.2)
-  - Eureka (4.2.0)
-  - FreakingSimpleRoundImageView (1.2.3)
+  - EFQRCode (4.3.0)
+  - Eureka (4.3.0)
+  - FreakingSimpleRoundImageView (1.3)
   - FTIndicator (1.2.9):
     - FTIndicator/FTNotificationIndicator (= 1.2.9)
     - FTIndicator/FTProgressIndicator (= 1.2.9)
@@ -16,40 +16,43 @@ PODS:
   - FTIndicator/FTNotificationIndicator (1.2.9)
   - FTIndicator/FTProgressIndicator (1.2.9)
   - FTIndicator/FTToastIndicator (1.2.9)
-  - Haring (2.0.8)
+  - Haring (2.1)
   - KeychainAccess (3.1.1)
   - libCEd25519 (1.1.0)
   - libsodium (1.0.12)
   - Lisk (1.0.0):
     - Ed25519 (~> 1.1.0)
-  - M13Checkbox (3.2.2)
-  - MessageKit (1.0.0)
-  - MyLittlePinpad (0.2.5)
-  - Parchment (1.4.0)
-  - PMAlertController (3.4.0)
-  - PromiseKit (6.3.5):
-    - PromiseKit/CorePromise (= 6.3.5)
-    - PromiseKit/Foundation (= 6.3.5)
-    - PromiseKit/UIKit (= 6.3.5)
-  - PromiseKit/CorePromise (6.3.5)
-  - PromiseKit/Foundation (6.3.5):
+  - MessageInputBar/Core (0.4.0)
+  - MessageKit (1.0.0):
+    - MessageInputBar/Core
+  - MyLittlePinpad (0.3)
+  - Parchment (1.4.1)
+  - PMAlertController (3.5.0)
+  - PromiseKit (6.4.1):
+    - PromiseKit/CorePromise (= 6.4.1)
+    - PromiseKit/Foundation (= 6.4.1)
+    - PromiseKit/UIKit (= 6.4.1)
+  - PromiseKit/CorePromise (6.4.1)
+  - PromiseKit/Foundation (6.4.1):
     - PromiseKit/CorePromise
-  - PromiseKit/UIKit (6.3.5):
+  - PromiseKit/UIKit (6.4.1):
     - PromiseKit/CorePromise
-  - QRCodeReader.swift (8.2.0)
-  - ReachabilitySwift (4.1.0)
-  - Result (3.0.0)
+  - QRCodeReader.swift (9.0.1)
+  - ReachabilitySwift (4.3.0)
+  - Result (4.0.0)
   - RNCryptor (5.0.3)
+  - scrypt (2.0):
+    - CryptoSwift (~> 0.11)
   - secp256k1_ios (0.1.3)
   - SipHash (1.2.2)
-  - Swinject (2.4.1)
-  - web3swift (1.1.1):
-    - BigInt (~> 3.1.0)
-    - CryptoSwift (~> 0.10.0)
-    - libsodium (~> 1.0.12)
-    - PromiseKit (~> 6.3.0)
-    - Result (~> 3.0.0)
-    - secp256k1_ios (~> 0.1.3)
+  - Swinject (2.5.0)
+  - web3swift (1.1.9):
+    - BigInt (~> 3.1)
+    - CryptoSwift (~> 0.11)
+    - PromiseKit (~> 6.3)
+    - Result (~> 4.0)
+    - scrypt (~> 2.0)
+    - secp256k1_ios (~> 0.1)
 
 DEPENDENCIES:
   - Alamofire
@@ -61,9 +64,9 @@ DEPENDENCIES:
   - FTIndicator
   - Haring
   - KeychainAccess
+  - libsodium
   - Lisk (from `https://github.com/boyarkin-anton/lisk-swift.git`, branch `dev`)
-  - M13Checkbox
-  - MessageKit (from `https://github.com/RealBonus/MessageKit`, branch `enhancement/customMessageKind`)
+  - MessageKit (from `https://github.com/RealBonus/MessageKit`, branch `temp/customMessageKind_swift42`)
   - MyLittlePinpad
   - Parchment
   - PMAlertController
@@ -88,7 +91,7 @@ SPEC REPOS:
     - KeychainAccess
     - libCEd25519
     - libsodium
-    - M13Checkbox
+    - MessageInputBar
     - MyLittlePinpad
     - Parchment
     - PMAlertController
@@ -97,6 +100,7 @@ SPEC REPOS:
     - ReachabilitySwift
     - Result
     - RNCryptor
+    - scrypt
     - secp256k1_ios
     - SipHash
     - Swinject
@@ -107,7 +111,7 @@ EXTERNAL SOURCES:
     :branch: dev
     :git: https://github.com/boyarkin-anton/lisk-swift.git
   MessageKit:
-    :branch: enhancement/customMessageKind
+    :branch: temp/customMessageKind_swift42
     :git: https://github.com/RealBonus/MessageKit
 
 CHECKOUT OPTIONS:
@@ -115,39 +119,40 @@ CHECKOUT OPTIONS:
     :commit: 952fea02d6076668f68eb252ec5bd8bf4e656960
     :git: https://github.com/boyarkin-anton/lisk-swift.git
   MessageKit:
-    :commit: fe0a000fc536ec46efe1a4e49af6ad39e27cfed3
+    :commit: 4409d10a7dcf390abbb696d280ec02025e89f4e7
     :git: https://github.com/RealBonus/MessageKit
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
   BigInt: 76b5dfdfa3e2e478d4ffdf161aeede5502e2742f
-  CryptoSwift: 6c778d69282bed3b4e975ff97a79d074f20bb011
+  CryptoSwift: 1c07ca50843dd48bc54e6ea53d7a4dba3b645716
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   Ed25519: d84c847d8ffbb2f6fec71479abbb8fa3dfe12578
-  EFQRCode: 203846c7b135b5f7c1d18bb7923bc32a74c8b363
-  Eureka: 0748c7bbb2560130e43c7bfa83e99c98854a1f42
-  FreakingSimpleRoundImageView: 66a0f0fa1722faf63b662ba61f8441b09436a428
+  EFQRCode: 51b67bd10952da9ef619ae0a396abb746b94263f
+  Eureka: 6d711cb30ca333b4bc893110285a722ae3840114
+  FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
-  Haring: d2a4cfc00dfb63836dffc93e45919369f850e134
+  Haring: b3a8495c073a016f03296d67debc609a7ecf7710
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
   libCEd25519: 45de00a0944cb2d51e64fcef67bd9989c42d20ca
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   Lisk: a900424110c208c425102ee8b6fd60d9b6b878c3
-  M13Checkbox: a8c2491cfbbca10797925fd0b9154a782bf40d89
-  MessageKit: 16160036b16476b04bd0e9f2c7ce67e662e503e4
-  MyLittlePinpad: ec1d9990d9715eab48205ecc08f4ff359ead521b
-  Parchment: 3ff467cea1e214ae2ce84f83aa738ecaab8057eb
-  PMAlertController: efb781925d741d50e0200018a00c53cecb8b4910
-  PromiseKit: 32c36425387e9cfc7f1206f27bfd906d0b53c0d6
-  QRCodeReader.swift: 003eb32f18a5a675b936ec82ba0ff368cddbff45
-  ReachabilitySwift: 6849231cd4e06559f3b9ef4a97a0a0f96d41e09f
-  Result: 1b3e431f37cbcd3ad89c6aa9ab0ae55515fae3b6
+  MessageInputBar: d46ecc5b355d13433b8367dcd200e05a6564f0ed
+  MessageKit: 0aaaa6115a9b4497a65fcdfed5dad270fbc8f2b2
+  MyLittlePinpad: 5d57cb5a092ddbeb5c4e6fa0b46df83bd3e88b0c
+  Parchment: e6c2a3a0063739382dd207e21d48fe5e81f3324a
+  PMAlertController: 06dab8160066fc4ce991c880e3722cd403e2926a
+  PromiseKit: 4c76a6506638034e3d7bede97b2ff7743f7bd2dc
+  QRCodeReader.swift: 96292a5612fbc2fd9a0b26f93fa5164c8d02f59d
+  ReachabilitySwift: 408477d1b6ed9779dba301953171e017c31241f3
+  Result: 7645bb3f50c2ce726dd0ff2fa7b6f42bbe6c3713
   RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
+  scrypt: 3fe5b1a3b0976f97cd87488673a8f7c65708cc84
   secp256k1_ios: ac9ef04e761f43c58012b28548afa91493761f17
   SipHash: fad90a4683e420c52ef28063063dbbce248ea6d4
-  Swinject: f7f15a9672e99328c1f07f277091087917215700
-  web3swift: 4b4e4a0dd16e7081b7190bf8596c5638f313a498
+  Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
+  web3swift: 4895c765c9858eb4737ef222eb8643bb5fc7fdb3
 
-PODFILE CHECKSUM: cfd2838f8f1dc168ff67bd1b77a253dc69d0cc8d
+PODFILE CHECKSUM: 48a1c938787f00cd7c1673909d7b2854d430cabe
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.0.beta.1

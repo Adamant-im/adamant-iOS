@@ -26,7 +26,7 @@ extension TransferViewControllerBase {
 		self.view.addSubview(view)
 		self.view.constrainToEdges(view)
 		
-		let indicator = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+        let indicator = UIActivityIndicatorView(style: .whiteLarge)
 		view.addSubview(indicator)
 		view.constrainCentered(indicator)
 		indicator.startAnimating()

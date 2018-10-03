@@ -46,7 +46,11 @@ extension AdamantDialogService {
 			}
 			
 			if let nav = topController as? UINavigationController, let visible = nav.visibleViewController {
-				return visible
+				if let presented = visible.presentedViewController {
+					return presented
+				} else {
+					return visible
+				}
 			}
 			
 			while let presentedViewController = topController.presentedViewController {
@@ -109,8 +113,8 @@ extension AdamantDialogService {
 		let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
         
         alertVC.gravityDismissAnimation = false
-        alertVC.alertTitle.textColor = UIColor.adamantPrimary
-        alertVC.alertDescription.textColor = .adamantSecondary
+        alertVC.alertTitle.textColor = UIColor.adamant.primary
+        alertVC.alertDescription.textColor = UIColor.adamant.secondary
         alertVC.alertTitle.font = UIFont.systemFont(ofSize: 20)
         alertVC.alertDescription.font = UIFont.systemFont(ofSize: 14, weight: .light)
         alertVC.headerViewHeightConstraint.constant = 50
@@ -167,14 +171,14 @@ extension AdamantDialogService {
         
         okBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         okBtn.setTitleColor(UIColor.white, for: .normal)
-        okBtn.backgroundColor = UIColor.adamantSecondary
+        okBtn.backgroundColor = UIColor.adamant.secondary
         alertVC.addAction(okBtn)
         
         alertVC.alertActionStackView.axis = .vertical
         alertVC.alertActionStackView.spacing = 0
         alertVC.alertActionStackViewHeightConstraint.constant = 100
-        
-        self.present(alertVC, animated: true, completion: nil)
+		
+		present(alertVC, animated: true, completion: nil)
 	}
 	
 	func showRichError(error: RichError) {
@@ -215,7 +219,7 @@ extension AdamantDialogService {
 
 // MAKR: - Activity controllers
 extension AdamantDialogService {
-	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, completion: (() -> Void)?) {
+	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, completion: (() -> Void)?) {
 		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 		
 		for type in types {
@@ -278,7 +282,7 @@ extension AdamantDialogService {
 		
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
 			DispatchQueue.main.async {
-				if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
+				if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
 					UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
 				}
 			}
@@ -298,7 +302,7 @@ extension AdamantDialogService {
 
 
 // MARK: - Alerts
-fileprivate extension UIAlertActionStyle {
+fileprivate extension UIAlertAction.Style {
 	func asPMAlertAction() -> PMAlertActionStyle {
 		switch self {
 		case .cancel:
@@ -312,7 +316,7 @@ fileprivate extension UIAlertActionStyle {
 }
 
 fileprivate extension AdamantAlertStyle {
-	func asUIAlertControllerStyle() -> UIAlertControllerStyle {
+    func asUIAlertControllerStyle() -> UIAlertController.Style {
 		switch self {
 		case .alert,
 			 .richNotification:
@@ -337,7 +341,7 @@ fileprivate extension AdamantAlertAction {
 }
 
 extension AdamantDialogService {
-	func showAlert(title: String, message: String, style: AdamantAlertStyle, actions: [AdamantAlertAction]?) {
+	func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?) {
 		switch style {
 		case .alert, .actionSheet:
 			let uiStyle = style.asUIAlertControllerStyle()
@@ -352,14 +356,14 @@ extension AdamantDialogService {
 		case .richNotification:
 			if let actions = actions {
 				let pmActions: [PMAlertAction] = actions.map { $0.asPMAlertAction() }
-				showAlert(title: title, message: message, actions: pmActions)
+				showAlert(title: title ?? "", message: message ?? "", actions: pmActions)
 			} else {
-				showAlert(title: title, message: message, actions: nil)
+				showAlert(title: title ?? "", message: message ?? "", actions: nil)
 			}
 		}
 	}
 	
-	func showAlert(title: String, message: String, style: UIAlertControllerStyle, actions: [UIAlertAction]?) {
+    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?) {
 		let alertVc = UIAlertController(title: title, message: message, preferredStyle: style)
 		
 		if let actions = actions {
@@ -377,22 +381,22 @@ extension AdamantDialogService {
         let alertVC = PMAlertController(title: title, description: message, image: nil, style: .alert)
         
         alertVC.gravityDismissAnimation = false
-        alertVC.alertTitle.textColor = UIColor.adamantPrimary
-        alertVC.alertDescription.textColor = .adamantSecondary
+        alertVC.alertTitle.textColor = UIColor.adamant.primary
+        alertVC.alertDescription.textColor = UIColor.adamant.secondary
         alertVC.alertTitle.font = UIFont.systemFont(ofSize: 20)
 		alertVC.alertDescription.font = UIFont.systemFont(ofSize: 14, weight: .light)
         
         if let actions = actions {
             for action in actions {
                 action.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-                action.setTitleColor(UIColor.adamantSecondary, for: .normal)
+                action.setTitleColor(UIColor.adamant.secondary, for: .normal)
                 alertVC.addAction(action)
             }
             
             let cancelAction = PMAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
             cancelAction.titleLabel?.font = UIFont.systemFont(ofSize: 16)
             cancelAction.setTitleColor(UIColor.white, for: .normal)
-            cancelAction.backgroundColor = UIColor.adamantSecondary
+            cancelAction.backgroundColor = UIColor.adamant.secondary
 
             alertVC.addAction(cancelAction)
             
@@ -402,7 +406,7 @@ extension AdamantDialogService {
             
             okBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
             okBtn.setTitleColor(UIColor.white, for: .normal)
-            okBtn.backgroundColor = UIColor.adamantSecondary
+            okBtn.backgroundColor = UIColor.adamant.secondary
             alertVC.addAction(okBtn)
             
             alertVC.alertActionStackViewHeightConstraint.constant = 50

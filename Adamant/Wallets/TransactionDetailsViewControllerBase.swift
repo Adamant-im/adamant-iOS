@@ -192,7 +192,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 .cellUpdate({ (cell, _) in
                     if let label = cell.textLabel {
                         label.font = UIFont.adamantPrimary(ofSize: 17)
-                        label.textColor = UIColor.adamantPrimary
+                        label.textColor = UIColor.adamant.primary
                     }
                     
                     cell.accessoryType = .disclosureIndicator
@@ -201,7 +201,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     // TODO:
                     if let url = self?.transaction?.explorerUrl {
                         let safari = SFSafariViewController(url: url)
-                        safari.preferredControlTintColor = UIColor.adamantPrimary
+                        safari.preferredControlTintColor = UIColor.adamant.primary
                         self?.present(safari, animated: true, completion: nil)
                     }
                 })
@@ -217,7 +217,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 .cellUpdate({ (cell, _) in
                     if let label = cell.textLabel {
                         label.font = UIFont.adamantPrimary(ofSize: 17)
-                        label.textColor = UIColor.adamantPrimary
+                        label.textColor = UIColor.adamant.primary
                     }
                     
                     cell.accessoryType = .disclosureIndicator
@@ -228,7 +228,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
 
         
         // MARK: - UI
-        navigationAccessoryView.tintColor = UIColor.adamantPrimary
+        navigationAccessoryView.tintColor = UIColor.adamant.primary
         
         guard let transaction = transaction else {
             return
@@ -351,8 +351,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Privare tools
     private func updateCell(_ cell: BaseCell) {
-        cell.textLabel?.textColor = UIColor.adamantPrimary
-        cell.detailTextLabel?.textColor = UIColor.adamantSecondary
+        cell.textLabel?.textColor = UIColor.adamant.primary
+        cell.detailTextLabel?.textColor = UIColor.adamant.secondary
         
         let font = UIFont.adamantPrimary(ofSize: 17)
         cell.textLabel?.font = font

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import M13Checkbox
 
 
 // MARK: Cell's Delegate
@@ -20,12 +19,14 @@ class AdamantDelegateCell: UITableViewCell {
 	
 	// MARK: IBOutlets
 	
-    @IBOutlet weak var checkbox: M13Checkbox!
     @IBOutlet weak var rankLabel: UILabel!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var addressLabel: UILabel!
     @IBOutlet weak var statusLabel: UILabel!
 	@IBOutlet weak var votedLabel: UILabel!
+	
+	@IBOutlet weak var checkmarkBackgroundView: UIView!
+	@IBOutlet weak var checkmarkImageView: UIImageView!
 
 	@IBOutlet weak var checkboxExpander: UIView!
 	
@@ -33,17 +34,43 @@ class AdamantDelegateCell: UITableViewCell {
 	
 	weak var delegate: AdamantDelegateCellDelegate?
 	
+	private var _isChecked: Bool = false
+	
 	var isChecked: Bool {
-		set {
-			checkbox.checkState = isChecked ? .checked : .unchecked
-		}
 		get {
-			return checkbox.checkState == .checked
+			return _isChecked
+		}
+		set {
+			setIsChecked(newValue, animated: false)
 		}
 	}
 	
 	func setIsChecked(_ checked: Bool, animated: Bool) {
-		checkbox.setCheckState(checked ? .checked : .unchecked, animated: animated)
+		_isChecked = checked
+		let view = checkmarkImageView!
+		
+		if animated {
+			if checked {
+				view.isHidden = false
+				UIView.animate(withDuration: 0.15, animations: {
+					view.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+				}, completion: { _ in
+					UIView.animate(withDuration: 0.1) {
+						view.transform = CGAffineTransform.identity
+					}
+				})
+			} else {
+				UIView.animate(withDuration: 0.15, animations: {
+					view.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
+				}, completion: { _ in
+					view.transform = CGAffineTransform(scaleX: 0.0, y: 0.0)
+					view.isHidden = true
+				})
+			}
+		} else {
+			view.isHidden = !checked
+			view.transform = checked ? CGAffineTransform.identity : CGAffineTransform(scaleX: 0.0, y: 0.0)
+		}
 	}
 	
 	var delegateIsActive: Bool = false {
@@ -55,15 +82,29 @@ class AdamantDelegateCell: UITableViewCell {
 	var isUpvoted: Bool = false {
 		didSet {
 			votedLabel.text = isUpvoted ? "⬆︎" : ""
+			checkmarkImageView.image = isUpvoted ? #imageLiteral(resourceName: "Downvote") : #imageLiteral(resourceName: "Upvote")
 		}
 	}
 	
 	var checkmarkColor: UIColor {
 		get {
-			return checkbox.tintColor
+			return checkmarkImageView.tintColor
 		}
 		set {
-			checkbox.tintColor = newValue
+			checkmarkImageView.tintColor = newValue
+		}
+	}
+	
+	var checkmarkBorderColor: UIColor? {
+		get {
+			if let color = checkmarkBackgroundView.layer.borderColor {
+				return UIColor(cgColor: color)
+			} else {
+				return nil
+			}
+		}
+		set {
+			checkmarkBackgroundView.layer.borderColor = newValue?.cgColor
 		}
 	}
 	
@@ -72,18 +113,10 @@ class AdamantDelegateCell: UITableViewCell {
 	
     override func awakeFromNib() {
         super.awakeFromNib()
-        
-		// To avoid too many missclicks, we create a bigger view to catch taps
-		checkboxExpander.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onExpanderTap)))
 		
-		checkbox.addTarget(self, action: #selector(self.onSelectChanged), for: UIControlEvents.valueChanged)
-    }
-
-    @objc func onSelectChanged() {
-		if let delegate = delegate {
-			let state = checkbox.checkState == .checked
-			delegate.delegateCell(self, didChangeCheckedStateTo: state)
-		}
+		checkboxExpander.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onExpanderTap)))
+		checkmarkBackgroundView.layer.borderWidth = 1
+		checkmarkBackgroundView.layer.cornerRadius = checkmarkBackgroundView.frame.height / 2
     }
 	
 	@objc func onExpanderTap() {

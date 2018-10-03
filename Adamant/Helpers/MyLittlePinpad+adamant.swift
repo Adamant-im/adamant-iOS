@@ -50,9 +50,9 @@ extension PinpadViewController {
 	static func adamantPinpad(biometryButton: PinpadBiometryButtonType) -> PinpadViewController {
 		let pinpad = PinpadViewController.instantiateFromResourceNib()
 		
-		pinpad.bordersColor = UIColor.adamantSecondary
-		pinpad.setColor(UIColor.adamantPrimary, for: .normal)
-		pinpad.buttonsHighlightedColor = UIColor.adamantPinpadHighlightButton
+		pinpad.bordersColor = UIColor.adamant.secondary
+		pinpad.setColor(UIColor.adamant.primary, for: .normal)
+		pinpad.buttonsHighlightedColor = UIColor.adamant.pinpadHighlightButton
 		pinpad.buttonsFont = UIFont.adamantPrimary(ofSize: pinpad.buttonsFont.pointSize, weight: .light)
 		
 		pinpad.placeholdersSize = 15
@@ -69,7 +69,7 @@ extension PinpadViewController {
 			pinpad.pinpadToCancelSpacing = 14
 		}
 		
-		pinpad.placeholderActiveColor = UIColor.adamantPinpadHighlightButton
+		pinpad.placeholderActiveColor = UIColor.adamant.pinpadHighlightButton
 		pinpad.biometryButtonType = biometryButton
 		pinpad.cancelButton.setTitle(String.adamantLocalized.alert.cancel, for: .normal)
 		pinpad.pinDigits = 6

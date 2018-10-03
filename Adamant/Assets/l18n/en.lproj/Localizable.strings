@@ -148,6 +148,9 @@
 /* Product name */
 "ADAMANT" = "ADAMANT";
 
+/* AddressBookService: Not enought money to save address into blockchain */
+"AddressBookService.Error.NotEnoughtMoney" = "Not enought tokens to store data in Blockchain";
+
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
 "Application.deviceTokenErrorFormat" = "Failed to register in ANS: %@";
 
@@ -219,6 +222,15 @@
 
 /* Chat: status message for pending chat transaction */
 "ChatScene.MessageStatus.Pending" = "Pending";
+
+/* Chat: Body for actions menu */
+"ChatScene.Actions.Body" = "New name for %@";
+
+/* Chat: 'Rename' action in actions menu */
+"ChatScene.Actions.Rename" = "Rename";
+
+/* Chat: 'Name' field in actions menu */
+"ChatScene.Actions.NamePlaceholder" = "Name";
 
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegates";
@@ -437,7 +449,7 @@
 "NodesEditor.FailedToBuildURL" = "Invalid host";
 
 /* Security: Notification modes description. Markdown supported. */
-"SecurityPage.Row.Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. **Important: you will not receive notifications, if Messenger is not running**. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. It can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You will receive notification almost instantly after a message was sent and approved by the Blockchain — a few seconds delay. **Notifications will be received even if Messenger is not running**. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.\n\n";
+"SecurityPage.Row.Notifications.ModesDescription" = "#### Notification modes\n\n#### Disabled\nNo notifications.\n\n#### Background Fetch\nYour device fetchs for new messages by itself. No external calls. Fetch is initiated by iOS, the actual time determined by the operating system based on many factors like battery charge, cellular network, application usage patterns and cannot be predicted. It can be 20 minutes, or 6 hours, or maybe even a day. You still can open app and check for a new message though.\n\n#### Push\nNotifications sent to your device by ADAMANT Notification Service. You will receive notification almost instantly after a message was sent and approved by the Blockchain — a few seconds delay. But this mode requires your device to register it's Device Token in the Service's database. Device tokens are safe and secure, and this option is recommended in most cases.\n\nYou can read more about device registration on ADAMANT's Github page.\n\n";
 
 /* Security: Selected notifications types */
 "SecurityPage.Section.NotificationsType" = "Notifications";
@@ -636,6 +648,9 @@
 
 /* Transaction details: 'Requesting Data' progress message. */
 "TransactionDetailsScene.RequestingData" = "Requesting Data..";
+
+/* Transaction details: 'Your address' flag. */
+"TransactionDetailsScene.YourAddress" = "You";
 
 /* TransfersProvider: Transaction not found error. %@ for transaction's ID */
 "TransfersProvider.Error.TransactionNotFoundFormat" = "Transaction with id %@ not found";

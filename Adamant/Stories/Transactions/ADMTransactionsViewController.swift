@@ -171,7 +171,7 @@ extension ADMTransactionsViewController {
             }
         }
         
-        toChat.backgroundColor = UIColor.adamantPrimary
+        toChat.backgroundColor = UIColor.adamant.primary
         
         return [toChat]
     }
@@ -214,7 +214,7 @@ extension ADMTransactionsViewController {
         })
         
         toChat.image = (messeges != nil) ? #imageLiteral(resourceName: "chats_tab") : #imageLiteral(resourceName: "Chat")
-        toChat.backgroundColor = UIColor.adamantPrimary
+        toChat.backgroundColor = UIColor.adamant.primary
         return UISwipeActionsConfiguration(actions: [toChat])
     }
 }

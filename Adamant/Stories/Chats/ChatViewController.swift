@@ -8,6 +8,7 @@
 
 import UIKit
 import MessageKit
+import MessageInputBar
 import CoreData
 import SafariServices
 
@@ -19,6 +20,10 @@ extension String.adamantLocalized {
 		static let cancelError = NSLocalizedString("ChatScene.Error.cancelError", comment: "Chat: inform user that he can't cancel transaction, that was sent")
         static let failToSend = NSLocalizedString("ChatScene.MessageStatus.FailToSend", comment: "Chat: status message for failed to send chat transaction")
         static let pending = NSLocalizedString("ChatScene.MessageStatus.Pending", comment: "Chat: status message for pending chat transaction")
+		
+        static let actionsBody = NSLocalizedString("ChatScene.Actions.Body", comment: "Chat: Body for actions menu")
+        static let rename = NSLocalizedString("ChatScene.Actions.Rename", comment: "Chat: 'Rename' action in actions menu")
+        static let name = NSLocalizedString("ChatScene.Actions.NamePlaceholder", comment: "Chat: 'Name' field in actions menu")
 		
 		private init() { }
 	}
@@ -38,6 +43,7 @@ class ChatViewController: MessagesViewController {
 	var chatsProvider: ChatsProvider!
 	var dialogService: DialogService!
 	var router: Router!
+    var addressBookService: AddressBookService!
 	
 	// MARK: Properties
 	weak var delegate: ChatViewControllerDelegate?
@@ -116,14 +122,8 @@ class ChatViewController: MessagesViewController {
 		
 		// MARK: 1. Initial configuration
 		
-		if let partner = chatroom.partner {
-			if let name = partner.name {
-				self.navigationItem.title = name
-			} else {
-				self.navigationItem.title = partner.address
-			}
-		}
-		
+        updateTitle()
+        
 		messagesCollectionView.messagesDataSource = self
 		messagesCollectionView.messagesDisplayDelegate = self
 		messagesCollectionView.messagesLayoutDelegate = self
@@ -187,7 +187,7 @@ class ChatViewController: MessagesViewController {
 			$0.setSize(CGSize(width: buttonWidth, height: buttonHeight), animated: false)
 			$0.title = nil
 			$0.image = #imageLiteral(resourceName: "Arrow")
-			$0.setImage(#imageLiteral(resourceName: "Arrow_innactive"), for: UIControlState.disabled)
+			$0.setImage(#imageLiteral(resourceName: "Arrow_innactive"), for: UIControl.State.disabled)
 		}
 		
 		if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
@@ -198,7 +198,7 @@ class ChatViewController: MessagesViewController {
 		// MARK: 3. Readonly chat
 		
 		if chatroom.isReadonly {
-			messageInputBar.inputTextView.backgroundColor = UIColor.adamantChatSenderBackground
+			messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
 			messageInputBar.inputTextView.isEditable = false
 			messageInputBar.sendButton.isEnabled = false
             attachmentButton.isEnabled = false
@@ -224,12 +224,12 @@ class ChatViewController: MessagesViewController {
 		
 		// MARK: 5. Notifications
 		// Fixing content insets after modal window
-		NotificationCenter.default.addObserver(forName: NSNotification.Name.UIKeyboardWillShow, object: nil, queue: OperationQueue.main) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
 			guard let fixIt = self?.fixKeyboardInsets, fixIt else {
 				return
 			}
 			
-			guard let frame = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect,
+            guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
 				let scrollView = self?.messagesCollectionView else {
 				return
 			}
@@ -300,19 +300,72 @@ class ChatViewController: MessagesViewController {
 		cellUpdateTimers.removeAll()
 	}
 	
+    func updateTitle() {
+        if let partner = chatroom?.partner {
+            if let name = partner.name {
+                self.navigationItem.title = name
+            } else {
+                self.navigationItem.title = partner.address
+            }
+            
+            if let address = partner.address, let name = self.addressBookService.addressBook[address] {
+                self.navigationItem.title = name
+            }
+        }
+    }
 	
 	// MARK: IBAction
 	
 	@IBAction func properties(_ sender: Any) {
-		if let address = chatroom?.partner?.address {
-			let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
-			
+		guard let partner = chatroom?.partner, let address = partner.address else {
+			return
+		}
+		
+		let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+		
+		if partner.isSystem {
 			dialogService.presentShareAlertFor(string: encodedAddress,
-				types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+											   types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
 											   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 											   animated: true,
 											   completion: nil)
+			
+			return
 		}
+		
+		let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
+			self?.dialogService.presentShareAlertFor(string: encodedAddress,
+													types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+													excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+													animated: true,
+													completion: nil)
+		}
+		
+		let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] action in
+			let alert = UIAlertController(title: String(format: String.adamantLocalized.chat.actionsBody, address), message: nil, preferredStyle: .alert)
+			
+			alert.addTextField { (textField) in
+				textField.placeholder = String.adamantLocalized.chat.name
+				textField.autocapitalizationType = .words
+				
+				if let name = self?.addressBookService.addressBook[address] {
+					textField.text = name
+				}
+			}
+			
+			alert.addAction(UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak alert] (_) in
+				if let textField = alert?.textFields?.first, let newName = textField.text {
+					self?.addressBookService.set(name: newName, for: address)
+					self?.updateTitle()
+				}
+			})
+			
+			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+			
+			self?.present(alert, animated: true, completion: nil)
+		}
+		
+        dialogService.showAlert(title: nil, message: nil, style: .actionSheet, actions: [share, rename])
 	}
     
     

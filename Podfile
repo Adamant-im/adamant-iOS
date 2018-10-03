@@ -17,20 +17,18 @@ target 'Adamant' do
   pod 'FreakingSimpleRoundImageView' # Round avatars
   pod 'FTIndicator' # Notifications and activity indicator
   pod 'Eureka' # Forms
-  pod 'MessageKit', :git => 'https://github.com/RealBonus/MessageKit', :branch => 'enhancement/customMessageKind' # Chat UI
+  pod 'MessageKit', :git => 'https://github.com/RealBonus/MessageKit', :branch => 'temp/customMessageKind_swift42' # Chat UI, swift 4.2
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
-  pod 'M13Checkbox' # Checkbox control
   pod 'Parchment' # Paging menu
 
   # QR
   pod 'EFQRCode' # QR generator
   pod 'QRCodeReader.swift' # QR reader
   
-  # ETH
-  pod 'web3swift' # Web3 Swift Port
-  
-  # LSK
-  pod 'Lisk', :git => 'https://github.com/boyarkin-anton/lisk-swift.git', :branch => 'dev'
+  # Cryptos
+  pod 'libsodium'
+  pod 'web3swift' # ETH Web3 Swift Port
+  pod 'Lisk', :git => 'https://github.com/boyarkin-anton/lisk-swift.git', :branch => 'dev' # LSK
 
 end

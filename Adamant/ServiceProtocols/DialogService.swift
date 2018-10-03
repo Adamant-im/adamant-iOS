@@ -58,22 +58,22 @@ enum ShareContentType {
 		}
 	}
 	
-	var excludedActivityTypes: [UIActivityType]? {
+	var excludedActivityTypes: [UIActivity.ActivityType]? {
 		switch self {
 		case .passphrase:
-			var types: [UIActivityType] = [.postToFacebook,
-										   .postToTwitter,
-										   .postToWeibo,
-										   .message,
-										   .mail,
-										   .assignToContact,
-										   .saveToCameraRoll,
-										   .addToReadingList,
-										   .postToFlickr,
-										   .postToVimeo,
-										   .postToTencentWeibo,
-										   .airDrop,
-										   .openInIBooks]
+			var types: [UIActivity.ActivityType] = [.postToFacebook,
+                                                    .postToTwitter,
+                                                    .postToWeibo,
+                                                    .message,
+                                                    .mail,
+                                                    .assignToContact,
+                                                    .saveToCameraRoll,
+                                                    .addToReadingList,
+                                                    .postToFlickr,
+                                                    .postToVimeo,
+                                                    .postToTencentWeibo,
+                                                    .airDrop,
+                                                    .openInIBooks]
 			
 			if #available(iOS 11.0, *) { types.append(.markupAsPDF) }
 			return types
@@ -102,7 +102,7 @@ enum AdamantAlertStyle {
 
 struct AdamantAlertAction {
 	let title: String
-	let style: UIAlertActionStyle
+    let style: UIAlertAction.Style
 	let handler: (() -> Void)?
 }
 
@@ -134,11 +134,11 @@ protocol DialogService: class {
 	func dismissNotification()
 	
 	// MARK: - ActivityControllers
-	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, completion: (() -> Void)?)
+	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, completion: (() -> Void)?)
 	
 	func presentGoToSettingsAlert(title: String?, message: String?)
     
     // MARK: - Alerts
-	func showAlert(title: String, message: String, style: UIAlertControllerStyle, actions: [UIAlertAction]?)
-	func showAlert(title: String, message: String, style: AdamantAlertStyle, actions: [AdamantAlertAction]?)
+    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?)
+	func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?)
 }

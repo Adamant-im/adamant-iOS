@@ -123,10 +123,7 @@ extension SecurityViewController: PinpadViewControllerDelegate {
 				case .success:
 					self?.pinpadRequest = nil
 					DispatchQueue.main.async {
-						if let biometryType = self?.localAuth.biometryType,
-							biometryType == .touchID || biometryType == .faceID,
-							let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-							self?.showLoggedInOptions = true
+						if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
 							row.value = false
 							row.updateCell()
 							row.evaluateHidden()
@@ -136,11 +133,15 @@ extension SecurityViewController: PinpadViewControllerDelegate {
 							section.evaluateHidden()
 						}
 						
+						if let section = self?.form.sectionBy(tag: Sections.aboutNotificationTypes.tag) {
+							section.evaluateHidden()
+						}
+						
 						pinpad.dismiss(animated: true, completion: nil)
 					}
 					
 				case .failure(let error):
-					self?.dialogService.showError(withMessage: error.localized, error: error)
+					self?.dialogService.showRichError(error: error)
 				}
 			}
 			
@@ -154,16 +155,6 @@ extension SecurityViewController: PinpadViewControllerDelegate {
 			}
 			
 			accountService.dropSavedAccount()
-			if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
-				showLoggedInOptions = false
-				row.value = false
-				row.updateCell()
-				row.evaluateHidden()
-			}
-			
-			if let section = form.sectionBy(tag: Sections.notifications.tag) {
-				section.evaluateHidden()
-			}
 			
 			pinpad.dismiss(animated: true, completion: nil)
 			
@@ -208,7 +199,6 @@ extension SecurityViewController: PinpadViewControllerDelegate {
 					
 					DispatchQueue.main.async {
 						if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {
-							self?.showLoggedInOptions = false
 							row.value = false
 							row.updateCell()
 							row.evaluateHidden()

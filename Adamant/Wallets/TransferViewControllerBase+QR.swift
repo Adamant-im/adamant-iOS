@@ -45,7 +45,7 @@ extension TransferViewControllerBase {
 			
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
 				DispatchQueue.main.async {
-					if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
+                    if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
 						UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
 					}
 				}
@@ -105,10 +105,10 @@ extension TransferViewControllerBase: ButtonsStripeViewDelegate {
 
 // MARK: - UIImagePickerControllerDelegate
 extension TransferViewControllerBase: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
 		dismiss(animated: true, completion: nil)
 		
-		guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else {
+		guard let image = info[.originalImage] as? UIImage else {
 			return
 		}
 		

@@ -143,14 +143,14 @@ class LoginViewController: FormViewController {
 			
 			if let label = header.viewWithTag(888) as? UILabel {
 				label.text = String.adamantLocalized.shared.productName
-				label.textColor = UIColor.adamantPrimary
+				label.textColor = UIColor.adamant.primary
 			}
 		}
 		
 		if let footer = UINib(nibName: "VersionFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
 			if let label = footer.viewWithTag(555) as? UILabel {
 				label.text = AdamantUtilities.applicationVersion
-				label.textColor = UIColor.adamantPrimary
+				label.textColor = UIColor.adamant.primary
 				tableView.tableFooterView = footer
 			}
 		}
@@ -210,7 +210,7 @@ class LoginViewController: FormViewController {
 			
 			self?.loginWith(passphrase: passphrase)
 		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
 		
 		
@@ -231,13 +231,13 @@ class LoginViewController: FormViewController {
 			cell.textView.isSelectable = false
 			cell.textView.isEditable = false
 			
-			let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize), color: UIColor.adamantPrimary)
+			let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize), color: UIColor.adamant.primary)
 			
 			let style = NSMutableParagraphStyle()
 			style.alignment = NSTextAlignment.center
 			
 			let mutableText = NSMutableAttributedString(attributedString: parser.parse(Rows.saveYourPassphraseAlert.localized))
-			mutableText.addAttribute(NSAttributedStringKey.paragraphStyle, value: style, range: NSRange(location: 0, length: mutableText.length))
+			mutableText.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: NSRange(location: 0, length: mutableText.length))
 			
 			cell.textView.attributedText = mutableText
 		}
@@ -252,11 +252,11 @@ class LoginViewController: FormViewController {
 			})
 		}.cellUpdate({ (cell, row) in
 			cell.passphraseLabel.font = UIFont.systemFont(ofSize: 19)
-			cell.passphraseLabel.textColor = UIColor.adamantPrimary
+			cell.passphraseLabel.textColor = UIColor.adamant.primary
 			cell.passphraseLabel.textAlignment = .center
 		
 			cell.tipLabel.font = UIFont.systemFont(ofSize: 12)
-			cell.tipLabel.textColor = UIColor.adamantSecondary
+			cell.tipLabel.textColor = UIColor.adamant.secondary
 			cell.tipLabel.textAlignment = .center
 		}).onCellSelection({ [weak self] (cell, row) in
 			guard let passphrase = self?.generatedPassphrases.last, let dialogService = self?.dialogService else {
@@ -281,7 +281,7 @@ class LoginViewController: FormViewController {
 		}.onCellSelection { [weak self] (cell, row) in
 			self?.generateNewPassphrase()
 		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
         
         // MARK: Nodes list settings
@@ -292,7 +292,7 @@ class LoginViewController: FormViewController {
 		}.cellSetup { (cell, _) in
 			cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamantPrimary
+			cell.textLabel?.textColor = UIColor.adamant.primary
 		}.onCellSelection { [weak self] (_, _) in
 			guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
 				return
@@ -305,7 +305,7 @@ class LoginViewController: FormViewController {
 		
 		// MARK: tableView position tuning
 		if let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
-			NotificationCenter.default.addObserver(forName: Notification.Name.UITextFieldTextDidBeginEditing, object: row.cell.textField, queue: nil) { [weak self] _ in
+			NotificationCenter.default.addObserver(forName: UITextField.textDidBeginEditingNotification, object: row.cell.textField, queue: nil) { [weak self] _ in
 				guard let tableView = self?.tableView, let indexPath = self?.form.rowBy(tag: Rows.loginButton.tag)?.indexPath else {
 					return
 				}
@@ -317,7 +317,7 @@ class LoginViewController: FormViewController {
 		}
 		
 		// MARK: Requesting biometry onActive
-		NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationDidBecomeActive, object: nil, queue: OperationQueue.main) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			if let firstTimeActive = self?.firstTimeActive, firstTimeActive,
 				let accountService = self?.accountService, accountService.hasStayInAccount, accountService.useBiometry {
 				self?.loginWithBiometry()
@@ -376,7 +376,7 @@ extension LoginViewController {
 				self?.loginIntoExistingAccount(passphrase: passphrase)
 				
 			case .failure(let error):
-				self?.dialogService.showError(withMessage: error.localized, error: error)
+				self?.dialogService.showRichError(error: error)
 			}
 		})
 	}
@@ -394,7 +394,7 @@ extension LoginViewController {
 				self?.dialogService.dismissProgress()
 				
 				if let alert = alert {
-					self?.dialogService.showAlert(title: alert.title, message: alert.message, style: UIAlertControllerStyle.alert, actions: nil)
+                    self?.dialogService.showAlert(title: alert.title, message: alert.message, style: UIAlertController.Style.alert, actions: nil)
 				}
 				
 			case .failure(let error):

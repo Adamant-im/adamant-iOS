@@ -34,6 +34,79 @@ extension String.adamantLocalized.alert {
 
 // MARK: AccountViewController
 class AccountViewController: FormViewController {
+	// MARK: - Rows & Sections
+	private enum Sections {
+		case wallet, application, delegates, actions
+		
+		var tag: String {
+			switch self {
+			case .wallet: return "wllt"
+			case .application: return "app"
+			case .actions: return "actns"
+            case .delegates: return "dlgts"
+			}
+		}
+		
+		var localized: String {
+			switch self {
+			case .wallet: return "Wallet"	// Depends on selected wallet
+			case .application: return NSLocalizedString("AccountTab.Section.Application", comment: "Account tab: Application section title")
+			case .actions: return NSLocalizedString("AccountTab.Section.Actions", comment: "Account tab: Actions section title")
+            case .delegates: return NSLocalizedString("AccountTab.Section.Delegates", comment: "Account tab: Delegates section title")
+			}
+		}
+	}
+	
+	private enum Rows {
+		case balance, sendTokens, buyTokens, freeTokens // Wallet
+		case security, nodes, about // Application
+		case voteForDelegates // Delegates
+		case logout // Actions
+		
+		var tag: String {
+			switch self {
+			case .balance: return "blnc"
+			case .sendTokens: return "sndTkns"
+			case .buyTokens: return "bTkns"
+			case .freeTokens: return "frrTkns"
+			case .security: return "scrt"
+			case .nodes: return "nds"
+			case .about: return "bt"
+			case .logout: return "lgtrw"
+            case .voteForDelegates:
+                return "vtFrDlgts"
+			}
+		}
+		
+		var localized: String {
+			switch self {
+			case .balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
+			case .sendTokens: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
+			case .buyTokens: return NSLocalizedString("AccountTab.Row.BuyTokens", comment: "Account tab: 'Buy tokens' button")
+			case .freeTokens: return NSLocalizedString("AccountTab.Row.FreeTokens", comment: "Account tab: 'Get free tokens' button")
+			case .security: return NSLocalizedString("AccountTab.Row.Security", comment: "Account tab: 'Security' row")
+			case .nodes: return String.adamantLocalized.nodesList.nodesListButton
+			case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
+			case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
+			case .voteForDelegates: return NSLocalizedString("AccountTab.Row.VoteForDelegates", comment: "Account tab: 'Votes for delegates' button")
+			}
+		}
+		
+		var image: UIImage? {
+			switch self {
+			case .security: return #imageLiteral(resourceName: "row_security")
+			case .about: return #imageLiteral(resourceName: "row_about")
+			case .nodes: return #imageLiteral(resourceName: "row_nodes")
+			case .balance: return #imageLiteral(resourceName: "row_balance")
+			case .buyTokens: return #imageLiteral(resourceName: "row_buy-coins")
+			case .voteForDelegates: return #imageLiteral(resourceName: "row_vote-delegates")
+			case .logout: return #imageLiteral(resourceName: "row_logout")
+			case .freeTokens: return #imageLiteral(resourceName: "row_free-tokens")
+			case .sendTokens: return #imageLiteral(resourceName: "row_icon_placeholder") // TODO:
+			}
+		}
+	}
+	
 	// MARK: - Dependencies
 	var accountService: AccountService!
 	var dialogService: DialogService!
@@ -100,14 +173,14 @@ class AccountViewController: FormViewController {
 		
 		pagingViewController.menuItemSource = .nib(nib: UINib(nibName: "WalletCollectionViewCell", bundle: nil))
 		pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
-		pagingViewController.indicatorColor = UIColor.adamantPrimary
+		pagingViewController.indicatorColor = UIColor.adamant.primary
 		pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
 		pagingViewController.dataSource = self
 		pagingViewController.delegate = self
 		pagingViewController.select(index: 0)
 		accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
 		accountHeaderView.walletViewContainer.constrainToEdges(pagingViewController.view)
-		addChildViewController(pagingViewController)
+        addChild(pagingViewController)
 		
 		for wallet in accountService.wallets {
 			NotificationCenter.default.addObserver(forName: wallet.walletUpdatedNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
@@ -124,7 +197,7 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.security.localized
 			$0.tag = Rows.security.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.imageView?.image = Rows.security.image
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -140,7 +213,7 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.nodes.localized
 			$0.tag = Rows.nodes.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.imageView?.image = Rows.nodes.image
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -156,7 +229,7 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.about.localized
 			$0.tag = Rows.about.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.imageView?.image = Rows.about.image
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -178,7 +251,7 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.tag = Rows.voteForDelegates.tag
 			$0.title = Rows.voteForDelegates.localized
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.imageView?.image = Rows.voteForDelegates.image
 		}.cellSetup({ (cell, _) in
 			cell.selectionStyle = .gray
 		}).cellUpdate({ (cell, _) in
@@ -195,7 +268,7 @@ class AccountViewController: FormViewController {
 		<<< LabelRow() {
 			$0.title = Rows.logout.localized
 			$0.tag = Rows.logout.tag
-			$0.cell.imageView?.image = #imageLiteral(resourceName: "row_icon_placeholder")
+			$0.cell.imageView?.image = Rows.logout.image
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
@@ -225,12 +298,13 @@ class AccountViewController: FormViewController {
 		})
 		
 		
-		form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamantSecondary; }
+		form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamant.tableRowIcons }
 		
 		
 		// MARK: Notification Center
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.updateAccountInfo()
+			self?.tableView.setContentOffset(CGPoint.zero, animated: false)
 		}
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.updateAccountInfo()
@@ -270,7 +344,7 @@ class AccountViewController: FormViewController {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
 		
-		for vc in pagingViewController.pageViewController.childViewControllers {
+        for vc in pagingViewController.pageViewController.children {
 			vc.viewWillAppear(animated)
 		}
 	}
@@ -286,8 +360,12 @@ class AccountViewController: FormViewController {
 		if !initiated {
 			initiated = true
 		}
+
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = false
+		}
 	}
-	
+
 	deinit {
 		NotificationCenter.default.removeObserver(self)
 	}
@@ -295,11 +373,11 @@ class AccountViewController: FormViewController {
 	
 	// MARK: TableView configuration
 	
-	override func insertAnimation(forSections sections: [Section]) -> UITableViewRowAnimation {
+	override func insertAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
 		return .fade
 	}
 	
-	override func deleteAnimation(forSections sections: [Section]) -> UITableViewRowAnimation {
+	override func deleteAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
 		return .fade
 	}
 	
@@ -340,7 +418,8 @@ extension AccountViewController: AccountHeaderViewDelegate {
 			tableView.deselectRow(at: indexPath, animated: true)
 		}
 		
-		dialogService.presentShareAlertFor(string: address,
+		let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+		dialogService.presentShareAlertFor(string: encodedAddress,
 										   types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
 										   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 										   animated: true,
@@ -419,70 +498,6 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 		} else {
 			accountHeaderView.frame = headerBounds
 			tableView.tableHeaderView = accountHeaderView
-		}
-	}
-}
-
-
-// MARK: - Rows & Sections
-fileprivate extension AccountViewController {
-	enum Sections {
-		case wallet, application, delegates, actions
-		
-		var tag: String {
-			switch self {
-			case .wallet: return "wllt"
-			case .application: return "app"
-			case .actions: return "actns"
-			case .delegates: return "dlgts"
-			}
-		}
-		
-		var localized: String {
-			switch self {
-			case .wallet: return "Wallet"	// Depends on selected wallet
-			case .application: return NSLocalizedString("AccountTab.Section.Application", comment: "Account tab: Application section title")
-			case .actions: return NSLocalizedString("AccountTab.Section.Actions", comment: "Account tab: Actions section title")
-			case .delegates: return NSLocalizedString("AccountTab.Section.Delegates", comment: "Account tab: Delegates section title")
-			}
-		}
-	}
-	
-	enum Rows {
-		case balance, balanceEth, balanceLsk, sendTokens, buyTokens, freeTokens // Wallet
-		case security, nodes, about // Application
-		case voteForDelegates // Delegates
-		case logout // Actions
-		
-		var tag: String {
-			switch self {
-			case .balance: return "blnc"
-			case .balanceEth: return "blncEth"
-			case .balanceLsk: return "blncLsk"
-			case .sendTokens: return "sndTkns"
-			case .buyTokens: return "bTkns"
-			case .freeTokens: return "frrTkns"
-			case .security: return "scrt"
-			case .nodes: return "nds"
-			case .about: return "bt"
-			case .logout: return "lgtrw"
-			case .voteForDelegates:
-				return "vtFrDlgts"
-			}
-		}
-		
-		var localized: String {
-			switch self {
-			case .balance, .balanceEth, .balanceLsk: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
-			case .sendTokens: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
-			case .buyTokens: return NSLocalizedString("AccountTab.Row.BuyTokens", comment: "Account tab: 'Buy tokens' button")
-			case .freeTokens: return NSLocalizedString("AccountTab.Row.FreeTokens", comment: "Account tab: 'Get free tokens' button")
-			case .security: return NSLocalizedString("AccountTab.Row.Security", comment: "Account tab: 'Security' row")
-			case .nodes: return String.adamantLocalized.nodesList.nodesListButton
-			case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
-			case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
-			case .voteForDelegates: return NSLocalizedString("AccountTab.Row.VoteForDelegates", comment: "Account tab: 'Votes for delegates' button")
-			}
 		}
 	}
 }

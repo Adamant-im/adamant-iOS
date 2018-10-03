@@ -18,9 +18,9 @@ extension AdamantScene {
 			c.router = r.resolve(Router.self)
 			c.notificationsService = r.resolve(NotificationsService.self)
 			c.dialogService = r.resolve(DialogService.self)
+			c.addressBook = r.resolve(AddressBookService.self)
             
-            // MARK: - RichMessage handlers
-            
+            // MARK: RichMessage handlers
             // Transfer handlers from accountService' wallet services
             if let accountService = r.resolve(AccountService.self) {
                 for case let provider as RichMessageProvider in accountService.wallets {
@@ -36,9 +36,9 @@ extension AdamantScene {
 			c.chatsProvider = r.resolve(ChatsProvider.self)
 			c.dialogService = r.resolve(DialogService.self)
 			c.router = r.resolve(Router.self)
+            c.addressBookService = r.resolve(AddressBookService.self)
             
-            // MARK: - RichMessage handlers
-            
+            // MARK: RichMessage handlers
             // Transfer handlers from accountService' wallet services
             if let accountService = r.resolve(AccountService.self) {
                 for case let provider as RichMessageProvider in accountService.wallets {

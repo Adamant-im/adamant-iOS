@@ -8,6 +8,7 @@
 
 import Foundation
 import MessageKit
+import MessageInputBar
 import SafariServices
 import Haring
 
@@ -51,7 +52,7 @@ extension ChatViewController: MessagesDataSource {
     
     func cellTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
         if self.shouldDisplayHeader(for: message, at: indexPath, in: self.messagesCollectionView) {
-            return NSAttributedString(string: message.sentDate.humanizedDay(), attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedStringKey.foregroundColor: UIColor.gray])
+            return NSAttributedString(string: message.sentDate.humanizedDay(), attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.gray])
         }
         return nil
     }
@@ -64,10 +65,10 @@ extension ChatViewController: MessagesDataSource {
             
             switch transaction.statusEnum {
             case .failed:
-                return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedStringKey.foregroundColor: UIColor.darkText])
+                return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.darkText])
                 
             case .pending:
-                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedStringKey.foregroundColor: UIColor.darkText])
+                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.darkText])
                 
             case .delivered:
                 return nil
@@ -108,7 +109,7 @@ extension ChatViewController: MessagesDataSource {
 			}
 		}
 		
-		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
+		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption2)])
 	}
     
     func customCell(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
@@ -128,15 +129,15 @@ extension ChatViewController: MessagesDataSource {
             if fromCurrent {
                 if let transaction = message as? ChatTransaction {
                     switch transaction.statusEnum {
-                    case .failed: bgColor = .adamantFailChatBackground
-                    case .pending: bgColor = .adamantPendingChatBackground
-                    case .delivered: bgColor = .adamantChatSenderBackground
+                    case .failed: bgColor = UIColor.adamant.failChatBackground
+                    case .pending: bgColor = UIColor.adamant.pendingChatBackground
+                    case .delivered: bgColor = UIColor.adamant.chatSenderBackground
                     }
                 } else {
-                    bgColor = UIColor.adamantChatSenderBackground
+                    bgColor = UIColor.adamant.chatSenderBackground
                 }
             } else {
-                bgColor = UIColor.adamantChatRecipientBackground
+                bgColor = UIColor.adamant.chatRecipientBackground
             }
             
             chatCell.bubbleBackgroundColor = bgColor
@@ -161,21 +162,21 @@ extension ChatViewController: MessagesDisplayDelegate {
 	func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
 		if isFromCurrentSender(message: message) {
             guard let transaction = message as? ChatTransaction else {
-                return UIColor.adamantChatSenderBackground
+                return UIColor.adamant.chatSenderBackground
             }
             
             switch transaction.statusEnum {
             case .failed:
-                return UIColor.adamantFailChatBackground
+                return UIColor.adamant.failChatBackground
 				
 			case .pending:
-				return UIColor.adamantPendingChatBackground
+				return UIColor.adamant.pendingChatBackground
 				
             case .delivered:
-                return UIColor.adamantChatSenderBackground
+                return UIColor.adamant.chatSenderBackground
             }
 		} else {
-			return UIColor.adamantChatRecipientBackground
+			return UIColor.adamant.chatRecipientBackground
 		}
 	}
 	
@@ -302,7 +303,7 @@ extension ChatViewController: MessageCellDelegate {
 	
 	func didSelectURL(_ url: URL) {
 		let safari = SFSafariViewController(url: url)
-		safari.preferredControlTintColor = UIColor.adamantPrimary
+		safari.preferredControlTintColor = UIColor.adamant.primary
 		present(safari, animated: true, completion: nil)
 	}
 }
@@ -390,7 +391,7 @@ extension ChatViewController: MessagesLayoutDelegate {
         }
     }
     
-    func cellSizeCalculator(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CellSizeCalculator {
+    func customCellSizeCalculator(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CellSizeCalculator {
         guard let type = getRichMessageType(of: message) else {
             return (messagesCollectionView.collectionViewLayout as! MessagesCollectionViewFlowLayout).textMessageSizeCalculator
         }
@@ -516,8 +517,6 @@ extension RichMessageTransaction: MessageType {
 
 // MARK: TransferTransaction
 extension TransferTransaction: MessageType {
-    static let messageKindContent: [String: String] = ["type": AdmWalletService.richMessageType]
-    
 	public var sender: Sender {
 		let id = self.senderId!
 		return Sender(id: id, displayName: id)

@@ -11,11 +11,14 @@ import Foundation
 // MARK: - Notifications
 extension Notification.Name {
 	struct AdamantAccountService {
+		/// Raised when user has successfully logged in. See AdamantUserInfoKey.AccountService
+		static let userLoggedIn = Notification.Name("adamant.accountService.userHasLoggedIn")
+		
 		/// Raised when user has logged out.
 		static let userLoggedOut = Notification.Name("adamant.accountService.userHasLoggedOut")
 		
-		/// Raised when user has successfully logged in. See AdamantUserInfoKey.AccountService
-		static let userLoggedIn = Notification.Name("adamant.accountService.userHasLoggedIn")
+		/// Raised when user is about to log out. Save your data.
+		static let userWillLogOut = Notification.Name("adamant.accountService.userWillLogOut")
 		
 		/// Raised on account info (balance) updated.
 		static let accountDataUpdated = Notification.Name("adamant.accountService.accountDataUpdated")

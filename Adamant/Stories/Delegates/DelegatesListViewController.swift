@@ -23,6 +23,17 @@ extension String.adamantLocalized {
 
 class DelegatesListViewController: UIViewController {
 	
+	// MARK: - Wrapper
+	class CheckedDelegate {
+		var delegate: Delegate
+		var isChecked: Bool = false
+		
+		init(delegate: Delegate) {
+			self.delegate = delegate
+		}
+	}
+	
+	
     // MARK: - Dependencies
     
     var apiService: ApiService!
@@ -41,21 +52,26 @@ class DelegatesListViewController: UIViewController {
 	
     // MARK: - Properties
 	
-    private (set) var delegates: [Delegate] = [Delegate]()
-    private var delegatesChanges: [IndexPath] = [IndexPath]()
+    private (set) var delegates: [CheckedDelegate] = [CheckedDelegate]()
+	private var filteredDelegates: [Int]? = nil
     
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
-                                 for: UIControlEvents.valueChanged)
-        refreshControl.tintColor = UIColor.adamantPrimary
+                                 for: UIControl.Event.valueChanged)
+        refreshControl.tintColor = UIColor.adamant.primary
         
         return refreshControl
     }()
 	
 	private var forcedUpdateTimer: Timer? = nil
 
+	// MARK: Tools
+	
+	// Can start with 'u' or 'U', then 1-20 digits
+	private let possibleAddressRegEx = try! NSRegularExpression(pattern: "^[uU]{0,1}\\d{1,20}$", options: [])
+	
 	
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
@@ -75,19 +91,33 @@ class DelegatesListViewController: UIViewController {
         if #available(iOS 11.0, *) {
             navigationController?.navigationBar.prefersLargeTitles = false
         }
-        
+		
+		// MARK: Initial
         navigationItem.title = String.adamantLocalized.delegates.title
-        
         tableView.register(UINib.init(nibName: "AdamantDelegateCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
 		tableView.rowHeight = 50
 		tableView.addSubview(self.refreshControl)
-        
+		
+		// MARK: Search controller
+		if #available(iOS 11.0, *) {
+			let searchController = UISearchController(searchResultsController: nil)
+			searchController.searchResultsUpdater = self
+			searchController.obscuresBackgroundDuringPresentation = false
+			searchController.hidesNavigationBarDuringPresentation = false
+			navigationItem.searchController = searchController
+			definesPresentationContext = true
+			navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
+		}
+		
+		// MARK: Reset UI
         upVotesLabel.text = ""
         downVotesLabel.text = ""
         newVotesLabel.text = ""
         totalVotesLabel.text = ""
-        
-        refreshControl.beginRefreshing()
+		voteBtn.isEnabled = false
+		
+		// MARK: Load data
+//        refreshControl.beginRefreshing() // Nasty glitches
         handleRefresh(refreshControl)
     }
     
@@ -122,12 +152,21 @@ class DelegatesListViewController: UIViewController {
 		apiService.getDelegatesWithVotes(for: address, limit: activeDelegates) { (result) in
 			switch result {
 			case .success(let delegates):
-				self.delegates = delegates
+				let checkedNames = self.delegates.filter { $0.isChecked }.map { $0.delegate.username }
+				let checkedDelegates = delegates.map { CheckedDelegate(delegate: $0) }
+				for name in checkedNames {
+					if let i = delegates.index(where: { $0.username == name }) {
+						checkedDelegates[i].isChecked = true
+					}
+				}
+				
+				self.delegates = checkedDelegates
+				
 				DispatchQueue.main.async {
 					self.tableView.reloadData()
 				}
 			case .failure(let error):
-				self.dialogService.showError(withMessage: error.localized, error: error)
+				self.dialogService.showRichError(error: error)
 			}
 			
 			DispatchQueue.main.async {
@@ -136,6 +175,12 @@ class DelegatesListViewController: UIViewController {
 			}
 		}
     }
+	
+	@objc private func activateSearch() {
+		if #available(iOS 11.0, *), let bar = navigationItem.searchController?.searchBar, !bar.isFirstResponder {
+			bar.becomeFirstResponder()
+		}
+	}
 }
 
 
@@ -146,7 +191,11 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return delegates.count
+		if let filtered = filteredDelegates {
+			return filtered.count
+		} else {
+			return delegates.count
+		}
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -158,8 +207,7 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
 			return
 		}
 		
-        let delegate = delegates[indexPath.row]
-        controller.delegate = delegate
+        controller.delegate = checkedDelegateFor(indexPath: indexPath).delegate
 		
         navigationController?.pushViewController(controller, animated: true)
     }
@@ -169,8 +217,9 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
         guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? AdamantDelegateCell else {
 			return UITableViewCell(style: .default, reuseIdentifier: "cell")
         }
-        
-        let delegate = delegates[indexPath.row]
+		
+		let checkedDelegate = checkedDelegateFor(indexPath: indexPath)
+		let delegate = checkedDelegate.delegate
         
         cell.nameLabel.text = delegate.username
         cell.rankLabel.text = String(delegate.rank)
@@ -178,11 +227,12 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
         cell.delegateIsActive = delegate.rank <= activeDelegates
 		cell.accessoryType = .disclosureIndicator
 		cell.delegate = self
-		cell.checkmarkColor = UIColor.adamantPrimary
+		cell.checkmarkColor = UIColor.adamant.primary
+		cell.checkmarkBorderColor = UIColor.adamant.secondary
 		
 		cell.isUpvoted = delegate.voted
 		
-		cell.setIsChecked(delegatesChanges.contains(indexPath), animated: false)
+		cell.setIsChecked(checkedDelegate.isChecked, animated: false)
 		
         return cell
     }
@@ -196,14 +246,7 @@ extension DelegatesListViewController: AdamantDelegateCellDelegate {
 			return
 		}
 		
-		if state {
-			if !delegatesChanges.contains(indexPath) {
-				delegatesChanges.append(indexPath)
-			}
-		} else if let index = delegatesChanges.index(of: indexPath) {
-			delegatesChanges.remove(at: index)
-		}
-		
+		checkedDelegateFor(indexPath: indexPath).isChecked = state
 		updateVotePanel()
 	}
 }
@@ -213,7 +256,8 @@ extension DelegatesListViewController: AdamantDelegateCellDelegate {
 extension DelegatesListViewController {
 	@IBAction func vote(_ sender: Any) {
 		// MARK: Prepare
-		guard delegatesChanges.count > 0 else {
+		let checkedDelegates = delegates.enumerated().filter { $1.isChecked }
+		guard checkedDelegates.count > 0 else {
 			return
 		}
 		
@@ -232,37 +276,35 @@ extension DelegatesListViewController {
 		
 		var votes = [DelegateVote]()
 		
-		for indexPath in delegatesChanges {
-			let delegate = delegates[indexPath.row]
+		for checked in checkedDelegates {
+			let delegate = checked.element.delegate
 			let vote: DelegateVote = delegate.voted ? .downvote(publicKey: delegate.publicKey) : .upvote(publicKey: delegate.publicKey)
 			votes.append(vote)
 		}
-		
-		let indicies = delegatesChanges
-		
+
 		// MARK: Send
 		
 		dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
-		
+
 		apiService.voteForDelegates(from: account.address, keypair: keypair, votes: votes) { result in
 			switch result {
 			case .success:
 				self.dialogService.showSuccess(withMessage: String.adamantLocalized.delegates.success)
-				
+
 				DispatchQueue.main.async {
-					for indexPath in indicies {
-						var delegate = self.delegates[indexPath.row]
+					checkedDelegates.forEach {
+						$1.isChecked = false
+						
+						var delegate = $1.delegate
 						delegate.voted = !delegate.voted
-						self.delegates[indexPath.row] = delegate
+						$1.delegate = delegate
 					}
 					
-					self.delegatesChanges.removeAll()
+					self.tableView.reloadData()
 					self.updateVotePanel()
-					self.tableView.reloadRows(at: indicies, with: .none)
-					
-					self.scheduleUpdate() // schedule on main
+					self.scheduleUpdate()
 				}
-				
+
 			case .failure(let error):
 				self.dialogService.showRichError(error: TransfersProviderError.serverError(error))
 			}
@@ -271,8 +313,41 @@ extension DelegatesListViewController {
 }
 
 
+// MARK: - UISearchResultsUpdating
+extension DelegatesListViewController: UISearchResultsUpdating {
+	func updateSearchResults(for searchController: UISearchController) {
+		if let search = searchController.searchBar.text?.lowercased(), search.count > 0 {
+			let searchAddress = possibleAddressRegEx.matches(in: search, options: [], range: NSRange(location: 0, length: search.count)).count == 1
+			
+			
+			
+			let filter: ((Int, CheckedDelegate) -> Bool)
+			if searchAddress {
+				filter = { $1.delegate.username.lowercased().contains(search) || $1.delegate.address.lowercased().contains(search) }
+			} else {
+				filter = { $1.delegate.username.lowercased().contains(search) }
+			}
+			
+			filteredDelegates = delegates.enumerated().filter(filter).map { $0.offset }
+		} else {
+			filteredDelegates = nil
+		}
+		
+		tableView.reloadData()
+	}
+}
+
+
 // MARK: - Private
 extension DelegatesListViewController {
+	private func checkedDelegateFor(indexPath: IndexPath) -> CheckedDelegate {
+		if let filtered = filteredDelegates {
+			return delegates[filtered[indexPath.row]]
+		} else {
+			return delegates[indexPath.row]
+		}
+	}
+	
 	private func scheduleUpdate() {
 		if let timer = forcedUpdateTimer {
 			timer.invalidate()
@@ -289,7 +364,7 @@ extension DelegatesListViewController {
 	}
 	
 	private func updateVotePanel() {
-		let changes = delegatesChanges.map { delegates[$0.row] }
+		let changes = delegates.filter { $0.isChecked }.map { $0.delegate }
 		
 		var upvoted = 0
 		var downvoted = 0
@@ -301,24 +376,24 @@ extension DelegatesListViewController {
 			}
 		}
 		
-		let totalVoted = delegates.reduce(0) { $0 + ($1.voted ? 1 : 0) } + upvoted - downvoted
+		let totalVoted = delegates.reduce(0) { $0 + ($1.delegate.voted ? 1 : 0) } + upvoted - downvoted
 		
-		let votingEnabled = delegatesChanges.count <= maxVotes && totalVoted <= maxTotalVotes
-		let newVotesColor = delegatesChanges.count > maxVotes ? UIColor.red : UIColor.darkText
+		let votingEnabled = changes.count > 0 && changes.count <= maxVotes && totalVoted <= maxTotalVotes
+		let newVotesColor = changes.count > maxVotes ? UIColor.red : UIColor.darkText
 		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.red : UIColor.darkText
 		
 		
 		if Thread.isMainThread {
 			upVotesLabel.text = String(upvoted)
 			downVotesLabel.text = String(downvoted)
-			newVotesLabel.text = "\(delegatesChanges.count)/\(maxVotes)"
+			newVotesLabel.text = "\(changes.count)/\(maxVotes)"
 			totalVotesLabel.text = "\(totalVoted)/\(maxTotalVotes)"
 			
 			voteBtn.isEnabled = votingEnabled
 			newVotesLabel.textColor = newVotesColor
 			totalVotesLabel.textColor = totalVotesColor
 		} else {
-			let changes = delegatesChanges.count
+			let changes = changes.count
 			let max = maxVotes
 			let totalMax = maxTotalVotes
 			

@@ -45,7 +45,7 @@ class ComplexTransferViewController: UIViewController {
 		pagingViewController = PagingViewController<WalletPagingItem>()
 		pagingViewController.menuItemSource = .nib(nib: UINib(nibName: "WalletCollectionViewCell", bundle: nil))
 		pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
-		pagingViewController.indicatorColor = UIColor.adamantPrimary
+		pagingViewController.indicatorColor = UIColor.adamant.primary
 		pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
 		
 		pagingViewController.dataSource = self
@@ -53,7 +53,7 @@ class ComplexTransferViewController: UIViewController {
 		
 		view.addSubview(pagingViewController.view)
 		view.constrainToEdges(pagingViewController.view, relativeToSafeArea: true)
-		addChildViewController(pagingViewController)
+        addChild(pagingViewController)
 	}
 	
 	deinit {

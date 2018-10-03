@@ -62,8 +62,8 @@ extension UIView {
 		let bottomConstraint: NSLayoutConstraint
 		
 		if relativeToSafeArea, #available(iOS 11, *) {
-			topContraint = subview.topAnchor.constraintEqualToSystemSpacingBelow(safeAreaLayoutGuide.topAnchor, multiplier: 1.0)
-			bottomConstraint = safeAreaLayoutGuide.bottomAnchor.constraintEqualToSystemSpacingBelow(subview.bottomAnchor, multiplier: 1.0)
+            topContraint = subview.topAnchor.constraint(equalToSystemSpacingBelow: safeAreaLayoutGuide.topAnchor, multiplier: 1.0)
+            bottomConstraint = safeAreaLayoutGuide.bottomAnchor.constraint(equalToSystemSpacingBelow: subview.bottomAnchor, multiplier: 1.0)
 		} else {
 			topContraint = NSLayoutConstraint(
 				item: subview,
