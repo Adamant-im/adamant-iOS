@@ -1,5 +1,5 @@
 //
-//  ADMTransactionsViewController.swift
+//  AdmTransactionsViewController.swift
 //  Adamant
 //
 //  Created by Anton Boyarkin on 26/06/2018.
@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class ADMTransactionsViewController: TransactionsViewController {
+class AdmTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Dependencies
     var accountService: AccountService!
     var transfersProvider: TransfersProvider!
@@ -21,20 +21,16 @@ class ADMTransactionsViewController: TransactionsViewController {
     // MARK: - Properties
     var controller: NSFetchedResultsController<TransferTransaction>?
     
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         if accountService.account != nil {
-            initFetchedResultController(provider: transfersProvider)
+            reloadData()
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
-            self?.initFetchedResultController(provider: self?.transfersProvider)
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-            self?.initFetchedResultController(provider: nil)
-        }
+        currencySymbol = AdmWalletService.currencySymbol
     }
 	
 	override func viewDidAppear(_ animated: Bool) {
@@ -43,15 +39,17 @@ class ADMTransactionsViewController: TransactionsViewController {
 		markTransfersAsRead()
 	}
     
-    /// - Parameter provider: nil to drop and reset
-    private func initFetchedResultController(provider: TransfersProvider?) {
+    
+    // MARK: - Overrides
+    
+    override func reloadData() {
         controller = transfersProvider.transfersController()
-        controller?.delegate = self
+        controller!.delegate = self
         
         do {
             try controller?.performFetch()
         } catch {
-            print("There was an error performing fetch: \(error)")
+            dialogService.showError(withMessage: "Failed to get transactions. Please, report a bug", error: error)
             controller = nil
         }
         
@@ -70,40 +68,46 @@ class ADMTransactionsViewController: TransactionsViewController {
             switch result {
             case .success:
                 DispatchQueue.main.async {
+                    refreshControl.endRefreshing()
                     self?.tableView.reloadData()
                 }
-                break
+                
             case .failure(let error):
+                DispatchQueue.main.async {
+                    refreshControl.endRefreshing()
+                }
+                
                 self?.dialogService.showRichError(error: error)
-            }
-            
-            DispatchQueue.main.async {
-                refreshControl.endRefreshing()
             }
         }
     }
     
     private func markTransfersAsRead() {
-        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        privateContext.parent = stack.container.viewContext
+        guard let stack = stack else {
+            return
+        }
         
-        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
-        request.predicate = NSPredicate(format: "isUnread == true")
-        request.sortDescriptors = [NSSortDescriptor(key: "transactionId", ascending: false)]
-        
-        if let result = try? privateContext.fetch(request) {
-            result.forEach { $0.isUnread = false }
+        DispatchQueue.global(qos: .utility).async {
+            let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+            privateContext.parent = stack.container.viewContext
             
-            if privateContext.hasChanges {
-                try? privateContext.save()
+            let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+            request.predicate = NSPredicate(format: "isUnread == true")
+            request.sortDescriptors = [NSSortDescriptor(key: "transactionId", ascending: false)]
+            
+            if let result = try? privateContext.fetch(request) {
+                result.forEach { $0.isUnread = false }
+                
+                if privateContext.hasChanges {
+                    try? privateContext.save()
+                }
             }
         }
     }
-}
 
-// MARK: - UITableView
-extension ADMTransactionsViewController {
     
+    // MARK: - UITableView
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let f = controller?.fetchedObjects {
             return f.count
@@ -122,25 +126,42 @@ extension ADMTransactionsViewController {
             return
         }
         
-        controller.transaction = transaction
+//        controller.transaction = transaction
         navigationController?.pushViewController(controller, animated: true)
     }
     
+    func configureCell(_ cell: TransactionTableViewCell, for transaction: TransferTransaction) {
+        let partnerId = (transaction.isOutgoing ? transaction.recipientId : transaction.senderId) ?? ""
+        
+        let amount: Decimal = transaction.amount as Decimal? ?? 0
+        
+        configureCell(cell,
+                      isOutgoing: transaction.isOutgoing,
+                      partnerId: partnerId,
+                      partnerName: transaction.chatroom?.partner?.name,
+                      amount: amount,
+                      date: transaction.date as Date?)
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? TransactionTableViewCell,
-            let transfer = controller?.object(at: indexPath) else {
-                // TODO: Display & Log error
-                return UITableViewCell(style: .default, reuseIdentifier: "cell")
+        guard let transaction = controller?.object(at: indexPath) else {
+            return UITableViewCell(style: .default, reuseIdentifier: "cell")
         }
         
-        cell.accessoryType = .disclosureIndicator
+        let identifier = transaction.chatroom?.partner?.name != nil ? cellIdentifierFull : cellIdentifierCompact
         
-        configureCell(cell, for: transfer)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as? TransactionTableViewCell else {
+            return UITableViewCell(style: .default, reuseIdentifier: "cell")
+        }
+        
+        configureCell(cell, for: transaction)
+        
+        cell.accessoryType = .disclosureIndicator
         return cell
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAt: IndexPath) -> [UITableViewRowAction]? {
-        guard let transfer = controller?.object(at: editActionsForRowAt), let chatroom = transfer.partner?.chatroom, let transactions = chatroom.transactions  else {
+        guard let transaction = controller?.object(at: editActionsForRowAt), let chatroom = transaction.partner?.chatroom, let transactions = chatroom.transactions  else {
             return nil
         }
         
@@ -182,7 +203,7 @@ extension ADMTransactionsViewController {
     
     @available(iOS 11.0, *)
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let transfer = controller?.object(at: indexPath), let chatroom = transfer.partner?.chatroom, let transactions = chatroom.transactions  else {
+        guard let transaction = controller?.object(at: indexPath), let chatroom = transaction.partner?.chatroom, let transactions = chatroom.transactions  else {
             return nil
         }
         
@@ -219,7 +240,8 @@ extension ADMTransactionsViewController {
     }
 }
 
-extension ADMTransactionsViewController: NSFetchedResultsControllerDelegate {
+// MARK: - NSFetchedResultsControllerDelegate
+extension AdmTransactionsViewController: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         tableView.beginUpdates()
     }
@@ -234,8 +256,8 @@ extension ADMTransactionsViewController: NSFetchedResultsControllerDelegate {
             if let newIndexPath = newIndexPath {
                 tableView.insertRows(at: [newIndexPath], with: .automatic)
                 
-                if let transfer = anObject as? TransferTransaction {
-                    transfer.isUnread = false
+                if let transaction = anObject as? TransferTransaction {
+                    transaction.isUnread = false
                 }
             }
             
@@ -247,12 +269,14 @@ extension ADMTransactionsViewController: NSFetchedResultsControllerDelegate {
         case .update:
             if let indexPath = indexPath,
                 let cell = self.tableView.cellForRow(at: indexPath) as? TransactionTableViewCell,
-                let transfer = anObject as? TransferTransaction {
-                configureCell(cell, for: transfer)
+                let transaction = anObject as? TransferTransaction {
+                configureCell(cell, for: transaction)
             }
             
-        default:
-            break
+        case .move:
+            if let at = indexPath, let to = newIndexPath {
+                tableView.moveRow(at: at, to: to)
+            }
         }
     }
 }

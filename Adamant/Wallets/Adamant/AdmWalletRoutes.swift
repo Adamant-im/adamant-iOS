@@ -26,8 +26,8 @@ extension AdamantScene.Wallets {
 		}
 		
 		/// Transactions list
-		static let transactionsList = AdamantScene(identifier: "TransactionsViewController", factory: { r in
-			let c = ADMTransactionsViewController(nibName: "TransactionsViewController", bundle: nil)
+		static let transactionsList = AdamantScene(identifier: "AdmTransactionsViewController", factory: { r in
+			let c = AdmTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
 			c.accountService = r.resolve(AccountService.self)
 			c.transfersProvider = r.resolve(TransfersProvider.self)
 			c.dialogService = r.resolve(DialogService.self)

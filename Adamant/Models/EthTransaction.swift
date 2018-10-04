@@ -110,64 +110,34 @@ extension EthTransaction: Decodable {
 }
 
 
-// MARK: TransactionDetailsProtocol
-extension EthTransaction: TransactionDetailsProtocol {
-    var id: String {
-        return self.hash
-    }
-    
-    var senderAddress: String {
-        return self.from
-    }
-    
-    var recipientAddress: String {
-        return self.to
-    }
-    
-    var sentDate: Date {
-        return self.date
-    }
-    
-    var amountValue: Double {
-        guard let string = Web3.Utils.formatToEthereumUnits(value, toUnits: .eth, decimals: 8), let value = Double(string) else {
-            return 0
-        }
-        
-        return value
-    }
-    
-    var feeValue: Double {
-        guard let string = Web3.Utils.formatToEthereumUnits((self.gasPrice * self.gasUsed), toUnits: .eth, decimals: 8), let value = Double(string) else {
-            return 0
-        }
-        
-        return value
-    }
-    
-    var block: String {
-        return "\(self.blockNumber)"
-    }
-    
-    var showGoToExplorer: Bool {
-        return true
-    }
-    
-    var explorerUrl: URL? {
-        return URL(string: "https://etherscan.io/tx/\(id)")
-    }
-    
-    var showGoToChat: Bool {
-        return false
-    }
-    
-    var chatroom: Chatroom? {
-        return nil
-    }
-    
-    var currencyCode: String {
-        return "ETH"
-    }
-}
+// MARK: TransactionDetails
+//extension EthTransaction: TransactionDetails {
+//    var id: String { return hash }
+//    var senderAddress: String { return from }
+//    var recipientAddress: String { return to }
+//    var sentDate: Date { return date }
+//    var confirmations: String { return confirmationsValue }
+//    
+//    var amount: Decimal {
+//        return value.asDecimal(exponent: 8)
+//    }
+//    
+//    var fee: Decimal {
+//        return (gasPrice * gasUsed).asDecimal(exponent: 8)
+//    }
+//    
+//    var block: String {
+//        return "\(blockNumber)"
+//    }
+//    
+////    var explorerUrl: URL? {
+////        return URL(string: "https://etherscan.io/tx/\(id)")
+////    }
+//    
+//    var currencyCode: String {
+//        return EthWalletService.currencySymbol
+//    }
+//}
 
 
 // MARK: Sample JSON
@@ -202,79 +172,4 @@ struct Web3EthTransaction {
     let transaction: EthereumTransaction
     let transactionBlock: web3swift.Block?
     let lastBlockNumber: BigUInt?
-}
-
-extension Web3EthTransaction: TransactionDetailsProtocol {
-    var id: String {
-        return self.transaction.txhash ?? ""
-    }
-    
-    var senderAddress: String {
-        return self.transaction.sender?.address ?? ""
-    }
-    
-    var recipientAddress: String {
-        return self.transaction.to.address
-    }
-    
-    var sentDate: Date {
-        if let timestamp = self.transactionBlock?.timestamp {
-            return timestamp
-        } else {
-            return Date()
-        }
-    }
-    
-    var amountValue: Double {
-        guard let string = Web3.Utils.formatToEthereumUnits(self.transaction.value, toUnits: .eth, decimals: 8), let value = Double(string) else {
-            return 0
-        }
-        
-        return value
-    }
-    
-    var feeValue: Double {
-        guard let string = Web3.Utils.formatToEthereumUnits((self.transaction.gasPrice * self.transaction.gasLimit), toUnits: .eth, decimals: 8), let value = Double(string) else {
-            return 0
-        }
-        
-        return value
-    }
-    
-    var confirmationsValue: String {
-        if let blockNumber = self.transactionBlock?.number, let lastBlockNumber = self.lastBlockNumber {
-            let confirmations = lastBlockNumber - BigUInt(blockNumber)
-            return "\(confirmations)"
-        } else {
-            return "--"
-        }
-    }
-    
-    var block: String {
-        if let number = self.transactionBlock?.number {
-            return "\(number)"
-        } else {
-            return "--"
-        }
-    }
-    
-    var showGoToExplorer: Bool {
-        return false
-    }
-    
-    var explorerUrl: URL? {
-        return nil
-    }
-    
-    var showGoToChat: Bool {
-        return false
-    }
-    
-    var chatroom: Chatroom? {
-        return nil
-    }
-    
-    var currencyCode: String {
-        return "ETH"
-    }
 }

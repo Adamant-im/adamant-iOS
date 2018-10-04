@@ -29,7 +29,7 @@ extension AdamantScene.Wallets {
 		
 		/// List of Ethereum transactions
 		static let transactionsList = AdamantScene(identifier: "EthTransactionsViewController") { r in
-			let c = ETHTransactionsViewController(nibName: "TransactionsViewController", bundle: nil)
+			let c = EthTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
 			c.dialogService = r.resolve(DialogService.self)
 			c.router = r.resolve(Router.self)
 			return c

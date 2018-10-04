@@ -25,29 +25,21 @@ protocol TransactionDetails {
     var sentDate: Date { get }
     
     /// The amount of currency that was sent.
-    var amountValue: Decimal { get }
+    var amount: Decimal { get }
     
     /// The amount of fee that taken for transaction process.
-    var feeValue: Decimal { get }
+    var fee: Decimal { get }
     
     /// The confirmations of the transaction.
-    var confirmationsValue: String { get }
+    var confirmations: String { get }
     
     /// The block of the transaction.
     var block: String { get }
     
-    /// The show go to button.
-    var chatroom: Chatroom? { get }
-    
-    /// The currency of the transaction.
-    var currencyCode: String { get }
+    var isOutgoing: Bool { get }
 }
 
 extension TransactionDetails {
-    func isOutgoing(_ address: String) -> Bool {
-        return senderAddress.lowercased() == address.lowercased() ? true : false
-    }
-    
 //    func getSummary() -> String {
 //        return """
 //        Transaction #\(id)

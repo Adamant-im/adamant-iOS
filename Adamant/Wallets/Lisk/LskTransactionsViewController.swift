@@ -1,5 +1,5 @@
 //
-//  LSKTransactionsViewController.swift
+//  LskTransactionsViewController
 //  Adamant
 //
 //  Created by Anton Boyarkin on 17/07/2018.
@@ -11,7 +11,7 @@ import Lisk
 import web3swift
 import BigInt
 
-class LSKTransactionsViewController: TransactionsViewController {
+class LskTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Dependencies
     var lskApiService: LskApiService!
@@ -53,17 +53,8 @@ class LSKTransactionsViewController: TransactionsViewController {
         })
     }
     
-    override func currentAddress() -> String {
-        guard let address = lskApiService.account?.address else {
-            return ""
-        }
-        return address
-    }
-
-}
-
-// MARK: - UITableView
-extension LSKTransactionsViewController {
+    
+    // MARK: - UITableView
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return transactions.count
@@ -78,12 +69,12 @@ extension LSKTransactionsViewController {
             return
         }
         
-        controller.transaction = transaction
+//        controller.transaction = transaction
         navigationController?.pushViewController(controller, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? TransactionTableViewCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifierCompact, for: indexPath) as? TransactionTableViewCell else {
             // TODO: Display & Log error
             return UITableViewCell(style: .default, reuseIdentifier: "cell")
         }
@@ -92,65 +83,65 @@ extension LSKTransactionsViewController {
         
         cell.accessoryType = .disclosureIndicator
         
-        configureCell(cell, for: transaction)
+//        configureCell(cell, for: transaction)
         return cell
     }
 }
 
-extension Transactions.TransactionModel: TransactionDetailsProtocol {
-    var senderAddress: String {
-        return self.senderId
-    }
-    
-    var recipientAddress: String {
-        return self.recipientId ?? ""
-    }
-    
-    var sentDate: Date {
-        return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
-    }
-    
-    var amountValue: Double {
-        guard let string = Web3.Utils.formatToPrecision(BigUInt(self.amount) ?? BigUInt(0), numberDecimals: 8, formattingDecimals: 8, decimalSeparator: ".", fallbackToScientific: false), let value = Double(string) else {
-            return 0
-        }
-        
-        return value
-    }
-    
-    var feeValue: Double {
-        guard let string = Web3.Utils.formatToPrecision(BigUInt(self.fee) ?? BigUInt(0), numberDecimals: 8, formattingDecimals: 8, decimalSeparator: ".", fallbackToScientific: false), let value = Double(string) else {
-            return 0
-        }
-        
-        return value
-    }
-    
-    var confirmationsValue: String {
-        return "\(self.confirmations)"
-    }
-    
-    var block: String {
-        return self.blockId
-    }
-    
-    var showGoToExplorer: Bool {
-        return true
-    }
-    
-    var explorerUrl: URL? {
-        return URL(string: "https://testnet-explorer.lisk.io/tx/\(id)")
-    }
-    
-    var showGoToChat: Bool {
-        return false
-    }
-    
-    var chatroom: Chatroom? {
-        return nil
-    }
-    
-    var currencyCode: String {
-        return "LSK"
-    }
-}
+//extension Transactions.TransactionModel: TransactionDetails {
+//    var senderAddress: String {
+//        return self.senderId
+//    }
+//
+//    var recipientAddress: String {
+//        return self.recipientId ?? ""
+//    }
+//
+//    var sentDate: Date {
+//        return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
+//    }
+//
+//    var amountValue: Double {
+//        guard let string = Web3.Utils.formatToPrecision(BigUInt(self.amount) ?? BigUInt(0), numberDecimals: 8, formattingDecimals: 8, decimalSeparator: ".", fallbackToScientific: false), let value = Double(string) else {
+//            return 0
+//        }
+//
+//        return value
+//    }
+//
+//    var feeValue: Double {
+//        guard let string = Web3.Utils.formatToPrecision(BigUInt(self.fee) ?? BigUInt(0), numberDecimals: 8, formattingDecimals: 8, decimalSeparator: ".", fallbackToScientific: false), let value = Double(string) else {
+//            return 0
+//        }
+//
+//        return value
+//    }
+//
+//    var confirmationsValue: String {
+//        return "\(self.confirmations)"
+//    }
+//
+//    var block: String {
+//        return self.blockId
+//    }
+//
+//    var showGoToExplorer: Bool {
+//        return true
+//    }
+//
+//    var explorerUrl: URL? {
+//        return URL(string: "https://testnet-explorer.lisk.io/tx/\(id)")
+//    }
+//
+//    var showGoToChat: Bool {
+//        return false
+//    }
+//
+//    var chatroom: Chatroom? {
+//        return nil
+//    }
+//
+//    var currencyCode: String {
+//        return "LSK"
+//    }
+//}

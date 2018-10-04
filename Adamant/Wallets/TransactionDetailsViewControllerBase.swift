@@ -74,7 +74,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     var dialogService: DialogService!
     
     // MARK: - Properties
-    var transaction: TransactionDetailsProtocol?
+    var transaction: TransactionDetails?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -199,11 +199,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 })
                 .onCellSelection({ [weak self] (_, row) in
                     // TODO:
-                    if let url = self?.transaction?.explorerUrl {
-                        let safari = SFSafariViewController(url: url)
-                        safari.preferredControlTintColor = UIColor.adamant.primary
-                        self?.present(safari, animated: true, completion: nil)
-                    }
+//                    if let url = self?.transaction?.explorerUrl {
+//                        let safari = SFSafariViewController(url: url)
+//                        safari.preferredControlTintColor = UIColor.adamant.primary
+//                        self?.present(safari, animated: true, completion: nil)
+//                    }
                 })
         
             <<< LabelRow() {
@@ -242,17 +242,17 @@ class TransactionDetailsViewControllerBase: FormViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    func set(transaction: TransactionDetailsProtocol) {
+    func set(transaction: TransactionDetails) {
         self.transaction = transaction
         updateDetails(with: transaction)
     }
     
-    private func updateDetails(with transaction: TransactionDetailsProtocol) {
+    private func updateDetails(with transaction: TransactionDetails) {
         let currencyFormatter = NumberFormatter()
         currencyFormatter.numberStyle = .decimal
         currencyFormatter.roundingMode = .floor
         currencyFormatter.positiveFormat = "#.########"
-        currencyFormatter.positiveSuffix = " \(transaction.currencyCode)"
+//        currencyFormatter.positiveSuffix = " \(transaction.currencyCode)"
         
         if let row: TextRow = self.form.rowBy(tag: Row.transactionNumber.tag) {
             row.value = transaction.id
@@ -275,19 +275,19 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }
         
         if let row: DecimalRow = self.form.rowBy(tag: Row.amount.tag) {
-            row.value = transaction.amountValue
+            row.value = transaction.amount.doubleValue
             row.formatter = currencyFormatter
             row.reload()
         }
         
         if let row: DecimalRow = self.form.rowBy(tag: Row.fee.tag) {
-            row.value = transaction.feeValue
+            row.value = transaction.fee.doubleValue
             row.formatter = currencyFormatter
             row.reload()
         }
         
         if let row: TextRow = self.form.rowBy(tag: Row.confirmations.tag) {
-            row.value = transaction.confirmationsValue
+            row.value = transaction.confirmations
             row.reload()
         }
         
@@ -296,18 +296,18 @@ class TransactionDetailsViewControllerBase: FormViewController {
             row.reload()
         }
         
-        if let row: LabelRow = self.form.rowBy(tag: Row.openInExplorer.tag) {
-            row.hidden = transaction.showGoToExplorer ? false : true
-            row.reload()
-            row.evaluateHidden()
-        }
-        
-        if let row: LabelRow = self.form.rowBy(tag: Row.openChat.tag) {
-            row.hidden = transaction.showGoToChat ? false : true
-            row.title = (transaction.haveChatroom) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
-            row.reload()
-            row.evaluateHidden()
-        }
+//        if let row: LabelRow = self.form.rowBy(tag: Row.openInExplorer.tag) {
+//            row.hidden = transaction.showGoToExplorer ? false : true
+//            row.reload()
+//            row.evaluateHidden()
+//        }
+//
+//        if let row: LabelRow = self.form.rowBy(tag: Row.openChat.tag) {
+//            row.hidden = transaction.showGoToChat ? false : true
+//            row.title = (transaction.haveChatroom) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
+//            row.reload()
+//            row.evaluateHidden()
+//        }
     }
     
     // MARK: - Actions
@@ -320,20 +320,20 @@ class TransactionDetailsViewControllerBase: FormViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
         
-        if let url = transaction.explorerUrl {
-            // URL
-            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportUrlButton, style: .default) { [weak self] _ in
-                let alert = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-                self?.present(alert, animated: true, completion: nil)
-            })
-        }
-        
-        // Description
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportSummaryButton, style: .default, handler: { [weak self] _ in
-            let text = transaction.getSummary()
-            let alert = UIActivityViewController(activityItems: [text], applicationActivities: nil)
-            self?.present(alert, animated: true, completion: nil)
-        }))
+//        if let url = transaction.explorerUrl {
+//            // URL
+//            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportUrlButton, style: .default) { [weak self] _ in
+//                let alert = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+//                self?.present(alert, animated: true, completion: nil)
+//            })
+//        }
+//        
+//        // Description
+//        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportSummaryButton, style: .default, handler: { [weak self] _ in
+//            let text = transaction.getSummary()
+//            let alert = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+//            self?.present(alert, animated: true, completion: nil)
+//        }))
         
         present(alert, animated: true, completion: nil)
     }

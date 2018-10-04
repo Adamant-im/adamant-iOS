@@ -23,7 +23,7 @@ extension AdmWalletService: RichMessageProvider {
             fatalError("Can't get TransactionDetails scene")
         }
         
-        vc.transaction = transaction
+//        vc.transaction = transaction
         
         if let nav = chat.navigationController {
             nav.pushViewController(vc, animated: true)
