@@ -114,7 +114,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
                       isOutgoing: outgoing,
                       partnerId: partnerId,
                       partnerName: nil,
-                      amount: transaction.value.asDecimal(exponent: EthWalletService.currencyExponent),
+                      amount: transaction.value, //.asDecimal(exponent: EthWalletService.currencyExponent),
                       date: transaction.date)
     }
 }

@@ -50,27 +50,15 @@ enum TransactionReceiptStatus: String, Decodable {
 struct EthTransaction {
 	let date: Date
     let hash: String
-    let value: BigUInt
+    let value: Decimal
     let from: String
     let to: String
-    let gasUsed: BigUInt
-    let gasPrice: BigUInt
+    let gasUsed: Decimal
+    let gasPrice: Decimal
     let confirmationsValue: String
     let isError: Bool
     let receiptStatus: TransactionReceiptStatus
     let blockNumber: UInt
-	
-    func formattedValue() -> String {
-		if let formattedAmount = Web3.Utils.formatToEthereumUnits(value,
-                                                                  toUnits: .eth,
-                                                                  decimals: 8,
-                                                                  fallbackToScientific: true),
-			let amount = Double(formattedAmount) {
-            return "\(amount) ETH"
-        } else {
-            return "\(value)"
-        }
-    }
 }
 
 
@@ -93,19 +81,43 @@ extension EthTransaction: Decodable {
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		
-		let unixTimeStamp = Double((try? container.decode(String.self, forKey: .date)) ?? "0") ?? 0
-		date = Date(timeIntervalSince1970: unixTimeStamp)
-		hash = (try? container.decode(String.self, forKey: .hash)) ?? ""
-		value = BigUInt((try? container.decode(String.self, forKey: .value)) ?? "0") ?? BigUInt(0)
-		from = (try? container.decode(String.self, forKey: .from)) ?? ""
-		to = (try? container.decode(String.self, forKey: .to)) ?? ""
-		gasUsed = BigUInt((try? container.decode(String.self, forKey: .gasUsed)) ?? "0") ?? BigUInt(0)
-		gasPrice = BigUInt((try? container.decode(String.self, forKey: .gasPrice)) ?? "0") ?? BigUInt(0)
-		confirmationsValue = (try? container.decode(String.self, forKey: .confirmations)) ?? "0"
-		let isErrorStatus = Int((try? container.decode(String.self, forKey: .isError)) ?? "0") ?? 0
-		isError = isErrorStatus == 1 ? true : false
-		receiptStatus = (try? container.decode(TransactionReceiptStatus.self, forKey: .receiptStatus)) ?? .unknown
-		blockNumber = UInt((try? container.decode(String.self, forKey: .blockNumber)) ?? "0") ?? 0
+        hash = (try? container.decode(String.self, forKey: .hash)) ?? ""
+        from = (try? container.decode(String.self, forKey: .from)) ?? ""
+        to = (try? container.decode(String.self, forKey: .to)) ?? ""
+        confirmationsValue = (try? container.decode(String.self, forKey: .confirmations)) ?? "0"
+        receiptStatus = (try? container.decode(TransactionReceiptStatus.self, forKey: .receiptStatus)) ?? .unknown
+        blockNumber = UInt((try? container.decode(String.self, forKey: .blockNumber)) ?? "0") ?? 0
+        
+        if let timeStampRaw = try? container.decode(String.self, forKey: .date), let timeStamp = Double(timeStampRaw) {
+            self.date = Date(timeIntervalSince1970: timeStamp)
+        } else {
+            self.date = Date.init(timeIntervalSince1970: 0)
+        }
+        
+        if let isErrorRaw = try? container.decode(String.self, forKey: .isError) {
+            self.isError = isErrorRaw == "1"
+        } else {
+            self.isError = false
+        }
+        
+        // MARK: Decimals
+        if let valueRaw = try? container.decode(String.self, forKey: .value), let value = Decimal(string: valueRaw) {
+            self.value = Decimal(sign: .plus, exponent: EthWalletService.currencyExponent, significand: value)
+        } else {
+            self.value = 0
+        }
+        
+        if let gasRaw = try? container.decode(String.self, forKey: .gasUsed), let gas = Decimal(string: gasRaw) {
+            self.gasUsed = gas
+        } else {
+            self.gasUsed = 0
+        }
+        
+        if let gasPriceRaw = try? container.decode(String.self, forKey: .gasPrice), let gasPrice = Decimal(string: gasPriceRaw) {
+            self.gasPrice = Decimal(sign: .plus, exponent: EthWalletService.currencyExponent, significand: gasPrice)
+        } else {
+            self.gasPrice = 0
+        }
 	}
 }
 
