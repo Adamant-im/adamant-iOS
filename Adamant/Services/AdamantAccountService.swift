@@ -22,7 +22,10 @@ class AdamantAccountService: AccountService {
 				securedStoreSemaphore.signal()
 			}
 			
-			if securedStore.get(.publicKey) != nil,
+            if securedStore.get(.passphrase) != nil {
+                hasStayInAccount = true
+                _useBiometry = securedStore.get(.useBiometry) != nil
+            } else if securedStore.get(.publicKey) != nil,
 				securedStore.get(.privateKey) != nil,
 				securedStore.get(.pin) != nil {
 				hasStayInAccount = true
