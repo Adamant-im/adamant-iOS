@@ -10,6 +10,14 @@ import UIKit
 
 extension UIColor {
 	public struct adamant {
+        
+        // MARK: Colors from Adamant Guideline
+        static let first = UIColor(hex: "#474a5f")
+        static let fourth = UIColor(hex: "#eeeeee")
+
+        static let active = UIColor(hex: "#179cec")
+        static let background = UIColor(hex: "#f2f6fa")
+        
 		// MARK: Global colors
 		
 		/// Main dark gray, ~70% gray

@@ -7,7 +7,17 @@
 //
 
 import UIKit
-import paper_onboarding
+import SwiftyOnboard
+
+fileprivate class OnboardingPageItem {
+    var image: UIImage
+    var text: String
+    
+    init(image: UIImage, text: String) {
+        self.image = image
+        self.text = text
+    }
+}
 
 class WelcomeViewController: UIViewController {
     
@@ -16,60 +26,37 @@ class WelcomeViewController: UIViewController {
     private static let descriptionFont = UIFont.systemFont(ofSize: 14.0)
     
     // MARK: Outlets
-    @IBOutlet weak var onboarding: PaperOnboarding!
+    @IBOutlet weak var onboarding: SwiftyOnboard!
     @IBOutlet var skipButton: UIButton!
     
     // MARK: Properties
     fileprivate let items = [
-        OnboardingItemInfo(informationImage: #imageLiteral(resourceName: "SlideImage1"),
-                           title: NSLocalizedString("WelcomeScene.Title.Slide1", comment: "Welcome: Slide 1 Title"),
-                           description: NSLocalizedString("WelcomeScene.Description.Slide1", comment: "Welcome: Slide 1 Description"),
-                           pageIcon: #imageLiteral(resourceName: "SlideIcon1"),
-                           color: UIColor.white,
-                           titleColor: UIColor.adamant.primary, descriptionColor: UIColor.adamant.secondary, titleFont: titleFont, descriptionFont: descriptionFont),
-        
-        OnboardingItemInfo(informationImage: #imageLiteral(resourceName: "SlideImage2"),
-                           title: NSLocalizedString("WelcomeScene.Title.Slide2", comment: "Welcome: Slide 2 Title"),
-                           description: NSLocalizedString("WelcomeScene.Description.Slide2", comment: "Welcome: Slide 2 Description"),
-                           pageIcon: #imageLiteral(resourceName: "SlideIcon2"),
-                           color: UIColor.white,
-                           titleColor: UIColor.adamant.primary, descriptionColor: UIColor.adamant.secondary, titleFont: titleFont, descriptionFont: descriptionFont),
-        
-        OnboardingItemInfo(informationImage: #imageLiteral(resourceName: "SlideImage3"),
-                           title: NSLocalizedString("WelcomeScene.Title.Slide3", comment: "Welcome: Slide 3 Title"),
-                           description: NSLocalizedString("WelcomeScene.Description.Slide3", comment: "Welcome: Slide 3 Description"),
-                           pageIcon: #imageLiteral(resourceName: "SlideIcon3"),
-                           color: UIColor.white,
-                           titleColor: UIColor.adamant.primary, descriptionColor: UIColor.adamant.secondary, titleFont: titleFont, descriptionFont: descriptionFont),
-        
-        OnboardingItemInfo(informationImage: #imageLiteral(resourceName: "SlideImage4"),
-                           title: NSLocalizedString("WelcomeScene.Title.Slide4", comment: "Welcome: Slide 4 Title"),
-                           description: NSLocalizedString("WelcomeScene.Description.Slide4", comment: "Welcome: Slide 4 Description"),
-                           pageIcon: #imageLiteral(resourceName: "SlideIcon4"),
-                           color: UIColor.white,
-                           titleColor: UIColor.adamant.primary, descriptionColor: UIColor.adamant.secondary, titleFont: titleFont, descriptionFont: descriptionFont),
-        
-        OnboardingItemInfo(informationImage: #imageLiteral(resourceName: "SlideImage5"),
-                           title: NSLocalizedString("WelcomeScene.Title.Slide5", comment: "Welcome: Slide 5 Title"),
-                           description: NSLocalizedString("WelcomeScene.Description.Slide5", comment: "Welcome: Slide 5 Description"),
-                           pageIcon: #imageLiteral(resourceName: "SlideIcon5"),
-                           color: UIColor.white,
-                           titleColor: UIColor.adamant.primary, descriptionColor: UIColor.adamant.secondary, titleFont: titleFont, descriptionFont: descriptionFont),
-        
+        OnboardingPageItem(image: #imageLiteral(resourceName: "SlideImage1"),
+                           text: NSLocalizedString("WelcomeScene.Description.Slide1", comment: "Welcome: Slide 1 Description")),
+
+        OnboardingPageItem(image: #imageLiteral(resourceName: "SlideImage2"),
+                           text: NSLocalizedString("WelcomeScene.Description.Slide2", comment: "Welcome: Slide 2 Description")),
+
+        OnboardingPageItem(image: #imageLiteral(resourceName: "SlideImage3"),
+                           text: NSLocalizedString("WelcomeScene.Description.Slide3", comment: "Welcome: Slide 3 Description")),
+
+        OnboardingPageItem(image: #imageLiteral(resourceName: "SlideImage4"),
+                           text: NSLocalizedString("WelcomeScene.Description.Slide4", comment: "Welcome: Slide 4 Description")),
+
+        OnboardingPageItem(image: #imageLiteral(resourceName: "SlideImage5"),
+                           text: NSLocalizedString("WelcomeScene.Description.Slide5", comment: "Welcome: Slide 5 Description")),
         ]
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        onboarding.dataSource = self
+        
+        onboarding.style = .light
         onboarding.delegate = self
-        
-        skipButton.setTitleColor(UIColor.adamant.primary, for: .normal)
-        
-        onboarding.currentIndex(0, animated: false)
+        onboarding.dataSource = self
+        onboarding.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "stripeBg"))//UIColor.adamant.background
     }
     
-    @IBAction func skipButtonTapped(_: UIButton) {
+    @objc func handleSkip() {
         UserDefaults.standard.set(true, forKey: "welcomeIsShown")
         DispatchQueue.main.async {
             self.dismiss(animated: true, completion: nil)
@@ -77,33 +64,43 @@ class WelcomeViewController: UIViewController {
     }
 }
 
-// MARK: PaperOnboardingDelegate
+// MARK: SwiftyOnboard Delegate & DataSource
 
-extension WelcomeViewController: PaperOnboardingDelegate {
+extension WelcomeViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource {
     
-    func onboardingDidTransitonToIndex(_: Int) {
-    }
-    
-    func onboardingConfigurationItem(_ item: OnboardingContentViewItem, index: Int) {
-        item.titleCenterConstraint?.constant = 12
-        item.titleLabel?.numberOfLines = 2
-        item.descriptionLabel?.textAlignment = .left
-    }
-}
-
-// MARK: PaperOnboardingDataSource
-
-extension WelcomeViewController: PaperOnboardingDataSource {
-    
-    func onboardingItem(at index: Int) -> OnboardingItemInfo {
-        return items[index]
-    }
-    
-    func onboardingItemsCount() -> Int {
+    func swiftyOnboardNumberOfPages(_ swiftyOnboard: SwiftyOnboard) -> Int {
         return items.count
     }
     
-    func onboardingPageItemColor(at index: Int) -> UIColor {
-        return UIColor.adamant.secondary
+    func swiftyOnboardPageForIndex(_ swiftyOnboard: SwiftyOnboard, index: Int) -> SwiftyOnboardPage? {
+        let item = items[index]
+        
+        let view = OnboardPage.instanceFromNib() as? OnboardPage
+        view?.image.image = item.image
+        
+        let text = "<span style=\"font-family: Exo2-Regular; font-size: 16\">\(item.text)</span>"
+        
+        if let htmlData = text.data(using: String.Encoding.unicode), let attributedString = try? NSAttributedString(data: htmlData, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
+            view?.text.attributedText = attributedString
+        }
+        
+        return view
+    }
+    
+    func swiftyOnboardViewForOverlay(_ swiftyOnboard: SwiftyOnboard) -> SwiftyOnboardOverlay? {
+        let overlay = OnboardOverlay.instanceFromNib() as? OnboardOverlay
+        overlay?.skip.addTarget(self, action: #selector(handleSkip), for: .touchUpInside)
+        return overlay
+    }
+    
+    func swiftyOnboardOverlayForPosition(_ swiftyOnboard: SwiftyOnboard, overlay: SwiftyOnboardOverlay, for position: Double) {
+        let overlay = overlay as! OnboardOverlay
+        let currentPage = round(position)
+        overlay.contentControl.currentPage = Int(currentPage)
+        if currentPage == 4.0 {
+            overlay.skip.setImage(#imageLiteral(resourceName: "skip2Btn"), for: .normal)
+        } else {
+            overlay.skip.setImage(#imageLiteral(resourceName: "skipBtn"), for: .normal)
+        }
     }
 }

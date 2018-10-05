@@ -17,11 +17,11 @@ PODS:
   - libsodium (1.0.12)
   - MessageKit (1.0.0)
   - MyLittlePinpad (0.2.5)
-  - paper-onboarding (4.1.0)
   - PMAlertController (3.4.0)
   - QRCodeReader.swift (8.2.0)
   - ReachabilitySwift (4.1.0)
   - RNCryptor (5.0.3)
+  - SwiftyOnboard (1.3.6)
   - Swinject (2.4.1)
 
 DEPENDENCIES:
@@ -37,11 +37,11 @@ DEPENDENCIES:
   - libsodium
   - MessageKit
   - MyLittlePinpad
-  - paper-onboarding
   - PMAlertController
   - QRCodeReader.swift
   - ReachabilitySwift
   - RNCryptor
+  - SwiftyOnboard
   - Swinject
 
 SPEC REPOS:
@@ -58,11 +58,11 @@ SPEC REPOS:
     - libsodium
     - MessageKit
     - MyLittlePinpad
-    - paper-onboarding
     - PMAlertController
     - QRCodeReader.swift
     - ReachabilitySwift
     - RNCryptor
+    - SwiftyOnboard
     - Swinject
 
 SPEC CHECKSUMS:
@@ -78,13 +78,13 @@ SPEC CHECKSUMS:
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   MessageKit: 16160036b16476b04bd0e9f2c7ce67e662e503e4
   MyLittlePinpad: ec1d9990d9715eab48205ecc08f4ff359ead521b
-  paper-onboarding: 344780cbb0bfc229cd1862f5b9bba446b23c5185
   PMAlertController: efb781925d741d50e0200018a00c53cecb8b4910
   QRCodeReader.swift: 003eb32f18a5a675b936ec82ba0ff368cddbff45
   ReachabilitySwift: 6849231cd4e06559f3b9ef4a97a0a0f96d41e09f
   RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
+  SwiftyOnboard: 8dec41d4725b3e6ebcae276dd206d7f74c1b7f61
   Swinject: f7f15a9672e99328c1f07f277091087917215700
 
-PODFILE CHECKSUM: d6671260411ab3b64573a40341dd6c18934c226a
+PODFILE CHECKSUM: 9b1a5f43adb536492150aa38e7049e517f80911a
 
 COCOAPODS: 1.5.3

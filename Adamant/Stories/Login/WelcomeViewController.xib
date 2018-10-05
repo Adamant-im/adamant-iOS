@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -13,7 +13,6 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="WelcomeViewController" customModule="Adamant" customModuleProvider="target">
             <connections>
                 <outlet property="onboarding" destination="eTR-et-i7k" id="u7z-ga-Mis"/>
-                <outlet property="skipButton" destination="yY6-k0-GQW" id="3Bq-X3-76f"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -22,34 +21,17 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eTR-et-i7k" customClass="PaperOnboarding" customModule="paper_onboarding">
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eTR-et-i7k" customClass="SwiftyOnboard" customModule="SwiftyOnboard">
                     <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </view>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yY6-k0-GQW">
-                    <rect key="frame" x="325" y="40" width="30" height="30"/>
-                    <constraints>
-                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="30" id="ULb-vV-R6m"/>
-                    </constraints>
-                    <state key="normal" title="skip">
-                        <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    </state>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="string" keyPath="xibLocKey" value="WelcomeScene.Skip"/>
-                    </userDefinedRuntimeAttributes>
-                    <connections>
-                        <action selector="skipButtonTapped:" destination="-1" eventType="touchUpInside" id="tys-sl-3c9"/>
-                    </connections>
-                </button>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="eTR-et-i7k" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="0Xl-Oc-54J"/>
-                <constraint firstItem="yY6-k0-GQW" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" constant="20" id="Apb-ks-xXK"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="eTR-et-i7k" secondAttribute="bottom" id="QwO-c2-mIM"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="eTR-et-i7k" secondAttribute="trailing" id="WU4-DX-K6O"/>
                 <constraint firstItem="eTR-et-i7k" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="pfj-kr-W8i"/>
-                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="yY6-k0-GQW" secondAttribute="trailing" constant="20" id="sIN-w8-AT0"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <point key="canvasLocation" x="31.5" y="102.5"/>
