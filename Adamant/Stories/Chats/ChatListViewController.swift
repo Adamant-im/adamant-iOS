@@ -555,7 +555,9 @@ extension ChatListViewController {
 					self?.present(alert, animated: true, completion: nil)
 				}
 				
-                self?.dialogService.showAlert(title: nil, message: nil, style: UIAlertController.Style.actionSheet, actions: [share, rename])
+                let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
+                
+                self?.dialogService.showAlert(title: nil, message: nil, style: UIAlertController.Style.actionSheet, actions: [share, rename, cancel])
 			}
 			
 			completionHandler(true)
