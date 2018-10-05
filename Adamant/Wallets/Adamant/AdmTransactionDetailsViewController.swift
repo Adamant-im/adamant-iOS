@@ -19,6 +19,8 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     // MARK: - Properties
     private let autoupdateInterval: TimeInterval = 5.0
     
+    var haveChatroom = false
+    
     weak var timer: Timer?
     
     // MARK: - Lifecycle
@@ -28,11 +30,21 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         
         super.viewDidLoad()
         
+        if let transfer = transaction as? TransferTransaction, let chatroom = transfer.partner?.chatroom, let transactions = chatroom.transactions  {
+            let messeges = transactions.first (where: { (object) -> Bool in
+                return !(object is TransferTransaction)
+            })
+            
+            haveChatroom = messeges != nil
+        }
+        
+        let chatLabel = haveChatroom ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
+        
         // MARK: Open chat
         if let section = form.allSections.first {
             let row = LabelRow() {
                 $0.tag = Rows.openChat.tag
-                $0.title = Rows.openChat.localized
+                $0.title = chatLabel
                 $0.cell.imageView?.image = Rows.openChat.image
             }.cellSetup { (cell, _) in
                 cell.selectionStyle = .gray
