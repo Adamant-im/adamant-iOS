@@ -163,9 +163,6 @@
 /* Serious internal error: Error parsing response */
 "ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите разработчикам";
 
-/* Unknown internal error */
-"ApiService.InternalError.UnknownError" = "Неизвестная ошибка";
-
 /* Eureka forms Cancel button */
 "Cancel" = "Отмена";
 
@@ -315,6 +312,9 @@
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "Не выполнен вход";
+
+/* Shared unknown error */
+"Error.UnknownError" = "Неизвестная ошибка";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "LoginScene.Error.AuthorizeCamera" = "Для чтения QR-кодов необходимо разрешить доступ к камере";

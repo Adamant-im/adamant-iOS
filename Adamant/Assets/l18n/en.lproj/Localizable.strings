@@ -163,9 +163,6 @@
 /* Serious internal error: Error parsing response */
 "ApiService.InternalError.ParsingFailed" = "Parsing failed. Report a bug";
 
-/* Unknown internal error */
-"ApiService.InternalError.UnknownError" = "Unknown error. Report a bug";
-
 /* Eureka forms Cancel button */
 "Cancel" = "Cancel";
 
@@ -315,6 +312,9 @@
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "User is not logged in";
+
+/* Shared unknown error */
+"Error.UnknownError" = "Unknown error. Report a bug";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "LoginScene.Error.AuthorizeCamera" = "You need to authorize ADAMANT to use device's camera";
