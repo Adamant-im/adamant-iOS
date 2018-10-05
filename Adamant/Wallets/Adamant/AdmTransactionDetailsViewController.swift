@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Eureka
 
 class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     
@@ -23,7 +24,26 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
+        currencySymbol = AdmWalletService.currencySymbol
+        
         super.viewDidLoad()
+        
+        // MARK: Open chat
+        if let section = form.allSections.first {
+            let row = LabelRow() {
+                $0.tag = Rows.openChat.tag
+                $0.title = Rows.openChat.localized
+                $0.cell.imageView?.image = Rows.openChat.image
+            }.cellSetup { (cell, _) in
+                cell.selectionStyle = .gray
+            }.cellUpdate { (cell, _) in
+                cell.accessoryType = .disclosureIndicator
+            }.onCellSelection { [weak self] (_, _) in
+                self?.goToChat()
+            }
+            
+            section.append(row)
+        }
         
         startUpdate()
     }
@@ -32,32 +52,42 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         stopUpdate()
     }
     
-//    override func goToChat() {
-//        guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
-//            dialogService.showError(withMessage: "TransactionDetailsViewController: Failed to get ChatViewController", error: nil)
-//            return
-//        }
-//
-//        guard let chatroom = transaction?.chatroom else {
-//            dialogService.showError(withMessage: "TransactionDetailsViewController: Failed to get chatroom for transaction.", error: nil)
-//            return
-//        }
-//
-//        guard let account = self.accountService.account else {
-//            dialogService.showError(withMessage: "TransactionDetailsViewController: User not logged.", error: nil)
-//            return
-//        }
-//
-//        vc.account = account
-//        vc.chatroom = chatroom
-//        vc.hidesBottomBarWhenPushed = true
-//
-//        if let nav = self.navigationController {
-//            nav.pushViewController(vc, animated: true)
-//        } else {
-//            self.present(vc, animated: true)
-//        }
-//    }
+    // MARK: - Overrides
+    
+    override func explorerUrl(for transaction: TransactionDetails) -> URL? {
+        return URL(string: "\(AdamantResources.adamantExplorerAddress)\(transaction.id)")
+    }
+    
+    func goToChat() {
+        guard let transfer = transaction as? TransferTransaction else {
+            return
+        }
+        
+        guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
+            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: Failed to get ChatViewController", error: nil)
+            return
+        }
+
+        guard let chatroom = transfer.chatroom else {
+            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: Failed to get chatroom for transaction.", error: nil)
+            return
+        }
+
+        guard let account = accountService.account else {
+            dialogService.showError(withMessage: "AdmTransactionDetailsViewController: User not logged.", error: nil)
+            return
+        }
+
+        vc.account = account
+        vc.chatroom = chatroom
+        vc.hidesBottomBarWhenPushed = true
+
+        if let nav = self.navigationController {
+            nav.pushViewController(vc, animated: true)
+        } else {
+            self.present(vc, animated: true)
+        }
+    }
     
     // MARK: - Autoupdate
     

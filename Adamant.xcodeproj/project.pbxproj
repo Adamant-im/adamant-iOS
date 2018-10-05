@@ -150,6 +150,7 @@
 		E965A53220B82C850041A3EA /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53120B82C850041A3EA /* StateType.swift */; };
 		E965A53420B833A00041A3EA /* StateAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53320B833A00041A3EA /* StateAsset.swift */; };
 		E965A53620B8370C0041A3EA /* TransactionAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53520B8370C0041A3EA /* TransactionAsset.swift */; };
+		E96E86B821679C120061F80A /* EthTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96E86B721679C120061F80A /* EthTransactionDetailsViewController.swift */; };
 		E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722065201F42BB004F2AAD /* CoreDataStack.swift */; };
 		E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */; };
 		E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E972206A201F44CA004F2AAD /* TransfersProvider.swift */; };
@@ -212,7 +213,7 @@
 		E9D1BE1C211DABE100E86B72 /* WalletPagingItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D1BE1B211DABE100E86B72 /* WalletPagingItem.swift */; };
 		E9DFB71C21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9DFB71B21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift */; };
 		E9DFB71E21651FBE00CF8C7C /* JSAdamantCore+Native.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9DFB71D21651FBD00CF8C7C /* JSAdamantCore+Native.swift */; };
-		E9DFB720216619F400CF8C7C /* TransferTransaction+TransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9DFB71F216619F400CF8C7C /* TransferTransaction+TransactionDetails.swift */; };
+		E9DFB720216619F400CF8C7C /* BaseTransaction+TransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9DFB71F216619F400CF8C7C /* BaseTransaction+TransactionDetails.swift */; };
 		E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* AccountService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
 		E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */; };
@@ -432,6 +433,7 @@
 		E965A53120B82C850041A3EA /* StateType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateType.swift; sourceTree = "<group>"; };
 		E965A53320B833A00041A3EA /* StateAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateAsset.swift; sourceTree = "<group>"; };
 		E965A53520B8370C0041A3EA /* TransactionAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAsset.swift; sourceTree = "<group>"; };
+		E96E86B721679C120061F80A /* EthTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionDetailsViewController.swift; sourceTree = "<group>"; };
 		E9722065201F42BB004F2AAD /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InMemoryCoreDataStack.swift; sourceTree = "<group>"; };
 		E972206A201F44CA004F2AAD /* TransfersProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransfersProvider.swift; sourceTree = "<group>"; };
@@ -493,7 +495,7 @@
 		E9D1BE1B211DABE100E86B72 /* WalletPagingItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletPagingItem.swift; sourceTree = "<group>"; };
 		E9DFB71B21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmTransactionDetailsViewController.swift; sourceTree = "<group>"; };
 		E9DFB71D21651FBD00CF8C7C /* JSAdamantCore+Native.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "JSAdamantCore+Native.swift"; sourceTree = "<group>"; };
-		E9DFB71F216619F400CF8C7C /* TransferTransaction+TransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransferTransaction+TransactionDetails.swift"; sourceTree = "<group>"; };
+		E9DFB71F216619F400CF8C7C /* BaseTransaction+TransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BaseTransaction+TransactionDetails.swift"; sourceTree = "<group>"; };
 		E9E7CD8A20026B0600DFC4DB /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 		E9E7CD8C20026B6600DFC4DB /* DialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogService.swift; sourceTree = "<group>"; };
 		E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
@@ -825,6 +827,7 @@
 				E9981895212095CA0018C84C /* EthWalletViewController.swift */,
 				E993301D212EF39700CD5200 /* EthTransferViewController.swift */,
 				64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */,
+				E96E86B721679C120061F80A /* EthTransactionDetailsViewController.swift */,
 			);
 			path = Ethereum;
 			sourceTree = "<group>";
@@ -851,7 +854,6 @@
 				E9B1AA5A21283E0F00080A2A /* AdmTransferViewController.swift */,
 				64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */,
 				E9DFB71B21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift */,
-				E9DFB71F216619F400CF8C7C /* TransferTransaction+TransactionDetails.swift */,
 			);
 			path = Adamant;
 			sourceTree = "<group>";
@@ -902,6 +904,7 @@
 				E9AD78802158EED300742061 /* RichMessageTransaction+CoreDataProperties.swift */,
 				E9150B8F2066DA210065A985 /* BaseTransaction+CoreDataClass.swift */,
 				E9150B902066DA210065A985 /* BaseTransaction+CoreDataProperties.swift */,
+				E9DFB71F216619F400CF8C7C /* BaseTransaction+TransactionDetails.swift */,
 				E9150B912066DA210065A985 /* Chatroom+CoreDataClass.swift */,
 				E9150B922066DA210065A985 /* Chatroom+CoreDataProperties.swift */,
 				E9150B952066DA210065A985 /* ChatTransaction+CoreDataClass.swift */,
@@ -1449,7 +1452,7 @@
 				E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E905D39B2048A9BD00DDB504 /* KeychainStore.swift in Sources */,
-				E9DFB720216619F400CF8C7C /* TransferTransaction+TransactionDetails.swift in Sources */,
+				E9DFB720216619F400CF8C7C /* BaseTransaction+TransactionDetails.swift in Sources */,
 				E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */,
 				E9AA8BFC212C169200F9249F /* EthWalletService+Transfers.swift in Sources */,
 				E95F85692006AB9D0070534A /* NormalizedTransaction.swift in Sources */,
@@ -1514,6 +1517,7 @@
 				64FA53D120E24942006783C9 /* TransactionDetailsViewControllerBase.swift in Sources */,
 				64BD2B7720E2820300E2CD36 /* TransactionDetails.swift in Sources */,
 				E94008852114EE7500CD2D67 /* LskWalletService.swift in Sources */,
+				E96E86B821679C120061F80A /* EthTransactionDetailsViewController.swift in Sources */,
 				E90A4943204C5ED6009F6A65 /* EurekaPassphraseRow.swift in Sources */,
 				E965A53420B833A00041A3EA /* StateAsset.swift in Sources */,
 				E9393FA82055C92700EE6F30 /* Decimal+adamant.swift in Sources */,

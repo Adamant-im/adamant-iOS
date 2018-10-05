@@ -20,7 +20,7 @@ class EthTransferViewController: TransferViewControllerBase {
 	
 	override var balanceFormatter: NumberFormatter {
 		if let service = service {
-			return AdamantBalanceFormat.currencyFormatter(format: .full, currencySymbol: type(of: service).currencySymbol)
+			return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: type(of: service).currencySymbol)
 		} else {
 			return AdamantBalanceFormat.currencyFormatterFull
 		}

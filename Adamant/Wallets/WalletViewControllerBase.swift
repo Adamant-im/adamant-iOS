@@ -111,7 +111,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			
 			if let service = self?.service, let wallet = service.wallet {
 				let symbol = type(of: service).currencySymbol
-				$0.value = AdamantBalanceFormat.full.format(balance: wallet.balance, withCurrencySymbol: symbol)
+				$0.value = AdamantBalanceFormat.full.format(wallet.balance, withCurrencySymbol: symbol)
 			} else {
 				$0.value = "0"
 			}
@@ -171,7 +171,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 				
 				if let row: AlertLabelRow = self?.form.rowBy(tag: BaseRows.balance.tag) {
 					let symbol = type(of: service).currencySymbol
-					row.value = AdamantBalanceFormat.full.format(balance: wallet.balance, withCurrencySymbol: symbol)
+					row.value = AdamantBalanceFormat.full.format(wallet.balance, withCurrencySymbol: symbol)
 					
 					if wallet.notifications > 0 {
 						row.cell.alertLabel.text = String(wallet.notifications)

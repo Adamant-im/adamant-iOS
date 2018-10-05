@@ -14,7 +14,35 @@ extension EthWalletService: RichMessageProvider {
     // MARK: Events
     
     func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
-        print("tap!")
+        guard let richContent = transaction.richContent, let hash = richContent[RichContentKeys.transfer.hash] else {
+            return
+        }
+        
+        guard let dialogService = dialogService else {
+            return
+        }
+        
+        dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+        
+        getTransaction(by: hash) { [weak self] result in
+            dialogService.dismissProgress()
+            
+            switch result {
+            case .success(let transaction):
+                guard let vc = self?.router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController else {
+                    return
+                }
+                
+                vc.transaction = transaction
+                DispatchQueue.main.async {
+                    chat.navigationController?.pushViewController(vc, animated: true)
+                }
+                
+            case .failure(let error):
+                self?.dialogService.showRichError(error: error)
+            }
+        }
+        
     }
     
     // MARK: Cells
@@ -48,7 +76,7 @@ extension EthWalletService: RichMessageProvider {
     // MARK: Short description
     
     private static var formatter: NumberFormatter = {
-        return AdamantBalanceFormat.currencyFormatter(format: .full, currencySymbol: currencySymbol)
+        return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
     }()
     
     func shortDescription(for transaction: RichMessageTransaction) -> String {

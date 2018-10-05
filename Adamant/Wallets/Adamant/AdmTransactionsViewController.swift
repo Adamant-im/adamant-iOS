@@ -122,11 +122,11 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             return
         }
         
-        guard let controller = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? TransactionDetailsViewControllerBase else {
+        guard let controller = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? AdmTransactionDetailsViewController else {
             return
         }
         
-//        controller.transaction = transaction
+        controller.transaction = transaction
         navigationController?.pushViewController(controller, animated: true)
     }
     

@@ -25,9 +25,9 @@ class WalletCollectionViewCell: PagingCell {
 		currencySymbolLabel.text = item.currencySymbol
 		
 		if item.balance < 1 {
-			balanceLabel.text = AdamantBalanceFormat.compact.format(balance: item.balance)
+			balanceLabel.text = AdamantBalanceFormat.compact.format(item.balance)
 		} else {
-			balanceLabel.text = AdamantBalanceFormat.short.format(balance: item.balance)
+			balanceLabel.text = AdamantBalanceFormat.short.format(item.balance)
 		}
 		
 		accessoryContainerView.accessoriesBackgroundColor = options.indicatorColor

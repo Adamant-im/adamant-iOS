@@ -533,7 +533,7 @@ extension TransferTransaction: MessageType {
 	public var kind: MessageKind {
         let amountString: String
         if let a = amount as Decimal? {
-            amountString = AdamantBalanceFormat.full.format(balance: a)
+            amountString = AdamantBalanceFormat.full.format(a)
         } else {
             amountString = "0"
         }

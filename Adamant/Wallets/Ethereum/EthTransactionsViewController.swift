@@ -87,12 +87,12 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
         
         let transaction = transactions[indexPath.row]
         
-        guard let controller = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? TransactionDetailsViewControllerBase else {
+        guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController else {
             return
         }
 
-//        controller.transaction = transaction
-        navigationController?.pushViewController(controller, animated: true)
+        vc.transaction = transaction
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -114,7 +114,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
                       isOutgoing: outgoing,
                       partnerId: partnerId,
                       partnerName: nil,
-                      amount: transaction.value, //.asDecimal(exponent: EthWalletService.currencyExponent),
+                      amount: transaction.value,
                       date: transaction.date)
     }
 }

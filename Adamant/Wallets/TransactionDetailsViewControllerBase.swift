@@ -8,14 +8,13 @@
 
 import UIKit
 import Eureka
-import web3swift
-import BigInt
 import SafariServices
 
 // MARK: - Localization
 extension String.adamantLocalized {
     struct transactionDetails {
         static let title = NSLocalizedString("TransactionDetailsScene.Title", comment: "Transaction details: scene title")
+        static let yourAddress = NSLocalizedString("TransactionDetailsScene.YourAddress", comment: "Transaction details: 'Your address' flag.")
         static let requestingDataProgressMessage = NSLocalizedString("TransactionDetailsScene.RequestingData", comment: "Transaction details: 'Requesting Data' progress message.")
     }
 }
@@ -27,8 +26,8 @@ extension String.adamantLocalized.alert {
 
 class TransactionDetailsViewControllerBase: FormViewController {
     // MARK: - Rows
-    fileprivate enum Row: Int {
-        case transactionNumber = 0
+    enum Rows {
+        case transactionNumber
         case from
         case to
         case date
@@ -68,246 +67,193 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .openChat: return ""
             }
         }
+        
+        var image: UIImage? {
+            switch self {
+            case .openInExplorer: return #imageLiteral(resourceName: "row_explorer")
+            case .openChat: return #imageLiteral(resourceName: "row_chat")
+                
+            default: return nil
+            }
+        }
     }
     
     // MARK: - Dependencies
     var dialogService: DialogService!
     
     // MARK: - Properties
-    var transaction: TransactionDetails?
-
+    
+    var transaction: TransactionDetails? = nil {
+        didSet {
+            tableView?.reloadData()
+        }
+    }
+    
+    private let cellIdentifier = "cell"
+    private let doubleDetailsCellIdentifier = "dcell"
+    private let defaultCellHeight: CGFloat = 50.0
+    
+    var showToChatRow = true
+    
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = true
+        }
+        
         navigationItem.title = String.adamantLocalized.transactionDetails.title
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(share))
+        navigationAccessoryView.tintColor = UIColor.adamant.primary
         
         // MARK: - Transfer section
         form +++ Section()
             
-            <<< TextRow() {
-                $0.disabled = true
-                $0.tag = Row.transactionNumber.tag
-                $0.title = Row.transactionNumber.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.value {
-                        self.shareValue(text)
-                    }
-                })
-            
-            <<< TextRow() {
-                $0.disabled = true
-                $0.tag = Row.from.tag
-                $0.title = Row.from.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.value {
-                        self.shareValue(text)
-                    }
-                })
-            
-            <<< TextRow() {
-                $0.disabled = true
-                $0.tag = Row.to.tag
-                $0.title = Row.to.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                   if let text = row.value {
-                        self.shareValue(text)
-                    }
-                })
-            
-            <<< DateRow() {
-                $0.disabled = true
-                $0.tag = Row.date.tag
-                $0.title = Row.date.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = cell.detailTextLabel?.text {
-                        self.shareValue(text)
-                    }
-                })
-            
-            <<< DecimalRow() {
-                $0.disabled = true
-                $0.tag = Row.amount.tag
-                $0.title = Row.amount.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.displayValueFor?(row.value) {
-                        self.shareValue(text)
-                    }
-                })
-            
-            <<< DecimalRow() {
-                $0.disabled = true
-                $0.tag = Row.fee.tag
-                $0.title = Row.fee.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.displayValueFor?(row.value) {
-                        self.shareValue(text)
-                    }
-                })
-            
-            <<< TextRow() {
-                $0.disabled = true
-                $0.tag = Row.confirmations.tag
-                $0.title = Row.confirmations.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.value {
-                        self.shareValue(text)
-                    }
-                })
-            
-            <<< TextRow() {
-                $0.disabled = true
-                $0.tag = Row.block.tag
-                $0.title = Row.block.localized
-                }.cellUpdate { cell, row in
-                    self.updateCell(cell)
-                }.onCellSelection({ (cell, row) in
-                    if let text = row.value {
-                        self.shareValue(text)
-                    }
-                })
-        
-            <<< LabelRow() {
-                $0.hidden = true
-                $0.tag = Row.openInExplorer.tag
-                $0.title = Row.openInExplorer.localized
-                }
-                .cellSetup({ (cell, _) in
-                    cell.selectionStyle = .gray
-                })
-                .cellUpdate({ (cell, _) in
-                    if let label = cell.textLabel {
-                        label.font = UIFont.adamantPrimary(ofSize: 17)
-                        label.textColor = UIColor.adamant.primary
-                    }
-                    
-                    cell.accessoryType = .disclosureIndicator
-                })
-                .onCellSelection({ [weak self] (_, row) in
-                    // TODO:
-//                    if let url = self?.transaction?.explorerUrl {
-//                        let safari = SFSafariViewController(url: url)
-//                        safari.preferredControlTintColor = UIColor.adamant.primary
-//                        self?.present(safari, animated: true, completion: nil)
-//                    }
-                })
-        
-            <<< LabelRow() {
-                $0.hidden = true
-                $0.tag = Row.openChat.tag
-                $0.title = Row.openChat.localized
-                }
-                .cellSetup({ (cell, _) in
-                    cell.selectionStyle = .gray
-                })
-                .cellUpdate({ (cell, _) in
-                    if let label = cell.textLabel {
-                        label.font = UIFont.adamantPrimary(ofSize: 17)
-                        label.textColor = UIColor.adamant.primary
-                    }
-                    
-                    cell.accessoryType = .disclosureIndicator
-                })
-                .onCellSelection({ [weak self] (_, row) in
-                    self?.goToChat()
-                })
-
-        
-        // MARK: - UI
-        navigationAccessoryView.tintColor = UIColor.adamant.primary
-        
-        guard let transaction = transaction else {
-            return
+        // MARK: Transaction number
+        <<< TextRow() {
+            $0.disabled = true
+            $0.tag = Rows.transactionNumber.tag
+            $0.title = Rows.transactionNumber.localized
+            $0.value = transaction?.id
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.onCellSelection { (_, row) in
+            if let text = row.value {
+                self.shareValue(text)
+            }
         }
         
-        updateDetails(with: transaction)
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+        // MARK: Sender
+        <<< TextRow() {
+            $0.disabled = true
+            $0.tag = Rows.from.tag
+            $0.title = Rows.from.localized
+            $0.value = transaction?.senderAddress
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.onCellSelection { (_, row) in
+            if let text = row.value {
+                self.shareValue(text)
+            }
+        }
+        
+        // MARK: Recipient
+        <<< TextRow() {
+            $0.disabled = true
+            $0.tag = Rows.to.tag
+            $0.title = Rows.to.localized
+            $0.value = transaction?.recipientAddress
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.onCellSelection { (_, row) in
+           if let text = row.value {
+                self.shareValue(text)
+            }
+        }
+        
+        // MARK: Date
+        <<< DateRow() {
+            $0.disabled = true
+            $0.tag = Rows.date.tag
+            $0.title = Rows.date.localized
+            $0.value = transaction?.dateValue
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.onCellSelection { [weak self] (_, row) in
+            if let value = row.value {
+                let text = value.humanizedDateTimeFull()
+                self?.shareValue(text)
+            }
+        }
+        
+        // MARK: Amount
+        <<< DecimalRow() {
+            $0.disabled = true
+            $0.tag = Rows.amount.tag
+            $0.title = Rows.amount.localized
+            $0.formatter = AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
+            $0.value = transaction?.amountValue.doubleValue
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.onCellSelection { [weak self] (_, row) in
+            if let value = row.value {
+                let text = AdamantBalanceFormat.full.format(value, withCurrencySymbol: self?.currencySymbol ?? nil)
+                self?.shareValue(text)
+            }
+        }
+        
+        // MARK: Fee
+        <<< DecimalRow() {
+            $0.disabled = true
+            $0.tag = Rows.fee.tag
+            $0.title = Rows.fee.localized
+            $0.formatter = AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
+            $0.value = transaction?.feeValue.doubleValue
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.onCellSelection { [weak self] (_, row) in
+            if let value = row.value {
+                let text = AdamantBalanceFormat.full.format(value, withCurrencySymbol: self?.currencySymbol ?? nil)
+                self?.shareValue(text)
+            }
+        }
+        
+        // MARK: Confirmations
+        <<< TextRow() {
+            $0.disabled = true
+            $0.tag = Rows.confirmations.tag
+            $0.title = Rows.confirmations.localized
+            $0.value = transaction?.confirmationsValue
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.onCellSelection { [weak self] (_, row) in
+            if let text = row.value {
+                self?.shareValue(text)
+            }
+        }
+        
+        // MARK: Block
+        <<< TextRow() {
+            $0.disabled = true
+            $0.tag = Rows.block.tag
+            $0.title = Rows.block.localized
+            $0.value = transaction?.blockValue
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.onCellSelection { [weak self] (_, row) in
+            if let text = row.value {
+                self?.shareValue(text)
+            }
+        }
     
-    func set(transaction: TransactionDetails) {
-        self.transaction = transaction
-        updateDetails(with: transaction)
-    }
-    
-    private func updateDetails(with transaction: TransactionDetails) {
-        let currencyFormatter = NumberFormatter()
-        currencyFormatter.numberStyle = .decimal
-        currencyFormatter.roundingMode = .floor
-        currencyFormatter.positiveFormat = "#.########"
-//        currencyFormatter.positiveSuffix = " \(transaction.currencyCode)"
-        
-        if let row: TextRow = self.form.rowBy(tag: Row.transactionNumber.tag) {
-            row.value = transaction.id
-            row.reload()
+        // MARK: Open in explorer
+        <<< LabelRow() {
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
+                if let transaction = self?.transaction {
+                    return self?.explorerUrl(for: transaction) == nil
+                } else {
+                    return true
+                }
+            })
+            
+            $0.tag = Rows.openInExplorer.tag
+            $0.title = Rows.openInExplorer.localized
+            $0.cell.imageView?.image = Rows.openInExplorer.image
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (_, _) in
+            guard let transaction = self?.transaction, let url = self?.explorerUrl(for: transaction) else {
+                return
+            }
+            
+            let safari = SFSafariViewController(url: url)
+            safari.preferredControlTintColor = UIColor.adamant.primary
+            self?.present(safari, animated: true, completion: nil)
         }
-        
-        if let row: TextRow = self.form.rowBy(tag: Row.from.tag) {
-            row.value = transaction.senderAddress
-            row.reload()
-        }
-        
-        if let row: TextRow = self.form.rowBy(tag: Row.to.tag) {
-            row.value = transaction.recipientAddress
-            row.reload()
-        }
-        
-        if let row: DateRow = self.form.rowBy(tag: Row.date.tag) {
-            row.value = transaction.sentDate
-            row.reload()
-        }
-        
-        if let row: DecimalRow = self.form.rowBy(tag: Row.amount.tag) {
-            row.value = transaction.amount.doubleValue
-            row.formatter = currencyFormatter
-            row.reload()
-        }
-        
-        if let row: DecimalRow = self.form.rowBy(tag: Row.fee.tag) {
-            row.value = transaction.fee.doubleValue
-            row.formatter = currencyFormatter
-            row.reload()
-        }
-        
-        if let row: TextRow = self.form.rowBy(tag: Row.confirmations.tag) {
-            row.value = transaction.confirmations
-            row.reload()
-        }
-        
-        if let row: TextRow = self.form.rowBy(tag: Row.block.tag) {
-            row.value = transaction.block
-            row.reload()
-        }
-        
-//        if let row: LabelRow = self.form.rowBy(tag: Row.openInExplorer.tag) {
-//            row.hidden = transaction.showGoToExplorer ? false : true
-//            row.reload()
-//            row.evaluateHidden()
-//        }
-//
-//        if let row: LabelRow = self.form.rowBy(tag: Row.openChat.tag) {
-//            row.hidden = transaction.showGoToChat ? false : true
-//            row.title = (transaction.haveChatroom) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
-//            row.reload()
-//            row.evaluateHidden()
-//        }
     }
     
     // MARK: - Actions
@@ -320,42 +266,49 @@ class TransactionDetailsViewControllerBase: FormViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
         
-//        if let url = transaction.explorerUrl {
-//            // URL
-//            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportUrlButton, style: .default) { [weak self] _ in
-//                let alert = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-//                self?.present(alert, animated: true, completion: nil)
-//            })
-//        }
-//        
-//        // Description
-//        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportSummaryButton, style: .default, handler: { [weak self] _ in
-//            let text = transaction.getSummary()
-//            let alert = UIActivityViewController(activityItems: [text], applicationActivities: nil)
-//            self?.present(alert, animated: true, completion: nil)
-//        }))
+        if let url = explorerUrl(for: transaction) {
+            // URL
+            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportUrlButton, style: .default) { [weak self] _ in
+                let alert = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+                self?.present(alert, animated: true, completion: nil)
+            })
+        }
+
+        // Description
+        if let summary = summary(for: transaction) {
+            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportSummaryButton, style: .default) { [weak self] _ in
+                let text = summary
+                let alert = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+                self?.present(alert, animated: true, completion: nil)
+            })
+        }
         
         present(alert, animated: true, completion: nil)
     }
     
-    func shareValue( _ value: String) {
-        dialogService.presentShareAlertFor(string: value,
-                                           types: [.copyToPasteboard, .share],
-                                           excludedActivityTypes: nil,
-                                           animated: true, completion: nil)
+    // MARK: - Tools
+    
+    func shareValue(_ value: String) {
+        dialogService.presentShareAlertFor(string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true) { [weak self] in
+            guard let tableView = self?.tableView else {
+                return
+            }
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+        }
     }
     
-    func goToChat() {
-        
+    // MARK: - To override
+    
+    var currencySymbol: String = ""
+    
+    func explorerUrl(for transaction: TransactionDetails) -> URL? {
+        return nil
     }
     
-    // MARK: - Privare tools
-    private func updateCell(_ cell: BaseCell) {
-        cell.textLabel?.textColor = UIColor.adamant.primary
-        cell.detailTextLabel?.textColor = UIColor.adamant.secondary
-        
-        let font = UIFont.adamantPrimary(ofSize: 17)
-        cell.textLabel?.font = font
-        cell.detailTextLabel?.font = font
+    func summary(for transaction: TransactionDetails) -> String? {
+        return AdamantFormattingTools.summaryFor(transaction: transaction, url: explorerUrl(for: transaction))
     }
 }

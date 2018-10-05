@@ -62,7 +62,7 @@ extension AdmWalletService: RichMessageProvider {
     
     // MARK: Short description
     private static var formatter: NumberFormatter = {
-        return AdamantBalanceFormat.currencyFormatter(format: .full, currencySymbol: currencySymbol)
+        return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
     }()
     
     func shortDescription(for transaction: RichMessageTransaction) -> String {

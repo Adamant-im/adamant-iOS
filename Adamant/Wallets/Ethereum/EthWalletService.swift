@@ -417,7 +417,14 @@ extension EthWalletService {
 					let model: EthResponse = try JSONDecoder().decode(EthResponse.self, from: data)
 					
 					if model.status == 1 {
-						completion(.success(result: model.result))
+                        var transactions = model.result
+                        
+                        for index in 0..<transactions.count {
+                            let from = transactions[index].from
+                            transactions[index].isOutgoing = from == address
+                        }
+                        
+						completion(.success(result: transactions))
 					} else {
 						completion(.failure(error: .remoteServiceError(message: model.message)))
 					}
@@ -431,42 +438,45 @@ extension EthWalletService {
 		}
 	}
 	
-	func getTransaction(byHash hash: String, completion: @escaping (ApiServiceResult<Web3EthTransaction>) -> Void) {
-		DispatchQueue.global().async {
-			let result = self.web3.eth.getTransactionDetails(hash)
-			switch result {
-			case .success(let transaction):
-				if let number = transaction.blockNumber {
-					let resultBlockNumber = self.web3.eth.getBlockNumber()
-					guard case .success(let blockNumber) = resultBlockNumber else {
-						DispatchQueue.main.async {
-							completion(.success(Web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil, lastBlockNumber: nil)))
-						}
-						return
-					}
-					
-					let result = self.web3.eth.getBlockByNumber(number)
-					guard case .success(let block) = result else {
-						DispatchQueue.main.async {
-							completion(.success(Web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil, lastBlockNumber: blockNumber)))
-						}
-						return
-					}
-					DispatchQueue.main.async {
-						completion(.success(Web3EthTransaction(transaction: transaction.transaction, transactionBlock: block, lastBlockNumber: blockNumber)))
-					}
-				} else {
-					DispatchQueue.main.async {
-						completion(.success(Web3EthTransaction(transaction: transaction.transaction, transactionBlock: nil, lastBlockNumber: nil)))
-					}
-				}
-				break
-			case .failure(let error):
-				DispatchQueue.main.async {
-					completion(.failure(.internalError(message: "ETH Wallet: fail to load transaction details", error: error)))
-				}
-				break
-			}
-		}
-	}
+    func getTransaction(by hash: String, completion: @escaping (WalletServiceResult<EthTransaction>) -> Void) {
+        let sender = wallet?.address
+        let eth = web3.eth
+        
+        DispatchQueue.global(qos: .utility).async {
+            do {
+                // MARK: 1. Transaction's details and receipt
+                let details = try eth.getTransactionDetailsPromise(hash).wait()
+                let receipt = try eth.getTransactionReceiptPromise(hash).wait()
+                
+                // MARK: 2. Determine if transaction is outcome or income
+                let isOutgoing: Bool
+                if let sender = sender {
+                    isOutgoing = details.transaction.to.address != sender
+                } else {
+                    isOutgoing = false
+                }
+                
+                // MARK: 3. Check if transaction is delivered
+                guard receipt.status == .ok, let blockNumber = details.blockNumber else {
+                    let transaction = details.transaction.asEthTransaction(date: nil, gasUsed: receipt.gasUsed, blockNumber: nil, confirmations: nil, receiptStatus: receipt.status, isOutgoing: isOutgoing)
+                    completion(.success(result: transaction))
+                    return
+                }
+                
+                // MARK: 4. Block timestamp & confirmations
+                let currentBlock = try eth.getBlockNumberPromise().wait()
+                let block = try eth.getBlockByNumberPromise(blockNumber).wait()
+                let confirmations = currentBlock - blockNumber
+                
+                let transaction = details.transaction.asEthTransaction(date: block.timestamp, gasUsed: receipt.gasUsed, blockNumber: String(blockNumber), confirmations: String(confirmations), receiptStatus: receipt.status, isOutgoing: isOutgoing)
+                
+                completion(.success(result: transaction))
+                
+            } catch let error as Web3Error {
+                completion(.failure(error: error.asWalletServiceError()))
+            } catch {
+                completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: error)))
+            }
+        }
+    }
 }

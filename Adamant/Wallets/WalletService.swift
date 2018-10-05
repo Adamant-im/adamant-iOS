@@ -36,6 +36,7 @@ enum WalletServiceError: Error {
 	case remoteServiceError(message: String)
 	case apiError(ApiServiceError)
 	case internalError(message: String, error: Error?)
+    case transactionNotFound(reason: String)
 }
 
 extension WalletServiceError: RichError {
@@ -67,6 +68,9 @@ extension WalletServiceError: RichError {
 			
 		case .invalidAmount(let amount):
 			return "Неверное количество для перевода: \(amount)"
+            
+        case .transactionNotFound:
+            return "Не удалось найти транзакцию"
 		}
 	}
 	
@@ -79,7 +83,7 @@ extension WalletServiceError: RichError {
 	
 	var level: ErrorLevel {
 		switch self {
-		case .notLogged, .notEnoughtMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated:
+        case .notLogged, .notEnoughtMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated, .transactionNotFound:
 			return .warning
 			
 		case .remoteServiceError, .internalError:

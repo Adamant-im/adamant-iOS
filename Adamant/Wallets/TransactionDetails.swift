@@ -22,19 +22,19 @@ protocol TransactionDetails {
     var recipientAddress: String { get }
     
     /// The date the transaction was sent.
-    var sentDate: Date { get }
+    var dateValue: Date? { get }
     
     /// The amount of currency that was sent.
-    var amount: Decimal { get }
+    var amountValue: Decimal { get }
     
     /// The amount of fee that taken for transaction process.
-    var fee: Decimal { get }
+    var feeValue: Decimal { get }
     
     /// The confirmations of the transaction.
-    var confirmations: String { get }
+    var confirmationsValue: String? { get }
     
     /// The block of the transaction.
-    var block: String { get }
+    var blockValue: String? { get }
     
     var isOutgoing: Bool { get }
 }

@@ -27,7 +27,7 @@ enum AdamantBalanceFormat {
 	
 	// MARK: Formatters
 	
-	static func currencyFormatter(format: AdamantBalanceFormat, currencySymbol symbol: String?) -> NumberFormatter {
+	static func currencyFormatter(for format: AdamantBalanceFormat, currencySymbol symbol: String?) -> NumberFormatter {
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .decimal
 		formatter.roundingMode = .floor
@@ -50,15 +50,15 @@ enum AdamantBalanceFormat {
 	}
 	
 	static var currencyFormatterFull: NumberFormatter = {
-		return currencyFormatter(format: .full, currencySymbol: nil)
+		return currencyFormatter(for: .full, currencySymbol: nil)
 	}()
 	
 	static var currencyFormatterCompact: NumberFormatter = {
-		return currencyFormatter(format: .compact, currencySymbol: nil)
+		return currencyFormatter(for: .compact, currencySymbol: nil)
 	}()
 	
 	static var currencyFormatterShort: NumberFormatter = {
-		return currencyFormatter(format: .short, currencySymbol: nil)
+		return currencyFormatter(for: .short, currencySymbol: nil)
 	}()
 	
 	
@@ -72,13 +72,21 @@ enum AdamantBalanceFormat {
 		}
 	}
 	
-	func format(balance: Decimal, withCurrencySymbol symbol: String? = nil) -> String {
+	func format(_ value: Decimal, withCurrencySymbol symbol: String? = nil) -> String {
 		if let symbol = symbol {
-			return "\(defaultFormatter.string(fromDecimal: balance)!) \(symbol)"
+			return "\(defaultFormatter.string(fromDecimal: value)!) \(symbol)"
 		} else {
-			return defaultFormatter.string(fromDecimal: balance)!
+			return defaultFormatter.string(fromDecimal: value)!
 		}
 	}
+    
+    func format(_ value: Double, withCurrencySymbol symbol: String? = nil) -> String {
+        if let symbol = symbol {
+            return "\(defaultFormatter.string(from: NSNumber(floatLiteral: value))!) \(symbol)"
+        } else {
+            return defaultFormatter.string(from: NSNumber(floatLiteral: value))!
+        }
+    }
 }
 
 

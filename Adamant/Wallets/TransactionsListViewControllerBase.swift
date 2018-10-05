@@ -151,7 +151,7 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
             }
         }
         
-        cell.ammountLabel.text = AdamantBalanceFormat.full.format(balance: amount, withCurrencySymbol: currencySymbol)
+        cell.ammountLabel.text = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
         
         if let date = date {
             cell.dateLabel.text = date.humanizedDateTime()
