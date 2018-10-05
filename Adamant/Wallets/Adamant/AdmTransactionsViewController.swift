@@ -127,6 +127,21 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         }
         
         controller.transaction = transaction
+        
+        if let address = accountService.account?.address {
+            if address == transaction.senderId {
+                controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                controller.senderName = transaction.chatroom?.partner?.name
+            }
+            
+            if address == transaction.recipientId {
+                controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                controller.recipientName = transaction.chatroom?.partner?.name
+            }
+        }
+        
         navigationController?.pushViewController(controller, animated: true)
     }
     

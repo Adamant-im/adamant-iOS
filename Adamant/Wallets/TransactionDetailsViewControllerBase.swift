@@ -89,12 +89,6 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }
     }
     
-    private let cellIdentifier = "cell"
-    private let doubleDetailsCellIdentifier = "dcell"
-    private let defaultCellHeight: CGFloat = 50.0
-    
-    var showToChatRow = true
-    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -112,7 +106,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         form +++ Section()
             
         // MARK: Transaction number
-        <<< TextRow() {
+        <<< LabelRow() {
             $0.disabled = true
             $0.tag = Rows.transactionNumber.tag
             $0.title = Rows.transactionNumber.localized
@@ -123,34 +117,90 @@ class TransactionDetailsViewControllerBase: FormViewController {
             if let text = row.value {
                 self.shareValue(text)
             }
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = .black
         }
         
         // MARK: Sender
-        <<< TextRow() {
+        <<< DoubleDetailsRow() { [weak self] in
             $0.disabled = true
             $0.tag = Rows.from.tag
-            $0.title = Rows.from.localized
-            $0.value = transaction?.senderAddress
-        }.cellSetup { (cell, _) in
-            cell.selectionStyle = .gray
-        }.onCellSelection { (_, row) in
-            if let text = row.value {
-                self.shareValue(text)
+            $0.cell.titleLabel.text = Rows.from.localized
+            
+            if let transaction = transaction {
+                if let senderName = self?.senderName {
+                    $0.value = DoubleDetail(first: senderName, second: transaction.senderAddress)
+                } else {
+                    $0.value = DoubleDetail(first: transaction.senderAddress, second: nil)
+                }
+            } else {
+                $0.value = nil
             }
+        }.cellSetup { [weak self] (cell, _) in
+            cell.selectionStyle = .gray
+            cell.height = {
+                if self?.senderName != nil {
+                    return DoubleDetailsTableViewCell.fullHeight
+                } else {
+                    return DoubleDetailsTableViewCell.compactHeight
+                }
+            }
+        }.onCellSelection { (_, row) in
+            guard let value = row.value else {
+                return
+            }
+            
+            let text: String
+            if let name = value.second {
+                text = "\(name) (\(value.first))"
+            } else {
+                text = value.first
+            }
+            
+            self.shareValue(text)
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = .black
         }
         
         // MARK: Recipient
-        <<< TextRow() {
+        <<< DoubleDetailsRow() { [weak self] in
             $0.disabled = true
             $0.tag = Rows.to.tag
-            $0.title = Rows.to.localized
-            $0.value = transaction?.recipientAddress
-        }.cellSetup { (cell, _) in
-            cell.selectionStyle = .gray
-        }.onCellSelection { (_, row) in
-           if let text = row.value {
-                self.shareValue(text)
+            $0.cell.titleLabel.text = Rows.to.localized
+            
+            if let transaction = transaction {
+                if let recipientName = self?.recipientName {
+                    $0.value = DoubleDetail(first: recipientName, second: transaction.recipientAddress)
+                } else {
+                    $0.value = DoubleDetail(first: transaction.senderAddress, second: nil)
+                }
+            } else {
+                $0.value = nil
             }
+        }.cellSetup { [weak self] (cell, _) in
+            cell.selectionStyle = .gray
+            cell.height = {
+                if self?.recipientName != nil {
+                    return DoubleDetailsTableViewCell.fullHeight
+                } else {
+                    return DoubleDetailsTableViewCell.compactHeight
+                }
+            }
+        }.onCellSelection { (_, row) in
+            guard let value = row.value else {
+                return
+            }
+            
+            let text: String
+            if let name = value.second {
+                text = "\(name) (\(value.first))"
+            } else {
+                text = value.first
+            }
+            
+            self.shareValue(text)
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = .black
         }
         
         // MARK: Date
@@ -166,6 +216,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 let text = value.humanizedDateTimeFull()
                 self?.shareValue(text)
             }
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = .black
         }
         
         // MARK: Amount
@@ -182,6 +234,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 let text = AdamantBalanceFormat.full.format(value, withCurrencySymbol: self?.currencySymbol ?? nil)
                 self?.shareValue(text)
             }
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = .black
         }
         
         // MARK: Fee
@@ -198,10 +252,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 let text = AdamantBalanceFormat.full.format(value, withCurrencySymbol: self?.currencySymbol ?? nil)
                 self?.shareValue(text)
             }
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = .black
         }
         
         // MARK: Confirmations
-        <<< TextRow() {
+        <<< LabelRow() {
             $0.disabled = true
             $0.tag = Rows.confirmations.tag
             $0.title = Rows.confirmations.localized
@@ -212,10 +268,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
             if let text = row.value {
                 self?.shareValue(text)
             }
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = .black
         }
         
         // MARK: Block
-        <<< TextRow() {
+        <<< LabelRow() {
             $0.disabled = true
             $0.tag = Rows.block.tag
             $0.title = Rows.block.localized
@@ -226,6 +284,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             if let text = row.value {
                 self?.shareValue(text)
             }
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = .black
         }
     
         // MARK: Open in explorer
@@ -302,7 +362,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - To override
     
-    var currencySymbol: String = ""
+    var currencySymbol: String? = nil
+    var senderName: String? = nil
+    var recipientName: String? = nil
     
     func explorerUrl(for transaction: TransactionDetails) -> URL? {
         return nil

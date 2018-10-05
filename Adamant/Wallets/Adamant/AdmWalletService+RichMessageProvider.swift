@@ -19,16 +19,30 @@ extension AdmWalletService: RichMessageProvider {
     }
     
     func richMessageTapped(for transaction: TransferTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
-        guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? TransactionDetailsViewControllerBase else {
+        guard let controller = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? TransactionDetailsViewControllerBase else {
             fatalError("Can't get TransactionDetails scene")
         }
         
-//        vc.transaction = transaction
+        controller.transaction = transaction
+        
+        if let address = accountService.account?.address {
+            if address == transaction.senderId {
+                controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                controller.senderName = transaction.chatroom?.partner?.name
+            }
+            
+            if address == transaction.recipientId {
+                controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                controller.recipientName = transaction.chatroom?.partner?.name
+            }
+        }
         
         if let nav = chat.navigationController {
-            nav.pushViewController(vc, animated: true)
+            nav.pushViewController(controller, animated: true)
         } else {
-            chat.present(vc, animated: true, completion: nil)
+            chat.present(controller, animated: true, completion: nil)
         }
     }
     
