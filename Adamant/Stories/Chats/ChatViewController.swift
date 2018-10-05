@@ -458,36 +458,42 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	}
 	
 	private func performBatchChanges(_ changes: [ControllerChange]) {
-        for change in changes {
-            switch change.type {
-			case .insert:
-                guard let newIndexPath = change.newIndexPath else {
-                    continue
+        let chat = messagesCollectionView
+        
+        chat.performBatchUpdates({
+            for change in changes {
+                switch change.type {
+                case .insert:
+                    guard let newIndexPath = change.newIndexPath else {
+                        continue
+                    }
+                    
+                    chat.insertSections(IndexSet(integer: newIndexPath.row))
+                    chat.scrollToBottom(animated: true)
+                    
+                case .delete:
+                    guard let indexPath = change.indexPath else {
+                        continue
+                    }
+                    
+                    chat.deleteSections(IndexSet(integer: indexPath.row))
+                    
+                case .move:
+                    if let section = change.indexPath?.row, let newSection = change.newIndexPath?.row {
+                        chat.moveSection(section, toSection: newSection)
+                    }
+                    
+                case .update:
+                    guard let section = change.indexPath?.row else {
+                        continue
+                    }
+                    
+                    chat.reloadItems(at: [IndexPath(row: 0, section: section)])
                 }
-                
-                messagesCollectionView.insertSections(IndexSet(integer: newIndexPath.row))
-                messagesCollectionView.scrollToBottom(animated: true)
-				
-			case .delete:
-				guard let indexPath = change.indexPath else {
-                    continue
-                }
-                
-                messagesCollectionView.deleteSections(IndexSet(integer: indexPath.row))
-				
-			case .move:
-                if let section = change.indexPath?.row, let newSection = change.newIndexPath?.row {
-                    messagesCollectionView.moveSection(section, toSection: newSection)
-                }
-				
-			case .update:
-                guard let section = change.indexPath?.row else {
-                    continue
-                }
-                
-                messagesCollectionView.reloadItems(at: [IndexPath(row: 0, section: section)])
-			}
-		}
+            }
+        }, completion: { animationSuccess in
+            chat.scrollToBottom(animated: animationSuccess)
+        })
 	}
 }
 
