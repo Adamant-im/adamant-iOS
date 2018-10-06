@@ -8,12 +8,16 @@
 
 import UIKit
 
+extension String.adamantLocalized.wallets {
+    static let ethereum = NSLocalizedString("AccountTab.Wallets.ethereum_wallet", comment: "Account tab: Ethereum wallet")
+}
+
 class EthWalletViewController: WalletViewControllerBase {
 	// MARK: Lifecycle
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		walletTitleLabel.text = "Ethereum Wallet"
+		walletTitleLabel.text = String.adamantLocalized.wallets.ethereum
 	}
 }

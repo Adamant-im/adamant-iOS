@@ -115,6 +115,9 @@
 /* Account tab: 'Send tokens' button */
 "AccountTab.Row.SendTokens" = "Send Tokens";
 
+/* Account tab: 'Address' row */
+"AccountTab.Row.Address" = "Address";
+
 /* Account tab: 'Get free tokens' button */
 "AccountTab.Row.FreeTokens" = "Free ADM tokens";
 
@@ -130,14 +133,14 @@
 /* Account tab: Application section title */
 "AccountTab.Section.Application" = "Application";
 
-/* Account tab: Adamant wallet section */
-"AccountTab.Sections.adamant_wallet" = "ADAMANT Wallet";
+/* Account tab: Adamant wallet */
+"AccountTab.Wallets.adamant_wallet" = "Adamant Wallet";
 
-/* Account tab: Ethereum wallet section */
-"AccountTab.Sections.ethereum_wallet" = "Ethereum Wallet";
+/* Account tab: Ethereum wallet */
+"AccountTab.Wallets.ethereum_wallet" = "Ethereum Wallet";
 
-/* Account tab: Lisk wallet section */
-"AccountTab.Sections.lisk_wallet" = "Lisk Wallet";
+/* Account tab: Lisk wallet */
+"AccountTab.Wallets.lisk_wallet" = "Lisk Wallet";
 
 /* Account page: scene title */
 "AccountTab.Title" = "Account";

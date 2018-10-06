@@ -63,7 +63,7 @@ class EthWalletService: WalletService {
 	// MARK: - Notifications
 	let walletUpdatedNotification = Notification.Name("adamant.ethWallet.walletUpdated")
 	let serviceEnabledChanged = Notification.Name("adamant.ethWallet.enabledChanged")
-	let transactionFeeUpdated: Notification.Name = Notification.Name("adamant.ethWallet.feeUpdated")
+	let transactionFeeUpdated = Notification.Name("adamant.ethWallet.feeUpdated")
 	
     
     // MARK: RichMessageProvider properties

@@ -115,6 +115,9 @@
 /* Account tab: 'Send tokens' button */
 "AccountTab.Row.SendTokens" = "Отправить токены";
 
+/* Account tab: 'Address' row */
+"AccountTab.Row.Address" = "Адрес";
+
 /* Account tab: 'Get free tokens' button */
 "AccountTab.Row.FreeTokens" = "Бесплатные ADM-токены";
 
@@ -130,14 +133,14 @@
 /* Account tab: Application section title */
 "AccountTab.Section.Application" = "Приложение";
 
-/* Account tab: Adamant wallet section */
-"AccountTab.Sections.adamant_wallet" = "ADAMANT кошелёк";
+/* Account tab: Adamant wallet */
+"AccountTab.Wallets.adamant_wallet" = "Adamant кошелёк";
 
-/* Account tab: Ethereum wallet section */
-"AccountTab.Sections.ethereum_wallet" = "Ethereum кошелёк";
+/* Account tab: Ethereum wallet */
+"AccountTab.Wallets.ethereum_wallet" = "Ethereum кошелёк";
 
-/* Account tab: Lisk wallet section */
-"AccountTab.Sections.lisk_wallet" = "Lisk кошелёк";
+/* Account tab: Lisk wallet */
+"AccountTab.Wallets.lisk_wallet" = "Lisk кошелёк";
 
 /* Account tab: Delegates section title */
 "AccountTab.Section.Delegates" = "Делегаты";

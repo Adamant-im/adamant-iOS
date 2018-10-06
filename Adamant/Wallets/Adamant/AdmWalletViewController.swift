@@ -8,12 +8,16 @@
 
 import UIKit
 
+extension String.adamantLocalized.wallets {
+    static let adamant = NSLocalizedString("AccountTab.Wallets.adamant_wallet", comment: "Account tab: Adamant wallet")
+}
+
 class AdmWalletViewController: WalletViewControllerBase {
 	// MARK: Lifecycle
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		walletTitleLabel.text = "Adamant Wallet"
+		walletTitleLabel.text = String.adamantLocalized.wallets.adamant
 	}
 }

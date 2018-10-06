@@ -9,6 +9,13 @@
 import UIKit
 import Eureka
 
+extension String.adamantLocalized {
+    struct wallets {
+        
+        private init() {}
+    }
+}
+
 class WalletViewControllerBase: FormViewController, WalletViewController {
 	// MARK: - Rows
 	enum BaseRows {
@@ -24,9 +31,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 		
 		var localized: String {
 			switch self {
-			case .address: return "Адрес"
-			case . balance: return "Баланс"
-			case .send: return "Отправить"
+			case .address: return NSLocalizedString("AccountTab.Row.Address", comment: "Account tab: 'Address' row")
+			case . balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
+			case .send: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
 			}
 		}
 	}

@@ -30,7 +30,7 @@ class AdmWalletService: NSObject, WalletService {
 	// MARK: - Notifications
 	let walletUpdatedNotification = Notification.Name("adamant.admWallet.updated")
 	let serviceEnabledChanged = Notification.Name("adamant.admWallet.enabledChanged")
-	let transactionFeeUpdated: Notification.Name = Notification.Name("adamant.admWallet.feeUpdated")
+	let transactionFeeUpdated = Notification.Name("adamant.admWallet.feeUpdated")
 	
     // MARK: RichMessageProvider properties
     static let richMessageType = "adm_transaction" // not used
