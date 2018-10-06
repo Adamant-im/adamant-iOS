@@ -11,6 +11,7 @@ import Eureka
 import SafariServices
 import FreakingSimpleRoundImageView
 import CoreData
+import Parchment
 
 
 // MARK: - Localization
@@ -30,25 +31,6 @@ extension String.adamantLocalized.alert {
 	static let logoutMessageFormat = NSLocalizedString("AccountTab.ConfirmLogout.MessageFormat", comment: "Account tab: Confirm logout alert")
 	static let logoutButton = NSLocalizedString("AccountTab.ConfirmLogout.Logout", comment: "Account tab: Confirm logout alert: Logout (Ok) button")
 }
-
-
-// MARK: - Wallet extension
-fileprivate extension Wallet {
-	var sectionTag: String {
-		switch self {
-		case .adamant: return "s_adm"
-		case .ethereum: return "s_eth"
-		}
-	}
-	
-	var sectionTitle: String {
-		switch self {
-		case .adamant: return NSLocalizedString("AccountTab.Sections.adamant_wallet", comment: "Account tab: Adamant wallet section")
-		case .ethereum: return NSLocalizedString("AccountTab.Sections.ethereum_wallet", comment: "Account tab: Ethereum wallet section")
-		}
-	}
-}
-
 
 // MARK: AccountViewController
 class AccountViewController: FormViewController {
@@ -133,27 +115,17 @@ class AccountViewController: FormViewController {
 	var transfersProvider: TransfersProvider!
 	
 	
-	// MARK: - Wallets
-	var selectedWalletIndex: Int = 0
-	
-	
 	// MARK: - Properties
 	
 	var hideFreeTokensRow = false
 	
 	let walletCellIdentifier = "wllt"
 	private (set) var accountHeaderView: AccountHeaderView!
-	var wallets: [Wallet]? {
-		didSet {
-			selectedWalletIndex = 0
-			accountHeaderView?.walletCollectionView.reloadData()
-		}
-	}
 	
 	private var transfersController: NSFetchedResultsController<TransferTransaction>?
+	private var pagingViewController: PagingViewController<WalletPagingItem>!
 	
-	private let accessoryContentInsets = UIEdgeInsets(top: 2, left: 4, bottom: 2, right: 4)
-	private let accessoryContainerInsets = UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
+	private var initiated = false
 	
 	// MARK: - Lifecycle
 	
@@ -163,7 +135,10 @@ class AccountViewController: FormViewController {
 		navigationOptions = .Disabled
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		
-		wallets = [.adamant(balance: Decimal(floatLiteral: 100.001)), .ethereum]
+		// MARK: Status Bar
+		let statusBarView = UIView(frame: UIApplication.shared.statusBarFrame)
+		statusBarView.backgroundColor = UIColor.white
+		view.addSubview(statusBarView)
 		
 		// MARK: Transfers controller
 		let controller = transfersProvider.unreadTransfersController()
@@ -184,13 +159,6 @@ class AccountViewController: FormViewController {
 		
 		accountHeaderView = header
 		accountHeaderView.delegate = self
-		accountHeaderView.walletCollectionView.delegate = self
-		accountHeaderView.walletCollectionView.dataSource = self
-		accountHeaderView.walletCollectionView.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: walletCellIdentifier)
-		
-		if #available(iOS 11.0, *), let topInset = UIApplication.shared.keyWindow?.safeAreaInsets.top, topInset > 0 {
-			accountHeaderView.backgroundTopConstraint.constant = -topInset
-		}
 		
 		updateAccountInfo()
 		
@@ -200,24 +168,25 @@ class AccountViewController: FormViewController {
 			tableView.tableFooterView = footer
 		}
 		
+		// MARK: Wallet view
+		pagingViewController = PagingViewController<WalletPagingItem>()
 		
-		// MARK: Wallets
-		if let wallets = wallets {
-			for (walletIndex, wallet) in wallets.enumerated() {
-				let section = createSectionFor(wallet: wallet)
-				
-				section.hidden = Condition.function([], { [weak self] _ -> Bool in
-					guard let selectedIndex = self?.selectedWalletIndex else {
-						return true
-					}
-					
-					return walletIndex != selectedIndex
-				})
-				
-				form.append(section)
+		pagingViewController.menuItemSource = .nib(nib: UINib(nibName: "WalletCollectionViewCell", bundle: nil))
+		pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
+		pagingViewController.indicatorColor = UIColor.adamant.primary
+		pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
+		pagingViewController.dataSource = self
+		pagingViewController.delegate = self
+		pagingViewController.select(index: 0)
+		accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
+		accountHeaderView.walletViewContainer.constrainToEdges(pagingViewController.view)
+        addChild(pagingViewController)
+		
+		for wallet in accountService.wallets {
+			NotificationCenter.default.addObserver(forName: wallet.walletUpdatedNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+				self?.pagingViewController.reloadData()
 			}
 		}
-		
 		
 		// MARK: Application
 		form +++ Section(Sections.application.localized) {
@@ -331,8 +300,6 @@ class AccountViewController: FormViewController {
 		
 		form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamant.tableRowIcons }
 		
-		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .centeredHorizontally)
-		
 		
 		// MARK: Notification Center
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
@@ -346,6 +313,27 @@ class AccountViewController: FormViewController {
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.updateAccountInfo()
 		}
+		
+		NotificationCenter.default.addObserver(forName: Notification.Name.WalletViewController.heightUpdated, object: nil, queue: OperationQueue.main) { [weak self] notification in
+			if let vc = notification.object as? WalletViewController,
+				let cvc = self?.pagingViewController.pageViewController.selectedViewController,
+				vc.viewController == cvc {
+				
+				if let initiated = self?.initiated {
+					self?.updateHeaderSize(with: vc, animated: initiated)
+				} else {
+					self?.updateHeaderSize(with: vc, animated: false)
+				}
+			}
+		}
+		
+		for (index, service) in accountService.wallets.enumerated() {
+			NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,
+												   object: service,
+												   queue: OperationQueue.main) { [weak self] _ in
+													self?.pagingViewController.collectionView.reloadItems(at: [IndexPath(row: index, section: 0)])
+			}
+		}
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -355,13 +343,9 @@ class AccountViewController: FormViewController {
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
-	}
-	
-	override func viewDidAppear(_ animated: Bool) {
-		super.viewDidAppear(animated)
 		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
+        for vc in pagingViewController.pageViewController.children {
+			vc.viewWillAppear(animated)
 		}
 	}
 	
@@ -370,6 +354,18 @@ class AccountViewController: FormViewController {
 		navigationController?.setNavigationBarHidden(false, animated: animated)
 	}
 	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		
+		if !initiated {
+			initiated = true
+		}
+
+		if #available(iOS 11.0, *) {
+			navigationController?.navigationBar.prefersLargeTitles = false
+		}
+	}
+
 	deinit {
 		NotificationCenter.default.removeObserver(self)
 	}
@@ -389,139 +385,22 @@ class AccountViewController: FormViewController {
 	// MARK: Other
 	func updateAccountInfo() {
 		let address: String
-		let adamantWallet: Wallet
 		
 		if let account = accountService.account {
 			address = account.address
-			adamantWallet = Wallet.adamant(balance: account.balance)
 			hideFreeTokensRow = account.balance > 0
 		} else {
 			address = ""
-			adamantWallet = Wallet.adamant(balance: 0)
 			hideFreeTokensRow = true
-		}
-		
-		if wallets != nil {
-			wallets![0] = adamantWallet
-			accountHeaderView.walletCollectionView.reloadItems(at: [IndexPath(row: 0, section: 0)])
-		} else {
-			wallets = [adamantWallet, Wallet.ethereum]
-			accountHeaderView.walletCollectionView.reloadData()
-		}
-		
-		if let row: AlertLabelRow = form.rowBy(tag: Rows.balance.tag) {
-			row.value = adamantWallet.format(numberFormat: .full, includeCurrencySymbol: true)
-			row.updateCell()
 		}
 		
 		if let row: LabelRow = form.rowBy(tag: Rows.freeTokens.tag) {
 			row.evaluateHidden()
 		}
 		
-		accountHeaderView.walletCollectionView.selectItem(at: IndexPath(row: selectedWalletIndex, section: 0), animated: false, scrollPosition: .centeredHorizontally)
 		accountHeaderView.addressButton.setTitle(address, for: .normal)
 	}
 }
-
-
-// MARK: - UICollectionViewDelegate, UICollectionViewDataSource
-extension AccountViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-	func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-		guard let wallets = wallets else {
-			return 0
-		}
-		
-		return wallets.count
-	}
-	
-	func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-		guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: walletCellIdentifier, for: indexPath) as? WalletCollectionViewCell else {
-			fatalError("Can't dequeue wallet cell")
-		}
-		
-		guard let wallet = wallets?[indexPath.row] else {
-			fatalError("Wallets collectionView: Out of bounds row")
-		}
-		
-		if !cell.isInitialized {
-			cell.tintColor = UIColor.adamant.secondary
-			
-			cell.balanceLabel.textColor = UIColor.adamant.primary
-			cell.currencySymbolLabel.textColor = UIColor.adamant.primary
-			
-			cell.accessoryContainerView.accessoriesBackgroundColor = UIColor.adamant.primary
-			cell.accessoryContainerView.accessoriesBorderColor = UIColor.white
-			cell.accessoryContainerView.accessoriesBorderWidth = 2
-			
-			if cell.accessoryContainerView.accessoriesContentInsets != accessoryContentInsets {
-				cell.accessoryContainerView.accessoriesContentInsets = accessoryContentInsets
-			}
-			
-			if cell.accessoryContainerView.accessoriesContainerInsets == accessoryContainerInsets {
-				cell.accessoryContainerView.accessoriesContainerInsets = accessoryContainerInsets
-			}
-			
-			cell.isInitialized = true
-		}
-		
-		cell.currencyImageView.image = wallet.currencyLogo
-		cell.balanceLabel.text = wallet.format(numberFormat: .compact, includeCurrencySymbol: false)
-		cell.currencySymbolLabel.text = wallet.currencySymbol
-		
-		if indexPath.row == 0, let count = transfersController?.fetchedObjects?.count, count > 0 {
-			let accessory = AccessoryType.label(text: String(count))
-			cell.accessoryContainerView.setAccessory(accessory, at: AccessoryPosition.topRight)
-		} else {
-			cell.accessoryContainerView.setAccessory(nil, at: AccessoryPosition.topRight)
-		}
-		
-		cell.setSelected(indexPath.row == selectedWalletIndex, animated: false)
-		
-		if wallet.enabled {
-			cell.currencyImageView.alpha = 1
-			cell.currencySymbolLabel.alpha = 1
-		} else {
-			cell.currencyImageView.alpha = 0.3
-			cell.currencySymbolLabel.alpha = 0.3
-		}
-		
-		return cell
-	}
-	
-	func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-		guard let wallet = wallets?[indexPath.row] else {
-			return false
-		}
-		
-		return wallet.enabled
-	}
-	
-	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-		selectedWalletIndex = indexPath.row
-
-		form.allSections.filter { $0.hidden != nil }.forEach { $0.evaluateHidden() }
-
-		if let cell = collectionView.cellForItem(at: indexPath) as? WalletCollectionViewCell {
-			cell.setSelected(true, animated: true)
-		}
-	}
-	
-	func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-		if let cell = collectionView.cellForItem(at: indexPath) as? WalletCollectionViewCell {
-			cell.setSelected(false, animated: true)
-		}
-	}
-	
-	// Flow delegate
-	func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-		return CGSize(width: 110, height: 110)
-	}
-	
-	func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-		return UIEdgeInsets.zero
-	}
-}
-
 
 
 // MARK: - AccountHeaderViewDelegate
@@ -552,8 +431,6 @@ extension AccountViewController: AccountHeaderViewDelegate {
 // MARK: - NSFetchedResultsControllerDelegate
 extension AccountViewController: NSFetchedResultsControllerDelegate {
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-		accountHeaderView.walletCollectionView.reloadItems(at: [IndexPath(row: 0, section: 0)])
-		
 		if let row: AlertLabelRow = form.rowBy(tag: Rows.balance.tag), let alertLabel = row.cell.alertLabel, let count = controller.fetchedObjects?.count {
 			if count > 0 {
 				alertLabel.isHidden = false
@@ -566,121 +443,61 @@ extension AccountViewController: NSFetchedResultsControllerDelegate {
 }
 
 
-// MARK: - Tools
-extension AccountViewController {
-	func createSectionFor(wallet: Wallet) -> Section {
-		let section = Section(wallet.sectionTitle) {
-			$0.tag = wallet.sectionTag
+// MARK: - PagingViewControllerDataSource
+extension AccountViewController: PagingViewControllerDataSource, PagingViewControllerDelegate {
+	func numberOfViewControllers<T>(in pagingViewController: PagingViewController<T>) -> Int {
+		return accountService.wallets.count
+	}
+	
+	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
+		return accountService.wallets[index].walletViewController.viewController
+	}
+	
+	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, pagingItemForIndex index: Int) -> T {
+		let service = accountService.wallets[index]
+		
+		guard let wallet = service.wallet else {
+			return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm")) as! T
 		}
 		
-		switch wallet {
-		case .adamant:
-			// Balance
-			section <<< AlertLabelRow() { [weak self] in
-				$0.title = Rows.balance.localized
-				$0.tag = Rows.balance.tag
-				$0.value = wallet.format(numberFormat: .full, includeCurrencySymbol: true)
-				$0.cell.imageView?.image = Rows.balance.image
-				$0.cell.selectionStyle = .gray
-				
-				if let alertLabel = $0.cell.alertLabel {
-					alertLabel.backgroundColor = UIColor.adamant.primary
-					alertLabel.textColor = UIColor.white
-					alertLabel.clipsToBounds = true
-					alertLabel.textInsets = UIEdgeInsets(top: 1, left: 5, bottom: 1, right: 5)
-					
-					if let count = self?.transfersController?.fetchedObjects?.count, count > 0 {
-						alertLabel.text = String(count)
-					} else {
-						alertLabel.isHidden = true
-					}
-				}
-			}.cellUpdate({ (cell, _) in
-				cell.accessoryType = .disclosureIndicator
-			}).onCellSelection({ [weak self] (_, _) in
-				guard let vc = self?.router.get(scene: AdamantScene.Transactions.transactions), let nav = self?.navigationController else {
-					return
-				}
-				
-				nav.pushViewController(vc, animated: true)
-			})
-			
-			// Send Tokens
-//			<<< LabelRow() {
-//				$0.title = Rows.sendTokens.localized
-//				$0.tag = Rows.sendTokens.tag
-//				$0.cell.imageView?.image = Rows.sendTokens.image
-//				$0.cell.selectionStyle = .gray
-//			}.cellUpdate({ (cell, _) in
-//				cell.accessoryType = .disclosureIndicator
-//			})
-			
-			// Buy tokens
-			<<< LabelRow() {
-				$0.title = Rows.buyTokens.localized
-				$0.tag = Rows.buyTokens.tag
-				$0.cell.imageView?.image = Rows.buyTokens.image
-				$0.cell.selectionStyle = .gray
-			}.cellUpdate({ (cell, _) in
-				cell.accessoryType = .disclosureIndicator
-			}).onCellSelection({ [weak self] (_, _) in
-				let urlOpt: URL?
-				if let address = self?.accountService.account?.address {
-					urlOpt = URL(string: String.localizedStringWithFormat(String.adamantLocalized.account.buyTokensUrlFormat, address))
-				} else {
-					urlOpt = nil
-				}
-				
-				guard let url = urlOpt else {
-					self?.dialogService.showError(withMessage: "Failed to build 'Buy tokens' url, report a bug", error: nil)
-					return
-				}
-				
-				let safari = SFSafariViewController(url: url)
-				safari.preferredControlTintColor = UIColor.adamant.primary
-				self?.present(safari, animated: true, completion: nil)
-			})
-			
-			// Get free tokens
-			<<< LabelRow() {
-				$0.title = Rows.freeTokens.localized
-				$0.tag = Rows.freeTokens.tag
-				$0.cell.imageView?.image = Rows.freeTokens.image
-				$0.cell.selectionStyle = .gray
-				
-				$0.hidden = Condition.function([], { [weak self] _ -> Bool in
-					guard let hideFreeTokensRow = self?.hideFreeTokensRow else {
-						return true
-					}
-					
-					return hideFreeTokensRow
-				})
-			}.cellUpdate({ (cell, _) in
-				cell.accessoryType = .disclosureIndicator
-			}).onCellSelection({ [weak self] (_, _) in
-				let raw: URL?
-				if let address = self?.accountService.account?.address {
-					raw = URL(string: String.localizedStringWithFormat(String.adamantLocalized.account.getFreeTokensUrlFormat, address))
-				} else {
-					raw = URL(string: String.adamantLocalized.account.getFreeTokensUrlFormat)
-				}
-				
-				guard let url = raw else {
-					self?.dialogService.showError(withMessage: "Failed to build 'Free tokens' url, report a bug", error: nil)
-					return
-				}
-				
-				let safari = SFSafariViewController(url: url)
-				safari.preferredControlTintColor = UIColor.adamant.primary
-				self?.present(safari, animated: true, completion: nil)
-			})
-			
-		case .ethereum:
-			section <<< LabelRow() {
-				$0.title = "Soon..."
+		let serviceType = type(of: service)
+		
+		let item = WalletPagingItem(index: index, currencySymbol: serviceType.currencySymbol, currencyImage: serviceType.currencyLogo)
+		item.balance = wallet.balance
+		item.notifications = wallet.notifications
+		
+		return item as! T
+	}
+	
+	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, didScrollToItem pagingItem: T, startingViewController: UIViewController?, destinationViewController: UIViewController, transitionSuccessful: Bool) {
+		guard transitionSuccessful,
+			let first = startingViewController as? WalletViewController,
+			let second = destinationViewController as? WalletViewController,
+			first.height != second.height else {
+			return
+		}
+
+		updateHeaderSize(with: second, animated: true)
+	}
+	
+	func updateHeaderSize(with walletViewController: WalletViewController, animated: Bool) {
+		guard case let .fixed(_, menuHeight) = pagingViewController.menuItemSize else {
+			return
+		}
+		
+		let pagingHeight = menuHeight + walletViewController.height
+		
+		var headerBounds = accountHeaderView.bounds
+		headerBounds.size.height = accountHeaderView.walletViewContainer.frame.origin.y + pagingHeight
+		
+		if animated {
+			UIView.animate(withDuration: 0.2) { [unowned self] in
+				self.accountHeaderView.bounds = headerBounds
+				self.tableView.tableHeaderView = self.accountHeaderView
 			}
+		} else {
+			accountHeaderView.frame = headerBounds
+			tableView.tableHeaderView = accountHeaderView
 		}
-		
-		return section
 	}
 }

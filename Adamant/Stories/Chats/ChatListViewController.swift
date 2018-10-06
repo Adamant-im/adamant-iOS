@@ -30,6 +30,8 @@ class ChatListViewController: UIViewController {
 	var notificationsService: NotificationsService!
 	var dialogService: DialogService!
 	var addressBook: AddressBookService!
+    
+    var richMessageProviders = [String:RichMessageProvider]()
 	
 	// MARK: IBOutlet
 	@IBOutlet weak var tableView: UITableView!
@@ -264,26 +266,12 @@ extension ChatListViewController {
 		}
 		
 		cell.hasUnreadMessages = chatroom.hasUnreadMessages
-		
-		switch chatroom.lastTransaction {
-		case let message as MessageTransaction:
-			guard let text = message.message else {
-				cell.lastMessageLabel.text = nil
-				break
-			}
-			
-			if message.isOutgoing {
-				cell.lastMessageLabel.text = String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, text)
-			} else {
-				cell.lastMessageLabel.text = text
-			}
-			
-		case let transfer as TransferTransaction:
-			cell.lastMessageLabel.text = formatTransferPreview(transfer)
-			
-		default:
-			cell.lastMessageLabel.text = nil
-		}
+        
+        if let lastTransaction = chatroom.lastTransaction {
+            cell.lastMessageLabel.text = shortDescription(for: lastTransaction)
+        } else {
+            cell.lastMessageLabel.text = nil
+        }
 		
 		if let date = chatroom.updatedAt as Date?, date != Date.adamantNullDate {
 			cell.dateLabel.text = date.humanizedDay()
@@ -426,6 +414,11 @@ extension ChatListViewController: ChatViewControllerDelegate {
 // MARK: - Working with in-app notifications
 extension ChatListViewController {
 	private func showNotification(for transaction: ChatTransaction) {
+        // MARK: 0. Do not show notifications for initial sync
+        guard chatsProvider.isInitiallySynced else {
+            return
+        }
+        
 		// MARK: 1. Show notification only for incomming transactions
 		guard !transaction.silentNotification, !transaction.isOutgoing,
 			let chatroom = transaction.chatroom, chatroom != presentedChatroom(), !chatroom.isHidden,
@@ -433,30 +426,9 @@ extension ChatListViewController {
 			return
 		}
 		
-		
-		// MARK: 2. Check transaction type. Do not show notifications for initial sync
-		let text: String
-		switch transaction {
-		case let message as MessageTransaction:
-			guard chatsProvider.isInitiallySynced, let t = message.message else {
-				return
-			}
-			
-			text = t
-			
-		case let transfer as TransferTransaction:
-			guard transfersProvider.isInitiallySynced, let t = formatTransferPreview(transfer) else {
-				return
-			}
-			
-			text = t
-			
-		default:
-			return
-		}
-		
-		// MARK: 3. Prepare notification
-		let title = partner.name ?? partner.address
+        // MARK: 2. Prepare notification
+        let title = partner.name ?? partner.address
+        let text = shortDescription(for: transaction)
 		
 		let image: UIImage
 		if let ava = partner.avatar, let img = UIImage(named: ava) {
@@ -499,18 +471,30 @@ extension ChatListViewController {
 			present(vc, animated: true)
 		}
 	}
-	
-	private func formatTransferPreview(_ transfer: TransferTransaction) -> String? {
-		guard let balance = transfer.amount else {
-			return nil
-		}
-		
-		if transfer.isOutgoing {
-			return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(AdamantUtilities.format(balance: balance))")
-		} else {
-			return "➡️  \(AdamantUtilities.format(balance: balance))"
-		}
-	}
+    
+    private func shortDescription(for transaction: ChatTransaction) -> String? {
+        switch transaction {
+        case let message as MessageTransaction:
+            return message.message
+            
+        case let transfer as TransferTransaction:
+            if let admService = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService {
+                return admService.shortDescription(for: transfer)
+            } else {
+                return nil
+            }
+            
+        case let richMessage as RichMessageTransaction:
+            if let type = richMessage.richType, let provider = richMessageProviders[type] {
+                return provider.shortDescription(for: richMessage)
+            } else {
+                return richMessage.serializedMessage()
+            }
+            
+        default:
+            return nil
+        }
+    }
 }
 
 
@@ -571,7 +555,9 @@ extension ChatListViewController {
 					self?.present(alert, animated: true, completion: nil)
 				}
 				
-				self?.dialogService.showSystemActionSheet(title: nil, message: nil, actions: [share, rename])
+                let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
+                
+                self?.dialogService.showAlert(title: nil, message: nil, style: UIAlertController.Style.actionSheet, actions: [share, rename, cancel])
 			}
 			
 			completionHandler(true)

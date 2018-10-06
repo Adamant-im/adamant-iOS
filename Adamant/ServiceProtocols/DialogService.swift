@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import PMAlertController
 
 extension String.adamantLocalized.alert {
 	static let copyToPasteboard = NSLocalizedString("Shared.CopyToPasteboard", comment: "Shared alert 'Copy' button. Used anywhere. Used for copy-paste info.")
@@ -44,6 +43,20 @@ enum ShareType {
 enum ShareContentType {
 	case passphrase
 	case address
+	
+	func shareTypes(sharingTip: String?) -> [ShareType] {
+		switch self {
+		case .address:
+			return [.copyToPasteboard,
+					.share,
+					.generateQr(sharingTip: sharingTip)]
+			
+		case .passphrase:
+			return [.copyToPasteboard,
+					.share,
+					.generateQr(sharingTip: sharingTip)]
+		}
+	}
 	
 	var excludedActivityTypes: [UIActivity.ActivityType]? {
 		switch self {
@@ -83,6 +96,16 @@ protocol RichError: Error {
 	var level: ErrorLevel { get }
 }
 
+enum AdamantAlertStyle {
+	case alert, actionSheet, richNotification
+}
+
+struct AdamantAlertAction {
+	let title: String
+    let style: UIAlertAction.Style
+	let handler: (() -> Void)?
+}
+
 protocol DialogService: class {
 	
 	func getTopmostViewController() -> UIViewController?
@@ -116,6 +139,6 @@ protocol DialogService: class {
 	func presentGoToSettingsAlert(title: String?, message: String?)
     
     // MARK: - Alerts
-    func showAlert(title:String, message: String, actions: [PMAlertAction]?)
-    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?)
+    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?)
+	func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?)
 }

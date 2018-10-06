@@ -103,19 +103,15 @@ extension AdamantDialogService {
 	
 	func showError(withMessage message: String, error: Error? = nil) {
 		if Thread.isMainThread {
-			internalShowError(withMessage: message, error: error)
+			FTIndicator.dismissProgress()
 		} else {
-			DispatchQueue.main.async {
-				self.internalShowError(withMessage: message, error: error)
+			DispatchQueue.main.sync {
+				FTIndicator.dismissProgress()
 			}
 		}
-	}
-	
-	/// Must be called from main thread only
-	private func internalShowError(withMessage message: String, error: Error? = nil) {
-		let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
-		FTIndicator.dismissProgress()
 		
+		let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
+        
         alertVC.gravityDismissAnimation = false
         alertVC.alertTitle.textColor = UIColor.adamant.primary
         alertVC.alertDescription.textColor = UIColor.adamant.secondary
@@ -304,8 +300,83 @@ extension AdamantDialogService {
 	}
 }
 
-// MAKR: - Alerts
+
+// MARK: - Alerts
+fileprivate extension UIAlertAction.Style {
+	func asPMAlertAction() -> PMAlertActionStyle {
+		switch self {
+		case .cancel:
+			return .cancel
+			
+		case .default,
+			 .destructive:
+			return .default
+		}
+	}
+}
+
+fileprivate extension AdamantAlertStyle {
+    func asUIAlertControllerStyle() -> UIAlertController.Style {
+		switch self {
+		case .alert,
+			 .richNotification:
+			return .alert
+			
+		case .actionSheet:
+			return .actionSheet
+		}
+	}
+}
+
+fileprivate extension AdamantAlertAction {
+	func asUIAlertAction() -> UIAlertAction {
+		let handler = self.handler
+		return UIAlertAction(title: self.title, style: self.style, handler: { _ in handler?() })
+	}
+	
+	func asPMAlertAction() -> PMAlertAction {
+		let handler = self.handler
+		return PMAlertAction(title: self.title, style: self.style.asPMAlertAction(), action: handler)
+	}
+}
+
 extension AdamantDialogService {
+	func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?) {
+		switch style {
+		case .alert, .actionSheet:
+			let uiStyle = style.asUIAlertControllerStyle()
+			if let actions = actions {
+				let uiActions: [UIAlertAction] = actions.map { $0.asUIAlertAction() }
+				
+				showAlert(title: title, message: message, style: uiStyle, actions: uiActions)
+			} else {
+				showAlert(title: title, message: message, style: uiStyle, actions: nil)
+			}
+			
+		case .richNotification:
+			if let actions = actions {
+				let pmActions: [PMAlertAction] = actions.map { $0.asPMAlertAction() }
+				showAlert(title: title ?? "", message: message ?? "", actions: pmActions)
+			} else {
+				showAlert(title: title ?? "", message: message ?? "", actions: nil)
+			}
+		}
+	}
+	
+    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?) {
+		let alertVc = UIAlertController(title: title, message: message, preferredStyle: style)
+		
+		if let actions = actions {
+			for action in actions {
+				alertVc.addAction(action)
+			}
+		} else {
+			alertVc.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default))
+		}
+		
+		present(alertVc, animated: true, completion: nil)
+	}
+	
     func showAlert(title: String, message: String, actions: [PMAlertAction]?) {
         let alertVC = PMAlertController(title: title, description: message, image: nil, style: .alert)
         
@@ -340,22 +411,6 @@ extension AdamantDialogService {
             
             alertVC.alertActionStackViewHeightConstraint.constant = 50
         }
-        
-        self.present(alertVC, animated: true, completion: nil)
-    }
-    
-    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?) {
-        guard let actions = actions, actions.count > 0 else {
-            return
-        }
-        
-        let alertVC = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
-        
-        for action in actions {
-            alertVC.addAction(action)
-        }
-        
-        alertVC.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel))
         
         self.present(alertVC, animated: true, completion: nil)
     }

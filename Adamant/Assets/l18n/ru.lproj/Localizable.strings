@@ -76,6 +76,12 @@
 /* AccountsProvider: Address not valid error, %@ for address */
 "AccountsProvider.Error.AddressNotValidFormat" = "Неправильный адрес: %@";
 
+/* AccountService: Alert title. Changes in version 1.2 */
+"AccountService.update.v12.title" = "Новое в версии 1.2: Криптокошельки";
+
+/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets */
+"AccountService.update.v12.message" = "Необходимо снова зайти в приложение чтобы создать Ethereum и Lisk кошельки";
+
 /* Login: user typed in invalid passphrase */
 "AccountServiceError.InvalidPassphrase" = "Неправильный пароль";
 
@@ -109,6 +115,9 @@
 /* Account tab: 'Send tokens' button */
 "AccountTab.Row.SendTokens" = "Отправить токены";
 
+/* Account tab: 'Address' row */
+"AccountTab.Row.Address" = "Адрес";
+
 /* Account tab: 'Get free tokens' button */
 "AccountTab.Row.FreeTokens" = "Бесплатные ADM-токены";
 
@@ -124,11 +133,14 @@
 /* Account tab: Application section title */
 "AccountTab.Section.Application" = "Приложение";
 
-/* Account tab: Adamant wallet section */
-"AccountTab.Sections.adamant_wallet" = "ADAMANT кошелёк";
+/* Account tab: Adamant wallet */
+"AccountTab.Wallets.adamant_wallet" = "Adamant кошелёк";
 
-/* Account tab: Ethereum wallet section */
-"AccountTab.Sections.ethereum_wallet" = "Ethereum кошелёк";
+/* Account tab: Ethereum wallet */
+"AccountTab.Wallets.ethereum_wallet" = "Ethereum кошелёк";
+
+/* Account tab: Lisk wallet */
+"AccountTab.Wallets.lisk_wallet" = "Lisk кошелёк";
 
 /* Account tab: Delegates section title */
 "AccountTab.Section.Delegates" = "Делегаты";
@@ -153,9 +165,6 @@
 
 /* Serious internal error: Error parsing response */
 "ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите разработчикам";
-
-/* Unknown internal error */
-"ApiService.InternalError.UnknownError" = "Неизвестная ошибка";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Отмена";
@@ -306,6 +315,9 @@
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "Не выполнен вход";
+
+/* Shared unknown error */
+"Error.UnknownError" = "Неизвестная ошибка";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "LoginScene.Error.AuthorizeCamera" = "Для чтения QR-кодов необходимо разрешить доступ к камере";
@@ -595,6 +607,24 @@
 /* TransactionList: Start Chat button */
 "TransactionListScene.StartChat" = "Начать чат";
 
+/* TransactionList: 'Transactions not found' message. */
+"TransactionListScene.Error.NotFound" = "Транзакции не найдены";
+
+/* TransactionList: 'Transactions not found' localize error message from API. */
+"No transactions found" = "Транзакции не найдены";
+
+/* Transaction status: updating in progress */
+"TransactionStatus.Updating" = "Обновление...";
+
+/* Transaction status: transaction is pending */
+"TransactionStatus.Pending" = "Ожидается";
+
+/* Transaction status: success */
+"TransactionStatus.Success" = "Успешно";
+
+/* Transaction status: transaction failed */
+"TransactionStatus.Failed" = "Ошибка";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Подробности";
 
@@ -603,6 +633,9 @@
 
 /* Transaction details: Block id row. */
 "TransactionDetailsScene.Row.Block" = "Блок";
+
+/* Transaction details: Transaction delivery status. */
+"TransactionDetailsScene.Row.Status" = "Состояние";
 
 /* Transaction details: confirmations row. */
 "TransactionDetailsScene.Row.Confirmations" = "Подтверждения";
@@ -630,6 +663,9 @@
 
 /* Export transaction: 'Share transaction URL' button */
 "TransactionDetailsScene.Share.URL" = "URL";
+
+/* Transaction details: 'Requesting Data' progress message. */
+"TransactionDetailsScene.RequestingData" = "Запрашиваем данные..";
 
 /* Transaction details: 'Your address' flag. */
 "TransactionDetailsScene.YourAddress" = "Вы";
@@ -676,6 +712,9 @@
 /* Transfer: transfer fee */
 "TransferScene.Row.TransactionFee" = "Комиссия";
 
+/* Transfer: comment for transfer in chat */
+"TransferScene.Row.Comments" = "Комментарии";
+
 /* Transfer: 'Transfer info' section */
 "TransferScene.Section.TransferInfo" = "Перевод";
 
@@ -684,6 +723,9 @@
 
 /* Transfer: Confirm transfer alert: Send tokens button */
 "TransferScene.Send" = "Отправить";
+
+/* Transfer: Confirm transfer alert: 'Can't Undo' message */
+"TransferScene.CantUndo" = "Вы не сможете отменить это действие.";
 
 /* Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
 "TransferScene.SendConfirmFormat" = "Отправить %1$@ получателю %2$@?";

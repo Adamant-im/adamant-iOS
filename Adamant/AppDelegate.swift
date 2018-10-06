@@ -43,8 +43,14 @@ struct AdamantResources {
 		Node(scheme: .https, host: "endless.adamant.im", port: nil),
 		Node(scheme: .https, host: "clown.adamant.im", port: nil),
 		Node(scheme: .https, host: "lake.adamant.im", port: nil),
-		Node(scheme: .http, host: "80.211.177.181", port: nil)
+//		Node(scheme: .http, host: "80.211.177.181", port: nil), // Bugged one
+//		Node(scheme: .http, host: "163.172.183.198", port: nil) // Testnet
 	]
+    
+    static let ethServers = [
+//        "https://ethnode1.adamant.im/"
+        "https://ropsten.infura.io/"  // test network
+    ]
 	
 	// Addresses
 	static let supportEmail = "ios@adamant.im"
@@ -61,6 +67,11 @@ struct AdamantResources {
 		
 		private init() {}
 	}
+    
+    // Explorers
+    static let adamantExplorerAddress = "https://explorer.adamant.im/tx/"
+//    static let ethereumExplorerAddress = "https://etherscan.io/tx/"
+    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
 	
 	private init() {}
 }

@@ -120,7 +120,7 @@ extension SecurityViewController: PinpadViewControllerDelegate {
 			
 			accountService.setStayLoggedIn(pin: pin) { [weak self] result in
 				switch result {
-				case .success(account: _):
+				case .success:
 					self?.pinpadRequest = nil
 					DispatchQueue.main.async {
 						if let row: SwitchRow = self?.form.rowBy(tag: Rows.biometry.tag) {

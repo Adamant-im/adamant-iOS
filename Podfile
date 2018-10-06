@@ -12,20 +12,24 @@ target 'Adamant' do
   pod 'ReachabilitySwift' # Network status
   pod 'Haring' # Markdown parser
   pod 'DateToolsSwift' # Date formatter tools
+  pod 'ProcedureKit' # Async programming tools
   
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars
   pod 'FTIndicator' # Notifications and activity indicator
   pod 'Eureka' # Forms
-  pod 'MessageKit', :git => 'https://github.com/MessageKit/MessageKit', :branch => 'development' # Chat UI. development branch for Swift 4.2
+  pod 'MessageKit', :git => 'https://github.com/RealBonus/MessageKit', :branch => 'temp/customMessageKind_swift42' # Chat UI, swift 4.2
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
+  pod 'Parchment' # Paging menu
 
   # QR
   pod 'EFQRCode' # QR generator
   pod 'QRCodeReader.swift' # QR reader
   
-  # Crypto
+  # Cryptos
   pod 'libsodium'
+  pod 'web3swift' # ETH Web3 Swift Port
+  pod 'Lisk', :git => 'https://github.com/boyarkin-anton/lisk-swift.git', :branch => 'dev' # LSK
 
 end

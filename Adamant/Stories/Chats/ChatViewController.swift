@@ -10,6 +10,8 @@ import UIKit
 import MessageKit
 import MessageInputBar
 import CoreData
+import SafariServices
+import ProcedureKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -43,10 +45,11 @@ class ChatViewController: MessagesViewController {
 	var dialogService: DialogService!
 	var router: Router!
     var addressBookService: AddressBookService!
+    var stack: CoreDataStack!
 	
 	// MARK: Properties
 	weak var delegate: ChatViewControllerDelegate?
-	var account: Account?
+	var account: AdamantAccount?
 	var chatroom: Chatroom?
 	var dateFormatter: DateFormatter {
 		let formatter = DateFormatter()
@@ -56,8 +59,17 @@ class ChatViewController: MessagesViewController {
 	}
 	
 	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
-	private var controllerChanges: [NSFetchedResultsChangeType:[(indexPath: IndexPath?, newIndexPath: IndexPath?)]] = [:]
+    
+    // Batch changes
+    private struct ControllerChange {
+        let type: NSFetchedResultsChangeType
+        let indexPath: IndexPath?
+        let newIndexPath: IndexPath?
+    }
+    
+	private var controllerChanges: [ControllerChange] = []
 	
+    // Cell update timing
 	var cellUpdateTimers: [Timer] = [Timer]()
 	var cellsUpdating: [IndexPath] = [IndexPath]()
     
@@ -65,14 +77,49 @@ class ChatViewController: MessagesViewController {
 	
 	private var isFirstLayout = true
 	
+	// Content insets are broken after modal view dissapears
+	private var fixKeyboardInsets = false
+	
+    // MARK: Rich Messages
+    var richMessageProviders = [String:RichMessageProvider]()
+    var cellCalculators = [String:CellSizeCalculator]()
+    
 	// MARK: Fee label
 	private var feeIsVisible: Bool = false
 	private var feeTimer: Timer?
 	private var feeLabel: InputBarButtonItem?
 	private var prevFee: Decimal = 0
 	
+    // MARK: Attachment button
+    lazy var attachmentButton: InputBarButtonItem = {
+        return InputBarButtonItem()
+            .configure {
+                $0.setSize(CGSize(width: 36, height: 36), animated: false)
+                $0.image = #imageLiteral(resourceName: "attachment")
+            }.onTouchUpInside { [weak self] _ in
+				guard let vc = self?.router.get(scene: AdamantScene.Chats.complexTransfer) as? ComplexTransferViewController else {
+					return
+				}
+				
+				vc.partner = self?.chatroom?.partner
+				vc.transferDelegate = self
+				
+				let navigator = UINavigationController(rootViewController: vc)
+				self?.present(navigator, animated: true, completion: nil)
+        }
+    }()
 	
-	// MARK: Lifecycle
+    // MARK: RichTransaction status updates
+    private lazy var richStatusDispatchQueue = DispatchQueue(label: "com.adamant.chat.status-update.dispatch-queue", qos: .utility, attributes: [.concurrent])
+    private lazy var richStatusOperationQueue: ProcedureQueue = {
+        let queue = ProcedureQueue()
+        queue.name = "com.adamant.chat.status-update.operation-queue"
+        queue.underlyingQueue = richStatusDispatchQueue
+        queue.maxConcurrentOperationCount = 2
+        return queue
+    }()
+    
+	// MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
 		navigationItem.rightBarButtonItem = UIBarButtonItem(title: "•••", style: .plain, target: self, action: #selector(properties))
@@ -131,6 +178,7 @@ class ChatViewController: MessagesViewController {
 		messageInputBar.textViewPadding.right = -buttonWidth
 		
 		messageInputBar.setRightStackViewWidthConstant(to: buttonWidth, animated: false)
+        messageInputBar.setLeftStackViewWidthConstant(to: 36, animated: false)
 		
 		// Make feeLabel
 		let feeLabel = InputBarButtonItem()
@@ -142,6 +190,7 @@ class ChatViewController: MessagesViewController {
 		// Setup stack views
 		messageInputBar.setStackViewItems([messageInputBar.sendButton], forStack: .right, animated: false)
 		messageInputBar.setStackViewItems([feeLabel, .flexibleSpace], forStack: .bottom, animated: false)
+        messageInputBar.setStackViewItems([attachmentButton], forStack: .left, animated: false)
 		
 		messageInputBar.sendButton.configure {
 			$0.layer.cornerRadius = size*2
@@ -164,8 +213,8 @@ class ChatViewController: MessagesViewController {
 			messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
 			messageInputBar.inputTextView.isEditable = false
 			messageInputBar.sendButton.isEnabled = false
-		}
-		
+            attachmentButton.isEnabled = false
+        }
 		
 		// MARK: 4. Data
 		let controller = chatsProvider.getChatController(for: chatroom)
@@ -177,6 +226,53 @@ class ChatViewController: MessagesViewController {
 		} catch {
 			print("There was an error performing fetch: \(error)")
 		}
+        
+        // MARK: 4.1 Rich messages
+        if let fetched = controller.fetchedObjects {
+            for case let rich as RichMessageTransaction in fetched {
+                rich.kind = messageKind(for: rich)
+            }
+        }
+		
+		// MARK: 5. Notifications
+		// Fixing content insets after modal window
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
+			guard let fixIt = self?.fixKeyboardInsets, fixIt else {
+				return
+			}
+			
+            guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+				let scrollView = self?.messagesCollectionView else {
+				return
+			}
+			
+			var contentInsets = scrollView.contentInset
+			contentInsets.bottom = frame.size.height
+			scrollView.contentInset = contentInsets
+			
+			var scrollIndicatorInsets = scrollView.scrollIndicatorInsets
+			scrollIndicatorInsets.bottom = frame.size.height
+			scrollView.scrollIndicatorInsets = scrollIndicatorInsets
+			
+			scrollView.scrollToBottom(animated: true)
+			
+			self?.fixKeyboardInsets = false
+		}
+        
+        // MARK: 6. RichMessage handlers
+        for handler in richMessageProviders.values {
+            if let source = handler.cellSource {
+                switch source {
+                case .class(let type):
+                    messagesCollectionView.register(type, forCellWithReuseIdentifier: handler.cellIdentifierSent)
+                    messagesCollectionView.register(type, forCellWithReuseIdentifier: handler.cellIdentifierReceived)
+                    
+                case .nib(let nib):
+                    messagesCollectionView.register(nib, forCellWithReuseIdentifier: handler.cellIdentifierSent)
+                    messagesCollectionView.register(nib, forCellWithReuseIdentifier: handler.cellIdentifierReceived)
+                }
+            }
+        }
 	}
 	
 	override func viewDidAppear(_ animated: Bool) {
@@ -216,6 +312,7 @@ class ChatViewController: MessagesViewController {
 		}
 		
 		cellUpdateTimers.removeAll()
+        richStatusOperationQueue.cancelAllOperations()
 	}
 	
     func updateTitle() {
@@ -283,8 +380,28 @@ class ChatViewController: MessagesViewController {
 			self?.present(alert, animated: true, completion: nil)
 		}
 		
-		dialogService.showSystemActionSheet(title: nil, message: nil, actions: [share, rename])
+        dialogService.showAlert(title: nil, message: nil, style: .actionSheet, actions: [share, rename])
 	}
+    
+    
+    // MARK: Tools
+    private func messageKind(for richMessage: RichMessageTransaction) -> MessageKind {
+        if let type = richMessage.richType, richMessageProviders[type] != nil, let richContent = richMessage.richContent, let richMessageTransfer = RichMessageTransfer(content: richContent) {
+            return MessageKind.custom(richMessageTransfer)
+        } else if var richContent = richMessage.richContent {
+            if let type = richMessage.richType {
+                richContent[RichContentKeys.type] = type
+            }
+                
+            if let data = try? JSONSerialization.data(withJSONObject: richContent, options: .prettyPrinted), let string = String(data: data, encoding: String.Encoding.utf8) {
+                return MessageKind.text(string)
+            } else {
+                return MessageKind.text(richMessage.richType ?? "")
+            }
+        } else {
+            return MessageKind.text(richMessage.richType ?? "")
+        }
+    }
 }
 
 
@@ -343,52 +460,135 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	}
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-		
-		if type == .insert, let trs = anObject as? MessageTransaction {
-			trs.isUnread = false
-			chatroom?.hasUnreadMessages = false
+        if type == .insert, let trs = anObject as? ChatTransaction {
+            trs.isUnread = false
+            chatroom?.hasUnreadMessages = false
+            
+            if let rich = anObject as? RichMessageTransaction {
+                rich.kind = messageKind(for: rich)
+            }
 		}
 		
-		if controllerChanges[type] == nil {
-			controllerChanges[type] = [(IndexPath?, IndexPath?)]()
-		}
-		controllerChanges[type]!.append((indexPath, newIndexPath))
+        controllerChanges.append(ControllerChange(type: type, indexPath: indexPath, newIndexPath: newIndexPath))
 	}
 	
-	private func performBatchChanges(_ changes: [NSFetchedResultsChangeType:[(indexPath: IndexPath?, newIndexPath: IndexPath?)]]) {
-		for (type, change) in changes {
-			switch type {
-			case .insert:
-				let sections = IndexSet(change.compactMap {$0.newIndexPath?.row})
-				if sections.count > 0 {
-					messagesCollectionView.insertSections(sections)
-					messagesCollectionView.scrollToBottom(animated: true)
-				}
-				
-			case .delete:
-				let sections = IndexSet(change.compactMap {$0.indexPath?.row})
-				if sections.count > 0 {
-					messagesCollectionView.deleteSections(sections)
-				}
-				
-			case .move:
-				for paths in change {
-					if let section = paths.indexPath?.row, let newSection = paths.newIndexPath?.row {
-						messagesCollectionView.moveSection(section, toSection: newSection)
-					}
-				}
-				
-			case .update:
-				let indexes = change.compactMap { (indexPath: IndexPath?, _) -> IndexPath? in
-					if let row = indexPath?.row {
-						return IndexPath(row: 0, section: row)
-					} else {
-						return nil
-					}
-				}
-				messagesCollectionView.reloadItems(at: indexes)
-				return
+	private func performBatchChanges(_ changes: [ControllerChange]) {
+        let chat = messagesCollectionView
+        
+        let scrollToBottom = changes.first { $0.type == .insert } != nil
+        
+        chat.performBatchUpdates({
+            for change in changes {
+                switch change.type {
+                case .insert:
+                    guard let newIndexPath = change.newIndexPath else {
+                        continue
+                    }
+                    
+                    chat.insertSections(IndexSet(integer: newIndexPath.row))
+                    chat.scrollToBottom(animated: true)
+                    
+                case .delete:
+                    guard let indexPath = change.indexPath else {
+                        continue
+                    }
+                    
+                    chat.deleteSections(IndexSet(integer: indexPath.row))
+                    
+                case .move:
+                    if let section = change.indexPath?.row, let newSection = change.newIndexPath?.row {
+                        chat.moveSection(section, toSection: newSection)
+                    }
+                    
+                case .update:
+                    guard let section = change.indexPath?.row else {
+                        continue
+                    }
+                    
+                    chat.reloadItems(at: [IndexPath(row: 0, section: section)])
+                }
+            }
+        }, completion: { animationSuccess in
+            if scrollToBottom {
+                chat.scrollToBottom(animated: animationSuccess)
+            }
+        })
+	}
+}
+
+extension ChatViewController: TransferViewControllerDelegate, ComplexTransferViewControllerDelegate {
+	func transferViewControllerDidFinishTransfer(_ viewController: TransferViewControllerBase) {
+		dismissTransferViewController()
+    }
+	
+	func complexTransferViewControllerDidFinish(_ viewController: ComplexTransferViewController) {
+		dismissTransferViewController()
+	}
+	
+	private func dismissTransferViewController() {
+		fixKeyboardInsets = true
+		
+		if Thread.isMainThread {
+			dismiss(animated: true, completion: nil)
+		} else {
+			DispatchQueue.main.async { [weak self] in
+				self?.dismiss(animated: true, completion: nil)
 			}
 		}
 	}
+}
+
+// MARK: - RichTransfers status update
+extension ChatViewController {
+    func updateStatus(for transaction: RichMessageTransaction, provider: RichMessageProviderWithStatusCheck) {
+        transaction.transactionStatus = .updating
+        
+        let operation = StatusUpdateProcedure(parentContext: stack.container.viewContext,
+                                              objectId: transaction.objectID,
+                                              provider: provider)
+        
+        richStatusOperationQueue.addOperation(operation)
+    }
+}
+
+private class StatusUpdateProcedure: Procedure {
+    // MARK: Props
+    let parentContext: NSManagedObjectContext
+    let objectId: NSManagedObjectID
+    let provider: RichMessageProviderWithStatusCheck
+    
+    init(parentContext: NSManagedObjectContext, objectId: NSManagedObjectID, provider: RichMessageProviderWithStatusCheck) {
+        self.parentContext = parentContext
+        self.objectId = objectId
+        self.provider = provider
+        super.init()
+    }
+    
+    override func execute() {
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = parentContext
+        
+        guard let transaction = privateContext.object(with: objectId) as? RichMessageTransaction else {
+            return
+        }
+        
+        guard let txHash = transaction.richContent?[RichContentKeys.transfer.hash] else {
+            transaction.transactionStatus = .failed
+            try? privateContext.save()
+            return
+        }
+        
+        provider.statusForTransactionBy(hash: txHash) { result in
+            switch result {
+            case .success(let status):
+                transaction.transactionStatus = status
+
+            case .failure:
+                transaction.transactionStatus = .failed
+            }
+
+            try? privateContext.save()
+            self.finish()
+        }
+    }
 }

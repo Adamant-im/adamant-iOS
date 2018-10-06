@@ -86,7 +86,11 @@ extension Container {
 			service.securedStore = r.resolve(SecuredStore.self)!
 			service.notificationsService = r.resolve(NotificationsService.self)!
 			return service
-		}.inObjectScope(.container)
+		}.inObjectScope(.container).initCompleted { (r, service) in
+			for case let wallet as SwinjectDependentService in service.wallets {
+				wallet.injectDependencies(from: self)
+			}
+		}
         
         // MARK: AddressBookServeice
         self.register(AddressBookService.self) { r in
@@ -127,12 +131,19 @@ extension Container {
 		// MARK: Chats
 		self.register(ChatsProvider.self) { r in
 			let provider = AdamantChatsProvider()
-			provider.accountService = r.resolve(AccountService.self)
-			provider.apiService = r.resolve(ApiService.self)
-			provider.stack = r.resolve(CoreDataStack.self)
-			provider.adamantCore = r.resolve(AdamantCore.self)
-			provider.accountsProvider = r.resolve(AccountsProvider.self)
-			provider.securedStore = r.resolve(SecuredStore.self)
+            provider.apiService = r.resolve(ApiService.self)
+            provider.stack = r.resolve(CoreDataStack.self)
+            provider.adamantCore = r.resolve(AdamantCore.self)
+            provider.securedStore = r.resolve(SecuredStore.self)
+            provider.accountsProvider = r.resolve(AccountsProvider.self)
+            
+            let accountService = r.resolve(AccountService.self)!
+            provider.accountService = accountService
+            var richProviders = [String: RichMessageProviderWithStatusCheck]()
+            for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
+                richProviders[type(of: provider).richMessageType] = provider
+            }
+            provider.richProviders = richProviders
 			return provider
 		}.inObjectScope(.container)
 	}

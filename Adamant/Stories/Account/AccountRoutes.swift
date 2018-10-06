@@ -20,14 +20,6 @@ extension AdamantScene {
 			return c
 		}
 		
-		static let transfer = AdamantScene(identifier: "TransferViewController") { r in
-			let c = TransferViewController()
-			c.apiService = r.resolve(ApiService.self)
-			c.accountService = r.resolve(AccountService.self)
-			c.dialogService = r.resolve(DialogService.self)
-			return c
-		}
-		
 		private init() {}
 	}
 }

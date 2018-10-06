@@ -126,7 +126,6 @@ class LoginViewController: FormViewController {
 	var localAuth: LocalAuthentication!
     var router: Router!
 	
-	
 	// MARK: Properties
 	private var hideNewPassphrase: Bool = true
 	private var generatedPassphrases = [String]()
@@ -385,7 +384,7 @@ extension LoginViewController {
 	private func loginIntoExistingAccount(passphrase: String) {
 		accountService.loginWith(passphrase: passphrase, completion: { [weak self] result in
 			switch result {
-			case .success(_):
+			case .success(_, let alert):
 				if let nav = self?.navigationController {
 					nav.popViewController(animated: true)
 				} else {
@@ -393,6 +392,10 @@ extension LoginViewController {
 				}
 				
 				self?.dialogService.dismissProgress()
+				
+				if let alert = alert {
+                    self?.dialogService.showAlert(title: alert.title, message: alert.message, style: UIAlertController.Style.alert, actions: nil)
+				}
 				
 			case .failure(let error):
 				self?.dialogService.showRichError(error: error)

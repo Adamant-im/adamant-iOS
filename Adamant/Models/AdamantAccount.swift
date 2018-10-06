@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Account {
+struct AdamantAccount {
 	let address: String
 	var unconfirmedBalance: Decimal
 	var balance: Decimal
@@ -20,7 +20,7 @@ struct Account {
 	let uMultisignatures: [String]?
 }
 
-extension Account: Decodable {
+extension AdamantAccount: Decodable {
 	enum CodingKeys: String, CodingKey {
 		case address
 		case unconfirmedBalance
@@ -51,7 +51,7 @@ extension Account: Decodable {
 	}
 }
 
-extension Account: WrappableModel {
+extension AdamantAccount: WrappableModel {
 	static let ModelKey = "account"
 }
 
