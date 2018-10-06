@@ -151,6 +151,8 @@
 		E965A53420B833A00041A3EA /* StateAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53320B833A00041A3EA /* StateAsset.swift */; };
 		E965A53620B8370C0041A3EA /* TransactionAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53520B8370C0041A3EA /* TransactionAsset.swift */; };
 		E96E86B821679C120061F80A /* EthTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96E86B721679C120061F80A /* EthTransactionDetailsViewController.swift */; };
+		E971591A21681D6900A5F904 /* TransactionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E971591921681D6900A5F904 /* TransactionStatus.swift */; };
+		E971591C2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = E971591B2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift */; };
 		E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722065201F42BB004F2AAD /* CoreDataStack.swift */; };
 		E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */; };
 		E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E972206A201F44CA004F2AAD /* TransfersProvider.swift */; };
@@ -434,6 +436,8 @@
 		E965A53320B833A00041A3EA /* StateAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateAsset.swift; sourceTree = "<group>"; };
 		E965A53520B8370C0041A3EA /* TransactionAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAsset.swift; sourceTree = "<group>"; };
 		E96E86B721679C120061F80A /* EthTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionDetailsViewController.swift; sourceTree = "<group>"; };
+		E971591921681D6900A5F904 /* TransactionStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionStatus.swift; sourceTree = "<group>"; };
+		E971591B2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EthWalletService+RichMessageProviderWithStatusCheck.swift"; sourceTree = "<group>"; };
 		E9722065201F42BB004F2AAD /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InMemoryCoreDataStack.swift; sourceTree = "<group>"; };
 		E972206A201F44CA004F2AAD /* TransfersProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransfersProvider.swift; sourceTree = "<group>"; };
@@ -696,6 +700,7 @@
 				E923222521135F9000A7E5AF /* EthAccount.swift */,
 				E940086A2114A70600CD2D67 /* LskAccount.swift */,
 				E993302321369B8A00CD5200 /* RichMessage.swift */,
+				E971591921681D6900A5F904 /* TransactionStatus.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -824,6 +829,7 @@
 				E9AA8BF9212C166600F9249F /* EthWalletService+Send.swift */,
 				E9AA8BFB212C169200F9249F /* EthWalletService+Transfers.swift */,
 				E9FEECA52143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift */,
+				E971591B2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift */,
 				E9981895212095CA0018C84C /* EthWalletViewController.swift */,
 				E993301D212EF39700CD5200 /* EthTransferViewController.swift */,
 				64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */,
@@ -1250,6 +1256,7 @@
 				"${BUILT_PRODUCTS_DIR}/MyLittlePinpad/MyLittlePinpad.framework",
 				"${BUILT_PRODUCTS_DIR}/PMAlertController/PMAlertController.framework",
 				"${BUILT_PRODUCTS_DIR}/Parchment/Parchment.framework",
+				"${BUILT_PRODUCTS_DIR}/ProcedureKit/ProcedureKit.framework",
 				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/QRCodeReader.swift/QRCodeReader.framework",
 				"${BUILT_PRODUCTS_DIR}/RNCryptor/RNCryptor.framework",
@@ -1282,6 +1289,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MyLittlePinpad.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PMAlertController.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Parchment.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProcedureKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCodeReader.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCryptor.framework",
@@ -1403,6 +1411,7 @@
 				E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */,
 				E983AE2120E655C500497E1A /* AccountHeaderView.swift in Sources */,
 				64E8305020F5FEEF006FA590 /* VotesAsset.swift in Sources */,
+				E971591C2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
 				644EC35220EFA9A300F40C73 /* DelegateRoutes.swift in Sources */,
 				E926E032213EC43B005E536B /* FullscreenAlertView.swift in Sources */,
 				644EC35B20EFB8E900F40C73 /* AdamantDelegateCell.swift in Sources */,
@@ -1414,6 +1423,7 @@
 				E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */,
 				E9150B9C2066DA210065A985 /* BaseTransaction+CoreDataProperties.swift in Sources */,
 				E9B1AA592122D59600080A2A /* WalletsRoutes.swift in Sources */,
+				E971591A21681D6900A5F904 /* TransactionStatus.swift in Sources */,
 				E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */,
 				E95F85872008FDBF0070534A /* ChatAsset.swift in Sources */,
 				E9A03FD220DBC0F2007653A1 /* NodeEditorViewController.swift in Sources */,

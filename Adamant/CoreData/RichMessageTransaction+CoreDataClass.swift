@@ -23,6 +23,22 @@ public class RichMessageTransaction: ChatTransaction {
         }
     }
     
+    var transferCheckStatus: TransactionStatus? {
+        get {
+            if let raw = transferStatusRaw {
+                return TransactionStatus(rawValue: raw.int16Value)
+            } else {
+                return nil
+            }
+        }
+        set {
+            if let raw = newValue {
+                transferStatusRaw = raw.rawValue as NSNumber
+            } else {
+                transferStatusRaw = nil
+            }
+        }
+    }
     
     // Hack? Yes. So?
     public var kind: MessageKind = .text("?")

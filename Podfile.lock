@@ -28,6 +28,9 @@ PODS:
   - MyLittlePinpad (0.3)
   - Parchment (1.4.1)
   - PMAlertController (3.5.0)
+  - ProcedureKit (4.5.0):
+    - ProcedureKit/Standard (= 4.5.0)
+  - ProcedureKit/Standard (4.5.0)
   - PromiseKit (6.4.1):
     - PromiseKit/CorePromise (= 6.4.1)
     - PromiseKit/Foundation (= 6.4.1)
@@ -70,6 +73,7 @@ DEPENDENCIES:
   - MyLittlePinpad
   - Parchment
   - PMAlertController
+  - ProcedureKit
   - QRCodeReader.swift
   - ReachabilitySwift
   - RNCryptor
@@ -95,6 +99,7 @@ SPEC REPOS:
     - MyLittlePinpad
     - Parchment
     - PMAlertController
+    - ProcedureKit
     - PromiseKit
     - QRCodeReader.swift
     - ReachabilitySwift
@@ -142,6 +147,7 @@ SPEC CHECKSUMS:
   MyLittlePinpad: 5d57cb5a092ddbeb5c4e6fa0b46df83bd3e88b0c
   Parchment: e6c2a3a0063739382dd207e21d48fe5e81f3324a
   PMAlertController: 06dab8160066fc4ce991c880e3722cd403e2926a
+  ProcedureKit: 023e4600e921fe0b8d94f2d19ed680df83aa28ba
   PromiseKit: 4c76a6506638034e3d7bede97b2ff7743f7bd2dc
   QRCodeReader.swift: 96292a5612fbc2fd9a0b26f93fa5164c8d02f59d
   ReachabilitySwift: 408477d1b6ed9779dba301953171e017c31241f3
@@ -153,6 +159,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: 4895c765c9858eb4737ef222eb8643bb5fc7fdb3
 
-PODFILE CHECKSUM: 48a1c938787f00cd7c1673909d7b2854d430cabe
+PODFILE CHECKSUM: 4a06595861816208b7a6aacfeded5a0b26245f53
 
 COCOAPODS: 1.6.0.beta.1

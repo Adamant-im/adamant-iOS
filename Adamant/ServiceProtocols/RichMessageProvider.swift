@@ -17,7 +17,8 @@ enum CellSource {
 protocol RichMessageProvider {
     static var richMessageType: String { get }
     
-    var cellIdentifier: String { get }
+    var cellIdentifierSent: String { get }
+    var cellIdentifierReceived: String { get }
     var cellSource: CellSource? { get }
 	
     // MARK: Events
@@ -29,4 +30,8 @@ protocol RichMessageProvider {
     // MARK: MessageKit
     func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator
     func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell
+}
+
+protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
+    func statusForTransactionBy(hash: String, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void)
 }

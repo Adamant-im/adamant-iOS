@@ -68,7 +68,8 @@ class EthWalletService: WalletService {
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "eth_transaction"
-    let cellIdentifier = "ethTransfer"
+    let cellIdentifierSent = "ethTransferSent"
+    let cellIdentifierReceived = "ethTransferReceived"
     let cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
     
     

@@ -58,6 +58,7 @@ extension EthWalletService: RichMessageProvider {
             fatalError("ETH service tried to render wrong message kind: \(message.kind)")
         }
         
+        let cellIdentifier = isFromCurrentSender ? cellIdentifierSent : cellIdentifierReceived
         guard let cell = messagesCollectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? TransferCollectionViewCell else {
             fatalError("Can't dequeue \(cellIdentifier) cell")
         }
@@ -67,8 +68,11 @@ extension EthWalletService: RichMessageProvider {
         
         cell.amountLabel.text = transfer.amount
         cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
+        cell.transactionStatus = (message as? RichMessageTransaction)?.transferCheckStatus
         
-        cell.isAlignedRight = isFromCurrentSender
+        if cell.isAlignedRight != isFromCurrentSender {
+            cell.isAlignedRight = isFromCurrentSender
+        }
         
         return cell
     }

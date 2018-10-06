@@ -147,6 +147,12 @@ extension ChatViewController: MessagesDataSource {
             customCell.delegate = self
         }
         
+        if let richTransaction = message as? RichMessageTransaction,
+            (richTransaction.transferCheckStatus == nil || richTransaction.transferCheckStatus == .notInitiated),
+            let updater = provider as? RichMessageProviderWithStatusCheck {
+            updateStatus(for: richTransaction, provider: updater)
+        }
+        
         return cell
     }
 }

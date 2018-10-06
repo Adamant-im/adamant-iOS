@@ -11,6 +11,7 @@ import MessageKit
 import MessageInputBar
 import CoreData
 import SafariServices
+import ProcedureKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -44,6 +45,7 @@ class ChatViewController: MessagesViewController {
 	var dialogService: DialogService!
 	var router: Router!
     var addressBookService: AddressBookService!
+    var stack: CoreDataStack!
 	
 	// MARK: Properties
 	weak var delegate: ChatViewControllerDelegate?
@@ -107,7 +109,17 @@ class ChatViewController: MessagesViewController {
         }
     }()
 	
-	// MARK: Lifecycle
+    // MARK: RichTransaction status updates
+    private lazy var richStatusDispatchQueue = DispatchQueue(label: "com.adamant.chat.status-update.dispatch-queue", qos: .utility, attributes: [.concurrent])
+    private lazy var richStatusOperationQueue: ProcedureQueue = {
+        let queue = ProcedureQueue()
+        queue.name = "com.adamant.chat.status-update.operation-queue"
+        queue.underlyingQueue = richStatusDispatchQueue
+        queue.maxConcurrentOperationCount = 2
+        return queue
+    }()
+    
+	// MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
 		navigationItem.rightBarButtonItem = UIBarButtonItem(title: "•••", style: .plain, target: self, action: #selector(properties))
@@ -252,10 +264,12 @@ class ChatViewController: MessagesViewController {
             if let source = handler.cellSource {
                 switch source {
                 case .class(let type):
-                    messagesCollectionView.register(type, forCellWithReuseIdentifier: handler.cellIdentifier)
+                    messagesCollectionView.register(type, forCellWithReuseIdentifier: handler.cellIdentifierSent)
+                    messagesCollectionView.register(type, forCellWithReuseIdentifier: handler.cellIdentifierReceived)
                     
                 case .nib(let nib):
-                    messagesCollectionView.register(nib, forCellWithReuseIdentifier: handler.cellIdentifier)
+                    messagesCollectionView.register(nib, forCellWithReuseIdentifier: handler.cellIdentifierSent)
+                    messagesCollectionView.register(nib, forCellWithReuseIdentifier: handler.cellIdentifierReceived)
                 }
             }
         }
@@ -298,6 +312,7 @@ class ChatViewController: MessagesViewController {
 		}
 		
 		cellUpdateTimers.removeAll()
+        richStatusOperationQueue.cancelAllOperations()
 	}
 	
     func updateTitle() {
@@ -460,6 +475,8 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	private func performBatchChanges(_ changes: [ControllerChange]) {
         let chat = messagesCollectionView
         
+        let scrollToBottom = changes.first { $0.type == .insert } != nil
+        
         chat.performBatchUpdates({
             for change in changes {
                 switch change.type {
@@ -492,7 +509,9 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
                 }
             }
         }, completion: { animationSuccess in
-            chat.scrollToBottom(animated: animationSuccess)
+            if scrollToBottom {
+                chat.scrollToBottom(animated: animationSuccess)
+            }
         })
 	}
 }
@@ -517,4 +536,59 @@ extension ChatViewController: TransferViewControllerDelegate, ComplexTransferVie
 			}
 		}
 	}
+}
+
+// MARK: - RichTransfers status update
+extension ChatViewController {
+    func updateStatus(for transaction: RichMessageTransaction, provider: RichMessageProviderWithStatusCheck) {
+        transaction.transferCheckStatus = .updating
+        
+        let operation = StatusUpdateProcedure(parentContext: stack.container.viewContext,
+                                              objectId: transaction.objectID,
+                                              provider: provider)
+        
+        richStatusOperationQueue.addOperation(operation)
+    }
+}
+
+private class StatusUpdateProcedure: Procedure {
+    // MARK: Props
+    let parentContext: NSManagedObjectContext
+    let objectId: NSManagedObjectID
+    let provider: RichMessageProviderWithStatusCheck
+    
+    init(parentContext: NSManagedObjectContext, objectId: NSManagedObjectID, provider: RichMessageProviderWithStatusCheck) {
+        self.parentContext = parentContext
+        self.objectId = objectId
+        self.provider = provider
+        super.init()
+    }
+    
+    override func execute() {
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = parentContext
+        
+        guard let transaction = privateContext.object(with: objectId) as? RichMessageTransaction else {
+            return
+        }
+        
+        guard let txHash = transaction.richContent?[RichContentKeys.transfer.hash] else {
+            transaction.transferCheckStatus = .failed
+            try? privateContext.save()
+            return
+        }
+        
+        provider.statusForTransactionBy(hash: txHash) { result in
+            switch result {
+            case .success(let status):
+                transaction.transferCheckStatus = status
+
+            case .failure:
+                transaction.transferCheckStatus = .failed
+            }
+
+            try? privateContext.save()
+            self.finish()
+        }
+    }
 }

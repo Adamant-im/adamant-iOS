@@ -47,6 +47,7 @@
     <entity name="RichMessageTransaction" representedClassName="RichMessageTransaction" parentEntity="ChatTransaction" syncable="YES">
         <attribute name="richContent" optional="YES" attributeType="Transformable" customClassName="[String:String]" syncable="YES"/>
         <attribute name="richType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="transferStatusRaw" optional="YES" attributeType="Integer 16" usesScalarValueType="NO" customClassName="RichTransferStatus" syncable="YES"/>
     </entity>
     <entity name="TransferTransaction" representedClassName="TransferTransaction" parentEntity="ChatTransaction" syncable="YES">
         <relationship name="partner" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CoreDataAccount" inverseName="transfers" inverseEntity="CoreDataAccount" syncable="YES"/>
@@ -57,7 +58,7 @@
         <element name="ChatTransaction" positionX="142" positionY="137" width="128" height="135"/>
         <element name="CoreDataAccount" positionX="-236" positionY="174" width="128" height="150"/>
         <element name="MessageTransaction" positionX="243" positionY="326" width="128" height="75"/>
-        <element name="RichMessageTransaction" positionX="-27" positionY="171" width="128" height="75"/>
+        <element name="RichMessageTransaction" positionX="-27" positionY="171" width="128" height="90"/>
         <element name="TransferTransaction" positionX="97" positionY="342" width="128" height="58"/>
     </elements>
 </model>

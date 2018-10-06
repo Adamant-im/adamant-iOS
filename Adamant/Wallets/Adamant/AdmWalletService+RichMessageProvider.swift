@@ -59,6 +59,7 @@ extension AdmWalletService: RichMessageProvider {
             fatalError("ADM service tried to render wrong message kind: \(message.kind)")
         }
         
+        let cellIdentifier = isFromCurrentSender ? cellIdentifierSent : cellIdentifierReceived
         guard let cell = messagesCollectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? TransferCollectionViewCell else {
             fatalError("Can't dequeue \(cellIdentifier) cell")
         }
@@ -68,8 +69,11 @@ extension AdmWalletService: RichMessageProvider {
         
         cell.amountLabel.text = richMessage.amount
         cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
+        cell.transactionStatus = nil
         
-        cell.isAlignedRight = isFromCurrentSender
+        if cell.isAlignedRight != isFromCurrentSender {
+            cell.isAlignedRight = isFromCurrentSender
+        }
         
         return cell
     }

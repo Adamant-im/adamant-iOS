@@ -18,6 +18,8 @@ class AdamantChatsProvider: ChatsProvider {
 	var accountsProvider: AccountsProvider!
 	var securedStore: SecuredStore!
 	
+    var richProviders: [String:RichMessageProviderWithStatusCheck]!
+    
 	// MARK: Properties
 	private(set) var state: State = .empty
 	private(set) var isInitiallySynced: Bool = false
@@ -321,6 +323,8 @@ extension AdamantChatsProvider {
         
         transaction.richContent = richContent
         transaction.richType = richType
+        
+        transaction.transferCheckStatus = richProviders[richType] != nil ? .notInitiated : nil
         
         prepareAndSendChatTransaction(transaction, in: context, recipientId: recipientId, type: type, keypair: keypair, completion: completion)
     }
@@ -959,6 +963,8 @@ extension AdamantChatsProvider {
                 let type = json["type"] {
                 transaction.richType = type
                 transaction.richContent = json
+                
+                transaction.transferCheckStatus = richProviders[type] != nil ? .notInitiated : nil
             }
             
             messageTransaction = transaction
