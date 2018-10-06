@@ -145,6 +145,10 @@ extension EthTransaction: TransactionDetails {
     var feeValue: Decimal {
         return gasPrice * gasUsed
     }
+    
+    var transactionStatus: TransactionStatus? {
+        return receiptStatus.asTransactionStatus()
+    }
 }
 
 // MARK: - From EthereumTransaction

@@ -148,7 +148,7 @@ extension ChatViewController: MessagesDataSource {
         }
         
         if let richTransaction = message as? RichMessageTransaction,
-            (richTransaction.transferCheckStatus == nil || richTransaction.transferCheckStatus == .notInitiated),
+            (richTransaction.transactionStatus == nil || richTransaction.transactionStatus == .notInitiated),
             let updater = provider as? RichMessageProviderWithStatusCheck {
             updateStatus(for: richTransaction, provider: updater)
         }

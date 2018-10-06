@@ -23,7 +23,7 @@ public class RichMessageTransaction: ChatTransaction {
         }
     }
     
-    var transferCheckStatus: TransactionStatus? {
+    override var transactionStatus: TransactionStatus? {
         get {
             if let raw = transferStatusRaw {
                 return TransactionStatus(rawValue: raw.int16Value)

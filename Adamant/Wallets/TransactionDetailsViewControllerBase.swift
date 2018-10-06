@@ -35,6 +35,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         case fee
         case confirmations
         case block
+        case status
         case openInExplorer
         case openChat
         
@@ -48,6 +49,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .fee: return "fee"
             case .confirmations: return "confirmations"
             case .block: return "block"
+            case .status: return "status"
             case .openInExplorer: return "openInExplorer"
             case .openChat: return "openChat"
             }
@@ -63,6 +65,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .fee: return NSLocalizedString("TransactionDetailsScene.Row.Fee", comment: "Transaction details: fee row.")
             case .confirmations: return NSLocalizedString("TransactionDetailsScene.Row.Confirmations", comment: "Transaction details: confirmations row.")
             case .block: return NSLocalizedString("TransactionDetailsScene.Row.Block", comment: "Transaction details: Block id row.")
+            case .status: return NSLocalizedString("TransactionDetailsScene.Row.Status", comment: "Transaction details: Transaction delivery status.")
             case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
             case .openChat: return ""
             }
@@ -103,10 +106,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
         navigationAccessoryView.tintColor = UIColor.adamant.primary
         
         // MARK: - Transfer section
-        form +++ Section()
+        let section = Section()
             
         // MARK: Transaction number
-        <<< LabelRow() {
+        let idRow = LabelRow() {
             $0.disabled = true
             $0.tag = Rows.transactionNumber.tag
             $0.title = Rows.transactionNumber.localized
@@ -121,8 +124,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = .black
         }
         
+        section.append(idRow)
+        
         // MARK: Sender
-        <<< DoubleDetailsRow() { [weak self] in
+        let senderRow = DoubleDetailsRow() { [weak self] in
             $0.disabled = true
             $0.tag = Rows.from.tag
             $0.cell.titleLabel.text = Rows.from.localized
@@ -161,9 +166,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
         }
+            
+        section.append(senderRow)
         
         // MARK: Recipient
-        <<< DoubleDetailsRow() { [weak self] in
+        let recipientRow = DoubleDetailsRow() { [weak self] in
             $0.disabled = true
             $0.tag = Rows.to.tag
             $0.cell.titleLabel.text = Rows.to.localized
@@ -172,7 +179,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 if let recipientName = self?.recipientName {
                     $0.value = DoubleDetail(first: recipientName, second: transaction.recipientAddress)
                 } else {
-                    $0.value = DoubleDetail(first: transaction.senderAddress, second: nil)
+                    $0.value = DoubleDetail(first: transaction.recipientAddress, second: nil)
                 }
             } else {
                 $0.value = nil
@@ -203,8 +210,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = .black
         }
         
+        section.append(recipientRow)
+        
         // MARK: Date
-        <<< DateRow() {
+        let dateRow = DateRow() {
             $0.disabled = true
             $0.tag = Rows.date.tag
             $0.title = Rows.date.localized
@@ -219,9 +228,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
         }
+            
+        section.append(dateRow)
         
         // MARK: Amount
-        <<< DecimalRow() {
+        let amountRow = DecimalRow() {
             $0.disabled = true
             $0.tag = Rows.amount.tag
             $0.title = Rows.amount.localized
@@ -237,9 +248,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
         }
+            
+        section.append(amountRow)
         
         // MARK: Fee
-        <<< DecimalRow() {
+        let feeRow = DecimalRow() {
             $0.disabled = true
             $0.tag = Rows.fee.tag
             $0.title = Rows.fee.localized
@@ -255,9 +268,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
         }
+            
+        section.append(feeRow)
         
         // MARK: Confirmations
-        <<< LabelRow() {
+        let confirmationsRow = LabelRow() {
             $0.disabled = true
             $0.tag = Rows.confirmations.tag
             $0.title = Rows.confirmations.localized
@@ -271,9 +286,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
         }
+            
+        section.append(confirmationsRow)
         
         // MARK: Block
-        <<< LabelRow() {
+        let blockRow = LabelRow() {
             $0.disabled = true
             $0.tag = Rows.block.tag
             $0.title = Rows.block.localized
@@ -287,9 +304,30 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
         }
-    
+            
+        section.append(blockRow)
+            
+        // MARK: Status
+        if let status = transaction?.transactionStatus {
+            let statusRow = LabelRow() {
+                $0.tag = Rows.status.tag
+                $0.title = Rows.status.localized
+                $0.value = status.localized
+            }.cellSetup { (cell, _) in
+                cell.selectionStyle = .gray
+            }.onCellSelection { [weak self] (_, row) in
+                if let text = row.value {
+                    self?.shareValue(text)
+                }
+            }.cellUpdate { (cell, _) in
+                cell.textLabel?.textColor = .black
+            }
+            
+            section.append(statusRow)
+        }
+            
         // MARK: Open in explorer
-        <<< LabelRow() {
+        let explorerRow = LabelRow() {
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 if let transaction = self?.transaction {
                     return self?.explorerUrl(for: transaction) == nil
@@ -314,6 +352,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
             safari.preferredControlTintColor = UIColor.adamant.primary
             self?.present(safari, animated: true, completion: nil)
         }
+        
+        section.append(explorerRow)
+        
+        form.append(section)
     }
     
     // MARK: - Actions

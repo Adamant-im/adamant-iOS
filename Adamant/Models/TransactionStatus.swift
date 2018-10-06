@@ -18,13 +18,13 @@ enum TransactionStatus: Int16 {
     var localized: String {
         switch self {
         case .notInitiated, .updating:
-            return "Обновление..."
+            return NSLocalizedString("TransactionStatus.Updating", comment: "Transaction status: updating in progress")
         case .pending:
-            return "Ожидается подтверждение"
+            return NSLocalizedString("TransactionStatus.Pending", comment: "Transaction status: transaction is pending")
         case .success:
-            return "Успешно"
+            return NSLocalizedString("TransactionStatus.Success", comment: "Transaction status: success")
         case .failed:
-            return "Ошибка"
+            return NSLocalizedString("TransactionStatus.Failed", comment: "Transaction status: transaction failed")
         }
     }
 }

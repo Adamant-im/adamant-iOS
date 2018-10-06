@@ -68,7 +68,7 @@ extension EthWalletService: RichMessageProvider {
         
         cell.amountLabel.text = transfer.amount
         cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
-        cell.transactionStatus = (message as? RichMessageTransaction)?.transferCheckStatus
+        cell.transactionStatus = (message as? RichMessageTransaction)?.transactionStatus
         
         if cell.isAlignedRight != isFromCurrentSender {
             cell.isAlignedRight = isFromCurrentSender

@@ -324,7 +324,7 @@ extension AdamantChatsProvider {
         transaction.richContent = richContent
         transaction.richType = richType
         
-        transaction.transferCheckStatus = richProviders[richType] != nil ? .notInitiated : nil
+        transaction.transactionStatus = richProviders[richType] != nil ? .notInitiated : nil
         
         prepareAndSendChatTransaction(transaction, in: context, recipientId: recipientId, type: type, keypair: keypair, completion: completion)
     }
@@ -964,7 +964,7 @@ extension AdamantChatsProvider {
                 transaction.richType = type
                 transaction.richContent = json
                 
-                transaction.transferCheckStatus = richProviders[type] != nil ? .notInitiated : nil
+                transaction.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
             }
             
             messageTransaction = transaction

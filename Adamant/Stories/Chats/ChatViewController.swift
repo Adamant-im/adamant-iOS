@@ -541,7 +541,7 @@ extension ChatViewController: TransferViewControllerDelegate, ComplexTransferVie
 // MARK: - RichTransfers status update
 extension ChatViewController {
     func updateStatus(for transaction: RichMessageTransaction, provider: RichMessageProviderWithStatusCheck) {
-        transaction.transferCheckStatus = .updating
+        transaction.transactionStatus = .updating
         
         let operation = StatusUpdateProcedure(parentContext: stack.container.viewContext,
                                               objectId: transaction.objectID,
@@ -573,7 +573,7 @@ private class StatusUpdateProcedure: Procedure {
         }
         
         guard let txHash = transaction.richContent?[RichContentKeys.transfer.hash] else {
-            transaction.transferCheckStatus = .failed
+            transaction.transactionStatus = .failed
             try? privateContext.save()
             return
         }
@@ -581,10 +581,10 @@ private class StatusUpdateProcedure: Procedure {
         provider.statusForTransactionBy(hash: txHash) { result in
             switch result {
             case .success(let status):
-                transaction.transferCheckStatus = status
+                transaction.transactionStatus = status
 
             case .failure:
-                transaction.transferCheckStatus = .failed
+                transaction.transactionStatus = .failed
             }
 
             try? privateContext.save()

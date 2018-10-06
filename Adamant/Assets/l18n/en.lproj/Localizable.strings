@@ -610,6 +610,18 @@
 /* TransactionList: 'Transactions not found' localize error message from API. */
 "No transactions found" = "Transactions not found";
 
+/* Transaction status: updating in progress */
+"TransactionStatus.Updating" = "Updating...";
+
+/* Transaction status: transaction is pending */
+"TransactionStatus.Pending" = "Pending";
+
+/* Transaction status: success */
+"TransactionStatus.Success" = "Success";
+
+/* Transaction status: transaction failed */
+"TransactionStatus.Failed" = "Failed";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";
 
@@ -618,6 +630,9 @@
 
 /* Transaction details: Block id row. */
 "TransactionDetailsScene.Row.Block" = "Block";
+
+/* Transaction details: Transaction delivery status. */
+"TransactionDetailsScene.Row.Status" = "Transaction status";
 
 /* Transaction details: confirmations row. */
 "TransactionDetailsScene.Row.Confirmations" = "Confirmations";

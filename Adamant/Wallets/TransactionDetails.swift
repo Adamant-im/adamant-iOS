@@ -37,6 +37,8 @@ protocol TransactionDetails {
     var blockValue: String? { get }
     
     var isOutgoing: Bool { get }
+    
+    var transactionStatus: TransactionStatus? { get }
 }
 
 extension TransactionDetails {
