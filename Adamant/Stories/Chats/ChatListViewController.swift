@@ -260,7 +260,7 @@ extension ChatListViewController {
 				cell.avatarImage = avatar
 				cell.avatarImageView.tintColor = UIColor.adamant.primary
 			} else {
-                if let address = partner.address {
+                if let address = partner.publicKey {
                     DispatchQueue.global().async {
                         let image = self.avatarService.avatar(for: address, size: 200)
                         DispatchQueue.main.async {

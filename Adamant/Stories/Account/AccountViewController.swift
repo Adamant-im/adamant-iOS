@@ -400,10 +400,12 @@ class AccountViewController: FormViewController {
 		
 		accountHeaderView.addressButton.setTitle(address, for: .normal)
         
-        DispatchQueue.global().async {
-            let image = self.avatarService.avatar(for: address, size: 200)
-            DispatchQueue.main.async {
-                self.accountHeaderView.avatarImageView.image = image
+        if let publickey = accountService.keypair?.publicKey {
+            DispatchQueue.global().async {
+                let image = self.avatarService.avatar(for: publickey, size: 200)
+                DispatchQueue.main.async {
+                    self.accountHeaderView.avatarImageView.image = image
+                }
             }
         }
 	}
