@@ -15,22 +15,34 @@ class AdamantAvatarService: AvatarService {
     
     private let colors: [[UIColor]] = [
         [
-            UIColor(red: 255.0 / 255.0, green: 255.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0), //background
-            UIColor(red: 255.0 / 255.0, green: 135.0 / 255.0, blue: 134.0 / 255.0, alpha: 1.0), // main
-            UIColor(red: 119.0 / 255.0, green: 136.0 / 255.0, blue: 250.0 / 255.0, alpha: 1.0), // 2dary
-            UIColor(red: 255.0 / 255.0, green: 207.0 / 255.0, blue: 155.0 / 255.0, alpha: 1.0)  // 2dary
+            UIColor(hex: "#ffffff"), //background
+            UIColor(hex: "#179cec"), // main
+            UIColor(hex: "#8bcef6"), // 2dary
+            UIColor(hex: "#c5e6fa") // 2dary
         ],
         [
-            UIColor(red: 255.0 / 255.0, green: 255.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0), //background
-            UIColor(red: 119.0 / 255.0, green: 136.0 / 255.0, blue: 250.0 / 255.0, alpha: 1.0), // main
-            UIColor(red: 81.0 / 255.0, green: 181.0 / 255.0, blue: 241.0 / 255.0, alpha: 1.0), // 2dary
-            UIColor(red: 168.0 / 255.0, green: 217.0 / 255.0, blue: 247.0 / 255.0, alpha: 1.0)  // 2dary
+            UIColor(hex: "#ffffff"), //background
+            UIColor(hex: "#32d296"), // main
+            UIColor(hex: "#99e9cb"), // 2dary
+            UIColor(hex: "#ccf4e5") // 2dary
         ],
         [
-            UIColor(red: 255.0 / 255.0, green: 255.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0), //background
-            UIColor(red: 124.0 / 255.0, green: 227.0 / 255.0, blue: 216.0 / 255.0, alpha: 1.0), // main
-            UIColor(red: 255.0 / 255.0, green: 219.0 / 255.0, blue: 180.0 / 255.0, alpha: 1.0), // 2dary
-            UIColor(red: 195.0 / 255.0, green: 196.0 / 255.0, blue: 203.0 / 255.0, alpha: 1.0)  // 2dary
+            UIColor(hex: "#ffffff"), //background
+            UIColor(hex: "#faa05a"), // main
+            UIColor(hex: "#fdd0ad"), // 2dary
+            UIColor(hex: "#fee7d6") // 2dary
+        ],
+        [
+            UIColor(hex: "#ffffff"), //background
+            UIColor(hex: "#474a5f"), // main
+            UIColor(hex: "#a3a5af"), // 2dary
+            UIColor(hex: "#d1d2d7") // 2dary
+        ],
+        [
+            UIColor(hex: "#ffffff"), //background
+            UIColor(hex: "#9497a3"), // main
+            UIColor(hex: "#cacbd1"), // 2dary
+            UIColor(hex: "#e4e5e8") // 2dary
         ]
     ]
     
