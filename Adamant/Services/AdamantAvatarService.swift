@@ -257,10 +257,10 @@ class AdamantAvatarService: AvatarService {
             seed += UInt64(u)
         }
         
-        let rndSrc = GKMersenneTwisterRandomSource(seed: seed)
+        let rndSrc = GKLinearCongruentialRandomSource(seed: scramble(seed: seed))
         let rnd = GKRandomDistribution(randomSource: rndSrc,
                                          lowestValue: 0,
-                                         highestValue: Int.max/2)
+                                         highestValue: Int(Int32.max/2))
         
         let colors = colors[rnd.nextInt() % colors.count]
         
@@ -272,6 +272,13 @@ class AdamantAvatarService: AvatarService {
             tColors.append(color)
         }
         return tColors
+    }
+    
+    func scramble( seed : UInt64 ) -> UInt64 {
+        let multiplier : UInt64 = 0x5DEECE66D
+        let mask : UInt64 = (1 << 48) - 1
+        
+        return (seed ^ multiplier) & mask;
     }
     
     func isOutsideHexagon(_ xL: Int, _ yL: Int, _ lines: Int) -> Bool {
