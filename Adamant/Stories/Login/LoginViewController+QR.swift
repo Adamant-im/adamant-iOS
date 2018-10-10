@@ -55,6 +55,7 @@ extension LoginViewController {
 			picker.delegate = self
 			picker.allowsEditing = false
 			picker.sourceType = .photoLibrary
+            picker.style = "modalPicker"
 			self?.present(picker, animated: true, completion: nil)
 		}
 		

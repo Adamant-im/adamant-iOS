@@ -1,31 +1,48 @@
 variables:
-  primaryColor: "#FFFFFF"
-  secondaryColor: "#297BED"
-  primaryBackgroundColor: "#000000"
-  secondaryBackgroundColor: white:0.3 # "#000000"
+  firstColor: "#D5DDE5" # (текст чатов, заголовки, элементы меню)
+  secondaryColor: "#9497a3" # (цвета элементов дизайна, иконок меню)
+  thirdColor: "#474a5f" # (цвета элементов дизайна)
+  activeColor: "#179cec" # (цвет подсветки триггеров в приложении)
+  successColor: "#32d296" # (принятый перевод и успешное действие)
+  alertColor: "#faa05a" # (отправленный перевод и отмененное действие)
+  backgroundColor: "#0D0905"
 styles:
+  modalPicker:
+    view:
+      tintColor: "#D5DDE5"
+      backgroundColor: "#0D0905"
+    navigationBar:
+      tintColor: "#D5DDE5"
+      barTintColor: "#0D0905"
+      titleColor: "#D5DDE5"
   mainBackground:
-    backgroundColor: $primaryBackgroundColor
+    backgroundColor: $backgroundColor
+  btnBg:
+    backgroundColor: $thirdColor
   loginTableView:
-    backgroundColor: $primaryBackgroundColor
-    separatorColor: $primaryBackgroundColor
+    backgroundColor: $backgroundColor
+    separatorColor: $secondaryColor
   plain:
-    textColor: $primaryColor
+    textColor: $firstColor
   plainSecondary:
     textColor: $secondaryColor
   input:
-    textColor: $primaryColor
-    tintColor: $primaryColor
-    textAlignment: center
+    textColor: $firstColor
+    tintColor: $firstColor
+    placeholderColor: $secondaryColor
+    clearButtonTintColor: $firstColor
+    # textAlignment: center
   login:
-    textColor: $primaryColor
-    backgroundColor: $secondaryColor
-    layoutMargins: [40,0]
-    cornerRadius: 20
-    clipsToBounds: true
+    textColor: $firstColor
+    backgroundColor: $thirdColor
+    # layoutMargins: [40,0]
+    # cornerRadius: 20
+    # clipsToBounds: false
   biometricButton:
-    backgroundColor: $primaryBackgroundColor
-    tintColor: $primaryColor
-    borderColor: $primaryBackgroundColor
+    backgroundColor: $thirdColor
+    tintColor: $firstColor
+    borderColor: $firstColor
+    highlightedBackgroundColor: $thirdColor
+    normalBackgroundColor: $thirdColor
   logo:
     image: "DarkLogo"

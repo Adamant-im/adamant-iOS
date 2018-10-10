@@ -1,31 +1,47 @@
 variables:
-  primaryColor: "#4A4A4A" # ~ 70% grey
-  secondaryColor: "#7A7A7A" # ~50% grey
-  primaryBackgroundColor: "#FFFFFF"
-  secondaryBackgroundColor: "#EFEFF4"
+  firstColor: "#474a5f" # (текст чатов, заголовки, элементы меню)
+  secondaryColor: "#9497a3" # (цвета элементов дизайна, иконок меню)
+  thirdColor: "#D5DDE5" # (цвета элементов дизайна)
+  activeColor: "#179cec" # (цвет подсветки триггеров в приложении)
+  successColor: "#32d296" # (принятый перевод и успешное действие)
+  alertColor: "#faa05a" # (отправленный перевод и отмененное действие)
+  backgroundColor: "#f2f6fa"
 styles:
+  modalPicker:
+    # view:
+    #   tintColor: $firstColor
+      # backgroundColor: $backgroundColor
+    navigationBar:
+      # tintColor: $firstColor
+      barTintColor: $backgroundColor
   mainBackground:
-    backgroundColor: $primaryBackgroundColor
+    backgroundColor: $backgroundColor
+  btnBg:
+    backgroundColor: $thirdColor
   loginTableView:
-    backgroundColor: $secondaryBackgroundColor
-    separatorColor: "#C8C8CD"
+    backgroundColor: $backgroundColor
+    separatorColor: $secondaryColor
   plain:
-    textColor: $primaryColor
+    textColor: $firstColor
   plainSecondary:
     textColor: $secondaryColor
   input:
-    textColor: $primaryColor
-    tintColor: $primaryColor
-    textAlignment: left
+    textColor: $firstColor
+    tintColor: $firstColor
+    placeholderColor: $secondaryColor
+    clearButtonTintColor: $firstColor
+    # textAlignment: left
   login:
-    textColor: $primaryColor
-    backgroundColor: $primaryBackgroundColor
-    layoutMargins: [0,0]
-    cornerRadius: 0
-    clipsToBounds: false
+    textColor: $firstColor
+    backgroundColor: $thirdColor
+    # layoutMargins: [0,0]
+    # cornerRadius: 20
+    # clipsToBounds: true
   biometricButton:
-    backgroundColor: $primaryBackgroundColor
-    tintColor: $primaryColor
-    borderColor: $primaryColor
+    backgroundColor: $thirdColor
+    tintColor: $firstColor
+    borderColor: $firstColor
+    highlightedBackgroundColor: $thirdColor
+    normalBackgroundColor: $thirdColor
   logo:
     image: "Adamant-logo"

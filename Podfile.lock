@@ -18,8 +18,8 @@ PODS:
   - FTIndicator/FTToastIndicator (1.2.9)
   - Haring (2.1)
   - KeychainAccess (3.1.1)
-  - libCEd25519 (1.1.0)
   - KZFileWatchers (1.0.5)
+  - libCEd25519 (1.1.0)
   - libsodium (1.0.12)
   - Lisk (1.0.0):
     - Ed25519 (~> 1.1.0)
@@ -49,6 +49,9 @@ PODS:
     - CryptoSwift (~> 0.11)
   - secp256k1_ios (0.1.3)
   - SipHash (1.2.2)
+  - Stylist (0.2.1):
+    - KZFileWatchers (~> 1.0.5)
+    - Yams (~> 1.0.0)
   - Swinject (2.5.0)
   - web3swift (1.1.9):
     - BigInt (~> 3.1)
@@ -57,9 +60,6 @@ PODS:
     - Result (~> 4.0)
     - scrypt (~> 2.0)
     - secp256k1_ios (~> 0.1)
-  - Stylist (0.2.1):
-    - KZFileWatchers (~> 1.0.5)
-    - Yams (~> 1.0.0)
   - Yams (1.0.1)
 
 DEPENDENCIES:
@@ -99,8 +99,8 @@ SPEC REPOS:
     - FTIndicator
     - Haring
     - KeychainAccess
-    - libCEd25519
     - KZFileWatchers
+    - libCEd25519
     - libsodium
     - MessageInputBar
     - MyLittlePinpad
@@ -112,10 +112,13 @@ SPEC REPOS:
     - ReachabilitySwift
     - Result
     - RNCryptor
+    - scrypt
+    - secp256k1_ios
+    - SipHash
     - Stylist
     - Swinject
-    - Yams
     - web3swift
+    - Yams
 
 EXTERNAL SOURCES:
   Lisk:
@@ -145,8 +148,8 @@ SPEC CHECKSUMS:
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   Haring: b3a8495c073a016f03296d67debc609a7ecf7710
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
-  libCEd25519: 45de00a0944cb2d51e64fcef67bd9989c42d20ca
   KZFileWatchers: cdb033e4120fbe61c8e0f4df3613d5894741653d
+  libCEd25519: 45de00a0944cb2d51e64fcef67bd9989c42d20ca
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   Lisk: a900424110c208c425102ee8b6fd60d9b6b878c3
   MessageInputBar: d46ecc5b355d13433b8367dcd200e05a6564f0ed
@@ -163,10 +166,11 @@ SPEC CHECKSUMS:
   scrypt: 3fe5b1a3b0976f97cd87488673a8f7c65708cc84
   secp256k1_ios: ac9ef04e761f43c58012b28548afa91493761f17
   SipHash: fad90a4683e420c52ef28063063dbbce248ea6d4
+  Stylist: 62917294a7b21ef61735a7067c3e9232d14ceb6f
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: 4895c765c9858eb4737ef222eb8643bb5fc7fdb3
-  Stylist: 62917294a7b21ef61735a7067c3e9232d14ceb6f
+  Yams: 572f625a8b719b73e0b57fd313c680f3e2161fe9
 
-PODFILE CHECKSUM: 4a06595861816208b7a6aacfeded5a0b26245f53
+PODFILE CHECKSUM: 0e50eb93eaa7f0e2b91f3563550bfc94871c67d7
 
-COCOAPODS: 1.6.0.beta.1
+COCOAPODS: 1.5.3

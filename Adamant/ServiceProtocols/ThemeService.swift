@@ -179,7 +179,7 @@ public class ThemeManager {
             NotificationCenter.default.addObserver(
                 self,
                 selector: #selector(ThemeManager.handleDynamicTypeChange(_:)),
-                name: NSNotification.Name.UIContentSizeCategoryDidChange,
+                name: UIContentSizeCategory.didChangeNotification,
                 object: nil
             )
         }
@@ -304,16 +304,16 @@ public class ThemeManager {
             
             // NotificationCenter notifies its observers
             // synchronously, so we do not need to wait:
-            #if os(iOS)
-            // HACK: apparently the only way to
-            // change the appearance of existing instances:
-            for window in UIApplication.shared.windows {
-                for view in window.subviews {
-                    view.removeFromSuperview()
-                    window.addSubview(view)
-                }
-            }
-            #endif
+//            #if os(iOS)
+//            // HACK: apparently the only way to
+//            // change the appearance of existing instances:
+//            for window in UIApplication.shared.windows {
+//                for view in window.subviews {
+//                    view.removeFromSuperview()
+//                    window.addSubview(view)
+//                }
+//            }
+//            #endif
         }
     }
 }

@@ -165,9 +165,16 @@ class LoginViewController: FormViewController {
 		
 		
 		// MARK: Login section
-		form +++ Section(Sections.login.localized) {
+		form +++ Section() {
 			$0.tag = Sections.login.tag
-			
+            
+            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
+            header.title = Sections.login.localized
+            header.onSetupView = {view, _ in
+                view.textLabel?.style = "plainSecondary"
+            }
+            $0.header = header
+            
 			$0.footer = { [weak self] in
 				var footer = HeaderFooterView<UIView>(.callback {
 					let view = ButtonsStripeView.adamantConfigured()
@@ -203,7 +210,7 @@ class LoginViewController: FormViewController {
             }.cellUpdate({ (cell, _) in
                 cell.textField.textColor = UIColor.adamant.primary
                 cell.textField?.style = "input"
-                cell.style = "mainBackground"
+                cell.style = "btnBg"
                 })
 			
 		// Login with passphrase row
@@ -224,14 +231,20 @@ class LoginViewController: FormViewController {
 			self?.loginWith(passphrase: passphrase)
 		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.style = "mainBackground"
+            cell.style = "btnBg"
             cell.textLabel?.style = "login"
 		}
 		
 		
 		// MARK: New account section
-		form +++ Section(Sections.newAccount.localized) {
+		form +++ Section() {
 			$0.tag = Sections.newAccount.tag
+            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
+            header.title = Sections.newAccount.localized
+            header.onSetupView = {view, _ in
+                view.textLabel?.style = "plainSecondary"
+            }
+            $0.header = header
 		}
 		
 		// Alert
@@ -256,8 +269,8 @@ class LoginViewController: FormViewController {
 			
 			cell.textView.attributedText = mutableText
             
-            cell.textView?.style = "mainBackground,plain"
-            cell.style = "mainBackground"
+            cell.textView?.style = "btnBg,plain"
+            cell.style = "btnBg"
 		}
 		
 		// New genegated passphrase
@@ -277,9 +290,9 @@ class LoginViewController: FormViewController {
 			cell.tipLabel.textColor = UIColor.adamant.secondary
 			cell.tipLabel.textAlignment = .center
             
-            cell.passphraseLabel?.style = "mainBackground,plain"
+            cell.passphraseLabel?.style = "btnBg,plain"
             cell.tipLabel?.style = "plainSecondary"
-            cell.style = "mainBackground"
+            cell.style = "btnBg"
 		}).onCellSelection({ [weak self] (cell, row) in
 			guard let passphrase = self?.generatedPassphrases.last, let dialogService = self?.dialogService else {
 				return
@@ -305,7 +318,7 @@ class LoginViewController: FormViewController {
 		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
             cell.textLabel?.style = "plain"
-            cell.style = "mainBackground"
+            cell.style = "btnBg"
 		}
         
         // MARK: Nodes list settings
@@ -318,7 +331,7 @@ class LoginViewController: FormViewController {
 		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
             cell.textLabel?.style = "plain"
-            cell.style = "mainBackground"
+            cell.style = "btnBg"
 		}.onCellSelection { [weak self] (_, _) in
 			guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
 				return
@@ -344,7 +357,7 @@ class LoginViewController: FormViewController {
             cell.accessoryType = .disclosureIndicator
             cell.textLabel?.style = "plain"
             cell.detailTextLabel?.style = "plain"
-            cell.style = "mainBackground"
+            cell.style = "btnBg"
         })
 		
 		// MARK: tableView position tuning
@@ -474,6 +487,16 @@ extension LoginViewController: Themeable {
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
+        return UIColor.adamantTheme.statusBar
+    }
+}
+
+extension UIImagePickerController: Themeable {
+    public func apply(theme: BaseTheme) {
+        setNeedsStatusBarAppearanceUpdate()
+    }
+    
+    override open var preferredStatusBarStyle: UIStatusBarStyle {
         return UIColor.adamantTheme.statusBar
     }
 }
