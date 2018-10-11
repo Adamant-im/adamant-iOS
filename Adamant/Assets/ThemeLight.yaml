@@ -7,36 +7,58 @@ variables:
   alertColor: "#faa05a" # (отправленный перевод и отмененное действие)
   backgroundColor: "#f2f6fa"
 styles:
-  modalPicker:
-    # view:
-    #   tintColor: $firstColor
-      # backgroundColor: $backgroundColor
-    navigationBar:
-      # tintColor: $firstColor
-      barTintColor: $backgroundColor
-  mainBackground:
+  pinpad:
+    textColor: $firstColor
+    butttonsColor: $firstColor
     backgroundColor: $backgroundColor
-  btnBg:
-    backgroundColor: $thirdColor
-  loginTableView:
+    buttonsHighlightedColor: $thirdColor
+    placeholderActiveColor: $firstColor
+    placeholderNormalColor: $backgroundColor
+  modalPicker:
+    view:
+      tintColor: "#474a5f"
+      backgroundColor: "#f2f6fa"
+    navigationBar:
+      tintColor: "#474a5f"
+      barTintColor: "#f2f6fa"
+      titleColor: "#474a5f"
+  Adamant.ChatListViewController:
+    view:
+      tintColor: "#474a5f"
+      backgroundColor: "#f2f6fa"
+    navigationBar:
+      tintColor: "#474a5f"
+      barTintColor: "#f2f6fa"
+      titleColor: "#474a5f"
+    tabBar:
+      tintColor: "#474a5f"
+      barTintColor: "#f2f6fa"
+  Adamant.NewChatViewController:
+    view:
+      tintColor: "#474a5f"
+      backgroundColor: "#f2f6fa"
+    navigationBar:
+      tintColor: "#474a5f"
+      barTintColor: "#f2f6fa"
+      titleColor: "#474a5f"
+      largeTextColor: "#474a5f"
+  chatsList:
     backgroundColor: $backgroundColor
     separatorColor: $secondaryColor
-  plain:
-    textColor: $firstColor
-  plainSecondary:
-    textColor: $secondaryColor
+  chatCell:
+    tintColor: $firstColor
+    backgroundColor: $backgroundColor
+    avatarTintColor: $firstColor
+  tabItem:
+    badgeColor: $activeColor
+  activeBg:
+    backgroundColor: $activeColor
   input:
     textColor: $firstColor
     tintColor: $firstColor
     placeholderColor: $secondaryColor
     clearButtonTintColor: $firstColor
-    # textAlignment: left
-  login:
-    textColor: $firstColor
-    backgroundColor: $thirdColor
-    # layoutMargins: [0,0]
-    # cornerRadius: 20
-    # clipsToBounds: true
+    showDarkKeyboard: false
   biometricButton:
     backgroundColor: $thirdColor
     tintColor: $firstColor
@@ -45,3 +67,27 @@ styles:
     normalBackgroundColor: $thirdColor
   logo:
     image: "Adamant-logo"
+### Base styles ###
+  ## Tint ##
+  primaryTint:
+    tintColor: $firstColor
+  secondaryTint:
+    tintColor: $secondaryColor
+  thirdTint:
+    tintColor: $thirdColor
+  ## Text color ##
+  primaryText:
+    textColor: $firstColor
+  secondaryText:
+    textColor: $secondaryColor
+  thirdText:
+    textColor: $thirdColor
+  ## Background Colors ##
+  primaryBackground:
+    backgroundColor: $backgroundColor
+  secondaryBackground:
+    backgroundColor: $thirdColor
+  ## Base Table ##
+  baseTable:
+    backgroundColor: $backgroundColor
+    separatorColor: $secondaryColor

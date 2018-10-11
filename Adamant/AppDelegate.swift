@@ -143,6 +143,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         })
         
+        Stylist.shared.addProperty(StyleProperty(name: "clearButtonTintColor") { (view: UITextField, value: PropertyValue<UIColor>) in
+            view.clearButtonTint = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "showDarkKeyboard") { (view: UITextField, value: PropertyValue<Bool>) in
+            view.keyboardAppearance = value.value ? .dark : .light
+        })
+        
         Stylist.shared.addProperty(StyleProperty(name: "highlightedBackgroundColor") { (view: RoundedButton, value: PropertyValue<UIColor>) in
             view.highlightedBackgroundColor = value.value
         })
@@ -150,9 +158,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Stylist.shared.addProperty(StyleProperty(name: "normalBackgroundColor") { (view: RoundedButton, value: PropertyValue<UIColor>) in
             view.normalBackgroundColor = value.value
         })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "avatarTintColor") { (view: ChatTableViewCell, value: PropertyValue<UIColor>) in
+            view.avatarImageView.tintColor = value.value
+            view.borderColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "badgeColor") { (view: UITabBarItem, value: PropertyValue<UIColor>) in
+            view.badgeColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "largeTextColor") { (view: UINavigationBar, value: PropertyValue<UIColor>) in
+            if #available(iOS 11.0, *) {
+                view.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: value.value]
+            }
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "textColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
+            pinpad.commentLabel.textColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "butttonsColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
+            pinpad.bordersColor = value.value
+            pinpad.setColor(value.value, for: .normal)
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "backgroundColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
+            pinpad.backgroundView.backgroundColor = value.value
+            pinpad.view.backgroundColor = value.value
+            pinpad.commentLabel.backgroundColor = value.value
             
-        Stylist.shared.addProperty(StyleProperty(name: "clearButtonTintColor") { (view: UITextField, value: PropertyValue<UIColor>) in
-            view.clearButtonTint = value.value
+            for view in pinpad.view.subviews {
+                if view is UIStackView {
+                    for view in view.subviews {
+                        view.backgroundColor = .clear
+                    }
+                }
+            }
+
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "buttonsHighlightedColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "placeholderActiveColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
+            pinpad.placeholderActiveColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "placeholderNormalColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
+            pinpad.placeholderNormalColor = value.value
         })
         
         self.observeThemeChange()

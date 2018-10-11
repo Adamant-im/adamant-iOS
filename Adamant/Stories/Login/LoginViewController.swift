@@ -141,7 +141,7 @@ class LoginViewController: FormViewController {
         
 		navigationOptions = RowNavigationOptions.Disabled
         
-        self.tableView.styles = ["loginTableView"]
+        self.tableView.styles = ["baseTable"]
 		
 		// MARK: Header & Footer
 		if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
@@ -150,7 +150,7 @@ class LoginViewController: FormViewController {
 			if let label = header.viewWithTag(888) as? UILabel {
 				label.text = String.adamantLocalized.shared.productName
 				label.textColor = UIColor.adamant.primary
-                label.style = "plain"
+                label.style = "primaryText"
 			}
 		}
 		
@@ -159,7 +159,7 @@ class LoginViewController: FormViewController {
 				label.text = AdamantUtilities.applicationVersion
 				label.textColor = UIColor.adamant.primary
 				tableView.tableFooterView = footer
-                label.style = "plain"
+                label.style = "primaryText"
 			}
 		}
 		
@@ -171,7 +171,7 @@ class LoginViewController: FormViewController {
             var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
             header.title = Sections.login.localized
             header.onSetupView = {view, _ in
-                view.textLabel?.style = "plainSecondary"
+                view.textLabel?.style = "secondaryText"
             }
             $0.header = header
             
@@ -210,7 +210,7 @@ class LoginViewController: FormViewController {
             }.cellUpdate({ (cell, _) in
                 cell.textField.textColor = UIColor.adamant.primary
                 cell.textField?.style = "input"
-                cell.style = "btnBg"
+                cell.style = "secondaryBackground"
                 })
 			
 		// Login with passphrase row
@@ -231,8 +231,8 @@ class LoginViewController: FormViewController {
 			self?.loginWith(passphrase: passphrase)
 		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.style = "btnBg"
-            cell.textLabel?.style = "login"
+            cell.style = "secondaryBackground"
+            cell.textLabel?.style = "primaryText"
 		}
 		
 		
@@ -242,7 +242,7 @@ class LoginViewController: FormViewController {
             var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
             header.title = Sections.newAccount.localized
             header.onSetupView = {view, _ in
-                view.textLabel?.style = "plainSecondary"
+                view.textLabel?.style = "secondaryText"
             }
             $0.header = header
 		}
@@ -269,8 +269,8 @@ class LoginViewController: FormViewController {
 			
 			cell.textView.attributedText = mutableText
             
-            cell.textView?.style = "btnBg,plain"
-            cell.style = "btnBg"
+            cell.textView?.style = "secondaryBackground,primaryText"
+            cell.style = "secondaryBackground"
 		}
 		
 		// New genegated passphrase
@@ -290,9 +290,9 @@ class LoginViewController: FormViewController {
 			cell.tipLabel.textColor = UIColor.adamant.secondary
 			cell.tipLabel.textAlignment = .center
             
-            cell.passphraseLabel?.style = "btnBg,plain"
-            cell.tipLabel?.style = "plainSecondary"
-            cell.style = "btnBg"
+            cell.passphraseLabel?.style = "secondaryBackground,primaryText"
+            cell.tipLabel?.style = "secondaryText"
+            cell.style = "secondaryBackground"
 		}).onCellSelection({ [weak self] (cell, row) in
 			guard let passphrase = self?.generatedPassphrases.last, let dialogService = self?.dialogService else {
 				return
@@ -317,8 +317,8 @@ class LoginViewController: FormViewController {
 			self?.generateNewPassphrase()
 		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.textLabel?.style = "plain"
-            cell.style = "btnBg"
+            cell.textLabel?.style = "primaryText"
+            cell.style = "secondaryBackground"
 		}
         
         // MARK: Nodes list settings
@@ -330,8 +330,8 @@ class LoginViewController: FormViewController {
 			cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.textLabel?.style = "plain"
-            cell.style = "btnBg"
+            cell.textLabel?.style = "primaryText"
+            cell.style = "secondaryBackground"
 		}.onCellSelection { [weak self] (_, _) in
 			guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
 				return
@@ -355,9 +355,9 @@ class LoginViewController: FormViewController {
             }
         }.cellUpdate({ (cell, _) in
             cell.accessoryType = .disclosureIndicator
-            cell.textLabel?.style = "plain"
-            cell.detailTextLabel?.style = "plain"
-            cell.style = "btnBg"
+            cell.textLabel?.style = "primaryText"
+            cell.detailTextLabel?.style = "primaryText"
+            cell.style = "secondaryBackground"
         })
 		
 		// MARK: tableView position tuning
@@ -491,11 +491,7 @@ extension LoginViewController: Themeable {
     }
 }
 
-extension UIImagePickerController: Themeable {
-    public func apply(theme: BaseTheme) {
-        setNeedsStatusBarAppearanceUpdate()
-    }
-    
+extension UINavigationController {    
     override open var preferredStatusBarStyle: UIStatusBarStyle {
         return UIColor.adamantTheme.statusBar
     }

@@ -85,6 +85,8 @@ class ShareQrViewController: FormViewController {
 		if #available(iOS 11.0, *) {
 			navigationController?.navigationBar.prefersLargeTitles = true
 		}
+        
+        tableView.styles = ["baseTable"]
 		
 		// MARK: QR code
 		form +++ Section()
@@ -92,9 +94,11 @@ class ShareQrViewController: FormViewController {
 			$0.value = qrCode
 			$0.tag = Rows.qr.tag
 			$0.cell.selectionStyle = .none
+            $0.cell.style = "secondaryBackground"
 			
 			if let sharingTip = sharingTip {
 				$0.cell.tipLabel.text = sharingTip
+                $0.cell.tipLabel.style = "primaryText"
 			} else {
 				$0.cell.tipLabelIsHidden = true
 			}
@@ -124,6 +128,8 @@ class ShareQrViewController: FormViewController {
 			}
 		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
+            cell.style = "secondaryBackground"
+            cell.textLabel?.style = "primaryText"
 		}
 			
 		// Share
@@ -154,6 +160,8 @@ class ShareQrViewController: FormViewController {
 			self?.present(vc, animated: true, completion: nil)
 		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
+            cell.style = "secondaryBackground"
+            cell.textLabel?.style = "primaryText"
 		}
 		
 		<<< ButtonRow() {
@@ -163,6 +171,8 @@ class ShareQrViewController: FormViewController {
 			self?.close()
 		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
+            cell.style = "secondaryBackground"
+            cell.textLabel?.style = "primaryText"
 		}
 	}
 	
@@ -182,4 +192,10 @@ class ShareQrViewController: FormViewController {
 			close()
 		}
 	}
+}
+
+extension ShareQrViewController {
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return UIColor.adamantTheme.statusBar
+    }
 }

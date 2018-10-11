@@ -51,7 +51,7 @@ class ChatListViewController: UIViewController {
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
         refreshControl.tintColor = UIColor.adamant.primary
-        
+        refreshControl.style = "primaryTint"
         return refreshControl
     }()
 	
@@ -73,6 +73,8 @@ class ChatListViewController: UIViewController {
 		tableView.delegate = self
 		tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         tableView.refreshControl = refreshControl
+        
+        tableView.styles = ["baseTable"]
 		
 		if self.accountService.account != nil {
 			initFetchedRequestControllers(provider: chatsProvider)
@@ -235,6 +237,8 @@ extension ChatListViewController {
 		cell.borderColor = UIColor.adamant.primary
 		cell.badgeColor = UIColor.adamant.primary
 		cell.borderWidth = 1
+        
+        cell.setupStyles()
 		
 		return cell
 	}
@@ -602,6 +606,8 @@ extension ChatListViewController {
 		} else {
 			item = tabBarItem
 		}
+        
+        item.style = "tabItem"
 		
 		if let value = value, value > 0 {
 			item.badgeValue = String(value)

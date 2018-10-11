@@ -7,6 +7,13 @@ variables:
   alertColor: "#faa05a" # (отправленный перевод и отмененное действие)
   backgroundColor: "#0D0905"
 styles:
+  pinpad:
+    textColor: $firstColor
+    butttonsColor: $firstColor
+    backgroundColor: $backgroundColor
+    buttonsHighlightedColor: $thirdColor
+    placeholderActiveColor: $firstColor
+    placeholderNormalColor: $backgroundColor
   modalPicker:
     view:
       tintColor: "#D5DDE5"
@@ -15,29 +22,43 @@ styles:
       tintColor: "#D5DDE5"
       barTintColor: "#0D0905"
       titleColor: "#D5DDE5"
-  mainBackground:
-    backgroundColor: $backgroundColor
-  btnBg:
-    backgroundColor: $thirdColor
-  loginTableView:
+  Adamant.ChatListViewController:
+    view:
+      tintColor: "#D5DDE5"
+      backgroundColor: "#0D0905"
+    navigationBar:
+      tintColor: "#D5DDE5"
+      barTintColor: "#0D0905"
+      titleColor: "#D5DDE5"
+    tabBar:
+      tintColor: "#D5DDE5"
+      barTintColor: "#0D0905"
+  Adamant.NewChatViewController:
+    view:
+      tintColor: "#D5DDE5"
+      backgroundColor: "#0D0905"
+    navigationBar:
+      tintColor: "#D5DDE5"
+      barTintColor: "#0D0905"
+      titleColor: "#D5DDE5"
+      largeTextColor: "#D5DDE5"
+  chatsList:
     backgroundColor: $backgroundColor
     separatorColor: $secondaryColor
-  plain:
-    textColor: $firstColor
-  plainSecondary:
-    textColor: $secondaryColor
+  chatCell:
+    tintColor: $firstColor
+    backgroundColor: $backgroundColor
+    avatarTintColor: $firstColor
+  tabItem:
+    badgeColor: $activeColor
+  activeBg:
+    backgroundColor: $activeColor
   input:
     textColor: $firstColor
     tintColor: $firstColor
     placeholderColor: $secondaryColor
     clearButtonTintColor: $firstColor
-    # textAlignment: center
-  login:
-    textColor: $firstColor
-    backgroundColor: $thirdColor
-    # layoutMargins: [40,0]
-    # cornerRadius: 20
-    # clipsToBounds: false
+    showDarkKeyboard: true
   biometricButton:
     backgroundColor: $thirdColor
     tintColor: $firstColor
@@ -46,3 +67,34 @@ styles:
     normalBackgroundColor: $thirdColor
   logo:
     image: "DarkLogo"
+### Base styles ###
+  ## Tint ##
+  primaryTint:
+    tintColor: $firstColor
+  secondaryTint:
+    tintColor: $secondaryColor
+  thirdTint:
+    tintColor: $thirdColor
+  ## Text color ##
+  primaryText:
+    textColor: $firstColor
+  secondaryText:
+    textColor: $secondaryColor
+  thirdText:
+    textColor: $thirdColor
+  ## Background Colors ##
+  primaryBackground:
+    backgroundColor: $backgroundColor
+  secondaryBackground:
+    backgroundColor: $thirdColor
+  ## Bar tint ##
+  primaryBarTint:
+    titleColor: $firstColor
+    largeTextColor: $firstColor
+    barTintColor: $backgroundColor
+  primaryTabBarTint:
+    barTintColor: $backgroundColor
+  ## Base Table ##
+  baseTable:
+    backgroundColor: $backgroundColor
+    separatorColor: $secondaryColor
