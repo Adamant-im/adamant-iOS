@@ -31,6 +31,9 @@ class WalletCollectionViewCell: PagingCell {
 		}
 		
 		accessoryContainerView.accessoriesBackgroundColor = options.indicatorColor
+        balanceLabel.style = "primaryText"
+        currencySymbolLabel.style = "primaryText"
+        self.style = "secondaryBackground"
 		
 		if item.notifications > 0 {
 			accessoryContainerView.setAccessory(AccessoryType.label(text: String(item.notifications)), at: .topRight)

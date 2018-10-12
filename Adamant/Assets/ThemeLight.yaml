@@ -20,26 +20,40 @@ styles:
       backgroundColor: "#f2f6fa"
     navigationBar:
       tintColor: "#474a5f"
-      barTintColor: "#f2f6fa"
+      barTintColor: "#D5DDE5"
       titleColor: "#474a5f"
+  Adamant.AccountViewController:
+    view:
+      tintColor: "#474a5f"
+      backgroundColor: "#f2f6fa"
+  paging:
+    indicatorColor: $activeColor
+    textColor: $firstColor
+    selectedTextColor: $firstColor
+    backgroundColor: $thirdColor
+    selectedBackgroundColor: $thirdColor
+    menuBackgroundColor: $thirdColor
+  # Adamant.WalletCollectionViewCell:
+  #   tintColor: $firstColor
+  #   backgroundColor: $thirdColor
   Adamant.ChatListViewController:
     view:
       tintColor: "#474a5f"
       backgroundColor: "#f2f6fa"
     navigationBar:
       tintColor: "#474a5f"
-      barTintColor: "#f2f6fa"
+      barTintColor: "#D5DDE5"
       titleColor: "#474a5f"
     tabBar:
       tintColor: "#474a5f"
-      barTintColor: "#f2f6fa"
+      barTintColor: "#D5DDE5"
   Adamant.NewChatViewController:
     view:
       tintColor: "#474a5f"
       backgroundColor: "#f2f6fa"
     navigationBar:
       tintColor: "#474a5f"
-      barTintColor: "#f2f6fa"
+      barTintColor: "#D5DDE5"
       titleColor: "#474a5f"
       largeTextColor: "#474a5f"
   chatsList:

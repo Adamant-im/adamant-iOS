@@ -13,6 +13,7 @@ import CoreData
 
 import Stylist
 import MyLittlePinpad
+import Parchment
 
 // MARK: - Constants
 extension String.adamantLocalized {
@@ -195,7 +196,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     }
                 }
             }
-
         })
         
         Stylist.shared.addProperty(StyleProperty(name: "buttonsHighlightedColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
@@ -207,6 +207,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         Stylist.shared.addProperty(StyleProperty(name: "placeholderNormalColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
             pinpad.placeholderNormalColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "indicatorColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
+            view.indicatorColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "textColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
+            view.textColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "selectedTextColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
+            view.selectedTextColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "backgroundColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
+            view.backgroundColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "selectedBackgroundColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
+            view.selectedBackgroundColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "menuBackgroundColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
+            view.menuBackgroundColor = value.value
         })
         
         self.observeThemeChange()

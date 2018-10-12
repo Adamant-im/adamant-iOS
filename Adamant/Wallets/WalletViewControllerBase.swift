@@ -64,6 +64,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         super.viewDidLoad()
 		
 		let section = Section()
+        
+        tableView.styles = ["baseTable"]
+        walletTitleLabel.style = "secondaryText"
 		
 		// MARK: Address
 		let addressRow = LabelRow() {
@@ -76,6 +79,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
+            cell.textLabel?.style = "primaryText"
+            cell.style = "secondaryBackground,primaryTint"
+            cell.detailTextLabel?.style = "secondaryText"
 		}.onCellSelection { [weak self] (_, _) in
 			let completion = { [weak self] in
 				guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
@@ -128,6 +134,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			balanceRow.cell.selectionStyle = .gray
 			balanceRow.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
+                cell.textLabel?.style = "primaryText"
+                cell.style = "secondaryBackground,primaryTint"
+                cell.detailTextLabel?.style = "secondaryText"
 			}.onCellSelection { [weak self] (_, _) in
 				guard let service = self?.service as? WalletServiceWithTransfers else {
 					return
@@ -147,6 +156,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 				$0.cell.selectionStyle = .gray
 			}.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
+                cell.textLabel?.style = "primaryText"
+                cell.style = "secondaryBackground"
 			}.onCellSelection { [weak self] (_, _) in
 				guard let service = self?.service as? WalletServiceWithSend else {
 					return
