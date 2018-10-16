@@ -52,7 +52,7 @@ extension ChatViewController: MessagesDataSource {
     
     func cellTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
         if self.shouldDisplayHeader(for: message, at: indexPath, in: self.messagesCollectionView) {
-            return NSAttributedString(string: message.sentDate.humanizedDay(), attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.gray])
+            return NSAttributedString(string: message.sentDate.humanizedDay(), attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.adamantTheme.secondary])
         }
         return nil
     }
@@ -65,10 +65,10 @@ extension ChatViewController: MessagesDataSource {
             
             switch transaction.statusEnum {
             case .failed:
-                return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.darkText])
+                return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.adamantTheme.primary])
                 
             case .pending:
-                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.darkText])
+                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.adamantTheme.primary])
                 
             case .delivered:
                 return nil
@@ -109,7 +109,7 @@ extension ChatViewController: MessagesDataSource {
 			}
 		}
 		
-		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption2)])
+		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption2), NSAttributedString.Key.foregroundColor: UIColor.adamantTheme.secondary])
 	}
     
     func customCell(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
@@ -129,15 +129,15 @@ extension ChatViewController: MessagesDataSource {
             if fromCurrent {
                 if let transaction = message as? ChatTransaction {
                     switch transaction.statusEnum {
-                    case .failed: bgColor = UIColor.adamant.failChatBackground
-                    case .pending: bgColor = UIColor.adamant.pendingChatBackground
-                    case .delivered: bgColor = UIColor.adamant.chatSenderBackground
+                    case .failed: bgColor = UIColor.adamantTheme.failChatBackground
+                    case .pending: bgColor = UIColor.adamantTheme.pendingChatBackground
+                    case .delivered: bgColor = UIColor.adamantTheme.chatSenderBackground
                     }
                 } else {
-                    bgColor = UIColor.adamant.chatSenderBackground
+                    bgColor = UIColor.adamantTheme.chatSenderBackground
                 }
             } else {
-                bgColor = UIColor.adamant.chatRecipientBackground
+                bgColor = UIColor.adamantTheme.chatRecipientBackground
             }
             
             chatCell.bubbleBackgroundColor = bgColor
@@ -168,26 +168,26 @@ extension ChatViewController: MessagesDisplayDelegate {
 	func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
 		if isFromCurrentSender(message: message) {
             guard let transaction = message as? ChatTransaction else {
-                return UIColor.adamant.chatSenderBackground
+                return UIColor.adamantTheme.chatSenderBackground
             }
             
             switch transaction.statusEnum {
             case .failed:
-                return UIColor.adamant.failChatBackground
+                return UIColor.adamantTheme.failChatBackground
 				
 			case .pending:
-				return UIColor.adamant.pendingChatBackground
+				return UIColor.adamantTheme.pendingChatBackground
 				
             case .delivered:
-                return UIColor.adamant.chatSenderBackground
+                return UIColor.adamantTheme.chatSenderBackground
             }
 		} else {
-			return UIColor.adamant.chatRecipientBackground
+			return UIColor.adamantTheme.chatRecipientBackground
 		}
 	}
 	
 	func textColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
-		return UIColor.darkText
+		return UIColor.adamantTheme.primary
 	}
 	
 	func enabledDetectors(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> [DetectorType] {

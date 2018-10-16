@@ -75,6 +75,9 @@ class ChatListViewController: UIViewController {
         tableView.refreshControl = refreshControl
         
         tableView.styles = ["baseTable"]
+        navigationController?.navigationBar.style = "baseNavigationBar"
+        tabBarController?.tabBar.style = "baseTabBar"
+        view.style = "primaryBackground,primaryTint"
 		
 		if self.accountService.account != nil {
 			initFetchedRequestControllers(provider: chatsProvider)

@@ -98,6 +98,8 @@ class NewChatViewController: FormViewController {
 		tableView.keyboardDismissMode = .none
         
         tableView.styles = ["baseTable"]
+        navigationController?.navigationBar.style = "baseNavigationBar"
+        view.style = "primaryBackground,primaryTint"
 		
 		if #available(iOS 11.0, *) {
 			navigationController?.navigationBar.prefersLargeTitles = true
@@ -365,7 +367,8 @@ extension NewChatViewController {
 			picker.delegate = self
 			picker.allowsEditing = false
 			picker.sourceType = .photoLibrary
-            picker.style = "modalPicker"
+            picker.navigationBar.style = "baseNavigationBar"
+            picker.view.style = "primaryBackground,primaryTint"
 			self?.present(picker, animated: true, completion: nil)
 		}
 		

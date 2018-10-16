@@ -14,6 +14,7 @@ import CoreData
 import Stylist
 import MyLittlePinpad
 import Parchment
+import MessageInputBar
 
 // MARK: - Constants
 extension String.adamantLocalized {
@@ -149,6 +150,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         })
         
         Stylist.shared.addProperty(StyleProperty(name: "showDarkKeyboard") { (view: UITextField, value: PropertyValue<Bool>) in
+            view.keyboardAppearance = value.value ? .dark : .light
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "showDarkKeyboard") { (view: InputTextView, value: PropertyValue<Bool>) in
             view.keyboardAppearance = value.value ? .dark : .light
         })
         

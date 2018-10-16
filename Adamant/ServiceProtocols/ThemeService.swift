@@ -42,6 +42,9 @@ public protocol BaseTheme {
 
     /// Secondary color
     var secondary: UIColor { get }
+    
+    /// Alert Color
+    var alertColor: UIColor { get }
 
     /// Chat icons color
     var chatIcons: UIColor { get }
@@ -85,10 +88,12 @@ struct LightTheme: BaseTheme {
     // MARK: Global colors
 
     /// Main dark gray, ~70% gray
-    let primary = UIColor(red: 0.29, green: 0.29, blue: 0.29, alpha: 1)
+    let primary = UIColor(hex: "#474a5f")
 
     /// Secondary color, ~50% gray
-    let secondary = UIColor(red: 0.478, green: 0.478, blue: 0.478, alpha: 1)
+    let secondary = UIColor(hex: "#9497a3")
+    
+    let alertColor = UIColor(hex: "#faa05a")
 
     /// Chat icons color, ~40% gray
     let chatIcons = UIColor(red: 0.62, green: 0.62, blue: 0.62, alpha: 1)
@@ -102,12 +107,12 @@ struct LightTheme: BaseTheme {
     // MARK: Chat colors
 
     /// User chat bubble background, ~4% gray
-    let chatRecipientBackground = UIColor(red: 0.965, green: 0.973, blue: 0.981, alpha: 1)
-    let pendingChatBackground = UIColor(white: 0.98, alpha: 1.0)
-    let failChatBackground = UIColor(white: 0.8, alpha: 1.0)
+    let chatRecipientBackground = UIColor(hex: "#D5DDE5")
+    let pendingChatBackground = UIColor(hex: "#D5DDE5")
+    let failChatBackground = UIColor(hex: "#D5DDE5")
 
     /// Partner chat bubble background, ~8% gray
-    let chatSenderBackground = UIColor(red: 0.925, green: 0.925, blue: 0.925, alpha: 1)
+    let chatSenderBackground = UIColor(hex: "#D5DDE5")
 
 
     // MARK: Pinpad
@@ -128,24 +133,26 @@ struct LightTheme: BaseTheme {
 struct DarkTheme: BaseTheme {
     let name = "dark"
     
-    let primary = UIColor.white
+    let primary = UIColor(hex: "#D5DDE5")
 
-    let secondary = UIColor(hex: "#297BED")
+    let secondary = UIColor(hex: "#9497a3")
+    
+    let alertColor = UIColor(hex: "#faa05a")
 
     let chatIcons = UIColor(hex: "")
 
     let tableRowIcons = UIColor(hex: "")
 
-    let background = UIColor.black
-    var secondaryBackground = UIColor.black
+    let background = UIColor(hex: "#0D0905")
+    var secondaryBackground = UIColor(hex: "#474a5f")
 
-    let chatRecipientBackground = UIColor(hex: "")
+    let chatRecipientBackground = UIColor(hex: "#53566E")
 
-    let pendingChatBackground = UIColor(hex: "")
+    let pendingChatBackground = UIColor(hex: "#474a5f")
 
-    let failChatBackground = UIColor(hex: "")
+    let failChatBackground = UIColor(hex: "#474a5f")
 
-    let chatSenderBackground = UIColor(hex: "")
+    let chatSenderBackground = UIColor(hex: "#474a5f")
 
     let pinpadHighlightButton = UIColor(hex: "")
 

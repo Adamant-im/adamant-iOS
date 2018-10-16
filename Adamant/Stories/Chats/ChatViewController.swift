@@ -208,9 +208,13 @@ class ChatViewController: MessagesViewController {
 		}
 		
 		// MARK: 3. Readonly chat
+        messageInputBar.backgroundView.style = "secondaryBackground,secondaryBorder"
+        messageInputBar.inputTextView.style = "secondaryBorder,input"
+        messageInputBar.sendButton.style = "secondaryBackground,primaryTint,secondaryBorder"
+        attachmentButton.style = "primaryTint"
 		
 		if chatroom.isReadonly {
-			messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
+			messageInputBar.inputTextView.backgroundColor = UIColor.adamantTheme.chatSenderBackground
 			messageInputBar.inputTextView.isEditable = false
 			messageInputBar.sendButton.isEnabled = false
             attachmentButton.isEnabled = false
@@ -273,6 +277,9 @@ class ChatViewController: MessagesViewController {
                 }
             }
         }
+        
+        self.view.style = "primaryBackground"
+        self.messagesCollectionView.style = "primaryBackground"
 	}
 	
 	override func viewDidAppear(_ animated: Bool) {

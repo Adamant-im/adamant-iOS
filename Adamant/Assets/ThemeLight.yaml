@@ -14,18 +14,6 @@ styles:
     buttonsHighlightedColor: $thirdColor
     placeholderActiveColor: $firstColor
     placeholderNormalColor: $backgroundColor
-  modalPicker:
-    view:
-      tintColor: "#474a5f"
-      backgroundColor: "#f2f6fa"
-    navigationBar:
-      tintColor: "#474a5f"
-      barTintColor: "#D5DDE5"
-      titleColor: "#474a5f"
-  Adamant.AccountViewController:
-    view:
-      tintColor: "#474a5f"
-      backgroundColor: "#f2f6fa"
   paging:
     indicatorColor: $activeColor
     textColor: $firstColor
@@ -33,29 +21,6 @@ styles:
     backgroundColor: $thirdColor
     selectedBackgroundColor: $thirdColor
     menuBackgroundColor: $thirdColor
-  # Adamant.WalletCollectionViewCell:
-  #   tintColor: $firstColor
-  #   backgroundColor: $thirdColor
-  Adamant.ChatListViewController:
-    view:
-      tintColor: "#474a5f"
-      backgroundColor: "#f2f6fa"
-    navigationBar:
-      tintColor: "#474a5f"
-      barTintColor: "#D5DDE5"
-      titleColor: "#474a5f"
-    tabBar:
-      tintColor: "#474a5f"
-      barTintColor: "#D5DDE5"
-  Adamant.NewChatViewController:
-    view:
-      tintColor: "#474a5f"
-      backgroundColor: "#f2f6fa"
-    navigationBar:
-      tintColor: "#474a5f"
-      barTintColor: "#D5DDE5"
-      titleColor: "#474a5f"
-      largeTextColor: "#474a5f"
   chatsList:
     backgroundColor: $backgroundColor
     separatorColor: $secondaryColor
@@ -96,6 +61,13 @@ styles:
     textColor: $secondaryColor
   thirdText:
     textColor: $thirdColor
+  ## Border color##
+  primaryBorder:
+    borderColor: $firstColor
+  secondaryBorder:
+    borderColor: $secondaryColor
+  thirdBorder:
+    borderColor: $thirdColor
   ## Background Colors ##
   primaryBackground:
     backgroundColor: $backgroundColor
@@ -105,3 +77,12 @@ styles:
   baseTable:
     backgroundColor: $backgroundColor
     separatorColor: $secondaryColor
+  ## Bar tint ##
+  baseNavigationBar:
+    tintColor: $firstColor
+    barTintColor: $thirdColor
+    titleColor: $firstColor
+    largeTextColor: $firstColor
+  baseTabBar:
+    tintColor: $firstColor
+    barTintColor: $thirdColor

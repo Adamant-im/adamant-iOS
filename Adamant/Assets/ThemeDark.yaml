@@ -14,18 +14,6 @@ styles:
     buttonsHighlightedColor: $thirdColor
     placeholderActiveColor: $firstColor
     placeholderNormalColor: $backgroundColor
-  modalPicker:
-    view:
-      tintColor: "#D5DDE5"
-      backgroundColor: "#0D0905"
-    navigationBar:
-      tintColor: "#D5DDE5"
-      barTintColor: "#474a5f"
-      titleColor: "#D5DDE5"
-  Adamant.AccountViewController:
-    view:
-      tintColor: "#D5DDE5"
-      backgroundColor: "#0D0905"
   paging:
     indicatorColor: $activeColor
     textColor: $firstColor
@@ -33,26 +21,6 @@ styles:
     backgroundColor: $thirdColor
     selectedBackgroundColor: $thirdColor
     menuBackgroundColor: $thirdColor
-  Adamant.ChatListViewController:
-    view:
-      tintColor: "#D5DDE5"
-      backgroundColor: "#0D0905"
-    navigationBar:
-      tintColor: "#D5DDE5"
-      barTintColor: "#474a5f"
-      titleColor: "#D5DDE5"
-    tabBar:
-      tintColor: "#D5DDE5"
-      barTintColor: "#474a5f"
-  Adamant.NewChatViewController:
-    view:
-      tintColor: "#D5DDE5"
-      backgroundColor: "#0D0905"
-    navigationBar:
-      tintColor: "#D5DDE5"
-      barTintColor: "#474a5f"
-      titleColor: "#D5DDE5"
-      largeTextColor: "#D5DDE5"
   chatsList:
     backgroundColor: $backgroundColor
     separatorColor: $secondaryColor
@@ -93,19 +61,28 @@ styles:
     textColor: $secondaryColor
   thirdText:
     textColor: $thirdColor
+  ## Border color##
+  primaryBorder:
+    borderColor: $firstColor
+  secondaryBorder:
+    borderColor: $secondaryColor
+  thirdBorder:
+    borderColor: $thirdColor
   ## Background Colors ##
   primaryBackground:
     backgroundColor: $backgroundColor
   secondaryBackground:
     backgroundColor: $thirdColor
-  ## Bar tint ##
-  primaryBarTint:
-    titleColor: $firstColor
-    largeTextColor: $firstColor
-    barTintColor: $backgroundColor
-  primaryTabBarTint:
-    barTintColor: $backgroundColor
   ## Base Table ##
   baseTable:
     backgroundColor: $backgroundColor
     separatorColor: $secondaryColor
+  ## Bar tint ##
+  baseNavigationBar:
+    tintColor: $firstColor
+    barTintColor: $thirdColor
+    titleColor: $firstColor
+    largeTextColor: $firstColor
+  baseTabBar:
+    tintColor: $firstColor
+    barTintColor: $thirdColor

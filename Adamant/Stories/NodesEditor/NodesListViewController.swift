@@ -83,6 +83,9 @@ class NodesListViewController: FormViewController {
         super.viewDidLoad()
         navigationItem.title = String.adamantLocalized.nodesList.title
         navigationOptions = .Disabled
+        
+        navigationController?.navigationBar.style = "baseNavigationBar"
+        view.style = "primaryBackground,primaryTint"
 		
 		if #available(iOS 11.0, *) {
 			navigationController?.navigationBar.prefersLargeTitles = true

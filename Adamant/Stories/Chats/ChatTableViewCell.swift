@@ -26,9 +26,9 @@ class ChatTableViewCell: UITableViewCell {
     
     func setupStyles() {
         style = "chatCell"
-        accountLabel.style = "secondaryText"
-        lastMessageLabel.style = "primaryText"
-        dateLabel.style = "thirdText"
+        accountLabel.style = "primaryText"
+        lastMessageLabel.style = "secondaryText"
+        dateLabel.style = "secondaryText"
         badgeView.style = "activeBg"
     }
 	
