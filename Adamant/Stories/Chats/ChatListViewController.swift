@@ -76,7 +76,7 @@ class ChatListViewController: UIViewController {
         
         tableView.styles = ["baseTable"]
         navigationController?.navigationBar.style = "baseNavigationBar"
-        tabBarController?.tabBar.style = "baseTabBar"
+        tabBarController?.tabBar.style = "baseBarTint"
         view.style = "primaryBackground,primaryTint"
 		
 		if self.accountService.account != nil {

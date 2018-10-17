@@ -97,6 +97,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.styles = ["baseTable"]
+        navigationController?.navigationBar.style = "baseNavigationBar"
+        tabBarController?.tabBar.style = "baseBarTint"
+        view.style = "primaryBackground,primaryTint"
+        
         if #available(iOS 11.0, *) {
             navigationController?.navigationBar.prefersLargeTitles = true
         }
@@ -122,6 +127,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
+            cell.textLabel?.style = "primaryText"
+            cell.detailTextLabel?.style = "primaryText"
+            cell.style = "secondaryBackground"
         }
         
         section.append(idRow)
@@ -165,6 +173,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
             self.shareValue(text)
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
+            cell.titleLabel?.style = "primaryText"
+            cell.detailsLabel?.style = "primaryText"
+            cell.secondDetailsLabel?.style = "secondaryText"
+            cell.style = "secondaryBackground"
         }
             
         section.append(senderRow)
@@ -208,6 +220,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
             self.shareValue(text)
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
+            cell.titleLabel?.style = "primaryText"
+            cell.detailsLabel?.style = "primaryText"
+            cell.secondDetailsLabel?.style = "secondaryText"
+            cell.style = "secondaryBackground"
         }
         
         section.append(recipientRow)
@@ -227,6 +243,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
+            cell.textLabel?.style = "primaryText"
+            cell.detailTextLabel?.style = "primaryText"
+            cell.style = "secondaryBackground"
         }
             
         section.append(dateRow)
@@ -247,6 +266,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
+            cell.textLabel?.style = "primaryText"
+            cell.textField?.style = "primaryText"
+            cell.style = "secondaryBackground"
         }
             
         section.append(amountRow)
@@ -267,6 +289,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
+            cell.textLabel?.style = "primaryText"
+            cell.textField?.style = "primaryText"
+            cell.style = "secondaryBackground"
         }
             
         section.append(feeRow)
@@ -285,6 +310,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
+            cell.textLabel?.style = "primaryText"
+            cell.detailTextLabel?.style = "primaryText"
+            cell.style = "secondaryBackground"
         }
             
         section.append(confirmationsRow)
@@ -303,6 +331,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
+            cell.textLabel?.style = "primaryText"
+            cell.detailTextLabel?.style = "primaryText"
+            cell.style = "secondaryBackground"
         }
             
         section.append(blockRow)
@@ -321,6 +352,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 }
             }.cellUpdate { (cell, _) in
                 cell.textLabel?.textColor = .black
+                cell.textLabel?.style = "primaryText"
+                cell.detailTextLabel?.style = "primaryText"
+                cell.style = "secondaryBackground"
             }
             
             section.append(statusRow)
@@ -343,6 +377,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
+            cell.textLabel?.style = "primaryText"
+            cell.detailTextLabel?.style = "primaryText"
+            cell.style = "secondaryBackground"
         }.onCellSelection { [weak self] (_, _) in
             guard let transaction = self?.transaction, let url = self?.explorerUrl(for: transaction) else {
                 return

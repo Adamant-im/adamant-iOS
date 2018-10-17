@@ -28,8 +28,7 @@ class TransactionsListViewControllerBase: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
-        refreshControl.tintColor = UIColor.adamant.primary
-        
+        refreshControl.style = "primaryTint"
         return refreshControl
     }()
     
@@ -42,6 +41,11 @@ class TransactionsListViewControllerBase: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        tableView.styles = ["baseTable"]
+        navigationController?.navigationBar.style = "baseNavigationBar"
+        tabBarController?.tabBar.style = "baseBarTint"
+        view.style = "primaryBackground,primaryTint"
         
         if #available(iOS 11.0, *) {
             navigationController?.navigationBar.prefersLargeTitles = false

@@ -31,6 +31,10 @@ class ComplexTransferViewController: UIViewController {
 		view.backgroundColor = UIColor.white
 		navigationItem.title = partner?.address
 		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+        
+        navigationController?.navigationBar.style = "baseNavigationBar"
+        tabBarController?.tabBar.style = "baseBarTint"
+        view.style = "primaryBackground,primaryTint"
 		
 		// MARK: Services
 		services = accountService.wallets.compactMap { $0 as? WalletServiceWithSend }
@@ -50,6 +54,11 @@ class ComplexTransferViewController: UIViewController {
 		
 		pagingViewController.dataSource = self
 		pagingViewController.select(index: 0)
+        
+        pagingViewController.style = "paging"
+        pagingViewController.view.style = "secondaryBackground"
+        pagingViewController.collectionView.style = "secondaryBackground"
+        pagingViewController.borderColor = UIColor.clear
 		
 		view.addSubview(pagingViewController.view)
 		view.constrainToEdges(pagingViewController.view, relativeToSafeArea: true)

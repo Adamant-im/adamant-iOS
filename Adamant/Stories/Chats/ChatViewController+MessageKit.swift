@@ -494,6 +494,8 @@ extension MessageTransaction: MessageType {
 		
         if isMarkdown {
             let parser = MarkdownParser(font: UIFont.adamantChatDefault)
+            parser.color = UIColor.adamantTheme.primary
+            parser.link.color = UIColor.adamantTheme.secondary
             return MessageKind.attributedText(parser.parse(message))
         } else {
             return MessageKind.text(message)

@@ -22,6 +22,7 @@ class ChatTableViewCell: UITableViewCell {
 	
 	override func awakeFromNib() {
 		badgeView.layer.cornerRadius = badgeView.bounds.height / 2
+        self.selectedBackgroundView = UIView()
 	}
     
     func setupStyles() {
@@ -30,6 +31,8 @@ class ChatTableViewCell: UITableViewCell {
         lastMessageLabel.style = "secondaryText"
         dateLabel.style = "secondaryText"
         badgeView.style = "activeBg"
+        
+        self.selectedBackgroundView?.style = "secondaryBackground"
     }
 	
 	var avatarImage: UIImage? {

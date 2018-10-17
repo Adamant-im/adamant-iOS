@@ -66,5 +66,12 @@ class TransactionTableViewCell: UITableViewCell {
 	
 	override func awakeFromNib() {
 		transactionType = .income
+        self.style = "primaryBackground,universalTint"
+        self.selectedBackgroundView = UIView()
+        self.selectedBackgroundView?.style = "secondaryBackground"
+        accountLabel.style = "primaryText"
+        addressLabel.style = "secondaryText"
+        ammountLabel.style = "primaryText"
+        dateLabel.style = "secondaryText"
 	}
 }

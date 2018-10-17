@@ -54,6 +54,8 @@ styles:
     tintColor: $secondaryColor
   thirdTint:
     tintColor: $thirdColor
+  universalTint:
+    tintColor: "#787A83"
   ## Text color ##
   primaryText:
     textColor: $firstColor
@@ -79,10 +81,9 @@ styles:
     separatorColor: $secondaryColor
   ## Bar tint ##
   baseNavigationBar:
-    tintColor: $firstColor
-    barTintColor: $thirdColor
+    styles: [baseBarTint]
     titleColor: $firstColor
     largeTextColor: $firstColor
-  baseTabBar:
+  baseBarTint:
     tintColor: $firstColor
     barTintColor: $thirdColor

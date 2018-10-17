@@ -89,6 +89,7 @@ class AdmTransferViewController: TransferViewControllerBase {
 			let prefix = UILabel()
 			prefix.text = "U"
 			prefix.sizeToFit()
+            prefix.style = "primaryText"
 			let view = UIView()
 			view.addSubview(prefix)
 			view.frame = prefix.frame
@@ -97,12 +98,14 @@ class AdmTransferViewController: TransferViewControllerBase {
 			
 			if recipientIsReadonly {
 				$0.disabled = true
-				prefix.isEnabled = false
+//                prefix.isEnabled = false
 			}
 		}.cellUpdate { (cell, row) in
 			if let text = cell.textField.text {
-				cell.textField.text = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
+                cell.textField.text = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
 			}
+            cell.textField?.style = "input"
+            cell.style = "secondaryBackground"
 		}.onChange { [weak self] row in
 			if let skip = self?.skipValueChange, skip {
 				self?.skipValueChange = false

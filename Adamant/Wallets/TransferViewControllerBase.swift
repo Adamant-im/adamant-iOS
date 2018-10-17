@@ -213,6 +213,12 @@ class TransferViewControllerBase: FormViewController {
 		
 		// MARK: UI
 		navigationAccessoryView.tintColor = UIColor.adamant.primary
+        
+        tableView.styles = ["baseTable"]
+        navigationController?.navigationBar.style = "baseNavigationBar"
+        tabBarController?.tabBar.style = "baseBarTint"
+        view.style = "primaryBackground,primaryTint"
+        navigationAccessoryView.style = "baseBarTint"
 		
 		// MARK: Sections
 		form.append(walletSection())
@@ -238,14 +244,25 @@ class TransferViewControllerBase: FormViewController {
 			}
 		}.onCellSelection { [weak self] (cell, row) in
 			self?.confirmSendFunds()
-		}
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.style = "primaryText"
+            cell.style = "secondaryBackground"
+        }
     }
 	
 	// MARK: - Form constructors
 	
 	func walletSection() -> Section {
-		let section = Section(Sections.wallet.localized) {
+		let section = Section() {
 			$0.tag = Sections.wallet.tag
+            
+            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
+            header.title = Sections.wallet.localized
+            header.onSetupView = {view, _ in
+                view.textLabel?.style = "secondaryText"
+            }
+            header.height = { 50 }
+            $0.header = header
 		}
 		
 		section.append(defaultRowFor(baseRow: BaseRows.balance))
@@ -255,8 +272,16 @@ class TransferViewControllerBase: FormViewController {
 	}
 	
 	func recipientSection() -> Section {
-		let section = Section(Sections.recipient.localized) {
+		let section = Section() {
 			$0.tag = Sections.recipient.tag
+            
+            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
+            header.title = Sections.recipient.localized
+            header.onSetupView = {view, _ in
+                view.textLabel?.style = "secondaryText"
+            }
+            header.height = { 50 }
+            $0.header = header
 		}
 		
 		section.append(defaultRowFor(baseRow: BaseRows.address))
@@ -278,8 +303,16 @@ class TransferViewControllerBase: FormViewController {
 	}
 	
 	func transactionInfoSection() -> Section {
-		let section = Section(Sections.transferInfo.localized) {
+		let section = Section() {
 			$0.tag = Sections.transferInfo.tag
+            
+            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
+            header.title = Sections.transferInfo.localized
+            header.onSetupView = {view, _ in
+                view.textLabel?.style = "secondaryText"
+            }
+            header.height = { 50 }
+            $0.header = header
 		}
 		
 		section.append(defaultRowFor(baseRow: .amount))
@@ -416,7 +449,7 @@ class TransferViewControllerBase: FormViewController {
 	}
 	
 	func markRow(_ row: BaseRowType, valid: Bool) {
-		row.baseCell.textLabel?.textColor = valid ? UIColor.black : UIColor.red
+		row.baseCell.textLabel?.textColor = valid ? UIColor.adamantTheme.primary : UIColor.adamantTheme.alertColor
 	}
 	
 	
@@ -636,7 +669,11 @@ extension TransferViewControllerBase {
 				} else {
 					$0.value = 0
 				}
-			}
+            }.cellUpdate({ (cell, _) in
+                cell.textLabel?.style = "primaryText"
+                cell.textField?.style = "primaryText"
+                cell.style = "secondaryBackground"
+            })
 			
 		case .address:
 			return recipientRow()
@@ -651,7 +688,11 @@ extension TransferViewControllerBase {
 				if let maxToTransfer = self?.maxToTransfer {
 					$0.value = maxToTransfer.doubleValue
 				}
-			}
+            }.cellUpdate({ (cell, _) in
+                cell.textLabel?.style = "primaryText"
+                cell.textField?.style = "primaryText"
+                cell.style = "secondaryBackground"
+            })
 			
 		case .amount:
 			return DecimalRow { [weak self] in
@@ -665,7 +706,11 @@ extension TransferViewControllerBase {
 				}
 			}.onChange { [weak self] (row) in
 				self?.validateForm()
-			}
+            }.cellUpdate({ (cell, _) in
+                cell.textLabel?.style = "primaryText"
+                cell.textField?.style = "input"
+                cell.style = "secondaryBackground"
+            })
 		
 		case .fee:
 			return DecimalRow() { [weak self] in
@@ -679,7 +724,11 @@ extension TransferViewControllerBase {
 				} else {
 					$0.value = 0
 				}
-			}
+            }.cellUpdate({ (cell, _) in
+                cell.textLabel?.style = "primaryText"
+                cell.textField?.style = "primaryText"
+                cell.style = "secondaryBackground"
+            })
 			
 		case .total:
 			return DecimalRow() { [weak self] in
@@ -692,7 +741,11 @@ extension TransferViewControllerBase {
 				if let balance = self?.service?.wallet?.balance {
 					$0.add(rule: RuleSmallerOrEqualThan<Double>(max: balance.doubleValue))
 				}
-			}
+            }.cellUpdate({ (cell, _) in
+                cell.textLabel?.style = "primaryText"
+                cell.textField?.style = "primaryText"
+                cell.style = "secondaryBackground"
+            })
 		
 		case .comments:
 			fatalError()
@@ -715,7 +768,10 @@ extension TransferViewControllerBase {
 				}
 			}.onCellSelection { [weak self] (cell, row) in
 				self?.confirmSendFunds()
-			}
+            }.cellUpdate({ (cell, _) in
+                cell.textLabel?.style = "primaryText"
+                cell.style = "secondaryBackground"
+            })
 		}
 	}
 }

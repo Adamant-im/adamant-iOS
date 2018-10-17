@@ -238,6 +238,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             view.menuBackgroundColor = value.value
         })
         
+        Stylist.shared.addProperty(StyleProperty(name: "barTintColor") { (view: UIToolbar, value: PropertyValue<UIColor>) in
+            view.barTintColor = value.value
+        })
+        
         self.observeThemeChange()
 		
 		// MARK: 3. Show login
