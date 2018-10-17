@@ -66,6 +66,10 @@ class QRGeneratorViewController: FormViewController {
 		navigationItem.title = String.adamantLocalized.qrGenerator.title
 		navigationOptions = .Disabled
 		
+        self.tableView.styles = ["baseTable"]
+        navigationController?.navigationBar.style = "baseNavigationBar"
+        view.style = "primaryBackground,primaryTint"
+        
 		tableView.showsVerticalScrollIndicator = false
 		tableView.showsHorizontalScrollIndicator = false
 		
@@ -135,7 +139,8 @@ class QRGeneratorViewController: FormViewController {
 			$0.tag = Rows.passphrase.tag
 			$0.textAreaHeight = .dynamic(initialTextViewHeight: 28.0) // 28 for textView and 8+8 for insets
 		}.cellUpdate { (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
+            cell.textView?.style = "secondaryBackground,input"
+            cell.style = "secondaryBackground"
 		}
 		
 		<<< ButtonRow() {
@@ -144,7 +149,8 @@ class QRGeneratorViewController: FormViewController {
 		}.onCellSelection { [weak self] (cell, row) in
 			self?.generateQr()
 		}.cellUpdate { (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
+            cell.style = "secondaryBackground"
+            cell.textLabel?.style = "primaryText"
 		}
     }
 	

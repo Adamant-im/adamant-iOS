@@ -386,7 +386,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
             
             let safari = SFSafariViewController(url: url)
-            safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.preferredControlTintColor = UIColor.adamantTheme.primary
+            safari.preferredBarTintColor = UIColor.adamantTheme.secondaryBackground
             self?.present(safari, animated: true, completion: nil)
         }
         

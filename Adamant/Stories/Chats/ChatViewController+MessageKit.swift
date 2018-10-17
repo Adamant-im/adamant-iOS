@@ -309,7 +309,8 @@ extension ChatViewController: MessageCellDelegate {
 	
 	func didSelectURL(_ url: URL) {
 		let safari = SFSafariViewController(url: url)
-		safari.preferredControlTintColor = UIColor.adamant.primary
+        safari.preferredControlTintColor = UIColor.adamantTheme.primary
+        safari.preferredBarTintColor = UIColor.adamantTheme.secondaryBackground
 		present(safari, animated: true, completion: nil)
 	}
 }
