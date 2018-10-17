@@ -109,9 +109,7 @@ class TransferViewControllerBase: FormViewController {
 			switch self {
 			case .wallet: return NSLocalizedString("TransferScene.Section.YourWallet", comment: "Transfer: 'Your wallet' section")
 				
-			case .recipient: return "Получатель"
-//				NSLocalizedString("TransferScene.Section.Recipient", comment: "Transfer: 'Recipient info' section")
-				
+			case .recipient: return NSLocalizedString("TransferScene.Section.Recipient", comment: "Transfer: 'Recipient info' section")
 				
 			case .transferInfo: return NSLocalizedString("TransferScene.Section.TransferInfo", comment: "Transfer: 'Transfer info' section")
 			}

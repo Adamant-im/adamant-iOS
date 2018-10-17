@@ -115,6 +115,12 @@
 /* Account tab: 'Send tokens' button */
 "AccountTab.Row.SendTokens" = "Отправить токены";
 
+/* Account tab: 'Send ADM tokens' button */
+"AccountTab.Row.SendAdm" = "Отправить ADM";
+
+/* Account tab: 'Send ETH tokens' button */
+"AccountTab.Row.SendEth" = "Отправить ETH";
+
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Адрес";
 
@@ -134,7 +140,7 @@
 "AccountTab.Section.Application" = "Приложение";
 
 /* Account tab: Adamant wallet */
-"AccountTab.Wallets.adamant_wallet" = "Adamant кошелёк";
+"AccountTab.Wallets.adamant_wallet" = "ADAMANT кошелёк";
 
 /* Account tab: Ethereum wallet */
 "AccountTab.Wallets.ethereum_wallet" = "Ethereum кошелёк";
@@ -720,6 +726,9 @@
 
 /* Transfer: 'Your wallet' section */
 "TransferScene.Section.YourWallet" = "Ваш кошелёк";
+
+/* Transfer: 'Recipient info' section */
+"TransferScene.Section.Recipient" = "Получатель";
 
 /* Transfer: Confirm transfer alert: Send tokens button */
 "TransferScene.Send" = "Отправить";

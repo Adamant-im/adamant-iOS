@@ -141,9 +141,11 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 		
 		// MARK: Send
 		if service is WalletServiceWithSend {
+            let label = sendRowLocalizedLabel()
+            
 			let sendRow = LabelRow() {
 				$0.tag = BaseRows.send.tag
-				$0.title = BaseRows.send.localized
+				$0.title = label
 				$0.cell.selectionStyle = .gray
 			}.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
@@ -216,6 +218,13 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 	override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
 		return UIView()
 	}
+    
+    
+    // MARK: - To override
+    
+    func sendRowLocalizedLabel() -> String {
+        return BaseRows.send.localized
+    }
 }
 
 
