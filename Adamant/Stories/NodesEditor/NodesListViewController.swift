@@ -84,6 +84,7 @@ class NodesListViewController: FormViewController {
         navigationItem.title = String.adamantLocalized.nodesList.title
         navigationOptions = .Disabled
         
+        self.tableView.styles = ["baseTable"]
         navigationController?.navigationBar.style = "baseNavigationBar"
         view.style = "primaryBackground,primaryTint"
 		
@@ -123,7 +124,8 @@ class NodesListViewController: FormViewController {
 		}.onCellSelection { [weak self] (_, _) in
 			self?.createNewNode()
 		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
+            cell.style = "secondaryBackground"
+            cell.textLabel?.style = "primaryText"
 		}
 			
 			
@@ -138,7 +140,8 @@ class NodesListViewController: FormViewController {
 		}.onCellSelection { [weak self] (_, _) in
 			self?.resetToDefault()
 		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
+            cell.style = "secondaryBackground"
+            cell.textLabel?.style = "primaryText"
 		}
     }
 	
@@ -344,6 +347,8 @@ extension NodesListViewController {
 			}
 			
 			cell.accessoryType = .disclosureIndicator
+            cell.style = "secondaryBackground"
+            cell.textLabel?.style = "primaryText"
 		}).onCellSelection { [weak self] (_, row) in
 			guard let node = row.value, let tag = row.tag else {
 				return

@@ -15,6 +15,7 @@ import Stylist
 import MyLittlePinpad
 import Parchment
 import MessageInputBar
+import Eureka
 
 // MARK: - Constants
 extension String.adamantLocalized {
@@ -244,6 +245,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         Stylist.shared.addProperty(StyleProperty(name: "isDarkMode") { (view: UISearchBar, value: PropertyValue<Bool>) in
             view.barStyle = value.value ? .black : .default
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "textColor") { (view: PickerCell<URLScheme>, value: PropertyValue<UIColor>) in
+            view.pickerTextAttributes = [NSAttributedString.Key.foregroundColor: value.value]
         })
         
         self.observeThemeChange()
