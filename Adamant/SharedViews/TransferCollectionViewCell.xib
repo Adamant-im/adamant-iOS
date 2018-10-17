@@ -82,11 +82,13 @@
                             <constraint firstItem="1fX-7h-3ZM" firstAttribute="top" secondItem="o85-0D-Zxx" secondAttribute="top" id="Rqa-n6-S9m"/>
                             <constraint firstItem="Kjn-Hz-4TH" firstAttribute="leading" secondItem="o85-0D-Zxx" secondAttribute="leading" id="Uth-R4-IUn"/>
                             <constraint firstItem="Mru-Jw-5Sl" firstAttribute="leading" secondItem="o85-0D-Zxx" secondAttribute="leading" id="XpC-8j-1Jj"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Mru-Jw-5Sl" secondAttribute="trailing" constant="12" id="ZsV-fJ-Zob"/>
                             <constraint firstItem="BMK-A4-pVp" firstAttribute="top" secondItem="1fX-7h-3ZM" secondAttribute="bottom" id="bbH-rb-4I2"/>
                             <constraint firstItem="o85-0D-Zxx" firstAttribute="leading" secondItem="AZm-82-9YR" secondAttribute="leading" id="cXd-7H-ZTX"/>
                             <constraint firstItem="1fX-7h-3ZM" firstAttribute="leading" secondItem="o85-0D-Zxx" secondAttribute="trailing" constant="8" id="fLv-Hg-vmF"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Kjn-Hz-4TH" secondAttribute="trailing" constant="12" id="hY4-aH-PvT"/>
                             <constraint firstItem="AZm-82-9YR" firstAttribute="top" secondItem="Q4K-uf-ULJ" secondAttribute="top" constant="8" id="hje-1e-SbH"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="BMK-A4-pVp" secondAttribute="trailing" constant="12" id="jhf-nF-1QC"/>
                             <constraint firstItem="NrO-10-gNu" firstAttribute="centerX" secondItem="Q4K-uf-ULJ" secondAttribute="centerX" id="jvn-Ha-9KO"/>
                             <constraint firstItem="Kjn-Hz-4TH" firstAttribute="top" secondItem="o85-0D-Zxx" secondAttribute="bottom" constant="6" id="qMh-4q-LLD"/>
                             <constraint firstItem="AZm-82-9YR" firstAttribute="leading" secondItem="Q4K-uf-ULJ" secondAttribute="leading" constant="12" id="r7s-32-6N9"/>
