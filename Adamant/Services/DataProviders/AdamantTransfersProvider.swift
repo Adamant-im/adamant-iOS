@@ -340,6 +340,7 @@ extension AdamantTransfersProvider {
         transaction.senderId = senderId
         transaction.type = Int16(TransactionType.send.rawValue)
         transaction.isOutgoing = true
+        transaction.showsChatroom = false
         
         transaction.transactionId = UUID().uuidString
         transaction.blockId = UUID().uuidString
@@ -636,6 +637,7 @@ extension AdamantTransfersProvider {
             transfer.blockId = t.blockId
             transfer.confirmations = t.confirmations
             transfer.statusEnum = .delivered
+            transfer.showsChatroom = false
             
             transfer.isOutgoing = t.senderId == address
             let partnerId = transfer.isOutgoing ? t.recipientId : t.senderId

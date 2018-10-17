@@ -586,7 +586,10 @@ extension AdamantChatsProvider {
 								   NSSortDescriptor(key: "title", ascending: true)]
 		request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
 			NSPredicate(format: "partner!=nil"),
-			NSPredicate(format: "isHidden = false")])
+            NSPredicate(format: "isForcedVisible = true OR isHidden = false"),
+            NSPredicate(format: "isForcedVisible = true OR ANY transactions.showsChatroom = true")
+        ])
+        
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 		
 		return controller
