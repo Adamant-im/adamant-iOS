@@ -169,6 +169,8 @@ class TransferViewControllerBase: FormViewController {
 		}
 	}
     
+    private var recipientAddressIsValid = false
+    
     var recipientName: String? = nil {
         didSet {
             guard let row: RowOf<String> = form.rowBy(tag: BaseRows.name.tag) else {
@@ -394,15 +396,17 @@ class TransferViewControllerBase: FormViewController {
 		}
 		
 		if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
-			if let address = row.value, validateRecipient(address) {
-				recipientAddress = address
-				markRow(row, valid: true)
-			} else {
-				recipientAddress = nil
-				markRow(row, valid: false)
-			}
+            if let address = row.value, validateRecipient(address) {
+                recipientAddress = address
+                markRow(row, valid: true)
+                recipientAddressIsValid = true
+            } else {
+                markRow(row, valid: false)
+                recipientAddressIsValid = false
+            }
 		} else {
 			recipientAddress = nil
+            recipientAddressIsValid = false
 		}
 		
 		if let row: DecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
@@ -504,7 +508,7 @@ class TransferViewControllerBase: FormViewController {
 	}
 	
 	func formIsValid() -> Bool {
-		if let recipient = recipientAddress, validateRecipient(recipient), let amount = amount, validateAmount(amount) {
+		if let recipient = recipientAddress, validateRecipient(recipient), let amount = amount, validateAmount(amount), recipientAddressIsValid {
 			return true
 		} else {
 			return false

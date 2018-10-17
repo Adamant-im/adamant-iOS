@@ -132,7 +132,7 @@ class EthTransferViewController: TransferViewControllerBase {
 			return true
 			
 		case .invalid, .system:
-			return true
+			return false
 		}
 	}
 	
