@@ -60,8 +60,7 @@ class DelegatesListViewController: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
-        refreshControl.tintColor = UIColor.adamant.primary
-        
+        refreshControl.style = "primaryTint"
         return refreshControl
     }()
 	
@@ -91,6 +90,10 @@ class DelegatesListViewController: UIViewController {
         if #available(iOS 11.0, *) {
             navigationController?.navigationBar.prefersLargeTitles = false
         }
+        
+        self.tableView.styles = ["baseTable"]
+        navigationController?.navigationBar.style = "baseNavigationBar"
+        view.style = "secondaryBackground,primaryTint"
 		
 		// MARK: Initial
         navigationItem.title = String.adamantLocalized.delegates.title
@@ -107,6 +110,8 @@ class DelegatesListViewController: UIViewController {
 			navigationItem.searchController = searchController
 			definesPresentationContext = true
 			navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
+            
+            searchController.searchBar.style = "baseBarTint"
 		}
 		
 		// MARK: Reset UI
@@ -227,8 +232,8 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
         cell.delegateIsActive = delegate.rank <= activeDelegates
 		cell.accessoryType = .disclosureIndicator
 		cell.delegate = self
-		cell.checkmarkColor = UIColor.adamant.primary
-		cell.checkmarkBorderColor = UIColor.adamant.secondary
+		cell.checkmarkColor = UIColor.adamantTheme.primary
+		cell.checkmarkBorderColor = UIColor.adamantTheme.secondary
 		
 		cell.isUpvoted = delegate.voted
 		
@@ -379,8 +384,8 @@ extension DelegatesListViewController {
 		let totalVoted = delegates.reduce(0) { $0 + ($1.delegate.voted ? 1 : 0) } + upvoted - downvoted
 		
 		let votingEnabled = changes.count > 0 && changes.count <= maxVotes && totalVoted <= maxTotalVotes
-		let newVotesColor = changes.count > maxVotes ? UIColor.red : UIColor.darkText
-		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.red : UIColor.darkText
+		let newVotesColor = changes.count > maxVotes ? UIColor.adamantTheme.alertColor : UIColor.adamantTheme.primary
+		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.adamantTheme.alertColor : UIColor.adamantTheme.primary
 		
 		
 		if Thread.isMainThread {

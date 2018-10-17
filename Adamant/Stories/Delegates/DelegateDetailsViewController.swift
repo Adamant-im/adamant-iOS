@@ -114,6 +114,10 @@ class DelegateDetailsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.tableView.styles = ["baseTable"]
+        navigationController?.navigationBar.style = "baseNavigationBar"
+        view.style = "primaryBackground,primaryTint"
+        
         if #available(iOS 11.0, *) {
             navigationController?.navigationBar.prefersLargeTitles = false
         }
@@ -214,7 +218,11 @@ extension DelegateDetailsViewController {
 		cell.textLabel?.text = row.localized
 		cell.accessoryType = .none
 		cell.imageView?.image = row.image
-		cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
+		cell.imageView?.tintColor = UIColor.adamantTheme.primary
+        cell.style = "secondaryBackground"
+        
+        cell.textLabel?.style = "primaryText"
+        cell.detailTextLabel?.style = "primaryText"
 		
 		switch row {
 		case .username:

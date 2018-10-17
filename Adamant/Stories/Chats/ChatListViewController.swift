@@ -50,7 +50,6 @@ class ChatListViewController: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
-        refreshControl.tintColor = UIColor.adamant.primary
         refreshControl.style = "primaryTint"
         return refreshControl
     }()

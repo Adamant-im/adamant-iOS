@@ -242,6 +242,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             view.barTintColor = value.value
         })
         
+        Stylist.shared.addProperty(StyleProperty(name: "isDarkMode") { (view: UISearchBar, value: PropertyValue<Bool>) in
+            view.barStyle = value.value ? .black : .default
+        })
+        
         self.observeThemeChange()
 		
 		// MARK: 3. Show login

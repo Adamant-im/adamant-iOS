@@ -87,3 +87,4 @@ styles:
   baseBarTint:
     tintColor: $firstColor
     barTintColor: $thirdColor
+    isDarkMode: false
