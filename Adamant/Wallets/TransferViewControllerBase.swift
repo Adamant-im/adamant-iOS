@@ -36,6 +36,8 @@ extension String.adamantLocalized {
         
         static let cantUndo = NSLocalizedString("TransferScene.CantUndo", comment: "Transfer: Send button")
 		
+        static let useMaxToTransfer = NSLocalizedString("TransferScene.UseMaxToTransfer", comment: "Tranfser: Confirm using maximum available for transfer tokens as amount to transfer.")
+        
 		private init() { }
 	}
 }
@@ -59,6 +61,7 @@ class TransferViewControllerBase: FormViewController {
 		case balance
 		case amount
 		case maxToTransfer
+        case name
 		case address
 		case fee
 		case total
@@ -70,6 +73,7 @@ class TransferViewControllerBase: FormViewController {
 			case .balance: return "balance"
 			case .amount: return "amount"
 			case .maxToTransfer: return "max"
+            case .name: return "name"
 			case .address: return "recipient"
 			case .fee: return "fee"
 			case .total: return "total"
@@ -82,8 +86,9 @@ class TransferViewControllerBase: FormViewController {
 			switch self {
 			case .balance: return NSLocalizedString("TransferScene.Row.Balance", comment: "Transfer: logged user balance.")
 			case .amount: return NSLocalizedString("TransferScene.Row.Amount", comment: "Transfer: amount of adamant to transfer.")
-			case .maxToTransfer: return NSLocalizedString("TransferScene.Row.MaxToTransfer", comment: "Transfer: maximum amount to transfer: available account money substracting transfer fee.")
-			case .address: return NSLocalizedString("TransferScene.Row.Recipient", comment: "Transfer: recipient address")
+			case .maxToTransfer: return NSLocalizedString("TransferScene.Row.MaxToTransfer", comment: "Transfer: maximum amount to transfer: available account money substracting transfer fee")
+            case .name: return NSLocalizedString("TransferScene.Row.RecipientName", comment: "Transfer: recipient name")
+			case .address: return NSLocalizedString("TransferScene.Row.RecipientAddress", comment: "Transfer: recipient address")
 			case .fee: return NSLocalizedString("TransferScene.Row.TransactionFee", comment: "Transfer: transfer fee")
 			case .total: return NSLocalizedString("TransferScene.Row.Total", comment: "Transfer: total amount of transaction: money to transfer adding fee")
             case .comments: return NSLocalizedString("TransferScene.Row.Comments", comment: "Transfer: transfer comment")
@@ -155,14 +160,26 @@ class TransferViewControllerBase: FormViewController {
 	
 	weak var delegate: TransferViewControllerDelegate?
 	
-	var recipient: String? = nil {
+	var recipientAddress: String? = nil {
 		didSet {
 			if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
-				row.value = recipient
+				row.value = recipientAddress
 				row.updateCell()
 			}
 		}
 	}
+    
+    var recipientName: String? = nil {
+        didSet {
+            guard let row: RowOf<String> = form.rowBy(tag: BaseRows.name.tag) else {
+                return
+            }
+            
+            row.value = recipientName
+            row.updateCell()
+            row.evaluateHidden()
+        }
+    }
 	
 	var admReportRecipient: String? = nil
 	var amount: Decimal? = nil
@@ -211,6 +228,7 @@ class TransferViewControllerBase: FormViewController {
 		
 		// MARK: UI
 		navigationAccessoryView.tintColor = UIColor.adamant.primary
+        navigationItem.title = defaultSceneTitle()
 		
 		// MARK: Sections
 		form.append(walletSection())
@@ -257,6 +275,11 @@ class TransferViewControllerBase: FormViewController {
 			$0.tag = Sections.recipient.tag
 		}
 		
+        // Name row
+        let nameRow = defaultRowFor(baseRow: BaseRows.name)
+        section.append(nameRow)
+        
+        // Address row
 		section.append(defaultRowFor(baseRow: BaseRows.address))
 		
 		if !recipientIsReadonly, let stripe = recipientStripe() {
@@ -372,14 +395,14 @@ class TransferViewControllerBase: FormViewController {
 		
 		if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
 			if let address = row.value, validateRecipient(address) {
-				recipient = address
+				recipientAddress = address
 				markRow(row, valid: true)
 			} else {
-				recipient = nil
+				recipientAddress = nil
 				markRow(row, valid: false)
 			}
 		} else {
-			recipient = nil
+			recipientAddress = nil
 		}
 		
 		if let row: DecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
@@ -416,12 +439,12 @@ class TransferViewControllerBase: FormViewController {
 	func markRow(_ row: BaseRowType, valid: Bool) {
 		row.baseCell.textLabel?.textColor = valid ? UIColor.black : UIColor.red
 	}
-	
+    
 	
 	// MARK: - Send Actions
 	
 	private func confirmSendFunds() {
-		guard let recipient = recipient, let amount = amount else {
+		guard let recipient = recipientAddress, let amount = amount else {
 			return
 		}
 		
@@ -477,11 +500,11 @@ class TransferViewControllerBase: FormViewController {
 		
 		let total = withFee ? amount + service.transactionFee : amount
 		
-		return balance > total
+		return balance >= total
 	}
 	
 	func formIsValid() -> Bool {
-		if let recipient = recipient, validateRecipient(recipient), let amount = amount, validateAmount(amount) {
+		if let recipient = recipientAddress, validateRecipient(recipient), let amount = amount, validateAmount(amount) {
 			return true
 		} else {
 			return false
@@ -498,6 +521,13 @@ class TransferViewControllerBase: FormViewController {
 	func reportTransferTo(admAddress: String, transferRecipient: String, amount: Decimal, comments: String, hash: String) {
 		
 	}
+    
+    func defaultSceneTitle() -> String? {
+        return WalletViewControllerBase.BaseRows.send.localized
+    }
+    
+    
+    /// MARK: - Abstract
 	
 	/// Send funds to recipient after validations
 	/// You must override this method
@@ -505,9 +535,6 @@ class TransferViewControllerBase: FormViewController {
 	func sendFunds() {
 		fatalError("You must implement sending logic")
 	}
-	
-	
-	/// MARK: - Abstract
 	
 	/// User loaded address from QR (camera or library)
 	/// You must override this method
@@ -636,20 +663,60 @@ extension TransferViewControllerBase {
 				}
 			}
 			
+        case .name:
+            return LabelRow() { [weak self] in
+                $0.title = BaseRows.name.localized
+                $0.tag = BaseRows.name.tag
+                $0.value = self?.recipientName
+                $0.hidden = Condition.function([], { form in
+                    if let row: RowOf<String> = form.rowBy(tag: BaseRows.name.tag), row.value != nil {
+                        return false
+                    } else {
+                        return true
+                    }
+                })
+            }
+            
 		case .address:
 			return recipientRow()
 			
 		case .maxToTransfer:
-			return DecimalRow() { [weak self] in
+            let row = DecimalRow() { [weak self] in
 				$0.title = BaseRows.maxToTransfer.localized
 				$0.tag = BaseRows.maxToTransfer.tag
 				$0.disabled = true
 				$0.formatter = self?.balanceFormatter
+                $0.cell.selectionStyle = .gray
 				
 				if let maxToTransfer = self?.maxToTransfer {
 					$0.value = maxToTransfer.doubleValue
 				}
-			}
+            }.onCellSelection { [weak self] (cell, row) in
+                guard let value = row.value, value > 0, let presenter = self else {
+                    row.deselect(animated: true)
+                    return
+                }
+                
+                let alert = UIAlertController(title: String.adamantLocalized.transfer.useMaxToTransfer, message: nil, preferredStyle: .alert)
+                let cancelAction = UIAlertAction(title: String.adamantLocalized.alert.cancel , style: .cancel, handler: nil)
+                let confirmAction = UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default) { [weak self] _ in
+                    guard let amountRow: DecimalRow = self?.form.rowBy(tag: BaseRows.amount.tag) else {
+                        return
+                    }
+                    amountRow.value = value
+                    amountRow.updateCell()
+                    self?.validateForm()
+                }
+                
+                alert.addAction(cancelAction)
+                alert.addAction(confirmAction)
+                
+                presenter.present(alert, animated: true, completion: {
+                    row.deselect(animated: true)
+                })
+            }
+            
+            return row
 			
 		case .amount:
 			return DecimalRow { [weak self] in

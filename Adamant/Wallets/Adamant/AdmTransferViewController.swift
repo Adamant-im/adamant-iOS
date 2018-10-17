@@ -23,7 +23,7 @@ class AdmTransferViewController: TransferViewControllerBase {
 	// MARK: Sending
 	
 	override func sendFunds() {
-		guard let service = service as? AdmWalletService, let recipient = recipient, let amount = amount else {
+		guard let service = service as? AdmWalletService, let recipient = recipientAddress, let amount = amount else {
 			return
 		}
 		
@@ -57,7 +57,7 @@ class AdmTransferViewController: TransferViewControllerBase {
 	
 	private var _recipient: String?
 	
-	override var recipient: String? {
+	override var recipientAddress: String? {
 		set {
 			if let recipient = newValue, let first = recipient.first, first != "U" {
 				_recipient = "U\(recipient)"
@@ -81,7 +81,7 @@ class AdmTransferViewController: TransferViewControllerBase {
 			$0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
 			$0.cell.textField.keyboardType = .numberPad
 			
-			if let recipient = recipient {
+			if let recipient = recipientAddress {
 				let trimmed = recipient.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
 				$0.value = trimmed
 			}
@@ -163,4 +163,8 @@ class AdmTransferViewController: TransferViewControllerBase {
 			return false
 		}
 	}
+    
+    override func defaultSceneTitle() -> String? {
+        return String.adamantLocalized.wallets.sendAdm
+    }
 }

@@ -91,11 +91,14 @@ class ChatViewController: MessagesViewController {
 	private var prevFee: Decimal = 0
 	
     // MARK: Attachment button
+    static let attachmentButtonSize: CGFloat = 36.0
+    
     lazy var attachmentButton: InputBarButtonItem = {
         return InputBarButtonItem()
             .configure {
-                $0.setSize(CGSize(width: 36, height: 36), animated: false)
-                $0.image = #imageLiteral(resourceName: "attachment")
+                $0.setSize(CGSize(width: ChatViewController.attachmentButtonSize, height: ChatViewController.attachmentButtonSize), animated: false)
+                $0.image = #imageLiteral(resourceName: "Attachment.png")
+                $0.tintColor = UIColor.adamant.primary
             }.onTouchUpInside { [weak self] _ in
 				guard let vc = self?.router.get(scene: AdamantScene.Chats.complexTransfer) as? ComplexTransferViewController else {
 					return
@@ -106,7 +109,7 @@ class ChatViewController: MessagesViewController {
 				
 				let navigator = UINavigationController(rootViewController: vc)
 				self?.present(navigator, animated: true, completion: nil)
-        }
+            }
     }()
 	
     // MARK: RichTransaction status updates
@@ -178,7 +181,6 @@ class ChatViewController: MessagesViewController {
 		messageInputBar.textViewPadding.right = -buttonWidth
 		
 		messageInputBar.setRightStackViewWidthConstant(to: buttonWidth, animated: false)
-        messageInputBar.setLeftStackViewWidthConstant(to: 36, animated: false)
 		
 		// Make feeLabel
 		let feeLabel = InputBarButtonItem()
@@ -192,6 +194,12 @@ class ChatViewController: MessagesViewController {
 		messageInputBar.setStackViewItems([feeLabel, .flexibleSpace], forStack: .bottom, animated: false)
         messageInputBar.setStackViewItems([attachmentButton], forStack: .left, animated: false)
 		
+        // Add spacing between leftStackView (attachment button) and message input field
+        messageInputBar.leftStackView.alignment = .leading
+        messageInputBar.setLeftStackViewWidthConstant(to: ChatViewController.attachmentButtonSize + size*2, animated: false)
+        messageInputBar.leftStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: size*2)
+        messageInputBar.leftStackView.isLayoutMarginsRelativeArrangement = true
+        
 		messageInputBar.sendButton.configure {
 			$0.layer.cornerRadius = size*2
 			$0.layer.borderWidth = 1

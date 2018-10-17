@@ -24,12 +24,22 @@ class ComplexTransferViewController: UIViewController {
 	
 	weak var transferDelegate: ComplexTransferViewControllerDelegate?
 	var services: [WalletServiceWithSend]!
-	var partner: CoreDataAccount?
+    var partner: CoreDataAccount? {
+        didSet {
+            if let partner = partner {
+                navigationItem.title = partner.name ?? partner.address
+            }
+        }
+    }
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = UIColor.white
-		navigationItem.title = partner?.address
+        
+        if let partner = partner {
+            navigationItem.title = partner.name ?? partner.address
+        }
+        
 		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
 		
 		// MARK: Services
@@ -79,6 +89,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 		let vc = services[index].transferViewController()
 		if let v = vc as? TransferViewControllerBase {
 			if let address = partner?.address {
+                let name = partner?.name
 				v.admReportRecipient = address
 				v.recipientIsReadonly = true
 				v.showProgressView(animated: false)
@@ -87,7 +98,8 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 					switch result {
 					case .success(let walletAddress):
 						DispatchQueue.main.async {
-							v.recipient = walletAddress
+							v.recipientAddress = walletAddress
+                            v.recipientName = name
 							v.hideProgress(animated: true)
 						}
 						

@@ -38,7 +38,7 @@ class EthTransferViewController: TransferViewControllerBase {
 	override func sendFunds() {
 		let comments = "" // TODO:
 		
-		guard let service = service as? EthWalletService, let recipient = recipient, let amount = amount else {
+		guard let service = service as? EthWalletService, let recipient = recipientAddress, let amount = amount else {
 			return
 		}
 		
@@ -97,7 +97,7 @@ class EthTransferViewController: TransferViewControllerBase {
 	
 	private var _recipient: String?
 	
-	override var recipient: String? {
+	override var recipientAddress: String? {
 		set {
 			if let recipient = newValue, let first = recipient.first, first != "0" {
 				_recipient = "0x\(recipient)"
@@ -142,7 +142,7 @@ class EthTransferViewController: TransferViewControllerBase {
 			$0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
 			$0.cell.textField.keyboardType = UIKeyboardType.namePhonePad
 			
-			if let recipient = recipient {
+			if let recipient = recipientAddress {
 				let trimmed = recipient.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
 				$0.value = trimmed
 			}
@@ -227,4 +227,8 @@ class EthTransferViewController: TransferViewControllerBase {
 			}
 		}
 	}
+    
+    override func defaultSceneTitle() -> String? {
+        return String.adamantLocalized.wallets.sendEth
+    }
 }

@@ -703,11 +703,14 @@
 /* Transfer: logged user balance. */
 "TransferScene.Row.Balance" = "Balance";
 
-/* Transfer: maximum amount to transfer: available account money substracting transfer fee. */
+/* Transfer: maximum amount to transfer: available account money substracting transfer fee */
 "TransferScene.Row.MaxToTransfer" = "Max to transfer";
 
 /* Transfer: recipient address */
-"TransferScene.Row.Recipient" = "Address";
+"TransferScene.Row.RecipientAddress" = "Address";
+
+/* Transfer: recipient name */
+"TransferScene.Row.RecipientName" = "Name";
 
 /* Transfer: Send button */
 "TransferScene.Row.Send" = "Send";
@@ -734,7 +737,10 @@
 "TransferScene.Send" = "Send";
 
 /* Transfer: Confirm transfer alert: 'Can't Undo' message */
-"TransferScene.CantUndo" = "You can't undo this action.";
+"TransferScene.CantUndo" = "You can't undo this action";
+
+/* Tranfser: Confirm using maximum available for transfer tokens as amount to transfer. */
+"TransferScene.UseMaxToTransfer" = "Use all available tokens as amount to transfer?";
 
 /* Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
 "TransferScene.SendConfirmFormat" = "Send %1$@ to %2$@?";
