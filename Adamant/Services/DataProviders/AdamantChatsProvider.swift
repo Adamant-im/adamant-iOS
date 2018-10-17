@@ -953,24 +953,70 @@ extension AdamantChatsProvider {
         let messageTransaction: ChatTransaction
         switch chat.type {
         case .message, .messageOld, .signal, .unknown:
-            let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-            transaction.message = decodedMessage
-            messageTransaction = transaction
+            let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+            trs.message = decodedMessage
+            messageTransaction = trs
             
         case .richMessage:
-            let transaction = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
-            
-            if let decodedMessage = decodedMessage,
-                let data = decodedMessage.data(using: String.Encoding.utf8),
-                let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: String],
-                let type = json["type"] {
-                transaction.richType = type
-                transaction.richContent = json
-                
-                transaction.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+            if let decodedMessage = decodedMessage, let data = decodedMessage.data(using: String.Encoding.utf8), let jsonRaw = try? JSONSerialization.jsonObject(with: data, options: []) {
+                switch jsonRaw {
+                // MARK: Valid json
+                case let json as [String:String]:
+                    // Supported rich message type
+                    if let type = json[RichContentKeys.type] {
+                        let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
+                        trs.richContent = json
+                        trs.richType = type
+                        trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+                        messageTransaction = trs
+                    }
+                        
+                    // Not supported, show as text message
+                    else {
+                        let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                        trs.message = decodedMessage
+                        messageTransaction = trs
+                    }
+                    
+                // MARK: Bad json, try to fix it
+                case let json as [String:Any]:
+                    // Supported type but in wrong format
+                    if let type = json[RichContentKeys.type] as? String {
+                        var fixedJson = [String:String]()
+                        
+                        for (key, raw) in json {
+                            if let value = raw as? String {
+                                fixedJson[key] = value
+                            } else if let value = raw as? NSNumber, let amount = AdamantBalanceFormat.currencyFormatterFull.string(from: value) {
+                                fixedJson[key] = amount
+                            } else {
+                                fixedJson[key] = String(describing: raw)
+                            }
+                        }
+                        
+                        let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
+                        trs.richContent = fixedJson
+                        trs.richType = type
+                        trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+                        messageTransaction = trs
+                    }
+                        // Not supported, show as text message
+                    else {
+                        let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                        trs.message = decodedMessage
+                        messageTransaction = trs
+                    }
+                    
+                default:
+                    let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                    trs.message = decodedMessage
+                    messageTransaction = trs
+                }
+            } else {
+                let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                trs.message = decodedMessage
+                messageTransaction = trs
             }
-            
-            messageTransaction = transaction
         }
         
 		messageTransaction.date = transaction.date as NSDate
