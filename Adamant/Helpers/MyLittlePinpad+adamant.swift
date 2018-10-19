@@ -48,7 +48,7 @@ extension BiometryType {
 
 extension PinpadViewController {
     override open var preferredStatusBarStyle: UIStatusBarStyle {
-        return UIColor.adamantTheme.statusBar
+        return UIColor.adamant.statusBar
     }
     
 	static func adamantPinpad(biometryButton: PinpadBiometryButtonType) -> PinpadViewController {

@@ -59,7 +59,7 @@ class AccountViewController: FormViewController {
 	
 	private enum Rows {
 		case balance, sendTokens, buyTokens, freeTokens // Wallet
-		case security, nodes, about // Application
+		case security, theme, nodes, about // Application
 		case voteForDelegates // Delegates
 		case logout // Actions
 		
@@ -70,6 +70,7 @@ class AccountViewController: FormViewController {
 			case .buyTokens: return "bTkns"
 			case .freeTokens: return "frrTkns"
 			case .security: return "scrt"
+            case .theme: return "thm"
 			case .nodes: return "nds"
 			case .about: return "bt"
 			case .logout: return "lgtrw"
@@ -85,6 +86,7 @@ class AccountViewController: FormViewController {
 			case .buyTokens: return NSLocalizedString("AccountTab.Row.BuyTokens", comment: "Account tab: 'Buy tokens' button")
 			case .freeTokens: return NSLocalizedString("AccountTab.Row.FreeTokens", comment: "Account tab: 'Get free tokens' button")
 			case .security: return NSLocalizedString("AccountTab.Row.Security", comment: "Account tab: 'Security' row")
+            case .theme: return NSLocalizedString("AccountTab.Row.Theme", comment: "Account tab: 'Theme' row")
 			case .nodes: return String.adamantLocalized.nodesList.nodesListButton
 			case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
 			case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
@@ -96,7 +98,8 @@ class AccountViewController: FormViewController {
 			switch self {
 			case .security: return #imageLiteral(resourceName: "row_security")
 			case .about: return #imageLiteral(resourceName: "row_about")
-			case .nodes: return #imageLiteral(resourceName: "row_nodes")
+			case .theme: return #imageLiteral(resourceName: "row_icon_placeholder") // TODO:
+            case .nodes: return #imageLiteral(resourceName: "row_nodes")
 			case .balance: return #imageLiteral(resourceName: "row_balance")
 			case .buyTokens: return #imageLiteral(resourceName: "row_buy-coins")
 			case .voteForDelegates: return #imageLiteral(resourceName: "row_vote-delegates")
@@ -261,17 +264,25 @@ class AccountViewController: FormViewController {
             
         // Theme select
         <<< AlertRow<ADMTheme>() {
-            $0.title = "Theme"
-            $0.cancelTitle = "Dismiss"
-            $0.selectorTitle = "Theme"
+            $0.title = Rows.theme.localized
+            $0.tag = Rows.theme.tag
+            $0.cell.imageView?.image = Rows.theme.image
+            $0.cell.selectionStyle = .gray
+            
+            $0.cancelTitle = String.adamantLocalized.alert.cancel
+            $0.selectorTitle = Rows.theme.localized
             $0.options = [ADMTheme.light, ADMTheme.dark]
             $0.value = ThemeManager.currentTheme()
+            $0.displayValueFor = { value in
+                return value?.title ?? ""
+            }
+            
             }.onChange { row in
                 print(row.value ?? "No Value")
                 if let theme = row.value {
                     ThemeManager.applyTheme(theme: theme)
                 }
-            }.cellUpdate({ (cell, _) in
+            }.cellUpdate({ (cell, row) in
                 cell.accessoryType = .disclosureIndicator
                 cell.imageView?.style = "primaryTint"
                 cell.textLabel?.style = "primaryText"
@@ -577,11 +588,11 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 }
 
 extension AccountViewController: Themeable {
-    func apply(theme: BaseTheme) {
+    func apply(theme: ThemeProtocol) {
         setNeedsStatusBarAppearanceUpdate()
     }
     
     override open var preferredStatusBarStyle: UIStatusBarStyle {
-        return UIColor.adamantTheme.statusBar
+        return UIColor.adamant.statusBar
     }
 }

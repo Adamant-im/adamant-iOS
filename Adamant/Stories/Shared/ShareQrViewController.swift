@@ -196,6 +196,6 @@ class ShareQrViewController: FormViewController {
 
 extension ShareQrViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return UIColor.adamantTheme.statusBar
+        return UIColor.adamant.statusBar
     }
 }

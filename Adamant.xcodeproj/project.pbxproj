@@ -272,6 +272,7 @@
 
 /* Begin PBXFileReference section */
 		642361BD20E3869D0061559E /* eth_l18n.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = eth_l18n.strings; sourceTree = "<group>"; };
+		640360E82179D1550009968B /* UITextField+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+adamant.swift"; sourceTree = "<group>"; };
 		64156D662141198E00AE3024 /* ThemeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeService.swift; sourceTree = "<group>"; };
 		643ED0B02109F4BD005A9FDA /* JSAdamantCore+Native.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSAdamantCore+Native.swift"; sourceTree = "<group>"; };
 		6441CE63215BBE8900E48CA2 /* ThemeLight.yaml */ = {isa = PBXFileReference; lastKnownFileType = text; path = ThemeLight.yaml; sourceTree = "<group>"; };
@@ -738,6 +739,7 @@
 				E927171D20C04613002BB9A6 /* UIColor+hex.swift */,
 				E98FC34320F920BD00032D65 /* UIFont+adamant.swift */,
 				E9D1BE19211DA25300E86B72 /* UIView+constraints.swift */,
+				640360E82179D1550009968B /* UITextField+adamant.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -1392,6 +1394,7 @@
 				64A223D820F7A08E005157CB /* LskApiService.swift in Sources */,
 				E94008702114EA6800CD2D67 /* AdamantBalanceFormat.swift in Sources */,
 				E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */,
+				640360E92179D1550009968B /* UITextField+adamant.swift in Sources */,
 				E993301E212EF39700CD5200 /* EthTransferViewController.swift in Sources */,
 				E9CAE8DA2018ACD300345E76 /* AdamantApi+Chats.swift in Sources */,
 				E91947B020002393001362F8 /* AdamantApiService.swift in Sources */,

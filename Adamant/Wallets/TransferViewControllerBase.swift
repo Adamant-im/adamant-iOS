@@ -449,7 +449,7 @@ class TransferViewControllerBase: FormViewController {
 	}
 	
 	func markRow(_ row: BaseRowType, valid: Bool) {
-		row.baseCell.textLabel?.textColor = valid ? UIColor.adamantTheme.primary : UIColor.adamantTheme.alertColor
+		row.baseCell.textLabel?.textColor = valid ? UIColor.adamant.primary : UIColor.adamant.alertColor
 	}
 	
 	

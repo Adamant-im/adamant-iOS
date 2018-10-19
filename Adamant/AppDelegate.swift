@@ -12,10 +12,6 @@ import CryptoSwift
 import CoreData
 
 import Stylist
-import MyLittlePinpad
-import Parchment
-import MessageInputBar
-import Eureka
 
 // MARK: - Constants
 extension String.adamantLocalized {
@@ -94,8 +90,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var notificationService: NotificationsService!
     var dialogService: DialogService!
     var addressBookService: AddressBookService!
-    
-    var themes: [String: Theme] = [:]
 
 	// MARK: - Lifecycle
 	
@@ -113,150 +107,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		window!.rootViewController = UITabBarController()
 		window!.rootViewController?.view.backgroundColor = .white
 		window!.makeKeyAndVisible()
-		window!.tintColor = UIColor.adamant.primary
-		
-        print("Strat loading themes")
-        if let path = Bundle.main.path(forResource: "ThemeLight", ofType: "yaml") {
-            do {
-                let theme = try Theme(path: path)
-                self.themes["light"] = theme
-            } catch {
-                print("\(error)")
-            }
-        }
-        
-        if let path = Bundle.main.path(forResource: "ThemeDark", ofType: "yaml") {
-            do {
-                let theme = try Theme(path: path)
-                self.themes["dark"] = theme
-            } catch {
-                print("\(error)")
-            }
-        }
-        print("Stop loading themes")
+		window!.tintColor = UIColor.adamantDefault.primary
         
         // adds custom properties to Stylist
-        Stylist.shared.addProperty(StyleProperty(name: "separatorColor") { (view: UITableView, value: PropertyValue<UIColor>) in
-            view.separatorColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "placeholderColor") { (view: UITextField, value: PropertyValue<UIColor>) in
-            if let placeholder = view.placeholder {
-                view.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [NSAttributedString.Key.foregroundColor: value.value])
-            }
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "clearButtonTintColor") { (view: UITextField, value: PropertyValue<UIColor>) in
-            view.clearButtonTint = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "showDarkKeyboard") { (view: UITextField, value: PropertyValue<Bool>) in
-            view.keyboardAppearance = value.value ? .dark : .light
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "showDarkKeyboard") { (view: InputTextView, value: PropertyValue<Bool>) in
-            view.keyboardAppearance = value.value ? .dark : .light
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "highlightedBackgroundColor") { (view: RoundedButton, value: PropertyValue<UIColor>) in
-            view.highlightedBackgroundColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "normalBackgroundColor") { (view: RoundedButton, value: PropertyValue<UIColor>) in
-            view.normalBackgroundColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "avatarTintColor") { (view: ChatTableViewCell, value: PropertyValue<UIColor>) in
-            view.avatarImageView.tintColor = value.value
-            view.borderColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "badgeColor") { (view: UITabBarItem, value: PropertyValue<UIColor>) in
-            view.badgeColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "largeTextColor") { (view: UINavigationBar, value: PropertyValue<UIColor>) in
-            if #available(iOS 11.0, *) {
-                view.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: value.value]
-            }
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "textColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
-            pinpad.commentLabel.textColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "butttonsColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
-            pinpad.bordersColor = value.value
-            pinpad.setColor(value.value, for: .normal)
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "backgroundColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
-            pinpad.backgroundView.backgroundColor = value.value
-            pinpad.view.backgroundColor = value.value
-            pinpad.commentLabel.backgroundColor = value.value
-            
-            for view in pinpad.view.subviews {
-                if view is UIStackView {
-                    for view in view.subviews {
-                        view.backgroundColor = .clear
-                    }
-                }
-            }
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "buttonsHighlightedColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "placeholderActiveColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
-            pinpad.placeholderActiveColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "placeholderNormalColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
-            pinpad.placeholderNormalColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "indicatorColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
-            view.indicatorColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "textColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
-            view.textColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "selectedTextColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
-            view.selectedTextColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "backgroundColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
-            view.backgroundColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "selectedBackgroundColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
-            view.selectedBackgroundColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "menuBackgroundColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
-            view.menuBackgroundColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "barTintColor") { (view: UIToolbar, value: PropertyValue<UIColor>) in
-            view.barTintColor = value.value
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "isDarkMode") { (view: UISearchBar, value: PropertyValue<Bool>) in
-            view.barStyle = value.value ? .black : .default
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "textColor") { (view: PickerCell<URLScheme>, value: PropertyValue<UIColor>) in
-            view.pickerTextAttributes = [NSAttributedString.Key.foregroundColor: value.value]
-        })
-        
-        Stylist.shared.addProperty(StyleProperty(name: "selectedBackgroundColor") { (view: UITableViewCell, value: PropertyValue<UIColor>) in
-            if view.selectedBackgroundView == nil {
-                view.selectedBackgroundView = UIView()
-            }
-            view.selectedBackgroundView?.backgroundColor = value.value
-        })
+        ThemeManager.addCustomStyleProperties()
         
         self.observeThemeChange()
 		
@@ -575,120 +429,11 @@ extension AppDelegate {
 
 
 extension AppDelegate: Themeable {
-    func apply(theme: BaseTheme) {
+    func apply(theme: ThemeProtocol) {
         let name = theme.name
         print("Apply \(name) theme")
-        if let theme = self.themes[theme.name] {
+        if let theme = theme.theme {
             Stylist.shared.addTheme(theme, name: "main")
         }
     }
-}
-
-extension UITextField {
-    
-    private struct UITextField_AssociatedKeys {
-        static var clearButtonTint = "uitextfield_clearButtonTint"
-        static var originalImage = "uitextfield_originalImage"
-    }
-    
-    private var originalImage: UIImage? {
-        get {
-            if let cl = objc_getAssociatedObject(self, &UITextField_AssociatedKeys.originalImage) as? Wrapper<UIImage> {
-                return cl.underlying
-            }
-            return nil
-        }
-        set {
-            objc_setAssociatedObject(self, &UITextField_AssociatedKeys.originalImage, Wrapper<UIImage>(newValue), .OBJC_ASSOCIATION_RETAIN)
-        }
-    }
-    
-    var clearButtonTint: UIColor? {
-        get {
-            if let cl = objc_getAssociatedObject(self, &UITextField_AssociatedKeys.clearButtonTint) as? Wrapper<UIColor> {
-                return cl.underlying
-            }
-            return nil
-        }
-        set {
-            UITextField.runOnce
-            objc_setAssociatedObject(self, &UITextField_AssociatedKeys.clearButtonTint, Wrapper<UIColor>(newValue), .OBJC_ASSOCIATION_RETAIN)
-            applyClearButtonTint()
-        }
-    }
-    
-    private static let runOnce: Void = {
-        Swizzle.for(UITextField.self, selector: #selector(UITextField.layoutSubviews), with: #selector(UITextField.uitextfield_layoutSubviews))
-    }()
-    
-    private func applyClearButtonTint() {
-        if let button = UIView.find(of: UIButton.self, in: self), let color = clearButtonTint {
-            if originalImage == nil {
-                originalImage = button.image(for: .normal)
-            }
-            button.setImage(originalImage?.tinted(with: color), for: .normal)
-        }
-    }
-    
-    @objc func uitextfield_layoutSubviews() {
-        uitextfield_layoutSubviews()
-        applyClearButtonTint()
-    }
-    
-}
-
-class Wrapper<T> {
-    var underlying: T?
-    
-    init(_ underlying: T?) {
-        self.underlying = underlying
-    }
-}
-
-extension UIView {
-    
-    static func find<T>(of type: T.Type, in view: UIView, includeSubviews: Bool = true) -> T? where T: UIView {
-        if view.isKind(of: T.self) {
-            return view as? T
-        }
-        for subview in view.subviews {
-            if subview.isKind(of: T.self) {
-                return subview as? T
-            } else if includeSubviews, let control = find(of: type, in: subview) {
-                return control
-            }
-        }
-        return nil
-    }
-    
-}
-
-extension UIImage {
-    
-    func tinted(with color: UIColor) -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(self.size, false, self.scale)
-        color.set()
-        self.withRenderingMode(.alwaysTemplate).draw(in: CGRect(origin: CGPoint(x: 0, y: 0), size: self.size))
-        
-        let result = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return result
-    }
-    
-}
-
-class Swizzle {
-    
-    class func `for`(_ className: AnyClass, selector originalSelector: Selector, with newSelector: Selector) {
-        if let method: Method = class_getInstanceMethod(className, originalSelector),
-            let swizzledMethod: Method = class_getInstanceMethod(className, newSelector) {
-        if (class_addMethod(className, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))) {
-            class_replaceMethod(className, newSelector, method_getImplementation(method), method_getTypeEncoding(method))
-        } else {
-            method_exchangeImplementations(method, swizzledMethod)
-        }
-        }
-    }
-    
 }

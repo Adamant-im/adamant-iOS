@@ -214,7 +214,7 @@ class ChatViewController: MessagesViewController {
         attachmentButton.style = "primaryTint"
 		
 		if chatroom.isReadonly {
-			messageInputBar.inputTextView.backgroundColor = UIColor.adamantTheme.chatSenderBackground
+			messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
 			messageInputBar.inputTextView.isEditable = false
 			messageInputBar.sendButton.isEnabled = false
             attachmentButton.isEnabled = false

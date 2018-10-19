@@ -303,8 +303,8 @@ class SecurityViewController: FormViewController {
 			}
 			
 			let safari = SFSafariViewController(url: url)
-            safari.preferredControlTintColor = UIColor.adamantTheme.primary
-            safari.preferredBarTintColor = UIColor.adamantTheme.secondaryBackground
+            safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
 			self?.present(safari, animated: true, completion: nil)
 		}
 		

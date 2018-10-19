@@ -174,8 +174,8 @@ extension DelegateDetailsViewController {
 			}
 			
 			let safari = SFSafariViewController(url: url)
-            safari.preferredControlTintColor = UIColor.adamantTheme.primary
-            safari.preferredBarTintColor = UIColor.adamantTheme.secondaryBackground
+            safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
 			present(safari, animated: true, completion: nil)
 			
 		default:
@@ -219,7 +219,7 @@ extension DelegateDetailsViewController {
 		cell.textLabel?.text = row.localized
 		cell.accessoryType = .none
 		cell.imageView?.image = row.image
-		cell.imageView?.tintColor = UIColor.adamantTheme.primary
+		cell.imageView?.tintColor = UIColor.adamant.primary
         cell.style = "secondaryBackground"
         
         cell.textLabel?.style = "primaryText"

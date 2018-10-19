@@ -232,8 +232,8 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
         cell.delegateIsActive = delegate.rank <= activeDelegates
 		cell.accessoryType = .disclosureIndicator
 		cell.delegate = self
-		cell.checkmarkColor = UIColor.adamantTheme.primary
-		cell.checkmarkBorderColor = UIColor.adamantTheme.secondary
+		cell.checkmarkColor = UIColor.adamant.primary
+		cell.checkmarkBorderColor = UIColor.adamant.secondary
 		
 		cell.isUpvoted = delegate.voted
 		
@@ -384,8 +384,8 @@ extension DelegatesListViewController {
 		let totalVoted = delegates.reduce(0) { $0 + ($1.delegate.voted ? 1 : 0) } + upvoted - downvoted
 		
 		let votingEnabled = changes.count > 0 && changes.count <= maxVotes && totalVoted <= maxTotalVotes
-		let newVotesColor = changes.count > maxVotes ? UIColor.adamantTheme.alertColor : UIColor.adamantTheme.primary
-		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.adamantTheme.alertColor : UIColor.adamantTheme.primary
+		let newVotesColor = changes.count > maxVotes ? UIColor.adamant.alertColor : UIColor.adamant.primary
+		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.adamant.alertColor : UIColor.adamant.primary
 		
 		
 		if Thread.isMainThread {

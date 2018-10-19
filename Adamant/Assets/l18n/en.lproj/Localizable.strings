@@ -121,6 +121,15 @@
 /* Account tab: 'Get free tokens' button */
 "AccountTab.Row.FreeTokens" = "Free ADM tokens";
 
+/* Account tab: 'Theme' row */
+"AccountTab.Row.Theme" = "Theme";
+
+/* Account tab: 'Theme' row value 'Light' */
+"AccountTab.Row.Theme.Light" = "Light";
+
+/* Account tab: 'Theme' row value 'Dark' */
+"AccountTab.Row.Theme.Dark" = "Dark";
+
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "About";
 

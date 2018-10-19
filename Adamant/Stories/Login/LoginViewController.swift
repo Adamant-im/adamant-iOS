@@ -463,17 +463,17 @@ extension LoginViewController: ButtonsStripeViewDelegate {
 }
 
 extension LoginViewController: Themeable {
-    func apply(theme: BaseTheme) {
+    func apply(theme: ThemeProtocol) {
         setNeedsStatusBarAppearanceUpdate()
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return UIColor.adamantTheme.statusBar
+        return UIColor.adamant.statusBar
     }
 }
 
 extension UINavigationController {    
     override open var preferredStatusBarStyle: UIStatusBarStyle {
-        return UIColor.adamantTheme.statusBar
+        return UIColor.adamant.statusBar
     }
 }

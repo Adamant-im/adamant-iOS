@@ -8,6 +8,11 @@
 
 import Foundation
 import UIKit
+import Stylist
+import MyLittlePinpad
+import Parchment
+import MessageInputBar
+import Eureka
 
 enum ADMTheme: Int, Codable {
     case light = 0
@@ -15,7 +20,7 @@ enum ADMTheme: Int, Codable {
 
     static let `default`: ADMTheme = .light
 
-    var theme: BaseTheme {
+    var theme: ThemeProtocol {
         switch self {
         case .light: return LightTheme()
         case .dark: return DarkTheme()
@@ -26,14 +31,15 @@ enum ADMTheme: Int, Codable {
     
     var title: String {
         switch self {
-        case .light: return "Light"
-        case .dark: return "Dark"
+        case .light: return NSLocalizedString("AccountTab.Row.Theme.Light", comment: "Account tab: 'Theme' row value 'Light'")
+        case .dark: return NSLocalizedString("AccountTab.Row.Theme.Dark", comment: "Account tab: 'Theme' row value 'Dark'")
         }
     }
 }
 
-public protocol BaseTheme {
+public protocol ThemeProtocol {
     var name: String { get }
+    var theme: Theme? { get }
     
     // MARK: Global colors
 
@@ -88,94 +94,192 @@ public protocol BaseTheme {
     var statusBar : UIStatusBarStyle { get }
 }
 
-struct LightTheme: BaseTheme {
+class LightTheme:BaseTheme, ThemeProtocol {
     let name = "light"
     
     // MARK: Global colors
 
-    /// Main dark gray, ~70% gray
-    let primary = UIColor(hex: "#474a5f")
-
-    /// Secondary color, ~50% gray
-    let secondary = UIColor(hex: "#9497a3")
+    var primary: UIColor {
+        return getColor("firstColor")
+    }
     
-    let activeColor = UIColor(hex: "#179cec")
+    var secondary: UIColor {
+        return getColor("secondaryColor")
+    }
     
-    let successColor = UIColor(hex: "#50fa7b")
+    var activeColor: UIColor {
+        return getColor("activeColor")
+    }
     
-    let alertColor = UIColor(hex: "#faa05a")
-
-    /// Chat icons color, ~40% gray
-    let chatIcons = UIColor(red: 0.62, green: 0.62, blue: 0.62, alpha: 1)
-
-    /// Table row icons color, ~45% gray
-    let tableRowIcons = UIColor(red: 0.45, green: 0.45, blue: 0.45, alpha: 1)
-
-    let background = UIColor(hex: "#ffffff")
-    let secondaryBackground = UIColor.groupTableViewBackground
-
-    // MARK: Chat colors
-
-    /// User chat bubble background, ~4% gray
-    let chatRecipientBackground = UIColor(hex: "#ffffff")//UIColor(red: 0.965, green: 0.973, blue: 0.981, alpha: 1)
-    let pendingChatBackground = UIColor(hex: "#ffffff")//UIColor(white: 0.98, alpha: 1.0)
-    let failChatBackground = UIColor(hex: "#ffffff")//UIColor(white: 0.8, alpha: 1.0)
+    var successColor: UIColor {
+        return getColor("successColor")
+    }
     
-    /// Partner chat bubble background, ~8% gray
-    let chatSenderBackground = UIColor(hex: "#ffffff")//UIColor(red: 0.925, green: 0.925, blue: 0.925, alpha: 1)
+    var alertColor: UIColor {
+        return getColor("alertColor")
+    }
 
-
-    // MARK: Pinpad
-    /// Pinpad highligh button background, 12% gray
-    let pinpadHighlightButton = UIColor(red: 0.88, green: 0.88, blue: 0.88, alpha: 1)
-
-
-    // MARK: Transfers
-    /// Income transfer icon background, light green
-    let transferIncomeIconBackground = UIColor(red: 0.7, green: 0.93, blue: 0.55, alpha: 1)
-
-    // Outcome transfer icon background, light red
-    let transferOutcomeIconBackground = UIColor(red: 0.94, green: 0.52, blue: 0.53, alpha: 1)
+    var chatIcons: UIColor {
+        return getColor("firstColor")
+    }
+    
+    var tableRowIcons: UIColor {
+        return getColor("firstColor")
+    }
+    
+    var background: UIColor {
+        return getColor("backgroundColor")
+    }
+    
+    var secondaryBackground: UIColor {
+        return getColor("backgroundColor")
+    }
+    
+    var chatRecipientBackground: UIColor {
+        return getColor("backgroundColor")
+    }
+    
+    var pendingChatBackground: UIColor {
+        return getColor("backgroundColor")
+    }
+    
+    var failChatBackground: UIColor {
+        return getColor("backgroundColor")
+    }
+    
+    var chatSenderBackground: UIColor {
+        return getColor("backgroundColor")
+    }
+    
+    var pinpadHighlightButton: UIColor {
+        return getColor("backgroundColor")
+    }
+    
+    var transferIncomeIconBackground: UIColor {
+        return getColor("successColor")
+    }
+    
+    var transferOutcomeIconBackground: UIColor {
+        return getColor("alertColor")
+    }
     
     let statusBar = UIStatusBarStyle.default
+    
+    init() {
+        super.init(fileName: "ThemeLight")
+    }
 }
 
-struct DarkTheme: BaseTheme {
+class DarkTheme:BaseTheme, ThemeProtocol {
     let name = "dark"
     
-    let primary = UIColor(hex: "#D5DDE5")
+    var primary: UIColor {
+        return getColor("firstColor")
+    }
 
-    let secondary = UIColor(hex: "#9497a3")
+    var secondary: UIColor {
+        return getColor("secondaryColor")
+    }
     
-    let activeColor = UIColor(hex: "#179cec")
+    var activeColor: UIColor {
+        return getColor("activeColor")
+    }
     
-    let successColor = UIColor(hex: "#50fa7b")
+    var successColor: UIColor {
+        return getColor("successColor")
+    }
     
-    let alertColor = UIColor(hex: "#faa05a")
+    var alertColor: UIColor {
+        return getColor("alertColor")
+    }
 
-    let chatIcons = UIColor(hex: "")
+    var chatIcons: UIColor {
+        return getColor("firstColor")
+    }
 
-    let tableRowIcons = UIColor(hex: "")
+    var tableRowIcons: UIColor {
+        return getColor("firstColor")
+    }
 
-    let background = UIColor(hex: "#0D0905")
-    var secondaryBackground = UIColor(hex: "#474a5f")
+    var background: UIColor {
+        return getColor("backgroundColor")
+    }
+    
+    var secondaryBackground: UIColor {
+        return getColor("thirdColor")
+    }
 
-    let chatRecipientBackground = UIColor(hex: "#53566E")
+    var chatRecipientBackground: UIColor {
+        return getColor("thirdColor")
+    }
 
-    let pendingChatBackground = UIColor(hex: "#474a5f")
+    var pendingChatBackground: UIColor {
+        return getColor("thirdColor")
+    }
 
-    let failChatBackground = UIColor(hex: "#474a5f")
+    var failChatBackground: UIColor {
+        return getColor("thirdColor")
+    }
 
-    let chatSenderBackground = UIColor(hex: "#474a5f")
+    var chatSenderBackground: UIColor {
+        return getColor("thirdColor")
+    }
 
-    let pinpadHighlightButton = UIColor(hex: "")
+    var pinpadHighlightButton: UIColor {
+        return getColor("thirdColor")
+    }
 
-    let transferIncomeIconBackground = UIColor(hex: "")
+    var transferIncomeIconBackground: UIColor {
+        return getColor("successColor")
+    }
 
-    let transferOutcomeIconBackground = UIColor(hex: "")
+    var transferOutcomeIconBackground: UIColor {
+        return getColor("alertColor")
+    }
 
     let statusBar = UIStatusBarStyle.lightContent
     
+    
+    init() {
+        super.init(fileName: "ThemeDark")
+    }
+}
+
+class BaseTheme {
+    internal var theme: Theme?
+    
+    internal init(fileName: String) {
+        if let theme = ThemeManager.themes[fileName] {
+            print("Loading cached theme: \(fileName)")
+            self.theme = theme
+        } else if let path = Bundle.main.path(forResource: fileName, ofType: "yaml") {
+            print("Strat loading theme: \(fileName)")
+            do {
+                let theme = try Theme(path: path)
+                self.theme = theme
+                ThemeManager.themes[fileName] = theme
+            } catch {
+                print("Can't parse theme: \(fileName)")
+                print("\(error)")
+            }
+        } else {
+            print("Can't load theme: \(fileName)")
+        }
+    }
+    
+    internal func getColor(_ name: String) -> UIColor {
+        if let theme = self.theme {
+            if let colorHex = theme.variables[name] as? String {
+                return UIColor(hex: colorHex)
+            } else {
+                print("No color for: \(name) in: \(self)")
+                return UIColor.red
+            }
+        } else {
+            print("No theme in: \(self)")
+            return UIColor.red
+        }
+    }
 }
 
 public class ThemeManager {
@@ -192,6 +296,8 @@ public class ThemeManager {
     
     private var observations: Set<ObjectIdentifier> = []
     
+    public static var themes: [String: Theme] = [:]
+    
     public init() {
         self.theme = ThemeManager.currentTheme().theme
         
@@ -205,6 +311,130 @@ public class ThemeManager {
             )
         }
         #endif
+    }
+    
+    static func addCustomStyleProperties() {
+        Stylist.shared.addProperty(StyleProperty(name: "separatorColor") { (view: UITableView, value: PropertyValue<UIColor>) in
+            view.separatorColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "placeholderColor") { (view: UITextField, value: PropertyValue<UIColor>) in
+            if let placeholder = view.placeholder {
+                view.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [NSAttributedString.Key.foregroundColor: value.value])
+            }
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "clearButtonTintColor") { (view: UITextField, value: PropertyValue<UIColor>) in
+            view.clearButtonTint = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "showDarkKeyboard") { (view: UITextField, value: PropertyValue<Bool>) in
+            view.keyboardAppearance = value.value ? .dark : .light
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "showDarkKeyboard") { (view: InputTextView, value: PropertyValue<Bool>) in
+            view.keyboardAppearance = value.value ? .dark : .light
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "highlightedBackgroundColor") { (view: RoundedButton, value: PropertyValue<UIColor>) in
+            view.highlightedBackgroundColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "normalBackgroundColor") { (view: RoundedButton, value: PropertyValue<UIColor>) in
+            view.normalBackgroundColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "avatarTintColor") { (view: ChatTableViewCell, value: PropertyValue<UIColor>) in
+            view.avatarImageView.tintColor = value.value
+            view.borderColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "badgeColor") { (view: UITabBarItem, value: PropertyValue<UIColor>) in
+            view.badgeColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "largeTextColor") { (view: UINavigationBar, value: PropertyValue<UIColor>) in
+            if #available(iOS 11.0, *) {
+                view.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: value.value]
+            }
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "textColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
+            pinpad.commentLabel.textColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "butttonsColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
+            pinpad.bordersColor = value.value
+            pinpad.setColor(value.value, for: .normal)
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "backgroundColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
+            pinpad.backgroundView.backgroundColor = value.value
+            pinpad.view.backgroundColor = value.value
+            pinpad.commentLabel.backgroundColor = value.value
+            
+            for view in pinpad.view.subviews {
+                if view is UIStackView {
+                    for view in view.subviews {
+                        view.backgroundColor = .clear
+                    }
+                }
+            }
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "buttonsHighlightedColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "placeholderActiveColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
+            pinpad.placeholderActiveColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "placeholderNormalColor") { (pinpad: PinpadViewController, value: PropertyValue<UIColor>) in
+            pinpad.placeholderNormalColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "indicatorColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
+            view.indicatorColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "textColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
+            view.textColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "selectedTextColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
+            view.selectedTextColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "backgroundColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
+            view.backgroundColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "selectedBackgroundColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
+            view.selectedBackgroundColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "menuBackgroundColor") { (view: PagingViewController<WalletPagingItem>, value: PropertyValue<UIColor>) in
+            view.menuBackgroundColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "barTintColor") { (view: UIToolbar, value: PropertyValue<UIColor>) in
+            view.barTintColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "isDarkMode") { (view: UISearchBar, value: PropertyValue<Bool>) in
+            view.barStyle = value.value ? .black : .default
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "textColor") { (view: PickerCell<URLScheme>, value: PropertyValue<UIColor>) in
+            view.pickerTextAttributes = [NSAttributedString.Key.foregroundColor: value.value]
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(name: "selectedBackgroundColor") { (view: UITableViewCell, value: PropertyValue<UIColor>) in
+            if view.selectedBackgroundView == nil {
+                view.selectedBackgroundView = UIView()
+            }
+            view.selectedBackgroundView?.backgroundColor = value.value
+        })
     }
 
     static func currentTheme() -> ADMTheme {
@@ -224,7 +454,7 @@ public class ThemeManager {
         ThemeManager.default.theme = theme.theme
     }
     
-    public var theme: BaseTheme? {
+    public var theme: ThemeProtocol? {
         didSet {
             self.notify()
         }
@@ -263,7 +493,7 @@ public class ThemeManager {
     }
     
     public func observe(
-        closure: @escaping (BaseTheme) -> ()
+        closure: @escaping (ThemeProtocol) -> ()
         ) -> Disposable
     {
         let observer = ThemeObserver { theme in
@@ -340,7 +570,7 @@ public class ThemeManager {
 }
 
 public protocol Themeable: class {
-    func apply(theme: BaseTheme)
+    func apply(theme: ThemeProtocol)
 }
 
 extension Themeable {
@@ -359,9 +589,9 @@ internal struct RedundantObservationError: Error {
 }
 
 internal class ThemeObserver {
-    private let closure: (BaseTheme) -> ()
+    private let closure: (ThemeProtocol) -> ()
     
-    internal init(closure: @escaping (BaseTheme) -> ()) {
+    internal init(closure: @escaping (ThemeProtocol) -> ()) {
         self.closure = closure
     }
     
