@@ -1,11 +1,11 @@
 variables:
-  firstColor: "#D5DDE5" # (текст чатов, заголовки, элементы меню)
-  secondaryColor: "#9497a3" # (цвета элементов дизайна, иконок меню)
-  thirdColor: "#474a5f" # (цвета элементов дизайна)
+  firstColor: "#F8F8F2" # (текст чатов, заголовки, элементы меню)
+  secondaryColor: "#9497A3" # (цвета элементов дизайна, иконок меню)
+  thirdColor: "#44475A" # (цвета элементов дизайна)
   activeColor: "#179cec" # (цвет подсветки триггеров в приложении)
-  successColor: "#32d296" # (принятый перевод и успешное действие)
-  alertColor: "#faa05a" # (отправленный перевод и отмененное действие)
-  backgroundColor: "#0D0905"
+  successColor: "#50fa7b" # (принятый перевод и успешное действие)
+  alertColor: "#FAA05A" # (отправленный перевод и отмененное действие)
+  backgroundColor: "#282D35"
 styles:
   pinpad:
     textColor: $firstColor
@@ -25,8 +25,7 @@ styles:
     backgroundColor: $backgroundColor
     separatorColor: $secondaryColor
   chatCell:
-    tintColor: $firstColor
-    backgroundColor: $backgroundColor
+    styles: [baseTableCell]
     avatarTintColor: $firstColor
   tabItem:
     badgeColor: $activeColor
@@ -79,6 +78,10 @@ styles:
   baseTable:
     backgroundColor: $backgroundColor
     separatorColor: $secondaryColor
+  baseTableCell:
+    tintColor: $firstColor
+    backgroundColor: $thirdColor
+    selectedBackgroundColor: $secondaryColor
   ## Bar tint ##
   baseNavigationBar:
     styles: [baseBarTint]

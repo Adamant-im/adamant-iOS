@@ -341,25 +341,6 @@ class LoginViewController: FormViewController {
 			self?.present(nav, animated: true, completion: nil)
 		}
 		
-        // Theme select
-        <<< AlertRow<ADMTheme>() {
-            $0.title = "Theme"
-            $0.cancelTitle = "Dismiss"
-            $0.selectorTitle = "Theme"
-            $0.options = [ADMTheme.light, ADMTheme.dark]
-            $0.value = ThemeManager.currentTheme()
-        }.onChange { row in
-            print(row.value ?? "No Value")
-            if let theme = row.value {
-                ThemeManager.applyTheme(theme: theme)
-            }
-        }.cellUpdate({ (cell, _) in
-            cell.accessoryType = .disclosureIndicator
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "primaryText"
-            cell.style = "secondaryBackground"
-        })
-		
 		// MARK: tableView position tuning
 		if let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
 			NotificationCenter.default.addObserver(forName: UITextField.textDidBeginEditingNotification, object: row.cell.textField, queue: nil) { [weak self] _ in

@@ -251,6 +251,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             view.pickerTextAttributes = [NSAttributedString.Key.foregroundColor: value.value]
         })
         
+        Stylist.shared.addProperty(StyleProperty(name: "selectedBackgroundColor") { (view: UITableViewCell, value: PropertyValue<UIColor>) in
+            if view.selectedBackgroundView == nil {
+                view.selectedBackgroundView = UIView()
+            }
+            view.selectedBackgroundView?.backgroundColor = value.value
+        })
+        
         self.observeThemeChange()
 		
 		// MARK: 3. Show login

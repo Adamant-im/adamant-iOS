@@ -43,6 +43,12 @@ public protocol BaseTheme {
     /// Secondary color
     var secondary: UIColor { get }
     
+    /// Success Color
+    var successColor: UIColor { get }
+    
+    /// Active Color
+    var activeColor: UIColor { get }
+    
     /// Alert Color
     var alertColor: UIColor { get }
 
@@ -93,6 +99,10 @@ struct LightTheme: BaseTheme {
     /// Secondary color, ~50% gray
     let secondary = UIColor(hex: "#9497a3")
     
+    let activeColor = UIColor(hex: "#179cec")
+    
+    let successColor = UIColor(hex: "#50fa7b")
+    
     let alertColor = UIColor(hex: "#faa05a")
 
     /// Chat icons color, ~40% gray
@@ -107,12 +117,12 @@ struct LightTheme: BaseTheme {
     // MARK: Chat colors
 
     /// User chat bubble background, ~4% gray
-    let chatRecipientBackground = UIColor(hex: "#D5DDE5")
-    let pendingChatBackground = UIColor(hex: "#D5DDE5")
-    let failChatBackground = UIColor(hex: "#D5DDE5")
-
+    let chatRecipientBackground = UIColor(hex: "#ffffff")//UIColor(red: 0.965, green: 0.973, blue: 0.981, alpha: 1)
+    let pendingChatBackground = UIColor(hex: "#ffffff")//UIColor(white: 0.98, alpha: 1.0)
+    let failChatBackground = UIColor(hex: "#ffffff")//UIColor(white: 0.8, alpha: 1.0)
+    
     /// Partner chat bubble background, ~8% gray
-    let chatSenderBackground = UIColor(hex: "#D5DDE5")
+    let chatSenderBackground = UIColor(hex: "#ffffff")//UIColor(red: 0.925, green: 0.925, blue: 0.925, alpha: 1)
 
 
     // MARK: Pinpad
@@ -136,6 +146,10 @@ struct DarkTheme: BaseTheme {
     let primary = UIColor(hex: "#D5DDE5")
 
     let secondary = UIColor(hex: "#9497a3")
+    
+    let activeColor = UIColor(hex: "#179cec")
+    
+    let successColor = UIColor(hex: "#50fa7b")
     
     let alertColor = UIColor(hex: "#faa05a")
 

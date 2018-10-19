@@ -133,7 +133,7 @@
                             </userDefinedRuntimeAttributes>
                         </label>
                     </subviews>
-                    <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstItem="zqu-7r-qQ5" firstAttribute="centerY" secondItem="imt-ab-neh" secondAttribute="centerY" id="3Af-kp-MDr"/>
                         <constraint firstItem="QeM-gf-SAn" firstAttribute="leading" secondItem="zqu-7r-qQ5" secondAttribute="trailing" constant="8" id="9fW-2z-48q"/>
@@ -153,9 +153,6 @@
                         <constraint firstItem="imt-ab-neh" firstAttribute="top" secondItem="TYr-G3-5pk" secondAttribute="bottom" constant="8" id="wA4-Y1-4UC"/>
                         <constraint firstItem="CVw-tR-gHb" firstAttribute="centerY" secondItem="TYr-G3-5pk" secondAttribute="centerY" id="xzg-dg-bl9"/>
                     </constraints>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="string" keyPath="style" value="secondaryBackground"/>
-                    </userDefinedRuntimeAttributes>
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="50 ADM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hkB-PI-SFR">
                     <rect key="frame" x="264" y="509" width="46" height="14.5"/>

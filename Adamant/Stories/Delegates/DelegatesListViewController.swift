@@ -93,7 +93,7 @@ class DelegatesListViewController: UIViewController {
         
         self.tableView.styles = ["baseTable"]
         navigationController?.navigationBar.style = "baseNavigationBar"
-        view.style = "secondaryBackground,primaryTint"
+        view.style = "primaryBackground,primaryTint"
 		
 		// MARK: Initial
         navigationItem.title = String.adamantLocalized.delegates.title

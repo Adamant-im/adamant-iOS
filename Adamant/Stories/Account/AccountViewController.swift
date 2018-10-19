@@ -275,7 +275,7 @@ class AccountViewController: FormViewController {
                 cell.accessoryType = .disclosureIndicator
                 cell.imageView?.style = "primaryTint"
                 cell.textLabel?.style = "primaryText"
-                cell.detailTextLabel?.style = "secondaryText"
+                cell.detailTextLabel?.style = "primaryText"
                 cell.style = "secondaryBackground,primaryTint"
             })
 		

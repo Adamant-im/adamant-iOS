@@ -6,27 +6,27 @@ variables:
   successColor: "#32d296" # (принятый перевод и успешное действие)
   alertColor: "#faa05a" # (отправленный перевод и отмененное действие)
   backgroundColor: "#f2f6fa"
+  altBackgroundColor: "#ffffff"
 styles:
   pinpad:
     textColor: $firstColor
     butttonsColor: $firstColor
     backgroundColor: $backgroundColor
-    buttonsHighlightedColor: $thirdColor
+    buttonsHighlightedColor: $altBackgroundColor
     placeholderActiveColor: $firstColor
     placeholderNormalColor: $backgroundColor
   paging:
     indicatorColor: $activeColor
     textColor: $firstColor
     selectedTextColor: $firstColor
-    backgroundColor: $thirdColor
-    selectedBackgroundColor: $thirdColor
-    menuBackgroundColor: $thirdColor
+    backgroundColor: $altBackgroundColor
+    selectedBackgroundColor: $altBackgroundColor
+    menuBackgroundColor: $altBackgroundColor
   chatsList:
     backgroundColor: $backgroundColor
     separatorColor: $secondaryColor
   chatCell:
-    tintColor: $firstColor
-    backgroundColor: $backgroundColor
+    styles: [baseTableCell]
     avatarTintColor: $firstColor
   tabItem:
     badgeColor: $activeColor
@@ -39,11 +39,11 @@ styles:
     clearButtonTintColor: $firstColor
     showDarkKeyboard: false
   biometricButton:
-    backgroundColor: $thirdColor
+    backgroundColor: $altBackgroundColor
     tintColor: $firstColor
     borderColor: $firstColor
-    highlightedBackgroundColor: $thirdColor
-    normalBackgroundColor: $thirdColor
+    highlightedBackgroundColor: $altBackgroundColor
+    normalBackgroundColor: $altBackgroundColor
   logo:
     image: "Adamant-logo"
 ### Base styles ###
@@ -74,11 +74,15 @@ styles:
   primaryBackground:
     backgroundColor: $backgroundColor
   secondaryBackground:
-    backgroundColor: $thirdColor
+    backgroundColor: $altBackgroundColor
   ## Base Table ##
   baseTable:
     backgroundColor: $backgroundColor
     separatorColor: $secondaryColor
+  baseTableCell:
+    tintColor: $firstColor
+    backgroundColor: $altBackgroundColor
+    selectedBackgroundColor: $backgroundColor
   ## Bar tint ##
   baseNavigationBar:
     styles: [baseBarTint]
@@ -86,5 +90,5 @@ styles:
     largeTextColor: $firstColor
   baseBarTint:
     tintColor: $firstColor
-    barTintColor: $thirdColor
+    barTintColor: $altBackgroundColor
     isDarkMode: false
