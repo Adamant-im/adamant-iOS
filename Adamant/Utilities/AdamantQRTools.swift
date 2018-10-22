@@ -21,8 +21,19 @@ enum QRToolDecodeResult {
 }
 
 class AdamantQRTools {
-	static func generateQrFrom(string: String) -> QRToolGenerateResult {
-		if let qr = EFQRCode.generate(content: string) {
+    static func generateQrFrom(string: String, withLogo: Bool = false ) -> QRToolGenerateResult {
+        let generator = EFQRCodeGenerator(
+            content: string,
+            size: EFIntSize(width: 600, height: 600)
+        )
+        generator.setColors(backgroundColor: CGColor.EFWhite(), foregroundColor: CGColor.EFBlack())
+        if withLogo {
+            let hasAdm = string.contains("adm:")
+            let logoSize = hasAdm ? EFIntSize(width: 156, height: 156) : EFIntSize(width: 138, height: 138)
+            generator.setIcon(icon: UIImage(named: "logo")?.toCGImage(), size: logoSize)
+        }
+        
+		if let qr = generator.generate() {
 			let image = UIImage(cgImage: qr)
 			return .success(image)
 		}

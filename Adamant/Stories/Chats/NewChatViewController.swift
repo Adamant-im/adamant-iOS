@@ -184,7 +184,7 @@ class NewChatViewController: FormViewController {
 				cell.textLabel?.textColor = UIColor.adamant.primary
 			}.onCellSelection { [weak self] (cell, row) in
 				let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
-				switch AdamantQRTools.generateQrFrom(string: encodedAddress) {
+				switch AdamantQRTools.generateQrFrom(string: encodedAddress, withLogo: true) {
 				case .success(let qr):
 					guard let vc = self?.router.get(scene: AdamantScene.Shared.shareQr) as? ShareQrViewController else {
 						fatalError("Can't find ShareQrViewController")
