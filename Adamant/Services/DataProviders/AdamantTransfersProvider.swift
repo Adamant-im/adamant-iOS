@@ -285,14 +285,14 @@ extension AdamantTransfersProvider {
 	// MARK: Sending Funds
     
     // Wrapper
-	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void) {
+	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderTransferResult) -> Void) {
         // Go background
         sendingQueue.async {
             self.transferFundsInternal(toAddress: recipient, amount: amount, completion: completion)
         }
     }
     
-    private func transferFundsInternal(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void) {
+    private func transferFundsInternal(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderTransferResult) -> Void) {
         // MARK: 0. Prepare
 		guard let senderId = accountService.account?.address, let keypair = accountService.keypair else {
 			completion(.failure(.notLogged))
@@ -383,8 +383,17 @@ extension AdamantTransfersProvider {
                 }
                 self.unconfirmedsSemaphore.signal()
                 
+                do {
+                    try context.save()
+                } catch {
+                    completion(.failure(.internalError(message: "Failed to save data context", error: error)))
+                }
                 
-				completion(.success)
+                if let trs = self.stack.container.viewContext.object(with: transaction.objectID) as? TransactionDetails {
+                    completion(.success(transaction: trs))
+                } else {
+                    completion(.failure(.internalError(message: "Failed to get transaction in viewContext", error: nil)))
+                }
 				
 			case .failure(let error):
 				completion(.failure(.serverError(error)))
@@ -611,6 +620,7 @@ extension AdamantTransfersProvider {
                 transaction.blockId = t.blockId
                 transaction.confirmations = t.confirmations
                 transaction.statusEnum = .delivered
+                transaction.fee = t.fee as NSDecimalNumber
                 
                 unconfirmedTransactions.removeValue(forKey: t.id)
                 

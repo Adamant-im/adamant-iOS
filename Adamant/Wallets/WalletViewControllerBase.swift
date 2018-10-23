@@ -229,15 +229,24 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 
 
 extension WalletViewControllerBase: TransferViewControllerDelegate {
-	func transferViewControllerDidFinishTransfer(_ viewController: TransferViewControllerBase) {
-		if let nav = navigationController, nav.topViewController == viewController {
-			DispatchQueue.main.async {
-				nav.popViewController(animated: true)
-			}
-		} else if presentedViewController == viewController {
-			DispatchQueue.main.async { [weak self] in
-				self?.dismiss(animated: true, completion: nil)
-			}
-		}
-	}
+    func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails, detailsViewController: UIViewController?) {
+        if let nav = navigationController, nav.topViewController == viewController {
+            DispatchQueue.main.async {
+                if let detailsViewController = detailsViewController {
+                    nav.popViewController(animated: false)
+                    nav.pushViewController(detailsViewController, animated: true)
+                } else {
+                    nav.popViewController(animated: true)
+                }
+            }
+        } else if presentedViewController == viewController {
+            DispatchQueue.main.async { [weak self] in
+                self?.dismiss(animated: true, completion: nil)
+                
+                if let detailsViewController = detailsViewController {
+                    self?.present(detailsViewController, animated: true, completion: nil)
+                }
+            }
+        }
+    }
 }

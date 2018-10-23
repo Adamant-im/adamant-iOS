@@ -22,6 +22,7 @@ extension AdamantScene.Wallets {
 			let c = AdmTransferViewController()
 			c.dialogService = r.resolve(DialogService.self)
 			c.accountService = r.resolve(AccountService.self)
+            c.router = r.resolve(Router.self)
 			return c
 		}
 		

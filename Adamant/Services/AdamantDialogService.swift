@@ -178,7 +178,13 @@ extension AdamantDialogService {
         alertVC.alertActionStackView.spacing = 0
         alertVC.alertActionStackViewHeightConstraint.constant = 100
 		
-		present(alertVC, animated: true, completion: nil)
+        if Thread.isMainThread {
+            present(alertVC, animated: true, completion: nil)
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.present(alertVC, animated: true, completion: nil)
+            }
+        }
 	}
 	
 	func showRichError(error: RichError) {
@@ -412,7 +418,13 @@ extension AdamantDialogService {
             alertVC.alertActionStackViewHeightConstraint.constant = 50
         }
         
-        self.present(alertVC, animated: true, completion: nil)
+        if Thread.isMainThread {
+            present(alertVC, animated: true, completion: nil)
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.present(alertVC, animated: true, completion: nil)
+            }
+        }
     }
 }
 

@@ -199,7 +199,7 @@ protocol WalletServiceWithSend: WalletService {
 }
 
 protocol WalletServiceSimpleSend: WalletServiceWithSend {
-	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceSimpleResult) -> Void)
+	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<TransactionDetails>) -> Void)
 }
 
 protocol WalletServiceTwoStepSend: WalletServiceWithSend {

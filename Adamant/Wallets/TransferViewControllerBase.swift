@@ -14,7 +14,7 @@ import QRCodeReader
 // MARK: - Transfer Delegate Protocol
 
 protocol TransferViewControllerDelegate: class {
-	func transferViewControllerDidFinishTransfer(_ viewController: TransferViewControllerBase)
+    func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails, detailsViewController: UIViewController?)
 }
 
 
@@ -126,7 +126,8 @@ class TransferViewControllerBase: FormViewController {
 	
 	var accountService: AccountService!
 	var dialogService: DialogService!
-	
+    var router: Router!
+    
 	
 	// MARK: - Properties
 	

@@ -31,7 +31,7 @@ class AdmTransferViewController: TransferViewControllerBase {
 		
 		service.sendMoney(recipient: recipient, amount: amount, comments: "") { [weak self] result in
 			switch result {
-			case .success:
+			case .success(let result):
 				service.update()
 				
 				guard let vc = self else {
@@ -39,7 +39,11 @@ class AdmTransferViewController: TransferViewControllerBase {
 				}
 				
 				vc.dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-				vc.delegate?.transferViewControllerDidFinishTransfer(vc)
+                
+                let detailsVC = self?.router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? AdmTransactionDetailsViewController
+                detailsVC?.transaction = result
+                
+                vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
 				
 			case .failure(let error):
 				guard let dialogService = self?.dialogService else {

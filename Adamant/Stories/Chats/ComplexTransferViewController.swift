@@ -10,7 +10,7 @@ import UIKit
 import Parchment
 
 protocol ComplexTransferViewControllerDelegate: class {
-	func complexTransferViewControllerDidFinish(_ viewController: ComplexTransferViewController)
+    func complexTransferViewController(_ viewController: ComplexTransferViewController, didFinishWithTransfer: TransactionDetails?, detailsViewController: UIViewController?)
 }
 
 class ComplexTransferViewController: UIViewController {
@@ -72,7 +72,7 @@ class ComplexTransferViewController: UIViewController {
 	
 	@objc
 	func cancel() {
-		transferDelegate?.complexTransferViewControllerDidFinish(self)
+        transferDelegate?.complexTransferViewController(self, didFinishWithTransfer: nil, detailsViewController: nil)
 	}
 }
 
@@ -132,7 +132,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 }
 
 extension ComplexTransferViewController: TransferViewControllerDelegate {
-	func transferViewControllerDidFinishTransfer(_ viewController: TransferViewControllerBase) {
-		transferDelegate?.complexTransferViewControllerDidFinish(self)
-	}
+	func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails, detailsViewController: UIViewController?) {
+        transferDelegate?.complexTransferViewController(self, didFinishWithTransfer: transfer, detailsViewController: detailsViewController)
+    }
 }

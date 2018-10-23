@@ -42,7 +42,6 @@ extension EthWalletService: RichMessageProvider {
                 self?.dialogService.showRichError(error: error)
             }
         }
-        
     }
     
     // MARK: Cells

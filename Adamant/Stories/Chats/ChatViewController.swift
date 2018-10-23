@@ -525,23 +525,31 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 }
 
 extension ChatViewController: TransferViewControllerDelegate, ComplexTransferViewControllerDelegate {
-	func transferViewControllerDidFinishTransfer(_ viewController: TransferViewControllerBase) {
-		dismissTransferViewController()
+    func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails, detailsViewController: UIViewController?) {
+        dismissTransferViewController(andPresent: detailsViewController)
     }
 	
-	func complexTransferViewControllerDidFinish(_ viewController: ComplexTransferViewController) {
-		dismissTransferViewController()
-	}
+    func complexTransferViewController(_ viewController: ComplexTransferViewController, didFinishWithTransfer: TransactionDetails?, detailsViewController: UIViewController?) {
+        dismissTransferViewController(andPresent: detailsViewController)
+    }
 	
-	private func dismissTransferViewController() {
+    private func dismissTransferViewController(andPresent viewController: UIViewController?) {
 		fixKeyboardInsets = true
 		
 		if Thread.isMainThread {
 			dismiss(animated: true, completion: nil)
+            
+            if let viewController = viewController, let nav = navigationController {
+                nav.pushViewController(viewController, animated: true)
+            }
 		} else {
 			DispatchQueue.main.async { [weak self] in
 				self?.dismiss(animated: true, completion: nil)
-			}
+                
+                if let viewController = viewController, let nav = self?.navigationController {
+                    nav.pushViewController(viewController, animated: true)
+                }
+            }
 		}
 	}
 }
