@@ -92,6 +92,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }
     }
     
+    private static let awaitingValueString = "⏱"
+    
+    private lazy var currencyFormatter: NumberFormatter = {
+        return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
+    }()
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -113,15 +119,26 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.disabled = true
             $0.tag = Rows.transactionNumber.tag
             $0.title = Rows.transactionNumber.localized
-            $0.value = transaction?.id
+            
+            if let value = transaction?.id {
+                $0.value = value
+            } else {
+                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { (_, row) in
+        }.onCellSelection { [weak self] (_, row) in
             if let text = row.value {
-                self.shareValue(text)
+                self?.shareValue(text)
             }
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
+            
+            if let value = self?.transaction?.id {
+                row.value = value
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }
         
         section.append(idRow)
@@ -150,7 +167,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     return DoubleDetailsTableViewCell.compactHeight
                 }
             }
-        }.onCellSelection { (_, row) in
+        }.onCellSelection { [weak self] (_, row) in
             guard let value = row.value else {
                 return
             }
@@ -162,7 +179,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 text = value.first
             }
             
-            self.shareValue(text)
+            self?.shareValue(text)
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
         }
@@ -193,7 +210,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     return DoubleDetailsTableViewCell.compactHeight
                 }
             }
-        }.onCellSelection { (_, row) in
+        }.onCellSelection { [weak self] (_, row) in
             guard let value = row.value else {
                 return
             }
@@ -205,7 +222,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 text = value.first
             }
             
-            self.shareValue(text)
+            self?.shareValue(text)
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
         }
@@ -225,8 +242,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 let text = value.humanizedDateTimeFull()
                 self?.shareValue(text)
             }
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
+            row.value = self?.transaction?.dateValue
         }
             
         section.append(dateRow)
@@ -245,28 +263,38 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 let text = AdamantBalanceFormat.full.format(value, withCurrencySymbol: self?.currencySymbol ?? nil)
                 self?.shareValue(text)
             }
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
+            row.value = self?.transaction?.amountValue.doubleValue
         }
             
         section.append(amountRow)
         
         // MARK: Fee
-        let feeRow = DecimalRow() {
+        let feeRow = LabelRow() {
             $0.disabled = true
             $0.tag = Rows.fee.tag
             $0.title = Rows.fee.localized
-            $0.formatter = AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
-            $0.value = transaction?.feeValue.doubleValue
+            
+            if let value = transaction?.feeValue {
+                $0.value = currencyFormatter.string(fromDecimal: value)
+            } else {
+                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
         }.onCellSelection { [weak self] (_, row) in
             if let value = row.value {
-                let text = AdamantBalanceFormat.full.format(value, withCurrencySymbol: self?.currencySymbol ?? nil)
-                self?.shareValue(text)
+                self?.shareValue(value)
             }
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
+            
+            if let value = self?.transaction?.feeValue, let formatter = self?.currencyFormatter {
+                row.value = formatter.string(fromDecimal: value)
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }
             
         section.append(feeRow)
@@ -276,15 +304,26 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.disabled = true
             $0.tag = Rows.confirmations.tag
             $0.title = Rows.confirmations.localized
-            $0.value = transaction?.confirmationsValue
+            
+            if let value = transaction?.confirmationsValue {
+                $0.value = value
+            } else {
+                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
         }.onCellSelection { [weak self] (_, row) in
             if let text = row.value {
                 self?.shareValue(text)
             }
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
+            
+            if let value = self?.transaction?.confirmationsValue {
+                row.value = value
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }
             
         section.append(confirmationsRow)
@@ -294,15 +333,26 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.disabled = true
             $0.tag = Rows.block.tag
             $0.title = Rows.block.localized
-            $0.value = transaction?.blockValue
+            
+            if let value = transaction?.blockValue {
+                $0.value = value
+            } else {
+                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
         }.onCellSelection { [weak self] (_, row) in
             if let text = row.value {
                 self?.shareValue(text)
             }
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
+            
+            if let value = self?.transaction?.blockValue {
+                row.value = value
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }
             
         section.append(blockRow)
@@ -319,8 +369,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 if let text = row.value {
                     self?.shareValue(text)
                 }
-            }.cellUpdate { (cell, _) in
+            }.cellUpdate { [weak self] (cell, row) in
                 cell.textLabel?.textColor = .black
+                
+                row.value = self?.transaction?.transactionStatus?.localized
             }
             
             section.append(statusRow)

@@ -9,24 +9,18 @@
 import Foundation
 
 extension BaseTransaction: TransactionDetails {
-    var id: String { return transactionId ?? "" }
+    var id: String? { return transactionId }
     var senderAddress: String { return senderId ?? "" }
-    var recipientAddress: String { return self.recipientId ?? "" }
-    var blockValue: String? { return self.blockId }
-    var confirmationsValue: String? { return String(confirmations) }
+    var recipientAddress: String { return recipientId ?? "" }
     var dateValue: Date? { return date as Date? }
+    var feeValue: Decimal? { return fee?.decimalValue }
+    
+    var confirmationsValue: String? { return isConfirmed ? String(confirmations) : nil }
+    var blockValue: String? { return isConfirmed ? blockId : nil }
     
     var amountValue: Decimal {
         if let amount = self.amount {
             return amount.decimalValue
-        } else {
-            return 0
-        }
-    }
-    
-    var feeValue: Decimal {
-        if let fee = self.fee {
-            return fee.decimalValue
         } else {
             return 0
         }

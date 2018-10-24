@@ -18,7 +18,7 @@ class AdamantTransfersProvider: TransfersProvider {
 	var securedStore: SecuredStore!
 	
 	// MARK: Properties
-	var transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
+	let transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
 	
 	private(set) var state: State = .empty
 	private(set) var isInitiallySynced: Bool = false
@@ -341,9 +341,11 @@ extension AdamantTransfersProvider {
         transaction.type = Int16(TransactionType.send.rawValue)
         transaction.isOutgoing = true
         transaction.showsChatroom = false
+        transaction.fee = transferFee as NSDecimalNumber
         
-        transaction.transactionId = UUID().uuidString
-        transaction.blockId = UUID().uuidString
+        transaction.transactionId = nil
+        transaction.blockId = nil
+        transaction.chatMessageId = UUID().uuidString
         transaction.statusEnum = MessageStatus.pending
         
         // MARK: 3. Chatroom
@@ -648,6 +650,8 @@ extension AdamantTransfersProvider {
             transfer.confirmations = t.confirmations
             transfer.statusEnum = .delivered
             transfer.showsChatroom = false
+            transfer.isConfirmed = true
+            transfer.chatMessageId = UUID().uuidString
             
             transfer.isOutgoing = t.senderId == address
             let partnerId = transfer.isOutgoing ? t.recipientId : t.senderId

@@ -302,6 +302,7 @@ extension AdamantChatsProvider {
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
         transaction.isOutgoing = true
+        transaction.chatMessageId = UUID().uuidString
         
         transaction.message = text
         
@@ -320,6 +321,7 @@ extension AdamantChatsProvider {
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
         transaction.isOutgoing = true
+        transaction.chatMessageId = UUID().uuidString
         
         transaction.richContent = richContent
         transaction.richType = richType
@@ -374,8 +376,6 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 3. Prepare transaction
-        transaction.transactionId = UUID().uuidString
-        transaction.blockId = UUID().uuidString
         transaction.statusEnum = MessageStatus.pending
         
         chatroom.addToTransactions(transaction)
@@ -1029,6 +1029,7 @@ extension AdamantChatsProvider {
 		messageTransaction.isOutgoing = isOutgoing
 		messageTransaction.blockId = transaction.blockId
 		messageTransaction.confirmations = transaction.confirmations
+        messageTransaction.chatMessageId = UUID().uuidString
         
         messageTransaction.statusEnum = MessageStatus.delivered
 		

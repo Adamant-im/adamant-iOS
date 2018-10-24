@@ -101,14 +101,18 @@ extension AdamantDialogService {
 		FTIndicator.showError(withMessage: message)
 	}
 	
-	func showError(withMessage message: String, error: Error? = nil) {
-		if Thread.isMainThread {
-			FTIndicator.dismissProgress()
-		} else {
-			DispatchQueue.main.sync {
-				FTIndicator.dismissProgress()
-			}
-		}
+    func showError(withMessage message: String, error: Error? = nil) {
+        if Thread.isMainThread {
+            internalShowError(withMessage: message, error: error)
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.internalShowError(withMessage: message, error: error)
+            }
+        }
+    }
+    
+	private func internalShowError(withMessage message: String, error: Error? = nil) {
+        FTIndicator.dismissProgress()
 		
 		let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
         
@@ -178,13 +182,7 @@ extension AdamantDialogService {
         alertVC.alertActionStackView.spacing = 0
         alertVC.alertActionStackViewHeightConstraint.constant = 100
 		
-        if Thread.isMainThread {
-            present(alertVC, animated: true, completion: nil)
-        } else {
-            DispatchQueue.main.async { [weak self] in
-                self?.present(alertVC, animated: true, completion: nil)
-            }
-        }
+        present(alertVC, animated: true, completion: nil)
 	}
 	
 	func showRichError(error: RichError) {

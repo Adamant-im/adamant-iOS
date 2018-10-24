@@ -134,7 +134,7 @@ extension EthTransaction: Decodable {
 
 // MARK: - TransactionDetails
 extension EthTransaction: TransactionDetails {
-    var id: String { return hash }
+    var id: String? { return hash }
     var senderAddress: String { return from }
     var recipientAddress: String { return to }
     var dateValue: Date? { return date }
@@ -142,7 +142,7 @@ extension EthTransaction: TransactionDetails {
     var confirmationsValue: String? { return confirmations }
     var blockValue: String? { return blockNumber}
     
-    var feeValue: Decimal {
+    var feeValue: Decimal? {
         return gasPrice * gasUsed
     }
     

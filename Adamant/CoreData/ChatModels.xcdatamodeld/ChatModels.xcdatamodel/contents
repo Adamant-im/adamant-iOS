@@ -2,15 +2,16 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14315.18" systemVersion="17G65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="BaseTransaction" representedClassName="BaseTransaction" isAbstract="YES" syncable="YES">
         <attribute name="amount" optional="YES" attributeType="Decimal" defaultValueString="0" syncable="YES"/>
-        <attribute name="blockId" attributeType="String" syncable="YES"/>
+        <attribute name="blockId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="confirmations" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="date" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="fee" optional="YES" attributeType="Decimal" defaultValueString="0" syncable="YES"/>
         <attribute name="height" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isConfirmed" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isOutgoing" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="recipientId" attributeType="String" syncable="YES"/>
         <attribute name="senderId" attributeType="String" syncable="YES"/>
-        <attribute name="transactionId" attributeType="String" syncable="YES"/>
+        <attribute name="transactionId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="type" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
     </entity>
     <entity name="Chatroom" representedClassName="Chatroom" syncable="YES">
@@ -25,7 +26,7 @@
         <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ChatTransaction" inverseName="chatroom" inverseEntity="ChatTransaction" syncable="YES"/>
     </entity>
     <entity name="ChatTransaction" representedClassName="ChatTransaction" isAbstract="YES" parentEntity="BaseTransaction" syncable="YES">
-        <attribute name="isConfirmed" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="chatMessageId" attributeType="String" syncable="YES"/>
         <attribute name="isUnread" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="showsChatroom" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="silentNotification" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
@@ -55,7 +56,7 @@
         <relationship name="partner" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CoreDataAccount" inverseName="transfers" inverseEntity="CoreDataAccount" syncable="YES"/>
     </entity>
     <elements>
-        <element name="BaseTransaction" positionX="378" positionY="18" width="128" height="210"/>
+        <element name="BaseTransaction" positionX="378" positionY="18" width="128" height="225"/>
         <element name="Chatroom" positionX="-74" positionY="26" width="128" height="180"/>
         <element name="ChatTransaction" positionX="142" positionY="137" width="128" height="150"/>
         <element name="CoreDataAccount" positionX="-236" positionY="174" width="128" height="150"/>

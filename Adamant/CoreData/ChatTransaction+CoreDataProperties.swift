@@ -2,7 +2,7 @@
 //  ChatTransaction+CoreDataProperties.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 17.10.2018.
+//  Created by Anokhov Pavel on 24.10.2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 //
@@ -17,11 +17,11 @@ extension ChatTransaction {
         return NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
     }
 
-    @NSManaged public var isConfirmed: Bool
     @NSManaged public var isUnread: Bool
+    @NSManaged public var showsChatroom: Bool
     @NSManaged public var silentNotification: Bool
     @NSManaged public var status: Int16
-    @NSManaged public var showsChatroom: Bool
+    @NSManaged public var chatMessageId: String?
     @NSManaged public var chatroom: Chatroom?
     @NSManaged public var lastIn: Chatroom?
 

@@ -115,6 +115,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
                 case .success:
                     DispatchQueue.main.async {
                         self?.tableView.reloadData()
+//                        self?.form.
                     }
                     
                 case .failure:

@@ -480,11 +480,11 @@ extension MessageTransaction: MessageType {
 	}
 	
 	public var messageId: String {
-		return self.transactionId!
+		return chatMessageId!
 	}
 	
 	public var sentDate: Date {
-		return self.date! as Date
+		return date! as Date
 	}
 	
 	public var kind: MessageKind {
@@ -513,11 +513,11 @@ extension RichMessageTransaction: MessageType {
     }
     
     public var messageId: String {
-        return self.transactionId!
+        return chatMessageId!
     }
     
     public var sentDate: Date {
-        return self.date! as Date
+        return date! as Date
     }
 }
 
@@ -529,7 +529,7 @@ extension TransferTransaction: MessageType {
 	}
 	
 	public var messageId: String {
-		return transactionId!
+		return chatMessageId!
 	}
 	
 	public var sentDate: Date {
