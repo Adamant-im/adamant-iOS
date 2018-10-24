@@ -55,7 +55,7 @@ extension WalletServiceError: RichError {
 			return String.adamantLocalized.transfer.accountNotFound
 			
 		case .walletNotInitiated:
-			return "Кошелёк ещё не создан для этого аккаунта"
+            return NSLocalizedString("WalletServices.SharedErrors.WalletNotInitiated", comment: "Wallet Services: Shared error, user has not yet initiated a specific wallet.")
 			
 		case .remoteServiceError(let message):
 			return String.adamantLocalized.sharedErrors.remoteServerError(message: message)
@@ -67,10 +67,10 @@ extension WalletServiceError: RichError {
 			return String.adamantLocalized.sharedErrors.internalError(message: message)
 			
 		case .invalidAmount(let amount):
-			return "Неверное количество для перевода: \(amount)"
+            return String.localizedStringWithFormat(NSLocalizedString("WalletServices.SharedErrors.InvalidAmountFormat", comment: "Wallet Services: Shared error, invalid amount format. %@ for amount"), AdamantBalanceFormat.full.format(amount))
             
         case .transactionNotFound:
-            return "Не удалось найти транзакцию"
+            return NSLocalizedString("WalletServices.SharedErrors.TransactionNotFound", comment: "Wallet Services: Shared error, transaction not found")
 		}
 	}
 	

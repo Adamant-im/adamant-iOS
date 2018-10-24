@@ -750,3 +750,15 @@
 
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "Готово!";
+
+/* Wallet Services: Shared error, user do not have enought money. */
+"WalletServices.SharedErrors.NotEnoughtMoney" = "Недостаточно средств";
+
+/* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
+"WalletServices.SharedErrors.WalletNotInitiated" = "Кошелёк ещё не создан";
+
+/* Wallet Services: Shared error, invalid amount format. %@ for amount */
+"WalletServices.SharedErrors.InvalidAmountFormat" = "Неверное количество для отправки: %@";
+
+/* Wallet Services: Shared error, transaction not found */
+"WalletServices.SharedErrors.TransactionNotFound" = "Транзакция не найдена";
