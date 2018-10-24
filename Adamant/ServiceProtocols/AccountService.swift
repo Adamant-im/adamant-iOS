@@ -33,8 +33,8 @@ extension Notification.Name {
 		/// Raised when wallets collection updated
 		///
 		/// UserInfo:
-		/// - Adamant.AccountService.updatedWallet: wallet object
-		/// - Adamant.AccountService.updatedWalletIndex: wallet index in AccountService.wallets collection
+		/// - AdamantUserInfoKey.AccountService.updatedWallet: wallet object
+		/// - AdamantUserInfoKey.AccountService.updatedWalletIndex: wallet index in AccountService.wallets collection
 		static let walletUpdated = Notification.Name("adamant.accountService.walletUpdated")
 		
 		private init() {}

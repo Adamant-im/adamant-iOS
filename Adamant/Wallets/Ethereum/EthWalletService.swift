@@ -89,6 +89,8 @@ class EthWalletService: WalletService {
 		vc.service = self
 		return vc
 	}
+    
+    private var initialBalanceCheck = false
 	
 	// MARK: - State
 	private (set) var state: WalletServiceState = .notInitiated
@@ -96,7 +98,9 @@ class EthWalletService: WalletService {
 	
 	var wallet: WalletAccount? { return ethWallet }
 	
-	
+    // MARK: - Delayed KVS save
+    private var balanceObserver: NSObjectProtocol? = nil
+    
 	// MARK: - Logic
 	init(apiUrl: String) throws {
 		// Init network
@@ -118,6 +122,11 @@ class EthWalletService: WalletService {
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
 			self?.ethWallet = nil
+            self?.initialBalanceCheck = false
+            if let balanceObserver = self?.balanceObserver {
+                NotificationCenter.default.removeObserver(balanceObserver)
+                self?.balanceObserver = nil
+            }
 		}
 	}
 	
@@ -139,22 +148,36 @@ class EthWalletService: WalletService {
 		
 		state = .updating
 		
-		getBalance(forAddress: wallet.ethAddress) { result in
-			defer {
-				self.stateSemaphore.signal()
-			}
-			self.stateSemaphore.wait()
-			self.state = .updated
-			
+		getBalance(forAddress: wallet.ethAddress) { [weak self] result in
+            if let stateSemaphore = self?.stateSemaphore {
+                defer {
+                    stateSemaphore.signal()
+                }
+                stateSemaphore.wait()
+                self?.state = .updated
+            }
+            
 			switch result {
 			case .success(let balance):
+                let notification: Notification.Name?
+                
 				if wallet.balance != balance {
 					wallet.balance = balance
-					NotificationCenter.default.post(name: self.walletUpdatedNotification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
-				}
+                    notification = self?.walletUpdatedNotification
+                    self?.initialBalanceCheck = false
+                } else if let initialBalanceCheck = self?.initialBalanceCheck, initialBalanceCheck {
+                    self?.initialBalanceCheck = false
+                    notification = self?.walletUpdatedNotification
+                } else {
+                    notification = nil
+                }
+                
+                if let notification = notification {
+                    NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+                }
 				
 			case .failure(let error):
-				self.dialogService.showRichError(error: error)
+				self?.dialogService.showRichError(error: error)
 			}
 		}
 		
@@ -230,6 +253,11 @@ class EthWalletService: WalletService {
 // MARK: - WalletInitiatedWithPassphrase
 extension EthWalletService: InitiatedWithPassphraseService {
 	func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+        guard let adamant = accountService.account else {
+            completion(.failure(error: .notLogged))
+            return
+        }
+        
 		// MARK: 1. Prepare
 		stateSemaphore.wait()
 		
@@ -265,7 +293,8 @@ extension EthWalletService: InitiatedWithPassphraseService {
 		}
 		
 		// MARK: 3. Update
-		ethWallet = EthWallet(address: ethAddress.address, ethAddress: ethAddress, keystore: keystore)
+        let eWallet = EthWallet(address: ethAddress.address, ethAddress: ethAddress, keystore: keystore)
+		ethWallet = eWallet
 		state = .initiated
 		
 		if !enabled {
@@ -276,19 +305,76 @@ extension EthWalletService: InitiatedWithPassphraseService {
 		stateSemaphore.signal()
 		
 		// MARK: 4. Save into KVS
-		save(ethAddress: ethAddress.address) { [weak self] result in
-			switch result {
-			case .success:
-				break
-				
-			case .failure(let error):
-				self?.dialogService.showRichError(error: error)
-			}
-		}
-		
-		// MARK: 5. Initiate update
-		update()
+        getWalletAddress(byAdamantAddress: adamant.address) { [weak self] result in
+            switch result {
+            case .success(let address):
+                // ETH already saved
+                if address != ethAddress.address {
+                    self?.save(ethAddress: ethAddress.address) { result in
+                        self?.kvsSaveCompletionRecursion(ethAddress: ethAddress.address, result: result)
+                    }
+                }
+                
+                self?.initialBalanceCheck = true
+                self?.update()
+                
+                completion(.success(result: eWallet))
+                
+            case .failure(let error):
+                switch error {
+                case .walletNotInitiated:
+                    // Show '0' without waiting for balance update
+                    if let notification = self?.walletUpdatedNotification, let wallet = self?.ethWallet {
+                        NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+                    }
+                    
+                    self?.save(ethAddress: ethAddress.address) { result in
+                        self?.kvsSaveCompletionRecursion(ethAddress: ethAddress.address, result: result)
+                    }
+                    
+                    completion(.success(result: eWallet))
+                    
+                default:
+                    completion(.failure(error: error))
+                }
+            }
+        }
 	}
+    
+    
+    /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
+    private func kvsSaveCompletionRecursion(ethAddress: String, result: WalletServiceSimpleResult) {
+        if let observer = balanceObserver {
+            NotificationCenter.default.removeObserver(observer)
+            balanceObserver = nil
+        }
+        
+        switch result {
+        case .success:
+            break
+            
+        case .failure(let error):
+            switch error {
+            case .notEnoughtMoney:  // Possibly new account, we need to wait for dropship
+                // Register observer
+                let observer = NotificationCenter.default.addObserver(forName: NSNotification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
+                    guard let balance = self?.accountService.account?.balance, balance > AdamantApiService.KvsFee else {
+                        return
+                    }
+                    
+                    self?.save(ethAddress: ethAddress) { result in
+                        self?.kvsSaveCompletionRecursion(ethAddress: ethAddress, result: result)
+                    }
+                }
+                
+                // Save referense to unregister it later
+                balanceObserver = observer
+                
+            default:
+                dialogService.showRichError(error: error)
+            }
+        }
+    }
 }
 
 
@@ -349,42 +435,26 @@ extension EthWalletService {
 	///   - ethAddress: Ethereum address to save into KVS
 	///   - adamantAddress: Owner of Ethereum address
 	///   - completion: success
-	private func save(ethAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+    private func save(ethAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
 		guard let adamant = accountService.account, let keypair = accountService.keypair else {
 			completion(.failure(error: .notLogged))
 			return
 		}
 		
-		let api = apiService
-		
-		getWalletAddress(byAdamantAddress: adamant.address) { result in
-			switch result {
-			case .success(let address):
-				guard address == ethAddress else {
-					// ETH already saved
-					completion(.success)
-					return
-				}
-				
-				guard adamant.balance >= AdamantApiService.KvsFee else {
-					completion(.failure(error: .notEnoughtMoney))
-					return
-				}
-				
-				api?.store(key: EthWalletService.kvsAddress, value: ethAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-					switch result {
-					case .success:
-						completion(.success)
-						
-					case .failure(let error):
-						completion(.failure(error: .apiError(error)))
-					}
-				}
-				
-			case .failure(let error):
-				completion(.failure(error: error))
-			}
-		}
+        guard adamant.balance >= AdamantApiService.KvsFee else {
+            completion(.failure(error: .notEnoughtMoney))
+            return
+        }
+        
+        apiService.store(key: EthWalletService.kvsAddress, value: ethAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
+            switch result {
+            case .success:
+                completion(.success)
+                
+            case .failure(let error):
+                completion(.failure(error: .apiError(error)))
+            }
+        }
 	}
 }
 

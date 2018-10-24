@@ -53,15 +53,41 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 	
 	var service: WalletService?
 	
+    var isInitiated: Bool = true {
+        didSet {
+            guard viewDidInitialLoad else {
+                return
+            }
+            
+            if isInitiated {
+                initiatingActivityIndicator.stopAnimating()
+                tableView.isHidden = false
+            } else {
+                initiatingActivityIndicator.startAnimating()
+                tableView.isHidden = true
+            }
+        }
+    }
+    
+    // If we try to set isInitiated before view did load from nib, we will get a nil in IBOutlets.
+    private var viewDidInitialLoad = false
+    
 	// MARK: - IBOutlets
 	
 	@IBOutlet weak var walletTitleLabel: UILabel!
-	
+    @IBOutlet weak var initiatingActivityIndicator: UIActivityIndicatorView!
+    
 	
 	// MARK: - Lifecycle
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        viewDidInitialLoad = true
+        if !isInitiated {
+            initiatingActivityIndicator.startAnimating()
+            tableView.isHidden = true
+        }
 		
 		let section = Section()
 		
@@ -175,8 +201,13 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 		if let service = service {
 			let callback = { [weak self] (notification: Notification) in
 				guard let wallet = notification.userInfo?[AdamantUserInfoKey.WalletService.wallet] as? WalletAccount else {
+                    self?.isInitiated = false
 					return
 				}
+                
+                if let isInitiated = self?.isInitiated, !isInitiated {
+                    self?.isInitiated = true
+                }
 				
 				if let row: AlertLabelRow = self?.form.rowBy(tag: BaseRows.balance.tag) {
 					let symbol = type(of: service).currencySymbol

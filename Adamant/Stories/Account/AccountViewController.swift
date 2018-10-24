@@ -23,6 +23,8 @@ extension String.adamantLocalized {
 		static let getFreeTokensUrlFormat = NSLocalizedString("AccountTab.FreeTokens.UrlFormat", comment: "Account tab: A full 'Get free tokens' link, with %@ as address")
 		static let buyTokensUrlFormat = NSLocalizedString("AccountTab.BuyTokens.UrlFormat", comment: "Account tab: A full 'Buy tokens' link, with %@ as address")
 		
+        static let updatingBalance = "…"
+        
 		private init() { }
 	}
 }
@@ -450,23 +452,30 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
-		return accountService.wallets[index].walletViewController.viewController
+        let service = accountService.wallets[index]
+        let viewController = service.walletViewController.viewController
+        
+        if let vcBase = viewController as? WalletViewControllerBase {
+            vcBase.isInitiated = service.wallet != nil
+        }
+        
+		return viewController
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, pagingItemForIndex index: Int) -> T {
 		let service = accountService.wallets[index]
-		
-		guard let wallet = service.wallet else {
-			return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm")) as! T
-		}
-		
-		let serviceType = type(of: service)
-		
-		let item = WalletPagingItem(index: index, currencySymbol: serviceType.currencySymbol, currencyImage: serviceType.currencyLogo)
-		item.balance = wallet.balance
-		item.notifications = wallet.notifications
-		
-		return item as! T
+        let serviceType = type(of: service)
+        
+        let item = WalletPagingItem(index: index, currencySymbol: serviceType.currencySymbol, currencyImage: serviceType.currencyLogo)
+        
+        if let wallet = service.wallet {
+            item.balance = wallet.balance
+            item.notifications = wallet.notifications
+        } else {
+            item.balance = nil
+        }
+        
+        return item as! T
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, didScrollToItem pagingItem: T, startingViewController: UIViewController?, destinationViewController: UIViewController, transitionSuccessful: Bool) {

@@ -14,7 +14,7 @@ class WalletPagingItem: PagingItem, Hashable, Comparable {
 	let currencySymbol: String
 	let currencyImage: UIImage
 	
-	var balance: Decimal = 0
+	var balance: Decimal? = 0
 	var notifications: Int = 0
 	
 	init(index: Int, currencySymbol symbol: String, currencyImage image: UIImage) {
