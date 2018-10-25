@@ -97,7 +97,7 @@ class ChatViewController: MessagesViewController {
         return InputBarButtonItem()
             .configure {
                 $0.setSize(CGSize(width: ChatViewController.attachmentButtonSize, height: ChatViewController.attachmentButtonSize), animated: false)
-                $0.image = #imageLiteral(resourceName: "Attachment.png")
+                $0.image = #imageLiteral(resourceName: "SendMoney")
                 $0.tintColor = UIColor.adamant.primary
             }.onTouchUpInside { [weak self] _ in
 				guard let vc = self?.router.get(scene: AdamantScene.Chats.complexTransfer) as? ComplexTransferViewController else {
