@@ -452,14 +452,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
-        let service = accountService.wallets[index]
-        let viewController = service.walletViewController.viewController
-        
-        if let vcBase = viewController as? WalletViewControllerBase {
-            vcBase.isInitiated = service.wallet != nil
-        }
-        
-		return viewController
+        return accountService.wallets[index].walletViewController.viewController
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, pagingItemForIndex index: Int) -> T {

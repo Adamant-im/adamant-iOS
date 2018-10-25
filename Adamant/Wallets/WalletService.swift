@@ -10,8 +10,8 @@ import Foundation
 import UIKit
 import Swinject
 
-enum WalletServiceState {
-	case notInitiated, initiated, updated, updating
+enum WalletServiceState: Equatable {
+    case notInitiated, updating, upToDate, initiationFailed(reason: String)
 }
 
 enum WalletServiceSimpleResult {
@@ -124,7 +124,8 @@ extension ApiServiceError {
 extension AdamantUserInfoKey {
 	struct WalletService {
 		static let wallet = "Adamant.WalletService.wallet"
-		
+		static let walletState = "Adamant.WalletService.walletState"
+        
 		private init() {}
 	}
 }
@@ -161,6 +162,9 @@ protocol WalletService: class {
 	/// Enabled state changed
 	var serviceEnabledChanged: Notification.Name { get }
 	
+    /// State changed
+    var serviceStateChanged: Notification.Name { get }
+    
 	// MARK: State
 	var wallet: WalletAccount? { get }
 	var state: WalletServiceState { get }
@@ -183,6 +187,7 @@ protocol SwinjectDependentService: WalletService {
 
 protocol InitiatedWithPassphraseService: WalletService {
 	func initWallet(withPassphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void)
+    func setInitiationFailed(reason: String)
 }
 
 protocol WalletServiceWithTransfers: WalletService {

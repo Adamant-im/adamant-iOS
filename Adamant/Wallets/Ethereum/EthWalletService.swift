@@ -63,6 +63,7 @@ class EthWalletService: WalletService {
 	let walletUpdatedNotification = Notification.Name("adamant.ethWallet.walletUpdated")
 	let serviceEnabledChanged = Notification.Name("adamant.ethWallet.enabledChanged")
 	let transactionFeeUpdated = Notification.Name("adamant.ethWallet.feeUpdated")
+    let serviceStateChanged = Notification.Name("adamant.ethWallet.stateChanged")
 	
     
     // MARK: RichMessageProvider properties
@@ -93,7 +94,22 @@ class EthWalletService: WalletService {
     private var initialBalanceCheck = false
 	
 	// MARK: - State
-	private (set) var state: WalletServiceState = .notInitiated
+    private (set) var state: WalletServiceState = .notInitiated
+    
+    private func setState(_ newState: WalletServiceState, silent: Bool = false) {
+        guard newState != state else {
+            return
+        }
+        
+        state = newState
+        
+        if !silent {
+            NotificationCenter.default.post(name: serviceStateChanged,
+                                            object: self,
+                                            userInfo: [AdamantUserInfoKey.WalletService.walletState: state])
+        }
+    }
+    
 	private (set) var ethWallet: EthWallet? = nil
 	
 	var wallet: WalletAccount? { return ethWallet }
@@ -139,14 +155,14 @@ class EthWalletService: WalletService {
 		stateSemaphore.wait()
 		
 		switch state {
-		case .notInitiated, .updating:
+		case .notInitiated, .updating, .initiationFailed(_):
 			return
 			
-		case .initiated, .updated:
+		case .upToDate:
 			break
 		}
 		
-		state = .updating
+        setState(.updating)
 		
 		getBalance(forAddress: wallet.ethAddress) { [weak self] result in
             if let stateSemaphore = self?.stateSemaphore {
@@ -154,7 +170,6 @@ class EthWalletService: WalletService {
                     stateSemaphore.signal()
                 }
                 stateSemaphore.wait()
-                self?.state = .updated
             }
             
 			switch result {
@@ -179,6 +194,8 @@ class EthWalletService: WalletService {
 			case .failure(let error):
 				self?.dialogService.showRichError(error: error)
 			}
+            
+            self?.setState(.upToDate)
 		}
 		
 		getGasPrices { [weak self] result in
@@ -252,7 +269,7 @@ class EthWalletService: WalletService {
 
 // MARK: - WalletInitiatedWithPassphrase
 extension EthWalletService: InitiatedWithPassphraseService {
-	func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+    func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
         guard let adamant = accountService.account else {
             completion(.failure(error: .notLogged))
             return
@@ -260,8 +277,8 @@ extension EthWalletService: InitiatedWithPassphraseService {
         
 		// MARK: 1. Prepare
 		stateSemaphore.wait()
-		
-		state = .notInitiated
+        
+        setState(.notInitiated)
 		
 		if enabled {
 			enabled = false
@@ -295,7 +312,6 @@ extension EthWalletService: InitiatedWithPassphraseService {
 		// MARK: 3. Update
         let eWallet = EthWallet(address: ethAddress.address, ethAddress: ethAddress, keystore: keystore)
 		ethWallet = eWallet
-		state = .initiated
 		
 		if !enabled {
 			enabled = true
@@ -306,17 +322,22 @@ extension EthWalletService: InitiatedWithPassphraseService {
 		
 		// MARK: 4. Save into KVS
         getWalletAddress(byAdamantAddress: adamant.address) { [weak self] result in
+            guard let service = self else {
+                return
+            }
+            
             switch result {
             case .success(let address):
                 // ETH already saved
                 if address != ethAddress.address {
-                    self?.save(ethAddress: ethAddress.address) { result in
-                        self?.kvsSaveCompletionRecursion(ethAddress: ethAddress.address, result: result)
+                    service.save(ethAddress: ethAddress.address) { result in
+                        service.kvsSaveCompletionRecursion(ethAddress: ethAddress.address, result: result)
                     }
                 }
                 
-                self?.initialBalanceCheck = true
-                self?.update()
+                service.initialBalanceCheck = true
+                service.setState(.upToDate, silent: true)
+                service.update()
                 
                 completion(.success(result: eWallet))
                 
@@ -324,22 +345,30 @@ extension EthWalletService: InitiatedWithPassphraseService {
                 switch error {
                 case .walletNotInitiated:
                     // Show '0' without waiting for balance update
-                    if let notification = self?.walletUpdatedNotification, let wallet = self?.ethWallet {
-                        NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+                    if let wallet = service.ethWallet {
+                        NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
                     }
                     
-                    self?.save(ethAddress: ethAddress.address) { result in
-                        self?.kvsSaveCompletionRecursion(ethAddress: ethAddress.address, result: result)
+                    service.save(ethAddress: ethAddress.address) { result in
+                        service.kvsSaveCompletionRecursion(ethAddress: ethAddress.address, result: result)
                     }
-                    
+                    service.setState(.upToDate)
                     completion(.success(result: eWallet))
                     
                 default:
+                    service.setState(.upToDate)
                     completion(.failure(error: error))
                 }
             }
         }
 	}
+    
+    func setInitiationFailed(reason: String) {
+        stateSemaphore.wait()
+        setState(.initiationFailed(reason: reason))
+        ethWallet = nil
+        stateSemaphore.signal()
+    }
     
     
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save

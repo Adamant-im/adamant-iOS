@@ -155,6 +155,7 @@ extension AdamantAccountService {
 		securedStore.remove(.privateKey)
 		securedStore.remove(.useBiometry)
 		securedStore.remove(.passphrase)
+        securedStore.remove(.showedV12)
 		hasStayInAccount = false
 		NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.stayInChanged, object: self, userInfo: [AdamantUserInfoKey.AccountService.newStayInState : false])
 		notificationsService.setNotificationsMode(.disabled, completion: nil)
@@ -326,12 +327,26 @@ extension AdamantAccountService {
 		}
 		
 		if let keypair = getSavedKeypair() {
-			loginWith(keypair: keypair) { result in
+			loginWith(keypair: keypair) { [weak self] result in
 				switch result {
 				case .success(let account, _):
-					completion(.success(account: account,
-										alert: (title: String.adamantLocalized.accountService.updateAlertTitleV12,
-												message: String.adamantLocalized.accountService.updateAlertMessageV12)))
+                    
+                    let alert: (title: String, message: String)?
+                    if self?.securedStore.get(.showedV12) != nil {
+                        alert = nil
+                    } else {
+                        self?.securedStore.set("1", for: .showedV12)
+                        alert = (title: String.adamantLocalized.accountService.updateAlertTitleV12,
+                                 message: String.adamantLocalized.accountService.updateAlertMessageV12)
+                    }
+                    
+					completion(.success(account: account, alert: alert))
+                    
+                    if let wallets = self?.wallets {
+                        for case let wallet as InitiatedWithPassphraseService in wallets {
+                            wallet.setInitiationFailed(reason: String.adamantLocalized.accountService.reloginToInitiateWallets)
+                        }
+                    }
 					
 				default:
 					completion(result)
@@ -434,6 +449,7 @@ extension StoreKey {
 		static let pin = "accountService.pin"
 		static let useBiometry = "accountService.useBiometry"
 		static let passphrase = "accountService.passphrase"
+        static let showedV12 = "accountService.showedV12"
 		
 		private init() {}
 	}
@@ -445,6 +461,7 @@ fileprivate enum Key {
 	case pin
 	case useBiometry
 	case passphrase
+    case showedV12
 	
 	var stringValue: String {
 		switch self {
@@ -453,6 +470,7 @@ fileprivate enum Key {
 		case .pin: return StoreKey.accountService.pin
 		case .useBiometry: return StoreKey.accountService.useBiometry
 		case .passphrase: return StoreKey.accountService.passphrase
+        case .showedV12: return StoreKey.accountService.showedV12
 		}
 	}
 }

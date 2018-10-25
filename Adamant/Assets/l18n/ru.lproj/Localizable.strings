@@ -80,7 +80,10 @@
 "AccountService.update.v12.title" = "Новое в версии 1.2: Криптокошельки";
 
 /* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets */
-"AccountService.update.v12.message" = "Необходимо снова зайти в приложение чтобы создать Ethereum и Lisk кошельки";
+"AccountService.update.v12.message" = "Необходимо снова зайти в приложение чтобы создать Ethereum кошелёк";
+
+/* AccountService: User must relogin into app to initiate wallets */
+"AccountService.reloginToInitiateWallets" = "Необходимо перезайти в приложение чтобы создать кошелёк";
 
 /* Login: user typed in invalid passphrase */
 "AccountServiceError.InvalidPassphrase" = "Неправильный пароль";

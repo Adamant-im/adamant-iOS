@@ -47,6 +47,7 @@ extension String.adamantLocalized {
 	struct accountService {
 		static let updateAlertTitleV12 = NSLocalizedString("AccountService.update.v12.title", comment: "AccountService: Alert title. Changes in version 1.2")
 		static let updateAlertMessageV12 = NSLocalizedString("AccountService.update.v12.message", comment: "AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets")
+        static let reloginToInitiateWallets = NSLocalizedString("AccountService.reloginToInitiateWallets", comment: "AccountService: User must relogin into app to initiate wallets")
 	}
 }
 

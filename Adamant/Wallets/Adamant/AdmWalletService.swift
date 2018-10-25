@@ -31,6 +31,7 @@ class AdmWalletService: NSObject, WalletService {
 	let walletUpdatedNotification = Notification.Name("adamant.admWallet.updated")
 	let serviceEnabledChanged = Notification.Name("adamant.admWallet.enabledChanged")
 	let transactionFeeUpdated = Notification.Name("adamant.admWallet.feeUpdated")
+    let serviceStateChanged = Notification.Name("adamant.admWallet.stateChanged")
 	
     // MARK: RichMessageProvider properties
     static let richMessageType = "adm_transaction" // not used
@@ -53,7 +54,7 @@ class AdmWalletService: NSObject, WalletService {
 	private var transfersController: NSFetchedResultsController<TransferTransaction>?
 	
 	// MARK: - State
-	private (set) var state: WalletServiceState = .notInitiated
+	private (set) var state: WalletServiceState = .upToDate
 	private (set) var wallet: WalletAccount? = nil
 	
 	

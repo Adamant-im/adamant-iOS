@@ -53,43 +53,23 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 	
 	var service: WalletService?
 	
-    var isInitiated: Bool = true {
-        didSet {
-            guard viewDidInitialLoad else {
-                return
-            }
-            
-            if isInitiated {
-                initiatingActivityIndicator.stopAnimating()
-                tableView.isHidden = false
-            } else {
-                initiatingActivityIndicator.startAnimating()
-                tableView.isHidden = true
-            }
-        }
-    }
-    
-    // If we try to set isInitiated before view did load from nib, we will get a nil in IBOutlets.
-    private var viewDidInitialLoad = false
-    
 	// MARK: - IBOutlets
 	
 	@IBOutlet weak var walletTitleLabel: UILabel!
     @IBOutlet weak var initiatingActivityIndicator: UIActivityIndicatorView!
     
-	
+    // MARK: Error view
+    
+    @IBOutlet weak var errorView: UIView!
+    @IBOutlet weak var errorImageView: UIImageView!
+    @IBOutlet weak var errorLabel: UILabel!
+    
 	// MARK: - Lifecycle
 	
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        viewDidInitialLoad = true
-        if !isInitiated {
-            initiatingActivityIndicator.startAnimating()
-            tableView.isHidden = true
-        }
-		
-		let section = Section()
+        let section = Section()
 		
 		// MARK: Address
 		let addressRow = LabelRow() {
@@ -199,16 +179,12 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 		
 		// MARK: Notification
 		if let service = service {
-			let callback = { [weak self] (notification: Notification) in
+            // MARK: Wallet updated
+			let walletUpdatedCallback = { [weak self] (notification: Notification) in
 				guard let wallet = notification.userInfo?[AdamantUserInfoKey.WalletService.wallet] as? WalletAccount else {
-                    self?.isInitiated = false
 					return
 				}
                 
-                if let isInitiated = self?.isInitiated, !isInitiated {
-                    self?.isInitiated = true
-                }
-				
 				if let row: AlertLabelRow = self?.form.rowBy(tag: BaseRows.balance.tag) {
 					let symbol = type(of: service).currencySymbol
 					row.value = AdamantBalanceFormat.full.format(wallet.balance, withCurrencySymbol: symbol)
@@ -230,8 +206,34 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,
 												   object: service,
 												   queue: OperationQueue.main,
-												   using: callback)
+												   using: walletUpdatedCallback)
+            
+            // MARK: Wallet state updated
+            let stateUpdatedCallback = { [weak self] (notification: Notification) in
+                guard let newState = notification.userInfo?[AdamantUserInfoKey.WalletService.walletState] as? WalletServiceState else {
+                    return
+                }
+                
+                self?.setUiToWalletServiceState(newState)
+            }
+            
+            NotificationCenter.default.addObserver(forName: service.serviceStateChanged,
+                                                   object: service,
+                                                   queue: OperationQueue.main,
+                                                   using: stateUpdatedCallback)
 		}
+        
+        if let state = service?.state {
+            switch state {
+            case .updating:
+                setUiToWalletServiceState(.notInitiated)
+                
+            default:
+                setUiToWalletServiceState(state)
+            }
+        } else {
+            setUiToWalletServiceState(.notInitiated)
+        }
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -255,6 +257,40 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     func sendRowLocalizedLabel() -> String {
         return BaseRows.send.localized
+    }
+    
+    
+    // MARK: - Other
+    
+    private var currentUiState: WalletServiceState = .upToDate
+    
+    func setUiToWalletServiceState(_ state: WalletServiceState) {
+        guard currentUiState != state else {
+            return
+        }
+        
+        switch state {
+        case .updating:
+            break
+            
+        case .upToDate:
+            initiatingActivityIndicator.stopAnimating()
+            tableView.isHidden = false
+            errorView.isHidden = true
+            
+        case .notInitiated:
+            initiatingActivityIndicator.startAnimating()
+            tableView.isHidden = true
+            errorView.isHidden = true
+            
+        case .initiationFailed(let reason):
+            initiatingActivityIndicator.stopAnimating()
+            tableView.isHidden = true
+            errorView.isHidden = false
+            errorLabel.text = reason
+        }
+        
+        currentUiState = state
     }
 }
 
