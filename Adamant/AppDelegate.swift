@@ -48,8 +48,8 @@ struct AdamantResources {
 	]
     
     static let ethServers = [
-//        "https://ethnode1.adamant.im/"
-        "https://ropsten.infura.io/"  // test network
+        "https://ethnode1.adamant.im/"
+//        "https://ropsten.infura.io/"  // test network
     ]
 	
 	// Addresses
@@ -70,8 +70,8 @@ struct AdamantResources {
     
     // Explorers
     static let adamantExplorerAddress = "https://explorer.adamant.im/tx/"
-//    static let ethereumExplorerAddress = "https://etherscan.io/tx/"
-    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
+    static let ethereumExplorerAddress = "https://etherscan.io/tx/"
+//    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
 	
 	private init() {}
 }
