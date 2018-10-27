@@ -198,3 +198,95 @@ extension EthereumTransaction {
  }
  
  */
+
+// MARK: - Adamant ETH API transactions
+
+struct EthTransactionShort {
+    let date: Date
+    let hash: String
+    let from: String
+    let to: String
+    let gasUsed: Decimal
+    let gasPrice: Decimal
+    let value: Decimal
+    let blockNumber: String
+    
+    func asEthTransaction(isOutgoing: Bool) -> EthTransaction {
+        return EthTransaction(date: date,
+                              hash: hash,
+                              value: value,
+                              from: from,
+                              to: to,
+                              gasUsed: gasUsed,
+                              gasPrice: gasPrice,
+                              confirmations: nil,
+                              isError: false,
+                              receiptStatus: .ok,
+                              blockNumber: blockNumber,
+                              isOutgoing: isOutgoing)
+    }
+}
+
+extension EthTransactionShort: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case time
+        case txfrom
+        case txto
+        case gas
+        case gasprice
+        case block
+        case txhash
+        case value
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        from = try container.decode(String.self, forKey: .txfrom)
+        to = try container.decode(String.self, forKey: .txto)
+        
+        // Hash
+        let hashRaw = try container.decode(String.self, forKey: .txhash)
+        hash = hashRaw.replacingOccurrences(of: "\\", with: "0")
+        
+        // Block
+        let blockRaw = try container.decode(UInt64.self, forKey: .block)
+        blockNumber = String(blockRaw)
+        
+        // Date
+        let timestamp = try container.decode(TimeInterval.self, forKey: .time)
+        date = Date(timeIntervalSince1970: timestamp)
+        
+        // Gas used
+        gasUsed = try container.decode(Decimal.self, forKey: .gas)
+        
+        // Gas price
+        let gasPriceRaw = try container.decode(Decimal.self, forKey: .gasprice)
+        gasPrice = Decimal(sign: .plus, exponent: EthWalletService.currencyExponent, significand: gasPriceRaw)
+        
+        // Value
+        let valueRaw = try container.decode(Decimal.self, forKey: .value)
+        value = Decimal(sign: .plus, exponent: EthWalletService.currencyExponent, significand: valueRaw)
+    }
+}
+
+// MARK: Adamant node Sample JSON
+/*
+ 
+ {
+     "time": 1540676411,
+     "txfrom": "0xcE25C5bbEB9f27ac942f914183279FDB31C999dC",
+     "txto": "0x201B95b75B4114A825b278710307EFA0b5A5Ebf1",
+     "gas": 21000,
+     "gasprice": 4000000000,
+     "block": 6595442,
+     "txhash": "\\x998b47613f294dd6795ccd28e2c68f244a97a87e20ba30f88012a34e899d029b",
+     "value": 4000000000000000000,
+     "contract_to": "",
+     "contract_value": ""
+ }
+ 
+ Note broken txhash
+ contract_to & contract_value not requested from API
+ 
+ */

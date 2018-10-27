@@ -75,6 +75,8 @@ class EthWalletService: WalletService {
     
 	// MARK: - Properties
 	
+    private static let transactionsListApiSubpath = "ethtxs"
+    
 	let web3: web3
 	private let baseUrl: String
 	let defaultDispatchQueue = DispatchQueue(label: "im.adamant.ethWalletService", qos: .utility, attributes: [.concurrent])
@@ -255,8 +257,8 @@ class EthWalletService: WalletService {
 		return "https://api\(suffix).etherscan.io/api"
 	}
 	
-	private func buildUrl(queryItems: [URLQueryItem]? = nil) throws -> URL {
-		guard let url = URL(string: baseUrl), var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+    private func buildUrl(url: URL, queryItems: [URLQueryItem]? = nil) throws -> URL {
+		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
 			throw AdamantApiService.InternalError.endpointBuildFailed
 		}
 		
@@ -490,53 +492,6 @@ extension EthWalletService {
 
 // MARK: - Transactions
 extension EthWalletService {
-	func getTransactionsHistory(address: String, page: Int = 1, size: Int = 50, completion: @escaping (WalletServiceResult<[EthTransaction]>) -> Void) {
-		let queryItems: [URLQueryItem] = [URLQueryItem(name: "module", value: "account"),
-										  URLQueryItem(name: "action", value: "txlist"),
-										  URLQueryItem(name: "address", value: address),
-										  URLQueryItem(name: "page", value: "\(page)"),
-										  URLQueryItem(name: "offset", value: "\(size)"),
-										  URLQueryItem(name: "sort", value: "desc")
-			//			            ,URLQueryItem(name: "apikey", value: "YourApiKeyToken")
-		]
-		
-		let endpoint: URL
-		do {
-			endpoint = try buildUrl(queryItems: queryItems)
-		} catch {
-			let err = AdamantApiService.InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-			completion(.failure(error: WalletServiceError.apiError(err)))
-			return
-		}
-		
-		Alamofire.request(endpoint).responseData(queue: defaultDispatchQueue) { response in
-			switch response.result {
-			case .success(let data):
-				do {
-					let model: EthResponse = try JSONDecoder().decode(EthResponse.self, from: data)
-					
-					if model.status == 1 {
-                        var transactions = model.result
-                        
-                        for index in 0..<transactions.count {
-                            let from = transactions[index].from
-                            transactions[index].isOutgoing = from == address
-                        }
-                        
-						completion(.success(result: transactions))
-					} else {
-						completion(.failure(error: .remoteServiceError(message: model.message)))
-					}
-				} catch {
-					completion(.failure(error: .internalError(message: "Failed to deserialize transactions", error: error)))
-				}
-				
-			case .failure:
-				completion(.failure(error: .networkError))
-			}
-		}
-	}
-	
     func getTransaction(by hash: String, completion: @escaping (WalletServiceResult<EthTransaction>) -> Void) {
         let sender = wallet?.address
         let eth = web3.eth
@@ -597,6 +552,102 @@ extension EthWalletService {
                 completion(result)
             } catch {
                 completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: error)))
+            }
+        }
+    }
+    
+    func getTransactionsHistory(address: String, offset: Int = 0, limit: Int = 100, completion: @escaping (WalletServiceResult<[EthTransactionShort]>) -> Void) {
+        
+        // Headers
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        
+        // Request
+        let columns = "time,txfrom,txto,gas,gasprice,block,txhash,value"
+        let order = "time.desc"
+        
+        let queryItems: [URLQueryItem] = [URLQueryItem(name: "select", value: columns),
+                                          URLQueryItem(name: "limit", value: String(limit)),
+                                          URLQueryItem(name: "txfrom", value: "eq.\(address)"),
+                                          URLQueryItem(name: "offset", value: String(offset)),
+                                          URLQueryItem(name: "order", value: order)
+        ]
+        
+        guard let raw = AdamantResources.ethServers.randomElement(), let url = URL(string: raw) else {
+            fatalError("Failed to build ETH endpoint URL")
+        }
+        
+        let endpoint: URL
+        do {
+            endpoint = try buildUrl(url: url.appendingPathComponent(EthWalletService.transactionsListApiSubpath), queryItems: queryItems)
+        } catch {
+            let err = AdamantApiService.InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+            completion(.failure(error: WalletServiceError.apiError(err)))
+            return
+        }
+        
+        Alamofire.request(endpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+            switch response.result {
+            case .success(let data):
+                do {
+                    let transactions = try JSONDecoder().decode([EthTransactionShort].self, from: data)
+                    completion(.success(result: transactions))
+                } catch {
+                    completion(.failure(error: .internalError(message: "Failed to deserialize transactions", error: error)))
+                }
+                
+            case .failure:
+                completion(.failure(error: .networkError))
+            }
+        }
+    }
+    
+    
+    /// Transaction history for Ropsten testnet
+    func getTransactionsHistoryRopsten(address: String, page: Int = 1, size: Int = 50, completion: @escaping (WalletServiceResult<[EthTransaction]>) -> Void) {
+        let queryItems: [URLQueryItem] = [URLQueryItem(name: "module", value: "account"),
+                                          URLQueryItem(name: "action", value: "txlist"),
+                                          URLQueryItem(name: "address", value: address),
+                                          URLQueryItem(name: "page", value: "\(page)"),
+                                          URLQueryItem(name: "offset", value: "\(size)"),
+                                          URLQueryItem(name: "sort", value: "desc")
+            //                        ,URLQueryItem(name: "apikey", value: "YourApiKeyToken")
+        ]
+        
+        let endpoint: URL
+        do {
+            endpoint = try buildUrl(url: URL(string: baseUrl)!, queryItems: queryItems)
+        } catch {
+            let err = AdamantApiService.InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+            completion(.failure(error: WalletServiceError.apiError(err)))
+            return
+        }
+        
+        Alamofire.request(endpoint).responseData(queue: defaultDispatchQueue) { response in
+            switch response.result {
+            case .success(let data):
+                do {
+                    let model: EthResponse = try JSONDecoder().decode(EthResponse.self, from: data)
+                    
+                    if model.status == 1 {
+                        var transactions = model.result
+                        
+                        for index in 0..<transactions.count {
+                            let from = transactions[index].from
+                            transactions[index].isOutgoing = from == address
+                        }
+                        
+                        completion(.success(result: transactions))
+                    } else {
+                        completion(.failure(error: .remoteServiceError(message: model.message)))
+                    }
+                } catch {
+                    completion(.failure(error: .internalError(message: "Failed to deserialize transactions", error: error)))
+                }
+                
+            case .failure:
+                completion(.failure(error: .networkError))
             }
         }
     }

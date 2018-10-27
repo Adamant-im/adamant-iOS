@@ -21,7 +21,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
     var router: Router!
     
     // MARK: - Properties
-    var transactions: [EthTransaction] = []
+    var transactions: [EthTransactionShort] = []
     private var ethAddress: String = ""
     
     override func viewDidLoad() {
@@ -84,16 +84,34 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        let hash = transactions[indexPath.row].hash
         
-        let transaction = transactions[indexPath.row]
-        
-        guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController else {
+        guard let dialogService = dialogService else {
             return
         }
-
-        vc.transaction = transaction
+        
+        guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController else {
+            fatalError("Failed to get EthTransactionDetailsViewController")
+        }
+        
         vc.service = ethWalletService
-        navigationController?.pushViewController(vc, animated: true)
+        
+        dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+        
+        ethWalletService.getTransaction(by: hash) { [weak self] result in
+            dialogService.dismissProgress()
+            
+            switch result {
+            case .success(let ethTransaction):
+                DispatchQueue.main.async {
+                    vc.transaction = ethTransaction
+                    self?.navigationController?.pushViewController(vc, animated: true)
+                }
+                
+            case .failure(let error):
+                dialogService.showRichError(error: error)
+            }
+        }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -107,7 +125,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
         return cell
     }
     
-    func configureCell(_ cell: TransactionTableViewCell, for transaction: EthTransaction) {
+    func configureCell(_ cell: TransactionTableViewCell, for transaction: EthTransactionShort) {
         let outgoing = isOutgoing(transaction)
         let partnerId = outgoing ? transaction.to : transaction.from
         
@@ -123,7 +141,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
 
 // MARK: - Tools
 extension EthTransactionsViewController {
-    private func isOutgoing(_ transaction: EthTransaction) -> Bool {
+    private func isOutgoing(_ transaction: EthTransactionShort) -> Bool {
         return transaction.from.lowercased() == ethAddress.lowercased()
     }
 }
