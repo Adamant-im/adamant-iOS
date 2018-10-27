@@ -86,11 +86,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Properties
     
-    var transaction: TransactionDetails? = nil {
-        didSet {
-            tableView?.reloadData()
-        }
-    }
+    var transaction: TransactionDetails? = nil
     
     private static let awaitingValueString = "⏱"
     

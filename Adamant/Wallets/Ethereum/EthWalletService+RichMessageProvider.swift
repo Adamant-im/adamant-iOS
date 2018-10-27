@@ -30,6 +30,8 @@ extension EthWalletService: RichMessageProvider {
                 return
             }
             
+            vc.service = self
+            
             switch result {
             case .success(let ethTransaction):
                 vc.transaction = ethTransaction

@@ -92,6 +92,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
         }
 
         vc.transaction = transaction
+        vc.service = ethWalletService
         navigationController?.pushViewController(vc, animated: true)
     }
     

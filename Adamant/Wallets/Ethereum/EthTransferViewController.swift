@@ -77,11 +77,15 @@ class EthTransferViewController: TransferViewControllerBase {
                         service.getTransaction(by: hash) { result in
                             switch result {
                             case .success(let transaction):
-                                let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController
-                                detailsVc?.transaction = transaction
-                                
                                 vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+                                
+                                if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController {
+                                    detailsVc.transaction = transaction
+                                    detailsVc.service = service
+                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+                                } else {
+                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
+                                }
                                 
                             case .failure(let error):
                                 vc.dialogService.showRichError(error: error)
