@@ -18,6 +18,10 @@ class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     }
     
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
-        return URL(string: "\(AdamantResources.ethereumExplorerAddress)\(transaction.id)")
+        guard let id = transaction.id else {
+            return nil
+        }
+        
+        return URL(string: "\(AdamantResources.ethereumExplorerAddress)\(id)")
     }
 }
