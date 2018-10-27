@@ -143,14 +143,34 @@ extension ChatViewController: MessagesDataSource {
             chatCell.bubbleBackgroundColor = bgColor
         }
         
-        if let customCell = cell as? TapRecognizerCustomCell {
-            customCell.delegate = self
+        // MARK: Delegates
+        switch cell {
+        case let tapCell as TapRecognizerCustomCell:
+            tapCell.delegate = self
+            
+        case let transferCell as TapRecognizerTransferCell:
+            transferCell.delegate = self
+            
+        default:
+            break
         }
         
+        // MARK: Rich transfer statuses
         if let richTransaction = message as? RichMessageTransaction,
             (richTransaction.transactionStatus == nil || richTransaction.transactionStatus == .notInitiated),
             let updater = provider as? RichMessageProviderWithStatusCheck {
-            updateStatus(for: richTransaction, provider: updater)
+            
+            /*
+             Сообщения-отчёты об отправленных средствах создаются раньше, чем на эфирных нодах появляется сама транзакция перевода (по ТЗ).
+             Проблема - как только сообщение появляется в чате, мы запрашиваем у эфирной ноды статус транзакции которую ещё не отправили - нода возвращает ошибку.
+             Решение - если сообщение появилось только что - обновим статус этой транзакции с 'некоторой' задержкой.
+             🤷🏻‍♂️
+             */
+            if let date = richTransaction.date, date.timeIntervalSinceNow > -2.0 {
+                updateStatus(for: richTransaction, provider: updater, delay: 5.0)
+            } else {
+                updateStatus(for: richTransaction, provider: updater)
+            }
         }
         
         return cell
@@ -341,6 +361,55 @@ extension ChatViewController: CustomCellDelegate {
         default:
             return
         }
+    }
+}
+
+// MARK: - TransferCollectionViewCellDelegate
+extension ChatViewController: TransferCellDelegate {
+    func didTapTransferCell(_ cell: TapRecognizerTransferCell) {
+        guard let c = cell as? UICollectionViewCell,
+            let indexPath = messagesCollectionView.indexPath(for: c),
+            let transaction = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) else {
+                return
+        }
+        
+        switch transaction {
+        case let transfer as TransferTransaction:
+            guard let provider = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService else {
+                break
+            }
+            
+            provider.richMessageTapped(for: transfer, at: indexPath, in: self)
+            
+        case let richTransaction as RichMessageTransaction:
+            guard let type = richTransaction.richType, let provider = richMessageProviders[type] else {
+                break
+            }
+            
+            provider.richMessageTapped(for: richTransaction, at: indexPath, in: self)
+            
+        default:
+            return
+        }
+    }
+    
+    func didTapTransferCellStatus(_ cell: TapRecognizerTransferCell) {
+        guard let c = cell as? UICollectionViewCell,
+            let indexPath = messagesCollectionView.indexPath(for: c),
+            let transaction = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) as? RichMessageTransaction else {
+                return
+        }
+        
+        guard transaction.transactionStatus != TransactionStatus.updating else {
+            return
+        }
+        
+        guard let type = transaction.richType,
+            let provider = richMessageProviders[type] as? RichMessageProviderWithStatusCheck else {
+                return
+        }
+        
+        updateStatus(for: transaction, provider: provider, delay: 1)
     }
 }
 

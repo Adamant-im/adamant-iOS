@@ -97,7 +97,7 @@ class ChatViewController: MessagesViewController {
         return InputBarButtonItem()
             .configure {
                 $0.setSize(CGSize(width: ChatViewController.attachmentButtonSize, height: ChatViewController.attachmentButtonSize), animated: false)
-                $0.image = #imageLiteral(resourceName: "SendMoney")
+                $0.image = #imageLiteral(resourceName: "Attachment")
                 $0.tintColor = UIColor.adamant.primary
             }.onTouchUpInside { [weak self] _ in
 				guard let vc = self?.router.get(scene: AdamantScene.Chats.complexTransfer) as? ComplexTransferViewController else {
@@ -525,7 +525,7 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 }
 
 extension ChatViewController: TransferViewControllerDelegate, ComplexTransferViewControllerDelegate {
-    func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails, detailsViewController: UIViewController?) {
+    func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?) {
         dismissTransferViewController(andPresent: detailsViewController)
     }
 	
@@ -556,14 +556,20 @@ extension ChatViewController: TransferViewControllerDelegate, ComplexTransferVie
 
 // MARK: - RichTransfers status update
 extension ChatViewController {
-    func updateStatus(for transaction: RichMessageTransaction, provider: RichMessageProviderWithStatusCheck) {
+    func updateStatus(for transaction: RichMessageTransaction, provider: RichMessageProviderWithStatusCheck, delay: TimeInterval? = nil) {
         transaction.transactionStatus = .updating
         
         let operation = StatusUpdateProcedure(parentContext: stack.container.viewContext,
                                               objectId: transaction.objectID,
                                               provider: provider)
         
-        richStatusOperationQueue.addOperation(operation)
+        if let delay = delay {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                self?.richStatusOperationQueue.addOperation(operation)
+            }
+        } else {
+            richStatusOperationQueue.addOperation(operation)
+        }
     }
 }
 

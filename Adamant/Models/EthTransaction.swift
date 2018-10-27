@@ -47,7 +47,7 @@ struct EthTransaction {
     let value: Decimal
     let from: String
     let to: String
-    let gasUsed: Decimal
+    let gasUsed: Decimal?
     let gasPrice: Decimal
     let confirmations: String?
     let isError: Bool
@@ -143,6 +143,10 @@ extension EthTransaction: TransactionDetails {
     var blockValue: String? { return blockNumber}
     
     var feeValue: Decimal? {
+        guard let gasUsed = gasUsed else {
+            return nil
+        }
+        
         return gasPrice * gasUsed
     }
     
@@ -153,13 +157,13 @@ extension EthTransaction: TransactionDetails {
 
 // MARK: - From EthereumTransaction
 extension EthereumTransaction {
-    func asEthTransaction(date: Date?, gasUsed: BigUInt, blockNumber: String?, confirmations: String?, receiptStatus: TransactionReceipt.TXStatus, isOutgoing: Bool) -> EthTransaction {
+    func asEthTransaction(date: Date?, gasUsed: BigUInt?, blockNumber: String?, confirmations: String?, receiptStatus: TransactionReceipt.TXStatus, isOutgoing: Bool) -> EthTransaction {
         return EthTransaction(date: date,
                               hash: txhash ?? "",
                               value: value.asDecimal(exponent: EthWalletService.currencyExponent),
                               from: sender?.address ?? "",
                               to: to.address,
-                              gasUsed: gasUsed.asDecimal(exponent: 0),
+                              gasUsed: gasUsed?.asDecimal(exponent: 0),
                               gasPrice: gasPrice.asDecimal(exponent: EthWalletService.currencyExponent),
                               confirmations: confirmations,
                               isError: receiptStatus != .failed,

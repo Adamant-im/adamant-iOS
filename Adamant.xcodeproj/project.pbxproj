@@ -249,6 +249,7 @@
 		E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FAE5D9203DBFEF008D3A6B /* Comparable+clamped.swift */; };
 		E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */; };
 		E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */; };
+		E9FCA1E6218334C00005E83D /* SimpleTransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FCA1E5218334C00005E83D /* SimpleTransactionDetails.swift */; };
 		E9FEECA421413659007DD7C8 /* RichMessageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FEECA321413659007DD7C8 /* RichMessageProvider.swift */; };
 		E9FEECA62143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FEECA52143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift */; };
 		E9FEECA92143C371007DD7C8 /* TransferCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FEECA72143C371007DD7C8 /* TransferCollectionViewCell.swift */; };
@@ -524,6 +525,7 @@
 		E9FAE5D9203DBFEF008D3A6B /* Comparable+clamped.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Comparable+clamped.swift"; sourceTree = "<group>"; };
 		E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareQrViewController.swift; sourceTree = "<group>"; };
 		E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShareQrViewController.xib; sourceTree = "<group>"; };
+		E9FCA1E5218334C00005E83D /* SimpleTransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleTransactionDetails.swift; sourceTree = "<group>"; };
 		E9FEECA321413659007DD7C8 /* RichMessageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichMessageProvider.swift; sourceTree = "<group>"; };
 		E9FEECA52143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EthWalletService+RichMessageProvider.swift"; sourceTree = "<group>"; };
 		E9FEECA72143C371007DD7C8 /* TransferCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -701,6 +703,7 @@
 				E940086A2114A70600CD2D67 /* LskAccount.swift */,
 				E993302321369B8A00CD5200 /* RichMessage.swift */,
 				E971591921681D6900A5F904 /* TransactionStatus.swift */,
+				E9FCA1E5218334C00005E83D /* SimpleTransactionDetails.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1386,6 +1389,7 @@
 				E9150B9D2066DA210065A985 /* Chatroom+CoreDataClass.swift in Sources */,
 				E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */,
 				E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */,
+				E9FCA1E6218334C00005E83D /* SimpleTransactionDetails.swift in Sources */,
 				64A223DA20F7A14B005157CB /* AdamantLskApiService.swift in Sources */,
 				E9150BA22066DA210065A985 /* ChatTransaction+CoreDataProperties.swift in Sources */,
 				6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */,

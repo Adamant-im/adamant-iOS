@@ -9,7 +9,7 @@
 import UIKit
 //import MessageKit
 
-class TransferCollectionViewCell: UICollectionViewCell, ChatCell, TapRecognizerCustomCell {
+class TransferCollectionViewCell: UICollectionViewCell, ChatCell, TapRecognizerTransferCell {
     @IBOutlet weak var sentLabel: UILabel!
     @IBOutlet weak var amountLabel: UILabel!
     @IBOutlet weak var currencySymbolLabel: UILabel!
@@ -28,7 +28,7 @@ class TransferCollectionViewCell: UICollectionViewCell, ChatCell, TapRecognizerC
     @IBOutlet weak var statusLeadingConstraint: NSLayoutConstraint?
     @IBOutlet weak var statusTrailingConstraint: NSLayoutConstraint?
     
-    weak var delegate: CustomCellDelegate? = nil
+    weak var delegate: TransferCellDelegate? = nil
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -36,12 +36,17 @@ class TransferCollectionViewCell: UICollectionViewCell, ChatCell, TapRecognizerC
         
         bubbleView.layer.cornerRadius = 16.0
         bubbleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTap)))
+        statusView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapStatus)))
     }
     
     // MARK: - Tap
     
     @objc func didTap(sender: UITapGestureRecognizer) {
-        delegate?.didTapCustomCell(self)
+        delegate?.didTapTransferCell(self)
+    }
+    
+    @objc func didTapStatus(sender: UITapGestureRecognizer) {
+        delegate?.didTapTransferCellStatus(self)
     }
     
     // MARK: - Status

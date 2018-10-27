@@ -296,7 +296,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 
 
 extension WalletViewControllerBase: TransferViewControllerDelegate {
-    func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails, detailsViewController: UIViewController?) {
+    func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?) {
         if let nav = navigationController, nav.topViewController == viewController {
             DispatchQueue.main.async {
                 if let detailsViewController = detailsViewController {

@@ -130,7 +130,7 @@ extension RichMessageTransfer {
         f.roundingMode = .floor
         f.decimalSeparator = "."
         f.minimumFractionDigits = 0
-        f.maximumFractionDigits = 18
+        f.maximumFractionDigits = 12 // 18 is too low, 0.007 for example will serialize as 0.007000000000000001
         return f
     }()
     

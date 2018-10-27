@@ -49,16 +49,22 @@ class EthTransferViewController: TransferViewControllerBase {
 		dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
 		
 		service.createTransaction(recipient: recipient, amount: amount, comments: comments) { [weak self] result in
+            guard let vc = self else {
+                dialogService.dismissProgress()
+                dialogService.showError(withMessage: String.adamantLocalized.sharedErrors.unknownError, error: nil)
+                return
+            }
+            
 			switch result {
 			case .success(let transaction):
 				// MARK: 1. Send adm report
-				if let reportRecipient = self?.admReportRecipient, let hash = transaction.txhash {
+				if let reportRecipient = vc.admReportRecipient, let hash = transaction.txhash {
 					let payload = RichMessageTransfer(type: EthWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
 					let message = AdamantMessage.richMessage(payload: payload)
 					
-					self?.chatsProvider.sendMessage(message, recipientId: reportRecipient) { result in
+					vc.chatsProvider.sendMessage(message, recipientId: reportRecipient) { result in
 						if case .failure(let error) = result {
-							self?.dialogService.showRichError(error: error)
+							vc.dialogService.showRichError(error: error)
 						}
 					}
 				}
@@ -68,15 +74,10 @@ class EthTransferViewController: TransferViewControllerBase {
 					switch result {
 					case .success(let hash):
 						service.update()
-						
-						guard let vc = self else {
-							break
-						}
-						
                         service.getTransaction(by: hash) { result in
                             switch result {
                             case .success(let transaction):
-                                let detailsVc = self?.router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController
+                                let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController
                                 detailsVc?.transaction = transaction
                                 
                                 vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
@@ -84,19 +85,16 @@ class EthTransferViewController: TransferViewControllerBase {
                                 
                             case .failure(let error):
                                 vc.dialogService.showRichError(error: error)
+                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
                             }
                         }
 						
 					case .failure(let error):
-						self?.dialogService.showRichError(error: error)
+						vc.dialogService.showRichError(error: error)
 					}
 				}
 				
 			case .failure(let error):
-				guard let dialogService = self?.dialogService else {
-					break
-				}
-				
 				dialogService.dismissProgress()
 				dialogService.showRichError(error: error)
 			}
