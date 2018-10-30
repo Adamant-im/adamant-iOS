@@ -51,6 +51,8 @@ class EthWalletService: WalletService {
 	static let transferGas: Decimal = 21000
 	static let defaultGasPrice = 20000000000 // 20 Gwei
 	static let kvsAddress = "eth:address"
+    
+    static let walletPath = "m/44'/60'/3'/1"
 	
 	
 	// MARK: - Dependencies
@@ -244,7 +246,7 @@ extension EthWalletService: InitiatedWithPassphraseService {
 		// MARK: 2. Create keys and addresses
 		let keystore: BIP32Keystore
 		do {
-			guard let store = try BIP32Keystore(mnemonics: passphrase, password: "", mnemonicsPassword: "", language: .english) else {
+            guard let store = try BIP32Keystore(mnemonics: passphrase, password: "", mnemonicsPassword: "", language: .english, prefixPath: EthWalletService.walletPath) else {
 				completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
 				stateSemaphore.signal()
 				return
