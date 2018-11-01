@@ -388,7 +388,9 @@ class ChatViewController: MessagesViewController {
 			self?.present(alert, animated: true, completion: nil)
 		}
 		
-        dialogService.showAlert(title: nil, message: nil, style: .actionSheet, actions: [share, rename])
+        let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
+        
+        dialogService.showAlert(title: nil, message: nil, style: .actionSheet, actions: [share, rename, cancel])
 	}
     
     
