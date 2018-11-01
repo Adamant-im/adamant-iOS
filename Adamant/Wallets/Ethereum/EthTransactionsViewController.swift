@@ -83,6 +83,8 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let address = ethWalletService.wallet?.address
+        
         tableView.deselectRow(at: indexPath, animated: true)
         let hash = transactions[indexPath.row].hash
         
@@ -105,6 +107,13 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
             case .success(let ethTransaction):
                 DispatchQueue.main.async {
                     vc.transaction = ethTransaction
+                    
+                    if ethTransaction.senderAddress == address {
+                        vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                    } else if ethTransaction.recipientAddress == address {
+                        vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                    }
+                    
                     self?.navigationController?.pushViewController(vc, animated: true)
                 }
                 

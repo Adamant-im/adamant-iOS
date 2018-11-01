@@ -14,15 +14,46 @@ extension EthWalletService: RichMessageProvider {
     // MARK: Events
     
     func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController) {
-        guard let richContent = transaction.richContent, let hash = richContent[RichContentKeys.transfer.hash] else {
-            return
-        }
-        
-        guard let dialogService = dialogService else {
-            return
+        // MARK: 0. Prepare
+        guard let richContent = transaction.richContent,
+            let hash = richContent[RichContentKeys.transfer.hash],
+            let dialogService = dialogService else {
+                return
         }
         
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+        
+        // MARK: 1. Sender & recipient names
+        
+        let senderName: String?
+        let recipientName: String?
+        
+        if let address = accountService.account?.address {
+            if address == transaction.senderId {
+                senderName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                senderName = transaction.chatroom?.partner?.name
+            }
+            
+            if address == transaction.recipientId {
+                recipientName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                recipientName = transaction.chatroom?.partner?.name
+            }
+        } else if let partner = transaction.chatroom?.partner, let id = partner.address {
+            if transaction.senderId == id {
+                senderName = partner.name
+                recipientName = nil
+            } else {
+                recipientName = partner.name
+                senderName = nil
+            }
+        } else {
+            senderName = nil
+            recipientName = nil
+        }
+        
+        // MARK: 2. Go go transaction
         
         getTransaction(by: hash) { [weak self] result in
             dialogService.dismissProgress()
@@ -31,6 +62,8 @@ extension EthWalletService: RichMessageProvider {
             }
             
             vc.service = self
+            vc.senderName = senderName
+            vc.recipientName = recipientName
             
             switch result {
             case .success(let ethTransaction):
@@ -110,8 +143,16 @@ extension EthWalletService: RichMessageProvider {
     }()
     
     func shortDescription(for transaction: RichMessageTransaction) -> String {
-        guard let amount = transaction.richContent?[RichContentKeys.transfer.amount] else {
-            return ""
+        let amount: String
+        
+        guard let raw = transaction.richContent?[RichContentKeys.transfer.amount] else {
+            return "⬅️  \(EthWalletService.currencySymbol)"
+        }
+        
+        if let decimal = Decimal(string: raw) {
+            amount = AdamantBalanceFormat.full.format(decimal)
+        } else {
+            amount = raw
         }
         
         if transaction.isOutgoing {
