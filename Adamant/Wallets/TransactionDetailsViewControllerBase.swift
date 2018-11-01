@@ -226,11 +226,16 @@ class TransactionDetailsViewControllerBase: FormViewController {
         section.append(recipientRow)
         
         // MARK: Date
-        let dateRow = DateRow() {
+        let dateRow = DateTimeRow() {
             $0.disabled = true
             $0.tag = Rows.date.tag
             $0.title = Rows.date.localized
             $0.value = transaction?.dateValue
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .medium
+            dateFormatter.timeStyle = .short
+            $0.dateFormatter = dateFormatter
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
         }.onCellSelection { [weak self] (_, row) in
