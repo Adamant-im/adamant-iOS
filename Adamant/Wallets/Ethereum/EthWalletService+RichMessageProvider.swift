@@ -92,7 +92,7 @@ extension EthWalletService: RichMessageProvider {
         cell.currencyLogoImageView.image = EthWalletService.currencyLogo
         cell.currencySymbolLabel.text = EthWalletService.currencySymbol
         
-        cell.amountLabel.text = transfer.amount
+        cell.amountLabel.text = AdamantBalanceFormat.full.format(transfer.amount)
         cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
         cell.transactionStatus = (message as? RichMessageTransaction)?.transactionStatus
         

@@ -67,7 +67,7 @@ extension AdmWalletService: RichMessageProvider {
         cell.currencyLogoImageView.image = AdmWalletService.currencyLogo
         cell.currencySymbolLabel.text = AdmWalletService.currencySymbol
         
-        cell.amountLabel.text = richMessage.amount
+        cell.amountLabel.text = AdamantBalanceFormat.full.format(richMessage.amount)
         cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
         cell.transactionStatus = nil
         

@@ -19,7 +19,7 @@ open class TransferMessageSizeCalculator: MessageSizeCalculator {
             fatalError("messageContainerSize received unhandled MessageDataType: \(message.kind)")
         }
         
-        let amount = transfer.amount
+        let amount = AdamantBalanceFormat.full.format(transfer.amount)
         
         var messageContainerSize = CGSize(width: cellWidth, height: cellHeight)
         

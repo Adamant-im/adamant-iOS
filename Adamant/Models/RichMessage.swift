@@ -38,27 +38,20 @@ struct RichContentKeys {
 
 struct RichMessageTransfer: RichMessage {
 	let type: String
-	let amount: String
+	let amount: Decimal
 	let hash: String
 	let comments: String
     
     func content() -> [String:String] {
         return [
             CodingKeys.type.stringValue: type,
-            CodingKeys.amount.stringValue: amount,
+            CodingKeys.amount.stringValue: AdamantBalanceFormat.full.format(amount),
             CodingKeys.hash.stringValue: hash,
             CodingKeys.comments.stringValue: comments
         ]
     }
     
     init(type: String, amount: Decimal, hash: String, comments: String) {
-        self.type = type
-        self.amount = RichMessageTransfer.serialize(balance: amount)
-        self.hash = hash
-        self.comments = comments
-    }
-    
-    init(type: String, amount: String, hash: String, comments: String) {
         self.type = type
         self.amount = amount
         self.hash = hash
@@ -77,10 +70,10 @@ struct RichMessageTransfer: RichMessage {
         self.type = type
         self.hash = hash
         
-        if let amount = content[CodingKeys.amount.stringValue] {
+        if let raw = content[CodingKeys.amount.stringValue], let amount = Decimal(string: raw) {
             self.amount = amount
         } else {
-            self.amount = "0"
+            self.amount = 0
         }
         
         if let comments = content[CodingKeys.comments.stringValue] {
@@ -119,7 +112,14 @@ extension RichMessageTransfer {
 		self.type = try container.decode(String.self, forKey: .type)
 		self.hash = try container.decode(String.self, forKey: .hash)
         self.comments = try container.decode(String.self, forKey: .comments)
-        self.amount = try container.decode(String.self, forKey: .amount)
+        
+        if let raw = try? container.decode(String.self, forKey: .amount), let amount = Decimal(string: raw) {
+            self.amount = amount
+        } else if let amount = try? container.decode(Decimal.self, forKey: .amount) {
+            self.amount = amount
+        } else {
+            self.amount = 0
+        }
 	}
 }
 

@@ -606,15 +606,8 @@ extension TransferTransaction: MessageType {
 	}
 	
 	public var kind: MessageKind {
-        let amountString: String
-        if let a = amount as Decimal? {
-            amountString = AdamantBalanceFormat.full.format(a)
-        } else {
-            amountString = "0"
-        }
-        
         return MessageKind.custom(RichMessageTransfer(type: AdmWalletService.richMessageType,
-                                                      amount: amountString,
+                                                      amount: amount as Decimal? ?? 0,
                                                       hash: "",
                                                       comments: ""))
 	}
