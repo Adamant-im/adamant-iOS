@@ -449,11 +449,11 @@ class TransferViewControllerBase: FormViewController {
 	// MARK: - Send Actions
 	
 	private func confirmSendFunds() {
-		guard let recipient = recipientAddress, let amount = amount else {
+		guard let recipientAddress = recipientAddress, let amount = amount else {
 			return
 		}
-		
-		guard validateRecipient(recipient) else {
+        
+		guard validateRecipient(recipientAddress) else {
 			dialogService.showWarning(withMessage: String.adamantLocalized.transfer.addressValidationError)
 			return
 		}
@@ -467,6 +467,13 @@ class TransferViewControllerBase: FormViewController {
 			dialogService.showWarning(withMessage: "Not enought money to send report")
 			return
 		}
+        
+        let recipient: String
+        if let recipientName = recipientName {
+            recipient = "\(recipientName) \(recipientAddress)"
+        } else {
+            recipient = recipientAddress
+        }
 		
 		let formattedAmount = balanceFormatter.string(from: amount as NSDecimalNumber)!
 		let title = String.adamantLocalized.alert.confirmSendMessage(formattedAmount: formattedAmount, recipient: recipient)
