@@ -394,20 +394,28 @@ class ChatViewController: MessagesViewController {
     
     // MARK: Tools
     private func messageKind(for richMessage: RichMessageTransaction) -> MessageKind {
-        if let type = richMessage.richType, richMessageProviders[type] != nil, let richContent = richMessage.richContent, let richMessageTransfer = RichMessageTransfer(content: richContent) {
+        guard let type = richMessage.richType else {
+            return MessageKind.text(richMessage.richType ?? "Failed to read richmessage id: \(richMessage.id!)")
+        }
+        
+        guard var richContent = richMessage.richContent else {
+            fatalError()
+        }
+        
+        if richMessageProviders[type] != nil, let richMessageTransfer = RichMessageTransfer(content: richContent) {
             return MessageKind.custom(richMessageTransfer)
-        } else if var richContent = richMessage.richContent {
-            if let type = richMessage.richType {
+        } else {
+            if richContent[RichContentKeys.type] == nil {
                 richContent[RichContentKeys.type] = type
             }
-                
-            if let data = try? JSONSerialization.data(withJSONObject: richContent, options: .prettyPrinted), let string = String(data: data, encoding: String.Encoding.utf8) {
-                return MessageKind.text(string)
-            } else {
-                return MessageKind.text(richMessage.richType ?? "")
+            
+            do {
+                let raw = try JSONSerialization.data(withJSONObject: richContent, options: [])
+                let serialized = String(data: raw, encoding: String.Encoding.utf8)!
+                return MessageKind.text(serialized)
+            } catch {
+                return MessageKind.text("Failed to read rich message: \(error.localizedDescription)")
             }
-        } else {
-            return MessageKind.text(richMessage.richType ?? "")
         }
     }
 }
