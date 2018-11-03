@@ -43,7 +43,27 @@ class AdmTransferViewController: TransferViewControllerBase {
                 let detailsVC = self?.router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? AdmTransactionDetailsViewController
                 detailsVC?.transaction = result
                 
-                vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                // MARK: Sender, you
+                detailsVC?.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                
+                // MARK: Get recipient
+                if let recipientName = self?.recipientName {
+                    detailsVC?.recipientName = recipientName
+                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                } else if let accountsProvider = self?.accountsProvider {
+                    accountsProvider.getAccount(byAddress: recipient) { accResult in
+                        switch accResult {
+                        case .success(let account):
+                            detailsVC?.recipientName = account.name
+                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                            
+                        default:
+                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                        }
+                    }
+                } else {
+                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                }
 				
 			case .failure(let error):
 				guard let dialogService = self?.dialogService else {

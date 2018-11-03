@@ -125,6 +125,7 @@ class TransferViewControllerBase: FormViewController {
 	// MARK: - Dependencies
 	
 	var accountService: AccountService!
+    var accountsProvider: AccountsProvider!
 	var dialogService: DialogService!
     var router: Router!
     

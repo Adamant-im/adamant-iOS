@@ -82,6 +82,7 @@ class EthTransferViewController: TransferViewControllerBase {
                                 if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController {
                                     detailsVc.transaction = transaction
                                     detailsVc.service = service
+                                    detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
                                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
                                 } else {
                                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
