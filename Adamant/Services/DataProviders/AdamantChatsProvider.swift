@@ -957,10 +957,16 @@ extension AdamantChatsProvider {
             switch chat.type {
             // MARK: Text message
             case .message, .messageOld, .signal, .unknown:
-                let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                trs.message = decodedMessage
                 
-                messageTransaction = trs
+                if transaction.amount > 0 {
+                    let trs = TransferTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                    trs.comment = decodedMessage
+                    messageTransaction = trs
+                } else {
+                    let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                    trs.message = decodedMessage
+                    messageTransaction = trs
+                }
                 
             // MARK: Rich message
             case .richMessage:

@@ -690,7 +690,11 @@ extension AdamantTransfersProvider {
             
             for (chatroom, trs) in chatrooms {
                 chatroom.hasUnreadMessages = true
-                trs.forEach { $0.isUnread = true }
+                trs.forEach {
+                    if !$0.isOutgoing {
+                        $0.isUnread = true
+                    }
+                }
             }
             
             transfers.filter({$0.height > unreadedHeight}).forEach({$0.isUnread = true})

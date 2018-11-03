@@ -2,7 +2,7 @@
 //  TransferTransaction+CoreDataProperties.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 24.03.2018.
+//  Created by Anokhov Pavel on 03/11/2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 //
@@ -17,6 +17,7 @@ extension TransferTransaction {
         return NSFetchRequest<TransferTransaction>(entityName: "TransferTransaction")
     }
 
+    @NSManaged public var comment: String?
     @NSManaged public var partner: CoreDataAccount?
 
 }
