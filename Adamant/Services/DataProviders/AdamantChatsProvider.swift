@@ -601,7 +601,9 @@ extension AdamantChatsProvider {
 		}
 		
 		let request: NSFetchRequest<ChatTransaction> = NSFetchRequest(entityName: "ChatTransaction")
-		request.predicate = NSPredicate(format: "chatroom = %@", chatroom)
+		request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "chatroom = %@", chatroom),
+            NSPredicate(format: "isHidden == false")])
 		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true),
 								   NSSortDescriptor(key: "transactionId", ascending: true)]
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
@@ -612,8 +614,9 @@ extension AdamantChatsProvider {
 	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction> {
 		let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
 		request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-			NSPredicate(format: "isUnread == true"),
-			NSPredicate(format: "chatroom.isHidden == false")])
+            NSPredicate(format: "chatroom.isHidden == false"),
+            NSPredicate(format: "isUnread == true"),
+            NSPredicate(format: "isHidden == false")])
 		
 		request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
 								   NSSortDescriptor(key: "transactionId", ascending: false)]
@@ -948,75 +951,86 @@ extension AdamantChatsProvider {
 			return nil
 		}
 		
-        let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)
-        
         let messageTransaction: ChatTransaction
-        switch chat.type {
-        case .message, .messageOld, .signal, .unknown:
-            let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-            trs.message = decodedMessage
-            messageTransaction = trs
-            
-        case .richMessage:
-            if let decodedMessage = decodedMessage, let data = decodedMessage.data(using: String.Encoding.utf8), let jsonRaw = try? JSONSerialization.jsonObject(with: data, options: []) {
-                switch jsonRaw {
-                // MARK: Valid json
-                case let json as [String:String]:
-                    // Supported rich message type
-                    if let type = json[RichContentKeys.type] {
-                        let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
-                        trs.richContent = json
-                        trs.richType = type
-                        trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
-                        messageTransaction = trs
-                    }
-                        
-                    // Not supported, show as text message
-                    else {
-                        let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                        trs.message = decodedMessage
-                        messageTransaction = trs
-                    }
-                    
-                // MARK: Bad json, try to fix it
-                case let json as [String:Any]:
-                    // Supported type but in wrong format
-                    if let type = json[RichContentKeys.type] as? String {
-                        var fixedJson = [String:String]()
-                        
-                        for (key, raw) in json {
-                            if let value = raw as? String {
-                                fixedJson[key] = value
-                            } else if let value = raw as? NSNumber, let amount = AdamantBalanceFormat.currencyFormatterFull.string(from: value) {
-                                fixedJson[key] = amount
-                            } else {
-                                fixedJson[key] = String(describing: raw)
-                            }
+        // MARK: Decode message, message must contain data
+        if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey), decodedMessage.count > 0 {
+            switch chat.type {
+            // MARK: Text message
+            case .message, .messageOld, .signal, .unknown:
+                let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                trs.message = decodedMessage
+                
+                messageTransaction = trs
+                
+            // MARK: Rich message
+            case .richMessage:
+                if let data = decodedMessage.data(using: String.Encoding.utf8), let jsonRaw = try? JSONSerialization.jsonObject(with: data, options: []) {
+                    switch jsonRaw {
+                    // MARK: Valid json
+                    case let json as [String:String]:
+                        // Supported rich message type
+                        if let type = json[RichContentKeys.type] {
+                            let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
+                            trs.richContent = json
+                            trs.richType = type
+                            trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+                            messageTransaction = trs
+                        }
+                            
+                            // Not supported, show as text message
+                        else {
+                            let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                            trs.message = decodedMessage
+                            messageTransaction = trs
                         }
                         
-                        let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
-                        trs.richContent = fixedJson
-                        trs.richType = type
-                        trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
-                        messageTransaction = trs
-                    }
-                        // Not supported, show as text message
-                    else {
+                    // MARK: Bad json, try to fix it
+                    case let json as [String:Any]:
+                        // Supported type but in wrong format
+                        if let type = json[RichContentKeys.type] as? String {
+                            var fixedJson = [String:String]()
+                            
+                            for (key, raw) in json {
+                                if let value = raw as? String {
+                                    fixedJson[key] = value
+                                } else if let value = raw as? NSNumber, let amount = AdamantBalanceFormat.currencyFormatterFull.string(from: value) {
+                                    fixedJson[key] = amount
+                                } else {
+                                    fixedJson[key] = String(describing: raw)
+                                }
+                            }
+                            
+                            let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
+                            trs.richContent = fixedJson
+                            trs.richType = type
+                            trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+                            messageTransaction = trs
+                        }
+                            // Not supported, show as text message
+                        else {
+                            let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                            trs.message = decodedMessage
+                            messageTransaction = trs
+                        }
+                        
+                    default:
                         let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                         trs.message = decodedMessage
                         messageTransaction = trs
                     }
-                    
-                default:
+                } else {
                     let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                     trs.message = decodedMessage
                     messageTransaction = trs
                 }
-            } else {
-                let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                trs.message = decodedMessage
-                messageTransaction = trs
             }
+        }
+        // MARK: Failed to decode, or message was empty
+        else {
+            let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+            trs.message = ""
+            trs.isHidden = true
+            messageTransaction = trs
         }
         
 		messageTransaction.date = transaction.date as NSDate

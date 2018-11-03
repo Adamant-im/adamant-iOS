@@ -27,6 +27,7 @@
     </entity>
     <entity name="ChatTransaction" representedClassName="ChatTransaction" isAbstract="YES" parentEntity="BaseTransaction" syncable="YES">
         <attribute name="chatMessageId" attributeType="String" syncable="YES"/>
+        <attribute name="isHidden" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isUnread" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="showsChatroom" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="silentNotification" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
@@ -58,7 +59,7 @@
     <elements>
         <element name="BaseTransaction" positionX="378" positionY="18" width="128" height="225"/>
         <element name="Chatroom" positionX="-74" positionY="26" width="128" height="180"/>
-        <element name="ChatTransaction" positionX="142" positionY="137" width="128" height="150"/>
+        <element name="ChatTransaction" positionX="142" positionY="137" width="128" height="165"/>
         <element name="CoreDataAccount" positionX="-236" positionY="174" width="128" height="150"/>
         <element name="MessageTransaction" positionX="243" positionY="326" width="128" height="75"/>
         <element name="RichMessageTransaction" positionX="-27" positionY="171" width="128" height="90"/>

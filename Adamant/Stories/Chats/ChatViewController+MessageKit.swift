@@ -558,6 +558,8 @@ extension MessageTransaction: MessageType {
 	
 	public var kind: MessageKind {
 		guard let message = message else {
+            isHidden = true
+            try? managedObjectContext?.save()
 			return MessageKind.text("")
 		}
 		
