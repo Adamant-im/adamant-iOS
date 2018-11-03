@@ -408,7 +408,14 @@ extension AppDelegate {
 									  date: Date.adamantNullDate,
 									  unread: unread,
 									  silent: welcome.silentNotification,
-									  completion: { _ in })
+                                      showsChatroom: true,
+                                      completion: { result in
+                                        guard case let .failure(error) = result else {
+                                            return
+                                        }
+                                        
+                                        print("ERROR showing welcome message: \(error.message)")
+            })
 		}
 		
 		if let ico = AdamantContacts.adamantIco.messages["chats.ico_message"] {
@@ -417,7 +424,14 @@ extension AppDelegate {
 									  date: Date.adamantNullDate,
 									  unread: unread,
 									  silent: ico.silentNotification,
-									  completion: { _ in })
+                                      showsChatroom: true,
+									  completion: { result in
+                                        guard case let .failure(error) = result else {
+                                            return
+                                        }
+                                        
+                                        print("ERROR showing welcome message: \(error.message)")
+            })
 		}
 	}
 }
