@@ -211,7 +211,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		// MARK: 7. Welcome messages
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: nil, queue: OperationQueue.main, using: handleWelcomeMessages)
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: nil, queue: OperationQueue.main, using: handleWelcomeMessages)
 		
 		return true
 	}
@@ -389,6 +389,10 @@ extension AppDelegate {
 // MARK: - Welcome messages
 extension AppDelegate {
 	private func handleWelcomeMessages(notification: Notification) {
+        guard let synced = notification.userInfo?[AdamantUserInfoKey.ChatProvider.initiallySynced] as? Bool, synced else {
+            return
+        }
+        
 		guard let stack = container.resolve(CoreDataStack.self), let chatProvider = container.resolve(ChatsProvider.self) else {
 			fatalError("Whoa...")
 		}

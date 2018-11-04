@@ -21,13 +21,18 @@ class AdamantChatsProvider: ChatsProvider {
     var richProviders: [String:RichMessageProviderWithStatusCheck]!
     
 	// MARK: Properties
-	private(set) var state: State = .empty
-	private(set) var isInitiallySynced: Bool = false
-	private(set) var receivedLastHeight: Int64?
-	private(set) var readedLastHeight: Int64?
-	private let apiTransactions = 100
-	private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
-	
+    private(set) var state: State = .empty
+    private(set) var receivedLastHeight: Int64?
+    private(set) var readedLastHeight: Int64?
+    private let apiTransactions = 100
+    private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
+    
+    private(set) var isInitiallySynced: Bool = false {
+        didSet {
+            NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: self, userInfo: [AdamantUserInfoKey.ChatProvider.initiallySynced : isInitiallySynced])
+        }
+    }
+    
 	private let processingQueue = DispatchQueue(label: "im.adamant.processing.chat", qos: .utility, attributes: [.concurrent])
 	private let sendingQueue = DispatchQueue(label: "im.adamant.sending.chat", qos: .utility, attributes: [.concurrent])
 	private let unconfirmedsSemaphore = DispatchSemaphore(value: 1)
@@ -217,7 +222,6 @@ extension AdamantChatsProvider {
 				
 				if let synced = self?.isInitiallySynced, !synced {
 					self?.isInitiallySynced = true
-					NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: self)
 				}
 				
 				completion?(.success)

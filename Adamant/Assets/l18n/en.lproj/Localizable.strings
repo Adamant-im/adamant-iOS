@@ -181,6 +181,9 @@
 /* ChatList: outgoing message preview format, like 'You: %@' */
 "ChatListPage.SentMessageFormat" = "You: %@";
 
+/* ChatList: First syncronization is in progress */
+"ChatListPage.SyncingChats" = "Syncing chats…";
+
 /* ChatList: scene title */
 "ChatListPage.Title" = "Chats";
 

@@ -120,7 +120,7 @@ extension Notification.Name {
 		/// Received new messagess. See AdamantUserInfoKey.ChatProvider
 		static let newUnreadMessages = Notification.Name("adamant.chatsProvider.newUnreadMessages")
 
-		static let initialSyncFinished = Notification.Name("adamant.chatsProvider.initialSyncFinished")
+        static let initiallySyncedChanged = Notification.Name("adamant.chatsProvider.initialSyncChanged")
 
 		private init() {}
 	}
@@ -135,6 +135,8 @@ extension AdamantUserInfoKey {
 		/// lastMessageHeight: new lastMessageHeight
 		static let lastMessageHeight = "adamant.chatsProvider.newMessage.lastHeight"
 		
+        static let initiallySynced = "adamant.chatsProvider.initiallySynced"
+        
 		private init() {}
 	}
 }
