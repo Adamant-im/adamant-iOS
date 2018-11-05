@@ -628,6 +628,12 @@
 /* Export transaction: 'Share transaction URL' button */
 "TransactionDetailsScene.Share.URL" = "URL";
 
+/* "Transaction details: 'Comments' section" */
+"TransactionDetailsScene.Section.Comment" = "Comments";
+
+/* "Transaction details: 'Actions' section" */
+"TransactionDetailsScene.Section.Actions" = "Actions";
+
 /* Transaction details: 'Your address' flag. */
 "TransactionDetailsScene.YourAddress" = "Sie";
 

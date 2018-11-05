@@ -70,8 +70,14 @@ struct RichMessageTransfer: RichMessage {
         self.type = type
         self.hash = hash
         
-        if let raw = content[CodingKeys.amount.stringValue], let amount = Decimal(string: raw) {
-            self.amount = amount
+        if let raw = content[CodingKeys.amount.stringValue] {
+            if let number = RichMessageTransfer.formatter.number(from: raw) {
+                self.amount = number.decimalValue
+            } else if let number = RichMessageTransfer.commaFormatter.number(from: raw) {
+                self.amount = number.decimalValue
+            } else {
+                self.amount = 0
+            }
         } else {
             self.amount = 0
         }
@@ -113,8 +119,14 @@ extension RichMessageTransfer {
 		self.hash = try container.decode(String.self, forKey: .hash)
         self.comments = try container.decode(String.self, forKey: .comments)
         
-        if let raw = try? container.decode(String.self, forKey: .amount), let amount = Decimal(string: raw) {
-            self.amount = amount
+        if let raw = try? container.decode(String.self, forKey: .amount) {
+            if let number = RichMessageTransfer.formatter.number(from: raw) {
+                self.amount = number.decimalValue
+            } else if let number = RichMessageTransfer.commaFormatter.number(from: raw) {
+                self.amount = number.decimalValue
+            } else {
+                self.amount = 0
+            }
         } else if let amount = try? container.decode(Decimal.self, forKey: .amount) {
             self.amount = amount
         } else {
@@ -129,6 +141,18 @@ extension RichMessageTransfer {
         f.numberStyle = .decimal
         f.roundingMode = .floor
         f.decimalSeparator = "."
+        f.usesGroupingSeparator = false
+        f.minimumFractionDigits = 0
+        f.maximumFractionDigits = 12 // 18 is too low, 0.007 for example will serialize as 0.007000000000000001
+        return f
+    }()
+    
+    static var commaFormatter: NumberFormatter = {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.roundingMode = .floor
+        f.decimalSeparator = ","
+        f.usesGroupingSeparator = false
         f.minimumFractionDigits = 0
         f.maximumFractionDigits = 12 // 18 is too low, 0.007 for example will serialize as 0.007000000000000001
         return f

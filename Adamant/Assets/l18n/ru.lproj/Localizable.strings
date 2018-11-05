@@ -676,6 +676,12 @@
 /* Export transaction: 'Share transaction URL' button */
 "TransactionDetailsScene.Share.URL" = "URL";
 
+/* "Transaction details: 'Comments' section" */
+"TransactionDetailsScene.Section.Comment" = "Комментарии";
+
+/* "Transaction details: 'Actions' section" */
+"TransactionDetailsScene.Section.Actions" = "Действия";
+
 /* Transaction details: 'Requesting Data' progress message. */
 "TransactionDetailsScene.RequestingData" = "Запрашиваем данные..";
 

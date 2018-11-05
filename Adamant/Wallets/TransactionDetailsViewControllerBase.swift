@@ -92,8 +92,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
         var localized: String {
             switch self {
             case .details: return ""
-            case .comment: return "Comment"
-            case .actions: return "Actions"
+            case .comment: return NSLocalizedString("TransactionDetailsScene.Section.Comment", comment: "Transaction details: 'Comments' section")
+            case .actions: return NSLocalizedString("TransactionDetailsScene.Section.Actions", comment: "Transaction details: 'Actions' section")
             }
         }
         
