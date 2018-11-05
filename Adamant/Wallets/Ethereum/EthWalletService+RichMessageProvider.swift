@@ -23,6 +23,13 @@ extension EthWalletService: RichMessageProvider {
         
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         
+        let comment: String?
+        if let raw = transaction.richContent?[RichContentKeys.transfer.comments], raw.count > 0 {
+            comment = raw
+        } else {
+            comment = nil
+        }
+        
         // MARK: 1. Sender & recipient names
         
         let senderName: String?
@@ -64,6 +71,7 @@ extension EthWalletService: RichMessageProvider {
             vc.service = self
             vc.senderName = senderName
             vc.recipientName = recipientName
+            vc.comment = comment
             
             switch result {
             case .success(let ethTransaction):
@@ -128,6 +136,8 @@ extension EthWalletService: RichMessageProvider {
         cell.amountLabel.text = AdamantBalanceFormat.full.format(transfer.amount)
         cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
         cell.transactionStatus = (message as? RichMessageTransaction)?.transactionStatus
+        
+        cell.commentsLabel.text = transfer.comments
         
         if cell.isAlignedRight != isFromCurrentSender {
             cell.isAlignedRight = isFromCurrentSender

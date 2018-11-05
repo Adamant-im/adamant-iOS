@@ -143,6 +143,11 @@ extension ChatViewController: MessagesDataSource {
             chatCell.bubbleBackgroundColor = bgColor
         }
         
+        if let transferCell = cell as? TransferCollectionViewCell, let calculator = cellCalculators[type] as? TransferMessageSizeCalculator {
+            let width = calculator.messageContainerMaxWidth(for: message) - TransferCollectionViewCell.statusImageSizeAndSpace
+            transferCell.transferContentWidthConstraint.constant = width
+        }
+        
         // MARK: Delegates
         switch cell {
         case let tapCell as TapRecognizerCustomCell:

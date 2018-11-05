@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import Swinject
 import CoreData
+import MessageKit
 
 class AdmWalletService: NSObject, WalletService {
 	// MARK: - Constants
@@ -18,7 +19,7 @@ class AdmWalletService: NSObject, WalletService {
 	let transactionFee: Decimal = 0.5
 	static var currencySymbol = "ADM"
 	static var currencyLogo = #imageLiteral(resourceName: "wallet_adm")
-	
+	let commentsEnabledForRichMessages = false
 	
 	// MARK: - Dependencies
 	weak var accountService: AccountService!

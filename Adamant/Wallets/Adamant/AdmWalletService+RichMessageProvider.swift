@@ -24,6 +24,7 @@ extension AdmWalletService: RichMessageProvider {
         }
         
         controller.transaction = transaction
+        controller.comment = transaction.comment
         
         if let address = accountService.account?.address {
             if address == transaction.senderId {
@@ -70,6 +71,8 @@ extension AdmWalletService: RichMessageProvider {
         cell.amountLabel.text = AdamantBalanceFormat.full.format(richMessage.amount)
         cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
         cell.transactionStatus = nil
+        
+        cell.commentsLabel.text = richMessage.comments
         
         if cell.isAlignedRight != isFromCurrentSender {
             cell.isAlignedRight = isFromCurrentSender

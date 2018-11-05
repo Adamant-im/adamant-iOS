@@ -200,7 +200,14 @@ protocol WalletServiceWithSend: WalletService {
 	var transactionFeeUpdated: Notification.Name { get }
 	
 	var transactionFee : Decimal { get }
+    var commentsEnabledForRichMessages: Bool { get }
 	func transferViewController() -> UIViewController
+}
+
+extension WalletServiceWithSend {
+    var commentsEnabledForRichMessages: Bool {
+        return true
+    }
 }
 
 protocol WalletServiceSimpleSend: WalletServiceWithSend {
@@ -210,7 +217,7 @@ protocol WalletServiceSimpleSend: WalletServiceWithSend {
 protocol WalletServiceTwoStepSend: WalletServiceWithSend {
 	associatedtype T: RawTransaction
 	
-	func createTransaction(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<T>) -> Void)
+	func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<T>) -> Void)
 	func sendTransaction(_ transaction: T, completion: @escaping (WalletServiceResult<String>) -> Void)
 }
 

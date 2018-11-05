@@ -101,22 +101,23 @@ class TransferViewControllerBase: FormViewController {
 		case wallet
 		case recipient
 		case transferInfo
+        case comments
 		
 		var tag: String {
 			switch self {
 			case .wallet: return "wlt"
 			case .recipient: return "rcp"
 			case .transferInfo: return "trsfr"
+            case .comments: return "cmmnt"
 			}
 		}
 		
 		var localized: String {
 			switch self {
 			case .wallet: return NSLocalizedString("TransferScene.Section.YourWallet", comment: "Transfer: 'Your wallet' section")
-				
 			case .recipient: return NSLocalizedString("TransferScene.Section.Recipient", comment: "Transfer: 'Recipient info' section")
-				
 			case .transferInfo: return NSLocalizedString("TransferScene.Section.TransferInfo", comment: "Transfer: 'Transfer info' section")
+            case .comments: return "Comments"
 			}
 		}
 	}
@@ -131,6 +132,8 @@ class TransferViewControllerBase: FormViewController {
     
 	
 	// MARK: - Properties
+    
+    var commentsEnabled: Bool = false
 	
 	var service: WalletServiceWithSend? {
 		didSet {
@@ -238,6 +241,10 @@ class TransferViewControllerBase: FormViewController {
 		form.append(walletSection())
 		form.append(recipientSection())
 		form.append(transactionInfoSection())
+        
+        if commentsEnabled {
+            form.append(commentsSection())
+        }
 		
         // MARK: - Button section
 		form +++ Section()
@@ -313,6 +320,16 @@ class TransferViewControllerBase: FormViewController {
 		
 		return section
 	}
+    
+    func commentsSection() -> Section {
+        let section = Section(Sections.comments.localized) {
+            $0.tag = Sections.comments.tag
+        }
+        
+        section.append(defaultRowFor(baseRow: .comments))
+        
+        return section
+    }
 	
 
 /*
@@ -773,7 +790,10 @@ extension TransferViewControllerBase {
 			}
 		
 		case .comments:
-			fatalError()
+            return TextAreaRow() {
+                $0.tag = BaseRows.comments.tag
+                $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
+            }
 			
 		case .sendButton:
 			return ButtonRow() { [weak self] in

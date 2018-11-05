@@ -74,7 +74,6 @@ class EthWalletService: WalletService {
     let cellIdentifierReceived = "ethTransferReceived"
     let cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
     
-    
 	// MARK: - Properties
 	
     private static let transactionsListApiSubpath = "ethtxs"

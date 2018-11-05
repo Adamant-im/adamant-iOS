@@ -86,12 +86,15 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
-		let vc = services[index].transferViewController()
+        let service = services[index]
+        
+		let vc = service.transferViewController()
 		if let v = vc as? TransferViewControllerBase {
 			if let address = partner?.address {
                 let name = partner?.name
 				v.admReportRecipient = address
 				v.recipientIsReadonly = true
+                v.commentsEnabled = service.commentsEnabledForRichMessages
 				v.showProgressView(animated: false)
 				
 				services[index].getWalletAddress(byAdamantAddress: address) { result in

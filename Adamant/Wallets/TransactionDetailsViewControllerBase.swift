@@ -38,6 +38,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         case status
         case openInExplorer
         case openChat
+        case comment
         
         var tag: String {
             switch self {
@@ -52,6 +53,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .status: return "status"
             case .openInExplorer: return "openInExplorer"
             case .openChat: return "openChat"
+            case .comment: return "comment"
             }
         }
         
@@ -68,6 +70,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .status: return NSLocalizedString("TransactionDetailsScene.Row.Status", comment: "Transaction details: Transaction delivery status.")
             case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
             case .openChat: return ""
+            case .comment: return ""
             }
         }
         
@@ -77,6 +80,28 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .openChat: return #imageLiteral(resourceName: "row_chat")
                 
             default: return nil
+            }
+        }
+    }
+    
+    enum Sections {
+        case details
+        case comment
+        case actions
+        
+        var localized: String {
+            switch self {
+            case .details: return ""
+            case .comment: return "Comment"
+            case .actions: return "Actions"
+            }
+        }
+        
+        var tag: String {
+            switch self {
+            case .details: return "details"
+            case .comment: return "comment"
+            case .actions: return "actions"
             }
         }
     }
@@ -108,7 +133,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
         navigationAccessoryView.tintColor = UIColor.adamant.primary
         
         // MARK: - Transfer section
-        let section = Section()
+        let detailsSection = Section(Sections.details.localized) {
+            $0.tag = Sections.details.tag
+        }
             
         // MARK: Transaction number
         let idRow = LabelRow() {
@@ -137,7 +164,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }
         
-        section.append(idRow)
+        detailsSection.append(idRow)
         
         // MARK: Sender
         let senderRow = DoubleDetailsRow() { [weak self] in
@@ -180,7 +207,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = .black
         }
             
-        section.append(senderRow)
+        detailsSection.append(senderRow)
         
         // MARK: Recipient
         let recipientRow = DoubleDetailsRow() { [weak self] in
@@ -223,7 +250,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = .black
         }
         
-        section.append(recipientRow)
+        detailsSection.append(recipientRow)
         
         // MARK: Date
         let dateRow = DateTimeRow() {
@@ -248,7 +275,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             row.value = self?.transaction?.dateValue
         }
             
-        section.append(dateRow)
+        detailsSection.append(dateRow)
         
         // MARK: Amount
         let amountRow = DecimalRow() {
@@ -269,7 +296,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             row.value = self?.transaction?.amountValue.doubleValue
         }
             
-        section.append(amountRow)
+        detailsSection.append(amountRow)
         
         // MARK: Fee
         let feeRow = LabelRow() {
@@ -298,7 +325,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }
             
-        section.append(feeRow)
+        detailsSection.append(feeRow)
         
         // MARK: Confirmations
         let confirmationsRow = LabelRow() {
@@ -327,7 +354,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }
             
-        section.append(confirmationsRow)
+        detailsSection.append(confirmationsRow)
         
         // MARK: Block
         let blockRow = LabelRow() {
@@ -356,7 +383,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }
             
-        section.append(blockRow)
+        detailsSection.append(blockRow)
             
         // MARK: Status
         if let status = transaction?.transactionStatus {
@@ -376,11 +403,45 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 row.value = self?.transaction?.transactionStatus?.localized
             }
             
-            section.append(statusRow)
+            detailsSection.append(statusRow)
+        }
+        
+        form.append(detailsSection)
+        
+        // MARK: Comments section
+        
+        if let comment = comment {
+            let commentSection = Section(Sections.comment.localized) {
+                $0.tag = Sections.comment.tag
+            }
+            
+            let row = TextAreaRow(Rows.comment.tag) {
+                $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
+                $0.value = comment
+            }.cellSetup { (cell, _) in
+                cell.selectionStyle = .gray
+            }.cellUpdate { (cell, _) in
+                cell.textView.isSelectable = false
+                cell.textView.isEditable = false
+            }.onCellSelection { [weak self] (_, row) in
+                if let text = row.value {
+                    self?.shareValue(text)
+                }
+            }
+            
+            commentSection.append(row)
+            
+            form.append(commentSection)
+        }
+            
+        // MARK: Actions section
+        
+        let actionsSection = Section(Sections.actions.localized) {
+            $0.tag = Sections.actions.tag
         }
             
         // MARK: Open in explorer
-        let explorerRow = LabelRow() {
+        let explorerRow = LabelRow(Rows.openInExplorer.tag) {
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 if let transaction = self?.transaction {
                     return self?.explorerUrl(for: transaction) == nil
@@ -389,7 +450,6 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 }
             })
             
-            $0.tag = Rows.openInExplorer.tag
             $0.title = Rows.openInExplorer.localized
             $0.cell.imageView?.image = Rows.openInExplorer.image
         }.cellSetup { (cell, _) in
@@ -406,9 +466,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             self?.present(safari, animated: true, completion: nil)
         }
         
-        section.append(explorerRow)
+        actionsSection.append(explorerRow)
         
-        form.append(section)
+        form.append(actionsSection)
     }
     
     // MARK: - Actions
@@ -458,8 +518,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
     // MARK: - To override
     
     var currencySymbol: String? = nil
+    
+    // MARK: - Fix this later
     var senderName: String? = nil
     var recipientName: String? = nil
+    var comment: String? = nil
     
     func explorerUrl(for transaction: TransactionDetails) -> URL? {
         return nil

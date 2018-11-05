@@ -36,7 +36,12 @@ class EthTransferViewController: TransferViewControllerBase {
 	// MARK: Send
 	
 	override func sendFunds() {
-		let comments = "" // TODO:
+        let comments: String
+        if let row: TextAreaRow = form.rowBy(tag: BaseRows.comments.tag), let text = row.value {
+            comments = text
+        } else {
+            comments = ""
+        }
 		
 		guard let service = service as? EthWalletService, let recipient = recipientAddress, let amount = amount else {
 			return
@@ -48,7 +53,7 @@ class EthTransferViewController: TransferViewControllerBase {
 		
 		dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
 		
-		service.createTransaction(recipient: recipient, amount: amount, comments: comments) { [weak self] result in
+		service.createTransaction(recipient: recipient, amount: amount) { [weak self] result in
             guard let vc = self else {
                 dialogService.dismissProgress()
                 dialogService.showError(withMessage: String.adamantLocalized.sharedErrors.unknownError, error: nil)
@@ -83,6 +88,11 @@ class EthTransferViewController: TransferViewControllerBase {
                                     detailsVc.transaction = transaction
                                     detailsVc.service = service
                                     detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                                    
+                                    if comments.count > 0 {
+                                        detailsVc.comment = comments
+                                    }
+                                    
                                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
                                 } else {
                                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)

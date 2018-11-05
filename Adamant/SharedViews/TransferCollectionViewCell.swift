@@ -10,14 +10,34 @@ import UIKit
 //import MessageKit
 
 class TransferCollectionViewCell: UICollectionViewCell, ChatCell, TapRecognizerTransferCell {
+    
+    // MARK: Hacks&Helpers
+    /// Comment label constraints inside transfer content view
+    static let commentLabelTrailAndLead: CGFloat = 24
+    
+    /// Transfer status image size and space between status image and transfer bubble
+    static let statusImageSizeAndSpace: CGFloat = 42
+    
+    /// Cell height without transfer comment
+    static let cellHeightCompact: CGFloat = 126
+    
+    /// Cell height with transfer comment without comment label's height. You need to calculate label's height and add to this value.
+    static let cellHeightWithComment: CGFloat = 131
+    
+    /// Comment label's font. Used to calculate total cell height
+    static let commentFont = UIFont.systemFont(ofSize: 14.0)
+    
+    // MARK: IBOutlets
+    
     @IBOutlet weak var sentLabel: UILabel!
     @IBOutlet weak var amountLabel: UILabel!
     @IBOutlet weak var currencySymbolLabel: UILabel!
     @IBOutlet weak var currencyLogoImageView: UIImageView!
-    @IBOutlet weak var tapForDetailsLabel: UILabel!
+    @IBOutlet weak var commentsLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
     
     @IBOutlet weak var transferContentView: UIView!
+    @IBOutlet weak var transferContentWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak var bubbleView: UIView!
     
     @IBOutlet weak var leadingConstraint: NSLayoutConstraint?

@@ -45,7 +45,7 @@ struct RichMessageTransfer: RichMessage {
     func content() -> [String:String] {
         return [
             CodingKeys.type.stringValue: type,
-            CodingKeys.amount.stringValue: AdamantBalanceFormat.full.format(amount),
+            CodingKeys.amount.stringValue: RichMessageTransfer.serialize(balance: amount),
             CodingKeys.hash.stringValue: hash,
             CodingKeys.comments.stringValue: comments
         ]
