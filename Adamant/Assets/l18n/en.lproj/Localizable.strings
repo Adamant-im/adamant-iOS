@@ -626,7 +626,7 @@
 "No transactions found" = "Transactions not found";
 
 /* Transaction status: updating in progress */
-"TransactionStatus.Updating" = "Updating...";
+"TransactionStatus.Updating" = "Updating…";
 
 /* Transaction status: transaction is pending */
 "TransactionStatus.Pending" = "Pending";

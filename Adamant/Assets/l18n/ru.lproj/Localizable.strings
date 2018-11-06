@@ -626,7 +626,7 @@
 "No transactions found" = "Транзакции не найдены";
 
 /* Transaction status: updating in progress */
-"TransactionStatus.Updating" = "Обновление...";
+"TransactionStatus.Updating" = "Обновление…";
 
 /* Transaction status: transaction is pending */
 "TransactionStatus.Pending" = "Ожидается";
