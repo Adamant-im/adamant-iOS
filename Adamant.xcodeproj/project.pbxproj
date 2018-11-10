@@ -54,6 +54,8 @@
 		E90847362196FEA80095825D /* Chatroom+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90847282196FEA80095825D /* Chatroom+CoreDataClass.swift */; };
 		E90847372196FEA80095825D /* Chatroom+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90847292196FEA80095825D /* Chatroom+CoreDataProperties.swift */; };
 		E90847392196FEF50095825D /* BaseTransaction+TransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90847382196FEF50095825D /* BaseTransaction+TransactionDetails.swift */; };
+		E908473B219707200095825D /* AccountViewController+StayIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E908473A219707200095825D /* AccountViewController+StayIn.swift */; };
+		E908473D219713300095825D /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E908473C219713300095825D /* NotificationsViewController.swift */; };
 		E90A4943204C5ED6009F6A65 /* EurekaPassphraseRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A4942204C5ED6009F6A65 /* EurekaPassphraseRow.swift */; };
 		E90A4945204C6204009F6A65 /* PassphraseCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E90A4944204C5F60009F6A65 /* PassphraseCell.xib */; };
 		E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */; };
@@ -320,6 +322,8 @@
 		E90847282196FEA80095825D /* Chatroom+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Chatroom+CoreDataClass.swift"; sourceTree = "<group>"; };
 		E90847292196FEA80095825D /* Chatroom+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Chatroom+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		E90847382196FEF50095825D /* BaseTransaction+TransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BaseTransaction+TransactionDetails.swift"; sourceTree = "<group>"; };
+		E908473A219707200095825D /* AccountViewController+StayIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountViewController+StayIn.swift"; sourceTree = "<group>"; };
+		E908473C219713300095825D /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		E90A4942204C5ED6009F6A65 /* EurekaPassphraseRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EurekaPassphraseRow.swift; sourceTree = "<group>"; };
 		E90A4944204C5F60009F6A65 /* PassphraseCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PassphraseCell.xib; sourceTree = "<group>"; };
 		E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAuthentication.swift; sourceTree = "<group>"; };
@@ -951,6 +955,7 @@
 				E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */,
 				E90055FA20ECE78A00D0CB2D /* SecurityViewController+notifications.swift */,
 				E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */,
+				E908473C219713300095825D /* NotificationsViewController.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -1020,6 +1025,7 @@
 			children = (
 				E9E7CDB02002B97B00DFC4DB /* AccountRoutes.swift */,
 				E983AE2820E65F3200497E1A /* AccountViewController.swift */,
+				E908473A219707200095825D /* AccountViewController+StayIn.swift */,
 				E983AE2020E655C500497E1A /* AccountHeaderView.swift */,
 				E941CCDA20E786D700C96220 /* AccountHeader.xib */,
 				E983AE2C20E6720D00497E1A /* AccountFooter.xib */,
@@ -1470,6 +1476,7 @@
 				E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */,
 				E90847322196FEA80095825D /* TransferTransaction+CoreDataClass.swift in Sources */,
 				E90847392196FEF50095825D /* BaseTransaction+TransactionDetails.swift in Sources */,
+				E908473B219707200095825D /* AccountViewController+StayIn.swift in Sources */,
 				E9204B5220C9762400F3B9AB /* MessageStatus.swift in Sources */,
 				E993302421369B8A00CD5200 /* RichMessage.swift in Sources */,
 				E908471B2196FE590095825D /* Adamant.xcdatamodeld in Sources */,
@@ -1483,6 +1490,7 @@
 				E993302221354BC300CD5200 /* EthWalletRoutes.swift in Sources */,
 				E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */,
 				E965A53020B594120041A3EA /* AdamantApi+States.swift in Sources */,
+				E908473D219713300095825D /* NotificationsViewController.swift in Sources */,
 				E908472E2196FEA80095825D /* BaseTransaction+CoreDataClass.swift in Sources */,
 				64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */,
 				E91E5BF220DAF05500B06B3C /* EurekaNodeRow.swift in Sources */,

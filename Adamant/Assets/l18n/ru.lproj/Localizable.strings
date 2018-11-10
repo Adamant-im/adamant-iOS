@@ -539,7 +539,7 @@
 "SecurityPage.Row.Notifications" = "Уведомления";
 
 /* Security: Stay logged row */
-"SecurityPage.Row.StayLoggedIn" = "Оставаться в системе";
+"SecurityPage.Row.StayLoggedIn" = "Оставаться в приложении";
 
 /* Security: Security section */
 "SecurityPage.Section.Security" = "Безопасность";

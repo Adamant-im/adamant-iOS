@@ -34,6 +34,12 @@ extension AdamantScene {
 			c.router = r.resolve(Router.self)
 			return c
 		}
+        
+        static let notifications = AdamantScene(identifier: "Notifications") { r in
+            let c = NotificationsViewController()
+            c.notificationsService = r.resolve(NotificationsService.self)
+            return c
+        }
 		
 		private init() {}
 	}
