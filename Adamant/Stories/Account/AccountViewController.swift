@@ -114,10 +114,10 @@ class AccountViewController: FormViewController {
 			case .logout: return #imageLiteral(resourceName: "row_logout")
 			case .freeTokens: return #imageLiteral(resourceName: "row_free-tokens")
 			case .sendTokens: return nil
-            case .generateQr: return nil
-            case .stayIn: return nil
-            case .biometry: return nil
-            case .notifications: return nil
+            case .generateQr: return #imageLiteral(resourceName: "row_QR.png")
+            case .stayIn: return #imageLiteral(resourceName: "row_security")
+            case .biometry: return nil // Determined by localAuth service
+            case .notifications: return #imageLiteral(resourceName: "row_Notifications.png")
 			}
 		}
 	}
@@ -388,10 +388,18 @@ class AccountViewController: FormViewController {
         securitySection.append(stayInRow)
         
         // Biometry
-        let biometryRow = SwitchRow() {
+        let biometryRow = SwitchRow() { [weak self] in
             $0.tag = Rows.biometry.tag
             $0.title = localAuth.biometryType.localized
             $0.value = accountService.useBiometry
+            
+            if let auth = self?.localAuth {
+                switch auth.biometryType {
+                case .none: $0.cell.imageView?.image = nil
+                case .touchID: $0.cell.imageView?.image = #imageLiteral(resourceName: "row_touchid.png")
+                case .faceID: $0.cell.imageView?.image = #imageLiteral(resourceName: "row_faceid.png")
+                }
+            }
             
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 guard let showBiometry = self?.showBiometryOptions else {
@@ -413,6 +421,7 @@ class AccountViewController: FormViewController {
             $0.title = Rows.notifications.localized
             $0.cell.selectionStyle = .gray
             $0.value = self?.notificationsService.notificationsMode.localized
+            $0.cell.imageView?.image = Rows.notifications.image
             
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 guard let showNotifications = self?.showLoggedInOptions else {
