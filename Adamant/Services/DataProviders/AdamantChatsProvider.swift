@@ -963,7 +963,7 @@ extension AdamantChatsProvider {
             case .message, .messageOld, .signal, .unknown:
                 
                 if transaction.amount > 0 {
-                    let trs = TransferTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                    let trs = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
                     trs.comment = decodedMessage
                     messageTransaction = trs
                 } else {
