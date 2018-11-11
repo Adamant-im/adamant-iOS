@@ -15,7 +15,7 @@ extension Container {
 		// MARK: - Standalone services
 		// MARK: AdamantCore
 		self.register(AdamantCore.self) { _ in
-			let core = AdamantCoreService()
+			let core = NativeAdamantCore()
 			return core
 		}.inObjectScope(.container)
 		

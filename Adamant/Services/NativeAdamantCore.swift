@@ -1,5 +1,5 @@
 //
-//  AdamantCoreService.swift
+//  NativeAdamantCore.swift
 //  Adamant
 //
 //  Created by Anton Boyarkin on 26/07/2018.
@@ -10,7 +10,7 @@ import Foundation
 import CryptoSwift
 import ByteBackpacker
 
-class AdamantCoreService : AdamantCore {
+class NativeAdamantCore : AdamantCore {
     
     func createHashFor(passphrase: String) -> String? {
         guard let hash = createRawHashFor(passphrase: passphrase) else {

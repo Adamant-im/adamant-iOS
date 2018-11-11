@@ -117,7 +117,7 @@ extension AdamantNotificationsService {
 			case .authorized:
 				completion(true, nil)
 				
-			case .denied:
+			case .denied, .provisional:
 				completion(false, nil)
 				
 			case .notDetermined:
