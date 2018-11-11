@@ -36,7 +36,6 @@ extension StoreKey {
 
 // MARK: - Resources
 struct AdamantResources {
-	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
 	static let coreDataModel = Bundle.main.url(forResource: "Adamant", withExtension: "momd")!
 	
 	static let nodes: [Node] = [
