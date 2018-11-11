@@ -37,6 +37,14 @@ enum AdamantCoreError: Error {
 
 /// You must load JavaScript before calling any methods.
 class JSAdamantCore : AdamantCore {
+    func encodeValue(_ value: [String : Any], privateKey: String) -> (message: String, nonce: String)? {
+        return nil
+    }
+    
+    func decodeValue(rawMessage: String, rawNonce: String, privateKey: String) -> String? {
+        return nil
+    }
+    
 	enum Result {
 		case success
 		case error(error: Error)

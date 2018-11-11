@@ -73,6 +73,7 @@
 		E921597D2065031D0000CA5C /* ButtonsStripe.xib in Resources */ = {isa = PBXBuildFile; fileRef = E921597C2065031D0000CA5C /* ButtonsStripe.xib */; };
 		E9220E0321983156009C9642 /* adamant-core.js in Resources */ = {isa = PBXBuildFile; fileRef = E9220E0121983155009C9642 /* adamant-core.js */; };
 		E9220E0421983156009C9642 /* JSAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9220E0221983155009C9642 /* JSAdamantCore.swift */; };
+		E9220E08219879B9009C9642 /* NativeCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9220E07219879B9009C9642 /* NativeCoreTests.swift */; };
 		E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9256F5E2034C21100DE86E9 /* String+localized.swift */; };
 		E9256F6D20357B1700DE86E9 /* LogoFullHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9256F6C20357B1700DE86E9 /* LogoFullHeader.xib */; };
 		E9256F762039A9A200DE86E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */; };
@@ -300,6 +301,7 @@
 		E921597C2065031D0000CA5C /* ButtonsStripe.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ButtonsStripe.xib; sourceTree = "<group>"; };
 		E9220E0121983155009C9642 /* adamant-core.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adamant-core.js"; sourceTree = "<group>"; };
 		E9220E0221983155009C9642 /* JSAdamantCore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSAdamantCore.swift; sourceTree = "<group>"; };
+		E9220E07219879B9009C9642 /* NativeCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeCoreTests.swift; sourceTree = "<group>"; };
 		E9256F5E2034C21100DE86E9 /* String+localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+localized.swift"; sourceTree = "<group>"; };
 		E9256F6C20357B1700DE86E9 /* LogoFullHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LogoFullHeader.xib; sourceTree = "<group>"; };
 		E9256F752039A9A200DE86E9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -653,14 +655,15 @@
 			path = ServerResponses;
 			sourceTree = "<group>";
 		};
-		E9220E0021983145009C9642 /* JSCore */ = {
+		E9220E0021983145009C9642 /* Core */ = {
 			isa = PBXGroup;
 			children = (
 				E9220E0221983155009C9642 /* JSAdamantCore.swift */,
 				E9220E0121983155009C9642 /* adamant-core.js */,
 				E95F85762007E8EC0070534A /* JSAdamantCoreTests.swift */,
+				E9220E07219879B9009C9642 /* NativeCoreTests.swift */,
 			);
-			path = JSCore;
+			path = Core;
 			sourceTree = "<group>";
 		};
 		E93EB09D20DA3F3A001F9601 /* NodesEditor */ = {
@@ -864,7 +867,7 @@
 		E9EC344520066D4A00C0E546 /* AdamantTests */ = {
 			isa = PBXGroup;
 			children = (
-				E9220E0021983145009C9642 /* JSCore */,
+				E9220E0021983145009C9642 /* Core */,
 				E95F85B8200A4D9C0070534A /* Parsing */,
 				E950652020404BF0008352E5 /* AdamantUriBuilding.swift */,
 				E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */,
@@ -1303,6 +1306,7 @@
 				E95F85772007E8EC0070534A /* JSAdamantCoreTests.swift in Sources */,
 				E95F85712007D98D0070534A /* CurrencyFormatterTests.swift in Sources */,
 				E950652120404BF0008352E5 /* AdamantUriBuilding.swift in Sources */,
+				E9220E08219879B9009C9642 /* NativeCoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
