@@ -6,8 +6,6 @@ target 'Adamant' do
 
   pod 'Alamofire' # Network
   pod 'KeychainAccess' # Keychain
-  pod 'RNCryptor' # Cryptor
-  pod 'CryptoSwift' # MD5 hash
   pod 'Swinject' # Dependency Injection
   pod 'ReachabilitySwift' # Network status
   pod 'Haring' # Markdown parser
@@ -27,9 +25,14 @@ target 'Adamant' do
   pod 'EFQRCode' # QR generator
   pod 'QRCodeReader.swift' # QR reader
   
-  # Cryptos
-  pod 'libsodium'
+  # Crypto
+  pod 'RNCryptor' # Cryptor
+  pod 'CryptoSwift' # MD5 hash
+  pod 'libsodium' # Sodium crypto library
   pod 'web3swift' # ETH Web3 Swift Port
   pod 'Lisk', :git => 'https://github.com/boyarkin-anton/lisk-swift.git', :branch => 'dev' # LSK
+  
+  # Utility
+  pod 'ByteBackpacker' # Utility to pack value types into a Byte array
 
 end

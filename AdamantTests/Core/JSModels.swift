@@ -8,7 +8,7 @@
 
 import Foundation
 import JavaScriptCore
-
+@testable import Adamant
 
 // MARK: Keypair
 
