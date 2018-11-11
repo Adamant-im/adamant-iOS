@@ -29,6 +29,9 @@ class ChatListViewController: UIViewController {
 	var router: Router!
 	var notificationsService: NotificationsService!
 	var dialogService: DialogService!
+	var addressBook: AddressBookService!
+    
+    var richMessageProviders = [String:RichMessageProvider]()
 	
 	// MARK: IBOutlet
 	@IBOutlet weak var tableView: UITableView!
@@ -46,7 +49,7 @@ class ChatListViewController: UIViewController {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
-                                 for: UIControlEvents.valueChanged)
+                                 for: UIControl.Event.valueChanged)
         refreshControl.tintColor = UIColor.adamant.primary
         
         return refreshControl
@@ -263,26 +266,12 @@ extension ChatListViewController {
 		}
 		
 		cell.hasUnreadMessages = chatroom.hasUnreadMessages
-		
-		switch chatroom.lastTransaction {
-		case let message as MessageTransaction:
-			guard let text = message.message else {
-				cell.lastMessageLabel.text = nil
-				break
-			}
-			
-			if message.isOutgoing {
-				cell.lastMessageLabel.text = String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, text)
-			} else {
-				cell.lastMessageLabel.text = text
-			}
-			
-		case let transfer as TransferTransaction:
-			cell.lastMessageLabel.text = formatTransferPreview(transfer)
-			
-		default:
-			cell.lastMessageLabel.text = nil
-		}
+        
+        if let lastTransaction = chatroom.lastTransaction {
+            cell.lastMessageLabel.text = shortDescription(for: lastTransaction)
+        } else {
+            cell.lastMessageLabel.text = nil
+        }
 		
 		if let date = chatroom.updatedAt as Date?, date != Date.adamantNullDate {
 			cell.dateLabel.text = date.humanizedDay()
@@ -425,6 +414,11 @@ extension ChatListViewController: ChatViewControllerDelegate {
 // MARK: - Working with in-app notifications
 extension ChatListViewController {
 	private func showNotification(for transaction: ChatTransaction) {
+        // MARK: 0. Do not show notifications for initial sync
+        guard chatsProvider.isInitiallySynced else {
+            return
+        }
+        
 		// MARK: 1. Show notification only for incomming transactions
 		guard !transaction.silentNotification, !transaction.isOutgoing,
 			let chatroom = transaction.chatroom, chatroom != presentedChatroom(), !chatroom.isHidden,
@@ -432,30 +426,9 @@ extension ChatListViewController {
 			return
 		}
 		
-		
-		// MARK: 2. Check transaction type. Do not show notifications for initial sync
-		let text: String
-		switch transaction {
-		case let message as MessageTransaction:
-			guard chatsProvider.isInitiallySynced, let t = message.message else {
-				return
-			}
-			
-			text = t
-			
-		case let transfer as TransferTransaction:
-			guard transfersProvider.isInitiallySynced, let t = formatTransferPreview(transfer) else {
-				return
-			}
-			
-			text = t
-			
-		default:
-			return
-		}
-		
-		// MARK: 3. Prepare notification
-		let title = partner.name ?? partner.address
+        // MARK: 2. Prepare notification
+        let title = partner.name ?? partner.address
+        let text = shortDescription(for: transaction)
 		
 		let image: UIImage
 		if let ava = partner.avatar, let img = UIImage(named: ava) {
@@ -498,17 +471,123 @@ extension ChatListViewController {
 			present(vc, animated: true)
 		}
 	}
-	
-	private func formatTransferPreview(_ transfer: TransferTransaction) -> String? {
-		guard let balance = transfer.amount else {
+    
+    private func shortDescription(for transaction: ChatTransaction) -> String? {
+        switch transaction {
+        case let message as MessageTransaction:
+            return message.message
+            
+        case let transfer as TransferTransaction:
+            if let admService = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService {
+                return admService.shortDescription(for: transfer)
+            } else {
+                return nil
+            }
+            
+        case let richMessage as RichMessageTransaction:
+            if let type = richMessage.richType, let provider = richMessageProviders[type] {
+                return provider.shortDescription(for: richMessage)
+            } else {
+                return richMessage.serializedMessage()
+            }
+            
+        default:
+            return nil
+        }
+    }
+}
+
+
+// MARK: - Swipe actions
+extension ChatListViewController {
+	@available(iOS 11.0, *)
+	func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+		guard let chatroom = chatsController?.object(at: indexPath) else {
 			return nil
 		}
 		
-		if transfer.isOutgoing {
-			return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(AdamantUtilities.format(balance: balance))")
-		} else {
-			return "➡️  \(AdamantUtilities.format(balance: balance))"
+		let actions: [UIContextualAction]
+		
+		// More
+		let more = UIContextualAction(style: .normal, title: nil) { [weak self] (_, _, completionHandler: (Bool) -> Void) in
+			guard let partner = chatroom.partner, let address = partner.address else {
+				completionHandler(false)
+				return
+			}
+			
+			let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+			
+			if partner.isSystem {
+				self?.dialogService.presentShareAlertFor(string: encodedAddress,
+												   types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+												   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+												   animated: true,
+												   completion: nil)
+			} else {
+				let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
+					self?.dialogService.presentShareAlertFor(string: encodedAddress,
+															 types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+															 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+															 animated: true,
+															 completion: nil)
+				}
+				
+				let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] action in
+					let alert = UIAlertController(title: String(format: String.adamantLocalized.chat.actionsBody, address), message: nil, preferredStyle: .alert)
+					
+					alert.addTextField { (textField) in
+						textField.placeholder = String.adamantLocalized.chat.name
+						textField.autocapitalizationType = .words
+						
+						if let name = partner.name {
+							textField.text = name
+						}
+					}
+					 
+					alert.addAction(UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak alert] (_) in
+						if let textField = alert?.textFields?.first, let newName = textField.text {
+							self?.addressBook.set(name: newName, for: address)
+						}
+					})
+					
+					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+					
+					self?.present(alert, animated: true, completion: nil)
+				}
+				
+                let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
+                
+                self?.dialogService.showAlert(title: nil, message: nil, style: UIAlertController.Style.actionSheet, actions: [share, rename, cancel])
+			}
+			
+			completionHandler(true)
 		}
+		
+		more.image = #imageLiteral(resourceName: "swipe_more")
+		more.backgroundColor = UIColor.adamant.primary
+		
+		// Mark as read
+		if chatroom.hasUnreadMessages {
+			let markAsRead = UIContextualAction(style: .normal, title: nil) { [weak self] (_, _, completionHandler: (Bool) -> Void) in
+				guard let chatroom = self?.chatsController?.object(at: indexPath) else {
+					completionHandler(false)
+					return
+				}
+				
+				chatroom.markAsReaded()
+				try? chatroom.managedObjectContext?.save()
+				completionHandler(true)
+			}
+			
+			markAsRead.image = #imageLiteral(resourceName: "swipe_mark-as-read")
+			markAsRead.backgroundColor = UIColor.adamant.primary
+			
+			actions = [markAsRead, more]
+		} else {
+			actions = [more]
+		}
+		
+		return UISwipeActionsConfiguration(actions: actions)
 	}
 }
 

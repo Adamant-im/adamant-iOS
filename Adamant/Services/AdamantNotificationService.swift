@@ -133,15 +133,15 @@ extension AdamantNotificationsService {
 			switch mode {
 			case .disabled:
 				UIApplication.shared.unregisterForRemoteNotifications()
-				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)
 				
 			case .backgroundFetch:
 				UIApplication.shared.unregisterForRemoteNotifications()
-				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalMinimum)
 				
 			case .push:
 				UIApplication.shared.registerForRemoteNotifications()
-				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)
 			}
 		}
 		
@@ -162,7 +162,7 @@ extension AdamantNotificationsService {
 		let content = UNMutableNotificationContent()
 		content.title = title
 		content.body = body
-		content.sound = UNNotificationSound(named: "notification.mp3")
+		content.sound = UNNotificationSound(named: UNNotificationSoundName("notification.mp3"))
 		
 		if let number = type.badge {
 			if Thread.isMainThread {

@@ -42,8 +42,14 @@ struct AdamantResources {
 		Node(scheme: .https, host: "endless.adamant.im", port: nil),
 		Node(scheme: .https, host: "clown.adamant.im", port: nil),
 		Node(scheme: .https, host: "lake.adamant.im", port: nil),
-		Node(scheme: .http, host: "80.211.177.181", port: nil)
+//		Node(scheme: .http, host: "80.211.177.181", port: nil), // Bugged one
+//		Node(scheme: .http, host: "163.172.183.198", port: nil) // Testnet
 	]
+    
+    static let ethServers = [
+//        "https://ethnode1.adamant.im/"
+        "https://ropsten.infura.io/"  // test network
+    ]
 	
 	// Addresses
 	static let supportEmail = "ios@adamant.im"
@@ -60,6 +66,11 @@ struct AdamantResources {
 		
 		private init() {}
 	}
+    
+    // Explorers
+    static let adamantExplorerAddress = "https://explorer.adamant.im/tx/"
+//    static let ethereumExplorerAddress = "https://etherscan.io/tx/"
+    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
 	
 	private init() {}
 }
@@ -71,7 +82,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var window: UIWindow?
 	var repeater: RepeaterService!
 	var container: Container!
-	var backgroundTaskID: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
 	
 	// MARK: Dependencies
 	var accountService: AccountService!
@@ -81,7 +91,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	// MARK: - Lifecycle
 	
-	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// MARK: 1. Initiating Swinject
 		container = Container()
 		container.registerAdamantServices()
@@ -213,16 +223,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
 	func applicationDidEnterBackground(_ application: UIApplication) {
 		repeater.pauseAll()
-		
-		// MARK: Save KVS data
-		backgroundTaskID = UIApplication.shared.beginBackgroundTask { [unowned self] in
-			UIApplication.shared.endBackgroundTask(self.backgroundTaskID)
-			self.backgroundTaskID = UIBackgroundTaskInvalid
-		}
-		
 		addressBookService.saveIfNeeded()
-		UIApplication.shared.endBackgroundTask(backgroundTaskID)
-		self.backgroundTaskID = UIBackgroundTaskInvalid
 	}
 	
 	// MARK: Notifications
@@ -331,7 +332,7 @@ extension AppDelegate {
 		container.registerAdamantBackgroundFetchServices()
 		
 		guard let notificationsService = container.resolve(NotificationsService.self) else {
-				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalNever)
+				UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalNever)
 				completionHandler(.failed)
 				return
 		}

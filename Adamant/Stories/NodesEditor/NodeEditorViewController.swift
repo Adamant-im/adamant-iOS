@@ -99,7 +99,7 @@ class NodeEditorViewController: FormViewController {
 			}
 		}
 		
-		fileprivate var accessoryType: UITableViewCellAccessoryType {
+		fileprivate var accessoryType: UITableViewCell.AccessoryType {
 			switch self {
 			case .notTested, .failed: return .disclosureIndicator
 			case .passed: return .checkmark

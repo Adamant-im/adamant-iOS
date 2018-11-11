@@ -8,35 +8,34 @@
 
 import UIKit
 import FreakingSimpleRoundImageView
+import Parchment
 
-class WalletCollectionViewCell: UICollectionViewCell {
+class WalletCollectionViewCell: PagingCell {
 	@IBOutlet weak var currencyImageView: UIImageView!
 	@IBOutlet weak var balanceLabel: UILabel!
 	@IBOutlet weak var currencySymbolLabel: UILabel!
-	@IBOutlet weak var markerView: UIView!
-	@IBOutlet weak var markerWidthConstraint: NSLayoutConstraint!
 	@IBOutlet weak var accessoryContainerView: AccessoryContainerView!
 	
-	var activeMarkerMultiplier: CGFloat = 0.68
-	var markerAnimationDuration: TimeInterval = 0.15
-	
-	override var tintColor: UIColor! {
-		didSet {
-			markerView.backgroundColor = tintColor
+	override func setPagingItem(_ pagingItem: PagingItem, selected: Bool, options: PagingOptions) {
+		guard let item = pagingItem as? WalletPagingItem else {
+			return
 		}
-	}
-	
-	func setSelected(_ selected: Bool, animated: Bool) {
-		let width = selected ? frame.width * activeMarkerMultiplier : 0.0
-		if animated {
-			UIView.animate(withDuration: markerAnimationDuration) {
-				self.markerWidthConstraint.constant = width
-				self.layoutIfNeeded()
-			}
+		
+		currencyImageView.image = item.currencyImage
+		currencySymbolLabel.text = item.currencySymbol
+		
+		if item.balance < 1 {
+			balanceLabel.text = AdamantBalanceFormat.compact.format(item.balance)
 		} else {
-			markerWidthConstraint.constant = width
+			balanceLabel.text = AdamantBalanceFormat.short.format(item.balance)
+		}
+		
+		accessoryContainerView.accessoriesBackgroundColor = options.indicatorColor
+		
+		if item.notifications > 0 {
+			accessoryContainerView.setAccessory(AccessoryType.label(text: String(item.notifications)), at: .topRight)
+		} else {
+			accessoryContainerView.setAccessory(nil, at: .topRight)
 		}
 	}
-	
-	var isInitialized = false
 }

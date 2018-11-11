@@ -8,8 +8,22 @@
 
 import Foundation
 import MessageKit
+import MessageInputBar
 import SafariServices
 import Haring
+
+
+// MARK: - Tools
+extension ChatViewController {
+    private func getRichMessageType(of message: MessageType) -> String? {
+        guard case .custom(let raw) = message.kind, let transfer = raw as? RichMessageTransfer else {
+            return nil
+        }
+        
+        return transfer.type
+    }
+}
+
 
 // MARK: - MessagesDataSource
 extension ChatViewController: MessagesDataSource {
@@ -38,7 +52,7 @@ extension ChatViewController: MessagesDataSource {
     
     func cellTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
         if self.shouldDisplayHeader(for: message, at: indexPath, in: self.messagesCollectionView) {
-            return NSAttributedString(string: message.sentDate.humanizedDay(), attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedStringKey.foregroundColor: UIColor.gray])
+            return NSAttributedString(string: message.sentDate.humanizedDay(), attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.gray])
         }
         return nil
     }
@@ -51,10 +65,10 @@ extension ChatViewController: MessagesDataSource {
             
             switch transaction.statusEnum {
             case .failed:
-                return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedStringKey.foregroundColor: UIColor.darkText])
+                return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.darkText])
                 
             case .pending:
-                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedStringKey.foregroundColor: UIColor.darkText])
+                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.darkText])
                 
             case .delivered:
                 return nil
@@ -95,8 +109,52 @@ extension ChatViewController: MessagesDataSource {
 			}
 		}
 		
-		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2)])
+		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption2)])
 	}
+    
+    func customCell(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
+        guard let type = getRichMessageType(of: message), let provider = richMessageProviders[type] else {
+            fatalError("Tried to render wrong messagetype: \(message.kind)")
+        }
+        
+        let fromCurrent = isFromCurrentSender(message: message)
+        
+        let cell = provider.cell(for: message, isFromCurrentSender: fromCurrent, at: indexPath, in: messagesCollectionView)
+        
+        if let chatCell = cell as? ChatCell {
+//            let corner: MessageStyle.TailCorner = fromCurrent ? .bottomRight : .bottomLeft
+//            chatCell.bubbleStyle = .bubbleTail(corner, .curved)
+            
+            let bgColor: UIColor
+            if fromCurrent {
+                if let transaction = message as? ChatTransaction {
+                    switch transaction.statusEnum {
+                    case .failed: bgColor = UIColor.adamant.failChatBackground
+                    case .pending: bgColor = UIColor.adamant.pendingChatBackground
+                    case .delivered: bgColor = UIColor.adamant.chatSenderBackground
+                    }
+                } else {
+                    bgColor = UIColor.adamant.chatSenderBackground
+                }
+            } else {
+                bgColor = UIColor.adamant.chatRecipientBackground
+            }
+            
+            chatCell.bubbleBackgroundColor = bgColor
+        }
+        
+        if let customCell = cell as? TapRecognizerCustomCell {
+            customCell.delegate = self
+        }
+        
+        if let richTransaction = message as? RichMessageTransaction,
+            (richTransaction.transactionStatus == nil || richTransaction.transactionStatus == .notInitiated),
+            let updater = provider as? RichMessageProviderWithStatusCheck {
+            updateStatus(for: richTransaction, provider: updater)
+        }
+        
+        return cell
+    }
 }
 
 
@@ -185,26 +243,12 @@ extension ChatViewController: MessageCellDelegate {
 		}
 		
 		switch message {
-		case let transfer as TransferTransaction:
-			// MARK: Show transfer details
-			guard let vc = router.get(scene: AdamantScene.Transactions.transactionDetails) as? TransactionDetailsViewController else {
-				fatalError("Can't get TransactionDetails scene")
-			}
-			
-			vc.transaction = transfer
-			vc.showToChatRow = false
-			
-			if let nav = navigationController {
-				nav.pushViewController(vc, animated: true)
-			} else {
-				present(vc, animated: true, completion: nil)
-			}
-			
-		case let message as MessageTransaction:
-			// MARK: Show Retry/Cancel action sheet
-			guard message.messageStatus == .failed else {
-				break
-			}
+        // MARK: Show Retry/Cancel action sheet
+        case let message as MessageTransaction:
+            // Only for failed messages
+            guard message.messageStatus == .failed else {
+                break
+            }
 			
 			let retry = UIAlertAction(title: String.adamantLocalized.alert.retry, style: .default, handler: { [weak self] action in
 				self?.chatsProvider.retrySendMessage(message) { result in
@@ -237,8 +281,27 @@ extension ChatViewController: MessageCellDelegate {
 				}
 			})
 			
-			dialogService.showSystemActionSheet(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, actions: [retry, cancelMessage])
+			let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
 			
+			dialogService.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, style: .actionSheet, actions: [retry, cancelMessage, cancel])
+			
+            
+        // MARK: Show ADM transfer details
+        case let transfer as TransferTransaction:
+            guard let provider = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService else {
+                return
+            }
+            
+            provider.richMessageTapped(for: transfer, at: indexPath, in: self)
+            
+        // MARK: Pass event to rich message provider
+        case let richMessage as RichMessageTransaction:
+            guard let type = richMessage.richType, let provider = richMessageProviders[type] else {
+                break
+            }
+            
+            provider.richMessageTapped(for: richMessage, at: indexPath, in: self)
+            
 		default:
 			break
 		}
@@ -251,6 +314,35 @@ extension ChatViewController: MessageCellDelegate {
 	}
 }
 
+// MARK: - TransferCollectionViewCellDelegate
+extension ChatViewController: CustomCellDelegate {
+    func didTapCustomCell(_ cell: TapRecognizerCustomCell) {
+        guard let c = cell as? UICollectionViewCell,
+            let indexPath = messagesCollectionView.indexPath(for: c),
+            let transaction = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) else {
+            return
+        }
+        
+        switch transaction {
+        case let transfer as TransferTransaction:
+            guard let provider = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService else {
+                break
+            }
+            
+            provider.richMessageTapped(for: transfer, at: indexPath, in: self)
+            
+        case let richTransaction as RichMessageTransaction:
+            guard let type = richTransaction.richType, let provider = richMessageProviders[type] else {
+                break
+            }
+            
+            provider.richMessageTapped(for: richTransaction, at: indexPath, in: self)
+            
+        default:
+            return
+        }
+    }
+}
 
 // MARK: - MessagesLayoutDelegate
 extension ChatViewController: MessagesLayoutDelegate {
@@ -302,6 +394,22 @@ extension ChatViewController: MessagesLayoutDelegate {
             }
         } else {
             return 16
+        }
+    }
+    
+    func customCellSizeCalculator(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CellSizeCalculator {
+        guard let type = getRichMessageType(of: message) else {
+            return (messagesCollectionView.collectionViewLayout as! MessagesCollectionViewFlowLayout).textMessageSizeCalculator
+        }
+        
+        if let calculator = cellCalculators[type] {
+            return calculator
+        } else if let provider = richMessageProviders[type] {
+            let calculator = provider.cellSizeCalculator(for: messagesCollectionView.collectionViewLayout as! MessagesCollectionViewFlowLayout)
+            cellCalculators[type] = calculator
+            return calculator
+        } else {
+            return (messagesCollectionView.collectionViewLayout as! MessagesCollectionViewFlowLayout).textMessageSizeCalculator
         }
     }
 }
@@ -384,16 +492,32 @@ extension MessageTransaction: MessageType {
 			return MessageKind.text("")
 		}
 		
-		if isMarkdown {
-			let parser = MarkdownParser(font: UIFont.adamantChatDefault)
-			return MessageKind.attributedText(parser.parse(message))
-		} else {
-			return MessageKind.text(message)
-		}
+        if isMarkdown {
+            let parser = MarkdownParser(font: UIFont.adamantChatDefault)
+            return MessageKind.attributedText(parser.parse(message))
+        } else {
+            return MessageKind.text(message)
+        }
 	}
     
     public var messageStatus: MessageStatus {
         return self.statusEnum
+    }
+}
+
+// MARK: - RichMessageTransaction
+extension RichMessageTransaction: MessageType {
+    public var sender: Sender {
+        let id = self.senderId!
+        return Sender(id: id, displayName: id)
+    }
+    
+    public var messageId: String {
+        return self.transactionId!
+    }
+    
+    public var sentDate: Date {
+        return self.date! as Date
     }
 }
 
@@ -413,6 +537,16 @@ extension TransferTransaction: MessageType {
 	}
 	
 	public var kind: MessageKind {
-		return MessageKind.attributedText(AdamantFormattingTools.formatTransferTransaction(self))
+        let amountString: String
+        if let a = amount as Decimal? {
+            amountString = AdamantBalanceFormat.full.format(a)
+        } else {
+            amountString = "0"
+        }
+        
+        return MessageKind.custom(RichMessageTransfer(type: AdmWalletService.richMessageType,
+                                                      amount: amountString,
+                                                      hash: "",
+                                                      comments: ""))
 	}
 }

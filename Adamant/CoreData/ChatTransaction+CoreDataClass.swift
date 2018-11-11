@@ -16,4 +16,8 @@ public class ChatTransaction: BaseTransaction {
 		get { return MessageStatus(rawValue: self.status) ?? .failed }
 		set { self.status = newValue.rawValue }
 	}
+    
+    func serializedMessage() -> String? {
+        fatalError("You must implement serializedMessage in ChatTransaction classes")
+    }
 }

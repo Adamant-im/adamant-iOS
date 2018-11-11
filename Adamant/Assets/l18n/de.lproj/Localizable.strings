@@ -76,6 +76,12 @@
 /* AccountsProvider: Address not valid error, %@ for address */
 "AccountsProvider.Error.AddressNotValidFormat" = "Ungültige Adresse: %@";
 
+/* AccountService: Alert title. Changes in version 1.2 */
+"AccountService.update.v12.title" = "Version 1.2 update: Cryptowallets";
+
+/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets */
+"AccountService.update.v12.message" = "You need to relogin to initiate Ethereum and Lisk wallets";
+
 /* Login: user typed in invalid passphrase */
 "AccountServiceError.InvalidPassphrase" = "Falsche Passphrase";
 
@@ -112,6 +118,9 @@
 /* Account tab: 'Send tokens' button */
 "AccountTab.Row.SendTokens" = "Tokens senden";
 
+/* Account tab: 'Address' row */
+"AccountTab.Row.Address" = "Addresse";
+
 /* Account tab: 'Get free tokens' button */
 "AccountTab.Row.FreeTokens" = "Kostenlose ADM Tokens";
 
@@ -127,11 +136,14 @@
 /* Account tab: Application section title */
 "AccountTab.Section.Application" = "Application";
 
-/* Account tab: Adamant wallet section */
-"AccountTab.Sections.adamant_wallet" = "ADAMANT Wallet";
+/* Account tab: Adamant wallet */
+"AccountTab.Wallets.adamant_wallet" = "Adamant Wallet";
 
-/* Account tab: Ethereum wallet section */
-"AccountTab.Sections.ethereum_wallet" = "Ethereum Wallet";
+/* Account tab: Ethereum wallet */
+"AccountTab.Wallets.ethereum_wallet" = "Ethereum Wallet";
+
+/* Account tab: Lisk wallet */
+"AccountTab.Wallets.lisk_wallet" = "Lisk Wallet";
 
 /* Account page: scene title */
 "AccountTab.Title" = "Konto";
@@ -143,7 +155,7 @@
 "ADAMANT" = "ADAMANT";
 
 /* AddressBookService: Not enought money to save address into blockchain */
-"AddressBookService.Error.NotEnoughtMoney" = "Not enought tokens to store data in Blockchain";
+"AddressBookService.Error.NotEnoughtMoney" = "Nicht genug Tokens, um Daten auf der Blockchain zu speichern";
 
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
 "Application.deviceTokenErrorFormat" = "Anmeldefehler in ANS: %@";
@@ -156,9 +168,6 @@
 
 /* Serious internal error: Error parsing response */
 "ApiService.InternalError.ParsingFailed" = "Parsing fehlgeschlagen. Bericht senden";
-
-/* Unknown internal error */
-"ApiService.InternalError.UnknownError" = "Unbekannter Fehler. Bericht senden";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Abbrechen";
@@ -218,10 +227,10 @@
 "ChatScene.tapForDetails" = "Tippen Sie für Details";
 
 /* Chat: Body for actions menu */
-"ChatScene.Actions.Body" = "New name for %@";
+"ChatScene.Actions.Body" = "Neuer Name für %@";
 
 /* Chat: 'Rename' action in actions menu */
-"ChatScene.Actions.Rename" = "Rename";
+"ChatScene.Actions.Rename" = "Umbenennen";
 
 /* Chat: 'Name' field in actions menu */
 "ChatScene.Actions.NamePlaceholder" = "Name";
@@ -309,6 +318,9 @@
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "Sie sind nicht eingeloggt";
+
+/* Shared unknown error */
+"Error.UnknownError" = "Unbekannter Fehler. Bericht senden";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "LoginScene.Error.AuthorizeCamera" = "Sie müssen die Kamera freigeben, damit ADAMANT die Gerätekamera verwenden kann";
@@ -553,6 +565,18 @@
 /* TransactionList: scene title */
 "TransactionListScene.Title" = "Transaktionen";
 
+/* Transaction status: updating in progress */
+"TransactionStatus.Updating" = "Updating...";
+
+/* Transaction status: transaction is pending */
+"TransactionStatus.Pending" = "Pending";
+
+/* Transaction status: success */
+"TransactionStatus.Success" = "Success";
+
+/* Transaction status: transaction failed */
+"TransactionStatus.Failed" = "Failed";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";
 
@@ -561,6 +585,9 @@
 
 /* Transaction details: Block id row. */
 "TransactionDetailsScene.Row.Block" = "Block";
+
+/* Transaction details: Transaction delivery status. */
+"TransactionDetailsScene.Row.Status" = "Transaction status";
 
 /* Transaction details: confirmations row. */
 "TransactionDetailsScene.Row.Confirmations" = "Bestätigungen";
@@ -588,6 +615,9 @@
 
 /* Export transaction: 'Share transaction URL' button */
 "TransactionDetailsScene.Share.URL" = "URL";
+
+/* Transaction details: 'Your address' flag. */
+"TransactionDetailsScene.YourAddress" = "Sie";
 
 /* TransfersProvider: Transaction not found error. %@ for transaction's ID */
 "TransfersProvider.Error.TransactionNotFoundFormat" = "Transaktion mit der ID %@ nicht gefunden";

@@ -11,11 +11,14 @@ import Foundation
 // MARK: - Notifications
 extension Notification.Name {
 	struct AdamantAccountService {
+		/// Raised when user has successfully logged in. See AdamantUserInfoKey.AccountService
+		static let userLoggedIn = Notification.Name("adamant.accountService.userHasLoggedIn")
+		
 		/// Raised when user has logged out.
 		static let userLoggedOut = Notification.Name("adamant.accountService.userHasLoggedOut")
 		
-		/// Raised when user has successfully logged in. See AdamantUserInfoKey.AccountService
-		static let userLoggedIn = Notification.Name("adamant.accountService.userHasLoggedIn")
+		/// Raised when user is about to log out. Save your data.
+		static let userWillLogOut = Notification.Name("adamant.accountService.userWillLogOut")
 		
 		/// Raised on account info (balance) updated.
 		static let accountDataUpdated = Notification.Name("adamant.accountService.accountDataUpdated")
@@ -26,7 +29,24 @@ extension Notification.Name {
 		/// - Adamant.AccountService.newStayInState with new state
 		static let stayInChanged = Notification.Name("adamant.accountService.stayInChanged")
 		
+		
+		/// Raised when wallets collection updated
+		///
+		/// UserInfo:
+		/// - Adamant.AccountService.updatedWallet: wallet object
+		/// - Adamant.AccountService.updatedWalletIndex: wallet index in AccountService.wallets collection
+		static let walletUpdated = Notification.Name("adamant.accountService.walletUpdated")
+		
 		private init() {}
+	}
+}
+
+
+// MARK: - Localization
+extension String.adamantLocalized {
+	struct accountService {
+		static let updateAlertTitleV12 = NSLocalizedString("AccountService.update.v12.title", comment: "AccountService: Alert title. Changes in version 1.2")
+		static let updateAlertMessageV12 = NSLocalizedString("AccountService.update.v12.message", comment: "AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets")
 	}
 }
 
@@ -36,6 +56,8 @@ extension AdamantUserInfoKey {
 	struct AccountService {
 		static let loggedAccountAddress = "adamant.accountService.loggedin.address"
 		static let newStayInState = "adamant.accountService.stayIn"
+		static let updatedWallet = "adamant.accountService.updatedWallet"
+		static let updatedWalletIndex = "adamant.accountService.updatedWalletIndex"
 		
 		private init() {}
 	}
@@ -52,7 +74,7 @@ enum AccountServiceState {
 }
 
 enum AccountServiceResult {
-	case success(account: Account)
+	case success(account: AdamantAccount, alert: (title: String, message: String)?)
 	case failure(AccountServiceError)
 }
 
@@ -124,8 +146,12 @@ protocol AccountService: class {
 	// MARK: State
 	
 	var state: AccountServiceState { get }
-	var account: Account? { get }
+	var account: AdamantAccount? { get }
 	var keypair: Keypair? { get }
+	
+	
+	// MARK: Wallets
+	var wallets: [WalletService] { get }
 	
 	
 	// MARK: Account functions
