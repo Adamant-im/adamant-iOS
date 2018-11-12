@@ -564,7 +564,15 @@ extension ChatListViewController {
     private func shortDescription(for transaction: ChatTransaction) -> String? {
         switch transaction {
         case let message as MessageTransaction:
-            return message.message
+            guard let text = message.message else {
+                return nil
+            }
+            
+            if message.isOutgoing {
+                return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, text)
+            } else {
+                return text
+            }
             
         case let transfer as TransferTransaction:
             if let admService = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService {
@@ -574,10 +582,20 @@ extension ChatListViewController {
             }
             
         case let richMessage as RichMessageTransaction:
+            let description: String
+            
             if let type = richMessage.richType, let provider = richMessageProviders[type] {
-                return provider.shortDescription(for: richMessage)
+                description = provider.shortDescription(for: richMessage)
+            } else if let serialized = richMessage.serializedMessage() {
+                description = serialized
             } else {
-                return richMessage.serializedMessage()
+                return nil
+            }
+            
+            if richMessage.isOutgoing {
+                return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, description)
+            } else {
+                return description
             }
             
         default:
