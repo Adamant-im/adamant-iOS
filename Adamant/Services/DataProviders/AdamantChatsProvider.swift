@@ -1043,6 +1043,7 @@ extension AdamantChatsProvider {
             messageTransaction = trs
         }
         
+        messageTransaction.amount = transaction.amount as NSDecimalNumber
 		messageTransaction.date = transaction.date as NSDate
 		messageTransaction.recipientId = transaction.recipientId
 		messageTransaction.senderId = transaction.senderId

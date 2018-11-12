@@ -616,6 +616,6 @@ extension TransferTransaction: MessageType {
         return MessageKind.custom(RichMessageTransfer(type: AdmWalletService.richMessageType,
                                                       amount: amount as Decimal? ?? 0,
                                                       hash: "",
-                                                      comments: ""))
+                                                      comments: comment ?? ""))
 	}
 }
