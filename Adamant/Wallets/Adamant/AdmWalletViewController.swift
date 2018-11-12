@@ -26,4 +26,8 @@ class AdmWalletViewController: WalletViewControllerBase {
     override func sendRowLocalizedLabel() -> String {
         return String.adamantLocalized.wallets.sendAdm
     }
+    
+    override func encodeForQr(address: String) -> String? {
+        return AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+    }
 }

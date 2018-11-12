@@ -344,11 +344,11 @@ class ChatViewController: MessagesViewController {
 			return
 		}
 		
-		let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+        let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
 		
 		if partner.isSystem {
-			dialogService.presentShareAlertFor(string: encodedAddress,
-											   types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+			dialogService.presentShareAlertFor(string: address,
+											   types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address)],
 											   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 											   animated: true,
 											   completion: nil)
@@ -357,8 +357,8 @@ class ChatViewController: MessagesViewController {
 		}
 		
 		let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
-			self?.dialogService.presentShareAlertFor(string: encodedAddress,
-													types: [.copyToPasteboard, .share, .generateQr(sharingTip: address)],
+			self?.dialogService.presentShareAlertFor(string: address,
+													types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address)],
 													excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 													animated: true,
 													completion: nil)

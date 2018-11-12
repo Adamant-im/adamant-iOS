@@ -92,11 +92,17 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}
 			
 			if let address = self?.service?.wallet?.address {
-				
-				let contentType = ShareContentType.address
+                let types: [ShareType]
+                
+                if let encodedAddress = self?.encodeForQr(address: address) {
+                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address)]
+                } else {
+                    types = [.copyToPasteboard, .share]
+                }
+                
 				self?.dialogService.presentShareAlertFor(string: address,
-														 types: contentType.shareTypes(sharingTip: address),
-														 excludedActivityTypes: contentType.excludedActivityTypes,
+														 types: types,
+														 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 														 animated: true,
 														 completion: completion)
 			}
@@ -257,6 +263,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     func sendRowLocalizedLabel() -> String {
         return BaseRows.send.localized
+    }
+    
+    func encodeForQr(address: String) -> String? {
+        return nil
     }
     
     
