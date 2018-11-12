@@ -39,11 +39,11 @@ struct AdamantResources {
 	static let coreDataModel = Bundle.main.url(forResource: "Adamant", withExtension: "momd")!
 	
 	static let nodes: [Node] = [
-		Node(scheme: .https, host: "endless.adamant.im", port: nil),
-		Node(scheme: .https, host: "clown.adamant.im", port: nil),
-		Node(scheme: .https, host: "lake.adamant.im", port: nil),
+        Node(scheme: .https, host: "endless.adamant.im", port: nil),
+        Node(scheme: .https, host: "clown.adamant.im", port: nil),
+        Node(scheme: .https, host: "lake.adamant.im", port: nil),
 //		Node(scheme: .http, host: "80.211.177.181", port: nil), // Bugged one
-//		Node(scheme: .http, host: "163.172.183.198", port: nil) // Testnet
+//      Node(scheme: .http, host: "163.172.132.38", port: 36667) // Testnet
 	]
     
     static let ethServers = [

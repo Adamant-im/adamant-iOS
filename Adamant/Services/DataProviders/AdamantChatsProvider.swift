@@ -961,7 +961,6 @@ extension AdamantChatsProvider {
             switch chat.type {
             // MARK: Text message
             case .message, .messageOld, .signal, .unknown:
-                
                 if transaction.amount > 0 {
                     let trs = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
                     trs.comment = decodedMessage
