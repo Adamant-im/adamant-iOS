@@ -957,7 +957,7 @@ extension AdamantChatsProvider {
 		
         let messageTransaction: ChatTransaction
         // MARK: Decode message, message must contain data
-        if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey), decodedMessage.count > 0 {
+        if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)?.trimmingCharacters(in: .whitespacesAndNewlines), !decodedMessage.isEmpty {
             switch chat.type {
             // MARK: Text message
             case .message, .messageOld, .signal, .unknown:
