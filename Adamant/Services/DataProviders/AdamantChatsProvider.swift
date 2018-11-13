@@ -1054,7 +1054,7 @@ extension AdamantChatsProvider {
 		messageTransaction.blockId = transaction.blockId
 		messageTransaction.confirmations = transaction.confirmations
         messageTransaction.chatMessageId = UUID().uuidString
-        
+        messageTransaction.fee = transaction.fee as NSDecimalNumber
         messageTransaction.statusEnum = MessageStatus.delivered
 		
 		return messageTransaction
