@@ -166,7 +166,7 @@ extension EthWalletService: RichMessageProvider {
         }
         
         if transaction.isOutgoing {
-            return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(amount) \(EthWalletService.currencySymbol)")
+            return "⬅️  \(amount) \(EthWalletService.currencySymbol)"
         } else {
             return "➡️  \(amount) \(EthWalletService.currencySymbol)"
         }

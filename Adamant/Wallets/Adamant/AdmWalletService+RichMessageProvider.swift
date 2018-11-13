@@ -105,7 +105,7 @@ extension AdmWalletService: RichMessageProvider {
     
     private func shortDescription(isOutgoing: Bool, balance: Decimal) -> String {
         if isOutgoing {
-            return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(AdmWalletService.formatter.string(fromDecimal: balance)!)")
+            return "⬅️  \(AdmWalletService.formatter.string(fromDecimal: balance)!)"
         } else {
             return "➡️  \(AdmWalletService.formatter.string(fromDecimal: balance)!)"
         }
