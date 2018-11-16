@@ -14,7 +14,7 @@ enum CellSource {
     case nib(nib: UINib)
 }
 
-protocol RichMessageProvider {
+protocol RichMessageProvider: class {
     static var richMessageType: String { get }
     
     var cellIdentifierSent: String { get }
@@ -34,4 +34,12 @@ protocol RichMessageProvider {
 
 protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
     func statusForTransactionBy(hash: String, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void)
+    
+    var delayBetweenChecks: TimeInterval { get }
+}
+
+extension RichMessageProviderWithStatusCheck {
+    var delayBetweenChecks: TimeInterval {
+        return 10.0
+    }
 }

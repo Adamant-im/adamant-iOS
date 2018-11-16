@@ -568,17 +568,26 @@ extension ChatViewController: TransferViewControllerDelegate, ComplexTransferVie
 // MARK: - RichTransfers status update
 extension ChatViewController {
     func updateStatus(for transaction: RichMessageTransaction, provider: RichMessageProviderWithStatusCheck, delay: TimeInterval? = nil) {
+        guard transaction.transactionStatus != .updating else {
+            return
+        }
+        
         transaction.transactionStatus = .updating
+        try? stack.container.viewContext.save()
         
         let operation = StatusUpdateProcedure(parentContext: stack.container.viewContext,
                                               objectId: transaction.objectID,
-                                              provider: provider)
+                                              provider: provider,
+                                              controller: self)
         
         if let delay = delay {
-            let semaphore = richQueueSemaphore
-            DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + delay) { [weak self] in
+            DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + delay) { [weak self] in
+                guard let semaphore = self?.richQueueSemaphore, let queue = self?.richStatusOperationQueue else {
+                    return
+                }
+                
                 semaphore.wait()
-                self?.richStatusOperationQueue.addOperation(operation)
+                queue.addOperation(operation)
                 semaphore.signal()
             }
         } else {
@@ -595,10 +604,13 @@ private class StatusUpdateProcedure: Procedure {
     let objectId: NSManagedObjectID
     let provider: RichMessageProviderWithStatusCheck
     
-    init(parentContext: NSManagedObjectContext, objectId: NSManagedObjectID, provider: RichMessageProviderWithStatusCheck) {
+    weak var controller: ChatViewController?
+    
+    init(parentContext: NSManagedObjectContext, objectId: NSManagedObjectID, provider: RichMessageProviderWithStatusCheck, controller: ChatViewController) {
         self.parentContext = parentContext
         self.objectId = objectId
         self.provider = provider
+        self.controller = controller
         super.init()
     }
     
@@ -620,6 +632,25 @@ private class StatusUpdateProcedure: Procedure {
             switch result {
             case .success(let status):
                 transaction.transactionStatus = status
+                
+                if status == .pending {
+                    // 'self' is destroyed right after completion of this clousure, so we need to hold references
+                    weak var controller = self.controller
+                    weak var provider = self.provider
+                    weak var context = self.parentContext
+                    
+                    DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + self.provider.delayBetweenChecks) {
+                        guard let controller = controller, let provider = provider else {
+                            return
+                        }
+                        
+                        guard let trs = context?.object(with: transaction.objectID) as? RichMessageTransaction else {
+                            return
+                        }
+                        
+                        controller.updateStatus(for: trs, provider: provider, delay: 2.0)
+                    }
+                }
 
             case .failure:
                 transaction.transactionStatus = .failed
