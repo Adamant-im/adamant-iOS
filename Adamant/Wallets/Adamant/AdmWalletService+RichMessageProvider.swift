@@ -70,7 +70,12 @@ extension AdmWalletService: RichMessageProvider {
         
         cell.amountLabel.text = AdamantBalanceFormat.full.format(richMessage.amount)
         cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
-        cell.transactionStatus = nil
+        
+        if let status = (message as? TransferTransaction)?.statusEnum {
+            cell.transactionStatus = status.toTransactionStatus()
+        } else {
+            cell.transactionStatus = nil
+        }
         
         cell.commentsLabel.text = richMessage.comments
         
@@ -108,6 +113,17 @@ extension AdmWalletService: RichMessageProvider {
             return "⬅️  \(AdmWalletService.formatter.string(fromDecimal: balance)!)"
         } else {
             return "➡️  \(AdmWalletService.formatter.string(fromDecimal: balance)!)"
+        }
+    }
+}
+
+// MARK: - Tools
+extension MessageStatus {
+    func toTransactionStatus() -> TransactionStatus {
+        switch self {
+        case .pending: return TransactionStatus.updating
+        case .delivered: return TransactionStatus.success
+        case .failed: return TransactionStatus.failed
         }
     }
 }
