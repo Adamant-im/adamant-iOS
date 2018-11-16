@@ -68,6 +68,8 @@ class ChatViewController: MessagesViewController {
     }
     
 	private var controllerChanges: [ControllerChange] = []
+    
+    private var skipRichInitialUpdate: [String] = []
 	
     // Cell update timing
 	var cellUpdateTimers: [Timer] = [Timer]()
@@ -479,14 +481,26 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	}
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        if type == .insert, let trs = anObject as? ChatTransaction {
-            trs.isUnread = false
-            chatroom?.hasUnreadMessages = false
-            
-            if let rich = anObject as? RichMessageTransaction {
-                rich.kind = messageKind(for: rich)
+        
+        switch type {
+        case .insert:
+            if let trs = anObject as? ChatTransaction {
+                trs.isUnread = false
+                chatroom?.hasUnreadMessages = false
+                
+                if let rich = anObject as? RichMessageTransaction {
+                    rich.kind = messageKind(for: rich)
+                }
             }
-		}
+            
+        case .update:
+            if let rich = anObject as? RichMessageTransaction, let index = skipRichInitialUpdate.firstIndex(of: rich.messageId) {
+                skipRichInitialUpdate.remove(at: index)
+                return
+            }
+            
+        default: break
+        }
 		
         controllerChanges.append(ControllerChange(type: type, indexPath: indexPath, newIndexPath: newIndexPath))
 	}
@@ -572,8 +586,11 @@ extension ChatViewController {
             return
         }
         
+        if transaction.transactionStatus == nil || transaction.transactionStatus == .notInitiated {
+            skipRichInitialUpdate.append(transaction.messageId)
+        }
+        
         transaction.transactionStatus = .updating
-        try? stack.container.viewContext.save()
         
         let operation = StatusUpdateProcedure(parentContext: stack.container.viewContext,
                                               objectId: transaction.objectID,
