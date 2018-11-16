@@ -88,6 +88,7 @@ class EthTransferViewController: TransferViewControllerBase {
                                     detailsVc.transaction = transaction
                                     detailsVc.service = service
                                     detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                                    detailsVc.recipientName = self?.recipientName
                                     
                                     if comments.count > 0 {
                                         detailsVc.comment = comments
