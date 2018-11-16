@@ -113,6 +113,7 @@ class ChatViewController: MessagesViewController {
     }()
 	
     // MARK: RichTransaction status updates
+    private lazy var richQueueSemaphore = DispatchSemaphore(value: 1)
     private lazy var richStatusDispatchQueue = DispatchQueue(label: "com.adamant.chat.status-update.dispatch-queue", qos: .utility, attributes: [.concurrent])
     private lazy var richStatusOperationQueue: ProcedureQueue = {
         let queue = ProcedureQueue()
@@ -574,11 +575,16 @@ extension ChatViewController {
                                               provider: provider)
         
         if let delay = delay {
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            let semaphore = richQueueSemaphore
+            DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + delay) { [weak self] in
+                semaphore.wait()
                 self?.richStatusOperationQueue.addOperation(operation)
+                semaphore.signal()
             }
         } else {
+            richQueueSemaphore.wait()
             richStatusOperationQueue.addOperation(operation)
+            richQueueSemaphore.signal()
         }
     }
 }
