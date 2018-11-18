@@ -558,6 +558,9 @@ extension EthWalletService {
     }
     
     func getTransactionsHistory(address: String, offset: Int = 0, limit: Int = 100, completion: @escaping (WalletServiceResult<[EthTransactionShort]>) -> Void) {
+        guard let raw = AdamantResources.ethServers.randomElement(), let url = URL(string: raw) else {
+            fatalError("Failed to build ETH endpoint URL")
+        }
         
         // Headers
         let headers = [
@@ -568,39 +571,107 @@ extension EthWalletService {
         let columns = "time,txfrom,txto,gas,gasprice,block,txhash,value"
         let order = "time.desc"
         
-        let queryItems: [URLQueryItem] = [URLQueryItem(name: "select", value: columns),
-                                          URLQueryItem(name: "limit", value: String(limit)),
-                                          URLQueryItem(name: "txfrom", value: "eq.\(address)"),
-                                          URLQueryItem(name: "offset", value: String(offset)),
-                                          URLQueryItem(name: "order", value: order)
+        // MARK: Request txFrom
+        let txFromQueryItems: [URLQueryItem] = [URLQueryItem(name: "select", value: columns),
+                                                URLQueryItem(name: "limit", value: String(limit)),
+                                                URLQueryItem(name: "txfrom", value: "eq.\(address)"),
+                                                URLQueryItem(name: "offset", value: String(offset)),
+                                                URLQueryItem(name: "order", value: order)
         ]
         
-        guard let raw = AdamantResources.ethServers.randomElement(), let url = URL(string: raw) else {
-            fatalError("Failed to build ETH endpoint URL")
-        }
-        
-        let endpoint: URL
+        let txFromEndpoint: URL
         do {
-            endpoint = try buildUrl(url: url.appendingPathComponent(EthWalletService.transactionsListApiSubpath), queryItems: queryItems)
+            txFromEndpoint = try buildUrl(url: url.appendingPathComponent(EthWalletService.transactionsListApiSubpath), queryItems: txFromQueryItems)
         } catch {
             let err = AdamantApiService.InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
             completion(.failure(error: WalletServiceError.apiError(err)))
             return
         }
         
-        Alamofire.request(endpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+        // MARK: Request txTo
+        let txToQueryItems: [URLQueryItem] = [URLQueryItem(name: "select", value: columns),
+                                              URLQueryItem(name: "limit", value: String(limit)),
+                                              URLQueryItem(name: "txto", value: "eq.\(address)"),
+                                              URLQueryItem(name: "offset", value: String(offset)),
+                                              URLQueryItem(name: "order", value: order)
+        ]
+        
+        let txToEndpoint: URL
+        do {
+            txToEndpoint = try buildUrl(url: url.appendingPathComponent(EthWalletService.transactionsListApiSubpath), queryItems: txToQueryItems)
+        } catch {
+            let err = AdamantApiService.InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+            completion(.failure(error: WalletServiceError.apiError(err)))
+            return
+        }
+        
+        // MARK: Sending requests
+        
+        let dispatchGroup = DispatchGroup()
+        var error: WalletServiceError? = nil
+        
+        var transactions = [EthTransactionShort]()
+        let semaphore = DispatchSemaphore(value: 1)
+        
+        dispatchGroup.enter() // Enter for txFrom
+        Alamofire.request(txFromEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+            defer {
+                dispatchGroup.leave() // Exit for txFrom
+            }
+            
             switch response.result {
             case .success(let data):
                 do {
-                    let transactions = try JSONDecoder().decode([EthTransactionShort].self, from: data)
-                    completion(.success(result: transactions))
-                } catch {
-                    completion(.failure(error: .internalError(message: "Failed to deserialize transactions", error: error)))
+                    let trs = try JSONDecoder().decode([EthTransactionShort].self, from: data)
+                    
+                    semaphore.wait()
+                    defer { semaphore.signal() }
+                    transactions.append(contentsOf: trs)
+                } catch let err {
+                    error = .internalError(message: "Failed to deserialize transactions", error: err)
                 }
                 
             case .failure:
-                completion(.failure(error: .networkError))
+                error = .networkError
             }
+        }
+        
+        dispatchGroup.enter() // Enter for txTo
+        Alamofire.request(txToEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+            defer {
+                dispatchGroup.leave() // Enter for txTo
+            }
+            
+            switch response.result {
+            case .success(let data):
+                do {
+                    let trs = try JSONDecoder().decode([EthTransactionShort].self, from: data)
+                    
+                    semaphore.wait()
+                    defer { semaphore.signal() }
+                    transactions.append(contentsOf: trs)
+                } catch let err {
+                    error = .internalError(message: "Failed to deserialize transactions", error: err)
+                }
+                
+            case .failure:
+                error = .networkError
+            }
+        }
+        
+        // MARK: Handle results
+        // Go background, so we won't block mainthread with .wait()
+        DispatchQueue.global(qos: .userInitiated).async {
+            dispatchGroup.wait()
+            
+            if let error = error {
+                completion(.failure(error: error))
+                return
+            }
+            
+            transactions.sort { $0.date.compare($1.date) == .orderedDescending }
+            
+            completion(.success(result: transactions))
         }
     }
     

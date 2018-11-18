@@ -108,10 +108,12 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
                 DispatchQueue.main.async {
                     vc.transaction = ethTransaction
                     
-                    if ethTransaction.senderAddress == address {
-                        vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                    } else if ethTransaction.recipientAddress == address {
-                        vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                    if let address = address {
+                        if ethTransaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+                            vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                        } else if ethTransaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+                            vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                        }
                     }
                     
                     self?.navigationController?.pushViewController(vc, animated: true)

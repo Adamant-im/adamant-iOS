@@ -36,13 +36,13 @@ extension EthWalletService: RichMessageProvider {
         let recipientName: String?
         
         if let address = accountService.account?.address {
-            if address == transaction.senderId {
+            if let senderId = transaction.senderId, senderId.caseInsensitiveCompare(address) == .orderedSame {
                 senderName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
                 senderName = transaction.chatroom?.partner?.name
             }
             
-            if address == transaction.recipientId {
+            if let recipientId = transaction.recipientId, recipientId.caseInsensitiveCompare(address) == .orderedSame {
                 recipientName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
                 recipientName = transaction.chatroom?.partner?.name
