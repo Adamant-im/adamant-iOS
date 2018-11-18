@@ -31,6 +31,7 @@ enum AdamantBalanceFormat {
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .decimal
 		formatter.roundingMode = .floor
+        formatter.minimumFractionDigits = 0
 		
 		let positiveFormat: String
 		
@@ -87,6 +88,30 @@ enum AdamantBalanceFormat {
             return defaultFormatter.string(from: NSNumber(floatLiteral: value))!
         }
     }
+    
+    // MARK: Other formatters
+    
+    static var rawNumberDotFormatter: NumberFormatter = {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.roundingMode = .floor
+        f.decimalSeparator = "."
+        f.usesGroupingSeparator = false
+        f.minimumFractionDigits = 0
+        f.maximumFractionDigits = 12 // 18 is too low, 0.007 for example will serialize as 0.007000000000000001
+        return f
+    }()
+    
+    static var rawNumberCommaFormatter: NumberFormatter = {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.roundingMode = .floor
+        f.decimalSeparator = ","
+        f.usesGroupingSeparator = false
+        f.minimumFractionDigits = 0
+        f.maximumFractionDigits = 12 // 18 is too low, 0.007 for example will serialize as 0.007000000000000001
+        return f
+    }()
 }
 
 

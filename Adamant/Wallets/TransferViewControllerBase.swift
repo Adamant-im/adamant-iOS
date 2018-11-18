@@ -429,12 +429,29 @@ class TransferViewControllerBase: FormViewController {
 		}
 		
 		if let row: DecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
-			if let raw = row.value {
-				let amount = Decimal(raw)
+            // Eureka looses decimal precision when deserializing numbers by itself.
+            // Try to get raw value and deserialize it
+            if let input = row.cell.textInput as? UITextField, let raw = input.text {
+                if let amount = AdamantBalanceFormat.rawNumberDotFormatter.number(from: raw)?.decimalValue {
+                    self.amount = amount
+                    markRow(row, valid: validateAmount(amount))
+                } else if let amount = AdamantBalanceFormat.rawNumberCommaFormatter.number(from: raw)?.decimalValue {
+                    self.amount = amount
+                    markRow(row, valid: validateAmount(amount))
+                } else if let raw = row.value {
+                    let amount = Decimal(raw)
+                    self.amount = amount
+                    markRow(row, valid: validateAmount(amount))
+                } else {
+                    self.amount = nil
+                    markRow(row, valid: true)
+                }
+            } else if let raw = row.value { // We can't get raw value, let's try to get a value from row
+                let amount = Decimal(raw)
 				self.amount = amount
 				
 				markRow(row, valid: validateAmount(amount))
-			} else {
+			} else { // No value at all
 				amount = nil
 				markRow(row, valid: true)
 			}
@@ -754,6 +771,7 @@ extension TransferViewControllerBase {
 				$0.placeholder = String.adamantLocalized.transfer.amountPlaceholder
 				$0.tag = BaseRows.amount.tag
 				$0.formatter = self?.balanceFormatter
+                $0.useFormatterDuringInput = false
 				
 				if let amount = self?.amount {
 					$0.value = amount.doubleValue
