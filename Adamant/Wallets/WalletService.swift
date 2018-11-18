@@ -46,7 +46,7 @@ extension WalletServiceError: RichError {
 			return String.adamantLocalized.sharedErrors.userNotLogged
 			
 		case .notEnoughtMoney:
-			return NSLocalizedString("WalletServices.SharedErrors.NotEnoughtMoney", comment: "Wallet Services: Shared error, user do not have enought money.")
+			return String.adamantLocalized.sharedErrors.notEnoughtMoney
 			
 		case .networkError:
 			return String.adamantLocalized.sharedErrors.networkError

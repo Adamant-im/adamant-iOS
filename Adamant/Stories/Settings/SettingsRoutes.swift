@@ -20,11 +20,11 @@ extension AdamantScene {
 			return c
 		}
 		
-		static let qRGenerator = AdamantScene(identifier: "QRGeneratorViewController", factory: { r in
+		static let qRGenerator = AdamantScene(identifier: "QRGeneratorViewController") { r in
 			let c = QRGeneratorViewController()
 			c.dialogService = r.resolve(DialogService.self)
 			return c
-		})
+		}
 		
 		static let about = AdamantScene(identifier: "About") { r in
 			let c = AboutViewController()
@@ -38,6 +38,7 @@ extension AdamantScene {
         static let notifications = AdamantScene(identifier: "Notifications") { r in
             let c = NotificationsViewController()
             c.notificationsService = r.resolve(NotificationsService.self)
+            c.dialogService = r.resolve(DialogService.self)
             return c
         }
 		

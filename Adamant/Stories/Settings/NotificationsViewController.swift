@@ -56,6 +56,7 @@ class NotificationsViewController: FormViewController {
     
     // MARK: - Dependencies
     
+    var dialogService: DialogService!
     var notificationsService: NotificationsService!
     
     // MARK: - Lifecycle
@@ -160,13 +161,17 @@ class NotificationsViewController: FormViewController {
             case .success:
                 return
                 
-            case .denied(error: _):
+            case .failure(let error):
                 if let row: SwitchRow = self?.form.rowBy(tag: Rows.notificationsMode.tag) {
                     row.value = false
                     row.updateCell()
                 }
                 
-                DispatchQueue.main.async {
+                switch error {
+                case .notEnoughtMoney:
+                    self?.dialogService.showRichError(error: error)
+                    
+                case .denied:
                     self?.presentNotificationsDeniedError()
                 }
             }
@@ -174,18 +179,20 @@ class NotificationsViewController: FormViewController {
     }
     
     private func presentNotificationsDeniedError() {
-        let alert = UIAlertController(title: nil, message: String.adamantLocalized.notifications.notificationsDisabled, preferredStyle: .alert)
-        
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
-            DispatchQueue.main.async {
-                if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(settingsURL)
+        DispatchQueue.main.async { [weak self] in
+            let alert = UIAlertController(title: nil, message: String.adamantLocalized.notifications.notificationsDisabled, preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
+                DispatchQueue.main.async {
+                    if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(settingsURL)
+                    }
                 }
-            }
-        })
-        
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-        
-        present(alert, animated: true, completion: nil)
+            })
+            
+            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+            
+            self?.present(alert, animated: true, completion: nil)
+        }
     }
 }
