@@ -78,8 +78,8 @@ class EthWalletService: WalletService {
 	
     private static let transactionsListApiSubpath = "ethtxs"
     
-	let web3: web3
-	private let baseUrl: String
+	private(set) var web3: web3!
+	private var baseUrl: String!
 	let defaultDispatchQueue = DispatchQueue(label: "im.adamant.ethWalletService", qos: .utility, attributes: [.concurrent])
 	private (set) var enabled = true
 	
@@ -121,15 +121,7 @@ class EthWalletService: WalletService {
     private var balanceObserver: NSObjectProtocol? = nil
     
 	// MARK: - Logic
-	init(apiUrl: String) throws {
-		// Init network
-		guard let url = URL(string: apiUrl), let web3 = Web3.new(url) else {
-			throw WalletServiceError.networkError
-		}
-		
-		self.web3 = web3
-		self.baseUrl = EthWalletService.buildBaseUrl(for: web3.provider.network)
-		
+	init() {
 		// Notifications
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
 			self?.update()
@@ -148,6 +140,18 @@ class EthWalletService: WalletService {
             }
 		}
 	}
+    
+    func initiateNetwork(apiUrl: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let url = URL(string: apiUrl), let web3 = Web3.new(url) else {
+                completion(.failure(error: WalletServiceError.networkError))
+                return
+            }
+            
+            self.web3 = web3
+            self.baseUrl = EthWalletService.buildBaseUrl(for: web3.provider.network)
+        }
+    }
 	
 	func update() {
 		guard let wallet = ethWallet else {

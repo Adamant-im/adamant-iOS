@@ -14,7 +14,8 @@ class AdamantAccountService: AccountService {
 	
 	var apiService: ApiService!
 	var adamantCore: AdamantCore!
-	var notificationsService: NotificationsService!
+	weak var notificationsService: NotificationsService!
+    var dialogService: DialogService!
 	var securedStore: SecuredStore! {
 		didSet {
 			securedStoreSemaphore.wait()
@@ -86,9 +87,55 @@ class AdamantAccountService: AccountService {
 	// MARK: Wallets
 	var wallets: [WalletService] = [
 		AdmWalletService(),
-		try! EthWalletService(apiUrl: AdamantResources.ethServers.first!), // TODO: Move to background thread
+		EthWalletService(), // TODO: Move to background thread
 //		LskWalletService()
 	]
+    
+    init() {
+        guard let ethWallet = wallets[1] as? EthWalletService else {
+            fatalError("Failed to get EthWalletService")
+        }
+        
+        ethWallet.initiateNetwork(apiUrl: AdamantResources.ethServers.first!) { result in
+            switch result {
+            case .success:
+                break
+                
+            case .failure(let error):
+                switch error {
+                case .networkError:
+                    NotificationCenter.default.addObserver(forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: nil, queue: nil) { notification in
+                        guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection else {
+                            return
+                        }
+                        
+                        switch connection {
+                        case .none:
+                            break
+                            
+                        case .wifi, .cellular:
+                            ethWallet.initiateNetwork(apiUrl: AdamantResources.ethServers.first!) { result in
+                                switch result {
+                                case .success:
+                                    NotificationCenter.default.removeObserver(self, name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: nil)
+                                    
+                                case .failure(let error):
+                                    self.dialogService.showRichError(error: error)
+                                }
+                            }
+                        }
+                    }
+                    
+                case .notLogged, .transactionNotFound, .notEnoughtMoney, .accountNotFound, .walletNotInitiated, .invalidAmount:
+                    break
+                    
+                case .remoteServiceError, .apiError, .internalError:
+                    self.dialogService.showRichError(error: error)
+                    self.wallets.remove(at: 1)
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Saved data
