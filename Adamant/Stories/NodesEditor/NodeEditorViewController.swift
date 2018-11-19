@@ -134,6 +134,7 @@ class NodeEditorViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationAccessoryView.tintColor = UIColor.adamant.primary
 		
 		if let node = node {
 			self.navigationItem.title = node.host

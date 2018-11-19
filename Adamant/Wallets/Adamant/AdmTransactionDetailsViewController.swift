@@ -41,7 +41,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         let chatLabel = haveChatroom ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
         
         // MARK: Open chat
-        if let section = form.allSections.first {
+        if let section = form.sectionBy(tag: Sections.actions.tag) {
             let row = LabelRow() {
                 $0.tag = Rows.openChat.tag
                 $0.title = chatLabel
@@ -67,7 +67,11 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     // MARK: - Overrides
     
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
-        return URL(string: "\(AdamantResources.adamantExplorerAddress)\(transaction.id)")
+        guard let id = transaction.id else {
+            return nil
+        }
+        
+        return URL(string: "\(AdamantResources.adamantExplorerAddress)\(id)")
     }
     
     func goToChat() {
@@ -115,6 +119,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
                 case .success:
                     DispatchQueue.main.async {
                         self?.tableView.reloadData()
+//                        self?.form.
                     }
                     
                 case .failure:

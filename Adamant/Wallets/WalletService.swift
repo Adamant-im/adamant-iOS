@@ -10,8 +10,8 @@ import Foundation
 import UIKit
 import Swinject
 
-enum WalletServiceState {
-	case notInitiated, initiated, updated, updating
+enum WalletServiceState: Equatable {
+    case notInitiated, updating, upToDate, initiationFailed(reason: String)
 }
 
 enum WalletServiceSimpleResult {
@@ -46,7 +46,7 @@ extension WalletServiceError: RichError {
 			return String.adamantLocalized.sharedErrors.userNotLogged
 			
 		case .notEnoughtMoney:
-			return NSLocalizedString("WalletServices.SharedErrors.NotEnoughtMoney", comment: "Wallet Services: Shared error, user do not have enought money.")
+			return String.adamantLocalized.sharedErrors.notEnoughtMoney
 			
 		case .networkError:
 			return String.adamantLocalized.sharedErrors.networkError
@@ -55,7 +55,7 @@ extension WalletServiceError: RichError {
 			return String.adamantLocalized.transfer.accountNotFound
 			
 		case .walletNotInitiated:
-			return "Кошелёк ещё не создан для этого аккаунта"
+            return NSLocalizedString("WalletServices.SharedErrors.WalletNotInitiated", comment: "Wallet Services: Shared error, user has not yet initiated a specific wallet.")
 			
 		case .remoteServiceError(let message):
 			return String.adamantLocalized.sharedErrors.remoteServerError(message: message)
@@ -67,10 +67,10 @@ extension WalletServiceError: RichError {
 			return String.adamantLocalized.sharedErrors.internalError(message: message)
 			
 		case .invalidAmount(let amount):
-			return "Неверное количество для перевода: \(amount)"
+            return String.localizedStringWithFormat(NSLocalizedString("WalletServices.SharedErrors.InvalidAmountFormat", comment: "Wallet Services: Shared error, invalid amount format. %@ for amount"), AdamantBalanceFormat.full.format(amount))
             
         case .transactionNotFound:
-            return "Не удалось найти транзакцию"
+            return NSLocalizedString("WalletServices.SharedErrors.TransactionNotFound", comment: "Wallet Services: Shared error, transaction not found")
 		}
 	}
 	
@@ -124,7 +124,8 @@ extension ApiServiceError {
 extension AdamantUserInfoKey {
 	struct WalletService {
 		static let wallet = "Adamant.WalletService.wallet"
-		
+		static let walletState = "Adamant.WalletService.walletState"
+        
 		private init() {}
 	}
 }
@@ -161,6 +162,9 @@ protocol WalletService: class {
 	/// Enabled state changed
 	var serviceEnabledChanged: Notification.Name { get }
 	
+    /// State changed
+    var serviceStateChanged: Notification.Name { get }
+    
 	// MARK: State
 	var wallet: WalletAccount? { get }
 	var state: WalletServiceState { get }
@@ -183,6 +187,7 @@ protocol SwinjectDependentService: WalletService {
 
 protocol InitiatedWithPassphraseService: WalletService {
 	func initWallet(withPassphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void)
+    func setInitiationFailed(reason: String)
 }
 
 protocol WalletServiceWithTransfers: WalletService {
@@ -195,17 +200,24 @@ protocol WalletServiceWithSend: WalletService {
 	var transactionFeeUpdated: Notification.Name { get }
 	
 	var transactionFee : Decimal { get }
+    var commentsEnabledForRichMessages: Bool { get }
 	func transferViewController() -> UIViewController
 }
 
+extension WalletServiceWithSend {
+    var commentsEnabledForRichMessages: Bool {
+        return true
+    }
+}
+
 protocol WalletServiceSimpleSend: WalletServiceWithSend {
-	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceSimpleResult) -> Void)
+	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<TransactionDetails>) -> Void)
 }
 
 protocol WalletServiceTwoStepSend: WalletServiceWithSend {
 	associatedtype T: RawTransaction
 	
-	func createTransaction(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<T>) -> Void)
+	func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<T>) -> Void)
 	func sendTransaction(_ transaction: T, completion: @escaping (WalletServiceResult<String>) -> Void)
 }
 

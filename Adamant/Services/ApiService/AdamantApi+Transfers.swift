@@ -14,7 +14,7 @@ extension AdamantApiService {
         // MARK: 1. Prepare params
 		let params: [String : Any] = [
 			"type": TransactionType.send.rawValue,
-			"amount": amount.shiftedToAdamant(),
+			"amount": (amount.shiftedToAdamant() as NSDecimalNumber).uint64Value,
 			"recipientId": recipient,
 			"senderId": sender,
 			"publicKey": keypair.publicKey
@@ -55,7 +55,7 @@ extension AdamantApiService {
 				// MARK: 4.2. Create transaction
 				let transaction: [String: Any] = [
                     "type": normalizedTransaction.type.rawValue,
-                    "amount": normalizedTransaction.amount.shiftedToAdamant(),
+                    "amount": (normalizedTransaction.amount.shiftedToAdamant() as NSDecimalNumber).uint64Value,
                     "senderPublicKey": normalizedTransaction.senderPublicKey,
                     "requesterPublicKey": normalizedTransaction.requesterPublicKey ?? NSNull(),
                     "timestamp": normalizedTransaction.timestamp,

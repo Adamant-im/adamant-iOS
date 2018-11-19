@@ -18,7 +18,7 @@ class AdamantTransfersProvider: TransfersProvider {
 	var securedStore: SecuredStore!
 	
 	// MARK: Properties
-	var transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
+	let transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
 	
 	private(set) var state: State = .empty
 	private(set) var isInitiallySynced: Bool = false
@@ -285,14 +285,14 @@ extension AdamantTransfersProvider {
 	// MARK: Sending Funds
     
     // Wrapper
-	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void) {
+	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderTransferResult) -> Void) {
         // Go background
         sendingQueue.async {
             self.transferFundsInternal(toAddress: recipient, amount: amount, completion: completion)
         }
     }
     
-    private func transferFundsInternal(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void) {
+    private func transferFundsInternal(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderTransferResult) -> Void) {
         // MARK: 0. Prepare
 		guard let senderId = accountService.account?.address, let keypair = accountService.keypair else {
 			completion(.failure(.notLogged))
@@ -340,9 +340,12 @@ extension AdamantTransfersProvider {
         transaction.senderId = senderId
         transaction.type = Int16(TransactionType.send.rawValue)
         transaction.isOutgoing = true
+        transaction.showsChatroom = false
+        transaction.fee = transferFee as NSDecimalNumber
         
-        transaction.transactionId = UUID().uuidString
-        transaction.blockId = UUID().uuidString
+        transaction.transactionId = nil
+        transaction.blockId = nil
+        transaction.chatMessageId = UUID().uuidString
         transaction.statusEnum = MessageStatus.pending
         
         // MARK: 3. Chatroom
@@ -382,8 +385,17 @@ extension AdamantTransfersProvider {
                 }
                 self.unconfirmedsSemaphore.signal()
                 
+                do {
+                    try context.save()
+                } catch {
+                    completion(.failure(.internalError(message: "Failed to save data context", error: error)))
+                }
                 
-				completion(.success)
+                if let trs = self.stack.container.viewContext.object(with: transaction.objectID) as? TransactionDetails {
+                    completion(.success(transaction: trs))
+                } else {
+                    completion(.failure(.internalError(message: "Failed to get transaction in viewContext", error: nil)))
+                }
 				
 			case .failure(let error):
 				completion(.failure(.serverError(error)))
@@ -610,6 +622,7 @@ extension AdamantTransfersProvider {
                 transaction.blockId = t.blockId
                 transaction.confirmations = t.confirmations
                 transaction.statusEnum = .delivered
+                transaction.fee = t.fee as NSDecimalNumber
                 
                 unconfirmedTransactions.removeValue(forKey: t.id)
                 
@@ -636,6 +649,9 @@ extension AdamantTransfersProvider {
             transfer.blockId = t.blockId
             transfer.confirmations = t.confirmations
             transfer.statusEnum = .delivered
+            transfer.showsChatroom = false
+            transfer.isConfirmed = true
+            transfer.chatMessageId = UUID().uuidString
             
             transfer.isOutgoing = t.senderId == address
             let partnerId = transfer.isOutgoing ? t.recipientId : t.senderId
@@ -674,7 +690,11 @@ extension AdamantTransfersProvider {
             
             for (chatroom, trs) in chatrooms {
                 chatroom.hasUnreadMessages = true
-                trs.forEach { $0.isUnread = true }
+                trs.forEach {
+                    if !$0.isOutgoing {
+                        $0.isUnread = true
+                    }
+                }
             }
             
             transfers.filter({$0.height > unreadedHeight}).forEach({$0.isUnread = true})

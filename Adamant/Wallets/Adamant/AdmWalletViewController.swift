@@ -10,6 +10,8 @@ import UIKit
 
 extension String.adamantLocalized.wallets {
     static let adamant = NSLocalizedString("AccountTab.Wallets.adamant_wallet", comment: "Account tab: Adamant wallet")
+    
+    static let sendAdm = NSLocalizedString("AccountTab.Row.SendAdm", comment: "Account tab: 'Send ADM tokens' button")
 }
 
 class AdmWalletViewController: WalletViewControllerBase {
@@ -20,4 +22,12 @@ class AdmWalletViewController: WalletViewControllerBase {
 		
 		walletTitleLabel.text = String.adamantLocalized.wallets.adamant
 	}
+    
+    override func sendRowLocalizedLabel() -> String {
+        return String.adamantLocalized.wallets.sendAdm
+    }
+    
+    override func encodeForQr(address: String) -> String? {
+        return AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+    }
 }
