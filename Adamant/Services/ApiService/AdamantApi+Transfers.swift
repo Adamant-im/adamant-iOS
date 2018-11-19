@@ -9,11 +9,12 @@
 import Foundation
 
 extension AdamantApiService {
-	func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<Bool>) -> Void) {
-		// MARK: 1. Prepare params
+	func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
+        
+        // MARK: 1. Prepare params
 		let params: [String : Any] = [
 			"type": TransactionType.send.rawValue,
-			"amount": amount.shiftedToAdamant(),
+			"amount": (amount.shiftedToAdamant() as NSDecimalNumber).uint64Value,
 			"recipientId": recipient,
 			"senderId": sender,
 			"publicKey": keypair.publicKey
@@ -53,14 +54,14 @@ extension AdamantApiService {
 				
 				// MARK: 4.2. Create transaction
 				let transaction: [String: Any] = [
-					"type": TransactionType.send.rawValue,
-					"amount": amount.shiftedToAdamant(),
-					"senderPublicKey": keypair.publicKey,
-					"requesterPublicKey": normalizedTransaction.requesterPublicKey ?? NSNull(),
-					"timestamp": normalizedTransaction.timestamp,
-					"recipientId": recipient,
-					"senderId": sender,
-					"signature": signature
+                    "type": normalizedTransaction.type.rawValue,
+                    "amount": (normalizedTransaction.amount.shiftedToAdamant() as NSDecimalNumber).uint64Value,
+                    "senderPublicKey": normalizedTransaction.senderPublicKey,
+                    "requesterPublicKey": normalizedTransaction.requesterPublicKey ?? NSNull(),
+                    "timestamp": normalizedTransaction.timestamp,
+                    "recipientId": normalizedTransaction.recipientId ?? NSNull(),
+                    "senderId": sender,
+                    "signature": signature
 				]
 				
 				let params: [String: Any] = [
@@ -68,10 +69,18 @@ extension AdamantApiService {
 				]
 				
 				// MARK: 5. Send
-				self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: .json, headers: headers) { (response: ApiServiceResult<ServerResponse>) in
+				self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: .json, headers: headers) { (response: ApiServiceResult<TransactionIdResponse>) in
 					switch response {
-					case .success(_):
-						completion(.success(true))
+					case .success(let result):
+                        if let id = result.transactionId {
+                            completion(.success(id))
+                        } else {
+                            if let error = result.error {
+                                completion(.failure(.internalError(message: error, error: nil)))
+                            } else {
+                                completion(.failure(.internalError(message: "Unknown Error", error: nil)))
+                            }
+                        }
 						
 					case .failure(let error):
 						completion(.failure(error))

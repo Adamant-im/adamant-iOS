@@ -14,13 +14,7 @@ extension Container {
 	func registerAdamantServices() {
 		// MARK: - Standalone services
 		// MARK: AdamantCore
-		self.register(AdamantCore.self) { _ in
-			let core = JSAdamantCore()
-			core.loadJs(from: AdamantResources.jsCore, queue: DispatchQueue.global(qos: .background)) { result in
-				if case .error(let e) = result { fatalError(e.localizedDescription) }
-			}
-			return core
-		}.inObjectScope(.container)
+		self.register(AdamantCore.self) { _ in NativeAdamantCore() }.inObjectScope(.container)
 		
 		// MARK: Router
 		self.register(Router.self) { _ in
@@ -84,9 +78,16 @@ extension Container {
 			service.apiService = r.resolve(ApiService.self)!
 			service.adamantCore = r.resolve(AdamantCore.self)!
 			service.securedStore = r.resolve(SecuredStore.self)!
-			service.notificationsService = r.resolve(NotificationsService.self)!
-			return service
-		}.inObjectScope(.container)
+            service.dialogService = r.resolve(DialogService.self)!
+            return service
+        }.inObjectScope(.container).initCompleted { (r, c) in
+            let service = c as! AdamantAccountService
+            service.notificationsService = r.resolve(NotificationsService.self)!
+            
+			for case let wallet as SwinjectDependentService in service.wallets {
+				wallet.injectDependencies(from: self)
+			}
+		}
         
         // MARK: AddressBookServeice
         self.register(AddressBookService.self) { r in
@@ -127,12 +128,19 @@ extension Container {
 		// MARK: Chats
 		self.register(ChatsProvider.self) { r in
 			let provider = AdamantChatsProvider()
-			provider.accountService = r.resolve(AccountService.self)
-			provider.apiService = r.resolve(ApiService.self)
-			provider.stack = r.resolve(CoreDataStack.self)
-			provider.adamantCore = r.resolve(AdamantCore.self)
-			provider.accountsProvider = r.resolve(AccountsProvider.self)
-			provider.securedStore = r.resolve(SecuredStore.self)
+            provider.apiService = r.resolve(ApiService.self)
+            provider.stack = r.resolve(CoreDataStack.self)
+            provider.adamantCore = r.resolve(AdamantCore.self)
+            provider.securedStore = r.resolve(SecuredStore.self)
+            provider.accountsProvider = r.resolve(AccountsProvider.self)
+            
+            let accountService = r.resolve(AccountService.self)!
+            provider.accountService = accountService
+            var richProviders = [String: RichMessageProviderWithStatusCheck]()
+            for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
+                richProviders[type(of: provider).richMessageType] = provider
+            }
+            provider.richProviders = richProviders
 			return provider
 		}.inObjectScope(.container)
 	}

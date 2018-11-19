@@ -20,16 +20,22 @@ extension SecurityViewController {
 			case .success:
 				return
 				
-			case .denied(error: _):
-				if let row: SwitchRow = self?.form.rowBy(tag: Rows.notificationsMode.tag) {
-					row.value = false
-					row.updateCell()
-				}
-				
-				DispatchQueue.main.async {
-					self?.presentNotificationsDeniedError()
-				}
-			}
+            case .failure(let error):
+                if let row: SwitchRow = self?.form.rowBy(tag: Rows.notificationsMode.tag) {
+                    row.value = false
+                    row.updateCell()
+                }
+                
+                switch error {
+                case .notEnoughtMoney:
+                    self?.dialogService.showRichError(error: error)
+                    
+                case .denied:
+                    DispatchQueue.main.async {
+                        self?.presentNotificationsDeniedError()
+                    }
+                }
+            }
 		}
 	}
 	
@@ -38,8 +44,8 @@ extension SecurityViewController {
 		
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
 			DispatchQueue.main.async {
-				if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
-					UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+				if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+					UIApplication.shared.open(settingsURL)
 				}
 			}
 		})

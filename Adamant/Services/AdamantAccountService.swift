@@ -14,7 +14,8 @@ class AdamantAccountService: AccountService {
 	
 	var apiService: ApiService!
 	var adamantCore: AdamantCore!
-	var notificationsService: NotificationsService!
+	weak var notificationsService: NotificationsService!
+    var dialogService: DialogService!
 	var securedStore: SecuredStore! {
 		didSet {
 			securedStoreSemaphore.wait()
@@ -22,7 +23,10 @@ class AdamantAccountService: AccountService {
 				securedStoreSemaphore.signal()
 			}
 			
-			if securedStore.get(.publicKey) != nil,
+            if securedStore.get(.passphrase) != nil {
+                hasStayInAccount = true
+                _useBiometry = securedStore.get(.useBiometry) != nil
+            } else if securedStore.get(.publicKey) != nil,
 				securedStore.get(.privateKey) != nil,
 				securedStore.get(.pin) != nil {
 				hasStayInAccount = true
@@ -42,16 +46,15 @@ class AdamantAccountService: AccountService {
 	private let stateSemaphore = DispatchSemaphore(value: 1)
 	private let securedStoreSemaphore = DispatchSemaphore(value: 1)
 	
-	private(set) var account: Account?
+	private(set) var account: AdamantAccount?
 	private(set) var keypair: Keypair?
+	private var passphrase: String?
 	
 	private func setState(_ state: AccountServiceState) {
 		stateSemaphore.wait()
 		self.state = state
 		stateSemaphore.signal()
 	}
-	
-	
 	
 	private(set) var hasStayInAccount: Bool = false
 	
@@ -80,6 +83,59 @@ class AdamantAccountService: AccountService {
 			}
 		}
 	}
+	
+	// MARK: Wallets
+	var wallets: [WalletService] = [
+		AdmWalletService(),
+		EthWalletService(), // TODO: Move to background thread
+//		LskWalletService()
+	]
+    
+    init() {
+        guard let ethWallet = wallets[1] as? EthWalletService else {
+            fatalError("Failed to get EthWalletService")
+        }
+        
+        ethWallet.initiateNetwork(apiUrl: AdamantResources.ethServers.first!) { result in
+            switch result {
+            case .success:
+                break
+                
+            case .failure(let error):
+                switch error {
+                case .networkError:
+                    NotificationCenter.default.addObserver(forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: nil, queue: nil) { notification in
+                        guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection else {
+                            return
+                        }
+                        
+                        switch connection {
+                        case .none:
+                            break
+                            
+                        case .wifi, .cellular:
+                            ethWallet.initiateNetwork(apiUrl: AdamantResources.ethServers.first!) { result in
+                                switch result {
+                                case .success:
+                                    NotificationCenter.default.removeObserver(self, name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: nil)
+                                    
+                                case .failure(let error):
+                                    self.dialogService.showRichError(error: error)
+                                }
+                            }
+                        }
+                    }
+                    
+                case .notLogged, .transactionNotFound, .notEnoughtMoney, .accountNotFound, .walletNotInitiated, .invalidAmount:
+                    break
+                    
+                case .remoteServiceError, .apiError, .internalError:
+                    self.dialogService.showRichError(error: error)
+                    self.wallets.remove(at: 1)
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Saved data
@@ -101,11 +157,17 @@ extension AdamantAccountService {
 		}
 		
 		securedStore.set(pin, for: .pin)
-		securedStore.set(keypair.publicKey, for: .publicKey)
-		securedStore.set(keypair.privateKey, for: .privateKey)
+		
+		if let passphrase = passphrase {
+			securedStore.set(passphrase, for: .passphrase)
+		} else {
+			securedStore.set(keypair.publicKey, for: .publicKey)
+			securedStore.set(keypair.privateKey, for: .privateKey)
+		}
+		
 		hasStayInAccount = true
 		NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.stayInChanged, object: self, userInfo: [AdamantUserInfoKey.AccountService.newStayInState : true])
-		completion(.success(account: account))
+		completion(.success(account: account, alert: nil))
 	}
 	
 	func validatePin(_ pin: String) -> Bool {
@@ -124,6 +186,10 @@ extension AdamantAccountService {
 		return nil
 	}
 	
+	private func getSavedPassphrase() -> String? {
+		return securedStore.get(.passphrase)
+	}
+	
 	func dropSavedAccount() {
 		securedStoreSemaphore.wait()
 		defer {
@@ -135,6 +201,8 @@ extension AdamantAccountService {
 		securedStore.remove(.publicKey)
 		securedStore.remove(.privateKey)
 		securedStore.remove(.useBiometry)
+		securedStore.remove(.passphrase)
+        securedStore.remove(.showedV12)
 		hasStayInAccount = false
 		NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.stayInChanged, object: self, userInfo: [AdamantUserInfoKey.AccountService.newStayInState : false])
 		notificationsService.setNotificationsMode(.disabled, completion: nil)
@@ -184,12 +252,20 @@ extension AdamantAccountService {
 				}
 				
 				self?.setState(.loggedIn)
-                completion?(.success(account: account))
+				completion?(.success(account: account, alert: nil))
+				
+				if let adm = self?.wallets.first(where: { $0 is AdmWalletService }) {
+					adm.update()
+				}
 				
 			case .failure(let error):
                 completion?(.failure(.apiError(error: error)))
 				self?.setState(prevState)
 			}
+		}
+		
+		for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
+			wallet.update()
 		}
 	}
 }
@@ -219,7 +295,7 @@ extension AdamantAccountService {
 					apiService.newAccount(byPublicKey: publicKey) { result in
 						switch result {
 						case .success(let account):
-							completion(.success(account: account))
+							completion(.success(account: account, alert: nil))
 							
 						case .failure(let error):
 							completion(.failure(.apiError(error: error)))
@@ -247,22 +323,31 @@ extension AdamantAccountService {
 			return
 		}
 		
-		if let savedKeypair = getSavedKeypair() {
-			loginWith(keypair: keypair) { [weak self] result in
-				switch result {
-				case .success(_):
-					if let newKeypair = self?.keypair, newKeypair != savedKeypair {
-						self?.dropSavedAccount()
-					}
-					
-				default:
-					break
-				}
-				
+		loginWith(keypair: keypair) { [weak self] result in
+			guard case .success = result else {
 				completion(result)
+				return
 			}
-		} else {
-			loginWith(keypair: keypair, completion: completion)
+			
+			// MARK: Drop saved accs
+			if let storedPassphrase = self?.getSavedPassphrase(), storedPassphrase != passphrase {
+				self?.dropSavedAccount()
+			}
+			
+			if let storedKeypair = self?.getSavedKeypair(), storedKeypair != self?.keypair {
+				self?.dropSavedAccount()
+			}
+			
+			// Update and initiate wallet services
+			self?.passphrase = passphrase
+			
+			if let wallets = self?.wallets {
+				for case let wallet as InitiatedWithPassphraseService in wallets {
+					wallet.initWallet(withPassphrase: passphrase, completion: { _ in })
+				}
+			}
+			
+			completion(result)
 		}
 	}
 	
@@ -283,12 +368,41 @@ extension AdamantAccountService {
 	
 	// MARK: Biometry
 	func loginWithStoredAccount(completion: @escaping (AccountServiceResult) -> Void) {
-		guard let keypair = getSavedKeypair() else {
-			completion(.failure(.invalidPassphrase))
+		if let passphrase = getSavedPassphrase() {
+			loginWith(passphrase: passphrase, completion: completion)
 			return
 		}
 		
-		loginWith(keypair: keypair, completion: completion)
+		if let keypair = getSavedKeypair() {
+			loginWith(keypair: keypair) { [weak self] result in
+				switch result {
+				case .success(let account, _):
+                    
+                    let alert: (title: String, message: String)?
+                    if self?.securedStore.get(.showedV12) != nil {
+                        alert = nil
+                    } else {
+                        self?.securedStore.set("1", for: .showedV12)
+                        alert = (title: String.adamantLocalized.accountService.updateAlertTitleV12,
+                                 message: String.adamantLocalized.accountService.updateAlertMessageV12)
+                    }
+                    
+					completion(.success(account: account, alert: alert))
+                    
+                    if let wallets = self?.wallets {
+                        for case let wallet as InitiatedWithPassphraseService in wallets {
+                            wallet.setInitiationFailed(reason: String.adamantLocalized.accountService.reloginToInitiateWallets)
+                        }
+                    }
+					
+				default:
+					completion(result)
+				}
+			}
+			return
+		}
+		
+		completion(.failure(.invalidPassphrase))
 	}
 	
 	
@@ -325,7 +439,8 @@ extension AdamantAccountService {
 				let userInfo = [AdamantUserInfoKey.AccountService.loggedAccountAddress:account.address]
 				NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.userLoggedIn, object: self, userInfo: userInfo)
 				self.setState(.loggedIn)
-				completion(.success(account: account))
+				
+				completion(.success(account: account, alert: nil))
 				
 			case .failure(let error):
 				self.setState(.notLogged)
@@ -358,6 +473,7 @@ extension AdamantAccountService {
 		let wasLogged = account != nil
 		account = nil
 		keypair = nil
+		passphrase = nil
 		
 		if lockSemaphore {
 			setState(.notLogged)
@@ -379,6 +495,8 @@ extension StoreKey {
 		static let privateKey = "accountService.privateKey"
 		static let pin = "accountService.pin"
 		static let useBiometry = "accountService.useBiometry"
+		static let passphrase = "accountService.passphrase"
+        static let showedV12 = "accountService.showedV12"
 		
 		private init() {}
 	}
@@ -389,6 +507,8 @@ fileprivate enum Key {
 	case privateKey
 	case pin
 	case useBiometry
+	case passphrase
+    case showedV12
 	
 	var stringValue: String {
 		switch self {
@@ -396,6 +516,8 @@ fileprivate enum Key {
 		case .privateKey: return StoreKey.accountService.privateKey
 		case .pin: return StoreKey.accountService.pin
 		case .useBiometry: return StoreKey.accountService.useBiometry
+		case .passphrase: return StoreKey.accountService.passphrase
+        case .showedV12: return StoreKey.accountService.showedV12
 		}
 	}
 }

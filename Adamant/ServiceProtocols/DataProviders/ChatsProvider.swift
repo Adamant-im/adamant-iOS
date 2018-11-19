@@ -120,7 +120,7 @@ extension Notification.Name {
 		/// Received new messagess. See AdamantUserInfoKey.ChatProvider
 		static let newUnreadMessages = Notification.Name("adamant.chatsProvider.newUnreadMessages")
 
-		static let initialSyncFinished = Notification.Name("adamant.chatsProvider.initialSyncFinished")
+        static let initiallySyncedChanged = Notification.Name("adamant.chatsProvider.initialSyncChanged")
 
 		private init() {}
 	}
@@ -135,6 +135,8 @@ extension AdamantUserInfoKey {
 		/// lastMessageHeight: new lastMessageHeight
 		static let lastMessageHeight = "adamant.chatsProvider.newMessage.lastHeight"
 		
+        static let initiallySynced = "adamant.chatsProvider.initiallySynced"
+        
 		private init() {}
 	}
 }
@@ -172,16 +174,16 @@ protocol ChatsProvider: DataProvider {
 	
 	// MARK: - Sending messages
 	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
-	func retrySendMessage(_ message: MessageTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void)
+	func retrySendMessage(_ message: ChatTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void)
     
     // MARK: - Delete local message
-    func cancelMessage(_ message: MessageTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void )
+    func cancelMessage(_ message: ChatTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void )
 	
 	// MARK: - Tools
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
 	
 	// MARK: - Fake messages
-	func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, completion: @escaping (ChatsProviderResult) -> Void)
-	func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, completion: @escaping (ChatsProviderResult) -> Void)
+    func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void)
+    func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void)
     func fakeUpdate(status: MessageStatus, forTransactionId id: String, completion: @escaping (ChatsProviderResult) -> Void)
 }

@@ -77,7 +77,7 @@ class ShareQrViewController: FormViewController {
 		}
 	}
 	
-	var excludedActivityTypes: [UIActivityType]?
+	var excludedActivityTypes: [UIActivity.ActivityType]?
 	
 	// MARK: - Lifecycle
 	override func viewDidLoad() {
@@ -140,7 +140,7 @@ class ShareQrViewController: FormViewController {
 				vc.excludedActivityTypes = excludedActivityTypes
 			}
 			
-			vc.completionWithItemsHandler = { [weak self] (type: UIActivityType?, completed: Bool, _, error: Error?) in
+			vc.completionWithItemsHandler = { [weak self] (type: UIActivity.ActivityType?, completed: Bool, _, error: Error?) in
 				if completed {
 					if let error = error {
 						self?.dialogService.showWarning(withMessage: error.localizedDescription)

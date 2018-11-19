@@ -148,11 +148,11 @@ class QRGeneratorViewController: FormViewController {
 		}
     }
 	
-	override func insertAnimation(forSections sections: [Section]) -> UITableViewRowAnimation {
+	override func insertAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
 		return .top
 	}
 	
-	override func insertAnimation(forRows rows: [BaseRow]) -> UITableViewRowAnimation {
+	override func insertAnimation(forRows rows: [BaseRow]) -> UITableView.RowAnimation {
 		return .top
 	}
 	
