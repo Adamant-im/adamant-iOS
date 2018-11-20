@@ -30,7 +30,7 @@ class PageControl: UIView {
     }
     
     // MARK: - Allingment
-    var contentHorizontalAlignment: UIControlContentHorizontalAlignment = .center
+    var contentHorizontalAlignment: UIControl.ContentHorizontalAlignment = .center
     
     // MARK: - Colors
     @IBInspectable var currentPageTintColor: UIColor = .white
