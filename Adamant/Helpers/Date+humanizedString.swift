@@ -11,7 +11,7 @@ import DateToolsSwift
 
 extension Date {
 	/// Returns readable date with time.
-	func humanizedDateTime() -> String {
+    func humanizedDateTime(withWeekday: Bool = true) -> String {
 		if yearsAgo < 1 {
 			let dateString: String
 			if isToday {
@@ -23,7 +23,7 @@ extension Date {
 					it will display something like '6 hours ago'
 				*/
 				dateString = NSLocalizedString("Yesterday", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
-			} else if weeksAgo < 1 { // This week, show weekday, month and date
+			} else if withWeekday && weeksAgo < 1 { // This week, show weekday, month and date
 				dateString = Date.formatterWeekDayMonth.string(from: self)
 			} else { // This year, long ago: show month and date
 				dateString = Date.formatterDayMonth.string(from: self)

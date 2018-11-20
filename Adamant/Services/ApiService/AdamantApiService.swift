@@ -42,7 +42,7 @@ class AdamantApiService: ApiService {
 				return NSLocalizedString("ApiService.InternalError.ParsingFailed", comment: "Serious internal error: Error parsing response")
 				
 			case .unknownError:
-				return NSLocalizedString("ApiService.InternalError.UnknownError", comment: "Unknown internal error")
+				return String.adamantLocalized.sharedErrors.unknownError
 			}
 		}
 	}

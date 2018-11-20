@@ -20,7 +20,7 @@ extension AdamantApiService.ApiCommands {
 extension AdamantApiService {
 	
 	/// Create new account with publicKey
-	func newAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<Account>) -> Void) {
+	func newAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
 		// MARK: 1. Build endpoint
 		let endpoint: URL
 		do {
@@ -40,7 +40,7 @@ extension AdamantApiService {
 		]
 		
 		// MARK: 3. Send
-		sendRequest(url: endpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerModelResponse<Account>>) in
+		sendRequest(url: endpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerModelResponse<AdamantAccount>>) in
 			switch serverResponse {
 			case .success(let response):
 				if let model = response.model {
@@ -57,7 +57,7 @@ extension AdamantApiService {
 	}
 	
 	/// Get existing account by passphrase.
-	func getAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<Account>) -> Void) {
+	func getAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
 		// MARK: 1. Get keypair from passphrase
 		guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase) else {
 			completion(.failure(.accountNotFound))
@@ -69,7 +69,7 @@ extension AdamantApiService {
 	}
 	
 	/// Get existing account by publicKey
-	func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<Account>) -> Void) {
+	func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
 		// MARK: 1. Build endpoint
 		let endpoint: URL
 		do {
@@ -81,7 +81,7 @@ extension AdamantApiService {
 		}
 		
 		// MARK: 2. Send
-		sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerModelResponse<Account>>) in
+		sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerModelResponse<AdamantAccount>>) in
 			switch serverResponse {
 			case .success(let response):
 				if let model = response.model {
@@ -97,7 +97,7 @@ extension AdamantApiService {
 		}
 	}
 	
-	func getAccount(byAddress address: String, completion: @escaping (ApiServiceResult<Account>) -> Void) {
+	func getAccount(byAddress address: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
 		// MARK: 1. Build endpoint
 		let endpoint: URL
 		do {
@@ -109,7 +109,7 @@ extension AdamantApiService {
 		}
 		
 		// MARK: 2. Send
-		sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerModelResponse<Account>>) in
+		sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerModelResponse<AdamantAccount>>) in
 			switch serverResponse {
 			case .success(let response):
 				if let model = response.model {

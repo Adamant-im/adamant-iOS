@@ -14,6 +14,10 @@ extension Decimal {
 	}
 	
 	func shiftedToAdamant() -> Decimal {
-		return Decimal(sign: self.isSignMinus ? .minus : .plus, exponent: 0, significand: self)
+		return Decimal(sign: self.isSignMinus ? .minus : .plus, exponent: -AdamantUtilities.currencyExponent, significand: self)
+	}
+	
+	var doubleValue: Double {
+		return (self as NSNumber).doubleValue
 	}
 }

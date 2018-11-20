@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import PMAlertController
 
 extension String.adamantLocalized.alert {
 	static let copyToPasteboard = NSLocalizedString("Shared.CopyToPasteboard", comment: "Shared alert 'Copy' button. Used anywhere. Used for copy-paste info.")
@@ -21,7 +20,7 @@ extension String.adamantLocalized.alert {
 enum ShareType {
 	case copyToPasteboard
 	case share
-	case generateQr(sharingTip: String?)
+    case generateQr(encodedContent: String?, sharingTip: String?)
 	case saveToPhotolibrary(image: UIImage)
 	
 	var localized: String {
@@ -45,22 +44,22 @@ enum ShareContentType {
 	case passphrase
 	case address
 	
-	var excludedActivityTypes: [UIActivityType]? {
+	var excludedActivityTypes: [UIActivity.ActivityType]? {
 		switch self {
 		case .passphrase:
-			var types: [UIActivityType] = [.postToFacebook,
-										   .postToTwitter,
-										   .postToWeibo,
-										   .message,
-										   .mail,
-										   .assignToContact,
-										   .saveToCameraRoll,
-										   .addToReadingList,
-										   .postToFlickr,
-										   .postToVimeo,
-										   .postToTencentWeibo,
-										   .airDrop,
-										   .openInIBooks]
+			var types: [UIActivity.ActivityType] = [.postToFacebook,
+                                                    .postToTwitter,
+                                                    .postToWeibo,
+                                                    .message,
+                                                    .mail,
+                                                    .assignToContact,
+                                                    .saveToCameraRoll,
+                                                    .addToReadingList,
+                                                    .postToFlickr,
+                                                    .postToVimeo,
+                                                    .postToTencentWeibo,
+                                                    .airDrop,
+                                                    .openInIBooks]
 			
 			if #available(iOS 11.0, *) { types.append(.markupAsPDF) }
 			return types
@@ -81,6 +80,16 @@ protocol RichError: Error {
 	var message: String { get }
 	var internalError: Error? { get }
 	var level: ErrorLevel { get }
+}
+
+enum AdamantAlertStyle {
+	case alert, actionSheet, richNotification
+}
+
+struct AdamantAlertAction {
+	let title: String
+    let style: UIAlertAction.Style
+	let handler: (() -> Void)?
 }
 
 protocol DialogService: class {
@@ -111,13 +120,15 @@ protocol DialogService: class {
 	func dismissNotification()
 	
 	// MARK: - ActivityControllers
-	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?)
-    func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, from: UIBarButtonItem?, completion: (() -> Void)?)
+	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?)
+    func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIBarButtonItem?, completion: (() -> Void)?)
 	
 	func presentGoToSettingsAlert(title: String?, message: String?)
     
     // MARK: - Alerts
-    func showAlert(title:String, message: String, actions: [PMAlertAction]?)
+    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?)
+	func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?)
+
     func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?, from: UIView?)
     func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?, from: UIBarButtonItem?)
 }

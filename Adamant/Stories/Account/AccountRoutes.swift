@@ -17,14 +17,7 @@ extension AdamantScene {
 			c.router = r.resolve(Router.self)
 			c.notificationsService = r.resolve(NotificationsService.self)
 			c.transfersProvider = r.resolve(TransfersProvider.self)
-			return c
-		}
-		
-		static let transfer = AdamantScene(identifier: "TransferViewController") { r in
-			let c = TransferViewController()
-			c.apiService = r.resolve(ApiService.self)
-			c.accountService = r.resolve(AccountService.self)
-			c.dialogService = r.resolve(DialogService.self)
+            c.localAuth = r.resolve(LocalAuthentication.self)
 			return c
 		}
 		

@@ -1,0 +1,18 @@
+//
+//  LskAccount.swift
+//  Adamant
+//
+//  Created by Anokhov Pavel on 03.08.2018.
+//  Copyright © 2018 Adamant. All rights reserved.
+//
+
+import Foundation
+import BigInt
+import Ed25519
+
+struct LskAccount {
+	let keys: KeyPair
+	let address: String
+	var balance: BigUInt?
+	var balanceString: String?
+}

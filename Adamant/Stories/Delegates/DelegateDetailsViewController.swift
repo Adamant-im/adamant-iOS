@@ -231,7 +231,7 @@ extension DelegateDetailsViewController {
 			
 		case .vote:
 			let weight = Decimal(string: delegate.vote)?.shiftedFromAdamant() ?? 0
-			cell.detailTextLabel?.text = AdamantUtilities.currencyFormatterShort.string(for: weight)
+			cell.detailTextLabel?.text = AdamantBalanceFormat.currencyFormatterShort.string(for: weight)
 			
 		case .producedblocks:
 			cell.detailTextLabel?.text = String(delegate.producedblocks)
@@ -267,7 +267,7 @@ extension DelegateDetailsViewController {
 			}
 			
 		case .forged:
-			cell.detailTextLabel?.text = AdamantUtilities.currencyFormatterShort.string(for: forged)
+			cell.detailTextLabel?.text = AdamantBalanceFormat.currencyFormatterShort.string(for: forged)
 		}
 		
 		return cell

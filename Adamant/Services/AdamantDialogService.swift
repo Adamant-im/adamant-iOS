@@ -101,21 +101,21 @@ extension AdamantDialogService {
 		FTIndicator.showError(withMessage: message)
 	}
 	
-	func showError(withMessage message: String, error: Error? = nil) {
-		if Thread.isMainThread {
-			internalShowError(withMessage: message, error: error)
-		} else {
-			DispatchQueue.main.async {
-				self.internalShowError(withMessage: message, error: error)
-			}
-		}
-	}
-	
-	/// Must be called from main thread only
+    func showError(withMessage message: String, error: Error? = nil) {
+        if Thread.isMainThread {
+            internalShowError(withMessage: message, error: error)
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.internalShowError(withMessage: message, error: error)
+            }
+        }
+    }
+    
 	private func internalShowError(withMessage message: String, error: Error? = nil) {
-		let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
-		FTIndicator.dismissProgress()
+        FTIndicator.dismissProgress()
 		
+		let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
+        
         alertVC.gravityDismissAnimation = false
         alertVC.alertTitle.textColor = UIColor.adamant.primary
         alertVC.alertDescription.textColor = UIColor.adamant.secondary
@@ -182,7 +182,7 @@ extension AdamantDialogService {
         alertVC.alertActionStackView.spacing = 0
         alertVC.alertActionStackViewHeightConstraint.constant = 100
 		
-		present(alertVC, animated: true, completion: nil)
+        present(alertVC, animated: true, completion: nil)
 	}
 	
 	func showRichError(error: RichError) {
@@ -223,7 +223,7 @@ extension AdamantDialogService {
 
 // MAKR: - Activity controllers
 extension AdamantDialogService {
-    func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
+    func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
 		let alert = createShareAlertFor(string: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, completion: completion)
         
         if let sourceView = from {
@@ -235,7 +235,7 @@ extension AdamantDialogService {
 		present(alert, animated: animated, completion: completion)
 	}
     
-    func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, from: UIBarButtonItem?, completion: (() -> Void)?) {
+    func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIBarButtonItem?, completion: (() -> Void)?) {
         let alert = createShareAlertFor(string: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, completion: completion)
         
         if let sourceView = from { alert.popoverPresentationController?.barButtonItem = sourceView }
@@ -243,56 +243,55 @@ extension AdamantDialogService {
         present(alert, animated: animated, completion: completion)
     }
     
-    private func createShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivityType]?, animated: Bool, completion: (() -> Void)?) -> UIAlertController {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        for type in types {
-            switch type {
-            case .copyToPasteboard:
-                alert.addAction(UIAlertAction(title: type.localized , style: .default) { [weak self] _ in
-                    UIPasteboard.general.string = string
-                    self?.showToastMessage(String.adamantLocalized.alert.copiedToPasteboardNotification)
-                })
-                
-            case .share:
-                alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-                    let vc = UIActivityViewController(activityItems: [string], applicationActivities: nil)
-                    vc.excludedActivityTypes = excludedActivityTypes
-                    self?.present(vc, animated: true, completion: completion)
-                })
-                
-            case .generateQr(let sharingTip):
-                alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-                    switch AdamantQRTools.generateQrFrom(string: string) {
-                    case .success(let qr):
-                        guard let vc = self?.router.get(scene: AdamantScene.Shared.shareQr) as? ShareQrViewController else {
-                            fatalError("Can't find ShareQrViewController")
-                        }
-                        
-                        vc.qrCode = qr
-                        vc.sharingTip = sharingTip
-                        vc.excludedActivityTypes = excludedActivityTypes
-                        self?.present(vc, animated: true, completion: completion)
-                        
-                    case .failure(error: let error):
-                        self?.showError(withMessage: error.localizedDescription, error: error)
-                    }
-                })
-                
-            case .saveToPhotolibrary(let image):
-                let action = UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-                    UIImageWriteToSavedPhotosAlbum(image, self, #selector(self?.image(_:didFinishSavingWithError:contextInfo:)), nil)
-                }
-                
-                alert.addAction(action)
-            }
-        }
-        
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-        
-        return alert
+    private func createShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, completion: (() -> Void)?) -> UIAlertController {
+let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
+for type in types {
+switch type {
+case .copyToPasteboard:
+alert.addAction(UIAlertAction(title: type.localized , style: .default) { [weak self] _ in
+UIPasteboard.general.string = string
+self?.showToastMessage(String.adamantLocalized.alert.copiedToPasteboardNotification)
+})
+
+case .share:
+alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
+let vc = UIActivityViewController(activityItems: [string], applicationActivities: nil)
+vc.excludedActivityTypes = excludedActivityTypes
+self?.present(vc, animated: true, completion: completion)
+})
+
+case .generateQr(let encodedContent, let sharingTip):
+alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
+switch AdamantQRTools.generateQrFrom(string: encodedContent ?? string) {
+case .success(let qr):
+guard let vc = self?.router.get(scene: AdamantScene.Shared.shareQr) as? ShareQrViewController else {
+fatalError("Can't find ShareQrViewController")
+}
+
+vc.qrCode = qr
+vc.sharingTip = sharingTip
+vc.excludedActivityTypes = excludedActivityTypes
+self?.present(vc, animated: true, completion: completion)
+
+case .failure(error: let error):
+self?.showError(withMessage: error.localizedDescription, error: error)
+}
+})
+
+case .saveToPhotolibrary(let image):
+let action = UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
+UIImageWriteToSavedPhotosAlbum(image, self, #selector(self?.image(_:didFinishSavingWithError:contextInfo:)), nil)
+}
+
+alert.addAction(action)
+}
+}
+
+alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+return alert
     }
-	
+
 	@objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
 		if let error = error {
 			showError(withMessage: error.localizedDescription)
@@ -306,7 +305,7 @@ extension AdamantDialogService {
 		
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.settings, style: .default) { _ in
 			DispatchQueue.main.async {
-				if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
+				if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
 					UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
 				}
 			}
@@ -324,8 +323,83 @@ extension AdamantDialogService {
 	}
 }
 
-// MAKR: - Alerts
+
+// MARK: - Alerts
+fileprivate extension UIAlertAction.Style {
+	func asPMAlertAction() -> PMAlertActionStyle {
+		switch self {
+		case .cancel:
+			return .cancel
+			
+		case .default,
+			 .destructive:
+			return .default
+		}
+	}
+}
+
+fileprivate extension AdamantAlertStyle {
+    func asUIAlertControllerStyle() -> UIAlertController.Style {
+		switch self {
+		case .alert,
+			 .richNotification:
+			return .alert
+			
+		case .actionSheet:
+			return .actionSheet
+		}
+	}
+}
+
+fileprivate extension AdamantAlertAction {
+	func asUIAlertAction() -> UIAlertAction {
+		let handler = self.handler
+		return UIAlertAction(title: self.title, style: self.style, handler: { _ in handler?() })
+	}
+	
+	func asPMAlertAction() -> PMAlertAction {
+		let handler = self.handler
+		return PMAlertAction(title: self.title, style: self.style.asPMAlertAction(), action: handler)
+	}
+}
+
 extension AdamantDialogService {
+	func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?) {
+		switch style {
+		case .alert, .actionSheet:
+			let uiStyle = style.asUIAlertControllerStyle()
+			if let actions = actions {
+				let uiActions: [UIAlertAction] = actions.map { $0.asUIAlertAction() }
+				
+				showAlert(title: title, message: message, style: uiStyle, actions: uiActions)
+			} else {
+				showAlert(title: title, message: message, style: uiStyle, actions: nil)
+			}
+			
+		case .richNotification:
+			if let actions = actions {
+				let pmActions: [PMAlertAction] = actions.map { $0.asPMAlertAction() }
+				showAlert(title: title ?? "", message: message ?? "", actions: pmActions)
+			} else {
+				showAlert(title: title ?? "", message: message ?? "", actions: nil)
+			}
+		}
+	}
+	
+    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?) {
+		let alertVc = UIAlertController(title: title, message: message, preferredStyle: style)
+		
+		if let actions = actions {
+			for action in actions {
+				alertVc.addAction(action)
+			}
+		} else {
+			alertVc.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default))
+		}
+		
+		present(alertVc, animated: true, completion: nil)
+	}
+	
     func showAlert(title: String, message: String, actions: [PMAlertAction]?) {
         let alertVC = PMAlertController(title: title, description: message, image: nil, style: .alert)
         
@@ -361,48 +435,54 @@ extension AdamantDialogService {
             alertVC.alertActionStackViewHeightConstraint.constant = 50
         }
         
-        self.present(alertVC, animated: true, completion: nil)
+        if Thread.isMainThread {
+            present(alertVC, animated: true, completion: nil)
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.present(alertVC, animated: true, completion: nil)
+            }
+        }
     }
-    
-    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?, from: UIBarButtonItem?) {
-        guard let actions = actions, actions.count > 0 else {
-            return
-        }
-        
-        let alertVC = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
-        
-        for action in actions {
-            alertVC.addAction(action)
-        }
-        
-        alertVC.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel))
-        
-        if let barButtonItem = from { alertVC.popoverPresentationController?.barButtonItem = barButtonItem }
-        
-        self.present(alertVC, animated: true, completion: nil)
-    }
-    
-    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?, from: UIView?) {
-        guard let actions = actions, actions.count > 0 else {
-            return
-        }
-        
-        let alertVC = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
-        
-        for action in actions {
-            alertVC.addAction(action)
-        }
-        
-        alertVC.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel))
-        
-        if let sourceView = from {
-            alertVC.popoverPresentationController?.sourceView = sourceView
-            alertVC.popoverPresentationController?.sourceRect = sourceView.bounds
-            alertVC.popoverPresentationController?.canOverlapSourceViewRect = false
-        }
-        
-        self.present(alertVC, animated: true, completion: nil)
-    }
+
+func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?, from: UIBarButtonItem?) {
+guard let actions = actions, actions.count > 0 else {
+return
+}
+
+let alertVC = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+
+for action in actions {
+alertVC.addAction(action)
+}
+
+alertVC.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel))
+
+if let barButtonItem = from { alertVC.popoverPresentationController?.barButtonItem = barButtonItem }
+
+self.present(alertVC, animated: true, completion: nil)
+}
+
+func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?, from: UIView?) {
+guard let actions = actions, actions.count > 0 else {
+return
+}
+
+let alertVC = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+
+for action in actions {
+alertVC.addAction(action)
+}
+
+alertVC.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel))
+
+if let sourceView = from {
+alertVC.popoverPresentationController?.sourceView = sourceView
+alertVC.popoverPresentationController?.sourceRect = sourceView.bounds
+alertVC.popoverPresentationController?.canOverlapSourceViewRect = false
+}
+
+self.present(alertVC, animated: true, completion: nil)
+}
 }
 
 fileprivate class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
