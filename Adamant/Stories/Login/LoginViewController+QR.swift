@@ -102,10 +102,10 @@ extension LoginViewController: QRCodeReaderViewControllerDelegate {
 
 // MARK: - UIImagePickerControllerDelegate
 extension LoginViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
 		dismiss(animated: true, completion: nil)
 		
-		guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else {
+		guard let image = info[.originalImage] as? UIImage else {
 			return
 		}
 		

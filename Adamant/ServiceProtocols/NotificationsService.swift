@@ -113,7 +113,35 @@ extension AdamantUserInfoKey {
 // MARK: - Protocol
 enum NotificationsServiceResult {
 	case success
-	case denied(error: Error?)
+    case failure(error: NotificationsServiceError)
+}
+
+enum NotificationsServiceError: Error {
+    case notEnoughtMoney
+    case denied(error: Error?)
+}
+
+extension NotificationsServiceError: RichError {
+    var message: String {
+        switch self {
+        case .notEnoughtMoney: return String.adamantLocalized.sharedErrors.notEnoughtMoney
+        case .denied: return String.adamantLocalized.notifications.notificationsDisabled
+        }
+    }
+    
+    var internalError: Error? {
+        switch self {
+        case .notEnoughtMoney: return nil
+        case .denied(let error): return error
+        }
+    }
+    
+    var level: ErrorLevel {
+        switch self {
+        case .notEnoughtMoney: return .warning
+        case .denied: return .error
+        }
+    }
 }
 
 protocol NotificationsService: class {

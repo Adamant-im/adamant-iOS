@@ -7,8 +7,14 @@
 //
 
 import UIKit
+import Eureka
 
-public final class DoubleDetailsTableViewCell: UITableViewCell {
+public struct DoubleDetail: Equatable {
+    let first: String
+    let second: String?
+}
+
+public final class DoubleDetailsTableViewCell: Cell<DoubleDetail>, CellType {
 	
 	// MARK: Constants
 	static let compactHeight: CGFloat = 50.0
@@ -31,4 +37,24 @@ public final class DoubleDetailsTableViewCell: UITableViewCell {
 			}
 		}
 	}
+    
+    public override func update() {
+        super.update()
+        
+        if let value = row.value {
+            detailsLabel.text = value.first
+            secondDetailsLabel.text = value.second
+        } else {
+            detailsLabel.text = nil
+            secondDetailsLabel.text = nil
+        }
+    }
+}
+
+public final class DoubleDetailsRow: Row<DoubleDetailsTableViewCell>, RowType {
+    required public init(tag: String?) {
+        super.init(tag: tag)
+        // We set the cellProvider to load the .xib corresponding to our cell
+        cellProvider = CellProvider<DoubleDetailsTableViewCell>(nibName: "DoubleDetailsTableViewCell")
+    }
 }

@@ -99,7 +99,7 @@ class NodeEditorViewController: FormViewController {
 			}
 		}
 		
-		fileprivate var accessoryType: UITableViewCellAccessoryType {
+		fileprivate var accessoryType: UITableViewCell.AccessoryType {
 			switch self {
 			case .notTested, .failed: return .disclosureIndicator
 			case .passed: return .checkmark
@@ -134,6 +134,7 @@ class NodeEditorViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationAccessoryView.tintColor = UIColor.adamant.primary
 		
 		if let node = node {
 			self.navigationItem.title = node.host

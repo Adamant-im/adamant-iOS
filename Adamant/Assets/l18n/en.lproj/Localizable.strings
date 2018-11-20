@@ -76,6 +76,15 @@
 /* AccountsProvider: Address not valid error, %@ for address */
 "AccountsProvider.Error.AddressNotValidFormat" = "Invalid address: %@";
 
+/* AccountService: Alert title. Changes in version 1.2 */
+"AccountService.update.v12.title" = "Version 1.2 update: Cryptowallets";
+
+/* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets */
+"AccountService.update.v12.message" = "You need to relogin to initiate Ethereum wallet";
+
+/* AccountService: User must relogin into app to initiate wallets */
+"AccountService.reloginToInitiateWallets" = "Relogin to initiate wallet";
+
 /* Login: user typed in invalid passphrase */
 "AccountServiceError.InvalidPassphrase" = "Wrong passphrase";
 
@@ -109,6 +118,15 @@
 /* Account tab: 'Send tokens' button */
 "AccountTab.Row.SendTokens" = "Send Tokens";
 
+/* Account tab: 'Send ADM tokens' button */
+"AccountTab.Row.SendAdm" = "Send ADM";
+
+/* Account tab: 'Send ETH tokens' button */
+"AccountTab.Row.SendEth" = "Send ETH";
+
+/* Account tab: 'Address' row */
+"AccountTab.Row.Address" = "Address";
+
 /* Account tab: 'Get free tokens' button */
 "AccountTab.Row.FreeTokens" = "Free ADM tokens";
 
@@ -124,11 +142,14 @@
 /* Account tab: Application section title */
 "AccountTab.Section.Application" = "Application";
 
-/* Account tab: Adamant wallet section */
-"AccountTab.Sections.adamant_wallet" = "ADAMANT Wallet";
+/* Account tab: Adamant wallet */
+"AccountTab.Wallets.adamant_wallet" = "ADAMANT Wallet";
 
-/* Account tab: Ethereum wallet section */
-"AccountTab.Sections.ethereum_wallet" = "Ethereum Wallet";
+/* Account tab: Ethereum wallet */
+"AccountTab.Wallets.ethereum_wallet" = "Ethereum Wallet";
+
+/* Account tab: Lisk wallet */
+"AccountTab.Wallets.lisk_wallet" = "Lisk Wallet";
 
 /* Account page: scene title */
 "AccountTab.Title" = "Account";
@@ -154,14 +175,14 @@
 /* Serious internal error: Error parsing response */
 "ApiService.InternalError.ParsingFailed" = "Parsing failed. Report a bug";
 
-/* Unknown internal error */
-"ApiService.InternalError.UnknownError" = "Unknown error. Report a bug";
-
 /* Eureka forms Cancel button */
 "Cancel" = "Cancel";
 
 /* ChatList: outgoing message preview format, like 'You: %@' */
 "ChatListPage.SentMessageFormat" = "You: %@";
+
+/* ChatList: First syncronization is in progress */
+"ChatListPage.SyncingChats" = "Syncing chats…";
 
 /* ChatList: scene title */
 "ChatListPage.Title" = "Chats";
@@ -306,6 +327,9 @@
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "User is not logged in";
+
+/* Shared unknown error */
+"Error.UnknownError" = "Unknown error. Report a bug";
 
 /* Login: Notify user, that he disabled camera in settings, and need to authorize application. */
 "LoginScene.Error.AuthorizeCamera" = "You need to authorize ADAMANT to use device's camera";
@@ -595,6 +619,24 @@
 /* TransactionList: Start Chat button */
 "TransactionListScene.StartChat" = "Start Chat";
 
+/* TransactionList: 'Transactions not found' message. */
+"TransactionListScene.Error.NotFound" = "Transactions not found";
+
+/* TransactionList: 'Transactions not found' localize error message from API. */
+"No transactions found" = "Transactions not found";
+
+/* Transaction status: updating in progress */
+"TransactionStatus.Updating" = "Updating…";
+
+/* Transaction status: transaction is pending */
+"TransactionStatus.Pending" = "Pending";
+
+/* Transaction status: success */
+"TransactionStatus.Success" = "Success";
+
+/* Transaction status: transaction failed */
+"TransactionStatus.Failed" = "Failed";
+
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";
 
@@ -603,6 +645,9 @@
 
 /* Transaction details: Block id row. */
 "TransactionDetailsScene.Row.Block" = "Block";
+
+/* Transaction details: Transaction delivery status. */
+"TransactionDetailsScene.Row.Status" = "Transaction status";
 
 /* Transaction details: confirmations row. */
 "TransactionDetailsScene.Row.Confirmations" = "Confirmations";
@@ -630,6 +675,15 @@
 
 /* Export transaction: 'Share transaction URL' button */
 "TransactionDetailsScene.Share.URL" = "URL";
+
+/* "Transaction details: 'Comments' section" */
+"TransactionDetailsScene.Section.Comment" = "Comments";
+
+/* "Transaction details: 'Actions' section" */
+"TransactionDetailsScene.Section.Actions" = "Actions";
+
+/* Transaction details: 'Requesting Data' progress message. */
+"TransactionDetailsScene.RequestingData" = "Requesting Data..";
 
 /* Transaction details: 'Your address' flag. */
 "TransactionDetailsScene.YourAddress" = "You";
@@ -661,11 +715,14 @@
 /* Transfer: logged user balance. */
 "TransferScene.Row.Balance" = "Balance";
 
-/* Transfer: maximum amount to transfer: available account money substracting transfer fee. */
+/* Transfer: maximum amount to transfer: available account money substracting transfer fee */
 "TransferScene.Row.MaxToTransfer" = "Max to transfer";
 
 /* Transfer: recipient address */
-"TransferScene.Row.Recipient" = "Address";
+"TransferScene.Row.RecipientAddress" = "Address";
+
+/* Transfer: recipient name */
+"TransferScene.Row.RecipientName" = "Name";
 
 /* Transfer: Send button */
 "TransferScene.Row.Send" = "Send";
@@ -676,14 +733,26 @@
 /* Transfer: transfer fee */
 "TransferScene.Row.TransactionFee" = "Fee";
 
+/* Transfer: comment for transfer in chat */
+"TransferScene.Row.Comments" = "Comments";
+
 /* Transfer: 'Transfer info' section */
 "TransferScene.Section.TransferInfo" = "Transfer Info";
 
 /* Transfer: 'Your wallet' section */
 "TransferScene.Section.YourWallet" = "Your Wallet";
 
+/* Transfer: 'Recipient info' section */
+"TransferScene.Section.Recipient" = "Recipient";
+
 /* Transfer: Confirm transfer alert: Send tokens button */
 "TransferScene.Send" = "Send";
+
+/* Transfer: Confirm transfer alert: 'Can't Undo' message */
+"TransferScene.CantUndo" = "You can't undo this action";
+
+/* Tranfser: Confirm using maximum available for transfer tokens as amount to transfer. */
+"TransferScene.UseMaxToTransfer" = "Use all available tokens as amount to transfer?";
 
 /* Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
 "TransferScene.SendConfirmFormat" = "Send %1$@ to %2$@?";
@@ -693,6 +762,18 @@
 
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "Done!";
+
+/* Wallet Services: Shared error, user do not have enought money. */
+"WalletServices.SharedErrors.NotEnoughtMoney" = "Not enought money";
+
+/* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
+"WalletServices.SharedErrors.WalletNotInitiated" = "Wallet not yet initiated";
+
+/* Wallet Services: Shared error, invalid amount format. %@ for amount */
+"WalletServices.SharedErrors.InvalidAmountFormat" = "Invalid amount to send: %@";
+
+/* Wallet Services: Shared error, transaction not found */
+"WalletServices.SharedErrors.TransactionNotFound" = "Transaction not found";
 
 /* Welcome: Skip button */
 "WelcomeScene.Skip" = "skip";

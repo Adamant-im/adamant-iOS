@@ -24,6 +24,11 @@ enum TransfersProviderResult {
 	case failure(TransfersProviderError)
 }
 
+enum TransfersProviderTransferResult {
+    case success(transaction: TransactionDetails)
+    case failure(TransfersProviderError)
+}
+
 extension TransfersProviderError: RichError {
 	var message: String {
 		switch self {
@@ -135,7 +140,7 @@ protocol TransfersProvider: DataProvider {
     func update(completion: ((TransfersProviderResult?) -> Void)?)
 	
 	// MARK: - Sending funds
-	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void)
+	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderTransferResult) -> Void)
     
     // MARK: - Transactions
     func getTransfer(id: String) -> TransferTransaction?

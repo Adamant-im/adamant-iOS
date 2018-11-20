@@ -19,6 +19,15 @@ extension AdamantScene {
 			c.notificationsService = r.resolve(NotificationsService.self)
 			c.dialogService = r.resolve(DialogService.self)
 			c.addressBook = r.resolve(AddressBookService.self)
+            
+            // MARK: RichMessage handlers
+            // Transfer handlers from accountService' wallet services
+            if let accountService = r.resolve(AccountService.self) {
+                for case let provider as RichMessageProvider in accountService.wallets {
+                    c.richMessageProviders[type(of: provider).richMessageType] = provider
+                }
+            }
+            
 			return c
 		})
 		
@@ -28,7 +37,17 @@ extension AdamantScene {
 			c.dialogService = r.resolve(DialogService.self)
 			c.router = r.resolve(Router.self)
             c.addressBookService = r.resolve(AddressBookService.self)
-			return c
+            c.stack = r.resolve(CoreDataStack.self)
+            
+            // MARK: RichMessage handlers
+            // Transfer handlers from accountService' wallet services
+            if let accountService = r.resolve(AccountService.self) {
+                for case let provider as RichMessageProvider in accountService.wallets {
+                    c.richMessageProviders[type(of: provider).richMessageType] = provider
+                }
+            }
+			
+            return c
 		})
 		
 		static let newChat = AdamantScene(identifier: "NewChatViewController", factory: { r in
@@ -39,8 +58,13 @@ extension AdamantScene {
 			c.router = r.resolve(Router.self)
 			
 			let navigator = UINavigationController(rootViewController: c)
-			
 			return navigator
+		})
+		
+		static let complexTransfer = AdamantScene(identifier: "ComplexTransferViewController", factory: { r in
+			let c = ComplexTransferViewController()
+			c.accountService = r.resolve(AccountService.self)
+			return c
 		})
 		
 		private init() {}

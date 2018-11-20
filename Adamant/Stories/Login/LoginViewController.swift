@@ -126,7 +126,6 @@ class LoginViewController: FormViewController {
 	var localAuth: LocalAuthentication!
     var router: Router!
 	
-	
 	// MARK: Properties
 	private var hideNewPassphrase: Bool = true
 	private var generatedPassphrases = [String]()
@@ -238,7 +237,7 @@ class LoginViewController: FormViewController {
 			style.alignment = NSTextAlignment.center
 			
 			let mutableText = NSMutableAttributedString(attributedString: parser.parse(Rows.saveYourPassphraseAlert.localized))
-			mutableText.addAttribute(NSAttributedStringKey.paragraphStyle, value: style, range: NSRange(location: 0, length: mutableText.length))
+			mutableText.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: NSRange(location: 0, length: mutableText.length))
 			
 			cell.textView.attributedText = mutableText
 		}
@@ -269,8 +268,8 @@ class LoginViewController: FormViewController {
 			}
 			
 			let encodedPassphrase = AdamantUriTools.encode(request: AdamantUri.passphrase(passphrase: passphrase))
-			dialogService.presentShareAlertFor(string: encodedPassphrase,
-											   types: [.copyToPasteboard, .share, .generateQr(sharingTip: nil)],
+			dialogService.presentShareAlertFor(string: passphrase,
+                                               types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedPassphrase, sharingTip: nil)],
 											   excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
 											   animated: true,
 											   completion: nil)
@@ -306,7 +305,7 @@ class LoginViewController: FormViewController {
 		
 		// MARK: tableView position tuning
 		if let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
-			NotificationCenter.default.addObserver(forName: Notification.Name.UITextFieldTextDidBeginEditing, object: row.cell.textField, queue: nil) { [weak self] _ in
+			NotificationCenter.default.addObserver(forName: UITextField.textDidBeginEditingNotification, object: row.cell.textField, queue: nil) { [weak self] _ in
 				guard let tableView = self?.tableView, let indexPath = self?.form.rowBy(tag: Rows.loginButton.tag)?.indexPath else {
 					return
 				}
@@ -318,7 +317,7 @@ class LoginViewController: FormViewController {
 		}
 		
 		// MARK: Requesting biometry onActive
-		NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationDidBecomeActive, object: nil, queue: OperationQueue.main) { [weak self] _ in
+		NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			if let firstTimeActive = self?.firstTimeActive, firstTimeActive,
 				let accountService = self?.accountService, accountService.hasStayInAccount, accountService.useBiometry {
 				self?.loginWithBiometry()
@@ -385,7 +384,7 @@ extension LoginViewController {
 	private func loginIntoExistingAccount(passphrase: String) {
 		accountService.loginWith(passphrase: passphrase, completion: { [weak self] result in
 			switch result {
-			case .success(_):
+			case .success(_, let alert):
 				if let nav = self?.navigationController {
 					nav.popViewController(animated: true)
 				} else {
@@ -393,6 +392,10 @@ extension LoginViewController {
 				}
 				
 				self?.dialogService.dismissProgress()
+				
+				if let alert = alert {
+                    self?.dialogService.showAlert(title: alert.title, message: alert.message, style: UIAlertController.Style.alert, actions: nil)
+				}
 				
 			case .failure(let error):
 				self?.dialogService.showRichError(error: error)
