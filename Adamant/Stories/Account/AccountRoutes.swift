@@ -17,6 +17,7 @@ extension AdamantScene {
 			c.router = r.resolve(Router.self)
 			c.notificationsService = r.resolve(NotificationsService.self)
 			c.transfersProvider = r.resolve(TransfersProvider.self)
+            c.localAuth = r.resolve(LocalAuthentication.self)
             c.avatarService = r.resolve(AvatarService.self)
 			return c
 		}

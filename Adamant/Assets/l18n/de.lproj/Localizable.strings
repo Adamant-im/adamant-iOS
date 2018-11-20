@@ -77,10 +77,13 @@
 "AccountsProvider.Error.AddressNotValidFormat" = "Ungültige Adresse: %@";
 
 /* AccountService: Alert title. Changes in version 1.2 */
-"AccountService.update.v12.title" = "Version 1.2 update: Cryptowallets";
+"AccountService.update.v12.title" = "Version 1.2 Update: Cryptowallets";
 
 /* AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets */
-"AccountService.update.v12.message" = "You need to relogin to initiate Ethereum and Lisk wallets";
+"AccountService.update.v12.message" = "Sie müssen sich wieder einloggen, um die Ethereum-Wallet zu initiieren";
+
+/* AccountService: User must relogin into app to initiate wallets */
+"AccountService.reloginToInitiateWallets" = "Erneut einloggen, um die Wallet zu initiieren";
 
 /* Login: user typed in invalid passphrase */
 "AccountServiceError.InvalidPassphrase" = "Falsche Passphrase";
@@ -118,6 +121,12 @@
 /* Account tab: 'Send tokens' button */
 "AccountTab.Row.SendTokens" = "Tokens senden";
 
+/* Account tab: 'Send ADM tokens' button */
+"AccountTab.Row.SendAdm" = "ADM senden";
+
+/* Account tab: 'Send ETH tokens' button */
+"AccountTab.Row.SendEth" = "ETH senden";
+
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Addresse";
 
@@ -137,7 +146,7 @@
 "AccountTab.Section.Application" = "Application";
 
 /* Account tab: Adamant wallet */
-"AccountTab.Wallets.adamant_wallet" = "Adamant Wallet";
+"AccountTab.Wallets.adamant_wallet" = "ADAMANT Wallet";
 
 /* Account tab: Ethereum wallet */
 "AccountTab.Wallets.ethereum_wallet" = "Ethereum Wallet";
@@ -174,6 +183,9 @@
 
 /* ChatList: outgoing message preview format, like 'You: %@' */
 "ChatListPage.SentMessageFormat" = "Sie: %@";
+
+/* ChatList: First syncronization is in progress */
+"ChatListPage.SyncingChats" = "Chats werden synchronisiert…";
 
 /* ChatList: scene title */
 "ChatListPage.Title" = "Chats";
@@ -566,16 +578,16 @@
 "TransactionListScene.Title" = "Transaktionen";
 
 /* Transaction status: updating in progress */
-"TransactionStatus.Updating" = "Updating...";
+"TransactionStatus.Updating" = "Aktualisieren…";
 
 /* Transaction status: transaction is pending */
-"TransactionStatus.Pending" = "Pending";
+"TransactionStatus.Pending" = "Ausstehend";
 
 /* Transaction status: success */
-"TransactionStatus.Success" = "Success";
+"TransactionStatus.Success" = "Erfolgreich";
 
 /* Transaction status: transaction failed */
-"TransactionStatus.Failed" = "Failed";
+"TransactionStatus.Failed" = "Abgelehnt";
 
 /* Transaction details: scene title */
 "TransactionDetailsScene.Title" = "Details";
@@ -587,7 +599,7 @@
 "TransactionDetailsScene.Row.Block" = "Block";
 
 /* Transaction details: Transaction delivery status. */
-"TransactionDetailsScene.Row.Status" = "Transaction status";
+"TransactionDetailsScene.Row.Status" = "Transaktionsstatus";
 
 /* Transaction details: confirmations row. */
 "TransactionDetailsScene.Row.Confirmations" = "Bestätigungen";
@@ -615,6 +627,12 @@
 
 /* Export transaction: 'Share transaction URL' button */
 "TransactionDetailsScene.Share.URL" = "URL";
+
+/* "Transaction details: 'Comments' section" */
+"TransactionDetailsScene.Section.Comment" = "Kommentare";
+
+/* "Transaction details: 'Actions' section" */
+"TransactionDetailsScene.Section.Actions" = "Aktionen";
 
 /* Transaction details: 'Your address' flag. */
 "TransactionDetailsScene.YourAddress" = "Sie";
@@ -646,11 +664,14 @@
 /* Transfer: logged user balance. */
 "TransferScene.Row.Balance" = "Kontostand";
 
-/* Transfer: maximum amount to transfer: available account money substracting transfer fee. */
+/* Transfer: maximum amount to transfer: available account money substracting transfer fee */
 "TransferScene.Row.MaxToTransfer" = "Maximalbetrag für den Versand verfügbar";
 
 /* Transfer: recipient address */
-"TransferScene.Row.Recipient" = "Adresse";
+"TransferScene.Row.RecipientAddress" = "Adresse";
+
+/* Transfer: recipient name */
+"TransferScene.Row.RecipientName" = "Name";
 
 /* Transfer: Send button */
 "TransferScene.Row.Send" = "Senden";
@@ -667,8 +688,17 @@
 /* Transfer: 'Your wallet' section */
 "TransferScene.Section.YourWallet" = "Ihre Wallet";
 
+/* Transfer: 'Recipient info' section */
+"TransferScene.Section.Recipient" = "Empfänger";
+
 /* Transfer: Confirm transfer alert: Send tokens button */
 "TransferScene.Send" = "Senden";
+
+/* Transfer: Confirm transfer alert: 'Can't Undo' message */
+"TransferScene.CantUndo" = "Sie können diese Aktion nicht rückgängig machen";
+
+/* Tranfser: Confirm using maximum available for transfer tokens as amount to transfer. */
+"TransferScene.UseMaxToTransfer" = "Alle verfügbaren Tokens versenden?";
 
 /* Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
 "TransferScene.SendConfirmFormat" = "%1$@ zu %2$@? senden";
@@ -679,3 +709,14 @@
 /* Transfer: Tokens transfered successfully message */
 "TransferScene.TransferSuccessMessage" = "Fertig!";
 
+/* Wallet Services: Shared error, user do not have enought money. */
+"WalletServices.SharedErrors.NotEnoughtMoney" = "Nicht genug Geld";
+
+/* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
+"WalletServices.SharedErrors.WalletNotInitiated" = "Die Wallet wurde noch nicht initiiert";
+
+/* Wallet Services: Shared error, invalid amount format. %@ for amount */
+"WalletServices.SharedErrors.InvalidAmountFormat" = "Ungültiger Betrag zum Senden: %@";
+
+/* Wallet Services: Shared error, transaction not found */
+"WalletServices.SharedErrors.TransactionNotFound" = "Transaktion nicht gefunden";

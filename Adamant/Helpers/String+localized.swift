@@ -49,6 +49,8 @@ extension String {
 			
             static let unknownError = NSLocalizedString("Error.UnknownError", comment: "Shared unknown error")
             
+            static let notEnoughtMoney = NSLocalizedString("WalletServices.SharedErrors.NotEnoughtMoney", comment: "Wallet Services: Shared error, user do not have enought money.")
+            
 			static func internalError(message: String) -> String {
 				return String.localizedStringWithFormat(NSLocalizedString("Error.InternalErrorFormat", comment: "Shared error: Internal error format, %@ for message"), message)
 			}

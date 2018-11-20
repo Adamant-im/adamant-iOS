@@ -270,9 +270,11 @@ class NewChatViewController: FormViewController {
 						account.name = name
 						
 						if let chatroom = account.chatroom, chatroom.title == nil {
-							account.chatroom?.title = name
+							chatroom.title = name
 						}
 					}
+                    
+                    account.chatroom?.isForcedVisible = true
 					
 					self.delegate?.newChatController(self, didSelectAccount: account)
 					self.dialogService.dismissProgress()

@@ -36,20 +36,19 @@ extension StoreKey {
 
 // MARK: - Resources
 struct AdamantResources {
-	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
-	static let coreDataModel = Bundle.main.url(forResource: "ChatModels", withExtension: "momd")!
+	static let coreDataModel = Bundle.main.url(forResource: "Adamant", withExtension: "momd")!
 	
 	static let nodes: [Node] = [
-		Node(scheme: .https, host: "endless.adamant.im", port: nil),
-		Node(scheme: .https, host: "clown.adamant.im", port: nil),
-		Node(scheme: .https, host: "lake.adamant.im", port: nil),
+        Node(scheme: .https, host: "endless.adamant.im", port: nil),
+        Node(scheme: .https, host: "clown.adamant.im", port: nil),
+        Node(scheme: .https, host: "lake.adamant.im", port: nil),
 //		Node(scheme: .http, host: "80.211.177.181", port: nil), // Bugged one
-//		Node(scheme: .http, host: "163.172.183.198", port: nil) // Testnet
+//      Node(scheme: .http, host: "163.172.132.38", port: 36667) // Testnet
 	]
     
     static let ethServers = [
-//        "https://ethnode1.adamant.im/"
-        "https://ropsten.infura.io/"  // test network
+        "https://ethnode1.adamant.im/"
+//        "https://ropsten.infura.io/"  // test network
     ]
 	
 	// Addresses
@@ -70,8 +69,8 @@ struct AdamantResources {
     
     // Explorers
     static let adamantExplorerAddress = "https://explorer.adamant.im/tx/"
-//    static let ethereumExplorerAddress = "https://etherscan.io/tx/"
-    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
+    static let ethereumExplorerAddress = "https://etherscan.io/tx/"
+//    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
 	
 	private init() {}
 }
@@ -211,7 +210,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		// MARK: 7. Welcome messages
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: nil, queue: OperationQueue.main, using: handleWelcomeMessages)
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: nil, queue: OperationQueue.main, using: handleWelcomeMessages)
 		
 		return true
 	}
@@ -389,6 +388,10 @@ extension AppDelegate {
 // MARK: - Welcome messages
 extension AppDelegate {
 	private func handleWelcomeMessages(notification: Notification) {
+        guard let synced = notification.userInfo?[AdamantUserInfoKey.ChatProvider.initiallySynced] as? Bool, synced else {
+            return
+        }
+        
 		guard let stack = container.resolve(CoreDataStack.self), let chatProvider = container.resolve(ChatsProvider.self) else {
 			fatalError("Whoa...")
 		}
@@ -408,7 +411,14 @@ extension AppDelegate {
 									  date: Date.adamantNullDate,
 									  unread: unread,
 									  silent: welcome.silentNotification,
-									  completion: { _ in })
+                                      showsChatroom: true,
+                                      completion: { result in
+                                        guard case let .failure(error) = result else {
+                                            return
+                                        }
+                                        
+                                        print("ERROR showing welcome message: \(error.message)")
+            })
 		}
 		
 		if let ico = AdamantContacts.adamantIco.messages["chats.ico_message"] {
@@ -417,7 +427,14 @@ extension AppDelegate {
 									  date: Date.adamantNullDate,
 									  unread: unread,
 									  silent: ico.silentNotification,
-									  completion: { _ in })
+                                      showsChatroom: true,
+									  completion: { result in
+                                        guard case let .failure(error) = result else {
+                                            return
+                                        }
+                                        
+                                        print("ERROR showing welcome message: \(error.message)")
+            })
 		}
 	}
 }

@@ -24,6 +24,8 @@ extension AdamantScene.Wallets {
 			c.dialogService = r.resolve(DialogService.self)
 			c.chatsProvider = r.resolve(ChatsProvider.self)
 			c.accountService = r.resolve(AccountService.self)
+            c.accountsProvider = r.resolve(AccountsProvider.self)
+            c.router = r.resolve(Router.self)
 			return c
 		}
 		

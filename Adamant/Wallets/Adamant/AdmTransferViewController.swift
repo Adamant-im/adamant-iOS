@@ -23,7 +23,7 @@ class AdmTransferViewController: TransferViewControllerBase {
 	// MARK: Sending
 	
 	override func sendFunds() {
-		guard let service = service as? AdmWalletService, let recipient = recipient, let amount = amount else {
+		guard let service = service as? AdmWalletService, let recipient = recipientAddress, let amount = amount else {
 			return
 		}
 		
@@ -31,7 +31,7 @@ class AdmTransferViewController: TransferViewControllerBase {
 		
 		service.sendMoney(recipient: recipient, amount: amount, comments: "") { [weak self] result in
 			switch result {
-			case .success:
+			case .success(let result):
 				service.update()
 				
 				guard let vc = self else {
@@ -39,7 +39,31 @@ class AdmTransferViewController: TransferViewControllerBase {
 				}
 				
 				vc.dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-				vc.delegate?.transferViewControllerDidFinishTransfer(vc)
+                
+                let detailsVC = self?.router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? AdmTransactionDetailsViewController
+                detailsVC?.transaction = result
+                
+                // MARK: Sender, you
+                detailsVC?.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                
+                // MARK: Get recipient
+                if let recipientName = self?.recipientName {
+                    detailsVC?.recipientName = recipientName
+                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                } else if let accountsProvider = self?.accountsProvider {
+                    accountsProvider.getAccount(byAddress: recipient) { accResult in
+                        switch accResult {
+                        case .success(let account):
+                            detailsVC?.recipientName = account.name
+                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                            
+                        default:
+                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                        }
+                    }
+                } else {
+                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                }
 				
 			case .failure(let error):
 				guard let dialogService = self?.dialogService else {
@@ -57,7 +81,7 @@ class AdmTransferViewController: TransferViewControllerBase {
 	
 	private var _recipient: String?
 	
-	override var recipient: String? {
+	override var recipientAddress: String? {
 		set {
 			if let recipient = newValue, let first = recipient.first, first != "U" {
 				_recipient = "U\(recipient)"
@@ -81,7 +105,7 @@ class AdmTransferViewController: TransferViewControllerBase {
 			$0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
 			$0.cell.textField.keyboardType = .numberPad
 			
-			if let recipient = recipient {
+			if let recipient = recipientAddress {
 				let trimmed = recipient.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
 				$0.value = trimmed
 			}
@@ -163,4 +187,8 @@ class AdmTransferViewController: TransferViewControllerBase {
 			return false
 		}
 	}
+    
+    override func defaultSceneTitle() -> String? {
+        return String.adamantLocalized.wallets.sendAdm
+    }
 }

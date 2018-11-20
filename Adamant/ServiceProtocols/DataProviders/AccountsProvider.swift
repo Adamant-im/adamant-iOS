@@ -22,7 +22,7 @@ enum AccountsProviderResult {
 			return ""
 			
 		case .notFound(let address):
-			return String.localizedStringWithFormat(String.adamantLocalized.sharedErrors.accountNotFound, address) 
+			return String.localizedStringWithFormat(String.adamantLocalized.sharedErrors.accountNotFound, address)
 			
 		case .invalidAddress(let address):
 			return String.localizedStringWithFormat(NSLocalizedString("AccountsProvider.Error.AddressNotValidFormat", comment: "AccountsProvider: Address not valid error, %@ for address"), address)

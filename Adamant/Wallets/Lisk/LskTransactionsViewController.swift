@@ -63,7 +63,7 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let transaction = transactions[indexPath.row]
+//        let transaction = transactions[indexPath.row]
         
         guard let controller = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? TransactionDetailsViewControllerBase else {
             return
@@ -79,7 +79,7 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
             return UITableViewCell(style: .default, reuseIdentifier: "cell")
         }
         
-        let transaction = transactions[indexPath.row]
+//        let transaction = transactions[indexPath.row]
         
         cell.accessoryType = .disclosureIndicator
         

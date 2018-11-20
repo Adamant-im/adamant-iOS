@@ -15,7 +15,7 @@ class JSAdamantCoreTests: XCTestCase {
     override func setUp() {
         super.setUp()
 		
-		guard let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js") else {
+        guard let jsCore = Bundle(for: type(of: self)).url(forResource: "adamant-core", withExtension: "js") else {
 				fatalError("Can't load system resources!")
 		}
 		
@@ -56,17 +56,17 @@ class JSAdamantCoreTests: XCTestCase {
 	
 	func testSignTransaction() {
 		let transaction = NormalizedTransaction(type: TransactionType.send,
-												amount: 50000000,
+												amount: 60000000,
 												senderPublicKey: "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f",
 												requesterPublicKey: nil,
-												timestamp: 11325525,
-												recipientId: "U48484848484848484848484",
+												timestamp: 13131802,
+												recipientId: "U7038846184609740192",
 												asset: TransactionAsset())
 		let senderId = "U2279741505997340299"
 		let keypair = Keypair(publicKey: "8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f",
 							  privateKey: "9001490b166816af75a15a3e2b0174bfe3be3dfaa63147b4f780ed3ab90ffeab8007a01493bb4b21ec67265769898eb19514d9427bd7b701f96bc9880a6e209f")
 		
-		let signature = "cf2718a77527016ae1a847c190b0986e75fdc57926afc5aaebfa16fb7cb2cb64690b79cab9230f3328695770cf36370cc5be2b323419873081aa351d32b5db05"
+		let signature = "cdde6db8cfa9ebbca67f4625b0fdded5a130f01b4300423c4446e7b8ed79f95447be8b4dfd5d67b849d47bd9d834ddff3942499d350673e129f15ba2c1005807"
 			
 		let freshSignature = core.sign(transaction: transaction, senderId: senderId, keypair: keypair)
 		XCTAssertEqual(signature, freshSignature)

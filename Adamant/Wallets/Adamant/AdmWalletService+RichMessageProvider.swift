@@ -24,6 +24,7 @@ extension AdmWalletService: RichMessageProvider {
         }
         
         controller.transaction = transaction
+        controller.comment = transaction.comment
         
         if let address = accountService.account?.address {
             if address == transaction.senderId {
@@ -67,9 +68,16 @@ extension AdmWalletService: RichMessageProvider {
         cell.currencyLogoImageView.image = AdmWalletService.currencyLogo
         cell.currencySymbolLabel.text = AdmWalletService.currencySymbol
         
-        cell.amountLabel.text = richMessage.amount
+        cell.amountLabel.text = AdamantBalanceFormat.full.format(richMessage.amount)
         cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
-        cell.transactionStatus = nil
+        
+        if let status = (message as? TransferTransaction)?.statusEnum {
+            cell.transactionStatus = status.toTransactionStatus()
+        } else {
+            cell.transactionStatus = nil
+        }
+        
+        cell.commentsLabel.text = richMessage.comments
         
         if cell.isAlignedRight != isFromCurrentSender {
             cell.isAlignedRight = isFromCurrentSender
@@ -102,9 +110,20 @@ extension AdmWalletService: RichMessageProvider {
     
     private func shortDescription(isOutgoing: Bool, balance: Decimal) -> String {
         if isOutgoing {
-            return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, " ⬅️  \(AdmWalletService.formatter.string(fromDecimal: balance)!)")
+            return "⬅️  \(AdmWalletService.formatter.string(fromDecimal: balance)!)"
         } else {
             return "➡️  \(AdmWalletService.formatter.string(fromDecimal: balance)!)"
+        }
+    }
+}
+
+// MARK: - Tools
+extension MessageStatus {
+    func toTransactionStatus() -> TransactionStatus {
+        switch self {
+        case .pending: return TransactionStatus.updating
+        case .delivered: return TransactionStatus.success
+        case .failed: return TransactionStatus.failed
         }
     }
 }
