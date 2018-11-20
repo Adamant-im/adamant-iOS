@@ -13,7 +13,8 @@ extension String.adamantLocalized {
 	struct chatList {
 		static let title = NSLocalizedString("ChatListPage.Title", comment: "ChatList: scene title")
 		static let sentMessagePrefix = NSLocalizedString("ChatListPage.SentMessageFormat", comment: "ChatList: outgoing message preview format, like 'You: %@'")
-		
+        static let syncingChats = NSLocalizedString("ChatListPage.SyncingChats", comment: "ChatList: First syncronization is in progress")
+        
 		private init() {}
 	}
 }
@@ -55,6 +56,15 @@ class ChatListViewController: UIViewController {
         return refreshControl
     }()
 	
+    // MARK: Busy indicator
+    
+    @IBOutlet weak var busyBackgroundView: UIView!
+    @IBOutlet weak var busyIndicatorView: UIView!
+    @IBOutlet weak var busyIndicatorLabel: UILabel!
+    
+    private(set) var isBusy: Bool = true
+    
+    
 	// MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -85,6 +95,27 @@ class ChatListViewController: UIViewController {
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.initFetchedRequestControllers(provider: nil)
 		}
+        
+        // MARK: Busy Indicator
+        busyIndicatorLabel.text = String.adamantLocalized.chatList.syncingChats
+        
+        busyIndicatorView.layer.cornerRadius = 14
+        busyIndicatorView.clipsToBounds = true
+        
+        isBusy = !chatsProvider.isInitiallySynced
+        if !isBusy {
+            setIsBusy(false, animated: false)
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: chatsProvider, queue: OperationQueue.main) { [weak self] notification in
+            if let synced = notification.userInfo?[AdamantUserInfoKey.ChatProvider.initiallySynced] as? Bool {
+                self?.setIsBusy(!synced)
+            } else if let synced = self?.chatsProvider.isInitiallySynced {
+                self?.setIsBusy(!synced)
+            } else {
+                self?.setIsBusy(true)
+            }
+        }
     }
 	
 	deinit {
@@ -185,6 +216,64 @@ class ChatListViewController: UIViewController {
             
             DispatchQueue.main.async {
                 refreshControl.endRefreshing()
+            }
+        }
+    }
+    
+    func setIsBusy(_ busy: Bool, animated: Bool = true) {
+        isBusy = busy
+        
+        // MARK: 0. Check if animated.
+        guard animated else {
+            if !busy {
+                busyBackgroundView.isHidden = true
+                return
+            }
+            
+            if Thread.isMainThread {
+                busyBackgroundView.isHidden = false
+                busyBackgroundView.alpha = 1.0
+                busyIndicatorView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+            } else {
+                DispatchQueue.main.async {
+                    self.busyBackgroundView.isHidden = false
+                    self.busyBackgroundView.alpha = 1.0
+                    self.busyIndicatorView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+                }
+            }
+            
+            return
+        }
+        
+        // MARK: 1. Prepare animation and completion
+        let animations: () -> Void = {
+            self.busyBackgroundView.alpha = busy ? 1.0 : 0.0
+            self.busyIndicatorView.transform = busy ? CGAffineTransform(scaleX: 1.0, y: 1.0) : CGAffineTransform(scaleX: 1.2, y: 1.2)
+        }
+        
+        let completion: (Bool) -> Void = { completed in
+            guard completed else {
+                return
+            }
+            
+            self.busyBackgroundView.isHidden = !busy
+        }
+        
+        // MARK: 2. Initial values
+        let initialValues: () -> Void = {
+            self.busyBackgroundView.alpha = busy ? 0.0 : 1.0
+            self.busyIndicatorView.transform = busy ? CGAffineTransform(scaleX: 1.2, y: 1.2) : CGAffineTransform(scaleX: 1.0, y: 1.0)
+            
+            self.busyBackgroundView.isHidden = false
+        }
+        
+        if Thread.isMainThread {
+            initialValues()
+            UIView.animate(withDuration: 0.2, animations: animations, completion: completion)
+        } else {
+            DispatchQueue.main.async {
+                initialValues()
+                UIView.animate(withDuration: 0.2, animations: animations, completion: completion)
             }
         }
     }
@@ -475,7 +564,15 @@ extension ChatListViewController {
     private func shortDescription(for transaction: ChatTransaction) -> String? {
         switch transaction {
         case let message as MessageTransaction:
-            return message.message
+            guard let text = message.message else {
+                return nil
+            }
+            
+            if message.isOutgoing {
+                return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, text)
+            } else {
+                return text
+            }
             
         case let transfer as TransferTransaction:
             if let admService = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService {
@@ -485,10 +582,20 @@ extension ChatListViewController {
             }
             
         case let richMessage as RichMessageTransaction:
+            let description: String
+            
             if let type = richMessage.richType, let provider = richMessageProviders[type] {
-                return provider.shortDescription(for: richMessage)
+                description = provider.shortDescription(for: richMessage)
+            } else if let serialized = richMessage.serializedMessage() {
+                description = serialized
             } else {
-                return richMessage.serializedMessage()
+                return nil
+            }
+            
+            if richMessage.isOutgoing {
+                return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, description)
+            } else {
+                return description
             }
             
         default:
@@ -518,15 +625,15 @@ extension ChatListViewController {
 			let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
 			
 			if partner.isSystem {
-				self?.dialogService.presentShareAlertFor(string: encodedAddress,
-                                                         types: [.copyToPasteboard, .share, .generateQr(sharingTip: address, withLogo: true)],
+				self?.dialogService.presentShareAlertFor(string: address,
+                                                         types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
 												   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 												   animated: true,
 												   completion: nil)
 			} else {
 				let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
-					self?.dialogService.presentShareAlertFor(string: encodedAddress,
-                                                             types: [.copyToPasteboard, .share, .generateQr(sharingTip: address, withLogo: true)],
+					self?.dialogService.presentShareAlertFor(string: address,
+                                                             types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
 															 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 															 animated: true,
 															 completion: nil)

@@ -14,13 +14,7 @@ extension Container {
 	func registerAdamantServices() {
 		// MARK: - Standalone services
 		// MARK: AdamantCore
-		self.register(AdamantCore.self) { _ in
-			let core = JSAdamantCore()
-			core.loadJs(from: AdamantResources.jsCore, queue: DispatchQueue.global(qos: .background)) { result in
-				if case .error(let e) = result { fatalError(e.localizedDescription) }
-			}
-			return core
-		}.inObjectScope(.container)
+		self.register(AdamantCore.self) { _ in NativeAdamantCore() }.inObjectScope(.container)
 		
 		// MARK: Router
 		self.register(Router.self) { _ in
@@ -84,9 +78,12 @@ extension Container {
 			service.apiService = r.resolve(ApiService.self)!
 			service.adamantCore = r.resolve(AdamantCore.self)!
 			service.securedStore = r.resolve(SecuredStore.self)!
-			service.notificationsService = r.resolve(NotificationsService.self)!
-			return service
-		}.inObjectScope(.container).initCompleted { (r, service) in
+            service.dialogService = r.resolve(DialogService.self)!
+            return service
+        }.inObjectScope(.container).initCompleted { (r, c) in
+            let service = c as! AdamantAccountService
+            service.notificationsService = r.resolve(NotificationsService.self)!
+            
 			for case let wallet as SwinjectDependentService in service.wallets {
 				wallet.injectDependencies(from: self)
 			}

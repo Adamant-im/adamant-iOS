@@ -11,19 +11,19 @@ import CoreData
 
 extension AdamantChatsProvider {
 	// MARK: - Public
-	func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, completion: @escaping (ChatsProviderResult) -> Void) {
+    func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
 		validate(message: message, partnerId: recipientId) { [weak self] result in
 			switch result {
 			case .success(let loggedAddress, let partner):
 				switch message {
 				case .text(let text):
-					self?.fakeSent(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, status: status, markdown: false, completion: completion)
+                    self?.fakeSent(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, status: status, markdown: false, showsChatroom: showsChatroom, completion: completion)
 					
 				case .richMessage(let payload):
-					self?.fakeSent(text: payload.serialized(), loggedAddress: loggedAddress, recipient: partner, date: date, status: status, markdown: false, completion: completion)
+					self?.fakeSent(text: payload.serialized(), loggedAddress: loggedAddress, recipient: partner, date: date, status: status, markdown: false, showsChatroom: showsChatroom, completion: completion)
 					
 				case .markdownText(let text):
-					self?.fakeSent(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, status: status, markdown: true, completion: completion)
+					self?.fakeSent(text: text, loggedAddress: loggedAddress, recipient: partner, date: date, status: status, markdown: true, showsChatroom: showsChatroom, completion: completion)
 				}
 				
 			case .failure(let error):
@@ -32,19 +32,19 @@ extension AdamantChatsProvider {
 		}
 	}
 	
-	func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
+	func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
 		validate(message: message, partnerId: senderId) { [weak self] result in
 			switch result {
 			case .success(let loggedAccount, let partner):
 				switch message {
 				case .text(let text):
-					self?.fakeReceived(text: text, loggedAddress: loggedAccount, sender: partner, date: date, unread: unread, silent: silent, markdown: false, completion: completion)
+                    self?.fakeReceived(text: text, loggedAddress: loggedAccount, sender: partner, date: date, unread: unread, silent: silent, markdown: false, showsChatroom: showsChatroom, completion: completion)
 					
 				case .richMessage(let payload):
-					self?.fakeReceived(text: payload.serialized(), loggedAddress: loggedAccount, sender: partner, date: date, unread: unread, silent: silent, markdown: false, completion: completion)
+					self?.fakeReceived(text: payload.serialized(), loggedAddress: loggedAccount, sender: partner, date: date, unread: unread, silent: silent, markdown: false, showsChatroom: showsChatroom, completion: completion)
 					
 				case .markdownText(let text):
-					self?.fakeReceived(text: text, loggedAddress: loggedAccount, sender: partner, date: date, unread: unread, silent: silent, markdown: true, completion: completion)
+					self?.fakeReceived(text: text, loggedAddress: loggedAccount, sender: partner, date: date, unread: unread, silent: silent, markdown: true, showsChatroom: showsChatroom, completion: completion)
 				}
 				
 			case .failure(let error):
@@ -91,7 +91,7 @@ extension AdamantChatsProvider {
 	
 	// MARK: - Logic
 	
-	private func fakeSent(text: String, loggedAddress: String, recipient: CoreDataAccount, date: Date, status: MessageStatus, markdown: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
+	private func fakeSent(text: String, loggedAddress: String, recipient: CoreDataAccount, date: Date, status: MessageStatus, markdown: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
 		// MARK: 0. Prepare
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = stack.container.viewContext
@@ -107,9 +107,11 @@ extension AdamantChatsProvider {
 		transaction.isUnread = false
 		transaction.isMarkdown = markdown
 		transaction.status = status.rawValue
+        transaction.showsChatroom = showsChatroom
 		
 		transaction.transactionId = UUID().uuidString
 		transaction.blockId = UUID().uuidString
+        transaction.chatMessageId = transaction.transactionId
 		
 		// MARK: 2. Get Chatroom
 		guard let id = recipient.chatroom?.objectID, let chatroom = privateContext.object(with: id) as? Chatroom else {
@@ -127,7 +129,7 @@ extension AdamantChatsProvider {
 		}
 	}
 	
-	private func fakeReceived(text: String, loggedAddress: String, sender: CoreDataAccount, date: Date, unread: Bool, silent: Bool, markdown: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
+	private func fakeReceived(text: String, loggedAddress: String, sender: CoreDataAccount, date: Date, unread: Bool, silent: Bool, markdown: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
 		// MARK: 0. Prepare
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = stack.container.viewContext
@@ -144,9 +146,11 @@ extension AdamantChatsProvider {
 		transaction.silentNotification = silent
 		transaction.isMarkdown = markdown
 		transaction.status = MessageStatus.delivered.rawValue
+        transaction.showsChatroom = showsChatroom
 		
 		transaction.transactionId = UUID().uuidString
 		transaction.blockId = UUID().uuidString
+        transaction.chatMessageId = transaction.transactionId
 		
 		// MARK: 2. Get Chatroom
 		guard let id = sender.chatroom?.objectID, let chatroom = privateContext.object(with: id) as? Chatroom else {

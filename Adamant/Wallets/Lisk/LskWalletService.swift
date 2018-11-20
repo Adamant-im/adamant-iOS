@@ -14,6 +14,7 @@ class LskWalletService: WalletService {
 	
 	let walletUpdatedNotification = Notification.Name("lsk.update")
 	let serviceEnabledChanged = Notification.Name("lsk.enabledChanged")
+    let serviceStateChanged = Notification.Name("lsk.stateChanged")
 	
 	// MARK: - Constants
 	let addressRegex = try! NSRegularExpression(pattern: "^([0-9]{2,22})L$", options: [])

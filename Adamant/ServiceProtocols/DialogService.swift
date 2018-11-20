@@ -20,7 +20,7 @@ extension String.adamantLocalized.alert {
 enum ShareType {
 	case copyToPasteboard
 	case share
-    case generateQr(sharingTip: String?, withLogo: Bool)
+    case generateQr(encodedContent: String?, sharingTip: String?, withLogo: Bool)
 	case saveToPhotolibrary(image: UIImage)
 	
 	var localized: String {
@@ -43,20 +43,6 @@ enum ShareType {
 enum ShareContentType {
 	case passphrase
 	case address
-	
-	func shareTypes(sharingTip: String?) -> [ShareType] {
-		switch self {
-		case .address:
-			return [.copyToPasteboard,
-					.share,
-                    .generateQr(sharingTip: sharingTip, withLogo: true)]
-			
-		case .passphrase:
-			return [.copyToPasteboard,
-					.share,
-                    .generateQr(sharingTip: sharingTip, withLogo: false)]
-		}
-	}
 	
 	var excludedActivityTypes: [UIActivity.ActivityType]? {
 		switch self {

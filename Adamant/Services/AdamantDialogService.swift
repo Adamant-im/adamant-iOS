@@ -101,14 +101,18 @@ extension AdamantDialogService {
 		FTIndicator.showError(withMessage: message)
 	}
 	
-	func showError(withMessage message: String, error: Error? = nil) {
-		if Thread.isMainThread {
-			FTIndicator.dismissProgress()
-		} else {
-			DispatchQueue.main.sync {
-				FTIndicator.dismissProgress()
-			}
-		}
+    func showError(withMessage message: String, error: Error? = nil) {
+        if Thread.isMainThread {
+            internalShowError(withMessage: message, error: error)
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.internalShowError(withMessage: message, error: error)
+            }
+        }
+    }
+    
+	private func internalShowError(withMessage message: String, error: Error? = nil) {
+        FTIndicator.dismissProgress()
 		
 		let alertVC = PMAlertController(title: String.adamantLocalized.alert.error, description: message, image: #imageLiteral(resourceName: "error"), style: .alert)
         
@@ -178,7 +182,7 @@ extension AdamantDialogService {
         alertVC.alertActionStackView.spacing = 0
         alertVC.alertActionStackViewHeightConstraint.constant = 100
 		
-		present(alertVC, animated: true, completion: nil)
+        present(alertVC, animated: true, completion: nil)
 	}
 	
 	func showRichError(error: RichError) {
@@ -237,9 +241,9 @@ extension AdamantDialogService {
 					self?.present(vc, animated: true, completion: completion)
 				})
 				
-			case .generateQr(let sharingTip, let withLogo):
+			case .generateQr(let encodedContent, let sharingTip, let withLogo):
 				alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-					switch AdamantQRTools.generateQrFrom(string: string, withLogo: withLogo) {
+					switch AdamantQRTools.generateQrFrom(string: encodedContent ?? string, withLogo: withLogo) {
 					case .success(let qr):
 						guard let vc = self?.router.get(scene: AdamantScene.Shared.shareQr) as? ShareQrViewController else {
 							fatalError("Can't find ShareQrViewController")
@@ -412,7 +416,13 @@ extension AdamantDialogService {
             alertVC.alertActionStackViewHeightConstraint.constant = 50
         }
         
-        self.present(alertVC, animated: true, completion: nil)
+        if Thread.isMainThread {
+            present(alertVC, animated: true, completion: nil)
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.present(alertVC, animated: true, completion: nil)
+            }
+        }
     }
 }
 

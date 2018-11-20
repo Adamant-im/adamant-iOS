@@ -2,6 +2,7 @@ PODS:
   - Alamofire (4.7.3)
   - BigInt (3.1.0):
     - SipHash (~> 1.2)
+  - ByteBackpacker (1.2.1)
   - CryptoSwift (0.12.0)
   - DateToolsSwift (4.0.0)
   - Ed25519 (1.1.0):
@@ -59,6 +60,7 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire
+  - ByteBackpacker
   - CryptoSwift
   - DateToolsSwift
   - EFQRCode
@@ -84,6 +86,7 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
     - BigInt
+    - ByteBackpacker
     - CryptoSwift
     - DateToolsSwift
     - Ed25519
@@ -130,6 +133,7 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
   BigInt: 76b5dfdfa3e2e478d4ffdf161aeede5502e2742f
+  ByteBackpacker: df001da117faacdbf09b69a116ec480f6651c9ec
   CryptoSwift: 1c07ca50843dd48bc54e6ea53d7a4dba3b645716
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   Ed25519: d84c847d8ffbb2f6fec71479abbb8fa3dfe12578
@@ -159,6 +163,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: 4895c765c9858eb4737ef222eb8643bb5fc7fdb3
 
-PODFILE CHECKSUM: 4a06595861816208b7a6aacfeded5a0b26245f53
+PODFILE CHECKSUM: 17981ca7dbf7440ef8c4e90c4b889b8aa510e6ad
 
 COCOAPODS: 1.6.0.beta.1

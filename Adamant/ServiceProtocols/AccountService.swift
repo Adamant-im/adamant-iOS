@@ -33,8 +33,8 @@ extension Notification.Name {
 		/// Raised when wallets collection updated
 		///
 		/// UserInfo:
-		/// - Adamant.AccountService.updatedWallet: wallet object
-		/// - Adamant.AccountService.updatedWalletIndex: wallet index in AccountService.wallets collection
+		/// - AdamantUserInfoKey.AccountService.updatedWallet: wallet object
+		/// - AdamantUserInfoKey.AccountService.updatedWalletIndex: wallet index in AccountService.wallets collection
 		static let walletUpdated = Notification.Name("adamant.accountService.walletUpdated")
 		
 		private init() {}
@@ -47,6 +47,7 @@ extension String.adamantLocalized {
 	struct accountService {
 		static let updateAlertTitleV12 = NSLocalizedString("AccountService.update.v12.title", comment: "AccountService: Alert title. Changes in version 1.2")
 		static let updateAlertMessageV12 = NSLocalizedString("AccountService.update.v12.message", comment: "AccountService: Alert message. Changes in version 1.2, notify user that he needs to relogin to initiate eth & lsk wallets")
+        static let reloginToInitiateWallets = NSLocalizedString("AccountService.reloginToInitiateWallets", comment: "AccountService: User must relogin into app to initiate wallets")
 	}
 }
 

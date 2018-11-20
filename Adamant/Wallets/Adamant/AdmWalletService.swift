@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import Swinject
 import CoreData
+import MessageKit
 
 class AdmWalletService: NSObject, WalletService {
 	// MARK: - Constants
@@ -18,7 +19,7 @@ class AdmWalletService: NSObject, WalletService {
 	let transactionFee: Decimal = 0.5
 	static var currencySymbol = "ADM"
 	static var currencyLogo = #imageLiteral(resourceName: "wallet_adm")
-	
+	let commentsEnabledForRichMessages = false
 	
 	// MARK: - Dependencies
 	weak var accountService: AccountService!
@@ -31,6 +32,7 @@ class AdmWalletService: NSObject, WalletService {
 	let walletUpdatedNotification = Notification.Name("adamant.admWallet.updated")
 	let serviceEnabledChanged = Notification.Name("adamant.admWallet.enabledChanged")
 	let transactionFeeUpdated = Notification.Name("adamant.admWallet.feeUpdated")
+    let serviceStateChanged = Notification.Name("adamant.admWallet.stateChanged")
 	
     // MARK: RichMessageProvider properties
     static let richMessageType = "adm_transaction" // not used
@@ -53,7 +55,7 @@ class AdmWalletService: NSObject, WalletService {
 	private var transfersController: NSFetchedResultsController<TransferTransaction>?
 	
 	// MARK: - State
-	private (set) var state: WalletServiceState = .notInitiated
+	private (set) var state: WalletServiceState = .upToDate
 	private (set) var wallet: WalletAccount? = nil
 	
 	

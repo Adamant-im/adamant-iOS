@@ -11,7 +11,7 @@ import MessageKit
 
 open class TransferMessageSizeCalculator: MessageSizeCalculator {
     let cellWidth: CGFloat = 87
-    let cellHeight: CGFloat = 145
+    
     var font: UIFont! = nil
     
     override open func messageContainerSize(for message: MessageType) -> CGSize {
@@ -19,9 +19,9 @@ open class TransferMessageSizeCalculator: MessageSizeCalculator {
             fatalError("messageContainerSize received unhandled MessageDataType: \(message.kind)")
         }
         
-        let amount = transfer.amount
+        let amount = AdamantBalanceFormat.full.format(transfer.amount)
         
-        var messageContainerSize = CGSize(width: cellWidth, height: cellHeight)
+        var messageContainerSize = CGSize(width: cellWidth, height: TransferCollectionViewCell.cellHeightCompact)
         
         let maxWidth = messageContainerMaxWidth(for: message)
         let attributedText = NSAttributedString(string: amount, attributes: [.font: font])
@@ -30,14 +30,35 @@ open class TransferMessageSizeCalculator: MessageSizeCalculator {
         
         messageContainerSize.width += rect.width
         
+        if transfer.comments.count > 0 {
+            let commentHeight = commentLabelHeight(for: transfer.comments, maxWidth: maxWidth)
+            messageContainerSize.height += commentHeight
+        }
+        
         return messageContainerSize
     }
     
     open override func cellContentHeight(for message: MessageType, at indexPath: IndexPath) -> CGFloat {
-        return cellHeight
+        guard case MessageKind.custom(let raw) = message.kind, let transfer = raw as? RichMessageTransfer else {
+            fatalError("messageContainerSize received unhandled MessageDataType: \(message.kind)")
+        }
+        
+        if transfer.comments.count > 0 {
+            let maxWidth = messageContainerMaxWidth(for: message)
+            let commentHeight = commentLabelHeight(for: transfer.comments, maxWidth: maxWidth)
+            return TransferCollectionViewCell.cellHeightWithComment + commentHeight
+        } else {
+            return TransferCollectionViewCell.cellHeightCompact
+        }
     }
     
-    
+    private func commentLabelHeight(for comment: String, maxWidth: CGFloat) -> CGFloat {
+        let commentAttributedText = NSAttributedString(string: comment, attributes: [.font: TransferCollectionViewCell.commentFont])
+        let commentBox = CGSize(width: maxWidth - TransferCollectionViewCell.commentLabelTrailAndLead - TransferCollectionViewCell.statusImageSizeAndSpace, height: .greatestFiniteMagnitude)
+        let commentRect = commentAttributedText.boundingRect(with: commentBox, options: [.usesLineFragmentOrigin, .usesFontLeading], context: nil).integral
+        
+        return commentRect.height
+    }
 }
 
 extension NSAttributedString {

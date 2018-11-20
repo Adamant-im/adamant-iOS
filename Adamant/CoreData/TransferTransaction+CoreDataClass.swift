@@ -2,7 +2,7 @@
 //  TransferTransaction+CoreDataClass.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 24.03.2018.
+//  Created by Anokhov Pavel on 10/11/2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 //
@@ -12,5 +12,5 @@ import CoreData
 
 @objc(TransferTransaction)
 public class TransferTransaction: ChatTransaction {
-	static let entityName = "TransferTransaction"
+    static let entityName = "TransferTransaction"
 }

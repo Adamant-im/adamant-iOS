@@ -23,11 +23,11 @@ extension AdmWalletService: WalletServiceSimpleSend {
 	
 	
 	/// Comments not implemented
-	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<TransactionDetails>) -> Void) {
         transfersProvider.transferFunds(toAddress: recipient, amount: amount) { result in
             switch result {
-            case .success:
-                completion(.success)
+            case .success(let transaction):
+                completion(.success(result: transaction))
                 
             case .failure(let error):
                 completion(.failure(error: error.asWalletServiceError()))
