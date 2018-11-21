@@ -394,7 +394,7 @@ extension LoginViewController {
 				self?.dialogService.dismissProgress()
 				
 				if let alert = alert {
-                    self?.dialogService.showAlert(title: alert.title, message: alert.message, style: UIAlertController.Style.alert, actions: nil)
+                    self?.dialogService?.showAlert(title: alert.title, message: alert.message, style: UIAlertController.Style.alert, actions: nil, from: nil)
 				}
 				
 			case .failure(let error):

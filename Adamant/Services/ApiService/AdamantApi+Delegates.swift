@@ -217,7 +217,7 @@ extension AdamantApiService {
 	func voteForDelegates(from address: String, keypair: Keypair, votes: [DelegateVote], completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
         self.sendingMsgTaskId = UIApplication.shared.beginBackgroundTask {
             UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-            self.sendingMsgTaskId = UIBackgroundTaskInvalid
+            self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
         }
         
 		// MARK: 0. Prepare
@@ -289,7 +289,7 @@ extension AdamantApiService {
             
             defer {
                 UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-                self.sendingMsgTaskId = UIBackgroundTaskInvalid
+                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
             }
         }
     }

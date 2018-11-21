@@ -65,7 +65,7 @@ class AdamantApiService: ApiService {
 	}
 	private var currentUrl: URL?
     
-    internal var sendingMsgTaskId: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
+    internal var sendingMsgTaskId: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier.invalid
 	
 	let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility, attributes: [.concurrent])
 	

@@ -82,7 +82,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}.onCellSelection { [weak self] (_, _) in
+		}.onCellSelection { [weak self] (cell, _) in
 			let completion = { [weak self] in
 				guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
 					return
@@ -103,7 +103,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 				self?.dialogService.presentShareAlertFor(string: address,
 														 types: types,
 														 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-														 animated: true,
+                                                         animated: true, from: cell,
 														 completion: completion)
 			}
 		}

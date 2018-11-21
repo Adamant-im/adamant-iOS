@@ -126,9 +126,6 @@ protocol DialogService: class {
 	func presentGoToSettingsAlert(title: String?, message: String?)
     
     // MARK: - Alerts
-    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?)
-	func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?)
-
-    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?, from: UIView?)
-    func showSystemActionSheet(title: String?, message: String?, actions: [UIAlertAction]?, from: UIBarButtonItem?)
+    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: Any?)
+	func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: Any?)
 }

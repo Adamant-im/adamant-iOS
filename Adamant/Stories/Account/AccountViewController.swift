@@ -550,11 +550,6 @@ class AccountViewController: FormViewController {
 			navigationController?.navigationBar.prefersLargeTitles = false
 		}
 	}
-	
-	override func viewWillDisappear(_ animated: Bool) {
-		super.viewWillDisappear(animated)
-		navigationController?.setNavigationBarHidden(false, animated: animated)
-	}
     
     override func viewDidLayoutSubviews() {
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
@@ -602,14 +597,14 @@ class AccountViewController: FormViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
 
         let width = view.bounds.size.width;
-        let temporaryWidthConstraints = NSLayoutConstraint.constraints(withVisualFormat: "[headerView(width)]", options: NSLayoutFormatOptions(rawValue: UInt(0)), metrics: ["width": width], views: ["headerView": view])
+        let temporaryWidthConstraints = NSLayoutConstraint.constraints(withVisualFormat: "[headerView(width)]", options: NSLayoutConstraint.FormatOptions(rawValue: UInt(0)), metrics: ["width": width], views: ["headerView": view])
 
         view.addConstraints(temporaryWidthConstraints)
 
         view.setNeedsLayout()
         view.layoutIfNeeded()
 
-        let size = view.systemLayoutSizeFitting(UILayoutFittingCompressedSize)
+        let size = view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
         let height = size.height
         var frame = view.frame
 
@@ -627,14 +622,14 @@ class AccountViewController: FormViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
 
         let width = view.bounds.size.width;
-        let temporaryWidthConstraints = NSLayoutConstraint.constraints(withVisualFormat: "[footerView(width)]", options: NSLayoutFormatOptions(rawValue: UInt(0)), metrics: ["width": width], views: ["footerView": view])
+        let temporaryWidthConstraints = NSLayoutConstraint.constraints(withVisualFormat: "[footerView(width)]", options: NSLayoutConstraint.FormatOptions(rawValue: UInt(0)), metrics: ["width": width], views: ["footerView": view])
 
         view.addConstraints(temporaryWidthConstraints)
 
         view.setNeedsLayout()
         view.layoutIfNeeded()
 
-        let size = view.systemLayoutSizeFitting(UILayoutFittingCompressedSize)
+        let size = view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
         let height = size.height
         var frame = view.frame
 

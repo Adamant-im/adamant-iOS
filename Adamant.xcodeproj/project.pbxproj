@@ -582,7 +582,6 @@
 				644EC35920EFB8E900F40C73 /* AdamantDelegateCell.swift */,
 				644EC35A20EFB8E900F40C73 /* AdamantDelegateCell.xib */,
 				644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */,
-				645E7B072114944B006CC9FD /* DelegateDetailsViewController.xib */,
 			);
 			path = Delegates;
 			sourceTree = "<group>";
@@ -1248,7 +1247,6 @@
 				E9A174B920587B84003667CD /* notification.mp3 in Resources */,
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
 				E948E0482024F02700975D6B /* VersionFooter.xib in Resources */,
-				645E7B082114944B006CC9FD /* DelegateDetailsViewController.xib in Resources */,
 				E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */,
 				E921534F20EE1E8700C0843F /* AlertLabelCell.xib in Resources */,
 				644EC35820EFAAB700F40C73 /* DelegatesListViewController.xib in Resources */,
@@ -1798,7 +1796,7 @@
 				PROVISIONING_PROFILE = "e4233bbf-3705-44fe-95b0-e77475672c60";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Debug Dev";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -1821,7 +1819,7 @@
 				PROVISIONING_PROFILE = "bedd1b75-2f23-4a85-a0b2-14c424fcff42";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
