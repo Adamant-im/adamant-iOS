@@ -170,22 +170,16 @@ class AdmTransferViewController: TransferViewControllerBase {
 	}
 	
 	override func handleRawAddress(_ address: String) -> Bool {
-		guard let uri = AdamantUriTools.decode(uri: address) else {
-			return false
-		}
-		
-		switch uri {
-		case .address(let address, _):
-			if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
-				row.value = address
-				row.updateCell()
-			}
-			
-			return true
-			
-		default:
-			return false
-		}
+        guard let admAddress = address.getAdamantAddress() else {
+            return false
+        }
+        
+        if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
+            row.value = admAddress.address
+            row.updateCell()
+        }
+        
+        return true
 	}
     
     override func defaultSceneTitle() -> String? {

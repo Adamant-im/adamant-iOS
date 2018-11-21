@@ -626,14 +626,14 @@ extension ChatListViewController {
 			
 			if partner.isSystem {
 				self?.dialogService.presentShareAlertFor(string: address,
-                                                         types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address)],
-                                                         excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                                         animated: true,
-                                                         completion: nil)
+                                                         types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
+												   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+												   animated: true,
+												   completion: nil)
 			} else {
 				let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
 					self?.dialogService.presentShareAlertFor(string: address,
-															 types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address)],
+                                                             types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
 															 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
 															 animated: true,
 															 completion: nil)
