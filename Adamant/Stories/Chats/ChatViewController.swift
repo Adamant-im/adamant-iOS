@@ -9,6 +9,7 @@
 import UIKit
 import MessageKit
 import MessageInputBar
+import class InputBarAccessoryView.KeyboardManager
 import CoreData
 import SafariServices
 import ProcedureKit
@@ -57,6 +58,8 @@ class ChatViewController: MessagesViewController {
 		formatter.timeStyle = .short
 		return formatter
 	}
+    
+    private var keyboardManager = KeyboardManager()
 	
 	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
     
@@ -213,6 +216,22 @@ class ChatViewController: MessagesViewController {
 			$0.setImage(#imageLiteral(resourceName: "Arrow_innactive"), for: UIControl.State.disabled)
 		}
 		
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            view.addSubview(messageInputBar)
+            keyboardManager.bind(inputAccessoryView: messageInputBar)
+            keyboardManager.bind(to: messagesCollectionView)
+            
+            keyboardManager.on(event: .didChangeFrame) { [weak self] (notification) in
+                let barHeight = self?.messageInputBar.bounds.height ?? 0
+                self?.messagesCollectionView.contentInset.bottom = barHeight + notification.endFrame.height
+                self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight + notification.endFrame.height
+                }.on(event: .didHide) { [weak self] _ in
+                    let barHeight = self?.messageInputBar.bounds.height ?? 0
+                    self?.messagesCollectionView.contentInset.bottom = barHeight
+                    self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight
+            }
+        }
+        
 		if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
 			messageInputBar.inputTextView.text = message
 			setEstimatedFee(AdamantMessage.text(message).fee)
@@ -310,12 +329,32 @@ class ChatViewController: MessagesViewController {
 	
 	override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            messagesCollectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
+        }
 		
 		if isFirstLayout {
 			isFirstLayout = false
 			messagesCollectionView.scrollToBottom(animated: false)
 		}
 	}
+    
+    override var inputAccessoryView: UIView? {
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            return nil
+        } else {
+            return super.inputAccessoryView
+        }
+    }
+    
+    override var canBecomeFirstResponder: Bool {
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            return false
+        } else {
+            return true
+        }
+    }
 	
 	deinit {
 		for timer in cellUpdateTimers {

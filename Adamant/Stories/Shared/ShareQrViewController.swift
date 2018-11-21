@@ -85,6 +85,15 @@ class ShareQrViewController: FormViewController {
 		if #available(iOS 11.0, *) {
 			navigationController?.navigationBar.prefersLargeTitles = true
 		}
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            var frame = tableView.frame
+            frame.size.width = 300
+            tableView.frame = frame
+            
+            tableView.center = view.center
+            view.backgroundColor = tableView.backgroundColor
+        }
 		
 		// MARK: QR code
 		form +++ Section()
