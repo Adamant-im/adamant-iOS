@@ -145,7 +145,13 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 					return
 				}
 				
-				self?.navigationController?.pushViewController(service.transferListViewController(), animated: true )
+                let vc = service.transferListViewController()
+                if let split = self?.splitViewController {
+                    let details = UINavigationController(rootViewController:vc)
+                    split.showDetailViewController(details, sender: self)
+                } else {
+                    self?.navigationController?.pushViewController(vc, animated: true )
+                }
 			}
 		}
 		
@@ -171,11 +177,16 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 					v.delegate = self
 				}
 				
-				if let nav = self?.navigationController {
-					nav.pushViewController(vc, animated: true)
-				} else {
-					self?.present(vc, animated: true)
-				}
+                if let split = self?.splitViewController {
+                    let details = UINavigationController(rootViewController:vc)
+                    split.showDetailViewController(details, sender: self)
+                } else {
+                    if let nav = self?.navigationController {
+                        nav.pushViewController(vc, animated: true)
+                    } else {
+                        self?.present(vc, animated: true)
+                    }
+                }
 			}
 			
 			section.append(sendRow)

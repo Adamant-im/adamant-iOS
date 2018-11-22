@@ -151,7 +151,11 @@ class ChatListViewController: UIViewController {
 			c.delegate = self
 		}
 		
-		present(controller, animated: true, completion: nil)
+        if let split = self.splitViewController {
+            split.showDetailViewController(controller, sender: self)
+        } else {
+            present(controller, animated: true)
+        }
 	}
 	
 	

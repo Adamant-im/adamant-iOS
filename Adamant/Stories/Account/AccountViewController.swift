@@ -320,7 +320,12 @@ class AccountViewController: FormViewController {
 				return
 			}
 			
-			nav.pushViewController(vc, animated: true)
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                nav.pushViewController(vc, animated: true)
+            }
 		}
         
         actionsSection.append(delegatesRow)
@@ -456,7 +461,12 @@ class AccountViewController: FormViewController {
                 return
             }
             
-            nav.pushViewController(vc, animated: true)
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                nav.pushViewController(vc, animated: true)
+            }
         }
         
         securitySection.append(notificationsRow)
