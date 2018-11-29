@@ -22,15 +22,26 @@ extension AdmWalletService: WalletServiceSimpleSend {
 	}
 	
 	
-	/// Comments not implemented
 	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<TransactionDetails>) -> Void) {
-        transfersProvider.transferFunds(toAddress: recipient, amount: amount) { result in
-            switch result {
-            case .success(let transaction):
-                completion(.success(result: transaction))
-                
-            case .failure(let error):
-                completion(.failure(error: error.asWalletServiceError()))
+        if comments.count > 0 {
+            chatsProvider.sendMessage(.text(comments), amount: amount, recipientId: recipient) { result in
+                switch result {
+                case .success(let transaction):
+                    completion(.success(result: transaction))
+                    
+                case .failure(let error):
+                    completion(.failure(error: error.asWalletServiceError()))
+                }
+            }
+        } else {
+            transfersProvider.transferFunds(toAddress: recipient, amount: amount) { result in
+                switch result {
+                case .success(let transaction):
+                    completion(.success(result: transaction))
+                    
+                case .failure(let error):
+                    completion(.failure(error: error.asWalletServiceError()))
+                }
             }
         }
 	}

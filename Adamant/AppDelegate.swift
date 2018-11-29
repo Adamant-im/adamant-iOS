@@ -305,7 +305,7 @@ extension AppDelegate {
 			fatalError("can't get api service to register device token")
 		}
 		
-		apiService.sendMessage(senderId: address, recipientId: AdamantResources.contacts.ansAddress, keypair: keypair, message: encodedPayload.message, type: ChatType.signal, nonce: encodedPayload.nonce) { [unowned self] result in
+        apiService.sendMessage(senderId: address, recipientId: AdamantResources.contacts.ansAddress, keypair: keypair, message: encodedPayload.message, type: ChatType.signal, amount: nil, nonce: encodedPayload.nonce) { [unowned self] result in
 			switch result {
 			case .success:
 				return

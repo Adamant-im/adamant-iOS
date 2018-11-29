@@ -11,7 +11,7 @@ import CoreData
 
 extension AdamantChatsProvider {
 	// MARK: - Public
-    func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
+    func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
 		validate(message: message, partnerId: recipientId) { [weak self] result in
 			switch result {
 			case .success(let loggedAddress, let partner):
@@ -32,7 +32,7 @@ extension AdamantChatsProvider {
 		}
 	}
 	
-	func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
+	func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
 		validate(message: message, partnerId: senderId) { [weak self] result in
 			switch result {
 			case .success(let loggedAccount, let partner):
@@ -91,7 +91,7 @@ extension AdamantChatsProvider {
 	
 	// MARK: - Logic
 	
-	private func fakeSent(text: String, loggedAddress: String, recipient: CoreDataAccount, date: Date, status: MessageStatus, markdown: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
+	private func fakeSent(text: String, loggedAddress: String, recipient: CoreDataAccount, date: Date, status: MessageStatus, markdown: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
 		// MARK: 0. Prepare
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = stack.container.viewContext
@@ -123,13 +123,13 @@ extension AdamantChatsProvider {
 			chatroom.addToTransactions(transaction)
 			recheckLastTransactionFor(chatroom: chatroom, with: transaction)
 			try privateContext.save()
-			completion(.success)
+            completion(.success(transaction: transaction))
 		} catch {
 			completion(.failure(.internalError(error)))
 		}
 	}
 	
-	private func fakeReceived(text: String, loggedAddress: String, sender: CoreDataAccount, date: Date, unread: Bool, silent: Bool, markdown: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void) {
+	private func fakeReceived(text: String, loggedAddress: String, sender: CoreDataAccount, date: Date, unread: Bool, silent: Bool, markdown: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
 		// MARK: 0. Prepare
 		let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		privateContext.parent = stack.container.viewContext
@@ -166,7 +166,7 @@ extension AdamantChatsProvider {
 			chatroom.addToTransactions(transaction)
 			recheckLastTransactionFor(chatroom: chatroom, with: transaction)
 			try privateContext.save()
-			completion(.success)
+            completion(.success(transaction: transaction))
 		} catch {
 			completion(.failure(.internalError(error)))
 		}

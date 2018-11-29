@@ -119,6 +119,42 @@ extension ApiServiceError {
 	}
 }
 
+extension ChatsProviderError {
+    func asWalletServiceError() -> WalletServiceError {
+        switch self {
+        case .notLogged:
+            return .notLogged
+            
+        case .messageNotValid(_):
+            return .notLogged
+            
+        case .notEnoughtMoneyToSend:
+            return .notEnoughtMoney
+            
+        case .networkError:
+            return .networkError
+            
+        case .serverError(let e as ApiServiceError):
+            return .apiError(e)
+            
+        case .serverError(let e):
+            return .internalError(message: self.message, error: e)
+            
+        case .accountNotFound(_):
+            return .accountNotFound
+            
+        case .dependencyError(let message):
+            return .internalError(message: message, error: nil)
+            
+        case .transactionNotFound(let id):
+            return .transactionNotFound(reason: "\(id)")
+            
+        case .internalError(let error):
+            return .internalError(message: self.message, error: error)
+        }
+    }
+}
+
 
 // MARK: - Notifications
 extension AdamantUserInfoKey {

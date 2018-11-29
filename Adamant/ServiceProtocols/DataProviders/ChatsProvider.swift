@@ -17,6 +17,11 @@ enum ChatsProviderResult {
 	case failure(ChatsProviderError)
 }
 
+enum ChatsProviderResultWithTransaction {
+    case success(transaction: ChatTransaction)
+    case failure(ChatsProviderError)
+}
+
 enum ChatsProviderRetryCancelResult {
 	case success
 	case invalidTransactionStatus(MessageStatus)
@@ -173,7 +178,7 @@ protocol ChatsProvider: DataProvider {
     func update(completion: ((ChatsProviderResult?) -> Void)?)
 	
 	// MARK: - Sending messages
-	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
+    func sendMessage(_ message: AdamantMessage, amount: Decimal?, recipientId: String, completion: @escaping (ChatsProviderResultWithTransaction) -> Void )
 	func retrySendMessage(_ message: ChatTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void)
     
     // MARK: - Delete local message
@@ -183,7 +188,7 @@ protocol ChatsProvider: DataProvider {
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
 	
 	// MARK: - Fake messages
-    func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void)
-    func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void)
+    func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void)
+    func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void)
     func fakeUpdate(status: MessageStatus, forTransactionId id: String, completion: @escaping (ChatsProviderResult) -> Void)
 }

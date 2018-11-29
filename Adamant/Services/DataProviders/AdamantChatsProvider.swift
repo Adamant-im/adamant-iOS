@@ -18,6 +18,7 @@ class AdamantChatsProvider: ChatsProvider {
 	var adamantCore: AdamantCore!
 	var accountsProvider: AccountsProvider!
 	var securedStore: SecuredStore!
+    weak var transfersProvider: TransfersProvider!
 	
     var richProviders: [String:RichMessageProviderWithStatusCheck]!
     
@@ -264,15 +265,22 @@ extension AdamantChatsProvider {
 
 // MARK: - Sending messages {
 extension AdamantChatsProvider {
-	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+    func sendMessage(_ message: AdamantMessage, amount: Decimal?, recipientId: String, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
             completion(.failure(.notLogged))
             return
         }
         
-        guard loggedAccount.balance >= message.fee else {
-            completion(.failure(.notEnoughtMoneyToSend))
-            return
+        if let amount = amount, amount > 0 {
+            guard loggedAccount.balance > amount + transfersProvider.transferFee else {
+                completion(.failure(.notEnoughtMoneyToSend))
+                return
+            }
+        } else {
+            guard loggedAccount.balance >= message.fee else {
+                completion(.failure(.notEnoughtMoneyToSend))
+                return
+            }
         }
         
         switch validateMessage(message) {
@@ -291,18 +299,18 @@ extension AdamantChatsProvider {
         sendingQueue.async {
             switch message {
             case .text(let text):
-                self.sendTextMessage(text: text, isMarkdown: false, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
+                self.sendTextMessage(text: text, isMarkdown: false, amount: amount, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
                 
             case .markdownText(let text):
-                self.sendTextMessage(text: text, isMarkdown: true, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
+                self.sendTextMessage(text: text, isMarkdown: true, amount: amount, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
 				
 			case .richMessage(let payload):
-                self.sendRichMessage(richContent: payload.content(), richType: payload.type, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, completion: completion)
+                self.sendRichMessage(richContent: payload.content(), amount: amount, richType: payload.type, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, completion: completion)
 			}
         }
     }
 	
-    private func sendTextMessage(text: String, isMarkdown: Bool, senderId: String, recipientId: String, keypair: Keypair, type: ChatType, completion: @escaping (ChatsProviderResult) -> Void) {
+    private func sendTextMessage(text: String, isMarkdown: Bool, amount: Decimal?, senderId: String, recipientId: String, keypair: Keypair, type: ChatType, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = stack.container.viewContext
         
@@ -315,12 +323,16 @@ extension AdamantChatsProvider {
         transaction.chatMessageId = UUID().uuidString
         transaction.isMarkdown = isMarkdown
         
+        if let amount = amount as NSDecimalNumber? {
+            transaction.amount = amount
+        }
+        
         transaction.message = text
         
         prepareAndSendChatTransaction(transaction, in: context, recipientId: recipientId, type: type, keypair: keypair, completion: completion)
     }
     
-    private func sendRichMessage(richContent: [String:String], richType: String, senderId: String, recipientId: String, keypair: Keypair, completion: @escaping (ChatsProviderResult) -> Void) {
+    private func sendRichMessage(richContent: [String:String], amount: Decimal?, richType: String, senderId: String, recipientId: String, keypair: Keypair, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = stack.container.viewContext
         
@@ -334,6 +346,10 @@ extension AdamantChatsProvider {
         transaction.isOutgoing = true
         transaction.chatMessageId = UUID().uuidString
         
+        if let amount = amount as NSDecimalNumber? {
+            transaction.amount = amount
+        }
+        
         transaction.richContent = richContent
         transaction.richType = richType
         
@@ -344,7 +360,7 @@ extension AdamantChatsProvider {
     
     
     /// Transaction must be in passed context
-    private func prepareAndSendChatTransaction(_ transaction: ChatTransaction, in context: NSManagedObjectContext, recipientId: String, type: ChatType, keypair: Keypair, completion: @escaping (ChatsProviderResult) -> Void) {
+    private func prepareAndSendChatTransaction(_ transaction: ChatTransaction, in context: NSManagedObjectContext, recipientId: String, type: ChatType, keypair: Keypair, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         // MARK: 1. Get account
         let accountsGroup = DispatchGroup()
         accountsGroup.enter()
@@ -414,10 +430,10 @@ extension AdamantChatsProvider {
         // MARK: 6. Send
         sendTransaction(transaction, type: type, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
             switch result {
-            case .success:
+            case .success(let transaction):
                 do {
                     try context.save()
-                    completion(.success)
+                    completion(.success(transaction: transaction))
                 } catch {
                     completion(.failure(.internalError(error)))
                 }
@@ -532,7 +548,7 @@ extension AdamantChatsProvider {
 	///
 	/// If success - update transaction's id and add it to unconfirmed transactions.
 	/// If fails - set transaction status to .failed
-	private func sendTransaction(_ transaction: ChatTransaction, type: ChatType, keypair: Keypair, recipientPublicKey: String, completion: @escaping (ChatsProviderResult) -> Void) {
+	private func sendTransaction(_ transaction: ChatTransaction, type: ChatType, keypair: Keypair, recipientPublicKey: String, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
 		// MARK: 0. Prepare
 		guard let senderId = transaction.senderId,
 			let recipientId = transaction.recipientId else {
@@ -545,9 +561,9 @@ extension AdamantChatsProvider {
 			completion(.failure(.dependencyError("Failed to encode message")))
 			return
 		}
-		
+        
 		// MARK: 2. Send
-		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, type: type, nonce: encodedMessage.nonce) { result in
+        apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, type: type, amount: transaction.amount as Decimal?, nonce: encodedMessage.nonce) { result in
 			switch result {
 			case .success(let id):
 				// Update ID with recieved, add to unconfirmed transactions.
@@ -559,7 +575,7 @@ extension AdamantChatsProvider {
 				}
 				self.unconfirmedsSemaphore.signal()
 				
-				completion(.success)
+                completion(.success(transaction: transaction))
 				
 			case .failure(let error):
 				transaction.statusEnum = MessageStatus.failed

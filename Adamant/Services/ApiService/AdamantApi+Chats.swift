@@ -52,9 +52,9 @@ extension AdamantApiService {
 		}
 	}
     
-	func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
+    func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, amount: Decimal?, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
         // MARK: 1. Prepare params
-        let params: [String : Any] = [
+        var params: [String : Any] = [
             "type": TransactionType.chatMessage.rawValue,
             "senderId": senderId,
             "recipientId": recipientId,
@@ -63,6 +63,10 @@ extension AdamantApiService {
             "own_message": nonce,
             "message_type": type.rawValue
         ]
+        
+        if let amount = amount, amount > 0 {
+            params["amount"] = (amount.shiftedToAdamant() as NSDecimalNumber).uint64Value
+        }
         
         let headers = [
             "Content-Type": "application/json"
