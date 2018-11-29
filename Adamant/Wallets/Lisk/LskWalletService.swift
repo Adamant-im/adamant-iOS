@@ -411,3 +411,40 @@ extension LskWalletService {
         }
     }
 }
+
+// MARK: - Transactions
+extension LskWalletService {
+    func getTransactions(_ completion: @escaping (ApiServiceResult<[Transactions.TransactionModel]>) -> Void) {
+        if let address = self.wallet?.address {
+            transactionApi.transactions(senderIdOrRecipientId: address, limit: 100, offset: 0, sort: APIRequest.Sort("timestamp", direction: .descending)) { (response) in
+                switch response {
+                case .success(response: let result):
+                    completion(.success(result.data))
+                    break
+                case .error(response: let error):
+                    print("ERROR: " + error.message)
+                    completion(.failure(.internalError(message: error.message, error: nil)))
+                    break
+                }
+            }
+        }
+    }
+    
+    func getTransaction(byHash hash: String, completion: @escaping (ApiServiceResult<Transactions.TransactionModel>) -> Void) {
+        transactionApi.transactions(id: hash, limit: 1, offset: 0) { (response) in
+            switch response {
+            case .success(response: let result):
+                if let transaction = result.data.first {
+                    completion(.success(transaction))
+                } else {
+                    completion(.failure(.internalError(message: "No transaction", error: nil)))
+                }
+                break
+            case .error(response: let error):
+                print("ERROR: " + error.message)
+                completion(.failure(.internalError(message: error.message, error: nil)))
+                break
+            }
+        }
+    }
+}

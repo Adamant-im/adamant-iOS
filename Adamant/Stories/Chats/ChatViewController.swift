@@ -400,7 +400,7 @@ class ChatViewController: MessagesViewController {
     // MARK: Tools
     private func messageKind(for richMessage: RichMessageTransaction) -> MessageKind {
         guard let type = richMessage.richType else {
-            return MessageKind.text(richMessage.richType ?? "Failed to read richmessage id: \(richMessage.id!)")
+            return MessageKind.text(richMessage.richType ?? "Failed to read richmessage id: \(richMessage.id)")
         }
         
         guard var richContent = richMessage.richContent else {

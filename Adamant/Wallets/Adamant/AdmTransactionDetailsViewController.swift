@@ -67,9 +67,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     // MARK: - Overrides
     
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
-        guard let id = transaction.id else {
-            return nil
-        }
+        let id = transaction.id
         
         return URL(string: "\(AdamantResources.adamantExplorerAddress)\(id)")
     }

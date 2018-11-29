@@ -9,7 +9,7 @@
 import Foundation
 
 struct SimpleTransactionDetails: TransactionDetails {
-    var id: String?
+    var id: String
     
     var senderAddress: String
     

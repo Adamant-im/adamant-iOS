@@ -14,7 +14,7 @@ import BigInt
 class LskTransactionsViewController: TransactionsListViewControllerBase {
     
     // MARK: - Dependencies
-    var lskApiService: LskApiService!
+    var lskWalletService: LskWalletService!
     var dialogService: DialogService!
     var router: Router!
     
@@ -26,11 +26,13 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
 
         self.refreshControl.beginRefreshing()
         
+        currencySymbol = LskWalletService.currencySymbol
+        
         handleRefresh(self.refreshControl)
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.lskApiService.getTransactions({ (result) in
+        self.lskWalletService.getTransactions({ (result) in
             switch result {
             case .success(let transactions):
                 self.transactions = transactions
@@ -63,7 +65,7 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-//        let transaction = transactions[indexPath.row]
+        let transaction = transactions[indexPath.row]
         
         guard let controller = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? TransactionDetailsViewControllerBase else {
             return
@@ -79,28 +81,80 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
             return UITableViewCell(style: .default, reuseIdentifier: "cell")
         }
         
-//        let transaction = transactions[indexPath.row]
+        let transaction = transactions[indexPath.row]
         
         cell.accessoryType = .disclosureIndicator
         
-//        configureCell(cell, for: transaction)
+        configureCell(cell, for: transaction)
         return cell
+    }
+    
+    func configureCell(_ cell: TransactionTableViewCell, for transaction: Transactions.TransactionModel) {
+        let outgoing = isOutgoing(transaction)
+        let partnerId = outgoing ? transaction.recipientId : transaction.senderId
+        
+        configureCell(cell,
+                      isOutgoing: outgoing,
+                      partnerId: partnerId ?? "",
+                      partnerName: nil,
+                      amount: transaction.amountValue,
+                      date: transaction.dateValue)
+    }
+    
+    private func isOutgoing(_ transaction: Transactions.TransactionModel) -> Bool {
+        return transaction.senderId.lowercased() == lskWalletService.wallet?.address.lowercased()
     }
 }
 
-//extension Transactions.TransactionModel: TransactionDetails {
-//    var senderAddress: String {
-//        return self.senderId
-//    }
-//
-//    var recipientAddress: String {
-//        return self.recipientId ?? ""
-//    }
-//
-//    var sentDate: Date {
-//        return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
-//    }
-//
+extension Transactions.TransactionModel: TransactionDetails {
+    
+    var dateValue: Date? {
+        return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
+    }
+    
+    var amountValue: Decimal {
+        let value = BigUInt(self.amount) ?? BigUInt(0)
+        
+        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+    }
+    
+    var feeValue: Decimal? {
+        let value = BigUInt(self.fee) ?? BigUInt(0)
+        
+        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+    }
+    
+    var confirmationsValue: String? {
+        return "\(self.confirmations)"
+    }
+    
+    var blockValue: String? {
+        return self.blockId
+    }
+    
+    var isOutgoing: Bool {
+        return false
+    }
+    
+    var transactionStatus: TransactionStatus? {
+        if confirmations > 100 {
+            return .success
+        }
+        return .pending
+    }
+    
+    var senderAddress: String {
+        return self.senderId
+    }
+
+    var recipientAddress: String {
+        return self.recipientId ?? ""
+    }
+
+    var sentDate: Date {
+        return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
+    }
+
 //    var amountValue: Double {
 //        guard let string = Web3.Utils.formatToPrecision(BigUInt(self.amount) ?? BigUInt(0), numberDecimals: 8, formattingDecimals: 8, decimalSeparator: ".", fallbackToScientific: false), let value = Double(string) else {
 //            return 0
@@ -144,4 +198,4 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
 //    var currencyCode: String {
 //        return "LSK"
 //    }
-//}
+}
