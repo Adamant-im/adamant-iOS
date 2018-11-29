@@ -152,11 +152,12 @@ extension EthWalletService: RichMessageProvider {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
     }()
     
-    func shortDescription(for transaction: RichMessageTransaction) -> String {
+    func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         let amount: String
+        let string: String
         
         guard let raw = transaction.richContent?[RichContentKeys.transfer.amount] else {
-            return "⬅️  \(EthWalletService.currencySymbol)"
+            return NSAttributedString(string: "⬅️  \(EthWalletService.currencySymbol)")
         }
         
         if let decimal = Decimal(string: raw) {
@@ -166,9 +167,11 @@ extension EthWalletService: RichMessageProvider {
         }
         
         if transaction.isOutgoing {
-            return "⬅️  \(amount) \(EthWalletService.currencySymbol)"
+            string = "⬅️  \(amount) \(EthWalletService.currencySymbol)"
         } else {
-            return "➡️  \(amount) \(EthWalletService.currencySymbol)"
+            string = "➡️  \(amount) \(EthWalletService.currencySymbol)"
         }
+        
+        return NSAttributedString(string: string)
     }
 }

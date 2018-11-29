@@ -91,12 +91,12 @@ extension AdmWalletService: RichMessageProvider {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
     }()
     
-    func shortDescription(for transaction: RichMessageTransaction) -> String {
+    func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         guard let balance = transaction.amount as Decimal? else {
-            return ""
+            return NSAttributedString(string: "")
         }
         
-        return shortDescription(isOutgoing: transaction.isOutgoing, balance: balance)
+        return NSAttributedString(string: shortDescription(isOutgoing: transaction.isOutgoing, balance: balance))
     }
     
     /// For ADM transfers
