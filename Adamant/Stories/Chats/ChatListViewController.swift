@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import Haring
 
 extension String.adamantLocalized {
 	struct chatList {
@@ -55,6 +56,8 @@ class ChatListViewController: UIViewController {
         
         return refreshControl
     }()
+    
+    private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize))
 	
     // MARK: Busy indicator
     
@@ -357,7 +360,7 @@ extension ChatListViewController {
 		cell.hasUnreadMessages = chatroom.hasUnreadMessages
         
         if let lastTransaction = chatroom.lastTransaction {
-            cell.lastMessageLabel.text = shortDescription(for: lastTransaction)
+            cell.lastMessageLabel.attributedText = shortDescription(for: lastTransaction)
         } else {
             cell.lastMessageLabel.text = nil
         }
@@ -527,7 +530,7 @@ extension ChatListViewController {
 		}
 		
 		// MARK: 4. Show notification with tap handler
-		dialogService.showNotification(title: title, message: text, image: image) { [weak self] in
+		dialogService.showNotification(title: title, message: text?.string, image: image) { [weak self] in
 			DispatchQueue.main.async {
 				self?.presentChatroom(chatroom)
 			}
@@ -561,39 +564,45 @@ extension ChatListViewController {
 		}
 	}
     
-    private func shortDescription(for transaction: ChatTransaction) -> String? {
+    private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
         switch transaction {
         case let message as MessageTransaction:
             guard let text = message.message else {
                 return nil
             }
             
+            let raw: String
             if message.isOutgoing {
-                return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, text)
+                raw = String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, text)
             } else {
-                return text
+                raw = text
             }
+            
+            return markdownParser.parse(raw)
             
         case let transfer as TransferTransaction:
             if let admService = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService {
-                return admService.shortDescription(for: transfer)
+                return markdownParser.parse(admService.shortDescription(for: transfer))
             } else {
                 return nil
             }
             
         case let richMessage as RichMessageTransaction:
-            let description: String
+            let description: NSAttributedString
             
             if let type = richMessage.richType, let provider = richMessageProviders[type] {
                 description = provider.shortDescription(for: richMessage)
             } else if let serialized = richMessage.serializedMessage() {
-                description = serialized
+                description = NSAttributedString(string: serialized)
             } else {
                 return nil
             }
             
             if richMessage.isOutgoing {
-                return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, description)
+                let mutable = NSMutableAttributedString(attributedString: description)
+                let prefix = NSAttributedString(string: String.adamantLocalized.chatList.sentMessagePrefix)
+                mutable.insert(prefix, at: 0)
+                return mutable.attributedSubstring(from: NSRange(location: 0, length: mutable.length))
             } else {
                 return description
             }
