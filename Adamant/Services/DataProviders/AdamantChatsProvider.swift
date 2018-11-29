@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import Haring
 
 class AdamantChatsProvider: ChatsProvider {
 	// MARK: Dependencies
@@ -39,6 +40,8 @@ class AdamantChatsProvider: ChatsProvider {
 	private let highSemaphore = DispatchSemaphore(value: 1)
 	private let stateSemaphore = DispatchSemaphore(value: 1)
 	
+    private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
+    
 	// MARK: Lifecycle
 	init() {
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
@@ -287,8 +290,11 @@ extension AdamantChatsProvider {
         
         sendingQueue.async {
             switch message {
-			case .text(let text), .markdownText(let text):
-                self.sendTextMessage(text: text, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
+            case .text(let text):
+                self.sendTextMessage(text: text, isMarkdown: false, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
+                
+            case .markdownText(let text):
+                self.sendTextMessage(text: text, isMarkdown: true, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
 				
 			case .richMessage(let payload):
                 self.sendRichMessage(richContent: payload.content(), richType: payload.type, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, completion: completion)
@@ -296,7 +302,7 @@ extension AdamantChatsProvider {
         }
     }
 	
-    private func sendTextMessage(text: String, senderId: String, recipientId: String, keypair: Keypair, type: ChatType, completion: @escaping (ChatsProviderResult) -> Void) {
+    private func sendTextMessage(text: String, isMarkdown: Bool, senderId: String, recipientId: String, keypair: Keypair, type: ChatType, completion: @escaping (ChatsProviderResult) -> Void) {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = stack.container.viewContext
         
@@ -307,6 +313,7 @@ extension AdamantChatsProvider {
         transaction.type = Int16(type.rawValue)
         transaction.isOutgoing = true
         transaction.chatMessageId = UUID().uuidString
+        transaction.isMarkdown = isMarkdown
         
         transaction.message = text
         
@@ -969,6 +976,10 @@ extension AdamantChatsProvider {
                     let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                     trs.message = decodedMessage
                     messageTransaction = trs
+                    
+                    let markdown = markdownParser.parse(decodedMessage)
+                    
+                    trs.isMarkdown = markdown.length != decodedMessage.count
                 }
                 
             // MARK: Rich message
