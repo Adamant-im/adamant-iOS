@@ -67,11 +67,11 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
         
         let transaction = transactions[indexPath.row]
         
-        guard let controller = router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? TransactionDetailsViewControllerBase else {
+        guard let controller = router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? TransactionDetailsViewControllerBase else {
             return
         }
         
-//        controller.transaction = transaction
+        controller.transaction = transaction
         navigationController?.pushViewController(controller, animated: true)
     }
     
@@ -154,48 +154,4 @@ extension Transactions.TransactionModel: TransactionDetails {
     var sentDate: Date {
         return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
     }
-
-//    var amountValue: Double {
-//        guard let string = Web3.Utils.formatToPrecision(BigUInt(self.amount) ?? BigUInt(0), numberDecimals: 8, formattingDecimals: 8, decimalSeparator: ".", fallbackToScientific: false), let value = Double(string) else {
-//            return 0
-//        }
-//
-//        return value
-//    }
-//
-//    var feeValue: Double {
-//        guard let string = Web3.Utils.formatToPrecision(BigUInt(self.fee) ?? BigUInt(0), numberDecimals: 8, formattingDecimals: 8, decimalSeparator: ".", fallbackToScientific: false), let value = Double(string) else {
-//            return 0
-//        }
-//
-//        return value
-//    }
-//
-//    var confirmationsValue: String {
-//        return "\(self.confirmations)"
-//    }
-//
-//    var block: String {
-//        return self.blockId
-//    }
-//
-//    var showGoToExplorer: Bool {
-//        return true
-//    }
-//
-//    var explorerUrl: URL? {
-//        return URL(string: "https://testnet-explorer.lisk.io/tx/\(id)")
-//    }
-//
-//    var showGoToChat: Bool {
-//        return false
-//    }
-//
-//    var chatroom: Chatroom? {
-//        return nil
-//    }
-//
-//    var currencyCode: String {
-//        return "LSK"
-//    }
 }

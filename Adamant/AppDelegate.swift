@@ -71,6 +71,8 @@ struct AdamantResources {
     static let adamantExplorerAddress = "https://explorer.adamant.im/tx/"
     static let ethereumExplorerAddress = "https://etherscan.io/tx/"
 //    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
+//    static let liskExplorerAddress = "https://explorer.lisk.io/tx/"
+    static let liskExplorerAddress = "https://testnet-explorer.lisk.io/tx/" // LISK Testnet
 	
 	private init() {}
 }

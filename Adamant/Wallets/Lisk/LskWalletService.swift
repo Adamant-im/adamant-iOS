@@ -430,7 +430,7 @@ extension LskWalletService {
         }
     }
     
-    func getTransaction(byHash hash: String, completion: @escaping (ApiServiceResult<Transactions.TransactionModel>) -> Void) {
+    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<Transactions.TransactionModel>) -> Void) {
         transactionApi.transactions(id: hash, limit: 1, offset: 0) { (response) in
             switch response {
             case .success(response: let result):
