@@ -24,7 +24,6 @@ class AdmWalletService: NSObject, WalletService {
 	weak var accountService: AccountService!
 	var apiService: ApiService!
 	var transfersProvider: TransfersProvider!
-    var chatsProvider: ChatsProvider!
     var router: Router!
 	
 	
@@ -151,7 +150,6 @@ extension AdmWalletService: SwinjectDependentService {
 		accountService = container.resolve(AccountService.self)
 		apiService = container.resolve(ApiService.self)
 		transfersProvider = container.resolve(TransfersProvider.self)
-        chatsProvider = container.resolve(ChatsProvider.self)
 		router = container.resolve(Router.self)
 		
 		let controller = transfersProvider.unreadTransfersController()

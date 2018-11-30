@@ -133,7 +133,6 @@ extension Container {
             provider.adamantCore = r.resolve(AdamantCore.self)
             provider.securedStore = r.resolve(SecuredStore.self)
             provider.accountsProvider = r.resolve(AccountsProvider.self)
-            provider.transfersProvider = r.resolve(TransfersProvider.self)
             
             let accountService = r.resolve(AccountService.self)!
             provider.accountService = accountService

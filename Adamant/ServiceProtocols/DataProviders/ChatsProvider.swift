@@ -178,7 +178,7 @@ protocol ChatsProvider: DataProvider {
     func update(completion: ((ChatsProviderResult?) -> Void)?)
 	
 	// MARK: - Sending messages
-    func sendMessage(_ message: AdamantMessage, amount: Decimal?, recipientId: String, completion: @escaping (ChatsProviderResultWithTransaction) -> Void )
+    func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResultWithTransaction) -> Void )
 	func retrySendMessage(_ message: ChatTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void)
     
     // MARK: - Delete local message

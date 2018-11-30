@@ -23,17 +23,17 @@ extension AdmWalletService: WalletServiceSimpleSend {
 	
 	
 	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<TransactionDetails>) -> Void) {
-        if comments.count > 0 {
-            chatsProvider.sendMessage(.text(comments), amount: amount, recipientId: recipient) { result in
-                switch result {
-                case .success(let transaction):
-                    completion(.success(result: transaction))
-                    
-                case .failure(let error):
-                    completion(.failure(error: error.asWalletServiceError()))
-                }
-            }
-        } else {
+//        if comments.count > 0 {
+//            chatsProvider.sendMessage(.text(comments), amount: amount, recipientId: recipient) { result in
+//                switch result {
+//                case .success(let transaction):
+//                    completion(.success(result: transaction))
+//
+//                case .failure(let error):
+//                    completion(.failure(error: error.asWalletServiceError()))
+//                }
+//            }
+//        } else {
             transfersProvider.transferFunds(toAddress: recipient, amount: amount) { result in
                 switch result {
                 case .success(let transaction):
@@ -43,7 +43,7 @@ extension AdmWalletService: WalletServiceSimpleSend {
                     completion(.failure(error: error.asWalletServiceError()))
                 }
             }
-        }
+//        }
 	}
 }
 
