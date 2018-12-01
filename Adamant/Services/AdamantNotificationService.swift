@@ -95,7 +95,7 @@ extension AdamantNotificationsService {
 			
         case .push:
             guard let account = accountService?.account, account.balance > AdamantApiService.KvsFee else {
-                completion?(.failure(error: .notEnoughtMoney))
+                completion?(.failure(error: .notEnoughMoney))
                 return
             }
             

@@ -28,7 +28,7 @@ enum WalletServiceResult<T> {
 
 enum WalletServiceError: Error {
 	case notLogged
-	case notEnoughtMoney
+	case notEnoughMoney
 	case networkError
 	case accountNotFound
 	case walletNotInitiated
@@ -45,8 +45,8 @@ extension WalletServiceError: RichError {
 		case .notLogged:
 			return String.adamantLocalized.sharedErrors.userNotLogged
 			
-		case .notEnoughtMoney:
-			return String.adamantLocalized.sharedErrors.notEnoughtMoney
+		case .notEnoughMoney:
+			return String.adamantLocalized.sharedErrors.notEnoughMoney
 			
 		case .networkError:
 			return String.adamantLocalized.sharedErrors.networkError
@@ -83,7 +83,7 @@ extension WalletServiceError: RichError {
 	
 	var level: ErrorLevel {
 		switch self {
-        case .notLogged, .notEnoughtMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated, .transactionNotFound:
+        case .notLogged, .notEnoughMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated, .transactionNotFound:
 			return .warning
 			
 		case .remoteServiceError, .internalError:
@@ -128,8 +128,8 @@ extension ChatsProviderError {
         case .messageNotValid(_):
             return .notLogged
             
-        case .notEnoughtMoneyToSend:
-            return .notEnoughtMoney
+        case .notEnoughMoneyToSend:
+            return .notEnoughMoney
             
         case .networkError:
             return .networkError

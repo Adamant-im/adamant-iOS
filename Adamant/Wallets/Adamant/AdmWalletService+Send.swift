@@ -64,6 +64,8 @@ extension TransfersProviderError {
             return .internalError(message: self.message, error: nil)
         case .internalError(let message, let error):
             return .internalError(message: message, error: error)
+        case .notEnoughMoney:
+            return .notEnoughMoney
         }
     }
 }

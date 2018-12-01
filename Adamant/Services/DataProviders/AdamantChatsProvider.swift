@@ -271,7 +271,7 @@ extension AdamantChatsProvider {
         }
         
         guard loggedAccount.balance >= message.fee else {
-            completion(.failure(.notEnoughtMoneyToSend))
+            completion(.failure(.notEnoughMoneyToSend))
             return
         }
         

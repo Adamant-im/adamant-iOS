@@ -31,7 +31,7 @@ enum ChatsProviderRetryCancelResult {
 enum ChatsProviderError: Error {
 	case notLogged
 	case messageNotValid(ValidateMessageResult)
-	case notEnoughtMoneyToSend
+	case notEnoughMoneyToSend
 	case networkError
 	case serverError(Error)
 	case accountNotFound(String)
@@ -49,8 +49,8 @@ extension ChatsProviderError: RichError {
 		case .messageNotValid(let result):
 			return result.localized
 			
-		case .notEnoughtMoneyToSend:
-			return NSLocalizedString("ChatsProvider.Error.NotEnoughtMoney", comment: "ChatsProvider: Notify user that he doesn't have money to pay a message fee")
+		case .notEnoughMoneyToSend:
+			return NSLocalizedString("ChatsProvider.Error.notEnoughMoney", comment: "ChatsProvider: Notify user that he doesn't have money to pay a message fee")
 			
 		case .networkError:
 			return String.adamantLocalized.sharedErrors.networkError
@@ -87,7 +87,7 @@ extension ChatsProviderError: RichError {
 			case .accountNotFound,
 				 .messageNotValid,
 				 .networkError,
-				 .notEnoughtMoneyToSend,
+				 .notEnoughMoneyToSend,
 				 .notLogged:
 			return .warning
 			

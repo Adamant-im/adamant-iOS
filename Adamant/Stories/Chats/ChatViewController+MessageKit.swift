@@ -527,7 +527,7 @@ extension ChatViewController: MessageInputBarDelegate {
 				
 			case .failure(let error):
 				switch error {
-				case .messageNotValid, .notEnoughtMoneyToSend:
+				case .messageNotValid, .notEnoughMoneyToSend:
 					DispatchQueue.main.async {
 						if inputBar.inputTextView.text.count == 0 {
 							inputBar.inputTextView.text = text
