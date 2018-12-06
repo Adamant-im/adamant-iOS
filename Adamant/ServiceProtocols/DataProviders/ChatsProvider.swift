@@ -187,6 +187,9 @@ protocol ChatsProvider: DataProvider {
 	// MARK: - Tools
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
 	
+    // MARK: - Unconfirmed Transaction
+    func addUnconfirmed(transactionId: UInt64, managedObjectId: NSManagedObjectID)
+    
 	// MARK: - Fake messages
     func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void)
     func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void)

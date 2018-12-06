@@ -104,6 +104,10 @@ extension ApiServiceError: Equatable {
 	}
 }
 
+protocol ServerResponseWithTimestamp {
+    var nodeTimestamp: TimeInterval { get }
+}
+
 
 // - MARK: ApiService
 protocol ApiService: class {
@@ -115,6 +119,10 @@ protocol ApiService: class {
 	
 	/// Current node
 	var node: Node? { get }
+    
+    /// Time interval between node (lhs) and client (rhs)
+    /// Substract this from client time to get server time
+    var nodeTimeDelta: TimeInterval? { get }
 	
 	/// Request new node from source
 	func refreshNode()
@@ -165,7 +173,7 @@ protocol ApiService: class {
 	
 	/// Send text message
 	///   - completion: Contains processed transactionId, if success, or AdamantError, if fails.
-    func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
+    func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, amount: Decimal?, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
 
     // MARK: - Delegates
     

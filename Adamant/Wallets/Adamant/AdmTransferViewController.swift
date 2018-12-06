@@ -50,6 +50,10 @@ class AdmTransferViewController: TransferViewControllerBase {
                 let detailsVC = self?.router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? AdmTransactionDetailsViewController
                 detailsVC?.transaction = result
                 
+                if comments.count > 0 {
+                    detailsVC?.comment = comments
+                }
+                
                 // MARK: Sender, you
                 detailsVC?.senderName = String.adamantLocalized.transactionDetails.yourAddress
                 

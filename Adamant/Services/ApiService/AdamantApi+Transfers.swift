@@ -9,8 +9,7 @@
 import Foundation
 
 extension AdamantApiService {
-	func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
-        
+    func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
         // MARK: 1. Prepare params
 		let params: [String : Any] = [
 			"type": TransactionType.send.rawValue,

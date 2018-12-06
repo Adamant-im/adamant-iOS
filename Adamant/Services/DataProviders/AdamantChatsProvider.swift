@@ -547,7 +547,7 @@ extension AdamantChatsProvider {
 		}
         
 		// MARK: 2. Send
-		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, type: type, nonce: encodedMessage.nonce) { result in
+        apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, type: type, nonce: encodedMessage.nonce, amount: nil) { result in
 			switch result {
 			case .success(let id):
 				// Update ID with recieved, add to unconfirmed transactions.
@@ -919,7 +919,16 @@ extension AdamantChatsProvider {
 
 // MARK: - Tools
 extension AdamantChatsProvider {
-	
+    func addUnconfirmed(transactionId id: UInt64, managedObjectId: NSManagedObjectID) {
+        unconfirmedsSemaphore.wait()
+        
+        DispatchQueue.main.sync {
+            self.unconfirmedTransactions[id] = managedObjectId
+        }
+        
+        unconfirmedsSemaphore.signal()
+    }
+    
 	/// Check if message is valid for sending
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult {
 		switch message {
