@@ -650,6 +650,15 @@ private class StatusUpdateProcedure: Procedure {
             case .success(let status):
                 transaction.transactionStatus = status
                 
+                if let date = transaction.dateValue {
+                    let timeAgo = -1 * date.timeIntervalSinceNow
+                    
+                    if status == .pending, timeAgo > 60 * 60 * 3 { // 3h waiting for panding status
+                        transaction.transactionStatus = .failed
+                        break
+                    }
+                }
+                
                 if status == .pending {
                     // 'self' is destroyed right after completion of this clousure, so we need to hold references
                     weak var controller = self.controller
