@@ -17,6 +17,7 @@ enum TransfersProviderError: Error {
 	case internalError(message: String, error: Error?)
 	case dependencyError(message: String)
 	case networkError
+    case notEnoughMoney
 }
 
 enum TransfersProviderResult {
@@ -52,6 +53,9 @@ extension TransfersProviderError: RichError {
 			
 		case .networkError:
 			return String.adamantLocalized.sharedErrors.networkError
+            
+        case .notEnoughMoney:
+            return String.adamantLocalized.sharedErrors.notEnoughMoney
 		}
 	}
 	
@@ -67,7 +71,7 @@ extension TransfersProviderError: RichError {
 	
 	var level: ErrorLevel {
 		switch self {
-		case .notLogged, .accountNotFound, .transactionNotFound, .networkError:
+		case .notLogged, .accountNotFound, .transactionNotFound, .networkError, .notEnoughMoney:
 			return .warning
 			
 		case .serverError, .internalError, .dependencyError:
@@ -140,7 +144,7 @@ protocol TransfersProvider: DataProvider {
     func update(completion: ((TransfersProviderResult?) -> Void)?)
 	
 	// MARK: - Sending funds
-	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderTransferResult) -> Void)
+    func transferFunds(toAddress recipient: String, amount: Decimal, comment: String?, completion: @escaping (TransfersProviderTransferResult) -> Void)
     
     // MARK: - Transactions
     func getTransfer(id: String) -> TransferTransaction?

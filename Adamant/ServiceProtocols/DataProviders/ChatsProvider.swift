@@ -17,6 +17,11 @@ enum ChatsProviderResult {
 	case failure(ChatsProviderError)
 }
 
+enum ChatsProviderResultWithTransaction {
+    case success(transaction: ChatTransaction)
+    case failure(ChatsProviderError)
+}
+
 enum ChatsProviderRetryCancelResult {
 	case success
 	case invalidTransactionStatus(MessageStatus)
@@ -26,7 +31,7 @@ enum ChatsProviderRetryCancelResult {
 enum ChatsProviderError: Error {
 	case notLogged
 	case messageNotValid(ValidateMessageResult)
-	case notEnoughtMoneyToSend
+	case notEnoughMoneyToSend
 	case networkError
 	case serverError(Error)
 	case accountNotFound(String)
@@ -44,8 +49,8 @@ extension ChatsProviderError: RichError {
 		case .messageNotValid(let result):
 			return result.localized
 			
-		case .notEnoughtMoneyToSend:
-			return NSLocalizedString("ChatsProvider.Error.NotEnoughtMoney", comment: "ChatsProvider: Notify user that he doesn't have money to pay a message fee")
+		case .notEnoughMoneyToSend:
+			return NSLocalizedString("ChatsProvider.Error.notEnoughMoney", comment: "ChatsProvider: Notify user that he doesn't have money to pay a message fee")
 			
 		case .networkError:
 			return String.adamantLocalized.sharedErrors.networkError
@@ -82,7 +87,7 @@ extension ChatsProviderError: RichError {
 			case .accountNotFound,
 				 .messageNotValid,
 				 .networkError,
-				 .notEnoughtMoneyToSend,
+				 .notEnoughMoneyToSend,
 				 .notLogged:
 			return .warning
 			
@@ -173,7 +178,7 @@ protocol ChatsProvider: DataProvider {
     func update(completion: ((ChatsProviderResult?) -> Void)?)
 	
 	// MARK: - Sending messages
-	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void )
+    func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResultWithTransaction) -> Void )
 	func retrySendMessage(_ message: ChatTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void)
     
     // MARK: - Delete local message
@@ -182,8 +187,11 @@ protocol ChatsProvider: DataProvider {
 	// MARK: - Tools
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
 	
+    // MARK: - Unconfirmed Transaction
+    func addUnconfirmed(transactionId: UInt64, managedObjectId: NSManagedObjectID)
+    
 	// MARK: - Fake messages
-    func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void)
-    func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResult) -> Void)
+    func fakeSent(message: AdamantMessage, recipientId: String, date: Date, status: MessageStatus, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void)
+    func fakeReceived(message: AdamantMessage, senderId: String, date: Date, unread: Bool, silent: Bool, showsChatroom: Bool, completion: @escaping (ChatsProviderResultWithTransaction) -> Void)
     func fakeUpdate(status: MessageStatus, forTransactionId id: String, completion: @escaping (ChatsProviderResult) -> Void)
 }

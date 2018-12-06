@@ -28,7 +28,7 @@ enum WalletServiceResult<T> {
 
 enum WalletServiceError: Error {
 	case notLogged
-	case notEnoughtMoney
+	case notEnoughMoney
 	case networkError
 	case accountNotFound
 	case walletNotInitiated
@@ -45,8 +45,8 @@ extension WalletServiceError: RichError {
 		case .notLogged:
 			return String.adamantLocalized.sharedErrors.userNotLogged
 			
-		case .notEnoughtMoney:
-			return String.adamantLocalized.sharedErrors.notEnoughtMoney
+		case .notEnoughMoney:
+			return String.adamantLocalized.sharedErrors.notEnoughMoney
 			
 		case .networkError:
 			return String.adamantLocalized.sharedErrors.networkError
@@ -83,7 +83,7 @@ extension WalletServiceError: RichError {
 	
 	var level: ErrorLevel {
 		switch self {
-        case .notLogged, .notEnoughtMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated, .transactionNotFound:
+        case .notLogged, .notEnoughMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated, .transactionNotFound:
 			return .warning
 			
 		case .remoteServiceError, .internalError:
@@ -117,6 +117,42 @@ extension ApiServiceError {
 			return .apiError(self)
 		}
 	}
+}
+
+extension ChatsProviderError {
+    func asWalletServiceError() -> WalletServiceError {
+        switch self {
+        case .notLogged:
+            return .notLogged
+            
+        case .messageNotValid(_):
+            return .notLogged
+            
+        case .notEnoughMoneyToSend:
+            return .notEnoughMoney
+            
+        case .networkError:
+            return .networkError
+            
+        case .serverError(let e as ApiServiceError):
+            return .apiError(e)
+            
+        case .serverError(let e):
+            return .internalError(message: self.message, error: e)
+            
+        case .accountNotFound(_):
+            return .accountNotFound
+            
+        case .dependencyError(let message):
+            return .internalError(message: message, error: nil)
+            
+        case .transactionNotFound(let id):
+            return .transactionNotFound(reason: "\(id)")
+            
+        case .internalError(let error):
+            return .internalError(message: self.message, error: error)
+        }
+    }
 }
 
 

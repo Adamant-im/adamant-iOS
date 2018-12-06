@@ -264,14 +264,14 @@ extension AdamantChatsProvider {
 
 // MARK: - Sending messages {
 extension AdamantChatsProvider {
-	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+    func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
             completion(.failure(.notLogged))
             return
         }
         
         guard loggedAccount.balance >= message.fee else {
-            completion(.failure(.notEnoughtMoneyToSend))
+            completion(.failure(.notEnoughMoneyToSend))
             return
         }
         
@@ -302,7 +302,7 @@ extension AdamantChatsProvider {
         }
     }
 	
-    private func sendTextMessage(text: String, isMarkdown: Bool, senderId: String, recipientId: String, keypair: Keypair, type: ChatType, completion: @escaping (ChatsProviderResult) -> Void) {
+    private func sendTextMessage(text: String, isMarkdown: Bool, senderId: String, recipientId: String, keypair: Keypair, type: ChatType, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = stack.container.viewContext
         
@@ -320,7 +320,7 @@ extension AdamantChatsProvider {
         prepareAndSendChatTransaction(transaction, in: context, recipientId: recipientId, type: type, keypair: keypair, completion: completion)
     }
     
-    private func sendRichMessage(richContent: [String:String], richType: String, senderId: String, recipientId: String, keypair: Keypair, completion: @escaping (ChatsProviderResult) -> Void) {
+    private func sendRichMessage(richContent: [String:String], richType: String, senderId: String, recipientId: String, keypair: Keypair, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = stack.container.viewContext
         
@@ -344,7 +344,7 @@ extension AdamantChatsProvider {
     
     
     /// Transaction must be in passed context
-    private func prepareAndSendChatTransaction(_ transaction: ChatTransaction, in context: NSManagedObjectContext, recipientId: String, type: ChatType, keypair: Keypair, completion: @escaping (ChatsProviderResult) -> Void) {
+    private func prepareAndSendChatTransaction(_ transaction: ChatTransaction, in context: NSManagedObjectContext, recipientId: String, type: ChatType, keypair: Keypair, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         // MARK: 1. Get account
         let accountsGroup = DispatchGroup()
         accountsGroup.enter()
@@ -414,10 +414,10 @@ extension AdamantChatsProvider {
         // MARK: 6. Send
         sendTransaction(transaction, type: type, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
             switch result {
-            case .success:
+            case .success(let transaction):
                 do {
                     try context.save()
-                    completion(.success)
+                    completion(.success(transaction: transaction))
                 } catch {
                     completion(.failure(.internalError(error)))
                 }
@@ -532,7 +532,7 @@ extension AdamantChatsProvider {
 	///
 	/// If success - update transaction's id and add it to unconfirmed transactions.
 	/// If fails - set transaction status to .failed
-	private func sendTransaction(_ transaction: ChatTransaction, type: ChatType, keypair: Keypair, recipientPublicKey: String, completion: @escaping (ChatsProviderResult) -> Void) {
+	private func sendTransaction(_ transaction: ChatTransaction, type: ChatType, keypair: Keypair, recipientPublicKey: String, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
 		// MARK: 0. Prepare
 		guard let senderId = transaction.senderId,
 			let recipientId = transaction.recipientId else {
@@ -545,9 +545,9 @@ extension AdamantChatsProvider {
 			completion(.failure(.dependencyError("Failed to encode message")))
 			return
 		}
-		
+        
 		// MARK: 2. Send
-		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, type: type, nonce: encodedMessage.nonce) { result in
+        apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, type: type, nonce: encodedMessage.nonce, amount: nil) { result in
 			switch result {
 			case .success(let id):
 				// Update ID with recieved, add to unconfirmed transactions.
@@ -559,7 +559,7 @@ extension AdamantChatsProvider {
 				}
 				self.unconfirmedsSemaphore.signal()
 				
-				completion(.success)
+                completion(.success(transaction: transaction))
 				
 			case .failure(let error):
 				transaction.statusEnum = MessageStatus.failed
@@ -919,7 +919,16 @@ extension AdamantChatsProvider {
 
 // MARK: - Tools
 extension AdamantChatsProvider {
-	
+    func addUnconfirmed(transactionId id: UInt64, managedObjectId: NSManagedObjectID) {
+        unconfirmedsSemaphore.wait()
+        
+        DispatchQueue.main.sync {
+            self.unconfirmedTransactions[id] = managedObjectId
+        }
+        
+        unconfirmedsSemaphore.signal()
+    }
+    
 	/// Check if message is valid for sending
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult {
 		switch message {

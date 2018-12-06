@@ -168,7 +168,7 @@ class NotificationsViewController: FormViewController {
                 }
                 
                 switch error {
-                case .notEnoughtMoney:
+                case .notEnoughMoney:
                     self?.dialogService.showRichError(error: error)
                     
                 case .denied:

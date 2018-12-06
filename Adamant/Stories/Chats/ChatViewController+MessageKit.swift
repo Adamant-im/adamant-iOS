@@ -521,13 +521,13 @@ extension ChatViewController: MessageInputBarDelegate {
 			return
 		}
 		
-		chatsProvider.sendMessage(message, recipientId: partner, completion: { [weak self] result in
+        chatsProvider.sendMessage(message, recipientId: partner, completion: { [weak self] result in
 			switch result {
 			case .success: break
 				
 			case .failure(let error):
 				switch error {
-				case .messageNotValid, .notEnoughtMoneyToSend:
+				case .messageNotValid, .notEnoughMoneyToSend:
 					DispatchQueue.main.async {
 						if inputBar.inputTextView.text.count == 0 {
 							inputBar.inputTextView.text = text
