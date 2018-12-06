@@ -11,8 +11,10 @@
 		6414C18E217DF43100373FA6 /* String+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6414C18D217DF43100373FA6 /* String+adamant.swift */; };
 		6416B19D21AD7B92006089AC /* LskWalletRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B19C21AD7B92006089AC /* LskWalletRoutes.swift */; };
 		6416B19F21AD7CBE006089AC /* LskWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B19E21AD7CBE006089AC /* LskWalletViewController.swift */; };
+		6416B1A121AD7D93006089AC /* LskTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B1A021AD7D93006089AC /* LskTransferViewController.swift */; };
 		6416B1A321AD7EA1006089AC /* LskTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B1A221AD7EA1006089AC /* LskTransactionDetailsViewController.swift */; };
 		6416B1A521AEE157006089AC /* LskWalletService+Transfers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B1A421AEE157006089AC /* LskWalletService+Transfers.swift */; };
+		6416B1A721B024B6006089AC /* LskWalletService+Send.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B1A621B024B6006089AC /* LskWalletService+Send.swift */; };
 		642361BE20E3869D0061559E /* eth_l18n.strings in Resources */ = {isa = PBXBuildFile; fileRef = 642361BD20E3869D0061559E /* eth_l18n.strings */; };
 		643ED0B12109F4BD005A9FDA /* NativeAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643ED0B02109F4BD005A9FDA /* NativeAdamantCore.swift */; };
 		644EC34D20EFA60900F40C73 /* AdamantApi+Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC34C20EFA60900F40C73 /* AdamantApi+Delegates.swift */; };
@@ -282,8 +284,10 @@
 		6414C18D217DF43100373FA6 /* String+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+adamant.swift"; sourceTree = "<group>"; };
 		6416B19C21AD7B92006089AC /* LskWalletRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskWalletRoutes.swift; sourceTree = "<group>"; };
 		6416B19E21AD7CBE006089AC /* LskWalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskWalletViewController.swift; sourceTree = "<group>"; };
+		6416B1A021AD7D93006089AC /* LskTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskTransferViewController.swift; sourceTree = "<group>"; };
 		6416B1A221AD7EA1006089AC /* LskTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskTransactionDetailsViewController.swift; sourceTree = "<group>"; };
 		6416B1A421AEE157006089AC /* LskWalletService+Transfers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LskWalletService+Transfers.swift"; sourceTree = "<group>"; };
+		6416B1A621B024B6006089AC /* LskWalletService+Send.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LskWalletService+Send.swift"; sourceTree = "<group>"; };
 		642361BD20E3869D0061559E /* eth_l18n.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = eth_l18n.strings; sourceTree = "<group>"; };
 		643ED0B02109F4BD005A9FDA /* NativeAdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAdamantCore.swift; sourceTree = "<group>"; };
 		644EC34C20EFA60900F40C73 /* AdamantApi+Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Delegates.swift"; sourceTree = "<group>"; };
@@ -888,8 +892,10 @@
 				6416B19C21AD7B92006089AC /* LskWalletRoutes.swift */,
 				E94008822114EE4700CD2D67 /* LskWallet.swift */,
 				E94008842114EE7500CD2D67 /* LskWalletService.swift */,
+				6416B1A621B024B6006089AC /* LskWalletService+Send.swift */,
 				6416B1A421AEE157006089AC /* LskWalletService+Transfers.swift */,
 				6416B19E21AD7CBE006089AC /* LskWalletViewController.swift */,
+				6416B1A021AD7D93006089AC /* LskTransferViewController.swift */,
 				64EE46B120FE0C8D00194DDA /* LskTransactionsViewController.swift */,
 				6416B1A221AD7EA1006089AC /* LskTransactionDetailsViewController.swift */,
 			);
@@ -1497,6 +1503,7 @@
 				E9220E0D21988EEA009C9642 /* (null) in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */,
+				6416B1A721B024B6006089AC /* LskWalletService+Send.swift in Sources */,
 				E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */,
 				E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */,
 				E9AA8C02212C5BF500F9249F /* AdmWalletService+Send.swift in Sources */,
@@ -1568,6 +1575,7 @@
 				E9CAE8D62018AC5300345E76 /* AdamantApi+Transactions.swift in Sources */,
 				E93D7ABE2052CEE1005D19DC /* NotificationsService.swift in Sources */,
 				E940087D2114EDEE00CD2D67 /* EthWallet.swift in Sources */,
+				6416B1A121AD7D93006089AC /* LskTransferViewController.swift in Sources */,
 				E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */,
 				E9FEECA421413659007DD7C8 /* RichMessageProvider.swift in Sources */,
 				6416B1A321AD7EA1006089AC /* LskTransactionDetailsViewController.swift in Sources */,

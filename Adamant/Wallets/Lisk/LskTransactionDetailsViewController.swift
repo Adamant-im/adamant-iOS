@@ -27,7 +27,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
-        currencySymbol = EthWalletService.currencySymbol
+        currencySymbol = LskWalletService.currencySymbol
         
         super.viewDidLoad()
         
@@ -45,13 +45,13 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     // MARK: - Overrides
     
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
-        let id = transaction.id
+        let id = transaction.txId
         
         return URL(string: "\(AdamantResources.liskExplorerAddress)\(id)")
     }
     
     @objc func refresh() {
-        guard let id = transaction?.id, let service = service else {
+        guard let id = transaction?.txId, let service = service else {
             refreshControl.endRefreshing()
             return
         }
@@ -81,7 +81,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     func startUpdate() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            guard let id = self?.transaction?.id, let service = self?.service else {
+            guard let id = self?.transaction?.txId, let service = self?.service else {
                 return
             }
             

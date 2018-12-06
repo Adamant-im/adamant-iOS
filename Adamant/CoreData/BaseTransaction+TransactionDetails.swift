@@ -9,7 +9,7 @@
 import Foundation
 
 extension BaseTransaction: TransactionDetails {
-    var id: String { return transactionId ?? "" }
+    var txId: String { return transactionId ?? "" }
     var senderAddress: String { return senderId ?? "" }
     var recipientAddress: String { return recipientId ?? "" }
     var dateValue: Date? { return date as Date? }

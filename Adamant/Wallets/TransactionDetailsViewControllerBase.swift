@@ -143,7 +143,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.tag = Rows.transactionNumber.tag
             $0.title = Rows.transactionNumber.localized
             
-            if let value = transaction?.id {
+            if let value = transaction?.txId {
                 $0.value = value
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
@@ -157,7 +157,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
             
-            if let value = self?.transaction?.id {
+            if let value = self?.transaction?.txId {
                 row.value = value
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString

@@ -107,6 +107,9 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
 }
 
 extension Transactions.TransactionModel: TransactionDetails {
+    var txId: String {
+        return id
+    }
     
     var dateValue: Date? {
         return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
@@ -154,4 +157,51 @@ extension Transactions.TransactionModel: TransactionDetails {
     var sentDate: Date {
         return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
     }
+}
+
+extension LocalTransaction: TransactionDetails {
+    var txId: String {
+        return id ?? ""
+    }
+    
+    var senderAddress: String {
+        return self.senderPublicKey ?? ""
+    }
+    
+    var recipientAddress: String {
+        return self.recipientId ?? ""
+    }
+    
+    var dateValue: Date? {
+        return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
+    }
+    
+    var amountValue: Decimal {
+        let value = BigUInt(self.amount)
+        
+        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+    }
+    
+    var feeValue: Decimal? {
+        let value = BigUInt(self.fee)
+        
+        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+    }
+    
+    var confirmationsValue: String? {
+        return nil
+    }
+    
+    var blockValue: String? {
+        return nil
+    }
+    
+    var isOutgoing: Bool {
+        return true
+    }
+    
+    var transactionStatus: TransactionStatus? {
+        return .pending
+    }
+    
 }

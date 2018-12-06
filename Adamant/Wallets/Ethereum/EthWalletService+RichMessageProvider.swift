@@ -87,7 +87,7 @@ extension EthWalletService: RichMessageProvider {
                         amount = 0
                     }
                     
-                    let failedTransaction = SimpleTransactionDetails(id: hash,
+                    let failedTransaction = SimpleTransactionDetails(txId: hash,
                                                              senderAddress: transaction.senderAddress,
                                                              recipientAddress: transaction.recipientAddress,
                                                              dateValue: nil,

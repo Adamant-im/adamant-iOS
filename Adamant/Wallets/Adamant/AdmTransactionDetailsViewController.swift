@@ -67,7 +67,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     // MARK: - Overrides
     
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
-        let id = transaction.id
+        let id = transaction.txId
         
         return URL(string: "\(AdamantResources.adamantExplorerAddress)\(id)")
     }
@@ -108,7 +108,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     func startUpdate() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            guard let id = self?.transaction?.id else {
+            guard let id = self?.transaction?.txId else {
                 return
             }
             

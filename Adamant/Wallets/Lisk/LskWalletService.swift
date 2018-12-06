@@ -27,9 +27,11 @@ class LskWalletService: WalletService {
         return vc
     }
 	
-	let walletUpdatedNotification = Notification.Name("lsk.update")
-	let serviceEnabledChanged = Notification.Name("lsk.enabledChanged")
-    let serviceStateChanged = Notification.Name("lsk.stateChanged")
+    // MARK: - Notifications
+    let walletUpdatedNotification = Notification.Name("adamant.lskhWallet.walletUpdated")
+    let serviceEnabledChanged = Notification.Name("adamant.lskWallet.enabledChanged")
+    let transactionFeeUpdated = Notification.Name("adamant.lskWallet.feeUpdated")
+    let serviceStateChanged = Notification.Name("adamant.lskWallet.stateChanged")
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "lsk_transaction"
@@ -61,10 +63,12 @@ class LskWalletService: WalletService {
 	let transferAvailable: Bool = true
     private var initialBalanceCheck = false
     
-    private var accountApi: Accounts!
-    private var transactionApi: Transactions!
+    internal var accountApi: Accounts!
+    internal var transactionApi: Transactions!
     
     private (set) var lskWallet: LskWallet? = nil
+    
+    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.lskWalletService", qos: .utility, attributes: [.concurrent])
 	
 	// MARK: - State
 	private (set) var state: WalletServiceState = .notInitiated
@@ -171,7 +175,7 @@ class LskWalletService: WalletService {
 	func validate(address: String) -> AddressValidationResult {
 		let value = address.replacingOccurrences(of: "L", with: "")
 		
-        if addressRegex.perfectMatch(with: value), let number = BigUInt(value), number < maxAddressNumber {
+        if addressRegex.perfectMatch(with: address), let number = BigUInt(value), number < maxAddressNumber {
             return .valid
         }
 		return .invalid
@@ -345,8 +349,9 @@ extension LskWalletService {
                         let balance = BigUInt(account.balance ?? "0") ?? BigUInt(0)
                         
                         completion(.success(result: balance.asDecimal(exponent: LskWalletService.currencyExponent)))
+                    } else {
+                        completion(.success(result: 0))
                     }
-                    
                     
                     break
                 case .error(response: let error):
