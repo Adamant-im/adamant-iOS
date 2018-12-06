@@ -22,6 +22,7 @@ PODS:
   - libCEd25519 (1.1.0)
   - libsodium (1.0.12)
   - Lisk (1.0.0):
+    - CryptoSwift (~> 0.12.0)
     - Ed25519 (~> 1.1.0)
   - MessageInputBar/Core (0.4.0)
   - MessageKit (1.0.0):
@@ -124,7 +125,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   Lisk:
-    :commit: 952fea02d6076668f68eb252ec5bd8bf4e656960
+    :commit: cdc362726e0fd42e900b87d8918d874d635492a6
     :git: https://github.com/boyarkin-anton/lisk-swift.git
   MessageKit:
     :commit: 4409d10a7dcf390abbb696d280ec02025e89f4e7
@@ -145,7 +146,7 @@ SPEC CHECKSUMS:
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
   libCEd25519: 45de00a0944cb2d51e64fcef67bd9989c42d20ca
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
-  Lisk: a900424110c208c425102ee8b6fd60d9b6b878c3
+  Lisk: 1720448e52a2e38b35d94df0650c1692c8b83e81
   MessageInputBar: d46ecc5b355d13433b8367dcd200e05a6564f0ed
   MessageKit: 0aaaa6115a9b4497a65fcdfed5dad270fbc8f2b2
   MyLittlePinpad: 5d57cb5a092ddbeb5c4e6fa0b46df83bd3e88b0c
@@ -163,6 +164,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: 4895c765c9858eb4737ef222eb8643bb5fc7fdb3
 
-PODFILE CHECKSUM: 17981ca7dbf7440ef8c4e90c4b889b8aa510e6ad
+PODFILE CHECKSUM: 128111df3bc687d33010bfd38806242309494578
 
 COCOAPODS: 1.6.0.beta.1

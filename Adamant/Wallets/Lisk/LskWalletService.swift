@@ -218,7 +218,7 @@ extension LskWalletService: InitiatedWithPassphraseService {
         
         // MARK: 2. Create keys and addresses
         do {
-            let keyPair = try Lisk.Crypto.keyPair(fromPassphrase: passphrase)
+            let keyPair = try Lisk.Crypto.keyPair(fromPassphrase: passphrase, salt: "adm")
             let address = Lisk.Crypto.address(fromPublicKey: keyPair.publicKeyString)
             
             // MARK: 3. Update
