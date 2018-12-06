@@ -130,6 +130,7 @@ class AccountViewController: FormViewController {
 	var transfersProvider: TransfersProvider!
     var localAuth: LocalAuthentication!
 	
+    var avatarService: AvatarService!
 	
 	// MARK: - Properties
 	
@@ -580,6 +581,15 @@ class AccountViewController: FormViewController {
 		}
 		
 		accountHeaderView.addressButton.setTitle(address, for: .normal)
+        
+        if let publickey = accountService.keypair?.publicKey {
+            DispatchQueue.global().async {
+                let image = self.avatarService.avatar(for: publickey, size: 200)
+                DispatchQueue.main.async {
+                    self.accountHeaderView.avatarImageView.image = image
+                }
+            }
+        }
 	}
 }
 

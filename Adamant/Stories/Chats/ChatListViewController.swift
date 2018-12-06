@@ -32,6 +32,7 @@ class ChatListViewController: UIViewController {
 	var notificationsService: NotificationsService!
 	var dialogService: DialogService!
 	var addressBook: AddressBookService!
+    var avatarService: AvatarService!
     
     var richMessageProviders = [String:RichMessageProvider]()
 	
@@ -351,7 +352,20 @@ extension ChatListViewController {
 				cell.avatarImage = avatar
 				cell.avatarImageView.tintColor = UIColor.adamant.primary
 			} else {
-				cell.avatarImage = nil
+                if let address = partner.publicKey {
+                    DispatchQueue.global().async {
+                        let image = self.avatarService.avatar(for: address, size: 200)
+                        DispatchQueue.main.async {
+                            cell.avatarImage = image
+                        }
+                    }
+                    
+                    cell.avatarImageView.roundingMode = .round
+                    cell.avatarImageView.clipsToBounds = true
+                } else {
+                    cell.avatarImage = nil
+                }
+                cell.borderWidth = 0
 			}
 		} else if let title = chatroom.title {
 			cell.accountLabel.text = title
