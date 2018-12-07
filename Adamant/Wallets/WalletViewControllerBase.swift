@@ -95,7 +95,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 let types: [ShareType]
                 
                 if let encodedAddress = self?.encodeForQr(address: address) {
-                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address)]
+                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)]
                 } else {
                     types = [.copyToPasteboard, .share]
                 }

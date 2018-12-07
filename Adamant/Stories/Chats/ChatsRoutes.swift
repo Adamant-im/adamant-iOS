@@ -19,6 +19,7 @@ extension AdamantScene {
 			c.notificationsService = r.resolve(NotificationsService.self)
 			c.dialogService = r.resolve(DialogService.self)
 			c.addressBook = r.resolve(AddressBookService.self)
+            c.avatarService = r.resolve(AvatarService.self)
             
             // MARK: RichMessage handlers
             // Transfer handlers from accountService' wallet services

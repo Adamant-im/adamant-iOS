@@ -269,7 +269,7 @@ class LoginViewController: FormViewController {
 			
 			let encodedPassphrase = AdamantUriTools.encode(request: AdamantUri.passphrase(passphrase: passphrase))
 			dialogService.presentShareAlertFor(string: passphrase,
-                                               types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedPassphrase, sharingTip: nil)],
+                                               types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedPassphrase, sharingTip: nil, withLogo: false)],
 											   excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
                                                animated: true, from: cell,
 											   completion: nil)

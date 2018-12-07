@@ -261,9 +261,9 @@ extension AdamantDialogService {
                     self?.present(vc, animated: true, completion: completion)
                 })
                 
-            case .generateQr(let encodedContent, let sharingTip):
+            case .generateQr(let encodedContent, let sharingTip, let withLogo):
                 alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-                    switch AdamantQRTools.generateQrFrom(string: encodedContent ?? string) {
+                    switch AdamantQRTools.generateQrFrom(string: encodedContent ?? string, withLogo: withLogo) {
                     case .success(let qr):
                         guard let vc = self?.router.get(scene: AdamantScene.Shared.shareQr) as? ShareQrViewController else {
                             fatalError("Can't find ShareQrViewController")

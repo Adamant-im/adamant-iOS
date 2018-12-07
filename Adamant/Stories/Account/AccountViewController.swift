@@ -130,6 +130,7 @@ class AccountViewController: FormViewController {
 	var transfersProvider: TransfersProvider!
     var localAuth: LocalAuthentication!
 	
+    var avatarService: AvatarService!
 	
 	// MARK: - Properties
 	
@@ -626,6 +627,15 @@ class AccountViewController: FormViewController {
 		}
 		
 		accountHeaderView.addressButton.setTitle(address, for: .normal)
+        
+        if let publickey = accountService.keypair?.publicKey {
+            DispatchQueue.global().async {
+                let image = self.avatarService.avatar(for: publickey, size: 200)
+                DispatchQueue.main.async {
+                    self.accountHeaderView.avatarImageView.image = image
+                }
+            }
+        }
 	}
     
     func layoutTableHeaderView() {
@@ -682,7 +692,7 @@ extension AccountViewController: AccountHeaderViewDelegate {
 		
 		let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
 		dialogService.presentShareAlertFor(string: address,
-                                           types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address)],
+                                           types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
 										   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                                            animated: true, from: from,
 										   completion: completion)

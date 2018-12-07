@@ -19,13 +19,12 @@ class AdmWalletService: NSObject, WalletService {
 	let transactionFee: Decimal = 0.5
 	static var currencySymbol = "ADM"
 	static var currencyLogo = #imageLiteral(resourceName: "wallet_adm")
-	let commentsEnabledForRichMessages = false
 	
 	// MARK: - Dependencies
 	weak var accountService: AccountService!
 	var apiService: ApiService!
 	var transfersProvider: TransfersProvider!
-	var router: Router!
+    var router: Router!
 	
 	
 	// MARK: - Notifications

@@ -12,7 +12,8 @@ import FreakingSimpleRoundImageView
 class ChatTableViewCell: UITableViewCell {
 	
 	static var defaultAvatar: UIImage = #imageLiteral(resourceName: "avatar-chat-placeholder")
-	
+    static let shortDescriptionTextSize: CGFloat = 15.0
+    
 	// MARK: - IBOutlets
 	@IBOutlet weak var avatarImageView: RoundImageView!
 	@IBOutlet weak var accountLabel: UILabel!

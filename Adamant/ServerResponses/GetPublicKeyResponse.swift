@@ -15,9 +15,10 @@ class GetPublicKeyResponse: ServerResponse {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let success = try container.decode(Bool.self, forKey: .success)
 		let error = try? container.decode(String.self, forKey: .error)
+        let nodeTimestamp = try container.decode(TimeInterval.self, forKey: CodingKeys.nodeTimestamp)
 		self.publicKey = try? container.decode(String.self, forKey: CodingKeys.init(stringValue: "publicKey")!)
 		
-		super.init(success: success, error: error)
+        super.init(success: success, error: error, nodeTimestamp: nodeTimestamp)
 	}
 }
 

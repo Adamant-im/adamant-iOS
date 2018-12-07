@@ -25,7 +25,7 @@ protocol RichMessageProvider: class {
     func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController)
     
     // MARK: Chats list
-    func shortDescription(for transaction: RichMessageTransaction) -> String
+    func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
     
     // MARK: MessageKit
     func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator

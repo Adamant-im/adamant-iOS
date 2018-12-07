@@ -58,11 +58,29 @@ class AdamantApiService: ApiService {
 	
 	// MARK: - Properties
 	
-	var node: Node? {
+	private(set) var node: Node? {
 		didSet {
 			currentUrl = node?.asURL()
 		}
 	}
+    
+    private var _nodeTimeDelta: TimeInterval?
+    private var nodeTimeDeltaSemaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
+    
+    private(set) var nodeTimeDelta: TimeInterval? {
+        get {
+            defer { nodeTimeDeltaSemaphore.signal() }
+            nodeTimeDeltaSemaphore.wait()
+            
+            return _nodeTimeDelta
+        }
+        set {
+            nodeTimeDeltaSemaphore.wait()
+            _nodeTimeDelta = newValue
+            nodeTimeDeltaSemaphore.signal()
+        }
+    }
+    
 	private var currentUrl: URL?
     
     internal var sendingMsgTaskId: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier.invalid
@@ -81,6 +99,16 @@ class AdamantApiService: ApiService {
 	
 	func refreshNode() {
 		node = nodesSource?.getNewNode()
+        
+        if let url = currentUrl {
+            getNodeVersion(url: url) { result in
+                guard case let .success(version) = result else {
+                    return
+                }
+                
+                self.nodeTimeDelta = Date().timeIntervalSince(version.nodeDate)
+            }
+        }
 	}
 	
 	func buildUrl(path: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
@@ -120,11 +148,17 @@ class AdamantApiService: ApiService {
 		}
 		
 		Alamofire.request(url, method: method, parameters: parameters, encoding: encoding, headers: headers)
-			.responseData(queue: defaultResponseDispatchQueue) { response in
+			.responseData(queue: defaultResponseDispatchQueue) { [weak self] response in
 				switch response.result {
 				case .success(let data):
 					do {
 						let model: T = try JSONDecoder().decode(T.self, from: data)
+                        
+                        if let timestampResponse = model as? ServerResponseWithTimestamp {
+                            let nodeDate = AdamantUtilities.decodeAdamant(timestamp: timestampResponse.nodeTimestamp)
+                            self?.nodeTimeDelta = Date().timeIntervalSince(nodeDate)
+                        }
+                        
 						completion(.success(model))
 					} catch {
 						completion(.failure(InternalError.parsingFailed.apiServiceErrorWith(error: error)))

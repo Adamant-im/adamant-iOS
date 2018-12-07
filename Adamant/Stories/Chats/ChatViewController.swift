@@ -390,7 +390,7 @@ class ChatViewController: MessagesViewController {
 		
 		if partner.isSystem {
 			dialogService.presentShareAlertFor(string: address,
-											   types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address)],
+                                               types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
 											   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                                                animated: true, from: sender,
 											   completion: nil)
@@ -400,7 +400,7 @@ class ChatViewController: MessagesViewController {
 		
 		let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
 			self?.dialogService.presentShareAlertFor(string: address,
-													types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address)],
+                                                     types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
 													excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                                                     animated: true, from: sender,
 													completion: nil)

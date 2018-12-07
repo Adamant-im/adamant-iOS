@@ -491,8 +491,18 @@ extension ChatViewController: MessagesLayoutDelegate {
 
 // MARK: - MessageInputBarDelegate
 extension ChatViewController: MessageInputBarDelegate {
+    private static let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
+    
 	func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
-		let message = AdamantMessage.text(text)
+        let parsedText = ChatViewController.markdownParser.parse(text)
+        
+        let message: AdamantMessage
+        if parsedText.length == text.count {
+            message = .text(text)
+        } else {
+            message = .markdownText(text)
+        }
+        
 		let valid = chatsProvider.validateMessage(message)
 		switch valid {
 		case .isValid:
@@ -511,13 +521,13 @@ extension ChatViewController: MessageInputBarDelegate {
 			return
 		}
 		
-		chatsProvider.sendMessage(.text(text), recipientId: partner, completion: { [weak self] result in
+        chatsProvider.sendMessage(message, recipientId: partner, completion: { [weak self] result in
 			switch result {
 			case .success: break
 				
 			case .failure(let error):
 				switch error {
-				case .messageNotValid, .notEnoughtMoneyToSend:
+				case .messageNotValid, .notEnoughMoneyToSend:
 					DispatchQueue.main.async {
 						if inputBar.inputTextView.text.count == 0 {
 							inputBar.inputTextView.text = text
@@ -569,8 +579,7 @@ extension MessageTransaction: MessageType {
 		}
 		
         if isMarkdown {
-            let parser = MarkdownParser(font: UIFont.adamantChatDefault)
-            return MessageKind.attributedText(parser.parse(message))
+            return MessageKind.attributedText(MessageTransaction.markdownParser.parse(message))
         } else {
             return MessageKind.text(message)
         }
@@ -579,9 +588,11 @@ extension MessageTransaction: MessageType {
     public var messageStatus: MessageStatus {
         return self.statusEnum
     }
+    
+    private static let markdownParser = MarkdownParser(font: UIFont.adamantChatDefault)
 }
 
-// MARK: - RichMessageTransaction
+// MARK: RichMessageTransaction
 extension RichMessageTransaction: MessageType {
     public var sender: Sender {
         let id = self.senderId!
