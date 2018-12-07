@@ -308,7 +308,7 @@ extension ChatViewController: MessageCellDelegate {
 			
 			let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
 			
-			dialogService.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, style: .actionSheet, actions: [retry, cancelMessage, cancel])
+            dialogService?.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, style: .actionSheet, actions: [retry, cancelMessage, cancel], from: cell)
 			
             
         // MARK: Show ADM transfer details

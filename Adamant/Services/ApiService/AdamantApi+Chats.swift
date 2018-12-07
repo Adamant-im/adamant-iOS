@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension AdamantApiService.ApiCommands {
 	static let Chats = (

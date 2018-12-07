@@ -244,13 +244,18 @@ class AccountViewController: FormViewController {
 			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.security) else {
 				return
 			}
-			
-			nav.pushViewController(vc, animated: true)
-		}
             
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                nav.pushViewController(vc, animated: true)
+            }
+		}
+
         appSection.append(securityRow)
-         */
-		
+        */
+
 		// Node list
 		let nodesRow = LabelRow() {
 			$0.title = Rows.nodes.localized
@@ -264,11 +269,16 @@ class AccountViewController: FormViewController {
 				return
 			}
 			
-			nav.pushViewController(vc, animated: true)
-		}
-            
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                nav.pushViewController(vc, animated: true)
+            }
+        }
+
         appSection.append(nodesRow)
-		
+
 		// About
 		let aboutRow = LabelRow() {
 			$0.title = Rows.about.localized
@@ -282,11 +292,15 @@ class AccountViewController: FormViewController {
 				return
 			}
 			
-			nav.pushViewController(vc, animated: true)
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                nav.pushViewController(vc, animated: true)
+            }
 		}
-            
+		
         appSection.append(aboutRow)
-        
 			
 		// MARK: Actions
 		let actionsSection = Section(Sections.actions.localized) {
@@ -307,7 +321,12 @@ class AccountViewController: FormViewController {
 				return
 			}
 			
-			nav.pushViewController(vc, animated: true)
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                nav.pushViewController(vc, animated: true)
+            }
 		}
         
         actionsSection.append(delegatesRow)
@@ -325,11 +344,16 @@ class AccountViewController: FormViewController {
                 return
             }
             
-            nav.pushViewController(vc, animated: true)
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                nav.pushViewController(vc, animated: true)
+            }
         }
-            
+
         actionsSection.append(generateQrRow)
-		
+
 		// Logout
 		let logoutRow = LabelRow() {
 			$0.title = Rows.logout.localized
@@ -438,7 +462,12 @@ class AccountViewController: FormViewController {
                 return
             }
             
-            nav.pushViewController(vc, animated: true)
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                nav.pushViewController(vc, animated: true)
+            }
         }
         
         securitySection.append(notificationsRow)
@@ -516,6 +545,10 @@ class AccountViewController: FormViewController {
 													self?.pagingViewController.collectionView.reloadItems(at: [IndexPath(row: index, section: 0)])
 			}
 		}
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            layoutTableHeaderView()
+        }
     }
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -547,7 +580,20 @@ class AccountViewController: FormViewController {
 			navigationController?.navigationBar.prefersLargeTitles = false
 		}
 	}
-
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
+        }
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            layoutTableHeaderView()
+            layoutTableFooterView()
+        }
+    }
+	
 	deinit {
 		NotificationCenter.default.removeObserver(self)
 	}
@@ -591,12 +637,47 @@ class AccountViewController: FormViewController {
             }
         }
 	}
+    
+    func layoutTableHeaderView() {
+        guard let view = tableView.tableHeaderView else { return }
+        var frame = view.frame
+
+        frame.size.height = 300
+        view.frame = frame
+
+        self.tableView.tableHeaderView = view
+    }
+    
+    func layoutTableFooterView() {
+        guard let view = tableView.tableFooterView else { return }
+        view.translatesAutoresizingMaskIntoConstraints = false
+
+        let width = view.bounds.size.width;
+        let temporaryWidthConstraints = NSLayoutConstraint.constraints(withVisualFormat: "[footerView(width)]", options: NSLayoutConstraint.FormatOptions(rawValue: UInt(0)), metrics: ["width": width], views: ["footerView": view])
+
+        view.addConstraints(temporaryWidthConstraints)
+
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+
+        let size = view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+        let height = size.height
+        var frame = view.frame
+
+        frame.size.height = height
+        view.frame = frame
+
+        self.tableView.tableFooterView = view
+
+        view.removeConstraints(temporaryWidthConstraints)
+        view.translatesAutoresizingMaskIntoConstraints = true
+    }
 }
 
 
 // MARK: - AccountHeaderViewDelegate
 extension AccountViewController: AccountHeaderViewDelegate {
-	func addressLabelTapped() {
+    func addressLabelTapped(from: UIView) {
 		guard let address = accountService.account?.address else {
 			return
 		}
@@ -613,7 +694,7 @@ extension AccountViewController: AccountHeaderViewDelegate {
 		dialogService.presentShareAlertFor(string: address,
                                            types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
 										   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-										   animated: true,
+                                           animated: true, from: from,
 										   completion: completion)
 	}
 }

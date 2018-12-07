@@ -21,6 +21,7 @@
 		644EC35E20F34F1E00F40C73 /* DelegateDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */; };
 		6455E9F121075D3600B2E94C /* AddressBookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6455E9F021075D3600B2E94C /* AddressBookService.swift */; };
 		6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */; };
+		6458548C211B3AB1004C5909 /* WelcomeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6458548A211B3AB1004C5909 /* WelcomeViewController.xib */; };
 		645E7B062111DF3A006CC9FD /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645E7B052111DF3A006CC9FD /* Crypto.swift */; };
 		649E9A152111B3C200686B01 /* Mnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649E9A142111B3C200686B01 /* Mnemonic.swift */; };
 		648BCA6B213D37A900875EB5 /* AdamantAvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */; };
@@ -66,6 +67,7 @@
 		E90A4945204C6204009F6A65 /* PassphraseCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E90A4944204C5F60009F6A65 /* PassphraseCell.xib */; };
 		E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */; };
 		E90A494D204DA932009F6A65 /* LocalAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A494C204DA932009F6A65 /* LocalAuthentication.swift */; };
+		E90EA5C321BA8BF400A2CE25 /* DelegateDetailsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E90EA5C221BA8BF400A2CE25 /* DelegateDetailsViewController.xib */; };
 		E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */; };
 		E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E913C8F81FFFA51D001A83F7 /* Assets.xcassets */; };
 		E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9071FFFA943001A83F7 /* AdamantCore.swift */; };
@@ -290,6 +292,7 @@
 		644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateDetailsViewController.swift; sourceTree = "<group>"; };
 		6455E9F021075D3600B2E94C /* AddressBookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBookService.swift; sourceTree = "<group>"; };
 		6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAddressBookService.swift; sourceTree = "<group>"; };
+		6458548A211B3AB1004C5909 /* WelcomeViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WelcomeViewController.xib; sourceTree = "<group>"; };
 		645E7B052111DF3A006CC9FD /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
 		649E9A142111B3C200686B01 /* Mnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mnemonic.swift; sourceTree = "<group>"; };
 		648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantAvatarService.swift; sourceTree = "<group>"; };
@@ -341,6 +344,7 @@
 		E90A4944204C5F60009F6A65 /* PassphraseCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PassphraseCell.xib; sourceTree = "<group>"; };
 		E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAuthentication.swift; sourceTree = "<group>"; };
 		E90A494C204DA932009F6A65 /* LocalAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAuthentication.swift; sourceTree = "<group>"; };
+		E90EA5C221BA8BF400A2CE25 /* DelegateDetailsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DelegateDetailsViewController.xib; sourceTree = "<group>"; };
 		E91319F820CEC4E100192A18 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = de; path = de.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		E91319F920CEC4E200192A18 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E91319FA20CEC4E200192A18 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -588,6 +592,7 @@
 				644EC35920EFB8E900F40C73 /* AdamantDelegateCell.swift */,
 				644EC35A20EFB8E900F40C73 /* AdamantDelegateCell.xib */,
 				644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */,
+				E90EA5C221BA8BF400A2CE25 /* DelegateDetailsViewController.xib */,
 			);
 			path = Delegates;
 			sourceTree = "<group>";
@@ -1114,6 +1119,7 @@
 			isa = PBXGroup;
 			children = (
 				E94E7B07205D4CB80042B639 /* SharedRoutes.swift */,
+				6458548A211B3AB1004C5909 /* WelcomeViewController.xib */,
 				E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */,
 				E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */,
 				E921597A206503000000CA5C /* ButtonsStripeView.swift */,
@@ -1238,6 +1244,7 @@
 				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
 				E926E034213EC454005E536B /* FullscreenAlertView.xib in Resources */,
 				E9EC3417200524CA00C0E546 /* Exo+2_400_italic.ttf in Resources */,
+				E90EA5C321BA8BF400A2CE25 /* DelegateDetailsViewController.xib in Resources */,
 				E94E7B01205D3F090042B639 /* ChatListViewController.xib in Resources */,
 				E941CCDB20E786D800C96220 /* AccountHeader.xib in Resources */,
 				E9EC341E200524CA00C0E546 /* Roboto_500_normal.ttf in Resources */,
@@ -1252,6 +1259,7 @@
 				E95CB45E205D7F9600A7218E /* Localizable.stringsdict in Resources */,
 				E9981892212088DE0018C84C /* NodeCell.xib in Resources */,
 				E9B4E1AA210F1803007E77FC /* DoubleDetailsTableViewCell.xib in Resources */,
+				6458548C211B3AB1004C5909 /* WelcomeViewController.xib in Resources */,
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
 				E9A174B920587B84003667CD /* notification.mp3 in Resources */,
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
@@ -1296,6 +1304,7 @@
 				"${BUILT_PRODUCTS_DIR}/FTIndicator/FTIndicator.framework",
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
 				"${BUILT_PRODUCTS_DIR}/Haring/Haring.framework",
+				"${BUILT_PRODUCTS_DIR}/InputBarAccessoryView/InputBarAccessoryView.framework",
 				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
 				"${BUILT_PRODUCTS_DIR}/Lisk/Lisk.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageInputBar/MessageInputBar.framework",
@@ -1330,6 +1339,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FTIndicator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Haring.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/InputBarAccessoryView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lisk.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageInputBar.framework",
@@ -1808,7 +1818,7 @@
 				PROVISIONING_PROFILE = "e4233bbf-3705-44fe-95b0-e77475672c60";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Debug Dev";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -1831,7 +1841,7 @@
 				PROVISIONING_PROFILE = "bedd1b75-2f23-4a85-a0b2-14c424fcff42";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

@@ -82,7 +82,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}.onCellSelection { [weak self] (_, _) in
+		}.onCellSelection { [weak self] (cell, _) in
 			let completion = { [weak self] in
 				guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
 					return
@@ -103,7 +103,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 				self?.dialogService.presentShareAlertFor(string: address,
 														 types: types,
 														 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-														 animated: true,
+                                                         animated: true, from: cell,
 														 completion: completion)
 			}
 		}
@@ -145,7 +145,13 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 					return
 				}
 				
-				self?.navigationController?.pushViewController(service.transferListViewController(), animated: true )
+                let vc = service.transferListViewController()
+                if let split = self?.splitViewController {
+                    let details = UINavigationController(rootViewController:vc)
+                    split.showDetailViewController(details, sender: self)
+                } else {
+                    self?.navigationController?.pushViewController(vc, animated: true )
+                }
 			}
 		}
 		
@@ -171,11 +177,16 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 					v.delegate = self
 				}
 				
-				if let nav = self?.navigationController {
-					nav.pushViewController(vc, animated: true)
-				} else {
-					self?.present(vc, animated: true)
-				}
+                if let split = self?.splitViewController {
+                    let details = UINavigationController(rootViewController:vc)
+                    split.showDetailViewController(details, sender: self)
+                } else {
+                    if let nav = self?.navigationController {
+                        nav.pushViewController(vc, animated: true)
+                    } else {
+                        self?.present(vc, animated: true)
+                    }
+                }
 			}
 			
 			section.append(sendRow)
