@@ -64,6 +64,7 @@
 		E90A4945204C6204009F6A65 /* PassphraseCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E90A4944204C5F60009F6A65 /* PassphraseCell.xib */; };
 		E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */; };
 		E90A494D204DA932009F6A65 /* LocalAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A494C204DA932009F6A65 /* LocalAuthentication.swift */; };
+		E90EA5C321BA8BF400A2CE25 /* DelegateDetailsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E90EA5C221BA8BF400A2CE25 /* DelegateDetailsViewController.xib */; };
 		E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */; };
 		E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E913C8F81FFFA51D001A83F7 /* Assets.xcassets */; };
 		E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C9071FFFA943001A83F7 /* AdamantCore.swift */; };
@@ -86,7 +87,6 @@
 		E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921597420611A6A0000CA5C /* AdamantReachability.swift */; };
 		E921597B206503000000CA5C /* ButtonsStripeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921597A206503000000CA5C /* ButtonsStripeView.swift */; };
 		E921597D2065031D0000CA5C /* ButtonsStripe.xib in Resources */ = {isa = PBXBuildFile; fileRef = E921597C2065031D0000CA5C /* ButtonsStripe.xib */; };
-		E9220E0D21988EEA009C9642 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		E9220E1121988F81009C9642 /* JSAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9220E0221983155009C9642 /* JSAdamantCore.swift */; };
 		E9220E1221988F81009C9642 /* adamant-core.js in Resources */ = {isa = PBXBuildFile; fileRef = E9220E0121983155009C9642 /* adamant-core.js */; };
 		E9220E1321988F81009C9642 /* JSAdamantCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85762007E8EC0070534A /* JSAdamantCoreTests.swift */; };
@@ -337,6 +337,7 @@
 		E90A4944204C5F60009F6A65 /* PassphraseCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PassphraseCell.xib; sourceTree = "<group>"; };
 		E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAuthentication.swift; sourceTree = "<group>"; };
 		E90A494C204DA932009F6A65 /* LocalAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAuthentication.swift; sourceTree = "<group>"; };
+		E90EA5C221BA8BF400A2CE25 /* DelegateDetailsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DelegateDetailsViewController.xib; sourceTree = "<group>"; };
 		E91319F820CEC4E100192A18 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = de; path = de.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		E91319F920CEC4E200192A18 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E91319FA20CEC4E200192A18 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -584,6 +585,7 @@
 				644EC35920EFB8E900F40C73 /* AdamantDelegateCell.swift */,
 				644EC35A20EFB8E900F40C73 /* AdamantDelegateCell.xib */,
 				644EC35D20F34F1E00F40C73 /* DelegateDetailsViewController.swift */,
+				E90EA5C221BA8BF400A2CE25 /* DelegateDetailsViewController.xib */,
 			);
 			path = Delegates;
 			sourceTree = "<group>";
@@ -1232,6 +1234,7 @@
 				E9E7CDC82003F6D200DFC4DB /* TransactionTableViewCell.xib in Resources */,
 				E926E034213EC454005E536B /* FullscreenAlertView.xib in Resources */,
 				E9EC3417200524CA00C0E546 /* Exo+2_400_italic.ttf in Resources */,
+				E90EA5C321BA8BF400A2CE25 /* DelegateDetailsViewController.xib in Resources */,
 				E94E7B01205D3F090042B639 /* ChatListViewController.xib in Resources */,
 				E941CCDB20E786D800C96220 /* AccountHeader.xib in Resources */,
 				E9EC341E200524CA00C0E546 /* Roboto_500_normal.ttf in Resources */,
@@ -1483,7 +1486,6 @@
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E941CCDE20E7B70200C96220 /* WalletCollectionViewCell.swift in Sources */,
 				E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */,
-				E9220E0D21988EEA009C9642 /* BuildFile in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */,
 				E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */,
