@@ -26,4 +26,8 @@ class LskWalletViewController: WalletViewControllerBase {
     override func sendRowLocalizedLabel() -> String {
         return String.adamantLocalized.sendLsk
     }
+    
+    override func encodeForQr(address: String) -> String? {
+        return "lisk:\(address)"
+    }
 }
