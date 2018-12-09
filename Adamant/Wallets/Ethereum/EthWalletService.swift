@@ -336,9 +336,9 @@ extension EthWalletService: InitiatedWithPassphraseService {
             switch result {
             case .success(let address):
                 // ETH already saved
-                if address != ethAddress.address {
+                if ethAddress.address.caseInsensitiveCompare(address) != .orderedSame {
                     service.save(ethAddress: ethAddress.address) { result in
-                        service.kvsSaveCompletionRecursion(ethAddress: ethAddress.address, result: result)
+                        service.kvsSaveCompletionRecursion(ethAddress: ethAddress.address.lowercased(), result: result)
                     }
                 }
                 
