@@ -124,6 +124,9 @@
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendEth" = "Отправить ETH";
 
+/* Account tab: 'Send ETH tokens' button */
+"AccountTab.Row.SendLsk" = "Отправить LSK";
+
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Адрес";
 
