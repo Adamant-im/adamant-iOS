@@ -414,7 +414,7 @@ class TransferViewControllerBase: FormViewController {
 			markRow(row, valid: wallet.balance > service.transactionFee)
 		}
 		
-		if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
+		if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
             if let address = row.value, validateRecipient(address) {
                 recipientAddress = address
                 markRow(row, valid: true)

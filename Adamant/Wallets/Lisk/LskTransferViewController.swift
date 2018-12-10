@@ -145,7 +145,7 @@ class LskTransferViewController: TransferViewControllerBase {
                 _recipient = newValue
             }
             
-            if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
+            if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
                 row.updateCell()
             }
@@ -170,28 +170,20 @@ class LskTransferViewController: TransferViewControllerBase {
     }
     
     override func recipientRow() -> BaseRow {
-        let row = TextRow() {
+        let row = SuffixTextRow() {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = UIKeyboardType.namePhonePad
+            $0.cell.textField.keyboardType = UIKeyboardType.numberPad
+            $0.cell.suffix = "L"
             
             if let recipient = recipientAddress {
                 let trimmed = recipient.components(separatedBy: LskTransferViewController.invalidCharacters).joined()
                 $0.value = trimmed
             }
             
-            let suffix = UILabel()
-            suffix.text = "L"
-            suffix.sizeToFit()
-            let view = UIView()
-            view.addSubview(suffix)
-            view.frame = suffix.frame
-            $0.cell.textField.leftView = view
-            $0.cell.textField.leftViewMode = .always
-            
             if recipientIsReadonly {
                 $0.disabled = true
-                suffix.isEnabled = false
+                $0.cell.textField.isEnabled = false
             }
             }.cellUpdate { (cell, row) in
                 if let text = cell.textField.text {
@@ -240,7 +232,7 @@ class LskTransferViewController: TransferViewControllerBase {
         
         switch service.validate(address: parsedAddress) {
         case .valid:
-            if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
+            if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = parsedAddress
                 row.updateCell()
             }
