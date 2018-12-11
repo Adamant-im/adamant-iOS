@@ -18,11 +18,13 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
                 } else {
                     completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))
                 }
-                break
                 
-            case .failure(_):
-                completion(.success(result: .pending)) // Note: No info about processing transactions
-                break
+            case .failure(let error):
+                if case let .internalError(message, _) = error, message == "No transaction" {
+                    completion(.success(result: .pending)) // Note: No info about processing transactions
+                } else {
+                    completion(.failure(error: error.asWalletServiceError()))
+                }
             }
         }
     }

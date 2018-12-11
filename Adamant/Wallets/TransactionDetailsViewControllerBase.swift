@@ -400,25 +400,26 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(blockRow)
             
         // MARK: Status
-        if let status = transaction?.transactionStatus {
-            let statusRow = LabelRow() {
-                $0.tag = Rows.status.tag
-                $0.title = Rows.status.localized
-                $0.value = status.localized
-            }.cellSetup { (cell, _) in
-                cell.selectionStyle = .gray
-            }.onCellSelection { [weak self] (_, row) in
-                if let text = row.value {
-                    self?.shareValue(text)
-                }
-            }.cellUpdate { [weak self] (cell, row) in
-                cell.textLabel?.textColor = .black
-                
-                row.value = self?.transaction?.transactionStatus?.localized
-            }
+        let statusRow = LabelRow() {
+            $0.tag = Rows.status.tag
+            $0.title = Rows.status.localized
+            $0.value = transaction?.transactionStatus?.localized
             
-            detailsSection.append(statusRow)
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
+                return self?.transaction?.transactionStatus == nil
+            })
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.onCellSelection { [weak self] (_, row) in
+            if let text = row.value {
+                self?.shareValue(text)
+            }
+        }.cellUpdate { [weak self] (cell, row) in
+            cell.textLabel?.textColor = .black
+            row.value = self?.transaction?.transactionStatus?.localized
         }
+        
+        detailsSection.append(statusRow)
         
         form.append(detailsSection)
         
@@ -452,6 +453,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         let actionsSection = Section(Sections.actions.localized) {
             $0.tag = Sections.actions.tag
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
+                return self?.transaction == nil
+            })
         }
             
         // MARK: Open in explorer

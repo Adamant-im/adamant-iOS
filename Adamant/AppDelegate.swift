@@ -38,6 +38,8 @@ extension StoreKey {
 struct AdamantResources {
 	static let coreDataModel = Bundle.main.url(forResource: "Adamant", withExtension: "momd")!
 	
+    // MARK: Nodes
+    
 	static let nodes: [Node] = [
         Node(scheme: .https, host: "endless.adamant.im", port: nil),
         Node(scheme: .https, host: "clown.adamant.im", port: nil),
@@ -51,11 +53,11 @@ struct AdamantResources {
 //        "https://ropsten.infura.io/"  // test network
     ]
 	
-	// Addresses
+    // MARK: ADAMANT Addresses
 	static let supportEmail = "ios@adamant.im"
 	static let ansReadmeUrl = "https://github.com/Adamant-im/AdamantNotificationService/blob/master/README.md"
 	
-	// Contacts
+    // MARK: Contacts
 	struct contacts {
 		static let adamantBountyWallet = "U15423595369615486571"
 		static let adamantIco = "U7047165086065693428"
@@ -67,12 +69,17 @@ struct AdamantResources {
 		private init() {}
 	}
     
-    // Explorers
+    // MARK: Explorers
+    // MARK: ADM
     static let adamantExplorerAddress = "https://explorer.adamant.im/tx/"
+    
+    // MARK: ETH
     static let ethereumExplorerAddress = "https://etherscan.io/tx/"
 //    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
-//    static let liskExplorerAddress = "https://explorer.lisk.io/tx/"
-    static let liskExplorerAddress = "https://testnet-explorer.lisk.io/tx/" // LISK Testnet
+    
+    // MARK: LSK
+    static let liskExplorerAddress = "https://explorer.lisk.io/tx/"
+//    static let liskExplorerAddress = "https://testnet-explorer.lisk.io/tx/" // LISK Testnet
 	
 	private init() {}
 }

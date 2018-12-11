@@ -95,8 +95,8 @@ class LskWalletService: WalletService {
 	
 	// MARK: - Logic
     init() {
-        accountApi = Accounts(client: .testnet)
-        transactionApi = Transactions(client: .testnet)
+        accountApi = Accounts(client: .mainnet)
+        transactionApi = Transactions(client: .mainnet)
         
         // Notifications
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in

@@ -35,7 +35,9 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
             tableView.refreshControl = refreshControl
         }
         
-        startUpdate()
+        if transaction != nil {
+            startUpdate()
+        }
     }
     
     deinit {
