@@ -67,7 +67,7 @@ class EthTransferViewController: TransferViewControllerBase {
 					let payload = RichMessageTransfer(type: EthWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
 					let message = AdamantMessage.richMessage(payload: payload)
 					
-					vc.chatsProvider.sendMessage(message, recipientId: reportRecipient) { result in
+                    vc.chatsProvider.sendMessage(message, recipientId: reportRecipient) { result in
 						if case .failure(let error) = result {
 							vc.dialogService.showRichError(error: error)
 						}
@@ -250,7 +250,7 @@ class EthTransferViewController: TransferViewControllerBase {
         
 		let message = AdamantMessage.richMessage(payload: payload)
 		
-		chatsProvider.sendMessage(message, recipientId: admAddress) { [weak self] result in
+        chatsProvider.sendMessage(message, recipientId: admAddress) { [weak self] result in
 			switch result {
 			case .success:
 				break

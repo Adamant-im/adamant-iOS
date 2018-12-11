@@ -117,28 +117,28 @@ enum NotificationsServiceResult {
 }
 
 enum NotificationsServiceError: Error {
-    case notEnoughtMoney
+    case notEnoughMoney
     case denied(error: Error?)
 }
 
 extension NotificationsServiceError: RichError {
     var message: String {
         switch self {
-        case .notEnoughtMoney: return String.adamantLocalized.sharedErrors.notEnoughtMoney
+        case .notEnoughMoney: return String.adamantLocalized.sharedErrors.notEnoughMoney
         case .denied: return String.adamantLocalized.notifications.notificationsDisabled
         }
     }
     
     var internalError: Error? {
         switch self {
-        case .notEnoughtMoney: return nil
+        case .notEnoughMoney: return nil
         case .denied(let error): return error
         }
     }
     
     var level: ErrorLevel {
         switch self {
-        case .notEnoughtMoney: return .warning
+        case .notEnoughMoney: return .warning
         case .denied: return .error
         }
     }

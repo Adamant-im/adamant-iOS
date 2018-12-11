@@ -120,11 +120,12 @@ protocol DialogService: class {
 	func dismissNotification()
 	
 	// MARK: - ActivityControllers
-	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, completion: (() -> Void)?)
+	func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?)
+    func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIBarButtonItem?, completion: (() -> Void)?)
 	
 	func presentGoToSettingsAlert(title: String?, message: String?)
     
     // MARK: - Alerts
-    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?)
-	func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?)
+    func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: Any?)
+	func showAlert(title: String?, message: String?, style: AdamantAlertStyle, actions: [AdamantAlertAction]?, from: Any?)
 }

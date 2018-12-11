@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import Haring
 
 extension String.adamantLocalized {
 	struct chatList {
@@ -31,6 +32,7 @@ class ChatListViewController: UIViewController {
 	var notificationsService: NotificationsService!
 	var dialogService: DialogService!
 	var addressBook: AddressBookService!
+    var avatarService: AvatarService!
     
     var richMessageProviders = [String:RichMessageProvider]()
 	
@@ -55,6 +57,8 @@ class ChatListViewController: UIViewController {
         
         return refreshControl
     }()
+    
+    private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize))
 	
     // MARK: Busy indicator
     
@@ -133,6 +137,13 @@ class ChatListViewController: UIViewController {
 		}
 	}
 	
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
+        }
+    }
 	
 	// MARK: IB Actions
 	@IBAction func newChat(sender: Any) {
@@ -144,7 +155,11 @@ class ChatListViewController: UIViewController {
 			c.delegate = self
 		}
 		
-		present(controller, animated: true, completion: nil)
+        if let split = self.splitViewController {
+            split.showDetailViewController(controller, sender: self)
+        } else {
+            present(controller, animated: true)
+        }
 	}
 	
 	
@@ -300,13 +315,16 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		if let chatroom = chatsController?.object(at: indexPath) {
-			let vc = chatViewController(for: chatroom)
-			
-			if let nav = navigationController {
-				nav.pushViewController(vc, animated: true)
-			} else {
-				present(vc, animated: true)
-			}
+            let vc = chatViewController(for: chatroom)
+            
+            if let split = self.splitViewController {
+                let chat = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(chat, sender: self)
+            } else if let nav = navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                present(vc, animated: true)
+            }
 		}
 	}
 }
@@ -348,7 +366,20 @@ extension ChatListViewController {
 				cell.avatarImage = avatar
 				cell.avatarImageView.tintColor = UIColor.adamant.primary
 			} else {
-				cell.avatarImage = nil
+                if let address = partner.publicKey {
+                    DispatchQueue.global().async {
+                        let image = self.avatarService.avatar(for: address, size: 200)
+                        DispatchQueue.main.async {
+                            cell.avatarImage = image
+                        }
+                    }
+                    
+                    cell.avatarImageView.roundingMode = .round
+                    cell.avatarImageView.clipsToBounds = true
+                } else {
+                    cell.avatarImage = nil
+                }
+                cell.borderWidth = 0
 			}
 		} else if let title = chatroom.title {
 			cell.accountLabel.text = title
@@ -357,7 +388,7 @@ extension ChatListViewController {
 		cell.hasUnreadMessages = chatroom.hasUnreadMessages
         
         if let lastTransaction = chatroom.lastTransaction {
-            cell.lastMessageLabel.text = shortDescription(for: lastTransaction)
+            cell.lastMessageLabel.attributedText = shortDescription(for: lastTransaction)
         } else {
             cell.lastMessageLabel.text = nil
         }
@@ -448,26 +479,32 @@ extension ChatListViewController: NewChatViewControllerDelegate {
 		}
 		
 		DispatchQueue.main.async { [weak self] in
-			guard let vc = self?.chatViewController(for: chatroom) else {
-				return
-			}
-			
-			self?.navigationController?.pushViewController(vc, animated: false)
-			
-			let nvc: UIViewController
-			if let nav = controller.navigationController {
-				nvc = nav
-			} else {
-				nvc = controller
-			}
-			
-			nvc.dismiss(animated: true) {
-				vc.becomeFirstResponder()
-				
-				if let count = vc.chatroom?.transactions?.count, count == 0 {
-					vc.messageInputBar.inputTextView.becomeFirstResponder()
-				}
-			}
+            guard let vc = self?.chatViewController(for: chatroom) else {
+                return
+            }
+            
+            if let split = self?.splitViewController {
+                let chat = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(chat, sender: self)
+            } else {
+                self?.navigationController?.pushViewController(vc, animated: false)
+            }
+
+            let nvc: UIViewController
+            if let nav = controller.navigationController {
+                nvc = nav
+            } else {
+                nvc = controller
+            }
+
+            nvc.dismiss(animated: true) {
+                vc.becomeFirstResponder()
+
+                if let count = vc.chatroom?.transactions?.count, count == 0 {
+                    vc.messageInputBar.inputTextView.becomeFirstResponder()
+                }
+            }
+            
 		}
 		
 		// Select row after awhile
@@ -527,7 +564,7 @@ extension ChatListViewController {
 		}
 		
 		// MARK: 4. Show notification with tap handler
-		dialogService.showNotification(title: title, message: text, image: image) { [weak self] in
+		dialogService.showNotification(title: title, message: text?.string, image: image) { [weak self] in
 			DispatchQueue.main.async {
 				self?.presentChatroom(chatroom)
 			}
@@ -536,64 +573,74 @@ extension ChatListViewController {
 	
 	private func presentChatroom(_ chatroom: Chatroom) {
 		// MARK: 1. Create and config ViewController
-		let vc = chatViewController(for: chatroom)
-		
-		
-		// MARK: 2. Config TabBarController
-		let animated: Bool
-		if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController {
-			if let navigator = navigationController, selectedView != navigator, let index = tabVC.viewControllers?.index(of: navigator) {
-				animated = false
-				tabVC.selectedIndex = index
-			} else {
-				animated = true
-			}
-		} else {
-			animated = true
-		}
-		
-		
-		// MARK: 3. Present ViewController
-		if let nav = navigationController {
-			nav.pushViewController(vc, animated: animated)
-		} else {
-			present(vc, animated: true)
-		}
+        let vc = chatViewController(for: chatroom)
+        
+        if let split = self.splitViewController {
+            let chat = UINavigationController(rootViewController:vc)
+            split.showDetailViewController(chat, sender: self)
+        } else {
+            // MARK: 2. Config TabBarController
+            let animated: Bool
+            if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController {
+                if let navigator = navigationController, selectedView != navigator, let index = tabVC.viewControllers?.index(of: navigator) {
+                    animated = false
+                    tabVC.selectedIndex = index
+                } else {
+                    animated = true
+                }
+            } else {
+                animated = true
+            }
+            
+            
+            // MARK: 3. Present ViewController
+            if let nav = navigationController {
+                nav.pushViewController(vc, animated: animated)
+            } else {
+                present(vc, animated: true)
+            }
+        }
 	}
     
-    private func shortDescription(for transaction: ChatTransaction) -> String? {
+    private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
         switch transaction {
         case let message as MessageTransaction:
             guard let text = message.message else {
                 return nil
             }
             
+            let raw: String
             if message.isOutgoing {
-                return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, text)
+                raw = String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, text)
             } else {
-                return text
+                raw = text
             }
+            
+            return markdownParser.parse(raw)
             
         case let transfer as TransferTransaction:
             if let admService = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService {
-                return admService.shortDescription(for: transfer)
+                return markdownParser.parse(admService.shortDescription(for: transfer))
             } else {
                 return nil
             }
             
         case let richMessage as RichMessageTransaction:
-            let description: String
+            let description: NSAttributedString
             
             if let type = richMessage.richType, let provider = richMessageProviders[type] {
                 description = provider.shortDescription(for: richMessage)
             } else if let serialized = richMessage.serializedMessage() {
-                description = serialized
+                description = NSAttributedString(string: serialized)
             } else {
                 return nil
             }
             
             if richMessage.isOutgoing {
-                return String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, description)
+                let mutable = NSMutableAttributedString(attributedString: description)
+                let prefix = NSAttributedString(string: String.adamantLocalized.chatList.sentMessagePrefix)
+                mutable.insert(prefix, at: 0)
+                return mutable.attributedSubstring(from: NSRange(location: 0, length: mutable.length))
             } else {
                 return description
             }
@@ -616,7 +663,7 @@ extension ChatListViewController {
 		let actions: [UIContextualAction]
 		
 		// More
-		let more = UIContextualAction(style: .normal, title: nil) { [weak self] (_, _, completionHandler: (Bool) -> Void) in
+		let more = UIContextualAction(style: .normal, title: nil) { [weak self] (_, view, completionHandler: (Bool) -> Void) in
 			guard let partner = chatroom.partner, let address = partner.address else {
 				completionHandler(false)
 				return
@@ -627,15 +674,16 @@ extension ChatListViewController {
 			if partner.isSystem {
 				self?.dialogService.presentShareAlertFor(string: address,
                                                          types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
-												   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-												   animated: true,
-												   completion: nil)
+                                                         excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                                                         animated: true,
+                                                         from: view,
+                                                         completion: nil)
 			} else {
 				let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
 					self?.dialogService.presentShareAlertFor(string: address,
                                                              types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
 															 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-															 animated: true,
+                                                             animated: true, from: view,
 															 completion: nil)
 				}
 				
@@ -664,7 +712,7 @@ extension ChatListViewController {
 				
                 let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
                 
-                self?.dialogService.showAlert(title: nil, message: nil, style: UIAlertController.Style.actionSheet, actions: [share, rename, cancel])
+                self?.dialogService?.showAlert(title: nil, message: nil, style: UIAlertController.Style.actionSheet, actions: [share, rename, cancel], from: view)
 			}
 			
 			completionHandler(true)

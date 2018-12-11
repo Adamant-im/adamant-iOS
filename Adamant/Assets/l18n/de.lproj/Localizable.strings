@@ -167,7 +167,7 @@
 "ADAMANT" = "ADAMANT";
 
 /* AddressBookService: Not enought money to save address into blockchain */
-"AddressBookService.Error.NotEnoughtMoney" = "Nicht genug Tokens, um Daten auf der Blockchain zu speichern";
+"AddressBookService.Error.notEnoughMoney" = "Nicht genug Tokens, um Daten auf der Blockchain zu speichern";
 
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
 "Application.deviceTokenErrorFormat" = "Anmeldefehler in ANS: %@";
@@ -194,7 +194,7 @@
 "ChatListPage.Title" = "Chats";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.NotEnoughtMoney" = "Sie haben nicht genügend Tokens, um eine Nachricht zu senden";
+"ChatsProvider.Error.notEnoughMoney" = "Sie haben nicht genügend Tokens, um eine Nachricht zu senden";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "Nachricht mit der ID %@ nicht gefunden";
@@ -653,7 +653,7 @@
 "TransferScene.Error.InvalidAddress" = "Geben Sie eine gültige Adresse ein";
 
 /* Transfer: Amount is hiegher that user's total money notification */
-"TransferScene.Error.NotEnoughtMoney" = "Sie haben nicht genug Tokens";
+"TransferScene.Error.notEnoughMoney" = "Sie haben nicht genug Tokens";
 
 /* Transfer: Amount is zero, or even negative notification */
 "TransferScene.Error.TooLittleMoney" = "Sie müssen mehr Tokens senden";
@@ -685,6 +685,9 @@
 /* Transfer: transfer fee */
 "TransferScene.Row.TransactionFee" = "Gebühr";
 
+/* Transfer: comment for transfer in chat */
+"TransferScene.Row.Comments" = "Bemerkungen";
+
 /* Transfer: 'Transfer info' section */
 "TransferScene.Section.TransferInfo" = "Transaktionsinfo";
 
@@ -713,7 +716,7 @@
 "TransferScene.TransferSuccessMessage" = "Fertig!";
 
 /* Wallet Services: Shared error, user do not have enought money. */
-"WalletServices.SharedErrors.NotEnoughtMoney" = "Nicht genug Geld";
+"WalletServices.SharedErrors.notEnoughMoney" = "Nicht genug Geld";
 
 /* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
 "WalletServices.SharedErrors.WalletNotInitiated" = "Die Wallet wurde noch nicht initiiert";

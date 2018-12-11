@@ -105,7 +105,14 @@ class NewChatViewController: FormViewController {
 		let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
 		doneButton.isEnabled = false
 		navigationItem.rightBarButtonItem = doneButton
-		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+        
+        if let _ = self.splitViewController {
+            if #available(iOS 11.0, *) {
+                navigationController?.navigationBar.prefersLargeTitles = false
+            }
+        } else {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+        }
 		
 		navigationOptions = .Disabled
 		

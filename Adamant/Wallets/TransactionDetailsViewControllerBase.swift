@@ -150,9 +150,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
-                self?.shareValue(text)
+                self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
@@ -192,7 +192,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     return DoubleDetailsTableViewCell.compactHeight
                 }
             }
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             guard let value = row.value else {
                 return
             }
@@ -204,7 +204,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 text = value.first
             }
             
-            self?.shareValue(text)
+            self?.shareValue(text, from: cell)
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
             
@@ -247,7 +247,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     return DoubleDetailsTableViewCell.compactHeight
                 }
             }
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             guard let value = row.value else {
                 return
             }
@@ -259,7 +259,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 text = value.first
             }
             
-            self?.shareValue(text)
+            self?.shareValue(text, from: cell)
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
         }
@@ -279,10 +279,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.dateFormatter = dateFormatter
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let value = row.value {
                 let text = value.humanizedDateTimeFull()
-                self?.shareValue(text)
+                self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
@@ -300,10 +300,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.value = transaction?.amountValue.doubleValue
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let value = row.value {
                 let text = AdamantBalanceFormat.full.format(value, withCurrencySymbol: self?.currencySymbol ?? nil)
-                self?.shareValue(text)
+                self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
@@ -325,9 +325,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let value = row.value {
-                self?.shareValue(value)
+                self?.shareValue(value, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
@@ -354,9 +354,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
-                self?.shareValue(text)
+                self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
@@ -383,9 +383,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
-                self?.shareValue(text)
+                self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
@@ -410,9 +410,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             })
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
-                self?.shareValue(text)
+                self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
@@ -438,9 +438,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }.cellUpdate { (cell, _) in
                 cell.textView.isSelectable = false
                 cell.textView.isEditable = false
-            }.onCellSelection { [weak self] (_, row) in
+            }.onCellSelection { [weak self] (cell, row) in
                 if let text = row.value {
-                    self?.shareValue(text)
+                    self?.shareValue(text, from: cell)
                 }
             }
             
@@ -521,8 +521,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Tools
     
-    func shareValue(_ value: String) {
-        dialogService.presentShareAlertFor(string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true) { [weak self] in
+    func shareValue(_ value: String, from: UIView) {
+        dialogService.presentShareAlertFor(string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: from) { [weak self] in
             guard let tableView = self?.tableView else {
                 return
             }

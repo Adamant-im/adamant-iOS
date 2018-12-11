@@ -29,7 +29,14 @@ class AdmTransferViewController: TransferViewControllerBase {
 		
 		dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
 		
-		service.sendMoney(recipient: recipient, amount: amount, comments: "") { [weak self] result in
+        let comments: String
+        if let row: TextAreaRow = form.rowBy(tag: BaseRows.comments.tag), let text = row.value {
+            comments = text
+        } else {
+            comments = ""
+        }
+        
+		service.sendMoney(recipient: recipient, amount: amount, comments: comments) { [weak self] result in
 			switch result {
 			case .success(let result):
 				service.update()
@@ -42,6 +49,10 @@ class AdmTransferViewController: TransferViewControllerBase {
                 
                 let detailsVC = self?.router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? AdmTransactionDetailsViewController
                 detailsVC?.transaction = result
+                
+                if comments.count > 0 {
+                    detailsVC?.comment = comments
+                }
                 
                 // MARK: Sender, you
                 detailsVC?.senderName = String.adamantLocalized.transactionDetails.yourAddress

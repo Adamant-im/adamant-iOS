@@ -164,7 +164,7 @@
 "ADAMANT" = "ADAMANT";
 
 /* AddressBookService: Not enought money to save address into blockchain */
-"AddressBookService.Error.NotEnoughtMoney" = "Not enought tokens to store data in Blockchain";
+"AddressBookService.Error.notEnoughMoney" = "Not enought tokens to store data in Blockchain";
 
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
 "Application.deviceTokenErrorFormat" = "Failed to register in ANS: %@";
@@ -191,7 +191,7 @@
 "ChatListPage.Title" = "Chats";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.NotEnoughtMoney" = "You don't have enough tokens to send a message";
+"ChatsProvider.Error.notEnoughMoney" = "You don't have enough tokens to send a message";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "Message with id %@ not found";
@@ -704,7 +704,7 @@
 "TransferScene.Error.InvalidAddress" = "Enter a valid address";
 
 /* Transfer: Amount is hiegher that user's total money notification */
-"TransferScene.Error.NotEnoughtMoney" = "You don't have that tokens";
+"TransferScene.Error.notEnoughMoney" = "You don't have that tokens";
 
 /* Transfer: Amount is zero, or even negative notification */
 "TransferScene.Error.TooLittleMoney" = "You should send more tokens";
@@ -767,7 +767,7 @@
 "TransferScene.TransferSuccessMessage" = "Done!";
 
 /* Wallet Services: Shared error, user do not have enought money. */
-"WalletServices.SharedErrors.NotEnoughtMoney" = "Not enought money";
+"WalletServices.SharedErrors.notEnoughMoney" = "Not enought money";
 
 /* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
 "WalletServices.SharedErrors.WalletNotInitiated" = "Wallet not yet initiated";
