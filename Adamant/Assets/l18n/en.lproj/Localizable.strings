@@ -181,8 +181,8 @@
 /* Eureka forms Cancel button */
 "Cancel" = "Cancel";
 
-/* ChatList: outgoing message preview format, like 'You: %@' */
-"ChatListPage.SentMessageFormat" = "You: %@";
+/* ChatList: outgoing message prefix */
+"ChatListPage.SentMessagePrefix" = "You: ";
 
 /* ChatList: First syncronization is in progress */
 "ChatListPage.SyncingChats" = "Syncing chats…";

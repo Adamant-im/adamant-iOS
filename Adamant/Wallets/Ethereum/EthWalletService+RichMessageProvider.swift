@@ -154,7 +154,6 @@ extension EthWalletService: RichMessageProvider {
     
     func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         let amount: String
-        let string: String
         
         guard let raw = transaction.richContent?[RichContentKeys.transfer.amount] else {
             return NSAttributedString(string: "⬅️  \(EthWalletService.currencySymbol)")
@@ -166,6 +165,7 @@ extension EthWalletService: RichMessageProvider {
             amount = raw
         }
         
+        let string: String
         if transaction.isOutgoing {
             string = "⬅️  \(amount) \(EthWalletService.currencySymbol)"
         } else {

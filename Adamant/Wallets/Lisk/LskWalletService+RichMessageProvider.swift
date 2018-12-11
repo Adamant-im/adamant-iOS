@@ -166,10 +166,13 @@ extension LskWalletService: RichMessageProvider {
             amount = raw
         }
         
+        let string: String
         if transaction.isOutgoing {
-            return NSAttributedString(string: "⬅️  \(amount) \(LskWalletService.currencySymbol)")
+            string = "⬅️  \(amount) \(LskWalletService.currencySymbol)"
         } else {
-            return NSAttributedString(string: "➡️  \(amount) \(LskWalletService.currencySymbol)")
+            string = "➡️  \(amount) \(LskWalletService.currencySymbol)"
         }
+        
+        return NSAttributedString(string: string)
     }
 }

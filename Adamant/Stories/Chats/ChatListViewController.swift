@@ -13,7 +13,7 @@ import Haring
 extension String.adamantLocalized {
 	struct chatList {
 		static let title = NSLocalizedString("ChatListPage.Title", comment: "ChatList: scene title")
-		static let sentMessagePrefix = NSLocalizedString("ChatListPage.SentMessageFormat", comment: "ChatList: outgoing message preview format, like 'You: %@'")
+		static let sentMessagePrefix = NSLocalizedString("ChatListPage.SentMessagePrefix", comment: "ChatList: outgoing message prefix")
         static let syncingChats = NSLocalizedString("ChatListPage.SyncingChats", comment: "ChatList: First syncronization is in progress")
         
 		private init() {}
@@ -611,7 +611,7 @@ extension ChatListViewController {
             
             let raw: String
             if message.isOutgoing {
-                raw = String.localizedStringWithFormat(String.adamantLocalized.chatList.sentMessagePrefix, text)
+                raw = "\(String.adamantLocalized.chatList.sentMessagePrefix)\(text)"
             } else {
                 raw = text
             }
@@ -636,6 +636,9 @@ extension ChatListViewController {
                 return nil
             }
             
+            return description
+            
+            /*
             if richMessage.isOutgoing {
                 let mutable = NSMutableAttributedString(attributedString: description)
                 let prefix = NSAttributedString(string: String.adamantLocalized.chatList.sentMessagePrefix)
@@ -644,6 +647,7 @@ extension ChatListViewController {
             } else {
                 return description
             }
+             */
             
         default:
             return nil
