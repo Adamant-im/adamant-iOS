@@ -174,7 +174,7 @@ extension LocalTransaction: TransactionDetails {
     }
     
     var senderAddress: String {
-        return self.senderPublicKey ?? ""
+        return ""
     }
     
     var recipientAddress: String {

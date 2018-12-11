@@ -173,7 +173,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.cell.titleLabel.text = Rows.from.localized
             
             if let transaction = transaction {
-                if let senderName = self?.senderName {
+                if transaction.senderAddress.count == 0 {
+                    $0.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
+                } else if let senderName = self?.senderName {
                     $0.value = DoubleDetail(first: senderName, second: transaction.senderAddress)
                 } else {
                     $0.value = DoubleDetail(first: transaction.senderAddress, second: nil)
@@ -203,8 +205,20 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
             
             self?.shareValue(text)
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
+            
+            if let transaction = self?.transaction {
+                if transaction.senderAddress.count == 0 {
+                    row.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
+                } else if let senderName = self?.senderName {
+                    row.value = DoubleDetail(first: senderName, second: transaction.senderAddress)
+                } else {
+                    row.value = DoubleDetail(first: transaction.senderAddress, second: nil)
+                }
+            } else {
+                row.value = nil
+            }
         }
             
         detailsSection.append(senderRow)
