@@ -222,11 +222,19 @@ class EthTransferViewController: TransferViewControllerBase {
 		guard let service = service else {
 			return false
 		}
+        
+        let parsedAddress: String
+        if address.hasPrefix("ethereum:"), let firstIndex = address.firstIndex(of: ":") {
+            let index = address.index(firstIndex, offsetBy: 1)
+            parsedAddress = String(address[index...])
+        } else {
+            parsedAddress = address
+        }
 		
-		switch service.validate(address: address) {
+		switch service.validate(address: parsedAddress) {
 		case .valid:
 			if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
-				row.value = address
+				row.value = parsedAddress
 				row.updateCell()
 			}
 			

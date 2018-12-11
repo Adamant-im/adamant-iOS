@@ -1,17 +1,17 @@
 //
-//  EthTransactionDetailsViewController.swift
+//  LskTransactionDetailsViewController.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 05.10.2018.
+//  Created by Anton Boyarkin on 27/11/2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
 import UIKit
 
-class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase {
+class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase {
     // MARK: - Dependencies
     
-    weak var service: EthWalletService?
+    weak var service: LskWalletService?
     
     // MARK: - Properties
     
@@ -27,7 +27,7 @@ class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
-        currencySymbol = EthWalletService.currencySymbol
+        currencySymbol = LskWalletService.currencySymbol
         
         super.viewDidLoad()
         
@@ -35,7 +35,9 @@ class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase 
             tableView.refreshControl = refreshControl
         }
         
-        startUpdate()
+        if transaction != nil {
+            startUpdate()
+        }
     }
     
     deinit {
@@ -47,7 +49,7 @@ class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
         let id = transaction.txId
         
-        return URL(string: "\(AdamantResources.ethereumExplorerAddress)\(id)")
+        return URL(string: "\(AdamantResources.liskExplorerAddress)\(id)")
     }
     
     @objc func refresh() {
@@ -60,15 +62,15 @@ class EthTransactionDetailsViewController: TransactionDetailsViewControllerBase 
             switch result {
             case .success(let trs):
                 self?.transaction = trs
-                
+
                 DispatchQueue.main.async {
                     self?.tableView.reloadData()
                     self?.refreshControl.endRefreshing()
                 }
-                
+
             case .failure(let error):
                 self?.dialogService.showRichError(error: error)
-                
+
                 DispatchQueue.main.async {
                     self?.refreshControl.endRefreshing()
                 }

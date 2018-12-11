@@ -439,7 +439,7 @@ class ChatViewController: MessagesViewController {
     // MARK: Tools
     private func messageKind(for richMessage: RichMessageTransaction) -> MessageKind {
         guard let type = richMessage.richType else {
-            return MessageKind.text(richMessage.richType ?? "Failed to read richmessage id: \(richMessage.id!)")
+            return MessageKind.text(richMessage.richType ?? "Failed to read richmessage id: \(richMessage.txId)")
         }
         
         guard var richContent = richMessage.richContent else {
@@ -688,6 +688,15 @@ private class StatusUpdateProcedure: Procedure {
             switch result {
             case .success(let status):
                 transaction.transactionStatus = status
+                
+                if let date = transaction.dateValue {
+                    let timeAgo = -1 * date.timeIntervalSinceNow
+                    
+                    if status == .pending, timeAgo > 60 * 60 * 3 { // 3h waiting for panding status
+                        transaction.transactionStatus = .failed
+                        break
+                    }
+                }
                 
                 if status == .pending {
                     // 'self' is destroyed right after completion of this clousure, so we need to hold references

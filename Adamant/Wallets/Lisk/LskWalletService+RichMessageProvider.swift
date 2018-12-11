@@ -1,15 +1,15 @@
 //
-//  EthWalletService+RichMessageProvider.swift
+//  LskWalletService+RichMessageProvider.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 08.09.2018.
+//  Created by Anton Boyarkin on 06/12/2018.
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
 import Foundation
 import MessageKit
 
-extension EthWalletService: RichMessageProvider {
+extension LskWalletService: RichMessageProvider {
     
     // MARK: Events
     
@@ -64,7 +64,7 @@ extension EthWalletService: RichMessageProvider {
         
         getTransaction(by: hash) { [weak self] result in
             dialogService.dismissProgress()
-            guard let vc = self?.router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController else {
+            guard let vc = self?.router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController else {
                 return
             }
             
@@ -74,36 +74,37 @@ extension EthWalletService: RichMessageProvider {
             vc.comment = comment
             
             switch result {
-            case .success(let ethTransaction):
-                vc.transaction = ethTransaction
+            case .success(let transaction):
+                vc.transaction = transaction
                 
             case .failure(let error):
-                switch error {
-                case .remoteServiceError:
-                    let amount: Decimal
-                    if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
-                        amount = decimal
-                    } else {
-                        amount = 0
-                    }
-                    
-                    let failedTransaction = SimpleTransactionDetails(txId: hash,
-                                                             senderAddress: transaction.senderAddress,
-                                                             recipientAddress: transaction.recipientAddress,
-                                                             dateValue: nil,
-                                                             amountValue: amount,
-                                                             feeValue: nil,
-                                                             confirmationsValue: nil,
-                                                             blockValue: nil,
-                                                             isOutgoing: transaction.isOutgoing,
-                                                             transactionStatus: TransactionStatus.failed)
-                    
-                    vc.transaction = failedTransaction
-                    
-                default:
-                    self?.dialogService.showRichError(error: error)
-                    return
-                }
+//                switch error {
+//                case .remoteServiceError:
+//                    let amount: Decimal
+//                    if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
+//                        amount = decimal
+//                    } else {
+//                        amount = 0
+//                    }
+//
+//                    let failedTransaction = SimpleTransactionDetails(txId: hash,
+//                                                                     senderAddress: transaction.senderAddress,
+//                                                                     recipientAddress: transaction.recipientAddress,
+//                                                                     dateValue: nil,
+//                                                                     amountValue: amount,
+//                                                                     feeValue: nil,
+//                                                                     confirmationsValue: nil,
+//                                                                     blockValue: nil,
+//                                                                     isOutgoing: transaction.isOutgoing,
+//                                                                     transactionStatus: TransactionStatus.failed)
+//
+//                    vc.transaction = failedTransaction
+//
+//                default:
+//                    self?.dialogService.showRichError(error: error)
+//                    return
+//                }
+                break
             }
             
             DispatchQueue.main.async {
@@ -122,7 +123,7 @@ extension EthWalletService: RichMessageProvider {
     
     func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
         guard case .custom(let raw) = message.kind, let transfer = raw as? RichMessageTransfer else {
-            fatalError("ETH service tried to render wrong message kind: \(message.kind)")
+            fatalError("LSK service tried to render wrong message kind: \(message.kind)")
         }
         
         let cellIdentifier = isFromCurrentSender ? cellIdentifierSent : cellIdentifierReceived
@@ -130,8 +131,8 @@ extension EthWalletService: RichMessageProvider {
             fatalError("Can't dequeue \(cellIdentifier) cell")
         }
         
-        cell.currencyLogoImageView.image = EthWalletService.currencyLogo
-        cell.currencySymbolLabel.text = EthWalletService.currencySymbol
+        cell.currencyLogoImageView.image = LskWalletService.currencyLogo
+        cell.currencySymbolLabel.text = LskWalletService.currencySymbol
         
         cell.amountLabel.text = AdamantBalanceFormat.full.format(transfer.amount)
         cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
@@ -152,12 +153,11 @@ extension EthWalletService: RichMessageProvider {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
     }()
     
-    func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
+    func shortDescription(for transaction: RichMessageTransaction) -> String {
         let amount: String
-        let string: String
         
         guard let raw = transaction.richContent?[RichContentKeys.transfer.amount] else {
-            return NSAttributedString(string: "⬅️  \(EthWalletService.currencySymbol)")
+            return "⬅️  \(LskWalletService.currencySymbol)"
         }
         
         if let decimal = Decimal(string: raw) {
@@ -167,11 +167,9 @@ extension EthWalletService: RichMessageProvider {
         }
         
         if transaction.isOutgoing {
-            string = "⬅️  \(amount) \(EthWalletService.currencySymbol)"
+            return "⬅️  \(amount) \(LskWalletService.currencySymbol)"
         } else {
-            string = "➡️  \(amount) \(EthWalletService.currencySymbol)"
+            return "➡️  \(amount) \(LskWalletService.currencySymbol)"
         }
-        
-        return NSAttributedString(string: string)
     }
 }
