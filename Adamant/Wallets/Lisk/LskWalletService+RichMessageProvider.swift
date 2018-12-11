@@ -153,11 +153,11 @@ extension LskWalletService: RichMessageProvider {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
     }()
     
-    func shortDescription(for transaction: RichMessageTransaction) -> String {
+    func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
         let amount: String
         
         guard let raw = transaction.richContent?[RichContentKeys.transfer.amount] else {
-            return "⬅️  \(LskWalletService.currencySymbol)"
+            return NSAttributedString(string: "⬅️  \(LskWalletService.currencySymbol)")
         }
         
         if let decimal = Decimal(string: raw) {
@@ -167,9 +167,9 @@ extension LskWalletService: RichMessageProvider {
         }
         
         if transaction.isOutgoing {
-            return "⬅️  \(amount) \(LskWalletService.currencySymbol)"
+            return NSAttributedString(string: "⬅️  \(amount) \(LskWalletService.currencySymbol)")
         } else {
-            return "➡️  \(amount) \(LskWalletService.currencySymbol)"
+            return NSAttributedString(string: "➡️  \(amount) \(LskWalletService.currencySymbol)")
         }
     }
 }
