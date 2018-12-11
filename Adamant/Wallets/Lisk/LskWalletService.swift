@@ -173,12 +173,26 @@ class LskWalletService: WalletService {
 	
 	// MARK: - Tools
 	func validate(address: String) -> AddressValidationResult {
-		let value = address.replacingOccurrences(of: "L", with: "")
-		
-        if addressRegex.perfectMatch(with: address), let number = BigUInt(value), number < maxAddressNumber {
-            return .valid
+        let full: String
+        let short: String
+        
+        guard let last = address.last else {
+            return .invalid
         }
-		return .invalid
+        
+        if last == "L" {
+            full = address
+            short = address.replacingOccurrences(of: "L", with: "")
+        } else {
+            full = "\(address)L"
+            short = address
+        }
+        
+        if addressRegex.perfectMatch(with: full), let number = BigUInt(short), number < maxAddressNumber {
+            return .valid
+        } else {
+            return .invalid
+        }
 	}
     
     func fromRawLsk(value: BigUInt) -> String {
@@ -227,6 +241,7 @@ extension LskWalletService: InitiatedWithPassphraseService {
         } catch {
             print("\(error)")
             completion(.failure(error: .accountNotFound))
+            stateSemaphore.signal()
             return
         }
         

@@ -72,6 +72,15 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
         }
         
         controller.transaction = transaction
+        
+        if let address = lskWalletService.wallet?.address {
+            if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+                controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            } else if transaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+                controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+            }
+        }
+        
         navigationController?.pushViewController(controller, animated: true)
     }
     

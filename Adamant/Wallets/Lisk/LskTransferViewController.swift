@@ -99,24 +99,26 @@ class LskTransferViewController: TransferViewControllerBase {
                                 }
 
                             case .failure(let error):
-                                // Issue: No transaction - delay of transation processing on server
-//                                vc.dialogService.showRichError(error: error)
-                                vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                                if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController {
-                                    detailsVc.transaction = transaction
-                                    detailsVc.service = service
-                                    detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                                    detailsVc.recipientName = self?.recipientName
-                                    
-                                    if comments.count > 0 {
-                                        detailsVc.comment = comments
+                                if case let .internalError(message, _) = error, message == "No transaction" {
+                                    vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                                    if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController {
+                                        detailsVc.transaction = transaction
+                                        detailsVc.service = service
+                                        detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                                        detailsVc.recipientName = self?.recipientName
+                                        
+                                        if comments.count > 0 {
+                                            detailsVc.comment = comments
+                                        }
+                                        
+                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+                                    } else {
+                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
                                     }
-                                    
-                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
                                 } else {
-                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
+                                    vc.dialogService.showRichError(error: error)
+                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
                                 }
-                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
                             }
                         }
                         
