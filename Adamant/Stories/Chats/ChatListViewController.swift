@@ -15,6 +15,7 @@ extension String.adamantLocalized {
 		static let title = NSLocalizedString("ChatListPage.Title", comment: "ChatList: scene title")
 		static let sentMessagePrefix = NSLocalizedString("ChatListPage.SentMessagePrefix", comment: "ChatList: outgoing message prefix")
         static let syncingChats = NSLocalizedString("ChatListPage.SyncingChats", comment: "ChatList: First syncronization is in progress")
+        static let searchPlaceholder = NSLocalizedString("ChatListPage.SearchBar.Placeholder", comment: "ChatList: SearchBar placeholder text")
         
 		private init() {}
 	}
@@ -105,7 +106,7 @@ class ChatListViewController: UIViewController {
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
         searchController.searchBar.delegate = self
-        searchController.searchBar.placeholder = NSLocalizedString("ChatListPage.SearchBar.Placeholder", comment: "")
+        searchController.searchBar.placeholder = String.adamantLocalized.chatList.searchPlaceholder
         
         tableView.tableHeaderView = self.searchController!.searchBar
         definesPresentationContext = true
@@ -820,10 +821,20 @@ extension ChatListViewController {
 extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, SearchResultDelegate {
     func updateSearchResults(for searchController: UISearchController) {
         if let searchString = searchController.searchBar.text {
-            if let result = chatsProvider.getMessages(with: searchString) {
-                if let vc = searchController.searchResultsController as? SearchResultsViewController {
-                    vc.updateResult(newResults: result)
+            let contacts = chatsController?.fetchedObjects?.filter({ (chatroom) -> Bool in
+                if let address = chatroom.partner?.address {
+                    if let name = self.addressBook.addressBook[address] {
+                        return name.contains(searchString) || address.contains(searchString)
+                    }
+                    return address.contains(searchString)
                 }
+                return false
+            })
+            
+            let messages = chatsProvider.getMessages(with: searchString)
+            
+            if let vc = searchController.searchResultsController as? SearchResultsViewController {
+                vc.updateResult(contacts: contacts, messages: messages)
             }
         }
     }
@@ -834,6 +845,14 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
                 DispatchQueue.main.async {
                     self.presentChatroom(chatroom, with: message)
                 }
+            }
+        }
+    }
+    
+    func didSelected(_ contact: Chatroom) {
+        searchController.dismiss(animated: true) {
+            DispatchQueue.main.async {
+                self.presentChatroom(contact)
             }
         }
     }
