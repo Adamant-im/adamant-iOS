@@ -67,6 +67,13 @@ extension AdamantScene {
 			c.accountService = r.resolve(AccountService.self)
 			return c
 		})
+        
+        static let searchResults = AdamantScene(identifier: "SearchResultsViewController", factory: { r in
+            let c = SearchResultsViewController(nibName: "SearchResultsViewController", bundle: nil)
+            c.router = r.resolve(Router.self)
+            c.avatarService = r.resolve(AvatarService.self)
+            return c
+        })
 		
 		private init() {}
 	}

@@ -51,6 +51,7 @@ class ChatViewController: MessagesViewController {
 	weak var delegate: ChatViewControllerDelegate?
 	var account: AdamantAccount?
 	var chatroom: Chatroom?
+    var messageToShow: MessageTransaction?
 	var dateFormatter: DateFormatter {
 		let formatter = DateFormatter()
 		formatter.dateStyle = .short
@@ -340,6 +341,20 @@ class ChatViewController: MessagesViewController {
 	override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
 		
+        // MARK: 4.2 Scroll to message
+        if let messageToShow = self.messageToShow {
+            if let fetched = chatController?.fetchedObjects {
+                if let idx = fetched.firstIndex(where: { (transaction) -> Bool in
+                    transaction.transactionId == messageToShow.transactionId
+                }) {
+                    let indexPath = IndexPath(item: 0, section: idx)
+                    messagesCollectionView.scrollToItem(at: indexPath, at: [.centeredVertically, .centeredHorizontally], animated: true)
+                    
+                    return
+                }
+            }
+        }
+        
 		if isFirstLayout {
 			isFirstLayout = false
             if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {

@@ -43,6 +43,8 @@ class ChatListViewController: UIViewController {
 	// MARK: Properties
 	var chatsController: NSFetchedResultsController<Chatroom>?
 	var unreadController: NSFetchedResultsController<ChatTransaction>?
+    
+    var searchController: UISearchController!
 	
 	private var preservedMessagess = [String:String]()
 	
@@ -91,6 +93,23 @@ class ChatListViewController: UIViewController {
 		if self.accountService.account != nil {
 			initFetchedRequestControllers(provider: chatsProvider)
 		}
+        
+        // MARK: Search controller
+        guard let searchResultController = router.get(scene: AdamantScene.Chats.searchResults) as? SearchResultsViewController else {
+            fatalError("Can't get SearchResultsViewController")
+        }
+        
+        searchResultController.delegate = self
+        
+        searchController = UISearchController(searchResultsController: searchResultController)
+        searchController.searchResultsUpdater = self
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.searchBar.delegate = self
+        searchController.searchBar.placeholder = NSLocalizedString("ChatListPage.SearchBar.Placeholder", comment: "")
+        
+        tableView.tableHeaderView = self.searchController!.searchBar
+        definesPresentationContext = true
+        searchController!.searchBar.sizeToFit()
 		
 		// MARK: Login/Logout
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
@@ -175,7 +194,7 @@ class ChatListViewController: UIViewController {
 	
 	
 	// MARK: Helpers
-	private func chatViewController(for chatroom: Chatroom) -> ChatViewController {
+    private func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil) -> ChatViewController {
 		guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
 			fatalError("Can't get ChatViewController")
 		}
@@ -183,6 +202,10 @@ class ChatListViewController: UIViewController {
 		if let account = accountService.account {
 			vc.account = account
 		}
+        
+        if let message = message {
+            vc.messageToShow = message
+        }
 		
 		vc.hidesBottomBarWhenPushed = true
 		vc.chatroom = chatroom
@@ -582,9 +605,9 @@ extension ChatListViewController {
 		}
 	}
 	
-	private func presentChatroom(_ chatroom: Chatroom) {
+    private func presentChatroom(_ chatroom: Chatroom, with message: MessageTransaction? = nil) {
 		// MARK: 1. Create and config ViewController
-        let vc = chatViewController(for: chatroom)
+        let vc = chatViewController(for: chatroom, with: message)
         
         if let split = self.splitViewController {
             let chat = UINavigationController(rootViewController:vc)
@@ -790,4 +813,28 @@ extension ChatListViewController {
 		
 		return vc.chatroom
 	}
+}
+
+// MARK: Search
+
+extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, SearchResultDelegate {
+    func updateSearchResults(for searchController: UISearchController) {
+        if let searchString = searchController.searchBar.text {
+            if let result = chatsProvider.getMessages(with: searchString) {
+                if let vc = searchController.searchResultsController as? SearchResultsViewController {
+                    vc.updateResult(newResults: result)
+                }
+            }
+        }
+    }
+    
+    func didSelected(_ message: MessageTransaction) {
+        searchController.dismiss(animated: true) {
+            if let chatroom = message.chatroom {
+                DispatchQueue.main.async {
+                    self.presentChatroom(chatroom, with: message)
+                }
+            }
+        }
+    }
 }
