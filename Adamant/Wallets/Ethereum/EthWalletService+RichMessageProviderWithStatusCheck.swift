@@ -10,7 +10,7 @@ import Foundation
 import web3swift
 
 extension EthWalletService: RichMessageProviderWithStatusCheck {
-    func statusForTransactionBy(hash: String, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void) {
+    func statusForTransactionBy(hash: String, date: Date?, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void) {
         do {
             _ = try web3.eth.getTransactionDetailsPromise(hash).wait()
         } catch let error as Web3Error {
