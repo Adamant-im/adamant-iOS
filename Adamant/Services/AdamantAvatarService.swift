@@ -54,7 +54,7 @@ class AdamantAvatarService: AvatarService {
         }
         
         UIGraphicsBeginImageContextWithOptions(CGSize(width: size, height: size), false, 0)
-        Hexa16(key: key, colors: colors, size: size)
+        Hexa16(key: key, size: size)
         
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -67,13 +67,13 @@ class AdamantAvatarService: AvatarService {
         }
     }
     
-    func Hexa16(key: String, colors: [[UIColor]], size: Double) {
+    func Hexa16(key: String, size: Double) {
         let fringeSize = size / 6
         let distance = distanceTo3rdPoint(fringeSize)
         let lines = size / fringeSize
         let offset = ((fringeSize - distance) * lines) / 2
         
-        let fillTriangle = triangleColors(0, key, colors, Int(lines))
+        let fillTriangle = triangleColors(0, key, Int(lines))
         let transparent = UIColor.clear
         
         let isLeft: (Int)->Bool = { (v: Int) -> Bool in return (v % 2) == 0 }
@@ -249,7 +249,7 @@ class AdamantAvatarService: AvatarService {
         return xsMirror
     }
     
-    func triangleColors(_ id: Int, _ key: String, _ colors: [[UIColor]], _ lines: Int) -> [UIColor] {
+    func triangleColors(_ id: Int, _ key: String, _ lines: Int) -> [UIColor] {
         var tColors = [UIColor]()
         
         var seed: UInt64 = 0
@@ -262,7 +262,7 @@ class AdamantAvatarService: AvatarService {
                                          lowestValue: 0,
                                          highestValue: Int(Int32.max/2))
         
-        let colors = colors[rnd.nextInt() % colors.count]
+        let colors = self.colors[rnd.nextInt() % self.colors.count]
         
         for t in Triangle.triangles[id] {
             let x = t.x
@@ -373,7 +373,7 @@ fileprivate struct Triangle {
     let y: Int
     let direction: Direction
     
-    // triangles in an array of arrray triangle positions.
+    // triangles in an array of array triangle positions.
     // each array correspond to a triangle, there are 6 of them,
     // indexes from 0 to 5, they form an hexagon.
     // each triangle to composed of 9 subtriangles ordered
