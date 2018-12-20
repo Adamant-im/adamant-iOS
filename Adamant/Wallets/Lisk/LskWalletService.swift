@@ -13,6 +13,7 @@ import BigInt
 import Lisk
 import Ed25519
 import web3swift
+import Alamofire
 
 class LskWalletService: WalletService {
     
@@ -70,6 +71,8 @@ class LskWalletService: WalletService {
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.lskWalletService", qos: .utility, attributes: [.concurrent])
 	
+    private let mainnet: Bool
+    
 	// MARK: - State
 	private (set) var state: WalletServiceState = .notInitiated
     
@@ -94,9 +97,8 @@ class LskWalletService: WalletService {
 	
 	
 	// MARK: - Logic
-    init() {
-        accountApi = Accounts(client: .mainnet)
-        transactionApi = Transactions(client: .mainnet)
+    init(mainnet: Bool = true) {
+        self.mainnet = mainnet
         
         // Notifications
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
@@ -212,12 +214,89 @@ class LskWalletService: WalletService {
     }
 }
 
+// MARK: - Nodes
+extension LskWalletService {
+    private func initiateNodes(completion: @escaping (Bool) -> Void) {
+        getAliveNodes(from: APIOptions.mainnet.nodes, timeout: 2.0) { nodes in
+            if nodes.count > 0 {
+                self.accountApi = Accounts(client: APIClient(options: APIOptions(nodes: nodes, nethash: APINethash.mainnet, randomNode: true)))
+                self.transactionApi = Transactions(client:  APIClient(options: APIOptions(nodes: nodes, nethash: APINethash.mainnet, randomNode: true)))
+                completion(true)
+            } else {
+                self.accountApi = nil
+                self.transactionApi = nil
+                completion(false)
+            }
+        }
+    }
+    
+    private func getAliveNodes(from nodes: [APINode], timeout: TimeInterval, completion: @escaping ([APINode]) -> Void) {
+        let group = DispatchGroup()
+        var aliveNodes = [APINode]()
+        
+        for node in nodes {
+            if let url = URL(string: "\(node.origin)/api/node/status") {
+                
+                var request = URLRequest(url: url)
+                request.httpMethod = "GET"
+                request.timeoutInterval = timeout
+                
+                group.enter() // Enter 1
+                
+                Alamofire.request(request).responseData { response in
+                    defer { group.leave() } // Leave 1
+                    
+                    switch response.result {
+                    case .success:
+                        aliveNodes.append(node)
+                        
+                    case .failure:
+                        break
+                    }
+                }
+            }
+        }
+        
+        group.notify(queue: defaultDispatchQueue) {
+            completion(aliveNodes)
+        }
+    }
+}
+
 // MARK: - WalletInitiatedWithPassphrase
 extension LskWalletService: InitiatedWithPassphraseService {
     func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+        DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
+            self.initWalletInternal(withPassphrase: passphrase, completion: completion)
+        }
+    }
+    
+    private func initWalletInternal(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
         guard let adamant = accountService.account else {
             completion(.failure(error: .notLogged))
             return
+        }
+        
+        // MARK: 0. Nodes
+        if mainnet {
+            var success = false
+            let group = DispatchGroup()
+            group.enter()
+            
+            initiateNodes { result in
+                defer { group.leave() }
+                success = result
+            }
+            
+            group.wait()
+            
+            if !success {
+                completion(.failure(error: .networkError))
+                return
+            }
+        } else {
+            accountApi = Accounts(client: .testnet)
+            transactionApi = Transactions(client: .testnet)
         }
         
         // MARK: 1. Prepare
@@ -356,24 +435,26 @@ extension LskWalletService: SwinjectDependentService {
 // MARK: - Balances & addresses
 extension LskWalletService {
     func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        if let address = self.lskWallet?.address {
-            accountApi.accounts(address: address) { (response) in
-                switch response {
-                case .success(response: let response):
-                    if let account = response.data.first {
-                        let balance = BigUInt(account.balance ?? "0") ?? BigUInt(0)
+        if let address = self.lskWallet?.address, let accountApi = accountApi {
+            defaultDispatchQueue.async {
+                accountApi.accounts(address: address) { (response) in
+                    switch response {
+                    case .success(response: let response):
+                        if let account = response.data.first {
+                            let balance = BigUInt(account.balance ?? "0") ?? BigUInt(0)
+                            
+                            completion(.success(result: balance.asDecimal(exponent: LskWalletService.currencyExponent)))
+                        } else {
+                            completion(.success(result: 0))
+                        }
                         
-                        completion(.success(result: balance.asDecimal(exponent: LskWalletService.currencyExponent)))
-                    } else {
-                        completion(.success(result: 0))
+                        break
+                    case .error(response: let error):
+                        print(error)
+                        
+                        completion(.failure(error: .internalError(message: error.message, error: nil)))
+                        break
                     }
-                    
-                    break
-                case .error(response: let error):
-                    print(error)
-                    
-                    completion(.failure(error: .internalError(message: error.message, error: nil)))
-                    break
                 }
             }
         } else {
@@ -435,35 +516,40 @@ extension LskWalletService {
 // MARK: - Transactions
 extension LskWalletService {
     func getTransactions(_ completion: @escaping (ApiServiceResult<[Transactions.TransactionModel]>) -> Void) {
-        if let address = self.wallet?.address {
-            transactionApi.transactions(senderIdOrRecipientId: address, limit: 100, offset: 0, sort: APIRequest.Sort("timestamp", direction: .descending)) { (response) in
+        if let address = self.wallet?.address, let transactionApi = transactionApi {
+            defaultDispatchQueue.async {
+                transactionApi.transactions(senderIdOrRecipientId: address, limit: 100, offset: 0, sort: APIRequest.Sort("timestamp", direction: .descending)) { (response) in
+                    switch response {
+                    case .success(response: let result):
+                        completion(.success(result.data))
+                        
+                    case .error(response: let error):
+                        completion(.failure(.internalError(message: error.message, error: nil)))
+                    }
+                }
+            }
+        } else {
+            completion(.failure(.internalError(message: "LSK Wallet: not found", error: nil)))
+        }
+    }
+    
+    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<Transactions.TransactionModel>) -> Void) {
+        let api: Transactions! = transactionApi
+        defaultDispatchQueue.async {
+            api.transactions(id: hash, limit: 1, offset: 0) { (response) in
                 switch response {
                 case .success(response: let result):
-                    completion(.success(result.data))
+                    if let transaction = result.data.first {
+                        completion(.success(transaction))
+                    } else {
+                        completion(.failure(.internalError(message: "No transaction", error: nil)))
+                    }
                     break
                 case .error(response: let error):
                     print("ERROR: " + error.message)
                     completion(.failure(.internalError(message: error.message, error: nil)))
                     break
                 }
-            }
-        }
-    }
-    
-    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<Transactions.TransactionModel>) -> Void) {
-        transactionApi.transactions(id: hash, limit: 1, offset: 0) { (response) in
-            switch response {
-            case .success(response: let result):
-                if let transaction = result.data.first {
-                    completion(.success(transaction))
-                } else {
-                    completion(.failure(.internalError(message: "No transaction", error: nil)))
-                }
-                break
-            case .error(response: let error):
-                print("ERROR: " + error.message)
-                completion(.failure(.internalError(message: error.message, error: nil)))
-                break
             }
         }
     }
