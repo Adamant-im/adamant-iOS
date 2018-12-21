@@ -361,10 +361,12 @@ class TransferViewControllerBase: FormViewController {
             // Eureka looses decimal precision when deserializing numbers by itself.
             // Try to get raw value and deserialize it
             if let input = row.cell.textInput as? UITextField, let raw = input.text {
-                if let amount = AdamantBalanceFormat.rawNumberDotFormatter.number(from: raw)?.decimalValue {
+                // NumberFormatter.number(from: string).decimalValue loses precision.
+                
+                if let amount = Decimal(string: raw), amount != 0.0 {
                     self.amount = amount
                     markRow(row, valid: validateAmount(amount))
-                } else if let amount = AdamantBalanceFormat.rawNumberCommaFormatter.number(from: raw)?.decimalValue {
+                } else if let amount = Decimal(string: raw, locale: Locale.current), amount != 0.0 {
                     self.amount = amount
                     markRow(row, valid: validateAmount(amount))
                 } else if let raw = row.value {
@@ -492,10 +494,6 @@ class TransferViewControllerBase: FormViewController {
 	/// nil for no stripe
 	func recipientStripe() -> Stripe? {
 		return [.qrCameraReader, .qrPhotoReader]
-	}
-	
-	func reportTransferTo(admAddress: String, transferRecipient: String, amount: Decimal, comments: String, hash: String) {
-		
 	}
     
     func defaultSceneTitle() -> String? {
