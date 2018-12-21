@@ -161,20 +161,34 @@ extension ChatViewController: MessagesDataSource {
         }
         
         // MARK: Rich transfer statuses
-        if let richTransaction = message as? RichMessageTransaction,
-            (richTransaction.transactionStatus == nil || richTransaction.transactionStatus == .notInitiated),
-            let updater = provider as? RichMessageProviderWithStatusCheck {
-            
-            /*
-             Сообщения-отчёты об отправленных средствах создаются раньше, чем на эфирных нодах появляется сама транзакция перевода (по ТЗ).
-             Проблема - как только сообщение появляется в чате, мы запрашиваем у эфирной ноды статус транзакции которую ещё не отправили - нода возвращает ошибку.
-             Решение - если сообщение появилось только что - обновим статус этой транзакции с 'некоторой' задержкой.
-             🤷🏻‍♂️
-             */
-            if let date = richTransaction.date, date.timeIntervalSinceNow > -2.0 {
-                updateStatus(for: richTransaction, provider: updater, delay: 5.0)
-            } else {
+        if let richTransaction = message as? RichMessageTransaction {
+            switch richTransaction.transactionStatus {
+            case nil, .notInitiated?:
+                guard let updater = provider as? RichMessageProviderWithStatusCheck else {
+                    break
+                }
+                
+                /*
+                 Сообщения-отчёты об отправленных средствах создаются раньше, чем на эфирных нодах появляется сама транзакция перевода (по ТЗ).
+                 Проблема - как только сообщение появляется в чате, мы запрашиваем у эфирной ноды статус транзакции которую ещё не отправили - нода возвращает ошибку.
+                 Решение - если сообщение появилось только что - обновим статус этой транзакции с 'некоторой' задержкой.
+                 🤷🏻‍♂️
+                 */
+                if let date = richTransaction.date, date.timeIntervalSinceNow > -2.0 {
+                    updateStatus(for: richTransaction, provider: updater, delay: 5.0)
+                } else {
+                    updateStatus(for: richTransaction, provider: updater)
+                }
+                
+            case .pending?:
+                guard !isUpdatingRichMessageStatus(id: richTransaction.objectID), let updater = provider as? RichMessageProviderWithStatusCheck else {
+                    break
+                }
+                
                 updateStatus(for: richTransaction, provider: updater)
+                
+            default:
+                break
             }
         }
         
