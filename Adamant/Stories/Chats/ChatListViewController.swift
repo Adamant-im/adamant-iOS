@@ -141,14 +141,18 @@ class ChatListViewController: UIViewController {
         super.viewDidLayoutSubviews()
         
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            var insets = tableView.contentInset
             if let rect = self.tabBarController?.tabBar.frame {
-                tableView.contentInset.bottom = rect.height
+                insets.bottom = rect.height
             }
             
-            if let rect = self.navigationController?.navigationBar.frame {
-                let y = rect.size.height + rect.origin.y
-                self.tableView.contentInset.top = y
+            if #available(iOS 11.0, *) { } else {
+                if let rect = self.navigationController?.navigationBar.frame {
+                    let y = rect.size.height + rect.origin.y
+                    insets.top = y
+                }
             }
+            tableView.contentInset = insets
         }
     }
 	
