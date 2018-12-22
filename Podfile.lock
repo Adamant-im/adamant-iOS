@@ -18,7 +18,6 @@ PODS:
   - FTIndicator/FTProgressIndicator (1.2.9)
   - FTIndicator/FTToastIndicator (1.2.9)
   - Haring (2.1)
-  - InputBarAccessoryView (4.1.1)
   - KeychainAccess (3.1.1)
   - libCEd25519 (1.1.0)
   - libsodium (1.0.12)
@@ -70,10 +69,9 @@ DEPENDENCIES:
   - FreakingSimpleRoundImageView
   - FTIndicator
   - Haring
-  - InputBarAccessoryView
   - KeychainAccess
   - libsodium
-  - Lisk (from `https://github.com/RealBonus/lisk-swift.git`, branch `dev`)
+  - Lisk (from `https://github.com/boyarkin-anton/lisk-swift.git`, branch `dev`)
   - MessageKit (from `https://github.com/RealBonus/MessageKit`, branch `temp/customMessageKind_swift42`)
   - MyLittlePinpad
   - Parchment
@@ -98,7 +96,6 @@ SPEC REPOS:
     - FreakingSimpleRoundImageView
     - FTIndicator
     - Haring
-    - InputBarAccessoryView
     - KeychainAccess
     - libCEd25519
     - libsodium
@@ -121,15 +118,15 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Lisk:
     :branch: dev
-    :git: https://github.com/RealBonus/lisk-swift.git
+    :git: https://github.com/boyarkin-anton/lisk-swift.git
   MessageKit:
     :branch: temp/customMessageKind_swift42
     :git: https://github.com/RealBonus/MessageKit
 
 CHECKOUT OPTIONS:
   Lisk:
-    :commit: 8436efc5ffd781b2484c989cccf3cbe69063892d
-    :git: https://github.com/RealBonus/lisk-swift.git
+    :commit: cdc362726e0fd42e900b87d8918d874d635492a6
+    :git: https://github.com/boyarkin-anton/lisk-swift.git
   MessageKit:
     :commit: 4409d10a7dcf390abbb696d280ec02025e89f4e7
     :git: https://github.com/RealBonus/MessageKit
@@ -146,7 +143,6 @@ SPEC CHECKSUMS:
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   Haring: b3a8495c073a016f03296d67debc609a7ecf7710
-  InputBarAccessoryView: 00890d184fd2903b7e0f7f1551bb546ec9c5845c
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
   libCEd25519: 45de00a0944cb2d51e64fcef67bd9989c42d20ca
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
@@ -168,6 +164,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: 4895c765c9858eb4737ef222eb8643bb5fc7fdb3
 
-PODFILE CHECKSUM: f2f557345988f38ecc6334ac472e3e3ade299b9a
+PODFILE CHECKSUM: 17981ca7dbf7440ef8c4e90c4b889b8aa510e6ad
 
 COCOAPODS: 1.6.0.beta.1

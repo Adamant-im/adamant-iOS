@@ -82,7 +82,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}.onCellSelection { [weak self] (cell, _) in
+		}.onCellSelection { [weak self] (cell, row) in
+            row.deselect()
 			let completion = { [weak self] in
 				guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
 					return
@@ -140,7 +141,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			balanceRow.cell.selectionStyle = .gray
 			balanceRow.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
-			}.onCellSelection { [weak self] (_, _) in
+			}.onCellSelection { [weak self] (_, row) in
+                row.deselect()
 				guard let service = self?.service as? WalletServiceWithTransfers else {
 					return
 				}
@@ -167,7 +169,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 				$0.cell.selectionStyle = .gray
 			}.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
-			}.onCellSelection { [weak self] (_, _) in
+			}.onCellSelection { [weak self] (_, row) in
+                row.deselect()
 				guard let service = self?.service as? WalletServiceWithSend else {
 					return
 				}
