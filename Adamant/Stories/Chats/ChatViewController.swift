@@ -9,7 +9,6 @@
 import UIKit
 import MessageKit
 import MessageInputBar
-import class InputBarAccessoryView.KeyboardManager
 import CoreData
 import SafariServices
 import ProcedureKit
@@ -217,18 +216,29 @@ class ChatViewController: MessagesViewController {
 		}
 		
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            self.edgesForExtendedLayout = UIRectEdge.top
+            
             view.addSubview(messageInputBar)
-            keyboardManager.bind(inputAccessoryView: messageInputBar)
+            keyboardManager.bind(inputAccessoryView: messageInputBar, usingTabBar: self.tabBarController?.tabBar)
             keyboardManager.bind(to: messagesCollectionView)
+            
+            self.scrollsToBottomOnKeyboardBeginsEditing = true
             
             keyboardManager.on(event: .didChangeFrame) { [weak self] (notification) in
                 let barHeight = self?.messageInputBar.bounds.height ?? 0
-                self?.messagesCollectionView.contentInset.bottom = barHeight + notification.endFrame.height
-                self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight + notification.endFrame.height
+                let keyboardHeight = notification.endFrame.height
+                let tabBarHeight = self?.tabBarController?.tabBar.bounds.height ?? 0
+                
+                self?.messagesCollectionView.contentInset.bottom = barHeight + keyboardHeight
+                self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight + keyboardHeight - tabBarHeight
+                DispatchQueue.main.async {
+                    self?.messagesCollectionView.scrollToBottom(animated: false)
+                }
                 }.on(event: .didHide) { [weak self] _ in
                     let barHeight = self?.messageInputBar.bounds.height ?? 0
+                    let tabBarHeight = self?.tabBarController?.tabBar.bounds.height ?? 0
                     self?.messagesCollectionView.contentInset.bottom = barHeight
-                    self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight
+                    self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight - tabBarHeight
             }
         }
         
@@ -329,13 +339,15 @@ class ChatViewController: MessagesViewController {
 	
 	override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
-        
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-            messagesCollectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
-        }
 		
 		if isFirstLayout {
 			isFirstLayout = false
+            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+                let barHeight = self.messageInputBar.bounds.height
+                messagesCollectionView.contentInset.bottom = barHeight
+                messagesCollectionView.scrollIndicatorInsets.bottom = barHeight - (tabBarController?.tabBar.bounds.height ?? 0)
+            }
+            
 			messagesCollectionView.scrollToBottom(animated: false)
 		}
 	}
@@ -684,19 +696,10 @@ private class StatusUpdateProcedure: Procedure {
             return
         }
         
-        provider.statusForTransactionBy(hash: txHash) { result in
+        provider.statusForTransactionBy(hash: txHash, date: transaction.dateValue) { result in
             switch result {
             case .success(let status):
                 transaction.transactionStatus = status
-                
-                if let date = transaction.dateValue {
-                    let timeAgo = -1 * date.timeIntervalSinceNow
-                    
-                    if status == .pending, timeAgo > 60 * 60 * 3 { // 3h waiting for panding status
-                        transaction.transactionStatus = .failed
-                        break
-                    }
-                }
                 
                 if status == .pending {
                     // 'self' is destroyed right after completion of this clousure, so we need to hold references

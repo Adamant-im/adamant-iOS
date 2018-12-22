@@ -17,7 +17,6 @@ target 'Adamant' do
   pod 'FTIndicator' # Notifications and activity indicator
   pod 'Eureka' # Forms
   pod 'MessageKit', :git => 'https://github.com/RealBonus/MessageKit', :branch => 'temp/customMessageKind_swift42' # Chat UI, swift 4.2
-  pod 'InputBarAccessoryView' # Input view for chat
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
   pod 'Parchment' # Paging menu

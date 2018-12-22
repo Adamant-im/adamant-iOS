@@ -33,7 +33,7 @@ protocol RichMessageProvider: class {
 }
 
 protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
-    func statusForTransactionBy(hash: String, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void)
+    func statusForTransactionBy(hash: String, date: Date?, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void)
     
     var delayBetweenChecks: TimeInterval { get }
 }
