@@ -9,7 +9,6 @@
 import UIKit
 import MessageKit
 import MessageInputBar
-import class InputBarAccessoryView.KeyboardManager
 import CoreData
 import SafariServices
 import ProcedureKit
@@ -217,9 +216,13 @@ class ChatViewController: MessagesViewController {
 		}
 		
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            self.edgesForExtendedLayout = UIRectEdge.top
+            
             view.addSubview(messageInputBar)
-            keyboardManager.bind(inputAccessoryView: messageInputBar)
+            keyboardManager.bind(inputAccessoryView: messageInputBar, usingTabBar: self.tabBarController?.tabBar)
             keyboardManager.bind(to: messagesCollectionView)
+            
+            self.scrollsToBottomOnKeyboardBeginsEditing = true
             
             keyboardManager.on(event: .didChangeFrame) { [weak self] (notification) in
                 let barHeight = self?.messageInputBar.bounds.height ?? 0
@@ -228,6 +231,9 @@ class ChatViewController: MessagesViewController {
                 
                 self?.messagesCollectionView.contentInset.bottom = barHeight + keyboardHeight
                 self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight + keyboardHeight - tabBarHeight
+                DispatchQueue.main.async {
+                    self?.messagesCollectionView.scrollToBottom(animated: false)
+                }
                 }.on(event: .didHide) { [weak self] _ in
                     let barHeight = self?.messageInputBar.bounds.height ?? 0
                     let tabBarHeight = self?.tabBarController?.tabBar.bounds.height ?? 0
