@@ -588,7 +588,7 @@ class AccountViewController: FormViewController {
             tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
         }
         
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !initiated {
             layoutTableHeaderView()
             layoutTableFooterView()
         }
