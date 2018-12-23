@@ -71,7 +71,7 @@ DEPENDENCIES:
   - Haring
   - KeychainAccess
   - libsodium
-  - Lisk (from `https://github.com/boyarkin-anton/lisk-swift.git`, branch `dev`)
+  - Lisk (from `https://github.com/RealBonus/lisk-swift.git`, branch `dev`)
   - MessageKit (from `https://github.com/RealBonus/MessageKit`, branch `temp/customMessageKind_swift42`)
   - MyLittlePinpad
   - Parchment
@@ -118,15 +118,15 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Lisk:
     :branch: dev
-    :git: https://github.com/boyarkin-anton/lisk-swift.git
+    :git: https://github.com/RealBonus/lisk-swift.git
   MessageKit:
     :branch: temp/customMessageKind_swift42
     :git: https://github.com/RealBonus/MessageKit
 
 CHECKOUT OPTIONS:
   Lisk:
-    :commit: cdc362726e0fd42e900b87d8918d874d635492a6
-    :git: https://github.com/boyarkin-anton/lisk-swift.git
+    :commit: 8436efc5ffd781b2484c989cccf3cbe69063892d
+    :git: https://github.com/RealBonus/lisk-swift.git
   MessageKit:
     :commit: 4409d10a7dcf390abbb696d280ec02025e89f4e7
     :git: https://github.com/RealBonus/MessageKit
@@ -164,6 +164,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: 4895c765c9858eb4737ef222eb8643bb5fc7fdb3
 
-PODFILE CHECKSUM: 17981ca7dbf7440ef8c4e90c4b889b8aa510e6ad
+PODFILE CHECKSUM: 97118d0b822e23f64e979daee78c3fc9947a4cf9
 
 COCOAPODS: 1.6.0.beta.1

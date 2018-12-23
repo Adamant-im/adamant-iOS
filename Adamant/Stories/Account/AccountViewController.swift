@@ -8,7 +8,6 @@
 
 import UIKit
 import Eureka
-import SafariServices
 import FreakingSimpleRoundImageView
 import CoreData
 import Parchment
@@ -18,10 +17,6 @@ import Parchment
 extension String.adamantLocalized {
 	struct account {
 		static let title = NSLocalizedString("AccountTab.Title", comment: "Account page: scene title")
-		
-		// URLs
-		static let getFreeTokensUrlFormat = NSLocalizedString("AccountTab.FreeTokens.UrlFormat", comment: "Account tab: A full 'Get free tokens' link, with %@ as address")
-		static let buyTokensUrlFormat = NSLocalizedString("AccountTab.BuyTokens.UrlFormat", comment: "Account tab: A full 'Buy tokens' link, with %@ as address")
 		
         static let updatingBalance = "…"
         
@@ -62,7 +57,7 @@ class AccountViewController: FormViewController {
 	}
 	
 	enum Rows {
-		case balance, sendTokens, buyTokens, freeTokens // Wallet
+		case balance, sendTokens // Wallet
 		case security, nodes, about // Application
 		case voteForDelegates, generateQr, logout // Actions
         case stayIn, biometry, notifications // Security
@@ -71,8 +66,6 @@ class AccountViewController: FormViewController {
 			switch self {
 			case .balance: return "blnc"
 			case .sendTokens: return "sndTkns"
-			case .buyTokens: return "bTkns"
-			case .freeTokens: return "frrTkns"
 			case .security: return "scrt"
 			case .nodes: return "nds"
 			case .about: return "bt"
@@ -89,8 +82,6 @@ class AccountViewController: FormViewController {
 			switch self {
 			case .balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
 			case .sendTokens: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
-			case .buyTokens: return NSLocalizedString("AccountTab.Row.BuyTokens", comment: "Account tab: 'Buy tokens' button")
-			case .freeTokens: return NSLocalizedString("AccountTab.Row.FreeTokens", comment: "Account tab: 'Get free tokens' button")
 			case .security: return NSLocalizedString("AccountTab.Row.Security", comment: "Account tab: 'Security' row")
 			case .nodes: return String.adamantLocalized.nodesList.nodesListButton
 			case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
@@ -109,10 +100,8 @@ class AccountViewController: FormViewController {
 			case .about: return #imageLiteral(resourceName: "row_about")
 			case .nodes: return #imageLiteral(resourceName: "row_nodes")
 			case .balance: return #imageLiteral(resourceName: "row_balance")
-			case .buyTokens: return #imageLiteral(resourceName: "row_buy-coins")
-			case .voteForDelegates: return #imageLiteral(resourceName: "row_vote-delegates")
-			case .logout: return #imageLiteral(resourceName: "row_logout")
-			case .freeTokens: return #imageLiteral(resourceName: "row_free-tokens")
+            case .voteForDelegates: return #imageLiteral(resourceName: "row_vote-delegates")
+            case .logout: return #imageLiteral(resourceName: "row_logout")
 			case .sendTokens: return nil
             case .generateQr: return #imageLiteral(resourceName: "row_QR.png")
             case .stayIn: return #imageLiteral(resourceName: "row_security")
@@ -133,8 +122,6 @@ class AccountViewController: FormViewController {
     var avatarService: AvatarService!
 	
 	// MARK: - Properties
-	
-	var hideFreeTokensRow = false
 	
 	let walletCellIdentifier = "wllt"
 	private (set) var accountHeaderView: AccountHeaderView!
@@ -616,14 +603,8 @@ class AccountViewController: FormViewController {
 		
 		if let account = accountService.account {
 			address = account.address
-			hideFreeTokensRow = account.balance > 0
 		} else {
 			address = ""
-			hideFreeTokensRow = true
-		}
-		
-		if let row: LabelRow = form.rowBy(tag: Rows.freeTokens.tag) {
-			row.evaluateHidden()
 		}
 		
 		accountHeaderView.addressButton.setTitle(address, for: .normal)

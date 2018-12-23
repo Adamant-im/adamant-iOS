@@ -69,6 +69,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.tableFooterView = UIView()
+        
         let section = Section()
 		
 		// MARK: Address
