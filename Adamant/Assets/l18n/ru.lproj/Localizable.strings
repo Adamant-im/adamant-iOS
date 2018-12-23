@@ -68,7 +68,7 @@
 "About.Row.Adamant" = "АДАМАНТ";
 
 /* System accounts: ADAMANT Tokens */
-"Accounts.AdamantTokens" = "Токены АДАМАНТ";
+"Accounts.AdamantTokens" = "Приветствие АДАМАНТа";
 
 /* System accounts: ADAMANT iOS Support */
 "Accounts.iOSSupport" = "Техподдержка iOS ADAMANT";
@@ -134,10 +134,10 @@
 "AccountTab.Row.FreeTokens" = "Бесплатные ADM-токены";
 
 /* Account tab: 'About' row */
-"AccountTab.Row.About" = "О нас";
+"AccountTab.Row.About" = "Об АДАМАНТе";
 
 /* Account tab: 'Vote for delegates' button */
-"AccountTab.Row.VoteForDelegates" = "Проголосовать за делегатов";
+"AccountTab.Row.VoteForDelegates" = "Голосовать за делегатов";
 
 /* Account tab: Actions section title */
 "AccountTab.Section.Actions" = "Действия";
@@ -146,13 +146,13 @@
 "AccountTab.Section.Application" = "Приложение";
 
 /* Account tab: Adamant wallet */
-"AccountTab.Wallets.adamant_wallet" = "ADAMANT кошелёк";
+"AccountTab.Wallets.adamant_wallet" = "Кошелек ADAMANT";
 
 /* Account tab: Ethereum wallet */
-"AccountTab.Wallets.ethereum_wallet" = "Ethereum кошелёк";
+"AccountTab.Wallets.ethereum_wallet" = "Кошелек Ethereum";
 
 /* Account tab: Lisk wallet */
-"AccountTab.Wallets.lisk_wallet" = "Lisk кошелёк";
+"AccountTab.Wallets.lisk_wallet" = "Кошелек Lisk";
 
 /* Account tab: Delegates section title */
 "AccountTab.Section.Delegates" = "Делегаты";
@@ -203,19 +203,19 @@
 "ChatsProvider.Validation.MessageTooLong" = "Сообщение слишком длинное";
 
 /* Known contacts: Adamant ICO message. Markdown supported. */
-"Chats.IcoMessage" = "Сейчас у вас есть возможность купить токены самого защищенного мессенджера АДАМАНТ по низкой цене.\n\nВажно! Пожалуйста, убедитесь, что вы сохранили пароль к этому аккаунту — выйдите из аккаунта и войдите в него снова. Лучше всего иметь запись пароля и на бумаге. Однако помните, только **вы несете ответственность за сохранность вашего пароля**. Его невозможно восстановить. А если он попадет в другие руки, ваши деньги будут украдены. Отнеситесь к этому вопросу так серьезно, как если бы цена токенов на вашем кошельке когда-то станет равна миллиарду долларов.\n\nЧтобы купить токены ADM, перейдите в этом месседжере на вкладку Кошелек и нажмите кнопку Купить токены, или откройте в браузере веб-страницу https://adamant.im/ru-buy-tokens/. В форме покупки токенов укажите ваш адрес АДАМАНТа — на него будут перечислены токены ADM. При переходе из мессенджера он будет вставлен автоматически. Укажите криптовалюту, в которой вы хотите произвести оплату, и какую сумму. Вы увидите сколько ADM-токенов вы получите, с учетом скидки за объем: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Нажмите кнопку Купить токены АДАМАНТ. Вы получите уникальный адрес, на который необходимо выполнить перевод. Как только на него поступит ожидаемая сумма и транзакция будет подтверждена, вы получите токены ADM. Транзакцию можно выполнить **с любого кошелька, включая биржи**. Необязятельно переводить точную сумму с учетом комиссии, платеж все равно будет засчитан.\nПосле того, как вы получите токены ADM, мы рекомендуем вам хранить их в кошельке как можно дольше. Ежемесячно все нераспроданные токены будут распределяться по кошелькам пользователей, увеличивая балансы на 5%. Подробную информацию можно получить на сайте Adamant.im и в Белой книге Проекта.\n\nНе отвечайте на это сообщение, этот адрес служебный. Если же у вас остались вопросы, напишите в аккаунт **U15677078342684640219**.";
+"Chats.IcoMessage" = "Null-0";
 
 /* Known contacts: Adamant pre ICO message */
 "Chats.PreIcoMessage" = "Null";
 
 /* Known contacts: Adamant welcome message. Markdown supported. */
-"Chats.WelcomeMessage" = "Добро пожаловать в самый анонимный и безопасный мессенджер АДАМАНТ. Помните, что безопасность и анонимность зависит и от вас самих. Не переходите по ссылкам, которые вы получаете в чатах, иначе ваш IP-адрес может быть определен. Не доверяйте расширениям браузера. Лучше всего передавать ваш ADM-адрес собеседникам лично, а не через другие мессенджеры. Храните вашу секретную фразу (пароль) от аккаунта в тайне. Установите на ваше устройство пароль или закрываете вкладку браузера после завершения диалогов.\n\nБолее полную информацию о безопасности и анонимности читайте на странице https://adamant.im/staysecured/.\n\nВсе транзакции в блокчейне требуют минимальной комиссии. Это необходимо для поддержания инфраструктуры сети. Чтобы начать общаться, **получите бесплатные токены** — перейдите на вкладку Кошелек и нажмите Бесплатные токены. Затем на вкладке Диалоги нажмите Новый чат и введите адрес собеседника. Чтобы скопировать ваш адрес, нажмите Идентификатор кошелька на вкладке Кошелек.\n\nНе отвечайте на это сообщение, этот адрес служебный. Если же у вас остались вопросы, напишите в аккаунт **U15677078342684640219**."; 
+"Chats.WelcomeMessage" = "Null"; 
 
 /* Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them */
 "Chats.RetryOrDelete.Title" = "Повторить или удалить?";
 
-/* Alert 'Retry Or Delete' body message. Used in caht for sending failed messages again or delete them */
-"Chats.RetryOrDelete.Body" = "Вы хотите отправить сообщение еще раз или удалить его?";
+/* Alert 'Retry Or Delete' body message. Used in chat for sending failed messages again or delete them */
+"Chats.RetryOrDelete.Body" = "Попробовать отправить сообщение еще раз, или удалить его?";
 
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Сообщение уже отправлено";
@@ -251,7 +251,7 @@
 "Delegates.Title" = "Делегаты";
 
 /* Delegates tab: Message about 50 ADM fee for vote */
-"Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Вам нужно иметь 50 ADM на счете вашего акаунта";
+"Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Нужно 50 ADM";
 
 /* Delegate details: scene title */
 "DelegateDetails.Title" = "Подробности";
