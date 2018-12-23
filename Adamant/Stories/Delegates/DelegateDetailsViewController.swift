@@ -230,7 +230,7 @@ extension DelegateDetailsViewController {
 			cell.detailTextLabel?.text = delegate.publicKey
 			
 		case .vote:
-			let weight = Decimal(string: delegate.vote)?.shiftedFromAdamant() ?? 0
+			let weight = Decimal(string: delegate.voteFair)?.shiftedFromAdamant() ?? 0
 			cell.detailTextLabel?.text = AdamantBalanceFormat.currencyFormatterShort.string(for: weight)
 			
 		case .producedblocks:
