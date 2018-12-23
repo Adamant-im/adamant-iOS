@@ -266,13 +266,13 @@
 "DelegateDetails.Row.PublicKey" = "Публичный ключ";
 
 /* Delegate Details Screen: Rows title for 'Vote weight'" */
-"DelegateDetails.Row.VoteWeight" = "Вес голоса";
+"DelegateDetails.Row.VoteWeight" = "Вес голосов";
 
 /* Delegate Details Screen: Rows title for 'Produced blocks'" */
-"DelegateDetails.Row.ProducedBlocks" = "Обработано";
+"DelegateDetails.Row.ProducedBlocks" = "Обработано блоков";
 
 /* Delegate Details Screen: Rows title for 'Missed blocks'" */
-"DelegateDetails.Row.MissedBlocks" = "Пропущено";
+"DelegateDetails.Row.MissedBlocks" = "Пропущено блоков";
 
 /* Delegate Details Screen: Rows title for 'Rate'" */
 "DelegateDetails.Row.Rate" = "Позиция";
@@ -281,10 +281,10 @@
 "DelegateDetails.Row.Rank" = "Ранг";
 
 /* Delegate Details Screen: Rows title for 'Approval'" */
-"DelegateDetails.Row.Approval" = "Блоков";
+"DelegateDetails.Row.Approval" = "Доля голосов";
 
 /* Delegate Details Screen: Rows title for 'Productivity'" */
-"DelegateDetails.Row.Productivity" = "Аптайм";
+"DelegateDetails.Row.Productivity" = "Продуктивность";
 
 /* Delegate Details Screen: Rows title for 'Forging time'" */
 "DelegateDetails.Row.ForgingTime" = "Время форжинга";
@@ -308,13 +308,13 @@
 "Delegates.VotePanel.Total" = "Всего:";
 
 /* Shared error: Account not found error. Using %@ for address. */
-"Error.AccountNotFoundFormat" = "Аккаун не найден: %@";
+"Error.AccountNotFoundFormat" = "Аккаунт не найден: %@";
 
 /* Shared error: Internal error format, %@ for message */
 "Error.InternalErrorFormat" = "Внутренняя ошибка: %@";
 
 /* Error messge title for support email */
-"Error.Mail.Title" = "У меня проблема с iOS-приложением";
+"Error.Mail.Title" = "Проблема с iOS-приложением";
 
 /* Error messge body for support email */
 "Error.Mail.Body" = "Здравствуйте,\n\nУ меня вот такая ошибка:\n\n%@\n\nУстройство:\n\n%@";
@@ -326,7 +326,7 @@
 "Error.NoNetwork" = "Нет соединения с сетью";
 
 /* Shared error: Remote error format, %@ for message */
-"Error.RemoteServerErrorFormat" = "Ошибка на узле блокчейна: %@. Сообщите об ошибке";
+"Error.RemoteServerErrorFormat" = "Ошибка на узле блокчейна: %@";
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "Не выполнен вход";
@@ -422,13 +422,13 @@
 "NodesList.AddNewNode" = "Добавить новую ноду";
 
 /* NodesList: Reset nodes alert title */
-"NodesList.ResetNodeListAlert" = "Сбросить список нод к списку по-умолчанию?";
+"NodesList.ResetNodeListAlert" = "Сбросить список нод к списку по умолчанию?";
 
 /* NodesList: 'Reset' button */
 "NodesList.ResetButton" = "Сбросить";
 
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
-"NodeList.DefaultNodesLoaded" = "Был загружен список нод по-умолчанию";
+"NodeList.DefaultNodesLoaded" = "Был загружен список нод по умолчанию";
 
 /* NodesEditor: New node scene title */
 "NodesEditor.NewNodeTitle" = "Новая нода";
@@ -461,7 +461,7 @@
 "NodesEditor.DeleteNodeButton" = "Удалить ноду";
 
 /* NodesEditor: Host row placeholder */
-"NodesEditor.HostRow.Placeholder" = "ip или имя хоста";
+"NodesEditor.HostRow.Placeholder" = "IP или имя хоста";
 
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Некорректный адрес хоста";
@@ -557,7 +557,7 @@
 "Shared.Cancel" = "Отмена";
 
 /* Shared alert notification: message about item copied to pasteboard. */
-"Shared.CopiedToPasteboard" = "Скопировано!";
+"Shared.CopiedToPasteboard" = "Скопировано";
 
 /* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
 "Shared.CopyToPasteboard" = "Копировать";
@@ -581,7 +581,7 @@
 "Shared.NoMail" = "Отправка почты недоступна";
 
 /* Shared alert 'Ok' button. Used anywhere */
-"Shared.Ok" = "Ок";
+"Shared.Ok" = "OK";
 
 /* Shared alert 'Save' button. Used anywhere */
 "Shared.Save" = "Сохранить";
@@ -686,7 +686,7 @@
 "TransactionDetailsScene.Section.Actions" = "Действия";
 
 /* Transaction details: 'Requesting Data' progress message. */
-"TransactionDetailsScene.RequestingData" = "Запрашиваем данные..";
+"TransactionDetailsScene.RequestingData" = "Запрашиваем данные…";
 
 /* Transaction details: 'Your address' flag. */
 "TransactionDetailsScene.YourAddress" = "Вы";
@@ -770,7 +770,7 @@
 "WalletServices.SharedErrors.notEnoughMoney" = "Недостаточно средств";
 
 /* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
-"WalletServices.SharedErrors.WalletNotInitiated" = "Кошелёк ещё не создан";
+"WalletServices.SharedErrors.WalletNotInitiated" = "Кошелек получателя еще не инициирован";
 
 /* Wallet Services: Shared error, invalid amount format. %@ for amount */
 "WalletServices.SharedErrors.InvalidAmountFormat" = "Неверное количество для отправки: %@";
