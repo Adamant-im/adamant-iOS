@@ -314,7 +314,7 @@
 "Error.InternalErrorFormat" = "Internal error: %@";
 
 /* Error messge title for support email */
-"Error.Mail.Title" = "I have error in my iOS app";
+"Error.Mail.Title" = "Error in iOS app";
 
 /* Error messge body for support email */
 "Error.Mail.Body" = "Hello,\n\nI have this error:\n\n%@\n\nMy device info:\n\n%@";
@@ -326,7 +326,7 @@
 "Error.NoNetwork" = "No connection";
 
 /* Shared error: Remote error format, %@ for message */
-"Error.RemoteServerErrorFormat" = "Blockchain Node error: %@";
+"Error.RemoteServerErrorFormat" = "Blockchain node error: %@";
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "User is not logged in";
@@ -422,13 +422,13 @@
 "NodesList.AddNewNode" = "Add new node";
 
 /* NodesList: Reset nodes alert title */
-"NodesList.ResetNodeListAlert" = "Reset node list to default?";
+"NodesList.ResetNodeListAlert" = "Reset nodes list to default?";
 
 /* NodesList: 'Reset' button */
 "NodesList.ResetButton" = "Reset";
 
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
-"NodeList.DefaultNodesLoaded" = "Default node list was loaded";
+"NodeList.DefaultNodesLoaded" = "Default nodes list was loaded";
 
 /* NodesEditor: New node scene title */
 "NodesEditor.NewNodeTitle" = "New node";
@@ -461,7 +461,7 @@
 "NodesEditor.DeleteNodeButton" = "Delete";
 
 /* NodesEditor: Host row placeholder */
-"NodesEditor.HostRow.Placeholder" = "ip or host name";
+"NodesEditor.HostRow.Placeholder" = "IP or host name";
 
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Invalid host";
@@ -494,13 +494,13 @@
 "NotificationsService.NewMessage.Title" = "New Message";
 
 /* Notifications: New single message notification body */
-"NotificationsService.NewMessage.BodySingle" = "You have new message";
+"NotificationsService.NewMessage.BodySingle" = "You have a new message";
 
 /* Notifications: New transfer transaction title */
 "NotificationsService.NewTransfer.Title" = "New Transfer";
 
 /* Notifications: New single transfer transaction body */
-"NotificationsService.NewTransfer.BodySingle" = "You have new transfer";
+"NotificationsService.NewTransfer.BodySingle" = "You have a new transfer";
 
 /* Notifications: User has disabled notifications. Head him into settings */
 "NotificationsService.NotificationsDisabled" = "Notifications disabled. You can enable notifications in Settings";
@@ -557,7 +557,7 @@
 "Shared.Cancel" = "Cancel";
 
 /* Shared alert notification: message about item copied to pasteboard. */
-"Shared.CopiedToPasteboard" = "Copied to Pasteboard!";
+"Shared.CopiedToPasteboard" = "Copied to Pasteboard";
 
 /* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
 "Shared.CopyToPasteboard" = "Copy to Pasteboard";
@@ -581,7 +581,7 @@
 "Shared.NoMail" = "Mail services are not available";
 
 /* Shared alert 'Ok' button. Used anywhere */
-"Shared.Ok" = "Ok";
+"Shared.Ok" = "OK";
 
 /* Shared alert 'Save' button. Used anywhere */
 "Shared.Save" = "Save";
@@ -686,13 +686,13 @@
 "TransactionDetailsScene.Section.Actions" = "Actions";
 
 /* Transaction details: 'Requesting Data' progress message. */
-"TransactionDetailsScene.RequestingData" = "Requesting Data..";
+"TransactionDetailsScene.RequestingData" = "Requesting Data…";
 
 /* Transaction details: 'Your address' flag. */
 "TransactionDetailsScene.YourAddress" = "You";
 
 /* TransfersProvider: Transaction not found error. %@ for transaction's ID */
-"TransfersProvider.Error.TransactionNotFoundFormat" = "Transaction with id %@ not found";
+"TransfersProvider.Error.TransactionNotFoundFormat" = "Transaction with ID %@ not found";
 
 /* Transfer: transfer amount placeholder */
 "TransferScene.Amount.Placeholder" = "to send";
@@ -752,7 +752,7 @@
 "TransferScene.Send" = "Send";
 
 /* Transfer: Confirm transfer alert: 'Can't Undo' message */
-"TransferScene.CantUndo" = "You can't undo this action";
+"TransferScene.CantUndo" = "You'll unable to undo this action";
 
 /* Tranfser: Confirm using maximum available for transfer tokens as amount to transfer. */
 "TransferScene.UseMaxToTransfer" = "Use all available tokens as amount to transfer?";
@@ -767,10 +767,10 @@
 "TransferScene.TransferSuccessMessage" = "Done!";
 
 /* Wallet Services: Shared error, user do not have enought money. */
-"WalletServices.SharedErrors.notEnoughMoney" = "Not enought money";
+"WalletServices.SharedErrors.notEnoughMoney" = "Not enough tokens";
 
 /* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
-"WalletServices.SharedErrors.WalletNotInitiated" = "Wallet not yet initiated";
+"WalletServices.SharedErrors.WalletNotInitiated" = "Recepient's wallet is not initiated yet";
 
 /* Wallet Services: Shared error, invalid amount format. %@ for amount */
 "WalletServices.SharedErrors.InvalidAmountFormat" = "Invalid amount to send: %@";
