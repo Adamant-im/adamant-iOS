@@ -82,9 +82,6 @@ class ShareQrViewController: FormViewController {
 	// MARK: - Lifecycle
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = true
-		}
         
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             var frame = tableView.frame

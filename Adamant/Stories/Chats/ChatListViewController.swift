@@ -73,8 +73,9 @@ class ChatListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = true
+            navigationItem.largeTitleDisplayMode = .never
 		}
 
 		navigationItem.title = String.adamantLocalized.chatList.title
@@ -130,10 +131,6 @@ class ChatListViewController: UIViewController {
 		super.viewWillAppear(animated)
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
-		}
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
 		}
 	}
 	

@@ -167,7 +167,7 @@ class ChatViewController: MessagesViewController {
 		}
 		
 		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
+            navigationItem.largeTitleDisplayMode = .never
 		}
 		
 		// MARK: 1. Initial configuration
@@ -349,14 +349,6 @@ class ChatViewController: MessagesViewController {
 		super.viewDidAppear(animated)
 		
 		chatroom?.markAsReaded()
-	}
-	
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
-		}
 	}
 	
 	override func viewDidDisappear(_ animated: Bool) {

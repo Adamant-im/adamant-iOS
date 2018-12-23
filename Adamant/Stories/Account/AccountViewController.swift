@@ -157,6 +157,11 @@ class AccountViewController: FormViewController {
 		
 		navigationOptions = .Disabled
 		navigationController?.setNavigationBarHidden(true, animated: false)
+        
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = true
+            navigationItem.largeTitleDisplayMode = .never
+        }
 		
 		// MARK: Status Bar
 		let statusBarView = UIView(frame: UIApplication.shared.statusBarFrame)
@@ -561,10 +566,6 @@ class AccountViewController: FormViewController {
 		
 		if !initiated {
 			initiated = true
-		}
-
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
 		}
 	}
     

@@ -88,8 +88,9 @@ class DelegatesListViewController: UIViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = false
+            navigationItem.largeTitleDisplayMode = .always
         }
 		
 		// MARK: Initial
@@ -132,10 +133,6 @@ class DelegatesListViewController: UIViewController {
 	
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
-		}
 		
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)

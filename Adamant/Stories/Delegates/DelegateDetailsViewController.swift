@@ -117,10 +117,6 @@ class DelegateDetailsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = false
-        }
-		
         if let delegate = delegate {
 			refreshData(with: delegate)
 			navigationItem.title = delegate.username
@@ -134,10 +130,6 @@ class DelegateDetailsViewController: UIViewController {
 		
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: true)
-		}
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
 		}
 	}
 }

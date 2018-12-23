@@ -44,7 +44,7 @@ class TransactionsListViewControllerBase: UIViewController {
         super.viewDidLoad()
         
         if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = false
+            navigationItem.largeTitleDisplayMode = .never
         }
         
         navigationItem.title = String.adamantLocalized.transactionList.title
