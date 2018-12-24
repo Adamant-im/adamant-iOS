@@ -257,15 +257,17 @@ class AccountViewController: FormViewController {
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
 		}.onCellSelection { [weak self] (_, _) in
-			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
+			guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
 				return
 			}
 			
             if let split = self?.splitViewController {
                 let details = UINavigationController(rootViewController:vc)
                 split.showDetailViewController(details, sender: self)
-            } else {
+            } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
+            } else {
+                self?.present(vc, animated: true, completion: nil)
             }
         }
 
@@ -280,15 +282,17 @@ class AccountViewController: FormViewController {
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
 		}.onCellSelection { [weak self] (_, _) in
-			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.about) else {
+			guard let vc = self?.router.get(scene: AdamantScene.Settings.about) else {
 				return
 			}
 			
             if let split = self?.splitViewController {
                 let details = UINavigationController(rootViewController:vc)
                 split.showDetailViewController(details, sender: self)
-            } else {
+            } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
+            } else {
+                self?.present(vc, animated: true, completion: nil)
             }
 		}
 		
@@ -309,15 +313,17 @@ class AccountViewController: FormViewController {
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
 		}.onCellSelection { [weak self] (_, row) in
-			guard let vc = self?.router.get(scene: AdamantScene.Delegates.delegates), let nav = self?.navigationController else {
+			guard let vc = self?.router.get(scene: AdamantScene.Delegates.delegates) else {
 				return
 			}
 			
             if let split = self?.splitViewController {
                 let details = UINavigationController(rootViewController:vc)
                 split.showDetailViewController(details, sender: self)
-            } else {
+            } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
+            } else {
+                self?.present(vc, animated: true, completion: nil)
             }
 		}
         
@@ -332,15 +338,17 @@ class AccountViewController: FormViewController {
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
-            guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.qRGenerator) else {
+            guard let vc = self?.router.get(scene: AdamantScene.Settings.qRGenerator) else {
                 return
             }
             
             if let split = self?.splitViewController {
                 let details = UINavigationController(rootViewController:vc)
                 split.showDetailViewController(details, sender: self)
-            } else {
+            } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
+            } else {
+                self?.present(vc, animated: true, completion: nil)
             }
         }
 
@@ -450,15 +458,17 @@ class AccountViewController: FormViewController {
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
-            guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.notifications) else {
+            guard let vc = self?.router.get(scene: AdamantScene.Settings.notifications) else {
                 return
             }
             
             if let split = self?.splitViewController {
                 let details = UINavigationController(rootViewController:vc)
                 split.showDetailViewController(details, sender: self)
-            } else {
+            } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
+            } else {
+                self?.present(vc, animated: true, completion: nil)
             }
         }
         

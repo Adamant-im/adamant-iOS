@@ -124,23 +124,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		// MARK: 4. Prepare pages
 		if let tabbar = window?.rootViewController as? UITabBarController {
+            // MARK: Chats
             let chats = UISplitViewController()
             chats.tabBarItem.title = String.adamantLocalized.tabItems.chats
             chats.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
             chats.preferredDisplayMode = .allVisible
             chats.tabBarItem.badgeColor = UIColor.adamant.primary
             
+            let chatList = UINavigationController(rootViewController: router.get(scene: AdamantScene.Chats.chatList))
+            
+            // MARK: Accounts
             let accounts = UISplitViewController()
             accounts.tabBarItem.title = String.adamantLocalized.tabItems.account
             accounts.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
             accounts.preferredDisplayMode = .allVisible
             accounts.tabBarItem.badgeColor = UIColor.adamant.primary
             
-            let chatListRoot = router.get(scene: AdamantScene.Chats.chatList)
-            let chatList = UINavigationController(rootViewController: chatListRoot)
-            
-            let accountRoot = router.get(scene: AdamantScene.Account.account)
-            let account = UINavigationController(rootViewController: accountRoot)
+            let account = UINavigationController(rootViewController: router.get(scene: AdamantScene.Account.account))
             
             if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
                 let chatDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
