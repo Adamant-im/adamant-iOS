@@ -250,35 +250,49 @@ class AdamantAvatarService: AvatarService {
     }
     
     func triangleColors(_ id: Int, _ key: String, _ lines: Int) -> [UIColor] {
-        var tColors = [UIColor]()
-        
-        var seed: UInt64 = 0
-        for u in key.md5().unicodeScalars {
-            seed += UInt64(u)
+        let keyHash = key.md5()
+        guard keyHash.count == 32 else {
+            fatalError("AdamantAvatarService: Wrong md5 hash")
         }
         
-        let rndSrc = GKLinearCongruentialRandomSource(seed: scramble(seed: seed))
-        let rnd = GKRandomDistribution(randomSource: rndSrc,
-                                         lowestValue: 0,
-                                         highestValue: Int(Int32.max/2))
+        var tColors = [UIColor]()
         
-        let colors = self.colors[rnd.nextInt() % self.colors.count]
+        var rawKeyArray = [Int]()
+        for u in keyHash.unicodeScalars {
+            rawKeyArray.append(Int(u.value))
+        }
+        let seed = scramble(rawKeyArray.reduce(0, +)) // sum of all values
         
-        for t in Triangle.triangles[id] {
+        // process hash values to number array with 10 values. 1 - avatar color set (merge first 5), 2-10 - values for triange colors (merged by 3 values)
+        var keyArray = [Int]()
+        keyArray.append(rawKeyArray[0..<5].reduce(0, +)) // merge first 5
+        for i in stride(from: 5, to: 32, by: 3) {
+            keyArray.append(rawKeyArray[i..<(i+3)].reduce(0, +)) // merge rest by 3
+        }
+        
+        let setId = seed % getValue(from: keyHash, by: keyArray[0])
+        let colorsSet = self.colors[setId % self.colors.count]
+        
+        for (i,t) in Triangle.triangles[id].enumerated() {
             let x = t.x
             let y = t.y
-            let index = (x + 3 * y + lines + rnd.nextInt()) % 15
-            let color = PickColor(key, colors, index: index)
+            let index = x + 3 * y + lines + seed + getValue(from: keyHash, by: keyArray[i+1])
+            let color = PickColor(keyHash, colorsSet, index: index)
             tColors.append(color)
         }
         return tColors
     }
     
-    func scramble( seed : UInt64 ) -> UInt64 {
-        let multiplier : UInt64 = 0x5DEECE66D
-        let mask : UInt64 = (1 << 48) - 1
+    func scramble( _ seed : Int ) -> Int {
+        let multiplier : Int = 0x5DEECE66D
+        let mask : Int = (1 << 48) - 1
         
         return (seed ^ multiplier) & mask;
+    }
+    
+    func getValue(from string: String, by index: Int) -> Int {
+        let s = String(string[index % string.count])
+        return Int([UInt8](s.utf8).first ?? 0)
     }
     
     func isOutsideHexagon(_ xL: Int, _ yL: Int, _ lines: Int) -> Bool {
@@ -325,7 +339,7 @@ class AdamantAvatarService: AvatarService {
     
     // PickColor returns a color given a key string, an array of colors and an index.
     // key: should be a md5 hash string.
-    // index: is an index from the key string. Should be in interval [0, 16]
+    // index: is an index from the key string.
     // Algorithm: PickColor converts the key[index] value to a decimal value.
     // We pick the ith colors that respects the equality value%numberOfColors == i.
     func PickColor(_ key: String, _ colors: [UIColor], index: Int) -> UIColor {
@@ -337,12 +351,11 @@ class AdamantAvatarService: AvatarService {
     // PickIndex returns an index of given a key string, the size of an array of colors
     //  and an index.
     // key: should be a md5 hash string.
-    // index: is an index from the key string. Should be in interval [0, 16]
+    // index: is an index from the key string.
     // Algorithm: PickIndex converts the key[index] value to a decimal value.
     // We pick the ith index that respects the equality value%sizeOfArray == i.
     func PickIndex(_ key: String, _ n: Int, _ index: Int) -> Int {
-        let s = String(key.md5()[index])
-        let r = Int([UInt8](s.utf8).first ?? 0)
+        let r = getValue(from: key, by: index)
         for i in 0 ..< n {
             if r%n == i {
                 return i
