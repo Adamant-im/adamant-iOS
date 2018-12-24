@@ -64,8 +64,10 @@ class DelegatesListViewController: UIViewController {
         
         return refreshControl
     }()
-	
-	private var forcedUpdateTimer: Timer? = nil
+    
+    private var forcedUpdateTimer: Timer? = nil
+    
+    private var searchController: UISearchController?
 
 	// MARK: Tools
 	
@@ -89,10 +91,6 @@ class DelegatesListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .always
-        }
-		
 		// MARK: Initial
         navigationItem.title = String.adamantLocalized.delegates.title
         tableView.register(UINib.init(nibName: "AdamantDelegateCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
@@ -101,13 +99,16 @@ class DelegatesListViewController: UIViewController {
 		
 		// MARK: Search controller
 		if #available(iOS 11.0, *) {
-			let searchController = UISearchController(searchResultsController: nil)
-			searchController.searchResultsUpdater = self
-			searchController.obscuresBackgroundDuringPresentation = false
-			searchController.hidesNavigationBarDuringPresentation = false
-			navigationItem.searchController = searchController
-			definesPresentationContext = true
-			navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
+            navigationItem.largeTitleDisplayMode = .always
+            
+			let controller = UISearchController(searchResultsController: nil)
+			controller.searchResultsUpdater = self
+			controller.obscuresBackgroundDuringPresentation = false
+			controller.hidesNavigationBarDuringPresentation = true
+            searchController = controller
+            
+            definesPresentationContext = true
+            navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
 		}
 		
 		// MARK: Reset UI
@@ -120,6 +121,18 @@ class DelegatesListViewController: UIViewController {
 		// MARK: Load data
 //        refreshControl.beginRefreshing() // Nasty glitches
         handleRefresh(refreshControl)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // Fix for UISplitViewController with UINavigationController with UISearchController.
+        // UISplitView in collapsed mode can't figure out what navigation item is topmost, and in viewDidLoad method searchController gets assigned to a wrong navigation item.
+        if #available(iOS 11.0, *) {
+            if navigationItem.searchController == nil {
+                navigationItem.searchController = searchController
+            }
+        }
     }
     
     deinit {
