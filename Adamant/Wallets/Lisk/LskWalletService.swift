@@ -72,6 +72,7 @@ class LskWalletService: WalletService {
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.lskWalletService", qos: .utility, attributes: [.concurrent])
 	
     private let mainnet: Bool
+    private let nodes: [APINode]
     
 	// MARK: - State
 	private (set) var state: WalletServiceState = .notInitiated
@@ -97,8 +98,17 @@ class LskWalletService: WalletService {
 	
 	
 	// MARK: - Logic
-    init(mainnet: Bool = true) {
+    convenience init(mainnet: Bool = true) {
+        self.init(mainnet: mainnet, nodes: APIOptions.mainnet.nodes)
+    }
+    
+    convenience init(mainnet: Bool, origins: [String]) {
+        self.init(mainnet: mainnet, nodes: origins.map { APINode(origin: $0) })
+    }
+    
+    init(mainnet: Bool, nodes: [APINode]) {
         self.mainnet = mainnet
+        self.nodes = nodes
         
         // Notifications
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
@@ -217,7 +227,7 @@ class LskWalletService: WalletService {
 // MARK: - Nodes
 extension LskWalletService {
     private func initiateNodes(completion: @escaping (Bool) -> Void) {
-        getAliveNodes(from: APIOptions.mainnet.nodes, timeout: 2.0) { nodes in
+        getAliveNodes(from: nodes, timeout: 2.0) { nodes in
             if nodes.count > 0 {
                 self.accountApi = Accounts(client: APIClient(options: APIOptions(nodes: nodes, nethash: APINethash.mainnet, randomNode: true)))
                 self.transactionApi = Transactions(client:  APIClient(options: APIOptions(nodes: nodes, nethash: APINethash.mainnet, randomNode: true)))

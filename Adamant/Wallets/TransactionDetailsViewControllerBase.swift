@@ -125,7 +125,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         super.viewDidLoad()
         
         if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .always
+            navigationItem.largeTitleDisplayMode = .never // some glitches, again
         }
         
         navigationItem.title = String.adamantLocalized.transactionDetails.title

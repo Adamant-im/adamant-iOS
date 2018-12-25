@@ -52,6 +52,10 @@ struct AdamantResources {
         "https://ethnode1.adamant.im/"
 //        "https://ropsten.infura.io/"  // test network
     ]
+    
+    static let lskServers = [
+        "https://lisknode1.adamant.im"
+    ]
 	
     // MARK: ADAMANT Addresses
 	static let supportEmail = "ios@adamant.im"
