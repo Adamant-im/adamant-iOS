@@ -276,7 +276,7 @@ class AdamantAvatarService: AvatarService {
         for (i,t) in Triangle.triangles[id].enumerated() {
             let x = t.x
             let y = t.y
-            let index = x + 3 * y + lines + seed + getValue(from: keyHash, by: keyArray[i+1])
+            let index = x + 3 * y + lines + seed % getValue(from: keyHash, by: keyArray[i+1])
             let color = PickColor(keyHash, colorsSet, index: index)
             tColors.append(color)
         }
@@ -284,10 +284,10 @@ class AdamantAvatarService: AvatarService {
     }
     
     func scramble( _ seed : Int ) -> Int {
-        let multiplier : Int = 0x5DEECE66D
-        let mask : Int = (1 << 48) - 1
+        let multiplier : Int64 = 0x5DEEC
+        let mask : Int64 = (1 << 30) - 1
         
-        return (seed ^ multiplier) & mask;
+        return Int((Int64(seed) ^ multiplier) & mask)
     }
     
     func getValue(from string: String, by index: Int) -> Int {
