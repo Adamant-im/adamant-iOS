@@ -184,6 +184,15 @@
 /* ChatList: outgoing message prefix */
 "ChatListPage.SentMessagePrefix" = "Вы: ";
 
+/* ChatList: SearchBar placeholder text */
+"ChatListPage.SearchBar.Placeholder" = "Поиск контактов или сообщений";
+
+/* SearchPage: Contacts header */
+"SearchPage.Contacts" = "Контакты";
+
+/* SearchPage: Messages header */
+"SearchPage.Messages" = "Сообщения";
+
 /* ChatList: First syncronization is in progress */
 "ChatListPage.SyncingChats" = "Загружаем чаты…";
 

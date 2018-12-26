@@ -104,13 +104,20 @@ class ChatListViewController: UIViewController {
         
         searchController = UISearchController(searchResultsController: searchResultController)
         searchController.searchResultsUpdater = self
-        searchController.dimsBackgroundDuringPresentation = false
         searchController.searchBar.delegate = self
         searchController.searchBar.placeholder = String.adamantLocalized.chatList.searchPlaceholder
-        
-        tableView.tableHeaderView = self.searchController!.searchBar
         definesPresentationContext = true
-        searchController!.searchBar.sizeToFit()
+        
+        if #available(iOS 11.0, *) {
+            searchController.obscuresBackgroundDuringPresentation = false
+            searchController.hidesNavigationBarDuringPresentation = false
+            navigationItem.searchController = searchController
+        } else {
+            searchController.dimsBackgroundDuringPresentation = false
+        
+            tableView.tableHeaderView = self.searchController!.searchBar
+            searchController!.searchBar.sizeToFit()
+        }
 		
 		// MARK: Login/Logout
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
@@ -822,19 +829,26 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
     func updateSearchResults(for searchController: UISearchController) {
         if let searchString = searchController.searchBar.text {
             let contacts = chatsController?.fetchedObjects?.filter({ (chatroom) -> Bool in
-                if let address = chatroom.partner?.address {
-                    if let name = self.addressBook.addressBook[address] {
-                        return name.contains(searchString) || address.contains(searchString)
+                if let partner = chatroom.partner {
+                    if partner.isSystem {
+                        return false
+                    } else {
+                        if let address = partner.address {
+                            if let name = self.addressBook.addressBook[address] {
+                                return name.localizedCaseInsensitiveContains(searchString) || address.localizedCaseInsensitiveContains(searchString)
+                            }
+                            return address.localizedCaseInsensitiveContains(searchString)
+                        }
                     }
-                    return address.contains(searchString)
                 }
+                
                 return false
             })
             
             let messages = chatsProvider.getMessages(with: searchString)
             
             if let vc = searchController.searchResultsController as? SearchResultsViewController {
-                vc.updateResult(contacts: contacts, messages: messages)
+                vc.updateResult(contacts: contacts, messages: messages, searchText: searchString)
             }
         }
     }

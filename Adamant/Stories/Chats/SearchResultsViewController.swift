@@ -33,6 +33,7 @@ class SearchResultsViewController: UITableViewController {
     // MARK: Properties
     private var contacts: [Chatroom] = [Chatroom]()
     private var messages: [MessageTransaction] = [MessageTransaction]()
+    private var searchText: String = ""
     
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize))
     
@@ -47,9 +48,11 @@ class SearchResultsViewController: UITableViewController {
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: "resultCell")
     }
     
-    func updateResult(contacts: [Chatroom]?, messages: [MessageTransaction]?) {
+    func updateResult(contacts: [Chatroom]?, messages: [MessageTransaction]?, searchText: String) {
         self.contacts = contacts ?? [Chatroom]()
         self.messages = messages ?? [MessageTransaction]()
+        self.searchText = searchText
+        
         tableView.reloadData()
     }
 
@@ -103,10 +106,13 @@ class SearchResultsViewController: UITableViewController {
         if let partner = chatroom.partner {
             if let title = chatroom.title {
                 cell.accountLabel.text = title
+                cell.lastMessageLabel.text = partner.address
             } else if let name = partner.name {
                 cell.accountLabel.text = name
+                cell.lastMessageLabel.text = partner.address
             } else {
-                cell.accountLabel.text = partner.address
+                cell.accountLabel.text = nil
+                cell.lastMessageLabel.text = partner.address
             }
             
             if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
@@ -129,22 +135,12 @@ class SearchResultsViewController: UITableViewController {
                 cell.borderWidth = 0
             }
         } else if let title = chatroom.title {
-            cell.accountLabel.text = title
+            cell.accountLabel.text = nil
+            cell.lastMessageLabel.text = title
         }
         
         cell.hasUnreadMessages = false
-        
-        if let lastTransaction = chatroom.lastTransaction {
-            cell.lastMessageLabel.attributedText = shortDescription(for: lastTransaction)
-        } else {
-            cell.lastMessageLabel.text = nil
-        }
-        
-        if let date = chatroom.updatedAt as Date?, date != Date.adamantNullDate {
-            cell.dateLabel.text = date.humanizedDay()
-        } else {
-            cell.dateLabel.text = nil
-        }
+        cell.dateLabel.text = nil
     }
     
     private func configureCell(_ cell: ChatTableViewCell, for message: MessageTransaction) {
@@ -182,7 +178,6 @@ class SearchResultsViewController: UITableViewController {
         
         cell.hasUnreadMessages = false
         
-//        cell.lastMessageLabel.text = message.message
         cell.lastMessageLabel.attributedText = shortDescription(for: message)
         
         if let date = message.sentDate as Date?, date != Date.adamantNullDate {
@@ -206,7 +201,17 @@ class SearchResultsViewController: UITableViewController {
                 raw = text
             }
             
-            return markdownParser.parse(raw)
+            let attributedString = markdownParser.parse(raw).mutableCopy() as! NSMutableAttributedString
+            
+            if let ranges = raw.range(of: searchText, options: .caseInsensitive) {
+                let attributes: [NSAttributedString.Key: Any] = [
+                    .foregroundColor: UIColor.adamant.active,
+                    ]
+                
+                attributedString.addAttributes(attributes, range: NSRange(ranges, in: raw))
+            }
+            
+            return attributedString
             
         default:
             return nil
@@ -244,4 +249,19 @@ class SearchResultsViewController: UITableViewController {
         return nil
     }
 
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if self.contacts.count > 0, self.messages.count > 0 {
+            if indexPath.section == 0  {
+                return 60
+            } else {
+                return 80
+            }
+        } else if self.contacts.count > 0 {
+            return 60
+        } else if self.messages.count > 0 {
+            return 80
+        }
+        
+        return 0
+    }
 }

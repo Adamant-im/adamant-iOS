@@ -10,10 +10,6 @@ import Foundation
 import CoreData
 
 extension AdamantChatsProvider {
-    func getMessages(with text: String) {
-        
-    }
-    
     func getMessages(with text: String) -> [MessageTransaction]?
     {
         let request = NSFetchRequest<MessageTransaction>(entityName: "MessageTransaction")
