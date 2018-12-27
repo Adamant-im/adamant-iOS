@@ -11,7 +11,6 @@ import UIKit
 import Swinject
 import BigInt
 import Lisk
-import Ed25519
 import web3swift
 
 class LskWalletService: WalletService {

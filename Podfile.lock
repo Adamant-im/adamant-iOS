@@ -5,8 +5,6 @@ PODS:
   - ByteBackpacker (1.2.1)
   - CryptoSwift (0.12.0)
   - DateToolsSwift (4.0.0)
-  - Ed25519 (1.1.0):
-    - libCEd25519 (~> 1.1.0)
   - EFQRCode (4.3.0)
   - Eureka (4.3.0)
   - FreakingSimpleRoundImageView (1.3)
@@ -19,11 +17,10 @@ PODS:
   - FTIndicator/FTToastIndicator (1.2.9)
   - Haring (2.1)
   - KeychainAccess (3.1.1)
-  - libCEd25519 (1.1.0)
   - libsodium (1.0.12)
   - Lisk (1.0.0):
     - CryptoSwift (~> 0.12.0)
-    - Ed25519 (~> 1.1.0)
+    - libsodium (~> 1.0.12)
   - MessageInputBar/Core (0.4.0)
   - MessageKit (1.0.0):
     - MessageInputBar/Core
@@ -71,7 +68,7 @@ DEPENDENCIES:
   - Haring
   - KeychainAccess
   - libsodium
-  - Lisk (from `https://github.com/boyarkin-anton/lisk-swift.git`, branch `dev`)
+  - Lisk (from `https://github.com/boyarkin-anton/lisk-swift.git`, branch `migrate_to_libsodium`)
   - MessageKit (from `https://github.com/RealBonus/MessageKit`, branch `temp/customMessageKind_swift42`)
   - MyLittlePinpad
   - Parchment
@@ -90,14 +87,12 @@ SPEC REPOS:
     - ByteBackpacker
     - CryptoSwift
     - DateToolsSwift
-    - Ed25519
     - EFQRCode
     - Eureka
     - FreakingSimpleRoundImageView
     - FTIndicator
     - Haring
     - KeychainAccess
-    - libCEd25519
     - libsodium
     - MessageInputBar
     - MyLittlePinpad
@@ -117,7 +112,7 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   Lisk:
-    :branch: dev
+    :branch: migrate_to_libsodium
     :git: https://github.com/boyarkin-anton/lisk-swift.git
   MessageKit:
     :branch: temp/customMessageKind_swift42
@@ -125,7 +120,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   Lisk:
-    :commit: cdc362726e0fd42e900b87d8918d874d635492a6
+    :commit: 646d859d59e3360df9650deeb3306cb8a7420ecc
     :git: https://github.com/boyarkin-anton/lisk-swift.git
   MessageKit:
     :commit: 4409d10a7dcf390abbb696d280ec02025e89f4e7
@@ -137,16 +132,14 @@ SPEC CHECKSUMS:
   ByteBackpacker: df001da117faacdbf09b69a116ec480f6651c9ec
   CryptoSwift: 1c07ca50843dd48bc54e6ea53d7a4dba3b645716
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
-  Ed25519: d84c847d8ffbb2f6fec71479abbb8fa3dfe12578
   EFQRCode: 51b67bd10952da9ef619ae0a396abb746b94263f
   Eureka: 6d711cb30ca333b4bc893110285a722ae3840114
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   Haring: b3a8495c073a016f03296d67debc609a7ecf7710
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
-  libCEd25519: 45de00a0944cb2d51e64fcef67bd9989c42d20ca
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
-  Lisk: 1720448e52a2e38b35d94df0650c1692c8b83e81
+  Lisk: 872c9089e44dec799df728d1239c75f4aef11dbb
   MessageInputBar: d46ecc5b355d13433b8367dcd200e05a6564f0ed
   MessageKit: 0aaaa6115a9b4497a65fcdfed5dad270fbc8f2b2
   MyLittlePinpad: 5d57cb5a092ddbeb5c4e6fa0b46df83bd3e88b0c
@@ -164,6 +157,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: 4895c765c9858eb4737ef222eb8643bb5fc7fdb3
 
-PODFILE CHECKSUM: 17981ca7dbf7440ef8c4e90c4b889b8aa510e6ad
+PODFILE CHECKSUM: 45db1cd56ec1a35d508f002c908a8402c573ff72
 
 COCOAPODS: 1.6.0.beta.1
