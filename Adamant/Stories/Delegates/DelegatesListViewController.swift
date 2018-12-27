@@ -85,7 +85,8 @@ class DelegatesListViewController: UIViewController {
     
     @IBOutlet weak var voteBtn: UIButton!
 
-	
+    @IBOutlet weak var infoViewBottomConstain: NSLayoutConstraint!
+    
 	// MARK: - Lifecycle
 	
     override func viewDidLoad() {
@@ -151,6 +152,19 @@ class DelegatesListViewController: UIViewController {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
 	}
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            if #available(iOS 11.0, *) {
+            } else if infoViewBottomConstain.constant == 0.0, let height = tabBarController?.tabBar.bounds.height {
+                infoViewBottomConstain.constant = -height
+                tableView.contentInset.bottom = 0.0
+                tableView.scrollIndicatorInsets.bottom = 0.0
+            }
+        }
+    }
 
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
 		guard let address = accountService.account?.address else {
