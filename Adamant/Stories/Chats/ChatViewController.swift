@@ -439,7 +439,8 @@ class ChatViewController: MessagesViewController {
 			dialogService.presentShareAlertFor(string: address,
                                                types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
 											   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                               animated: true, from: sender,
+                                               animated: true,
+                                               from: sender,
 											   completion: nil)
 			
 			return
@@ -448,9 +449,10 @@ class ChatViewController: MessagesViewController {
 		let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
 			self?.dialogService.presentShareAlertFor(string: address,
                                                      types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
-													excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                                    animated: true, from: sender,
-													completion: nil)
+                                                     excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                                                     animated: true,
+                                                     from: sender,
+                                                     completion: nil)
 		}
 		
 		let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] action in

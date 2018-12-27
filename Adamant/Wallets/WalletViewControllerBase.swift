@@ -326,6 +326,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 }
 
 
+// MARK: - TransferViewControllerDelegate
 extension WalletViewControllerBase: TransferViewControllerDelegate {
     func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?) {
         if let nav = navigationController, nav.topViewController == viewController {
