@@ -96,9 +96,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			
 			if let address = self?.service?.wallet?.address {
                 let types: [ShareType]
+                let withLogo = self?.includeLogoInQR() ?? false
                 
                 if let encodedAddress = self?.encodeForQr(address: address) {
-                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)]
+                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: withLogo)]
                 } else {
                     types = [.copyToPasteboard, .share]
                 }
@@ -283,6 +284,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     func encodeForQr(address: String) -> String? {
         return nil
+    }
+    
+    func includeLogoInQR() -> Bool {
+        return false
     }
     
     

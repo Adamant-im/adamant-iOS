@@ -139,4 +139,8 @@ class AdmWalletViewController: WalletViewControllerBase {
         
         return row
     }
+    
+    override func includeLogoInQR() -> Bool {
+        return true
+    }
 }
