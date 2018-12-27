@@ -230,7 +230,7 @@ class ChatViewController: MessagesViewController {
         messageInputBar.setStackViewItems([attachmentButton], forStack: .left, animated: false)
 		
         // Add spacing between leftStackView (attachment button) and message input field
-        messageInputBar.leftStackView.alignment = .leading
+        messageInputBar.leftStackView.alignment = .bottom
         messageInputBar.setLeftStackViewWidthConstant(to: ChatViewController.attachmentButtonSize + size*2, animated: false)
         messageInputBar.leftStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: size*2)
         messageInputBar.leftStackView.isLayoutMarginsRelativeArrangement = true
