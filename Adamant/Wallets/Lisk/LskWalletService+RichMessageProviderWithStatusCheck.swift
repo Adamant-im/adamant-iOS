@@ -9,11 +9,24 @@
 import Foundation
 
 extension LskWalletService: RichMessageProviderWithStatusCheck {
-    func statusForTransactionBy(hash: String, date: Date?, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void) {
+    func statusForTransactionBy(hash: String, date: Date?, amount: Double, isOutgoing: Bool, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void) {
         getTransaction(by: hash) { result in
             switch result {
-            case .success(let traansaction):
-                if let status = traansaction.transactionStatus {
+            case .success(let transaction):
+                if var status = transaction.transactionStatus {
+                    
+                    if status == .success, isOutgoing == false, let date = date {
+                        let start = date.addingTimeInterval(-60 * 5)
+                        let end = date.addingTimeInterval(60 * 5)
+                        let range = start...end
+                        if transaction.recipientAddress != self.lskWallet?.address ||
+                            !range.contains(transaction.sentDate) ||
+                            amount != transaction.amountValue.doubleValue
+                            {
+                            status = .warning
+                        }
+                    }
+                    
                     completion(.success(result: status))
                 } else {
                     completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))

@@ -690,13 +690,13 @@ private class StatusUpdateProcedure: Procedure {
             return
         }
         
-        guard let txHash = transaction.richContent?[RichContentKeys.transfer.hash] else {
+        guard let txHash = transaction.richContent?[RichContentKeys.transfer.hash], let amount = Double(transaction.richContent?[RichContentKeys.transfer.amount] ?? "") else {
             transaction.transactionStatus = .failed
             try? privateContext.save()
             return
         }
         
-        provider.statusForTransactionBy(hash: txHash, date: transaction.dateValue) { result in
+        provider.statusForTransactionBy(hash: txHash, date: transaction.dateValue, amount: amount, isOutgoing: transaction.isOutgoing) { result in
             switch result {
             case .success(let status):
                 transaction.transactionStatus = status

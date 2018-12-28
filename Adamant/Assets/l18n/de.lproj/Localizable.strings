@@ -238,6 +238,9 @@
 /* Chat: status message for pending chat transaction */
 "ChatScene.MessageStatus.Pending" = "Ausstehend";
 
+/* Chat: status message for warning chat transaction */
+"ChatScene.MessageStatus.Warning" = "Warnung";
+
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Tippen Sie für Details";
 

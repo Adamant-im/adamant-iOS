@@ -235,6 +235,9 @@
 /* Chat: status message for pending chat transaction */
 "ChatScene.MessageStatus.Pending" = "Отправка";
 
+/* Chat: status message for warning chat transaction */
+"ChatScene.MessageStatus.Warning" = "Внимание";
+
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Подробнее…";
 
