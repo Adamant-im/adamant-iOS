@@ -329,11 +329,35 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 // MARK: - TransferViewControllerDelegate
 extension WalletViewControllerBase: TransferViewControllerDelegate {
     func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?) {
-        if let nav = navigationController, nav.topViewController == viewController {
+        if let split = splitViewController {
+            if let nav = split.viewControllers.last as? UINavigationController {
+                DispatchQueue.main.async { [weak self] in
+                    if let detailsViewController = detailsViewController {
+                        var viewControllers = nav.viewControllers
+                        viewControllers.removeLast()
+                        
+                        if let service = self?.service as? WalletServiceWithTransfers {
+                            viewControllers.append(service.transferListViewController())
+                        }
+                        
+                        viewControllers.append(detailsViewController)
+                        nav.setViewControllers(viewControllers, animated: true)
+                    } else {
+                        nav.popViewController(animated: true)
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    split.showDetailViewController(viewController, sender: nil)
+                }
+            }
+        } else if let nav = navigationController {
             DispatchQueue.main.async {
                 if let detailsViewController = detailsViewController {
-                    nav.popViewController(animated: false)
-                    nav.pushViewController(detailsViewController, animated: true)
+                    var viewControllers = nav.viewControllers
+                    viewControllers.removeLast()
+                    viewControllers.append(detailsViewController)
+                    nav.setViewControllers(viewControllers, animated: true)
                 } else {
                     nav.popViewController(animated: true)
                 }
