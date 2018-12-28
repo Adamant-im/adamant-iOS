@@ -171,7 +171,7 @@ extension TransactionStatus {
         case .pending:return #imageLiteral(resourceName: "status_pending")
         case .success: return #imageLiteral(resourceName: "status_success")
         case .failed: return #imageLiteral(resourceName: "status_failed")
-        case .warning: return #imageLiteral(resourceName: "error")
+        case .warning: return #imageLiteral(resourceName: "status_warning")
         }
     }
     
