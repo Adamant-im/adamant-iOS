@@ -149,7 +149,7 @@ extension Transactions.TransactionModel: TransactionDetails {
     }
     
     var transactionStatus: TransactionStatus? {
-        if confirmations > 100 {
+        if confirmations >= 1 {
             return .success
         }
         return .pending

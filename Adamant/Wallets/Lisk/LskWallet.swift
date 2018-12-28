@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Ed25519
+import Lisk
 
 class LskWallet: WalletAccount {
 	let address: String
