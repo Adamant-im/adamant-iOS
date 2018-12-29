@@ -83,18 +83,10 @@ class ShareQrViewController: FormViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
         
-        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-            var frame = tableView.frame
-            frame.size.width = 300
-            tableView.frame = frame
-            
-            tableView.center = view.center
-            view.backgroundColor = tableView.backgroundColor
-        }
-		
 		// MARK: QR code
-		form +++ Section()
-		<<< QrRow() {
+        let qrSection = Section()
+        
+		let qrRow = QrRow() {
 			$0.value = qrCode
 			$0.tag = Rows.qr.tag
 			$0.cell.selectionStyle = .none
@@ -105,12 +97,18 @@ class ShareQrViewController: FormViewController {
 				$0.cell.tipLabelIsHidden = true
 			}
 		}
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            qrRow.cell.height = { 450.0 }
+        }
+        
+        qrSection.append(qrRow)
 		
 		// MARK: Buttons
-		+++ Section()
+		let buttonsSection = Section()
 			
 		// Photolibrary
-		<<< ButtonRow() {
+		let photolibraryRow = ButtonRow() {
 			$0.tag = Rows.saveToPhotos.tag
 			$0.title = Rows.saveToPhotos.localized
 		}.onCellSelection { [weak self] (cell, row) in
@@ -133,7 +131,7 @@ class ShareQrViewController: FormViewController {
 		}
 			
 		// Share
-		<<< ButtonRow() {
+		let shareRow = ButtonRow() {
 			$0.tag = Rows.shareButton.tag
 			$0.title = Rows.shareButton.localized
 		}.onCellSelection { [weak self] (cell, row) in
@@ -145,6 +143,11 @@ class ShareQrViewController: FormViewController {
 			if let excludedActivityTypes = self?.excludedActivityTypes {
 				vc.excludedActivityTypes = excludedActivityTypes
 			}
+            
+            if let c = vc.popoverPresentationController {
+                c.sourceView = cell
+                c.sourceRect = cell.bounds
+            }
 			
 			vc.completionWithItemsHandler = { [weak self] (type: UIActivity.ActivityType?, completed: Bool, _, error: Error?) in
 				if completed {
@@ -162,7 +165,7 @@ class ShareQrViewController: FormViewController {
 			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
 		
-		<<< ButtonRow() {
+		let cancelRow = ButtonRow() {
 			$0.tag = Rows.cancelButton.tag
 			$0.title = Rows.cancelButton.localized
 		}.onCellSelection { [weak self] (cell, row) in
@@ -170,6 +173,10 @@ class ShareQrViewController: FormViewController {
 		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
+        
+        buttonsSection.append(contentsOf: [photolibraryRow, shareRow, cancelRow])
+        
+        form.append(contentsOf: [qrSection, buttonsSection])
 	}
 	
 	func close() {
