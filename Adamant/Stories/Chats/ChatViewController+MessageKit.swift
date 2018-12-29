@@ -29,7 +29,9 @@ extension ChatViewController {
 extension ChatViewController: MessagesDataSource {
 	func currentSender() -> Sender {
 		guard let account = account else {
-			fatalError("No account")
+            // Until we will update our network to procedures
+            return(Sender(id: "your moma", displayName: ""))
+//            fatalError("No account")
 		}
 		return Sender(id: account.address, displayName: account.address)
 	}
