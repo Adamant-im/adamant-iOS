@@ -18,7 +18,7 @@ PODS:
   - Haring (2.1)
   - KeychainAccess (3.1.1)
   - libsodium (1.0.12)
-  - Lisk (1.0.0):
+  - Lisk (1.1.0):
     - CryptoSwift (~> 0.12.0)
     - libsodium (~> 1.0.12)
   - MessageInputBar/Core (0.4.0)
@@ -68,7 +68,7 @@ DEPENDENCIES:
   - Haring
   - KeychainAccess
   - libsodium
-  - Lisk (from `https://github.com/boyarkin-anton/lisk-swift.git`, branch `migrate_to_libsodium`)
+  - Lisk (from `https://github.com/adamant-im/lisk-swift.git`)
   - MessageKit (from `https://github.com/RealBonus/MessageKit`, branch `temp/customMessageKind_swift42`)
   - MyLittlePinpad
   - Parchment
@@ -112,16 +112,15 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   Lisk:
-    :branch: migrate_to_libsodium
-    :git: https://github.com/boyarkin-anton/lisk-swift.git
+    :git: https://github.com/adamant-im/lisk-swift.git
   MessageKit:
     :branch: temp/customMessageKind_swift42
     :git: https://github.com/RealBonus/MessageKit
 
 CHECKOUT OPTIONS:
   Lisk:
-    :commit: 646d859d59e3360df9650deeb3306cb8a7420ecc
-    :git: https://github.com/boyarkin-anton/lisk-swift.git
+    :commit: 154a3af05772136b776ff14ae05f92c8d844ea20
+    :git: https://github.com/adamant-im/lisk-swift.git
   MessageKit:
     :commit: 4409d10a7dcf390abbb696d280ec02025e89f4e7
     :git: https://github.com/RealBonus/MessageKit
@@ -139,7 +138,7 @@ SPEC CHECKSUMS:
   Haring: b3a8495c073a016f03296d67debc609a7ecf7710
   KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
-  Lisk: 872c9089e44dec799df728d1239c75f4aef11dbb
+  Lisk: 2b21f9a60f4b1583349a1b1677d83781ec32ca70
   MessageInputBar: d46ecc5b355d13433b8367dcd200e05a6564f0ed
   MessageKit: 0aaaa6115a9b4497a65fcdfed5dad270fbc8f2b2
   MyLittlePinpad: 5d57cb5a092ddbeb5c4e6fa0b46df83bd3e88b0c
@@ -157,6 +156,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: 4895c765c9858eb4737ef222eb8643bb5fc7fdb3
 
-PODFILE CHECKSUM: 45db1cd56ec1a35d508f002c908a8402c573ff72
+PODFILE CHECKSUM: 0211bde992c1ef60f3943165f36ecaad63e86cc1
 
 COCOAPODS: 1.6.0.beta.1
