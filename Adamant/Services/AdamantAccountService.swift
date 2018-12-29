@@ -87,8 +87,11 @@ class AdamantAccountService: AccountService {
 	// MARK: Wallets
 	var wallets: [WalletService] = [
 		AdmWalletService(),
-		EthWalletService(), // TODO: Move to background thread
+		EthWalletService(),
         LskWalletService(mainnet: true, origins: AdamantResources.lskServers)
+        
+        // Testnet
+//        LskWalletService(mainnet: false)
 	]
     
     init() {

@@ -98,7 +98,8 @@ class LskWalletService: WalletService {
 	
 	// MARK: - Logic
     convenience init(mainnet: Bool = true) {
-        self.init(mainnet: mainnet, nodes: APIOptions.mainnet.nodes)
+        let nodes = mainnet ? APIOptions.mainnet.nodes : APIOptions.testnet.nodes
+        self.init(mainnet: mainnet, nodes: nodes)
     }
     
     convenience init(mainnet: Bool, origins: [String]) {
