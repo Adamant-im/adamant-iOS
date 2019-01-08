@@ -67,11 +67,12 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
         
         let transaction = transactions[indexPath.row]
         
-        guard let controller = router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? TransactionDetailsViewControllerBase else {
+        guard let controller = router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController else {
             return
         }
         
         controller.transaction = transaction
+        controller.service = lskWalletService
         
         if let address = lskWalletService.wallet?.address {
             if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {

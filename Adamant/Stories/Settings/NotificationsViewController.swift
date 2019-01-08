@@ -64,12 +64,12 @@ class NotificationsViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        if #available(iOS 11.0, *) {
+            navigationItem.largeTitleDisplayMode = .always
+        }
+        
         navigationItem.title = String.adamantLocalized.security.title
         navigationOptions = .Disabled
-        
-        if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = true
-        }
         
         // MARK: Notifications
         // Type

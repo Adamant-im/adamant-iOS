@@ -69,6 +69,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.tableFooterView = UIView()
+        
         let section = Section()
 		
 		// MARK: Address
@@ -94,9 +96,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			
 			if let address = self?.service?.wallet?.address {
                 let types: [ShareType]
+                let withLogo = self?.includeLogoInQR() ?? false
                 
                 if let encodedAddress = self?.encodeForQr(address: address) {
-                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)]
+                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: withLogo)]
                 } else {
                     types = [.copyToPasteboard, .share]
                 }
@@ -283,6 +286,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         return nil
     }
     
+    func includeLogoInQR() -> Bool {
+        return false
+    }
+    
     
     // MARK: - Other
     
@@ -319,13 +326,38 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 }
 
 
+// MARK: - TransferViewControllerDelegate
 extension WalletViewControllerBase: TransferViewControllerDelegate {
     func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?) {
-        if let nav = navigationController, nav.topViewController == viewController {
+        if let split = splitViewController {
+            if let nav = split.viewControllers.last as? UINavigationController {
+                DispatchQueue.main.async { [weak self] in
+                    if let detailsViewController = detailsViewController {
+                        var viewControllers = nav.viewControllers
+                        viewControllers.removeLast()
+                        
+                        if let service = self?.service as? WalletServiceWithTransfers {
+                            viewControllers.append(service.transferListViewController())
+                        }
+                        
+                        viewControllers.append(detailsViewController)
+                        nav.setViewControllers(viewControllers, animated: true)
+                    } else {
+                        nav.popViewController(animated: true)
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    split.showDetailViewController(viewController, sender: nil)
+                }
+            }
+        } else if let nav = navigationController {
             DispatchQueue.main.async {
                 if let detailsViewController = detailsViewController {
-                    nav.popViewController(animated: false)
-                    nav.pushViewController(detailsViewController, animated: true)
+                    var viewControllers = nav.viewControllers
+                    viewControllers.removeLast()
+                    viewControllers.append(detailsViewController)
+                    nav.setViewControllers(viewControllers, animated: true)
                 } else {
                     nav.popViewController(animated: true)
                 }

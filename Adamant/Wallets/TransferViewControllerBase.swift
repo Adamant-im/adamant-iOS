@@ -361,19 +361,29 @@ class TransferViewControllerBase: FormViewController {
             // Eureka looses decimal precision when deserializing numbers by itself.
             // Try to get raw value and deserialize it
             if let input = row.cell.textInput as? UITextField, let raw = input.text {
-                if let amount = AdamantBalanceFormat.rawNumberDotFormatter.number(from: raw)?.decimalValue {
-                    self.amount = amount
-                    markRow(row, valid: validateAmount(amount))
-                } else if let amount = AdamantBalanceFormat.rawNumberCommaFormatter.number(from: raw)?.decimalValue {
-                    self.amount = amount
-                    markRow(row, valid: validateAmount(amount))
-                } else if let raw = row.value {
-                    let amount = Decimal(raw)
-                    self.amount = amount
-                    markRow(row, valid: validateAmount(amount))
-                } else {
-                    self.amount = nil
-                    markRow(row, valid: true)
+                // NumberFormatter.number(from: string).decimalValue loses precision.
+                // Creating decimal with Decimal(string: "") drops decimal part, if wrong locale used
+                var gotValue = false
+                if let localeSeparator = Locale.current.decimalSeparator {
+                    let replacingSeparator = localeSeparator == "." ? "," : "."
+                    let fixed = raw.replacingOccurrences(of: replacingSeparator, with: localeSeparator)
+                    
+                    if let amount = Decimal(string: fixed, locale: Locale.current) {
+                        self.amount = amount
+                        markRow(row, valid: validateAmount(amount))
+                        gotValue = true
+                    }
+                }
+                
+                if !gotValue {
+                    if let raw = row.value {
+                        let amount = Decimal(raw)
+                        self.amount = amount
+                        markRow(row, valid: validateAmount(amount))
+                    } else {
+                        self.amount = nil
+                        markRow(row, valid: true)
+                    }
                 }
             } else if let raw = row.value { // We can't get raw value, let's try to get a value from row
                 let amount = Decimal(raw)
@@ -492,10 +502,6 @@ class TransferViewControllerBase: FormViewController {
 	/// nil for no stripe
 	func recipientStripe() -> Stripe? {
 		return [.qrCameraReader, .qrPhotoReader]
-	}
-	
-	func reportTransferTo(admAddress: String, transferRecipient: String, amount: Decimal, comments: String, hash: String) {
-		
 	}
     
     func defaultSceneTitle() -> String? {

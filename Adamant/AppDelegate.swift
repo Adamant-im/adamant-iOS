@@ -52,6 +52,10 @@ struct AdamantResources {
         "https://ethnode1.adamant.im/"
 //        "https://ropsten.infura.io/"  // test network
     ]
+    
+    static let lskServers = [
+        "https://lisknode1.adamant.im"
+    ]
 	
     // MARK: ADAMANT Addresses
 	static let supportEmail = "ios@adamant.im"
@@ -124,23 +128,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		// MARK: 4. Prepare pages
 		if let tabbar = window?.rootViewController as? UITabBarController {
+            // MARK: Chats
             let chats = UISplitViewController()
             chats.tabBarItem.title = String.adamantLocalized.tabItems.chats
             chats.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
             chats.preferredDisplayMode = .allVisible
             chats.tabBarItem.badgeColor = UIColor.adamant.primary
             
+            let chatList = UINavigationController(rootViewController: router.get(scene: AdamantScene.Chats.chatList))
+            
+            // MARK: Accounts
             let accounts = UISplitViewController()
             accounts.tabBarItem.title = String.adamantLocalized.tabItems.account
             accounts.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
             accounts.preferredDisplayMode = .allVisible
             accounts.tabBarItem.badgeColor = UIColor.adamant.primary
             
-            let chatListRoot = router.get(scene: AdamantScene.Chats.chatList)
-            let chatList = UINavigationController(rootViewController: chatListRoot)
-            
-            let accountRoot = router.get(scene: AdamantScene.Account.account)
-            let account = UINavigationController(rootViewController: accountRoot)
+            let account = UINavigationController(rootViewController: router.get(scene: AdamantScene.Account.account))
             
             if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
                 let chatDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
@@ -446,6 +450,7 @@ extension AppDelegate {
             })
 		}
 		
+        /*
 		if let ico = AdamantContacts.adamantIco.messages["chats.ico_message"] {
 			chatProvider.fakeReceived(message: ico.message,
 									  senderId: AdamantContacts.adamantIco.name,
@@ -461,5 +466,6 @@ extension AppDelegate {
                                         print("ERROR showing welcome message: \(error.message)")
             })
 		}
+        */
 	}
 }

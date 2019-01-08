@@ -73,8 +73,9 @@ class ChatListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = true
+            navigationItem.largeTitleDisplayMode = .never
 		}
 
 		navigationItem.title = String.adamantLocalized.chatList.title
@@ -130,10 +131,6 @@ class ChatListViewController: UIViewController {
 		super.viewWillAppear(animated)
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
-		}
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
 		}
 	}
 	
@@ -494,28 +491,32 @@ extension ChatListViewController: NewChatViewControllerDelegate {
                 return
             }
             
-            if let split = self?.splitViewController {
-                let chat = UINavigationController(rootViewController:vc)
-                split.showDetailViewController(chat, sender: self)
-            } else {
-                self?.navigationController?.pushViewController(vc, animated: false)
-            }
-
-            let nvc: UIViewController
+            let navigator: UINavigationController
             if let nav = controller.navigationController {
-                nvc = nav
+                navigator = nav
+            } else if let nav = self?.navigationController {
+                navigator = nav
             } else {
-                nvc = controller
-            }
-
-            nvc.dismiss(animated: true) {
-                vc.becomeFirstResponder()
-
-                if let count = vc.chatroom?.transactions?.count, count == 0 {
-                    vc.messageInputBar.inputTextView.becomeFirstResponder()
+                self?.present(vc, animated: true) {
+                    vc.becomeFirstResponder()
+                    
+                    if let count = vc.chatroom?.transactions?.count, count == 0 {
+                        vc.messageInputBar.inputTextView.becomeFirstResponder()
+                    }
                 }
+                
+                return
             }
             
+            navigator.pushViewController(vc, animated: true)
+            
+            if let index = navigator.viewControllers.firstIndex(of: controller) {
+                navigator.viewControllers.remove(at: index)
+            }
+            
+            if let count = vc.chatroom?.transactions?.count, count == 0 {
+                vc.messageInputBar.inputTextView.becomeFirstResponder()
+            }
 		}
 		
 		// Select row after awhile

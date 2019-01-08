@@ -95,20 +95,20 @@ class NewChatViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
+        if #available(iOS 11.0, *) {
+            navigationItem.largeTitleDisplayMode = .always
+        }
+        
 		tableView.keyboardDismissMode = .none
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = true
-		}
 		
 		navigationItem.title = String.adamantLocalized.newChat.title
 		let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
 		doneButton.isEnabled = false
 		navigationItem.rightBarButtonItem = doneButton
         
-        if let _ = self.splitViewController {
+        if self.splitViewController != nil {
             if #available(iOS 11.0, *) {
-                navigationController?.navigationBar.prefersLargeTitles = false
+                navigationItem.largeTitleDisplayMode = .never
             }
         } else {
             navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
