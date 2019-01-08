@@ -16,6 +16,12 @@ struct ChatAsset: Codable {
 	let message: String
 	let ownMessage: String
 	let type: ChatType
+    
+    init(message: String, ownMessage: String, type: ChatType) {
+        self.message = message
+        self.ownMessage = ownMessage
+        self.type = type
+    }
 }
 
 /* JSON

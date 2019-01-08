@@ -87,8 +87,11 @@ class AdamantAccountService: AccountService {
 	// MARK: Wallets
 	var wallets: [WalletService] = [
 		AdmWalletService(),
-		EthWalletService(), // TODO: Move to background thread
-//		LskWalletService()
+		EthWalletService(),
+        LskWalletService(mainnet: true, origins: AdamantResources.lskServers)
+        
+        // Testnet
+//        LskWalletService(mainnet: false)
 	]
     
     init() {
@@ -126,7 +129,7 @@ class AdamantAccountService: AccountService {
                         }
                     }
                     
-                case .notLogged, .transactionNotFound, .notEnoughtMoney, .accountNotFound, .walletNotInitiated, .invalidAmount:
+                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount:
                     break
                     
                 case .remoteServiceError, .apiError, .internalError:

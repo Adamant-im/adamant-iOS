@@ -9,7 +9,7 @@
 import UIKit
 
 protocol AccountHeaderViewDelegate: class {
-	func addressLabelTapped()
+    func addressLabelTapped(from: UIView)
 }
 
 class AccountHeaderView: UIView {
@@ -21,7 +21,7 @@ class AccountHeaderView: UIView {
 	
 	weak var delegate: AccountHeaderViewDelegate?
 	
-	@IBAction func addressButtonTapped(_ sender: Any) {
-		delegate?.addressLabelTapped()
+	@IBAction func addressButtonTapped(_ sender: UIButton) {
+        delegate?.addressLabelTapped(from: sender)
 	}
 }

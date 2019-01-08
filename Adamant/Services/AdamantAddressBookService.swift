@@ -287,7 +287,7 @@ class AdamantAddressBookService: AddressBookService {
 		}
 		
         guard loggedAccount.balance >= AdamantApiService.KvsFee else {
-			completion(.failure(.notEnoughtMoney))
+			completion(.failure(.notEnoughMoney))
 			return
 		}
 		

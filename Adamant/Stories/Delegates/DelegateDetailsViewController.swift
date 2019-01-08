@@ -19,7 +19,7 @@ extension String.adamantLocalized {
 
 
 // MARK: -
-class DelegateDetailsViewController: UITableViewController {
+class DelegateDetailsViewController: UIViewController {
     
     // MARK: - Rows
     fileprivate enum Row: Int {
@@ -75,6 +75,9 @@ class DelegateDetailsViewController: UITableViewController {
     var accountService: AccountService!
     var dialogService: DialogService!
     
+    // MARK: - IBOutlets
+    @IBOutlet weak var tableView: UITableView!
+    
     // MARK: - Properties
 	private let delegateUrl = "https://explorer.adamant.im/delegate/"
 	private let cellIdentifier = "cell"
@@ -114,10 +117,6 @@ class DelegateDetailsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = false
-        }
-		
         if let delegate = delegate {
 			refreshData(with: delegate)
 			navigationItem.title = delegate.username
@@ -132,17 +131,13 @@ class DelegateDetailsViewController: UITableViewController {
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: true)
 		}
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
-		}
 	}
 }
 
 
 // MARK: - TableView data & delegate
-extension DelegateDetailsViewController {
-	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+extension DelegateDetailsViewController: UITableViewDelegate, UITableViewDataSource {
+	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		if delegate != nil {
 			return Row.total
 		} else {
@@ -150,15 +145,15 @@ extension DelegateDetailsViewController {
 		}
 	}
 	
-	override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+	func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
 		return UIView()
 	}
 	
-	override func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+	func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
 		return true
 	}
 	
-	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		guard let row = Row(rawValue: indexPath.row) else {
 			return
 		}
@@ -189,7 +184,7 @@ extension DelegateDetailsViewController {
 			dialogService.presentShareAlertFor(string: value,
 											   types: [.copyToPasteboard, .share],
 											   excludedActivityTypes: nil,
-											   animated: true,
+                                               animated: true, from: cell,
 											   completion: completion)
 		}
 	}
@@ -198,7 +193,7 @@ extension DelegateDetailsViewController {
 
 // MARK: - Cells
 extension DelegateDetailsViewController {
-	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		guard let delegate = delegate, let row = Row(rawValue: indexPath.row) else {
 			return UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
 		}
@@ -227,7 +222,7 @@ extension DelegateDetailsViewController {
 			cell.detailTextLabel?.text = delegate.publicKey
 			
 		case .vote:
-			let weight = Decimal(string: delegate.vote)?.shiftedFromAdamant() ?? 0
+			let weight = Decimal(string: delegate.voteFair)?.shiftedFromAdamant() ?? 0
 			cell.detailTextLabel?.text = AdamantBalanceFormat.currencyFormatterShort.string(for: weight)
 			
 		case .producedblocks:

@@ -69,6 +69,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.tableFooterView = UIView()
+        
         let section = Section()
 		
 		// MARK: Address
@@ -82,7 +84,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}.onCellSelection { [weak self] (_, _) in
+		}.onCellSelection { [weak self] (cell, row) in
+            row.deselect()
 			let completion = { [weak self] in
 				guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
 					return
@@ -93,9 +96,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			
 			if let address = self?.service?.wallet?.address {
                 let types: [ShareType]
+                let withLogo = self?.includeLogoInQR() ?? false
                 
                 if let encodedAddress = self?.encodeForQr(address: address) {
-                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address)]
+                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: withLogo)]
                 } else {
                     types = [.copyToPasteboard, .share]
                 }
@@ -103,7 +107,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 				self?.dialogService.presentShareAlertFor(string: address,
 														 types: types,
 														 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-														 animated: true,
+                                                         animated: true, from: cell,
 														 completion: completion)
 			}
 		}
@@ -140,12 +144,19 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			balanceRow.cell.selectionStyle = .gray
 			balanceRow.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
-			}.onCellSelection { [weak self] (_, _) in
+			}.onCellSelection { [weak self] (_, row) in
+                row.deselect()
 				guard let service = self?.service as? WalletServiceWithTransfers else {
 					return
 				}
 				
-				self?.navigationController?.pushViewController(service.transferListViewController(), animated: true )
+                let vc = service.transferListViewController()
+                if let split = self?.splitViewController {
+                    let details = UINavigationController(rootViewController:vc)
+                    split.showDetailViewController(details, sender: self)
+                } else {
+                    self?.navigationController?.pushViewController(vc, animated: true )
+                }
 			}
 		}
 		
@@ -161,7 +172,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 				$0.cell.selectionStyle = .gray
 			}.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
-			}.onCellSelection { [weak self] (_, _) in
+			}.onCellSelection { [weak self] (_, row) in
+                row.deselect()
 				guard let service = self?.service as? WalletServiceWithSend else {
 					return
 				}
@@ -171,11 +183,16 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 					v.delegate = self
 				}
 				
-				if let nav = self?.navigationController {
-					nav.pushViewController(vc, animated: true)
-				} else {
-					self?.present(vc, animated: true)
-				}
+                if let split = self?.splitViewController {
+                    let details = UINavigationController(rootViewController:vc)
+                    split.showDetailViewController(details, sender: self)
+                } else {
+                    if let nav = self?.navigationController {
+                        nav.pushViewController(vc, animated: true)
+                    } else {
+                        self?.present(vc, animated: true)
+                    }
+                }
 			}
 			
 			section.append(sendRow)
@@ -269,6 +286,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         return nil
     }
     
+    func includeLogoInQR() -> Bool {
+        return false
+    }
+    
     
     // MARK: - Other
     
@@ -305,13 +326,38 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 }
 
 
+// MARK: - TransferViewControllerDelegate
 extension WalletViewControllerBase: TransferViewControllerDelegate {
     func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?) {
-        if let nav = navigationController, nav.topViewController == viewController {
+        if let split = splitViewController {
+            if let nav = split.viewControllers.last as? UINavigationController {
+                DispatchQueue.main.async { [weak self] in
+                    if let detailsViewController = detailsViewController {
+                        var viewControllers = nav.viewControllers
+                        viewControllers.removeLast()
+                        
+                        if let service = self?.service as? WalletServiceWithTransfers {
+                            viewControllers.append(service.transferListViewController())
+                        }
+                        
+                        viewControllers.append(detailsViewController)
+                        nav.setViewControllers(viewControllers, animated: true)
+                    } else {
+                        nav.popViewController(animated: true)
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    split.showDetailViewController(viewController, sender: nil)
+                }
+            }
+        } else if let nav = navigationController {
             DispatchQueue.main.async {
                 if let detailsViewController = detailsViewController {
-                    nav.popViewController(animated: false)
-                    nav.pushViewController(detailsViewController, animated: true)
+                    var viewControllers = nav.viewControllers
+                    viewControllers.removeLast()
+                    viewControllers.append(detailsViewController)
+                    nav.setViewControllers(viewControllers, animated: true)
                 } else {
                     nav.popViewController(animated: true)
                 }

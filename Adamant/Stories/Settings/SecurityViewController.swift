@@ -131,10 +131,6 @@ class SecurityViewController: FormViewController {
 		navigationItem.title = String.adamantLocalized.security.title
 		navigationOptions = .Disabled
 		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = true
-		}
-		
 		// MARK: StayIn
 		// Generate QR
 		let qrRow = LabelRow() {

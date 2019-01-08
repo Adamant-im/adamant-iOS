@@ -40,6 +40,5 @@ public class RichMessageTransaction: ChatTransaction {
         }
     }
     
-    // Hack? Yes. So?
     public var kind: MessageKind = .text("?")
 }

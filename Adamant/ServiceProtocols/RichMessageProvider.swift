@@ -25,7 +25,7 @@ protocol RichMessageProvider: class {
     func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController)
     
     // MARK: Chats list
-    func shortDescription(for transaction: RichMessageTransaction) -> String
+    func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
     
     // MARK: MessageKit
     func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator
@@ -33,7 +33,7 @@ protocol RichMessageProvider: class {
 }
 
 protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
-    func statusForTransactionBy(hash: String, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void)
+    func statusForTransactionBy(hash: String, date: Date?, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void)
     
     var delayBetweenChecks: TimeInterval { get }
 }

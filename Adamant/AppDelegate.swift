@@ -38,6 +38,8 @@ extension StoreKey {
 struct AdamantResources {
 	static let coreDataModel = Bundle.main.url(forResource: "Adamant", withExtension: "momd")!
 	
+    // MARK: Nodes
+    
 	static let nodes: [Node] = [
         Node(scheme: .https, host: "endless.adamant.im", port: nil),
         Node(scheme: .https, host: "clown.adamant.im", port: nil),
@@ -50,12 +52,16 @@ struct AdamantResources {
         "https://ethnode1.adamant.im/"
 //        "https://ropsten.infura.io/"  // test network
     ]
+    
+    static let lskServers = [
+        "https://lisknode1.adamant.im"
+    ]
 	
-	// Addresses
+    // MARK: ADAMANT Addresses
 	static let supportEmail = "ios@adamant.im"
 	static let ansReadmeUrl = "https://github.com/Adamant-im/AdamantNotificationService/blob/master/README.md"
 	
-	// Contacts
+    // MARK: Contacts
 	struct contacts {
 		static let adamantBountyWallet = "U15423595369615486571"
 		static let adamantIco = "U7047165086065693428"
@@ -67,10 +73,17 @@ struct AdamantResources {
 		private init() {}
 	}
     
-    // Explorers
+    // MARK: Explorers
+    // MARK: ADM
     static let adamantExplorerAddress = "https://explorer.adamant.im/tx/"
+    
+    // MARK: ETH
     static let ethereumExplorerAddress = "https://etherscan.io/tx/"
 //    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
+    
+    // MARK: LSK
+    static let liskExplorerAddress = "https://explorer.lisk.io/tx/"
+//    static let liskExplorerAddress = "https://testnet-explorer.lisk.io/tx/" // LISK Testnet
 	
 	private init() {}
 }
@@ -104,7 +117,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		window = UIWindow(frame: UIScreen.main.bounds)
 		window!.rootViewController = UITabBarController()
 		window!.rootViewController?.view.backgroundColor = .white
-		window!.makeKeyAndVisible()
 		window!.tintColor = UIColor.adamant.primary
 		
 		
@@ -114,27 +126,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			fatalError("Failed to get Router")
 		}
 		
-		let login = router.get(scene: AdamantScene.Login.login)
-		window!.rootViewController?.present(login, animated: false, completion: nil)
-		
 		// MARK: 4. Prepare pages
 		if let tabbar = window?.rootViewController as? UITabBarController {
-			let chatListRoot = router.get(scene: AdamantScene.Chats.chatList)
-			let chatList = UINavigationController(rootViewController: chatListRoot)
-			chatList.tabBarItem.title = String.adamantLocalized.tabItems.chats
-			chatList.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
-			
-			let accountRoot = router.get(scene: AdamantScene.Account.account)
-			let account = UINavigationController(rootViewController: accountRoot)
-			account.tabBarItem.title = String.adamantLocalized.tabItems.account
-			account.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
-			
-			chatList.tabBarItem.badgeColor = UIColor.adamant.primary
-			account.tabBarItem.badgeColor = UIColor.adamant.primary
-			
-			tabbar.setViewControllers([chatList, account], animated: false)
+            // MARK: Chats
+            let chats = UISplitViewController()
+            chats.tabBarItem.title = String.adamantLocalized.tabItems.chats
+            chats.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
+            chats.preferredDisplayMode = .allVisible
+            chats.tabBarItem.badgeColor = UIColor.adamant.primary
+            
+            let chatList = UINavigationController(rootViewController: router.get(scene: AdamantScene.Chats.chatList))
+            
+            // MARK: Accounts
+            let accounts = UISplitViewController()
+            accounts.tabBarItem.title = String.adamantLocalized.tabItems.account
+            accounts.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
+            accounts.preferredDisplayMode = .allVisible
+            accounts.tabBarItem.badgeColor = UIColor.adamant.primary
+            
+            let account = UINavigationController(rootViewController: router.get(scene: AdamantScene.Account.account))
+            
+            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+                let chatDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
+                let accountDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
+                
+                chats.viewControllers = [chatList, chatDetails]
+                accounts.viewControllers = [account, accountDetails]
+            } else {
+                chats.viewControllers = [chatList]
+                accounts.viewControllers = [account]
+            }
+            
+            tabbar.setViewControllers([chats, accounts], animated: false)
 		}
-		
+        
+        window!.makeKeyAndVisible()
+        
+        let login = router.get(scene: AdamantScene.Login.login)
+        window!.rootViewController?.present(login, animated: false, completion: nil)
 		
 		// MARK: 5 Reachability & Autoupdate
 		repeater = RepeaterService()
@@ -305,7 +334,7 @@ extension AppDelegate {
 			fatalError("can't get api service to register device token")
 		}
 		
-		apiService.sendMessage(senderId: address, recipientId: AdamantResources.contacts.ansAddress, keypair: keypair, message: encodedPayload.message, type: ChatType.signal, nonce: encodedPayload.nonce) { [unowned self] result in
+        apiService.sendMessage(senderId: address, recipientId: AdamantResources.contacts.ansAddress, keypair: keypair, message: encodedPayload.message, type: ChatType.signal, nonce: encodedPayload.nonce, amount: nil) { [unowned self] result in
 			switch result {
 			case .success:
 				return
@@ -421,6 +450,7 @@ extension AppDelegate {
             })
 		}
 		
+        /*
 		if let ico = AdamantContacts.adamantIco.messages["chats.ico_message"] {
 			chatProvider.fakeReceived(message: ico.message,
 									  senderId: AdamantContacts.adamantIco.name,
@@ -436,5 +466,6 @@ extension AppDelegate {
                                         print("ERROR showing welcome message: \(error.message)")
             })
 		}
+        */
 	}
 }

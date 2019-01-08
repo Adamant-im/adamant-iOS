@@ -26,4 +26,8 @@ class EthWalletViewController: WalletViewControllerBase {
     override func sendRowLocalizedLabel() -> String {
         return String.adamantLocalized.wallets.sendEth
     }
+    
+    override func encodeForQr(address: String) -> String? {
+        return "ethereum:\(address)"
+    }
 }

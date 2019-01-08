@@ -99,6 +99,11 @@ extension Container {
             return service
         }.inObjectScope(.container)
 		
+        // MARK: AdamantAvatarService
+        self.register(AvatarService.self) { r in
+            return AdamantAvatarService()
+        }
+
 		// MARK: - Data Providers
 		// MARK: CoreData Stack
 		self.register(CoreDataStack.self) { _ in
@@ -122,8 +127,12 @@ extension Container {
 			provider.accountService = r.resolve(AccountService.self)
 			provider.accountsProvider = r.resolve(AccountsProvider.self)
 			provider.securedStore = r.resolve(SecuredStore.self)
+            provider.adamantCore = r.resolve(AdamantCore.self)
 			return provider
-		}.inObjectScope(.container)
+        }.inObjectScope(.container).initCompleted { (r, c) in
+            let provider = c as! AdamantTransfersProvider
+            provider.chatsProvider = r.resolve(ChatsProvider.self)
+        }
 		
 		// MARK: Chats
 		self.register(ChatsProvider.self) { r in

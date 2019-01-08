@@ -12,7 +12,8 @@ struct Delegate: Decodable {
     let username: String
     let address: String
     let publicKey: String
-    let vote: String
+    let voteObsolete: String
+    let voteFair: String
     let producedblocks: Int
     let missedblocks: Int
     let rate: Int
@@ -26,7 +27,8 @@ struct Delegate: Decodable {
         case username
         case address
         case publicKey
-        case vote
+        case voteObsolete = "vote"
+        case voteFair = "votesWeight"
         case producedblocks
         case missedblocks
         case rate

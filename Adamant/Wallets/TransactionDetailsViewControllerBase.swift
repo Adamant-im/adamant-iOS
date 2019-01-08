@@ -125,7 +125,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         super.viewDidLoad()
         
         if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = true
+            navigationItem.largeTitleDisplayMode = .never // some glitches, again
         }
         
         navigationItem.title = String.adamantLocalized.transactionDetails.title
@@ -143,21 +143,21 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.tag = Rows.transactionNumber.tag
             $0.title = Rows.transactionNumber.localized
             
-            if let value = transaction?.id {
+            if let value = transaction?.txId {
                 $0.value = value
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
-                self?.shareValue(text)
+                self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
             
-            if let value = self?.transaction?.id {
+            if let value = self?.transaction?.txId {
                 row.value = value
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
@@ -173,7 +173,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.cell.titleLabel.text = Rows.from.localized
             
             if let transaction = transaction {
-                if let senderName = self?.senderName {
+                if transaction.senderAddress.count == 0 {
+                    $0.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
+                } else if let senderName = self?.senderName {
                     $0.value = DoubleDetail(first: senderName, second: transaction.senderAddress)
                 } else {
                     $0.value = DoubleDetail(first: transaction.senderAddress, second: nil)
@@ -190,7 +192,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     return DoubleDetailsTableViewCell.compactHeight
                 }
             }
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             guard let value = row.value else {
                 return
             }
@@ -202,9 +204,21 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 text = value.first
             }
             
-            self?.shareValue(text)
-        }.cellUpdate { (cell, _) in
+            self?.shareValue(text, from: cell)
+        }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
+            
+            if let transaction = self?.transaction {
+                if transaction.senderAddress.count == 0 {
+                    row.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
+                } else if let senderName = self?.senderName {
+                    row.value = DoubleDetail(first: senderName, second: transaction.senderAddress)
+                } else {
+                    row.value = DoubleDetail(first: transaction.senderAddress, second: nil)
+                }
+            } else {
+                row.value = nil
+            }
         }
             
         detailsSection.append(senderRow)
@@ -233,7 +247,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     return DoubleDetailsTableViewCell.compactHeight
                 }
             }
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             guard let value = row.value else {
                 return
             }
@@ -245,7 +259,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 text = value.first
             }
             
-            self?.shareValue(text)
+            self?.shareValue(text, from: cell)
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
         }
@@ -265,10 +279,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.dateFormatter = dateFormatter
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let value = row.value {
                 let text = value.humanizedDateTimeFull()
-                self?.shareValue(text)
+                self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
@@ -286,10 +300,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.value = transaction?.amountValue.doubleValue
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let value = row.value {
                 let text = AdamantBalanceFormat.full.format(value, withCurrencySymbol: self?.currencySymbol ?? nil)
-                self?.shareValue(text)
+                self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
@@ -311,9 +325,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let value = row.value {
-                self?.shareValue(value)
+                self?.shareValue(value, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
@@ -340,9 +354,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
-                self?.shareValue(text)
+                self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
@@ -369,9 +383,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
-                self?.shareValue(text)
+                self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
@@ -386,25 +400,26 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(blockRow)
             
         // MARK: Status
-        if let status = transaction?.transactionStatus {
-            let statusRow = LabelRow() {
-                $0.tag = Rows.status.tag
-                $0.title = Rows.status.localized
-                $0.value = status.localized
-            }.cellSetup { (cell, _) in
-                cell.selectionStyle = .gray
-            }.onCellSelection { [weak self] (_, row) in
-                if let text = row.value {
-                    self?.shareValue(text)
-                }
-            }.cellUpdate { [weak self] (cell, row) in
-                cell.textLabel?.textColor = .black
-                
-                row.value = self?.transaction?.transactionStatus?.localized
-            }
+        let statusRow = LabelRow() {
+            $0.tag = Rows.status.tag
+            $0.title = Rows.status.localized
+            $0.value = transaction?.transactionStatus?.localized
             
-            detailsSection.append(statusRow)
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
+                return self?.transaction?.transactionStatus == nil
+            })
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.onCellSelection { [weak self] (cell, row) in
+            if let text = row.value {
+                self?.shareValue(text, from: cell)
+            }
+        }.cellUpdate { [weak self] (cell, row) in
+            cell.textLabel?.textColor = .black
+            row.value = self?.transaction?.transactionStatus?.localized
         }
+        
+        detailsSection.append(statusRow)
         
         form.append(detailsSection)
         
@@ -423,9 +438,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }.cellUpdate { (cell, _) in
                 cell.textView.isSelectable = false
                 cell.textView.isEditable = false
-            }.onCellSelection { [weak self] (_, row) in
+            }.onCellSelection { [weak self] (cell, row) in
                 if let text = row.value {
-                    self?.shareValue(text)
+                    self?.shareValue(text, from: cell)
                 }
             }
             
@@ -438,6 +453,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         let actionsSection = Section(Sections.actions.localized) {
             $0.tag = Sections.actions.tag
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
+                return self?.transaction == nil
+            })
         }
             
         // MARK: Open in explorer
@@ -503,8 +521,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Tools
     
-    func shareValue(_ value: String) {
-        dialogService.presentShareAlertFor(string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true) { [weak self] in
+    func shareValue(_ value: String, from: UIView) {
+        dialogService.presentShareAlertFor(string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: from) { [weak self] in
             guard let tableView = self?.tableView else {
                 return
             }
