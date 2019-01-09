@@ -63,6 +63,10 @@ class QRGeneratorViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
+        if #available(iOS 11.0, *) {
+            navigationItem.largeTitleDisplayMode = .always
+        }
+        
 		navigationItem.title = String.adamantLocalized.qrGenerator.title
 		navigationOptions = .Disabled
 		
@@ -72,10 +76,6 @@ class QRGeneratorViewController: FormViewController {
         
 		tableView.showsVerticalScrollIndicator = false
 		tableView.showsHorizontalScrollIndicator = false
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = true
-		}
 		
 		// MARK: QR section
 		form +++ Section() { $0.tag = Sections.qr.tag }
@@ -124,6 +124,7 @@ class QRGeneratorViewController: FormViewController {
 			alert.addAction(save)
 			alert.addAction(share)
 			alert.addAction(cancel)
+            alert.popoverPresentationController?.sourceView = cell
 			self?.present(alert, animated: true, completion: nil)
 		}
 		

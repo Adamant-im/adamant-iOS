@@ -11,7 +11,7 @@ import libsodium
 
 class AdamantAddressBookService: AddressBookService {
 	let addressBookKey = "contact_list"
-    let waitTime: TimeInterval = 60.0 // in sec
+    let waitTime: TimeInterval = 20.0 // in sec
 	
 	
     // MARK: - Dependencies
@@ -148,6 +148,14 @@ class AdamantAddressBookService: AddressBookService {
 	}
 	
 	func update(_ completion: ((AddressBookServiceResult) -> Void)?) {
+        // Check if book has changes. Skip update until changes is saved
+        isChangingSemaphore.wait()
+        guard !hasChanges else {
+            isChangingSemaphore.signal()
+            return
+        }
+        isChangingSemaphore.signal()
+        
 		isSavingSemaphore.wait()
 		
 		getAddressBook { result in
@@ -211,6 +219,16 @@ class AdamantAddressBookService: AddressBookService {
 		
 		isSavingSemaphore.wait()
 		
+        // Check again
+        isChangingSemaphore.wait()
+        guard hasChanges else {
+            isSavingSemaphore.signal()
+            isChangingSemaphore.signal()
+            return
+        }
+        isChangingSemaphore.signal()
+        
+        
 		// Background task
 		savingBookTaskId = UIApplication.shared.beginBackgroundTask {
 			UIApplication.shared.endBackgroundTask(self.savingBookTaskId)
@@ -226,12 +244,35 @@ class AdamantAddressBookService: AddressBookService {
 			}
 			
 			switch result {
-			case .success:
-				self.isChangingSemaphore.wait()
-				self.hasChanges = false
-				self.isChangingSemaphore.signal()
-				
-				self.removedNames.removeAll()
+			case .success(let id):
+                var done: Bool = false
+                let group = DispatchGroup()
+                
+                // Hold updates until transaction passed on backend
+                while !done {
+                    Thread.sleep(forTimeInterval: 3.0)
+                    
+                    group.enter()
+                    
+                    self.apiService.getTransaction(id: id) { result in
+                        defer { group.leave() }
+                        
+                        switch result {
+                        case .success: done = true
+                        default: break
+                        }
+                    }
+                    
+                    group.wait()
+                }
+                
+                if done {
+                    self.isChangingSemaphore.wait()
+                    self.hasChanges = false
+                    self.isChangingSemaphore.signal()
+                    
+                    self.removedNames.removeAll()
+                }
 				
 			case .failure(let error):
 				self.dialogService.showRichError(error: error)
@@ -239,14 +280,14 @@ class AdamantAddressBookService: AddressBookService {
 		}
 	}
 	
-	private func saveAddressBook(_ book: [String: String], completion: @escaping (AddressBookServiceResult) -> Void) {
+	private func saveAddressBook(_ book: [String: String], completion: @escaping (AddressBookServiceResultId) -> Void) {
 		guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
 			completion(.failure(.notLogged))
 			return
 		}
 		
         guard loggedAccount.balance >= AdamantApiService.KvsFee else {
-			completion(.failure(.notEnoughtMoney))
+			completion(.failure(.notEnoughMoney))
 			return
 		}
 		
@@ -261,8 +302,8 @@ class AdamantAddressBookService: AddressBookService {
 			// MARK: 2. Submit to KVS
 			apiService.store(key: addressBookKey, value: value, type: .keyValue, sender: address, keypair: keypair) { (result) in
 				switch result {
-				case .success:
-					completion(.success)
+				case .success(let id):
+                    completion(.success(id: id))
 					
 				case .failure(let error):
 					completion(.failure(.apiServiceError(error: error)))
@@ -340,4 +381,9 @@ extension AdamantAddressBookService {
 		}
 		return processedBook
 	}
+}
+
+private enum AddressBookServiceResultId {
+    case success(id: UInt64)
+    case failure(AddressBookServiceError)
 }

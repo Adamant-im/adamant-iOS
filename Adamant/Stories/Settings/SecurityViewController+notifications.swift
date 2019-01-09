@@ -20,16 +20,22 @@ extension SecurityViewController {
 			case .success:
 				return
 				
-			case .denied(error: _):
-				if let row: SwitchRow = self?.form.rowBy(tag: Rows.notificationsMode.tag) {
-					row.value = false
-					row.updateCell()
-				}
-				
-				DispatchQueue.main.async {
-					self?.presentNotificationsDeniedError()
-				}
-			}
+            case .failure(let error):
+                if let row: SwitchRow = self?.form.rowBy(tag: Rows.notificationsMode.tag) {
+                    row.value = false
+                    row.updateCell()
+                }
+                
+                switch error {
+                case .notEnoughMoney:
+                    self?.dialogService.showRichError(error: error)
+                    
+                case .denied:
+                    DispatchQueue.main.async {
+                        self?.presentNotificationsDeniedError()
+                    }
+                }
+            }
 		}
 	}
 	

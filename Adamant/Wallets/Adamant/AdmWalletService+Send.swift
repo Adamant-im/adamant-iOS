@@ -22,12 +22,11 @@ extension AdmWalletService: WalletServiceSimpleSend {
 	}
 	
 	
-	/// Comments not implemented
-	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
-        transfersProvider.transferFunds(toAddress: recipient, amount: amount) { result in
+	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<TransactionDetails>) -> Void) {
+        transfersProvider.transferFunds(toAddress: recipient, amount: amount, comment: comments) { result in
             switch result {
-            case .success:
-                completion(.success)
+            case .success(let transaction):
+                completion(.success(result: transaction))
                 
             case .failure(let error):
                 completion(.failure(error: error.asWalletServiceError()))
@@ -53,6 +52,8 @@ extension TransfersProviderError {
             return .internalError(message: self.message, error: nil)
         case .internalError(let message, let error):
             return .internalError(message: message, error: error)
+        case .notEnoughMoney:
+            return .notEnoughMoney
         }
     }
 }

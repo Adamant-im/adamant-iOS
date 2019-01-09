@@ -22,7 +22,7 @@ enum AccountsProviderResult {
 			return ""
 			
 		case .notFound(let address):
-			return String.localizedStringWithFormat(String.adamantLocalized.sharedErrors.accountNotFound, address) 
+			return String.localizedStringWithFormat(String.adamantLocalized.sharedErrors.accountNotFound, address)
 			
 		case .invalidAddress(let address):
 			return String.localizedStringWithFormat(NSLocalizedString("AccountsProvider.Error.AddressNotValidFormat", comment: "AccountsProvider: Address not valid error, %@ for address"), address)
@@ -60,7 +60,11 @@ struct SystemMessage {
 }
 
 enum AdamantContacts {
-	static let systemAddresses: [String] = {
+    case adamantBountyWallet
+    case adamantIco
+    case iosSupport
+    
+    static let systemAddresses: [String] = {
 		return [AdamantContacts.adamantIco.name, AdamantContacts.adamantBountyWallet.name]
 	}()
 	
@@ -77,14 +81,10 @@ enum AdamantContacts {
 		}
 	}
 	
-	case adamantBountyWallet
-	case adamantIco
-	case iosSupport
-	
 	var name: String {
 		switch self {
-		case .adamantBountyWallet: return "ADAMANT Bounty"
-		case .adamantIco: return NSLocalizedString("Accounts.AdamantTokens", comment: "System accounts: ADAMANT Tokens")
+		case .adamantBountyWallet: return NSLocalizedString("Accounts.AdamantTokens", comment: "System accounts: ADAMANT Tokens")
+		case .adamantIco: return "Adamant ICO"
 		case .iosSupport: return NSLocalizedString("Accounts.iOSSupport", comment: "System accounts: ADAMANT iOS Support")
 		}
 	}

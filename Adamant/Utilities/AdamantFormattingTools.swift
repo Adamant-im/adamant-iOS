@@ -27,12 +27,12 @@ class AdamantFormattingTools {
 	}
     
     static func summaryFor(transaction: TransactionDetails, url: URL?) -> String {
-        return summaryFor(id: transaction.id,
+        return summaryFor(id: transaction.txId,
                           sender: transaction.senderAddress,
                           recipient: transaction.recipientAddress,
                           date: transaction.dateValue,
                           amount: transaction.amountValue,
-                          fee: transaction.feeValue,
+                          fee: transaction.feeValue ?? 0,
                           confirmations: transaction.confirmationsValue,
                           blockId: transaction.blockValue,
                           url: url)

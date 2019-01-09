@@ -37,27 +37,32 @@ extension StoreKey {
 
 // MARK: - Resources
 struct AdamantResources {
-	static let jsCore = Bundle.main.url(forResource: "adamant-core", withExtension: "js")!
-	static let coreDataModel = Bundle.main.url(forResource: "ChatModels", withExtension: "momd")!
+	static let coreDataModel = Bundle.main.url(forResource: "Adamant", withExtension: "momd")!
 	
+    // MARK: Nodes
+    
 	static let nodes: [Node] = [
-		Node(scheme: .https, host: "endless.adamant.im", port: nil),
-		Node(scheme: .https, host: "clown.adamant.im", port: nil),
-		Node(scheme: .https, host: "lake.adamant.im", port: nil),
+        Node(scheme: .https, host: "endless.adamant.im", port: nil),
+        Node(scheme: .https, host: "clown.adamant.im", port: nil),
+        Node(scheme: .https, host: "lake.adamant.im", port: nil),
 //		Node(scheme: .http, host: "80.211.177.181", port: nil), // Bugged one
-//		Node(scheme: .http, host: "163.172.183.198", port: nil) // Testnet
+//      Node(scheme: .http, host: "163.172.132.38", port: 36667) // Testnet
 	]
     
     static let ethServers = [
-//        "https://ethnode1.adamant.im/"
-        "https://ropsten.infura.io/"  // test network
+        "https://ethnode1.adamant.im/"
+//        "https://ropsten.infura.io/"  // test network
+    ]
+    
+    static let lskServers = [
+        "https://lisknode1.adamant.im"
     ]
 	
-	// Addresses
+    // MARK: ADAMANT Addresses
 	static let supportEmail = "ios@adamant.im"
 	static let ansReadmeUrl = "https://github.com/Adamant-im/AdamantNotificationService/blob/master/README.md"
 	
-	// Contacts
+    // MARK: Contacts
 	struct contacts {
 		static let adamantBountyWallet = "U15423595369615486571"
 		static let adamantIco = "U7047165086065693428"
@@ -69,10 +74,17 @@ struct AdamantResources {
 		private init() {}
 	}
     
-    // Explorers
+    // MARK: Explorers
+    // MARK: ADM
     static let adamantExplorerAddress = "https://explorer.adamant.im/tx/"
-//    static let ethereumExplorerAddress = "https://etherscan.io/tx/"
-    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
+    
+    // MARK: ETH
+    static let ethereumExplorerAddress = "https://etherscan.io/tx/"
+//    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
+    
+    // MARK: LSK
+    static let liskExplorerAddress = "https://explorer.lisk.io/tx/"
+//    static let liskExplorerAddress = "https://testnet-explorer.lisk.io/tx/" // LISK Testnet
 	
 	private init() {}
 }
@@ -120,27 +132,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			fatalError("Failed to get Router")
 		}
 		
-		let login = router.get(scene: AdamantScene.Login.login)
-		window!.rootViewController?.present(login, animated: false, completion: nil)
-		
 		// MARK: 4. Prepare pages
 		if let tabbar = window?.rootViewController as? UITabBarController {
-			let chatListRoot = router.get(scene: AdamantScene.Chats.chatList)
-			let chatList = UINavigationController(rootViewController: chatListRoot)
-			chatList.tabBarItem.title = String.adamantLocalized.tabItems.chats
-			chatList.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
-			
-			let accountRoot = router.get(scene: AdamantScene.Account.account)
-			let account = UINavigationController(rootViewController: accountRoot)
-			account.tabBarItem.title = String.adamantLocalized.tabItems.account
-			account.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
-			
-			chatList.tabBarItem.badgeColor = UIColor.adamant.primary
-			account.tabBarItem.badgeColor = UIColor.adamant.primary
-			
-			tabbar.setViewControllers([chatList, account], animated: false)
+            // MARK: Chats
+            let chats = UISplitViewController()
+            chats.tabBarItem.title = String.adamantLocalized.tabItems.chats
+            chats.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
+            chats.preferredDisplayMode = .allVisible
+            chats.tabBarItem.badgeColor = UIColor.adamant.primary
+            
+            let chatList = UINavigationController(rootViewController: router.get(scene: AdamantScene.Chats.chatList))
+            
+            // MARK: Accounts
+            let accounts = UISplitViewController()
+            accounts.tabBarItem.title = String.adamantLocalized.tabItems.account
+            accounts.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
+            accounts.preferredDisplayMode = .allVisible
+            accounts.tabBarItem.badgeColor = UIColor.adamant.primary
+            
+            let account = UINavigationController(rootViewController: router.get(scene: AdamantScene.Account.account))
+            
+            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+                let chatDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
+                let accountDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
+                
+                chats.viewControllers = [chatList, chatDetails]
+                accounts.viewControllers = [account, accountDetails]
+            } else {
+                chats.viewControllers = [chatList]
+                accounts.viewControllers = [account]
+            }
+            
+            tabbar.setViewControllers([chats, accounts], animated: false)
 		}
-		
+        
+        window!.makeKeyAndVisible()
+        
+        let login = router.get(scene: AdamantScene.Login.login)
+        window!.rootViewController?.present(login, animated: false, completion: nil)
 		
 		// MARK: 5 Reachability & Autoupdate
 		repeater = RepeaterService()
@@ -216,7 +245,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 		
 		// MARK: 7. Welcome messages
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: nil, queue: OperationQueue.main, using: handleWelcomeMessages)
+		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: nil, queue: OperationQueue.main, using: handleWelcomeMessages)
 		
 		return true
 	}
@@ -311,7 +340,7 @@ extension AppDelegate {
 			fatalError("can't get api service to register device token")
 		}
 		
-		apiService.sendMessage(senderId: address, recipientId: AdamantResources.contacts.ansAddress, keypair: keypair, message: encodedPayload.message, type: ChatType.signal, nonce: encodedPayload.nonce) { [unowned self] result in
+        apiService.sendMessage(senderId: address, recipientId: AdamantResources.contacts.ansAddress, keypair: keypair, message: encodedPayload.message, type: ChatType.signal, nonce: encodedPayload.nonce, amount: nil) { [unowned self] result in
 			switch result {
 			case .success:
 				return
@@ -394,6 +423,10 @@ extension AppDelegate {
 // MARK: - Welcome messages
 extension AppDelegate {
 	private func handleWelcomeMessages(notification: Notification) {
+        guard let synced = notification.userInfo?[AdamantUserInfoKey.ChatProvider.initiallySynced] as? Bool, synced else {
+            return
+        }
+        
 		guard let stack = container.resolve(CoreDataStack.self), let chatProvider = container.resolve(ChatsProvider.self) else {
 			fatalError("Whoa...")
 		}
@@ -413,17 +446,33 @@ extension AppDelegate {
 									  date: Date.adamantNullDate,
 									  unread: unread,
 									  silent: welcome.silentNotification,
-									  completion: { _ in })
+                                      showsChatroom: true,
+                                      completion: { result in
+                                        guard case let .failure(error) = result else {
+                                            return
+                                        }
+                                        
+                                        print("ERROR showing welcome message: \(error.message)")
+            })
 		}
 		
+        /*
 		if let ico = AdamantContacts.adamantIco.messages["chats.ico_message"] {
 			chatProvider.fakeReceived(message: ico.message,
 									  senderId: AdamantContacts.adamantIco.name,
 									  date: Date.adamantNullDate,
 									  unread: unread,
 									  silent: ico.silentNotification,
-									  completion: { _ in })
+                                      showsChatroom: true,
+									  completion: { result in
+                                        guard case let .failure(error) = result else {
+                                            return
+                                        }
+                                        
+                                        print("ERROR showing welcome message: \(error.message)")
+            })
 		}
+        */
 	}
 }
 

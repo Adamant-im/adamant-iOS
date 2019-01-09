@@ -29,7 +29,9 @@ extension ChatViewController {
 extension ChatViewController: MessagesDataSource {
 	func currentSender() -> Sender {
 		guard let account = account else {
-			fatalError("No account")
+            // Until we will update our network to procedures
+            return(Sender(id: "your moma", displayName: ""))
+//            fatalError("No account")
 		}
 		return Sender(id: account.address, displayName: account.address)
 	}
@@ -143,14 +145,53 @@ extension ChatViewController: MessagesDataSource {
             chatCell.bubbleBackgroundColor = bgColor
         }
         
-        if let customCell = cell as? TapRecognizerCustomCell {
-            customCell.delegate = self
+        if let transferCell = cell as? TransferCollectionViewCell, let calculator = cellCalculators[type] as? TransferMessageSizeCalculator {
+            let width = calculator.messageContainerMaxWidth(for: message) - TransferCollectionViewCell.statusImageSizeAndSpace
+            transferCell.transferContentWidthConstraint.constant = width
         }
         
-        if let richTransaction = message as? RichMessageTransaction,
-            (richTransaction.transactionStatus == nil || richTransaction.transactionStatus == .notInitiated),
-            let updater = provider as? RichMessageProviderWithStatusCheck {
-            updateStatus(for: richTransaction, provider: updater)
+        // MARK: Delegates
+        switch cell {
+        case let tapCell as TapRecognizerCustomCell:
+            tapCell.delegate = self
+            
+        case let transferCell as TapRecognizerTransferCell:
+            transferCell.delegate = self
+            
+        default:
+            break
+        }
+        
+        // MARK: Rich transfer statuses
+        if let richTransaction = message as? RichMessageTransaction {
+            switch richTransaction.transactionStatus {
+            case nil, .notInitiated?:
+                guard let updater = provider as? RichMessageProviderWithStatusCheck else {
+                    break
+                }
+                
+                /*
+                 Сообщения-отчёты об отправленных средствах создаются раньше, чем на эфирных нодах появляется сама транзакция перевода (по ТЗ).
+                 Проблема - как только сообщение появляется в чате, мы запрашиваем у эфирной ноды статус транзакции которую ещё не отправили - нода возвращает ошибку.
+                 Решение - если сообщение появилось только что - обновим статус этой транзакции с 'некоторой' задержкой.
+                 🤷🏻‍♂️
+                 */
+                if let date = richTransaction.date, date.timeIntervalSinceNow > -2.0 {
+                    updateStatus(for: richTransaction, provider: updater, delay: 5.0)
+                } else {
+                    updateStatus(for: richTransaction, provider: updater)
+                }
+                
+            case .pending?:
+                guard !isUpdatingRichMessageStatus(id: richTransaction.objectID), let updater = provider as? RichMessageProviderWithStatusCheck else {
+                    break
+                }
+                
+                updateStatus(for: richTransaction, provider: updater)
+                
+            default:
+                break
+            }
         }
         
         return cell
@@ -283,7 +324,7 @@ extension ChatViewController: MessageCellDelegate {
 			
 			let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
 			
-			dialogService.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, style: .actionSheet, actions: [retry, cancelMessage, cancel])
+            dialogService?.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, style: .actionSheet, actions: [retry, cancelMessage, cancel], from: cell)
 			
             
         // MARK: Show ADM transfer details
@@ -342,6 +383,55 @@ extension ChatViewController: CustomCellDelegate {
         default:
             return
         }
+    }
+}
+
+// MARK: - TransferCollectionViewCellDelegate
+extension ChatViewController: TransferCellDelegate {
+    func didTapTransferCell(_ cell: TapRecognizerTransferCell) {
+        guard let c = cell as? UICollectionViewCell,
+            let indexPath = messagesCollectionView.indexPath(for: c),
+            let transaction = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) else {
+                return
+        }
+        
+        switch transaction {
+        case let transfer as TransferTransaction:
+            guard let provider = richMessageProviders[AdmWalletService.richMessageType] as? AdmWalletService else {
+                break
+            }
+            
+            provider.richMessageTapped(for: transfer, at: indexPath, in: self)
+            
+        case let richTransaction as RichMessageTransaction:
+            guard let type = richTransaction.richType, let provider = richMessageProviders[type] else {
+                break
+            }
+            
+            provider.richMessageTapped(for: richTransaction, at: indexPath, in: self)
+            
+        default:
+            return
+        }
+    }
+    
+    func didTapTransferCellStatus(_ cell: TapRecognizerTransferCell) {
+        guard let c = cell as? UICollectionViewCell,
+            let indexPath = messagesCollectionView.indexPath(for: c),
+            let transaction = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) as? RichMessageTransaction else {
+                return
+        }
+        
+        guard transaction.transactionStatus != TransactionStatus.updating else {
+            return
+        }
+        
+        guard let type = transaction.richType,
+            let provider = richMessageProviders[type] as? RichMessageProviderWithStatusCheck else {
+                return
+        }
+        
+        updateStatus(for: transaction, provider: provider, delay: 1)
     }
 }
 
@@ -418,8 +508,18 @@ extension ChatViewController: MessagesLayoutDelegate {
 
 // MARK: - MessageInputBarDelegate
 extension ChatViewController: MessageInputBarDelegate {
+    private static let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
+    
 	func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
-		let message = AdamantMessage.text(text)
+        let parsedText = ChatViewController.markdownParser.parse(text)
+        
+        let message: AdamantMessage
+        if parsedText.length == text.count {
+            message = .text(text)
+        } else {
+            message = .markdownText(text)
+        }
+        
 		let valid = chatsProvider.validateMessage(message)
 		switch valid {
 		case .isValid:
@@ -438,13 +538,13 @@ extension ChatViewController: MessageInputBarDelegate {
 			return
 		}
 		
-		chatsProvider.sendMessage(.text(text), recipientId: partner, completion: { [weak self] result in
+        chatsProvider.sendMessage(message, recipientId: partner, completion: { [weak self] result in
 			switch result {
 			case .success: break
 				
 			case .failure(let error):
 				switch error {
-				case .messageNotValid, .notEnoughtMoneyToSend:
+				case .messageNotValid, .notEnoughMoneyToSend:
 					DispatchQueue.main.async {
 						if inputBar.inputTextView.text.count == 0 {
 							inputBar.inputTextView.text = text
@@ -481,20 +581,22 @@ extension MessageTransaction: MessageType {
 	}
 	
 	public var messageId: String {
-		return self.transactionId!
+		return chatMessageId!
 	}
 	
 	public var sentDate: Date {
-		return self.date! as Date
+		return date! as Date
 	}
 	
 	public var kind: MessageKind {
 		guard let message = message else {
+            isHidden = true
+            try? managedObjectContext?.save()
 			return MessageKind.text("")
 		}
 		
         if isMarkdown {
-            let parser = MarkdownParser(font: UIFont.adamantChatDefault)
+            let parser = MessageTransaction.markdownParser
             parser.color = UIColor.adamant.primary
             parser.link.color = UIColor.adamant.secondary
             return MessageKind.attributedText(parser.parse(message))
@@ -506,9 +608,11 @@ extension MessageTransaction: MessageType {
     public var messageStatus: MessageStatus {
         return self.statusEnum
     }
+    
+    private static let markdownParser = MarkdownParser(font: UIFont.adamantChatDefault)
 }
 
-// MARK: - RichMessageTransaction
+// MARK: RichMessageTransaction
 extension RichMessageTransaction: MessageType {
     public var sender: Sender {
         let id = self.senderId!
@@ -516,11 +620,11 @@ extension RichMessageTransaction: MessageType {
     }
     
     public var messageId: String {
-        return self.transactionId!
+        return chatMessageId!
     }
     
     public var sentDate: Date {
-        return self.date! as Date
+        return date! as Date
     }
 }
 
@@ -532,7 +636,7 @@ extension TransferTransaction: MessageType {
 	}
 	
 	public var messageId: String {
-		return transactionId!
+		return chatMessageId!
 	}
 	
 	public var sentDate: Date {
@@ -540,16 +644,9 @@ extension TransferTransaction: MessageType {
 	}
 	
 	public var kind: MessageKind {
-        let amountString: String
-        if let a = amount as Decimal? {
-            amountString = AdamantBalanceFormat.full.format(a)
-        } else {
-            amountString = "0"
-        }
-        
         return MessageKind.custom(RichMessageTransfer(type: AdmWalletService.richMessageType,
-                                                      amount: amountString,
+                                                      amount: amount as Decimal? ?? 0,
                                                       hash: "",
-                                                      comments: ""))
+                                                      comments: comment ?? ""))
 	}
 }

@@ -13,7 +13,7 @@ import BigInt
 /// A standard protocol representing a Transaction details.
 protocol TransactionDetails {
     /// The identifier of the transaction.
-    var id: String { get }
+    var txId: String { get }
     
     /// The sender of the transaction.
     var senderAddress: String { get }
@@ -28,7 +28,7 @@ protocol TransactionDetails {
     var amountValue: Decimal { get }
     
     /// The amount of fee that taken for transaction process.
-    var feeValue: Decimal { get }
+    var feeValue: Decimal? { get }
     
     /// The confirmations of the transaction.
     var confirmationsValue: String? { get }

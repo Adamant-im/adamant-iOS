@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import Haring
 
 class AdamantChatsProvider: ChatsProvider {
 	// MARK: Dependencies
@@ -21,19 +22,26 @@ class AdamantChatsProvider: ChatsProvider {
     var richProviders: [String:RichMessageProviderWithStatusCheck]!
     
 	// MARK: Properties
-	private(set) var state: State = .empty
-	private(set) var isInitiallySynced: Bool = false
-	private(set) var receivedLastHeight: Int64?
-	private(set) var readedLastHeight: Int64?
-	private let apiTransactions = 100
-	private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
-	
+    private(set) var state: State = .empty
+    private(set) var receivedLastHeight: Int64?
+    private(set) var readedLastHeight: Int64?
+    private let apiTransactions = 100
+    private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
+    
+    private(set) var isInitiallySynced: Bool = false {
+        didSet {
+            NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: self, userInfo: [AdamantUserInfoKey.ChatProvider.initiallySynced : isInitiallySynced])
+        }
+    }
+    
 	private let processingQueue = DispatchQueue(label: "im.adamant.processing.chat", qos: .utility, attributes: [.concurrent])
 	private let sendingQueue = DispatchQueue(label: "im.adamant.sending.chat", qos: .utility, attributes: [.concurrent])
 	private let unconfirmedsSemaphore = DispatchSemaphore(value: 1)
 	private let highSemaphore = DispatchSemaphore(value: 1)
 	private let stateSemaphore = DispatchSemaphore(value: 1)
 	
+    private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
+    
 	// MARK: Lifecycle
 	init() {
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
@@ -217,7 +225,6 @@ extension AdamantChatsProvider {
 				
 				if let synced = self?.isInitiallySynced, !synced {
 					self?.isInitiallySynced = true
-					NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initialSyncFinished, object: self)
 				}
 				
 				completion?(.success)
@@ -257,14 +264,14 @@ extension AdamantChatsProvider {
 
 // MARK: - Sending messages {
 extension AdamantChatsProvider {
-	func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResult) -> Void) {
+    func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
             completion(.failure(.notLogged))
             return
         }
         
         guard loggedAccount.balance >= message.fee else {
-            completion(.failure(.notEnoughtMoneyToSend))
+            completion(.failure(.notEnoughMoneyToSend))
             return
         }
         
@@ -283,8 +290,11 @@ extension AdamantChatsProvider {
         
         sendingQueue.async {
             switch message {
-			case .text(let text), .markdownText(let text):
-                self.sendTextMessage(text: text, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
+            case .text(let text):
+                self.sendTextMessage(text: text, isMarkdown: false, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
+                
+            case .markdownText(let text):
+                self.sendTextMessage(text: text, isMarkdown: true, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, type: message.chatType, completion: completion)
 				
 			case .richMessage(let payload):
                 self.sendRichMessage(richContent: payload.content(), richType: payload.type, senderId: loggedAccount.address, recipientId: recipientId, keypair: keypair, completion: completion)
@@ -292,7 +302,7 @@ extension AdamantChatsProvider {
         }
     }
 	
-    private func sendTextMessage(text: String, senderId: String, recipientId: String, keypair: Keypair, type: ChatType, completion: @escaping (ChatsProviderResult) -> Void) {
+    private func sendTextMessage(text: String, isMarkdown: Bool, senderId: String, recipientId: String, keypair: Keypair, type: ChatType, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = stack.container.viewContext
         
@@ -302,13 +312,15 @@ extension AdamantChatsProvider {
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
         transaction.isOutgoing = true
+        transaction.chatMessageId = UUID().uuidString
+        transaction.isMarkdown = isMarkdown
         
         transaction.message = text
         
         prepareAndSendChatTransaction(transaction, in: context, recipientId: recipientId, type: type, keypair: keypair, completion: completion)
     }
     
-    private func sendRichMessage(richContent: [String:String], richType: String, senderId: String, recipientId: String, keypair: Keypair, completion: @escaping (ChatsProviderResult) -> Void) {
+    private func sendRichMessage(richContent: [String:String], richType: String, senderId: String, recipientId: String, keypair: Keypair, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = stack.container.viewContext
         
@@ -320,6 +332,7 @@ extension AdamantChatsProvider {
         transaction.senderId = senderId
         transaction.type = Int16(type.rawValue)
         transaction.isOutgoing = true
+        transaction.chatMessageId = UUID().uuidString
         
         transaction.richContent = richContent
         transaction.richType = richType
@@ -331,7 +344,7 @@ extension AdamantChatsProvider {
     
     
     /// Transaction must be in passed context
-    private func prepareAndSendChatTransaction(_ transaction: ChatTransaction, in context: NSManagedObjectContext, recipientId: String, type: ChatType, keypair: Keypair, completion: @escaping (ChatsProviderResult) -> Void) {
+    private func prepareAndSendChatTransaction(_ transaction: ChatTransaction, in context: NSManagedObjectContext, recipientId: String, type: ChatType, keypair: Keypair, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         // MARK: 1. Get account
         let accountsGroup = DispatchGroup()
         accountsGroup.enter()
@@ -374,8 +387,6 @@ extension AdamantChatsProvider {
         }
         
         // MARK: 3. Prepare transaction
-        transaction.transactionId = UUID().uuidString
-        transaction.blockId = UUID().uuidString
         transaction.statusEnum = MessageStatus.pending
         
         chatroom.addToTransactions(transaction)
@@ -403,10 +414,10 @@ extension AdamantChatsProvider {
         // MARK: 6. Send
         sendTransaction(transaction, type: type, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
             switch result {
-            case .success:
+            case .success(let transaction):
                 do {
                     try context.save()
-                    completion(.success)
+                    completion(.success(transaction: transaction))
                 } catch {
                     completion(.failure(.internalError(error)))
                 }
@@ -521,7 +532,7 @@ extension AdamantChatsProvider {
 	///
 	/// If success - update transaction's id and add it to unconfirmed transactions.
 	/// If fails - set transaction status to .failed
-	private func sendTransaction(_ transaction: ChatTransaction, type: ChatType, keypair: Keypair, recipientPublicKey: String, completion: @escaping (ChatsProviderResult) -> Void) {
+	private func sendTransaction(_ transaction: ChatTransaction, type: ChatType, keypair: Keypair, recipientPublicKey: String, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
 		// MARK: 0. Prepare
 		guard let senderId = transaction.senderId,
 			let recipientId = transaction.recipientId else {
@@ -534,9 +545,9 @@ extension AdamantChatsProvider {
 			completion(.failure(.dependencyError("Failed to encode message")))
 			return
 		}
-		
+        
 		// MARK: 2. Send
-		apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, type: type, nonce: encodedMessage.nonce) { result in
+        apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, type: type, nonce: encodedMessage.nonce, amount: nil) { result in
 			switch result {
 			case .success(let id):
 				// Update ID with recieved, add to unconfirmed transactions.
@@ -548,7 +559,7 @@ extension AdamantChatsProvider {
 				}
 				self.unconfirmedsSemaphore.signal()
 				
-				completion(.success)
+                completion(.success(transaction: transaction))
 				
 			case .failure(let error):
 				transaction.statusEnum = MessageStatus.failed
@@ -586,7 +597,10 @@ extension AdamantChatsProvider {
 								   NSSortDescriptor(key: "title", ascending: true)]
 		request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
 			NSPredicate(format: "partner!=nil"),
-			NSPredicate(format: "isHidden = false")])
+            NSPredicate(format: "isForcedVisible = true OR isHidden = false"),
+            NSPredicate(format: "isForcedVisible = true OR ANY transactions.showsChatroom = true")
+        ])
+        
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 		
 		return controller
@@ -598,7 +612,9 @@ extension AdamantChatsProvider {
 		}
 		
 		let request: NSFetchRequest<ChatTransaction> = NSFetchRequest(entityName: "ChatTransaction")
-		request.predicate = NSPredicate(format: "chatroom = %@", chatroom)
+		request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "chatroom = %@", chatroom),
+            NSPredicate(format: "isHidden == false")])
 		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true),
 								   NSSortDescriptor(key: "transactionId", ascending: true)]
 		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
@@ -609,8 +625,9 @@ extension AdamantChatsProvider {
 	func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction> {
 		let request = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
 		request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-			NSPredicate(format: "isUnread == true"),
-			NSPredicate(format: "chatroom.isHidden == false")])
+            NSPredicate(format: "chatroom.isHidden == false"),
+            NSPredicate(format: "isUnread == true"),
+            NSPredicate(format: "isHidden == false")])
 		
 		request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
 								   NSSortDescriptor(key: "transactionId", ascending: false)]
@@ -902,7 +919,16 @@ extension AdamantChatsProvider {
 
 // MARK: - Tools
 extension AdamantChatsProvider {
-	
+    func addUnconfirmed(transactionId id: UInt64, managedObjectId: NSManagedObjectID) {
+        unconfirmedsSemaphore.wait()
+        
+        DispatchQueue.main.sync {
+            self.unconfirmedTransactions[id] = managedObjectId
+        }
+        
+        unconfirmedsSemaphore.signal()
+    }
+    
 	/// Check if message is valid for sending
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult {
 		switch message {
@@ -945,31 +971,98 @@ extension AdamantChatsProvider {
 			return nil
 		}
 		
-        let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)
-        
         let messageTransaction: ChatTransaction
-        switch chat.type {
-        case .message, .messageOld, .signal, .unknown:
-            let transaction = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-            transaction.message = decodedMessage
-            messageTransaction = transaction
-            
-        case .richMessage:
-            let transaction = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
-            
-            if let decodedMessage = decodedMessage,
-                let data = decodedMessage.data(using: String.Encoding.utf8),
-                let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: String],
-                let type = json["type"] {
-                transaction.richType = type
-                transaction.richContent = json
+        // MARK: Decode message, message must contain data
+        if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)?.trimmingCharacters(in: .whitespacesAndNewlines), !decodedMessage.isEmpty {
+            switch chat.type {
+            // MARK: Text message
+            case .message, .messageOld, .signal, .unknown:
+                if transaction.amount > 0 {
+                    let trs = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
+                    trs.comment = decodedMessage
+                    messageTransaction = trs
+                } else {
+                    let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                    trs.message = decodedMessage
+                    messageTransaction = trs
+                    
+                    let markdown = markdownParser.parse(decodedMessage)
+                    
+                    trs.isMarkdown = markdown.length != decodedMessage.count
+                }
                 
-                transaction.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+            // MARK: Rich message
+            case .richMessage:
+                if let data = decodedMessage.data(using: String.Encoding.utf8), let jsonRaw = try? JSONSerialization.jsonObject(with: data, options: []) {
+                    switch jsonRaw {
+                    // MARK: Valid json
+                    case let json as [String:String]:
+                        // Supported rich message type
+                        if let type = json[RichContentKeys.type] {
+                            let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
+                            trs.richContent = json
+                            trs.richType = type
+                            trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+                            messageTransaction = trs
+                        }
+                            
+                            // Not supported, show as text message
+                        else {
+                            let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                            trs.message = decodedMessage
+                            messageTransaction = trs
+                        }
+                        
+                    // MARK: Bad json, try to fix it
+                    case let json as [String:Any]:
+                        // Supported type but in wrong format
+                        if let type = json[RichContentKeys.type] as? String {
+                            var fixedJson = [String:String]()
+                            
+                            for (key, raw) in json {
+                                if let value = raw as? String {
+                                    fixedJson[key] = value
+                                } else if let value = raw as? NSNumber, let amount = AdamantBalanceFormat.currencyFormatterFull.string(from: value) {
+                                    fixedJson[key] = amount
+                                } else {
+                                    fixedJson[key] = String(describing: raw)
+                                }
+                            }
+                            
+                            let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
+                            trs.richContent = fixedJson
+                            trs.richType = type
+                            trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+                            messageTransaction = trs
+                        }
+                            // Not supported, show as text message
+                        else {
+                            let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                            trs.message = decodedMessage
+                            messageTransaction = trs
+                        }
+                        
+                    default:
+                        let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                        trs.message = decodedMessage
+                        messageTransaction = trs
+                    }
+                } else {
+                    let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                    trs.message = decodedMessage
+                    messageTransaction = trs
+                }
             }
-            
-            messageTransaction = transaction
+        }
+        // MARK: Failed to decode, or message was empty
+        else {
+            let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+            trs.message = ""
+            trs.isHidden = true
+            messageTransaction = trs
         }
         
+        messageTransaction.amount = transaction.amount as NSDecimalNumber
 		messageTransaction.date = transaction.date as NSDate
 		messageTransaction.recipientId = transaction.recipientId
 		messageTransaction.senderId = transaction.senderId
@@ -980,7 +1073,8 @@ extension AdamantChatsProvider {
 		messageTransaction.isOutgoing = isOutgoing
 		messageTransaction.blockId = transaction.blockId
 		messageTransaction.confirmations = transaction.confirmations
-        
+        messageTransaction.chatMessageId = UUID().uuidString
+        messageTransaction.fee = transaction.fee as NSDecimalNumber
         messageTransaction.statusEnum = MessageStatus.delivered
 		
 		return messageTransaction

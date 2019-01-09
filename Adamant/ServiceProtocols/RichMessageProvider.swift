@@ -14,7 +14,7 @@ enum CellSource {
     case nib(nib: UINib)
 }
 
-protocol RichMessageProvider {
+protocol RichMessageProvider: class {
     static var richMessageType: String { get }
     
     var cellIdentifierSent: String { get }
@@ -25,7 +25,7 @@ protocol RichMessageProvider {
     func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController)
     
     // MARK: Chats list
-    func shortDescription(for transaction: RichMessageTransaction) -> String
+    func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString
     
     // MARK: MessageKit
     func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator
@@ -33,5 +33,13 @@ protocol RichMessageProvider {
 }
 
 protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
-    func statusForTransactionBy(hash: String, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void)
+    func statusForTransactionBy(hash: String, date: Date?, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void)
+    
+    var delayBetweenChecks: TimeInterval { get }
+}
+
+extension RichMessageProviderWithStatusCheck {
+    var delayBetweenChecks: TimeInterval {
+        return 10.0
+    }
 }

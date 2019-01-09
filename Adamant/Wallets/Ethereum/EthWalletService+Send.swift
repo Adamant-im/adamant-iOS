@@ -31,7 +31,7 @@ extension EthWalletService: WalletServiceTwoStepSend {
 	
 	
 	// MARK: Create & Send
-	func createTransaction(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<EthereumTransaction>) -> Void) {
+	func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<EthereumTransaction>) -> Void) {
 		// MARK: 1. Prepare
 		guard let ethWallet = ethWallet else {
 			completion(.failure(error: .notLogged))

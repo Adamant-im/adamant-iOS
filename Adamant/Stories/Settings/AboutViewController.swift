@@ -124,16 +124,16 @@ class AboutViewController: FormViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
+        
+        if #available(iOS 11.0, *) {
+            navigationItem.largeTitleDisplayMode = .always
+        }
+        
 		navigationItem.title = String.adamantLocalized.about.title
         
         self.tableView.styles = ["baseTable"]
         navigationController?.navigationBar.style = "baseNavigationBar"
         view.style = "primaryBackground,primaryTint"
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = true
-		}
 		
 		// MARK: Header & Footer
 		if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {

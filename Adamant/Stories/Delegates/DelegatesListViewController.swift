@@ -63,8 +63,10 @@ class DelegatesListViewController: UIViewController {
         refreshControl.style = "primaryTint"
         return refreshControl
     }()
-	
-	private var forcedUpdateTimer: Timer? = nil
+    
+    private var forcedUpdateTimer: Timer? = nil
+    
+    private var searchController: UISearchController?
 
 	// MARK: Tools
 	
@@ -82,15 +84,12 @@ class DelegatesListViewController: UIViewController {
     
     @IBOutlet weak var voteBtn: UIButton!
 
-	
+    @IBOutlet weak var infoViewBottomConstain: NSLayoutConstraint!
+    
 	// MARK: - Lifecycle
 	
     override func viewDidLoad() {
         super.viewDidLoad()
-        if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = false
-        }
-        
         self.tableView.styles = ["baseTable"]
         navigationController?.navigationBar.style = "baseNavigationBar"
         view.style = "primaryBackground,primaryTint"
@@ -103,13 +102,16 @@ class DelegatesListViewController: UIViewController {
 		
 		// MARK: Search controller
 		if #available(iOS 11.0, *) {
-			let searchController = UISearchController(searchResultsController: nil)
-			searchController.searchResultsUpdater = self
-			searchController.obscuresBackgroundDuringPresentation = false
-			searchController.hidesNavigationBarDuringPresentation = false
-			navigationItem.searchController = searchController
-			definesPresentationContext = true
-			navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
+            navigationItem.largeTitleDisplayMode = .always
+            
+			let controller = UISearchController(searchResultsController: nil)
+			controller.searchResultsUpdater = self
+			controller.obscuresBackgroundDuringPresentation = false
+			controller.hidesNavigationBarDuringPresentation = true
+            searchController = controller
+            
+            definesPresentationContext = true
+            navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
             
             searchController.searchBar.style = "baseBarTint"
 		}
@@ -126,6 +128,18 @@ class DelegatesListViewController: UIViewController {
         handleRefresh(refreshControl)
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // Fix for UISplitViewController with UINavigationController with UISearchController.
+        // UISplitView in collapsed mode can't figure out what navigation item is topmost, and in viewDidLoad method searchController gets assigned to a wrong navigation item.
+        if #available(iOS 11.0, *) {
+            if navigationItem.searchController == nil {
+                navigationItem.searchController = searchController
+            }
+        }
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
 		
@@ -138,14 +152,23 @@ class DelegatesListViewController: UIViewController {
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
-		}
-		
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
 	}
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            if #available(iOS 11.0, *) {
+            } else if infoViewBottomConstain.constant == 0.0, let height = tabBarController?.tabBar.bounds.height {
+                infoViewBottomConstain.constant = -height
+                tableView.contentInset.bottom = 0.0
+                tableView.scrollIndicatorInsets.bottom = 0.0
+            }
+        }
+    }
 
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
 		guard let address = accountService.account?.address else {

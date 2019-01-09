@@ -38,27 +38,20 @@ struct RichContentKeys {
 
 struct RichMessageTransfer: RichMessage {
 	let type: String
-	let amount: String
+	let amount: Decimal
 	let hash: String
 	let comments: String
     
     func content() -> [String:String] {
         return [
             CodingKeys.type.stringValue: type,
-            CodingKeys.amount.stringValue: amount,
+            CodingKeys.amount.stringValue: RichMessageTransfer.serialize(balance: amount),
             CodingKeys.hash.stringValue: hash,
             CodingKeys.comments.stringValue: comments
         ]
     }
     
     init(type: String, amount: Decimal, hash: String, comments: String) {
-        self.type = type
-        self.amount = RichMessageTransfer.serialize(balance: amount)
-        self.hash = hash
-        self.comments = comments
-    }
-    
-    init(type: String, amount: String, hash: String, comments: String) {
         self.type = type
         self.amount = amount
         self.hash = hash
@@ -77,10 +70,22 @@ struct RichMessageTransfer: RichMessage {
         self.type = type
         self.hash = hash
         
-        if let amount = content[CodingKeys.amount.stringValue] {
-            self.amount = amount
+        if let raw = content[CodingKeys.amount.stringValue] {
+            // NumberFormatter.number(from: string).decimalValue loses precision.
+            
+            if let number = Decimal(string: raw), number != 0.0 {
+                self.amount = number
+            } else if let number = Decimal(string: raw, locale: Locale.current), number != 0.0 {
+                self.amount = number
+            } else if let number = AdamantBalanceFormat.rawNumberDotFormatter.number(from: raw) {
+                self.amount = number.decimalValue
+            } else if let number = AdamantBalanceFormat.rawNumberCommaFormatter.number(from: raw) {
+                self.amount = number.decimalValue
+            } else {
+                self.amount = 0
+            }
         } else {
-            self.amount = "0"
+            self.amount = 0
         }
         
         if let comments = content[CodingKeys.comments.stringValue] {
@@ -119,22 +124,25 @@ extension RichMessageTransfer {
 		self.type = try container.decode(String.self, forKey: .type)
 		self.hash = try container.decode(String.self, forKey: .hash)
         self.comments = try container.decode(String.self, forKey: .comments)
-        self.amount = try container.decode(String.self, forKey: .amount)
+        
+        if let raw = try? container.decode(String.self, forKey: .amount) {
+            if let number = AdamantBalanceFormat.rawNumberDotFormatter.number(from: raw) {
+                self.amount = number.decimalValue
+            } else if let number = AdamantBalanceFormat.rawNumberCommaFormatter.number(from: raw) {
+                self.amount = number.decimalValue
+            } else {
+                self.amount = 0
+            }
+        } else if let amount = try? container.decode(Decimal.self, forKey: .amount) {
+            self.amount = amount
+        } else {
+            self.amount = 0
+        }
 	}
 }
 
 extension RichMessageTransfer {
-    static var formatter: NumberFormatter = {
-        let f = NumberFormatter()
-        f.numberStyle = .decimal
-        f.roundingMode = .floor
-        f.decimalSeparator = "."
-        f.minimumFractionDigits = 0
-        f.maximumFractionDigits = 18
-        return f
-    }()
-    
     static func serialize(balance: Decimal) -> String {
-        return formatter.string(fromDecimal: balance) ?? "0"
+        return AdamantBalanceFormat.rawNumberDotFormatter.string(fromDecimal: balance) ?? "0"
     }
 }

@@ -93,10 +93,18 @@ extension AdamantNotificationsService {
 			completion?(.success)
 			return
 			
-		case .backgroundFetch, .push:
+        case .push:
+            guard let account = accountService?.account, account.balance > AdamantApiService.KvsFee else {
+                completion?(.failure(error: .notEnoughMoney))
+                return
+            }
+            
+            fallthrough
+            
+		case .backgroundFetch:
 			authorizeNotifications { [weak self] (success, error) in
 				guard success else {
-					completion?(.denied(error: error))
+                    completion?(.failure(error: .denied(error: error)))
 					return
 				}
 				

@@ -13,12 +13,14 @@ class AdamantTransfersProvider: TransfersProvider {
 	// MARK: Dependencies
 	var apiService: ApiService!
 	var stack: CoreDataStack!
+    var adamantCore: AdamantCore!
 	var accountService: AccountService!
 	var accountsProvider: AccountsProvider!
 	var securedStore: SecuredStore!
+    weak var chatsProvider: ChatsProvider?
 	
 	// MARK: Properties
-	var transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
+	let transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
 	
 	private(set) var state: State = .empty
 	private(set) var isInitiallySynced: Bool = false
@@ -285,19 +287,157 @@ extension AdamantTransfersProvider {
 	// MARK: Sending Funds
     
     // Wrapper
-	func transferFunds(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void) {
-        // Go background
-        sendingQueue.async {
-            self.transferFundsInternal(toAddress: recipient, amount: amount, completion: completion)
+    func transferFunds(toAddress recipient: String, amount: Decimal, comment: String?, completion: @escaping (TransfersProviderTransferResult) -> Void) {
+        if let comment = comment, comment.count > 0 {
+            sendingQueue.async { [unowned self] in
+                self.transferFundsInternal(toAddress: recipient, amount: amount, comment: comment, completion: completion)
+            }
+        } else {
+            sendingQueue.async { [unowned self] in
+                self.transferFundsInternal(toAddress: recipient, amount: amount, completion: completion)
+            }
         }
     }
     
-    private func transferFundsInternal(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderResult) -> Void) {
+    private func transferFundsInternal(toAddress recipient: String, amount: Decimal, comment: String, completion: @escaping (TransfersProviderTransferResult) -> Void) {
         // MARK: 0. Prepare
-		guard let senderId = accountService.account?.address, let keypair = accountService.keypair else {
+        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+            completion(.failure(.notLogged))
+            return
+        }
+        
+        guard loggedAccount.balance > amount + transferFee else {
+            completion(.failure(.notEnoughMoney))
+            return
+        }
+        
+        // MARK: 1. Get recipient
+        let accountsGroup = DispatchGroup()
+        accountsGroup.enter()
+        
+        var result: AccountsProviderResult! = nil
+        accountsProvider.getAccount(byAddress: recipient) { r in
+            result = r
+            accountsGroup.leave()
+        }
+        
+        accountsGroup.wait()
+        
+        let recipientAccount: CoreDataAccount
+        switch result! {
+        case .success(let account):
+            recipientAccount = account
+            
+        case .notFound, .invalidAddress:
+            completion(.failure(.accountNotFound(address: recipient)))
+            return
+            
+        case .serverError(let error):
+            completion(.failure(.serverError(error)))
+            return
+            
+        case .networkError(_):
+            completion(.failure(.networkError))
+            return
+        }
+        
+        guard let recipientPublicKey = recipientAccount.publicKey else {
+            completion(.failure(.accountNotFound(address: recipient)))
+            return
+        }
+        
+        // MARK: 2. Chatroom
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+        
+        guard let id = recipientAccount.chatroom?.objectID, let chatroom = context.object(with: id) as? Chatroom else {
+            completion(.failure(.accountNotFound(address: recipient)))
+            return
+        }
+        
+        // MARK: 3. Transaction
+        let transaction = TransferTransaction(context: context)
+        transaction.amount = amount as NSDecimalNumber
+        transaction.date = Date() as NSDate
+        transaction.recipientId = recipient
+        transaction.senderId = loggedAccount.address
+        transaction.type = Int16(TransactionType.chatMessage.rawValue)
+        transaction.isOutgoing = true
+        transaction.showsChatroom = true
+        transaction.chatMessageId = UUID().uuidString
+        transaction.statusEnum = MessageStatus.pending
+        transaction.comment = comment
+        transaction.fee = transferFee as NSDecimalNumber
+        
+        chatroom.addToTransactions(transaction)
+        
+        // MARK: 4. Last in
+        if let lastTransaction = chatroom.lastTransaction {
+            if let dateA = lastTransaction.date as Date?, let dateB = transaction.date as Date?,
+                dateA.compare(dateB) == ComparisonResult.orderedAscending {
+                chatroom.lastTransaction = transaction
+                chatroom.updatedAt = transaction.date
+            }
+        } else {
+            chatroom.lastTransaction = transaction
+            chatroom.updatedAt = transaction.date
+        }
+        
+        // MARK: 5. Save unconfirmed transaction
+        do {
+            try context.save()
+        } catch {
+            completion(.failure(.internalError(message: String.adamantLocalized.sharedErrors.unknownError, error: error)))
+            return
+        }
+        
+        // MARK: 6. Encode
+        guard let encodedMessage = adamantCore.encodeMessage(comment, recipientPublicKey: recipientPublicKey, privateKey: keypair.privateKey) else {
+            completion(.failure(.internalError(message: "Failed to encode message", error: nil)))
+            return
+        }
+        
+        // MARK: 7. Send
+        apiService.sendMessage(senderId: loggedAccount.address, recipientId: recipient, keypair: keypair, message: encodedMessage.message, type: ChatType.message, nonce: encodedMessage.nonce, amount: amount) { [weak self] result in
+            switch result {
+            case .success(let id):
+                transaction.transactionId = String(id)
+                
+                self?.chatsProvider?.addUnconfirmed(transactionId: id, managedObjectId: transaction.objectID)
+                
+                do {
+                    try context.save()
+                } catch {
+                    completion(.failure(.internalError(message: String.adamantLocalized.sharedErrors.unknownError, error: error)))
+                    break
+                }
+                
+                if let trs = self?.stack.container.viewContext.object(with: transaction.objectID) as? TransferTransaction {
+                    completion(.success(transaction: trs))
+                } else {
+                    completion(.failure(.internalError(message: "Failed to get transaction in viewContext", error: nil)))
+                }
+                
+            case .failure(let error):
+                transaction.statusEnum = MessageStatus.failed
+                try? context.save()
+                
+                completion(.failure(.serverError(error)))
+            }
+        }
+    }
+    
+    private func transferFundsInternal(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderTransferResult) -> Void) {
+        // MARK: 0. Prepare
+		guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
 			completion(.failure(.notLogged))
 			return
 		}
+        
+        guard loggedAccount.balance > amount + transferFee else {
+            completion(.failure(.notEnoughMoney))
+            return
+        }
         
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = stack.container.viewContext
@@ -337,12 +477,15 @@ extension AdamantTransfersProvider {
         transaction.amount = amount as NSDecimalNumber
         transaction.date = Date() as NSDate
         transaction.recipientId = recipient
-        transaction.senderId = senderId
+        transaction.senderId = loggedAccount.address
         transaction.type = Int16(TransactionType.send.rawValue)
         transaction.isOutgoing = true
+        transaction.showsChatroom = false
+        transaction.fee = transferFee as NSDecimalNumber
         
-        transaction.transactionId = UUID().uuidString
-        transaction.blockId = UUID().uuidString
+        transaction.transactionId = nil
+        transaction.blockId = nil
+        transaction.chatMessageId = UUID().uuidString
         transaction.statusEnum = MessageStatus.pending
         
         // MARK: 3. Chatroom
@@ -370,7 +513,7 @@ extension AdamantTransfersProvider {
         }
         
         // MARK: 5. Send
-		apiService.transferFunds(sender: senderId, recipient: recipient, amount: amount, keypair: keypair) { result in
+		apiService.transferFunds(sender: loggedAccount.address, recipient: recipient, amount: amount, keypair: keypair) { result in
 			switch result {
 			case .success(let id):
                 // Update ID with recieved, add to unconfirmed transactions.
@@ -382,8 +525,18 @@ extension AdamantTransfersProvider {
                 }
                 self.unconfirmedsSemaphore.signal()
                 
+                do {
+                    try context.save()
+                } catch {
+                    completion(.failure(.internalError(message: "Failed to save data context", error: error)))
+                    break
+                }
                 
-				completion(.success)
+                if let trs = self.stack.container.viewContext.object(with: transaction.objectID) as? TransactionDetails {
+                    completion(.success(transaction: trs))
+                } else {
+                    completion(.failure(.internalError(message: "Failed to get transaction in viewContext", error: nil)))
+                }
 				
 			case .failure(let error):
 				completion(.failure(.serverError(error)))
@@ -610,6 +763,7 @@ extension AdamantTransfersProvider {
                 transaction.blockId = t.blockId
                 transaction.confirmations = t.confirmations
                 transaction.statusEnum = .delivered
+                transaction.fee = t.fee as NSDecimalNumber
                 
                 unconfirmedTransactions.removeValue(forKey: t.id)
                 
@@ -636,6 +790,9 @@ extension AdamantTransfersProvider {
             transfer.blockId = t.blockId
             transfer.confirmations = t.confirmations
             transfer.statusEnum = .delivered
+            transfer.showsChatroom = false
+            transfer.isConfirmed = true
+            transfer.chatMessageId = UUID().uuidString
             
             transfer.isOutgoing = t.senderId == address
             let partnerId = transfer.isOutgoing ? t.recipientId : t.senderId
@@ -674,7 +831,11 @@ extension AdamantTransfersProvider {
             
             for (chatroom, trs) in chatrooms {
                 chatroom.hasUnreadMessages = true
-                trs.forEach { $0.isUnread = true }
+                trs.forEach {
+                    if !$0.isOutgoing {
+                        $0.isUnread = true
+                    }
+                }
             }
             
             transfers.filter({$0.height > unreadedHeight}).forEach({$0.isUnread = true})

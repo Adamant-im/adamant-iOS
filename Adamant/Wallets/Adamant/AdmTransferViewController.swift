@@ -23,15 +23,22 @@ class AdmTransferViewController: TransferViewControllerBase {
 	// MARK: Sending
 	
 	override func sendFunds() {
-		guard let service = service as? AdmWalletService, let recipient = recipient, let amount = amount else {
+		guard let service = service as? AdmWalletService, let recipient = recipientAddress, let amount = amount else {
 			return
 		}
 		
 		dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
 		
-		service.sendMoney(recipient: recipient, amount: amount, comments: "") { [weak self] result in
+        let comments: String
+        if let row: TextAreaRow = form.rowBy(tag: BaseRows.comments.tag), let text = row.value {
+            comments = text
+        } else {
+            comments = ""
+        }
+        
+		service.sendMoney(recipient: recipient, amount: amount, comments: comments) { [weak self] result in
 			switch result {
-			case .success:
+			case .success(let result):
 				service.update()
 				
 				guard let vc = self else {
@@ -39,7 +46,35 @@ class AdmTransferViewController: TransferViewControllerBase {
 				}
 				
 				vc.dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-				vc.delegate?.transferViewControllerDidFinishTransfer(vc)
+                
+                let detailsVC = self?.router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? AdmTransactionDetailsViewController
+                detailsVC?.transaction = result
+                
+                if comments.count > 0 {
+                    detailsVC?.comment = comments
+                }
+                
+                // MARK: Sender, you
+                detailsVC?.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                
+                // MARK: Get recipient
+                if let recipientName = self?.recipientName {
+                    detailsVC?.recipientName = recipientName
+                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                } else if let accountsProvider = self?.accountsProvider {
+                    accountsProvider.getAccount(byAddress: recipient) { accResult in
+                        switch accResult {
+                        case .success(let account):
+                            detailsVC?.recipientName = account.name
+                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                            
+                        default:
+                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                        }
+                    }
+                } else {
+                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                }
 				
 			case .failure(let error):
 				guard let dialogService = self?.dialogService else {
@@ -57,7 +92,7 @@ class AdmTransferViewController: TransferViewControllerBase {
 	
 	private var _recipient: String?
 	
-	override var recipient: String? {
+	override var recipientAddress: String? {
 		set {
 			if let recipient = newValue, let first = recipient.first, first != "U" {
 				_recipient = "U\(recipient)"
@@ -81,7 +116,7 @@ class AdmTransferViewController: TransferViewControllerBase {
 			$0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
 			$0.cell.textField.keyboardType = .numberPad
 			
-			if let recipient = recipient {
+			if let recipient = recipientAddress {
 				let trimmed = recipient.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
 				$0.value = trimmed
 			}
@@ -149,21 +184,19 @@ class AdmTransferViewController: TransferViewControllerBase {
 	}
 	
 	override func handleRawAddress(_ address: String) -> Bool {
-		guard let uri = AdamantUriTools.decode(uri: address) else {
-			return false
-		}
-		
-		switch uri {
-		case .address(let address, _):
-			if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
-				row.value = address
-				row.updateCell()
-			}
-			
-			return true
-			
-		default:
-			return false
-		}
+        guard let admAddress = address.getAdamantAddress() else {
+            return false
+        }
+        
+        if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
+            row.value = admAddress.address
+            row.updateCell()
+        }
+        
+        return true
 	}
+    
+    override func defaultSceneTitle() -> String? {
+        return String.adamantLocalized.wallets.sendAdm
+    }
 }

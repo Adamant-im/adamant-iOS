@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -18,7 +18,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clearsContextBeforeDrawing="NO" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Adamant-logo" translatesAutoresizingMaskIntoConstraints="NO" id="Tte-Yg-uSj">
+                            <imageView clearsContextBeforeDrawing="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Adamant-logo" translatesAutoresizingMaskIntoConstraints="NO" id="Tte-Yg-uSj">
                                 <rect key="frame" x="75" y="231" width="225" height="225"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="Tte-Yg-uSj" secondAttribute="height" multiplier="1:1" id="o2N-vd-Hdc"/>
@@ -27,11 +27,28 @@
                         </subviews>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="Tte-Yg-uSj" firstAttribute="height" relation="lessThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="height" multiplier="0.4" id="KWn-Uz-8Qt"/>
+                            <constraint firstItem="Tte-Yg-uSj" firstAttribute="width" relation="lessThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="width" multiplier="0.4" id="SyS-9E-pHO"/>
                             <constraint firstItem="Tte-Yg-uSj" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="ZIP-t2-Exv"/>
-                            <constraint firstItem="Tte-Yg-uSj" firstAttribute="width" secondItem="6Tk-OE-BBY" secondAttribute="width" multiplier="0.6" id="hL5-t8-v0f"/>
+                            <constraint firstItem="Tte-Yg-uSj" firstAttribute="height" relation="lessThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="height" multiplier="0.6" id="bp2-Io-xyX"/>
+                            <constraint firstItem="Tte-Yg-uSj" firstAttribute="width" relation="lessThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="width" multiplier="0.6" id="hL5-t8-v0f"/>
                             <constraint firstItem="Tte-Yg-uSj" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="oeh-vQ-KXY"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="KWn-Uz-8Qt"/>
+                                <exclude reference="SyS-9E-pHO"/>
+                            </mask>
+                        </variation>
+                        <variation key="heightClass=regular-widthClass=regular">
+                            <mask key="constraints">
+                                <include reference="KWn-Uz-8Qt"/>
+                                <include reference="SyS-9E-pHO"/>
+                                <exclude reference="bp2-Io-xyX"/>
+                                <exclude reference="hL5-t8-v0f"/>
+                            </mask>
+                        </variation>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -40,6 +57,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Adamant-logo" width="937" height="1024"/>
+        <image name="Adamant-logo" width="1024" height="1024"/>
     </resources>
 </document>

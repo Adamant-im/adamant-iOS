@@ -10,7 +10,7 @@ import UIKit
 import Parchment
 
 protocol ComplexTransferViewControllerDelegate: class {
-	func complexTransferViewControllerDidFinish(_ viewController: ComplexTransferViewController)
+    func complexTransferViewController(_ viewController: ComplexTransferViewController, didFinishWithTransfer: TransactionDetails?, detailsViewController: UIViewController?)
 }
 
 class ComplexTransferViewController: UIViewController {
@@ -24,12 +24,22 @@ class ComplexTransferViewController: UIViewController {
 	
 	weak var transferDelegate: ComplexTransferViewControllerDelegate?
 	var services: [WalletServiceWithSend]!
-	var partner: CoreDataAccount?
+    var partner: CoreDataAccount? {
+        didSet {
+            if let partner = partner {
+                navigationItem.title = partner.name ?? partner.address
+            }
+        }
+    }
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = UIColor.white
-		navigationItem.title = partner?.address
+        
+        if let partner = partner {
+            navigationItem.title = partner.name ?? partner.address
+        }
+        
 		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
         
         navigationController?.navigationBar.style = "baseNavigationBar"
@@ -71,7 +81,7 @@ class ComplexTransferViewController: UIViewController {
 	
 	@objc
 	func cancel() {
-		transferDelegate?.complexTransferViewControllerDidFinish(self)
+        transferDelegate?.complexTransferViewController(self, didFinishWithTransfer: nil, detailsViewController: nil)
 	}
 }
 
@@ -85,18 +95,23 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
-		let vc = services[index].transferViewController()
+        let service = services[index]
+        
+		let vc = service.transferViewController()
 		if let v = vc as? TransferViewControllerBase {
 			if let address = partner?.address {
+                let name = partner?.name
 				v.admReportRecipient = address
 				v.recipientIsReadonly = true
+                v.commentsEnabled = service.commentsEnabledForRichMessages
 				v.showProgressView(animated: false)
 				
 				services[index].getWalletAddress(byAdamantAddress: address) { result in
 					switch result {
 					case .success(let walletAddress):
 						DispatchQueue.main.async {
-							v.recipient = walletAddress
+							v.recipientAddress = walletAddress
+                            v.recipientName = name
 							v.hideProgress(animated: true)
 						}
 						
@@ -129,7 +144,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 }
 
 extension ComplexTransferViewController: TransferViewControllerDelegate {
-	func transferViewControllerDidFinishTransfer(_ viewController: TransferViewControllerBase) {
-		transferDelegate?.complexTransferViewControllerDidFinish(self)
-	}
+	func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?) {
+        transferDelegate?.complexTransferViewController(self, didFinishWithTransfer: transfer, detailsViewController: detailsViewController)
+    }
 }

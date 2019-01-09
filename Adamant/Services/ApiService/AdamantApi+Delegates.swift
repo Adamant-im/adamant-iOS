@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension AdamantApiService.ApiCommands {
     static let Delegates = (
@@ -214,6 +215,11 @@ extension AdamantApiService {
     }
     
 	func voteForDelegates(from address: String, keypair: Keypair, votes: [DelegateVote], completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
+        self.sendingMsgTaskId = UIApplication.shared.beginBackgroundTask {
+            UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+            self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
+        }
+        
 		// MARK: 0. Prepare
 		var votesOrdered = votes
 		_ = votesOrdered.partition {
@@ -279,6 +285,11 @@ extension AdamantApiService {
                 
             case .failure(let error):
                 completion(.failure(.networkError(error: error)))
+            }
+            
+            defer {
+                UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
             }
         }
     }

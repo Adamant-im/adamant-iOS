@@ -9,7 +9,6 @@
 import Foundation
 import BigInt
 import Lisk
-import Ed25519
 import web3swift
 
 class AdamantLskApiService: LskApiService {
@@ -38,9 +37,10 @@ class AdamantLskApiService: LskApiService {
     }
     
     func newAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<LskAccount>) -> Void) {
+        /*
         do {
-            let keys = try Crypto.keyPair(fromPassphrase: passphrase)
-            let address = Crypto.address(fromPublicKey: keys.publicKeyString)
+            let keys: KeyPair! = try Crypto.keyPair(fromPassphrase: passphrase)
+            let address: String! = Crypto.address(fromPublicKey: keys.publicKeyString)
             let account = LskAccount(keys: keys, address: address, balance: BigUInt(0), balanceString: "0")
             self.account = account
 //            print(address)
@@ -98,6 +98,7 @@ class AdamantLskApiService: LskApiService {
                 }
             }
         }
+ */
     }
     
     func createTransaction(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<LocalTransaction>) -> Void) {

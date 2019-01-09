@@ -36,9 +36,14 @@ class EthTransferViewController: TransferViewControllerBase {
 	// MARK: Send
 	
 	override func sendFunds() {
-		let comments = "" // TODO:
+        let comments: String
+        if let row: TextAreaRow = form.rowBy(tag: BaseRows.comments.tag), let text = row.value {
+            comments = text
+        } else {
+            comments = ""
+        }
 		
-		guard let service = service as? EthWalletService, let recipient = recipient, let amount = amount else {
+		guard let service = service as? EthWalletService, let recipient = recipientAddress, let amount = amount else {
 			return
 		}
 		
@@ -48,44 +53,57 @@ class EthTransferViewController: TransferViewControllerBase {
 		
 		dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
 		
-		service.createTransaction(recipient: recipient, amount: amount, comments: comments) { [weak self] result in
+		service.createTransaction(recipient: recipient, amount: amount) { [weak self] result in
+            guard let vc = self else {
+                dialogService.dismissProgress()
+                dialogService.showError(withMessage: String.adamantLocalized.sharedErrors.unknownError, error: nil)
+                return
+            }
+            
 			switch result {
 			case .success(let transaction):
 				// MARK: 1. Send adm report
-				if let reportRecipient = self?.admReportRecipient, let hash = transaction.txhash {
-					let payload = RichMessageTransfer(type: EthWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
-					let message = AdamantMessage.richMessage(payload: payload)
-					
-					self?.chatsProvider.sendMessage(message, recipientId: reportRecipient) { result in
-						if case .failure(let error) = result {
-							self?.dialogService.showRichError(error: error)
-						}
-					}
+				if let reportRecipient = vc.admReportRecipient, let hash = transaction.txhash {
+                    self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
 				}
 				
 				// MARK: 2. Send eth transaction
 				service.sendTransaction(transaction) { result in
 					switch result {
-					case .success(_):
+					case .success(let hash):
 						service.update()
-						
-						guard let vc = self else {
-							break
-						}
-						
-						vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-						vc.delegate?.transferViewControllerDidFinishTransfer(vc)
+                        service.getTransaction(by: hash) { result in
+                            switch result {
+                            case .success(let transaction):
+                                vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                                
+                                if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController {
+                                    detailsVc.transaction = transaction
+                                    detailsVc.service = service
+                                    detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                                    detailsVc.recipientName = self?.recipientName
+                                    
+                                    if comments.count > 0 {
+                                        detailsVc.comment = comments
+                                    }
+                                    
+                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+                                } else {
+                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
+                                }
+                                
+                            case .failure(let error):
+                                vc.dialogService.showRichError(error: error)
+                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
+                            }
+                        }
 						
 					case .failure(let error):
-						self?.dialogService.showRichError(error: error)
+						vc.dialogService.showRichError(error: error)
 					}
 				}
 				
 			case .failure(let error):
-				guard let dialogService = self?.dialogService else {
-					break
-				}
-				
 				dialogService.dismissProgress()
 				dialogService.showRichError(error: error)
 			}
@@ -97,7 +115,7 @@ class EthTransferViewController: TransferViewControllerBase {
 	
 	private var _recipient: String?
 	
-	override var recipient: String? {
+	override var recipientAddress: String? {
 		set {
 			if let recipient = newValue, let first = recipient.first, first != "0" {
 				_recipient = "0x\(recipient)"
@@ -132,7 +150,7 @@ class EthTransferViewController: TransferViewControllerBase {
 			return true
 			
 		case .invalid, .system:
-			return true
+			return false
 		}
 	}
 	
@@ -142,7 +160,7 @@ class EthTransferViewController: TransferViewControllerBase {
 			$0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
 			$0.cell.textField.keyboardType = UIKeyboardType.namePhonePad
 			
-			if let recipient = recipient {
+			if let recipient = recipientAddress {
 				let trimmed = recipient.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
 				$0.value = trimmed
 			}
@@ -200,11 +218,19 @@ class EthTransferViewController: TransferViewControllerBase {
 		guard let service = service else {
 			return false
 		}
+        
+        let parsedAddress: String
+        if address.hasPrefix("ethereum:"), let firstIndex = address.firstIndex(of: ":") {
+            let index = address.index(firstIndex, offsetBy: 1)
+            parsedAddress = String(address[index...])
+        } else {
+            parsedAddress = address
+        }
 		
-		switch service.validate(address: address) {
+		switch service.validate(address: parsedAddress) {
 		case .valid:
 			if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
-				row.value = address
+				row.value = parsedAddress
 				row.updateCell()
 			}
 			
@@ -215,19 +241,19 @@ class EthTransferViewController: TransferViewControllerBase {
 		}
 	}
 	
-	override func reportTransferTo(admAddress: String, transferRecipient: String, amount: Decimal, comments: String, hash: String) {
+	func reportTransferTo(admAddress: String, amount: Decimal, comments: String, hash: String) {
 		let payload = RichMessageTransfer(type: EthWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
         
 		let message = AdamantMessage.richMessage(payload: payload)
 		
-		chatsProvider.sendMessage(message, recipientId: admAddress) { [weak self] result in
-			switch result {
-			case .success:
-				break
-				
-			case .failure(let error):
-				self?.dialogService.showRichError(error: error)
-			}
+        chatsProvider.sendMessage(message, recipientId: admAddress) { [weak self] result in
+            if case .failure(let error) = result {
+                self?.dialogService.showRichError(error: error)
+            }
 		}
 	}
+    
+    override func defaultSceneTitle() -> String? {
+        return String.adamantLocalized.wallets.sendEth
+    }
 }
