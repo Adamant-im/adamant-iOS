@@ -213,12 +213,9 @@ class ChatViewController: MessagesViewController {
 		messageInputBar.inputTextView.layer.masksToBounds = true
 		
 		// Insets
-		messageInputBar.inputTextView.textContainerInset = UIEdgeInsets(top: size, left: size*2, bottom: size, right: buttonWidth + size/2)
-		messageInputBar.inputTextView.placeholderLabelInsets = UIEdgeInsets(top: size, left: size*2+4, bottom: size, right: buttonWidth + size/2+2)
+		messageInputBar.inputTextView.textContainerInset = UIEdgeInsets(top: size+2, left: size*2, bottom: size-2, right: size*2)
+		messageInputBar.inputTextView.placeholderLabelInsets = UIEdgeInsets(top: size+2, left: size*2+4, bottom: size-2, right: size*2)
 		messageInputBar.inputTextView.scrollIndicatorInsets = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
-		messageInputBar.textViewPadding.right = -buttonWidth
-		
-		messageInputBar.setRightStackViewWidthConstant(to: buttonWidth, animated: false)
 		
 		// Make feeLabel
 		let feeLabel = InputBarButtonItem()
