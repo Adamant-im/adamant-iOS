@@ -247,6 +247,12 @@
 /* Chat: 'Name' field in actions menu */
 "ChatScene.Actions.NamePlaceholder" = "Name";
 
+/* Chat: warning message for opening email link without mail app configurated on device */
+"ChatScene.Warning.NoMailApp" = "Can't send email. Check Mail app configurations.";
+
+/* Chat: warning message for opening unsupported url schemes */
+"ChatScene.Warning.UnsupportedUrl" = "Unsupported url protocol";
+
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegates";
 
