@@ -621,6 +621,9 @@ extension ChatListViewController {
 	}
     
     private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
+        markdownParser.color = UIColor.adamant.primary
+        markdownParser.link.color = UIColor.adamant.secondary
+        
         switch transaction {
         case let message as MessageTransaction:
             guard let text = message.message else {

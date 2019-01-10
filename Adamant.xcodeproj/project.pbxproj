@@ -10,6 +10,7 @@
 		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
 		6406D74D21CE3AC100196713 /* KeyboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6406D74C21CE3AC100196713 /* KeyboardManager.swift */; };
 		6414C18E217DF43100373FA6 /* String+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6414C18D217DF43100373FA6 /* String+adamant.swift */; };
+		64156D672141198E00AE3024 /* ThemeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64156D662141198E00AE3024 /* ThemeService.swift */; };
 		6416B19D21AD7B92006089AC /* LskWalletRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B19C21AD7B92006089AC /* LskWalletRoutes.swift */; };
 		6416B19F21AD7CBE006089AC /* LskWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B19E21AD7CBE006089AC /* LskWalletViewController.swift */; };
 		6416B1A121AD7D93006089AC /* LskTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B1A021AD7D93006089AC /* LskTransferViewController.swift */; };
@@ -18,7 +19,6 @@
 		6416B1A721B024B6006089AC /* LskWalletService+Send.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B1A621B024B6006089AC /* LskWalletService+Send.swift */; };
 		642361BE20E3869D0061559E /* eth_l18n.strings in Resources */ = {isa = PBXBuildFile; fileRef = 642361BD20E3869D0061559E /* eth_l18n.strings */; };
 		643ED0B12109F4BD005A9FDA /* NativeAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643ED0B02109F4BD005A9FDA /* NativeAdamantCore.swift */; };
-		64156D672141198E00AE3024 /* ThemeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64156D662141198E00AE3024 /* ThemeService.swift */; };
 		6441CE64215BBE8900E48CA2 /* ThemeLight.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 6441CE63215BBE8900E48CA2 /* ThemeLight.yaml */; };
 		6441CE66215BC86900E48CA2 /* ThemeDark.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 6441CE65215BC86900E48CA2 /* ThemeDark.yaml */; };
 		644EC34D20EFA60900F40C73 /* AdamantApi+Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC34C20EFA60900F40C73 /* AdamantApi+Delegates.swift */; };
@@ -32,6 +32,7 @@
 		6455E9F121075D3600B2E94C /* AddressBookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6455E9F021075D3600B2E94C /* AddressBookService.swift */; };
 		6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */; };
 		6458548C211B3AB1004C5909 /* WelcomeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6458548A211B3AB1004C5909 /* WelcomeViewController.xib */; };
+		645AE06621E67D3300AD3623 /* UITextField+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645AE06521E67D3300AD3623 /* UITextField+adamant.swift */; };
 		645E7B062111DF3A006CC9FD /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645E7B052111DF3A006CC9FD /* Crypto.swift */; };
 		648BCA6B213D37A900875EB5 /* AdamantAvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */; };
 		648BCA6D213D384F00875EB5 /* AvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648BCA6C213D384F00875EB5 /* AvatarService.swift */; };
@@ -293,6 +294,7 @@
 /* Begin PBXFileReference section */
 		6406D74C21CE3AC100196713 /* KeyboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardManager.swift; sourceTree = "<group>"; };
 		6414C18D217DF43100373FA6 /* String+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+adamant.swift"; sourceTree = "<group>"; };
+		64156D662141198E00AE3024 /* ThemeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeService.swift; sourceTree = "<group>"; };
 		6416B19C21AD7B92006089AC /* LskWalletRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskWalletRoutes.swift; sourceTree = "<group>"; };
 		6416B19E21AD7CBE006089AC /* LskWalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskWalletViewController.swift; sourceTree = "<group>"; };
 		6416B1A021AD7D93006089AC /* LskTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskTransferViewController.swift; sourceTree = "<group>"; };
@@ -301,8 +303,6 @@
 		6416B1A621B024B6006089AC /* LskWalletService+Send.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LskWalletService+Send.swift"; sourceTree = "<group>"; };
 		642361BD20E3869D0061559E /* eth_l18n.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = eth_l18n.strings; sourceTree = "<group>"; };
 		643ED0B02109F4BD005A9FDA /* NativeAdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAdamantCore.swift; sourceTree = "<group>"; };
-		640360E82179D1550009968B /* UITextField+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+adamant.swift"; sourceTree = "<group>"; };
-		64156D662141198E00AE3024 /* ThemeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeService.swift; sourceTree = "<group>"; };
 		6441CE63215BBE8900E48CA2 /* ThemeLight.yaml */ = {isa = PBXFileReference; lastKnownFileType = text; path = ThemeLight.yaml; sourceTree = "<group>"; };
 		6441CE65215BC86900E48CA2 /* ThemeDark.yaml */ = {isa = PBXFileReference; lastKnownFileType = text; path = ThemeDark.yaml; sourceTree = "<group>"; };
 		644EC34C20EFA60900F40C73 /* AdamantApi+Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Delegates.swift"; sourceTree = "<group>"; };
@@ -316,6 +316,7 @@
 		6455E9F021075D3600B2E94C /* AddressBookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBookService.swift; sourceTree = "<group>"; };
 		6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAddressBookService.swift; sourceTree = "<group>"; };
 		6458548A211B3AB1004C5909 /* WelcomeViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WelcomeViewController.xib; sourceTree = "<group>"; };
+		645AE06521E67D3300AD3623 /* UITextField+adamant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITextField+adamant.swift"; sourceTree = "<group>"; };
 		645E7B052111DF3A006CC9FD /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
 		648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantAvatarService.swift; sourceTree = "<group>"; };
 		648BCA6C213D384F00875EB5 /* AvatarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarService.swift; sourceTree = "<group>"; };
@@ -784,7 +785,7 @@
 				E927171D20C04613002BB9A6 /* UIColor+hex.swift */,
 				E98FC34320F920BD00032D65 /* UIFont+adamant.swift */,
 				E9D1BE19211DA25300E86B72 /* UIView+constraints.swift */,
-				640360E82179D1550009968B /* UITextField+adamant.swift */,
+				645AE06521E67D3300AD3623 /* UITextField+adamant.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -1474,7 +1475,6 @@
 				64A223D820F7A08E005157CB /* LskApiService.swift in Sources */,
 				E94008702114EA6800CD2D67 /* AdamantBalanceFormat.swift in Sources */,
 				E9E7CD8F20026CD300DFC4DB /* AdamantDialogService.swift in Sources */,
-				640360E92179D1550009968B /* UITextField+adamant.swift in Sources */,
 				E993301E212EF39700CD5200 /* EthTransferViewController.swift in Sources */,
 				E9CAE8DA2018ACD300345E76 /* AdamantApi+Chats.swift in Sources */,
 				E90847362196FEA80095825D /* Chatroom+CoreDataClass.swift in Sources */,
@@ -1576,6 +1576,7 @@
 				E9150B802066861D0065A985 /* ChatViewController+MessageKit.swift in Sources */,
 				E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */,
 				E90847322196FEA80095825D /* TransferTransaction+CoreDataClass.swift in Sources */,
+				645AE06621E67D3300AD3623 /* UITextField+adamant.swift in Sources */,
 				E90847392196FEF50095825D /* BaseTransaction+TransactionDetails.swift in Sources */,
 				E908473B219707200095825D /* AccountViewController+StayIn.swift in Sources */,
 				E9204B5220C9762400F3B9AB /* MessageStatus.swift in Sources */,

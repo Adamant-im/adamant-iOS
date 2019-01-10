@@ -71,6 +71,10 @@ class NotificationsViewController: FormViewController {
         navigationItem.title = String.adamantLocalized.security.title
         navigationOptions = .Disabled
         
+        self.tableView.styles = ["baseTable"]
+        navigationController?.navigationBar.style = "baseNavigationBar"
+        view.style = "primaryBackground,primaryTint"
+        
         // MARK: Notifications
         // Type
         let nType = ActionSheetRow<NotificationsMode>() {
@@ -81,6 +85,9 @@ class NotificationsViewController: FormViewController {
             $0.value = notificationsService.notificationsMode
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
+            cell.style = "secondaryBackground,primaryTint"
+            cell.textLabel?.style = "primaryText"
+            cell.imageView?.style = "primaryTint"
         }.onChange { [weak self] row in
             let mode = row.value ?? NotificationsMode.disabled
             self?.setNotificationMode(mode)
@@ -105,7 +112,11 @@ class NotificationsViewController: FormViewController {
             cell.textView.isEditable = false
             
             let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
+            parser.color = UIColor.adamant.primary
+            parser.link.color = UIColor.adamant.secondary
             cell.textView.attributedText = parser.parse(Rows.description.localized)
+            cell.style = "secondaryBackground"
+            cell.textView?.style = "secondaryBackground,primaryText"
         }
         
         // Github readme
@@ -118,6 +129,9 @@ class NotificationsViewController: FormViewController {
             cell.selectionStyle = .gray
         }.cellUpdate({ (cell, _) in
             cell.accessoryType = .disclosureIndicator
+            cell.style = "secondaryBackground,primaryTint"
+            cell.textLabel?.style = "primaryText"
+            cell.imageView?.style = "primaryTint"
         }).onCellSelection { [weak self] (_, row) in
             guard let url = URL(string: AdamantResources.ansReadmeUrl) else {
                 fatalError("Failed to build ANS URL")

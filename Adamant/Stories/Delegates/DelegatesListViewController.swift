@@ -108,12 +108,11 @@ class DelegatesListViewController: UIViewController {
 			controller.searchResultsUpdater = self
 			controller.obscuresBackgroundDuringPresentation = false
 			controller.hidesNavigationBarDuringPresentation = true
+            controller.searchBar.style = "baseBarTint"
             searchController = controller
             
             definesPresentationContext = true
             navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
-            
-            searchController.searchBar.style = "baseBarTint"
 		}
 		
 		// MARK: Reset UI

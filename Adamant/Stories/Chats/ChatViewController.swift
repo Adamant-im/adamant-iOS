@@ -169,6 +169,10 @@ class ChatViewController: MessagesViewController {
 		if #available(iOS 11.0, *) {
             navigationItem.largeTitleDisplayMode = .never
 		}
+        
+        navigationController?.navigationBar.style = "baseNavigationBar"
+        tabBarController?.tabBar.style = "baseBarTint"
+        view.style = "primaryBackground,primaryTint"
 		
 		// MARK: 1. Initial configuration
 		

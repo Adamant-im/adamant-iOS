@@ -136,7 +136,7 @@ class LightTheme:BaseTheme, ThemeProtocol {
     }
     
     var chatRecipientBackground: UIColor {
-        return getColor("backgroundColor")
+        return getColor("altBackgroundColor")
     }
     
     var pendingChatBackground: UIColor {
@@ -148,7 +148,7 @@ class LightTheme:BaseTheme, ThemeProtocol {
     }
     
     var chatSenderBackground: UIColor {
-        return getColor("backgroundColor")
+        return getColor("altBackgroundColor")
     }
     
     var pinpadHighlightButton: UIColor {

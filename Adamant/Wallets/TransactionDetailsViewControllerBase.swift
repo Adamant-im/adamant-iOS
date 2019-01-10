@@ -354,7 +354,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
             cell.textLabel?.style = "primaryText"
-            cell.textField?.style = "primaryText"
+//            cell.textField?.style = "primaryText"
             cell.style = "secondaryBackground"
             
             if let value = self?.transaction?.feeValue, let formatter = self?.currencyFormatter {

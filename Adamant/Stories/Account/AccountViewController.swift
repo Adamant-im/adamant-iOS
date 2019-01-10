@@ -58,7 +58,7 @@ class AccountViewController: FormViewController {
 	
 	enum Rows {
 		case balance, sendTokens // Wallet
-		case security, nodes, about // Application
+		case security, nodes, theme, about // Application
 		case voteForDelegates, generateQr, logout // Actions
         case stayIn, biometry, notifications // Security
 		
@@ -419,6 +419,10 @@ class AccountViewController: FormViewController {
             $0.cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
+            cell.imageView?.style = "primaryTint"
+            cell.textLabel?.style = "primaryText"
+            cell.detailTextLabel?.style = "secondaryText"
+            cell.style = "secondaryBackground,primaryTint"
         }.onCellSelection { [weak self] (_, _) in
             guard let vc = self?.router.get(scene: AdamantScene.Settings.qRGenerator) else {
                 return
@@ -488,6 +492,11 @@ class AccountViewController: FormViewController {
             $0.title = Rows.stayIn.localized
             $0.cell.imageView?.image = Rows.stayIn.image
             $0.value = accountService.hasStayInAccount
+        }.cellUpdate { (cell, _) in
+            cell.imageView?.style = "primaryTint"
+            cell.textLabel?.style = "primaryText"
+            cell.detailTextLabel?.style = "secondaryText"
+            cell.style = "secondaryBackground,primaryTint"
         }.onChange { [weak self] row in
             guard let enabled = row.value else {
                 return
@@ -543,6 +552,10 @@ class AccountViewController: FormViewController {
             })
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
+            cell.imageView?.style = "primaryTint"
+            cell.textLabel?.style = "primaryText"
+            cell.detailTextLabel?.style = "secondaryText"
+            cell.style = "secondaryBackground,primaryTint"
         }.onCellSelection { [weak self] (_, _) in
             guard let vc = self?.router.get(scene: AdamantScene.Settings.notifications) else {
                 return
@@ -854,6 +867,16 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 
 extension AccountViewController: Themeable {
     func apply(theme: ThemeProtocol) {
+        setNeedsStatusBarAppearanceUpdate()
+    }
+    
+    override open var preferredStatusBarStyle: UIStatusBarStyle {
+        return UIColor.adamant.statusBar
+    }
+}
+
+extension UISplitViewController: Themeable {
+    public func apply(theme: ThemeProtocol) {
         setNeedsStatusBarAppearanceUpdate()
     }
     
