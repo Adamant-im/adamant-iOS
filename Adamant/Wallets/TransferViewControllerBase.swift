@@ -240,13 +240,10 @@ class TransferViewControllerBase: FormViewController {
         super.viewDidLoad()
 		
 		// MARK: UI
-		navigationAccessoryView.tintColor = UIColor.adamant.primary
-        
         tableView.styles = ["baseTable"]
         navigationController?.navigationBar.style = "baseNavigationBar"
         tabBarController?.tabBar.style = "baseBarTint"
         view.style = "primaryBackground,primaryTint"
-        navigationAccessoryView.style = "baseBarTint"
         navigationItem.title = defaultSceneTitle()
 		
 		// MARK: Sections

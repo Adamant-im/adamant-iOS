@@ -144,7 +144,6 @@ class NodeEditorViewController: FormViewController {
         self.tableView.styles = ["baseTable"]
         navigationController?.navigationBar.style = "baseNavigationBar"
         view.style = "primaryBackground,primaryTint"
-        navigationAccessoryView.style = "baseBarTint"
 		
 		if let node = node {
 			self.navigationItem.title = node.host
