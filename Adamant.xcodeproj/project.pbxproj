@@ -705,7 +705,6 @@
 				E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */,
 				64A223D720F7A08E005157CB /* LskApiService.swift */,
 				E9FEECA321413659007DD7C8 /* RichMessageProvider.swift */,
-				64156D662141198E00AE3024 /* ThemeService.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -729,6 +728,7 @@
 				E905D39A2048A9BD00DDB504 /* KeychainStore.swift */,
 				E950273F202E257E002C1098 /* RepeaterService.swift */,
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
+				64156D662141198E00AE3024 /* ThemeService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";

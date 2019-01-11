@@ -205,7 +205,7 @@ class LoginViewController: FormViewController {
 		<<< PasswordRow() {
 			$0.tag = Rows.passphrase.tag
 			$0.placeholder = Rows.passphrase.localized
-            $0.placeholderColor = UIColor.adamant.primary
+            $0.placeholderColor = UIColor.adamant.secondary
 			$0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
             }.cellUpdate({ (cell, _) in
                 cell.textField.textColor = UIColor.adamant.primary
@@ -231,7 +231,7 @@ class LoginViewController: FormViewController {
 			self?.loginWith(passphrase: passphrase)
 		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             cell.textLabel?.style = "primaryText"
 		}
 		
@@ -270,7 +270,7 @@ class LoginViewController: FormViewController {
 			cell.textView.attributedText = mutableText
             
             cell.textView?.style = "secondaryBackground,primaryText"
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
 		}
 		
 		// New genegated passphrase
@@ -292,7 +292,7 @@ class LoginViewController: FormViewController {
             
             cell.passphraseLabel?.style = "secondaryBackground,primaryText"
             cell.tipLabel?.style = "secondaryText"
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
 		}).onCellSelection({ [weak self] (cell, row) in
 			guard let passphrase = self?.generatedPassphrases.last, let dialogService = self?.dialogService else {
 				return
@@ -318,7 +318,7 @@ class LoginViewController: FormViewController {
 		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
             cell.textLabel?.style = "primaryText"
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
 		}
         
         // MARK: Nodes list settings
@@ -331,7 +331,7 @@ class LoginViewController: FormViewController {
 		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
             cell.textLabel?.style = "primaryText"
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
 		}.onCellSelection { [weak self] (_, _) in
 			guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
 				return

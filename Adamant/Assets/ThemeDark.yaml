@@ -81,7 +81,7 @@ styles:
   baseTableCell:
     tintColor: $firstColor
     backgroundColor: $thirdColor
-    selectedBackgroundColor: $secondaryColor
+    selectedBackgroundColor: $backgroundColor
   ## Bar tint ##
   baseNavigationBar:
     styles: [baseBarTint]

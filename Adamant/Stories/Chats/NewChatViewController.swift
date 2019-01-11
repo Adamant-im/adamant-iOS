@@ -196,7 +196,7 @@ class NewChatViewController: FormViewController {
 				$0.title = Rows.myQr.localized
 			}.cellUpdate { (cell, _) in
 				cell.textLabel?.textColor = UIColor.adamant.primary
-                cell.style = "secondaryBackground"
+                cell.style = "baseTableCell,secondaryBackground"
                 cell.textLabel?.style = "primaryText"
 			}.onCellSelection { [weak self] (cell, row) in
 				let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))

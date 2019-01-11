@@ -622,7 +622,8 @@ extension ChatListViewController {
     
     private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
         markdownParser.color = UIColor.adamant.primary
-        markdownParser.link.color = UIColor.adamant.secondary
+        markdownParser.link.color = UIColor.adamant.activeColor
+        markdownParser.automaticLinkDetectionEnabled = false
         
         switch transaction {
         case let message as MessageTransaction:
@@ -744,7 +745,7 @@ extension ChatListViewController {
 		}
 		
 		more.image = #imageLiteral(resourceName: "swipe_more")
-		more.backgroundColor = UIColor.adamant.primary
+		more.backgroundColor = UIColor.adamantDefault.primary
 		
 		// Mark as read
 		if chatroom.hasUnreadMessages {
@@ -760,7 +761,7 @@ extension ChatListViewController {
 			}
 			
 			markAsRead.image = #imageLiteral(resourceName: "swipe_mark-as-read")
-			markAsRead.backgroundColor = UIColor.adamant.primary
+			markAsRead.backgroundColor = UIColor.adamantDefault.primary
 			
 			actions = [markAsRead, more]
 		} else {

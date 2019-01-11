@@ -132,7 +132,7 @@ class ShareQrViewController: FormViewController {
 			}
 		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             cell.textLabel?.style = "primaryText"
 		}
 			
@@ -169,7 +169,7 @@ class ShareQrViewController: FormViewController {
 			self?.present(vc, animated: true, completion: nil)
 		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             cell.textLabel?.style = "primaryText"
 		}
 		
@@ -180,7 +180,7 @@ class ShareQrViewController: FormViewController {
 			self?.close()
 		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             cell.textLabel?.style = "primaryText"
 		}
         

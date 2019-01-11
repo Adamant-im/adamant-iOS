@@ -173,6 +173,8 @@ class ChatViewController: MessagesViewController {
         navigationController?.navigationBar.style = "baseNavigationBar"
         tabBarController?.tabBar.style = "baseBarTint"
         view.style = "primaryBackground,primaryTint"
+        
+        self.observeThemeChange()
 		
 		// MARK: 1. Initial configuration
 		
@@ -781,5 +783,11 @@ private class StatusUpdateProcedure: Procedure {
             try? privateContext.save()
             self.finish()
         }
+    }
+}
+
+extension ChatViewController: Themeable {
+    public func apply(theme: ThemeProtocol) {
+        self.messagesCollectionView.reloadData()
     }
 }

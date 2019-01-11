@@ -124,7 +124,7 @@ class NodesListViewController: FormViewController {
 		}.onCellSelection { [weak self] (_, _) in
 			self?.createNewNode()
 		}.cellUpdate { (cell, _) in
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             cell.textLabel?.style = "primaryText"
 		}
 			
@@ -140,7 +140,7 @@ class NodesListViewController: FormViewController {
 		}.onCellSelection { [weak self] (_, _) in
 			self?.resetToDefault()
 		}.cellUpdate { (cell, _) in
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             cell.textLabel?.style = "primaryText"
 		}
     }
@@ -353,7 +353,7 @@ extension NodesListViewController {
 			}
 			
 			cell.accessoryType = .disclosureIndicator
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             cell.textLabel?.style = "primaryText"
 		}).onCellSelection { [weak self] (_, row) in
 			guard let node = row.value, let tag = row.tag else {

@@ -737,7 +737,7 @@ extension TransferViewControllerBase {
 				self?.confirmSendFunds()
             }.cellUpdate({ (cell, _) in
                 cell.textLabel?.style = "primaryText"
-                cell.style = "secondaryBackground"
+                cell.style = "baseTableCell,secondaryBackground"
             })
 		}
 	}

@@ -141,6 +141,7 @@ class QRGeneratorViewController: FormViewController {
 			$0.textAreaHeight = .dynamic(initialTextViewHeight: 28.0) // 28 for textView and 8+8 for insets
 		}.cellUpdate { (cell, row) in
             cell.textView?.style = "secondaryBackground,input"
+            cell.placeholderLabel?.style = "secondaryText"
             cell.style = "secondaryBackground"
 		}
 		

@@ -163,7 +163,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = .black
             cell.textLabel?.style = "primaryText"
             cell.detailTextLabel?.style = "primaryText"
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             
             if let value = self?.transaction?.txId {
                 row.value = value
@@ -218,7 +218,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.titleLabel?.style = "primaryText"
             cell.detailsLabel?.style = "primaryText"
             cell.secondDetailsLabel?.style = "secondaryText"
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             
             if let transaction = self?.transaction {
                 if transaction.senderAddress.count == 0 {
@@ -277,7 +277,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.titleLabel?.style = "primaryText"
             cell.detailsLabel?.style = "primaryText"
             cell.secondDetailsLabel?.style = "secondaryText"
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
         }
         
         detailsSection.append(recipientRow)
@@ -304,7 +304,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = .black
             cell.textLabel?.style = "primaryText"
             cell.detailTextLabel?.style = "primaryText"
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             row.value = self?.transaction?.dateValue
         }
             
@@ -328,7 +328,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = .black
             cell.textLabel?.style = "primaryText"
             cell.textField?.style = "primaryText"
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             row.value = self?.transaction?.amountValue.doubleValue
         }
             
@@ -355,7 +355,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = .black
             cell.textLabel?.style = "primaryText"
 //            cell.textField?.style = "primaryText"
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             
             if let value = self?.transaction?.feeValue, let formatter = self?.currencyFormatter {
                 row.value = formatter.string(fromDecimal: value)
@@ -387,7 +387,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = .black
             cell.textLabel?.style = "primaryText"
             cell.detailTextLabel?.style = "primaryText"
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             
             if let value = self?.transaction?.confirmationsValue, value != "0" {
                 row.value = value
@@ -419,7 +419,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = .black
             cell.textLabel?.style = "primaryText"
             cell.detailTextLabel?.style = "primaryText"
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             
             if let value = self?.transaction?.blockValue {
                 row.value = value
@@ -447,6 +447,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
+            cell.textLabel?.style = "primaryText"
+            cell.detailTextLabel?.style = "primaryText"
+            cell.style = "baseTableCell,secondaryBackground"
             row.value = self?.transaction?.transactionStatus?.localized
         }
         
@@ -470,7 +473,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 cell.textLabel?.textColor = .black
                 cell.textLabel?.style = "primaryText"
                 cell.detailTextLabel?.style = "primaryText"
-                cell.style = "secondaryBackground"
+                cell.style = "baseTableCell,secondaryBackground"
                 cell.textView.isSelectable = false
                 cell.textView.isEditable = false
             }.onCellSelection { [weak self] (cell, row) in
@@ -511,7 +514,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.accessoryType = .disclosureIndicator
             cell.textLabel?.style = "primaryText"
             cell.detailTextLabel?.style = "primaryText"
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
         }.onCellSelection { [weak self] (_, _) in
             guard let transaction = self?.transaction, let url = self?.explorerUrl(for: transaction) else {
                 return

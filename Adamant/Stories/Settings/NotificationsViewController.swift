@@ -129,7 +129,7 @@ class NotificationsViewController: FormViewController {
             cell.selectionStyle = .gray
         }.cellUpdate({ (cell, _) in
             cell.accessoryType = .disclosureIndicator
-            cell.style = "secondaryBackground,primaryTint"
+            cell.style = "baseTableCell,secondaryBackground,primaryTint"
             cell.textLabel?.style = "primaryText"
             cell.imageView?.style = "primaryTint"
         }).onCellSelection { [weak self] (_, row) in

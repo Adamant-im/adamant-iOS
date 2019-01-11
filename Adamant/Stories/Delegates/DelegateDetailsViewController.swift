@@ -215,7 +215,7 @@ extension DelegateDetailsViewController {
 		cell.accessoryType = .none
 		cell.imageView?.image = row.image
 		cell.imageView?.tintColor = UIColor.adamant.primary
-        cell.style = "secondaryBackground"
+        cell.style = "baseTableCell,secondaryBackground"
         
         cell.textLabel?.style = "primaryText"
         cell.detailTextLabel?.style = "primaryText"

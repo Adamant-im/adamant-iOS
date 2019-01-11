@@ -129,7 +129,7 @@ class AdmWalletViewController: WalletViewControllerBase {
                 cell.imageView?.style = "primaryTint"
                 cell.textLabel?.style = "primaryText"
                 cell.detailTextLabel?.style = "secondaryText"
-                cell.style = "secondaryBackground,primaryTint"
+                cell.style = "baseTableCell,secondaryBackground,primaryTint"
             }.onCellSelection { [weak self] (_, _) in
                 guard let url = URL(string: urlRaw) else {
                     self?.dialogService.showError(withMessage: "Failed to create URL with string: \(urlRaw)", error: nil)

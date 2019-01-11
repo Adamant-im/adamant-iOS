@@ -88,7 +88,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
             cell.textLabel?.style = "primaryText"
-            cell.style = "secondaryBackground,primaryTint"
+            cell.style = "baseTableCell,secondaryBackground,primaryTint"
             cell.detailTextLabel?.style = "secondaryText"
         }.onCellSelection { [weak self] (cell, row) in
             row.deselect()
@@ -151,7 +151,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			balanceRow.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
                 cell.textLabel?.style = "primaryText"
-                cell.style = "secondaryBackground,primaryTint"
+                cell.style = "baseTableCell,secondaryBackground,primaryTint"
                 cell.detailTextLabel?.style = "secondaryText"
             }.onCellSelection { [weak self] (_, row) in
                 row.deselect()
@@ -182,7 +182,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
                 cell.textLabel?.style = "primaryText"
-                cell.style = "secondaryBackground"
+                cell.style = "baseTableCell,secondaryBackground"
 			}.onCellSelection { [weak self] (_, row) in
                 row.deselect()
 				guard let service = self?.service as? WalletServiceWithSend else {

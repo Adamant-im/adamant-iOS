@@ -235,6 +235,13 @@ extension ChatViewController: MessagesDisplayDelegate {
 		return [.url]
 	}
     
+    func detectorAttributes(for detector: DetectorType, and message: MessageType, at indexPath: IndexPath) -> [NSAttributedString.Key : Any] {
+        if detector == .url {
+            return [NSAttributedString.Key.foregroundColor:UIColor.adamant.activeColor]
+        }
+        return [:]
+    }
+    
     func configureAccessoryView(_ accessoryView: UIView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
         guard let message = message as? MessageTransaction else {
             accessoryView.subviews.first?.removeFromSuperview()
@@ -598,7 +605,8 @@ extension MessageTransaction: MessageType {
         if isMarkdown {
             let parser = MessageTransaction.markdownParser
             parser.color = UIColor.adamant.primary
-            parser.link.color = UIColor.adamant.secondary
+            parser.link.color = UIColor.adamant.activeColor
+            parser.automaticLink.color = UIColor.adamant.activeColor
             return MessageKind.attributedText(parser.parse(message))
         } else {
             return MessageKind.text(message)

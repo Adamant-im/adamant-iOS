@@ -224,7 +224,7 @@ class NodeEditorViewController: FormViewController {
 			$0.tag = Rows.testButton.tag
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-            cell.style = "secondaryBackground"
+            cell.style = "baseTableCell,secondaryBackground"
             cell.textLabel?.style = "primaryText"
             cell.detailTextLabel?.style = "primaryText"
 		}.onCellSelection { [weak self] (_, _) in
@@ -238,7 +238,7 @@ class NodeEditorViewController: FormViewController {
 				$0.title = Rows.deleteButton.localized
 				$0.tag = Rows.deleteButton.tag
 			}.cellUpdate { (cell, _) in
-                cell.style = "secondaryBackground"
+                cell.style = "baseTableCell,secondaryBackground"
                 cell.textLabel?.style = "primaryText"
 			}.onCellSelection { [weak self] (_, _) in
 				self?.deleteNode()

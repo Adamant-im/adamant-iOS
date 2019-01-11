@@ -430,10 +430,9 @@ public class ThemeManager {
         })
         
         Stylist.shared.addProperty(StyleProperty(name: "selectedBackgroundColor") { (view: UITableViewCell, value: PropertyValue<UIColor>) in
-            if view.selectedBackgroundView == nil {
-                view.selectedBackgroundView = UIView()
-            }
-            view.selectedBackgroundView?.backgroundColor = value.value
+            let selectedBackgroundView = UIView()
+            selectedBackgroundView.backgroundColor = value.value
+            view.selectedBackgroundView = selectedBackgroundView
         })
     }
 
