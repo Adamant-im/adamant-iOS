@@ -206,6 +206,12 @@ class TransferViewControllerBase: FormViewController {
 			return 0
 		}
 	}
+    
+    override var customNavigationAccessoryView: (UIView & NavigationAccessory)? {
+        let accessory = NavigationAccessoryView()
+        accessory.tintColor = UIColor.adamant.primary
+        return accessory
+    }
 	
 	
 	// MARK: - QR Reader

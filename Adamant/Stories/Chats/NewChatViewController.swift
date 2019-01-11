@@ -300,6 +300,11 @@ class NewChatViewController: FormViewController {
 				self.dialogService.showWarning(withMessage: result.localized)
 				
 			case .serverError(let error):
+                if let apiError = error as? ApiServiceError, case .internalError(let message, _) = apiError, message == String.adamantLocalized.sharedErrors.unknownError {
+                    self.dialogService.showWarning(withMessage: AccountsProviderResult.notFound(address: address).localized)
+                    return
+                }
+                
 				self.dialogService.showError(withMessage: result.localized, error: error)
 			}
 		}

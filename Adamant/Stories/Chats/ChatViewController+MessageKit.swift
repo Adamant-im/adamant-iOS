@@ -356,10 +356,24 @@ extension ChatViewController: MessageCellDelegate {
 	}
 	
 	func didSelectURL(_ url: URL) {
-		let safari = SFSafariViewController(url: url)
-        safari.preferredControlTintColor = UIColor.adamant.primary
-        safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
-		present(safari, animated: true, completion: nil)
+        if url.absoluteString.starts(with: "http") {
+            let safari = SFSafariViewController(url: url)
+            safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
+            present(safari, animated: true, completion: nil)
+        } else if url.absoluteString.starts(with: "mailto") {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            } else {
+                dialogService.showWarning(withMessage: String.adamantLocalized.chat.noMailAppWarning)
+            }
+        } else {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            } else {
+                dialogService.showWarning(withMessage:String.adamantLocalized.chat.unsupportedUrlWarning)
+            }
+        }
 	}
 }
 

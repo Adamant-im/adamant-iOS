@@ -87,6 +87,12 @@ class NodeEditorViewController: FormViewController {
 	weak var delegate: NodeEditorDelegate?
 	private var didCallDelegate: Bool = false
 	
+    override var customNavigationAccessoryView: (UIView & NavigationAccessory)? {
+        let accessory = NavigationAccessoryView()
+        accessory.tintColor = UIColor.adamant.primary
+        return accessory
+    }
+    
 	// MARK: Test state
 	enum TestState {
 		case notTested, failed, passed
