@@ -19,20 +19,20 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="sXd-S8-zR5">
-                        <rect key="frame" x="58.5" y="0.0" width="258" height="258"/>
+                        <rect key="frame" x="59" y="0.0" width="257.5" height="257.5"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="sXd-S8-zR5" secondAttribute="height" multiplier="1:1" id="btZ-av-5zo"/>
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Comments" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e4D-pZ-uK9">
-                        <rect key="frame" x="146" y="264" width="83.5" height="20.5"/>
+                        <rect key="frame" x="146" y="263.5" width="83.5" height="21"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="e4D-pZ-uK9" firstAttribute="top" secondItem="sXd-S8-zR5" secondAttribute="bottom" constant="6" id="3R0-l3-sxl"/>
+                    <constraint firstAttribute="bottom" secondItem="sXd-S8-zR5" secondAttribute="bottom" constant="33" id="F2o-YN-SC0"/>
                     <constraint firstAttribute="bottom" secondItem="e4D-pZ-uK9" secondAttribute="bottom" constant="6" id="N91-5h-8ko"/>
                     <constraint firstItem="e4D-pZ-uK9" firstAttribute="centerX" secondItem="HLh-xg-SCg" secondAttribute="centerX" id="S8q-Tt-zp9"/>
                     <constraint firstItem="e4D-pZ-uK9" firstAttribute="width" relation="lessThanOrEqual" secondItem="HLh-xg-SCg" secondAttribute="width" constant="-16" id="ami-fE-XaT"/>
@@ -42,6 +42,7 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
+                <outlet property="bottomConstrain" destination="F2o-YN-SC0" id="k4Q-X8-pTa"/>
                 <outlet property="qrImageView" destination="sXd-S8-zR5" id="WR8-aE-C1g"/>
                 <outlet property="tipLabel" destination="e4D-pZ-uK9" id="6Nr-k7-Xyv"/>
             </connections>
