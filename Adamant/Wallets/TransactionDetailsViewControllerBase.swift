@@ -130,7 +130,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         navigationItem.title = String.adamantLocalized.transactionDetails.title
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(share))
-        navigationAccessoryView.tintColor = UIColor.adamant.primary
+        navigationOptions = RowNavigationOptions.Disabled
         
         // MARK: - Transfer section
         let detailsSection = Section(Sections.details.localized) {

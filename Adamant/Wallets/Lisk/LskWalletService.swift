@@ -9,10 +9,10 @@
 import Foundation
 import UIKit
 import Swinject
-import BigInt
 import Lisk
 import web3swift
 import Alamofire
+import struct BigInt.BigUInt
 
 class LskWalletService: WalletService {
     
@@ -207,7 +207,7 @@ class LskWalletService: WalletService {
         }
 	}
     
-    func fromRawLsk(value: BigUInt) -> String {
+    func fromRawLsk(value: BigInt.BigUInt) -> String {
         if let formattedAmount = Web3.Utils.formatToPrecision(value, numberDecimals: 8, formattingDecimals: 8, decimalSeparator: ".", fallbackToScientific: false) {
             return formattedAmount
         } else {

@@ -7,9 +7,9 @@
 //
 
 import Foundation
-import BigInt
 import Lisk
 import web3swift
+import struct BigInt.BigUInt
 
 class AdamantLskApiService: LskApiService {
     
