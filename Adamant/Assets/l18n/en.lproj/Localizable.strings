@@ -779,16 +779,19 @@
 "WelcomeScene.Skip" = "skip";
 
 /* Welcome: Slide 1 Description */
-"WelcomeScene.Description.Slide1" = "Welcome to ADAMANT, true <b>Blockchain</b> Messenger.";
+"WelcomeScene.Description.Slide1" = "Welcome to ADAMANT, the genuine <b>blockchain</b> messenger.";
 
 /* Welcome: Slide 2 Description */
-"WelcomeScene.Description.Slide2" = "";
+"WelcomeScene.Description.Slide2" = "ADAMANT is <b>anonymity</b> and <b>security</b> of your messaging as well as in-chat cryptocurrency transferring tool.<br/><br/><a href=\“https://medium.com/adamant-im/adamant-security-features-e7cc836ff52c\“>Why are other messengers not secure?</a>";
 
 /* Welcome: Slide 3 Description */
-"WelcomeScene.Description.Slide3" = "";
+"WelcomeScene.Description.Slide3" = "ADAMANT infrastracture doesn't belong to anyone and is <b>decentralized</b>.<br/><br/>It is maintained by messages paid in ADM tokens. New accounts may receive free tokens for testing purposes.";
 
 /* Welcome: Slide 4 Description */
-"WelcomeScene.Description.Slide4" = "";
+"WelcomeScene.Description.Slide4" = "Create an account in a single click <b>without any requirements</b> (no email/phone/anything) and invite your friends.<br/><br/>Share your ADAMANT addresses <b>in-person</b> for true security.";
 
 /* Welcome: Slide 5 Description */
-"WelcomeScene.Description.Slide5" = "";
+"WelcomeScene.Description.Slide5" = "The project's source code is <a href=\“https://github.com/Adamant-im/\“>completely open</a>. The app is in development and we constantly add new features.<br/><br/>If you are a developer — join our team.";
+
+/* Welcome: Slide 6 Begin button */
+"WelcomeScene.Description.BeginButton" = "Start secure messaging";
