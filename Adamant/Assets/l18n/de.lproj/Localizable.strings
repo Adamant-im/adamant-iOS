@@ -11,7 +11,7 @@
 "About.Row.Website" = "Webseite";
 
 /* About scene: The Whitepaper row */
-"About.Row.Whitepaper" = "Das Whitepaper";
+"About.Row.Whitepaper" = "Whitepaper";
 
 /* About scene: Project's GitHub page row */
 "About.Row.GitHub" = "Seite des Projekts auf GitHub";
@@ -66,6 +66,9 @@
 
 /* About scene: Write to Adamant row */
 "About.Row.Adamant" = "ADAMANT";
+
+/* About scene: Show Welcome screens */
+"About.Row.Welcome" = "Willkommensbildschirm";
 
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "ADAMANT Tokens";

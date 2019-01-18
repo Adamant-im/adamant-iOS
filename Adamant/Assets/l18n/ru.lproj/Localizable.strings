@@ -67,6 +67,9 @@
 /* About scene: Write to Adamant row */
 "About.Row.Adamant" = "АДАМАНТ";
 
+/* About scene: Show Welcome screens */
+"About.Row.Welcome" = "Экраны приветствия";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Токены АДАМАНТ";
 
