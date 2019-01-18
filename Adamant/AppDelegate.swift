@@ -28,6 +28,7 @@ extension String.adamantLocalized {
 extension StoreKey {
 	struct application {
 		static let deviceTokenHash = "app.deviceTokenHash"
+        static let welcomeScreensIsShown = "app.welcomeScreensIsShown"
 		
 		private init() {}
 	}
@@ -117,10 +118,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let login = router.get(scene: AdamantScene.Login.login)
 		window!.rootViewController?.present(login, animated: false, completion: nil)
         
-        let welcomeIsShown = UserDefaults.standard.bool(forKey: "welcomeIsShown")
+        let welcomeIsShown = UserDefaults.standard.bool(forKey: StoreKey.application.welcomeScreensIsShown)
         if !welcomeIsShown {
             let welcome = router.get(scene: AdamantScene.Login.welcome)
             login.present(welcome, animated: false, completion: nil)
+            UserDefaults.standard.set(true, forKey: StoreKey.application.welcomeScreensIsShown)
         }
 		
 		// MARK: 4. Prepare pages

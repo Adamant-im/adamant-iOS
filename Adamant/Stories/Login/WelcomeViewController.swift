@@ -8,6 +8,7 @@
 
 import UIKit
 import SwiftyOnboard
+import SafariServices
 
 fileprivate class OnboardingPageItem {
     var image: UIImage
@@ -80,16 +81,26 @@ extension WelcomeViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
         
         let text = "<span style=\"font-family: Exo2-Regular; font-size: 16\">\(item.text)</span>"
         
-        if let htmlData = text.data(using: String.Encoding.unicode), let attributedString = try? NSAttributedString(data: htmlData, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
-            view?.text.attributedText = attributedString
+        if let htmlData = text.data(using: String.Encoding.unicode), let attributedString = try? NSMutableAttributedString(data: htmlData, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil), let view = view {
+            let style = NSMutableParagraphStyle()
+            style.alignment = .center
+            attributedString.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: attributedString.length))
+            view.text.attributedText = attributedString
+            view.text.delegate = self
+            
+            view.text.isSelectable = false
+            view.text.isEditable = false
         }
         
         return view
     }
     
     func swiftyOnboardViewForOverlay(_ swiftyOnboard: SwiftyOnboard) -> SwiftyOnboardOverlay? {
-        let overlay = OnboardOverlay.instanceFromNib() as? OnboardOverlay
-        overlay?.skip.addTarget(self, action: #selector(handleSkip), for: .touchUpInside)
+        guard let overlay = OnboardOverlay.instanceFromNib() as? OnboardOverlay else {
+            return nil
+        }
+        
+        overlay.skip.addTarget(self, action: #selector(handleSkip), for: .touchUpInside)
         return overlay
     }
     
@@ -102,5 +113,16 @@ extension WelcomeViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
         } else {
             overlay.skip.setImage(#imageLiteral(resourceName: "skipBtn"), for: .normal)
         }
+    }
+}
+
+
+// MARK: - UITextViewDelegate
+extension WelcomeViewController: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        let safari = SFSafariViewController(url: URL)
+        safari.preferredControlTintColor = UIColor.adamant.primary
+        present(safari, animated: true, completion: nil)
+        return false
     }
 }
