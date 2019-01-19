@@ -1,5 +1,5 @@
 //
-//  WelcomeViewController.swift
+//  OnboardViewController.swift
 //  Adamant
 //
 //  Created by Anton Boyarkin on 04/09/2018.
@@ -30,7 +30,7 @@ fileprivate extension String.adamantLocalized {
     }
 }
 
-class WelcomeViewController: UIViewController {
+class OnboardViewController: UIViewController {
     
     // MARK: Constants
     private static let titleFont = UIFont.adamantPrimary(ofSize: 18)
@@ -63,7 +63,7 @@ class WelcomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        onboarding.style = .custom(color: WelcomeViewController.themeColor)
+        onboarding.style = .custom(color: OnboardViewController.themeColor)
         onboarding.delegate = self
         onboarding.dataSource = self
         onboarding.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "stripeBg"))//UIColor.adamant.background
@@ -92,7 +92,7 @@ class WelcomeViewController: UIViewController {
 
 // MARK: SwiftyOnboard Delegate & DataSource
 
-extension WelcomeViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource {
+extension OnboardViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource {
     
     func swiftyOnboardNumberOfPages(_ swiftyOnboard: SwiftyOnboard) -> Int {
         return items.count
@@ -128,10 +128,10 @@ extension WelcomeViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
         overlay.continueButton.addTarget(self, action: #selector(handleContinue), for: .touchUpInside)
         
         //Setup for the overlay buttons:
-        overlay.continueButton.titleLabel?.font = WelcomeViewController.buttonsFont
+        overlay.continueButton.titleLabel?.font = OnboardViewController.buttonsFont
         overlay.continueButton.setTitle(String.adamantLocalized.Onboard.continueButton, for: .normal)
         
-        overlay.skipButton.titleLabel?.font = WelcomeViewController.buttonsFont
+        overlay.skipButton.titleLabel?.font = OnboardViewController.buttonsFont
         overlay.skipButton.setTitle(String.adamantLocalized.Onboard.skipButton, for: .normal)
         
         return overlay
@@ -153,7 +153,7 @@ extension WelcomeViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
 
 
 // MARK: - UITextViewDelegate
-extension WelcomeViewController: UITextViewDelegate {
+extension OnboardViewController: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         let safari = SFSafariViewController(url: URL)
         safari.preferredControlTintColor = UIColor.adamant.primary
