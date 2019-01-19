@@ -328,7 +328,7 @@ extension AdamantTransfersProvider {
         case .success(let account):
             recipientAccount = account
             
-        case .notFound, .invalidAddress:
+        case .notFound, .invalidAddress, .notInitiated:
             completion(.failure(.accountNotFound(address: recipient)))
             return
             
@@ -459,7 +459,7 @@ extension AdamantTransfersProvider {
         case .success(let account):
             recipientAccount = account
             
-        case .notFound, .invalidAddress:
+        case .notFound, .invalidAddress, .notInitiated:
             completion(.failure(.accountNotFound(address: recipient)))
             return
             
@@ -721,7 +721,7 @@ extension AdamantTransfersProvider {
                 case .success(_):
                     break
                     
-                case .notFound, .invalidAddress:
+                case .notFound, .invalidAddress, .notInitiated(_):
 					errors.append(ProcessingResult.accountNotFound(address: id))
 					
                 case .networkError(let error), .serverError(let error):

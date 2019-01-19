@@ -206,7 +206,7 @@ extension AdamantChatsProvider {
 			case .success(let account):
 				completion(.success(loggedAccount: loggedAddress, partner: account))
 				
-			case .notFound, .invalidAddress:
+			case .notFound, .invalidAddress, .notInitiated:
 				completion(.failure(.accountNotFound(partnerId)))
 				
 			case .networkError(_):

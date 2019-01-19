@@ -13,6 +13,7 @@ enum AccountsProviderResult {
 	case success(CoreDataAccount)
 	case notFound(address: String)
 	case invalidAddress(address: String)
+    case notInitiated(address: String)
 	case serverError(Error)
 	case networkError(Error)
 	
@@ -22,11 +23,14 @@ enum AccountsProviderResult {
 			return ""
 			
 		case .notFound(let address):
-			return String.localizedStringWithFormat(String.adamantLocalized.sharedErrors.accountNotFound, address)
+			return String.adamantLocalized.sharedErrors.accountNotFound(address)
 			
 		case .invalidAddress(let address):
 			return String.localizedStringWithFormat(NSLocalizedString("AccountsProvider.Error.AddressNotValidFormat", comment: "AccountsProvider: Address not valid error, %@ for address"), address)
 			
+        case .notInitiated(_):
+            return String.adamantLocalized.sharedErrors.accountNotInitiated
+            
 		case .serverError(let error):
 			return ApiServiceError.serverError(error: error.localizedDescription).localized
 			
