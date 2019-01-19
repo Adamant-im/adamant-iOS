@@ -20,11 +20,23 @@ fileprivate class OnboardingPageItem {
     }
 }
 
+fileprivate extension String.adamantLocalized {
+    struct Onboard {
+        static let beginButton = NSLocalizedString("WelcomeScene.Description.BeginButton", comment: "Welcome: Last slide Begin button")
+        static let continueButton = NSLocalizedString("WelcomeScene.Description.ContinueButton", comment: "Welcome: Next screen button")
+        static let skipButton = NSLocalizedString("WelcomeScene.Description.SkipButton", comment: "Welcome: Skip button")
+        
+        private init() {}
+    }
+}
+
 class WelcomeViewController: UIViewController {
     
     // MARK: Constants
-    private static let titleFont = UIFont.adamantPrimary(ofSize: 28.0)
-    private static let descriptionFont = UIFont.systemFont(ofSize: 14.0)
+    private static let titleFont = UIFont.adamantPrimary(ofSize: 18)
+    private static let buttonsFont = UIFont.adamantPrimary(ofSize: 16)
+    private static let themeColor = UIColor.adamant.primary
+    
     
     // MARK: Outlets
     @IBOutlet weak var onboarding: SwiftyOnboard!
@@ -45,15 +57,13 @@ class WelcomeViewController: UIViewController {
                            text: NSLocalizedString("WelcomeScene.Description.Slide4", comment: "Welcome: Slide 4 Description")),
 
         OnboardingPageItem(image: #imageLiteral(resourceName: "SlideImage5"),
-                           text: NSLocalizedString("WelcomeScene.Description.Slide5", comment: "Welcome: Slide 5 Description")),
-//        OnboardingPageItem(image: nil,
-//                           text: NSLocalizedString("WelcomeScene.Description.BeginButton", comment: "Welcome: Slide 6 Begin button"))
+                           text: NSLocalizedString("WelcomeScene.Description.Slide5", comment: "Welcome: Slide 5 Description"))
         ]
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        onboarding.style = .light
+        onboarding.style = .custom(color: WelcomeViewController.themeColor)
         onboarding.delegate = self
         onboarding.dataSource = self
         onboarding.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "stripeBg"))//UIColor.adamant.background
@@ -65,13 +75,17 @@ class WelcomeViewController: UIViewController {
         }
     }
     
-    @objc func handleNext() {
+    @objc func handleContinue() {
         DispatchQueue.main.async { [weak self] in
             guard let onboarding = self?.onboarding else {
                 return
             }
             
-            onboarding.goToPage(index: onboarding.currentPage, animated: true)
+            if let count = self?.items.count, onboarding.currentPage == count - 1 {
+                self?.handleSkip()
+            } else {
+                onboarding.goToPage(index: onboarding.currentPage + 1, animated: true)
+            }
         }
     }
 }
@@ -107,22 +121,32 @@ extension WelcomeViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
     }
     
     func swiftyOnboardViewForOverlay(_ swiftyOnboard: SwiftyOnboard) -> SwiftyOnboardOverlay? {
-        guard let overlay = OnboardOverlay.instanceFromNib() as? OnboardOverlay else {
-            return nil
-        }
+        let overlay = SwiftyOnboardOverlay()
         
-        overlay.skip.addTarget(self, action: #selector(handleSkip), for: .touchUpInside)
+        //Setup targets for the buttons on the overlay view:
+        overlay.skipButton.addTarget(self, action: #selector(handleSkip), for: .touchUpInside)
+        overlay.continueButton.addTarget(self, action: #selector(handleContinue), for: .touchUpInside)
+        
+        //Setup for the overlay buttons:
+        overlay.continueButton.titleLabel?.font = WelcomeViewController.buttonsFont
+        overlay.continueButton.setTitle(String.adamantLocalized.Onboard.continueButton, for: .normal)
+        
+        overlay.skipButton.titleLabel?.font = WelcomeViewController.buttonsFont
+        overlay.skipButton.setTitle(String.adamantLocalized.Onboard.skipButton, for: .normal)
+        
         return overlay
     }
     
     func swiftyOnboardOverlayForPosition(_ swiftyOnboard: SwiftyOnboard, overlay: SwiftyOnboardOverlay, for position: Double) {
-        let overlay = overlay as! OnboardOverlay
-        let currentPage = round(position)
-        overlay.contentControl.currentPage = Int(currentPage)
-        if currentPage == 4.0 {
-            overlay.skip.setImage(#imageLiteral(resourceName: "skip2Btn"), for: .normal)
+        let currentPage = Int(round(position))
+        overlay.pageControl.currentPage = currentPage
+        
+        if currentPage == items.count - 1 {
+            overlay.skipButton.isHidden = true
+            overlay.continueButton.setTitle(String.adamantLocalized.Onboard.beginButton, for: .normal)
         } else {
-            overlay.skip.setImage(#imageLiteral(resourceName: "skipBtn"), for: .normal)
+            overlay.skipButton.isHidden = false
+            overlay.continueButton.setTitle(String.adamantLocalized.Onboard.continueButton, for: .normal)
         }
     }
 }

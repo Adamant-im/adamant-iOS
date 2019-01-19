@@ -741,5 +741,11 @@
 /* Welcome: Slide 5 Description */
 "WelcomeScene.Description.Slide5" = "Der Quellcode des Projekts ist <a href=\“https://github.com/Adamant-im/\“>zu 100% offen</a>. Die App wird entwickelt und neue Funktionen werden ständig hinzugefügt.<br/><br/>Wenn Sie Entwickler sind, sind Sie bei uns herzlich willkommen.";
 
-/* Welcome: Slide 6 Begin button */
+/* WelcomeScene.Description.BeginButton */
 "WelcomeScene.Description.BeginButton" = "Sichere Kommunikation starten";
+
+/* Welcome: Next screen button */
+"WelcomeScene.Description.ContinueButton" = "Fortsetzen";
+
+/* Welcome: Skip button */
+"WelcomeScene.Description.SkipButton" = "Überspringen";

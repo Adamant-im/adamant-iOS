@@ -796,5 +796,11 @@
 /* Welcome: Slide 5 Description */
 "WelcomeScene.Description.Slide5" = "Исходный код проекта <a href=\"https://github.com/Adamant-im/\">полностью открыт</a>. Приложение в разработке, и новые функции добавляются постоянно.<br/><br/>Если вы разработчик — приглашаем вас принять участие.";
 
-/* Welcome: Slide 6 Begin button */
+/* Welcome: Last slide Begin button */
 "WelcomeScene.Description.BeginButton" = "Начать безопасное общение";
+
+/* Welcome: Next screen button */
+"WelcomeScene.Description.ContinueButton" = "Далее";
+
+/* Welcome: Skip button" */
+"WelcomeScene.Description.SkipButton" = "Пропустить";

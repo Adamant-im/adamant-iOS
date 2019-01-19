@@ -80,7 +80,7 @@ DEPENDENCIES:
   - QRCodeReader.swift
   - ReachabilitySwift
   - RNCryptor
-  - SwiftyOnboard
+  - SwiftyOnboard (from `https://github.com/RealBonus/SwiftyOnboard`, branch `feature/customStyle`)
   - Swinject
   - web3swift
 
@@ -113,7 +113,6 @@ SPEC REPOS:
     - scrypt
     - secp256k1_ios
     - SipHash
-    - SwiftyOnboard
     - Swinject
     - web3swift
 
@@ -124,6 +123,9 @@ EXTERNAL SOURCES:
   MessageKit:
     :branch: temp/customMessageKind_swift42
     :git: https://github.com/RealBonus/MessageKit
+  SwiftyOnboard:
+    :branch: feature/customStyle
+    :git: https://github.com/RealBonus/SwiftyOnboard
 
 CHECKOUT OPTIONS:
   Lisk:
@@ -132,6 +134,9 @@ CHECKOUT OPTIONS:
   MessageKit:
     :commit: 4409d10a7dcf390abbb696d280ec02025e89f4e7
     :git: https://github.com/RealBonus/MessageKit
+  SwiftyOnboard:
+    :commit: 8341eff1eb918e904a915be8dac5d5a1545887f2
+    :git: https://github.com/RealBonus/SwiftyOnboard
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
@@ -167,6 +172,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: 4895c765c9858eb4737ef222eb8643bb5fc7fdb3
 
-PODFILE CHECKSUM: 6884ce4b8c5e31d486b7d289a1eccb1b98a9161c
+PODFILE CHECKSUM: 6c2155051850a78b74c70bfbea61b04344b91139
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.0.beta.2
