@@ -120,7 +120,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let welcomeIsShown = UserDefaults.standard.bool(forKey: StoreKey.application.welcomeScreensIsShown)
         if !welcomeIsShown {
-            let welcome = router.get(scene: AdamantScene.Login.welcome)
+            let welcome = router.get(scene: AdamantScene.Onboard.welcome)
             login.present(welcome, animated: false, completion: nil)
             UserDefaults.standard.set(true, forKey: StoreKey.application.welcomeScreensIsShown)
         }

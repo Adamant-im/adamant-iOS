@@ -46,6 +46,8 @@ class WelcomeViewController: UIViewController {
 
         OnboardingPageItem(image: #imageLiteral(resourceName: "SlideImage5"),
                            text: NSLocalizedString("WelcomeScene.Description.Slide5", comment: "Welcome: Slide 5 Description")),
+//        OnboardingPageItem(image: nil,
+//                           text: NSLocalizedString("WelcomeScene.Description.BeginButton", comment: "Welcome: Slide 6 Begin button"))
         ]
 
     override func viewDidLoad() {
@@ -58,9 +60,18 @@ class WelcomeViewController: UIViewController {
     }
     
     @objc func handleSkip() {
-        UserDefaults.standard.set(true, forKey: "welcomeIsShown")
-        DispatchQueue.main.async {
-            self.dismiss(animated: true, completion: nil)
+        DispatchQueue.main.async { [weak self] in
+            self?.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    @objc func handleNext() {
+        DispatchQueue.main.async { [weak self] in
+            guard let onboarding = self?.onboarding else {
+                return
+            }
+            
+            onboarding.goToPage(index: onboarding.currentPage, animated: true)
         }
     }
 }

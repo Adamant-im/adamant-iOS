@@ -10,12 +10,7 @@ import Foundation
 
 extension AdamantScene {
 	struct Login {
-        static let welcome = AdamantScene(identifier: "WelcomeViewController") { r in
-            let c = WelcomeViewController(nibName: "WelcomeViewController", bundle: nil)
-            return c
-        }
-        
-		static let login = AdamantScene(identifier: "LoginViewController", factory: { r in
+        static let login = AdamantScene(identifier: "LoginViewController", factory: { r in
 			let c = LoginViewController()
 			c.accountService = r.resolve(AccountService.self)
 			c.adamantCore = r.resolve(AdamantCore.self)
