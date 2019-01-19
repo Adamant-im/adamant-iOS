@@ -51,6 +51,7 @@ PODS:
   - swift_qrcodejs (1.0.1)
   - SwiftRLP (1.2):
     - BigInt (~> 3.1)
+  - SwiftyOnboard (1.3.8)
   - Swinject (2.5.0)
   - web3swift (1.5.1):
     - BigInt (~> 3.1)
@@ -82,6 +83,7 @@ DEPENDENCIES:
   - QRCodeReader.swift
   - ReachabilitySwift
   - RNCryptor
+  - SwiftyOnboard (from `https://github.com/RealBonus/SwiftyOnboard`, branch `feature/customStyle`)
   - Swinject
   - web3swift
 
@@ -121,11 +123,17 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Lisk:
     :git: https://github.com/adamant-im/lisk-swift.git
+  SwiftyOnboard:
+    :branch: feature/customStyle
+    :git: https://github.com/RealBonus/SwiftyOnboard
 
 CHECKOUT OPTIONS:
   Lisk:
     :commit: 154a3af05772136b776ff14ae05f92c8d844ea20
     :git: https://github.com/adamant-im/lisk-swift.git
+  SwiftyOnboard:
+    :commit: 8341eff1eb918e904a915be8dac5d5a1545887f2
+    :git: https://github.com/RealBonus/SwiftyOnboard
 
 SPEC CHECKSUMS:
   Alamofire: 3ec537f71edc9804815215393ae2b1a8ea33a844
@@ -157,9 +165,10 @@ SPEC CHECKSUMS:
   SipHash: fad90a4683e420c52ef28063063dbbce248ea6d4
   swift_qrcodejs: c181fe5c849d30c699546a23762d7e3dd143ab37
   SwiftRLP: 98a02b2210128353ca02e4c2f4d83e2a9796db4f
+  SwiftyOnboard: de60e90c2af23dd61b01ec0c6a8d0be3370f857b
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: d80d1b9a3feca16e614acec9eea47ec26310d37d
 
-PODFILE CHECKSUM: c48dfca6a4a567218d3b21d2d625c4446aee6239
+PODFILE CHECKSUM: 1a42b369e3317521b2060baaf7b7bc56d7e6adb6
 
-COCOAPODS: 1.6.0.beta.1
+COCOAPODS: 1.6.0.beta.2

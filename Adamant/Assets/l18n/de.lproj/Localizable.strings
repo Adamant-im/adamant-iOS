@@ -11,7 +11,7 @@
 "About.Row.Website" = "Webseite";
 
 /* About scene: The Whitepaper row */
-"About.Row.Whitepaper" = "Das Whitepaper";
+"About.Row.Whitepaper" = "Whitepaper";
 
 /* About scene: Project's GitHub page row */
 "About.Row.GitHub" = "Seite des Projekts auf GitHub";
@@ -66,6 +66,9 @@
 
 /* About scene: Write to Adamant row */
 "About.Row.Adamant" = "ADAMANT";
+
+/* About scene: Show Welcome screens */
+"About.Row.Welcome" = "Willkommensbildschirm";
 
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Willkommen in ADAMANT";
@@ -732,3 +735,29 @@
 
 /* Wallet Services: Shared error, transaction not found */
 "WalletServices.SharedErrors.TransactionNotFound" = "Transaktion nicht gefunden";
+/* Welcome: Skip button */
+"WelcomeScene.Skip" = "überspringen";
+
+/* Welcome: Slide 1 Description */
+"WelcomeScene.Description.Slide1" = "Willkommen in ADAMANT, einem echten Messenger auf der <b>Blockchain</b>.";
+
+/* Welcome: Slide 2 Description */
+"WelcomeScene.Description.Slide2" = "ADAMANT ist <b>Anonymität</b> und <b>Sicherheit</b> Ihrer Kommunikation sowie Versand von Kryptowährungen in Chats.<br/><br/><a href=\“https://medium.com/adamant-im/adamant-security-features-e7cc836ff52c\“>Warum sind alle anderen Messenger nicht sicher?</a>";
+
+/* Welcome: Slide 3 Description */
+"WelcomeScene.Description.Slide3" = "Die Infrastruktur von ADAMANT hat keinen Besitzer, sie ist <b>dezentralisiert</b>.<br/><br/>Für ihre Unterstützung alle Nachrichten im Messenger werden mit ADM-Tokens bezahlt. Neue Konten erhalten kostenlose Tokens als Geschenk";
+
+/* Welcome: Slide 4 Description */
+"WelcomeScene.Description.Slide4" = "Um eine Konversation zu starten, erstellen Sie einfach ein neues Konto mit einem Klick <b>(Sie müssen keine Daten eingeben)</b> und fügen Sie Ihren ersten Gesprächspartner hinzu.<br/><br/>Wenn Sie Ihre Anonymität schätzen, empfehlen wir Ihnen, ADAMANT-Adressen <b>persönlich</b> mitzuteilen.";
+
+/* Welcome: Slide 5 Description */
+"WelcomeScene.Description.Slide5" = "Der Quellcode des Projekts ist <a href=\“https://github.com/Adamant-im/\“>zu 100% offen</a>. Die App wird entwickelt und neue Funktionen werden ständig hinzugefügt.<br/><br/>Wenn Sie Entwickler sind, sind Sie bei uns herzlich willkommen.";
+
+/* WelcomeScene.Description.BeginButton */
+"WelcomeScene.Description.BeginButton" = "Sichere Kommunikation starten";
+
+/* Welcome: Next screen button */
+"WelcomeScene.Description.ContinueButton" = "Weiter";
+
+/* Welcome: Skip button */
+"WelcomeScene.Description.SkipButton" = "Überspringen";
