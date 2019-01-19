@@ -161,16 +161,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window!.makeKeyAndVisible()
         
         // MARK: 4. Show login
-        let login = router.get(scene: AdamantScene.Login.login)
-        window!.rootViewController?.present(login, animated: false, completion: nil)
-		
+        let login = router.get(scene: AdamantScene.Login.login) as! LoginViewController
         let welcomeIsShown = UserDefaults.standard.bool(forKey: StoreKey.application.welcomeScreensIsShown)
+        login.requestBiometryOnFirstTimeActive = welcomeIsShown
+        window!.rootViewController?.present(login, animated: false, completion: nil)
+        
         if !welcomeIsShown {
             let welcome = router.get(scene: AdamantScene.Onboard.welcome)
-            login.present(welcome, animated: false, completion: nil)
+            login.present(welcome, animated: true, completion: nil)
             UserDefaults.standard.set(true, forKey: StoreKey.application.welcomeScreensIsShown)
         }
-        
+    
 		// MARK: 5 Reachability & Autoupdate
 		repeater = RepeaterService()
 		
