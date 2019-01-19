@@ -95,17 +95,24 @@ class NewChatViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
+        if #available(iOS 11.0, *) {
+            navigationItem.largeTitleDisplayMode = .always
+        }
+        
 		tableView.keyboardDismissMode = .none
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = true
-		}
 		
 		navigationItem.title = String.adamantLocalized.newChat.title
 		let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
 		doneButton.isEnabled = false
 		navigationItem.rightBarButtonItem = doneButton
-		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+        
+        if self.splitViewController != nil {
+            if #available(iOS 11.0, *) {
+                navigationItem.largeTitleDisplayMode = .never
+            }
+        } else {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+        }
 		
 		navigationOptions = .Disabled
 		
@@ -184,7 +191,7 @@ class NewChatViewController: FormViewController {
 				cell.textLabel?.textColor = UIColor.adamant.primary
 			}.onCellSelection { [weak self] (cell, row) in
 				let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
-				switch AdamantQRTools.generateQrFrom(string: encodedAddress) {
+				switch AdamantQRTools.generateQrFrom(string: encodedAddress, withLogo: true) {
 				case .success(let qr):
 					guard let vc = self?.router.get(scene: AdamantScene.Shared.shareQr) as? ShareQrViewController else {
 						fatalError("Can't find ShareQrViewController")
@@ -284,6 +291,11 @@ class NewChatViewController: FormViewController {
 				self.dialogService.showWarning(withMessage: result.localized)
 				
 			case .serverError(let error):
+                if let apiError = error as? ApiServiceError, case .internalError(let message, _) = apiError, message == String.adamantLocalized.sharedErrors.unknownError {
+                    self.dialogService.showWarning(withMessage: AccountsProviderResult.notFound(address: address).localized)
+                    return
+                }
+                
 				self.dialogService.showError(withMessage: result.localized, error: error)
 			}
 		}
@@ -388,39 +400,8 @@ extension NewChatViewController {
 // MARK: - QRCodeReaderViewControllerDelegate
 extension NewChatViewController: QRCodeReaderViewControllerDelegate {
 	func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-		let address: String?
-		var name: String? = nil
-		
-		if let uri = AdamantUriTools.decode(uri: result.value) {
-			switch uri {
-			case .address(address: let addr, params: let params):
-				address = addr
-				
-				if let params = params {
-					for param in params {
-						switch param {
-						case .label(let label):
-							name = label
-							break
-						}
-					}
-				}
-				
-			case .passphrase(_):
-				address = nil
-			}
-		} else {
-			switch AdamantUtilities.validateAdamantAddress(address: result.value) {
-			case .valid, .system:
-				address = result.value
-				
-			case .invalid:
-				address = nil
-			}
-		}
-		
-		if let address = address {
-			startNewChat(with: address, name: name)
+		if let admAddress = result.value.getAdamantAddress() {
+			startNewChat(with: admAddress.address, name: admAddress.name)
 			dismiss(animated: true, completion: nil)
 		} else {
 			dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)
@@ -447,20 +428,10 @@ extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerCo
 		
 		if let cgImage = image.toCGImage(), let codes = EFQRCode.recognize(image: cgImage), codes.count > 0 {
 			for aCode in codes {
-				if let uri = AdamantUriTools.decode(uri: aCode) {
-					if startNewChat(with: uri) {
-						return
-					}
-				} else {
-					switch AdamantUtilities.validateAdamantAddress(address: aCode) {
-					case .valid, .system:
-						startNewChat(with: aCode, name: nil)
-						return
-						
-					case .invalid:
-						break
-					}
-				}
+                if let admAddress = aCode.getAdamantAddress() {
+                    startNewChat(with: admAddress.address, name: admAddress.name)
+                    return
+                }
 			}
 			
 			dialogService.showWarning(withMessage: String.adamantLocalized.newChat.wrongQrError)

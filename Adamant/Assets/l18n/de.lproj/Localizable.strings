@@ -71,7 +71,7 @@
 "About.Row.Welcome" = "Willkommensbildschirm";
 
 /* System accounts: ADAMANT Tokens */
-"Accounts.AdamantTokens" = "ADAMANT Tokens";
+"Accounts.AdamantTokens" = "Willkommen in ADAMANT";
 
 /* System accounts: ADAMANT iOS Support */
 "Accounts.iOSSupport" = "ADAMANT iOS Support";
@@ -130,6 +130,9 @@
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendEth" = "ETH senden";
 
+/* Account tab: 'Send ETH tokens' button */
+"AccountTab.Row.SendLsk" = "LSK senden";
+
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Addresse";
 
@@ -167,7 +170,7 @@
 "ADAMANT" = "ADAMANT";
 
 /* AddressBookService: Not enought money to save address into blockchain */
-"AddressBookService.Error.NotEnoughtMoney" = "Nicht genug Tokens, um Daten auf der Blockchain zu speichern";
+"AddressBookService.Error.notEnoughMoney" = "Nicht genug Tokens, um Daten auf der Blockchain zu speichern";
 
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
 "Application.deviceTokenErrorFormat" = "Anmeldefehler in ANS: %@";
@@ -184,8 +187,8 @@
 /* Eureka forms Cancel button */
 "Cancel" = "Abbrechen";
 
-/* ChatList: outgoing message preview format, like 'You: %@' */
-"ChatListPage.SentMessageFormat" = "Sie: %@";
+/* ChatList: outgoing message prefix */
+"ChatListPage.SentMessagePrefix" = "Sie: ";
 
 /* ChatList: First syncronization is in progress */
 "ChatListPage.SyncingChats" = "Chats werden synchronisiert…";
@@ -194,7 +197,7 @@
 "ChatListPage.Title" = "Chats";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.NotEnoughtMoney" = "Sie haben nicht genügend Tokens, um eine Nachricht zu senden";
+"ChatsProvider.Error.notEnoughMoney" = "Sie haben nicht genügend Tokens, um eine Nachricht zu senden";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "Nachricht mit der ID %@ nicht gefunden";
@@ -206,13 +209,13 @@
 "ChatsProvider.Validation.MessageTooLong" = "Nachricht ist zu lang";
 
 /* Known contacts: Adamant ICO message. Markdown supported. */
-"Chats.IcoMessage" = "Sie haben die Möglichkeit, **am ICO** von ADAMANT, dem sichersten Messenger überhaupt, teilzunehmen. Mehr dazu auf Adamant.im oder im Whitepaper.\n\nBitte vergewissern Sie sich, dass sie die Passphrase für dieses Konto gemerkt haben — loggen Sie sich aus und wieder ein. Wir empfehlen Ihnen, diese auf einem Blatt Papier aufzuschreiben. Bitte beachten: nur **Sie sind für die Sicherheit der Passphrase zuständig**. Sie kann nicht wiederhergestellt werden. Wenn Dritte an die Passphrase kommen, Ihre Tokens werden gestohlen. Behandeln sie die Passphrase so, als würden in Ihrer Wallet mehrere Millionen Dollar liegen.\n\nUm die ADM Tokens zu kaufen, gehen Sie zur Wallet und klicken Sie Zum ICO oder öffnen Sie Adamant.im/ico/ im Browser. Im ICO-Formular geben Sie Ihre ADAMANT-Adresse ein. Als Nächstes, wählen Sie Kryptowährung, mit der Sie zahlen möchten, und den Betrag. Es wird angezeigt, wie viele ADM Tokens Sie bekommen, inklusive Bonus: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Klicken Sie auf ADAMANT Tokens kaufen. Es wird eine Adresse angezeigt, wo Sie Kryptowährung senden sollen. Sobald Ihre Transaktion bestätigt wurde, erhalten Sie Ihre ADM Tokens. Die Zahlung kann **von jeder Wallet oder Börse** getätigt werden. Es ist nicht notwendig, den exakten Betrag inklusive der Transaktionsgebühren zu senden, die Zahlung wird trotzdem bearbeitet.\nNachdem Sie Ihre ADM Tokens erhalten haben, empfehlen wir Ihnen, sie so lange wie möglich zu behalten. Alle während des ICOs nicht verkaufte Tokens werden unter den Wallets verteilt, 5% im Monat werden werden hinzugefügt. Zusätzliche Informationen finden Sie auf Adamant.im und im Whitepaper.\n\nBitte nicht auf diese Nachricht antworten, sie wurde maschinell erstellt. Wenn Sie noch Fragen haben, schreiben Sie **U15677078342684640219** an";
+"Chats.IcoMessage" = "Null";
 
 /* Known contacts: Adamant pre ICO message */
-"Chats.PreIcoMessage" = "You have a possibility to invest in ADAMANT, the most secure and anonymous messenger. Now is a Pre-ICO stage — the most profitable for investors. Learn more on Adamant.im website or in the Whitepaper. To participate just reply to this message and we will assist. We are eager to answer quickly, but sometimes delays for a couple of hours are possible.\nAfter you invest and receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens during ICO will be distributed among users wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.";
+"Chats.PreIcoMessage" = "Null";
 
 /* Known contacts: Adamant welcome message. Markdown supported. */
-"Chats.WelcomeMessage" = "Willkommen im ADAMANT, dem sichersten und anonymsten Messenger überhaupt. Beachten Sie, Ihre Sicherheit und Anonymität sind in Ihrem Interesse. Folgen Sie keinen Links, andernfalls kann Ihre IP-Adresse für Dritte sichtbar werden. Vertrauen Sie keinen Browser-Erweiterungen. Übergeben Sie Ihre ADM-Adresse persönlich, nutzen Sie dafür keine anderen Messenger. Halten Sie Ihre Passphrase geheim. Setzen Sie ein Passwort auf Ihrem Gerät oder loggen Sie sich aus, wenn Sie es nicht nutzen.\nLesen Sie mehr über Sicherheit und Anonymität unter https://adamant.im/staysecured.\nAlle Transaktionen auf der Blockchain müssen eine minimale Gebühr haben. Das ist nötig, um die Netzwerkinfrastruktur zu unterstützen. Um jetzt Nachrichten zu versenden, **erhalten Sie kostenlose Tokens** — gehen Sie zu Wallet und klicken Kostenlose ADM Tokens. Dann klicken Sie Neuen Chat starten in Chats und geben Sie die Adresse Ihres Gesprächspartners ein. Um Ihre Adresse zu kopieren, klicken Sie auf die ADAMANT-Adresse in Ihrer Wallet.\nBitte nicht auf diese Nachricht antworten, sie wurde maschinell erstellt. Wenn Sie noch Fragen haben, schreiben Sie **U15677078342684640219** an";
+"Chats.WelcomeMessage" = "ADAMANT ist ein Messenger, der vollständig auf der Blockchain funktioniert. Er ist unabhängig von Staaten, Konzernen und sogar Entwicklern. Das wird dank der dezentralen Netzinfrastruktur ermöglicht, deren Quellcode offen ist und die von Nutzern unterstützt wird. Deswegen kostet jede Transaktion wie Versand von Nachrichten oder Speichern von Kontakten eine Netzwerkgebühr von 0.001 ADM.\n\nDie Blockchain hilft, herausragende Sicherheit und Privatsphäre zu erlangen, die für keinen gewöhnlichen P2P- oder zentralisierten Messenger verfügbar ist. Außerdem stellt die Blockchain neue Möglichkeiten dar. Sie können Kryptowährungen in der Wallet aufbewahren sowie direkt im Chat versenden, ohne dabei die Kontrolle über Ihre privaten Schlüssel zu verlieren, oder auch ADAMANT als eine 2FA-Lösung verwenden.\n\nIn ADAMANT kann kein Konto kontrolliert, geblockt, deaktiviert, eingeschränkt oder zensiert werden. Alle Nutzer tragen die volle Verantwortung für die Inhalte, Nachrichten, Medien, Absichten und Ziele bei der Nutzung des Messenger.\n\nBedenken Sie, dass Sicherheit und Anonymität auch von Ihnen selbst abhängt. Folgen Sie keinen Links in den Chats, andernfalls kann Ihre IP-Adresse für Dritte sichtbar werden. Verwenden Sie einen PIN-Code auf Ihrem Gerät. Mehr Informationen zu Sicherheit und Anonymität lesen Sie hier: https://adamant.im/ru-staysecured/.\n\nVergewissern Sie sich, dass sie die Passphrase von Ihrem Konto gespeichert haben – loggen Sie sich aus und wieder ein. Schreiben Sie die Passphrase auf einem Stück Papier. Nur Sie tragen die Verantwortung für die sichere Aufbewahrung Ihrer Passphrase. Diese kann nämlich nicht wiederhergestellt werden. Gelangt Sie in die Hände Dritter, verlieren Sie Ihr Geld und Ihr Chatverlauf wird gelesen. Behandeln Sie Ihre Passphrase so, als würden Tokens in Ihrer Wallet 1.000.000.000 Dollar kosten.\n\nUm mit einer Konversation zu beginnen, erhalten Sie zuerst kostenlose Tokens im Account-Tab. Erstellen Sie einen neuen Chat und geben Sie die ADM-Adresse Ihres Gesprächspartners. Zeigen Sie Ihre ADM-Adresse persönlich und senden Sie sie nicht über andere Messenger.";
 
 /* Alert 'Retry Or Delete' title. Used in chat for sending failed messages again or delete them */
 "Chats.RetryOrDelete.Title" = "Erneut versuchen oder löschen?";
@@ -249,6 +252,12 @@
 
 /* Chat: 'Name' field in actions menu */
 "ChatScene.Actions.NamePlaceholder" = "Name";
+
+/* Chat: warning message for opening email link without mail app configurated on device */
+"ChatScene.Warning.NoMailApp" = "Email kann nicht gesendet werden. Überprüfen Sie die E-Mail-App-Konfigurationen.";
+
+/* Chat: warning message for opening unsupported url schemes */
+"ChatScene.Warning.UnsupportedUrl" = "Nicht unterstütztes URL-Protokoll";
 
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegate";
@@ -653,7 +662,7 @@
 "TransferScene.Error.InvalidAddress" = "Geben Sie eine gültige Adresse ein";
 
 /* Transfer: Amount is hiegher that user's total money notification */
-"TransferScene.Error.NotEnoughtMoney" = "Sie haben nicht genug Tokens";
+"TransferScene.Error.notEnoughMoney" = "Sie haben nicht genug Tokens";
 
 /* Transfer: Amount is zero, or even negative notification */
 "TransferScene.Error.TooLittleMoney" = "Sie müssen mehr Tokens senden";
@@ -685,6 +694,9 @@
 /* Transfer: transfer fee */
 "TransferScene.Row.TransactionFee" = "Gebühr";
 
+/* Transfer: comment for transfer in chat */
+"TransferScene.Row.Comments" = "Bemerkungen";
+
 /* Transfer: 'Transfer info' section */
 "TransferScene.Section.TransferInfo" = "Transaktionsinfo";
 
@@ -713,7 +725,7 @@
 "TransferScene.TransferSuccessMessage" = "Fertig!";
 
 /* Wallet Services: Shared error, user do not have enought money. */
-"WalletServices.SharedErrors.NotEnoughtMoney" = "Nicht genug Geld";
+"WalletServices.SharedErrors.notEnoughMoney" = "Nicht genug Geld";
 
 /* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
 "WalletServices.SharedErrors.WalletNotInitiated" = "Die Wallet wurde noch nicht initiiert";
@@ -745,7 +757,7 @@
 "WelcomeScene.Description.BeginButton" = "Sichere Kommunikation starten";
 
 /* Welcome: Next screen button */
-"WelcomeScene.Description.ContinueButton" = "Fortsetzen";
+"WelcomeScene.Description.ContinueButton" = "Weiter";
 
 /* Welcome: Skip button */
 "WelcomeScene.Description.SkipButton" = "Überspringen";

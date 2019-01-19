@@ -8,7 +8,7 @@
 
 import Foundation
 import web3swift
-import BigInt
+import struct BigInt.BigUInt
 
 struct EthAccount {
 	let wallet: BIP32Keystore

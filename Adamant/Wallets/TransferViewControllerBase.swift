@@ -26,7 +26,7 @@ extension String.adamantLocalized {
 		
 		static let addressValidationError = NSLocalizedString("TransferScene.Error.InvalidAddress", comment: "Transfer: Address validation error")
 		static let amountZeroError = NSLocalizedString("TransferScene.Error.TooLittleMoney", comment: "Transfer: Amount is zero, or even negative notification")
-		static let amountTooHigh = NSLocalizedString("TransferScene.Error.NotEnoughtMoney", comment: "Transfer: Amount is hiegher that user's total money notification")
+		static let amountTooHigh = NSLocalizedString("TransferScene.Error.notEnoughMoney", comment: "Transfer: Amount is hiegher that user's total money notification")
 		static let accountNotFound = NSLocalizedString("TransferScene.Error.AddressNotFound", comment: "Transfer: Address not found error")
 		
 		static let transferProcessingMessage = NSLocalizedString("TransferScene.SendingFundsProgress", comment: "Transfer: Processing message")
@@ -117,7 +117,7 @@ class TransferViewControllerBase: FormViewController {
 			case .wallet: return NSLocalizedString("TransferScene.Section.YourWallet", comment: "Transfer: 'Your wallet' section")
 			case .recipient: return NSLocalizedString("TransferScene.Section.Recipient", comment: "Transfer: 'Recipient info' section")
 			case .transferInfo: return NSLocalizedString("TransferScene.Section.TransferInfo", comment: "Transfer: 'Transfer info' section")
-            case .comments: return "Comments"
+            case .comments: return NSLocalizedString("TransferScene.Row.Comments", comment: "Transfer: transfer comment")
 			}
 		}
 	}
@@ -206,6 +206,12 @@ class TransferViewControllerBase: FormViewController {
 			return 0
 		}
 	}
+    
+    override var customNavigationAccessoryView: (UIView & NavigationAccessory)? {
+        let accessory = NavigationAccessoryView()
+        accessory.tintColor = UIColor.adamant.primary
+        return accessory
+    }
 	
 	
 	// MARK: - QR Reader
@@ -234,7 +240,6 @@ class TransferViewControllerBase: FormViewController {
         super.viewDidLoad()
 		
 		// MARK: UI
-		navigationAccessoryView.tintColor = UIColor.adamant.primary
         navigationItem.title = defaultSceneTitle()
 		
 		// MARK: Sections
@@ -332,77 +337,6 @@ class TransferViewControllerBase: FormViewController {
     }
 	
 
-/*
-    private func createLSKForm() {
-        if let account = lskApiService.account, let balanceString = account.balanceString, let balance = Double(balanceString) {
-            
-            maxToTransfer = balance
-//            defaultFee = AdamantLskApiService.defaultFee
-			
-            let currencyFormatter = NumberFormatter()
-            currencyFormatter.numberStyle = .decimal
-            currencyFormatter.roundingMode = .floor
-            currencyFormatter.positiveFormat = "#.######## LSK"
-            
-            form +++ Section(Sections.wallet.localized)
-                <<< DecimalRow() {
-                    $0.title = Row.balance.localized
-                    $0.value = balance
-                    $0.tag = Row.balance.tag
-                    $0.disabled = true
-                    $0.formatter = currencyFormatter
-            }
-            
-            // MARK: - Transfer section
-            form +++ Section(Sections.transferInfo.localized)
-                
-                <<< TextRow() {
-                    $0.title = Row.address.localized
-                    $0.placeholder = String.adamantLocalized.transfer.addressPlaceholder
-                    $0.tag = Row.address.tag
-//                    $0.value = toAddress
-                    $0.add(rule: RuleClosure<String>(closure: { value -> ValidationError? in
-                        guard let value = value?.uppercased() else {
-                            return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
-                        }
-                        switch AdamantLskApiService.validateAddress(address: value) {
-                        case .valid:
-                            return nil
-                            
-                        case .system, .invalid:
-                            return ValidationError(msg: String.adamantLocalized.transfer.addressValidationError)
-                        }
-                    }))
-                    $0.validationOptions = .validatesOnBlur
-                    }.cellUpdate({ (cell, row) in
-                        cell.titleLabel?.textColor = row.isValid ? .black : .red
-                    })
-                <<< DecimalRow() {
-                    $0.title = Row.amount.localized
-                    $0.placeholder = String.adamantLocalized.transfer.amountPlaceholder
-                    $0.tag = Row.amount.tag
-                    $0.formatter = currencyFormatter
-                    $0.add(rule: RuleSmallerOrEqualThan<Double>(max: maxToTransfer))
-                    $0.validationOptions = .validatesOnChange
-                    }.onChange(ethAmountChanged)
-                <<< DecimalRow() {
-                    $0.title = Row.fee.localized
-//                    $0.value = defaultFee
-                    $0.tag = Row.fee.tag
-                    $0.disabled = true
-                    $0.formatter = currencyFormatter
-                }
-                <<< DecimalRow() {
-                    $0.title = Row.total.localized
-                    $0.value = nil
-                    $0.tag = Row.total.tag
-                    $0.disabled = true
-                    $0.formatter = currencyFormatter
-            }
-        }
-    }
-*/
-
 	// MARK: - Tools
 	
 	func validateForm() {
@@ -414,7 +348,7 @@ class TransferViewControllerBase: FormViewController {
 			markRow(row, valid: wallet.balance > service.transactionFee)
 		}
 		
-		if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
+		if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
             if let address = row.value, validateRecipient(address) {
                 recipientAddress = address
                 markRow(row, valid: true)
@@ -432,19 +366,29 @@ class TransferViewControllerBase: FormViewController {
             // Eureka looses decimal precision when deserializing numbers by itself.
             // Try to get raw value and deserialize it
             if let input = row.cell.textInput as? UITextField, let raw = input.text {
-                if let amount = AdamantBalanceFormat.rawNumberDotFormatter.number(from: raw)?.decimalValue {
-                    self.amount = amount
-                    markRow(row, valid: validateAmount(amount))
-                } else if let amount = AdamantBalanceFormat.rawNumberCommaFormatter.number(from: raw)?.decimalValue {
-                    self.amount = amount
-                    markRow(row, valid: validateAmount(amount))
-                } else if let raw = row.value {
-                    let amount = Decimal(raw)
-                    self.amount = amount
-                    markRow(row, valid: validateAmount(amount))
-                } else {
-                    self.amount = nil
-                    markRow(row, valid: true)
+                // NumberFormatter.number(from: string).decimalValue loses precision.
+                // Creating decimal with Decimal(string: "") drops decimal part, if wrong locale used
+                var gotValue = false
+                if let localeSeparator = Locale.current.decimalSeparator {
+                    let replacingSeparator = localeSeparator == "." ? "," : "."
+                    let fixed = raw.replacingOccurrences(of: replacingSeparator, with: localeSeparator)
+                    
+                    if let amount = Decimal(string: fixed, locale: Locale.current) {
+                        self.amount = amount
+                        markRow(row, valid: validateAmount(amount))
+                        gotValue = true
+                    }
+                }
+                
+                if !gotValue {
+                    if let raw = row.value {
+                        let amount = Decimal(raw)
+                        self.amount = amount
+                        markRow(row, valid: validateAmount(amount))
+                    } else {
+                        self.amount = nil
+                        markRow(row, valid: true)
+                    }
                 }
             } else if let raw = row.value { // We can't get raw value, let's try to get a value from row
                 let amount = Decimal(raw)
@@ -564,10 +508,6 @@ class TransferViewControllerBase: FormViewController {
 	func recipientStripe() -> Stripe? {
 		return [.qrCameraReader, .qrPhotoReader]
 	}
-	
-	func reportTransferTo(admAddress: String, transferRecipient: String, amount: Decimal, comments: String, hash: String) {
-		
-	}
     
     func defaultSceneTitle() -> String? {
         return WalletViewControllerBase.BaseRows.send.localized
@@ -605,90 +545,6 @@ class TransferViewControllerBase: FormViewController {
 	func validateRecipient(_ address: String) -> Bool {
 		fatalError("You must implement recipient addres validation logic")
 	}
-	
-	/*
-    func sendLSKFunds() {
-        guard let recipientRow = form.rowBy(tag: Row.address.tag) as? TextRow,
-            let recipient = recipientRow.value,
-            let amountRow = form.rowBy(tag: Row.amount.tag) as? DecimalRow,
-            let amount = amountRow.value else {
-                return
-        }
-        
-        guard recipientRow.isValid else {
-            dialogService.showWarning(withMessage: (recipientRow.validationErrors.first?.msg) ?? "Invalid Address")
-            return
-        }
-        
-        guard let totalAmount = totalAmount, totalAmount <= maxToTransfer else {
-            dialogService.showWarning(withMessage: String.adamantLocalized.transfer.amountTooHigh)
-            return
-        }
-        
-        let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.confirmSendMessageFormat, "\(amount) LSK", recipient), message: String.adamantLocalized.transfer.cantUndo, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: String.adamantLocalized.alert.cancel , style: .cancel, handler: nil)
-        let sendAction = UIAlertAction(title: String.adamantLocalized.alert.send, style: .default, handler: { _ in
-            self.sendLsk(to: recipient, amount: amount)
-        })
-        
-        alert.addAction(cancelAction)
-        alert.addAction(sendAction)
-        
-        present(alert, animated: true, completion: nil)
-    }
-*/
-    
-    // MARK: - Private
-	/*
-	
-    
-    private func sendLsk(to recipient: String, amount: Double) {
-        self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
-        
-        self.lskApiService.createTransaction(toAddress: recipient, amount: amount) { (result) in
-            switch result {
-            case .success(let transaction):
-                if let id = transaction.id {
-                    var message = ["type": "lsk_transaction", "amount": "\(amount)", "hash": id, "comments":""]
-                    
-                    if let commentsRow = self.form.rowBy(tag: Row.comments.tag) as? TextAreaRow,
-                        let comments = commentsRow.value {
-                        message["comments"] = comments
-                    }
-                    
-                    do {
-                        let data = try JSONEncoder().encode(message)
-                        guard let raw = String(data: data, encoding: String.Encoding.utf8) else {
-                            return
-                        }
-                        print("Payload: \(raw)")
-                        self.delegate?.transferFinished(with: raw)
-                        
-                        self.lskApiService.sendTransaction(transaction: transaction, completion: { (result) in
-                            switch result {
-                            case .success(let hash):
-                                print("Hash: \(hash)")
-                                self.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                                self.close()
-                            case .failure(let error):
-                                self.dialogService.showError(withMessage: "Transrer issue", error: error)
-                            }
-                        })
-                    } catch {
-                        self.dialogService.showError(withMessage: "Transrer issue", error: nil)
-                    }
-                } else {
-                    self.dialogService.showError(withMessage: "Transrer issue", error: nil)
-                }
-                
-                break
-            case .failure(let error):
-                self.dialogService.showError(withMessage: "Transrer issue", error: error)
-                break
-            }
-        }
-    }
-*/
 }
 
 

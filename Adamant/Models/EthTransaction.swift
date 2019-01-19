@@ -8,7 +8,7 @@
 
 import Foundation
 import web3swift
-import BigInt
+import struct BigInt.BigUInt
 
 struct EthResponse {
     let status: Int
@@ -134,7 +134,7 @@ extension EthTransaction: Decodable {
 
 // MARK: - TransactionDetails
 extension EthTransaction: TransactionDetails {
-    var id: String? { return hash }
+    var txId: String { return hash }
     var senderAddress: String { return from }
     var recipientAddress: String { return to }
     var dateValue: Date? { return date }

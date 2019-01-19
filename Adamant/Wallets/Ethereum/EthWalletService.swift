@@ -336,9 +336,9 @@ extension EthWalletService: InitiatedWithPassphraseService {
             switch result {
             case .success(let address):
                 // ETH already saved
-                if address != ethAddress.address {
+                if ethAddress.address.caseInsensitiveCompare(address) != .orderedSame {
                     service.save(ethAddress: ethAddress.address) { result in
-                        service.kvsSaveCompletionRecursion(ethAddress: ethAddress.address, result: result)
+                        service.kvsSaveCompletionRecursion(ethAddress: ethAddress.address.lowercased(), result: result)
                     }
                 }
                 
@@ -391,7 +391,7 @@ extension EthWalletService: InitiatedWithPassphraseService {
             
         case .failure(let error):
             switch error {
-            case .notEnoughtMoney:  // Possibly new account, we need to wait for dropship
+            case .notEnoughMoney:  // Possibly new account, we need to wait for dropship
                 // Register observer
                 let observer = NotificationCenter.default.addObserver(forName: NSNotification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
                     guard let balance = self?.accountService.account?.balance, balance > AdamantApiService.KvsFee else {
@@ -478,7 +478,7 @@ extension EthWalletService {
 		}
 		
         guard adamant.balance >= AdamantApiService.KvsFee else {
-            completion(.failure(error: .notEnoughtMoney))
+            completion(.failure(error: .notEnoughMoney))
             return
         }
         

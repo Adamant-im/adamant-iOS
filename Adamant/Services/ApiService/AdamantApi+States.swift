@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension AdamantApiService.ApiCommands {
 	static let States = (
@@ -21,7 +22,11 @@ extension AdamantApiService {
     static let KvsFee: Decimal = 0.001
     
 	func store(key: String, value: String, type: StateType, sender: String, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
-		
+        self.sendingMsgTaskId = UIApplication.shared.beginBackgroundTask {
+            UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+            self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
+        }
+        
 		// MARK: 1. Create and sign transaction
         let asset = TransactionAsset(state: StateAsset(key: key, value: value, type: .keyValue))
 		let transaction = NormalizedTransaction(type: .state,
@@ -83,6 +88,11 @@ extension AdamantApiService {
 			case .failure(let error):
 				completion(.failure(.networkError(error: error)))
 			}
+            
+            defer {
+                UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
+            }
 		}
 	}
     

@@ -269,9 +269,9 @@ class LoginViewController: FormViewController {
 			
 			let encodedPassphrase = AdamantUriTools.encode(request: AdamantUri.passphrase(passphrase: passphrase))
 			dialogService.presentShareAlertFor(string: passphrase,
-                                               types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedPassphrase, sharingTip: nil)],
+                                               types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedPassphrase, sharingTip: nil, withLogo: false)],
 											   excludedActivityTypes: ShareContentType.passphrase.excludedActivityTypes,
-											   animated: true,
+                                               animated: true, from: cell,
 											   completion: nil)
 		})
 		
@@ -394,7 +394,7 @@ extension LoginViewController {
 				self?.dialogService.dismissProgress()
 				
 				if let alert = alert {
-                    self?.dialogService.showAlert(title: alert.title, message: alert.message, style: UIAlertController.Style.alert, actions: nil)
+                    self?.dialogService?.showAlert(title: alert.title, message: alert.message, style: UIAlertController.Style.alert, actions: nil, from: nil)
 				}
 				
 			case .failure(let error):

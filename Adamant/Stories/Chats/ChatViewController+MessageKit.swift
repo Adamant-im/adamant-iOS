@@ -29,7 +29,9 @@ extension ChatViewController {
 extension ChatViewController: MessagesDataSource {
 	func currentSender() -> Sender {
 		guard let account = account else {
-			fatalError("No account")
+            // Until we will update our network to procedures
+            return(Sender(id: "your moma", displayName: ""))
+//            fatalError("No account")
 		}
 		return Sender(id: account.address, displayName: account.address)
 	}
@@ -161,20 +163,34 @@ extension ChatViewController: MessagesDataSource {
         }
         
         // MARK: Rich transfer statuses
-        if let richTransaction = message as? RichMessageTransaction,
-            (richTransaction.transactionStatus == nil || richTransaction.transactionStatus == .notInitiated),
-            let updater = provider as? RichMessageProviderWithStatusCheck {
-            
-            /*
-             Сообщения-отчёты об отправленных средствах создаются раньше, чем на эфирных нодах появляется сама транзакция перевода (по ТЗ).
-             Проблема - как только сообщение появляется в чате, мы запрашиваем у эфирной ноды статус транзакции которую ещё не отправили - нода возвращает ошибку.
-             Решение - если сообщение появилось только что - обновим статус этой транзакции с 'некоторой' задержкой.
-             🤷🏻‍♂️
-             */
-            if let date = richTransaction.date, date.timeIntervalSinceNow > -2.0 {
-                updateStatus(for: richTransaction, provider: updater, delay: 5.0)
-            } else {
+        if let richTransaction = message as? RichMessageTransaction {
+            switch richTransaction.transactionStatus {
+            case nil, .notInitiated?:
+                guard let updater = provider as? RichMessageProviderWithStatusCheck else {
+                    break
+                }
+                
+                /*
+                 Сообщения-отчёты об отправленных средствах создаются раньше, чем на эфирных нодах появляется сама транзакция перевода (по ТЗ).
+                 Проблема - как только сообщение появляется в чате, мы запрашиваем у эфирной ноды статус транзакции которую ещё не отправили - нода возвращает ошибку.
+                 Решение - если сообщение появилось только что - обновим статус этой транзакции с 'некоторой' задержкой.
+                 🤷🏻‍♂️
+                 */
+                if let date = richTransaction.date, date.timeIntervalSinceNow > -2.0 {
+                    updateStatus(for: richTransaction, provider: updater, delay: 5.0)
+                } else {
+                    updateStatus(for: richTransaction, provider: updater)
+                }
+                
+            case .pending?:
+                guard !isUpdatingRichMessageStatus(id: richTransaction.objectID), let updater = provider as? RichMessageProviderWithStatusCheck else {
+                    break
+                }
+                
                 updateStatus(for: richTransaction, provider: updater)
+                
+            default:
+                break
             }
         }
         
@@ -308,7 +324,7 @@ extension ChatViewController: MessageCellDelegate {
 			
 			let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
 			
-			dialogService.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, style: .actionSheet, actions: [retry, cancelMessage, cancel])
+            dialogService?.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, style: .actionSheet, actions: [retry, cancelMessage, cancel], from: cell)
 			
             
         // MARK: Show ADM transfer details
@@ -333,9 +349,23 @@ extension ChatViewController: MessageCellDelegate {
 	}
 	
 	func didSelectURL(_ url: URL) {
-		let safari = SFSafariViewController(url: url)
-		safari.preferredControlTintColor = UIColor.adamant.primary
-		present(safari, animated: true, completion: nil)
+        if url.absoluteString.starts(with: "http") {
+            let safari = SFSafariViewController(url: url)
+            safari.preferredControlTintColor = UIColor.adamant.primary
+            present(safari, animated: true, completion: nil)
+        } else if url.absoluteString.starts(with: "mailto") {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            } else {
+                dialogService.showWarning(withMessage: String.adamantLocalized.chat.noMailAppWarning)
+            }
+        } else {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            } else {
+                dialogService.showWarning(withMessage:String.adamantLocalized.chat.unsupportedUrlWarning)
+            }
+        }
 	}
 }
 
@@ -491,8 +521,18 @@ extension ChatViewController: MessagesLayoutDelegate {
 
 // MARK: - MessageInputBarDelegate
 extension ChatViewController: MessageInputBarDelegate {
+    private static let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
+    
 	func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
-		let message = AdamantMessage.text(text)
+        let parsedText = ChatViewController.markdownParser.parse(text)
+        
+        let message: AdamantMessage
+        if parsedText.length == text.count {
+            message = .text(text)
+        } else {
+            message = .markdownText(text)
+        }
+        
 		let valid = chatsProvider.validateMessage(message)
 		switch valid {
 		case .isValid:
@@ -511,13 +551,13 @@ extension ChatViewController: MessageInputBarDelegate {
 			return
 		}
 		
-		chatsProvider.sendMessage(.text(text), recipientId: partner, completion: { [weak self] result in
+        chatsProvider.sendMessage(message, recipientId: partner, completion: { [weak self] result in
 			switch result {
 			case .success: break
 				
 			case .failure(let error):
 				switch error {
-				case .messageNotValid, .notEnoughtMoneyToSend:
+				case .messageNotValid, .notEnoughMoneyToSend:
 					DispatchQueue.main.async {
 						if inputBar.inputTextView.text.count == 0 {
 							inputBar.inputTextView.text = text
@@ -569,8 +609,7 @@ extension MessageTransaction: MessageType {
 		}
 		
         if isMarkdown {
-            let parser = MarkdownParser(font: UIFont.adamantChatDefault)
-            return MessageKind.attributedText(parser.parse(message))
+            return MessageKind.attributedText(MessageTransaction.markdownParser.parse(message))
         } else {
             return MessageKind.text(message)
         }
@@ -579,9 +618,11 @@ extension MessageTransaction: MessageType {
     public var messageStatus: MessageStatus {
         return self.statusEnum
     }
+    
+    private static let markdownParser = MarkdownParser(font: UIFont.adamantChatDefault)
 }
 
-// MARK: - RichMessageTransaction
+// MARK: RichMessageTransaction
 extension RichMessageTransaction: MessageType {
     public var sender: Sender {
         let id = self.senderId!

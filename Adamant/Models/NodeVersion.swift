@@ -13,15 +13,21 @@ struct NodeVersion: Codable {
 	let build: String
 	let commit: String
 	let version: String
+    let nodeTimestamp: TimeInterval
+    
+    var nodeDate: Date {
+        return AdamantUtilities.decodeAdamant(timestamp: nodeTimestamp)
+    }
 }
 
 /* JSON
 
 {
-	"success": true,
-	"build": "",
-	"commit": "7abb065fed19045733b61e0e836c3179009a294b",
-	"version": "0.3.0"
+    "success": true,
+    "nodeTimestamp": 39714374,
+    "build": "",
+    "commit": "3b02193d470640ba841ea941f93a042095f6fc60",
+    "version": "0.4.0"
 }
 
 */

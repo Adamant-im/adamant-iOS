@@ -45,7 +45,7 @@ enum AddressBookServiceResult {
 
 enum AddressBookServiceError {
 	case notLogged
-	case notEnoughtMoney
+	case notEnoughMoney
 	case apiServiceError(error: ApiServiceError)
 	case internalError(message: String, error: Error?)
 }
@@ -56,8 +56,8 @@ extension AddressBookServiceError: RichError {
 		case .notLogged:
 			return String.adamantLocalized.sharedErrors.userNotLogged
 			
-		case .notEnoughtMoney:
-			return NSLocalizedString("AddressBookService.Error.NotEnoughtMoney", comment: "AddressBookService: Not enought money to save address into blockchain")
+		case .notEnoughMoney:
+			return NSLocalizedString("AddressBookService.Error.notEnoughMoney", comment: "AddressBookService: Not enought money to save address into blockchain")
 			
 		case .apiServiceError(let error): return error.message
 		case .internalError(let message, _): return message
@@ -66,7 +66,7 @@ extension AddressBookServiceError: RichError {
 	
 	var internalError: Error? {
 		switch self {
-		case .notLogged, .notEnoughtMoney: return nil
+		case .notLogged, .notEnoughMoney: return nil
 		case .apiServiceError(let error): return error.internalError
 		case .internalError(_, let error): return error
 		}
@@ -74,7 +74,7 @@ extension AddressBookServiceError: RichError {
 	
 	var level: ErrorLevel {
 		switch self {
-		case .notLogged, .notEnoughtMoney: return .warning
+		case .notLogged, .notEnoughMoney: return .warning
 		case .apiServiceError(let error): return error.level
 		case .internalError: return .error
 		}

@@ -1,14 +1,13 @@
 PODS:
-  - Alamofire (4.7.3)
+  - Alamofire (4.8.0)
   - BigInt (3.1.0):
     - SipHash (~> 1.2)
   - ByteBackpacker (1.2.1)
   - CryptoSwift (0.12.0)
   - DateToolsSwift (4.0.0)
-  - Ed25519 (1.1.0):
-    - libCEd25519 (~> 1.1.0)
-  - EFQRCode (4.3.0)
-  - Eureka (4.3.0)
+  - EFQRCode (4.4.2):
+    - swift_qrcodejs (~> 1.0.1)
+  - Eureka (4.3.1)
   - FreakingSimpleRoundImageView (1.3)
   - FTIndicator (1.2.9):
     - FTIndicator/FTNotificationIndicator (= 1.2.9)
@@ -18,46 +17,50 @@ PODS:
   - FTIndicator/FTProgressIndicator (1.2.9)
   - FTIndicator/FTToastIndicator (1.2.9)
   - Haring (2.1)
-  - KeychainAccess (3.1.1)
-  - libCEd25519 (1.1.0)
+  - KeychainAccess (3.1.2)
   - libsodium (1.0.12)
-  - Lisk (1.0.0):
-    - Ed25519 (~> 1.1.0)
-  - MessageInputBar/Core (0.4.0)
-  - MessageKit (1.0.0):
+  - Lisk (1.1.0):
+    - CryptoSwift (~> 0.12.0)
+    - libsodium (~> 1.0.12)
+  - MessageInputBar/Core (0.4.1)
+  - MessageKit (2.0.0):
     - MessageInputBar/Core
   - MyLittlePinpad (0.3)
-  - Parchment (1.4.1)
+  - Parchment (1.5.0)
   - PMAlertController (3.5.0)
-  - ProcedureKit (4.5.0):
-    - ProcedureKit/Standard (= 4.5.0)
-  - ProcedureKit/Standard (4.5.0)
-  - PromiseKit (6.4.1):
-    - PromiseKit/CorePromise (= 6.4.1)
-    - PromiseKit/Foundation (= 6.4.1)
-    - PromiseKit/UIKit (= 6.4.1)
-  - PromiseKit/CorePromise (6.4.1)
-  - PromiseKit/Foundation (6.4.1):
+  - ProcedureKit (5.0.0):
+    - ProcedureKit/Standard (= 5.0.0)
+  - ProcedureKit/Standard (5.0.0)
+  - PromiseKit (6.7.1):
+    - PromiseKit/CorePromise (= 6.7.1)
+    - PromiseKit/Foundation (= 6.7.1)
+    - PromiseKit/UIKit (= 6.7.1)
+  - PromiseKit/CorePromise (6.7.1)
+  - PromiseKit/Foundation (6.7.1):
     - PromiseKit/CorePromise
-  - PromiseKit/UIKit (6.4.1):
+  - PromiseKit/UIKit (6.7.1):
     - PromiseKit/CorePromise
   - QRCodeReader.swift (9.0.1)
   - ReachabilitySwift (4.3.0)
-  - Result (4.0.0)
+  - Result (4.1.0)
   - RNCryptor (5.0.3)
   - scrypt (2.0):
     - CryptoSwift (~> 0.11)
-  - secp256k1_ios (0.1.3)
+  - secp256k1_swift (1.0.3)
   - SipHash (1.2.2)
+  - swift_qrcodejs (1.0.1)
+  - SwiftRLP (1.2):
+    - BigInt (~> 3.1)
   - SwiftyOnboard (1.3.8)
   - Swinject (2.5.0)
-  - web3swift (1.1.9):
+  - web3swift (1.5.1):
     - BigInt (~> 3.1)
     - CryptoSwift (~> 0.11)
     - PromiseKit (~> 6.3)
     - Result (~> 4.0)
     - scrypt (~> 2.0)
-    - secp256k1_ios (~> 0.1)
+    - secp256k1_swift (~> 1.0.3)
+    - SwiftRLP (~> 1.1)
 
 DEPENDENCIES:
   - Alamofire
@@ -71,8 +74,8 @@ DEPENDENCIES:
   - Haring
   - KeychainAccess
   - libsodium
-  - Lisk (from `https://github.com/boyarkin-anton/lisk-swift.git`, branch `dev`)
-  - MessageKit (from `https://github.com/RealBonus/MessageKit`, branch `temp/customMessageKind_swift42`)
+  - Lisk (from `https://github.com/adamant-im/lisk-swift.git`)
+  - MessageKit
   - MyLittlePinpad
   - Parchment
   - PMAlertController
@@ -91,16 +94,15 @@ SPEC REPOS:
     - ByteBackpacker
     - CryptoSwift
     - DateToolsSwift
-    - Ed25519
     - EFQRCode
     - Eureka
     - FreakingSimpleRoundImageView
     - FTIndicator
     - Haring
     - KeychainAccess
-    - libCEd25519
     - libsodium
     - MessageInputBar
+    - MessageKit
     - MyLittlePinpad
     - Parchment
     - PMAlertController
@@ -111,67 +113,62 @@ SPEC REPOS:
     - Result
     - RNCryptor
     - scrypt
-    - secp256k1_ios
+    - secp256k1_swift
     - SipHash
+    - swift_qrcodejs
+    - SwiftRLP
     - Swinject
     - web3swift
 
 EXTERNAL SOURCES:
   Lisk:
-    :branch: dev
-    :git: https://github.com/boyarkin-anton/lisk-swift.git
-  MessageKit:
-    :branch: temp/customMessageKind_swift42
-    :git: https://github.com/RealBonus/MessageKit
+    :git: https://github.com/adamant-im/lisk-swift.git
   SwiftyOnboard:
     :branch: feature/customStyle
     :git: https://github.com/RealBonus/SwiftyOnboard
 
 CHECKOUT OPTIONS:
   Lisk:
-    :commit: 952fea02d6076668f68eb252ec5bd8bf4e656960
-    :git: https://github.com/boyarkin-anton/lisk-swift.git
-  MessageKit:
-    :commit: 4409d10a7dcf390abbb696d280ec02025e89f4e7
-    :git: https://github.com/RealBonus/MessageKit
+    :commit: 154a3af05772136b776ff14ae05f92c8d844ea20
+    :git: https://github.com/adamant-im/lisk-swift.git
   SwiftyOnboard:
     :commit: 8341eff1eb918e904a915be8dac5d5a1545887f2
     :git: https://github.com/RealBonus/SwiftyOnboard
 
 SPEC CHECKSUMS:
-  Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
+  Alamofire: 3ec537f71edc9804815215393ae2b1a8ea33a844
   BigInt: 76b5dfdfa3e2e478d4ffdf161aeede5502e2742f
   ByteBackpacker: df001da117faacdbf09b69a116ec480f6651c9ec
   CryptoSwift: 1c07ca50843dd48bc54e6ea53d7a4dba3b645716
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
-  Ed25519: d84c847d8ffbb2f6fec71479abbb8fa3dfe12578
-  EFQRCode: 51b67bd10952da9ef619ae0a396abb746b94263f
-  Eureka: 6d711cb30ca333b4bc893110285a722ae3840114
+  EFQRCode: e65a9eb6c7137ed6db4cfce37f0cee47938e44f0
+  Eureka: 28ea296f06710f6745266b71f17862048941a32d
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   Haring: b3a8495c073a016f03296d67debc609a7ecf7710
-  KeychainAccess: 7bd430028059754a3debab3cfc0bd1fc7fb85df3
-  libCEd25519: 45de00a0944cb2d51e64fcef67bd9989c42d20ca
+  KeychainAccess: b3816fddcf28aa29d94b10ec305cd52be14c472b
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
-  Lisk: a900424110c208c425102ee8b6fd60d9b6b878c3
-  MessageInputBar: d46ecc5b355d13433b8367dcd200e05a6564f0ed
-  MessageKit: 0aaaa6115a9b4497a65fcdfed5dad270fbc8f2b2
+  Lisk: 2b21f9a60f4b1583349a1b1677d83781ec32ca70
+  MessageInputBar: e81c7535347f1f7b923de7080409a535a004b6e4
+  MessageKit: 29c1c87e5a396d2ca7a3f712e5171dc9aba42a1e
   MyLittlePinpad: 5d57cb5a092ddbeb5c4e6fa0b46df83bd3e88b0c
-  Parchment: e6c2a3a0063739382dd207e21d48fe5e81f3324a
+  Parchment: 5a8c9c73549a6d73a7c1b606c27246910d2e5720
   PMAlertController: 06dab8160066fc4ce991c880e3722cd403e2926a
-  ProcedureKit: 023e4600e921fe0b8d94f2d19ed680df83aa28ba
-  PromiseKit: 4c76a6506638034e3d7bede97b2ff7743f7bd2dc
+  ProcedureKit: f412f6edf88f62b986dcfca87842f36bde6e3e83
+  PromiseKit: ef376fb8b4e92edfeb66bd403b983eaa07fbde0c
   QRCodeReader.swift: 96292a5612fbc2fd9a0b26f93fa5164c8d02f59d
   ReachabilitySwift: 408477d1b6ed9779dba301953171e017c31241f3
-  Result: 7645bb3f50c2ce726dd0ff2fa7b6f42bbe6c3713
+  Result: bd966fac789cc6c1563440b348ab2598cc24d5c7
   RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
   scrypt: 3fe5b1a3b0976f97cd87488673a8f7c65708cc84
-  secp256k1_ios: ac9ef04e761f43c58012b28548afa91493761f17
+  secp256k1_swift: 4fc5c4b2d2c6d21ee8ccb868cdc92da12f38bed9
   SipHash: fad90a4683e420c52ef28063063dbbce248ea6d4
+  swift_qrcodejs: c181fe5c849d30c699546a23762d7e3dd143ab37
+  SwiftRLP: 98a02b2210128353ca02e4c2f4d83e2a9796db4f
   SwiftyOnboard: de60e90c2af23dd61b01ec0c6a8d0be3370f857b
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
-  web3swift: 4895c765c9858eb4737ef222eb8643bb5fc7fdb3
+  web3swift: d80d1b9a3feca16e614acec9eea47ec26310d37d
 
-PODFILE CHECKSUM: 6c2155051850a78b74c70bfbea61b04344b91139
+PODFILE CHECKSUM: 1a42b369e3317521b2060baaf7b7bc56d7e6adb6
 
 COCOAPODS: 1.6.0.beta.2
