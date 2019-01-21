@@ -366,7 +366,7 @@ extension AdamantChatsProvider {
             completion(.failure(.accountNotFound(recipientId)))
             return
             
-        case .notInitiated(_):
+        case .notInitiated(_), .dummy(_):
             completion(.failure(.accountNotInitiated(recipientId)))
             return
             

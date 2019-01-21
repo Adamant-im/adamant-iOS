@@ -30,7 +30,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         
         super.viewDidLoad()
         
-        if let transfer = transaction as? TransferTransaction, let chatroom = transfer.partner?.chatroom, let transactions = chatroom.transactions  {
+        if let transfer = transaction as? TransferTransaction, let partner = transfer.partner as? CoreDataAccount, let chatroom = partner.chatroom, let transactions = chatroom.transactions  {
             let messeges = transactions.first (where: { (object) -> Bool in
                 return !(object is TransferTransaction)
             })

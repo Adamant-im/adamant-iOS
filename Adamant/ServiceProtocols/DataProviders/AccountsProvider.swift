@@ -11,6 +11,7 @@ import CoreData
 
 enum AccountsProviderResult {
 	case success(CoreDataAccount)
+    case dummy(DummyAccount)
 	case notFound(address: String)
 	case invalidAddress(address: String)
     case notInitiated(address: String)
@@ -19,7 +20,7 @@ enum AccountsProviderResult {
 	
 	var localized: String {
 		switch self {
-		case .success(_):
+		case .success(_), .dummy(_):
 			return ""
 			
 		case .notFound(let address):
@@ -40,6 +41,13 @@ enum AccountsProviderResult {
 	}
 }
 
+enum AccountsProviderDummyAccountResult {
+    case success(DummyAccount)
+    case foundRealAccount(CoreDataAccount)
+    case invalidAddress(address: String)
+    case internalError(Error)
+}
+
 protocol AccountsProvider {
 	
 	/// Search for fetched account, if not found, asks server for account.
@@ -55,6 +63,10 @@ protocol AccountsProvider {
 	
 	/// Check locally if has account with specified address
 	func hasAccount(address: String, completion: @escaping (Bool) -> Void)
+    
+    
+    /// Request Dummy account, if account wasn't found or initiated
+    func getDummyAccount(for address: String, completion: @escaping (AccountsProviderDummyAccountResult) -> Void)
 }
 
 // MARK: - Known contacts

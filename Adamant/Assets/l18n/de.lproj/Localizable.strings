@@ -322,6 +322,9 @@
 /* Shared error: Account not found error. Using %@ for address. */
 "Error.AccountNotFoundFormat" = "Konto nicht gefunden: %@";
 
+/* Shared error: Account not initiated */
+"Error.AccountNotInitiated" = "Account not initiated";
+
 /* Shared error: Internal error format, %@ for message */
 "Error.InternalErrorFormat" = "Interner Fehler: %@";
 
@@ -666,6 +669,12 @@
 
 /* Transfer: Amount is zero, or even negative notification */
 "TransferScene.Error.TooLittleMoney" = "Sie müssen mehr Tokens senden";
+
+/* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.title" = "Can't verify %@";
+
+/* Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.body" = "Account not found, or not initiated. Double check recipient address and confirm transaction";
 
 /* Transfer: recipient address placeholder */
 "TransferScene.Recipient.Placeholder" = "Empfänger";

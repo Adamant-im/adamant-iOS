@@ -328,7 +328,7 @@ extension AdamantTransfersProvider {
         case .success(let account):
             recipientAccount = account
             
-        case .notFound, .invalidAddress, .notInitiated:
+        case .notFound, .invalidAddress, .notInitiated, .dummy(_):
             completion(.failure(.accountNotFound(address: recipient)))
             return
             
@@ -444,33 +444,71 @@ extension AdamantTransfersProvider {
         
         // MARK: 1. Get recipient
         let accountsGroup = DispatchGroup()
-        accountsGroup.enter()
+        accountsGroup.enter() // Enter 1
         
-        var result: AccountsProviderResult! = nil
-        accountsProvider.getAccount(byAddress: recipient) { r in
-            result = r
-            accountsGroup.leave()
+        var recipientAccount: BaseAccount? = nil
+        var providerError: TransfersProviderError? = nil
+        
+        accountsProvider.getAccount(byAddress: recipient) { result in
+            defer {
+                accountsGroup.leave() // Exit 1
+            }
+            
+            switch result {
+            case .success(let account):
+                recipientAccount = account
+                
+            case .dummy(let account):
+                recipientAccount = account
+                
+            case .notFound, .notInitiated:
+                accountsGroup.enter() // Enter 2, before exit 1
+                self.accountsProvider.getDummyAccount(for: recipient) { result in
+                    defer {
+                        accountsGroup.leave() // Exit 2
+                    }
+                    
+                    switch result {
+                    case .success(let dummy):
+                        recipientAccount = dummy
+                        
+                    case .foundRealAccount(let account):
+                        recipientAccount = account
+                        
+                    case .invalidAddress(let address):
+                        providerError = .accountNotFound(address: address)
+                        
+                    case .internalError(let error):
+                        providerError = TransfersProviderError.internalError(message: error.localizedDescription, error: error)
+                    }
+                }
+                
+            case .invalidAddress:
+                providerError = .accountNotFound(address: recipient)
+                
+            case .serverError(let error):
+                providerError = .serverError(error)
+                
+            case .networkError(_):
+                providerError = .networkError
+            }
         }
         
         accountsGroup.wait()
         
-        let recipientAccount: CoreDataAccount
-        switch result! {
-        case .success(let account):
-            recipientAccount = account
+        let backgroundAccount: BaseAccount
+        if let acc = recipientAccount, let obj = context.object(with: acc.objectID) as? BaseAccount {
+            backgroundAccount = obj
+        } else {
+            if let err = providerError {
+                completion(.failure(err))
+            } else {
+                completion(.failure(.accountNotFound(address: recipient)))
+            }
             
-        case .notFound, .invalidAddress, .notInitiated:
-            completion(.failure(.accountNotFound(address: recipient)))
-            return
-            
-        case .serverError(let error):
-            completion(.failure(.serverError(error)))
-            return
-            
-        case .networkError(_):
-            completion(.failure(.networkError))
             return
         }
+        
         
         // MARK: 2. Create transaction
         let transaction = TransferTransaction(context: context)
@@ -489,7 +527,9 @@ extension AdamantTransfersProvider {
         transaction.statusEnum = MessageStatus.pending
         
         // MARK: 3. Chatroom
-        if let id = recipientAccount.chatroom?.objectID, let chatroom = context.object(with: id) as? Chatroom {
+        backgroundAccount.addToTransfers(transaction)
+        
+        if let coreDataAccount = backgroundAccount as? CoreDataAccount, let id = coreDataAccount.chatroom?.objectID, let chatroom = context.object(with: id) as? Chatroom {
             chatroom.addToTransactions(transaction)
             
             if let lastTransaction = chatroom.lastTransaction {
@@ -711,23 +751,36 @@ extension AdamantTransfersProvider {
         let partnersGroup = DispatchGroup()
         var errors: [ProcessingResult] = []
         for id in partnerIds {
-            partnersGroup.enter()
-            accountsProvider.getAccount(byAddress: id, completion: { result in
-                defer {
-                    partnersGroup.leave()
-                }
-                
+            partnersGroup.enter() // Enter 1
+            
+            accountsProvider.getAccount(byAddress: id) { result in
                 switch result {
-                case .success(_):
-                    break
+                case .success(_), .dummy(_):
+                    partnersGroup.leave() // Leave 1
                     
                 case .notFound, .invalidAddress, .notInitiated(_):
-					errors.append(ProcessingResult.accountNotFound(address: id))
+                    self.accountsProvider.getDummyAccount(for: id) { result in
+                        defer {
+                            partnersGroup.leave() // Leave 1
+                        }
+                        
+                        switch result {
+                        case .success(_), .foundRealAccount(_):
+                            break
+                        
+                        case .invalidAddress(let address):
+                            errors.append(ProcessingResult.accountNotFound(address: address))
+                        
+                        case .internalError(let error):
+                            errors.append(ProcessingResult.error(error))
+                        }
+                    }
 					
                 case .networkError(let error), .serverError(let error):
                     errors.append(ProcessingResult.error(error))
+                    partnersGroup.leave() // Leave 1
                 }
-            })
+            }
         }
         
         partnersGroup.wait()

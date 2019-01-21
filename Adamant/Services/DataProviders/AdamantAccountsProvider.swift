@@ -27,6 +27,12 @@ class AdamantAccountsProvider: AccountsProvider {
 			self.isHidden = contact.isHidden
 		}
 	}
+    
+    private enum GetAccountResult {
+        case core(CoreDataAccount)
+        case dummy(DummyAccount)
+        case notFound
+    }
 	
 	// MARK: Dependencies
 	var stack: CoreDataStack!
@@ -108,16 +114,25 @@ class AdamantAccountsProvider: AccountsProvider {
 	private var requestGroups = [String:DispatchGroup]()
 	private let groupsSemaphore = DispatchSemaphore(value: 1)
 	
-	private func getAccount(byPredicate predicate: NSPredicate, context: NSManagedObjectContext? = nil) -> CoreDataAccount? {
-		let request = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
+	private func getAccount(byPredicate predicate: NSPredicate, context: NSManagedObjectContext? = nil) -> GetAccountResult {
+		let request = NSFetchRequest<BaseAccount>(entityName: BaseAccount.baseEntityName)
 		request.fetchLimit = 1
 		request.predicate = predicate
 		
-		var acc: CoreDataAccount? = nil
+		var acc = (try? (context ?? stack.container.viewContext).fetch(request))?.first
 		
-		
-		// TODO: Обернуть это в семафор
-		
+        if let context = context {
+            acc = (try? context.fetch(request))?.first
+        } else {
+            if Thread.isMainThread {
+                acc = (try? stack.container.viewContext.fetch(request))?.first
+            } else {
+                DispatchQueue.main.sync {
+                    acc = (try? stack.container.viewContext.fetch(request))?.first
+                }
+            }
+        }
+        
 		if Thread.isMainThread {
 			acc = (try? (context ?? stack.container.viewContext).fetch(request))?.first
 		} else {
@@ -126,7 +141,16 @@ class AdamantAccountsProvider: AccountsProvider {
 			}
 		}
 		
-		return acc
+        switch acc {
+        case let core as CoreDataAccount:
+            return .core(core)
+            
+        case let dummy as DummyAccount:
+            return .dummy(dummy)
+            
+        case .some(_), nil:
+            return .notFound
+        }
 	}
 }
 
@@ -150,7 +174,10 @@ extension AdamantAccountsProvider {
 			
 			let account = self.getAccount(byPredicate: NSPredicate(format: "address == %@", address))
 			
-			completion(account != nil)
+            switch account {
+            case .core(_), .dummy(_): completion(true)
+            case .notFound: return completion(false)
+            }
 		}
 	}
 	
@@ -165,6 +192,8 @@ extension AdamantAccountsProvider {
 			completion(.invalidAddress(address: address))
 			return
 		}
+        
+        let context = stack.container.viewContext
 		
 		// Go background, to not to hang threads (especially main) on semaphores and dispatch groups
 		queue.async {
@@ -176,13 +205,21 @@ extension AdamantAccountsProvider {
 				group.wait()
 				self.groupsSemaphore.wait()
 			}
-			
+            
 			// Check if there is an account, that we are looking for
-			if let account = self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
-				self.groupsSemaphore.signal()
-				completion(.success(account))
-				return
-			}
+            let dummy: DummyAccount?
+            switch self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
+            case .core(let account):
+                self.groupsSemaphore.signal()
+                completion(.success(account))
+                return
+                
+            case .dummy(let account):
+                dummy = account
+                
+            case .notFound:
+                dummy = nil
+            }
 			
 			// No, we need to get one
 			let group = DispatchGroup()
@@ -202,16 +239,48 @@ extension AdamantAccountsProvider {
 					
 					switch result {
 					case .success(let account):
-						let coreAccount = self.createCoreDataAccount(from: account)
-						completion(.success(coreAccount))
+                        guard account.publicKey != nil else {
+                            if let dummy = dummy {
+                                completion(.dummy(dummy))
+                            } else {
+                                completion(.notInitiated(address: address))
+                            }
+                            return
+                        }
+                        
+                        DispatchQueue.main.async {
+                            let coreAccount = self.createCoreDataAccount(from: account,  context: context)
+                            
+                            if let dummy = dummy {
+                                coreAccount.name = dummy.name
+                                
+                                if let transfers = dummy.transfers {
+                                    dummy.removeFromTransfers(transfers)
+                                    coreAccount.addToTransfers(transfers)
+                                    
+                                    if let chatroom = coreAccount.chatroom {
+                                        chatroom.addToTransactions(transfers)
+                                        chatroom.updateLastTransaction()
+                                    }
+                                }
+                                
+                                context.delete(dummy)
+                            }
+                            
+                            completion(.success(coreAccount))
+                        }
 						
 					case .failure(let error):
 						switch error {
 						case .accountNotFound:
-							completion(.notFound(address: address))
+                            if let dummy = dummy {
+                                completion(.dummy(dummy))
+                            } else {
+                                completion(.notFound(address: address))
+                            }
 							
 						case .networkError(let error):
-							completion(.networkError(error))
+                            completion(.networkError(error))
 							
 						default:
 							completion(.serverError(error))
@@ -364,7 +433,6 @@ extension AdamantAccountsProvider {
 		
 		coreAccount.chatroom = chatroom
 		
-		
 		if let acc = knownContacts[address] {
 			coreAccount.name = acc.name
 			coreAccount.avatar = acc.avatar
@@ -375,4 +443,49 @@ extension AdamantAccountsProvider {
 		
 		return coreAccount
 	}
+}
+
+
+// MARK: - Dummy
+extension AdamantAccountsProvider {
+    func getDummyAccount(for address: String, completion: @escaping (AccountsProviderDummyAccountResult) -> Void) {
+        let validation = AdamantUtilities.validateAdamantAddress(address: address)
+        if validation == .invalid {
+            completion(.invalidAddress(address: address))
+            return
+        }
+        
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = stack.container.viewContext
+        
+        queue.async {
+            self.groupsSemaphore.wait()
+            
+            if let group = self.requestGroups[address] {
+                self.groupsSemaphore.signal()
+                group.wait()
+            } else {
+                self.groupsSemaphore.signal()
+            }
+            
+            switch self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
+            case .core(let account):
+                completion(.foundRealAccount(account))
+                
+            case .dummy(let account):
+                completion(.success(account))
+                
+            case .notFound:
+                let dummy = DummyAccount(entity: DummyAccount.entity(), insertInto: context)
+                dummy.address = address
+                
+                do {
+                    try context.save()
+                    completion(.success(dummy))
+                } catch {
+                    completion(.internalError(error))
+                }
+            }
+        }
+    }
 }

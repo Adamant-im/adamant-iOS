@@ -322,6 +322,9 @@
 /* Shared error: Internal error format, %@ for message */
 "Error.InternalErrorFormat" = "Внутренняя ошибка: %@";
 
+/* Shared error: Account not initiated */
+"Error.AccountNotInitiated" = "Аккаунт не инициализирован";
+
 /* Error messge title for support email */
 "Error.Mail.Title" = "Проблема с iOS-приложением";
 
@@ -717,6 +720,12 @@
 
 /* Transfer: Amount is zero, or even negative notification */
 "TransferScene.Error.TooLittleMoney" = "Вам следует отправить больше токенов";
+
+/* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.title" = "Не удалось проверить адрес %@";
+
+/* Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.body" = "Аккаунт не найден или не инициализирован. Проверьте адрес получателя и подтвердите перевод";
 
 /* Transfer: recipient address placeholder */
 "TransferScene.Recipient.Placeholder" = "получателя";

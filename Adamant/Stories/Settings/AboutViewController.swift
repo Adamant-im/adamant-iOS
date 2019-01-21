@@ -250,7 +250,7 @@ class AboutViewController: FormViewController {
 						dialogService?.dismissProgress()
 					}
                     
-				case .invalidAddress, .notFound, .notInitiated(_), .networkError:
+				case .invalidAddress, .notFound, .notInitiated(_), .networkError, .dummy(_):
 					dialogService?.showWarning(withMessage: String.adamantLocalized.sharedErrors.networkError)
 					
 				case .serverError(let error):
