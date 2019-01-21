@@ -27,6 +27,8 @@ class AdamantTransfersProvider: TransfersProvider {
 	private(set) var receivedLastHeight: Int64?
 	private(set) var readedLastHeight: Int64?
     private let apiTransactions = 100
+    
+    private let processingHeightSemaphore = DispatchSemaphore(value: 1)
 	
 	private let processingQueue = DispatchQueue(label: "im.adamant.processing.transfers", qos: .utility, attributes: [.concurrent])
     private let sendingQueue = DispatchQueue(label: "im.adamant.sending.transfers", qos: .utility, attributes: [.concurrent])
@@ -166,12 +168,26 @@ extension AdamantTransfersProvider {
                 }
                 
                 if let store = self?.securedStore {
+                    // Received
                     if let h = self?.receivedLastHeight {
-                        store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
+                        if let raw = store.get(StoreKey.transfersProvider.receivedLastHeight), let prev = Int64(raw) {
+                            if h > prev {
+                                store.set(String(h), for: StoreKey.transfersProvider.receivedLastHeight)
+                            }
+                        } else {
+                            store.set(String(h), for: StoreKey.transfersProvider.receivedLastHeight)
+                        }
                     }
                     
-                    if let h = self?.readedLastHeight, h > 0 {
-                        store.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
+                    // Readed
+                    if let h = self?.readedLastHeight {
+                        if let raw = store.get(StoreKey.transfersProvider.readedLastHeight), let prev = Int64(raw) {
+                            if h > prev {
+                                store.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
+                            }
+                        } else {
+                            store.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
+                        }
                     }
                 }
                 
@@ -865,6 +881,8 @@ extension AdamantTransfersProvider {
         
         // MARK: 4. Check lastHeight
         // API returns transactions from lastHeight INCLUDING transaction with height == lastHeight, so +1
+        processingHeightSemaphore.wait()
+        
         if height > 0 {
             let uH = Int64(height + 1)
             
@@ -879,30 +897,15 @@ extension AdamantTransfersProvider {
         
         // MARK: 5. Unread transactions
         if let unreadedHeight = readedLastHeight {
-            let unreadTransactions = transfers.filter { $0.height > unreadedHeight }
-            let chatrooms = Dictionary.init(grouping: unreadTransactions, by: ({ (t: TransferTransaction) -> Chatroom in t.chatroom!}))
+            let unreadTransactions = transfers.filter { !$0.isOutgoing && $0.height > unreadedHeight }
             
-            for (chatroom, trs) in chatrooms {
-                chatroom.hasUnreadMessages = true
-                trs.forEach {
-                    if !$0.isOutgoing {
-                        $0.isUnread = true
-                    }
-                }
+            if unreadTransactions.count > 0 {
+                unreadTransactions.forEach { $0.isUnread = true }
+                Set(unreadTransactions.compactMap { $0.chatroom }).forEach { $0.hasUnreadMessages = true }
             }
-            
-            transfers.filter({$0.height > unreadedHeight}).forEach({$0.isUnread = true})
-            
-            readedLastHeight = self.receivedLastHeight
         }
         
-        if let h = self.receivedLastHeight {
-            securedStore.set(String(h), for: StoreKey.transfersProvider.receivedLastHeight)
-        }
-        
-        if let h = self.readedLastHeight {
-            securedStore.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
-        }
+        processingHeightSemaphore.signal()
         
         // MARK: 6. Dump transactions to viewContext
         if context.hasChanges {
