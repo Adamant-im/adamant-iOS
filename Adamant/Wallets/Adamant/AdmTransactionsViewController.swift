@@ -177,7 +177,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAt: IndexPath) -> [UITableViewRowAction]? {
-        guard let transaction = controller?.object(at: editActionsForRowAt), let chatroom = transaction.partner?.chatroom, let transactions = chatroom.transactions  else {
+        guard let transaction = controller?.object(at: editActionsForRowAt), let partner = transaction.partner as? CoreDataAccount, let chatroom = partner.chatroom, let transactions = chatroom.transactions  else {
             return nil
         }
         
@@ -219,7 +219,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
     
     @available(iOS 11.0, *)
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let transaction = controller?.object(at: indexPath), let chatroom = transaction.partner?.chatroom, let transactions = chatroom.transactions  else {
+        guard let transaction = controller?.object(at: indexPath), let partner = transaction.partner as? CoreDataAccount, let chatroom = partner.chatroom, let transactions = chatroom.transactions  else {
             return nil
         }
         

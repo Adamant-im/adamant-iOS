@@ -204,6 +204,10 @@
 		E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */; };
 		E9942B87203D9E5100C163AF /* EurekaQRRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9942B86203D9E5100C163AF /* EurekaQRRow.swift */; };
 		E9942B89203D9ECA00C163AF /* QrCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9942B88203D9ECA00C163AF /* QrCell.xib */; };
+		E9960B3321F5154300C840A8 /* BaseAccount+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9960B2F21F5154300C840A8 /* BaseAccount+CoreDataClass.swift */; };
+		E9960B3421F5154300C840A8 /* BaseAccount+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9960B3021F5154300C840A8 /* BaseAccount+CoreDataProperties.swift */; };
+		E9960B3521F5154300C840A8 /* DummyAccount+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9960B3121F5154300C840A8 /* DummyAccount+CoreDataClass.swift */; };
+		E9960B3621F5154300C840A8 /* DummyAccount+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9960B3221F5154300C840A8 /* DummyAccount+CoreDataProperties.swift */; };
 		E9981892212088DE0018C84C /* NodeCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E91E5BF320DAF3AB00B06B3C /* NodeCell.xib */; };
 		E99818942120892F0018C84C /* WalletViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99818932120892F0018C84C /* WalletViewControllerBase.swift */; };
 		E9981896212095CA0018C84C /* EthWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9981895212095CA0018C84C /* EthWalletViewController.swift */; };
@@ -515,6 +519,10 @@
 		E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantQRTools.swift; sourceTree = "<group>"; };
 		E9942B86203D9E5100C163AF /* EurekaQRRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EurekaQRRow.swift; sourceTree = "<group>"; };
 		E9942B88203D9ECA00C163AF /* QrCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = QrCell.xib; sourceTree = "<group>"; };
+		E9960B2F21F5154300C840A8 /* BaseAccount+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BaseAccount+CoreDataClass.swift"; sourceTree = "<group>"; };
+		E9960B3021F5154300C840A8 /* BaseAccount+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BaseAccount+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		E9960B3121F5154300C840A8 /* DummyAccount+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DummyAccount+CoreDataClass.swift"; sourceTree = "<group>"; };
+		E9960B3221F5154300C840A8 /* DummyAccount+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DummyAccount+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		E99818932120892F0018C84C /* WalletViewControllerBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewControllerBase.swift; sourceTree = "<group>"; };
 		E9981895212095CA0018C84C /* EthWalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthWalletViewController.swift; sourceTree = "<group>"; };
 		E9981897212096ED0018C84C /* WalletViewControllerBase.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WalletViewControllerBase.xib; sourceTree = "<group>"; };
@@ -1006,6 +1014,10 @@
 		E95F859220094B8E0070534A /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
+				E9960B2F21F5154300C840A8 /* BaseAccount+CoreDataClass.swift */,
+				E9960B3021F5154300C840A8 /* BaseAccount+CoreDataProperties.swift */,
+				E9960B3121F5154300C840A8 /* DummyAccount+CoreDataClass.swift */,
+				E9960B3221F5154300C840A8 /* DummyAccount+CoreDataProperties.swift */,
 				E90847202196FEA80095825D /* BaseTransaction+CoreDataClass.swift */,
 				E90847212196FEA80095825D /* BaseTransaction+CoreDataProperties.swift */,
 				E90847382196FEF50095825D /* BaseTransaction+TransactionDetails.swift */,
@@ -1477,6 +1489,7 @@
 				64A223D620F760BB005157CB /* Localization.swift in Sources */,
 				E94E7B08205D4CB80042B639 /* SharedRoutes.swift in Sources */,
 				E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */,
+				E9960B3621F5154300C840A8 /* DummyAccount+CoreDataProperties.swift in Sources */,
 				E9CAE8D22018AA7700345E76 /* AdamantApi+Accounts.swift in Sources */,
 				E987024920C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift in Sources */,
 				E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */,
@@ -1499,6 +1512,7 @@
 				644EC35E20F34F1E00F40C73 /* DelegateDetailsViewController.swift in Sources */,
 				E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */,
 				E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */,
+				E9960B3321F5154300C840A8 /* BaseAccount+CoreDataClass.swift in Sources */,
 				E9FCA1E6218334C00005E83D /* SimpleTransactionDetails.swift in Sources */,
 				64A223DA20F7A14B005157CB /* AdamantLskApiService.swift in Sources */,
 				6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */,
@@ -1529,6 +1543,7 @@
 				E926E032213EC43B005E536B /* FullscreenAlertView.swift in Sources */,
 				644EC35B20EFB8E900F40C73 /* AdamantDelegateCell.swift in Sources */,
 				6416B1A521AEE157006089AC /* LskWalletService+Transfers.swift in Sources */,
+				E9960B3421F5154300C840A8 /* BaseAccount+CoreDataProperties.swift in Sources */,
 				E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */,
 				E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */,
 				E91947B420002809001362F8 /* AdamantAccount.swift in Sources */,
@@ -1667,6 +1682,7 @@
 				E90847352196FEA80095825D /* MessageTransaction+CoreDataProperties.swift in Sources */,
 				E9A03FD420DBC824007653A1 /* NodeVersion.swift in Sources */,
 				E90847342196FEA80095825D /* MessageTransaction+CoreDataClass.swift in Sources */,
+				E9960B3521F5154300C840A8 /* DummyAccount+CoreDataClass.swift in Sources */,
 				E94008892114F0F700CD2D67 /* AdmWalletService.swift in Sources */,
 				64EE46B220FE0C8D00194DDA /* LskTransactionsViewController.swift in Sources */,
 				E94008832114EE4700CD2D67 /* LskWallet.swift in Sources */,

@@ -151,6 +151,9 @@ extension ChatsProviderError {
             
         case .internalError(let error):
             return .internalError(message: self.message, error: error)
+            
+        case .accountNotInitiated(_):
+            return .walletNotInitiated
         }
     }
 }
