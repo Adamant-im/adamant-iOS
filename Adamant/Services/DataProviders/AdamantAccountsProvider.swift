@@ -113,6 +113,25 @@ class AdamantAccountsProvider: AccountsProvider {
 	
 	private var requestGroups = [String:DispatchGroup]()
 	private let groupsSemaphore = DispatchSemaphore(value: 1)
+    
+    private func removeSafeFromRequests(_ address: String) {
+        if Thread.isMainThread {
+            let group = DispatchGroup()
+            
+            DispatchQueue.global(qos: .utility).async {
+                defer { group.leave() }
+                group.enter()
+                self.groupsSemaphore.wait()
+                self.requestGroups.removeValue(forKey: address)
+                self.groupsSemaphore.signal()
+                group.wait()
+            }
+        } else {
+            groupsSemaphore.wait()
+            requestGroups.removeValue(forKey: address)
+            groupsSemaphore.signal()
+        }
+    }
 	
 	private func getAccount(byPredicate predicate: NSPredicate, context: NSManagedObjectContext? = nil) -> GetAccountResult {
 		let request = NSFetchRequest<BaseAccount>(entityName: BaseAccount.baseEntityName)
@@ -197,20 +216,20 @@ extension AdamantAccountsProvider {
 		
 		// Go background, to not to hang threads (especially main) on semaphores and dispatch groups
 		queue.async {
-			self.groupsSemaphore.wait()
+			self.groupsSemaphore.wait() // 1
 			
 			// If there is already request for a this address, wait
 			if let group = self.requestGroups[address] {
-				self.groupsSemaphore.signal()
+				self.groupsSemaphore.signal() // 1
 				group.wait()
-				self.groupsSemaphore.wait()
+				self.groupsSemaphore.wait() // 2
 			}
             
 			// Check if there is an account, that we are looking for
             let dummy: DummyAccount?
             switch self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
             case .core(let account):
-                self.groupsSemaphore.signal()
+                self.groupsSemaphore.signal() // 1 or 2
                 completion(.success(account))
                 return
                 
@@ -225,21 +244,18 @@ extension AdamantAccountsProvider {
 			let group = DispatchGroup()
 			self.requestGroups[address] = group
 			group.enter()
-			self.groupsSemaphore.signal()
+            
+			self.groupsSemaphore.signal() // 1 or 2
 			
 			switch validation {
 			case .valid:
 				self.apiService.getAccount(byAddress: address) { result in
-					defer {
-						self.groupsSemaphore.wait()
-						self.requestGroups.removeValue(forKey: address)
-						self.groupsSemaphore.signal()
-						group.leave()
-					}
-					
 					switch result {
 					case .success(let account):
                         guard account.publicKey != nil else {
+                            self.removeSafeFromRequests(address)
+                            group.leave()
+                            
                             if let dummy = dummy {
                                 completion(.dummy(dummy))
                             } else {
@@ -248,8 +264,9 @@ extension AdamantAccountsProvider {
                             return
                         }
                         
-                        DispatchQueue.main.async {
-                            let coreAccount = self.createCoreDataAccount(from: account,  context: context)
+                        var coreAccount: CoreDataAccount! = nil
+                        DispatchQueue.main.sync {
+                            coreAccount = self.createCoreDataAccount(from: account,  context: context)
                             
                             if let dummy = dummy {
                                 coreAccount.name = dummy.name
@@ -267,10 +284,18 @@ extension AdamantAccountsProvider {
                                 context.delete(dummy)
                             }
                             
-                            completion(.success(coreAccount))
+                            try? context.save()
                         }
+                        
+                        self.removeSafeFromRequests(address)
+                        group.leave()
+                        
+                        completion(.success(coreAccount))
 						
 					case .failure(let error):
+                        self.removeSafeFromRequests(address)
+                        group.leave()
+                        
 						switch error {
 						case .accountNotFound:
                             if let dummy = dummy {
@@ -290,11 +315,15 @@ extension AdamantAccountsProvider {
 				
 			case .system:
 				let coreAccount = self.createCoreDataAccount(with: address, publicKey: "")
-				group.leave()
+                self.removeSafeFromRequests(address)
+                group.leave()
+                
 				completion(.success(coreAccount))
 				
 			case .invalid:
-				group.leave()
+                self.removeSafeFromRequests(address)
+                group.leave()
+                
 				completion(.invalidAddress(address: address))
 			}
 		}
