@@ -32,7 +32,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 		var localized: String {
 			switch self {
 			case .address: return NSLocalizedString("AccountTab.Row.Address", comment: "Account tab: 'Address' row")
-			case . balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
+			case .balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
 			case .send: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
 			}
 		}

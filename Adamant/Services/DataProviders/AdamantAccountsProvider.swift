@@ -138,11 +138,23 @@ class AdamantAccountsProvider: AccountsProvider {
 		request.fetchLimit = 1
 		request.predicate = predicate
 		
-		var acc = (try? (context ?? stack.container.viewContext).fetch(request))?.first
+        var acc: BaseAccount? = nil
 		
         if let context = context {
-            acc = (try? context.fetch(request))?.first
+            // viewContext only on MainThread
+            if context == stack.container.viewContext {
+                if Thread.isMainThread {
+                    acc = (try? context.fetch(request))?.first
+                } else {
+                    DispatchQueue.main.sync {
+                        acc = (try? context.fetch(request))?.first
+                    }
+                }
+            } else {
+                acc = (try? context.fetch(request))?.first
+            }
         } else {
+            // viewContext only on MainThread
             if Thread.isMainThread {
                 acc = (try? stack.container.viewContext.fetch(request))?.first
             } else {
@@ -151,14 +163,6 @@ class AdamantAccountsProvider: AccountsProvider {
                 }
             }
         }
-        
-		if Thread.isMainThread {
-			acc = (try? (context ?? stack.container.viewContext).fetch(request))?.first
-		} else {
-			DispatchQueue.main.sync {
-				acc = (try? (context ?? stack.container.viewContext).fetch(request))?.first
-			}
-		}
 		
         switch acc {
         case let core as CoreDataAccount:

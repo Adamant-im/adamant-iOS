@@ -112,9 +112,6 @@ extension OnboardViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
             attributedString.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: attributedString.length))
             view.text.attributedText = attributedString
             view.text.delegate = self
-            
-            view.text.isSelectable = false
-            view.text.isEditable = false
         }
         
         return view
