@@ -181,6 +181,7 @@
 		E965A53420B833A00041A3EA /* StateAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53320B833A00041A3EA /* StateAsset.swift */; };
 		E965A53620B8370C0041A3EA /* TransactionAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53520B8370C0041A3EA /* TransactionAsset.swift */; };
 		E96BBE3121F70F5E009AA738 /* ReadonlyTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BBE3021F70F5E009AA738 /* ReadonlyTextView.swift */; };
+		E96BBE3321F71290009AA738 /* BuyAndSellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BBE3221F71290009AA738 /* BuyAndSellViewController.swift */; };
 		E96E86B821679C120061F80A /* EthTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96E86B721679C120061F80A /* EthTransactionDetailsViewController.swift */; };
 		E971591A21681D6900A5F904 /* TransactionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E971591921681D6900A5F904 /* TransactionStatus.swift */; };
 		E971591C2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = E971591B2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift */; };
@@ -497,6 +498,7 @@
 		E965A53320B833A00041A3EA /* StateAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateAsset.swift; sourceTree = "<group>"; };
 		E965A53520B8370C0041A3EA /* TransactionAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionAsset.swift; sourceTree = "<group>"; };
 		E96BBE3021F70F5E009AA738 /* ReadonlyTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadonlyTextView.swift; sourceTree = "<group>"; };
+		E96BBE3221F71290009AA738 /* BuyAndSellViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuyAndSellViewController.swift; sourceTree = "<group>"; };
 		E96E86B721679C120061F80A /* EthTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionDetailsViewController.swift; sourceTree = "<group>"; };
 		E971591921681D6900A5F904 /* TransactionStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionStatus.swift; sourceTree = "<group>"; };
 		E971591B2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EthWalletService+RichMessageProviderWithStatusCheck.swift"; sourceTree = "<group>"; };
@@ -968,6 +970,7 @@
 				E9B1AA5A21283E0F00080A2A /* AdmTransferViewController.swift */,
 				64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */,
 				E9DFB71B21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift */,
+				E96BBE3221F71290009AA738 /* BuyAndSellViewController.swift */,
 			);
 			path = Adamant;
 			sourceTree = "<group>";
@@ -1572,6 +1575,7 @@
 				E9B3D3A9202082450019EB36 /* AdamantTransfersProvider.swift in Sources */,
 				648BCA6B213D37A900875EB5 /* AdamantAvatarService.swift in Sources */,
 				E9A174B72057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift in Sources */,
+				E96BBE3321F71290009AA738 /* BuyAndSellViewController.swift in Sources */,
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E941CCDE20E7B70200C96220 /* WalletCollectionViewCell.swift in Sources */,
 				E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */,

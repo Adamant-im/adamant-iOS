@@ -110,7 +110,7 @@
 "AccountTab.Row.Balance" = "Баланс";
 
 /* Account tab: 'Buy tokens' button */
-"AccountTab.Row.BuyTokens" = "Купить токены";
+"AccountTab.Row.BuyTokens" = "Купить и продать токены";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Выход";
@@ -129,6 +129,9 @@
 
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendLsk" = "Отправить LSK";
+
+/* Account tab: Anonymously buy ADM tokens */
+"AccountTab.Row.AnonymouslyBuyADM" = "Купить ADM анонимно";
 
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Адрес";

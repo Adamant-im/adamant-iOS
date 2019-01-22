@@ -15,6 +15,8 @@ extension String.adamantLocalized.wallets {
     
     static let sendAdm = NSLocalizedString("AccountTab.Row.SendAdm", comment: "Account tab: 'Send ADM tokens' button")
     
+    static let buyAdmTokens = NSLocalizedString("AccountTab.Row.AnonymouslyBuyADM", comment: "Account tab: Anonymously buy ADM tokens")
+    
     // URLs
     static func getFreeTokensUrl(for address: String) -> String {
         return String.localizedStringWithFormat(NSLocalizedString("AccountTab.FreeTokens.UrlFormat", comment: "Account tab: A full 'Get free tokens' link, with %@ as address"), address)
@@ -55,6 +57,10 @@ class AdmWalletViewController: WalletViewControllerBase {
         }
     }
     
+    // MARK: - Props & Deps
+    
+    var router: Router!
+    
     var hideFreeTokensRow = false
     
     // MARK: - Lifecycle
@@ -76,16 +82,54 @@ class AdmWalletViewController: WalletViewControllerBase {
         
         // MARK: Rows
         
-        let buyTokens = buildUrlRow(title: Rows.buyTokens.localized, value: nil, tag: Rows.buyTokens.tag, urlRaw: String.adamantLocalized.wallets.buyTokensUrl(for: address), image: Rows.buyTokens.image)
+        let buyTokensRow = LabelRow() {
+            $0.tag = Rows.buyTokens.tag
+            $0.title = Rows.buyTokens.localized
+            $0.cell.imageView?.image = Rows.buyTokens.image
+            $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (_, row) in
+            guard let vc = self?.router.get(scene: AdamantScene.Wallets.Adamant.buyAndSell) else {
+                fatalError("Failed to get BuyAndSell scele")
+            }
+            
+            row.deselect()
+            
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else {
+                self?.navigationController?.pushViewController(vc, animated: true )
+            }
+        }
         
-        let freeTokens = buildUrlRow(title: Rows.freeTokens.localized, value: nil, tag: Rows.freeTokens.tag, urlRaw: String.adamantLocalized.wallets.getFreeTokensUrl(for: address), image: Rows.freeTokens.image)
+        let freeTokensRow = LabelRow() {
+            $0.tag = Rows.freeTokens.tag
+            $0.title = Rows.freeTokens.localized
+            $0.cell.imageView?.image = Rows.freeTokens.image
+            $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
+            $0.cell.selectionStyle = .gray
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
+                return self?.hideFreeTokensRow ?? true
+            })
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (_, _) in
+            let urlRaw = String.adamantLocalized.wallets.getFreeTokensUrl(for: address)
+            guard let url = URL(string: urlRaw) else {
+                self?.dialogService.showError(withMessage: "Failed to create URL with string: \(urlRaw)", error: nil)
+                return
+            }
+            
+            let safari = SFSafariViewController(url: url)
+            safari.preferredControlTintColor = UIColor.adamant.primary
+            self?.present(safari, animated: true, completion: nil)
+        }
         
-        freeTokens.hidden = Condition.function([], { [weak self] _ -> Bool in
-            return self?.hideFreeTokensRow ?? true
-        })
-        
-        section.append(buyTokens)
-        section.append(freeTokens)
+        section.append(buyTokensRow)
+        section.append(freeTokensRow)
         
          // Notifications
         if let service = service {
