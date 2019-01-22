@@ -20,6 +20,7 @@ target 'Adamant' do
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
   pod 'Parchment' # Paging menu
+  pod 'SwiftyOnboard', :git => 'https://github.com/RealBonus/SwiftyOnboard', :branch => 'feature/customStyle' # wellcome screen
 
   # QR
   pod 'EFQRCode' # QR generator

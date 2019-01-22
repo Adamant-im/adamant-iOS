@@ -68,6 +68,9 @@ class DelegatesListViewController: UIViewController {
     private var forcedUpdateTimer: Timer? = nil
     
     private var searchController: UISearchController?
+    
+    private var originalInsets: UIEdgeInsets?
+    private var didShow: Bool = false
 
 	// MARK: Tools
 	
@@ -122,6 +125,10 @@ class DelegatesListViewController: UIViewController {
 		// MARK: Load data
 //        refreshControl.beginRefreshing() // Nasty glitches
         handleRefresh(refreshControl)
+        
+        // Keyboard
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -433,4 +440,42 @@ extension DelegatesListViewController {
 			}
 		}
 	}
+    
+    
+    // MARK: Keyboard
+    @objc private func keyboardWillShow(notification: Notification) {
+        // For some reason we will receive 2 notifications
+        guard !didShow else { return }
+        didShow = true
+        
+        guard let frame = notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue else {
+            return
+        }
+        
+        originalInsets = tableView.contentInset
+        
+        let gap = UIScreen.main.bounds.height - tableView.bounds.height + tableView.frame.origin.y
+        let bottom = frame.cgRectValue.size.height - gap
+        
+        var contentInsets = tableView.contentInset
+        contentInsets.bottom = bottom
+        
+        tableView.contentInset = contentInsets
+        tableView.scrollIndicatorInsets = contentInsets
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        guard didShow else { return }
+        didShow = false
+        
+        if let insets = originalInsets {
+            tableView.contentInset = insets
+            tableView.scrollIndicatorInsets = insets
+        } else {
+            var contentInsets = tableView.contentInset
+            contentInsets.bottom = 0.0
+            tableView.contentInset = contentInsets
+            tableView.scrollIndicatorInsets = contentInsets
+        }
+    }
 }

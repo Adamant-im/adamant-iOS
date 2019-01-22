@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14460.32" systemVersion="17G3025" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14460.32" systemVersion="17G4015" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="BaseAccount" representedClassName="BaseAccount" isAbstract="YES" syncable="YES">
+        <attribute name="address" attributeType="String" syncable="YES"/>
+        <attribute name="avatar" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isSystem" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="transfers" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TransferTransaction" inverseName="partner" inverseEntity="TransferTransaction" syncable="YES"/>
+    </entity>
     <entity name="BaseTransaction" representedClassName="BaseTransaction" isAbstract="YES" syncable="YES">
         <attribute name="amount" optional="YES" attributeType="Decimal" defaultValueString="0" syncable="YES"/>
         <attribute name="blockId" optional="YES" attributeType="String" syncable="YES"/>
@@ -35,15 +42,11 @@
         <relationship name="chatroom" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="transactions" inverseEntity="Chatroom" syncable="YES"/>
         <relationship name="lastIn" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="lastTransaction" inverseEntity="Chatroom" syncable="YES"/>
     </entity>
-    <entity name="CoreDataAccount" representedClassName="CoreDataAccount" syncable="YES">
-        <attribute name="address" attributeType="String" syncable="YES"/>
-        <attribute name="avatar" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="isSystem" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+    <entity name="CoreDataAccount" representedClassName="CoreDataAccount" parentEntity="BaseAccount" syncable="YES">
         <attribute name="publicKey" attributeType="String" syncable="YES"/>
         <relationship name="chatroom" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="partner" inverseEntity="Chatroom" syncable="YES"/>
-        <relationship name="transfers" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TransferTransaction" inverseName="partner" inverseEntity="TransferTransaction" syncable="YES"/>
     </entity>
+    <entity name="DummyAccount" representedClassName="DummyAccount" parentEntity="BaseAccount" syncable="YES"/>
     <entity name="MessageTransaction" representedClassName="MessageTransaction" parentEntity="ChatTransaction" syncable="YES">
         <attribute name="isMarkdown" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="message" attributeType="String" syncable="YES"/>
@@ -55,15 +58,17 @@
     </entity>
     <entity name="TransferTransaction" representedClassName="TransferTransaction" parentEntity="ChatTransaction" syncable="YES">
         <attribute name="comment" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="partner" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CoreDataAccount" inverseName="transfers" inverseEntity="CoreDataAccount" syncable="YES"/>
+        <relationship name="partner" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BaseAccount" inverseName="transfers" inverseEntity="BaseAccount" syncable="YES"/>
     </entity>
     <elements>
+        <element name="BaseAccount" positionX="-27" positionY="171" width="128" height="120"/>
         <element name="BaseTransaction" positionX="378" positionY="18" width="128" height="225"/>
         <element name="Chatroom" positionX="-74" positionY="26" width="128" height="180"/>
         <element name="ChatTransaction" positionX="142" positionY="137" width="128" height="165"/>
-        <element name="CoreDataAccount" positionX="-236" positionY="174" width="128" height="150"/>
+        <element name="CoreDataAccount" positionX="-236" positionY="174" width="128" height="75"/>
         <element name="MessageTransaction" positionX="243" positionY="326" width="128" height="75"/>
         <element name="RichMessageTransaction" positionX="-27" positionY="171" width="128" height="90"/>
         <element name="TransferTransaction" positionX="97" positionY="342" width="128" height="75"/>
+        <element name="DummyAccount" positionX="-18" positionY="180" width="128" height="45"/>
     </elements>
 </model>

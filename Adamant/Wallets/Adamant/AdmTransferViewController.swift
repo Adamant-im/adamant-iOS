@@ -9,6 +9,19 @@
 import UIKit
 import Eureka
 
+// MARK: - Localization
+extension String.adamantLocalized {
+    struct transferAdm {
+        static func accountNotFoundAlertTitle(for address: String) -> String {
+            return String.localizedStringWithFormat(NSLocalizedString("TransferScene.unsafeTransferAlert.title", comment: "Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address"), address)
+        }
+            
+        static let accountNotFoundAlertBody = NSLocalizedString("TransferScene.unsafeTransferAlert.body", comment: "Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address")
+        
+        private init() {}
+    }
+}
+
 class AdmTransferViewController: TransferViewControllerBase {
 	// MARK: Properties
 	
@@ -27,8 +40,6 @@ class AdmTransferViewController: TransferViewControllerBase {
 			return
 		}
 		
-		dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
-		
         let comments: String
         if let row: TextAreaRow = form.rowBy(tag: BaseRows.comments.tag), let text = row.value {
             comments = text
@@ -36,16 +47,53 @@ class AdmTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-		service.sendMoney(recipient: recipient, amount: amount, comments: comments) { [weak self] result in
-			switch result {
-			case .success(let result):
-				service.update()
-				
-				guard let vc = self else {
-					break
-				}
-				
-				vc.dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+        dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+        
+        // Check recipient
+        accountsProvider.getAccount(byAddress: recipient) { result in
+            switch result {
+            case .success(_):
+                self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
+                
+            case .notFound(_), .notInitiated(_), .dummy(_):
+                let alert = UIAlertController(title: String.adamantLocalized.transferAdm.accountNotFoundAlertTitle(for: recipient),
+                                              message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
+                                              preferredStyle: .alert)
+                
+                let send = UIAlertAction(title: TransferViewControllerBase.BaseRows.sendButton.localized,
+                                         style: .default,
+                                         handler: { _ in
+                                            self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+                                            self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
+                })
+                
+                let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
+                
+                alert.addAction(send)
+                alert.addAction(cancel)
+                
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true, completion: nil)
+                    self.dialogService.dismissProgress()
+                }
+                
+            case .invalidAddress(_), .serverError(_), .networkError(_):
+                self.dialogService.showWarning(withMessage: result.localized)
+            }
+        }
+	}
+    
+    private func sendFundsInternal(service: AdmWalletService, recipient: String, amount: Decimal, comments: String) {
+        service.sendMoney(recipient: recipient, amount: amount, comments: comments) { [weak self] result in
+            switch result {
+            case .success(let result):
+                service.update()
+                
+                guard let vc = self else {
+                    break
+                }
+                
+                vc.dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
                 
                 let detailsVC = self?.router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? AdmTransactionDetailsViewController
                 detailsVC?.transaction = result
@@ -75,17 +123,17 @@ class AdmTransferViewController: TransferViewControllerBase {
                 } else {
                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
                 }
-				
-			case .failure(let error):
-				guard let dialogService = self?.dialogService else {
-					break
-				}
-				
-				dialogService.dismissProgress()
-				dialogService.showRichError(error: error)
-			}
-		}
-	}
+                
+            case .failure(let error):
+                guard let dialogService = self?.dialogService else {
+                    break
+                }
+                
+                dialogService.dismissProgress()
+                dialogService.showRichError(error: error)
+            }
+        }
+    }
 	
 	
 	// MARK: Overrides

@@ -67,6 +67,9 @@
 /* About scene: Write to Adamant row */
 "About.Row.Adamant" = "ADAMANT";
 
+/* About scene: Show Welcome screens */
+"About.Row.Welcome" = "Welcome screens";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Welcome to ADAMANT";
 
@@ -107,7 +110,7 @@
 "AccountTab.Row.Balance" = "Balance";
 
 /* Account tab: 'Buy tokens' button */
-"AccountTab.Row.BuyTokens" = "Buy tokens";
+"AccountTab.Row.BuyTokens" = "Buy & Sell tokens";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Logout";
@@ -126,6 +129,9 @@
 
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendLsk" = "Send LSK";
+
+/* Account tab: Anonymously buy ADM tokens */
+"AccountTab.Row.AnonymouslyBuyADM" = "Buy ADM anonymously";
 
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Address";
@@ -315,6 +321,9 @@
 
 /* Shared error: Account not found error. Using %@ for address. */
 "Error.AccountNotFoundFormat" = "Account not found: %@";
+
+/* Shared error: Account not initiated */
+"Error.AccountNotInitiated" = "Account not initiated";
 
 /* Shared error: Internal error format, %@ for message */
 "Error.InternalErrorFormat" = "Internal error: %@";
@@ -715,6 +724,12 @@
 /* Transfer: Amount is zero, or even negative notification */
 "TransferScene.Error.TooLittleMoney" = "You should send more tokens";
 
+/* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.title" = "Can't verify %@";
+
+/* Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.body" = "Account not found, or not initiated. Double check recipient address and confirm transaction";
+
 /* Transfer: recipient address placeholder */
 "TransferScene.Recipient.Placeholder" = "of the recipient";
 
@@ -783,3 +798,30 @@
 
 /* Wallet Services: Shared error, transaction not found */
 "WalletServices.SharedErrors.TransactionNotFound" = "Transaction not found";
+
+/* Welcome: Skip button */
+"WelcomeScene.Skip" = "skip";
+
+/* Welcome: Slide 1 Description */
+"WelcomeScene.Description.Slide1" = "Welcome to ADAMANT, the genuine <b>blockchain</b> messenger.";
+
+/* Welcome: Slide 2 Description */
+"WelcomeScene.Description.Slide2" = "ADAMANT is <b>anonymity</b> and <b>security</b> of your messaging as well as in-chat cryptocurrency transferring tool.<br/><br/><a href=\"https://medium.com/adamant-im/adamant-security-features-e7cc836ff52c\">Why are other messengers not secure?</a>";
+
+/* Welcome: Slide 3 Description */
+"WelcomeScene.Description.Slide3" = "ADAMANT infrastracture doesn't belong to anyone and is <b>decentralized</b>.<br/><br/>It is maintained by messages paid in ADM tokens. New accounts may receive free tokens for testing purposes.";
+
+/* Welcome: Slide 4 Description */
+"WelcomeScene.Description.Slide4" = "Create an account in a single click <b>without any requirements</b> (no email/phone/anything) and invite your friends.<br/><br/>Share your ADAMANT addresses <b>in-person</b> for true security.";
+
+/* Welcome: Slide 5 Description */
+"WelcomeScene.Description.Slide5" = "The project's source code is <a href=\"https://github.com/Adamant-im/\">completely open</a>. The app is in development and we constantly add new features.<br/><br/>If you are a developer — join our team.";
+
+/* WelcomeScene.Description.BeginButton */
+"WelcomeScene.Description.BeginButton" = "Start secure messaging";
+
+/* Welcome: Next screen button */
+"WelcomeScene.Description.ContinueButton" = "Continue";
+
+/* Welcome: Skip button */
+"WelcomeScene.Description.SkipButton" = "Skip";

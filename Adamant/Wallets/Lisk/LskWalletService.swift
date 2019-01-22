@@ -544,7 +544,11 @@ extension LskWalletService {
     }
     
     func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<Transactions.TransactionModel>) -> Void) {
-        let api: Transactions! = transactionApi
+        guard let api = transactionApi else {
+            completion(ApiServiceResult.failure(ApiServiceError.networkError(error: AdamantError(message: "Problem with accessing LSK nodes, try later"))))
+            return
+        }
+        
         defaultDispatchQueue.async {
             api.transactions(id: hash, limit: 1, offset: 0) { (response) in
                 switch response {

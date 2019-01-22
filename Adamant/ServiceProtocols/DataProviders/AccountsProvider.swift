@@ -11,22 +11,27 @@ import CoreData
 
 enum AccountsProviderResult {
 	case success(CoreDataAccount)
+    case dummy(DummyAccount)
 	case notFound(address: String)
 	case invalidAddress(address: String)
+    case notInitiated(address: String)
 	case serverError(Error)
 	case networkError(Error)
 	
 	var localized: String {
 		switch self {
-		case .success(_):
+		case .success(_), .dummy(_):
 			return ""
 			
 		case .notFound(let address):
-			return String.localizedStringWithFormat(String.adamantLocalized.sharedErrors.accountNotFound, address)
+			return String.adamantLocalized.sharedErrors.accountNotFound(address)
 			
 		case .invalidAddress(let address):
 			return String.localizedStringWithFormat(NSLocalizedString("AccountsProvider.Error.AddressNotValidFormat", comment: "AccountsProvider: Address not valid error, %@ for address"), address)
 			
+        case .notInitiated(_):
+            return String.adamantLocalized.sharedErrors.accountNotInitiated
+            
 		case .serverError(let error):
 			return ApiServiceError.serverError(error: error.localizedDescription).localized
 			
@@ -34,6 +39,13 @@ enum AccountsProviderResult {
 			return String.adamantLocalized.sharedErrors.networkError
 		}
 	}
+}
+
+enum AccountsProviderDummyAccountResult {
+    case success(DummyAccount)
+    case foundRealAccount(CoreDataAccount)
+    case invalidAddress(address: String)
+    case internalError(Error)
 }
 
 protocol AccountsProvider {
@@ -51,6 +63,10 @@ protocol AccountsProvider {
 	
 	/// Check locally if has account with specified address
 	func hasAccount(address: String, completion: @escaping (Bool) -> Void)
+    
+    
+    /// Request Dummy account, if account wasn't found or initiated
+    func getDummyAccount(for address: String, completion: @escaping (AccountsProviderDummyAccountResult) -> Void)
 }
 
 // MARK: - Known contacts

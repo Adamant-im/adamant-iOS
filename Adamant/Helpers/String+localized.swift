@@ -45,8 +45,13 @@ extension String {
 		struct sharedErrors {
 			static let userNotLogged = NSLocalizedString("Error.UserNotLogged", comment: "Shared error: User not logged")
 			static let networkError = NSLocalizedString("Error.NoNetwork", comment: "Shared error: Network problems. In most cases - no connection")
-			static let accountNotFound = NSLocalizedString("Error.AccountNotFoundFormat", comment: "Shared error: Account not found error. Using %@ for address.")
+            
+            static func accountNotFound(_ account: String) -> String {
+                return String.localizedStringWithFormat(NSLocalizedString("Error.AccountNotFoundFormat", comment: "Shared error: Account not found error. Using %@ for address."), account)
+            }
 			
+            static let accountNotInitiated = NSLocalizedString("Error.AccountNotInitiated", comment: "Shared error: Account not initiated")
+            
             static let unknownError = NSLocalizedString("Error.UnknownError", comment: "Shared unknown error")
             
             static let notEnoughMoney = NSLocalizedString("WalletServices.SharedErrors.notEnoughMoney", comment: "Wallet Services: Shared error, user do not have enought money.")
