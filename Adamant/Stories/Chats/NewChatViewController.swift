@@ -95,20 +95,20 @@ class NewChatViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
+        if #available(iOS 11.0, *) {
+            navigationItem.largeTitleDisplayMode = .always
+        }
+        
 		tableView.keyboardDismissMode = .none
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = true
-		}
 		
 		navigationItem.title = String.adamantLocalized.newChat.title
 		let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
 		doneButton.isEnabled = false
 		navigationItem.rightBarButtonItem = doneButton
         
-        if let _ = self.splitViewController {
+        if self.splitViewController != nil {
             if #available(iOS 11.0, *) {
-                navigationController?.navigationBar.prefersLargeTitles = false
+                navigationItem.largeTitleDisplayMode = .never
             }
         } else {
             navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
@@ -287,10 +287,18 @@ class NewChatViewController: FormViewController {
 					self.dialogService.dismissProgress()
 				}
 				
-			case .notFound, .invalidAddress, .networkError(_):
+            case .dummy(_):
+                self.dialogService.showWarning(withMessage: AccountsProviderResult.notInitiated(address: address).localized)
+                
+			case .notFound, .invalidAddress, .notInitiated(_), .networkError(_):
 				self.dialogService.showWarning(withMessage: result.localized)
 				
 			case .serverError(let error):
+                if let apiError = error as? ApiServiceError, case .internalError(let message, _) = apiError, message == String.adamantLocalized.sharedErrors.unknownError {
+                    self.dialogService.showWarning(withMessage: AccountsProviderResult.notFound(address: address).localized)
+                    return
+                }
+                
 				self.dialogService.showError(withMessage: result.localized, error: error)
 			}
 		}

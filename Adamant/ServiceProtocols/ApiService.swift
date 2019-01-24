@@ -16,7 +16,7 @@ enum ApiServiceResult<T> {
 // MARK: - Error
 enum ApiServiceError: Error {
 	case notLogged
-	case accountNotFound
+    case accountNotFound
 	case serverError(error: String)
 	case internalError(message: String, error: Error?)
 	case networkError(error: Error)
@@ -27,7 +27,7 @@ enum ApiServiceError: Error {
 			return String.adamantLocalized.sharedErrors.userNotLogged
 			
 		case .accountNotFound:
-			return String.adamantLocalized.sharedErrors.accountNotFound
+			return String.adamantLocalized.sharedErrors.accountNotFound("")
 			
 		case .serverError(let error):
 			return String.adamantLocalized.sharedErrors.remoteServerError(message: error)

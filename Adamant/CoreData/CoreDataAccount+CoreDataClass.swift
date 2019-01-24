@@ -11,6 +11,6 @@ import Foundation
 import CoreData
 
 @objc(CoreDataAccount)
-public class CoreDataAccount: NSManagedObject {
+public class CoreDataAccount: BaseAccount {
     static let entityName = "CoreDataAccount"
 }

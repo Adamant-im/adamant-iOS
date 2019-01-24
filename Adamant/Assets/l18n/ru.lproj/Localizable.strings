@@ -1,4 +1,4 @@
-/* About page: scene title */
+/* About page: scene title */ 
 "About.Title" = "О приложении";
 
 /* About scene: 'Read about' section title. */
@@ -67,8 +67,11 @@
 /* About scene: Write to Adamant row */
 "About.Row.Adamant" = "АДАМАНТ";
 
+/* About scene: Show Welcome screens */
+"About.Row.Welcome" = "Экраны приветствия";
+
 /* System accounts: ADAMANT Tokens */
-"Accounts.AdamantTokens" = "Токены АДАМАНТ";
+"Accounts.AdamantTokens" = "Приветствие АДАМАНТа";
 
 /* System accounts: ADAMANT iOS Support */
 "Accounts.iOSSupport" = "Техподдержка iOS ADAMANT";
@@ -107,7 +110,7 @@
 "AccountTab.Row.Balance" = "Баланс";
 
 /* Account tab: 'Buy tokens' button */
-"AccountTab.Row.BuyTokens" = "Купить токены";
+"AccountTab.Row.BuyTokens" = "Купить и продать токены";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Выход";
@@ -127,6 +130,9 @@
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendLsk" = "Отправить LSK";
 
+/* Account tab: Anonymously buy ADM tokens */
+"AccountTab.Row.AnonymouslyBuyADM" = "Купить ADM анонимно";
+
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Адрес";
 
@@ -134,10 +140,10 @@
 "AccountTab.Row.FreeTokens" = "Бесплатные ADM-токены";
 
 /* Account tab: 'About' row */
-"AccountTab.Row.About" = "О нас";
+"AccountTab.Row.About" = "Об АДАМАНТе";
 
 /* Account tab: 'Vote for delegates' button */
-"AccountTab.Row.VoteForDelegates" = "Проголосовать за делегатов";
+"AccountTab.Row.VoteForDelegates" = "Голосовать за делегатов";
 
 /* Account tab: Actions section title */
 "AccountTab.Section.Actions" = "Действия";
@@ -146,13 +152,13 @@
 "AccountTab.Section.Application" = "Приложение";
 
 /* Account tab: Adamant wallet */
-"AccountTab.Wallets.adamant_wallet" = "ADAMANT кошелёк";
+"AccountTab.Wallets.adamant_wallet" = "Кошелек ADAMANT";
 
 /* Account tab: Ethereum wallet */
-"AccountTab.Wallets.ethereum_wallet" = "Ethereum кошелёк";
+"AccountTab.Wallets.ethereum_wallet" = "Кошелек Ethereum";
 
 /* Account tab: Lisk wallet */
-"AccountTab.Wallets.lisk_wallet" = "Lisk кошелёк";
+"AccountTab.Wallets.lisk_wallet" = "Кошелек Lisk";
 
 /* Account tab: Delegates section title */
 "AccountTab.Section.Delegates" = "Делегаты";
@@ -203,19 +209,19 @@
 "ChatsProvider.Validation.MessageTooLong" = "Сообщение слишком длинное";
 
 /* Known contacts: Adamant ICO message. Markdown supported. */
-"Chats.IcoMessage" = "Сейчас у вас есть возможность купить токены самого защищенного мессенджера АДАМАНТ по низкой цене.\n\nВажно! Пожалуйста, убедитесь, что вы сохранили пароль к этому аккаунту — выйдите из аккаунта и войдите в него снова. Лучше всего иметь запись пароля и на бумаге. Однако помните, только **вы несете ответственность за сохранность вашего пароля**. Его невозможно восстановить. А если он попадет в другие руки, ваши деньги будут украдены. Отнеситесь к этому вопросу так серьезно, как если бы цена токенов на вашем кошельке когда-то станет равна миллиарду долларов.\n\nЧтобы купить токены ADM, перейдите в этом месседжере на вкладку Кошелек и нажмите кнопку Купить токены, или откройте в браузере веб-страницу https://adamant.im/ru-buy-tokens/. В форме покупки токенов укажите ваш адрес АДАМАНТа — на него будут перечислены токены ADM. При переходе из мессенджера он будет вставлен автоматически. Укажите криптовалюту, в которой вы хотите произвести оплату, и какую сумму. Вы увидите сколько ADM-токенов вы получите, с учетом скидки за объем: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Нажмите кнопку Купить токены АДАМАНТ. Вы получите уникальный адрес, на который необходимо выполнить перевод. Как только на него поступит ожидаемая сумма и транзакция будет подтверждена, вы получите токены ADM. Транзакцию можно выполнить **с любого кошелька, включая биржи**. Необязятельно переводить точную сумму с учетом комиссии, платеж все равно будет засчитан.\nПосле того, как вы получите токены ADM, мы рекомендуем вам хранить их в кошельке как можно дольше. Ежемесячно все нераспроданные токены будут распределяться по кошелькам пользователей, увеличивая балансы на 5%. Подробную информацию можно получить на сайте Adamant.im и в Белой книге Проекта.\n\nНе отвечайте на это сообщение, этот адрес служебный. Если же у вас остались вопросы, напишите в аккаунт **U15677078342684640219**.";
+"Chats.IcoMessage" = "Null";
 
 /* Known contacts: Adamant pre ICO message */
 "Chats.PreIcoMessage" = "Null";
 
 /* Known contacts: Adamant welcome message. Markdown supported. */
-"Chats.WelcomeMessage" = "Добро пожаловать в самый анонимный и безопасный мессенджер АДАМАНТ. Помните, что безопасность и анонимность зависит и от вас самих. Не переходите по ссылкам, которые вы получаете в чатах, иначе ваш IP-адрес может быть определен. Не доверяйте расширениям браузера. Лучше всего передавать ваш ADM-адрес собеседникам лично, а не через другие мессенджеры. Храните вашу секретную фразу (пароль) от аккаунта в тайне. Установите на ваше устройство пароль или закрываете вкладку браузера после завершения диалогов.\n\nБолее полную информацию о безопасности и анонимности читайте на странице https://adamant.im/staysecured/.\n\nВсе транзакции в блокчейне требуют минимальной комиссии. Это необходимо для поддержания инфраструктуры сети. Чтобы начать общаться, **получите бесплатные токены** — перейдите на вкладку Кошелек и нажмите Бесплатные токены. Затем на вкладке Диалоги нажмите Новый чат и введите адрес собеседника. Чтобы скопировать ваш адрес, нажмите Идентификатор кошелька на вкладке Кошелек.\n\nНе отвечайте на это сообщение, этот адрес служебный. Если же у вас остались вопросы, напишите в аккаунт **U15677078342684640219**."; 
+"Chats.WelcomeMessage" = "АДАМАНТ — мессенджер, полностью работающий на блокчейне, независимый от государств, корпораций и даже разработчиков. Это возможно благодаря децентрализованной сетевой инфраструктуре, с полностью открытым исходным кодом и поддерживаемой пользователями. Поэтому каждое действие, включая отправку сообщения или сохранение адресной книги, имеет комиссию сети 0.001 ADM.\n\nБлокчейн позволяет добиться превосходной безопасности и приватности, недоступной для типичных P2P- и централизованных мессенджеров. Также, блокчейн предоставляет и новые возможности. Храните и передавайте криптовалюты в чатах, сохраняя полный контроль над приватными ключами, используйте АДАМАНТ как 2FA и больше.\n\nВ АДАМАНТе никто не может контролировать, блокировать, деактивировать, ограничивать или подвергать цензуре аккаунты. Сами пользователи берут на себя полную ответственность за контент, сообщения, медиа, намерения и цели использования мессенджера.\n\nПомните, что безопасность и анонимность зависит и от вас самих. Не переходите по ссылкам, которые вы получаете в чатах, иначе ваш IP-адрес может быть определен. Установите на ваше устройство пароль. Более полную информацию о безопасности и анонимности читайте на странице https://adamant.im/ru-staysecured/.\n\nУбедитесь, что вы сохранили пассфразу к этому аккаунту — выйдите из аккаунта и войдите в него снова. Запишите пассфразу на бумаге. Только **вы несете ответственность за сохранность вашей пассфразы**. Ее невозможно восстановить. А если она попадет в другие руки, ваши деньги будут украдены, а переписка прочитана. Отнеситесь к этому вопросу так серьезно, как если бы цена токенов на вашем кошельке когда-то станет равна миллиарду долларов.\n\nЧтобы начать общение, **получите бесплатные токены** на вкладке Аккаунт. Затем создайте новый чат и введите ADM-адрес вашего собеседника. Лучше показывайте ваш ADM-адрес лично, а не передавайте через другие мессенджеры."; 
 
 /* Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them */
 "Chats.RetryOrDelete.Title" = "Повторить или удалить?";
 
-/* Alert 'Retry Or Delete' body message. Used in caht for sending failed messages again or delete them */
-"Chats.RetryOrDelete.Body" = "Вы хотите отправить сообщение еще раз или удалить его?";
+/* Alert 'Retry Or Delete' body message. Used in chat for sending failed messages again or delete them */
+"Chats.RetryOrDelete.Body" = "Попробовать отправить сообщение еще раз, или удалить его?";
 
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Сообщение уже отправлено";
@@ -250,11 +256,17 @@
 /* Chat: 'Name' field in actions menu */
 "ChatScene.Actions.NamePlaceholder" = "Имя";
 
+/* Chat: warning message for opening email link without mail app configurated on device */
+"ChatScene.Warning.NoMailApp" = "Не удалось открыть почтовое приложение. Проверьте настройки.";
+
+/* Chat: warning message for opening unsupported url schemes */
+"ChatScene.Warning.UnsupportedUrl" = "Не поддерживаемый пролокол ссылок.";
+
 /* Delegates page: scene title */
 "Delegates.Title" = "Делегаты";
 
 /* Delegates tab: Message about 50 ADM fee for vote */
-"Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Вам нужно иметь 50 ADM на счете вашего акаунта";
+"Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Нужно 50 ADM";
 
 /* Delegate details: scene title */
 "DelegateDetails.Title" = "Подробности";
@@ -269,13 +281,13 @@
 "DelegateDetails.Row.PublicKey" = "Публичный ключ";
 
 /* Delegate Details Screen: Rows title for 'Vote weight'" */
-"DelegateDetails.Row.VoteWeight" = "Вес голоса";
+"DelegateDetails.Row.VoteWeight" = "Вес голосов";
 
 /* Delegate Details Screen: Rows title for 'Produced blocks'" */
-"DelegateDetails.Row.ProducedBlocks" = "Обработано";
+"DelegateDetails.Row.ProducedBlocks" = "Обработано блоков";
 
 /* Delegate Details Screen: Rows title for 'Missed blocks'" */
-"DelegateDetails.Row.MissedBlocks" = "Пропущено";
+"DelegateDetails.Row.MissedBlocks" = "Пропущено блоков";
 
 /* Delegate Details Screen: Rows title for 'Rate'" */
 "DelegateDetails.Row.Rate" = "Позиция";
@@ -284,10 +296,10 @@
 "DelegateDetails.Row.Rank" = "Ранг";
 
 /* Delegate Details Screen: Rows title for 'Approval'" */
-"DelegateDetails.Row.Approval" = "Блоков";
+"DelegateDetails.Row.Approval" = "Доля голосов";
 
 /* Delegate Details Screen: Rows title for 'Productivity'" */
-"DelegateDetails.Row.Productivity" = "Аптайм";
+"DelegateDetails.Row.Productivity" = "Продуктивность";
 
 /* Delegate Details Screen: Rows title for 'Forging time'" */
 "DelegateDetails.Row.ForgingTime" = "Время форжинга";
@@ -311,13 +323,16 @@
 "Delegates.VotePanel.Total" = "Всего:";
 
 /* Shared error: Account not found error. Using %@ for address. */
-"Error.AccountNotFoundFormat" = "Аккаун не найден: %@";
+"Error.AccountNotFoundFormat" = "Аккаунт не найден: %@";
 
 /* Shared error: Internal error format, %@ for message */
 "Error.InternalErrorFormat" = "Внутренняя ошибка: %@";
 
+/* Shared error: Account not initiated */
+"Error.AccountNotInitiated" = "Аккаунт не инициализирован";
+
 /* Error messge title for support email */
-"Error.Mail.Title" = "У меня проблема с iOS-приложением";
+"Error.Mail.Title" = "Проблема с iOS-приложением";
 
 /* Error messge body for support email */
 "Error.Mail.Body" = "Здравствуйте,\n\nУ меня вот такая ошибка:\n\n%@\n\nУстройство:\n\n%@";
@@ -329,7 +344,7 @@
 "Error.NoNetwork" = "Нет соединения с сетью";
 
 /* Shared error: Remote error format, %@ for message */
-"Error.RemoteServerErrorFormat" = "Ошибка на узле блокчейна: %@. Сообщите об ошибке";
+"Error.RemoteServerErrorFormat" = "Ошибка на узле блокчейна: %@";
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "Не выполнен вход";
@@ -425,13 +440,13 @@
 "NodesList.AddNewNode" = "Добавить новую ноду";
 
 /* NodesList: Reset nodes alert title */
-"NodesList.ResetNodeListAlert" = "Сбросить список нод к списку по-умолчанию?";
+"NodesList.ResetNodeListAlert" = "Сбросить список нод к списку по умолчанию?";
 
 /* NodesList: 'Reset' button */
 "NodesList.ResetButton" = "Сбросить";
 
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
-"NodeList.DefaultNodesLoaded" = "Был загружен список нод по-умолчанию";
+"NodeList.DefaultNodesLoaded" = "Был загружен список нод по умолчанию";
 
 /* NodesEditor: New node scene title */
 "NodesEditor.NewNodeTitle" = "Новая нода";
@@ -464,7 +479,7 @@
 "NodesEditor.DeleteNodeButton" = "Удалить ноду";
 
 /* NodesEditor: Host row placeholder */
-"NodesEditor.HostRow.Placeholder" = "ip или имя хоста";
+"NodesEditor.HostRow.Placeholder" = "IP или имя хоста";
 
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Некорректный адрес хоста";
@@ -560,7 +575,7 @@
 "Shared.Cancel" = "Отмена";
 
 /* Shared alert notification: message about item copied to pasteboard. */
-"Shared.CopiedToPasteboard" = "Скопировано!";
+"Shared.CopiedToPasteboard" = "Скопировано";
 
 /* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
 "Shared.CopyToPasteboard" = "Копировать";
@@ -584,7 +599,7 @@
 "Shared.NoMail" = "Отправка почты недоступна";
 
 /* Shared alert 'Ok' button. Used anywhere */
-"Shared.Ok" = "Ок";
+"Shared.Ok" = "OK";
 
 /* Shared alert 'Save' button. Used anywhere */
 "Shared.Save" = "Сохранить";
@@ -689,7 +704,7 @@
 "TransactionDetailsScene.Section.Actions" = "Действия";
 
 /* Transaction details: 'Requesting Data' progress message. */
-"TransactionDetailsScene.RequestingData" = "Запрашиваем данные..";
+"TransactionDetailsScene.RequestingData" = "Запрашиваем данные…";
 
 /* Transaction details: 'Your address' flag. */
 "TransactionDetailsScene.YourAddress" = "Вы";
@@ -711,6 +726,12 @@
 
 /* Transfer: Amount is zero, or even negative notification */
 "TransferScene.Error.TooLittleMoney" = "Вам следует отправить больше токенов";
+
+/* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.title" = "Не удалось проверить адрес %@";
+
+/* Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.body" = "Аккаунт не найден или не инициализирован. Проверьте адрес получателя и подтвердите перевод";
 
 /* Transfer: recipient address placeholder */
 "TransferScene.Recipient.Placeholder" = "получателя";
@@ -773,10 +794,37 @@
 "WalletServices.SharedErrors.notEnoughMoney" = "Недостаточно средств";
 
 /* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
-"WalletServices.SharedErrors.WalletNotInitiated" = "Кошелёк ещё не создан";
+"WalletServices.SharedErrors.WalletNotInitiated" = "Кошелек получателя еще не инициирован";
 
 /* Wallet Services: Shared error, invalid amount format. %@ for amount */
 "WalletServices.SharedErrors.InvalidAmountFormat" = "Неверное количество для отправки: %@";
 
 /* Wallet Services: Shared error, transaction not found */
 "WalletServices.SharedErrors.TransactionNotFound" = "Транзакция не найдена";
+
+/* Welcome: Skip button */
+"WelcomeScene.Skip" = "пропустить";
+
+/* Welcome: Slide 1 Description */
+"WelcomeScene.Description.Slide1" = "Добро пожаловать в АДАМАНТ, настоящий мессенджер на <b>блокчейне</b>.";
+
+/* Welcome: Slide 2 Description */
+"WelcomeScene.Description.Slide2" = "АДАМАНТ — это <b>анонимность</b> и <b>защищенность</b> вашей переписки, а также передача криптовалют в чатах.<br/><br/><a href=\"https://medium.com/adamant-im/adamant-security-features-e7cc836ff52c\">Почему другие мессенджеры небезопасны?</a>";
+
+/* Welcome: Slide 3 Description */
+"WelcomeScene.Description.Slide3" = "Инфраструктура АДАМАНТа никому не принадлежит и <b>децентрализована</b>.<br/><br/>Для ее поддержания все сообщения в мессенджере оплачиваются токенами ADM. Новым аккаунтам — бесплатные токены для тестирования.";
+
+/* Welcome: Slide 4 Description */
+"WelcomeScene.Description.Slide4" = "<b>Для регистрации не требуется никаких данных.</b><br/>Создайте новый аккаунт в один клик и добавьте ваших собеседников.<br/><br/>Рекомендуем передавать друг другу адреса АДАМАНТа <b>лично</b> в целях полной безопасности.";
+
+/* Welcome: Slide 5 Description */
+"WelcomeScene.Description.Slide5" = "Исходный код проекта <a href=\"https://github.com/Adamant-im/\">полностью открыт</a>. Приложение в разработке, и новые функции добавляются постоянно.<br/><br/>Если вы разработчик — приглашаем вас принять участие.";
+
+/* Welcome: Last slide Begin button */
+"WelcomeScene.Description.BeginButton" = "Начать безопасное общение";
+
+/* Welcome: Next screen button */
+"WelcomeScene.Description.ContinueButton" = "Далее";
+
+/* Welcome: Skip button" */
+"WelcomeScene.Description.SkipButton" = "Пропустить";

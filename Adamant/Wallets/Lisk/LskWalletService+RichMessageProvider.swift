@@ -78,32 +78,32 @@ extension LskWalletService: RichMessageProvider {
                 vc.transaction = transaction
                 
             case .failure(let error):
-//                switch error {
-//                case .remoteServiceError:
-//                    let amount: Decimal
-//                    if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
-//                        amount = decimal
-//                    } else {
-//                        amount = 0
-//                    }
-//
-//                    let failedTransaction = SimpleTransactionDetails(txId: hash,
-//                                                                     senderAddress: transaction.senderAddress,
-//                                                                     recipientAddress: transaction.recipientAddress,
-//                                                                     dateValue: nil,
-//                                                                     amountValue: amount,
-//                                                                     feeValue: nil,
-//                                                                     confirmationsValue: nil,
-//                                                                     blockValue: nil,
-//                                                                     isOutgoing: transaction.isOutgoing,
-//                                                                     transactionStatus: TransactionStatus.failed)
-//
-//                    vc.transaction = failedTransaction
-//
-//                default:
-//                    self?.dialogService.showRichError(error: error)
-//                    return
-//                }
+                switch error {
+                case .internalError(let message, _) where message == "No transaction":
+                    let amount: Decimal
+                    if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
+                        amount = decimal
+                    } else {
+                        amount = 0
+                    }
+
+                    let failedTransaction = SimpleTransactionDetails(txId: hash,
+                                                                     senderAddress: transaction.senderAddress,
+                                                                     recipientAddress: transaction.recipientAddress,
+                                                                     dateValue: nil,
+                                                                     amountValue: amount,
+                                                                     feeValue: nil,
+                                                                     confirmationsValue: nil,
+                                                                     blockValue: nil,
+                                                                     isOutgoing: transaction.isOutgoing,
+                                                                     transactionStatus: TransactionStatus.failed)
+
+                    vc.transaction = failedTransaction
+
+                default:
+                    self?.dialogService.showRichError(error: error)
+                    return
+                }
                 break
             }
             

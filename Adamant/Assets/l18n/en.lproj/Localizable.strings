@@ -67,8 +67,11 @@
 /* About scene: Write to Adamant row */
 "About.Row.Adamant" = "ADAMANT";
 
+/* About scene: Show Welcome screens */
+"About.Row.Welcome" = "Welcome screens";
+
 /* System accounts: ADAMANT Tokens */
-"Accounts.AdamantTokens" = "ADAMANT Tokens";
+"Accounts.AdamantTokens" = "Welcome to ADAMANT";
 
 /* System accounts: ADAMANT iOS Support */
 "Accounts.iOSSupport" = "ADAMANT iOS Support";
@@ -107,7 +110,7 @@
 "AccountTab.Row.Balance" = "Balance";
 
 /* Account tab: 'Buy tokens' button */
-"AccountTab.Row.BuyTokens" = "Buy tokens";
+"AccountTab.Row.BuyTokens" = "Buy & Sell tokens";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Logout";
@@ -126,6 +129,9 @@
 
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendLsk" = "Send LSK";
+
+/* Account tab: Anonymously buy ADM tokens */
+"AccountTab.Row.AnonymouslyBuyADM" = "Buy ADM anonymously";
 
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Address";
@@ -164,7 +170,7 @@
 "ADAMANT" = "ADAMANT";
 
 /* AddressBookService: Not enought money to save address into blockchain */
-"AddressBookService.Error.notEnoughMoney" = "Not enought tokens to store data in Blockchain";
+"AddressBookService.Error.notEnoughMoney" = "Not enough tokens to store data in Blockchain";
 
 /* Application: Failed to send deviceToken to ANS error format. %@ for error description */
 "Application.deviceTokenErrorFormat" = "Failed to register in ANS: %@";
@@ -203,22 +209,22 @@
 "ChatsProvider.Validation.MessageTooLong" = "Message is too long";
 
 /* Known contacts: Adamant ICO message. Markdown supported. */
-"Chats.IcoMessage" = "Now you have a possibility to buy tokens of ADAMANT, the most secure and anonymous messenger, with the cheapest price.\n\nPlease make sure your have saved the passphrase for this account — exit your account and open it again. Better save your password on a sheet of paper also. But remember, only **you are responsible for the passphrase safety**. It cannot be recovered. And if other person will get it, your money will be stolen. Treat this question as secure, as if tokens in your wallet will cost a billion dollars some time.\n\nTo buy ADM tokens, go to Wallet tab and click Buy Tokens, or open the page https://adamant.im/buy-tokens/ in the web browser. In the form enter your ADAMANT address — you will receive ADM tokens there. If you moved from Messenger App, your ADM address will be filled already. Next, choose crypto you want to spend and its amount. You'll see how much ADM tokens you will receive, including volume bonus: 20–30 ETH: +20%, 30–50 ETH: +30%, 50–90 ETH: +40%, 90+ ETH: +50%. Click Buy ADAMANT tokens. You'll get unique address where you need to send crypto. As soon as your transaction will be confirmed, you'll receive ADM tokens. Transaction can be done **from any wallet or exchange**. It is not necessary to transfer exact amount including transaction fees, the payment will be processed anyway.\n\nAfter you receive ADM tokens, we recommend to keep them as long as possible. All of unsold tokens will be distributed among users' wallets, adding 5% monthly. Additional info is on Adamant.im website and in the Whitepaper.\n\nDo not reply to this message, it is a system account. If you still have any questions, contact account **U15677078342684640219**.";
+"Chats.IcoMessage" = "Null";
 
 /* Known contacts: Adamant pre ICO message */
 "Chats.PreIcoMessage" = "Null";
 
 /* Known contacts: Adamant welcome message. Markdown supported. */
-"Chats.WelcomeMessage" = "Welcome to ADAMANT, the most secure and anonymous messenger.\n\nRemember, your security and anonymity is up to you also. Do not follow links you receive, otherwise your IP can be compromised. Do not trust browser extensions. Better to share your ADM address personally, but not using other messengers. Keep your secret passphrase secure. Set a password on your device or logout before leaving.\n\nLearn more about security and anonymity at https://adamant.im/staysecured.\n\nAll the transactions within the blockchain do need to have their minimal fees. This is necessary to support the network infrastructure. To start messengning now, **get free tokens** — go to Wallet tab and click Free ADM tokens. Then click Start new chat on Chats tab and put your interlocutor's address. To copy your address, click on Account on Wallet tab.\n\nDo not reply to this message, it is a system account. If you still have any questions, contact account **U15677078342684640219**.";
+"Chats.WelcomeMessage" = "ADAMANT is a true Blockchain messenger, independent from governments, corporations and even developers. It is possible due to a decentralized network infrastructure, fully open source and run by users. That's why every action, including sending message or saving contact name, has its network fee of 0.001 ADM.\n\nBlockchain offers superior security and privacy, not available for typical P2P and centralized messengers. Also, Blockchain provides new possibilities. You can store and transfer cryptos In-Chat with full control of your private keys, use ADAMANT as 2FA and more.\n\nIn ADAMANT, nobody can control, block, deactivate, restrict or censor accounts. Users take full responsibility for content, messages, media, and goals and intentions of using the Messenger.\n\nRemember, your security and anonymity is up to you. Do not follow links you receive, otherwise your IP can be compromised. Set a password on your device. Learn more about security and anonymity at https://adamant.im/staysecured/.\n\nMake sure you've saved the passPhrase for this account — logout and login again. Write your passPhrase on a sheet of paper as well. Only **you are responsible for passPhrase safety**. It cannot be recovered. And if other person will get it, your tokens will be stolen and correspondence read. Treat this question with outmost importance, as if tokens in your wallet will cost a billion dollars some time.\n\nTo start messaging now, **get free welcome tokens** on Account tab. Then create new chat and put your friend's ADM address. It is recommended to share your ADM address personally, not using other messengers.";
 
 /* Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them */
 "Chats.RetryOrDelete.Title" = "Retry or delete?";
 
-/* Alert 'Retry Or Delete' body message. Used in caht for sending failed messages again or delete them */
-"Chats.RetryOrDelete.Body" = "Do you whant to send message again or delete it?";
+/* Alert 'Retry Or Delete' body message. Used in chat for sending failed messages again or delete them */
+"Chats.RetryOrDelete.Body" = "Try to send message again, or delete it?";
 
 /* Chat: inform user that he can't cancel transaction, that was sent */
-"ChatScene.Error.cancelError" = "Message already sent";
+"ChatScene.Error.cancelError" = "Message is already sent";
 
 /* Chat: message input placeholder */
 "ChatScene.NewMessage.Placeholder" = "New message";
@@ -250,11 +256,17 @@
 /* Chat: 'Name' field in actions menu */
 "ChatScene.Actions.NamePlaceholder" = "Name";
 
+/* Chat: warning message for opening email link without mail app configurated on device */
+"ChatScene.Warning.NoMailApp" = "Can't send email. Check Mail app configurations.";
+
+/* Chat: warning message for opening unsupported url schemes */
+"ChatScene.Warning.UnsupportedUrl" = "Unsupported url protocol";
+
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegates";
 
 /* Delegates tab: Message about 50 ADM fee for vote */
-"Delegates.NotEnoughtTokensForVote" = "Not enought tokens for vote. You need to have 50 ADM on your account balance";
+"Delegates.NotEnoughtTokensForVote" = "Not enought tokens to vote. You need 50 ADM";
 
 /* Delegate details: scene title */
 "DelegateDetails.Title" = "Details";
@@ -313,11 +325,14 @@
 /* Shared error: Account not found error. Using %@ for address. */
 "Error.AccountNotFoundFormat" = "Account not found: %@";
 
+/* Shared error: Account not initiated */
+"Error.AccountNotInitiated" = "Account not initiated";
+
 /* Shared error: Internal error format, %@ for message */
 "Error.InternalErrorFormat" = "Internal error: %@";
 
 /* Error messge title for support email */
-"Error.Mail.Title" = "I have error in my iOS app";
+"Error.Mail.Title" = "Error in iOS app";
 
 /* Error messge body for support email */
 "Error.Mail.Body" = "Hello,\n\nI have this error:\n\n%@\n\nMy device info:\n\n%@";
@@ -329,7 +344,7 @@
 "Error.NoNetwork" = "No connection";
 
 /* Shared error: Remote error format, %@ for message */
-"Error.RemoteServerErrorFormat" = "Blockchain Node error: %@";
+"Error.RemoteServerErrorFormat" = "Blockchain node error: %@";
 
 /* Shared error: User not logged */
 "Error.UserNotLogged" = "User is not logged in";
@@ -425,13 +440,13 @@
 "NodesList.AddNewNode" = "Add new node";
 
 /* NodesList: Reset nodes alert title */
-"NodesList.ResetNodeListAlert" = "Reset node list to default?";
+"NodesList.ResetNodeListAlert" = "Reset nodes list to default?";
 
 /* NodesList: 'Reset' button */
 "NodesList.ResetButton" = "Reset";
 
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
-"NodeList.DefaultNodesLoaded" = "Default node list was loaded";
+"NodeList.DefaultNodesLoaded" = "Default nodes list was loaded";
 
 /* NodesEditor: New node scene title */
 "NodesEditor.NewNodeTitle" = "New node";
@@ -464,7 +479,7 @@
 "NodesEditor.DeleteNodeButton" = "Delete";
 
 /* NodesEditor: Host row placeholder */
-"NodesEditor.HostRow.Placeholder" = "ip or host name";
+"NodesEditor.HostRow.Placeholder" = "IP or host name";
 
 /* NodesEditor: Failed to build URL alert */
 "NodesEditor.FailedToBuildURL" = "Invalid host";
@@ -497,13 +512,13 @@
 "NotificationsService.NewMessage.Title" = "New Message";
 
 /* Notifications: New single message notification body */
-"NotificationsService.NewMessage.BodySingle" = "You have new message";
+"NotificationsService.NewMessage.BodySingle" = "You have a new message";
 
 /* Notifications: New transfer transaction title */
 "NotificationsService.NewTransfer.Title" = "New Transfer";
 
 /* Notifications: New single transfer transaction body */
-"NotificationsService.NewTransfer.BodySingle" = "You have new transfer";
+"NotificationsService.NewTransfer.BodySingle" = "You have a new transfer";
 
 /* Notifications: User has disabled notifications. Head him into settings */
 "NotificationsService.NotificationsDisabled" = "Notifications disabled. You can enable notifications in Settings";
@@ -560,7 +575,7 @@
 "Shared.Cancel" = "Cancel";
 
 /* Shared alert notification: message about item copied to pasteboard. */
-"Shared.CopiedToPasteboard" = "Copied to Pasteboard!";
+"Shared.CopiedToPasteboard" = "Copied to Pasteboard";
 
 /* Shared alert 'Copy' button. Used anywhere. Used for copy-paste info. */
 "Shared.CopyToPasteboard" = "Copy to Pasteboard";
@@ -584,7 +599,7 @@
 "Shared.NoMail" = "Mail services are not available";
 
 /* Shared alert 'Ok' button. Used anywhere */
-"Shared.Ok" = "Ok";
+"Shared.Ok" = "OK";
 
 /* Shared alert 'Save' button. Used anywhere */
 "Shared.Save" = "Save";
@@ -689,13 +704,13 @@
 "TransactionDetailsScene.Section.Actions" = "Actions";
 
 /* Transaction details: 'Requesting Data' progress message. */
-"TransactionDetailsScene.RequestingData" = "Requesting Data..";
+"TransactionDetailsScene.RequestingData" = "Requesting Data…";
 
 /* Transaction details: 'Your address' flag. */
 "TransactionDetailsScene.YourAddress" = "You";
 
 /* TransfersProvider: Transaction not found error. %@ for transaction's ID */
-"TransfersProvider.Error.TransactionNotFoundFormat" = "Transaction with id %@ not found";
+"TransfersProvider.Error.TransactionNotFoundFormat" = "Transaction with ID %@ not found";
 
 /* Transfer: transfer amount placeholder */
 "TransferScene.Amount.Placeholder" = "to send";
@@ -711,6 +726,12 @@
 
 /* Transfer: Amount is zero, or even negative notification */
 "TransferScene.Error.TooLittleMoney" = "You should send more tokens";
+
+/* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.title" = "Can't verify %@";
+
+/* Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.body" = "Account not found, or not initiated. Double check recipient address and confirm transaction";
 
 /* Transfer: recipient address placeholder */
 "TransferScene.Recipient.Placeholder" = "of the recipient";
@@ -755,7 +776,7 @@
 "TransferScene.Send" = "Send";
 
 /* Transfer: Confirm transfer alert: 'Can't Undo' message */
-"TransferScene.CantUndo" = "You can't undo this action";
+"TransferScene.CantUndo" = "You'll unable to undo this action";
 
 /* Tranfser: Confirm using maximum available for transfer tokens as amount to transfer. */
 "TransferScene.UseMaxToTransfer" = "Use all available tokens as amount to transfer?";
@@ -770,13 +791,40 @@
 "TransferScene.TransferSuccessMessage" = "Done!";
 
 /* Wallet Services: Shared error, user do not have enought money. */
-"WalletServices.SharedErrors.notEnoughMoney" = "Not enought money";
+"WalletServices.SharedErrors.notEnoughMoney" = "Not enough tokens";
 
 /* Wallet Services: Shared error, user has not yet initiated a specific wallet. */
-"WalletServices.SharedErrors.WalletNotInitiated" = "Wallet not yet initiated";
+"WalletServices.SharedErrors.WalletNotInitiated" = "Recepient's wallet is not initiated yet";
 
 /* Wallet Services: Shared error, invalid amount format. %@ for amount */
 "WalletServices.SharedErrors.InvalidAmountFormat" = "Invalid amount to send: %@";
 
 /* Wallet Services: Shared error, transaction not found */
 "WalletServices.SharedErrors.TransactionNotFound" = "Transaction not found";
+
+/* Welcome: Skip button */
+"WelcomeScene.Skip" = "skip";
+
+/* Welcome: Slide 1 Description */
+"WelcomeScene.Description.Slide1" = "Welcome to ADAMANT, the genuine <b>blockchain</b> messenger.";
+
+/* Welcome: Slide 2 Description */
+"WelcomeScene.Description.Slide2" = "ADAMANT is <b>anonymity</b> and <b>security</b> of your messaging as well as in-chat cryptocurrency transferring tool.<br/><br/><a href=\"https://medium.com/adamant-im/adamant-security-features-e7cc836ff52c\">Why are other messengers not secure?</a>";
+
+/* Welcome: Slide 3 Description */
+"WelcomeScene.Description.Slide3" = "ADAMANT infrastracture doesn't belong to anyone and is <b>decentralized</b>.<br/><br/>It is maintained by messages paid in ADM tokens. New accounts may receive free tokens for testing purposes.";
+
+/* Welcome: Slide 4 Description */
+"WelcomeScene.Description.Slide4" = "Create an account in a single click <b>without any requirements</b> (no email/phone/anything) and invite your friends.<br/><br/>Share your ADAMANT addresses <b>in-person</b> for true security.";
+
+/* Welcome: Slide 5 Description */
+"WelcomeScene.Description.Slide5" = "The project's source code is <a href=\"https://github.com/Adamant-im/\">completely open</a>. The app is in development and we constantly add new features.<br/><br/>If you are a developer — join our team.";
+
+/* WelcomeScene.Description.BeginButton */
+"WelcomeScene.Description.BeginButton" = "Start secure messaging";
+
+/* Welcome: Next screen button */
+"WelcomeScene.Description.ContinueButton" = "Continue";
+
+/* Welcome: Skip button */
+"WelcomeScene.Description.SkipButton" = "Skip";
