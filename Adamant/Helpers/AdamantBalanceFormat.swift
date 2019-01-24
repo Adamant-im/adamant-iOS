@@ -112,6 +112,22 @@ enum AdamantBalanceFormat {
         f.maximumFractionDigits = 12 // 18 is too low, 0.007 for example will serialize as 0.007000000000000001
         return f
     }()
+    
+    static func deserializeBalance(from string: String) -> Decimal? {
+        // NumberFormatter.number(from: string).decimalValue loses precision.
+        
+        if let number = Decimal(string: string), number != 0.0 {
+            return number
+        } else if let number = Decimal(string: string, locale: Locale.current), number != 0.0 {
+            return number
+        } else if let number = AdamantBalanceFormat.rawNumberDotFormatter.number(from: string) {
+            return number.decimalValue
+        } else if let number = AdamantBalanceFormat.rawNumberCommaFormatter.number(from: string) {
+            return number.decimalValue
+        } else {
+            return nil
+        }
+    }
 }
 
 

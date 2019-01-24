@@ -120,10 +120,8 @@ extension RichMessageTransfer {
         self.comments = try container.decode(String.self, forKey: .comments)
         
         if let raw = try? container.decode(String.self, forKey: .amount) {
-            if let number = AdamantBalanceFormat.rawNumberDotFormatter.number(from: raw) {
-                self.amount = number.decimalValue
-            } else if let number = AdamantBalanceFormat.rawNumberCommaFormatter.number(from: raw) {
-                self.amount = number.decimalValue
+            if let balance = AdamantBalanceFormat.deserializeBalance(from: raw) {
+                self.amount = balance
             } else {
                 self.amount = 0
             }
