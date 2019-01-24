@@ -730,13 +730,7 @@ private class StatusUpdateProcedure: Procedure {
             return
         }
         
-        guard let txHash = transaction.richContent?[RichContentKeys.transfer.hash] else {
-            transaction.transactionStatus = .failed
-            try? privateContext.save()
-            return
-        }
-        
-        provider.statusForTransactionBy(hash: txHash, date: transaction.dateValue) { result in
+        provider.statusFor(transaction: transaction) { result in
             switch result {
             case .success(let status):
                 transaction.transactionStatus = status

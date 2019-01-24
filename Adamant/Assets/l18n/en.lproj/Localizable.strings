@@ -244,6 +244,9 @@
 /* Chat: status message for pending chat transaction */
 "ChatScene.MessageStatus.Pending" = "Pending";
 
+/* Chat: status message for warning chat transaction */
+"ChatScene.MessageStatus.Warning" = "Warning";
+
 /* Chat: Body for actions menu */
 "ChatScene.Actions.Body" = "New name for %@";
 
