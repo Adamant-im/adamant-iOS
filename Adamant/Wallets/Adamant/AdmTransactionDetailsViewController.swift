@@ -50,9 +50,9 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
                 cell.selectionStyle = .gray
             }.cellUpdate { (cell, _) in
                 cell.accessoryType = .disclosureIndicator
-                cell.textLabel?.style = "primaryText"
-                cell.detailTextLabel?.style = "primaryText"
-                cell.style = "secondaryBackground"
+                cell.textLabel?.setStyle(.primaryText)
+                cell.detailTextLabel?.setStyle(.primaryText)
+                cell.setStyle(.secondaryBackground)
             }.onCellSelection { [weak self] (_, _) in
                 self?.goToChat()
             }

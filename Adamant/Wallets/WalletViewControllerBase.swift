@@ -74,7 +74,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         let section = Section()
 
         tableView.styles = ["baseTable"]
-        walletTitleLabel.style = "secondaryText"
+        walletTitleLabel.setStyle(.secondaryText)
 		
 		// MARK: Address
 		let addressRow = LabelRow() {
@@ -87,9 +87,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-            cell.textLabel?.style = "primaryText"
-            cell.style = "baseTableCell,secondaryBackground,primaryTint"
-            cell.detailTextLabel?.style = "secondaryText"
+            cell.textLabel?.setStyle(.primaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
+            cell.detailTextLabel?.setStyle(.secondaryText)
         }.onCellSelection { [weak self] (cell, row) in
             row.deselect()
 			let completion = { [weak self] in
@@ -150,9 +150,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			balanceRow.cell.selectionStyle = .gray
 			balanceRow.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
-                cell.textLabel?.style = "primaryText"
-                cell.style = "baseTableCell,secondaryBackground,primaryTint"
-                cell.detailTextLabel?.style = "secondaryText"
+                cell.textLabel?.setStyle(.primaryText)
+                cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
+                cell.detailTextLabel?.setStyle(.secondaryText)
             }.onCellSelection { [weak self] (_, row) in
                 row.deselect()
                 guard let service = self?.service as? WalletServiceWithTransfers else {
@@ -181,8 +181,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 				$0.cell.selectionStyle = .gray
 			}.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
-                cell.textLabel?.style = "primaryText"
-                cell.style = "baseTableCell,secondaryBackground"
+                cell.textLabel?.setStyle(.primaryText)
+                cell.style = AdamantThemeStyle.commonTableViewCell
 			}.onCellSelection { [weak self] (_, row) in
                 row.deselect()
 				guard let service = self?.service as? WalletServiceWithSend else {

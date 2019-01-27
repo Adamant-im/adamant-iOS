@@ -78,7 +78,7 @@ extension PinpadViewController {
 		pinpad.cancelButton.setTitle(String.adamantLocalized.alert.cancel, for: .normal)
 		pinpad.pinDigits = 6
         
-        pinpad.style = "pinpad"
+        pinpad.setStyle(.pinpad)
 		
 		return pinpad
 	}

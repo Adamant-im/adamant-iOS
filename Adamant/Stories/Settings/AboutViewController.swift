@@ -132,8 +132,8 @@ class AboutViewController: FormViewController {
 		navigationItem.title = String.adamantLocalized.about.title
         
         self.tableView.styles = ["baseTable"]
-        navigationController?.navigationBar.style = "baseNavigationBar"
-        view.style = "primaryBackground,primaryTint"
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
 		
 		// MARK: Header & Footer
 		if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
@@ -142,7 +142,7 @@ class AboutViewController: FormViewController {
 			if let label = header.viewWithTag(888) as? UILabel {
 				label.text = String.adamantLocalized.shared.productName
 				label.textColor = UIColor.adamant.primary
-                label.style = "primaryText"
+                label.setStyle(.primaryText)
 			}
 		}
 		
@@ -150,7 +150,7 @@ class AboutViewController: FormViewController {
 			if let label = footer.viewWithTag(555) as? UILabel {
 				label.text = AdamantUtilities.applicationVersion
 				label.textColor = UIColor.adamant.primary
-                label.style = "primaryText"
+                label.setStyle(.primaryText)
 				tableView.tableFooterView = footer
 			}
 		}
@@ -204,9 +204,9 @@ class AboutViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-            cell.style = "secondaryBackground,primaryTint"
-            cell.textLabel?.style = "primaryText"
-            cell.imageView?.style = "primaryTint"
+            cell.setStyles([.secondaryBackground, .primaryTint])
+            cell.textLabel?.setStyle(.primaryText)
+            cell.imageView?.setStyle(.primaryTint)
 		}.onCellSelection { [weak self] (_, _) in
 			guard let accountsProvider = self?.accountsProvider, let router = self?.router else {
 				return
@@ -258,10 +258,10 @@ class AboutViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-            cell.style = "secondaryBackground,primaryTint"
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "primaryText"
-            cell.imageView?.style = "primaryTint"
+            cell.setStyles([.secondaryBackground, .primaryTint])
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
+            cell.imageView?.setStyle(.primaryTint)
 		}.onCellSelection { [weak self] (_, _) in
 			let mailVC = MFMailComposeViewController()
 			mailVC.mailComposeDelegate = self
@@ -337,10 +337,10 @@ extension AboutViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-            cell.style = "secondaryBackground,primaryTint"
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "primaryText"
-            cell.imageView?.style = "primaryTint"
+            cell.setStyles([.secondaryBackground, .primaryTint])
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
+            cell.imageView?.setStyle(.primaryTint)
 		}.onCellSelection { [weak self] (_, _) in
 			guard let url = URL(string: urlRaw) else {
 				fatalError("Failed to build page url: \(urlRaw)")

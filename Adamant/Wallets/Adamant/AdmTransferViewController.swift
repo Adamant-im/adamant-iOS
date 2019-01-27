@@ -124,7 +124,7 @@ class AdmTransferViewController: TransferViewControllerBase {
 			let prefix = UILabel()
 			prefix.text = "U"
 			prefix.sizeToFit()
-            prefix.style = "primaryText"
+            prefix.setStyle(.primaryText)
 			let view = UIView()
 			view.addSubview(prefix)
 			view.frame = prefix.frame
@@ -139,8 +139,8 @@ class AdmTransferViewController: TransferViewControllerBase {
 			if let text = cell.textField.text {
                 cell.textField.text = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
 			}
-            cell.textField?.style = "input"
-            cell.style = "secondaryBackground"
+            cell.textField?.setStyle(.input)
+            cell.setStyle(.secondaryBackground)
 		}.onChange { [weak self] row in
 			if let skip = self?.skipValueChange, skip {
 				self?.skipValueChange = false

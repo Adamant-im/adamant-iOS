@@ -125,9 +125,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
         super.viewDidLoad()
         
         tableView.styles = ["baseTable"]
-        navigationController?.navigationBar.style = "baseNavigationBar"
-        tabBarController?.tabBar.style = "baseBarTint"
-        view.style = "primaryBackground,primaryTint"
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        tabBarController?.tabBar.setStyle(.baseBarTint)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
         
         if #available(iOS 11.0, *) {
             navigationItem.largeTitleDisplayMode = .never // some glitches, again
@@ -161,9 +161,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "primaryText"
-            cell.style = "baseTableCell,secondaryBackground"
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground])
             
             if let value = self?.transaction?.txId {
                 row.value = value
@@ -215,10 +215,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
             self?.shareValue(text, from: cell)
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
-            cell.titleLabel?.style = "primaryText"
-            cell.detailsLabel?.style = "primaryText"
-            cell.secondDetailsLabel?.style = "secondaryText"
-            cell.style = "baseTableCell,secondaryBackground"
+            cell.titleLabel?.setStyle(.primaryText)
+            cell.detailsLabel?.setStyle(.primaryText)
+            cell.secondDetailsLabel?.setStyle(.secondaryText)
+            cell.style = AdamantThemeStyle.commonTableViewCell
             
             if let transaction = self?.transaction {
                 if transaction.senderAddress.count == 0 {
@@ -274,10 +274,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
             self?.shareValue(text, from: cell)
         }.cellUpdate { (cell, _) in
             cell.textLabel?.textColor = .black
-            cell.titleLabel?.style = "primaryText"
-            cell.detailsLabel?.style = "primaryText"
-            cell.secondDetailsLabel?.style = "secondaryText"
-            cell.style = "baseTableCell,secondaryBackground"
+            cell.titleLabel?.setStyle(.primaryText)
+            cell.detailsLabel?.setStyle(.primaryText)
+            cell.secondDetailsLabel?.setStyle(.secondaryText)
+            cell.style = AdamantThemeStyle.commonTableViewCell
         }
         
         detailsSection.append(recipientRow)
@@ -302,9 +302,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "primaryText"
-            cell.style = "baseTableCell,secondaryBackground"
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground])
             row.value = self?.transaction?.dateValue
         }
             
@@ -326,9 +326,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
-            cell.textLabel?.style = "primaryText"
-            cell.textField?.style = "primaryText"
-            cell.style = "baseTableCell,secondaryBackground"
+            cell.textLabel?.setStyle(.primaryText)
+            cell.textField?.setStyle(.primaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground])
             row.value = self?.transaction?.amountValue.doubleValue
         }
             
@@ -353,9 +353,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
-            cell.textLabel?.style = "primaryText"
-//            cell.textField?.style = "primaryText"
-            cell.style = "baseTableCell,secondaryBackground"
+            cell.textLabel?.setStyle(.primaryText)
+//            cell.textField?.setStyle(.primaryText)
+            cell.style = AdamantThemeStyle.commonTableViewCell
             
             if let value = self?.transaction?.feeValue, let formatter = self?.currencyFormatter {
                 row.value = formatter.string(fromDecimal: value)
@@ -385,9 +385,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "primaryText"
-            cell.style = "baseTableCell,secondaryBackground"
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
+            cell.style = AdamantThemeStyle.commonTableViewCell
             
             if let value = self?.transaction?.confirmationsValue, value != "0" {
                 row.value = value
@@ -417,9 +417,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "primaryText"
-            cell.style = "baseTableCell,secondaryBackground"
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
+            cell.style = AdamantThemeStyle.commonTableViewCell
             
             if let value = self?.transaction?.blockValue {
                 row.value = value
@@ -447,9 +447,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "primaryText"
-            cell.style = "baseTableCell,secondaryBackground"
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground])
             row.value = self?.transaction?.transactionStatus?.localized
         }
         
@@ -471,9 +471,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 cell.selectionStyle = .gray
             }.cellUpdate { (cell, _) in
                 cell.textLabel?.textColor = .black
-                cell.textLabel?.style = "primaryText"
-                cell.detailTextLabel?.style = "primaryText"
-                cell.style = "baseTableCell,secondaryBackground"
+                cell.textLabel?.setStyle(.primaryText)
+                cell.detailTextLabel?.setStyle(.primaryText)
+                cell.style = AdamantThemeStyle.commonTableViewCell
                 cell.textView.isSelectable = false
                 cell.textView.isEditable = false
             }.onCellSelection { [weak self] (cell, row) in
@@ -512,9 +512,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "primaryText"
-            cell.style = "baseTableCell,secondaryBackground"
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
+            cell.style = AdamantThemeStyle.commonTableViewCell
         }.onCellSelection { [weak self] (_, _) in
             guard let transaction = self?.transaction, let url = self?.explorerUrl(for: transaction) else {
                 return

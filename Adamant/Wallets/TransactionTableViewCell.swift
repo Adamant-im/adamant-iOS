@@ -66,10 +66,10 @@ class TransactionTableViewCell: UITableViewCell {
 	
 	override func awakeFromNib() {
 		transactionType = .income
-        self.style = "baseTableCell"
-        accountLabel.style = "primaryText"
-        addressLabel.style = "secondaryText"
-        ammountLabel.style = "primaryText"
-        dateLabel.style = "secondaryText"
+        self.setStyle(.baseTableViewCell)
+        accountLabel.setStyle(.primaryText)
+        addressLabel.setStyle(.secondaryText)
+        ammountLabel.setStyle(.primaryText)
+        dateLabel.setStyle(.secondaryText)
 	}
 }

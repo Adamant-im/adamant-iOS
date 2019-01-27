@@ -173,9 +173,9 @@ class ChatViewController: MessagesViewController {
             navigationItem.largeTitleDisplayMode = .never
 		}
         
-        navigationController?.navigationBar.style = "baseNavigationBar"
-        tabBarController?.tabBar.style = "baseBarTint"
-        view.style = "primaryBackground,primaryTint"
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        tabBarController?.tabBar.setStyle(.baseBarTint)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
         
         self.observeThemeChange()
 		
@@ -284,10 +284,10 @@ class ChatViewController: MessagesViewController {
 		}
 		
 		// MARK: 3. Readonly chat
-        messageInputBar.backgroundView.style = "secondaryBackground,secondaryBorder"
-        messageInputBar.inputTextView.style = "secondaryBorder,input"
-        messageInputBar.sendButton.style = "secondaryBackground,primaryTint,secondaryBorder"
-        attachmentButton.style = "primaryTint"
+        messageInputBar.backgroundView.setStyles([.secondaryBackground, .secondaryBorder])
+        messageInputBar.inputTextView.setStyles([.secondaryBorder, .input])
+        messageInputBar.sendButton.setStyles([.secondaryBackground, .primaryTint, .secondaryBorder])
+        attachmentButton.setStyle(.primaryTint)
 		
 		if chatroom.isReadonly {
 			messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
@@ -354,8 +354,8 @@ class ChatViewController: MessagesViewController {
             }
         }
         
-        self.view.style = "primaryBackground"
-        self.messagesCollectionView.style = "primaryBackground"
+        self.view.setStyle(.primaryBackground)
+        self.messagesCollectionView.setStyle(.primaryBackground)
 	}
 	
 	override func viewDidAppear(_ animated: Bool) {

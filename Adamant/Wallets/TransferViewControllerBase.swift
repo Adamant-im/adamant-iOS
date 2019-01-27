@@ -241,9 +241,9 @@ class TransferViewControllerBase: FormViewController {
 		
 		// MARK: UI
         tableView.styles = ["baseTable"]
-        navigationController?.navigationBar.style = "baseNavigationBar"
-        tabBarController?.tabBar.style = "baseBarTint"
-        view.style = "primaryBackground,primaryTint"
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        tabBarController?.tabBar.setStyle(.baseBarTint)
+        view.setStyles([.primaryBackground, .primaryTint])
         navigationItem.title = defaultSceneTitle()
 		
 		// MARK: Sections
@@ -275,8 +275,8 @@ class TransferViewControllerBase: FormViewController {
 		}.onCellSelection { [weak self] (cell, row) in
 			self?.confirmSendFunds()
         }.cellUpdate { (cell, _) in
-            cell.textLabel?.style = "primaryText"
-            cell.style = "secondaryBackground"
+            cell.textLabel?.setStyle(.primaryText)
+            cell.setStyle(.secondaryBackground)
         }
     }
 	
@@ -289,7 +289,7 @@ class TransferViewControllerBase: FormViewController {
             var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
             header.title = Sections.wallet.localized
             header.onSetupView = {view, _ in
-                view.textLabel?.style = "secondaryText"
+                view.textLabel?.setStyle(.secondaryText)
             }
             header.height = { 50 }
             $0.header = header
@@ -308,7 +308,7 @@ class TransferViewControllerBase: FormViewController {
             var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
             header.title = Sections.recipient.localized
             header.onSetupView = {view, _ in
-                view.textLabel?.style = "secondaryText"
+                view.textLabel?.setStyle(.secondaryText)
             }
             header.height = { 50 }
             $0.header = header
@@ -344,7 +344,7 @@ class TransferViewControllerBase: FormViewController {
             var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
             header.title = Sections.transferInfo.localized
             header.onSetupView = {view, _ in
-                view.textLabel?.style = "secondaryText"
+                view.textLabel?.setStyle(.secondaryText)
             }
             header.height = { 50 }
             $0.header = header
@@ -596,9 +596,9 @@ extension TransferViewControllerBase {
 					$0.value = 0
 				}
             }.cellUpdate({ (cell, _) in
-                cell.textLabel?.style = "primaryText"
-                cell.textField?.style = "primaryText"
-                cell.style = "secondaryBackground"
+                cell.textLabel?.setStyle(.primaryText)
+                cell.textField?.setStyle(.primaryText)
+                cell.setStyle(.secondaryBackground)
             })
 			
         case .name:
@@ -630,9 +630,9 @@ extension TransferViewControllerBase {
 					$0.value = maxToTransfer.doubleValue
 				}
             }.cellUpdate({ (cell, _) in
-                cell.textLabel?.style = "primaryText"
-                cell.textField?.style = "primaryText"
-                cell.style = "secondaryBackground"
+                cell.textLabel?.setStyle(.primaryText)
+                cell.textField?.setStyle(.primaryText)
+                cell.setStyle(.secondaryBackground)
             }).onCellSelection { [weak self] (cell, row) in
                 guard let value = row.value, value > 0, let presenter = self else {
                     row.deselect(animated: true)
@@ -674,9 +674,9 @@ extension TransferViewControllerBase {
 			}.onChange { [weak self] (row) in
 				self?.validateForm()
             }.cellUpdate({ (cell, _) in
-                cell.textLabel?.style = "primaryText"
-                cell.textField?.style = "input"
-                cell.style = "secondaryBackground"
+                cell.textLabel?.setStyle(.primaryText)
+                cell.textField?.setStyle(.input)
+                cell.setStyle(.secondaryBackground)
             })
 		
 		case .fee:
@@ -692,9 +692,9 @@ extension TransferViewControllerBase {
 					$0.value = 0
 				}
             }.cellUpdate({ (cell, _) in
-                cell.textLabel?.style = "primaryText"
-                cell.textField?.style = "primaryText"
-                cell.style = "secondaryBackground"
+                cell.textLabel?.setStyle(.primaryText)
+                cell.textField?.setStyle(.primaryText)
+                cell.setStyle(.secondaryBackground)
             })
 			
 		case .total:
@@ -709,9 +709,9 @@ extension TransferViewControllerBase {
 					$0.add(rule: RuleSmallerOrEqualThan<Double>(max: balance.doubleValue))
 				}
             }.cellUpdate({ (cell, _) in
-                cell.textLabel?.style = "primaryText"
-                cell.textField?.style = "primaryText"
-                cell.style = "secondaryBackground"
+                cell.textLabel?.setStyle(.primaryText)
+                cell.textField?.setStyle(.primaryText)
+                cell.setStyle(.secondaryBackground)
             })
 		
 		case .comments:
@@ -739,8 +739,8 @@ extension TransferViewControllerBase {
 			}.onCellSelection { [weak self] (cell, row) in
 				self?.confirmSendFunds()
             }.cellUpdate({ (cell, _) in
-                cell.textLabel?.style = "primaryText"
-                cell.style = "baseTableCell,secondaryBackground"
+                cell.textLabel?.setStyle(.primaryText)
+                cell.style = AdamantThemeStyle.commonTableViewCell
             })
 		}
 	}

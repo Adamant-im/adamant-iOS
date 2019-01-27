@@ -89,8 +89,8 @@ class NodesListViewController: FormViewController {
         }
         
         self.tableView.styles = ["baseTable"]
-        navigationController?.navigationBar.style = "baseNavigationBar"
-        view.style = "primaryBackground,primaryTint"
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.setStyles([.primaryBackground, .primaryTint])
 		
         if splitViewController == nil, navigationController?.viewControllers.count == 1 {
             let done = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(NodesListViewController.close))
@@ -124,8 +124,8 @@ class NodesListViewController: FormViewController {
 		}.onCellSelection { [weak self] (_, _) in
 			self?.createNewNode()
 		}.cellUpdate { (cell, _) in
-            cell.style = "baseTableCell,secondaryBackground"
-            cell.textLabel?.style = "primaryText"
+            cell.style = AdamantThemeStyle.commonTableViewCell
+            cell.textLabel?.setStyle(.primaryText)
 		}
 			
 			
@@ -140,8 +140,8 @@ class NodesListViewController: FormViewController {
 		}.onCellSelection { [weak self] (_, _) in
 			self?.resetToDefault()
 		}.cellUpdate { (cell, _) in
-            cell.style = "baseTableCell,secondaryBackground"
-            cell.textLabel?.style = "primaryText"
+            cell.style = AdamantThemeStyle.commonTableViewCell
+            cell.textLabel?.setStyle(.primaryText)
 		}
     }
 	
@@ -353,8 +353,8 @@ extension NodesListViewController {
 			}
 			
 			cell.accessoryType = .disclosureIndicator
-            cell.style = "baseTableCell,secondaryBackground"
-            cell.textLabel?.style = "primaryText"
+            cell.setStyles([.baseTableViewCell, .secondaryBackground])
+            cell.textLabel?.setStyle(.primaryText)
 		}).onCellSelection { [weak self] (_, row) in
 			guard let node = row.value, let tag = row.tag else {
 				return

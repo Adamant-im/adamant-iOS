@@ -92,11 +92,11 @@ class ShareQrViewController: FormViewController {
 			$0.value = qrCode
 			$0.tag = Rows.qr.tag
 			$0.cell.selectionStyle = .none
-            $0.cell.style = "secondaryBackground"
+            $0.cell.setStyle(.secondaryBackground)
 			
 			if let sharingTip = sharingTip {
 				$0.cell.tipLabel.text = sharingTip
-                $0.cell.tipLabel.style = "primaryText"
+                $0.cell.tipLabel.setStyle(.primaryText)
 			} else {
 				$0.cell.tipLabelIsHidden = true
 			}
@@ -132,8 +132,8 @@ class ShareQrViewController: FormViewController {
 			}
 		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.style = "baseTableCell,secondaryBackground"
-            cell.textLabel?.style = "primaryText"
+            cell.setStyles([.baseTableViewCell, .secondaryBackground])
+            cell.textLabel?.setStyle(.primaryText)
 		}
 			
 		// Share
@@ -169,8 +169,8 @@ class ShareQrViewController: FormViewController {
 			self?.present(vc, animated: true, completion: nil)
 		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.style = "baseTableCell,secondaryBackground"
-            cell.textLabel?.style = "primaryText"
+            cell.setStyles([.baseTableViewCell, .secondaryBackground])
+            cell.textLabel?.setStyle(.primaryText)
 		}
 		
 		let cancelRow = ButtonRow() {
@@ -180,8 +180,8 @@ class ShareQrViewController: FormViewController {
 			self?.close()
 		}.cellUpdate { (cell, row) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.style = "baseTableCell,secondaryBackground"
-            cell.textLabel?.style = "primaryText"
+            cell.setStyles([.baseTableViewCell, .secondaryBackground])
+            cell.textLabel?.setStyle(.primaryText)
 		}
         
         buttonsSection.append(contentsOf: [photolibraryRow, shareRow, cancelRow])

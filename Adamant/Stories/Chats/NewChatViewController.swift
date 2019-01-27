@@ -102,8 +102,8 @@ class NewChatViewController: FormViewController {
 		tableView.keyboardDismissMode = .none
         
         tableView.styles = ["baseTable"]
-        navigationController?.navigationBar.style = "baseNavigationBar"
-        view.style = "primaryBackground,primaryTint"
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
 		
 		navigationItem.title = String.adamantLocalized.newChat.title
 		let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
@@ -143,7 +143,7 @@ class NewChatViewController: FormViewController {
 			let prefix = UILabel()
 			prefix.text = "U"
 			prefix.sizeToFit()
-            prefix.style = "primaryText"
+            prefix.setStyle(.primaryText)
 			let view = UIView()
 			view.addSubview(prefix)
 			view.frame = prefix.frame
@@ -153,8 +153,8 @@ class NewChatViewController: FormViewController {
 			if let text = cell.textField.text {
 				cell.textField.text = text.components(separatedBy: NewChatViewController.invalidCharacters).joined()
 			}
-            cell.textField?.style = "input"
-            cell.style = "secondaryBackground"
+            cell.textField?.setStyle(.input)
+            cell.setStyle(.secondaryBackground)
 		}.onChange { [weak self] row in
 			if let skip = self?.skipValueChange, skip {
 				self?.skipValueChange = false
@@ -196,8 +196,8 @@ class NewChatViewController: FormViewController {
 				$0.title = Rows.myQr.localized
 			}.cellUpdate { (cell, _) in
 				cell.textLabel?.textColor = UIColor.adamant.primary
-                cell.style = "baseTableCell,secondaryBackground"
-                cell.textLabel?.style = "primaryText"
+                cell.style = AdamantThemeStyle.commonTableViewCell
+                cell.textLabel?.setStyle(.primaryText)
 			}.onCellSelection { [weak self] (cell, row) in
 				let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
 				switch AdamantQRTools.generateQrFrom(string: encodedAddress, withLogo: true) {
@@ -381,8 +381,8 @@ extension NewChatViewController {
 			picker.delegate = self
 			picker.allowsEditing = false
 			picker.sourceType = .photoLibrary
-            picker.navigationBar.style = "baseNavigationBar"
-            picker.view.style = "primaryBackground,primaryTint"
+            picker.navigationBar.setStyle(.baseNavigationBar)
+            picker.view.style = AdamantThemeStyle.primaryTintAndBackground
 			self?.present(picker, animated: true, completion: nil)
 		}
 		

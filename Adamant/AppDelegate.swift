@@ -477,12 +477,9 @@ extension AppDelegate {
 }
 
 
+// MARK: - Stylist
 extension AppDelegate: Themeable {
     func apply(theme: ThemeProtocol) {
-        let name = theme.name
-        print("Apply \(name) theme")
-        if let theme = theme.theme {
-            Stylist.shared.addTheme(theme, name: "main")
-        }
+        Stylist.shared.addTheme(theme.theme, name: "main")
     }
 }

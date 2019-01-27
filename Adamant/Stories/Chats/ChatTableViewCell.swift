@@ -26,11 +26,11 @@ class ChatTableViewCell: UITableViewCell {
 	}
     
     func setupStyles() {
-        style = "chatCell"
-        accountLabel.style = "primaryText"
-        lastMessageLabel.style = "secondaryText"
-        dateLabel.style = "secondaryText"
-        badgeView.style = "activeBg"
+        setStyle(.chatCell)
+        accountLabel.setStyle(.primaryText)
+        lastMessageLabel.setStyle(.secondaryText)
+        dateLabel.setStyle(.secondaryText)
+        badgeView.setStyle(.activeBackground)
     }
 	
 	var avatarImage: UIImage? {

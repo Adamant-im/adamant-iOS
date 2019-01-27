@@ -60,7 +60,7 @@ class DelegatesListViewController: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
-        refreshControl.style = "primaryTint"
+        refreshControl.setStyle(.primaryTint)
         return refreshControl
     }()
     
@@ -91,8 +91,8 @@ class DelegatesListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.styles = ["baseTable"]
-        navigationController?.navigationBar.style = "baseNavigationBar"
-        view.style = "primaryBackground,primaryTint"
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
 		
 		// MARK: Initial
         navigationItem.title = String.adamantLocalized.delegates.title
@@ -108,7 +108,7 @@ class DelegatesListViewController: UIViewController {
 			controller.searchResultsUpdater = self
 			controller.obscuresBackgroundDuringPresentation = false
 			controller.hidesNavigationBarDuringPresentation = true
-            controller.searchBar.style = "baseBarTint"
+            controller.searchBar.setStyle(.baseBarTint)
             searchController = controller
             
             definesPresentationContext = true

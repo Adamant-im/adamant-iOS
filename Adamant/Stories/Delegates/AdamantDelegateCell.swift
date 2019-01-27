@@ -118,7 +118,7 @@ class AdamantDelegateCell: UITableViewCell {
 		checkmarkBackgroundView.layer.borderWidth = 1
 		checkmarkBackgroundView.layer.cornerRadius = checkmarkBackgroundView.frame.height / 2
         
-        self.style = "baseTableCell"
+        self.setStyle(.baseTableViewCell)
     }
 	
 	@objc func onExpanderTap() {

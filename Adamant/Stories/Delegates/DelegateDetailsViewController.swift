@@ -117,9 +117,9 @@ class DelegateDetailsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.tableView.styles = ["baseTable"]
-        navigationController?.navigationBar.style = "baseNavigationBar"
-        view.style = "primaryBackground,primaryTint"
+        self.tableView.styles = [AdamantThemeStyle.baseTable.rawValue]
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
 
         if let delegate = delegate {
 			refreshData(with: delegate)
@@ -215,10 +215,10 @@ extension DelegateDetailsViewController {
 		cell.accessoryType = .none
 		cell.imageView?.image = row.image
 		cell.imageView?.tintColor = UIColor.adamant.primary
-        cell.style = "baseTableCell,secondaryBackground"
+        cell.setStyles([.baseTableViewCell, .secondaryBackground])
         
-        cell.textLabel?.style = "primaryText"
-        cell.detailTextLabel?.style = "primaryText"
+        cell.textLabel?.setStyle(.primaryText)
+        cell.detailTextLabel?.setStyle(.primaryText)
 		
 		switch row {
 		case .username:

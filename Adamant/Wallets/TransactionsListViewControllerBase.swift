@@ -28,7 +28,7 @@ class TransactionsListViewControllerBase: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
-        refreshControl.style = "primaryTint"
+        refreshControl.setStyle(.primaryTint)
         return refreshControl
     }()
     
@@ -43,9 +43,9 @@ class TransactionsListViewControllerBase: UIViewController {
         super.viewDidLoad()
         
         tableView.styles = ["baseTable"]
-        navigationController?.navigationBar.style = "baseNavigationBar"
-        tabBarController?.tabBar.style = "baseBarTint"
-        view.style = "primaryBackground,primaryTint"
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        tabBarController?.tabBar.setStyle(.baseBarTint)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
         
         if #available(iOS 11.0, *) {
             navigationItem.largeTitleDisplayMode = .never

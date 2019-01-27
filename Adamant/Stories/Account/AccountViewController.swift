@@ -172,11 +172,11 @@ class AccountViewController: FormViewController {
 		let statusBarView = UIView(frame: UIApplication.shared.statusBarFrame)
 		statusBarView.backgroundColor = UIColor.white
 		view.addSubview(statusBarView)
-        statusBarView.style = "secondaryBackground"
+        statusBarView.setStyle(.secondaryBackground)
         
-        tableView.styles = ["baseTable"]
-        navigationController?.navigationBar.style = "baseNavigationBar"
-        view.style = "primaryBackground,primaryTint"
+        tableView.styles = [AdamantThemeStyle.baseTable.rawValue]
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
 		
 		// MARK: Transfers controller
 		let controller = transfersProvider.unreadTransfersController()
@@ -194,7 +194,7 @@ class AccountViewController: FormViewController {
 		guard let header = UINib(nibName: "AccountHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? AccountHeaderView else {
 			fatalError("Can't load AccountHeaderView")
 		}
-        header.style = "secondaryBackground,primaryTint"
+        header.setStyles([.secondaryBackground, .primaryTint])
 		
 		accountHeaderView = header
 		accountHeaderView.delegate = self
@@ -222,8 +222,8 @@ class AccountViewController: FormViewController {
         addChild(pagingViewController)
         
         pagingViewController.style = "paging"
-        pagingViewController.view.style = "secondaryBackground"
-        pagingViewController.collectionView.style = "secondaryBackground"
+        pagingViewController.view.setStyle(.secondaryBackground)
+        pagingViewController.collectionView.setStyle(.secondaryBackground)
         pagingViewController.borderColor = UIColor.clear
 		
 		for wallet in accountService.wallets {
@@ -241,7 +241,7 @@ class AccountViewController: FormViewController {
             var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
             header.title = Sections.application.localized
             header.onSetupView = {view, _ in
-                view.textLabel?.style = "secondaryText"
+                view.textLabel?.setStyle(.secondaryText)
             }
             header.height = {50}
             $0.header = header
@@ -263,10 +263,10 @@ class AccountViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-            cell.imageView?.style = "primaryTint"
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "secondaryText"
-            cell.style = "secondaryBackground,primaryTint"
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.secondaryBackground, .primaryTint])
 		}.onCellSelection { [weak self] (_, _) in
 			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.security) else {
 				return
@@ -291,10 +291,10 @@ class AccountViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-            cell.imageView?.style = "primaryTint"
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "secondaryText"
-            cell.style = "baseTableCell,secondaryBackground,primaryTint"
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onCellSelection { [weak self] (_, _) in
 			guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
 				return
@@ -313,7 +313,7 @@ class AccountViewController: FormViewController {
         appSection.append(nodesRow)
             
         // Theme select
-        let themeRow =  AlertRow<ADMTheme>() {
+        let themeRow =  AlertRow<AdamantTheme>() {
             $0.title = Rows.theme.localized
             $0.tag = Rows.theme.tag
             $0.cell.imageView?.image = Rows.theme.image
@@ -321,7 +321,7 @@ class AccountViewController: FormViewController {
             
             $0.cancelTitle = String.adamantLocalized.alert.cancel
             $0.selectorTitle = Rows.theme.localized
-            $0.options = [ADMTheme.light, ADMTheme.dark]
+            $0.options = [AdamantTheme.light, AdamantTheme.dark]
             $0.value = ThemeManager.currentTheme()
             $0.displayValueFor = { value in
                 return value?.title ?? ""
@@ -334,10 +334,10 @@ class AccountViewController: FormViewController {
                 }
             }.cellUpdate({ (cell, row) in
                 cell.accessoryType = .disclosureIndicator
-                cell.imageView?.style = "primaryTint"
-                cell.textLabel?.style = "primaryText"
-                cell.detailTextLabel?.style = "primaryText"
-                cell.style = "baseTableCell,secondaryBackground,primaryTint"
+                cell.imageView?.setStyle(.primaryTint)
+                cell.textLabel?.setStyle(.primaryText)
+                cell.detailTextLabel?.setStyle(.primaryText)
+                cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
             })
 		appSection.append(themeRow)
 
@@ -349,10 +349,10 @@ class AccountViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-            cell.imageView?.style = "primaryTint"
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "secondaryText"
-            cell.style = "baseTableCell,secondaryBackground,primaryTint"
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onCellSelection { [weak self] (_, _) in
 			guard let vc = self?.router.get(scene: AdamantScene.Settings.about) else {
 				return
@@ -377,7 +377,7 @@ class AccountViewController: FormViewController {
             var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
             header.title = Sections.actions.localized
             header.onSetupView = {view, _ in
-                view.textLabel?.style = "secondaryText"
+                view.textLabel?.setStyle(.secondaryText)
             }
             header.height = { 50 }
             $0.header = header
@@ -391,10 +391,10 @@ class AccountViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-            cell.imageView?.style = "primaryTint"
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "secondaryText"
-            cell.style = "baseTableCell,secondaryBackground,primaryTint"
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onCellSelection { [weak self] (_, row) in
 			guard let vc = self?.router.get(scene: AdamantScene.Delegates.delegates) else {
 				return
@@ -420,10 +420,10 @@ class AccountViewController: FormViewController {
             $0.cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-            cell.imageView?.style = "primaryTint"
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "secondaryText"
-            cell.style = "baseTableCell,secondaryBackground,primaryTint"
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onCellSelection { [weak self] (_, _) in
             guard let vc = self?.router.get(scene: AdamantScene.Settings.qRGenerator) else {
                 return
@@ -449,10 +449,10 @@ class AccountViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-            cell.imageView?.style = "primaryTint"
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "secondaryText"
-            cell.style = "baseTableCell,secondaryBackground,primaryTint"
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onCellSelection { [weak self] (_, row) in
 			guard let address = self?.accountService.account?.address else {
 				return
@@ -494,10 +494,10 @@ class AccountViewController: FormViewController {
             $0.cell.imageView?.image = Rows.stayIn.image
             $0.value = accountService.hasStayInAccount
         }.cellUpdate { (cell, _) in
-            cell.imageView?.style = "primaryTint"
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "secondaryText"
-            cell.style = "baseTableCell,secondaryBackground,primaryTint"
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onChange { [weak self] row in
             guard let enabled = row.value else {
                 return
@@ -530,10 +530,10 @@ class AccountViewController: FormViewController {
                 return !showBiometry
             })
         }.cellUpdate { (cell, _) in
-            cell.imageView?.style = "primaryTint"
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "secondaryText"
-            cell.style = "baseTableCell,secondaryBackground,primaryTint"
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onChange { [weak self] row in
             let value = row.value ?? false
             self?.setBiometry(enabled: value)
@@ -558,10 +558,10 @@ class AccountViewController: FormViewController {
             })
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-            cell.imageView?.style = "primaryTint"
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "secondaryText"
-            cell.style = "baseTableCell,secondaryBackground,primaryTint"
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onCellSelection { [weak self] (_, _) in
             guard let vc = self?.router.get(scene: AdamantScene.Settings.notifications) else {
                 return

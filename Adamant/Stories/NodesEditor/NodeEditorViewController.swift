@@ -142,8 +142,8 @@ class NodeEditorViewController: FormViewController {
         super.viewDidLoad()
         
         self.tableView.styles = ["baseTable"]
-        navigationController?.navigationBar.style = "baseNavigationBar"
-        view.style = "primaryBackground,primaryTint"
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
 		
 		if let node = node {
 			self.navigationItem.title = node.host
@@ -167,9 +167,9 @@ class NodeEditorViewController: FormViewController {
 			}.onChange({ [weak self] (_) in
 				self?.testState = .notTested
             }).cellUpdate { (cell, _) in
-                cell.style = "secondaryBackground"
-                cell.textLabel?.style = "primaryText"
-                cell.textField?.style = "primaryText"
+                cell.setStyle(.secondaryBackground)
+                cell.textLabel?.setStyle(.primaryText)
+                cell.textField?.setStyle(.primaryText)
             }
 			
 		// Port
@@ -186,9 +186,9 @@ class NodeEditorViewController: FormViewController {
 		}.onChange({ [weak self] (_) in
 			self?.testState = .notTested
         }).cellUpdate { (cell, _) in
-            cell.style = "secondaryBackground"
-            cell.textLabel?.style = "primaryText"
-            cell.textField?.style = "input"
+            cell.setStyle(.secondaryBackground)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.textField?.setStyle(.input)
         }
 		
 		// Scheme
@@ -199,7 +199,7 @@ class NodeEditorViewController: FormViewController {
 			$0.options = [.https, .http]
 		}.onExpandInlineRow({ (cell, _, inlineRow) in
 			inlineRow.cell.height = { 100 }
-            inlineRow.cell.style = "secondaryBackground,primaryText"
+            inlineRow.cell.setStyles([.secondaryBackground, .primaryText])
 		}).onChange({ [weak self] row in
 			self?.testState = .notTested
 			
@@ -213,9 +213,9 @@ class NodeEditorViewController: FormViewController {
 				portRow.updateCell()
 			}
         }).cellUpdate { (cell, _) in
-            cell.style = "secondaryBackground"
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "primaryText"
+            cell.setStyle(.secondaryBackground)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
         }
 		
 		
@@ -229,9 +229,9 @@ class NodeEditorViewController: FormViewController {
 			$0.tag = Rows.testButton.tag
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-            cell.style = "baseTableCell,secondaryBackground"
-            cell.textLabel?.style = "primaryText"
-            cell.detailTextLabel?.style = "primaryText"
+            cell.style = AdamantThemeStyle.commonTableViewCell
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
 		}.onCellSelection { [weak self] (_, _) in
 			self?.testNode()
 		}
@@ -243,8 +243,8 @@ class NodeEditorViewController: FormViewController {
 				$0.title = Rows.deleteButton.localized
 				$0.tag = Rows.deleteButton.tag
 			}.cellUpdate { (cell, _) in
-                cell.style = "baseTableCell,secondaryBackground"
-                cell.textLabel?.style = "primaryText"
+                cell.setStyles([.baseTableViewCell, .secondaryBackground])
+                cell.textLabel?.setStyle(.primaryText)
 			}.onCellSelection { [weak self] (_, _) in
 				self?.deleteNode()
 			}
