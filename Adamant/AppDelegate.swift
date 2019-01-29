@@ -113,6 +113,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		notificationService = container.resolve(NotificationsService.self)
         dialogService = container.resolve(DialogService.self)
         addressBookService = container.resolve(AddressBookService.self)
+        
+        ThemeManager.shared.securedStore = container.resolve(SecuredStore.self)
 		
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
@@ -479,7 +481,7 @@ extension AppDelegate {
 
 // MARK: - Stylist
 extension AppDelegate: Themeable {
-    func apply(theme: ThemeProtocol) {
+    func apply(theme: AdamantTheme) {
         Stylist.shared.addTheme(theme.theme, name: "main")
     }
 }

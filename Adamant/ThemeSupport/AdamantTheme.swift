@@ -1,5 +1,5 @@
 //
-//  ThemeProtocol.swift
+//  AdamantTheme.swift
 //  Adamant
 //
 //  Created by Anokhov Pavel on 27/01/2019.
@@ -10,7 +10,23 @@ import Foundation
 import UIKit
 import Stylist
 
-public protocol ThemeProtocol {
+public protocol Themeable: class {
+    func apply(theme: AdamantTheme)
+}
+
+extension Themeable {
+    public func observeThemeChange()
+    {
+        ThemeManager.shared.manage(for: self)
+    }
+}
+
+struct Themes {
+    private init() {}
+}
+
+public protocol AdamantTheme {
+    var id: String { get }
     var title: String { get }
     
     var theme: Theme { get }

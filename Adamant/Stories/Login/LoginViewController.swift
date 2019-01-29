@@ -463,7 +463,7 @@ extension LoginViewController: ButtonsStripeViewDelegate {
 }
 
 extension LoginViewController: Themeable {
-    func apply(theme: ThemeProtocol) {
+    func apply(theme: AdamantTheme) {
         setNeedsStatusBarAppearanceUpdate()
     }
     

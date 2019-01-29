@@ -29,6 +29,31 @@ extension String.adamantLocalized.alert {
 	static let logoutButton = NSLocalizedString("AccountTab.ConfirmLogout.Logout", comment: "Account tab: Confirm logout alert: Logout (Ok) button")
 }
 
+/// Templorary hack
+private enum ThemesEnum: Int {
+    case light
+    case dark
+    
+    var id: String {
+        switch self {
+        case .light: return "ThemeLight"
+        case .dark: return "ThemeDark"
+        }
+    }
+    
+    var theme: AdamantTheme {
+        return ThemeManager.shared.themes[id]!
+    }
+    
+    static var current: ThemesEnum {
+        switch ThemeManager.shared.currentTheme.id {
+        case ThemesEnum.light.id: return .light
+        case ThemesEnum.dark.id: return .dark
+        default: fatalError()
+        }
+    }
+}
+
 // MARK: AccountViewController
 class AccountViewController: FormViewController {
 	// MARK: - Rows & Sections
@@ -313,7 +338,7 @@ class AccountViewController: FormViewController {
         appSection.append(nodesRow)
             
         // Theme select
-        let themeRow =  AlertRow<AdamantTheme>() {
+        let themeRow =  AlertRow<ThemesEnum>() {
             $0.title = Rows.theme.localized
             $0.tag = Rows.theme.tag
             $0.cell.imageView?.image = Rows.theme.image
@@ -321,16 +346,19 @@ class AccountViewController: FormViewController {
             
             $0.cancelTitle = String.adamantLocalized.alert.cancel
             $0.selectorTitle = Rows.theme.localized
-            $0.options = [AdamantTheme.light, AdamantTheme.dark]
-            $0.value = ThemeManager.currentTheme()
+            $0.options = [ThemesEnum.light, ThemesEnum.dark]
+            $0.value = ThemesEnum.current
+            
             $0.displayValueFor = { value in
-                return value?.title ?? ""
+                return value?.theme.title ?? ""
             }
             
             }.onChange { row in
                 print(row.value ?? "No Value")
-                if let theme = row.value {
-                    ThemeManager.applyTheme(theme: theme)
+                if let themeEnum = row.value {
+                    let theme = themeEnum.theme
+                    
+                    ThemeManager.shared.applyTheme(theme)
                 }
             }.cellUpdate({ (cell, row) in
                 cell.accessoryType = .disclosureIndicator
@@ -872,7 +900,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 }
 
 extension AccountViewController: Themeable {
-    func apply(theme: ThemeProtocol) {
+    func apply(theme: AdamantTheme) {
         setNeedsStatusBarAppearanceUpdate()
     }
     
@@ -882,7 +910,7 @@ extension AccountViewController: Themeable {
 }
 
 extension UISplitViewController: Themeable {
-    public func apply(theme: ThemeProtocol) {
+    public func apply(theme: AdamantTheme) {
         setNeedsStatusBarAppearanceUpdate()
     }
     

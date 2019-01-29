@@ -787,7 +787,7 @@ private class StatusUpdateProcedure: Procedure {
 }
 
 extension ChatViewController: Themeable {
-    public func apply(theme: ThemeProtocol) {
+    public func apply(theme: AdamantTheme) {
         self.messagesCollectionView.reloadData()
     }
 }

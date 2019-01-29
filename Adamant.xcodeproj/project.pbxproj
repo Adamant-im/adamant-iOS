@@ -124,9 +124,8 @@
 		E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */; };
 		E93D7ABE2052CEE1005D19DC /* NotificationsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */; };
 		E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */; };
-		E93E288721FE16580044F7C7 /* ThemeProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E288621FE16580044F7C7 /* ThemeProtocol.swift */; };
+		E93E288721FE16580044F7C7 /* AdamantTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E288621FE16580044F7C7 /* AdamantTheme.swift */; };
 		E93E288B21FE16EB0044F7C7 /* ThemeLight.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E288A21FE16EB0044F7C7 /* ThemeLight.swift */; };
-		E93E288D21FE17980044F7C7 /* ThemesCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E288C21FE17980044F7C7 /* ThemesCore.swift */; };
 		E93E288F21FE17E30044F7C7 /* ThemeDark.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E288E21FE17E30044F7C7 /* ThemeDark.swift */; };
 		E93E289121FE18B50044F7C7 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E289021FE18B40044F7C7 /* ThemeManager.swift */; };
 		E93E289321FE1BCF0044F7C7 /* ThemeBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E289221FE1BCF0044F7C7 /* ThemeBase.swift */; };
@@ -435,9 +434,8 @@
 		E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantChatsProvider.swift; sourceTree = "<group>"; };
 		E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsService.swift; sourceTree = "<group>"; };
 		E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantNotificationService.swift; sourceTree = "<group>"; };
-		E93E288621FE16580044F7C7 /* ThemeProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeProtocol.swift; sourceTree = "<group>"; };
+		E93E288621FE16580044F7C7 /* AdamantTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantTheme.swift; sourceTree = "<group>"; };
 		E93E288A21FE16EB0044F7C7 /* ThemeLight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeLight.swift; sourceTree = "<group>"; };
-		E93E288C21FE17980044F7C7 /* ThemesCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemesCore.swift; sourceTree = "<group>"; };
 		E93E288E21FE17E30044F7C7 /* ThemeDark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeDark.swift; sourceTree = "<group>"; };
 		E93E289021FE18B40044F7C7 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		E93E289221FE1BCF0044F7C7 /* ThemeBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeBase.swift; sourceTree = "<group>"; };
@@ -876,8 +874,7 @@
 			isa = PBXGroup;
 			children = (
 				E93E288521FE16150044F7C7 /* Themes */,
-				E93E288C21FE17980044F7C7 /* ThemesCore.swift */,
-				E93E288621FE16580044F7C7 /* ThemeProtocol.swift */,
+				E93E288621FE16580044F7C7 /* AdamantTheme.swift */,
 				E93E289021FE18B40044F7C7 /* ThemeManager.swift */,
 				E93E289421FE316F0044F7C7 /* Styles.swift */,
 			);
@@ -1510,7 +1507,7 @@
 				E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */,
 				E908472F2196FEA80095825D /* BaseTransaction+CoreDataProperties.swift in Sources */,
 				E94008872114F05B00CD2D67 /* AddressValidationResult.swift in Sources */,
-				E93E288721FE16580044F7C7 /* ThemeProtocol.swift in Sources */,
+				E93E288721FE16580044F7C7 /* AdamantTheme.swift in Sources */,
 				E974D168215D033C003AD7E8 /* ChatCell.swift in Sources */,
 				64A223D820F7A08E005157CB /* LskApiService.swift in Sources */,
 				E94008702114EA6800CD2D67 /* AdamantBalanceFormat.swift in Sources */,
@@ -1702,7 +1699,6 @@
 				64EE46B220FE0C8D00194DDA /* LskTransactionsViewController.swift in Sources */,
 				E94008832114EE4700CD2D67 /* LskWallet.swift in Sources */,
 				E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */,
-				E93E288D21FE17980044F7C7 /* ThemesCore.swift in Sources */,
 				E98FC34220F9209900032D65 /* UIColor+adamant.swift in Sources */,
 				E948E04C2027679300975D6B /* AdamantFormattingTools.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,

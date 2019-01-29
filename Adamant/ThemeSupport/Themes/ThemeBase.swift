@@ -21,10 +21,14 @@ enum ThemeColors: String {
     case alternativeBackground = "altBackgroundColor"
 }
 
-class ThemeBase: ThemeProtocol {
+internal class ThemeBase: AdamantTheme {
     // MARK: Properties
+    
+    /// Using filename as id
+    let id: String
+    
     var title: String {
-        fatalError("You must override theme title")
+        fatalError("You must override property 'localisedTitle'")
     }
     
     var theme: Theme
@@ -102,11 +106,7 @@ class ThemeBase: ThemeProtocol {
     // MARK: - Init
     
     internal init(fileName: String) throws {
-        // Check cached themes
-        if let theme = ThemeManager.themes[fileName] {
-            self.theme = theme
-            return
-        }
+        self.id = fileName
         
         // Load file
         guard let path = Bundle.main.path(forResource: fileName, ofType: "yaml") else {
@@ -117,7 +117,6 @@ class ThemeBase: ThemeProtocol {
         do {
             let theme = try Theme(path: path)
             self.theme = theme
-            ThemeManager.themes[fileName] = theme
         } catch {
             throw ThemeManagerError.failedLoadingTheme
         }

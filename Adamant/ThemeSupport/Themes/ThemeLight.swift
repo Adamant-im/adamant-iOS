@@ -9,12 +9,14 @@
 import Foundation
 import UIKit
 
-class ThemeLight: ThemeBase {
-    override var title: String {
-        return NSLocalizedString("AccountTab.Row.Theme.Light", comment: "Account tab: 'Theme' row value 'Light'")
-    }
-    
-    init() throws {
-        try super.init(fileName: "ThemeLight")
+extension Themes {
+    class Light: ThemeBase {
+        override var title: String {
+            return NSLocalizedString("AccountTab.Row.Theme.Light", comment: "Account tab: 'Theme' row value 'Light'")
+        }
+        
+        init() throws {
+            try super.init(fileName: "ThemeLight")
+        }
     }
 }

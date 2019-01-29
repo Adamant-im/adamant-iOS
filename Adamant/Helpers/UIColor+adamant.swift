@@ -49,7 +49,7 @@ extension UIColor {
 		static let transferOutcomeIconBackground = UIColor(red: 0.94, green: 0.52, blue: 0.53, alpha: 1)
 	}
     
-    class var adamant: ThemeProtocol {
-        return ThemeManager.default.theme ?? AdamantTheme.default.theme
+    class var adamant: AdamantTheme {
+        return ThemeManager.shared.currentTheme ?? ThemeManager.shared.defaultTheme
     }
 }

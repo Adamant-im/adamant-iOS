@@ -19,40 +19,213 @@ enum ThemeManagerError: Error {
     case redundantObservationError
 }
 
+extension StoreKey {
+    struct ThemeManager {
+        static let selectedTheme = "themeManager.selectedTheme"
+    }
+}
 
+// MARK: - Disposable
+/// Disposable pattern
+public class Disposable {
+    private let disposal: () -> ()
+    
+    init(disposal: @escaping () -> ()) {
+        self.disposal = disposal
+    }
+    
+    deinit {
+        self.disposal()
+    }
+}
 
 // MARK: - Manager
-public class ThemeManager {
-    
-    public static let `default`: ThemeManager = .init()
-    
-    static let SelectedThemeKey = "SelectedTheme"
-    
+class ThemeManager {
     // Notification used for broadcasting theme changes
     private static let notificationName = Notification.Name("ThemeChangedNotification")
+    
+    // MARK: Singleton
+    static let shared: ThemeManager = ThemeManager()
+    
+    // MARK: Dependencies
+    var securedStore: SecuredStore? {
+        didSet {
+            if let securedStore = securedStore, let id = securedStore.get(StoreKey.ThemeManager.selectedTheme), let theme = themes[id] {
+                currentTheme = theme
+            }
+        }
+    }
+    
+    // MARK: - Properties
     
     // NotificationCenter used for broadcasting theme changes
     private var notificationCenter: NotificationCenter = .init()
     
     private var observations: Set<ObjectIdentifier> = []
     
-    public static var themes: [String: Theme] = [:]
+    // MARK: - Themes
     
-    public init() {
-        self.theme = ThemeManager.currentTheme().theme
+    /// Available themes
+    let themes: [String: AdamantTheme]
+    
+    let defaultTheme: AdamantTheme
+    
+    private (set) var currentTheme: AdamantTheme
+    
+    func applyTheme(_ theme: AdamantTheme) {
+        currentTheme = theme
+        notify()
         
-        #if os(iOS)
-        if #available(iOS 7, *) {
-            NotificationCenter.default.addObserver(
-                self,
-                selector: #selector(ThemeManager.handleDynamicTypeChange(_:)),
-                name: UIContentSizeCategory.didChangeNotification,
-                object: nil
-            )
-        }
-        #endif
+        securedStore?.set(currentTheme.id, for: StoreKey.ThemeManager.selectedTheme)
     }
     
+    // MARK: - Init
+    
+    private init() {
+        // MARK: Initializing themes
+        let light = try! Themes.Light()
+        let dark = try! Themes.Dark()
+        
+        self.themes = [
+            light.id: light,
+            dark.id: dark
+        ]
+        
+        self.defaultTheme = light
+        self.currentTheme = light
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(ThemeManager.handleDynamicTypeChange(_:)),
+                                               name: UIContentSizeCategory.didChangeNotification,
+                                               object: nil)
+    }
+    
+    // MARK: - Theme changed notify
+    
+    private func notify() {
+        DispatchQueue.main.async { [weak self] in
+            self?.notificationCenter.post(name: ThemeManager.notificationName, object: self)
+            
+            // NotificationCenter notifies its observers
+            // synchronously, so we do not need to wait:
+            //            #if os(iOS)
+            //            // HACK: apparently the only way to
+            //            // change the appearance of existing instances:
+            //            for window in UIApplication.shared.windows {
+            //                for view in window.subviews {
+            //                    view.removeFromSuperview()
+            //                    window.addSubview(view)
+            //                }
+            //            }
+            //            #endif
+        }
+
+    }
+    
+    // MARK: - Managing 
+    
+    public func manage<U>(for themeable: U) where U: Themeable {
+        let identifier = ObjectIdentifier(themeable)
+        if self.observations.contains(identifier) {
+            do {
+                throw ThemeManagerError.redundantObservationError
+            } catch {
+                // intentionally left blank
+            }
+        }
+        
+        self.observations.insert(identifier)
+        
+        let disposable = self.observe { [weak themeable] theme in
+            guard let strongThemeable = themeable else {
+                return
+            }
+            strongThemeable.apply(theme: theme)
+        }
+        
+        var associatedObjectKey = ObjectIdentifier(ThemeManager.self)
+        objc_setAssociatedObject(
+            themeable,
+            &associatedObjectKey,
+            disposable,
+            .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+        )
+    }
+    
+    private func observe(closure: @escaping (AdamantTheme) -> ()) -> Disposable {
+        let observer = ThemeObserver { theme in
+            closure(theme)
+        }
+        
+        add(observer: observer)
+        
+        closure(currentTheme)
+        
+        // Strongly references the observer (required):
+        return Disposable {
+            self.remove(observer: observer)
+        }
+    }
+    
+    private func add(observer: ThemeObserver) {
+        self.notificationCenter.addObserver(
+            forName: ThemeManager.notificationName,
+            object: self,
+            queue: nil // We call .post method inside DispatchQueue.main.async block, no need to specify queue
+        ) { [weak observer] notification in
+            guard let themeManager = notification.object as? ThemeManager else {
+                return
+            }
+            guard let strongObserver = observer else {
+                return
+            }
+            strongObserver.handleThemeChange(on: themeManager)
+        }
+    }
+    
+    private func remove(observer: ThemeObserver) {
+        self.notificationCenter.removeObserver(
+            observer,
+            name: ThemeManager.notificationName,
+            object: self
+        )
+    }
+    
+    @objc private func handleDynamicTypeChange(_ notification: Notification) {
+        self.notify()
+    }
+}
+
+// MARK: - Observer
+private class ThemeObserver {
+    private let closure: (AdamantTheme) -> ()
+    
+    init(closure: @escaping (AdamantTheme) -> ()) {
+        self.closure = closure
+    }
+    
+    func handleThemeChange(on themeManager: ThemeManager) {
+        let theme = themeManager.currentTheme
+        
+        if Thread.isMainThread {
+            closure(theme)
+        } else {
+            DispatchQueue.main.async {
+                self.closure(theme)
+            }
+        }
+    }
+}
+
+// MARK: - StyleProperty convinient init
+private extension StyleProperty {
+    init <ViewType, PropertyType>(_ styleName: AdamantThemeStyleProperty, style: @escaping (ViewType, PropertyValue<PropertyType>) -> Void) {
+        self.init(name: styleName.rawValue, style: style)
+    }
+}
+
+// MARK: - Register style properties
+extension ThemeManager {
     static func addCustomStyleProperties() {
         Stylist.shared.addProperty(StyleProperty(.separatorColor) { (view: UITableView, value: PropertyValue<UIColor>) in
             view.separatorColor = value.value
@@ -174,175 +347,5 @@ public class ThemeManager {
             selectedBackgroundView.backgroundColor = value.value
             view.selectedBackgroundView = selectedBackgroundView
         })
-    }
-    
-    static func currentTheme() -> AdamantTheme {
-        let storedTheme = UserDefaults.standard.integer(forKey: SelectedThemeKey)
-        
-//        if let theme = AdamantTheme(rawValue: storedTheme) {
-//            return theme
-//        } else {
-            return .default
-//        }
-    }
-    
-    static func applyTheme(theme: AdamantTheme) {
-//        UserDefaults.standard.set(theme.rawValue, forKey: SelectedThemeKey)
-//        UserDefaults.standard.synchronize()
-        
-        ThemeManager.default.theme = theme.theme
-    }
-    
-    public var theme: ThemeProtocol? {
-        didSet {
-            self.notify()
-        }
-    }
-    
-    public func manage<U>(for themeable: U) where U: Themeable {
-        let identifier = ObjectIdentifier(themeable)
-        if self.observations.contains(identifier) {
-            do {
-                throw ThemeManagerError.redundantObservationError
-            } catch {
-                // intentionally left blank
-            }
-        }
-        
-        self.observations.insert(identifier)
-        
-        let disposable = self.observe { [weak themeable] theme in
-            guard let strongThemeable = themeable else {
-                return
-            }
-            strongThemeable.apply(theme: theme)
-        }
-        
-        var associatedObjectKey = ObjectIdentifier(ThemeManager.self)
-        objc_setAssociatedObject(
-            themeable,
-            &associatedObjectKey,
-            disposable,
-            .OBJC_ASSOCIATION_RETAIN_NONATOMIC
-        )
-    }
-    
-    public func observe(closure: @escaping (ThemeProtocol) -> ()) -> Disposable {
-        let observer = ThemeObserver { theme in
-            closure(theme)
-        }
-        
-        self.add(observer: observer)
-        
-        if let theme = self.theme {
-            closure(theme)
-        }
-        
-        // Strongly references the observer (required):
-        return Disposable { [weak self] in
-            guard let strongSelf = self else {
-                return
-            }
-            strongSelf.remove(observer: observer)
-        }
-    }
-    
-    private func add(observer: ThemeObserver) {
-        self.notificationCenter.addObserver(
-            forName: ThemeManager.notificationName,
-            object: self,
-            queue: OperationQueue.main
-        ) { [weak observer] notification in
-            guard let themeManager = notification.object as? ThemeManager else {
-                return
-            }
-            guard let strongObserver = observer else {
-                return
-            }
-            strongObserver.handleThemeChange(on: themeManager)
-        }
-    }
-    
-    private func remove(observer: ThemeObserver) {
-        self.notificationCenter.removeObserver(
-            observer,
-            name: ThemeManager.notificationName,
-            object: self
-        )
-    }
-    
-    @objc private func handleDynamicTypeChange(_ notification: Notification) {
-        self.notify()
-    }
-    
-    private func notify() {
-        DispatchQueue.main.async { [weak self] in
-            guard let strongSelf = self else {
-                return
-            }
-            strongSelf.notificationCenter.post(
-                name: ThemeManager.notificationName,
-                object: strongSelf
-            )
-            
-            // NotificationCenter notifies its observers
-            // synchronously, so we do not need to wait:
-            //            #if os(iOS)
-            //            // HACK: apparently the only way to
-            //            // change the appearance of existing instances:
-            //            for window in UIApplication.shared.windows {
-            //                for view in window.subviews {
-            //                    view.removeFromSuperview()
-            //                    window.addSubview(view)
-            //                }
-            //            }
-            //            #endif
-        }
-    }
-}
-
-// MARK: - Observer
-internal class ThemeObserver {
-    private let closure: (ThemeProtocol) -> ()
-    
-    internal init(closure: @escaping (ThemeProtocol) -> ()) {
-        self.closure = closure
-    }
-    
-    internal func handleThemeChange(on themeManager: ThemeManager) {
-        assert(Thread.isMainThread)
-        
-        guard let theme = ThemeManager.default.theme else {
-            var themeManager = themeManager
-            Swift.withUnsafePointer(to: &themeManager) {
-                NSLog("No theme found for theme manager \($0)")
-            }
-            return
-        }
-        //        themeManager.animated(duration: themeManager.animationDuration) {
-        self.closure(theme)
-        //        }
-    }
-}
-
-// MARK: - Disposable
-/// Disposable pattern
-public class Disposable {
-    private let disposal: () -> ()
-    
-    init(disposal: @escaping () -> ()) {
-        self.disposal = disposal
-    }
-    
-    deinit {
-        self.disposal()
-    }
-}
-
-
-// MARK: - StyleProperty convinient init
-private extension StyleProperty {
-    init <ViewType, PropertyType>(_ styleName: AdamantThemeStyleProperty, style: @escaping (ViewType, PropertyValue<PropertyType>) -> Void) {
-        self.init(name: styleName.rawValue, style: style)
     }
 }
