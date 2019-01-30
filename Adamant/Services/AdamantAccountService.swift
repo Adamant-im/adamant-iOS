@@ -88,7 +88,8 @@ class AdamantAccountService: AccountService {
 	var wallets: [WalletService] = [
 		AdmWalletService(),
 		EthWalletService(),
-        LskWalletService(mainnet: true, origins: AdamantResources.lskServers)
+        LskWalletService(mainnet: true, origins: AdamantResources.lskServers),
+        BtcWalletService()
         
         // Testnet
 //        LskWalletService(mainnet: false)
