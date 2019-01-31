@@ -610,11 +610,13 @@ class AccountViewController: FormViewController {
             
             if let row: SwitchRow = form.rowBy(tag: Rows.stayIn.tag) {
                 row.value = accountService.hasStayInAccount
+                row.updateCell()
             }
             
             if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
                 row.value = accountService.hasStayInAccount && accountService.useBiometry
                 row.evaluateHidden()
+                row.updateCell()
             }
             
             if let row = form.rowBy(tag: Rows.notifications.tag) {
