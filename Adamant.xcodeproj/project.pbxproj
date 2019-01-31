@@ -119,6 +119,8 @@
 		E926E034213EC454005E536B /* FullscreenAlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = E926E033213EC454005E536B /* FullscreenAlertView.xib */; };
 		E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927171D20C04613002BB9A6 /* UIColor+hex.swift */; };
 		E93303D72201C89F0082F128 /* ThemesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93303D62201C89F0082F128 /* ThemesViewController.swift */; };
+		E93303DA22032CB00082F128 /* ThemeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93303D822032CB00082F128 /* ThemeTableViewCell.swift */; };
+		E93303DB22032CB00082F128 /* ThemeTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E93303D922032CB00082F128 /* ThemeTableViewCell.xib */; };
 		E9393FA82055C92700EE6F30 /* Decimal+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */; };
 		E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA92055D03300EE6F30 /* AdamantMessage.swift */; };
 		E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D732028B21400126346 /* ChatsProvider.swift */; };
@@ -430,6 +432,8 @@
 		E926E033213EC454005E536B /* FullscreenAlertView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FullscreenAlertView.xib; sourceTree = "<group>"; };
 		E927171D20C04613002BB9A6 /* UIColor+hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+hex.swift"; sourceTree = "<group>"; };
 		E93303D62201C89F0082F128 /* ThemesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemesViewController.swift; sourceTree = "<group>"; };
+		E93303D822032CB00082F128 /* ThemeTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeTableViewCell.swift; sourceTree = "<group>"; };
+		E93303D922032CB00082F128 /* ThemeTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ThemeTableViewCell.xib; sourceTree = "<group>"; };
 		E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+adamant.swift"; sourceTree = "<group>"; };
 		E9393FA92055D03300EE6F30 /* AdamantMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantMessage.swift; sourceTree = "<group>"; };
 		E93B0D732028B21400126346 /* ChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsProvider.swift; sourceTree = "<group>"; };
@@ -1072,6 +1076,8 @@
 				E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */,
 				E908473C219713300095825D /* NotificationsViewController.swift */,
 				E93303D62201C89F0082F128 /* ThemesViewController.swift */,
+				E93303D822032CB00082F128 /* ThemeTableViewCell.swift */,
+				E93303D922032CB00082F128 /* ThemeTableViewCell.xib */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -1334,6 +1340,7 @@
 				E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */,
 				E95CB456205D77B500A7218E /* Localizable.strings in Resources */,
 				E95CB45E205D7F9600A7218E /* Localizable.stringsdict in Resources */,
+				E93303DB22032CB00082F128 /* ThemeTableViewCell.xib in Resources */,
 				E9981892212088DE0018C84C /* NodeCell.xib in Resources */,
 				E9B4E1AA210F1803007E77FC /* DoubleDetailsTableViewCell.xib in Resources */,
 				6458548C211B3AB1004C5909 /* WelcomeViewController.xib in Resources */,
@@ -1585,6 +1592,7 @@
 				E9A174B72057F1B3003667CD /* AdamantChatsProvider+backgroundFetch.swift in Sources */,
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E941CCDE20E7B70200C96220 /* WalletCollectionViewCell.swift in Sources */,
+				E93303DA22032CB00082F128 /* ThemeTableViewCell.swift in Sources */,
 				E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */,
