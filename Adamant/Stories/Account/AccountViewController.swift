@@ -29,31 +29,6 @@ extension String.adamantLocalized.alert {
 	static let logoutButton = NSLocalizedString("AccountTab.ConfirmLogout.Logout", comment: "Account tab: Confirm logout alert: Logout (Ok) button")
 }
 
-/// Templorary hack
-private enum ThemesEnum: Int {
-    case light
-    case dark
-    
-    var id: String {
-        switch self {
-        case .light: return "ThemeLight"
-        case .dark: return "ThemeDark"
-        }
-    }
-    
-    var theme: AdamantTheme {
-        return ThemesManager.shared.themes[id]!
-    }
-    
-    static var current: ThemesEnum {
-        switch ThemesManager.shared.currentTheme.id {
-        case ThemesEnum.light.id: return .light
-        case ThemesEnum.dark.id: return .dark
-        default: fatalError()
-        }
-    }
-}
-
 // MARK: AccountViewController
 class AccountViewController: FormViewController {
 	// MARK: - Rows & Sections
@@ -338,35 +313,33 @@ class AccountViewController: FormViewController {
         appSection.append(nodesRow)
             
         // Theme select
-        let themeRow =  AlertRow<ThemesEnum>() {
+        let themeRow = LabelRow() {
             $0.title = Rows.theme.localized
             $0.tag = Rows.theme.tag
             $0.cell.imageView?.image = Rows.theme.image
             $0.cell.selectionStyle = .gray
-            
-            $0.cancelTitle = String.adamantLocalized.alert.cancel
-            $0.selectorTitle = Rows.theme.localized
-            $0.options = [ThemesEnum.light, ThemesEnum.dark]
-            $0.value = ThemesEnum.current
-            
-            $0.displayValueFor = { value in
-                return value?.theme.title ?? ""
+            $0.value = ThemesManager.shared.currentTheme.title
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
+        }.onCellSelection { [weak self] (_, _) in
+            guard let vc = self?.router.get(scene: AdamantScene.Settings.themes) else {
+                return
             }
             
-            }.onChange { row in
-                print(row.value ?? "No Value")
-                if let themeEnum = row.value {
-                    let theme = themeEnum.theme
-                    
-                    ThemeManager.shared.applyTheme(theme)
-                }
-            }.cellUpdate({ (cell, row) in
-                cell.accessoryType = .disclosureIndicator
-                cell.imageView?.setStyle(.primaryTint)
-                cell.textLabel?.setStyle(.primaryText)
-                cell.detailTextLabel?.setStyle(.primaryText)
-                cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
-            })
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else if let nav = self?.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                self?.present(vc, animated: true, completion: nil)
+            }
+        }
+        
 		appSection.append(themeRow)
 
 		// About
@@ -672,6 +645,15 @@ class AccountViewController: FormViewController {
 				}
 			}
 		}
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.ThemesManager.themeChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            guard let row: LabelRow = self?.form.rowBy(tag: Rows.theme.tag) else {
+                return
+            }
+            
+            row.value = ThemesManager.shared.currentTheme.title
+            row.updateCell()
+        }
 		
 		for (index, service) in accountService.wallets.enumerated() {
 			NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,

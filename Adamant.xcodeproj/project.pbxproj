@@ -118,6 +118,7 @@
 		E926E032213EC43B005E536B /* FullscreenAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E926E031213EC43B005E536B /* FullscreenAlertView.swift */; };
 		E926E034213EC454005E536B /* FullscreenAlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = E926E033213EC454005E536B /* FullscreenAlertView.xib */; };
 		E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927171D20C04613002BB9A6 /* UIColor+hex.swift */; };
+		E93303D72201C89F0082F128 /* ThemesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93303D62201C89F0082F128 /* ThemesViewController.swift */; };
 		E9393FA82055C92700EE6F30 /* Decimal+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */; };
 		E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA92055D03300EE6F30 /* AdamantMessage.swift */; };
 		E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D732028B21400126346 /* ChatsProvider.swift */; };
@@ -428,6 +429,7 @@
 		E926E031213EC43B005E536B /* FullscreenAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenAlertView.swift; sourceTree = "<group>"; };
 		E926E033213EC454005E536B /* FullscreenAlertView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FullscreenAlertView.xib; sourceTree = "<group>"; };
 		E927171D20C04613002BB9A6 /* UIColor+hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+hex.swift"; sourceTree = "<group>"; };
+		E93303D62201C89F0082F128 /* ThemesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemesViewController.swift; sourceTree = "<group>"; };
 		E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+adamant.swift"; sourceTree = "<group>"; };
 		E9393FA92055D03300EE6F30 /* AdamantMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantMessage.swift; sourceTree = "<group>"; };
 		E93B0D732028B21400126346 /* ChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsProvider.swift; sourceTree = "<group>"; };
@@ -1069,6 +1071,7 @@
 				E90055FA20ECE78A00D0CB2D /* SecurityViewController+notifications.swift */,
 				E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */,
 				E908473C219713300095825D /* NotificationsViewController.swift */,
+				E93303D62201C89F0082F128 /* ThemesViewController.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -1699,6 +1702,7 @@
 				64EE46B220FE0C8D00194DDA /* LskTransactionsViewController.swift in Sources */,
 				E94008832114EE4700CD2D67 /* LskWallet.swift in Sources */,
 				E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */,
+				E93303D72201C89F0082F128 /* ThemesViewController.swift in Sources */,
 				E98FC34220F9209900032D65 /* UIColor+adamant.swift in Sources */,
 				E948E04C2027679300975D6B /* AdamantFormattingTools.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,
