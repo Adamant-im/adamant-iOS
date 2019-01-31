@@ -29,6 +29,7 @@ extension String.adamantLocalized {
 extension StoreKey {
 	struct application {
 		static let deviceTokenHash = "app.deviceTokenHash"
+        static let welcomeScreensIsShown = "app.welcomeScreensIsShown"
 		
 		private init() {}
 	}
@@ -120,21 +121,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		window = UIWindow(frame: UIScreen.main.bounds)
 		window!.rootViewController = UITabBarController()
 		window!.rootViewController?.view.backgroundColor = .white
-		window!.makeKeyAndVisible()
-		window!.tintColor = UIColor.adamantDefault.primary
+		window!.tintColor = UIColor.adamant.primary
         
-        // adds custom properties to Stylist
+        // MARK: 2.1 Init Themes
         ThemesManager.addCustomStyleProperties()
+        observeThemeChange()
+
+        // MARK: 3. Prepare pages
+        guard let router = container.resolve(Router.self) else {
+            fatalError("Failed to get Router")
+        }
         
-        self.observeThemeChange()
-		
-		// MARK: 3. Show login
-		
-		guard let router = container.resolve(Router.self) else {
-			fatalError("Failed to get Router")
-		}
-		
-		// MARK: 4. Prepare pages
 		if let tabbar = window?.rootViewController as? UITabBarController {
             // MARK: Chats
             let chats = UISplitViewController()
@@ -170,9 +167,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         window!.makeKeyAndVisible()
         
-        let login = router.get(scene: AdamantScene.Login.login)
+        // MARK: 4. Show login
+        let login = router.get(scene: AdamantScene.Login.login) as! LoginViewController
+        let welcomeIsShown = UserDefaults.standard.bool(forKey: StoreKey.application.welcomeScreensIsShown)
+        login.requestBiometryOnFirstTimeActive = welcomeIsShown
         window!.rootViewController?.present(login, animated: false, completion: nil)
-		
+        
+        if !welcomeIsShown {
+            let welcome = router.get(scene: AdamantScene.Onboard.welcome)
+            login.present(welcome, animated: true, completion: nil)
+            UserDefaults.standard.set(true, forKey: StoreKey.application.welcomeScreensIsShown)
+        }
+    
 		// MARK: 5 Reachability & Autoupdate
 		repeater = RepeaterService()
 		

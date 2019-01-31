@@ -296,7 +296,10 @@ class NewChatViewController: FormViewController {
 					self.dialogService.dismissProgress()
 				}
 				
-			case .notFound, .invalidAddress, .networkError(_):
+            case .dummy(_):
+                self.dialogService.showWarning(withMessage: AccountsProviderResult.notInitiated(address: address).localized)
+                
+			case .notFound, .invalidAddress, .notInitiated(_), .networkError(_):
 				self.dialogService.showWarning(withMessage: result.localized)
 				
 			case .serverError(let error):

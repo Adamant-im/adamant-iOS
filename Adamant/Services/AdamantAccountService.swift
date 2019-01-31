@@ -236,11 +236,11 @@ extension AdamantAccountService {
 		state = .updating
 		stateSemaphore.signal()
 		
-		guard let loggedAccount = account else {
+		guard let loggedAccount = account, let publicKey = loggedAccount.publicKey else {
 			return
 		}
 		
-		apiService.getAccount(byPublicKey: loggedAccount.publicKey) { [weak self] result in
+		apiService.getAccount(byPublicKey: publicKey) { [weak self] result in
 			switch result {
 			case .success(let account):
 				guard let acc = self?.account, acc.address == account.address else {

@@ -131,6 +131,10 @@ class LoginViewController: FormViewController {
 	private var hideNewPassphrase: Bool = true
 	private var generatedPassphrases = [String]()
 	private var firstTimeActive: Bool = true
+    
+    
+    /// On launch, request user biometry (TouchID/FaceID) if has an account with biometry active
+    var requestBiometryOnFirstTimeActive: Bool = true
 	
 	// MARK: Lifecycle
 	
@@ -356,11 +360,16 @@ class LoginViewController: FormViewController {
 		
 		// MARK: Requesting biometry onActive
 		NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			if let firstTimeActive = self?.firstTimeActive, firstTimeActive,
-				let accountService = self?.accountService, accountService.hasStayInAccount, accountService.useBiometry {
-				self?.loginWithBiometry()
-				self?.firstTimeActive = false
-			}
+            guard let vc = self,
+                vc.firstTimeActive,
+                vc.requestBiometryOnFirstTimeActive,
+                vc.accountService.hasStayInAccount,
+                vc.accountService.useBiometry else {
+                return
+            }
+            
+            vc.loginWithBiometry()
+            vc.firstTimeActive = false
 		}
     }
 }

@@ -67,6 +67,9 @@
 /* About scene: Write to Adamant row */
 "About.Row.Adamant" = "АДАМАНТ";
 
+/* About scene: Show Welcome screens */
+"About.Row.Welcome" = "Экраны приветствия";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Приветствие АДАМАНТа";
 
@@ -107,7 +110,7 @@
 "AccountTab.Row.Balance" = "Баланс";
 
 /* Account tab: 'Buy tokens' button */
-"AccountTab.Row.BuyTokens" = "Купить токены";
+"AccountTab.Row.BuyTokens" = "Купить и продать токены";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Выход";
@@ -126,6 +129,9 @@
 
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendLsk" = "Отправить LSK";
+
+/* Account tab: Anonymously buy ADM tokens */
+"AccountTab.Row.AnonymouslyBuyADM" = "Купить ADM анонимно";
 
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Адрес";
@@ -244,6 +250,9 @@
 /* Chat: status message for pending chat transaction */
 "ChatScene.MessageStatus.Pending" = "Отправка";
 
+/* Chat: status message for warning chat transaction */
+"ChatScene.MessageStatus.Warning" = "Внимание";
+
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Подробнее…";
 
@@ -327,6 +336,9 @@
 
 /* Shared error: Internal error format, %@ for message */
 "Error.InternalErrorFormat" = "Внутренняя ошибка: %@";
+
+/* Shared error: Account not initiated */
+"Error.AccountNotInitiated" = "Аккаунт не инициализирован";
 
 /* Error messge title for support email */
 "Error.Mail.Title" = "Проблема с iOS-приложением";
@@ -724,6 +736,12 @@
 /* Transfer: Amount is zero, or even negative notification */
 "TransferScene.Error.TooLittleMoney" = "Вам следует отправить больше токенов";
 
+/* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.title" = "Не удалось проверить адрес %@";
+
+/* Transfer: Alert body: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
+"TransferScene.unsafeTransferAlert.body" = "Аккаунт не найден или не инициализирован. Проверьте адрес получателя и подтвердите перевод";
+
 /* Transfer: recipient address placeholder */
 "TransferScene.Recipient.Placeholder" = "получателя";
 
@@ -792,3 +810,30 @@
 
 /* Wallet Services: Shared error, transaction not found */
 "WalletServices.SharedErrors.TransactionNotFound" = "Транзакция не найдена";
+
+/* Welcome: Skip button */
+"WelcomeScene.Skip" = "пропустить";
+
+/* Welcome: Slide 1 Description */
+"WelcomeScene.Description.Slide1" = "Добро пожаловать в АДАМАНТ, настоящий мессенджер на <b>блокчейне</b>.";
+
+/* Welcome: Slide 2 Description */
+"WelcomeScene.Description.Slide2" = "АДАМАНТ — это <b>анонимность</b> и <b>защищенность</b> вашей переписки, а также передача криптовалют в чатах.<br/><br/><a href=\"https://medium.com/adamant-im/adamant-security-features-e7cc836ff52c\">Почему другие мессенджеры небезопасны?</a>";
+
+/* Welcome: Slide 3 Description */
+"WelcomeScene.Description.Slide3" = "Инфраструктура АДАМАНТа никому не принадлежит и <b>децентрализована</b>.<br/><br/>Для ее поддержания все сообщения в мессенджере оплачиваются токенами ADM. Новым аккаунтам — бесплатные токены для тестирования.";
+
+/* Welcome: Slide 4 Description */
+"WelcomeScene.Description.Slide4" = "<b>Для регистрации не требуется никаких данных.</b><br/>Создайте новый аккаунт в один клик и добавьте ваших собеседников.<br/><br/>Рекомендуем передавать друг другу адреса АДАМАНТа <b>лично</b> в целях полной безопасности.";
+
+/* Welcome: Slide 5 Description */
+"WelcomeScene.Description.Slide5" = "Исходный код проекта <a href=\"https://github.com/Adamant-im/\">полностью открыт</a>. Приложение в разработке, и новые функции добавляются постоянно.<br/><br/>Если вы разработчик — приглашаем вас принять участие.";
+
+/* Welcome: Last slide Begin button */
+"WelcomeScene.Description.BeginButton" = "Начать безопасное общение";
+
+/* Welcome: Next screen button */
+"WelcomeScene.Description.ContinueButton" = "Далее";
+
+/* Welcome: Skip button" */
+"WelcomeScene.Description.SkipButton" = "Пропустить";

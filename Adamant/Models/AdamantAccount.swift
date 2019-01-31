@@ -12,7 +12,7 @@ struct AdamantAccount {
 	let address: String
 	var unconfirmedBalance: Decimal
 	var balance: Decimal
-	let publicKey: String
+	let publicKey: String?
 	let unconfirmedSignature: Int
 	let secondSignature: Int
 	let secondPublicKey: String?
@@ -38,7 +38,7 @@ extension AdamantAccount: Decodable {
 		
 		self.address = try container.decode(String.self, forKey: .address)
 		self.unconfirmedSignature = try container.decode(Int.self, forKey: .unconfirmedSignature)
-		self.publicKey = try container.decode(String.self, forKey: .publicKey)
+		self.publicKey = try? container.decode(String.self, forKey: .publicKey)
 		self.secondSignature = try container.decode(Int.self, forKey: .secondSignature)
 		self.secondPublicKey = try? container.decode(String.self, forKey: .secondPublicKey)
 		self.multisignatures = try? container.decode([String].self, forKey: .multisignatures)

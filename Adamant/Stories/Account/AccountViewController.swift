@@ -403,6 +403,7 @@ class AccountViewController: FormViewController {
 			
             if let split = self?.splitViewController {
                 let details = UINavigationController(rootViewController:vc)
+                details.definesPresentationContext = true
                 split.showDetailViewController(details, sender: self)
             } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
