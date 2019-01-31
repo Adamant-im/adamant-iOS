@@ -53,7 +53,13 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             controller = nil
         }
         
-        tableView.reloadData()
+        if Thread.isMainThread {
+            tableView.reloadData()
+        } else {
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {

@@ -28,8 +28,8 @@ class TransactionTableViewCell: UITableViewCell {
 		
 		var bottomTintColor: UIColor {
 			switch self {
-			case .income: return UIColor.adamant.transferIncomeIconBackground
-			case .outcome: return UIColor.adamant.transferOutcomeIconBackground
+			case .income: return UIColor.adamant.successColor
+			case .outcome: return UIColor.adamant.alertColor
 			}
 		}
 	}
@@ -66,5 +66,10 @@ class TransactionTableViewCell: UITableViewCell {
 	
 	override func awakeFromNib() {
 		transactionType = .income
+        self.setStyle(.baseTableViewCell)
+        accountLabel.setStyle(.primaryText)
+        addressLabel.setStyle(.secondaryText)
+        ammountLabel.setStyle(.primaryText)
+        dateLabel.setStyle(.secondaryText)
 	}
 }

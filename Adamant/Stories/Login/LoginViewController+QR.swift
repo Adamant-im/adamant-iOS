@@ -55,6 +55,8 @@ extension LoginViewController {
 			picker.delegate = self
 			picker.allowsEditing = false
 			picker.sourceType = .photoLibrary
+            picker.navigationBar.setStyle(.baseNavigationBar)
+            picker.view.style = AdamantThemeStyle.primaryTintAndBackground
 			self?.present(picker, animated: true, completion: nil)
 		}
 		

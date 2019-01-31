@@ -24,6 +24,14 @@ class ChatTableViewCell: UITableViewCell {
 	override func awakeFromNib() {
 		badgeView.layer.cornerRadius = badgeView.bounds.height / 2
 	}
+    
+    func setupStyles() {
+        setStyle(.chatCell)
+        accountLabel.setStyle(.primaryText)
+        lastMessageLabel.setStyle(.primaryText)
+        dateLabel.setStyle(.secondaryText)
+        badgeView.setStyle(.activeBackground)
+    }
 	
 	var avatarImage: UIImage? {
 		get {

@@ -60,8 +60,7 @@ class DelegatesListViewController: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
-        refreshControl.tintColor = UIColor.adamant.primary
-        
+        refreshControl.setStyle(.primaryTint)
         return refreshControl
     }()
     
@@ -94,7 +93,10 @@ class DelegatesListViewController: UIViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.tableView.setStyle(.baseTable)
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
+		
 		// MARK: Initial
         navigationItem.title = String.adamantLocalized.delegates.title
         tableView.register(UINib.init(nibName: "AdamantDelegateCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
@@ -109,6 +111,7 @@ class DelegatesListViewController: UIViewController {
 			controller.searchResultsUpdater = self
 			controller.obscuresBackgroundDuringPresentation = false
 			controller.hidesNavigationBarDuringPresentation = true
+            controller.searchBar.setStyle(.baseBarTint)
             searchController = controller
             
             definesPresentationContext = true
@@ -410,8 +413,8 @@ extension DelegatesListViewController {
 		let totalVoted = delegates.reduce(0) { $0 + ($1.delegate.voted ? 1 : 0) } + upvoted - downvoted
 		
 		let votingEnabled = changes.count > 0 && changes.count <= maxVotes && totalVoted <= maxTotalVotes
-		let newVotesColor = changes.count > maxVotes ? UIColor.red : UIColor.darkText
-		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.red : UIColor.darkText
+		let newVotesColor = changes.count > maxVotes ? UIColor.adamant.alertColor : UIColor.adamant.primary
+		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.adamant.alertColor : UIColor.adamant.primary
 		
 		
 		if Thread.isMainThread {

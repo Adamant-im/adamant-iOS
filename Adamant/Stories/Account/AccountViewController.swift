@@ -58,7 +58,7 @@ class AccountViewController: FormViewController {
 	
 	enum Rows {
 		case balance, sendTokens // Wallet
-		case security, nodes, about // Application
+		case security, nodes, theme, about // Application
 		case voteForDelegates, generateQr, logout // Actions
         case stayIn, biometry, notifications // Security
 		
@@ -67,6 +67,7 @@ class AccountViewController: FormViewController {
 			case .balance: return "blnc"
 			case .sendTokens: return "sndTkns"
 			case .security: return "scrt"
+            case .theme: return "thm"
 			case .nodes: return "nds"
 			case .about: return "bt"
 			case .logout: return "lgtrw"
@@ -83,6 +84,7 @@ class AccountViewController: FormViewController {
 			case .balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
 			case .sendTokens: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
 			case .security: return NSLocalizedString("AccountTab.Row.Security", comment: "Account tab: 'Security' row")
+            case .theme: return NSLocalizedString("AccountTab.Row.Theme", comment: "Account tab: 'Theme' row")
 			case .nodes: return String.adamantLocalized.nodesList.nodesListButton
 			case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
 			case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
@@ -98,7 +100,8 @@ class AccountViewController: FormViewController {
 			switch self {
 			case .security: return #imageLiteral(resourceName: "row_security")
 			case .about: return #imageLiteral(resourceName: "row_about")
-			case .nodes: return #imageLiteral(resourceName: "row_nodes")
+			case .theme: return #imageLiteral(resourceName: "row_themes.png")
+            case .nodes: return #imageLiteral(resourceName: "row_nodes")
 			case .balance: return #imageLiteral(resourceName: "row_balance")
             case .voteForDelegates: return #imageLiteral(resourceName: "row_vote-delegates")
             case .logout: return #imageLiteral(resourceName: "row_logout")
@@ -131,6 +134,8 @@ class AccountViewController: FormViewController {
 	
 	private var initiated = false
 	
+    private var walletViewControllers = [WalletViewControllerBase]()
+    
     // MARK: StayIn
     
     var showLoggedInOptions: Bool {
@@ -154,6 +159,8 @@ class AccountViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.observeThemeChange()
 		
 		navigationOptions = .Disabled
 		navigationController?.setNavigationBarHidden(true, animated: false)
@@ -167,6 +174,11 @@ class AccountViewController: FormViewController {
 		let statusBarView = UIView(frame: UIApplication.shared.statusBarFrame)
 		statusBarView.backgroundColor = UIColor.white
 		view.addSubview(statusBarView)
+        statusBarView.setStyle(.secondaryBackground)
+        
+        tableView.styles = [AdamantThemeStyle.baseTable.rawValue]
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
 		
 		// MARK: Transfers controller
 		let controller = transfersProvider.unreadTransfersController()
@@ -184,6 +196,7 @@ class AccountViewController: FormViewController {
 		guard let header = UINib(nibName: "AccountHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? AccountHeaderView else {
 			fatalError("Can't load AccountHeaderView")
 		}
+        header.setStyles([.secondaryBackground, .primaryTint])
 		
 		accountHeaderView = header
 		accountHeaderView.delegate = self
@@ -209,6 +222,11 @@ class AccountViewController: FormViewController {
 		accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
 		accountHeaderView.walletViewContainer.constrainToEdges(pagingViewController.view)
         addChild(pagingViewController)
+        
+        pagingViewController.style = "paging"
+        pagingViewController.view.setStyle(.secondaryBackground)
+        pagingViewController.collectionView.setStyle(.secondaryBackground)
+        pagingViewController.borderColor = UIColor.clear
 		
 		for wallet in accountService.wallets {
 			NotificationCenter.default.addObserver(forName: wallet.walletUpdatedNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
@@ -221,6 +239,21 @@ class AccountViewController: FormViewController {
 		// MARK: Application
         let appSection = Section(Sections.application.localized) {
 			$0.tag = Sections.application.tag
+            
+            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
+            header.title = Sections.application.localized
+            header.onSetupView = {view, _ in
+                view.textLabel?.setStyle(.secondaryText)
+            }
+            header.height = {50}
+            $0.header = header
+            
+            var footer = HeaderFooterView<UIView>(.class)
+            footer.height = {0}
+            footer.onSetupView = { view, _ in
+                view.backgroundColor = .clear
+            }
+            $0.footer = footer
 		}
 			
 		// Security
@@ -232,6 +265,10 @@ class AccountViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.secondaryBackground, .primaryTint])
 		}.onCellSelection { [weak self] (_, _) in
 			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.security) else {
 				return
@@ -256,7 +293,11 @@ class AccountViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}.onCellSelection { [weak self] (_, _) in
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
+        }.onCellSelection { [weak self] (_, _) in
 			guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
 				return
 			}
@@ -269,9 +310,43 @@ class AccountViewController: FormViewController {
             } else {
                 self?.present(vc, animated: true, completion: nil)
             }
+            
+            self?.deselectWalletViewControllers()
         }
 
         appSection.append(nodesRow)
+            
+        // Theme select
+        let themeRow = LabelRow() {
+            $0.title = Rows.theme.localized
+            $0.tag = Rows.theme.tag
+            $0.cell.imageView?.image = Rows.theme.image
+            $0.cell.selectionStyle = .gray
+            $0.value = ThemesManager.shared.currentTheme.title
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
+        }.onCellSelection { [weak self] (_, _) in
+            guard let vc = self?.router.get(scene: AdamantScene.Settings.themes) else {
+                return
+            }
+            
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else if let nav = self?.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                self?.present(vc, animated: true, completion: nil)
+            }
+            
+            self?.deselectWalletViewControllers()
+        }
+        
+		appSection.append(themeRow)
 
 		// About
 		let aboutRow = LabelRow() {
@@ -281,7 +356,11 @@ class AccountViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}.onCellSelection { [weak self] (_, _) in
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
+        }.onCellSelection { [weak self] (_, _) in
 			guard let vc = self?.router.get(scene: AdamantScene.Settings.about) else {
 				return
 			}
@@ -294,6 +373,8 @@ class AccountViewController: FormViewController {
             } else {
                 self?.present(vc, animated: true, completion: nil)
             }
+            
+            self?.deselectWalletViewControllers()
 		}
 		
         appSection.append(aboutRow)
@@ -301,6 +382,14 @@ class AccountViewController: FormViewController {
 		// MARK: Actions
 		let actionsSection = Section(Sections.actions.localized) {
 			$0.tag = Sections.actions.tag
+            
+            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
+            header.title = Sections.actions.localized
+            header.onSetupView = {view, _ in
+                view.textLabel?.setStyle(.secondaryText)
+            }
+            header.height = { 50 }
+            $0.header = header
 		}
 		
 		// Delegates
@@ -308,11 +397,14 @@ class AccountViewController: FormViewController {
 			$0.tag = Rows.voteForDelegates.tag
 			$0.title = Rows.voteForDelegates.localized
 			$0.cell.imageView?.image = Rows.voteForDelegates.image
-		}.cellSetup { (cell, _) in
-			cell.selectionStyle = .gray
+			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}.onCellSelection { [weak self] (_, row) in
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
+        }.onCellSelection { [weak self] (_, row) in
 			guard let vc = self?.router.get(scene: AdamantScene.Delegates.delegates) else {
 				return
 			}
@@ -326,6 +418,8 @@ class AccountViewController: FormViewController {
             } else {
                 self?.present(vc, animated: true, completion: nil)
             }
+            
+            self?.deselectWalletViewControllers()
 		}
         
         actionsSection.append(delegatesRow)
@@ -338,6 +432,10 @@ class AccountViewController: FormViewController {
             $0.cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onCellSelection { [weak self] (_, _) in
             guard let vc = self?.router.get(scene: AdamantScene.Settings.qRGenerator) else {
                 return
@@ -351,6 +449,8 @@ class AccountViewController: FormViewController {
             } else {
                 self?.present(vc, animated: true, completion: nil)
             }
+            
+            self?.deselectWalletViewControllers()
         }
 
         actionsSection.append(generateQrRow)
@@ -363,7 +463,11 @@ class AccountViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}.onCellSelection { [weak self] (_, row) in
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
+        }.onCellSelection { [weak self] (_, row) in
 			guard let address = self?.accountService.account?.address else {
 				return
 			}
@@ -403,6 +507,12 @@ class AccountViewController: FormViewController {
             $0.title = Rows.stayIn.localized
             $0.cell.imageView?.image = Rows.stayIn.image
             $0.value = accountService.hasStayInAccount
+        }.cellUpdate { (cell, _) in
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.switchControl.onTintColor = UIColor.adamant.secondary
+            cell.setStyles([.primaryTint, .secondaryBackground])
         }.onChange { [weak self] row in
             guard let enabled = row.value else {
                 return
@@ -434,6 +544,12 @@ class AccountViewController: FormViewController {
                 
                 return !showBiometry
             })
+        }.cellUpdate { (cell, _) in
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.primaryTint, .secondaryBackground])
+            cell.switchControl.onTintColor = UIColor.adamant.secondary
         }.onChange { [weak self] row in
             let value = row.value ?? false
             self?.setBiometry(enabled: value)
@@ -458,6 +574,10 @@ class AccountViewController: FormViewController {
             })
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onCellSelection { [weak self] (_, _) in
             guard let vc = self?.router.get(scene: AdamantScene.Settings.notifications) else {
                 return
@@ -471,6 +591,8 @@ class AccountViewController: FormViewController {
             } else {
                 self?.present(vc, animated: true, completion: nil)
             }
+            
+            self?.deselectWalletViewControllers()
         }
         
         securitySection.append(notificationsRow)
@@ -503,11 +625,13 @@ class AccountViewController: FormViewController {
             
             if let row: SwitchRow = form.rowBy(tag: Rows.stayIn.tag) {
                 row.value = accountService.hasStayInAccount
+                row.updateCell()
             }
             
             if let row: SwitchRow = form.rowBy(tag: Rows.biometry.tag) {
                 row.value = accountService.hasStayInAccount && accountService.useBiometry
                 row.evaluateHidden()
+                row.updateCell()
             }
             
             if let row = form.rowBy(tag: Rows.notifications.tag) {
@@ -540,6 +664,15 @@ class AccountViewController: FormViewController {
 				}
 			}
 		}
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.ThemesManager.themeChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            guard let row: LabelRow = self?.form.rowBy(tag: Rows.theme.tag) else {
+                return
+            }
+            
+            row.value = ThemesManager.shared.currentTheme.title
+            row.updateCell()
+        }
 		
 		for (index, service) in accountService.wallets.enumerated() {
 			NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,
@@ -591,6 +724,8 @@ class AccountViewController: FormViewController {
             layoutTableHeaderView()
             layoutTableFooterView()
         }
+        
+        pagingViewController?.indicatorColor = UIColor.adamant.primary
     }
 	
 	deinit {
@@ -665,6 +800,14 @@ class AccountViewController: FormViewController {
         view.removeConstraints(temporaryWidthConstraints)
         view.translatesAutoresizingMaskIntoConstraints = true
     }
+    
+    private func deselectWalletViewControllers() {
+        for vc in walletViewControllers {
+            if let indexPath = vc.tableView.indexPathForSelectedRow {
+                vc.tableView.deselectRow(at: indexPath, animated: true)
+            }
+        }
+    }
 }
 
 
@@ -675,20 +818,12 @@ extension AccountViewController: AccountHeaderViewDelegate {
 			return
 		}
 		
-		let completion = { [weak self] in
-			guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
-				return
-			}
-			
-			tableView.deselectRow(at: indexPath, animated: true)
-		}
-		
 		let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
 		dialogService.presentShareAlertFor(string: address,
                                            types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
 										   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                                            animated: true, from: from,
-										   completion: completion)
+										   completion: nil)
 	}
 }
 
@@ -715,7 +850,14 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
-        return accountService.wallets[index].walletViewController.viewController
+        let vc = accountService.wallets[index].walletViewController.viewController
+        
+        if let wallet = vc as? WalletViewControllerBase {
+            wallet.delegate = self
+            walletViewControllers.append(wallet)
+        }
+        
+        return vc
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, pagingItemForIndex index: Int) -> T {
@@ -765,4 +907,40 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 			tableView.tableHeaderView = accountHeaderView
 		}
 	}
+}
+
+extension AccountViewController: WalletViewControllerDelegate {
+    func walletViewControllerSelectedRow(_ viewController: WalletViewControllerBase) {
+        if let indexPath = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
+        
+        for vc in walletViewControllers {
+            if vc != viewController, let indexPath = vc.tableView.indexPathForSelectedRow {
+                vc.tableView.deselectRow(at: indexPath, animated: true)
+            }
+        }
+    }
+}
+
+extension AccountViewController: Themeable {
+    func apply(theme: AdamantTheme) {
+        setNeedsStatusBarAppearanceUpdate()
+        pagingViewController?.indicatorColor = UIColor.adamant.primary
+        pagingViewController?.reloadData()
+    }
+    
+    override open var preferredStatusBarStyle: UIStatusBarStyle {
+        return UIColor.adamant.statusBar
+    }
+}
+
+extension UISplitViewController: Themeable {
+    public func apply(theme: AdamantTheme) {
+        setNeedsStatusBarAppearanceUpdate()
+    }
+    
+    override open var preferredStatusBarStyle: UIStatusBarStyle {
+        return UIColor.adamant.statusBar
+    }
 }

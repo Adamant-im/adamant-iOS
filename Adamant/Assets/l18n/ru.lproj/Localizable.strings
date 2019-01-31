@@ -142,6 +142,15 @@
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "Об АДАМАНТе";
 
+/* Account tab: 'Theme' row */
+"AccountTab.Row.Theme" = "Тема";
+
+/* Account tab: 'Theme' row value 'Light' */
+"AccountTab.Row.Theme.Light" = "Светлая";
+
+/* Account tab: 'Theme' row value 'Dark' */
+"AccountTab.Row.Theme.Dark" = "Темная";
+
 /* Account tab: 'Vote for delegates' button */
 "AccountTab.Row.VoteForDelegates" = "Голосовать за делегатов";
 

@@ -178,9 +178,9 @@ extension TransactionStatus {
     var imageTintColor: UIColor {
         switch self {
         case .notInitiated, .updating: return UIColor.adamant.secondary
-        case .pending, .success: return UIColor.adamant.primary
-        case .failed: return UIColor.adamant.transferOutcomeIconBackground
-        case .warning: return UIColor.adamant.transferOutcomeIconBackground
+        case .pending: return UIColor.adamant.primary
+        case .success: return UIColor.adamant.activeColor
+        case .warning, .failed: return UIColor.adamant.alertColor
         }
     }
 }

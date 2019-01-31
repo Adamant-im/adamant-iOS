@@ -172,6 +172,12 @@ class ChatViewController: MessagesViewController {
 		if #available(iOS 11.0, *) {
             navigationItem.largeTitleDisplayMode = .never
 		}
+        
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        tabBarController?.tabBar.setStyle(.baseBarTint)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
+        
+        self.observeThemeChange()
 		
 		// MARK: 1. Initial configuration
 		
@@ -278,6 +284,10 @@ class ChatViewController: MessagesViewController {
 		}
 		
 		// MARK: 3. Readonly chat
+        messageInputBar.backgroundView.setStyles([.secondaryBackground, .secondaryBorder])
+        messageInputBar.inputTextView.setStyles([.secondaryBorder, .input])
+        messageInputBar.sendButton.setStyles([.secondaryBackground, .primaryTint, .secondaryBorder])
+        attachmentButton.setStyle(.primaryTint)
 		
 		if chatroom.isReadonly {
 			messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
@@ -343,6 +353,9 @@ class ChatViewController: MessagesViewController {
                 }
             }
         }
+        
+        self.view.setStyle(.primaryBackground)
+        self.messagesCollectionView.setStyle(.primaryBackground)
 	}
 	
 	override func viewDidAppear(_ animated: Bool) {
@@ -764,5 +777,11 @@ private class StatusUpdateProcedure: Procedure {
             try? privateContext.save()
             self.finish()
         }
+    }
+}
+
+extension ChatViewController: Themeable {
+    public func apply(theme: AdamantTheme) {
+        self.messagesCollectionView.reloadData()
     }
 }

@@ -53,8 +53,7 @@ class ChatListViewController: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
-        refreshControl.tintColor = UIColor.adamant.primary
-        
+        refreshControl.setStyle(.primaryTint)
         return refreshControl
     }()
     
@@ -88,6 +87,11 @@ class ChatListViewController: UIViewController {
 		tableView.delegate = self
 		tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         tableView.refreshControl = refreshControl
+        
+        tableView.styles = [AdamantThemeStyle.baseTable.rawValue]
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        tabBarController?.tabBar.setStyle(.baseBarTint)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
 		
 		if self.accountService.account != nil {
 			initFetchedRequestControllers(provider: chatsProvider)
@@ -349,7 +353,10 @@ extension ChatListViewController {
 		cell.avatarImageView.tintColor = UIColor.adamant.primary
 		cell.borderColor = UIColor.adamant.primary
 		cell.badgeColor = UIColor.adamant.primary
+        cell.lastMessageLabel.textColor = UIColor.adamant.primary
 		cell.borderWidth = 1
+        
+        cell.setupStyles()
 		
 		return cell
 	}
@@ -615,6 +622,10 @@ extension ChatListViewController {
 	}
     
     private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
+        markdownParser.color = UIColor.adamant.primary
+        markdownParser.link.color = UIColor.adamant.activeColor
+        markdownParser.automaticLinkDetectionEnabled = false
+        
         switch transaction {
         case let message as MessageTransaction:
             guard let text = message.message else {
@@ -735,7 +746,7 @@ extension ChatListViewController {
 		}
 		
 		more.image = #imageLiteral(resourceName: "swipe_more")
-		more.backgroundColor = UIColor.adamant.primary
+		more.backgroundColor = UIColor.adamantDefault.primary
 		
 		// Mark as read
 		if chatroom.hasUnreadMessages {
@@ -751,7 +762,7 @@ extension ChatListViewController {
 			}
 			
 			markAsRead.image = #imageLiteral(resourceName: "swipe_mark-as-read")
-			markAsRead.backgroundColor = UIColor.adamant.primary
+			markAsRead.backgroundColor = UIColor.adamantDefault.primary
 			
 			actions = [markAsRead, more]
 		} else {
@@ -773,6 +784,8 @@ extension ChatListViewController {
 		} else {
 			item = tabBarItem
 		}
+        
+        item.setStyle(.tabItem)
 		
 		if let value = value, value > 0 {
 			item.badgeValue = String(value)

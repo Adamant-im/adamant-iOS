@@ -9,13 +9,13 @@
 import UIKit
 
 extension UIColor {
-	public struct adamant {
+	public struct adamantDefault {
         
         // MARK: Colors from Adamant Guideline
         static let first = UIColor(hex: "#474a5f")
         static let fourth = UIColor(hex: "#eeeeee")
 
-        static let active = UIColor(hex: "#179cec")
+        static let activeColor = UIColor(hex: "#179cec")
         static let background = UIColor(hex: "#f2f6fa")
         
 		// MARK: Global colors
@@ -56,4 +56,8 @@ extension UIColor {
 		// Outcome transfer icon background, light red
 		static let transferOutcomeIconBackground = UIColor(red: 0.94, green: 0.52, blue: 0.53, alpha: 1)
 	}
+    
+    class var adamant: AdamantTheme {
+        return ThemesManager.shared.currentTheme
+    }
 }

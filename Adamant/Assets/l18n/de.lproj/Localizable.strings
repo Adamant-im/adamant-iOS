@@ -142,6 +142,15 @@
 /* Account tab: 'Get free tokens' button */
 "AccountTab.Row.FreeTokens" = "Kostenlose ADM Tokens";
 
+/* Account tab: 'Theme' row */
+"AccountTab.Row.Theme" = "Design";
+
+/* Account tab: 'Theme' row value 'Light' */
+"AccountTab.Row.Theme.Light" = "Light";
+
+/* Account tab: 'Theme' row value 'Dark' */
+"AccountTab.Row.Theme.Dark" = "Dark";
+
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "Über ADAMANT";
 
