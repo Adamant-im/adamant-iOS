@@ -134,6 +134,8 @@ class AccountViewController: FormViewController {
 	
 	private var initiated = false
 	
+    private var walletViewControllers = [WalletViewControllerBase]()
+    
     // MARK: StayIn
     
     var showLoggedInOptions: Bool {
@@ -308,6 +310,8 @@ class AccountViewController: FormViewController {
             } else {
                 self?.present(vc, animated: true, completion: nil)
             }
+            
+            self?.deselectWalletViewControllers()
         }
 
         appSection.append(nodesRow)
@@ -338,6 +342,8 @@ class AccountViewController: FormViewController {
             } else {
                 self?.present(vc, animated: true, completion: nil)
             }
+            
+            self?.deselectWalletViewControllers()
         }
         
 		appSection.append(themeRow)
@@ -367,6 +373,8 @@ class AccountViewController: FormViewController {
             } else {
                 self?.present(vc, animated: true, completion: nil)
             }
+            
+            self?.deselectWalletViewControllers()
 		}
 		
         appSection.append(aboutRow)
@@ -410,6 +418,8 @@ class AccountViewController: FormViewController {
             } else {
                 self?.present(vc, animated: true, completion: nil)
             }
+            
+            self?.deselectWalletViewControllers()
 		}
         
         actionsSection.append(delegatesRow)
@@ -439,6 +449,8 @@ class AccountViewController: FormViewController {
             } else {
                 self?.present(vc, animated: true, completion: nil)
             }
+            
+            self?.deselectWalletViewControllers()
         }
 
         actionsSection.append(generateQrRow)
@@ -579,6 +591,8 @@ class AccountViewController: FormViewController {
             } else {
                 self?.present(vc, animated: true, completion: nil)
             }
+            
+            self?.deselectWalletViewControllers()
         }
         
         securitySection.append(notificationsRow)
@@ -786,6 +800,14 @@ class AccountViewController: FormViewController {
         view.removeConstraints(temporaryWidthConstraints)
         view.translatesAutoresizingMaskIntoConstraints = true
     }
+    
+    private func deselectWalletViewControllers() {
+        for vc in walletViewControllers {
+            if let indexPath = vc.tableView.indexPathForSelectedRow {
+                vc.tableView.deselectRow(at: indexPath, animated: true)
+            }
+        }
+    }
 }
 
 
@@ -796,20 +818,12 @@ extension AccountViewController: AccountHeaderViewDelegate {
 			return
 		}
 		
-		let completion = { [weak self] in
-			guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
-				return
-			}
-			
-			tableView.deselectRow(at: indexPath, animated: true)
-		}
-		
 		let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
 		dialogService.presentShareAlertFor(string: address,
                                            types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
 										   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                                            animated: true, from: from,
-										   completion: completion)
+										   completion: nil)
 	}
 }
 
@@ -836,7 +850,14 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
-        return accountService.wallets[index].walletViewController.viewController
+        let vc = accountService.wallets[index].walletViewController.viewController
+        
+        if let wallet = vc as? WalletViewControllerBase {
+            wallet.delegate = self
+            walletViewControllers.append(wallet)
+        }
+        
+        return vc
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, pagingItemForIndex index: Int) -> T {
@@ -886,6 +907,20 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 			tableView.tableHeaderView = accountHeaderView
 		}
 	}
+}
+
+extension AccountViewController: WalletViewControllerDelegate {
+    func walletViewControllerSelectedRow(_ viewController: WalletViewControllerBase) {
+        if let indexPath = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
+        
+        for vc in walletViewControllers {
+            if vc != viewController, let indexPath = vc.tableView.indexPathForSelectedRow {
+                vc.tableView.deselectRow(at: indexPath, animated: true)
+            }
+        }
+    }
 }
 
 extension AccountViewController: Themeable {

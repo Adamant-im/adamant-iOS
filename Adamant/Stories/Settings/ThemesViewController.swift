@@ -30,6 +30,7 @@ class ThemesViewController: UITableViewController {
         
         checkedRow = themeKeys.firstIndex(of: ThemesManager.shared.currentTheme.id)
         tableView.register(UINib(nibName: "ThemeTableViewCell", bundle: nil), forCellReuseIdentifier: ThemesViewController.identifier)
+        tableView.tableFooterView = UIView()
         
         // Styles
         tableView.setStyle(.baseTable)
@@ -46,10 +47,6 @@ class ThemesViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return themeKeys.count
-    }
-    
-    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        return UIView()
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -83,7 +80,7 @@ class ThemesViewController: UITableViewController {
         }
         
         cell.setStyle(.baseTableViewCell)
-        cell.textLabel?.textColor = UIColor.adamant.primary
+        cell.titleLabel?.setStyle(.primaryText)
 
         return cell
     }

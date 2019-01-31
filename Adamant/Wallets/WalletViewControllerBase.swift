@@ -16,6 +16,10 @@ extension String.adamantLocalized {
     }
 }
 
+protocol WalletViewControllerDelegate: class {
+    func walletViewControllerSelectedRow(_ viewController: WalletViewControllerBase)
+}
+
 class WalletViewControllerBase: FormViewController, WalletViewController {
 	// MARK: - Rows
 	enum BaseRows {
@@ -53,6 +57,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 	
 	var service: WalletService?
 	
+    weak var delegate: WalletViewControllerDelegate?
+    
 	// MARK: - IBOutlets
 	
 	@IBOutlet weak var walletTitleLabel: UILabel!
@@ -155,7 +161,6 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 cell.detailTextLabel?.setStyle(.secondaryText)
                 cell.alertLabel.setStyle(.notificationBubble)
             }.onCellSelection { [weak self] (_, row) in
-                row.deselect()
                 guard let service = self?.service as? WalletServiceWithTransfers else {
 					return
 				}
@@ -166,6 +171,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                     split.showDetailViewController(details, sender: self)
                 } else {
                     self?.navigationController?.pushViewController(vc, animated: true )
+                }
+                
+                if let vc = self, let delegate = vc.delegate {
+                    delegate.walletViewControllerSelectedRow(vc)
                 }
 			}
 		}
@@ -185,7 +194,6 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 cell.textLabel?.setStyle(.primaryText)
                 cell.style = AdamantThemeStyle.commonTableViewCell
 			}.onCellSelection { [weak self] (_, row) in
-                row.deselect()
 				guard let service = self?.service as? WalletServiceWithSend else {
 					return
 				}
@@ -204,6 +212,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                     } else {
                         self?.present(vc, animated: true)
                     }
+                }
+                
+                if let vc = self, let delegate = vc.delegate {
+                    delegate.walletViewControllerSelectedRow(vc)
                 }
 			}
 			
