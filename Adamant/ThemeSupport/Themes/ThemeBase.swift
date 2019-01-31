@@ -19,6 +19,8 @@ enum ThemeColors: String {
     case alert = "alertColor"
     case background = "backgroundColor"
     case alternativeBackground = "altBackgroundColor"
+    case bubbleText = "bubbleTextColor"
+    case bubble = "bubbleColor"
 }
 
 internal class ThemeBase: AdamantTheme {
@@ -101,6 +103,14 @@ internal class ThemeBase: AdamantTheme {
     
     var statusBar: UIStatusBarStyle {
         return UIStatusBarStyle.default
+    }
+    
+    var bubble: UIColor {
+        return getColor(.bubble)
+    }
+    
+    var bubbleText: UIColor {
+        return getColor(.bubbleText)
     }
     
     // MARK: - Init

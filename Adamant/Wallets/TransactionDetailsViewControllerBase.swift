@@ -470,10 +470,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }.cellSetup { (cell, _) in
                 cell.selectionStyle = .gray
             }.cellUpdate { (cell, _) in
-                cell.textLabel?.textColor = .black
-                cell.textLabel?.setStyle(.primaryText)
-                cell.detailTextLabel?.setStyle(.primaryText)
-                cell.style = AdamantThemeStyle.commonTableViewCell
+                cell.textView?.setStyle(.primaryText)
+                cell.textView?.backgroundColor = UIColor.clear
+                cell.setStyle(.secondaryBackground)
                 cell.textView.isSelectable = false
                 cell.textView.isEditable = false
             }.onCellSelection { [weak self] (cell, row) in

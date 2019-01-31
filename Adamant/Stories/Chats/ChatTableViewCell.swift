@@ -28,7 +28,7 @@ class ChatTableViewCell: UITableViewCell {
     func setupStyles() {
         setStyle(.chatCell)
         accountLabel.setStyle(.primaryText)
-        lastMessageLabel.setStyle(.secondaryText)
+        lastMessageLabel.setStyle(.primaryText)
         dateLabel.setStyle(.secondaryText)
         badgeView.setStyle(.activeBackground)
     }

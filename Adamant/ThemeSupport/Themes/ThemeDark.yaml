@@ -6,6 +6,8 @@ variables:
   successColor: "#50fa7b" # (принятый перевод и успешное действие)
   alertColor: "#FAA05A" # (отправленный перевод и отмененное действие)
   backgroundColor: "#282D35"
+  bubbleTextColor: "282D35" # (текст баббла с уведомлениями)
+  bubbleColor: "F8F8F2" # (цвет баббла с уведомлениями)
 styles:
   pinpad:
     textColor: $firstColor
@@ -45,6 +47,9 @@ styles:
     normalBackgroundColor: $thirdColor
   logo:
     image: "DarkLogo"
+  notificationBubble:
+    textColor: $bubbleTextColor
+    backgroundColor: $bubbleColor
 ### Base styles ###
   ## Tint ##
   primaryTint:

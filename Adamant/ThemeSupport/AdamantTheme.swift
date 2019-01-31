@@ -57,6 +57,12 @@ public protocol AdamantTheme {
     var background: UIColor { get }
     var secondaryBackground: UIColor { get }
     
+    /// Notifications bubble color
+    var bubble: UIColor { get }
+    
+    /// Notifications bubble text color
+    var bubbleText: UIColor { get }
+    
     // MARK: Chat colors
     
     /// User chat bubble background

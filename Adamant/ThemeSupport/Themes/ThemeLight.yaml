@@ -7,6 +7,8 @@ variables:
   alertColor: "#faa05a" # (отправленный перевод и отмененное действие)
   backgroundColor: "#f2f6fa"
   altBackgroundColor: "#ffffff"
+  bubbleTextColor: "f2f6fa" # (текст баббла с уведомлениями)
+  bubbleColor: "474a5f" # (цвет баббла с уведомлениями)
 styles:
   pinpad:
     textColor: $firstColor
@@ -46,6 +48,9 @@ styles:
     normalBackgroundColor: $altBackgroundColor
   logo:
     image: "Adamant-logo"
+  notificationBubble:
+    textColor: $bubbleTextColor
+    backgroundColor: $bubbleColor
 ### Base styles ###
   ## Tint ##
   primaryTint:

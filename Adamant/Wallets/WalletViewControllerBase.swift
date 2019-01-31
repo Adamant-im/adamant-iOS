@@ -153,6 +153,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 cell.textLabel?.setStyle(.primaryText)
                 cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
                 cell.detailTextLabel?.setStyle(.secondaryText)
+                cell.alertLabel.setStyle(.notificationBubble)
             }.onCellSelection { [weak self] (_, row) in
                 row.deselect()
                 guard let service = self?.service as? WalletServiceWithTransfers else {

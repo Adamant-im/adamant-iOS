@@ -13,6 +13,7 @@ import MyLittlePinpad
 import MessageInputBar
 import Parchment
 import Eureka
+import FreakingSimpleRoundImageView
 
 enum ThemesManagerError: Error {
     case failedLoadingTheme
@@ -337,6 +338,14 @@ extension ThemesManager {
         
         Stylist.shared.addProperty(StyleProperty(.textColor) { (view: PickerCell<URLScheme>, value: PropertyValue<UIColor>) in
             view.pickerTextAttributes = [NSAttributedString.Key.foregroundColor: value.value]
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(.textColor) { (view: RoundedLabel, value: PropertyValue<UIColor>) in
+            view.textColor = value.value
+        })
+        
+        Stylist.shared.addProperty(StyleProperty(.backgroundColor) { (view: RoundedLabel, value: PropertyValue<UIColor>) in
+            view.backgroundColor = value.value
         })
         
         Stylist.shared.addProperty(StyleProperty(.selectedBackgroundColor) { (view: UITableViewCell, value: PropertyValue<UIColor>) in

@@ -602,7 +602,7 @@ extension TransferViewControllerBase {
             })
 			
         case .name:
-            return LabelRow() { [weak self] in
+            let row = LabelRow() { [weak self] in
                 $0.title = BaseRows.name.localized
                 $0.tag = BaseRows.name.tag
                 $0.value = self?.recipientName
@@ -613,7 +613,13 @@ extension TransferViewControllerBase {
                         return true
                     }
                 })
+            }.cellUpdate { (cell, _) in
+                cell.textLabel?.setStyle(.primaryText)
+                cell.detailTextLabel?.setStyle(.secondaryText)
+                cell.setStyle(.secondaryBackground)
             }
+            
+            return row
             
 		case .address:
 			return recipientRow()
@@ -715,10 +721,16 @@ extension TransferViewControllerBase {
             })
 		
 		case .comments:
-            return TextAreaRow() {
+            let row = TextAreaRow() {
                 $0.tag = BaseRows.comments.tag
                 $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
+            }.cellUpdate { (cell, _) in
+                cell.textView?.setStyle(.primaryText)
+                cell.textView?.backgroundColor = UIColor.clear
+                cell.setStyle(.secondaryBackground)
             }
+            
+            return row
 			
 		case .sendButton:
 			return ButtonRow() { [weak self] in

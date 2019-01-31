@@ -498,7 +498,8 @@ class AccountViewController: FormViewController {
             cell.imageView?.setStyle(.primaryTint)
             cell.textLabel?.setStyle(.primaryText)
             cell.detailTextLabel?.setStyle(.secondaryText)
-            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
+            cell.switchControl.onTintColor = UIColor.adamant.secondary
+            cell.setStyles([.primaryTint, .secondaryBackground])
         }.onChange { [weak self] row in
             guard let enabled = row.value else {
                 return
@@ -534,7 +535,8 @@ class AccountViewController: FormViewController {
             cell.imageView?.setStyle(.primaryTint)
             cell.textLabel?.setStyle(.primaryText)
             cell.detailTextLabel?.setStyle(.secondaryText)
-            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
+            cell.setStyles([.primaryTint, .secondaryBackground])
+            cell.switchControl.onTintColor = UIColor.adamant.secondary
         }.onChange { [weak self] row in
             let value = row.value ?? false
             self?.setBiometry(enabled: value)
@@ -705,6 +707,8 @@ class AccountViewController: FormViewController {
             layoutTableHeaderView()
             layoutTableFooterView()
         }
+        
+        pagingViewController?.indicatorColor = UIColor.adamant.primary
     }
 	
 	deinit {
@@ -884,6 +888,8 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 extension AccountViewController: Themeable {
     func apply(theme: AdamantTheme) {
         setNeedsStatusBarAppearanceUpdate()
+        pagingViewController?.indicatorColor = UIColor.adamant.primary
+        pagingViewController?.reloadData()
     }
     
     override open var preferredStatusBarStyle: UIStatusBarStyle {

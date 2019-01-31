@@ -353,6 +353,7 @@ extension ChatListViewController {
 		cell.avatarImageView.tintColor = UIColor.adamant.primary
 		cell.borderColor = UIColor.adamant.primary
 		cell.badgeColor = UIColor.adamant.primary
+        cell.lastMessageLabel.textColor = UIColor.adamant.primary
 		cell.borderWidth = 1
         
         cell.setupStyles()

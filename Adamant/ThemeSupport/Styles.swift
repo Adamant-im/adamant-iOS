@@ -49,6 +49,7 @@ enum AdamantThemeStyle: String {
     case tabItem = "tabItem"
     case biometricButton = "biometricButton"
     case secondaryBorder = "secondaryBorder"
+    case notificationBubble = "notificationBubble"
     
     case primaryBackground = "primaryBackground"
     case secondaryBackground = "secondaryBackground"

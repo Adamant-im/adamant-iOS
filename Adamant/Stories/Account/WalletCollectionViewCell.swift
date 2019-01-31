@@ -34,7 +34,8 @@ class WalletCollectionViewCell: PagingCell {
             balanceLabel.text = String.adamantLocalized.account.updatingBalance
         }
 		
-		accessoryContainerView.accessoriesBackgroundColor = options.indicatorColor
+		accessoryContainerView.accessoriesBackgroundColor = ThemesManager.shared.currentTheme.bubble
+        accessoryContainerView.accessoriesFontColor = ThemesManager.shared.currentTheme.bubbleText
         balanceLabel.setStyle(.primaryText)
         currencySymbolLabel.setStyle(.primaryText)
         self.setStyle(.baseTableViewCell)
