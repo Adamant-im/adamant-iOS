@@ -100,7 +100,7 @@ class AccountViewController: FormViewController {
 			switch self {
 			case .security: return #imageLiteral(resourceName: "row_security")
 			case .about: return #imageLiteral(resourceName: "row_about")
-			case .theme: return #imageLiteral(resourceName: "row_icon_placeholder") // TODO:
+			case .theme: return #imageLiteral(resourceName: "row_themes.png")
             case .nodes: return #imageLiteral(resourceName: "row_nodes")
 			case .balance: return #imageLiteral(resourceName: "row_balance")
             case .voteForDelegates: return #imageLiteral(resourceName: "row_vote-delegates")
