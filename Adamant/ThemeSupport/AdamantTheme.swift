@@ -17,7 +17,7 @@ public protocol Themeable: class {
 extension Themeable {
     public func observeThemeChange()
     {
-        ThemeManager.shared.manage(for: self)
+        ThemesManager.shared.manage(for: self)
     }
 }
 

@@ -131,7 +131,7 @@ class SecurityViewController: FormViewController {
 		navigationItem.title = String.adamantLocalized.security.title
 		navigationOptions = .Disabled
         
-        self.tableView.styles = ["baseTable"]
+        self.tableView.setStyle(.baseTable)
         navigationController?.navigationBar.setStyle(.baseNavigationBar)
         view.style = AdamantThemeStyle.primaryTintAndBackground
 		

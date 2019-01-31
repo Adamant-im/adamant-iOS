@@ -83,7 +83,7 @@ class ShareQrViewController: FormViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-        tableView.styles = ["baseTable"]
+        tableView.setStyle(.baseTable)
 		
 		// MARK: QR code
         let qrSection = Section()

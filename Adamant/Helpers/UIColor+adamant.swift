@@ -50,6 +50,6 @@ extension UIColor {
 	}
     
     class var adamant: AdamantTheme {
-        return ThemeManager.shared.currentTheme ?? ThemeManager.shared.defaultTheme
+        return ThemesManager.shared.currentTheme ?? ThemesManager.shared.defaultTheme
     }
 }

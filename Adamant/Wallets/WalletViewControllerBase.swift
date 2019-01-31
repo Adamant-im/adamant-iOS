@@ -73,7 +73,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         
         let section = Section()
 
-        tableView.styles = ["baseTable"]
+        tableView.setStyle(.baseTable)
         walletTitleLabel.setStyle(.secondaryText)
 		
 		// MARK: Address

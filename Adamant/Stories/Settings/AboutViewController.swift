@@ -131,7 +131,7 @@ class AboutViewController: FormViewController {
         
 		navigationItem.title = String.adamantLocalized.about.title
         
-        self.tableView.styles = ["baseTable"]
+        self.tableView.setStyle(.baseTable)
         navigationController?.navigationBar.setStyle(.baseNavigationBar)
         view.style = AdamantThemeStyle.primaryTintAndBackground
 		

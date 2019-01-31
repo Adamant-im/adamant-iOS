@@ -42,7 +42,7 @@ class TransactionsListViewControllerBase: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView.styles = ["baseTable"]
+        tableView.setStyle(.baseTable)
         navigationController?.navigationBar.setStyle(.baseNavigationBar)
         tabBarController?.tabBar.setStyle(.baseBarTint)
         view.style = AdamantThemeStyle.primaryTintAndBackground

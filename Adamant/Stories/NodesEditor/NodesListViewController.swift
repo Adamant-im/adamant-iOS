@@ -88,7 +88,7 @@ class NodesListViewController: FormViewController {
             navigationItem.largeTitleDisplayMode = .always
         }
         
-        self.tableView.styles = ["baseTable"]
+        self.tableView.setStyle(.baseTable)
         navigationController?.navigationBar.setStyle(.baseNavigationBar)
         view.setStyles([.primaryBackground, .primaryTint])
 		

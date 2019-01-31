@@ -101,7 +101,7 @@ class NewChatViewController: FormViewController {
         
 		tableView.keyboardDismissMode = .none
         
-        tableView.styles = ["baseTable"]
+        tableView.setStyle(.baseTable)
         navigationController?.navigationBar.setStyle(.baseNavigationBar)
         view.style = AdamantThemeStyle.primaryTintAndBackground
 		

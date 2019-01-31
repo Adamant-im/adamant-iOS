@@ -114,7 +114,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dialogService = container.resolve(DialogService.self)
         addressBookService = container.resolve(AddressBookService.self)
         
-        ThemeManager.shared.securedStore = container.resolve(SecuredStore.self)
+        ThemesManager.shared.securedStore = container.resolve(SecuredStore.self)
 		
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
@@ -124,7 +124,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		window!.tintColor = UIColor.adamantDefault.primary
         
         // adds custom properties to Stylist
-        ThemeManager.addCustomStyleProperties()
+        ThemesManager.addCustomStyleProperties()
         
         self.observeThemeChange()
 		

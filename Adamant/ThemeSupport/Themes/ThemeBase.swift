@@ -110,7 +110,7 @@ internal class ThemeBase: AdamantTheme {
         
         // Load file
         guard let path = Bundle.main.path(forResource: fileName, ofType: "yaml") else {
-            throw ThemeManagerError.failedLoadingTheme
+            throw ThemesManagerError.failedLoadingTheme
         }
         
         // Parse it
@@ -118,7 +118,7 @@ internal class ThemeBase: AdamantTheme {
             let theme = try Theme(path: path)
             self.theme = theme
         } catch {
-            throw ThemeManagerError.failedLoadingTheme
+            throw ThemesManagerError.failedLoadingTheme
         }
     }
     

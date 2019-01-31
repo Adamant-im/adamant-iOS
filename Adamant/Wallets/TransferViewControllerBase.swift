@@ -240,7 +240,7 @@ class TransferViewControllerBase: FormViewController {
         super.viewDidLoad()
 		
 		// MARK: UI
-        tableView.styles = ["baseTable"]
+        tableView.setStyle(.baseTable)
         navigationController?.navigationBar.setStyle(.baseNavigationBar)
         tabBarController?.tabBar.setStyle(.baseBarTint)
         view.setStyles([.primaryBackground, .primaryTint])

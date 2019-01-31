@@ -42,11 +42,11 @@ private enum ThemesEnum: Int {
     }
     
     var theme: AdamantTheme {
-        return ThemeManager.shared.themes[id]!
+        return ThemesManager.shared.themes[id]!
     }
     
     static var current: ThemesEnum {
-        switch ThemeManager.shared.currentTheme.id {
+        switch ThemesManager.shared.currentTheme.id {
         case ThemesEnum.light.id: return .light
         case ThemesEnum.dark.id: return .dark
         default: fatalError()

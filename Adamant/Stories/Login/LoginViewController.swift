@@ -141,7 +141,7 @@ class LoginViewController: FormViewController {
         
 		navigationOptions = RowNavigationOptions.Disabled
         
-        self.tableView.styles = ["baseTable"]
+        self.tableView.setStyle(.baseTable)
 		
 		// MARK: Header & Footer
 		if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {

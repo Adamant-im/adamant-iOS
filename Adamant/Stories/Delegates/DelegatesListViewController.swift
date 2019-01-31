@@ -90,7 +90,7 @@ class DelegatesListViewController: UIViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView.styles = ["baseTable"]
+        self.tableView.setStyle(.baseTable)
         navigationController?.navigationBar.setStyle(.baseNavigationBar)
         view.style = AdamantThemeStyle.primaryTintAndBackground
 		

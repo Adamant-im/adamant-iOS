@@ -127,7 +127,7 @@
 		E93E288721FE16580044F7C7 /* AdamantTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E288621FE16580044F7C7 /* AdamantTheme.swift */; };
 		E93E288B21FE16EB0044F7C7 /* ThemeLight.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E288A21FE16EB0044F7C7 /* ThemeLight.swift */; };
 		E93E288F21FE17E30044F7C7 /* ThemeDark.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E288E21FE17E30044F7C7 /* ThemeDark.swift */; };
-		E93E289121FE18B50044F7C7 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E289021FE18B40044F7C7 /* ThemeManager.swift */; };
+		E93E289121FE18B50044F7C7 /* ThemesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E289021FE18B40044F7C7 /* ThemesManager.swift */; };
 		E93E289321FE1BCF0044F7C7 /* ThemeBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E289221FE1BCF0044F7C7 /* ThemeBase.swift */; };
 		E93E289521FE316F0044F7C7 /* Styles.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E289421FE316F0044F7C7 /* Styles.swift */; };
 		E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EB09E20DA3FA4001F9601 /* NodesEditorRoutes.swift */; };
@@ -437,7 +437,7 @@
 		E93E288621FE16580044F7C7 /* AdamantTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantTheme.swift; sourceTree = "<group>"; };
 		E93E288A21FE16EB0044F7C7 /* ThemeLight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeLight.swift; sourceTree = "<group>"; };
 		E93E288E21FE17E30044F7C7 /* ThemeDark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeDark.swift; sourceTree = "<group>"; };
-		E93E289021FE18B40044F7C7 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
+		E93E289021FE18B40044F7C7 /* ThemesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemesManager.swift; sourceTree = "<group>"; };
 		E93E289221FE1BCF0044F7C7 /* ThemeBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeBase.swift; sourceTree = "<group>"; };
 		E93E289421FE316F0044F7C7 /* Styles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Styles.swift; sourceTree = "<group>"; };
 		E93EB09E20DA3FA4001F9601 /* NodesEditorRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodesEditorRoutes.swift; sourceTree = "<group>"; };
@@ -875,7 +875,7 @@
 			children = (
 				E93E288521FE16150044F7C7 /* Themes */,
 				E93E288621FE16580044F7C7 /* AdamantTheme.swift */,
-				E93E289021FE18B40044F7C7 /* ThemeManager.swift */,
+				E93E289021FE18B40044F7C7 /* ThemesManager.swift */,
 				E93E289421FE316F0044F7C7 /* Styles.swift */,
 			);
 			path = ThemeSupport;
@@ -1499,7 +1499,7 @@
 			files = (
 				E908472A2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift in Sources */,
 				64A223D620F760BB005157CB /* Localization.swift in Sources */,
-				E93E289121FE18B50044F7C7 /* ThemeManager.swift in Sources */,
+				E93E289121FE18B50044F7C7 /* ThemesManager.swift in Sources */,
 				E94E7B08205D4CB80042B639 /* SharedRoutes.swift in Sources */,
 				E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */,
 				E9CAE8D22018AA7700345E76 /* AdamantApi+Accounts.swift in Sources */,
