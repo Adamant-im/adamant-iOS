@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14460.32" systemVersion="17G4015" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14460.32" systemVersion="17G5019" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="BaseAccount" representedClassName="BaseAccount" isAbstract="YES" syncable="YES">
         <attribute name="address" attributeType="String" syncable="YES"/>
         <attribute name="avatar" optional="YES" attributeType="String" syncable="YES"/>
@@ -29,7 +29,7 @@
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <relationship name="lastTransaction" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ChatTransaction" inverseName="lastIn" inverseEntity="ChatTransaction" syncable="YES"/>
-        <relationship name="partner" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CoreDataAccount" inverseName="chatroom" inverseEntity="CoreDataAccount" syncable="YES"/>
+        <relationship name="partner" maxCount="1" deletionRule="Nullify" destinationEntity="CoreDataAccount" inverseName="chatroom" inverseEntity="CoreDataAccount" syncable="YES"/>
         <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ChatTransaction" inverseName="chatroom" inverseEntity="ChatTransaction" syncable="YES"/>
     </entity>
     <entity name="ChatTransaction" representedClassName="ChatTransaction" isAbstract="YES" parentEntity="BaseTransaction" syncable="YES">
@@ -44,7 +44,7 @@
     </entity>
     <entity name="CoreDataAccount" representedClassName="CoreDataAccount" parentEntity="BaseAccount" syncable="YES">
         <attribute name="publicKey" attributeType="String" syncable="YES"/>
-        <relationship name="chatroom" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="partner" inverseEntity="Chatroom" syncable="YES"/>
+        <relationship name="chatroom" maxCount="1" deletionRule="Nullify" destinationEntity="Chatroom" inverseName="partner" inverseEntity="Chatroom" syncable="YES"/>
     </entity>
     <entity name="DummyAccount" representedClassName="DummyAccount" parentEntity="BaseAccount" syncable="YES"/>
     <entity name="MessageTransaction" representedClassName="MessageTransaction" parentEntity="ChatTransaction" syncable="YES">
@@ -66,9 +66,9 @@
         <element name="Chatroom" positionX="-74" positionY="26" width="128" height="180"/>
         <element name="ChatTransaction" positionX="142" positionY="137" width="128" height="165"/>
         <element name="CoreDataAccount" positionX="-236" positionY="174" width="128" height="75"/>
+        <element name="DummyAccount" positionX="-18" positionY="180" width="128" height="45"/>
         <element name="MessageTransaction" positionX="243" positionY="326" width="128" height="75"/>
         <element name="RichMessageTransaction" positionX="-27" positionY="171" width="128" height="90"/>
         <element name="TransferTransaction" positionX="97" positionY="342" width="128" height="75"/>
-        <element name="DummyAccount" positionX="-18" positionY="180" width="128" height="45"/>
     </elements>
 </model>

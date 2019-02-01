@@ -249,17 +249,17 @@ extension AdamantTransfersProvider {
 		securedStore.remove(StoreKey.transfersProvider.readedLastHeight)
 		
 		// Drop CoreData
-		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
-		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-		context.parent = stack.container.viewContext
-		
-		if let result = try? context.fetch(request) {
-			for obj in result {
-				context.delete(obj)
-			}
-			
-			try? context.save()
-		}
+//        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+//        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+//        context.parent = stack.container.viewContext
+//
+//        if let result = try? context.fetch(request) {
+//            for obj in result {
+//                context.delete(obj)
+//            }
+//
+//            try? context.save()
+//        }
 		
 		// Set state
 		setState(.empty, previous: prevState, notify: notify)

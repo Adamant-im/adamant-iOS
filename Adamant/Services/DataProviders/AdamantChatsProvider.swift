@@ -134,17 +134,18 @@ extension AdamantChatsProvider {
 		securedStore.remove(StoreKey.chatProvider.readedLastHeight)
 		
 		// Drop CoreData
-		let chatrooms = NSFetchRequest<Chatroom>(entityName: Chatroom.entityName)
-		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-		context.parent = stack.container.viewContext
-		
-		if let results = try? context.fetch(chatrooms) {
-			for obj in results {
-				context.delete(obj)
-			}
-			
-			try? context.save()
-		}
+//        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+//        context.parent = stack.container.viewContext
+//        
+//        let trs = NSFetchRequest<ChatTransaction>(entityName: "ChatTransaction")
+//        
+//        if let results = try? context.fetch(trs) {
+//            for obj in results {
+//                context.delete(obj)
+//            }
+//            
+//            try! context.save()
+//        }
 		
 		// Set State
 		setState(.empty, previous: prevState, notify: notify)
