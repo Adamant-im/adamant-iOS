@@ -489,6 +489,7 @@ class AccountViewController: FormViewController {
 			
 			alert.addAction(cancel)
 			alert.addAction(logout)
+            alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 			self?.present(alert, animated: true, completion: nil)
 		}
         

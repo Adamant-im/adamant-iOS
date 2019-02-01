@@ -325,6 +325,9 @@ extension AdamantDialogService {
         }
         
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        
+        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
+        
         return alert
     }
     
@@ -348,6 +351,8 @@ extension AdamantDialogService {
         })
         
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        
+        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
         
         if Thread.isMainThread {
             present(alert, animated: true, completion: nil)
@@ -423,25 +428,27 @@ extension AdamantDialogService {
     }
     
     func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: Any?) {
-        let alertVc = UIAlertController(title: title, message: message, preferredStyle: style)
+        let alert = UIAlertController(title: title, message: message, preferredStyle: style)
         
         if let actions = actions {
             for action in actions {
-                alertVc.addAction(action)
+                alert.addAction(action)
             }
         } else {
-            alertVc.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default))
+            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default))
         }
         
         if let sourceView = from as? UIView {
-            alertVc.popoverPresentationController?.sourceView = sourceView
-            alertVc.popoverPresentationController?.sourceRect = sourceView.bounds
-            alertVc.popoverPresentationController?.canOverlapSourceViewRect = false
+            alert.popoverPresentationController?.sourceView = sourceView
+            alert.popoverPresentationController?.sourceRect = sourceView.bounds
+            alert.popoverPresentationController?.canOverlapSourceViewRect = false
         } else if  let barButtonItem = from as? UIBarButtonItem {
-            alertVc.popoverPresentationController?.barButtonItem = barButtonItem
+            alert.popoverPresentationController?.barButtonItem = barButtonItem
         }
         
-        present(alertVc, animated: true, completion: nil)
+        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
+        
+        present(alert, animated: true, completion: nil)
     }
     
     func showAlert(title: String, message: String, actions: [PMAlertAction]?) {

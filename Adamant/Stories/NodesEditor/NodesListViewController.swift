@@ -221,6 +221,7 @@ extension NodesListViewController {
 			self?.nodesSource.saveNodes()
 		}))
 		
+        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 		present(alert, animated: true, completion: nil)
 	}
 	

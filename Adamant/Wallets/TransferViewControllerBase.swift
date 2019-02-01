@@ -497,6 +497,8 @@ class TransferViewControllerBase: FormViewController {
 		alert.addAction(cancelAction)
 		alert.addAction(sendAction)
 		
+        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
+        
 		present(alert, animated: true, completion: nil)
 	}
 	
@@ -658,6 +660,8 @@ extension TransferViewControllerBase {
                 
                 alert.addAction(cancelAction)
                 alert.addAction(confirmAction)
+                
+                alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
                 
                 presenter.present(alert, animated: true, completion: {
                     row.deselect(animated: true)

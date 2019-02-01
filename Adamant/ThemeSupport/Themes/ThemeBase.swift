@@ -113,6 +113,10 @@ internal class ThemeBase: AdamantTheme {
         return getColor(.bubbleText)
     }
     
+    var uiAlertTextColor: UIColor {
+        return UIColor(hex: "#474a5f")
+    }
+    
     // MARK: - Init
     
     internal init(fileName: String) throws {

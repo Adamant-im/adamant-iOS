@@ -87,5 +87,7 @@ public protocol AdamantTheme {
     var transferOutcomeIconBackground: UIColor { get }
     
     // Status bar
-    var statusBar : UIStatusBarStyle { get }
+    var statusBar: UIStatusBarStyle { get }
+    
+    var uiAlertTextColor: UIColor { get }
 }

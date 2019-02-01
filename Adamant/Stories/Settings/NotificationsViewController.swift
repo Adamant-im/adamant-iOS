@@ -206,6 +206,7 @@ class NotificationsViewController: FormViewController {
             
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
             
+            alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
             self?.present(alert, animated: true, completion: nil)
         }
     }

@@ -557,6 +557,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             })
         }
         
+        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
         present(alert, animated: true, completion: nil)
     }
     

@@ -125,6 +125,7 @@ class QRGeneratorViewController: FormViewController {
 			alert.addAction(share)
 			alert.addAction(cancel)
             alert.popoverPresentationController?.sourceView = cell
+            alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 			self?.present(alert, animated: true, completion: nil)
 		}
 		

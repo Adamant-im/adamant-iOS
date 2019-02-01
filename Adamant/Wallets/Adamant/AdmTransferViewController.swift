@@ -72,6 +72,8 @@ class AdmTransferViewController: TransferViewControllerBase {
                 alert.addAction(send)
                 alert.addAction(cancel)
                 
+                alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
+                
                 DispatchQueue.main.async {
                     self.present(alert, animated: true, completion: nil)
                     self.dialogService.dismissProgress()

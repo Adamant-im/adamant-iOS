@@ -380,6 +380,7 @@ extension NodeEditorViewController {
 			}
 		}))
 		
+        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 		present(alert, animated: true, completion: nil)
 	}
 }

@@ -42,6 +42,7 @@ extension LoginViewController {
 		case .restricted:
 			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+            alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 			present(alert, animated: true, completion: nil)
 			
 		case .denied:
