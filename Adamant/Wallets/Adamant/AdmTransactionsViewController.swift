@@ -256,7 +256,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             }
         })
         
-        toChat.image = (messeges != nil) ? #imageLiteral(resourceName: "chats_tab") : #imageLiteral(resourceName: "Chat")
+        toChat.image = #imageLiteral(resourceName: "chats_tab")
         toChat.backgroundColor = UIColor.adamant.primary
         return UISwipeActionsConfiguration(actions: [toChat])
     }
