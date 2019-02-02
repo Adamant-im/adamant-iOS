@@ -9,6 +9,7 @@ variables:
   altBackgroundColor: "#ffffff"
   bubbleTextColor: "f2f6fa" # (текст баббла с уведомлениями)
   bubbleColor: "474a5f" # (цвет баббла с уведомлениями)
+  trailingSwipeActionsColor: "179cec" # (цвет фона для действий свайп-ячеек. Цвет иконки всегда белый)
 styles:
   pinpad:
     textColor: $firstColor

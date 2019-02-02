@@ -257,7 +257,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         })
         
         toChat.image = #imageLiteral(resourceName: "chats_tab")
-        toChat.backgroundColor = UIColor.adamant.primary
+        toChat.backgroundColor = ThemesManager.shared.currentTheme.trailingSwipeActionsBackground
         return UISwipeActionsConfiguration(actions: [toChat])
     }
 }

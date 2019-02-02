@@ -747,7 +747,7 @@ extension ChatListViewController {
 		}
 		
 		more.image = #imageLiteral(resourceName: "swipe_more")
-		more.backgroundColor = UIColor.adamantDefault.primary
+		more.backgroundColor = ThemesManager.shared.currentTheme.trailingSwipeActionsBackground
 		
 		// Mark as read
 		if chatroom.hasUnreadMessages {
@@ -763,7 +763,7 @@ extension ChatListViewController {
 			}
 			
 			markAsRead.image = #imageLiteral(resourceName: "swipe_mark-as-read")
-			markAsRead.backgroundColor = UIColor.adamantDefault.primary
+			markAsRead.backgroundColor = ThemesManager.shared.currentTheme.trailingSwipeActionsBackground
 			
 			actions = [markAsRead, more]
 		} else {

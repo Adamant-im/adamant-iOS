@@ -63,6 +63,9 @@ public protocol AdamantTheme {
     /// Notifications bubble text color
     var bubbleText: UIColor { get }
     
+    /// Backgroound color for tableView trailing swipe actions. Icon always white.
+    var trailingSwipeActionsBackground: UIColor { get }
+    
     // MARK: Chat colors
     
     /// User chat bubble background

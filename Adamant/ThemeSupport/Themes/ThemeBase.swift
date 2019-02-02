@@ -21,6 +21,7 @@ enum ThemeColors: String {
     case alternativeBackground = "altBackgroundColor"
     case bubbleText = "bubbleTextColor"
     case bubble = "bubbleColor"
+    case trailingSwipeActionBackground = "trailingSwipeActionsColor"
 }
 
 internal class ThemeBase: AdamantTheme {
@@ -115,6 +116,10 @@ internal class ThemeBase: AdamantTheme {
     
     var uiAlertTextColor: UIColor {
         return UIColor(hex: "#474a5f")
+    }
+    
+    var trailingSwipeActionsBackground: UIColor {
+        return getColor(.trailingSwipeActionBackground)
     }
     
     // MARK: - Init
