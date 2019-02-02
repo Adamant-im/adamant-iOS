@@ -21,6 +21,13 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Properties
     var controller: NSFetchedResultsController<TransferTransaction>?
     
+    /*
+     In SplitViewController on iPhones, viewController can still present in memory, but not on screen.
+     In this cases not visible viewController will still mark messages isUnread = false
+     */
+    /// ViewController currently is ontop of the screen.
+    private var isOnTop = false
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -32,13 +39,17 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         currencySymbol = AdmWalletService.currencySymbol
     }
-	
+    
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-		
+		isOnTop = true
 		markTransfersAsRead()
 	}
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        isOnTop = false
+    }
     
     // MARK: - Overrides
     
@@ -292,7 +303,7 @@ extension AdmTransactionsViewController: NSFetchedResultsControllerDelegate {
             if let newIndexPath = newIndexPath {
                 tableView.insertRows(at: [newIndexPath], with: .automatic)
                 
-                if let transaction = anObject as? TransferTransaction {
+                if isOnTop, let transaction = anObject as? TransferTransaction {
                     transaction.isUnread = false
                 }
             }

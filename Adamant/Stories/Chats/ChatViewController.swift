@@ -65,6 +65,13 @@ class ChatViewController: MessagesViewController {
 	
 	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
     
+    /*
+     In SplitViewController on iPhones, viewController can still present in memory, but not on screen.
+     In this cases not visible viewController will still mark messages isUnread = false
+     */
+    /// ViewController currently is ontop of the screen.
+    private var isOnTop = false
+    
     // Batch changes
     private struct ControllerChange {
         let type: NSFetchedResultsChangeType
@@ -360,13 +367,13 @@ class ChatViewController: MessagesViewController {
 	
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-		
+		isOnTop = true
 		chatroom?.markAsReaded()
 	}
 	
 	override func viewDidDisappear(_ animated: Bool) {
 		super.viewDidDisappear(animated)
-		
+		isOnTop = false
 		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.partner?.address {
 			delegate.preserveMessage(message, forAddress: address)
 		}
@@ -583,12 +590,13 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	}
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        
         switch type {
         case .insert:
             if let trs = anObject as? ChatTransaction {
-                trs.isUnread = false
-                chatroom?.hasUnreadMessages = false
+                if isOnTop {
+                    trs.isUnread = false
+                    chatroom?.hasUnreadMessages = false
+                }
                 
                 if let rich = anObject as? RichMessageTransaction {
                     rich.kind = messageKind(for: rich)
