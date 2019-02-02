@@ -135,6 +135,8 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         controller.transaction = transaction
         controller.comment = transaction.comment
         
+        controller.showToChat = toShowChat(for: transaction)
+        
         if let address = accountService.account?.address {
             if address == transaction.senderId {
                 controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
@@ -220,7 +222,11 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
+        guard let transaction = controller?.object(at: indexPath) else {
+            return false
+        }
+        
+        return toShowChat(for: transaction)
     }
     
     @available(iOS 11.0, *)
@@ -235,7 +241,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         let title = (messeges != nil) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
         
-        let toChat = UIContextualAction(style: .normal, title:  title, handler: { (ac:UIContextualAction, view:UIView, success:(Bool) -> Void) in
+        let toChat = UIContextualAction(style: .normal, title:  title, handler: { (_, _, _) in
             guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
                 // TODO: Log this
                 return
@@ -259,6 +265,14 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         toChat.image = #imageLiteral(resourceName: "chats_tab")
         toChat.backgroundColor = ThemesManager.shared.currentTheme.trailingSwipeActionsBackground
         return UISwipeActionsConfiguration(actions: [toChat])
+    }
+    
+    private func toShowChat(for transaction: TransferTransaction) -> Bool {
+        guard let partner = transaction.partner as? CoreDataAccount, let chatroom = partner.chatroom, !chatroom.isReadonly else {
+            return false
+        }
+        
+        return true
     }
 }
 
