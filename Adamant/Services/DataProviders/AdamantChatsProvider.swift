@@ -817,7 +817,7 @@ extension AdamantChatsProvider {
 					publicKey = trs.transaction.senderPublicKey
 				}
 				
-				if let chatTransaction = chatTransaction(from: trs.transaction, isOutgoing: trs.isOut, publicKey: publicKey, privateKey: privateKey, context: privateContext) {
+                if let partner = privateContext.object(with: account.objectID) as? BaseAccount, let chatTransaction = chatTransaction(from: trs.transaction, isOutgoing: trs.isOut, publicKey: publicKey, privateKey: privateKey, partner: partner, context: privateContext) {
 					if height < chatTransaction.height {
 						height = chatTransaction.height
 					}
@@ -971,7 +971,7 @@ extension AdamantChatsProvider {
 	///   - privateKey: logged account private key
 	///   - context: context to insert parsed transaction to
 	/// - Returns: New parsed transaction
-	private func chatTransaction(from transaction: Transaction, isOutgoing: Bool, publicKey: String, privateKey: String, context: NSManagedObjectContext) -> ChatTransaction? {
+    private func chatTransaction(from transaction: Transaction, isOutgoing: Bool, publicKey: String, privateKey: String, partner: BaseAccount, context: NSManagedObjectContext) -> ChatTransaction? {
 		guard let chat = transaction.asset.chat else {
 			return nil
 		}
@@ -1081,6 +1081,7 @@ extension AdamantChatsProvider {
         messageTransaction.chatMessageId = UUID().uuidString
         messageTransaction.fee = transaction.fee as NSDecimalNumber
         messageTransaction.statusEnum = MessageStatus.delivered
+        messageTransaction.partner = partner
 		
 		return messageTransaction
 	}

@@ -108,6 +108,7 @@ extension AdamantChatsProvider {
 		transaction.isMarkdown = markdown
 		transaction.status = status.rawValue
         transaction.showsChatroom = showsChatroom
+        transaction.partner = privateContext.object(with: recipient.objectID) as? BaseAccount
 		
 		transaction.transactionId = UUID().uuidString
 		transaction.blockId = UUID().uuidString
@@ -147,6 +148,7 @@ extension AdamantChatsProvider {
 		transaction.isMarkdown = markdown
 		transaction.status = MessageStatus.delivered.rawValue
         transaction.showsChatroom = showsChatroom
+        transaction.partner = privateContext.object(with: sender.objectID) as? BaseAccount
 		
 		transaction.transactionId = UUID().uuidString
 		transaction.blockId = UUID().uuidString

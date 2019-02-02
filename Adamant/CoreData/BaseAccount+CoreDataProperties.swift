@@ -2,7 +2,7 @@
 //  BaseAccount+CoreDataProperties.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 20/01/2019.
+//  Created by Anokhov Pavel on 02/02/2019.
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 //
@@ -29,10 +29,10 @@ extension BaseAccount {
 extension BaseAccount {
 
     @objc(addTransfersObject:)
-    @NSManaged public func addToTransfers(_ value: TransferTransaction)
+    @NSManaged public func addToTransfers(_ value: BaseTransaction)
 
     @objc(removeTransfersObject:)
-    @NSManaged public func removeFromTransfers(_ value: TransferTransaction)
+    @NSManaged public func removeFromTransfers(_ value: BaseTransaction)
 
     @objc(addTransfers:)
     @NSManaged public func addToTransfers(_ values: NSSet)
