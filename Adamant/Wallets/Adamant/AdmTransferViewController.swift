@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import SafariServices
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -60,12 +61,23 @@ class AdmTransferViewController: TransferViewControllerBase {
                                               message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
                                               preferredStyle: .alert)
                 
+                if let url = URL(string: NewChatViewController.faqUrl) {
+                    let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean,
+                                            style: UIAlertAction.Style.default) { [weak self] _ in
+                        let safari = SFSafariViewController(url: url)
+                        safari.preferredControlTintColor = UIColor.adamant.primary
+                        safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
+                        self?.present(safari, animated: true, completion: nil)
+                    }
+                    
+                    alert.addAction(faq)
+                }
+                
                 let send = UIAlertAction(title: TransferViewControllerBase.BaseRows.sendButton.localized,
-                                         style: .default,
-                                         handler: { _ in
-                                            self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
-                                            self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
-                })
+                                         style: .default) { _ in
+                    self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+                    self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
+                }
                 
                 let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
                 

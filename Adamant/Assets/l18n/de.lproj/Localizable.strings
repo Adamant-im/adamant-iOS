@@ -442,6 +442,9 @@
 /* New chat: Show QR for my address button */
 "NewChatScene.MyQr" = "Show my QR";
 
+/* New Chat: 'What does it mean?', a help button for info about uninitialized accounts. */
+"NewChatScene.NotInitialized.HelpButton" = "Was bedeutet das?";
+
 /* NodesList: Button label */
 "NodesList.NodesList" = "Node-Liste";
 

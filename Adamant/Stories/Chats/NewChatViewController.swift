@@ -12,6 +12,7 @@ import QRCodeReader
 import EFQRCode
 import AVFoundation
 import Photos
+import SafariServices
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -24,6 +25,8 @@ extension String.adamantLocalized {
 		static let loggedUserAddressMessage = NSLocalizedString("NewChatScene.Error.OwnAddress", comment: "New chat: Notify user that he can't start chat with himself")
 		
 		static let wrongQrError = NSLocalizedString("NewChatScene.Error.WrongQr", comment: "New Chat: Notify user that scanned QR doesn't contains an address")
+        
+        static let whatDoesItMean = NSLocalizedString("NewChatScene.NotInitialized.HelpButton", comment: "New Chat: 'What does it mean?', a help button for info about uninitialized accounts.")
 		
 		private init() { }
 	}
@@ -38,6 +41,8 @@ protocol NewChatViewControllerDelegate: class {
 
 // MARK: -
 class NewChatViewController: FormViewController {
+    static let faqUrl = "https://medium.com/adamant-im/chats-and-uninitialized-accounts-in-adamant-5035438e2fcd"
+    
 	private enum Rows {
 		case addressField
 		case scanQr
@@ -297,7 +302,27 @@ class NewChatViewController: FormViewController {
 				}
 				
             case .dummy(_):
-                self.dialogService.showWarning(withMessage: AccountsProviderResult.notInitiated(address: address).localized)
+                self.dialogService.dismissProgress()
+                
+                let alert = UIAlertController(title: nil, message: AccountsProviderResult.notInitiated(address: address).localized, preferredStyle: .alert)
+                
+                let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean, style: .default, handler: { [weak self] _ in
+                    guard let url = URL(string: NewChatViewController.faqUrl) else {
+                        return
+                    }
+                    
+                    let safari = SFSafariViewController(url: url)
+                    safari.preferredControlTintColor = UIColor.adamant.primary
+                    safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
+                    self?.present(safari, animated: true, completion: nil)
+                })
+                
+                alert.addAction(faq)
+                alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+                
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true, completion: nil)
+                }
                 
 			case .notFound, .invalidAddress, .notInitiated(_), .networkError(_):
 				self.dialogService.showWarning(withMessage: result.localized)
