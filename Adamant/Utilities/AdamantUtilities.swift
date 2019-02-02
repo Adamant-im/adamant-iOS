@@ -114,7 +114,17 @@ extension AdamantUtilities {
 	/// - 12 words, splitted by a single whitespace
 	/// - a-z
 	static func validateAdamantPassphrase(passphrase: String) -> Bool {
-		return validate(string: passphrase, with: passphraseRegex)
+        guard validate(string: passphrase, with: passphraseRegex) else {
+            return false
+        }
+        
+        for word in passphrase.split(separator: " ") {
+            if !WordList.english.contains(word) {
+                return false
+            }
+        }
+        
+        return true
 	}
 	
 	private static func validate(string: String, with regex: NSRegularExpression) -> Bool {

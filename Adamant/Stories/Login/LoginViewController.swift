@@ -126,10 +126,10 @@ class LoginViewController: FormViewController {
 	var dialogService: DialogService!
 	var localAuth: LocalAuthentication!
     var router: Router!
+    var apiService: ApiService!
 	
 	// MARK: Properties
 	private var hideNewPassphrase: Bool = true
-	private var generatedPassphrases = [String]()
 	private var firstTimeActive: Bool = true
     
     
@@ -298,7 +298,7 @@ class LoginViewController: FormViewController {
             cell.tipLabel?.setStyle(.secondaryText)
             cell.style = AdamantThemeStyle.commonTableViewCell
 		}).onCellSelection({ [weak self] (cell, row) in
-			guard let passphrase = self?.generatedPassphrases.last, let dialogService = self?.dialogService else {
+            guard let passphrase = row.value, let dialogService = self?.dialogService else {
 				return
 			}
 			
@@ -385,22 +385,21 @@ extension LoginViewController {
 		
 		dialogService.showProgress(withMessage: String.adamantLocalized.login.loggingInProgressMessage, userInteractionEnable: false)
 		
-		if generatedPassphrases.contains(passphrase) {
-			DispatchQueue.global(qos: .utility).async { [weak self] in
-				self?.createAccountAndLogin(passphrase: passphrase)
-			}
-		} else {
-			DispatchQueue.global(qos: .utility).async { [weak self] in
-				self?.loginIntoExistingAccount(passphrase: passphrase)
-			}
-		}
+        apiService.getAccount(byPassphrase: passphrase) { result in
+            switch result {
+            case .success(_):
+                self.loginIntoExistingAccount(passphrase: passphrase)
+                
+            case .failure(_):
+                self.createAccountAndLogin(passphrase: passphrase)
+            }
+        }
 	}
 	
 	func generateNewPassphrase() {
 		let passphrase = adamantCore.generateNewPassphrase()
-		generatedPassphrases.append(passphrase)
 		
-		hideNewPassphrase = false
+        hideNewPassphrase = false
 		
 		form.rowBy(tag: Rows.saveYourPassphraseAlert.tag)?.evaluateHidden()
 		
