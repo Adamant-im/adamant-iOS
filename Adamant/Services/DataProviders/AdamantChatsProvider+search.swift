@@ -10,13 +10,23 @@ import Foundation
 import CoreData
 
 extension AdamantChatsProvider {
-    func getMessages(with text: String) -> [MessageTransaction]?
+    func getMessages(containing text: String, in chatroom: Chatroom?) -> [MessageTransaction]?
     {
         let request = NSFetchRequest<MessageTransaction>(entityName: "MessageTransaction")
-        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "message CONTAINS[cd] %@", text),
-            NSPredicate(format: "chatroom.isHidden == false"),
-            NSPredicate(format: "isHidden == false")])
+        
+        if let chatroom = chatroom {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSPredicate(format: "chatroom == %@", chatroom),
+                NSPredicate(format: "message CONTAINS[cd] %@", text),
+                NSPredicate(format: "chatroom.isHidden == false"),
+                NSPredicate(format: "isHidden == false")])
+        } else {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSPredicate(format: "message CONTAINS[cd] %@", text),
+                NSPredicate(format: "chatroom.isHidden == false"),
+                NSPredicate(format: "isHidden == false")])
+        }
+        
         
         request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
                                    NSSortDescriptor(key: "transactionId", ascending: false)]

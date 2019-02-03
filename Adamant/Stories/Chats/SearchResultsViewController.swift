@@ -42,7 +42,7 @@ class SearchResultsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = false
+            navigationItem.largeTitleDisplayMode = .never
         }
         
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: "resultCell")
@@ -70,33 +70,27 @@ class SearchResultsViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if self.contacts.count > 0, self.messages.count > 0 {
-            return section == 0 ? self.contacts.count : self.messages.count
-        } else if self.contacts.count > 0 {
-            return self.contacts.count
-        } else if self.messages.count > 0 {
-            return self.messages.count
+        switch defineSection(for: section) {
+        case .contacts: return contacts.count
+        case .messages: return messages.count
+        case .none: return 0
         }
-        return 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "resultCell", for: indexPath) as! ChatTableViewCell
-
-        if self.contacts.count > 0, self.messages.count > 0 {
-            if indexPath.section == 0  {
-                let value = contacts[indexPath.row]
-                configureCell(cell, for: value)
-            } else {
-                let value = messages[indexPath.row]
-                configureCell(cell, for: value)
-            }
-        } else if self.contacts.count > 0 {
-            let value = contacts[indexPath.row]
-            configureCell(cell, for: value)
-        } else if self.messages.count > 0 {
-            let value = messages[indexPath.row]
-            configureCell(cell, for: value)
+        
+        switch defineSection(for: indexPath) {
+        case .contacts:
+            let contact = contacts[indexPath.row]
+            configureCell(cell, for: contact)
+            
+        case .messages:
+            let message = messages[indexPath.row]
+            configureCell(cell, for: message)
+            
+        case .none:
+            break
         }
         
         return cell
@@ -220,48 +214,65 @@ class SearchResultsViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if self.contacts.count > 0, self.messages.count > 0 {
-            if indexPath.section == 0  {
-                let value = contacts[indexPath.row]
-                delegate?.didSelected(value)
-            } else {
-                let value = messages[indexPath.row]
-                delegate?.didSelected(value)
-            }
-        } else if self.contacts.count > 0 {
-            let value = contacts[indexPath.row]
-            delegate?.didSelected(value)
-        } else if self.messages.count > 0 {
-            let value = messages[indexPath.row]
-            delegate?.didSelected(value)
+        
+        guard let delegate = delegate else {
+            return
+        }
+        
+        switch defineSection(for: indexPath) {
+        case .contacts:
+            let contact = contacts[indexPath.row]
+            delegate.didSelected(contact)
+            
+        case .messages:
+            let message = messages[indexPath.row]
+            delegate.didSelected(message)
+            
+        case .none:
+            return
         }
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if self.contacts.count > 0, self.messages.count > 0 {
-            if section == 0  {
-                return String.adamantLocalized.search.contacts
-            } else {
-                return String.adamantLocalized.search.messages
-            }
+        switch defineSection(for: section) {
+        case .contacts: return String.adamantLocalized.search.contacts
+        case .messages: return String.adamantLocalized.search.messages
+        case .none: return nil
         }
-        
-        return nil
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        switch defineSection(for: indexPath) {
+        case .contacts: return 60
+        case .messages: return 80
+        case .none: return 60
+        }
+    }
+    
+    // MARK: - Working with sections
+    private enum Section {
+        case contacts
+        case messages
+        case none
+    }
+    
+    private func defineSection(for indexPath: IndexPath) -> Section {
+        return defineSection(for: indexPath.section)
+    }
+    
+    private func defineSection(for section: Int) -> Section {
         if self.contacts.count > 0, self.messages.count > 0 {
-            if indexPath.section == 0  {
-                return 60
+            if section == 0  {
+                return .contacts
             } else {
-                return 80
+                return .messages
             }
         } else if self.contacts.count > 0 {
-            return 60
+            return .contacts
         } else if self.messages.count > 0 {
-            return 80
+            return .messages
+        } else {
+            return .none
         }
-        
-        return 0
     }
 }

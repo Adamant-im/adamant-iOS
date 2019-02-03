@@ -196,5 +196,5 @@ protocol ChatsProvider: DataProvider {
     func fakeUpdate(status: MessageStatus, forTransactionId id: String, completion: @escaping (ChatsProviderResult) -> Void)
     
     // MARK: - Search
-    func getMessages(with text: String) -> [MessageTransaction]?
+    func getMessages(containing text: String, in chatroom: Chatroom?) -> [MessageTransaction]?
 }

@@ -81,9 +81,10 @@ class ChatListViewController: UIViewController {
 		}
 
 		navigationItem.title = String.adamantLocalized.chatList.title
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose,
-															target: self,
-															action: #selector(newChat))
+        navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat)),
+            UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(beginSearch))
+        ]
 		
 		// MARK: TableView
 		tableView.dataSource = self
@@ -110,7 +111,7 @@ class ChatListViewController: UIViewController {
         
         if #available(iOS 11.0, *) {
             searchController.obscuresBackgroundDuringPresentation = false
-            searchController.hidesNavigationBarDuringPresentation = false
+            searchController.hidesNavigationBarDuringPresentation = true
             navigationItem.searchController = searchController
         } else {
             searchController.dimsBackgroundDuringPresentation = false
@@ -826,31 +827,34 @@ extension ChatListViewController {
 // MARK: Search
 
 extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, SearchResultDelegate {
+    @objc
+    func beginSearch() {
+        searchController.searchBar.becomeFirstResponder()
+    }
+    
     func updateSearchResults(for searchController: UISearchController) {
-        if let searchString = searchController.searchBar.text {
-            let contacts = chatsController?.fetchedObjects?.filter({ (chatroom) -> Bool in
-                if let partner = chatroom.partner {
-                    if partner.isSystem {
-                        return false
-                    } else {
-                        if let address = partner.address {
-                            if let name = self.addressBook.addressBook[address] {
-                                return name.localizedCaseInsensitiveContains(searchString) || address.localizedCaseInsensitiveContains(searchString)
-                            }
-                            return address.localizedCaseInsensitiveContains(searchString)
-                        }
-                    }
-                }
-                
-                return false
-            })
-            
-            let messages = chatsProvider.getMessages(with: searchString)
-            
-            if let vc = searchController.searchResultsController as? SearchResultsViewController {
-                vc.updateResult(contacts: contacts, messages: messages, searchText: searchString)
-            }
+        guard let vc = searchController.searchResultsController as? SearchResultsViewController, let searchString = searchController.searchBar.text else {
+            return
         }
+        
+        let contacts = chatsController?.fetchedObjects?.filter { (chatroom) -> Bool in
+            guard let partner = chatroom.partner, !partner.isSystem else {
+                return false
+            }
+            
+            if let address = partner.address {
+                if let name = self.addressBook.addressBook[address] {
+                    return name.localizedCaseInsensitiveContains(searchString) || address.localizedCaseInsensitiveContains(searchString)
+                }
+                return address.localizedCaseInsensitiveContains(searchString)
+            }
+            
+            return false
+        }
+        
+        let messages = chatsProvider.getMessages(containing: searchString, in: nil)
+        
+        vc.updateResult(contacts: contacts, messages: messages, searchText: searchString)
     }
     
     func didSelected(_ message: MessageTransaction) {
