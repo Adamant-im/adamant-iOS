@@ -46,6 +46,9 @@ class SearchResultsViewController: UITableViewController {
         }
         
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: "resultCell")
+        
+        tableView.styles = [AdamantThemeStyle.baseTable.rawValue]
+        view.style = AdamantThemeStyle.primaryTintAndBackground
     }
     
     func updateResult(contacts: [Chatroom]?, messages: [MessageTransaction]?, searchText: String) {
@@ -83,15 +86,21 @@ class SearchResultsViewController: UITableViewController {
         switch defineSection(for: indexPath) {
         case .contacts:
             let contact = contacts[indexPath.row]
+            cell.lastMessageLabel.textColor = ThemesManager.shared.currentTheme.primary
             configureCell(cell, for: contact)
             
         case .messages:
             let message = messages[indexPath.row]
+            cell.lastMessageLabel.textColor = nil // Managed by NSAttributedText
             configureCell(cell, for: message)
             
         case .none:
             break
         }
+        
+        cell.setStyle(.chatCell)
+        cell.accountLabel.setStyle(.primaryText)
+        cell.dateLabel.setStyle(.secondaryText)
         
         return cell
     }
@@ -109,24 +118,18 @@ class SearchResultsViewController: UITableViewController {
                 cell.lastMessageLabel.text = partner.address
             }
             
+            cell.avatarImageView.tintColor = UIColor.adamant.primary
+            cell.avatarImageView.roundingMode = .round
+            cell.avatarImageView.clipsToBounds = true
+            cell.borderWidth = 0
+            
             if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
                 cell.avatarImage = avatar
-                cell.avatarImageView.tintColor = UIColor.adamant.primary
+            } else if let publicKey = partner.publicKey {
+                let image = avatarService.avatar(for: publicKey, size: 200)
+                cell.avatarImage = image
             } else {
-                if let address = partner.publicKey {
-                    DispatchQueue.global().async {
-                        let image = self.avatarService.avatar(for: address, size: 200)
-                        DispatchQueue.main.async {
-                            cell.avatarImage = image
-                        }
-                    }
-                    
-                    cell.avatarImageView.roundingMode = .round
-                    cell.avatarImageView.clipsToBounds = true
-                } else {
-                    cell.avatarImage = nil
-                }
-                cell.borderWidth = 0
+                cell.avatarImage = nil
             }
         } else if let title = chatroom.title {
             cell.accountLabel.text = nil
@@ -199,9 +202,14 @@ class SearchResultsViewController: UITableViewController {
             }
             
             let attributedString = markdownParser.parse(raw).mutableCopy() as! NSMutableAttributedString
+            attributedString.addAttribute(.foregroundColor,
+                                          value: ThemesManager.shared.currentTheme.primary,
+                                          range: NSRange(location: 0, length: attributedString.length))
             
             if let ranges = attributedString.string.range(of: searchText, options: .caseInsensitive) {
-                attributedString.addAttributes([.foregroundColor: UIColor.adamant.active], range: NSRange(ranges, in: attributedString.string))
+                attributedString.addAttribute(.foregroundColor,
+                                              value: ThemesManager.shared.currentTheme.activeColor,
+                                              range: NSRange(ranges, in: attributedString.string))
             }
             
             return attributedString

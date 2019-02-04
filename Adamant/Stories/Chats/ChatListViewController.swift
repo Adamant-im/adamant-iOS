@@ -128,6 +128,8 @@ class ChatListViewController: UIViewController {
             tableView.tableHeaderView = self.searchController!.searchBar
             searchController!.searchBar.sizeToFit()
         }
+        
+        ThemesManager.shared.manage(for: self)
 		
 		// MARK: Login/Logout
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
@@ -963,3 +965,8 @@ extension ChatListViewController {
     }
 }
 
+extension ChatListViewController: Themeable {
+    public func apply(theme: AdamantTheme) {
+        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: ThemesManager.shared.currentTheme.primary]
+    }
+}
