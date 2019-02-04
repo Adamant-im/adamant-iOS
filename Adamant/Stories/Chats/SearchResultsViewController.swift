@@ -152,7 +152,10 @@ class SearchResultsViewController: UITableViewController {
                 cell.avatarImageView.tintColor = UIColor.adamant.primary
             } else {
                 if let address = partner.publicKey {
-                    DispatchQueue.global().async {
+                    if Thread.isMainThread {
+                        let image = self.avatarService.avatar(for: address, size: 200)
+                        cell.avatarImage = image
+                    } else {
                         let image = self.avatarService.avatar(for: address, size: 200)
                         DispatchQueue.main.async {
                             cell.avatarImage = image
@@ -197,12 +200,8 @@ class SearchResultsViewController: UITableViewController {
             
             let attributedString = markdownParser.parse(raw).mutableCopy() as! NSMutableAttributedString
             
-            if let ranges = raw.range(of: searchText, options: .caseInsensitive) {
-                let attributes: [NSAttributedString.Key: Any] = [
-                    .foregroundColor: UIColor.adamant.active,
-                    ]
-                
-                attributedString.addAttributes(attributes, range: NSRange(ranges, in: raw))
+            if let ranges = attributedString.string.range(of: searchText, options: .caseInsensitive) {
+                attributedString.addAttributes([.foregroundColor: UIColor.adamant.active], range: NSRange(ranges, in: attributedString.string))
             }
             
             return attributedString
