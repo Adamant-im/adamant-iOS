@@ -15,6 +15,7 @@ extension String.adamantLocalized {
 		static let title = NSLocalizedString("ChatListPage.Title", comment: "ChatList: scene title")
 		static let sentMessagePrefix = NSLocalizedString("ChatListPage.SentMessagePrefix", comment: "ChatList: outgoing message prefix")
         static let syncingChats = NSLocalizedString("ChatListPage.SyncingChats", comment: "ChatList: First syncronization is in progress")
+        static let searchPlaceholder = NSLocalizedString("ChatListPage.SearchBar.Placeholder", comment: "ChatList: SearchBar placeholder text")
         
 		private init() {}
 	}
@@ -43,6 +44,8 @@ class ChatListViewController: UIViewController {
 	// MARK: Properties
 	var chatsController: NSFetchedResultsController<Chatroom>?
 	var unreadController: NSFetchedResultsController<ChatTransaction>?
+    
+    var searchController: UISearchController!
 	
 	private var preservedMessagess = [String:String]()
 	
@@ -67,6 +70,10 @@ class ChatListViewController: UIViewController {
     
     private(set) var isBusy: Bool = true
     
+    // MARK: Keyboard
+    // SplitView sends double notifications about keyboard.
+    private var originalInsets: UIEdgeInsets?
+    private var didShow: Bool = false
     
 	// MARK: Lifecycle
     override func viewDidLoad() {
@@ -78,9 +85,10 @@ class ChatListViewController: UIViewController {
 		}
 
 		navigationItem.title = String.adamantLocalized.chatList.title
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose,
-															target: self,
-															action: #selector(newChat))
+        navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat)),
+            UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(beginSearch))
+        ]
 		
 		// MARK: TableView
 		tableView.dataSource = self
@@ -96,6 +104,32 @@ class ChatListViewController: UIViewController {
 		if self.accountService.account != nil {
 			initFetchedRequestControllers(provider: chatsProvider)
 		}
+        
+        // MARK: Search controller
+        guard let searchResultController = router.get(scene: AdamantScene.Chats.searchResults) as? SearchResultsViewController else {
+            fatalError("Can't get SearchResultsViewController")
+        }
+        
+        searchResultController.delegate = self
+        
+        searchController = UISearchController(searchResultsController: searchResultController)
+        searchController.searchResultsUpdater = self
+        searchController.searchBar.delegate = self
+        searchController.searchBar.placeholder = String.adamantLocalized.chatList.searchPlaceholder
+        definesPresentationContext = true
+        
+        if #available(iOS 11.0, *) {
+            searchController.obscuresBackgroundDuringPresentation = false
+            searchController.hidesNavigationBarDuringPresentation = true
+            navigationItem.searchController = searchController
+        } else {
+            searchController.dimsBackgroundDuringPresentation = false
+        
+            tableView.tableHeaderView = self.searchController!.searchBar
+            searchController!.searchBar.sizeToFit()
+        }
+        
+        ThemesManager.shared.manage(for: self)
 		
 		// MARK: Login/Logout
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
@@ -125,6 +159,10 @@ class ChatListViewController: UIViewController {
                 self?.setIsBusy(true)
             }
         }
+        
+        // Keyboard
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 	
 	deinit {
@@ -176,7 +214,7 @@ class ChatListViewController: UIViewController {
 	
 	
 	// MARK: Helpers
-	private func chatViewController(for chatroom: Chatroom) -> ChatViewController {
+    private func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil) -> ChatViewController {
 		guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
 			fatalError("Can't get ChatViewController")
 		}
@@ -184,6 +222,10 @@ class ChatListViewController: UIViewController {
 		if let account = accountService.account {
 			vc.account = account
 		}
+        
+        if let message = message {
+            vc.messageToShow = message
+        }
 		
 		vc.hidesBottomBarWhenPushed = true
 		vc.chatroom = chatroom
@@ -590,9 +632,9 @@ extension ChatListViewController {
 		}
 	}
 	
-	private func presentChatroom(_ chatroom: Chatroom) {
+    private func presentChatroom(_ chatroom: Chatroom, with message: MessageTransaction? = nil) {
 		// MARK: 1. Create and config ViewController
-        let vc = chatViewController(for: chatroom)
+        let vc = chatViewController(for: chatroom, with: message)
         
         if let split = self.splitViewController {
             let chat = UINavigationController(rootViewController:vc)
@@ -805,4 +847,127 @@ extension ChatListViewController {
 		
 		return vc.chatroom
 	}
+}
+
+// MARK: Search
+
+extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, SearchResultDelegate {
+    @objc
+    func beginSearch() {
+        searchController.searchBar.becomeFirstResponder()
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let vc = searchController.searchResultsController as? SearchResultsViewController, let searchString = searchController.searchBar.text else {
+            return
+        }
+        
+        let contacts = chatsController?.fetchedObjects?.filter { (chatroom) -> Bool in
+            guard let partner = chatroom.partner, !partner.isSystem else {
+                return false
+            }
+            
+            if let address = partner.address {
+                if let name = self.addressBook.addressBook[address] {
+                    return name.localizedCaseInsensitiveContains(searchString) || address.localizedCaseInsensitiveContains(searchString)
+                }
+                return address.localizedCaseInsensitiveContains(searchString)
+            }
+            
+            return false
+        }
+        
+        let messages = chatsProvider.getMessages(containing: searchString, in: nil)
+        
+        vc.updateResult(contacts: contacts, messages: messages, searchText: searchString)
+    }
+    
+    func didSelected(_ message: MessageTransaction) {
+        guard let chatroom = message.chatroom else {
+            dialogService.showError(withMessage: "Error getting chatroom in SearchController result. Please, report an error", error: nil)
+            searchController.dismiss(animated: true, completion: nil)
+            return
+        }
+        
+        searchController.dismiss(animated: true) { [weak self] in
+            guard let presenter = self, let tableView = presenter.tableView else {
+                return
+            }
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+            
+            if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
+                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+            }
+            
+            presenter.presentChatroom(chatroom, with: message)
+        }
+    }
+    
+    func didSelected(_ chatroom: Chatroom) {
+        searchController.dismiss(animated: true) { [weak self] in
+            guard let presenter = self, let tableView = presenter.tableView else {
+                return
+            }
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+            
+            if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
+                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+            }
+            
+            presenter.presentChatroom(chatroom)
+        }
+    }
+}
+
+// MARK: Keyboard
+extension ChatListViewController {
+    @objc private func keyboardWillShow(notification: Notification) {
+        guard !didShow else { return }
+        didShow = true
+        
+        guard let frame = notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue else {
+            return
+        }
+        
+        originalInsets = tableView.contentInset
+        
+        var contentInsets = tableView.contentInset
+        
+        if let tabBarHeight = tabBarController?.tabBar.bounds.height {
+            contentInsets.bottom = frame.cgRectValue.size.height - tabBarHeight
+        } else {
+            contentInsets.bottom = frame.cgRectValue.size.height
+        }
+        
+        tableView.contentInset = contentInsets
+        tableView.scrollIndicatorInsets = contentInsets
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        guard didShow else { return }
+        didShow = false
+        
+        if let insets = originalInsets {
+            tableView.contentInset = insets
+            tableView.scrollIndicatorInsets = insets
+        } else {
+            var contentInsets = tableView.contentInset
+            contentInsets.bottom = 0.0
+            tableView.contentInset = contentInsets
+            tableView.scrollIndicatorInsets = contentInsets
+        }
+    }
+}
+
+extension ChatListViewController: Themeable {
+    public func apply(theme: AdamantTheme) {
+        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: ThemesManager.shared.currentTheme.primary]
+        searchController.searchBar.keyboardAppearance = ThemesManager.shared.currentTheme.darkKeyboard ? .dark : .light
+    }
 }

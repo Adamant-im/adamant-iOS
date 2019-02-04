@@ -202,6 +202,15 @@
 /* ChatList: outgoing message prefix */
 "ChatListPage.SentMessagePrefix" = "Sie: ";
 
+/* ChatList: SearchBar placeholder text */
+"ChatListPage.SearchBar.Placeholder" = "Nach Kontakten oder Nachrichten suchen";
+
+/* SearchPage: Contacts header */
+"SearchPage.Contacts" = "Kontakte";
+
+/* SearchPage: Messages header */
+"SearchPage.Messages" = "Mitteilungen";
+
 /* ChatList: First syncronization is in progress */
 "ChatListPage.SyncingChats" = "Chats werden synchronisiert…";
 

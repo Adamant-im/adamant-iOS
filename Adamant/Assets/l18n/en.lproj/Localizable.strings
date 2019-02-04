@@ -199,6 +199,15 @@
 /* ChatList: outgoing message prefix */
 "ChatListPage.SentMessagePrefix" = "You: ";
 
+/* ChatList: SearchBar placeholder text */
+"ChatListPage.SearchBar.Placeholder" = "Search for contacts or messages";
+
+/* SearchPage: Contacts header */
+"SearchPage.Contacts" = "Contacts";
+
+/* SearchPage: Messages header */
+"SearchPage.Messages" = "Messages";
+
 /* ChatList: First syncronization is in progress */
 "ChatListPage.SyncingChats" = "Syncing chats…";
 

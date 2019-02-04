@@ -10,6 +10,7 @@ variables:
   bubbleTextColor: "f2f6fa" # (текст баббла с уведомлениями)
   bubbleColor: "474a5f" # (цвет баббла с уведомлениями)
   trailingSwipeActionsColor: "179cec" # (цвет фона для действий свайп-ячеек. Цвет иконки всегда белый)
+  darkKeyboard: false
 styles:
   pinpad:
     textColor: $firstColor
@@ -40,7 +41,7 @@ styles:
     tintColor: $firstColor
     placeholderColor: $secondaryColor
     clearButtonTintColor: $firstColor
-    showDarkKeyboard: false
+    showDarkKeyboard: $darkKeyboard
   biometricButton:
     backgroundColor: $altBackgroundColor
     tintColor: $firstColor
