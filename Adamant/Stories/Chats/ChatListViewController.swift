@@ -866,20 +866,44 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
     }
     
     func didSelected(_ message: MessageTransaction) {
-        searchController.dismiss(animated: true) {
-            if let chatroom = message.chatroom {
-                DispatchQueue.main.async {
-                    self.presentChatroom(chatroom, with: message)
-                }
+        guard let chatroom = message.chatroom else {
+            dialogService.showError(withMessage: "Error getting chatroom in SearchController result. Please, report an error", error: nil)
+            searchController.dismiss(animated: true, completion: nil)
+            return
+        }
+        
+        searchController.dismiss(animated: true) { [weak self] in
+            guard let presenter = self, let tableView = presenter.tableView else {
+                return
             }
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+            
+            if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
+                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+            }
+            
+            presenter.presentChatroom(chatroom, with: message)
         }
     }
     
-    func didSelected(_ contact: Chatroom) {
-        searchController.dismiss(animated: true) {
-            DispatchQueue.main.async {
-                self.presentChatroom(contact)
+    func didSelected(_ chatroom: Chatroom) {
+        searchController.dismiss(animated: true) { [weak self] in
+            guard let presenter = self, let tableView = presenter.tableView else {
+                return
             }
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+            
+            if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
+                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+            }
+            
+            presenter.presentChatroom(chatroom)
         }
     }
 }

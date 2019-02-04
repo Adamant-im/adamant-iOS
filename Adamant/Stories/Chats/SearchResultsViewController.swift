@@ -19,9 +19,9 @@ extension String.adamantLocalized {
     }
 }
 
-protocol SearchResultDelegate {
+protocol SearchResultDelegate: class {
     func didSelected(_ message: MessageTransaction)
-    func didSelected(_ contact: Chatroom)
+    func didSelected(_ chatroom: Chatroom)
 }
 
 class SearchResultsViewController: UITableViewController {
@@ -37,7 +37,7 @@ class SearchResultsViewController: UITableViewController {
     
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize))
     
-    var delegate: SearchResultDelegate?
+    weak var delegate: SearchResultDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -213,7 +213,6 @@ class SearchResultsViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
         guard let delegate = delegate else {
             return
         }
