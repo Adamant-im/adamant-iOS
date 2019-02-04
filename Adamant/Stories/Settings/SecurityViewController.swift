@@ -130,10 +130,10 @@ class SecurityViewController: FormViewController {
 		
 		navigationItem.title = String.adamantLocalized.security.title
 		navigationOptions = .Disabled
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = true
-		}
+        
+        self.tableView.setStyle(.baseTable)
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
 		
 		// MARK: StayIn
 		// Generate QR
@@ -143,6 +143,8 @@ class SecurityViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
+            cell.setStyle(.secondaryBackground)
+            cell.textLabel?.setStyle(.primaryText)
 		}).onCellSelection { [weak self] (_, _) in
 			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.qRGenerator) else {
 				return
@@ -162,7 +164,11 @@ class SecurityViewController: FormViewController {
 			}
 			
 			self?.setStayLoggedIn(enabled: enabled)
-		}
+        }.cellUpdate({ (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+            cell.setStyle(.secondaryBackground)
+            cell.textLabel?.setStyle(.primaryText)
+        })
 		
 		// Biometry
 		let biometryRow = SwitchRow() {
@@ -180,10 +186,29 @@ class SecurityViewController: FormViewController {
 		}.onChange { [weak self] row in
 			let value = row.value ?? false
 			self?.setBiometry(enabled: value)
-		}
+        }.cellUpdate({ (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+            cell.setStyle(.secondaryBackground)
+            cell.textLabel?.setStyle(.primaryText)
+        })
 		
-		let stayInSection = Section(Sections.security.localized) {
+		let stayInSection = Section() {
 			$0.tag = Sections.security.tag
+            
+            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
+            header.title = Sections.security.localized
+            header.onSetupView = {view, _ in
+                view.textLabel?.setStyle(.secondaryText)
+            }
+            header.height = { 50 }
+            $0.header = header
+            
+            var footer = HeaderFooterView<UIView>(.class)
+            footer.height = {0}
+            footer.onSetupView = { view, _ in
+                view.backgroundColor = .clear
+            }
+            $0.footer = footer
 		}
 		
 		stayInSection.append(contentsOf: [qrRow, stayInRow, biometryRow])
@@ -200,14 +225,32 @@ class SecurityViewController: FormViewController {
 			$0.value = notificationsService.notificationsMode
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
+            cell.setStyle(.secondaryBackground)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
 		}.onChange { [weak self] row in
 			let mode = row.value ?? NotificationsMode.disabled
 			self?.setNotificationMode(mode)
 		}
 		
 		// Section
-		let notificationsSection = Section(Sections.notifications.localized) {
+		let notificationsSection = Section() {
 			$0.tag = Sections.notifications.tag
+            
+            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
+            header.title = Sections.notifications.localized
+            header.onSetupView = {view, _ in
+                view.textLabel?.setStyle(.secondaryText)
+            }
+            header.height = { 50 }
+            $0.header = header
+            
+            var footer = HeaderFooterView<UIView>(.class)
+            footer.height = {0}
+            footer.onSetupView = { view, _ in
+                view.backgroundColor = .clear
+            }
+            $0.footer = footer
 			
 			$0.hidden = Condition.function([], { [weak self] _ -> Bool in
 				guard let showNotifications = self?.showLoggedInOptions else {
@@ -233,6 +276,8 @@ class SecurityViewController: FormViewController {
 			
 			let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
 			cell.textView.attributedText = parser.parse(Rows.description.localized)
+            cell.setStyle(.secondaryBackground)
+            cell.textView?.setStyles([.secondaryBackground, .primaryText])
 		}
 		
 		// Github readme
@@ -245,19 +290,31 @@ class SecurityViewController: FormViewController {
 			cell.selectionStyle = .gray
 		}.cellUpdate({ (cell, _) in
 			cell.accessoryType = .disclosureIndicator
+            cell.setStyles([.secondaryBackground, .primaryTint])
+            cell.textLabel?.setStyle(.primaryText)
+            cell.imageView?.setStyle(.primaryTint)
 		}).onCellSelection { [weak self] (_, row) in
 			guard let url = URL(string: AdamantResources.ansReadmeUrl) else {
 				fatalError("Failed to build ANS URL")
 			}
 			
 			let safari = SFSafariViewController(url: url)
-			safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
 			self?.present(safari, animated: true, completion: nil)
 		}
 		
-		let ansSection = Section(Sections.aboutNotificationTypes.localized) {
+		let ansSection = Section() {
 			$0.tag = Sections.aboutNotificationTypes.tag
 			
+            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
+            header.title = Sections.aboutNotificationTypes.localized
+            header.onSetupView = {view, _ in
+                view.textLabel?.setStyle(.secondaryText)
+            }
+            header.height = { 50 }
+            $0.header = header
+            
 			$0.hidden = Condition.function([], { [weak self] _ -> Bool in
 				guard let showNotifications = self?.showLoggedInOptions else {
 					return true

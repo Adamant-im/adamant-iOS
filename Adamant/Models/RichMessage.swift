@@ -71,7 +71,13 @@ struct RichMessageTransfer: RichMessage {
         self.hash = hash
         
         if let raw = content[CodingKeys.amount.stringValue] {
-            if let number = AdamantBalanceFormat.rawNumberDotFormatter.number(from: raw) {
+            // NumberFormatter.number(from: string).decimalValue loses precision.
+            
+            if let number = Decimal(string: raw), number != 0.0 {
+                self.amount = number
+            } else if let number = Decimal(string: raw, locale: Locale.current), number != 0.0 {
+                self.amount = number
+            } else if let number = AdamantBalanceFormat.rawNumberDotFormatter.number(from: raw) {
                 self.amount = number.decimalValue
             } else if let number = AdamantBalanceFormat.rawNumberCommaFormatter.number(from: raw) {
                 self.amount = number.decimalValue
@@ -120,10 +126,8 @@ extension RichMessageTransfer {
         self.comments = try container.decode(String.self, forKey: .comments)
         
         if let raw = try? container.decode(String.self, forKey: .amount) {
-            if let number = AdamantBalanceFormat.rawNumberDotFormatter.number(from: raw) {
-                self.amount = number.decimalValue
-            } else if let number = AdamantBalanceFormat.rawNumberCommaFormatter.number(from: raw) {
-                self.amount = number.decimalValue
+            if let balance = AdamantBalanceFormat.deserializeBalance(from: raw) {
+                self.amount = balance
             } else {
                 self.amount = 0
             }

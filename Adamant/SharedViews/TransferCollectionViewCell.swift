@@ -171,14 +171,16 @@ extension TransactionStatus {
         case .pending:return #imageLiteral(resourceName: "status_pending")
         case .success: return #imageLiteral(resourceName: "status_success")
         case .failed: return #imageLiteral(resourceName: "status_failed")
+        case .warning: return #imageLiteral(resourceName: "status_warning")
         }
     }
     
     var imageTintColor: UIColor {
         switch self {
         case .notInitiated, .updating: return UIColor.adamant.secondary
-        case .pending, .success: return UIColor.adamant.primary
-        case .failed: return UIColor.adamant.transferOutcomeIconBackground
+        case .pending: return UIColor.adamant.primary
+        case .success: return UIColor.adamant.activeColor
+        case .warning, .failed: return UIColor.adamant.alertColor
         }
     }
 }

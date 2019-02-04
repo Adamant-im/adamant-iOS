@@ -224,7 +224,14 @@ extension AdamantDialogService {
 // MAKR: - Activity controllers
 extension AdamantDialogService {
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
-        let alert = createShareAlertFor(string: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, completion: completion)
+        let source: ViewSource?
+        if let from = from {
+            source = .view(from)
+        } else {
+            source = nil
+        }
+        
+        let alert = createShareAlertFor(string: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
         
         if let sourceView = from {
             alert.popoverPresentationController?.sourceView = sourceView
@@ -236,14 +243,29 @@ extension AdamantDialogService {
     }
     
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIBarButtonItem?, completion: (() -> Void)?) {
-        let alert = createShareAlertFor(string: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, completion: completion)
+        let source: ViewSource?
+        if let from = from {
+            source = .barButtonItem(from)
+        } else {
+            source = nil
+        }
         
-        if let sourceView = from { alert.popoverPresentationController?.barButtonItem = sourceView }
+        let alert = createShareAlertFor(string: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
+        
+        if let sourceView = from {
+            alert.popoverPresentationController?.barButtonItem = sourceView
+        }
         
         present(alert, animated: animated, completion: completion)
     }
     
-    private func createShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, completion: (() -> Void)?) -> UIAlertController {
+    // Passing sender to second modal window
+    private enum ViewSource {
+        case view(UIView)
+        case barButtonItem(UIBarButtonItem)
+    }
+    
+    private func createShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: ViewSource?, completion: (() -> Void)?) -> UIAlertController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         for type in types {
@@ -258,6 +280,20 @@ extension AdamantDialogService {
                 alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
                     let vc = UIActivityViewController(activityItems: [string], applicationActivities: nil)
                     vc.excludedActivityTypes = excludedActivityTypes
+                    
+                    switch from {
+                    case .view(let view)?:
+                        vc.popoverPresentationController?.sourceView = view
+                        vc.popoverPresentationController?.sourceRect = view.bounds
+                        vc.popoverPresentationController?.canOverlapSourceViewRect = false
+                        
+                    case .barButtonItem(let item)?:
+                        vc.popoverPresentationController?.barButtonItem = item
+                        
+                    default:
+                        break
+                    }
+                    
                     self?.present(vc, animated: true, completion: completion)
                 })
                 
@@ -289,6 +325,9 @@ extension AdamantDialogService {
         }
         
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        
+        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
+        
         return alert
     }
     
@@ -312,6 +351,8 @@ extension AdamantDialogService {
         })
         
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        
+        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
         
         if Thread.isMainThread {
             present(alert, animated: true, completion: nil)
@@ -387,25 +428,27 @@ extension AdamantDialogService {
     }
     
     func showAlert(title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction]?, from: Any?) {
-        let alertVc = UIAlertController(title: title, message: message, preferredStyle: style)
+        let alert = UIAlertController(title: title, message: message, preferredStyle: style)
         
         if let actions = actions {
             for action in actions {
-                alertVc.addAction(action)
+                alert.addAction(action)
             }
         } else {
-            alertVc.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default))
+            alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default))
         }
         
         if let sourceView = from as? UIView {
-            alertVc.popoverPresentationController?.sourceView = sourceView
-            alertVc.popoverPresentationController?.sourceRect = sourceView.bounds
-            alertVc.popoverPresentationController?.canOverlapSourceViewRect = false
+            alert.popoverPresentationController?.sourceView = sourceView
+            alert.popoverPresentationController?.sourceRect = sourceView.bounds
+            alert.popoverPresentationController?.canOverlapSourceViewRect = false
         } else if  let barButtonItem = from as? UIBarButtonItem {
-            alertVc.popoverPresentationController?.barButtonItem = barButtonItem
+            alert.popoverPresentationController?.barButtonItem = barButtonItem
         }
         
-        present(alertVc, animated: true, completion: nil)
+        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
+        
+        present(alert, animated: true, completion: nil)
     }
     
     func showAlert(title: String, message: String, actions: [PMAlertAction]?) {

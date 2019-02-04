@@ -28,8 +28,7 @@ class TransactionsListViewControllerBase: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
-        refreshControl.tintColor = UIColor.adamant.primary
-        
+        refreshControl.setStyle(.primaryTint)
         return refreshControl
     }()
     
@@ -43,8 +42,13 @@ class TransactionsListViewControllerBase: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.setStyle(.baseTable)
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        tabBarController?.tabBar.setStyle(.baseBarTint)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
+        
         if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = false
+            navigationItem.largeTitleDisplayMode = .never
         }
         
         navigationItem.title = String.adamantLocalized.transactionList.title
@@ -58,11 +62,11 @@ class TransactionsListViewControllerBase: UIViewController {
         tableView.refreshControl = refreshControl
         
         // MARK: Notifications
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] notification in
             self?.reloadData()
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.reloadData()
         }
         

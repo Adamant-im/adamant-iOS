@@ -14,6 +14,7 @@ extension AdamantScene.Wallets {
 		static let wallet = AdamantScene(identifier: "AdmWalletViewController") { r in
 			let c = AdmWalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
 			c.dialogService = r.resolve(DialogService.self)
+            c.router = r.resolve(Router.self)
 			return c
 		}
 		
@@ -47,6 +48,14 @@ extension AdamantScene.Wallets {
 			c.router = r.resolve(Router.self)
 			return c
 		})
+        
+        /// Buy and Sell options
+        static let buyAndSell = AdamantScene(identifier: "BuyAndSell") { r in
+            let c = BuyAndSellViewController()
+            c.accountService = r.resolve(AccountService.self)
+            c.dialogService = r.resolve(DialogService.self)
+            return c
+        }
 		
 		private init() {}
 	}

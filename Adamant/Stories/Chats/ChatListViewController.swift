@@ -56,8 +56,7 @@ class ChatListViewController: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
-        refreshControl.tintColor = UIColor.adamant.primary
-        
+        refreshControl.setStyle(.primaryTint)
         return refreshControl
     }()
     
@@ -80,8 +79,9 @@ class ChatListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = true
+            navigationItem.largeTitleDisplayMode = .never
 		}
 
 		navigationItem.title = String.adamantLocalized.chatList.title
@@ -95,6 +95,11 @@ class ChatListViewController: UIViewController {
 		tableView.delegate = self
 		tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         tableView.refreshControl = refreshControl
+        
+        tableView.styles = [AdamantThemeStyle.baseTable.rawValue]
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        tabBarController?.tabBar.setStyle(.baseBarTint)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
 		
 		if self.accountService.account != nil {
 			initFetchedRequestControllers(provider: chatsProvider)
@@ -166,10 +171,6 @@ class ChatListViewController: UIViewController {
 		super.viewWillAppear(animated)
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
-		}
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
 		}
 	}
 	
@@ -392,7 +393,10 @@ extension ChatListViewController {
 		cell.avatarImageView.tintColor = UIColor.adamant.primary
 		cell.borderColor = UIColor.adamant.primary
 		cell.badgeColor = UIColor.adamant.primary
+        cell.lastMessageLabel.textColor = UIColor.adamant.primary
 		cell.borderWidth = 1
+        
+        cell.setupStyles()
 		
 		return cell
 	}
@@ -534,28 +538,32 @@ extension ChatListViewController: NewChatViewControllerDelegate {
                 return
             }
             
-            if let split = self?.splitViewController {
-                let chat = UINavigationController(rootViewController:vc)
-                split.showDetailViewController(chat, sender: self)
-            } else {
-                self?.navigationController?.pushViewController(vc, animated: false)
-            }
-
-            let nvc: UIViewController
+            let navigator: UINavigationController
             if let nav = controller.navigationController {
-                nvc = nav
+                navigator = nav
+            } else if let nav = self?.navigationController {
+                navigator = nav
             } else {
-                nvc = controller
-            }
-
-            nvc.dismiss(animated: true) {
-                vc.becomeFirstResponder()
-
-                if let count = vc.chatroom?.transactions?.count, count == 0 {
-                    vc.messageInputBar.inputTextView.becomeFirstResponder()
+                self?.present(vc, animated: true) {
+                    vc.becomeFirstResponder()
+                    
+                    if let count = vc.chatroom?.transactions?.count, count == 0 {
+                        vc.messageInputBar.inputTextView.becomeFirstResponder()
+                    }
                 }
+                
+                return
             }
             
+            navigator.pushViewController(vc, animated: true)
+            
+            if let index = navigator.viewControllers.firstIndex(of: controller) {
+                navigator.viewControllers.remove(at: index)
+            }
+            
+            if let count = vc.chatroom?.transactions?.count, count == 0 {
+                vc.messageInputBar.inputTextView.becomeFirstResponder()
+            }
 		}
 		
 		// Select row after awhile
@@ -654,6 +662,10 @@ extension ChatListViewController {
 	}
     
     private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
+        markdownParser.color = UIColor.adamant.primary
+        markdownParser.link.color = UIColor.adamant.activeColor
+        markdownParser.automaticLinkDetectionEnabled = false
+        
         switch transaction {
         case let message as MessageTransaction:
             guard let text = message.message else {
@@ -762,6 +774,7 @@ extension ChatListViewController {
 					
 					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
 					
+                    alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 					self?.present(alert, animated: true, completion: nil)
 				}
 				
@@ -774,7 +787,7 @@ extension ChatListViewController {
 		}
 		
 		more.image = #imageLiteral(resourceName: "swipe_more")
-		more.backgroundColor = UIColor.adamant.primary
+		more.backgroundColor = ThemesManager.shared.currentTheme.trailingSwipeActionsBackground
 		
 		// Mark as read
 		if chatroom.hasUnreadMessages {
@@ -790,7 +803,7 @@ extension ChatListViewController {
 			}
 			
 			markAsRead.image = #imageLiteral(resourceName: "swipe_mark-as-read")
-			markAsRead.backgroundColor = UIColor.adamant.primary
+			markAsRead.backgroundColor = ThemesManager.shared.currentTheme.trailingSwipeActionsBackground
 			
 			actions = [markAsRead, more]
 		} else {
@@ -812,6 +825,8 @@ extension ChatListViewController {
 		} else {
 			item = tabBarItem
 		}
+        
+        item.setStyle(.tabItem)
 		
 		if let value = value, value > 0 {
 			item.badgeValue = String(value)

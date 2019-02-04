@@ -60,12 +60,16 @@ class DelegatesListViewController: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
-        refreshControl.tintColor = UIColor.adamant.primary
-        
+        refreshControl.setStyle(.primaryTint)
         return refreshControl
     }()
-	
-	private var forcedUpdateTimer: Timer? = nil
+    
+    private var forcedUpdateTimer: Timer? = nil
+    
+    private var searchController: UISearchController?
+    
+    private var originalInsets: UIEdgeInsets?
+    private var didShow: Bool = false
 
 	// MARK: Tools
 	
@@ -83,14 +87,15 @@ class DelegatesListViewController: UIViewController {
     
     @IBOutlet weak var voteBtn: UIButton!
 
-	
+    @IBOutlet weak var infoViewBottomConstain: NSLayoutConstraint!
+    
 	// MARK: - Lifecycle
 	
     override func viewDidLoad() {
         super.viewDidLoad()
-        if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = false
-        }
+        self.tableView.setStyle(.baseTable)
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
 		
 		// MARK: Initial
         navigationItem.title = String.adamantLocalized.delegates.title
@@ -100,13 +105,17 @@ class DelegatesListViewController: UIViewController {
 		
 		// MARK: Search controller
 		if #available(iOS 11.0, *) {
-			let searchController = UISearchController(searchResultsController: nil)
-			searchController.searchResultsUpdater = self
-			searchController.obscuresBackgroundDuringPresentation = false
-			searchController.hidesNavigationBarDuringPresentation = false
-			navigationItem.searchController = searchController
-			definesPresentationContext = true
-			navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
+            navigationItem.largeTitleDisplayMode = .always
+            
+			let controller = UISearchController(searchResultsController: nil)
+			controller.searchResultsUpdater = self
+			controller.obscuresBackgroundDuringPresentation = false
+			controller.hidesNavigationBarDuringPresentation = true
+            controller.searchBar.setStyle(.baseBarTint)
+            searchController = controller
+            
+            definesPresentationContext = true
+            navigationItem.rightBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .search, target: self, action: #selector(activateSearch))
 		}
 		
 		// MARK: Reset UI
@@ -119,6 +128,22 @@ class DelegatesListViewController: UIViewController {
 		// MARK: Load data
 //        refreshControl.beginRefreshing() // Nasty glitches
         handleRefresh(refreshControl)
+        
+        // Keyboard
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // Fix for UISplitViewController with UINavigationController with UISearchController.
+        // UISplitView in collapsed mode can't figure out what navigation item is topmost, and in viewDidLoad method searchController gets assigned to a wrong navigation item.
+        if #available(iOS 11.0, *) {
+            if navigationItem.searchController == nil {
+                navigationItem.searchController = searchController
+            }
+        }
     }
     
     deinit {
@@ -133,14 +158,23 @@ class DelegatesListViewController: UIViewController {
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
-		}
-		
 		if let indexPath = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: indexPath, animated: animated)
 		}
 	}
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            if #available(iOS 11.0, *) {
+            } else if infoViewBottomConstain.constant == 0.0, let height = tabBarController?.tabBar.bounds.height {
+                infoViewBottomConstain.constant = -height
+                tableView.contentInset.bottom = 0.0
+                tableView.scrollIndicatorInsets.bottom = 0.0
+            }
+        }
+    }
 
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
 		guard let address = accountService.account?.address else {
@@ -379,8 +413,8 @@ extension DelegatesListViewController {
 		let totalVoted = delegates.reduce(0) { $0 + ($1.delegate.voted ? 1 : 0) } + upvoted - downvoted
 		
 		let votingEnabled = changes.count > 0 && changes.count <= maxVotes && totalVoted <= maxTotalVotes
-		let newVotesColor = changes.count > maxVotes ? UIColor.red : UIColor.darkText
-		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.red : UIColor.darkText
+		let newVotesColor = changes.count > maxVotes ? UIColor.adamant.alertColor : UIColor.adamant.primary
+		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.adamant.alertColor : UIColor.adamant.primary
 		
 		
 		if Thread.isMainThread {
@@ -409,4 +443,42 @@ extension DelegatesListViewController {
 			}
 		}
 	}
+    
+    
+    // MARK: Keyboard
+    @objc private func keyboardWillShow(notification: Notification) {
+        // For some reason we will receive 2 notifications
+        guard !didShow else { return }
+        didShow = true
+        
+        guard let frame = notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue else {
+            return
+        }
+        
+        originalInsets = tableView.contentInset
+        
+        let gap = UIScreen.main.bounds.height - tableView.bounds.height + tableView.frame.origin.y
+        let bottom = frame.cgRectValue.size.height - gap
+        
+        var contentInsets = tableView.contentInset
+        contentInsets.bottom = bottom
+        
+        tableView.contentInset = contentInsets
+        tableView.scrollIndicatorInsets = contentInsets
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        guard didShow else { return }
+        didShow = false
+        
+        if let insets = originalInsets {
+            tableView.contentInset = insets
+            tableView.scrollIndicatorInsets = insets
+        } else {
+            var contentInsets = tableView.contentInset
+            contentInsets.bottom = 0.0
+            tableView.contentInset = contentInsets
+            tableView.scrollIndicatorInsets = contentInsets
+        }
+    }
 }

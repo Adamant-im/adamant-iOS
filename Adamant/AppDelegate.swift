@@ -11,6 +11,7 @@ import Swinject
 import CryptoSwift
 import CoreData
 
+import Stylist
 
 // MARK: - Constants
 extension String.adamantLocalized {
@@ -28,6 +29,7 @@ extension String.adamantLocalized {
 extension StoreKey {
 	struct application {
 		static let deviceTokenHash = "app.deviceTokenHash"
+        static let welcomeScreensIsShown = "app.welcomeScreensIsShown"
 		
 		private init() {}
 	}
@@ -51,6 +53,10 @@ struct AdamantResources {
     static let ethServers = [
         "https://ethnode1.adamant.im/"
 //        "https://ropsten.infura.io/"  // test network
+    ]
+    
+    static let lskServers = [
+        "https://lisknode1.adamant.im"
     ]
 	
     // MARK: ADAMANT Addresses
@@ -108,39 +114,43 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		notificationService = container.resolve(NotificationsService.self)
         dialogService = container.resolve(DialogService.self)
         addressBookService = container.resolve(AddressBookService.self)
+        
+        ThemesManager.shared.securedStore = container.resolve(SecuredStore.self)
 		
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
 		window!.rootViewController = UITabBarController()
-		window!.rootViewController?.view.backgroundColor = .white
-		window!.tintColor = UIColor.adamant.primary
-		
-		
-		// MARK: 3. Show login
-		
-		guard let router = container.resolve(Router.self) else {
-			fatalError("Failed to get Router")
-		}
-		
-		// MARK: 4. Prepare pages
+        
+        // MARK: 2.1 Init Themes
+        ThemesManager.addCustomStyleProperties()
+        observeThemeChange()
+        
+        window!.rootViewController?.view.backgroundColor = ThemesManager.shared.currentTheme.background
+        window!.tintColor = ThemesManager.shared.currentTheme.primary
+
+        // MARK: 3. Prepare pages
+        guard let router = container.resolve(Router.self) else {
+            fatalError("Failed to get Router")
+        }
+        
 		if let tabbar = window?.rootViewController as? UITabBarController {
+            // MARK: Chats
             let chats = UISplitViewController()
             chats.tabBarItem.title = String.adamantLocalized.tabItems.chats
             chats.tabBarItem.image = #imageLiteral(resourceName: "chats_tab")
             chats.preferredDisplayMode = .allVisible
             chats.tabBarItem.badgeColor = UIColor.adamant.primary
             
+            let chatList = UINavigationController(rootViewController: router.get(scene: AdamantScene.Chats.chatList))
+            
+            // MARK: Accounts
             let accounts = UISplitViewController()
             accounts.tabBarItem.title = String.adamantLocalized.tabItems.account
             accounts.tabBarItem.image = #imageLiteral(resourceName: "account-tab")
             accounts.preferredDisplayMode = .allVisible
             accounts.tabBarItem.badgeColor = UIColor.adamant.primary
             
-            let chatListRoot = router.get(scene: AdamantScene.Chats.chatList)
-            let chatList = UINavigationController(rootViewController: chatListRoot)
-            
-            let accountRoot = router.get(scene: AdamantScene.Account.account)
-            let account = UINavigationController(rootViewController: accountRoot)
+            let account = UINavigationController(rootViewController: router.get(scene: AdamantScene.Account.account))
             
             if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
                 let chatDetails = UIViewController(nibName: "WelcomeViewController", bundle: nil)
@@ -158,9 +168,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         window!.makeKeyAndVisible()
         
-        let login = router.get(scene: AdamantScene.Login.login)
+        // MARK: 4. Show login
+        let login = router.get(scene: AdamantScene.Login.login) as! LoginViewController
+        let welcomeIsShown = UserDefaults.standard.bool(forKey: StoreKey.application.welcomeScreensIsShown)
+        login.requestBiometryOnFirstTimeActive = welcomeIsShown
         window!.rootViewController?.present(login, animated: false, completion: nil)
-		
+        
+        if !welcomeIsShown {
+            let welcome = router.get(scene: AdamantScene.Onboard.welcome)
+            login.present(welcome, animated: true, completion: nil)
+            UserDefaults.standard.set(true, forKey: StoreKey.application.welcomeScreensIsShown)
+        }
+    
 		// MARK: 5 Reachability & Autoupdate
 		repeater = RepeaterService()
 		
@@ -446,6 +465,7 @@ extension AppDelegate {
             })
 		}
 		
+        /*
 		if let ico = AdamantContacts.adamantIco.messages["chats.ico_message"] {
 			chatProvider.fakeReceived(message: ico.message,
 									  senderId: AdamantContacts.adamantIco.name,
@@ -461,5 +481,16 @@ extension AppDelegate {
                                         print("ERROR showing welcome message: \(error.message)")
             })
 		}
+        */
 	}
+}
+
+
+// MARK: - Stylist
+extension AppDelegate: Themeable {
+    func apply(theme: AdamantTheme) {
+        Stylist.shared.addTheme(theme.theme, name: "main")
+        window!.rootViewController?.view.backgroundColor = ThemesManager.shared.currentTheme.background
+        window!.tintColor = ThemesManager.shared.currentTheme.primary
+    }
 }

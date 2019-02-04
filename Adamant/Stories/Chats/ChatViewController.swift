@@ -25,6 +25,9 @@ extension String.adamantLocalized {
         static let actionsBody = NSLocalizedString("ChatScene.Actions.Body", comment: "Chat: Body for actions menu")
         static let rename = NSLocalizedString("ChatScene.Actions.Rename", comment: "Chat: 'Rename' action in actions menu")
         static let name = NSLocalizedString("ChatScene.Actions.NamePlaceholder", comment: "Chat: 'Name' field in actions menu")
+        
+        static let noMailAppWarning = NSLocalizedString("ChatScene.Warning.NoMailApp", comment: "Chat: warning message for opening email link without mail app configurated on device")
+        static let unsupportedUrlWarning = NSLocalizedString("ChatScene.Warning.UnsupportedUrl", comment: "Chat: warning message for opening unsupported url schemes")
 		
 		private init() { }
 	}
@@ -63,6 +66,13 @@ class ChatViewController: MessagesViewController {
 	
 	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
     
+    /*
+     In SplitViewController on iPhones, viewController can still present in memory, but not on screen.
+     In this cases not visible viewController will still mark messages isUnread = false
+     */
+    /// ViewController currently is ontop of the screen.
+    private var isOnTop = false
+    
     // Batch changes
     private struct ControllerChange {
         let type: NSFetchedResultsChangeType
@@ -88,6 +98,36 @@ class ChatViewController: MessagesViewController {
     // MARK: Rich Messages
     var richMessageProviders = [String:RichMessageProvider]()
     var cellCalculators = [String:CellSizeCalculator]()
+    
+    private var richMessageStatusUpdating = [NSManagedObjectID]()
+    private let statusUpdatingSemaphore = DispatchSemaphore(value: 1)
+    
+    fileprivate func addRichMessageStatusUpdating(id: NSManagedObjectID) {
+        statusUpdatingSemaphore.wait()
+        defer { statusUpdatingSemaphore.signal() }
+        
+        if !richMessageStatusUpdating.contains(id) {
+            richMessageStatusUpdating.append(id)
+        }
+    }
+    
+    fileprivate func removeRichMessageStatusUpdating(id: NSManagedObjectID) {
+        statusUpdatingSemaphore.wait()
+        defer { statusUpdatingSemaphore.signal() }
+        
+        guard let index = richMessageStatusUpdating.firstIndex(of: id) else {
+            return
+        }
+        
+        richMessageStatusUpdating.remove(at: index)
+    }
+    
+    func isUpdatingRichMessageStatus(id: NSManagedObjectID) -> Bool {
+        statusUpdatingSemaphore.wait()
+        defer { statusUpdatingSemaphore.signal() }
+        
+        return richMessageStatusUpdating.contains(id)
+    }
     
 	// MARK: Fee label
 	private var feeIsVisible: Bool = false
@@ -138,8 +178,14 @@ class ChatViewController: MessagesViewController {
 		}
 		
 		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
+            navigationItem.largeTitleDisplayMode = .never
 		}
+        
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        tabBarController?.tabBar.setStyle(.baseBarTint)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
+        
+        self.observeThemeChange()
 		
 		// MARK: 1. Initial configuration
 		
@@ -181,12 +227,9 @@ class ChatViewController: MessagesViewController {
 		messageInputBar.inputTextView.layer.masksToBounds = true
 		
 		// Insets
-		messageInputBar.inputTextView.textContainerInset = UIEdgeInsets(top: size, left: size*2, bottom: size, right: buttonWidth + size/2)
-		messageInputBar.inputTextView.placeholderLabelInsets = UIEdgeInsets(top: size, left: size*2+4, bottom: size, right: buttonWidth + size/2+2)
+		messageInputBar.inputTextView.textContainerInset = UIEdgeInsets(top: size+2, left: size*2, bottom: size-2, right: size*2)
+		messageInputBar.inputTextView.placeholderLabelInsets = UIEdgeInsets(top: size+2, left: size*2+4, bottom: size-2, right: size*2)
 		messageInputBar.inputTextView.scrollIndicatorInsets = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
-		messageInputBar.textViewPadding.right = -buttonWidth
-		
-		messageInputBar.setRightStackViewWidthConstant(to: buttonWidth, animated: false)
 		
 		// Make feeLabel
 		let feeLabel = InputBarButtonItem()
@@ -201,7 +244,7 @@ class ChatViewController: MessagesViewController {
         messageInputBar.setStackViewItems([attachmentButton], forStack: .left, animated: false)
 		
         // Add spacing between leftStackView (attachment button) and message input field
-        messageInputBar.leftStackView.alignment = .leading
+        messageInputBar.leftStackView.alignment = .bottom
         messageInputBar.setLeftStackViewWidthConstant(to: ChatViewController.attachmentButtonSize + size*2, animated: false)
         messageInputBar.leftStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: size*2)
         messageInputBar.leftStackView.isLayoutMarginsRelativeArrangement = true
@@ -249,6 +292,10 @@ class ChatViewController: MessagesViewController {
 		}
 		
 		// MARK: 3. Readonly chat
+        messageInputBar.backgroundView.setStyles([.secondaryBackground, .secondaryBorder])
+        messageInputBar.inputTextView.setStyles([.secondaryBorder, .input])
+        messageInputBar.sendButton.setStyles([.secondaryBackground, .primaryTint, .secondaryBorder])
+        attachmentButton.setStyle(.primaryTint)
 		
 		if chatroom.isReadonly {
 			messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
@@ -314,25 +361,20 @@ class ChatViewController: MessagesViewController {
                 }
             }
         }
+        
+        self.view.setStyle(.primaryBackground)
+        self.messagesCollectionView.setStyle(.primaryBackground)
 	}
 	
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-		
+		isOnTop = true
 		chatroom?.markAsReaded()
-	}
-	
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = false
-		}
 	}
 	
 	override func viewDidDisappear(_ animated: Bool) {
 		super.viewDidDisappear(animated)
-		
+		isOnTop = false
 		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.partner?.address {
 			delegate.preserveMessage(message, forAddress: address)
 		}
@@ -390,6 +432,19 @@ class ChatViewController: MessagesViewController {
 		
 		cellUpdateTimers.removeAll()
         richStatusOperationQueue.cancelAllOperations()
+        
+        if richMessageStatusUpdating.count > 0 {
+            let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+            privateContext.parent = stack.container.viewContext
+            
+            let transactions = richMessageStatusUpdating.compactMap { privateContext.object(with: $0) as? RichMessageTransaction }
+            
+            for transaction in transactions where transaction.transactionStatus == .updating {
+                transaction.transactionStatus = .notInitiated
+            }
+            
+            try? privateContext.save()
+        }
 	}
 	
     func updateTitle() {
@@ -419,7 +474,8 @@ class ChatViewController: MessagesViewController {
 			dialogService.presentShareAlertFor(string: address,
                                                types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
 											   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                               animated: true, from: sender,
+                                               animated: true,
+                                               from: sender,
 											   completion: nil)
 			
 			return
@@ -428,9 +484,10 @@ class ChatViewController: MessagesViewController {
 		let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
 			self?.dialogService.presentShareAlertFor(string: address,
                                                      types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
-													excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                                    animated: true, from: sender,
-													completion: nil)
+                                                     excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                                                     animated: true,
+                                                     from: sender,
+                                                     completion: nil)
 		}
 		
 		let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] action in
@@ -454,6 +511,7 @@ class ChatViewController: MessagesViewController {
 			
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
 			
+            alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 			self?.present(alert, animated: true, completion: nil)
 		}
 		
@@ -547,12 +605,13 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	}
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        
         switch type {
         case .insert:
             if let trs = anObject as? ChatTransaction {
-                trs.isUnread = false
-                chatroom?.hasUnreadMessages = false
+                if isOnTop {
+                    trs.isUnread = false
+                    chatroom?.hasUnreadMessages = false
+                }
                 
                 if let rich = anObject as? RichMessageTransaction {
                     rich.kind = messageKind(for: rich)
@@ -657,9 +716,12 @@ extension ChatViewController {
         }
         
         transaction.transactionStatus = .updating
+        let objectID = transaction.objectID
+        
+        richMessageStatusUpdating.append(objectID)
         
         let operation = StatusUpdateProcedure(parentContext: stack.container.viewContext,
-                                              objectId: transaction.objectID,
+                                              objectId: objectID,
                                               provider: provider,
                                               controller: self)
         
@@ -705,13 +767,7 @@ private class StatusUpdateProcedure: Procedure {
             return
         }
         
-        guard let txHash = transaction.richContent?[RichContentKeys.transfer.hash] else {
-            transaction.transactionStatus = .failed
-            try? privateContext.save()
-            return
-        }
-        
-        provider.statusForTransactionBy(hash: txHash, date: transaction.dateValue) { result in
+        provider.statusFor(transaction: transaction) { result in
             switch result {
             case .success(let status):
                 transaction.transactionStatus = status
@@ -733,14 +789,23 @@ private class StatusUpdateProcedure: Procedure {
                         
                         controller.updateStatus(for: trs, provider: provider, delay: 2.0)
                     }
+                } else {
+                    self.controller?.removeRichMessageStatusUpdating(id: self.objectId)
                 }
 
             case .failure:
                 transaction.transactionStatus = .failed
+                self.controller?.removeRichMessageStatusUpdating(id: self.objectId)
             }
 
             try? privateContext.save()
             self.finish()
         }
+    }
+}
+
+extension ChatViewController: Themeable {
+    public func apply(theme: AdamantTheme) {
+        self.messagesCollectionView.reloadData()
     }
 }

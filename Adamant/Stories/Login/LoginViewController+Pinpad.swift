@@ -69,6 +69,8 @@ extension LoginViewController {
 				} else {
 					alertVc = nil
 				}
+                
+                alertVc?.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 				
 				if Thread.isMainThread {
 					presenter.dismiss(animated: true, completion: nil)

@@ -25,7 +25,22 @@ class InMemoryCoreDataStack: CoreDataStack {
 		container.loadPersistentStores { (_, _) in }
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			self?.container.viewContext.reset()
+            guard let context = self?.container.viewContext else {
+                return
+            }
+            
+            let fetch = NSFetchRequest<NSManagedObject>(entityName: "BaseAccount")
+            
+            do {
+                let result = try context.fetch(fetch)
+                for account in result {
+                    context.delete(account)
+                }
+                
+                try context.save()
+            } catch {
+                print("Got error saving context after reset")
+            }
 		}
 	}
 }

@@ -47,6 +47,10 @@ extension BiometryType {
 }
 
 extension PinpadViewController {
+    override open var preferredStatusBarStyle: UIStatusBarStyle {
+        return UIColor.adamant.statusBar
+    }
+    
 	static func adamantPinpad(biometryButton: PinpadBiometryButtonType) -> PinpadViewController {
 		let pinpad = PinpadViewController.instantiateFromResourceNib()
 		
@@ -73,6 +77,8 @@ extension PinpadViewController {
 		pinpad.biometryButtonType = biometryButton
 		pinpad.cancelButton.setTitle(String.adamantLocalized.alert.cancel, for: .normal)
 		pinpad.pinDigits = 6
+        
+        pinpad.setStyle(.pinpad)
 		
 		return pinpad
 	}

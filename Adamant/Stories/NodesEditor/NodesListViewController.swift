@@ -83,10 +83,15 @@ class NodesListViewController: FormViewController {
         super.viewDidLoad()
         navigationItem.title = String.adamantLocalized.nodesList.title
         navigationOptions = .Disabled
+        
+        if #available(iOS 11.0, *) {
+            navigationItem.largeTitleDisplayMode = .always
+        }
+        
+        self.tableView.setStyle(.baseTable)
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.setStyles([.primaryBackground, .primaryTint])
 		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = true
-		}
         if splitViewController == nil, navigationController?.viewControllers.count == 1 {
             let done = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(NodesListViewController.close))
             navigationItem.rightBarButtonItem = done
@@ -119,7 +124,8 @@ class NodesListViewController: FormViewController {
 		}.onCellSelection { [weak self] (_, _) in
 			self?.createNewNode()
 		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
+            cell.style = AdamantThemeStyle.commonTableViewCell
+            cell.textLabel?.setStyle(.primaryText)
 		}
 			
 			
@@ -134,7 +140,8 @@ class NodesListViewController: FormViewController {
 		}.onCellSelection { [weak self] (_, _) in
 			self?.resetToDefault()
 		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
+            cell.style = AdamantThemeStyle.commonTableViewCell
+            cell.textLabel?.setStyle(.primaryText)
 		}
     }
 	
@@ -214,6 +221,7 @@ extension NodesListViewController {
 			self?.nodesSource.saveNodes()
 		}))
 		
+        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 		present(alert, animated: true, completion: nil)
 	}
 	
@@ -346,6 +354,8 @@ extension NodesListViewController {
 			}
 			
 			cell.accessoryType = .disclosureIndicator
+            cell.setStyles([.baseTableViewCell, .secondaryBackground])
+            cell.textLabel?.setStyle(.primaryText)
 		}).onCellSelection { [weak self] (_, row) in
 			guard let node = row.value, let tag = row.tag else {
 				return

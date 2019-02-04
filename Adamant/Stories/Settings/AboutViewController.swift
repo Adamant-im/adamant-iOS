@@ -45,7 +45,7 @@ class AboutViewController: FormViewController {
 	}
 	
 	enum Rows {
-		case website, whitepaper, blog, github
+		case website, whitepaper, blog, github, welcomeScreens
 		case adm, email, bitcointalk, facebook, telegram, vk, twitter
 		
 		var tag: String {
@@ -53,6 +53,7 @@ class AboutViewController: FormViewController {
 			case .website: return "www"
 			case .whitepaper: return "whtpaper"
 			case .github: return "git"
+            case .welcomeScreens: return "welcome"
 			case .adm: return "amd"
 			case .email: return "email"
 			case .blog: return "blog"
@@ -70,6 +71,7 @@ class AboutViewController: FormViewController {
 			case .whitepaper: return NSLocalizedString("About.Row.Whitepaper", comment: "About scene: The Whitepaper row")
 			case .github: return NSLocalizedString("About.Row.GitHub", comment: "About scene: Project's GitHub page row")
 			case .adm: return NSLocalizedString("About.Row.Adamant", comment: "About scene: Write to Adamant row")
+            case .welcomeScreens: return NSLocalizedString("About.Row.Welcome", comment: "About scene: Show Welcome screens")
 			case .email: return NSLocalizedString("About.Row.WriteUs", comment: "About scene: Write us row")
 			case .blog: return NSLocalizedString("About.Row.Blog", comment: "About scene: Our blog row")
 			case .bitcointalk: return NSLocalizedString("About.Row.Bitcointalk", comment: "About scene: Bitcointalk.org row")
@@ -85,14 +87,15 @@ class AboutViewController: FormViewController {
 			case .website: return NSLocalizedString("About.Row.Website.Url", comment: "About scene: Website localized url")
 			case .whitepaper: return NSLocalizedString("About.Row.Whitepaper.Url", comment: "About scene: The Whitepaper localized url")
 			case .github: return NSLocalizedString("About.Row.GitHub.Url", comment: "About scene: Project's GitHub page localized url")
-			case .adm: return "" // no localized adamant chat
-			case .email: return "" // no localized emails
 			case .blog: return NSLocalizedString("About.Row.Blog.Url", comment: "About scene: Our blog localized url")
 			case .bitcointalk: return NSLocalizedString("About.Row.Bitcointalk.Url", comment: "About scene: Bitcointalk.org localized url")
 			case .facebook: return NSLocalizedString("About.Row.Facebook.Url", comment: "About scene: Facebook localized url")
 			case .telegram: return NSLocalizedString("About.Row.Telegram.Url", comment: "About scene: Telegram localized url")
 			case .vk: return NSLocalizedString("About.Row.VK.Url", comment: "About scene: VK localized url")
 			case .twitter: return NSLocalizedString("About.Row.Twitter.Url", comment: "About scene: Twitter localized url")
+                
+            // No urls
+            case .adm, .email, .welcomeScreens: return ""
 			}
 		}
 		
@@ -104,6 +107,7 @@ class AboutViewController: FormViewController {
 			case .blog: return #imageLiteral(resourceName: "row_blog")
 			case .adm: return #imageLiteral(resourceName: "row_chat_adamant")
 			case .website: return #imageLiteral(resourceName: "row_website")
+            case .welcomeScreens: return #imageLiteral(resourceName: "row_logo")
 			default: return #imageLiteral(resourceName: "row_icon_placeholder")
 			}
 		}
@@ -124,12 +128,16 @@ class AboutViewController: FormViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
+        
+        if #available(iOS 11.0, *) {
+            navigationItem.largeTitleDisplayMode = .always
+        }
+        
 		navigationItem.title = String.adamantLocalized.about.title
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = true
-		}
+        
+        tableView.setStyle(.baseTable)
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
 		
 		// MARK: Header & Footer
 		if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
@@ -138,6 +146,7 @@ class AboutViewController: FormViewController {
 			if let label = header.viewWithTag(888) as? UILabel {
 				label.text = String.adamantLocalized.shared.productName
 				label.textColor = UIColor.adamant.primary
+                label.setStyle(.primaryText)
 			}
 		}
 		
@@ -145,6 +154,7 @@ class AboutViewController: FormViewController {
 			if let label = footer.viewWithTag(555) as? UILabel {
 				label.text = AdamantUtilities.applicationVersion
 				label.textColor = UIColor.adamant.primary
+                label.setStyle(.primaryText)
 				tableView.tableFooterView = footer
 			}
 		}
@@ -183,6 +193,28 @@ class AboutViewController: FormViewController {
 						url: Rows.github.localizedUrl,
 						image: Rows.github.image)
 
+        // Welcome screens
+        <<< LabelRow() {
+            $0.title = Rows.welcomeScreens.localized
+            $0.tag = Rows.welcomeScreens.tag
+            $0.cell.imageView?.image = Rows.welcomeScreens.image
+            $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+            cell.setStyles([.secondaryBackground, .primaryTint])
+            cell.textLabel?.setStyle(.primaryText)
+            cell.imageView?.setStyle(.primaryTint)
+        }.onCellSelection { [weak self] (_, _) in
+            guard let vc = self?.router.get(scene: AdamantScene.Onboard.welcome) else {
+                if let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow {
+                    tableView.deselectRow(at: indexPath, animated: true)
+                }
+                return
+            }
+            
+            self?.present(vc, animated: true, completion: nil)
+        }
 			
 		// MARK: Contact
 		+++ Section(Sections.contactUs.localized) {
@@ -198,6 +230,9 @@ class AboutViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
+            cell.setStyles([.secondaryBackground, .primaryTint])
+            cell.textLabel?.setStyle(.primaryText)
+            cell.imageView?.setStyle(.primaryTint)
 		}.onCellSelection { [weak self] (_, _) in
 			guard let accountsProvider = self?.accountsProvider, let router = self?.router else {
 				return
@@ -226,11 +261,8 @@ class AboutViewController: FormViewController {
 						
 						dialogService?.dismissProgress()
 					}
-					
-				case .invalidAddress, .notFound:
-					dialogService?.dismissProgress()
-					
-				case .networkError:
+                    
+				case .invalidAddress, .notFound, .notInitiated(_), .networkError, .dummy(_):
 					dialogService?.showWarning(withMessage: String.adamantLocalized.sharedErrors.networkError)
 					
 				case .serverError(let error):
@@ -249,6 +281,10 @@ class AboutViewController: FormViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
+            cell.setStyles([.secondaryBackground, .primaryTint])
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
+            cell.imageView?.setStyle(.primaryTint)
 		}.onCellSelection { [weak self] (_, _) in
 			let mailVC = MFMailComposeViewController()
 			mailVC.mailComposeDelegate = self
@@ -324,6 +360,10 @@ extension AboutViewController {
 			$0.cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
+            cell.setStyles([.secondaryBackground, .primaryTint])
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
+            cell.imageView?.setStyle(.primaryTint)
 		}.onCellSelection { [weak self] (_, _) in
 			guard let url = URL(string: urlRaw) else {
 				fatalError("Failed to build page url: \(urlRaw)")
@@ -331,6 +371,7 @@ extension AboutViewController {
 			
 			let safari = SFSafariViewController(url: url)
 			safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
 			self?.present(safari, animated: true, completion: nil)
 		}
 		

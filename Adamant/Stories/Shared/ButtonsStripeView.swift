@@ -105,6 +105,8 @@ class ButtonsStripeView: UIView {
 				button.heightAnchor.constraint(equalToConstant: buttonsSize).isActive = true
 				button.widthAnchor.constraint(equalToConstant: buttonsSize).isActive = true
 				button.constraints.forEach({$0.identifier = "wh"})
+                
+                button.setStyle(.biometricButton)
 				
 				stripeStackView.addArrangedSubview(button)
 				buttons?.append(button)

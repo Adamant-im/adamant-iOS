@@ -12,6 +12,7 @@ import QRCodeReader
 import EFQRCode
 import AVFoundation
 import Photos
+import SafariServices
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -24,6 +25,8 @@ extension String.adamantLocalized {
 		static let loggedUserAddressMessage = NSLocalizedString("NewChatScene.Error.OwnAddress", comment: "New chat: Notify user that he can't start chat with himself")
 		
 		static let wrongQrError = NSLocalizedString("NewChatScene.Error.WrongQr", comment: "New Chat: Notify user that scanned QR doesn't contains an address")
+        
+        static let whatDoesItMean = NSLocalizedString("NewChatScene.NotInitialized.HelpButton", comment: "New Chat: 'What does it mean?', a help button for info about uninitialized accounts.")
 		
 		private init() { }
 	}
@@ -38,6 +41,8 @@ protocol NewChatViewControllerDelegate: class {
 
 // MARK: -
 class NewChatViewController: FormViewController {
+    static let faqUrl = "https://medium.com/adamant-im/chats-and-uninitialized-accounts-in-adamant-5035438e2fcd"
+    
 	private enum Rows {
 		case addressField
 		case scanQr
@@ -95,20 +100,24 @@ class NewChatViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
+        if #available(iOS 11.0, *) {
+            navigationItem.largeTitleDisplayMode = .always
+        }
+        
 		tableView.keyboardDismissMode = .none
-		
-		if #available(iOS 11.0, *) {
-			navigationController?.navigationBar.prefersLargeTitles = true
-		}
+        
+        tableView.setStyle(.baseTable)
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
 		
 		navigationItem.title = String.adamantLocalized.newChat.title
 		let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
 		doneButton.isEnabled = false
 		navigationItem.rightBarButtonItem = doneButton
         
-        if let _ = self.splitViewController {
+        if self.splitViewController != nil {
             if #available(iOS 11.0, *) {
-                navigationController?.navigationBar.prefersLargeTitles = false
+                navigationItem.largeTitleDisplayMode = .never
             }
         } else {
             navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
@@ -139,6 +148,7 @@ class NewChatViewController: FormViewController {
 			let prefix = UILabel()
 			prefix.text = "U"
 			prefix.sizeToFit()
+            prefix.setStyle(.primaryText)
 			let view = UIView()
 			view.addSubview(prefix)
 			view.frame = prefix.frame
@@ -148,6 +158,8 @@ class NewChatViewController: FormViewController {
 			if let text = cell.textField.text {
 				cell.textField.text = text.components(separatedBy: NewChatViewController.invalidCharacters).joined()
 			}
+            cell.textField?.setStyle(.input)
+            cell.setStyle(.secondaryBackground)
 		}.onChange { [weak self] row in
 			if let skip = self?.skipValueChange, skip {
 				self?.skipValueChange = false
@@ -189,6 +201,8 @@ class NewChatViewController: FormViewController {
 				$0.title = Rows.myQr.localized
 			}.cellUpdate { (cell, _) in
 				cell.textLabel?.textColor = UIColor.adamant.primary
+                cell.style = AdamantThemeStyle.commonTableViewCell
+                cell.textLabel?.setStyle(.primaryText)
 			}.onCellSelection { [weak self] (cell, row) in
 				let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
 				switch AdamantQRTools.generateQrFrom(string: encodedAddress, withLogo: true) {
@@ -287,10 +301,38 @@ class NewChatViewController: FormViewController {
 					self.dialogService.dismissProgress()
 				}
 				
-			case .notFound, .invalidAddress, .networkError(_):
+            case .dummy(_):
+                self.dialogService.dismissProgress()
+                
+                let alert = UIAlertController(title: nil, message: AccountsProviderResult.notInitiated(address: address).localized, preferredStyle: .alert)
+                
+                let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean, style: .default, handler: { [weak self] _ in
+                    guard let url = URL(string: NewChatViewController.faqUrl) else {
+                        return
+                    }
+                    
+                    let safari = SFSafariViewController(url: url)
+                    safari.preferredControlTintColor = UIColor.adamant.primary
+                    safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
+                    self?.present(safari, animated: true, completion: nil)
+                })
+                
+                alert.addAction(faq)
+                alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+                
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true, completion: nil)
+                }
+                
+			case .notFound, .invalidAddress, .notInitiated(_), .networkError(_):
 				self.dialogService.showWarning(withMessage: result.localized)
 				
 			case .serverError(let error):
+                if let apiError = error as? ApiServiceError, case .internalError(let message, _) = apiError, message == String.adamantLocalized.sharedErrors.unknownError {
+                    self.dialogService.showWarning(withMessage: AccountsProviderResult.notFound(address: address).localized)
+                    return
+                }
+                
 				self.dialogService.showError(withMessage: result.localized, error: error)
 			}
 		}
@@ -357,6 +399,7 @@ extension NewChatViewController {
 			
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
 			
+            alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 			present(alert, animated: true, completion: nil)
 		}
 	}
@@ -367,6 +410,8 @@ extension NewChatViewController {
 			picker.delegate = self
 			picker.allowsEditing = false
 			picker.sourceType = .photoLibrary
+            picker.navigationBar.setStyle(.baseNavigationBar)
+            picker.view.style = AdamantThemeStyle.primaryTintAndBackground
 			self?.present(picker, animated: true, completion: nil)
 		}
 		

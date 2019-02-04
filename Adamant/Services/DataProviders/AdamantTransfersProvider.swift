@@ -27,6 +27,8 @@ class AdamantTransfersProvider: TransfersProvider {
 	private(set) var receivedLastHeight: Int64?
 	private(set) var readedLastHeight: Int64?
     private let apiTransactions = 100
+    
+    private let processingHeightSemaphore = DispatchSemaphore(value: 1)
 	
 	private let processingQueue = DispatchQueue(label: "im.adamant.processing.transfers", qos: .utility, attributes: [.concurrent])
     private let sendingQueue = DispatchQueue(label: "im.adamant.sending.transfers", qos: .utility, attributes: [.concurrent])
@@ -166,12 +168,26 @@ extension AdamantTransfersProvider {
                 }
                 
                 if let store = self?.securedStore {
+                    // Received
                     if let h = self?.receivedLastHeight {
-                        store.set(String(h), for: StoreKey.chatProvider.receivedLastHeight)
+                        if let raw = store.get(StoreKey.transfersProvider.receivedLastHeight), let prev = Int64(raw) {
+                            if h > prev {
+                                store.set(String(h), for: StoreKey.transfersProvider.receivedLastHeight)
+                            }
+                        } else {
+                            store.set(String(h), for: StoreKey.transfersProvider.receivedLastHeight)
+                        }
                     }
                     
-                    if let h = self?.readedLastHeight, h > 0 {
-                        store.set(String(h), for: StoreKey.chatProvider.readedLastHeight)
+                    // Readed
+                    if let h = self?.readedLastHeight {
+                        if let raw = store.get(StoreKey.transfersProvider.readedLastHeight), let prev = Int64(raw) {
+                            if h > prev {
+                                store.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
+                            }
+                        } else {
+                            store.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
+                        }
                     }
                 }
                 
@@ -233,17 +249,17 @@ extension AdamantTransfersProvider {
 		securedStore.remove(StoreKey.transfersProvider.readedLastHeight)
 		
 		// Drop CoreData
-		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
-		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-		context.parent = stack.container.viewContext
-		
-		if let result = try? context.fetch(request) {
-			for obj in result {
-				context.delete(obj)
-			}
-			
-			try? context.save()
-		}
+//        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+//        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+//        context.parent = stack.container.viewContext
+//
+//        if let result = try? context.fetch(request) {
+//            for obj in result {
+//                context.delete(obj)
+//            }
+//
+//            try? context.save()
+//        }
 		
 		// Set state
 		setState(.empty, previous: prevState, notify: notify)
@@ -328,7 +344,7 @@ extension AdamantTransfersProvider {
         case .success(let account):
             recipientAccount = account
             
-        case .notFound, .invalidAddress:
+        case .notFound, .invalidAddress, .notInitiated, .dummy(_):
             completion(.failure(.accountNotFound(address: recipient)))
             return
             
@@ -444,33 +460,71 @@ extension AdamantTransfersProvider {
         
         // MARK: 1. Get recipient
         let accountsGroup = DispatchGroup()
-        accountsGroup.enter()
+        accountsGroup.enter() // Enter 1
         
-        var result: AccountsProviderResult! = nil
-        accountsProvider.getAccount(byAddress: recipient) { r in
-            result = r
-            accountsGroup.leave()
+        var recipientAccount: BaseAccount? = nil
+        var providerError: TransfersProviderError? = nil
+        
+        accountsProvider.getAccount(byAddress: recipient) { result in
+            defer {
+                accountsGroup.leave() // Exit 1
+            }
+            
+            switch result {
+            case .success(let account):
+                recipientAccount = account
+                
+            case .dummy(let account):
+                recipientAccount = account
+                
+            case .notFound, .notInitiated:
+                accountsGroup.enter() // Enter 2, before exit 1
+                self.accountsProvider.getDummyAccount(for: recipient) { result in
+                    defer {
+                        accountsGroup.leave() // Exit 2
+                    }
+                    
+                    switch result {
+                    case .success(let dummy):
+                        recipientAccount = dummy
+                        
+                    case .foundRealAccount(let account):
+                        recipientAccount = account
+                        
+                    case .invalidAddress(let address):
+                        providerError = .accountNotFound(address: address)
+                        
+                    case .internalError(let error):
+                        providerError = TransfersProviderError.internalError(message: error.localizedDescription, error: error)
+                    }
+                }
+                
+            case .invalidAddress:
+                providerError = .accountNotFound(address: recipient)
+                
+            case .serverError(let error):
+                providerError = .serverError(error)
+                
+            case .networkError(_):
+                providerError = .networkError
+            }
         }
         
         accountsGroup.wait()
         
-        let recipientAccount: CoreDataAccount
-        switch result! {
-        case .success(let account):
-            recipientAccount = account
+        let backgroundAccount: BaseAccount
+        if let acc = recipientAccount, let obj = context.object(with: acc.objectID) as? BaseAccount {
+            backgroundAccount = obj
+        } else {
+            if let err = providerError {
+                completion(.failure(err))
+            } else {
+                completion(.failure(.accountNotFound(address: recipient)))
+            }
             
-        case .notFound, .invalidAddress:
-            completion(.failure(.accountNotFound(address: recipient)))
-            return
-            
-        case .serverError(let error):
-            completion(.failure(.serverError(error)))
-            return
-            
-        case .networkError(_):
-            completion(.failure(.networkError))
             return
         }
+        
         
         // MARK: 2. Create transaction
         let transaction = TransferTransaction(context: context)
@@ -489,7 +543,9 @@ extension AdamantTransfersProvider {
         transaction.statusEnum = MessageStatus.pending
         
         // MARK: 3. Chatroom
-        if let id = recipientAccount.chatroom?.objectID, let chatroom = context.object(with: id) as? Chatroom {
+        backgroundAccount.addToTransfers(transaction)
+        
+        if let coreDataAccount = backgroundAccount as? CoreDataAccount, let id = coreDataAccount.chatroom?.objectID, let chatroom = context.object(with: id) as? Chatroom {
             chatroom.addToTransactions(transaction)
             
             if let lastTransaction = chatroom.lastTransaction {
@@ -711,23 +767,36 @@ extension AdamantTransfersProvider {
         let partnersGroup = DispatchGroup()
         var errors: [ProcessingResult] = []
         for id in partnerIds {
-            partnersGroup.enter()
-            accountsProvider.getAccount(byAddress: id, completion: { result in
-                defer {
-                    partnersGroup.leave()
-                }
-                
+            partnersGroup.enter() // Enter 1
+            
+            accountsProvider.getAccount(byAddress: id) { result in
                 switch result {
-                case .success(_):
-                    break
+                case .success(_), .dummy(_):
+                    partnersGroup.leave() // Leave 1
                     
-                case .notFound, .invalidAddress:
-					errors.append(ProcessingResult.accountNotFound(address: id))
+                case .notFound, .invalidAddress, .notInitiated(_):
+                    self.accountsProvider.getDummyAccount(for: id) { result in
+                        defer {
+                            partnersGroup.leave() // Leave 1
+                        }
+                        
+                        switch result {
+                        case .success(_), .foundRealAccount(_):
+                            break
+                        
+                        case .invalidAddress(let address):
+                            errors.append(ProcessingResult.accountNotFound(address: address))
+                        
+                        case .internalError(let error):
+                            errors.append(ProcessingResult.error(error))
+                        }
+                    }
 					
                 case .networkError(let error), .serverError(let error):
                     errors.append(ProcessingResult.error(error))
+                    partnersGroup.leave() // Leave 1
                 }
-            })
+            }
         }
         
         partnersGroup.wait()
@@ -743,9 +812,9 @@ extension AdamantTransfersProvider {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = self.stack.container.viewContext
         
-        var partners: [String:CoreDataAccount] = [:]
+        var partners: [String:BaseAccount] = [:]
         for id in partnerIds {
-            let request = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
+            let request = NSFetchRequest<BaseAccount>(entityName: BaseAccount.baseEntityName)
             request.predicate = NSPredicate(format: "address == %@", id)
             request.fetchLimit = 1
             if let partner = (try? context.fetch(request))?.first {
@@ -799,7 +868,10 @@ extension AdamantTransfersProvider {
             
             if let partner = partners[partnerId] {
                 transfer.partner = partner
-                transfer.chatroom = partner.chatroom
+                
+                if let chatroom = (partner as? CoreDataAccount)?.chatroom {
+                    transfer.chatroom = chatroom
+                }
             }
             
             if t.height > height {
@@ -812,6 +884,8 @@ extension AdamantTransfersProvider {
         
         // MARK: 4. Check lastHeight
         // API returns transactions from lastHeight INCLUDING transaction with height == lastHeight, so +1
+        processingHeightSemaphore.wait()
+        
         if height > 0 {
             let uH = Int64(height + 1)
             
@@ -826,30 +900,15 @@ extension AdamantTransfersProvider {
         
         // MARK: 5. Unread transactions
         if let unreadedHeight = readedLastHeight {
-            let unreadTransactions = transfers.filter { $0.height > unreadedHeight }
-            let chatrooms = Dictionary.init(grouping: unreadTransactions, by: ({ (t: TransferTransaction) -> Chatroom in t.chatroom!}))
+            let unreadTransactions = transfers.filter { !$0.isOutgoing && $0.height > unreadedHeight }
             
-            for (chatroom, trs) in chatrooms {
-                chatroom.hasUnreadMessages = true
-                trs.forEach {
-                    if !$0.isOutgoing {
-                        $0.isUnread = true
-                    }
-                }
+            if unreadTransactions.count > 0 {
+                unreadTransactions.forEach { $0.isUnread = true }
+                Set(unreadTransactions.compactMap { $0.chatroom }).forEach { $0.hasUnreadMessages = true }
             }
-            
-            transfers.filter({$0.height > unreadedHeight}).forEach({$0.isUnread = true})
-            
-            readedLastHeight = self.receivedLastHeight
         }
         
-        if let h = self.receivedLastHeight {
-            securedStore.set(String(h), for: StoreKey.transfersProvider.receivedLastHeight)
-        }
-        
-        if let h = self.readedLastHeight {
-            securedStore.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
-        }
+        processingHeightSemaphore.signal()
         
         // MARK: 6. Dump transactions to viewContext
         if context.hasChanges {
