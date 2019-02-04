@@ -122,6 +122,10 @@ internal class ThemeBase: AdamantTheme {
         return getColor(.trailingSwipeActionBackground)
     }
     
+    var darkKeyboard: Bool {
+        return theme.variables["darkKeyboard"] as? Bool ?? false
+    }
+    
     // MARK: - Init
     
     internal init(fileName: String) throws {

@@ -55,6 +55,8 @@ enum AdamantThemeStyle: String {
     case secondaryBackground = "secondaryBackground"
     case activeBackground = "activeBg"
     
+    case darkKeyboard = ""
+    
     case chatCell = "chatCell"
     
     // MARK: viewControllers

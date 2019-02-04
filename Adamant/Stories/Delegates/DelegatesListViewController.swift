@@ -97,6 +97,8 @@ class DelegatesListViewController: UIViewController {
         navigationController?.navigationBar.setStyle(.baseNavigationBar)
         view.style = AdamantThemeStyle.primaryTintAndBackground
 		
+        ThemesManager.shared.manage(for: self)
+        
 		// MARK: Initial
         navigationItem.title = String.adamantLocalized.delegates.title
         tableView.register(UINib.init(nibName: "AdamantDelegateCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
@@ -105,13 +107,14 @@ class DelegatesListViewController: UIViewController {
 		
 		// MARK: Search controller
 		if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .always
+            navigationItem.largeTitleDisplayMode = .never
             
 			let controller = UISearchController(searchResultsController: nil)
 			controller.searchResultsUpdater = self
 			controller.obscuresBackgroundDuringPresentation = false
 			controller.hidesNavigationBarDuringPresentation = true
             controller.searchBar.setStyle(.baseBarTint)
+            controller.searchBar.keyboardAppearance = ThemesManager.shared.currentTheme.darkKeyboard ? .dark : .light
             searchController = controller
             
             definesPresentationContext = true
@@ -443,8 +446,9 @@ extension DelegatesListViewController {
 			}
 		}
 	}
-    
-    
+}
+
+extension DelegatesListViewController {
     // MARK: Keyboard
     @objc private func keyboardWillShow(notification: Notification) {
         // For some reason we will receive 2 notifications
@@ -480,5 +484,12 @@ extension DelegatesListViewController {
             tableView.contentInset = contentInsets
             tableView.scrollIndicatorInsets = contentInsets
         }
+    }
+}
+
+extension DelegatesListViewController: Themeable {
+    public func apply(theme: AdamantTheme) {
+        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: ThemesManager.shared.currentTheme.primary]
+        searchController?.searchBar.keyboardAppearance = ThemesManager.shared.currentTheme.darkKeyboard ? .dark : .light
     }
 }

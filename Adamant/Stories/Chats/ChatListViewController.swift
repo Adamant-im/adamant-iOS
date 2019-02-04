@@ -968,5 +968,6 @@ extension ChatListViewController {
 extension ChatListViewController: Themeable {
     public func apply(theme: AdamantTheme) {
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: ThemesManager.shared.currentTheme.primary]
+        searchController.searchBar.keyboardAppearance = ThemesManager.shared.currentTheme.darkKeyboard ? .dark : .light
     }
 }

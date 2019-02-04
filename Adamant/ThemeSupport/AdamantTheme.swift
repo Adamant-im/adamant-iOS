@@ -66,6 +66,8 @@ public protocol AdamantTheme {
     /// Backgroound color for tableView trailing swipe actions. Icon always white.
     var trailingSwipeActionsBackground: UIColor { get }
     
+    var darkKeyboard: Bool { get }
+    
     // MARK: Chat colors
     
     /// User chat bubble background
