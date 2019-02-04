@@ -71,6 +71,10 @@ class ChatListViewController: UIViewController {
     
     private(set) var isBusy: Bool = true
     
+    // MARK: Keyboard
+    // SplitView sends double notifications about keyboard.
+    private var originalInsets: UIEdgeInsets?
+    private var didShow: Bool = false
     
 	// MARK: Lifecycle
     override func viewDidLoad() {
@@ -148,6 +152,10 @@ class ChatListViewController: UIViewController {
                 self?.setIsBusy(true)
             }
         }
+        
+        // Keyboard
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 	
 	deinit {
@@ -875,3 +883,44 @@ extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, 
         }
     }
 }
+
+// MARK: Keyboard
+extension ChatListViewController {
+    @objc private func keyboardWillShow(notification: Notification) {
+        guard !didShow else { return }
+        didShow = true
+        
+        guard let frame = notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue else {
+            return
+        }
+        
+        originalInsets = tableView.contentInset
+        
+        var contentInsets = tableView.contentInset
+        
+        if let tabBarHeight = tabBarController?.tabBar.bounds.height {
+            contentInsets.bottom = frame.cgRectValue.size.height - tabBarHeight
+        } else {
+            contentInsets.bottom = frame.cgRectValue.size.height
+        }
+        
+        tableView.contentInset = contentInsets
+        tableView.scrollIndicatorInsets = contentInsets
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        guard didShow else { return }
+        didShow = false
+        
+        if let insets = originalInsets {
+            tableView.contentInset = insets
+            tableView.scrollIndicatorInsets = insets
+        } else {
+            var contentInsets = tableView.contentInset
+            contentInsets.bottom = 0.0
+            tableView.contentInset = contentInsets
+            tableView.scrollIndicatorInsets = contentInsets
+        }
+    }
+}
+
