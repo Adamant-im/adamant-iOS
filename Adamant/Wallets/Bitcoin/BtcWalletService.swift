@@ -17,7 +17,7 @@ class BtcWalletService: WalletService {
     
     var walletViewController: WalletViewController {
         guard let vc = router.get(scene: AdamantScene.Wallets.Bitcoin.wallet) as? BtcWalletViewController else {
-            fatalError("Can't get LskWalletViewController")
+            fatalError("Can't get BtcWalletViewController")
         }
         
         vc.service = self
@@ -64,9 +64,7 @@ class BtcWalletService: WalletService {
     let stateSemaphore = DispatchSemaphore(value: 1)
     
     var peerGroup: PeerGroup?
-    var payments = [Payment]()
-    
-    var peer: Peer?
+    var blockStore: SQLiteBlockStore?
     
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
@@ -91,7 +89,6 @@ class BtcWalletService: WalletService {
     
     deinit {
         self.stopSync()
-        self.peer?.disconnect()
     }
     
     func update() {
@@ -162,6 +159,8 @@ class BtcWalletService: WalletService {
         self.peerGroup = PeerGroup(blockChain: blockChain)
         self.peerGroup?.delegate = self
         
+        self.blockStore = blockStore
+        
         if let wallet = self.btcWallet, let address = try? wallet.keystore.receiveAddress() {
             if let publicKey = address.publicKey {
                 self.peerGroup?.addFilter(publicKey)
@@ -218,9 +217,9 @@ extension BtcWalletService: SwinjectDependentService {
 extension BtcWalletService {
     func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
         if let address = try! self.btcWallet?.keystore.receiveAddress(), let blockChain = self.peerGroup?.blockChain {
+            let balance: Int64 = try! blockChain.calculateBalance(address: address)
+            
             DispatchQueue.main.async {
-                let balance: Int64 = try! blockChain.calculateBalance(address: address)
-                
                 let decimal = Decimal(balance)
                 completion(.success(result: (decimal / Decimal(100000000))))
             }
@@ -229,6 +228,38 @@ extension BtcWalletService {
         }
     }
 }
+
+// MARK: - Transactions
+extension BtcWalletService {
+    func getTransactions(_ completion: @escaping (ApiServiceResult<[Payment]>) -> Void) {
+        if let address = try! self.btcWallet?.keystore.receiveAddress(), let blockStore = self.blockStore {
+            defaultDispatchQueue.async {
+                if let transactions = try? blockStore.transactions(address: address) {
+                     completion(.success(transactions))
+                } else {
+                    completion(.success([Payment]()))
+                }
+            }
+        } else {
+            completion(.failure(.internalError(message: "BTC Wallet: not found", error: nil)))
+        }
+    }
+    
+    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<Payment>) -> Void) {
+    }
+}
+
+extension BtcWalletService: WalletServiceWithTransfers {
+    func transferListViewController() -> UIViewController {
+        guard let vc = router.get(scene: AdamantScene.Wallets.Bitcoin.transactionsList) as? BtcTransactionsViewController else {
+            fatalError("Can't get BtcTransactionsViewController")
+        }
+        
+        vc.btcWalletService = self
+        return vc
+    }
+}
+
 
 // BTC Sync
 extension BtcWalletService: PeerGroupDelegate {
@@ -269,7 +300,7 @@ class AdmBTCTestnet: Network {
     }
     override public var checkpoints: [Checkpoint] {
         return [
-            Checkpoint(height: 0, hash: Data(Data(hex: "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943")!.reversed()), timestamp: 1_376_543_922, target: 0x1d00ffff),
+//            Checkpoint(height: 0, hash: Data(Data(hex: "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943")!.reversed()), timestamp: 1_376_543_922, target: 0x1d00ffff),
             Checkpoint(height: 1450248, hash: Data(Data(hex: "000000000000d19bf1c7fdcc2f2d9a917fd837628ce09ed9439771a6d8391210")!.reversed()), timestamp: 1546234270, target: 0x1d00ffff)
         ]
     }
@@ -286,7 +317,7 @@ class AdmBTCTestnet: Network {
     }
     override var dnsSeeds: [String] {
         return [
-            "testnet-seed.bitcoin.jonasschnelli.ch", // Jonas Schnelli
+//            "testnet-seed.bitcoin.jonasschnelli.ch", // Jonas Schnelli
             "testnet-seed.bluematt.me",              // Matt Corallo
             "testnet-seed.bitcoin.petertodd.org",    // Peter Todd
             "testnet-seed.bitcoin.schildbach.de",    // Andreas Schildbach
