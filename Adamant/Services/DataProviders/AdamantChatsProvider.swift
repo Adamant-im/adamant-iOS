@@ -393,6 +393,7 @@ extension AdamantChatsProvider {
         
         // MARK: 3. Prepare transaction
         transaction.statusEnum = MessageStatus.pending
+        transaction.partner = context.object(with: recipientAccount.objectID) as? BaseAccount
         
         chatroom.addToTransactions(transaction)
         
