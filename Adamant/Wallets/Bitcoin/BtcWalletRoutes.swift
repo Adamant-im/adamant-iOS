@@ -24,5 +24,12 @@ extension AdamantScene.Wallets {
             c.router = r.resolve(Router.self)
             return c
         }
+
+        /// BTC transaction details
+        static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewControllerBase") { r in
+            let c = BtcTransactionDetailsViewController()
+            c.dialogService = r.resolve(DialogService.self)
+            return c
+        }
     }
 }

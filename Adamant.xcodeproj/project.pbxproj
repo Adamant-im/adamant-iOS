@@ -48,6 +48,7 @@
 		64A223D820F7A08E005157CB /* LskApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D720F7A08E005157CB /* LskApiService.swift */; };
 		64A223DA20F7A14B005157CB /* AdamantLskApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D920F7A14B005157CB /* AdamantLskApiService.swift */; };
 		64B5736D2201E196005DC968 /* BtcTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B5736C2201E196005DC968 /* BtcTransactionsViewController.swift */; };
+		64B5736F2209B892005DC968 /* BtcTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B5736E2209B892005DC968 /* BtcTransactionDetailsViewController.swift */; };
 		64BD2B7520E2814B00E2CD36 /* EthTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */; };
 		64BD2B7720E2820300E2CD36 /* TransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */; };
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
@@ -344,6 +345,7 @@
 		64A223D720F7A08E005157CB /* LskApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskApiService.swift; sourceTree = "<group>"; };
 		64A223D920F7A14B005157CB /* AdamantLskApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantLskApiService.swift; sourceTree = "<group>"; };
 		64B5736C2201E196005DC968 /* BtcTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcTransactionsViewController.swift; sourceTree = "<group>"; };
+		64B5736E2209B892005DC968 /* BtcTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcTransactionDetailsViewController.swift; sourceTree = "<group>"; };
 		64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransaction.swift; sourceTree = "<group>"; };
 		64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetails.swift; sourceTree = "<group>"; };
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
@@ -656,6 +658,7 @@
 				648E4A5E21EC972A0074B33F /* BtcWalletService.swift */,
 				648E4A6021EC97500074B33F /* BtcWalletViewController.swift */,
 				64B5736C2201E196005DC968 /* BtcTransactionsViewController.swift */,
+				64B5736E2209B892005DC968 /* BtcTransactionDetailsViewController.swift */,
 			);
 			path = Bitcoin;
 			sourceTree = "<group>";
@@ -1631,6 +1634,7 @@
 				E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
 				E905D39B2048A9BD00DDB504 /* KeychainStore.swift in Sources */,
+				64B5736F2209B892005DC968 /* BtcTransactionDetailsViewController.swift in Sources */,
 				E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */,
 				E9AA8BFC212C169200F9249F /* EthWalletService+Transfers.swift in Sources */,
 				649E9A152111B3C200686B01 /* Mnemonic.swift in Sources */,

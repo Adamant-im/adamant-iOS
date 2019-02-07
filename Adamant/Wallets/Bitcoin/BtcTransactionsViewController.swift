@@ -65,22 +65,22 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
         
         let transaction = transactions[indexPath.row]
         
-//        guard let controller = router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? BtcTransactionDetailsViewController else {
-//            return
-//        }
-//
-//        controller.transaction = transaction
-//        controller.service = lskWalletService
-//
-//        if let address = lskWalletService.wallet?.address {
-//            if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
-//                controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
-//            } else if transaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
-//                controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
-//            }
-//        }
-//
-//        navigationController?.pushViewController(controller, animated: true)
+        guard let controller = router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController else {
+            return
+        }
+
+        controller.transaction = transaction
+        controller.service = btcWalletService
+
+        if let address = btcWalletService.wallet?.address {
+            if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+                controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            } else if transaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+                controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+            }
+        }
+
+        navigationController?.pushViewController(controller, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -112,7 +112,7 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
 
 extension Payment: TransactionDetails {
     var txId: String {
-        return txid.toHexString()
+        return txid
     }
     
     var dateValue: Date? {
@@ -138,15 +138,23 @@ extension Payment: TransactionDetails {
     }
     
     var feeValue: Decimal? {
-        return 0 // TODO
+        if let fee = self.fee {
+            return Decimal(fee) / Decimal(100000000)
+        }
+        return nil
     }
     
     var confirmationsValue: String? {
-        return "\(0)"
+        return "\(self.confirmations)"
     }
     
     var blockValue: String? {
-        return nil
+        switch lockTime {
+        case 1..<500000000:
+            return "\(lockTime)"
+        default:
+            return nil
+        }
     }
     
     var isOutgoing: Bool {
@@ -154,7 +162,11 @@ extension Payment: TransactionDetails {
     }
     
     var transactionStatus: TransactionStatus? {
-        return .pending
+        if self.confirmations > 6 {
+            return .success
+        } else {
+            return .pending
+        }
     }
     
     var senderAddress: String {
@@ -164,8 +176,4 @@ extension Payment: TransactionDetails {
     var recipientAddress: String {
         return self.to.base58
     }
-    
-//    var sentDate: Date {
-//        return Date(timeIntervalSince1970: Double(timestamp))
-//    }
 }

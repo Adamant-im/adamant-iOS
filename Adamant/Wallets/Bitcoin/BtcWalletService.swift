@@ -246,6 +246,15 @@ extension BtcWalletService {
     }
     
     func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<Payment>) -> Void) {
+        defaultDispatchQueue.async {
+            do {
+                if let transaction = try self.blockStore?.transaction(with: hash) {
+                    completion(.success(transaction))
+                }
+            } catch (let error) {
+                completion(ApiServiceResult.failure(ApiServiceError.networkError(error: AdamantError(message: "Problem with getting BTC transaction", error: error))))
+            }
+        }
     }
 }
 
