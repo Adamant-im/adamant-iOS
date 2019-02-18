@@ -197,8 +197,19 @@ class BtcWalletService: WalletService {
     
     func startSync() {
         print("start sync")
-        let blockStore = SQLiteBlockStore(network: self.network)
+        
         self.setState(.updating)
+        
+        var bdName: String? = nil
+        var dbPassphrase: String? = nil
+        if let account = accountService.account?.address,
+            let privateKey = accountService.keypair?.privateKey,
+            let encrypted = Crypto.secretBox.seal(message: "\(account)-\(self.network.scheme)-\(self.network.name)".bytes, secretKey: privateKey.bytes) {
+            bdName = encrypted.authenticatedCipherText.hexString()
+            dbPassphrase = privateKey.bytes.hexString()
+        }
+        
+        let blockStore = SQLiteBlockStore(network: self.network, name: bdName, passphrase: dbPassphrase)
         let blockChain = BlockChain(network: self.network, blockStore: blockStore)
         self.peerGroup = PeerGroup(blockChain: blockChain)
         self.peerGroup?.delegate = self
