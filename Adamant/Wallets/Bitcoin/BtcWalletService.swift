@@ -41,10 +41,11 @@ class BtcWalletService: WalletService {
     
     static let defaultFee: Int64 = 500
     
-    static let kvsAddress = "btc:address"
     private (set) var transactionFee: Decimal = Decimal(BtcWalletService.defaultFee) / Decimal(100000000)
     
-    static let walletPath = "m/44'/1'/3'/1"
+    static let kvsAddress = "btc:address"
+    static let kvsCheckpoint = "btc:checkpoint"
+    static let walletPath = "m/44'/0'/21'/1"
     
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.brchWallet.walletUpdated")
@@ -87,6 +88,8 @@ class BtcWalletService: WalletService {
     init() {
         self.setState(.notInitiated)
         
+        self.checkpointSyncer = CheckpointSyncer(network: self.network)
+        self.checkpointSyncer?.start()
     }
     
     deinit {
@@ -337,6 +340,8 @@ extension BtcWalletService: PeerGroupDelegate {
 }
 
 class AdmBTCTestnet: Network {
+    public var customCheckpoint: Checkpoint?
+    
     public override var name: String {
         return "testnet"
     }
@@ -362,10 +367,15 @@ class AdmBTCTestnet: Network {
         return 18_333
     }
     override public var checkpoints: [Checkpoint] {
-        return [
-//            Checkpoint(height: 0, hash: Data(Data(hex: "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943")!.reversed()), timestamp: 1_376_543_922, target: 0x1d00ffff),
+        var value = [
+            Checkpoint(height: 0, hash: genesisBlock, timestamp: 1_376_543_922, target: 0x1d00ffff),
             Checkpoint(height: 1450248, hash: Data(Data(hex: "000000000000d19bf1c7fdcc2f2d9a917fd837628ce09ed9439771a6d8391210")!.reversed()), timestamp: 1546234270, target: 0x1d00ffff)
         ]
+        
+        if let checkpoint = customCheckpoint {
+            value.append(checkpoint)
+        }
+        return value
     }
     override public var genesisBlock: Data {
         return Data(Data(hex: "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943")!.reversed())
@@ -385,6 +395,29 @@ class AdmBTCTestnet: Network {
             "testnet-seed.bitcoin.petertodd.org",    // Peter Todd
             "testnet-seed.bitcoin.schildbach.de",    // Andreas Schildbach
             "bitcoin-testnet.bloqseeds.net"         // Bloq
+        ]
+    }
+}
+
+extension Checkpoint {
+    static func fromDictionry(_ dictionry: [String: Any]) -> Checkpoint? {
+        guard let hashString = dictionry["hash"] as? String else {
+            return nil
+        }
+        
+        guard let height = dictionry["height"] as? Int32 else {
+            return nil
+        }
+        
+        let hash = Data(hex: hashString).map { Data($0.reversed()) } ?? Data()
+        
+        return Checkpoint(height: height, hash: hash)
+    }
+    
+    func toDictionry() -> [String: Any] {
+        return [
+            "hash": hash.reversed().hexString(),
+            "height": height
         ]
     }
 }
