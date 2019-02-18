@@ -85,6 +85,7 @@ class BtcWalletService: WalletService {
     }
     
     init() {
+        self.setState(.notInitiated)
         
     }
     
@@ -197,6 +198,7 @@ class BtcWalletService: WalletService {
     func startSync() {
         print("start sync")
         let blockStore = SQLiteBlockStore(network: self.network)
+        self.setState(.updating)
         let blockChain = BlockChain(network: self.network, blockStore: blockStore)
         self.peerGroup = PeerGroup(blockChain: blockChain)
         self.peerGroup?.delegate = self
@@ -239,7 +241,6 @@ extension BtcWalletService: InitiatedWithPassphraseService {
             self.btcWallet = eWallet
 
             self.startSync()
-            self.setState(.upToDate)
             completion(.success(result: eWallet))
         }
     }
@@ -318,9 +319,18 @@ extension BtcWalletService: PeerGroupDelegate {
         peerGroup.delegate = nil
         self.peerGroup = nil
     }
-
-    func peerGroupDidReceiveTransaction(_ peerGroup: PeerGroup) {
-        
+    
+    func peerGroupDidChanged(_ state: PeerState) {
+        switch state {
+        case .notSynced:
+            self.setState(.notInitiated, silent: false)
+        case .syncing(let progress):
+            print("syncing: \(progress)")
+            self.setState(.notInitiated, silent: false)
+        case .synced:
+            print("synced")
+            self.setState(.upToDate, silent: false)
+        }
     }
 }
 
