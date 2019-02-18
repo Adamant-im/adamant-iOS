@@ -53,6 +53,9 @@ class BtcWalletService: WalletService {
     let serviceStateChanged = Notification.Name("adamant.btcWallet.stateChanged")
     let transactionFeeUpdated = Notification.Name("adamant.btcWallet.feeUpdated")
     
+    // MARK: - Delayed KVS save
+    private var balanceObserver: NSObjectProtocol? = nil
+    
     // MARK: - Properties
     private (set) var btcWallet: BtcWallet? = nil
     
@@ -195,7 +198,20 @@ class BtcWalletService: WalletService {
     }
     
     func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        
+        apiService.get(key: BtcWalletService.kvsAddress, sender: address) { (result) in
+            switch result {
+            case .success(let value):
+                if let address = value {
+                    completion(.success(result: address))
+                } else {
+                    completion(.failure(error: .walletNotInitiated))
+                }
+                
+            case .failure(let error):
+                completion(.failure(error: .internalError(message: "BTC Wallet: fail to get address from KVS", error: error)))
+            }
+        }
+    }
     }
     
     func startSync() {
@@ -244,6 +260,10 @@ extension BtcWalletService: InitiatedWithPassphraseService {
     }
     
     func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
+        guard let adamant = accountService.account else {
+            completion(.failure(error: .notLogged))
+            return
+        }
         
         defaultDispatchQueue.async { [unowned self] in
             let mnemonic = passphrase.components(separatedBy: " ")
@@ -253,6 +273,46 @@ extension BtcWalletService: InitiatedWithPassphraseService {
             
             let eWallet = BtcWallet(address: address.base58, keystore: keystore)
             self.btcWallet = eWallet
+            
+            // MARK: 4. Save address into KVS
+            self.getWalletAddress(byAdamantAddress: adamant.address) { [weak self] result in
+                guard let service = self else {
+                    return
+                }
+                
+                switch result {
+                case .success(let address):
+                    // BTC already saved
+                    if address != eWallet.address {
+                        service.save(btcAddress: eWallet.address) { result in
+                            service.kvsSaveCompletionRecursion(btcAddress: eWallet.address, result: result)
+                        }
+                    }
+                    
+                    service.update()
+                    
+                    completion(.success(result: eWallet))
+                    
+                case .failure(let error):
+                    switch error {
+                    case .walletNotInitiated:
+                        // Show '0' without waiting for balance update
+                        if let wallet = service.btcWallet {
+                            NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+                        }
+                        
+                        service.save(btcAddress: eWallet.address) { result in
+                            service.kvsSaveCompletionRecursion(btcAddress: eWallet.address, result: result)
+                        }
+                        service.setState(.upToDate)
+                        completion(.success(result: eWallet))
+                        
+                    default:
+                        service.setState(.upToDate)
+                        completion(.failure(error: error))
+                    }
+                }
+            }
 
             self.startSync()
             completion(.success(result: eWallet))
@@ -282,6 +342,69 @@ extension BtcWalletService {
             }
         } else {
             completion(.failure(error: .internalError(message: "BTC Wallet: not found", error: nil)))
+        }
+    }
+}
+
+// MARK: - KVS
+extension BtcWalletService {
+    /// - Parameters:
+    ///   - btcAddress: Bitcoin address to save into KVS
+    ///   - adamantAddress: Owner of BTC address
+    ///   - completion: success
+    private func save(btcAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
+        guard let adamant = accountService.account, let keypair = accountService.keypair else {
+            completion(.failure(error: .notLogged))
+            return
+        }
+        
+        guard adamant.balance >= AdamantApiService.KvsFee else {
+            completion(.failure(error: .notEnoughMoney))
+            return
+        }
+        
+        apiService.store(key: BtcWalletService.kvsAddress, value: btcAddress, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
+            switch result {
+            case .success:
+                completion(.success)
+                
+            case .failure(let error):
+                completion(.failure(error: .apiError(error)))
+            }
+        }
+    }
+    
+    /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
+    private func kvsSaveCompletionRecursion(btcAddress: String, result: WalletServiceSimpleResult) {
+        if let observer = balanceObserver {
+            NotificationCenter.default.removeObserver(observer)
+            balanceObserver = nil
+        }
+        
+        switch result {
+        case .success:
+            break
+            
+        case .failure(let error):
+            switch error {
+            case .notEnoughMoney:  // Possibly new account, we need to wait for dropship
+                // Register observer
+                let observer = NotificationCenter.default.addObserver(forName: NSNotification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
+                    guard let balance = self?.accountService.account?.balance, balance > AdamantApiService.KvsFee else {
+                        return
+                    }
+                    
+                    self?.save(btcAddress: btcAddress) { result in
+                        self?.kvsSaveCompletionRecursion(btcAddress: btcAddress, result: result)
+                    }
+                }
+                
+                // Save referense to unregister it later
+                balanceObserver = observer
+                
+            default:
+                dialogService.showRichError(error: error)
+            }
         }
     }
 }
