@@ -40,9 +40,10 @@ class BtcWalletService: WalletService {
     static var currencySymbol = "BTC"
     static var currencyLogo = #imageLiteral(resourceName: "wallet_lsk")
     
-    private (set) var transactionFee: Decimal = 0.0
+    static let defaultFee: Int64 = 500
     
     static let kvsAddress = "btc:address"
+    private (set) var transactionFee: Decimal = Decimal(BtcWalletService.defaultFee) / Decimal(100000000)
     
     static let walletPath = "m/44'/1'/3'/1"
     
@@ -50,6 +51,7 @@ class BtcWalletService: WalletService {
     let walletUpdatedNotification = Notification.Name("adamant.brchWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.btcWallet.enabledChanged")
     let serviceStateChanged = Notification.Name("adamant.btcWallet.stateChanged")
+    let transactionFeeUpdated = Notification.Name("adamant.btcWallet.feeUpdated")
     
     // MARK: - Properties
     private var btcWallet: BtcWallet? = nil

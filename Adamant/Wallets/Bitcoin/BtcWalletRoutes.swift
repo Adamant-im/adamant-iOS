@@ -17,6 +17,17 @@ extension AdamantScene.Wallets {
             return c
         }
 
+        /// Send BTC tokens
+        static let transfer = AdamantScene(identifier: "BtcTransferViewController") { r in
+            let c = BtcTransferViewController()
+            c.dialogService = r.resolve(DialogService.self)
+            c.chatsProvider = r.resolve(ChatsProvider.self)
+            c.accountService = r.resolve(AccountService.self)
+            c.accountsProvider = r.resolve(AccountsProvider.self)
+            c.router = r.resolve(Router.self)
+            return c
+        }
+
         /// List of BTC transactions
         static let transactionsList = AdamantScene(identifier: "BtcTransactionsViewController") { r in
             let c = BtcTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
