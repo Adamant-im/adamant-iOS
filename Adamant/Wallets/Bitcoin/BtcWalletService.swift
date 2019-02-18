@@ -38,7 +38,7 @@ class BtcWalletService: WalletService {
     
     // MARK: - Constants
     static var currencySymbol = "BTC"
-    static var currencyLogo = #imageLiteral(resourceName: "wallet_lsk")
+    static var currencyLogo = #imageLiteral(resourceName: "wallet_btc")
     
     static let defaultFee: Int64 = 500
     
