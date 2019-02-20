@@ -32,10 +32,13 @@ extension BtcWalletService: WalletServiceTwoStepSend {
     // MARK: Create & Send
     func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<BitcoinKit.Transaction>) -> Void) {
         // MARK: 1. Prepare
-        guard let wallet = self.btcWallet, let changeAddress = try? wallet.keystore.receiveAddress(), let key = try? wallet.keystore.privateKey(index: 0) else {
+        guard let wallet = self.btcWallet else {
             completion(.failure(error: .notLogged))
             return
         }
+        
+        let changeAddress = wallet.publicKey.toCashaddr()
+        let key = wallet.privateKey
         
         guard let toAddress = try? AddressFactory.create(recipient) else {
             completion(.failure(error: .accountNotFound))
@@ -79,7 +82,7 @@ extension BtcWalletService: WalletServiceTwoStepSend {
     }
     
     func getUnspentTransactions() -> [Payment] {
-        guard let address = try! self.btcWallet?.keystore.receiveAddress() else {
+        guard let address = self.btcWallet?.publicKey.toCashaddr() else {
             return []
         }
         

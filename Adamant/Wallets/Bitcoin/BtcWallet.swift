@@ -11,13 +11,15 @@ import BitcoinKit
 
 class BtcWallet: WalletAccount {
     var address: String
-    let keystore: HDWallet
+    let privateKey: PrivateKey
+    let publicKey: PublicKey
     
     var balance: Decimal = 0.0
     var notifications: Int = 0
     
-    init(address: String, keystore: HDWallet) {
-        self.address = address
-        self.keystore = keystore
+    init(privateKey: PrivateKey) {
+        self.privateKey = privateKey
+        self.publicKey = privateKey.publicKey()
+        self.address = publicKey.toCashaddr().base58
     }
 }
