@@ -76,8 +76,8 @@ extension BtcWalletService: WalletServiceTwoStepSend {
     
     func sendTransaction(_ transaction: BitcoinKit.Transaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
         defaultDispatchQueue.async {
-            self.peerGroup?.sendTransaction(transaction: transaction)
             completion(.success(result: transaction.txID))
+            self.peerGroup?.sendTransaction(transaction: transaction)
         }
     }
     

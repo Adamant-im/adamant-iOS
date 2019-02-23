@@ -63,7 +63,7 @@ class BtcTransferViewController: TransferViewControllerBase {
                 // MARK: 1. Send adm report
                 if let reportRecipient = vc.admReportRecipient {
                     let hash = transaction.txID
-//                    self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
+                    self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
                 }
 
                 // MARK: 2. Send BTC transaction
@@ -74,11 +74,11 @@ class BtcTransferViewController: TransferViewControllerBase {
 
                         service.getTransaction(by: hash) { result in
                             switch result {
-                            case .success(let transaction):
+                            case .success(let localTransaction):
                                 vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
 
                                 if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController {
-                                    detailsVc.transaction = transaction
+                                    detailsVc.transaction = localTransaction
                                     detailsVc.service = service
                                     detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
                                     detailsVc.recipientName = self?.recipientName
@@ -165,11 +165,8 @@ class BtcTransferViewController: TransferViewControllerBase {
         let row = SuffixTextRow() {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
-//            $0.cell.textField.keyboardType = UIKeyboardType.numberPad
-//            $0.cell.suffix = "L"
             
             if let recipient = recipientAddress {
-//                let trimmed = recipient.components(separatedBy: LskTransferViewController.invalidCharacters).joined()
                 $0.value = recipient
             }
             
@@ -177,33 +174,6 @@ class BtcTransferViewController: TransferViewControllerBase {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
             }
-            }.cellUpdate { (cell, row) in
-//                if let text = cell.textField.text {
-//                    cell.textField.text = text.components(separatedBy: LskTransferViewController.invalidCharacters).joined()
-//                }
-//            }.onChange { [weak self] row in
-//                if let skip = self?.skipValueChange, skip {
-//                    self?.skipValueChange = false
-//                    return
-//                }
-//
-//                if let text = row.value {
-//                    var trimmed = text.components(separatedBy: LskTransferViewController.invalidCharacters).joined()
-//                    if let last = text.last, last == "L" {
-//                        trimmed = text.replacingOccurrences(of: "L", with: "")
-//                    }
-//
-//                    if text != trimmed {
-//                        self?.skipValueChange = true
-//
-//                        DispatchQueue.main.async {
-//                            row.value = trimmed
-//                            row.updateCell()
-//                        }
-//                    }
-//                }
-//                
-//                self?.validateForm()
         }
         
         return row
@@ -237,7 +207,7 @@ class BtcTransferViewController: TransferViewControllerBase {
     }
     
     func reportTransferTo(admAddress: String, amount: Decimal, comments: String, hash: String) {
-        let payload = RichMessageTransfer(type: LskWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
+        let payload = RichMessageTransfer(type: BtcWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
         
         let message = AdamantMessage.richMessage(payload: payload)
         
