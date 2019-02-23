@@ -142,6 +142,9 @@
 /* Account tab: 'Send LSK tokens' button */
 "AccountTab.Row.SendLsk" = "LSK senden";
 
+/* Account tab: 'Send BTC tokens' button */
+"AccountTab.Row.SendBtc" = "BTC ";
+
 /* Account tab: 'Send DOGE tokens' button */
 "AccountTab.Row.SendDoge" = "DOGE senden";
 
@@ -195,6 +198,9 @@
 
 /* Account tab: Lisk wallet */
 "AccountTab.Wallets.lisk_wallet" = "Lisk Wallet";
+
+/* Account tab: Bitcoin wallet */
+"AccountTab.Wallets.bitcoin_wallet" = "Bitcoin Wallet";
 
 /* Account tab: Doge wallet */
 "AccountTab.Wallets.doge_wallet" = "Doge Wallet";
