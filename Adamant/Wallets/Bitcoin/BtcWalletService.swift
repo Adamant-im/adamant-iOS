@@ -67,7 +67,7 @@ class BtcWalletService: WalletService {
     
     private (set) var enabled = true
     
-    private var network = AdmBTCTestnet()
+    public var network: CustomNetwork
     
     private var checkpointSyncer: CheckpointSyncer?
     
@@ -96,7 +96,9 @@ class BtcWalletService: WalletService {
         }
     }
     
-    init() {
+    init(mainnet: Bool) {
+        self.network = mainnet ? AdmBTCMainnet() : AdmBTCTestnet()
+        
         self.setState(.notInitiated)
         
         self.checkpointSyncer = CheckpointSyncer(network: self.network)
@@ -246,7 +248,6 @@ class BtcWalletService: WalletService {
     
     func startSync(from checkpoint: Checkpoint) {
         print("start sync")
-        
         
         self.network.customCheckpoint = checkpoint
         
@@ -636,8 +637,11 @@ extension BtcWalletService: PeerGroupDelegate {
     }
 }
 
-class AdmBTCTestnet: Network {
+class CustomNetwork: Network {
     public var customCheckpoint: Checkpoint?
+}
+
+class AdmBTCTestnet: CustomNetwork {
     
     public override var name: String {
         return "testnet"
@@ -692,6 +696,62 @@ class AdmBTCTestnet: Network {
             "testnet-seed.bitcoin.petertodd.org",    // Peter Todd
             "testnet-seed.bitcoin.schildbach.de",    // Andreas Schildbach
             "bitcoin-testnet.bloqseeds.net"         // Bloq
+        ]
+    }
+}
+
+class AdmBTCMainnet: CustomNetwork {
+    
+    public override var name: String {
+        return "livenet"
+    }
+    public override var alias: String {
+        return "mainnet"
+    }
+    override public var pubkeyhash: UInt8 {
+        return 0x00
+    }
+    override public var privatekey: UInt8 {
+        return 0x80
+    }
+    override public var scripthash: UInt8 {
+        return 0x05
+    }
+    override public var xpubkey: UInt32 {
+        return 0x0488b21e
+    }
+    override public var xprivkey: UInt32 {
+        return 0x0488ade4
+    }
+    public override var port: UInt32 {
+        return 8333
+    }
+    override public var checkpoints: [Checkpoint] {
+        var value = [
+            Checkpoint(height: 0, hash: genesisBlock, timestamp: 1_231_006_505, target: 0x1d00ffff),
+            Checkpoint(height: 564_356, hash: Data(Data(hex: "000000000000000000003d8a4f78cb280e50012872e93c5b5076b4f0419deeb8")!.reversed()), timestamp: 1_550_948_622, target: 0x172e6f88)
+        ]
+        
+        if let checkpoint = customCheckpoint {
+            value.append(checkpoint)
+        }
+        return value
+    }
+    override public var genesisBlock: Data {
+        return Data(Data(hex: "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f")!.reversed())
+    }
+    
+    public override var scheme: String {
+        return "bitcoin"
+    }
+    
+    override public var magic: UInt32 {
+        return 0xf9beb4d9
+    }
+    
+    override var dnsSeeds: [String] {
+        return [
+            "btcnode1.adamant.im"
         ]
     }
 }
