@@ -58,14 +58,14 @@ PODS:
     - CryptoSwift (~> 0.11)
   - secp256k1_swift (1.0.3)
   - SipHash (1.2.2)
-  - Stylist (0.2.1):
-    - KZFileWatchers (~> 1.0.5)
-    - Yams (~> 1.0.0)
   - SQLCipher (3.4.2):
     - SQLCipher/standard (= 3.4.2)
   - SQLCipher/common (3.4.2)
   - SQLCipher/standard (3.4.2):
     - SQLCipher/common
+  - Stylist (0.2.1):
+    - KZFileWatchers (~> 1.0.5)
+    - Yams (~> 1.0.0)
   - swift_qrcodejs (1.0.1)
   - SwiftRLP (1.2):
     - BigInt (~> 3.1)
@@ -140,8 +140,8 @@ SPEC REPOS:
     - scrypt
     - secp256k1_swift
     - SipHash
-    - Stylist
     - SQLCipher
+    - Stylist
     - swift_qrcodejs
     - SwiftRLP
     - Swinject
@@ -202,8 +202,8 @@ SPEC CHECKSUMS:
   scrypt: 3fe5b1a3b0976f97cd87488673a8f7c65708cc84
   secp256k1_swift: 4fc5c4b2d2c6d21ee8ccb868cdc92da12f38bed9
   SipHash: fad90a4683e420c52ef28063063dbbce248ea6d4
-  Stylist: 62917294a7b21ef61735a7067c3e9232d14ceb6f
   SQLCipher: f9fcf29b2e59ced7defc2a2bdd0ebe79b40d4990
+  Stylist: 62917294a7b21ef61735a7067c3e9232d14ceb6f
   swift_qrcodejs: c181fe5c849d30c699546a23762d7e3dd143ab37
   SwiftRLP: 98a02b2210128353ca02e4c2f4d83e2a9796db4f
   SwiftyOnboard: de60e90c2af23dd61b01ec0c6a8d0be3370f857b
@@ -211,6 +211,6 @@ SPEC CHECKSUMS:
   web3swift: d80d1b9a3feca16e614acec9eea47ec26310d37d
   Yams: 572f625a8b719b73e0b57fd313c680f3e2161fe9
 
-PODFILE CHECKSUM: bca4bad85b3c921d691ed32e78fb34ad530f997f
+PODFILE CHECKSUM: 1761a9fa9acf1f380923970fa6c986b7fddb44fe
 
 COCOAPODS: 1.6.0.beta.2
