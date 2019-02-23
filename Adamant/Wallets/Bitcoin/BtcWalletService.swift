@@ -254,7 +254,7 @@ class BtcWalletService: WalletService {
         var bdName: String? = nil
         var dbPassphrase: String? = nil
         if let privateKey = btcWallet?.privateKey.data.bytes {
-            bdName = privateKey.hexString().sha256().sha512().md5()
+            bdName = "\(privateKey.hexString())-\(self.network.scheme)-\(self.network.alias)".sha256().sha512().md5()
             dbPassphrase = privateKey.hexString()
         }
         
@@ -354,7 +354,9 @@ extension BtcWalletService: InitiatedWithPassphraseService {
                             }
 
                             service.startSync(from: checkpoint)
+                            completion(.success(result: eWallet))
                         }
+                        return
                     }
 
                     // MARK: 5. Save checkpoint into KVS
