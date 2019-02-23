@@ -65,22 +65,22 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
         
         let transaction = transactions[indexPath.row]
         
-//        guard let controller = router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? BtcTransactionDetailsViewController else {
-//            return
-//        }
-//
-//        controller.transaction = transaction
-//        controller.service = lskWalletService
-//
-//        if let address = lskWalletService.wallet?.address {
-//            if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
-//                controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
-//            } else if transaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
-//                controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
-//            }
-//        }
-//
-//        navigationController?.pushViewController(controller, animated: true)
+        guard let controller = router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController else {
+            return
+        }
+
+        controller.transaction = transaction
+        controller.service = btcWalletService
+
+        if let address = btcWalletService.wallet?.address {
+            if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
+                controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            } else if transaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+                controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+            }
+        }
+
+        navigationController?.pushViewController(controller, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -112,25 +112,14 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
 
 extension Payment: TransactionDetails {
     var txId: String {
-        return txid.toHexString()
+        return txid
     }
     
     var dateValue: Date? {
-//      0               Not locked
-//      < 500000000     Block number at which this transaction is unlocked
-//      >= 500000000    UNIX timestamp at which this transaction is unlocked
-        switch lockTime {
-        case 1..<500000000:
-            if let timestamp = timestamp {
-                return Date(timeIntervalSince1970: TimeInterval(timestamp))
-            } else {
-                return nil
-            }
-        case 500000000...:
-            return Date(timeIntervalSince1970: TimeInterval(lockTime))
-        default:
-            return nil
+        if timestamp > 0 {
+            return Date(timeIntervalSince1970: TimeInterval(timestamp))
         }
+        return nil
     }
     
     var amountValue: Decimal {
@@ -138,14 +127,23 @@ extension Payment: TransactionDetails {
     }
     
     var feeValue: Decimal? {
-        return 0 // TODO
+        if let fee = self.fee {
+            return Decimal(fee) / Decimal(100000000)
+        }
+        return nil
     }
     
     var confirmationsValue: String? {
-        return "\(0)"
+        if confirmations > 0 {
+            return "\(confirmations)"
+        }
+        return nil
     }
     
     var blockValue: String? {
+        if blockHeight > 0 {
+            return "\(blockHeight)"
+        }
         return nil
     }
     
@@ -154,7 +152,11 @@ extension Payment: TransactionDetails {
     }
     
     var transactionStatus: TransactionStatus? {
-        return .pending
+        if self.confirmations > 0 {
+            return .success
+        } else {
+            return .pending
+        }
     }
     
     var senderAddress: String {
@@ -164,8 +166,4 @@ extension Payment: TransactionDetails {
     var recipientAddress: String {
         return self.to.base58
     }
-    
-//    var sentDate: Date {
-//        return Date(timeIntervalSince1970: Double(timestamp))
-//    }
 }
