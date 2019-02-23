@@ -116,21 +116,10 @@ extension Payment: TransactionDetails {
     }
     
     var dateValue: Date? {
-//      0               Not locked
-//      < 500000000     Block number at which this transaction is unlocked
-//      >= 500000000    UNIX timestamp at which this transaction is unlocked
-        switch lockTime {
-        case 1..<500000000:
-            if let timestamp = timestamp {
-                return Date(timeIntervalSince1970: TimeInterval(timestamp))
-            } else {
-                return nil
-            }
-        case 500000000...:
-            return Date(timeIntervalSince1970: TimeInterval(lockTime))
-        default:
-            return nil
+        if timestamp > 0 {
+            return Date(timeIntervalSince1970: TimeInterval(timestamp))
         }
+        return nil
     }
     
     var amountValue: Decimal {
@@ -145,16 +134,17 @@ extension Payment: TransactionDetails {
     }
     
     var confirmationsValue: String? {
-        return "\(self.confirmations)"
+        if confirmations > 0 {
+            return "\(confirmations)"
+        }
+        return nil
     }
     
     var blockValue: String? {
-        switch lockTime {
-        case 1..<500000000:
-            return "\(lockTime)"
-        default:
-            return nil
+        if blockHeight > 0 {
+            return "\(blockHeight)"
         }
+        return nil
     }
     
     var isOutgoing: Bool {
@@ -162,7 +152,7 @@ extension Payment: TransactionDetails {
     }
     
     var transactionStatus: TransactionStatus? {
-        if self.confirmations > 6 {
+        if self.confirmations > 0 {
             return .success
         } else {
             return .pending

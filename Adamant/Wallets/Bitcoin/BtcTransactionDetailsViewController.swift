@@ -47,9 +47,9 @@ class BtcTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     // MARK: - Overrides
     
     override func explorerUrl(for transaction: TransactionDetails) -> URL? {
-//        let id = transaction.txId
+        let id = transaction.txId
         
-        return nil// URL(string: "\(AdamantResources.bitcoinExplorerAddress)\(id)")
+        return  URL(string: "\(AdamantResources.bitcoinExplorerAddress)\(id)")
     }
     
     @objc func refresh() {
