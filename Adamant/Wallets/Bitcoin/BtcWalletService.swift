@@ -157,6 +157,7 @@ class BtcWalletService: WalletService {
             }
             
             self?.setState(.upToDate)
+            self?.stateSemaphore.signal()
         }
     }
     
@@ -246,7 +247,6 @@ class BtcWalletService: WalletService {
     func startSync(from checkpoint: Checkpoint) {
         print("start sync")
         
-        self.setState(.updating)
         
         self.network.customCheckpoint = checkpoint
         
@@ -274,6 +274,10 @@ class BtcWalletService: WalletService {
         }
         
         self.peerGroup?.start()
+        
+        self.initialBalanceCheck = true
+//        self.setState(.upToDate, silent: true)
+//        self.update()
     }
     
     func stopSync() {
@@ -287,13 +291,25 @@ class BtcWalletService: WalletService {
 // MARK: - WalletInitiatedWithPassphrase
 extension BtcWalletService: InitiatedWithPassphraseService {
     func setInitiationFailed(reason: String) {
-        
+        stateSemaphore.wait()
+        setState(.initiationFailed(reason: reason))
+        btcWallet = nil
+        stateSemaphore.signal()
     }
     
     func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
         guard let adamant = accountService.account else {
             completion(.failure(error: .notLogged))
             return
+        }
+        
+        stateSemaphore.wait()
+        
+        setState(.notInitiated)
+        
+        if enabled {
+            enabled = false
+            NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
         }
         
         defaultDispatchQueue.async { [unowned self] in
@@ -303,11 +319,19 @@ extension BtcWalletService: InitiatedWithPassphraseService {
             let keychain = HDKeychain(seed: seed, network: self.network)
             guard let privateKey = try? keychain.derivedKey(path: self.walletPath).privateKey() else {
                 completion(.failure(error: .accountNotFound))
+                self.stateSemaphore.signal()
                 return
             }
             
             let eWallet = BtcWallet(privateKey: privateKey)
             self.btcWallet = eWallet
+            
+            if !self.enabled {
+                self.enabled = true
+                NotificationCenter.default.post(name: self.serviceEnabledChanged, object: self)
+            }
+            
+            self.stateSemaphore.signal()
             
             // MARK: 4. Save address into KVS
             self.getWalletAddress(byAdamantAddress: adamant.address) { [weak self] result in
@@ -336,7 +360,6 @@ extension BtcWalletService: InitiatedWithPassphraseService {
                     service.initChecpoint(for: adamant.address) { result in
                         switch result {
                         case .success(let checkpoint):
-                            service.update()
                             service.startSync(from: checkpoint)
                             completion(.success(result: eWallet))
                         case .failure(let error):
@@ -378,6 +401,7 @@ extension BtcWalletService: InitiatedWithPassphraseService {
             
             switch result {
             case .success(let value):
+                service.checkpointSyncer?.stop()
                 completion(.success(result: value))
                 
             case .failure(let error):
@@ -413,11 +437,13 @@ extension BtcWalletService: SwinjectDependentService {
 extension BtcWalletService {
     func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
         if let address = self.btcWallet?.publicKey.toCashaddr(), let blockChain = self.peerGroup?.blockChain {
-            let balance: Int64 = try! blockChain.calculateBalance(address: address)
-            
-            DispatchQueue.main.async {
-                let decimal = Decimal(balance)
-                completion(.success(result: (decimal / Decimal(100000000))))
+            defaultDispatchQueue.async {
+                let balance: Int64 = try! blockChain.calculateBalance(address: address)
+                
+                DispatchQueue.main.async {
+                    let decimal = Decimal(balance)
+                    completion(.success(result: (decimal / Decimal(100000000))))
+                }
             }
         } else {
             completion(.failure(error: .internalError(message: "BTC Wallet: not found", error: nil)))
@@ -563,6 +589,17 @@ extension BtcWalletService {
     }
     
     func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<Payment>) -> Void) {
+        defaultDispatchQueue.async {
+            do {
+                if let transaction = try self.blockStore?.transaction(with: hash) {
+                    completion(.success(transaction))
+                } else {
+                    completion(.failure(.internalError(message: "No transaction", error: nil)))
+                }
+            } catch (let error) {
+                completion(ApiServiceResult.failure(ApiServiceError.networkError(error: AdamantError(message: "Problem with getting BTC transaction", error: error))))
+            }
+        }
     }
 }
 
@@ -589,11 +626,10 @@ extension BtcWalletService: PeerGroupDelegate {
         switch state {
         case .notSynced:
             self.setState(.notInitiated, silent: false)
-        case .syncing(let progress):
-            print("syncing: \(progress)")
-            self.setState(.notInitiated, silent: false)
+        case .syncing(_):
+            self.setState(.updating, silent: false)
         case .synced:
-            print("synced")
+            self.initialBalanceCheck = false
             self.setState(.upToDate, silent: false)
             self.update()
         }
@@ -607,7 +643,7 @@ class AdmBTCTestnet: Network {
         return "testnet"
     }
     public override var alias: String {
-        return "regtest"
+        return "testnet"
     }
     override public var pubkeyhash: UInt8 {
         return 0x6f
@@ -651,7 +687,7 @@ class AdmBTCTestnet: Network {
     }
     override var dnsSeeds: [String] {
         return [
-            "testnet-seed.bitcoin.jonasschnelli.ch", // Jonas Schnelli
+//            "testnet-seed.bitcoin.jonasschnelli.ch", // Jonas Schnelli
             "testnet-seed.bluematt.me",              // Matt Corallo
             "testnet-seed.bitcoin.petertodd.org",    // Peter Todd
             "testnet-seed.bitcoin.schildbach.de",    // Andreas Schildbach
