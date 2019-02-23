@@ -53,6 +53,7 @@ extension TransferViewControllerBase {
 			
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
 			
+            alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 			present(alert, animated: true, completion: nil)
 		}
 	}

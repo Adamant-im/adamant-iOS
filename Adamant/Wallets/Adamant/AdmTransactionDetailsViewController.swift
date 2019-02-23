@@ -19,7 +19,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     // MARK: - Properties
     private let autoupdateInterval: TimeInterval = 5.0
     
-    var haveChatroom = false
+    var showToChat: Bool = false
     
     weak var timer: Timer?
     
@@ -30,31 +30,40 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         
         super.viewDidLoad()
         
-        if let transfer = transaction as? TransferTransaction, let partner = transfer.partner as? CoreDataAccount, let chatroom = partner.chatroom, let transactions = chatroom.transactions  {
-            let messeges = transactions.first (where: { (object) -> Bool in
-                return !(object is TransferTransaction)
-            })
+        if showToChat {
+            let haveChatroom: Bool
             
-            haveChatroom = messeges != nil
-        }
-        
-        let chatLabel = haveChatroom ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
-        
-        // MARK: Open chat
-        if let trs = transaction as? TransferTransaction, trs.chatroom != nil, let section = form.sectionBy(tag: Sections.actions.tag) {
-            let row = LabelRow() {
-                $0.tag = Rows.openChat.tag
-                $0.title = chatLabel
-                $0.cell.imageView?.image = Rows.openChat.image
-            }.cellSetup { (cell, _) in
-                cell.selectionStyle = .gray
-            }.cellUpdate { (cell, _) in
-                cell.accessoryType = .disclosureIndicator
-            }.onCellSelection { [weak self] (_, _) in
-                self?.goToChat()
+            if let transfer = transaction as? TransferTransaction, let partner = transfer.partner as? CoreDataAccount, let chatroom = partner.chatroom, let transactions = chatroom.transactions  {
+                let messeges = transactions.first (where: { (object) -> Bool in
+                    return !(object is TransferTransaction)
+                })
+                
+                haveChatroom = messeges != nil
+            } else {
+                haveChatroom = false
             }
             
-            section.append(row)
+            let chatLabel = haveChatroom ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
+            
+            // MARK: Open chat
+            if let trs = transaction as? TransferTransaction, trs.chatroom != nil, let section = form.sectionBy(tag: Sections.actions.tag) {
+                let row = LabelRow() {
+                    $0.tag = Rows.openChat.tag
+                    $0.title = chatLabel
+                    $0.cell.imageView?.image = Rows.openChat.image
+                    }.cellSetup { (cell, _) in
+                        cell.selectionStyle = .gray
+                    }.cellUpdate { (cell, _) in
+                        cell.accessoryType = .disclosureIndicator
+                        cell.textLabel?.setStyle(.primaryText)
+                        cell.detailTextLabel?.setStyle(.primaryText)
+                        cell.setStyle(.secondaryBackground)
+                    }.onCellSelection { [weak self] (_, _) in
+                        self?.goToChat()
+                }
+                
+                section.append(row)
+            }
         }
         
         startUpdate()

@@ -90,6 +90,10 @@ class AdmWalletViewController: WalletViewControllerBase {
             $0.cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onCellSelection { [weak self] (_, row) in
             guard let vc = self?.router.get(scene: AdamantScene.Wallets.Adamant.buyAndSell) else {
                 fatalError("Failed to get BuyAndSell scele")
@@ -116,6 +120,10 @@ class AdmWalletViewController: WalletViewControllerBase {
             })
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
+            cell.imageView?.setStyle(.primaryTint)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.secondaryText)
+            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onCellSelection { [weak self] (_, _) in
             let urlRaw = String.adamantLocalized.wallets.getFreeTokensUrl(for: address)
             guard let url = URL(string: urlRaw) else {
@@ -125,6 +133,7 @@ class AdmWalletViewController: WalletViewControllerBase {
             
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
             self?.present(safari, animated: true, completion: nil)
         }
         
@@ -158,30 +167,6 @@ class AdmWalletViewController: WalletViewControllerBase {
         if let row: LabelRow = form.rowBy(tag: Rows.freeTokens.tag) {
             row.evaluateHidden()
         }
-    }
-    
-    private func buildUrlRow(title: String, value: String?, tag: String, urlRaw: String, image: UIImage?) -> LabelRow {
-        let row = LabelRow() {
-            $0.tag = tag
-            $0.title = title
-            $0.value = value
-            $0.cell.imageView?.image = image
-            $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
-            $0.cell.selectionStyle = .gray
-            }.cellUpdate { (cell, _) in
-                cell.accessoryType = .disclosureIndicator
-            }.onCellSelection { [weak self] (_, _) in
-                guard let url = URL(string: urlRaw) else {
-                    self?.dialogService.showError(withMessage: "Failed to create URL with string: \(urlRaw)", error: nil)
-                    return
-                }
-                
-                let safari = SFSafariViewController(url: url)
-                safari.preferredControlTintColor = UIColor.adamant.primary
-                self?.present(safari, animated: true, completion: nil)
-        }
-        
-        return row
     }
     
     override func includeLogoInQR() -> Bool {

@@ -1,0 +1,100 @@
+variables:
+  firstColor: "#F8F8F2" # (текст чатов, заголовки, элементы меню)
+  secondaryColor: "#9497A3" # (цвета элементов дизайна, иконок меню)
+  thirdColor: "#44475A" # (цвета элементов дизайна)
+  activeColor: "#179cec" # (цвет подсветки триггеров в приложении)
+  successColor: "#50fa7b" # (принятый перевод и успешное действие)
+  alertColor: "#FAA05A" # (отправленный перевод и отмененное действие)
+  backgroundColor: "#282D35"
+  bubbleTextColor: "282D35" # (текст баббла с уведомлениями)
+  bubbleColor: "F8F8F2" # (цвет баббла с уведомлениями)
+  trailingSwipeActionsColor: "282D35" # (цвет фона для действий свайп-ячеек. Цвет иконки всегда белый)
+  darkKeyboard: true
+styles:
+  pinpad:
+    textColor: $firstColor
+    butttonsColor: $firstColor
+    backgroundColor: $backgroundColor
+    buttonsHighlightedColor: $thirdColor
+    placeholderActiveColor: $firstColor
+    placeholderNormalColor: $backgroundColor
+  paging:
+    indicatorColor: $activeColor
+    textColor: $firstColor
+    selectedTextColor: $firstColor
+    backgroundColor: $thirdColor
+    selectedBackgroundColor: $thirdColor
+    menuBackgroundColor: $thirdColor
+  chatsList:
+    backgroundColor: $backgroundColor
+    separatorColor: $secondaryColor
+  chatCell:
+    styles: [baseTableCell]
+    avatarTintColor: $firstColor
+  tabItem:
+    badgeColor: $activeColor
+  activeBg:
+    backgroundColor: $activeColor
+  input:
+    textColor: $firstColor
+    tintColor: $firstColor
+    placeholderColor: $secondaryColor
+    clearButtonTintColor: $firstColor
+    showDarkKeyboard: $darkKeyboard
+  biometricButton:
+    backgroundColor: $thirdColor
+    tintColor: $firstColor
+    borderColor: $firstColor
+    highlightedBackgroundColor: $thirdColor
+    normalBackgroundColor: $thirdColor
+  logo:
+    image: "DarkLogo"
+  notificationBubble:
+    textColor: $bubbleTextColor
+    backgroundColor: $bubbleColor
+### Base styles ###
+  ## Tint ##
+  primaryTint:
+    tintColor: $firstColor
+  secondaryTint:
+    tintColor: $secondaryColor
+  thirdTint:
+    tintColor: $thirdColor
+  universalTint:
+    tintColor: "#787A83"
+  ## Text color ##
+  primaryText:
+    textColor: $firstColor
+  secondaryText:
+    textColor: $secondaryColor
+  thirdText:
+    textColor: $thirdColor
+  ## Border color##
+  primaryBorder:
+    borderColor: $firstColor
+  secondaryBorder:
+    borderColor: $secondaryColor
+  thirdBorder:
+    borderColor: $thirdColor
+  ## Background Colors ##
+  primaryBackground:
+    backgroundColor: $backgroundColor
+  secondaryBackground:
+    backgroundColor: $thirdColor
+  ## Base Table ##
+  baseTable:
+    backgroundColor: $backgroundColor
+    separatorColor: $secondaryColor
+  baseTableCell:
+    tintColor: $firstColor
+    backgroundColor: $thirdColor
+    selectedBackgroundColor: $backgroundColor
+  ## Bar tint ##
+  baseNavigationBar:
+    styles: [baseBarTint]
+    titleColor: $firstColor
+    largeTextColor: $firstColor
+  baseBarTint:
+    tintColor: $firstColor
+    barTintColor: $thirdColor
+    isDarkMode: true

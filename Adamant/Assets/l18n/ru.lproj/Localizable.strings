@@ -145,6 +145,15 @@
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "Об АДАМАНТе";
 
+/* Account tab: 'Theme' row */
+"AccountTab.Row.Theme" = "Тема";
+
+/* Account tab: 'Theme' row value 'Light' */
+"AccountTab.Row.Theme.Light" = "Светлая";
+
+/* Account tab: 'Theme' row value 'Dark' */
+"AccountTab.Row.Theme.Dark" = "Темная";
+
 /* Account tab: 'Vote for delegates' button */
 "AccountTab.Row.VoteForDelegates" = "Голосовать за делегатов";
 
@@ -195,6 +204,15 @@
 
 /* ChatList: outgoing message prefix */
 "ChatListPage.SentMessagePrefix" = "Вы: ";
+
+/* ChatList: SearchBar placeholder text */
+"ChatListPage.SearchBar.Placeholder" = "Поиск контактов или сообщений";
+
+/* SearchPage: Contacts header */
+"SearchPage.Contacts" = "Контакты";
+
+/* SearchPage: Messages header */
+"SearchPage.Messages" = "Сообщения";
 
 /* ChatList: First syncronization is in progress */
 "ChatListPage.SyncingChats" = "Загружаем чаты…";
@@ -435,6 +453,9 @@
 
 /* New chat: Show QR for my address button */
 "NewChatScene.MyQr" = "Показать мой QR";
+
+/* New Chat: 'What does it mean?', a help button for info about uninitialized accounts. */
+"NewChatScene.NotInitialized.HelpButton" = "Что это значит?";
 
 /* NodesList: Button label */
 "NodesList.NodesList" = "Список нод";

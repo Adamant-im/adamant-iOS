@@ -60,8 +60,7 @@ class DelegatesListViewController: UIViewController {
         refreshControl.addTarget(self, action:
             #selector(self.handleRefresh(_:)),
                                  for: UIControl.Event.valueChanged)
-        refreshControl.tintColor = UIColor.adamant.primary
-        
+        refreshControl.setStyle(.primaryTint)
         return refreshControl
     }()
     
@@ -94,6 +93,11 @@ class DelegatesListViewController: UIViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.tableView.setStyle(.baseTable)
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
+		
+        ThemesManager.shared.manage(for: self)
         
 		// MARK: Initial
         navigationItem.title = String.adamantLocalized.delegates.title
@@ -103,12 +107,14 @@ class DelegatesListViewController: UIViewController {
 		
 		// MARK: Search controller
 		if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .always
+            navigationItem.largeTitleDisplayMode = .never
             
 			let controller = UISearchController(searchResultsController: nil)
 			controller.searchResultsUpdater = self
 			controller.obscuresBackgroundDuringPresentation = false
 			controller.hidesNavigationBarDuringPresentation = true
+            controller.searchBar.setStyle(.baseBarTint)
+            controller.searchBar.keyboardAppearance = ThemesManager.shared.currentTheme.darkKeyboard ? .dark : .light
             searchController = controller
             
             definesPresentationContext = true
@@ -410,8 +416,8 @@ extension DelegatesListViewController {
 		let totalVoted = delegates.reduce(0) { $0 + ($1.delegate.voted ? 1 : 0) } + upvoted - downvoted
 		
 		let votingEnabled = changes.count > 0 && changes.count <= maxVotes && totalVoted <= maxTotalVotes
-		let newVotesColor = changes.count > maxVotes ? UIColor.red : UIColor.darkText
-		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.red : UIColor.darkText
+		let newVotesColor = changes.count > maxVotes ? UIColor.adamant.alertColor : UIColor.adamant.primary
+		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.adamant.alertColor : UIColor.adamant.primary
 		
 		
 		if Thread.isMainThread {
@@ -440,8 +446,9 @@ extension DelegatesListViewController {
 			}
 		}
 	}
-    
-    
+}
+
+extension DelegatesListViewController {
     // MARK: Keyboard
     @objc private func keyboardWillShow(notification: Notification) {
         // For some reason we will receive 2 notifications
@@ -477,5 +484,12 @@ extension DelegatesListViewController {
             tableView.contentInset = contentInsets
             tableView.scrollIndicatorInsets = contentInsets
         }
+    }
+}
+
+extension DelegatesListViewController: Themeable {
+    public func apply(theme: AdamantTheme) {
+        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: ThemesManager.shared.currentTheme.primary]
+        searchController?.searchBar.keyboardAppearance = ThemesManager.shared.currentTheme.darkKeyboard ? .dark : .light
     }
 }

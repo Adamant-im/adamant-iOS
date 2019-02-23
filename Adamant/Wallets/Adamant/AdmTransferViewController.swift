@@ -8,6 +8,7 @@
 
 import UIKit
 import Eureka
+import SafariServices
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -60,17 +61,30 @@ class AdmTransferViewController: TransferViewControllerBase {
                                               message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
                                               preferredStyle: .alert)
                 
+                if let url = URL(string: NewChatViewController.faqUrl) {
+                    let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean,
+                                            style: UIAlertAction.Style.default) { [weak self] _ in
+                        let safari = SFSafariViewController(url: url)
+                        safari.preferredControlTintColor = UIColor.adamant.primary
+                        safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
+                        self?.present(safari, animated: true, completion: nil)
+                    }
+                    
+                    alert.addAction(faq)
+                }
+                
                 let send = UIAlertAction(title: TransferViewControllerBase.BaseRows.sendButton.localized,
-                                         style: .default,
-                                         handler: { _ in
-                                            self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
-                                            self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
-                })
+                                         style: .default) { _ in
+                    self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
+                    self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
+                }
                 
                 let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
                 
                 alert.addAction(send)
                 alert.addAction(cancel)
+                
+                alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
                 
                 DispatchQueue.main.async {
                     self.present(alert, animated: true, completion: nil)
@@ -172,6 +186,7 @@ class AdmTransferViewController: TransferViewControllerBase {
 			let prefix = UILabel()
 			prefix.text = "U"
 			prefix.sizeToFit()
+            prefix.setStyle(.primaryText)
 			let view = UIView()
 			view.addSubview(prefix)
 			view.frame = prefix.frame
@@ -180,12 +195,14 @@ class AdmTransferViewController: TransferViewControllerBase {
 			
 			if recipientIsReadonly {
 				$0.disabled = true
-				prefix.isEnabled = false
+//                prefix.isEnabled = false
 			}
 		}.cellUpdate { (cell, row) in
 			if let text = cell.textField.text {
-				cell.textField.text = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
+                cell.textField.text = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
 			}
+            cell.textField?.setStyle(.input)
+            cell.setStyle(.secondaryBackground)
 		}.onChange { [weak self] row in
 			if let skip = self?.skipValueChange, skip {
 				self?.skipValueChange = false

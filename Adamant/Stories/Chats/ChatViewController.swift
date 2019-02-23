@@ -54,6 +54,7 @@ class ChatViewController: MessagesViewController {
 	weak var delegate: ChatViewControllerDelegate?
 	var account: AdamantAccount?
 	var chatroom: Chatroom?
+    var messageToShow: MessageTransaction?
 	var dateFormatter: DateFormatter {
 		let formatter = DateFormatter()
 		formatter.dateStyle = .short
@@ -64,6 +65,13 @@ class ChatViewController: MessagesViewController {
     private var keyboardManager = KeyboardManager()
 	
 	private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
+    
+    /*
+     In SplitViewController on iPhones, viewController can still present in memory, but not on screen.
+     In this cases not visible viewController will still mark messages isUnread = false
+     */
+    /// ViewController currently is ontop of the screen.
+    private var isOnTop = false
     
     // Batch changes
     private struct ControllerChange {
@@ -172,6 +180,12 @@ class ChatViewController: MessagesViewController {
 		if #available(iOS 11.0, *) {
             navigationItem.largeTitleDisplayMode = .never
 		}
+        
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        tabBarController?.tabBar.setStyle(.baseBarTint)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
+        
+        self.observeThemeChange()
 		
 		// MARK: 1. Initial configuration
 		
@@ -278,6 +292,10 @@ class ChatViewController: MessagesViewController {
 		}
 		
 		// MARK: 3. Readonly chat
+        messageInputBar.backgroundView.setStyles([.secondaryBackground, .secondaryBorder])
+        messageInputBar.inputTextView.setStyles([.secondaryBorder, .input])
+        messageInputBar.sendButton.setStyles([.secondaryBackground, .primaryTint, .secondaryBorder])
+        attachmentButton.setStyle(.primaryTint)
 		
 		if chatroom.isReadonly {
 			messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
@@ -343,17 +361,20 @@ class ChatViewController: MessagesViewController {
                 }
             }
         }
+        
+        self.view.setStyle(.primaryBackground)
+        self.messagesCollectionView.setStyle(.primaryBackground)
 	}
 	
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-		
+		isOnTop = true
 		chatroom?.markAsReaded()
 	}
 	
 	override func viewDidDisappear(_ animated: Bool) {
 		super.viewDidDisappear(animated)
-		
+		isOnTop = false
 		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.partner?.address {
 			delegate.preserveMessage(message, forAddress: address)
 		}
@@ -362,6 +383,20 @@ class ChatViewController: MessagesViewController {
 	override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
 		
+        // MARK: 4.2 Scroll to message
+        if let messageToShow = self.messageToShow {
+            if let fetched = chatController?.fetchedObjects {
+                if let idx = fetched.firstIndex(where: { (transaction) -> Bool in
+                    transaction.transactionId == messageToShow.transactionId
+                }) {
+                    let indexPath = IndexPath(item: 0, section: idx)
+                    messagesCollectionView.scrollToItem(at: indexPath, at: [.centeredVertically, .centeredHorizontally], animated: true)
+                    
+                    return
+                }
+            }
+        }
+        
 		if isFirstLayout {
 			isFirstLayout = false
             if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
@@ -476,6 +511,7 @@ class ChatViewController: MessagesViewController {
 			
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
 			
+            alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 			self?.present(alert, animated: true, completion: nil)
 		}
 		
@@ -569,12 +605,13 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	}
 	
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        
         switch type {
         case .insert:
             if let trs = anObject as? ChatTransaction {
-                trs.isUnread = false
-                chatroom?.hasUnreadMessages = false
+                if isOnTop {
+                    trs.isUnread = false
+                    chatroom?.hasUnreadMessages = false
+                }
                 
                 if let rich = anObject as? RichMessageTransaction {
                     rich.kind = messageKind(for: rich)
@@ -764,5 +801,11 @@ private class StatusUpdateProcedure: Procedure {
             try? privateContext.save()
             self.finish()
         }
+    }
+}
+
+extension ChatViewController: Themeable {
+    public func apply(theme: AdamantTheme) {
+        self.messagesCollectionView.reloadData()
     }
 }

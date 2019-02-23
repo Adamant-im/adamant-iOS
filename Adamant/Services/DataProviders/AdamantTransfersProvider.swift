@@ -249,17 +249,17 @@ extension AdamantTransfersProvider {
 		securedStore.remove(StoreKey.transfersProvider.readedLastHeight)
 		
 		// Drop CoreData
-		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
-		let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-		context.parent = stack.container.viewContext
-		
-		if let result = try? context.fetch(request) {
-			for obj in result {
-				context.delete(obj)
-			}
-			
-			try? context.save()
-		}
+//        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+//        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+//        context.parent = stack.container.viewContext
+//
+//        if let result = try? context.fetch(request) {
+//            for obj in result {
+//                context.delete(obj)
+//            }
+//
+//            try? context.save()
+//        }
 		
 		// Set state
 		setState(.empty, previous: prevState, notify: notify)
@@ -812,9 +812,9 @@ extension AdamantTransfersProvider {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = self.stack.container.viewContext
         
-        var partners: [String:CoreDataAccount] = [:]
+        var partners: [String:BaseAccount] = [:]
         for id in partnerIds {
-            let request = NSFetchRequest<CoreDataAccount>(entityName: CoreDataAccount.entityName)
+            let request = NSFetchRequest<BaseAccount>(entityName: BaseAccount.baseEntityName)
             request.predicate = NSPredicate(format: "address == %@", id)
             request.fetchLimit = 1
             if let partner = (try? context.fetch(request))?.first {
@@ -868,7 +868,10 @@ extension AdamantTransfersProvider {
             
             if let partner = partners[partnerId] {
                 transfer.partner = partner
-                transfer.chatroom = partner.chatroom
+                
+                if let chatroom = (partner as? CoreDataAccount)?.chatroom {
+                    transfer.chatroom = chatroom
+                }
             }
             
             if t.height > height {

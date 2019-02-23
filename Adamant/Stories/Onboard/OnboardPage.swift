@@ -55,7 +55,7 @@ class OnboardPage: SwiftyOnboardPage {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        text.tintColor = UIColor.adamant.active
+        text.tintColor = ThemesManager.shared.currentTheme.activeColor
     }
     
     override func layoutSubviews() {

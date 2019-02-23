@@ -141,6 +141,10 @@ class NodeEditorViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.tableView.setStyle(.baseTable)
+        navigationController?.navigationBar.setStyle(.baseNavigationBar)
+        view.style = AdamantThemeStyle.primaryTintAndBackground
+		
 		if let node = node {
 			self.navigationItem.title = node.host
 		} else {
@@ -162,7 +166,11 @@ class NodeEditorViewController: FormViewController {
 			$0.value = node?.host
 			}.onChange({ [weak self] (_) in
 				self?.testState = .notTested
-			})
+            }).cellUpdate { (cell, _) in
+                cell.setStyle(.secondaryBackground)
+                cell.textLabel?.setStyle(.primaryText)
+                cell.textField?.setStyle(.primaryText)
+            }
 			
 		// Port
 		<<< IntRow() {
@@ -177,7 +185,11 @@ class NodeEditorViewController: FormViewController {
 			}
 		}.onChange({ [weak self] (_) in
 			self?.testState = .notTested
-		})
+        }).cellUpdate { (cell, _) in
+            cell.setStyle(.secondaryBackground)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.textField?.setStyle(.input)
+        }
 		
 		// Scheme
 		<<< PickerInlineRow<URLScheme>() {
@@ -185,8 +197,9 @@ class NodeEditorViewController: FormViewController {
 			$0.tag = Rows.scheme.tag
 			$0.value = node?.scheme ?? URLScheme.default
 			$0.options = [.https, .http]
-		}.onExpandInlineRow({ (_, _, inlineRow) in
+		}.onExpandInlineRow({ (cell, _, inlineRow) in
 			inlineRow.cell.height = { 100 }
+            inlineRow.cell.setStyles([.secondaryBackground, .primaryText])
 		}).onChange({ [weak self] row in
 			self?.testState = .notTested
 			
@@ -199,7 +212,11 @@ class NodeEditorViewController: FormViewController {
 				
 				portRow.updateCell()
 			}
-		})
+        }).cellUpdate { (cell, _) in
+            cell.setStyle(.secondaryBackground)
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
+        }
 		
 		
 		// MARK: - Buttons
@@ -211,8 +228,10 @@ class NodeEditorViewController: FormViewController {
 			$0.title = Rows.testButton.localized
 			$0.tag = Rows.testButton.tag
 		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
 			cell.accessoryType = .disclosureIndicator
+            cell.style = AdamantThemeStyle.commonTableViewCell
+            cell.textLabel?.setStyle(.primaryText)
+            cell.detailTextLabel?.setStyle(.primaryText)
 		}.onCellSelection { [weak self] (_, _) in
 			self?.testNode()
 		}
@@ -224,7 +243,8 @@ class NodeEditorViewController: FormViewController {
 				$0.title = Rows.deleteButton.localized
 				$0.tag = Rows.deleteButton.tag
 			}.cellUpdate { (cell, _) in
-				cell.textLabel?.textColor = UIColor.adamant.primary
+                cell.setStyles([.baseTableViewCell, .secondaryBackground])
+                cell.textLabel?.setStyle(.primaryText)
 			}.onCellSelection { [weak self] (_, _) in
 				self?.deleteNode()
 			}
@@ -360,6 +380,7 @@ extension NodeEditorViewController {
 			}
 		}))
 		
+        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 		present(alert, animated: true, completion: nil)
 	}
 }

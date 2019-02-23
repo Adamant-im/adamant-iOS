@@ -145,6 +145,15 @@
 /* Account tab: 'Get free tokens' button */
 "AccountTab.Row.FreeTokens" = "Kostenlose ADM Tokens";
 
+/* Account tab: 'Theme' row */
+"AccountTab.Row.Theme" = "Design";
+
+/* Account tab: 'Theme' row value 'Light' */
+"AccountTab.Row.Theme.Light" = "Light";
+
+/* Account tab: 'Theme' row value 'Dark' */
+"AccountTab.Row.Theme.Dark" = "Dark";
+
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "Über ADAMANT";
 
@@ -198,6 +207,15 @@
 
 /* ChatList: outgoing message prefix */
 "ChatListPage.SentMessagePrefix" = "Sie: ";
+
+/* ChatList: SearchBar placeholder text */
+"ChatListPage.SearchBar.Placeholder" = "Nach Kontakten oder Nachrichten suchen";
+
+/* SearchPage: Contacts header */
+"SearchPage.Contacts" = "Kontakte";
+
+/* SearchPage: Messages header */
+"SearchPage.Messages" = "Mitteilungen";
 
 /* ChatList: First syncronization is in progress */
 "ChatListPage.SyncingChats" = "Chats werden synchronisiert…";
@@ -438,6 +456,9 @@
 
 /* New chat: Show QR for my address button */
 "NewChatScene.MyQr" = "Show my QR";
+
+/* New Chat: 'What does it mean?', a help button for info about uninitialized accounts. */
+"NewChatScene.NotInitialized.HelpButton" = "Was bedeutet das?";
 
 /* NodesList: Button label */
 "NodesList.NodesList" = "Node-Liste";
