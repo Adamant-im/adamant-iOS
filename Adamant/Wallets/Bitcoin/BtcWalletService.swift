@@ -258,7 +258,7 @@ class BtcWalletService: WalletService {
             dbPassphrase = privateKey.hexString()
         }
         
-        let blockStore = SQLiteBlockStore(network: self.network, name: bdName, passphrase: dbPassphrase)
+        let blockStore = SQLiteBlockStore(network: self.network, name: bdName, passphrase: dbPassphrase, isCompact: true)
         let blockChain = BlockChain(network: self.network, blockStore: blockStore)
         self.peerGroup = PeerGroup(blockChain: blockChain)
         self.peerGroup?.delegate = self
@@ -267,11 +267,7 @@ class BtcWalletService: WalletService {
         
         if let wallet = self.btcWallet {
             let address = wallet.publicKey.toCashaddr()
-            
-            if let publicKey = address.publicKey {
-                self.peerGroup?.addFilter(publicKey)
-            }
-            self.peerGroup?.addFilter(address.data)
+            self.peerGroup?.addAddressFilter([address])
         }
         
         self.peerGroup?.start()

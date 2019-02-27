@@ -24,7 +24,7 @@ PODS:
   - GRDB.swift (3.6.2)
   - GRDBCipher (3.6.2):
     - SQLCipher (~> 3.4.1)
-  - GRKOpenSSLFramework (1.0.2.15)
+  - GRKOpenSSLFramework (1.0.2.16)
   - Haring (2.1)
   - KeychainAccess (3.1.2)
   - KZFileWatchers (1.0.5)
@@ -160,7 +160,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   BitcoinKit:
-    :commit: 91b7026ba1f8c2f3c8ac9baf3031eca4daa42ccc
+    :commit: 4c0ba2fce414436e2288a354411675a12c2866dc
     :git: https://github.com/boyarkin-anton/BitcoinKit.git
   Lisk:
     :commit: 154a3af05772136b776ff14ae05f92c8d844ea20
@@ -182,7 +182,7 @@ SPEC CHECKSUMS:
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   GRDB.swift: e10787d857b6b8135354b9e08fb23b4bb8e2fab7
   GRDBCipher: caccb02f13acd7f745e595cf84a70be3e91fb5f3
-  GRKOpenSSLFramework: 8180d66833be66fc0f2d4942757d095edb0778d0
+  GRKOpenSSLFramework: 35944e317e6336b2944ad70b059d84db6b2d8532
   Haring: b3a8495c073a016f03296d67debc609a7ecf7710
   KeychainAccess: b3816fddcf28aa29d94b10ec305cd52be14c472b
   KZFileWatchers: cdb033e4120fbe61c8e0f4df3613d5894741653d
@@ -211,6 +211,6 @@ SPEC CHECKSUMS:
   web3swift: d80d1b9a3feca16e614acec9eea47ec26310d37d
   Yams: 572f625a8b719b73e0b57fd313c680f3e2161fe9
 
-PODFILE CHECKSUM: 1761a9fa9acf1f380923970fa6c986b7fddb44fe
+PODFILE CHECKSUM: 378abf25974f82bedf445bb836328c373ef39582
 
-COCOAPODS: 1.6.0.beta.2
+COCOAPODS: 1.6.1
