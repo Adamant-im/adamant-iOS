@@ -52,6 +52,10 @@
 		64BD2B7520E2814B00E2CD36 /* EthTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */; };
 		64BD2B7720E2820300E2CD36 /* TransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */; };
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
+		64E1C82D222E95E2006C4DA7 /* DogeWalletRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E1C82C222E95E2006C4DA7 /* DogeWalletRoutes.swift */; };
+		64E1C82F222E95F6006C4DA7 /* DogeWallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E1C82E222E95F6006C4DA7 /* DogeWallet.swift */; };
+		64E1C831222E9617006C4DA7 /* DogeWalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E1C830222E9617006C4DA7 /* DogeWalletService.swift */; };
+		64E1C833222EA0F0006C4DA7 /* DogeWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E1C832222EA0F0006C4DA7 /* DogeWalletViewController.swift */; };
 		64E8305020F5FEEF006FA590 /* VotesAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E8304F20F5FEEF006FA590 /* VotesAsset.swift */; };
 		64EE46B220FE0C8D00194DDA /* LskTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64EE46B120FE0C8D00194DDA /* LskTransactionsViewController.swift */; };
 		64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */; };
@@ -358,6 +362,10 @@
 		64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransaction.swift; sourceTree = "<group>"; };
 		64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetails.swift; sourceTree = "<group>"; };
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
+		64E1C82C222E95E2006C4DA7 /* DogeWalletRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletRoutes.swift; sourceTree = "<group>"; };
+		64E1C82E222E95F6006C4DA7 /* DogeWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWallet.swift; sourceTree = "<group>"; };
+		64E1C830222E9617006C4DA7 /* DogeWalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletService.swift; sourceTree = "<group>"; };
+		64E1C832222EA0F0006C4DA7 /* DogeWalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletViewController.swift; sourceTree = "<group>"; };
 		64E8304F20F5FEEF006FA590 /* VotesAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotesAsset.swift; sourceTree = "<group>"; };
 		64EE46B120FE0C8D00194DDA /* LskTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskTransactionsViewController.swift; sourceTree = "<group>"; };
 		64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmTransactionsViewController.swift; sourceTree = "<group>"; };
@@ -676,6 +684,17 @@
 			path = TokensApiService;
 			sourceTree = "<group>";
 		};
+		64E1C82B222E958C006C4DA7 /* Doge */ = {
+			isa = PBXGroup;
+			children = (
+				64E1C82C222E95E2006C4DA7 /* DogeWalletRoutes.swift */,
+				64E1C82E222E95F6006C4DA7 /* DogeWallet.swift */,
+				64E1C830222E9617006C4DA7 /* DogeWalletService.swift */,
+				64E1C832222EA0F0006C4DA7 /* DogeWalletViewController.swift */,
+			);
+			path = Doge;
+			sourceTree = "<group>";
+		};
 		E59396A8E0053F21F768E69B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -959,6 +978,7 @@
 				E94008902119D22400CD2D67 /* Adamant */,
 				E94008792114ECF100CD2D67 /* Ethereum */,
 				E94008812114EE3900CD2D67 /* Lisk */,
+				64E1C82B222E958C006C4DA7 /* Doge */,
 				E94008712114EACF00CD2D67 /* WalletAccount.swift */,
 				E940086D2114AA2E00CD2D67 /* WalletService.swift */,
 				E9B1AA582122D59600080A2A /* WalletsRoutes.swift */,
@@ -1432,6 +1452,7 @@
 				"${PODS_ROOT}/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/BigInt/BigInt.framework",
+				"${BUILT_PRODUCTS_DIR}/BitcoinKit/BitcoinKit.framework",
 				"${BUILT_PRODUCTS_DIR}/ByteBackpacker/ByteBackpacker.framework",
 				"${BUILT_PRODUCTS_DIR}/CryptoSwift/CryptoSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/DateToolsSwift/DateToolsSwift.framework",
@@ -1439,6 +1460,9 @@
 				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
 				"${BUILT_PRODUCTS_DIR}/FTIndicator/FTIndicator.framework",
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
+				"${BUILT_PRODUCTS_DIR}/GRDB.swift/GRDB.framework",
+				"${BUILT_PRODUCTS_DIR}/GRDBCipher/GRDBCipher.framework",
+				"${PODS_ROOT}/GRKOpenSSLFramework/OpenSSL-iOS/bin/openssl.framework",
 				"${BUILT_PRODUCTS_DIR}/Haring/Haring.framework",
 				"${BUILT_PRODUCTS_DIR}/KZFileWatchers/KZFileWatchers.framework",
 				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
@@ -1454,6 +1478,7 @@
 				"${BUILT_PRODUCTS_DIR}/RNCryptor/RNCryptor.framework",
 				"${BUILT_PRODUCTS_DIR}/ReachabilitySwift/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/Result/Result.framework",
+				"${BUILT_PRODUCTS_DIR}/SQLCipher/SQLCipher.framework",
 				"${BUILT_PRODUCTS_DIR}/SipHash/SipHash.framework",
 				"${BUILT_PRODUCTS_DIR}/Stylist/Stylist.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftRLP/SwiftRLP.framework",
@@ -1470,6 +1495,7 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BigInt.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BitcoinKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ByteBackpacker.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CryptoSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DateToolsSwift.framework",
@@ -1477,6 +1503,9 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Eureka.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FTIndicator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GRDB.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GRDBCipher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Haring.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KZFileWatchers.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
@@ -1492,6 +1521,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCryptor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Result.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SQLCipher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SipHash.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Stylist.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftRLP.framework",
@@ -1565,6 +1595,7 @@
 				E908472A2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift in Sources */,
 				64A223D620F760BB005157CB /* Localization.swift in Sources */,
 				E93E289121FE18B50044F7C7 /* ThemesManager.swift in Sources */,
+				64E1C82F222E95F6006C4DA7 /* DogeWallet.swift in Sources */,
 				E94E7B08205D4CB80042B639 /* SharedRoutes.swift in Sources */,
 				E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */,
 				E9960B3621F5154300C840A8 /* DummyAccount+CoreDataProperties.swift in Sources */,
@@ -1657,6 +1688,7 @@
 				E93303DA22032CB00082F128 /* ThemeTableViewCell.swift in Sources */,
 				E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */,
 				644793C32166314A00FC4CF5 /* OnboardPage.swift in Sources */,
+				64E1C831222E9617006C4DA7 /* DogeWalletService.swift in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
 				E95F85802008C8D70070534A /* ChatsRoutes.swift in Sources */,
 				6416B1A721B024B6006089AC /* LskWalletService+Send.swift in Sources */,
@@ -1684,6 +1716,7 @@
 				E905D39B2048A9BD00DDB504 /* KeychainStore.swift in Sources */,
 				E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */,
 				E9AA8BFC212C169200F9249F /* EthWalletService+Transfers.swift in Sources */,
+				64E1C82D222E95E2006C4DA7 /* DogeWalletRoutes.swift in Sources */,
 				649E9A152111B3C200686B01 /* Mnemonic.swift in Sources */,
 				E95F85692006AB9D0070534A /* NormalizedTransaction.swift in Sources */,
 				E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */,
@@ -1775,6 +1808,7 @@
 				E94008892114F0F700CD2D67 /* AdmWalletService.swift in Sources */,
 				64EE46B220FE0C8D00194DDA /* LskTransactionsViewController.swift in Sources */,
 				E94008832114EE4700CD2D67 /* LskWallet.swift in Sources */,
+				64E1C833222EA0F0006C4DA7 /* DogeWalletViewController.swift in Sources */,
 				E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */,
 				E93303D72201C89F0082F128 /* ThemesViewController.swift in Sources */,
 				E98FC34220F9209900032D65 /* UIColor+adamant.swift in Sources */,

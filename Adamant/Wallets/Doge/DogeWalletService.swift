@@ -8,8 +8,23 @@
 
 import Foundation
 import Swinject
+import Alamofire
 import BitcoinKit
 import BitcoinKit.Private
+
+struct DogeApiCommands {
+    static func balance(address: String) -> String {
+        return "/addr/\(address)/balance"
+    }
+    
+    static func getTransactions(address: String) -> String {
+        return "/addrs/\(address)/txs"
+    }
+    
+    static func getTransaction(txId: String) -> String {
+        return "/tx/\(txId)"
+    }
+}
 
 class DogeWalletService: WalletService {
     var wallet: WalletAccount? { return dogeWallet }
@@ -91,16 +106,61 @@ class DogeWalletService: WalletService {
     }
     
     func update() {
-        // Tooo
+        guard let wallet = dogeWallet else {
+            return
+        }
+        
+        defer { stateSemaphore.signal() }
+        stateSemaphore.wait()
+        
+        switch state {
+        case .notInitiated, .updating, .initiationFailed(_):
+            return
+            
+        case .upToDate:
+            break
+        }
+        
+        setState(.updating)
+        
+        getBalance { [weak self] result in
+            if let stateSemaphore = self?.stateSemaphore {
+                defer {
+                    stateSemaphore.signal()
+                }
+                stateSemaphore.wait()
+            }
+            
+            switch result {
+            case .success(let balance):
+                let notification: Notification.Name?
+                
+                if wallet.balance != balance {
+                    wallet.balance = balance
+                    notification = self?.walletUpdatedNotification
+                    self?.initialBalanceCheck = false
+                } else if let initialBalanceCheck = self?.initialBalanceCheck, initialBalanceCheck {
+                    self?.initialBalanceCheck = false
+                    notification = self?.walletUpdatedNotification
+                } else {
+                    notification = nil
+                }
+                
+                if let notification = notification {
+                    NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
+                }
+                
+            case .failure(let error):
+                self?.dialogService.showRichError(error: error)
+            }
+            
+            self?.setState(.upToDate)
+        }
     }
     
     func validate(address: String) -> AddressValidationResult {
         // Todo
         return .valid
-    }
-    
-    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        // Todo
     }
 }
 
@@ -182,6 +242,75 @@ extension DogeWalletService: InitiatedWithPassphraseService {
                         completion(.failure(error: error))
                     }
                 }
+            }
+        }
+    }
+}
+
+// MARK: - Dependencies
+extension DogeWalletService: SwinjectDependentService {
+    func injectDependencies(from container: Container) {
+        accountService = container.resolve(AccountService.self)
+        apiService = container.resolve(ApiService.self)
+        dialogService = container.resolve(DialogService.self)
+        router = container.resolve(Router.self)
+    }
+}
+
+// MARK: - Balances & addresses
+extension DogeWalletService {
+    func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
+        guard let raw = AdamantResources.dogeServers.randomElement(), let url = URL(string: raw) else {
+            fatalError("Failed to build DOGE endpoint URL")
+        }
+        
+        guard let address = self.dogeWallet?.address else {
+            completion(.failure(error: .internalError(message: "DOGE Wallet: not found", error: nil)))
+            return
+        }
+        
+        // Headers
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        
+        // Request url
+        let endpoint = url.appendingPathComponent(DogeApiCommands.balance(address: address))
+        
+        // MARK: Sending request
+        Alamofire.request(endpoint, method: .get, headers: headers).responseString(queue: defaultDispatchQueue) { response in
+            
+            switch response.result {
+            case .success(let data):
+                if let raw = Decimal(string: data) {
+                    let balance = raw / Decimal(DogeWalletService.multiplier)
+                    completion(.success(result: balance))
+                } else {
+                    completion(.failure(error: .internalError(message: "DOGE Wallet: balance not found", error: nil)))
+                }
+                
+            case .failure:
+                completion(.failure(error: .networkError))
+            }
+        }
+    }
+    
+    func getDogeAddress(byAdamandAddress address: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
+        apiService.get(key: DogeWalletService.kvsAddress, sender: address, completion: completion)
+    }
+    
+    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
+        apiService.get(key: DogeWalletService.kvsAddress, sender: address) { (result) in
+            switch result {
+            case .success(let value):
+                if let address = value {
+                    completion(.success(result: address))
+                } else {
+                    completion(.failure(error: .walletNotInitiated))
+                }
+                
+            case .failure(let error):
+                completion(.failure(error: .internalError(message: "DOGE Wallet: fail to get address from KVS", error: error)))
             }
         }
     }

@@ -58,6 +58,10 @@ struct AdamantResources {
     static let lskServers = [
         "https://lisknode1.adamant.im"
     ]
+    
+    static let dogeServers = [
+        "https://dogenode1.adamant.im/api"
+    ]
 	
     // MARK: ADAMANT Addresses
 	static let supportEmail = "ios@adamant.im"
