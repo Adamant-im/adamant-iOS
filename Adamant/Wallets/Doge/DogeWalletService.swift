@@ -99,8 +99,8 @@ class DogeWalletService: WalletService {
         }
     }
     
-    init(mainnet: Bool) {
-        self.network = mainnet ? DogeMainnet() : DogeTestnet()
+    init() {
+        self.network = DogeMainnet()
         
         self.setState(.notInitiated)
     }
@@ -379,6 +379,92 @@ extension DogeWalletService {
     }
 }
 
+// MARK: - Transactions
+extension DogeWalletService {
+    func getTransactions(_ completion: @escaping (ApiServiceResult<[DogeTransaction]>) -> Void) {
+        guard let raw = AdamantResources.dogeServers.randomElement(), let url = URL(string: raw) else {
+            fatalError("Failed to build DOGE endpoint URL")
+        }
+        
+        if let address = self.wallet?.address {
+            // Headers
+            let headers = [
+                "Content-Type": "application/json"
+            ]
+            
+            // Request url
+            let endpoint = url.appendingPathComponent(DogeApiCommands.getTransactions(address: address))
+            
+            // MARK: Sending request
+            Alamofire.request(endpoint, method: .get, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+                
+                switch response.result {
+                case .success(let data):
+                    
+                    if let result = data as? [String: Any], let items = result["items"] as? [[String: Any]] {
+                        var transactions = [DogeTransaction]()
+                        for item in items {
+                            transactions.append(DogeTransaction.from(item, with: address))
+                        }
+                        completion(.success(transactions))
+                    } else {
+                        completion(.failure(.internalError(message: "DOGE Wallet: not valid response", error: nil)))
+                    }
+                    
+                case .failure:
+                    completion(.failure(.internalError(message: "DOGE Wallet: server not response", error: nil)))
+                }
+            }
+        } else {
+            completion(.failure(.internalError(message: "DOGE Wallet: not found", error: nil)))
+        }
+    }
+    
+    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<DogeTransaction>) -> Void) {
+        guard let raw = AdamantResources.dogeServers.randomElement(), let url = URL(string: raw) else {
+            fatalError("Failed to build DOGE endpoint URL")
+        }
+        
+        if let address = self.wallet?.address {
+            // Headers
+            let headers = [
+                "Content-Type": "application/json"
+            ]
+            
+            // Request url
+            let endpoint = url.appendingPathComponent(DogeApiCommands.getTransaction(txId: hash))
+            
+            // MARK: Sending request
+            Alamofire.request(endpoint, method: .get, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+                
+                switch response.result {
+                case .success(let data):
+                    if let item = data as? [String: Any] {
+                        completion(.success(DogeTransaction.from(item, with: address)))
+                    } else {
+                        completion(.failure(.internalError(message: "No transaction", error: nil)))
+                    }
+                case .failure:
+                    completion(.failure(.internalError(message: "No transaction", error: nil)))
+                }
+            }
+        } else {
+            completion(.failure(.internalError(message: "DOGE Wallet: not found", error: nil)))
+        }
+    }
+}
+
+extension DogeWalletService: WalletServiceWithTransfers {
+    func transferListViewController() -> UIViewController {
+        guard let vc = router.get(scene: AdamantScene.Wallets.Doge.transactionsList) as? DogeTransactionsViewController else {
+            fatalError("Can't get DogeTransactionsViewController")
+        }
+        
+        vc.walletService = self
+        return vc
+    }
+}
+
 class DogeMainnet: Network {
     override var name: String {
         return "livenet"
@@ -422,65 +508,7 @@ class DogeMainnet: Network {
     
     override var dnsSeeds: [String] {
         return [
-            "seed.dogecoin.com",
-            "seed.multidoge.org",
-            "seed2.multidoge.org",
-            "seed.doger.dogecoin.com"
+            "dogenode1.adamant.im"
         ]
     }
-    
-    // todo hashGenesisBlock = "1a91e3dace36e2be3bf030a65679fe821aa1d6ef92e7c9902eb318182c355691"
-}
-
-class DogeTestnet: Network {
-    override var name: String {
-        return "livenet"
-    }
-    
-    override var alias: String {
-        return "mainnet"
-    }
-    
-    override var scheme: String {
-        return "dogecoin"
-    }
-    
-    override var magic: UInt32 {
-        return 0xc0c0c0c0
-    }
-    
-    override var pubkeyhash: UInt8 {
-        return 0x71
-    }
-    
-    override var privatekey: UInt8 {
-        return 0xf1
-    }
-    
-    override var scripthash: UInt8 {
-        return 0xc4
-    }
-    
-    override var xpubkey: UInt32 {
-        return 0x02facafd
-    }
-    
-    override var xprivkey: UInt32 {
-        return 0x02fac398
-    }
-    
-    override var port: UInt32 {
-        return 22556
-    }
-    
-    override var dnsSeeds: [String] {
-        return [
-            //            "seed.dogecoin.com",
-            //            "seed.multidoge.org",
-            //            "seed2.multidoge.org",
-            //            "seed.doger.dogecoin.com"
-        ]
-    }
-    
-    // todo hashGenesisBlock = ""
 }

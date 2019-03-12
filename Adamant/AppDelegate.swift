@@ -91,6 +91,8 @@ struct AdamantResources {
     static let liskExplorerAddress = "https://explorer.lisk.io/tx/"
 //    static let liskExplorerAddress = "https://testnet-explorer.lisk.io/tx/" // LISK Testnet
 	
+    static let dogeExplorerAddress = "https://dogechain.info/tx/"
+    
 	private init() {}
 }
 
