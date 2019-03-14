@@ -17,7 +17,18 @@ extension AdamantScene.Wallets {
             return c
         }
         
-        /// List of Lisk transactions
+        /// Send tokens
+        static let transfer = AdamantScene(identifier: "DogeTransferViewController") { r in
+            let c = DogeTransferViewController()
+            c.dialogService = r.resolve(DialogService.self)
+            c.chatsProvider = r.resolve(ChatsProvider.self)
+            c.accountService = r.resolve(AccountService.self)
+            c.accountsProvider = r.resolve(AccountsProvider.self)
+            c.router = r.resolve(Router.self)
+            return c
+        }
+        
+        /// List of transactions
         static let transactionsList = AdamantScene(identifier: "DogeTransactionsViewController") { r in
             let c = DogeTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
             c.dialogService = r.resolve(DialogService.self)
@@ -25,7 +36,7 @@ extension AdamantScene.Wallets {
             return c
         }
         
-        /// Lisk transaction details
+        /// Transaction details
         static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewControllerBase") { r in
             let c = DogeTransactionDetailsViewController()
             c.dialogService = r.resolve(DialogService.self)

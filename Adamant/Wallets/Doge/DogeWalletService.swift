@@ -24,6 +24,14 @@ struct DogeApiCommands {
     static func getTransaction(txId: String) -> String {
         return "/tx/\(txId)"
     }
+    
+    static func getUnspentTransactions(address: String) -> String {
+        return "/addr/\(address)/utxo"
+    }
+    
+    static func sendTransaction() -> String {
+        return "/tx/send"
+    }
 }
 
 class DogeWalletService: WalletService {
@@ -57,7 +65,7 @@ class DogeWalletService: WalletService {
     static let multiplier = 1e8
     static let chunkSize = 20
     
-    private (set) var transactionFee: Decimal = 1 // 1 DOGE per transaction
+    private (set) var transactionFee: Decimal = 1.0 // 1 DOGE per transaction
     
     static let kvsAddress = "doge:address"
     
@@ -159,8 +167,48 @@ class DogeWalletService: WalletService {
     }
     
     func validate(address: String) -> AddressValidationResult {
-        // Todo
-        return .valid
+        return isValid(bitcoinAddress: address) ? .valid : .invalid
+    }
+    
+    private func getBase58DecodeAsBytes(address: String, length: Int) -> [UTF8.CodeUnit]? {
+        let b58Chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+        
+        var output: [UTF8.CodeUnit] = Array(repeating: 0, count: length)
+        
+        for i in 0..<address.count {
+            let index = address.index(address.startIndex, offsetBy: i)
+            let charAtIndex = address[index]
+            
+            guard let charLoc = b58Chars.index(of: charAtIndex) else { continue }
+            
+            var p = b58Chars.distance(from: b58Chars.startIndex, to: charLoc)
+            for j in stride(from: length - 1, through: 0, by: -1) {
+                p += 58 * Int(output[j] & 0xFF)
+                output[j] = UTF8.CodeUnit(p % 256)
+                
+                p /= 256
+            }
+            
+            guard p == 0 else { return nil }
+        }
+        
+        return output
+    }
+    
+    public func isValid(bitcoinAddress address: String) -> Bool {
+        guard address.count >= 26 && address.count <= 35,
+            address.rangeOfCharacter(from: CharacterSet.alphanumerics.inverted) == nil,
+            let decodedAddress = getBase58DecodeAsBytes(address: address, length: 25),
+            decodedAddress.count >= 4
+            else { return false }
+        
+        let decodedAddressNoCheckSum = Array(decodedAddress.prefix(decodedAddress.count - 4))
+        let hashedSum = decodedAddressNoCheckSum.sha256().sha256()
+        
+        let checkSum = Array(decodedAddress.suffix(from: decodedAddress.count - 4))
+        let hashedSumHeader = Array(hashedSum.prefix(4))
+        
+        return hashedSumHeader == checkSum
     }
 }
 
@@ -320,7 +368,7 @@ extension DogeWalletService {
 extension DogeWalletService {
     /// - Parameters:
     ///   - dogeAddress: DOGE address to save into KVS
-    ///   - adamantAddress: Owner of Lisk address
+    ///   - adamantAddress: Owner of Doge address
     ///   - completion: success
     private func save(dogeAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
         guard let adamant = accountService.account, let keypair = accountService.keypair else {
@@ -417,6 +465,69 @@ extension DogeWalletService {
             }
         } else {
             completion(.failure(.internalError(message: "DOGE Wallet: not found", error: nil)))
+        }
+    }
+    
+    func getUnspentTransactions(_ completion: @escaping (ApiServiceResult<[UnspentTransaction]>) -> Void) {
+        guard let raw = AdamantResources.dogeServers.randomElement(), let url = URL(string: raw) else {
+            fatalError("Failed to build DOGE endpoint URL")
+        }
+        
+        guard let wallet = self.dogeWallet else {
+            completion(.failure(.notLogged))
+            return
+        }
+        
+        let address = wallet.address
+        
+        // Headers
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        
+        // Request url
+        let endpoint = url.appendingPathComponent(DogeApiCommands.getUnspentTransactions(address: address))
+        
+        let parameters = [
+            "noCache": "1"
+        ]
+        
+        // MARK: Sending request
+        Alamofire.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+            
+            switch response.result {
+            case .success(let data):
+                
+                if let items = data as? [[String: Any]] {
+                    var utxos = [UnspentTransaction]()
+                    for item in items {
+                        if let txid = item["txid"] as? String,
+                            let vout = item["vout"] as? NSNumber,
+                            let amount = item["amount"] as? NSNumber {
+                            
+                            let value = NSDecimalNumber(decimal: (amount.decimalValue * Decimal(DogeWalletService.multiplier))).uint64Value
+                            
+                            let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
+                            let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
+                            let txIndex = vout.uint32Value
+                            
+                            print(txid, txIndex, lockScript.hex, value)
+                            
+                            let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
+                            let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
+                            let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
+                            
+                            utxos.append(utxo)
+                        }
+                    }
+                    completion(.success(utxos))
+                } else {
+                    completion(.failure(.internalError(message: "DOGE Wallet: not valid response", error: nil)))
+                }
+                
+            case .failure:
+                completion(.failure(.internalError(message: "DOGE Wallet: server not response", error: nil)))
+            }
         }
     }
     

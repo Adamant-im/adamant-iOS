@@ -42,6 +42,11 @@
 		648BCA6D213D384F00875EB5 /* AvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648BCA6C213D384F00875EB5 /* AvatarService.swift */; };
 		648DD79E2236A0B500B811FD /* DogeTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648DD79D2236A0B500B811FD /* DogeTransactionsViewController.swift */; };
 		648DD7A02236A59200B811FD /* DogeTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648DD79F2236A59200B811FD /* DogeTransactionDetailsViewController.swift */; };
+		648DD7A22237D9A000B811FD /* DogeTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648DD7A12237D9A000B811FD /* DogeTransaction.swift */; };
+		648DD7A42237DB9E00B811FD /* DogeWalletService+Send.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648DD7A32237DB9E00B811FD /* DogeWalletService+Send.swift */; };
+		648DD7A62237DC4000B811FD /* DogeTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648DD7A52237DC4000B811FD /* DogeTransferViewController.swift */; };
+		648DD7A82239147800B811FD /* DogeWalletService+RichMessageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648DD7A72239147800B811FD /* DogeWalletService+RichMessageProvider.swift */; };
+		648DD7AA2239150E00B811FD /* DogeWalletService+RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648DD7A92239150E00B811FD /* DogeWalletService+RichMessageProviderWithStatusCheck.swift */; };
 		649D6BE821B95DB7009E727B /* LskWalletService+RichMessageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649D6BE721B95DB7009E727B /* LskWalletService+RichMessageProvider.swift */; };
 		649D6BEA21B9627B009E727B /* LskWalletService+RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649D6BE921B9627B009E727B /* LskWalletService+RichMessageProviderWithStatusCheck.swift */; };
 		649D6BEC21BD5A53009E727B /* UISuffixTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649D6BEB21BD5A53009E727B /* UISuffixTextField.swift */; };
@@ -354,6 +359,11 @@
 		648BCA6C213D384F00875EB5 /* AvatarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarService.swift; sourceTree = "<group>"; };
 		648DD79D2236A0B500B811FD /* DogeTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeTransactionsViewController.swift; sourceTree = "<group>"; };
 		648DD79F2236A59200B811FD /* DogeTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeTransactionDetailsViewController.swift; sourceTree = "<group>"; };
+		648DD7A12237D9A000B811FD /* DogeTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeTransaction.swift; sourceTree = "<group>"; };
+		648DD7A32237DB9E00B811FD /* DogeWalletService+Send.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DogeWalletService+Send.swift"; sourceTree = "<group>"; };
+		648DD7A52237DC4000B811FD /* DogeTransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeTransferViewController.swift; sourceTree = "<group>"; };
+		648DD7A72239147800B811FD /* DogeWalletService+RichMessageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DogeWalletService+RichMessageProvider.swift"; sourceTree = "<group>"; };
+		648DD7A92239150E00B811FD /* DogeWalletService+RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DogeWalletService+RichMessageProviderWithStatusCheck.swift"; sourceTree = "<group>"; };
 		649D6BE721B95DB7009E727B /* LskWalletService+RichMessageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LskWalletService+RichMessageProvider.swift"; sourceTree = "<group>"; };
 		649D6BE921B9627B009E727B /* LskWalletService+RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LskWalletService+RichMessageProviderWithStatusCheck.swift"; sourceTree = "<group>"; };
 		649D6BEB21BD5A53009E727B /* UISuffixTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISuffixTextField.swift; sourceTree = "<group>"; };
@@ -694,7 +704,11 @@
 				64E1C82C222E95E2006C4DA7 /* DogeWalletRoutes.swift */,
 				64E1C82E222E95F6006C4DA7 /* DogeWallet.swift */,
 				64E1C830222E9617006C4DA7 /* DogeWalletService.swift */,
+				648DD7A32237DB9E00B811FD /* DogeWalletService+Send.swift */,
+				648DD7A72239147800B811FD /* DogeWalletService+RichMessageProvider.swift */,
+				648DD7A92239150E00B811FD /* DogeWalletService+RichMessageProviderWithStatusCheck.swift */,
 				64E1C832222EA0F0006C4DA7 /* DogeWalletViewController.swift */,
+				648DD7A52237DC4000B811FD /* DogeTransferViewController.swift */,
 				648DD79D2236A0B500B811FD /* DogeTransactionsViewController.swift */,
 				648DD79F2236A59200B811FD /* DogeTransactionDetailsViewController.swift */,
 			);
@@ -826,6 +840,7 @@
 				E993302321369B8A00CD5200 /* RichMessage.swift */,
 				E971591921681D6900A5F904 /* TransactionStatus.swift */,
 				E9FCA1E5218334C00005E83D /* SimpleTransactionDetails.swift */,
+				648DD7A12237D9A000B811FD /* DogeTransaction.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1607,6 +1622,7 @@
 				E9960B3621F5154300C840A8 /* DummyAccount+CoreDataProperties.swift in Sources */,
 				E9CAE8D22018AA7700345E76 /* AdamantApi+Accounts.swift in Sources */,
 				E987024920C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift in Sources */,
+				648DD7A42237DB9E00B811FD /* DogeWalletService+Send.swift in Sources */,
 				E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */,
 				E908472F2196FEA80095825D /* BaseTransaction+CoreDataProperties.swift in Sources */,
 				E94008872114F05B00CD2D67 /* AddressValidationResult.swift in Sources */,
@@ -1641,6 +1657,7 @@
 				E908472B2196FEA80095825D /* RichMessageTransaction+CoreDataProperties.swift in Sources */,
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
 				64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */,
+				648DD7AA2239150E00B811FD /* DogeWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
 				E9D1BE1C211DABE100E86B72 /* WalletPagingItem.swift in Sources */,
 				E940086E2114AA2E00CD2D67 /* WalletService.swift in Sources */,
 				645FEB34213E72C100D6BA2D /* OnboardViewController.swift in Sources */,
@@ -1664,6 +1681,7 @@
 				E926E032213EC43B005E536B /* FullscreenAlertView.swift in Sources */,
 				644EC35B20EFB8E900F40C73 /* AdamantDelegateCell.swift in Sources */,
 				6416B1A521AEE157006089AC /* LskWalletService+Transfers.swift in Sources */,
+				648DD7A62237DC4000B811FD /* DogeTransferViewController.swift in Sources */,
 				E9960B3421F5154300C840A8 /* BaseAccount+CoreDataProperties.swift in Sources */,
 				E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */,
 				E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */,
@@ -1708,6 +1726,7 @@
 				E99818942120892F0018C84C /* WalletViewControllerBase.swift in Sources */,
 				E9B3D39E201F99F40019EB36 /* DataProvider.swift in Sources */,
 				643ED0B12109F4BD005A9FDA /* NativeAdamantCore.swift in Sources */,
+				648DD7A82239147800B811FD /* DogeWalletService+RichMessageProvider.swift in Sources */,
 				E93EB0A320DA4CCA001F9601 /* Node.swift in Sources */,
 				645E7B062111DF3A006CC9FD /* Crypto.swift in Sources */,
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
@@ -1828,6 +1847,7 @@
 				E9147B5F20500E9300145913 /* MyLittlePinpad+adamant.swift in Sources */,
 				E9981896212095CA0018C84C /* EthWalletViewController.swift in Sources */,
 				E98FC34620F9210100032D65 /* Date+adamant.swift in Sources */,
+				648DD7A22237D9A000B811FD /* DogeTransaction.swift in Sources */,
 				E90847372196FEA80095825D /* Chatroom+CoreDataProperties.swift in Sources */,
 				E905D39D204C13B900DDB504 /* SecuredStore.swift in Sources */,
 				E98FC34820F921EA00032D65 /* DelegateVote.swift in Sources */,
