@@ -161,7 +161,7 @@ class DogeTransferViewController: TransferViewControllerBase {
     }
     
     override func recipientRow() -> BaseRow {
-        let row = SuffixTextRow() {
+        let row = TextRow() {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
             
@@ -173,6 +173,20 @@ class DogeTransferViewController: TransferViewControllerBase {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
             }
+            }.cellUpdate { (cell, row) in
+                cell.textField?.setStyle(.input)
+                cell.setStyle(.secondaryBackground)
+            }.onChange { [weak self] row in
+                if let text = row.value {
+                    self?._recipient = text
+                }
+                
+                if let skip = self?.skipValueChange, skip {
+                    self?.skipValueChange = false
+                    return
+                }
+                
+                self?.validateForm()
         }
         
         return row

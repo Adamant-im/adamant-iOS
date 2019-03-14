@@ -160,7 +160,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   BitcoinKit:
-    :commit: fbc6c7dad2e3700415a839e8d43f6ecfc7772a84
+    :commit: b78dd8df08bee99bdd75eef5cb5e8de0e27638e8
     :git: https://github.com/boyarkin-anton/BitcoinKit.git
   Lisk:
     :commit: 154a3af05772136b776ff14ae05f92c8d844ea20
