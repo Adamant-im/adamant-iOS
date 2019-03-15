@@ -68,9 +68,8 @@ extension BtcWalletService: WalletServiceTwoStepSend {
             }
             
             // MARK: 3. Create local transaction
-            let unsignedTx = self.createUnsignedTx(toAddress: toAddress, amount: rawAwount, changeAddress: changeAddress, utxos: utxos, lockTime: UInt32(latestBlockHeight+1))
-            let signedTransaction = self.signTx(unsignedTx: unsignedTx, keys: [key])
-            completion(.success(result: signedTransaction))
+            let transaction = BitcoinKit.Transaction.createNewTransaction(toAddress: toAddress, amount: UInt64(rawAwount), fee: UInt64(BtcWalletService.defaultFee), changeAddress: changeAddress, utxos: utxos, lockTime: UInt32(latestBlockHeight+1), keys: [key])
+            completion(.success(result: transaction))
         }
     }
     
@@ -87,60 +86,6 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         }
         
         return try! blockStore?.unspentTransactions(address: address) ?? []
-    }
-    
-    // TODO: select utxos and decide fee
-    public func selectTx(from utxos: [UnspentTransaction], amount: Int64) -> (utxos: [UnspentTransaction], fee: Int64) {
-        return (utxos, BtcWalletService.defaultFee)
-    }
-    
-    public func createUnsignedTx(toAddress: Address, amount: Int64, changeAddress: Address, utxos: [UnspentTransaction], lockTime: UInt32 = 0) -> UnsignedTransaction {
-        let (utxos, fee) = selectTx(from: utxos, amount: amount)
-        let totalAmount: Int64 = Int64(utxos.reduce(0) { $0 + $1.output.value })
-        let change: Int64 = totalAmount - amount - fee
-        
-        let toPubKeyHash: Data = toAddress.data
-        let changePubkeyHash: Data = changeAddress.data
-        
-        let lockingScriptTo = Script.buildPublicKeyHashOut(pubKeyHash: toPubKeyHash)
-        let lockingScriptChange = Script.buildPublicKeyHashOut(pubKeyHash: changePubkeyHash)
-        
-        let toOutput = TransactionOutput(value: UInt64(amount), lockingScript: lockingScriptTo)
-        let changeOutput = TransactionOutput(value: UInt64(change), lockingScript: lockingScriptChange)
-        
-        let unsignedInputs = utxos.map { TransactionInput(previousOutput: $0.outpoint, signatureScript: Data(), sequence: UInt32.max) }
-        let tx = BitcoinKit.Transaction(version: 2, inputs: unsignedInputs, outputs: [toOutput, changeOutput], lockTime: lockTime)
-        return UnsignedTransaction(tx: tx, utxos: utxos)
-    }
-    
-    public func signTx(unsignedTx: UnsignedTransaction, keys: [PrivateKey]) -> BitcoinKit.Transaction {
-        var inputsToSign = unsignedTx.tx.inputs
-        var transactionToSign: BitcoinKit.Transaction {
-            return BitcoinKit.Transaction(version: unsignedTx.tx.version, inputs: inputsToSign, outputs: unsignedTx.tx.outputs, lockTime: unsignedTx.tx.lockTime)
-        }
-        
-        // Signing
-        let hashType = SighashType.BTC.ALL
-        for (i, utxo) in unsignedTx.utxos.enumerated() {
-            let pubkeyHash: Data = Script.getPublicKeyHash(from: utxo.output.lockingScript)
-            
-            let keysOfUtxo: [PrivateKey] = keys.filter { $0.publicKey().pubkeyHash == pubkeyHash }
-            guard let key = keysOfUtxo.first else {
-                print("No keys to this txout : \(utxo.output.value)")
-                continue
-            }
-            print("Value of signing txout : \(utxo.output.value)")
-            
-            let sighash: Data = transactionToSign.signatureHash(for: utxo.output, inputIndex: i, hashType: SighashType.BTC.ALL)
-            let signature: Data = try! BitcoinKit.Crypto.sign(sighash, privateKey: key)
-            let txin = inputsToSign[i]
-            let pubkey = key.publicKey()
-            
-            let unlockingScript = Script.buildPublicKeyUnlockingScript(signature: signature, pubkey: pubkey, hashType: hashType)
-            
-            inputsToSign[i] = TransactionInput(previousOutput: txin.previousOutput, signatureScript: unlockingScript, sequence: txin.sequence)
-        }
-        return transactionToSign
     }
 }
 

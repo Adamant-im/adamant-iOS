@@ -83,7 +83,7 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire
-  - BitcoinKit (from `https://github.com/boyarkin-anton/BitcoinKit.git`, branch `dev`)
+  - BitcoinKit (from `https://github.com/boyarkin-anton/BitcoinKit.git`, commit `b78dd8d`)
   - ByteBackpacker
   - CryptoSwift
   - DateToolsSwift
@@ -150,7 +150,7 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   BitcoinKit:
-    :branch: dev
+    :commit: b78dd8d
     :git: https://github.com/boyarkin-anton/BitcoinKit.git
   Lisk:
     :git: https://github.com/adamant-im/lisk-swift.git
@@ -160,7 +160,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   BitcoinKit:
-    :commit: 4c0ba2fce414436e2288a354411675a12c2866dc
+    :commit: b78dd8d
     :git: https://github.com/boyarkin-anton/BitcoinKit.git
   Lisk:
     :commit: 154a3af05772136b776ff14ae05f92c8d844ea20
@@ -211,6 +211,6 @@ SPEC CHECKSUMS:
   web3swift: d80d1b9a3feca16e614acec9eea47ec26310d37d
   Yams: 572f625a8b719b73e0b57fd313c680f3e2161fe9
 
-PODFILE CHECKSUM: 378abf25974f82bedf445bb836328c373ef39582
+PODFILE CHECKSUM: 16bb40371f23f068702c5a1a38610bb3692f99d4
 
 COCOAPODS: 1.6.1
