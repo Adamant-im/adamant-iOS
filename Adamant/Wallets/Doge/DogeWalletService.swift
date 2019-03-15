@@ -388,7 +388,11 @@ extension DogeWalletService {
 
 // MARK: - Transactions
 extension DogeWalletService {
-    func getTransactions(_ completion: @escaping (ApiServiceResult<[DogeTransaction]>) -> Void) {
+    func getTransactions(update:  @escaping ([DogeTransaction]) -> Void, completion: @escaping (ApiServiceResult<[DogeTransaction]>) -> Void) {
+        self.getNewTransactions(update: update, completion: completion)
+    }
+    
+    private func getNewTransactions(from: Int = 0, prevTransactions: [DogeTransaction] = [DogeTransaction](), update:  @escaping ([DogeTransaction]) -> Void, completion: @escaping (ApiServiceResult<[DogeTransaction]>) -> Void) {
         guard let raw = AdamantResources.dogeServers.randomElement(), let url = URL(string: raw) else {
             fatalError("Failed to build DOGE endpoint URL")
         }
@@ -399,21 +403,41 @@ extension DogeWalletService {
                 "Content-Type": "application/json"
             ]
             
+            let to = from + DogeWalletService.chunkSize
+            
+            let parameters = [
+                "from": from,
+                "to": to
+            ]
+            
             // Request url
             let endpoint = url.appendingPathComponent(DogeApiCommands.getTransactions(address: address))
             
             // MARK: Sending request
-            Alamofire.request(endpoint, method: .get, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+            Alamofire.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
                 
                 switch response.result {
                 case .success(let data):
                     
-                    if let result = data as? [String: Any], let items = result["items"] as? [[String: Any]] {
-                        var transactions = [DogeTransaction]()
+                    if let result = data as? [String: Any], let items = result["items"] as? [[String: Any]], let totalItems = result["totalItems"] as? NSNumber {
+                        
+                        let hasMore = to < totalItems.intValue
+                        
+                        var newTransactions = [DogeTransaction]()
                         for item in items {
-                            transactions.append(DogeTransaction.from(item, with: address))
+                            newTransactions.append(DogeTransaction.from(item, with: address))
                         }
-                        completion(.success(transactions))
+                        
+                        update(newTransactions)
+                        
+                        var transactions = prevTransactions
+                        transactions.append(contentsOf: newTransactions)
+                        
+                        if hasMore {
+                            self.getNewTransactions(from: to, prevTransactions: transactions, update: update, completion: completion)
+                        } else {
+                            completion(.success(transactions))
+                        }
                     } else {
                         completion(.failure(.internalError(message: "DOGE Wallet: not valid response", error: nil)))
                     }

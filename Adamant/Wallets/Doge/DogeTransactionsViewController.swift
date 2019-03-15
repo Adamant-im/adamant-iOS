@@ -29,7 +29,17 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.walletService.getTransactions({ (result) in
+        self.transactions.removeAll()
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+        
+        self.walletService.getTransactions(update: { transactions in
+            self.transactions.append(contentsOf: transactions)
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }, completion: { (result) in
             switch result {
             case .success(let transactions):
                 self.transactions = transactions
@@ -102,7 +112,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         
         configureCell(cell,
                       isOutgoing: outgoing,
-                      partnerId: partnerId ?? "",
+                      partnerId: partnerId,
                       partnerName: nil,
                       amount: transaction.amountValue,
                       date: transaction.dateValue)
