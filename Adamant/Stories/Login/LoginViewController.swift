@@ -9,7 +9,6 @@
 import UIKit
 import Eureka
 import Haring
-import Stylist
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -140,13 +139,8 @@ class LoginViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationOptions = RowNavigationOptions.Disabled
         
-        self.observeThemeChange()
-        
-		navigationOptions = RowNavigationOptions.Disabled
-        
-        self.tableView.setStyle(.baseTable)
-		
 		// MARK: Header & Footer
 		if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
 			tableView.tableHeaderView = header
@@ -154,7 +148,6 @@ class LoginViewController: FormViewController {
 			if let label = header.viewWithTag(888) as? UILabel {
 				label.text = String.adamantLocalized.shared.productName
 				label.textColor = UIColor.adamant.primary
-                label.setStyle(.primaryText)
 			}
 		}
 		
@@ -163,21 +156,13 @@ class LoginViewController: FormViewController {
 				label.text = AdamantUtilities.applicationVersion
 				label.textColor = UIColor.adamant.primary
 				tableView.tableFooterView = footer
-                label.setStyle(.primaryText)
 			}
 		}
 		
 		
 		// MARK: Login section
-		form +++ Section() {
+		form +++ Section(Sections.login.localized) {
 			$0.tag = Sections.login.tag
-            
-            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
-            header.title = Sections.login.localized
-            header.onSetupView = {view, _ in
-                view.textLabel?.setStyle(.secondaryText)
-            }
-            $0.header = header
             
 			$0.footer = { [weak self] in
 				var footer = HeaderFooterView<UIView>(.callback {
@@ -211,11 +196,7 @@ class LoginViewController: FormViewController {
 			$0.placeholder = Rows.passphrase.localized
             $0.placeholderColor = UIColor.adamant.secondary
 			$0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
-            }.cellUpdate({ (cell, _) in
-                cell.textField.textColor = UIColor.adamant.primary
-                cell.textField?.setStyle(.input)
-                cell.setStyle(.secondaryBackground)
-            })
+            }
 			
 		// Login with passphrase row
 		<<< ButtonRow() {
@@ -233,22 +214,12 @@ class LoginViewController: FormViewController {
 			}
 			
 			self?.loginWith(passphrase: passphrase)
-		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.setStyles([.baseTableViewCell, .secondaryBackground])
-            cell.textLabel?.setStyle(.primaryText)
 		}
 		
 		
 		// MARK: New account section
-		form +++ Section() {
+		form +++ Section(Sections.newAccount.localized) {
 			$0.tag = Sections.newAccount.tag
-            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
-            header.title = Sections.newAccount.localized
-            header.onSetupView = {view, _ in
-                view.textLabel?.setStyle(.secondaryText)
-            }
-            $0.header = header
 		}
 		
 		// Alert
@@ -272,9 +243,6 @@ class LoginViewController: FormViewController {
 			mutableText.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: NSRange(location: 0, length: mutableText.length))
 			
 			cell.textView.attributedText = mutableText
-            
-            cell.textView?.setStyles([.secondaryBackground, .primaryText])
-            cell.setStyles([.baseTableViewCell, .secondaryBackground])
 		}
 		
 		// New genegated passphrase
@@ -293,10 +261,6 @@ class LoginViewController: FormViewController {
 			cell.tipLabel.font = UIFont.systemFont(ofSize: 12)
 			cell.tipLabel.textColor = UIColor.adamant.secondary
 			cell.tipLabel.textAlignment = .center
-            
-            cell.passphraseLabel?.setStyles([.secondaryBackground, .primaryText])
-            cell.tipLabel?.setStyle(.secondaryText)
-            cell.style = AdamantThemeStyle.commonTableViewCell
 		}).onCellSelection({ [weak self] (cell, row) in
             guard let passphrase = row.value, let dialogService = self?.dialogService else {
 				return
@@ -319,10 +283,6 @@ class LoginViewController: FormViewController {
 			$0.title = Rows.generateNewPassphraseButton.localized
 		}.onCellSelection { [weak self] (cell, row) in
 			self?.generateNewPassphrase()
-		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.textLabel?.setStyle(.primaryText)
-            cell.setStyles([.baseTableViewCell, .secondaryBackground])
 		}
         
         // MARK: Nodes list settings
@@ -334,8 +294,6 @@ class LoginViewController: FormViewController {
 			cell.selectionStyle = .gray
 		}.cellUpdate { (cell, _) in
 			cell.textLabel?.textColor = UIColor.adamant.primary
-            cell.textLabel?.setStyle(.primaryText)
-            cell.style = AdamantThemeStyle.commonTableViewCell
 		}.onCellSelection { [weak self] (_, _) in
 			guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
 				return
@@ -468,20 +426,4 @@ extension LoginViewController: ButtonsStripeViewDelegate {
 			loginWithQrFromLibrary()
 		}
 	}
-}
-
-extension LoginViewController: Themeable {
-    func apply(theme: AdamantTheme) {
-        setNeedsStatusBarAppearanceUpdate()
-    }
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return UIColor.adamant.statusBar
-    }
-}
-
-extension UINavigationController {    
-    override open var preferredStatusBarStyle: UIStatusBarStyle {
-        return UIColor.adamant.statusBar
-    }
 }

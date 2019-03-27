@@ -19,8 +19,6 @@
 		6416B1A721B024B6006089AC /* LskWalletService+Send.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B1A621B024B6006089AC /* LskWalletService+Send.swift */; };
 		642361BE20E3869D0061559E /* eth_l18n.strings in Resources */ = {isa = PBXBuildFile; fileRef = 642361BD20E3869D0061559E /* eth_l18n.strings */; };
 		643ED0B12109F4BD005A9FDA /* NativeAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643ED0B02109F4BD005A9FDA /* NativeAdamantCore.swift */; };
-		6441CE64215BBE8900E48CA2 /* ThemeLight.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 6441CE63215BBE8900E48CA2 /* ThemeLight.yaml */; };
-		6441CE66215BC86900E48CA2 /* ThemeDark.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 6441CE65215BC86900E48CA2 /* ThemeDark.yaml */; };
 		644793C32166314A00FC4CF5 /* OnboardPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644793C22166314A00FC4CF5 /* OnboardPage.swift */; };
 		644793C52166315900FC4CF5 /* OnboardPage.xib in Resources */ = {isa = PBXBuildFile; fileRef = 644793C42166315900FC4CF5 /* OnboardPage.xib */; };
 		644EC34D20EFA60900F40C73 /* AdamantApi+Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644EC34C20EFA60900F40C73 /* AdamantApi+Delegates.swift */; };
@@ -125,9 +123,6 @@
 		E926E032213EC43B005E536B /* FullscreenAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E926E031213EC43B005E536B /* FullscreenAlertView.swift */; };
 		E926E034213EC454005E536B /* FullscreenAlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = E926E033213EC454005E536B /* FullscreenAlertView.xib */; };
 		E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927171D20C04613002BB9A6 /* UIColor+hex.swift */; };
-		E93303D72201C89F0082F128 /* ThemesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93303D62201C89F0082F128 /* ThemesViewController.swift */; };
-		E93303DA22032CB00082F128 /* ThemeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93303D822032CB00082F128 /* ThemeTableViewCell.swift */; };
-		E93303DB22032CB00082F128 /* ThemeTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E93303D922032CB00082F128 /* ThemeTableViewCell.xib */; };
 		E9332B8921F1FA4400D56E72 /* OnboardRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9332B8821F1FA4400D56E72 /* OnboardRoutes.swift */; };
 		E9393FA82055C92700EE6F30 /* Decimal+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */; };
 		E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA92055D03300EE6F30 /* AdamantMessage.swift */; };
@@ -135,12 +130,6 @@
 		E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */; };
 		E93D7ABE2052CEE1005D19DC /* NotificationsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */; };
 		E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */; };
-		E93E288721FE16580044F7C7 /* AdamantTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E288621FE16580044F7C7 /* AdamantTheme.swift */; };
-		E93E288B21FE16EB0044F7C7 /* ThemeLight.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E288A21FE16EB0044F7C7 /* ThemeLight.swift */; };
-		E93E288F21FE17E30044F7C7 /* ThemeDark.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E288E21FE17E30044F7C7 /* ThemeDark.swift */; };
-		E93E289121FE18B50044F7C7 /* ThemesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E289021FE18B40044F7C7 /* ThemesManager.swift */; };
-		E93E289321FE1BCF0044F7C7 /* ThemeBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E289221FE1BCF0044F7C7 /* ThemeBase.swift */; };
-		E93E289521FE316F0044F7C7 /* Styles.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93E289421FE316F0044F7C7 /* Styles.swift */; };
 		E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EB09E20DA3FA4001F9601 /* NodesEditorRoutes.swift */; };
 		E93EB0A320DA4CCA001F9601 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EB0A220DA4CCA001F9601 /* Node.swift */; };
 		E93EFE13200D1156000BB482 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EFE12200D1156000BB482 /* ChatViewController.swift */; };
@@ -325,8 +314,6 @@
 		6416B1A621B024B6006089AC /* LskWalletService+Send.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LskWalletService+Send.swift"; sourceTree = "<group>"; };
 		642361BD20E3869D0061559E /* eth_l18n.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = eth_l18n.strings; sourceTree = "<group>"; };
 		643ED0B02109F4BD005A9FDA /* NativeAdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAdamantCore.swift; sourceTree = "<group>"; };
-		6441CE63215BBE8900E48CA2 /* ThemeLight.yaml */ = {isa = PBXFileReference; lastKnownFileType = text; path = ThemeLight.yaml; sourceTree = "<group>"; };
-		6441CE65215BC86900E48CA2 /* ThemeDark.yaml */ = {isa = PBXFileReference; lastKnownFileType = text; path = ThemeDark.yaml; sourceTree = "<group>"; };
 		644793C22166314A00FC4CF5 /* OnboardPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardPage.swift; sourceTree = "<group>"; };
 		644793C42166315900FC4CF5 /* OnboardPage.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OnboardPage.xib; sourceTree = "<group>"; };
 		644EC34C20EFA60900F40C73 /* AdamantApi+Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Delegates.swift"; sourceTree = "<group>"; };
@@ -452,9 +439,6 @@
 		E926E031213EC43B005E536B /* FullscreenAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenAlertView.swift; sourceTree = "<group>"; };
 		E926E033213EC454005E536B /* FullscreenAlertView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FullscreenAlertView.xib; sourceTree = "<group>"; };
 		E927171D20C04613002BB9A6 /* UIColor+hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+hex.swift"; sourceTree = "<group>"; };
-		E93303D62201C89F0082F128 /* ThemesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemesViewController.swift; sourceTree = "<group>"; };
-		E93303D822032CB00082F128 /* ThemeTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeTableViewCell.swift; sourceTree = "<group>"; };
-		E93303D922032CB00082F128 /* ThemeTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ThemeTableViewCell.xib; sourceTree = "<group>"; };
 		E9332B8821F1FA4400D56E72 /* OnboardRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardRoutes.swift; sourceTree = "<group>"; };
 		E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+adamant.swift"; sourceTree = "<group>"; };
 		E9393FA92055D03300EE6F30 /* AdamantMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantMessage.swift; sourceTree = "<group>"; };
@@ -462,12 +446,6 @@
 		E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantChatsProvider.swift; sourceTree = "<group>"; };
 		E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsService.swift; sourceTree = "<group>"; };
 		E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantNotificationService.swift; sourceTree = "<group>"; };
-		E93E288621FE16580044F7C7 /* AdamantTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantTheme.swift; sourceTree = "<group>"; };
-		E93E288A21FE16EB0044F7C7 /* ThemeLight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeLight.swift; sourceTree = "<group>"; };
-		E93E288E21FE17E30044F7C7 /* ThemeDark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeDark.swift; sourceTree = "<group>"; };
-		E93E289021FE18B40044F7C7 /* ThemesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemesManager.swift; sourceTree = "<group>"; };
-		E93E289221FE1BCF0044F7C7 /* ThemeBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeBase.swift; sourceTree = "<group>"; };
-		E93E289421FE316F0044F7C7 /* Styles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Styles.swift; sourceTree = "<group>"; };
 		E93EB09E20DA3FA4001F9601 /* NodesEditorRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodesEditorRoutes.swift; sourceTree = "<group>"; };
 		E93EB0A220DA4CCA001F9601 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		E93EFE12200D1156000BB482 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
@@ -720,7 +698,6 @@
 				E940086C2114A8FD00CD2D67 /* Wallets */,
 				E9E7CDB82003AA8E00DFC4DB /* SharedViews */,
 				E919479920000FFD001362F8 /* Stories */,
-				E93E288421FE15DD0044F7C7 /* ThemeSupport */,
 				E913C9111FFFAB05001A83F7 /* Assets */,
 				E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */,
 				E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */,
@@ -918,29 +895,6 @@
 			path = Onboard;
 			sourceTree = "<group>";
 		};
-		E93E288421FE15DD0044F7C7 /* ThemeSupport */ = {
-			isa = PBXGroup;
-			children = (
-				E93E288521FE16150044F7C7 /* Themes */,
-				E93E288621FE16580044F7C7 /* AdamantTheme.swift */,
-				E93E289021FE18B40044F7C7 /* ThemesManager.swift */,
-				E93E289421FE316F0044F7C7 /* Styles.swift */,
-			);
-			path = ThemeSupport;
-			sourceTree = "<group>";
-		};
-		E93E288521FE16150044F7C7 /* Themes */ = {
-			isa = PBXGroup;
-			children = (
-				E93E289221FE1BCF0044F7C7 /* ThemeBase.swift */,
-				6441CE63215BBE8900E48CA2 /* ThemeLight.yaml */,
-				E93E288A21FE16EB0044F7C7 /* ThemeLight.swift */,
-				6441CE65215BC86900E48CA2 /* ThemeDark.yaml */,
-				E93E288E21FE17E30044F7C7 /* ThemeDark.swift */,
-			);
-			path = Themes;
-			sourceTree = "<group>";
-		};
 		E93EB09D20DA3F3A001F9601 /* NodesEditor */ = {
 			isa = PBXGroup;
 			children = (
@@ -1124,9 +1078,6 @@
 				E90055FA20ECE78A00D0CB2D /* SecurityViewController+notifications.swift */,
 				E9942B7F203C058C00C163AF /* QRGeneratorViewController.swift */,
 				E908473C219713300095825D /* NotificationsViewController.swift */,
-				E93303D62201C89F0082F128 /* ThemesViewController.swift */,
-				E93303D822032CB00082F128 /* ThemeTableViewCell.swift */,
-				E93303D922032CB00082F128 /* ThemeTableViewCell.xib */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -1363,7 +1314,6 @@
 				E983AE2D20E6720D00497E1A /* AccountFooter.xib in Resources */,
 				644793C52166315900FC4CF5 /* OnboardPage.xib in Resources */,
 				E9EC341B200524CA00C0E546 /* Roboto_300_normal.ttf in Resources */,
-				6441CE66215BC86900E48CA2 /* ThemeDark.yaml in Resources */,
 				E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
 				E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */,
@@ -1386,13 +1336,11 @@
 				E9EC3416200524CA00C0E546 /* Exo+2_300_normal.ttf in Resources */,
 				E9EC341C200524CA00C0E546 /* Roboto_400_italic.ttf in Resources */,
 				E94E7B0C205D5E4A0042B639 /* TransactionsListViewControllerBase.xib in Resources */,
-				6441CE64215BBE8900E48CA2 /* ThemeLight.yaml in Resources */,
 				6406D74A21C7F06000196713 /* SearchResultsViewController.xib in Resources */,
 				E9EC3415200524CA00C0E546 /* Exo+2_100_normal.ttf in Resources */,
 				E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */,
 				E95CB456205D77B500A7218E /* Localizable.strings in Resources */,
 				E95CB45E205D7F9600A7218E /* Localizable.stringsdict in Resources */,
-				E93303DB22032CB00082F128 /* ThemeTableViewCell.xib in Resources */,
 				E9981892212088DE0018C84C /* NodeCell.xib in Resources */,
 				E9B4E1AA210F1803007E77FC /* DoubleDetailsTableViewCell.xib in Resources */,
 				6458548C211B3AB1004C5909 /* WelcomeViewController.xib in Resources */,
@@ -1440,7 +1388,6 @@
 				"${BUILT_PRODUCTS_DIR}/FTIndicator/FTIndicator.framework",
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
 				"${BUILT_PRODUCTS_DIR}/Haring/Haring.framework",
-				"${BUILT_PRODUCTS_DIR}/KZFileWatchers/KZFileWatchers.framework",
 				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
 				"${BUILT_PRODUCTS_DIR}/Lisk/Lisk.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageInputBar/MessageInputBar.framework",
@@ -1455,11 +1402,9 @@
 				"${BUILT_PRODUCTS_DIR}/ReachabilitySwift/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/Result/Result.framework",
 				"${BUILT_PRODUCTS_DIR}/SipHash/SipHash.framework",
-				"${BUILT_PRODUCTS_DIR}/Stylist/Stylist.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftRLP/SwiftRLP.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyOnboard/SwiftyOnboard.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
-				"${BUILT_PRODUCTS_DIR}/Yams/Yams.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium/libsodium.framework",
 				"${BUILT_PRODUCTS_DIR}/scrypt/scrypt.framework",
 				"${BUILT_PRODUCTS_DIR}/secp256k1_swift/secp256k1_swift.framework",
@@ -1478,7 +1423,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FTIndicator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Haring.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KZFileWatchers.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lisk.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageInputBar.framework",
@@ -1493,11 +1437,9 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Result.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SipHash.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Stylist.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftRLP.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyOnboard.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Yams.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/scrypt.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/secp256k1_swift.framework",
@@ -1564,7 +1506,6 @@
 			files = (
 				E908472A2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift in Sources */,
 				64A223D620F760BB005157CB /* Localization.swift in Sources */,
-				E93E289121FE18B50044F7C7 /* ThemesManager.swift in Sources */,
 				E94E7B08205D4CB80042B639 /* SharedRoutes.swift in Sources */,
 				E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */,
 				E9960B3621F5154300C840A8 /* DummyAccount+CoreDataProperties.swift in Sources */,
@@ -1573,7 +1514,6 @@
 				E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */,
 				E908472F2196FEA80095825D /* BaseTransaction+CoreDataProperties.swift in Sources */,
 				E94008872114F05B00CD2D67 /* AddressValidationResult.swift in Sources */,
-				E93E288721FE16580044F7C7 /* AdamantTheme.swift in Sources */,
 				E974D168215D033C003AD7E8 /* ChatCell.swift in Sources */,
 				64A223D820F7A08E005157CB /* LskApiService.swift in Sources */,
 				E94008702114EA6800CD2D67 /* AdamantBalanceFormat.swift in Sources */,
@@ -1591,7 +1531,6 @@
 				E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */,
 				644EC35E20F34F1E00F40C73 /* DelegateDetailsViewController.swift in Sources */,
 				E9942B80203C058C00C163AF /* QRGeneratorViewController.swift in Sources */,
-				E93E289521FE316F0044F7C7 /* Styles.swift in Sources */,
 				E921597520611A6A0000CA5C /* AdamantReachability.swift in Sources */,
 				E9960B3321F5154300C840A8 /* BaseAccount+CoreDataClass.swift in Sources */,
 				E9FCA1E6218334C00005E83D /* SimpleTransactionDetails.swift in Sources */,
@@ -1613,7 +1552,6 @@
 				E983AE2A20E65F3200497E1A /* AccountViewController.swift in Sources */,
 				E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */,
 				6416B19F21AD7CBE006089AC /* LskWalletViewController.swift in Sources */,
-				E93E288B21FE16EB0044F7C7 /* ThemeLight.swift in Sources */,
 				64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */,
 				E9147B612050599000145913 /* LoginViewController+QR.swift in Sources */,
 				E9147B6F205088DE00145913 /* LoginViewController+Pinpad.swift in Sources */,
@@ -1654,7 +1592,6 @@
 				E96BBE3321F71290009AA738 /* BuyAndSellViewController.swift in Sources */,
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E941CCDE20E7B70200C96220 /* WalletCollectionViewCell.swift in Sources */,
-				E93303DA22032CB00082F128 /* ThemeTableViewCell.swift in Sources */,
 				E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */,
 				644793C32166314A00FC4CF5 /* OnboardPage.swift in Sources */,
 				E91947B22000246A001362F8 /* AdamantError.swift in Sources */,
@@ -1677,7 +1614,6 @@
 				E94008722114EACF00CD2D67 /* WalletAccount.swift in Sources */,
 				E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */,
 				E9CAE8D42018AC1800345E76 /* AdamantApi+Keys.swift in Sources */,
-				E93E288F21FE17E30044F7C7 /* ThemeDark.swift in Sources */,
 				E9C51EEF20139DC600385EB7 /* TransactionIdResponse.swift in Sources */,
 				E9722066201F42BB004F2AAD /* CoreDataStack.swift in Sources */,
 				E913C8F21FFFA51D001A83F7 /* AppDelegate.swift in Sources */,
@@ -1690,7 +1626,6 @@
 				E9150B802066861D0065A985 /* ChatViewController+MessageKit.swift in Sources */,
 				E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */,
 				E90847322196FEA80095825D /* TransferTransaction+CoreDataClass.swift in Sources */,
-				E93E289321FE1BCF0044F7C7 /* ThemeBase.swift in Sources */,
 				645AE06621E67D3300AD3623 /* UITextField+adamant.swift in Sources */,
 				E90847392196FEF50095825D /* BaseTransaction+TransactionDetails.swift in Sources */,
 				649D6BF021BFF481009E727B /* AdamantChatsProvider+search.swift in Sources */,
@@ -1776,7 +1711,6 @@
 				64EE46B220FE0C8D00194DDA /* LskTransactionsViewController.swift in Sources */,
 				E94008832114EE4700CD2D67 /* LskWallet.swift in Sources */,
 				E93EB09F20DA3FA4001F9601 /* NodesEditorRoutes.swift in Sources */,
-				E93303D72201C89F0082F128 /* ThemesViewController.swift in Sources */,
 				E98FC34220F9209900032D65 /* UIColor+adamant.swift in Sources */,
 				E948E04C2027679300975D6B /* AdamantFormattingTools.swift in Sources */,
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,

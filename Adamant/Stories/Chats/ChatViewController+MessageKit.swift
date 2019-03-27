@@ -237,7 +237,7 @@ extension ChatViewController: MessagesDisplayDelegate {
     
     func detectorAttributes(for detector: DetectorType, and message: MessageType, at indexPath: IndexPath) -> [NSAttributedString.Key : Any] {
         if detector == .url {
-            return [NSAttributedString.Key.foregroundColor:UIColor.adamant.activeColor]
+            return [NSAttributedString.Key.foregroundColor:UIColor.adamant.active]
         }
         return [:]
     }
@@ -359,7 +359,6 @@ extension ChatViewController: MessageCellDelegate {
         if url.absoluteString.starts(with: "http") {
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
-            safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
             present(safari, animated: true, completion: nil)
         } else if url.absoluteString.starts(with: "mailto") {
             if UIApplication.shared.canOpenURL(url) {
@@ -619,8 +618,8 @@ extension MessageTransaction: MessageType {
         if isMarkdown {
             let parser = MessageTransaction.markdownParser
             parser.color = UIColor.adamant.primary
-            parser.link.color = UIColor.adamant.activeColor
-            parser.automaticLink.color = UIColor.adamant.activeColor
+            parser.link.color = UIColor.adamant.active
+            parser.automaticLink.color = UIColor.adamant.active
             return MessageKind.attributedText(parser.parse(message))
         } else {
             return MessageKind.text(message)

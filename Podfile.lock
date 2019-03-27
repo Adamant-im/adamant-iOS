@@ -18,7 +18,6 @@ PODS:
   - FTIndicator/FTToastIndicator (1.2.9)
   - Haring (2.1)
   - KeychainAccess (3.1.2)
-  - KZFileWatchers (1.0.5)
   - libsodium (1.0.12)
   - Lisk (1.1.0):
     - CryptoSwift (~> 0.12.0)
@@ -49,9 +48,6 @@ PODS:
     - CryptoSwift (~> 0.11)
   - secp256k1_swift (1.0.3)
   - SipHash (1.2.2)
-  - Stylist (0.2.1):
-    - KZFileWatchers (~> 1.0.5)
-    - Yams (~> 1.0.0)
   - swift_qrcodejs (1.0.1)
   - SwiftRLP (1.2):
     - BigInt (~> 3.1)
@@ -65,7 +61,6 @@ PODS:
     - scrypt (~> 2.0)
     - secp256k1_swift (~> 1.0.3)
     - SwiftRLP (~> 1.1)
-  - Yams (1.0.1)
 
 DEPENDENCIES:
   - Alamofire
@@ -88,7 +83,6 @@ DEPENDENCIES:
   - QRCodeReader.swift
   - ReachabilitySwift
   - RNCryptor
-  - Stylist
   - SwiftyOnboard (from `https://github.com/RealBonus/SwiftyOnboard`, branch `feature/customStyle`)
   - Swinject
   - web3swift
@@ -106,7 +100,6 @@ SPEC REPOS:
     - FTIndicator
     - Haring
     - KeychainAccess
-    - KZFileWatchers
     - libsodium
     - MessageInputBar
     - MessageKit
@@ -122,12 +115,10 @@ SPEC REPOS:
     - scrypt
     - secp256k1_swift
     - SipHash
-    - Stylist
     - swift_qrcodejs
     - SwiftRLP
     - Swinject
     - web3swift
-    - Yams
 
 EXTERNAL SOURCES:
   Lisk:
@@ -156,7 +147,6 @@ SPEC CHECKSUMS:
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   Haring: b3a8495c073a016f03296d67debc609a7ecf7710
   KeychainAccess: b3816fddcf28aa29d94b10ec305cd52be14c472b
-  KZFileWatchers: cdb033e4120fbe61c8e0f4df3613d5894741653d
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   Lisk: 2b21f9a60f4b1583349a1b1677d83781ec32ca70
   MessageInputBar: e81c7535347f1f7b923de7080409a535a004b6e4
@@ -173,14 +163,12 @@ SPEC CHECKSUMS:
   scrypt: 3fe5b1a3b0976f97cd87488673a8f7c65708cc84
   secp256k1_swift: 4fc5c4b2d2c6d21ee8ccb868cdc92da12f38bed9
   SipHash: fad90a4683e420c52ef28063063dbbce248ea6d4
-  Stylist: 62917294a7b21ef61735a7067c3e9232d14ceb6f
   swift_qrcodejs: c181fe5c849d30c699546a23762d7e3dd143ab37
   SwiftRLP: 98a02b2210128353ca02e4c2f4d83e2a9796db4f
   SwiftyOnboard: de60e90c2af23dd61b01ec0c6a8d0be3370f857b
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: d80d1b9a3feca16e614acec9eea47ec26310d37d
-  Yams: 572f625a8b719b73e0b57fd313c680f3e2161fe9
 
-PODFILE CHECKSUM: bca4bad85b3c921d691ed32e78fb34ad530f997f
+PODFILE CHECKSUM: 1a42b369e3317521b2060baaf7b7bc56d7e6adb6
 
-COCOAPODS: 1.6.0.beta.2
+COCOAPODS: 1.6.0

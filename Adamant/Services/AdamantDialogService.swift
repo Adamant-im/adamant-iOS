@@ -326,8 +326,6 @@ extension AdamantDialogService {
         
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
         
-        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
-        
         return alert
     }
     
@@ -351,8 +349,6 @@ extension AdamantDialogService {
         })
         
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-        
-        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
         
         if Thread.isMainThread {
             present(alert, animated: true, completion: nil)
@@ -445,8 +441,6 @@ extension AdamantDialogService {
         } else if  let barButtonItem = from as? UIBarButtonItem {
             alert.popoverPresentationController?.barButtonItem = barButtonItem
         }
-        
-        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
         
         present(alert, animated: true, completion: nil)
     }

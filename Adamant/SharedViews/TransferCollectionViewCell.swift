@@ -179,8 +179,8 @@ extension TransactionStatus {
         switch self {
         case .notInitiated, .updating: return UIColor.adamant.secondary
         case .pending: return UIColor.adamant.primary
-        case .success: return UIColor.adamant.activeColor
-        case .warning, .failed: return UIColor.adamant.alertColor
+        case .success: return UIColor.adamant.active
+        case .warning, .failed: return UIColor.adamant.alert
         }
     }
 }

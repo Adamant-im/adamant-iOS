@@ -11,8 +11,6 @@ import Swinject
 import CryptoSwift
 import CoreData
 
-import Stylist
-
 // MARK: - Constants
 extension String.adamantLocalized {
 	struct tabItems {
@@ -115,19 +113,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dialogService = container.resolve(DialogService.self)
         addressBookService = container.resolve(AddressBookService.self)
         
-        ThemesManager.shared.securedStore = container.resolve(SecuredStore.self)
-		
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
 		window!.rootViewController = UITabBarController()
+        window!.rootViewController!.view.backgroundColor = .white
+        window!.tintColor = UIColor.adamant.primary
         
-        // MARK: 2.1 Init Themes
-        ThemesManager.addCustomStyleProperties()
-        observeThemeChange()
-        
-        window!.rootViewController?.view.backgroundColor = ThemesManager.shared.currentTheme.background
-        window!.tintColor = ThemesManager.shared.currentTheme.primary
-
         // MARK: 3. Prepare pages
         guard let router = container.resolve(Router.self) else {
             fatalError("Failed to get Router")
@@ -483,14 +474,4 @@ extension AppDelegate {
 		}
         */
 	}
-}
-
-
-// MARK: - Stylist
-extension AppDelegate: Themeable {
-    func apply(theme: AdamantTheme) {
-        Stylist.shared.addTheme(theme.theme, name: "main")
-        window!.rootViewController?.view.backgroundColor = ThemesManager.shared.currentTheme.background
-        window!.tintColor = ThemesManager.shared.currentTheme.primary
-    }
 }

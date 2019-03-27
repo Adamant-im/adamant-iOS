@@ -63,7 +63,6 @@ class OnboardViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        onboarding.style = .custom(color: OnboardViewController.themeColor)
         onboarding.delegate = self
         onboarding.dataSource = self
         onboarding.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "stripeBg"))//UIColor.adamant.background

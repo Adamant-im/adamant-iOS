@@ -88,10 +88,6 @@ class NodesListViewController: FormViewController {
             navigationItem.largeTitleDisplayMode = .always
         }
         
-        self.tableView.setStyle(.baseTable)
-        navigationController?.navigationBar.setStyle(.baseNavigationBar)
-        view.setStyles([.primaryBackground, .primaryTint])
-		
         if splitViewController == nil, navigationController?.viewControllers.count == 1 {
             let done = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(NodesListViewController.close))
             navigationItem.rightBarButtonItem = done
@@ -123,11 +119,7 @@ class NodesListViewController: FormViewController {
 			cell.selectionStyle = .gray
 		}.onCellSelection { [weak self] (_, _) in
 			self?.createNewNode()
-		}.cellUpdate { (cell, _) in
-            cell.style = AdamantThemeStyle.commonTableViewCell
-            cell.textLabel?.setStyle(.primaryText)
 		}
-			
 			
 		// MARK: Reset
 			
@@ -139,9 +131,6 @@ class NodesListViewController: FormViewController {
 			$0.title = Rows.reset.localized
 		}.onCellSelection { [weak self] (_, _) in
 			self?.resetToDefault()
-		}.cellUpdate { (cell, _) in
-            cell.style = AdamantThemeStyle.commonTableViewCell
-            cell.textLabel?.setStyle(.primaryText)
 		}
     }
 	
@@ -221,7 +210,6 @@ extension NodesListViewController {
 			self?.nodesSource.saveNodes()
 		}))
 		
-        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 		present(alert, animated: true, completion: nil)
 	}
 	
@@ -348,15 +336,13 @@ extension NodesListViewController {
 			if #available(iOS 11,*) {
 				$0.trailingSwipe.performsFirstActionWithFullSwipe = true
 			}
-		}.cellUpdate({ (cell, _) in
+		}.cellUpdate { (cell, _) in
 			if let label = cell.textLabel {
 				label.textColor = UIColor.adamant.primary
 			}
 			
 			cell.accessoryType = .disclosureIndicator
-            cell.setStyles([.baseTableViewCell, .secondaryBackground])
-            cell.textLabel?.setStyle(.primaryText)
-		}).onCellSelection { [weak self] (_, row) in
+		}.onCellSelection { [weak self] (_, row) in
 			guard let node = row.value, let tag = row.tag else {
 				return
 			}
