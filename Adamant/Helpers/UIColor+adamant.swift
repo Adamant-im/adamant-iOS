@@ -33,6 +33,9 @@ extension UIColor {
 		/// Table row icons color, ~45% gray
 		static let tableRowIcons = UIColor(red: 0.45, green: 0.45, blue: 0.45, alpha: 1)
         
+        /// Switch onTintColor
+        static let switchColor = UIColor(hex: "#179cec")
+        
 		// MARK: Chat colors
 		
 		/// User chat bubble background, ~4% gray

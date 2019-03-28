@@ -392,6 +392,8 @@ class AccountViewController: FormViewController {
             $0.title = Rows.stayIn.localized
             $0.cell.imageView?.image = Rows.stayIn.image
             $0.value = accountService.hasStayInAccount
+        }.cellUpdate { (cell, _) in
+            cell.switchControl.onTintColor = UIColor.adamant.switchColor
         }.onChange { [weak self] row in
             guard let enabled = row.value else {
                 return
@@ -424,7 +426,7 @@ class AccountViewController: FormViewController {
                 return !showBiometry
             })
         }.cellUpdate { (cell, _) in
-            cell.switchControl.onTintColor = UIColor.adamant.secondary
+            cell.switchControl.onTintColor = UIColor.adamant.switchColor
         }.onChange { [weak self] row in
             let value = row.value ?? false
             self?.setBiometry(enabled: value)
