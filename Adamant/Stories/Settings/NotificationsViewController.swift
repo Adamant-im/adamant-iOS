@@ -9,7 +9,7 @@
 import UIKit
 import Eureka
 import SafariServices
-import Haring
+import MarkdownKit
 
 class NotificationsViewController: FormViewController {
 
@@ -59,6 +59,12 @@ class NotificationsViewController: FormViewController {
     var dialogService: DialogService!
     var notificationsService: NotificationsService!
     
+    private lazy var markdownParser: MarkdownParser = {
+        let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
+        parser.link.color = UIColor.adamant.secondary
+        return parser
+    }()
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -100,14 +106,15 @@ class NotificationsViewController: FormViewController {
         let descriptionRow = TextAreaRow() {
             $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
             $0.tag = Rows.description.tag
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, _) in
             cell.textView.isSelectable = false
             cell.textView.isEditable = false
             
-            let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
-            parser.color = UIColor.adamant.primary
-            parser.link.color = UIColor.adamant.secondary
-            cell.textView.attributedText = parser.parse(Rows.description.localized)
+            if let parser = self?.markdownParser {
+                cell.textView.attributedText = parser.parse(Rows.description.localized)
+            } else {
+                cell.textView.text = Rows.description.localized
+            }
         }
         
         // Github readme

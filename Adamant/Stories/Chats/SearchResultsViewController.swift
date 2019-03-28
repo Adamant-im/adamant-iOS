@@ -8,7 +8,7 @@
 
 import UIKit
 import Swinject
-import Haring
+import MarkdownKit
 
 extension String.adamantLocalized {
     struct search {

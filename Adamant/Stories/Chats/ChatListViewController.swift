@@ -8,7 +8,7 @@
 
 import UIKit
 import CoreData
-import Haring
+import MarkdownKit
 
 extension String.adamantLocalized {
 	struct chatList {
@@ -58,7 +58,15 @@ class ChatListViewController: UIViewController {
         return refreshControl
     }()
     
-    private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize))
+    private lazy var markdownParser: MarkdownParser = {
+        let parser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize),
+                                    color: UIColor.adamant.primary,
+                                    enabledElements: .disabledAutomaticLink)
+        
+        parser.link.color = UIColor.adamant.active
+        
+        return parser
+    }()
 	
     // MARK: Busy indicator
     
@@ -653,10 +661,6 @@ extension ChatListViewController {
 	}
     
     private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
-        markdownParser.color = UIColor.adamant.primary
-        markdownParser.link.color = UIColor.adamant.active
-        markdownParser.automaticLinkDetectionEnabled = false
-        
         switch transaction {
         case let message as MessageTransaction:
             guard let text = message.message else {

@@ -9,7 +9,7 @@
 import Foundation
 import Eureka
 import SafariServices
-import Haring
+import MarkdownKit
 
 // MARK: - Localization
 extension String.adamantLocalized {

@@ -8,7 +8,7 @@ target 'Adamant' do
   pod 'KeychainAccess' # Keychain
   pod 'Swinject' # Dependency Injection
   pod 'ReachabilitySwift' # Network status
-  pod 'Haring' # Markdown parser
+  pod 'MarkdownKit', :git => 'https://github.com/RealBonus/MarkdownKit' # Markdown parser, forked fixing whitespaces '5 * 5 * 6'
   pod 'DateToolsSwift' # Date formatter tools
   pod 'ProcedureKit' # Async programming tools
   

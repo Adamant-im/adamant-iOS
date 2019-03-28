@@ -10,7 +10,7 @@ import Foundation
 import MessageKit
 import MessageInputBar
 import SafariServices
-import Haring
+import MarkdownKit
 
 
 // MARK: - Tools
@@ -616,11 +616,8 @@ extension MessageTransaction: MessageType {
 		}
 		
         if isMarkdown {
-            let parser = MessageTransaction.markdownParser
-            parser.color = UIColor.adamant.primary
-            parser.link.color = UIColor.adamant.active
-            parser.automaticLink.color = UIColor.adamant.active
-            return MessageKind.attributedText(parser.parse(message))
+            let markdown = MessageTransaction.markdownParser.parse(message)
+            return MessageKind.attributedText(markdown)
         } else {
             return MessageKind.text(message)
         }
@@ -630,7 +627,13 @@ extension MessageTransaction: MessageType {
         return self.statusEnum
     }
     
-    private static let markdownParser = MarkdownParser(font: UIFont.adamantChatDefault)
+    private static let markdownParser: MarkdownParser = {
+        let parser = MarkdownParser(font: UIFont.adamantChatDefault,
+                                    color: UIColor.adamant.primary)
+        parser.link.color = UIColor.adamant.active
+        parser.automaticLink.color = UIColor.adamant.active
+        return parser
+    }()
 }
 
 // MARK: RichMessageTransaction

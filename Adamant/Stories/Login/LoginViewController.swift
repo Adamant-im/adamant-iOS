@@ -8,7 +8,7 @@
 
 import UIKit
 import Eureka
-import Haring
+import MarkdownKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
