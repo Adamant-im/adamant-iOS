@@ -70,7 +70,7 @@
                                 </userDefinedRuntimeAttributes>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="1fX-7h-3ZM" secondAttribute="trailing" priority="750" constant="12" id="8af-YP-Iw0"/>
                             <constraint firstItem="o85-0D-Zxx" firstAttribute="top" secondItem="AZm-82-9YR" secondAttribute="bottom" constant="8" id="9bV-32-MQc"/>

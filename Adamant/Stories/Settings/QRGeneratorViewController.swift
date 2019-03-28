@@ -135,8 +135,6 @@ class QRGeneratorViewController: FormViewController {
 			$0.placeholder = String.adamantLocalized.qrGenerator.passphrasePlaceholder
 			$0.tag = Rows.passphrase.tag
 			$0.textAreaHeight = .dynamic(initialTextViewHeight: 28.0) // 28 for textView and 8+8 for insets
-		}.cellUpdate { (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
 		
 		<<< ButtonRow() {
@@ -144,8 +142,6 @@ class QRGeneratorViewController: FormViewController {
 			$0.tag = Rows.generateButton.tag
 		}.onCellSelection { [weak self] (cell, row) in
 			self?.generateQr()
-		}.cellUpdate { (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
     }
 	

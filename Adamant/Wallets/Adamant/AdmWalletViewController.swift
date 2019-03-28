@@ -160,30 +160,6 @@ class AdmWalletViewController: WalletViewControllerBase {
         }
     }
     
-    private func buildUrlRow(title: String, value: String?, tag: String, urlRaw: String, image: UIImage?) -> LabelRow {
-        let row = LabelRow() {
-            $0.tag = tag
-            $0.title = title
-            $0.value = value
-            $0.cell.imageView?.image = image
-            $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
-            $0.cell.selectionStyle = .gray
-            }.cellUpdate { (cell, _) in
-                cell.accessoryType = .disclosureIndicator
-            }.onCellSelection { [weak self] (_, _) in
-                guard let url = URL(string: urlRaw) else {
-                    self?.dialogService.showError(withMessage: "Failed to create URL with string: \(urlRaw)", error: nil)
-                    return
-                }
-                
-                let safari = SFSafariViewController(url: url)
-                safari.preferredControlTintColor = UIColor.adamant.primary
-                self?.present(safari, animated: true, completion: nil)
-        }
-        
-        return row
-    }
-    
     override func includeLogoInQR() -> Bool {
         return true
     }

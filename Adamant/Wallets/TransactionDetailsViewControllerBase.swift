@@ -436,6 +436,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }.cellSetup { (cell, _) in
                 cell.selectionStyle = .gray
             }.cellUpdate { (cell, _) in
+                cell.textView?.backgroundColor = UIColor.clear
                 cell.textView.isSelectable = false
                 cell.textView.isEditable = false
             }.onCellSelection { [weak self] (cell, row) in

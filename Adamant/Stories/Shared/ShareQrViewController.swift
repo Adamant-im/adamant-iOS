@@ -82,7 +82,7 @@ class ShareQrViewController: FormViewController {
 	// MARK: - Lifecycle
 	override func viewDidLoad() {
 		super.viewDidLoad()
-        
+		
 		// MARK: QR code
         let qrSection = Section()
         
@@ -90,7 +90,7 @@ class ShareQrViewController: FormViewController {
 			$0.value = qrCode
 			$0.tag = Rows.qr.tag
 			$0.cell.selectionStyle = .none
-			
+            
 			if let sharingTip = sharingTip {
 				$0.cell.tipLabel.text = sharingTip
 			} else {
@@ -126,8 +126,6 @@ class ShareQrViewController: FormViewController {
 			case .restricted, .denied:
 				self?.dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.shared.photolibraryNotAuthorized)
 			}
-		}.cellUpdate { (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
 			
 		// Share
@@ -161,8 +159,6 @@ class ShareQrViewController: FormViewController {
 			}
 			
 			self?.present(vc, animated: true, completion: nil)
-		}.cellUpdate { (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
 		
 		let cancelRow = ButtonRow() {
@@ -170,8 +166,6 @@ class ShareQrViewController: FormViewController {
 			$0.title = Rows.cancelButton.localized
 		}.onCellSelection { [weak self] (cell, row) in
 			self?.close()
-		}.cellUpdate { (cell, row) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
         
         buttonsSection.append(contentsOf: [photolibraryRow, shareRow, cancelRow])

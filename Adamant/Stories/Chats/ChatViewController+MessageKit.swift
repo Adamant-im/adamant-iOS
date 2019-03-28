@@ -10,7 +10,7 @@ import Foundation
 import MessageKit
 import MessageInputBar
 import SafariServices
-import Haring
+import MarkdownKit
 
 
 // MARK: - Tools
@@ -54,7 +54,7 @@ extension ChatViewController: MessagesDataSource {
     
     func cellTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
         if self.shouldDisplayHeader(for: message, at: indexPath, in: self.messagesCollectionView) {
-            return NSAttributedString(string: message.sentDate.humanizedDay(), attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.gray])
+            return NSAttributedString(string: message.sentDate.humanizedDay(), attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.adamant.secondary])
         }
         return nil
     }
@@ -67,10 +67,10 @@ extension ChatViewController: MessagesDataSource {
             
             switch transaction.statusEnum {
             case .failed:
-                return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.darkText])
+                return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.adamant.primary])
                 
             case .pending:
-                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.darkText])
+                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.adamant.primary])
                 
             case .delivered:
                 return nil
@@ -111,7 +111,7 @@ extension ChatViewController: MessagesDataSource {
 			}
 		}
 		
-		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption2)])
+		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption2), NSAttributedString.Key.foregroundColor: UIColor.adamant.secondary])
 	}
     
     func customCell(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
@@ -228,12 +228,19 @@ extension ChatViewController: MessagesDisplayDelegate {
 	}
 	
 	func textColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
-		return UIColor.darkText
+		return UIColor.adamant.primary
 	}
 	
 	func enabledDetectors(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> [DetectorType] {
 		return [.url]
 	}
+    
+    func detectorAttributes(for detector: DetectorType, and message: MessageType, at indexPath: IndexPath) -> [NSAttributedString.Key : Any] {
+        if detector == .url {
+            return [NSAttributedString.Key.foregroundColor:UIColor.adamant.active]
+        }
+        return [:]
+    }
     
     func configureAccessoryView(_ accessoryView: UIView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
         guard let message = message as? MessageTransaction else {
@@ -609,7 +616,8 @@ extension MessageTransaction: MessageType {
 		}
 		
         if isMarkdown {
-            return MessageKind.attributedText(MessageTransaction.markdownParser.parse(message))
+            let markdown = MessageTransaction.markdownParser.parse(message)
+            return MessageKind.attributedText(markdown)
         } else {
             return MessageKind.text(message)
         }
@@ -619,7 +627,13 @@ extension MessageTransaction: MessageType {
         return self.statusEnum
     }
     
-    private static let markdownParser = MarkdownParser(font: UIFont.adamantChatDefault)
+    private static let markdownParser: MarkdownParser = {
+        let parser = MarkdownParser(font: UIFont.adamantChatDefault,
+                                    color: UIColor.adamant.primary)
+        parser.link.color = UIColor.adamant.active
+        parser.automaticLink.color = UIColor.adamant.active
+        return parser
+    }()
 }
 
 // MARK: RichMessageTransaction

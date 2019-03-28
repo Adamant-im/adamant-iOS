@@ -34,8 +34,6 @@ class WalletCollectionViewCell: PagingCell {
             balanceLabel.text = String.adamantLocalized.account.updatingBalance
         }
 		
-		accessoryContainerView.accessoriesBackgroundColor = options.indicatorColor
-		
 		if item.notifications > 0 {
 			accessoryContainerView.setAccessory(AccessoryType.label(text: String(item.notifications)), at: .topRight)
 		} else {

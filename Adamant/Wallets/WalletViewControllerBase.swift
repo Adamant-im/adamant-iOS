@@ -16,6 +16,10 @@ extension String.adamantLocalized {
     }
 }
 
+protocol WalletViewControllerDelegate: class {
+    func walletViewControllerSelectedRow(_ viewController: WalletViewControllerBase)
+}
+
 class WalletViewControllerBase: FormViewController, WalletViewController {
 	// MARK: - Rows
 	enum BaseRows {
@@ -53,6 +57,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 	
 	var service: WalletService?
 	
+    weak var delegate: WalletViewControllerDelegate?
+    
 	// MARK: - IBOutlets
 	
 	@IBOutlet weak var walletTitleLabel: UILabel!
@@ -84,7 +90,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}.onCellSelection { [weak self] (cell, row) in
+        }.onCellSelection { [weak self] (cell, row) in
             row.deselect()
 			let completion = { [weak self] in
 				guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
@@ -144,9 +150,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			balanceRow.cell.selectionStyle = .gray
 			balanceRow.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
-			}.onCellSelection { [weak self] (_, row) in
-                row.deselect()
-				guard let service = self?.service as? WalletServiceWithTransfers else {
+            }.onCellSelection { [weak self] (_, row) in
+                guard let service = self?.service as? WalletServiceWithTransfers else {
 					return
 				}
 				
@@ -156,6 +161,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                     split.showDetailViewController(details, sender: self)
                 } else {
                     self?.navigationController?.pushViewController(vc, animated: true )
+                }
+                
+                if let vc = self, let delegate = vc.delegate {
+                    delegate.walletViewControllerSelectedRow(vc)
                 }
 			}
 		}
@@ -173,7 +182,6 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
 			}.onCellSelection { [weak self] (_, row) in
-                row.deselect()
 				guard let service = self?.service as? WalletServiceWithSend else {
 					return
 				}
@@ -192,6 +200,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                     } else {
                         self?.present(vc, animated: true)
                     }
+                }
+                
+                if let vc = self, let delegate = vc.delegate {
+                    delegate.walletViewControllerSelectedRow(vc)
                 }
 			}
 			

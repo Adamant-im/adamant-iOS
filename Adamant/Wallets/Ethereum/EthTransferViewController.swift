@@ -168,6 +168,7 @@ class EthTransferViewController: TransferViewControllerBase {
 			let prefix = UILabel()
 			prefix.text = "0x"
 			prefix.sizeToFit()
+            
 			let view = UIView()
 			view.addSubview(prefix)
 			view.frame = prefix.frame
@@ -176,7 +177,7 @@ class EthTransferViewController: TransferViewControllerBase {
 			
 			if recipientIsReadonly {
 				$0.disabled = true
-				prefix.isEnabled = false
+//                prefix.isEnabled = false
 			}
 		}.cellUpdate { (cell, row) in
 			if let text = cell.textField.text {

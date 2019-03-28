@@ -139,6 +139,15 @@
 /* Account tab: 'Get free tokens' button */
 "AccountTab.Row.FreeTokens" = "Free ADM tokens";
 
+/* Account tab: 'Theme' row */
+"AccountTab.Row.Theme" = "Theme";
+
+/* Account tab: 'Theme' row value 'Light' */
+"AccountTab.Row.Theme.Light" = "Light";
+
+/* Account tab: 'Theme' row value 'Dark' */
+"AccountTab.Row.Theme.Dark" = "Dark";
+
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "About";
 
@@ -189,6 +198,15 @@
 
 /* ChatList: outgoing message prefix */
 "ChatListPage.SentMessagePrefix" = "You: ";
+
+/* ChatList: SearchBar placeholder text */
+"ChatListPage.SearchBar.Placeholder" = "Search for contacts or messages";
+
+/* SearchPage: Contacts header */
+"SearchPage.Contacts" = "Contacts";
+
+/* SearchPage: Messages header */
+"SearchPage.Messages" = "Messages";
 
 /* ChatList: First syncronization is in progress */
 "ChatListPage.SyncingChats" = "Syncing chats…";
@@ -243,6 +261,9 @@
 
 /* Chat: status message for pending chat transaction */
 "ChatScene.MessageStatus.Pending" = "Pending";
+
+/* Chat: status message for warning chat transaction */
+"ChatScene.MessageStatus.Warning" = "Warning";
 
 /* Chat: Body for actions menu */
 "ChatScene.Actions.Body" = "New name for %@";
@@ -426,6 +447,9 @@
 
 /* New chat: Show QR for my address button */
 "NewChatScene.MyQr" = "Show my QR";
+
+/* New Chat: 'What does it mean?', a help button for info about uninitialized accounts. */
+"NewChatScene.NotInitialized.HelpButton" = "What does it mean?";
 
 /* NodesList: Button label */
 "NodesList.NodesList" = "Nodes list";

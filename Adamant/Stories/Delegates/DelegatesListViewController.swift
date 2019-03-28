@@ -57,11 +57,7 @@ class DelegatesListViewController: UIViewController {
     
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action:
-            #selector(self.handleRefresh(_:)),
-                                 for: UIControl.Event.valueChanged)
-        refreshControl.tintColor = UIColor.adamant.primary
-        
+        refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
         return refreshControl
     }()
     
@@ -94,7 +90,7 @@ class DelegatesListViewController: UIViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+		
 		// MARK: Initial
         navigationItem.title = String.adamantLocalized.delegates.title
         tableView.register(UINib.init(nibName: "AdamantDelegateCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
@@ -103,7 +99,7 @@ class DelegatesListViewController: UIViewController {
 		
 		// MARK: Search controller
 		if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .always
+            navigationItem.largeTitleDisplayMode = .never
             
 			let controller = UISearchController(searchResultsController: nil)
 			controller.searchResultsUpdater = self
@@ -410,8 +406,8 @@ extension DelegatesListViewController {
 		let totalVoted = delegates.reduce(0) { $0 + ($1.delegate.voted ? 1 : 0) } + upvoted - downvoted
 		
 		let votingEnabled = changes.count > 0 && changes.count <= maxVotes && totalVoted <= maxTotalVotes
-		let newVotesColor = changes.count > maxVotes ? UIColor.red : UIColor.darkText
-		let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.red : UIColor.darkText
+        let newVotesColor = changes.count > maxVotes ? UIColor.adamant.alert : UIColor.adamant.primary
+        let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.adamant.alert : UIColor.adamant.primary
 		
 		
 		if Thread.isMainThread {
@@ -440,8 +436,9 @@ extension DelegatesListViewController {
 			}
 		}
 	}
-    
-    
+}
+
+extension DelegatesListViewController {
     // MARK: Keyboard
     @objc private func keyboardWillShow(notification: Notification) {
         // For some reason we will receive 2 notifications

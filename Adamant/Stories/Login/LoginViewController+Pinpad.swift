@@ -69,7 +69,7 @@ extension LoginViewController {
 				} else {
 					alertVc = nil
 				}
-				
+                
 				if Thread.isMainThread {
 					presenter.dismiss(animated: true, completion: nil)
 					

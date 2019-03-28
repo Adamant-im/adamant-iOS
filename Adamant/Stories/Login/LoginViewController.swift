@@ -8,7 +8,7 @@
 
 import UIKit
 import Eureka
-import Haring
+import MarkdownKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -125,10 +125,10 @@ class LoginViewController: FormViewController {
 	var dialogService: DialogService!
 	var localAuth: LocalAuthentication!
     var router: Router!
+    var apiService: ApiService!
 	
 	// MARK: Properties
 	private var hideNewPassphrase: Bool = true
-	private var generatedPassphrases = [String]()
 	private var firstTimeActive: Bool = true
     
     
@@ -139,8 +139,8 @@ class LoginViewController: FormViewController {
 	
     override func viewDidLoad() {
         super.viewDidLoad()
-		navigationOptions = RowNavigationOptions.Disabled
-		
+        navigationOptions = RowNavigationOptions.Disabled
+        
 		// MARK: Header & Footer
 		if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
 			tableView.tableHeaderView = header
@@ -163,7 +163,7 @@ class LoginViewController: FormViewController {
 		// MARK: Login section
 		form +++ Section(Sections.login.localized) {
 			$0.tag = Sections.login.tag
-			
+            
 			$0.footer = { [weak self] in
 				var footer = HeaderFooterView<UIView>(.callback {
 					let view = ButtonsStripeView.adamantConfigured()
@@ -194,8 +194,9 @@ class LoginViewController: FormViewController {
 		<<< PasswordRow() {
 			$0.tag = Rows.passphrase.tag
 			$0.placeholder = Rows.passphrase.localized
+            $0.placeholderColor = UIColor.adamant.secondary
 			$0.keyboardReturnType = KeyboardReturnTypeConfiguration(nextKeyboardType: .go, defaultKeyboardType: .go)
-		}
+            }
 			
 		// Login with passphrase row
 		<<< ButtonRow() {
@@ -213,8 +214,6 @@ class LoginViewController: FormViewController {
 			}
 			
 			self?.loginWith(passphrase: passphrase)
-		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
 		
 		
@@ -263,7 +262,7 @@ class LoginViewController: FormViewController {
 			cell.tipLabel.textColor = UIColor.adamant.secondary
 			cell.tipLabel.textAlignment = .center
 		}).onCellSelection({ [weak self] (cell, row) in
-			guard let passphrase = self?.generatedPassphrases.last, let dialogService = self?.dialogService else {
+            guard let passphrase = row.value, let dialogService = self?.dialogService else {
 				return
 			}
 			
@@ -284,8 +283,6 @@ class LoginViewController: FormViewController {
 			$0.title = Rows.generateNewPassphraseButton.localized
 		}.onCellSelection { [weak self] (cell, row) in
 			self?.generateNewPassphrase()
-		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
         
         // MARK: Nodes list settings
@@ -305,7 +302,6 @@ class LoginViewController: FormViewController {
 			let nav = UINavigationController(rootViewController: vc)
 			self?.present(nav, animated: true, completion: nil)
 		}
-		
 		
 		// MARK: tableView position tuning
 		if let row: PasswordRow = form.rowBy(tag: Rows.passphrase.tag) {
@@ -347,22 +343,21 @@ extension LoginViewController {
 		
 		dialogService.showProgress(withMessage: String.adamantLocalized.login.loggingInProgressMessage, userInteractionEnable: false)
 		
-		if generatedPassphrases.contains(passphrase) {
-			DispatchQueue.global(qos: .utility).async { [weak self] in
-				self?.createAccountAndLogin(passphrase: passphrase)
-			}
-		} else {
-			DispatchQueue.global(qos: .utility).async { [weak self] in
-				self?.loginIntoExistingAccount(passphrase: passphrase)
-			}
-		}
+        apiService.getAccount(byPassphrase: passphrase) { result in
+            switch result {
+            case .success(_):
+                self.loginIntoExistingAccount(passphrase: passphrase)
+                
+            case .failure(_):
+                self.createAccountAndLogin(passphrase: passphrase)
+            }
+        }
 	}
 	
 	func generateNewPassphrase() {
 		let passphrase = adamantCore.generateNewPassphrase()
-		generatedPassphrases.append(passphrase)
 		
-		hideNewPassphrase = false
+        hideNewPassphrase = false
 		
 		form.rowBy(tag: Rows.saveYourPassphraseAlert.tag)?.evaluateHidden()
 		

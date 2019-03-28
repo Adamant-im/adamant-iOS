@@ -9,7 +9,7 @@
 import Foundation
 import Eureka
 import SafariServices
-import Haring
+import MarkdownKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -130,16 +130,16 @@ class SecurityViewController: FormViewController {
 		
 		navigationItem.title = String.adamantLocalized.security.title
 		navigationOptions = .Disabled
-		
+        
 		// MARK: StayIn
 		// Generate QR
 		let qrRow = LabelRow() {
 			$0.title = Rows.generateQr.localized
 			$0.tag = Rows.generateQr.tag
 			$0.cell.selectionStyle = .gray
-		}.cellUpdate({ (cell, _) in
+		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-		}).onCellSelection { [weak self] (_, _) in
+		}.onCellSelection { [weak self] (_, _) in
 			guard let nav = self?.navigationController, let vc = self?.router.get(scene: AdamantScene.Settings.qRGenerator) else {
 				return
 			}
@@ -158,7 +158,9 @@ class SecurityViewController: FormViewController {
 			}
 			
 			self?.setStayLoggedIn(enabled: enabled)
-		}
+        }.cellUpdate({ (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        })
 		
 		// Biometry
 		let biometryRow = SwitchRow() {
@@ -176,7 +178,9 @@ class SecurityViewController: FormViewController {
 		}.onChange { [weak self] row in
 			let value = row.value ?? false
 			self?.setBiometry(enabled: value)
-		}
+        }.cellUpdate({ (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        })
 		
 		let stayInSection = Section(Sections.security.localized) {
 			$0.tag = Sections.security.tag
@@ -204,7 +208,6 @@ class SecurityViewController: FormViewController {
 		// Section
 		let notificationsSection = Section(Sections.notifications.localized) {
 			$0.tag = Sections.notifications.tag
-			
 			$0.hidden = Condition.function([], { [weak self] _ -> Bool in
 				guard let showNotifications = self?.showLoggedInOptions else {
 					return true
@@ -247,13 +250,12 @@ class SecurityViewController: FormViewController {
 			}
 			
 			let safari = SFSafariViewController(url: url)
-			safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.preferredControlTintColor = UIColor.adamant.primary
 			self?.present(safari, animated: true, completion: nil)
 		}
 		
 		let ansSection = Section(Sections.aboutNotificationTypes.localized) {
 			$0.tag = Sections.aboutNotificationTypes.tag
-			
 			$0.hidden = Condition.function([], { [weak self] _ -> Bool in
 				guard let showNotifications = self?.showLoggedInOptions else {
 					return true

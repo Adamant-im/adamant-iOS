@@ -87,7 +87,7 @@ class NodesListViewController: FormViewController {
         if #available(iOS 11.0, *) {
             navigationItem.largeTitleDisplayMode = .always
         }
-		
+        
         if splitViewController == nil, navigationController?.viewControllers.count == 1 {
             let done = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(NodesListViewController.close))
             navigationItem.rightBarButtonItem = done
@@ -119,10 +119,7 @@ class NodesListViewController: FormViewController {
 			cell.selectionStyle = .gray
 		}.onCellSelection { [weak self] (_, _) in
 			self?.createNewNode()
-		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
-			
 			
 		// MARK: Reset
 			
@@ -134,8 +131,6 @@ class NodesListViewController: FormViewController {
 			$0.title = Rows.reset.localized
 		}.onCellSelection { [weak self] (_, _) in
 			self?.resetToDefault()
-		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
 		}
     }
 	
@@ -341,13 +336,13 @@ extension NodesListViewController {
 			if #available(iOS 11,*) {
 				$0.trailingSwipe.performsFirstActionWithFullSwipe = true
 			}
-		}.cellUpdate({ (cell, _) in
+		}.cellUpdate { (cell, _) in
 			if let label = cell.textLabel {
 				label.textColor = UIColor.adamant.primary
 			}
 			
 			cell.accessoryType = .disclosureIndicator
-		}).onCellSelection { [weak self] (_, row) in
+		}.onCellSelection { [weak self] (_, row) in
 			guard let node = row.value, let tag = row.tag else {
 				return
 			}

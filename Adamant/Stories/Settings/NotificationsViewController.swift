@@ -9,7 +9,7 @@
 import UIKit
 import Eureka
 import SafariServices
-import Haring
+import MarkdownKit
 
 class NotificationsViewController: FormViewController {
 
@@ -59,6 +59,12 @@ class NotificationsViewController: FormViewController {
     var dialogService: DialogService!
     var notificationsService: NotificationsService!
     
+    private lazy var markdownParser: MarkdownParser = {
+        let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
+        parser.link.color = UIColor.adamant.secondary
+        return parser
+    }()
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -100,12 +106,15 @@ class NotificationsViewController: FormViewController {
         let descriptionRow = TextAreaRow() {
             $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
             $0.tag = Rows.description.tag
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, _) in
             cell.textView.isSelectable = false
             cell.textView.isEditable = false
             
-            let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
-            cell.textView.attributedText = parser.parse(Rows.description.localized)
+            if let parser = self?.markdownParser {
+                cell.textView.attributedText = parser.parse(Rows.description.localized)
+            } else {
+                cell.textView.text = Rows.description.localized
+            }
         }
         
         // Github readme
@@ -116,9 +125,9 @@ class NotificationsViewController: FormViewController {
             $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.cellUpdate({ (cell, _) in
+        }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-        }).onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (_, row) in
             guard let url = URL(string: AdamantResources.ansReadmeUrl) else {
                 fatalError("Failed to build ANS URL")
             }

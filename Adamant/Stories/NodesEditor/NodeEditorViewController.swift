@@ -160,9 +160,9 @@ class NodeEditorViewController: FormViewController {
 			$0.placeholder = Rows.host.placeholder
 			
 			$0.value = node?.host
-			}.onChange({ [weak self] (_) in
+			}.onChange { [weak self] (_) in
 				self?.testState = .notTested
-			})
+            }
 			
 		// Port
 		<<< IntRow() {
@@ -175,9 +175,9 @@ class NodeEditorViewController: FormViewController {
 			} else {
 				$0.placeholder = String(URLScheme.default.defaultPort)
 			}
-		}.onChange({ [weak self] (_) in
+		}.onChange { [weak self] (_) in
 			self?.testState = .notTested
-		})
+        }
 		
 		// Scheme
 		<<< PickerInlineRow<URLScheme>() {
@@ -185,9 +185,9 @@ class NodeEditorViewController: FormViewController {
 			$0.tag = Rows.scheme.tag
 			$0.value = node?.scheme ?? URLScheme.default
 			$0.options = [.https, .http]
-		}.onExpandInlineRow({ (_, _, inlineRow) in
+		}.onExpandInlineRow { (cell, _, inlineRow) in
 			inlineRow.cell.height = { 100 }
-		}).onChange({ [weak self] row in
+		}.onChange { [weak self] row in
 			self?.testState = .notTested
 			
 			if let portRow: IntRow = self?.form.rowBy(tag: Rows.port.tag) {
@@ -199,8 +199,7 @@ class NodeEditorViewController: FormViewController {
 				
 				portRow.updateCell()
 			}
-		})
-		
+        }
 		
 		// MARK: - Buttons
 		
@@ -211,7 +210,6 @@ class NodeEditorViewController: FormViewController {
 			$0.title = Rows.testButton.localized
 			$0.tag = Rows.testButton.tag
 		}.cellUpdate { (cell, _) in
-			cell.textLabel?.textColor = UIColor.adamant.primary
 			cell.accessoryType = .disclosureIndicator
 		}.onCellSelection { [weak self] (_, _) in
 			self?.testNode()
@@ -223,8 +221,6 @@ class NodeEditorViewController: FormViewController {
 			<<< ButtonRow() {
 				$0.title = Rows.deleteButton.localized
 				$0.tag = Rows.deleteButton.tag
-			}.cellUpdate { (cell, _) in
-				cell.textLabel?.textColor = UIColor.adamant.primary
 			}.onCellSelection { [weak self] (_, _) in
 				self?.deleteNode()
 			}

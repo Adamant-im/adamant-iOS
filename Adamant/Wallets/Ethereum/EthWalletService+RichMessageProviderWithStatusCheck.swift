@@ -10,9 +10,17 @@ import Foundation
 import web3swift
 
 extension EthWalletService: RichMessageProviderWithStatusCheck {
-    func statusForTransactionBy(hash: String, date: Date?, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void) {
+    func statusFor(transaction: RichMessageTransaction, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void) {
+        guard let hash = transaction.richContent?[RichContentKeys.transfer.hash] else {
+            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction hash", error: nil)))
+            return
+        }
+        
+        // MARK: Get transaction
+        
+        let details: web3swift.TransactionDetails
         do {
-            _ = try web3.eth.getTransactionDetailsPromise(hash).wait()
+            details = try web3.eth.getTransactionDetailsPromise(hash).wait()
         } catch let error as Web3Error {
             completion(.failure(error: error.asWalletServiceError()))
             return
@@ -21,9 +29,19 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
             return
         }
         
+        let status: TransactionStatus
+        let transactionDate: Date
         do {
             let receipt = try web3.eth.getTransactionReceiptPromise(hash).wait()
-            completion(.success(result: receipt.status.asTransactionStatus()))
+            status = receipt.status.asTransactionStatus()
+            
+            guard status == .success, let blockNumber = details.blockNumber, let date = transaction.date as Date? else {
+                completion(.success(result: status))
+                return
+            }
+            
+            transactionDate = date
+            _ = try web3.eth.getBlockByNumberPromise(blockNumber).wait()
         } catch let error as Web3Error {
             let result: WalletServiceResult<TransactionStatus>
             
@@ -37,9 +55,44 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
             }
             
             completion(result)
+            return
         } catch {
             completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: error)))
+            return
         }
+        
+        let start = transactionDate.addingTimeInterval(-60 * 5)
+        let end = transactionDate.addingTimeInterval(60 * 5)
+        let range = start...end
+        let eth = details.transaction
+        
+        // MARK: Check addresses
+        if transaction.isOutgoing {
+            guard let sender = eth.sender?.address, let id = self.ethWallet?.address, sender == id else {
+                completion(.success(result: .warning))
+                return
+            }
+        } else {
+            guard let id = self.ethWallet?.address, eth.to.address == id else {
+                completion(.success(result: .warning))
+                return
+            }
+        }
+        
+        // MARK: Check dates
+        guard range.contains(transaction.dateValue ?? Date()) else {
+            completion(.success(result: .warning))
+            return
+        }
+        
+        // MARK: Compare amounts
+        let realAmount = eth.value.asDecimal(exponent: EthWalletService.currencyExponent)
+        guard let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reported = AdamantBalanceFormat.deserializeBalance(from: raw), reported == realAmount else {
+            completion(.success(result: .warning))
+            return
+        }
+        
+        completion(.success(result: .success))
     }
 }
 

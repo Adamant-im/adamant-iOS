@@ -41,7 +41,7 @@ class ComplexTransferViewController: UIViewController {
         }
         
 		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-		
+        
 		// MARK: Services
 		services = accountService.wallets.compactMap { $0 as? WalletServiceWithSend }
 		
@@ -60,6 +60,8 @@ class ComplexTransferViewController: UIViewController {
 		
 		pagingViewController.dataSource = self
 		pagingViewController.select(index: 0)
+        
+        pagingViewController.borderColor = UIColor.clear
 		
 		view.addSubview(pagingViewController.view)
 		view.constrainToEdges(pagingViewController.view, relativeToSafeArea: true)

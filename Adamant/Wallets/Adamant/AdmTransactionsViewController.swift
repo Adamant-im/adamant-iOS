@@ -21,6 +21,13 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Properties
     var controller: NSFetchedResultsController<TransferTransaction>?
     
+    /*
+     In SplitViewController on iPhones, viewController can still present in memory, but not on screen.
+     In this cases not visible viewController will still mark messages isUnread = false
+     */
+    /// ViewController currently is ontop of the screen.
+    private var isOnTop = false
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -32,13 +39,17 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         currencySymbol = AdmWalletService.currencySymbol
     }
-	
+    
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-		
+		isOnTop = true
 		markTransfersAsRead()
 	}
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        isOnTop = false
+    }
     
     // MARK: - Overrides
     
@@ -53,7 +64,13 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             controller = nil
         }
         
-        tableView.reloadData()
+        if Thread.isMainThread {
+            tableView.reloadData()
+        } else {
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
@@ -128,6 +145,8 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         controller.transaction = transaction
         controller.comment = transaction.comment
+        
+        controller.showToChat = toShowChat(for: transaction)
         
         if let address = accountService.account?.address {
             if address == transaction.senderId {
@@ -214,7 +233,11 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
+        guard let transaction = controller?.object(at: indexPath) else {
+            return false
+        }
+        
+        return toShowChat(for: transaction)
     }
     
     @available(iOS 11.0, *)
@@ -229,7 +252,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         let title = (messeges != nil) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
         
-        let toChat = UIContextualAction(style: .normal, title:  title, handler: { (ac:UIContextualAction, view:UIView, success:(Bool) -> Void) in
+        let toChat = UIContextualAction(style: .normal, title:  title, handler: { (_, _, _) in
             guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
                 // TODO: Log this
                 return
@@ -250,9 +273,17 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             }
         })
         
-        toChat.image = (messeges != nil) ? #imageLiteral(resourceName: "chats_tab") : #imageLiteral(resourceName: "Chat")
+        toChat.image = #imageLiteral(resourceName: "chats_tab")
         toChat.backgroundColor = UIColor.adamant.primary
         return UISwipeActionsConfiguration(actions: [toChat])
+    }
+    
+    private func toShowChat(for transaction: TransferTransaction) -> Bool {
+        guard let partner = transaction.partner as? CoreDataAccount, let chatroom = partner.chatroom, !chatroom.isReadonly else {
+            return false
+        }
+        
+        return true
     }
 }
 
@@ -272,7 +303,7 @@ extension AdmTransactionsViewController: NSFetchedResultsControllerDelegate {
             if let newIndexPath = newIndexPath {
                 tableView.insertRows(at: [newIndexPath], with: .automatic)
                 
-                if let transaction = anObject as? TransferTransaction {
+                if isOnTop, let transaction = anObject as? TransferTransaction {
                     transaction.isUnread = false
                 }
             }

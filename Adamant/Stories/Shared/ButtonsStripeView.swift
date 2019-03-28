@@ -105,7 +105,7 @@ class ButtonsStripeView: UIView {
 				button.heightAnchor.constraint(equalToConstant: buttonsSize).isActive = true
 				button.widthAnchor.constraint(equalToConstant: buttonsSize).isActive = true
 				button.constraints.forEach({$0.identifier = "wh"})
-				
+                
 				stripeStackView.addArrangedSubview(button)
 				buttons?.append(button)
 			}

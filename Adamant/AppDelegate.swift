@@ -11,7 +11,6 @@ import Swinject
 import CryptoSwift
 import CoreData
 
-
 // MARK: - Constants
 extension String.adamantLocalized {
 	struct tabItems {
@@ -113,12 +112,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		notificationService = container.resolve(NotificationsService.self)
         dialogService = container.resolve(DialogService.self)
         addressBookService = container.resolve(AddressBookService.self)
-		
+        
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
 		window!.rootViewController = UITabBarController()
-		window!.rootViewController?.view.backgroundColor = .white
-		window!.tintColor = UIColor.adamant.primary
+        window!.rootViewController!.view.backgroundColor = .white
+        window!.tintColor = UIColor.adamant.primary
         
         // MARK: 3. Prepare pages
         guard let router = container.resolve(Router.self) else {

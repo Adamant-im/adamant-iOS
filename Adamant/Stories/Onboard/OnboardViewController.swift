@@ -63,7 +63,6 @@ class OnboardViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        onboarding.style = .custom(color: OnboardViewController.themeColor)
         onboarding.delegate = self
         onboarding.dataSource = self
         onboarding.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "stripeBg"))//UIColor.adamant.background
@@ -101,18 +100,15 @@ extension OnboardViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
     func swiftyOnboardPageForIndex(_ swiftyOnboard: SwiftyOnboard, index: Int) -> SwiftyOnboardPage? {
         let item = items[index]
         
-        let view = OnboardPage.instanceFromNib() as? OnboardPage
-        view?.image.image = item.image
-        
-        let text = "<span style=\"font-family: Exo2-Regular; font-size: 16\">\(item.text)</span>"
-        
-        if let htmlData = text.data(using: String.Encoding.unicode), let attributedString = try? NSMutableAttributedString(data: htmlData, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil), let view = view {
-            let style = NSMutableParagraphStyle()
-            style.alignment = .center
-            attributedString.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: attributedString.length))
-            view.text.attributedText = attributedString
-            view.text.delegate = self
+        guard let view = OnboardPage.instanceFromNib() as? OnboardPage else {
+            return nil
         }
+        
+        view.image.image = item.image
+        view.text.delegate = self
+        
+        // Font & size logic moved to OnboardPage
+        view.rawRichText = item.text
         
         return view
     }

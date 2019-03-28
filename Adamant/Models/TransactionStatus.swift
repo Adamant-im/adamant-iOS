@@ -14,6 +14,7 @@ enum TransactionStatus: Int16 {
     case pending
     case success
     case failed
+    case warning
     
     var localized: String {
         switch self {
@@ -25,6 +26,8 @@ enum TransactionStatus: Int16 {
             return NSLocalizedString("TransactionStatus.Success", comment: "Transaction status: success")
         case .failed:
             return NSLocalizedString("TransactionStatus.Failed", comment: "Transaction status: transaction failed")
+        case .warning:
+            return NSLocalizedString("TransactionStatus.Warning", comment: "Transaction status: transaction warning")
         }
     }
 }

@@ -8,13 +8,14 @@
 
 import UIKit
 import CoreData
-import Haring
+import MarkdownKit
 
 extension String.adamantLocalized {
 	struct chatList {
 		static let title = NSLocalizedString("ChatListPage.Title", comment: "ChatList: scene title")
 		static let sentMessagePrefix = NSLocalizedString("ChatListPage.SentMessagePrefix", comment: "ChatList: outgoing message prefix")
         static let syncingChats = NSLocalizedString("ChatListPage.SyncingChats", comment: "ChatList: First syncronization is in progress")
+        static let searchPlaceholder = NSLocalizedString("ChatListPage.SearchBar.Placeholder", comment: "ChatList: SearchBar placeholder text")
         
 		private init() {}
 	}
@@ -43,6 +44,8 @@ class ChatListViewController: UIViewController {
 	// MARK: Properties
 	var chatsController: NSFetchedResultsController<Chatroom>?
 	var unreadController: NSFetchedResultsController<ChatTransaction>?
+    
+    var searchController: UISearchController!
 	
 	private var preservedMessagess = [String:String]()
 	
@@ -50,15 +53,20 @@ class ChatListViewController: UIViewController {
 	
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action:
-            #selector(self.handleRefresh(_:)),
-                                 for: UIControl.Event.valueChanged)
+        refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
         refreshControl.tintColor = UIColor.adamant.primary
-        
         return refreshControl
     }()
     
-    private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize))
+    private lazy var markdownParser: MarkdownParser = {
+        let parser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize),
+                                    color: UIColor.adamant.primary,
+                                    enabledElements: .disabledAutomaticLink)
+        
+        parser.link.color = UIColor.adamant.active
+        
+        return parser
+    }()
 	
     // MARK: Busy indicator
     
@@ -68,6 +76,10 @@ class ChatListViewController: UIViewController {
     
     private(set) var isBusy: Bool = true
     
+    // MARK: Keyboard
+    // SplitView sends double notifications about keyboard.
+    private var originalInsets: UIEdgeInsets?
+    private var didShow: Bool = false
     
 	// MARK: Lifecycle
     override func viewDidLoad() {
@@ -79,20 +91,45 @@ class ChatListViewController: UIViewController {
 		}
 
 		navigationItem.title = String.adamantLocalized.chatList.title
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose,
-															target: self,
-															action: #selector(newChat))
+        navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(newChat)),
+            UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(beginSearch))
+        ]
 		
 		// MARK: TableView
 		tableView.dataSource = self
 		tableView.delegate = self
 		tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         tableView.refreshControl = refreshControl
-		
+        
 		if self.accountService.account != nil {
 			initFetchedRequestControllers(provider: chatsProvider)
 		}
-		
+        
+        // MARK: Search controller
+        guard let searchResultController = router.get(scene: AdamantScene.Chats.searchResults) as? SearchResultsViewController else {
+            fatalError("Can't get SearchResultsViewController")
+        }
+        
+        searchResultController.delegate = self
+        
+        searchController = UISearchController(searchResultsController: searchResultController)
+        searchController.searchResultsUpdater = self
+        searchController.searchBar.delegate = self
+        searchController.searchBar.placeholder = String.adamantLocalized.chatList.searchPlaceholder
+        definesPresentationContext = true
+        
+        if #available(iOS 11.0, *) {
+            searchController.obscuresBackgroundDuringPresentation = false
+            searchController.hidesNavigationBarDuringPresentation = true
+            navigationItem.searchController = searchController
+        } else {
+            searchController.dimsBackgroundDuringPresentation = false
+        
+            tableView.tableHeaderView = self.searchController!.searchBar
+            searchController!.searchBar.sizeToFit()
+        }
+        
 		// MARK: Login/Logout
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.initFetchedRequestControllers(provider: self?.chatsProvider)
@@ -121,6 +158,10 @@ class ChatListViewController: UIViewController {
                 self?.setIsBusy(true)
             }
         }
+        
+        // Keyboard
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 	
 	deinit {
@@ -172,7 +213,7 @@ class ChatListViewController: UIViewController {
 	
 	
 	// MARK: Helpers
-	private func chatViewController(for chatroom: Chatroom) -> ChatViewController {
+    private func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil) -> ChatViewController {
 		guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
 			fatalError("Can't get ChatViewController")
 		}
@@ -180,6 +221,10 @@ class ChatListViewController: UIViewController {
 		if let account = accountService.account {
 			vc.account = account
 		}
+        
+        if let message = message {
+            vc.messageToShow = message
+        }
 		
 		vc.hidesBottomBarWhenPushed = true
 		vc.chatroom = chatroom
@@ -349,8 +394,9 @@ extension ChatListViewController {
 		cell.avatarImageView.tintColor = UIColor.adamant.primary
 		cell.borderColor = UIColor.adamant.primary
 		cell.badgeColor = UIColor.adamant.primary
+        cell.lastMessageLabel.textColor = UIColor.adamant.primary
 		cell.borderWidth = 1
-		
+        
 		return cell
 	}
 	
@@ -583,9 +629,9 @@ extension ChatListViewController {
 		}
 	}
 	
-	private func presentChatroom(_ chatroom: Chatroom) {
+    private func presentChatroom(_ chatroom: Chatroom, with message: MessageTransaction? = nil) {
 		// MARK: 1. Create and config ViewController
-        let vc = chatViewController(for: chatroom)
+        let vc = chatViewController(for: chatroom, with: message)
         
         if let split = self.splitViewController {
             let chat = UINavigationController(rootViewController:vc)
@@ -722,7 +768,6 @@ extension ChatListViewController {
 					})
 					
 					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-					
 					self?.present(alert, animated: true, completion: nil)
 				}
 				
@@ -773,7 +818,7 @@ extension ChatListViewController {
 		} else {
 			item = tabBarItem
 		}
-		
+        
 		if let value = value, value > 0 {
 			item.badgeValue = String(value)
 			notificationsService.setBadge(number: value)
@@ -791,4 +836,120 @@ extension ChatListViewController {
 		
 		return vc.chatroom
 	}
+}
+
+// MARK: Search
+
+extension ChatListViewController: UISearchBarDelegate, UISearchResultsUpdating, SearchResultDelegate {
+    @objc
+    func beginSearch() {
+        searchController.searchBar.becomeFirstResponder()
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let vc = searchController.searchResultsController as? SearchResultsViewController, let searchString = searchController.searchBar.text else {
+            return
+        }
+        
+        let contacts = chatsController?.fetchedObjects?.filter { (chatroom) -> Bool in
+            guard let partner = chatroom.partner, !partner.isSystem else {
+                return false
+            }
+            
+            if let address = partner.address {
+                if let name = self.addressBook.addressBook[address] {
+                    return name.localizedCaseInsensitiveContains(searchString) || address.localizedCaseInsensitiveContains(searchString)
+                }
+                return address.localizedCaseInsensitiveContains(searchString)
+            }
+            
+            return false
+        }
+        
+        let messages = chatsProvider.getMessages(containing: searchString, in: nil)
+        
+        vc.updateResult(contacts: contacts, messages: messages, searchText: searchString)
+    }
+    
+    func didSelected(_ message: MessageTransaction) {
+        guard let chatroom = message.chatroom else {
+            dialogService.showError(withMessage: "Error getting chatroom in SearchController result. Please, report an error", error: nil)
+            searchController.dismiss(animated: true, completion: nil)
+            return
+        }
+        
+        searchController.dismiss(animated: true) { [weak self] in
+            guard let presenter = self, let tableView = presenter.tableView else {
+                return
+            }
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+            
+            if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
+                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+            }
+            
+            presenter.presentChatroom(chatroom, with: message)
+        }
+    }
+    
+    func didSelected(_ chatroom: Chatroom) {
+        searchController.dismiss(animated: true) { [weak self] in
+            guard let presenter = self, let tableView = presenter.tableView else {
+                return
+            }
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+            
+            if let indexPath = self?.chatsController?.indexPath(forObject: chatroom) {
+                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+            }
+            
+            presenter.presentChatroom(chatroom)
+        }
+    }
+}
+
+// MARK: Keyboard
+extension ChatListViewController {
+    @objc private func keyboardWillShow(notification: Notification) {
+        guard !didShow else { return }
+        didShow = true
+        
+        guard let frame = notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue else {
+            return
+        }
+        
+        originalInsets = tableView.contentInset
+        
+        var contentInsets = tableView.contentInset
+        
+        if let tabBarHeight = tabBarController?.tabBar.bounds.height {
+            contentInsets.bottom = frame.cgRectValue.size.height - tabBarHeight
+        } else {
+            contentInsets.bottom = frame.cgRectValue.size.height
+        }
+        
+        tableView.contentInset = contentInsets
+        tableView.scrollIndicatorInsets = contentInsets
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        guard didShow else { return }
+        didShow = false
+        
+        if let insets = originalInsets {
+            tableView.contentInset = insets
+            tableView.scrollIndicatorInsets = insets
+        } else {
+            var contentInsets = tableView.contentInset
+            contentInsets.bottom = 0.0
+            tableView.contentInset = contentInsets
+            tableView.scrollIndicatorInsets = contentInsets
+        }
+    }
 }

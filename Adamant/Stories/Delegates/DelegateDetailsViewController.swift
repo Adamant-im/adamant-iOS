@@ -165,7 +165,7 @@ extension DelegateDetailsViewController: UITableViewDelegate, UITableViewDataSou
 			}
 			
 			let safari = SFSafariViewController(url: url)
-			safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.preferredControlTintColor = UIColor.adamant.primary
 			present(safari, animated: true, completion: nil)
 			
 		default:
@@ -209,8 +209,7 @@ extension DelegateDetailsViewController {
 		cell.textLabel?.text = row.localized
 		cell.accessoryType = .none
 		cell.imageView?.image = row.image
-		cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
-		
+        
 		switch row {
 		case .username:
 			cell.detailTextLabel?.text = delegate.username

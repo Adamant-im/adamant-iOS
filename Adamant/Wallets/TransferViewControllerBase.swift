@@ -270,7 +270,7 @@ class TransferViewControllerBase: FormViewController {
 			}
 		}.onCellSelection { [weak self] (cell, row) in
 			self?.confirmSendFunds()
-		}
+        }
     }
 	
 	// MARK: - Form constructors
@@ -421,7 +421,7 @@ class TransferViewControllerBase: FormViewController {
 	}
 	
 	func markRow(_ row: BaseRowType, valid: Bool) {
-		row.baseCell.textLabel?.textColor = valid ? UIColor.black : UIColor.red
+		row.baseCell.textLabel?.textColor = valid ? UIColor.adamant.primary : UIColor.adamant.alert
 	}
     
 	
@@ -564,10 +564,10 @@ extension TransferViewControllerBase {
 				} else {
 					$0.value = 0
 				}
-			}
+            }
 			
         case .name:
-            return LabelRow() { [weak self] in
+            let row = LabelRow() { [weak self] in
                 $0.title = BaseRows.name.localized
                 $0.tag = BaseRows.name.tag
                 $0.value = self?.recipientName
@@ -579,6 +579,8 @@ extension TransferViewControllerBase {
                     }
                 })
             }
+            
+            return row
             
 		case .address:
 			return recipientRow()
@@ -614,9 +616,9 @@ extension TransferViewControllerBase {
                 alert.addAction(cancelAction)
                 alert.addAction(confirmAction)
                 
-                presenter.present(alert, animated: true, completion: {
+                presenter.present(alert, animated: true) {
                     row.deselect(animated: true)
-                })
+                }
             }
             
             return row
@@ -634,7 +636,7 @@ extension TransferViewControllerBase {
 				}
 			}.onChange { [weak self] (row) in
 				self?.validateForm()
-			}
+            }
 		
 		case .fee:
 			return DecimalRow() { [weak self] in
@@ -648,7 +650,7 @@ extension TransferViewControllerBase {
 				} else {
 					$0.value = 0
 				}
-			}
+            }
 			
 		case .total:
 			return DecimalRow() { [weak self] in
@@ -661,13 +663,17 @@ extension TransferViewControllerBase {
 				if let balance = self?.service?.wallet?.balance {
 					$0.add(rule: RuleSmallerOrEqualThan<Double>(max: balance.doubleValue))
 				}
-			}
+            }
 		
 		case .comments:
-            return TextAreaRow() {
+            let row = TextAreaRow() {
                 $0.tag = BaseRows.comments.tag
                 $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
+            }.cellUpdate { (cell, _) in
+                cell.textView?.backgroundColor = UIColor.clear
             }
+            
+            return row
 			
 		case .sendButton:
 			return ButtonRow() { [weak self] in
@@ -687,7 +693,7 @@ extension TransferViewControllerBase {
 				}
 			}.onCellSelection { [weak self] (cell, row) in
 				self?.confirmSendFunds()
-			}
+            }
 		}
 	}
 }

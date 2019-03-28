@@ -134,14 +134,13 @@ class AboutViewController: FormViewController {
         }
         
 		navigationItem.title = String.adamantLocalized.about.title
-		
+        
 		// MARK: Header & Footer
 		if let header = UINib(nibName: "LogoFullHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
 			tableView.tableHeaderView = header
 			
 			if let label = header.viewWithTag(888) as? UILabel {
 				label.text = String.adamantLocalized.shared.productName
-				label.textColor = UIColor.adamant.primary
 			}
 		}
 		
