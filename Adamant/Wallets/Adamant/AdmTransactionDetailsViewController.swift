@@ -51,15 +51,12 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
                     $0.tag = Rows.openChat.tag
                     $0.title = chatLabel
                     $0.cell.imageView?.image = Rows.openChat.image
-                    }.cellSetup { (cell, _) in
-                        cell.selectionStyle = .gray
-                    }.cellUpdate { (cell, _) in
-                        cell.accessoryType = .disclosureIndicator
-                        cell.textLabel?.setStyle(.primaryText)
-                        cell.detailTextLabel?.setStyle(.primaryText)
-                        cell.setStyle(.secondaryBackground)
-                    }.onCellSelection { [weak self] (_, _) in
-                        self?.goToChat()
+                }.cellSetup { (cell, _) in
+                    cell.selectionStyle = .gray
+                }.cellUpdate { (cell, _) in
+                    cell.accessoryType = .disclosureIndicator
+                }.onCellSelection { [weak self] (_, _) in
+                    self?.goToChat()
                 }
                 
                 section.append(row)

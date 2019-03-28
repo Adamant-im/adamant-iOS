@@ -117,10 +117,6 @@ class DelegateDetailsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.tableView.styles = [AdamantThemeStyle.baseTable.rawValue]
-        navigationController?.navigationBar.setStyle(.baseNavigationBar)
-        view.style = AdamantThemeStyle.primaryTintAndBackground
-
         if let delegate = delegate {
 			refreshData(with: delegate)
 			navigationItem.title = delegate.username
@@ -170,7 +166,6 @@ extension DelegateDetailsViewController: UITableViewDelegate, UITableViewDataSou
 			
 			let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
-            safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
 			present(safari, animated: true, completion: nil)
 			
 		default:
@@ -214,12 +209,7 @@ extension DelegateDetailsViewController {
 		cell.textLabel?.text = row.localized
 		cell.accessoryType = .none
 		cell.imageView?.image = row.image
-		cell.imageView?.tintColor = UIColor.adamant.primary
-        cell.setStyles([.baseTableViewCell, .secondaryBackground])
         
-        cell.textLabel?.setStyle(.primaryText)
-        cell.detailTextLabel?.setStyle(.primaryText)
-		
 		switch row {
 		case .username:
 			cell.detailTextLabel?.text = delegate.username

@@ -181,12 +181,6 @@ class ChatViewController: MessagesViewController {
             navigationItem.largeTitleDisplayMode = .never
 		}
         
-        navigationController?.navigationBar.setStyle(.baseNavigationBar)
-        tabBarController?.tabBar.setStyle(.baseBarTint)
-        view.style = AdamantThemeStyle.primaryTintAndBackground
-        
-        self.observeThemeChange()
-		
 		// MARK: 1. Initial configuration
 		
         updateTitle()
@@ -253,6 +247,7 @@ class ChatViewController: MessagesViewController {
 			$0.layer.cornerRadius = size*2
 			$0.layer.borderWidth = 1
 			$0.layer.borderColor = bordersColor.cgColor
+            $0.tintColor = UIColor.adamant.primary
 			$0.setSize(CGSize(width: buttonWidth, height: buttonHeight), animated: false)
 			$0.title = nil
 			$0.image = #imageLiteral(resourceName: "Arrow")
@@ -292,12 +287,7 @@ class ChatViewController: MessagesViewController {
 		}
 		
 		// MARK: 3. Readonly chat
-        messageInputBar.backgroundView.setStyles([.secondaryBackground, .secondaryBorder])
-        messageInputBar.inputTextView.setStyles([.secondaryBorder, .input])
-        messageInputBar.sendButton.setStyles([.secondaryBackground, .primaryTint, .secondaryBorder])
-        attachmentButton.setStyle(.primaryTint)
-		
-		if chatroom.isReadonly {
+        if chatroom.isReadonly {
 			messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
 			messageInputBar.inputTextView.isEditable = false
 			messageInputBar.sendButton.isEnabled = false
@@ -361,9 +351,6 @@ class ChatViewController: MessagesViewController {
                 }
             }
         }
-        
-        self.view.setStyle(.primaryBackground)
-        self.messagesCollectionView.setStyle(.primaryBackground)
 	}
 	
 	override func viewDidAppear(_ animated: Bool) {
@@ -511,7 +498,6 @@ class ChatViewController: MessagesViewController {
 			
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
 			
-            alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 			self?.present(alert, animated: true, completion: nil)
 		}
 		
@@ -801,11 +787,5 @@ private class StatusUpdateProcedure: Procedure {
             try? privateContext.save()
             self.finish()
         }
-    }
-}
-
-extension ChatViewController: Themeable {
-    public func apply(theme: AdamantTheme) {
-        self.messagesCollectionView.reloadData()
     }
 }

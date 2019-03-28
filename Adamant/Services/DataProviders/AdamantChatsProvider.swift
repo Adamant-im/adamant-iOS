@@ -8,7 +8,7 @@
 
 import Foundation
 import CoreData
-import Haring
+import MarkdownKit
 
 class AdamantChatsProvider: ChatsProvider {
 	// MARK: Dependencies
