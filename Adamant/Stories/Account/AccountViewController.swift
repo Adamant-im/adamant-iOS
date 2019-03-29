@@ -103,7 +103,7 @@ class AccountViewController: FormViewController {
 			case .security: return #imageLiteral(resourceName: "row_security")
 			case .about: return #imageLiteral(resourceName: "row_about")
 			case .theme: return #imageLiteral(resourceName: "row_themes.png")
-            case .currency: return nil
+            case .currency: return #imageLiteral(resourceName: "row_currency")
             case .nodes: return #imageLiteral(resourceName: "row_nodes")
 			case .balance: return #imageLiteral(resourceName: "row_balance")
             case .voteForDelegates: return #imageLiteral(resourceName: "row_vote-delegates")
@@ -357,6 +357,7 @@ class AccountViewController: FormViewController {
         let currencyRow = PushRow<Currency>() {
             $0.title = Rows.currency.localized
             $0.tag = Rows.currency.tag
+            $0.cell.imageView?.image = Rows.currency.image
             $0.options = [Currency.USD, Currency.EUR, Currency.RUB, Currency.CNY, Currency.JPY]
             $0.value = currencyInfoService.currentCurrency
             $0.selectorTitle = Rows.currency.localized
