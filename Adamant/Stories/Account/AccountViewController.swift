@@ -86,7 +86,7 @@ class AccountViewController: FormViewController {
 			case .sendTokens: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
 			case .security: return NSLocalizedString("AccountTab.Row.Security", comment: "Account tab: 'Security' row")
             case .theme: return NSLocalizedString("AccountTab.Row.Theme", comment: "Account tab: 'Theme' row")
-            case .currency: return NSLocalizedString("AccountTab.Row.Cyrrency", comment: "Account tab: 'Currency' row")
+            case .currency: return NSLocalizedString("AccountTab.Row.Currency", comment: "Account tab: 'Currency' row")
 			case .nodes: return String.adamantLocalized.nodesList.nodesListButton
 			case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
 			case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")

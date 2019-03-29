@@ -145,6 +145,9 @@
 /* Account tab: 'Theme' row */
 "AccountTab.Row.Theme" = "Тема";
 
+/* Account tab: 'Currency' row */
+"AccountTab.Row.Currency" = "Валюта";
+
 /* Account tab: 'Theme' row value 'Light' */
 "AccountTab.Row.Theme.Light" = "Светлая";
 
