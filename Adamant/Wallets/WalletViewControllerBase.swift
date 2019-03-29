@@ -48,6 +48,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 	// MARK: - Dependencies
 	
 	var dialogService: DialogService!
+    var currencyInfoService: CurrencyInfoService!
 	
 	
 	// MARK: - Properties, WalletViewController
@@ -144,13 +145,20 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 				}
 			}
 			
-			if let service = self?.service, let wallet = service.wallet {
-				let symbol = type(of: service).currencySymbol
-				$0.value = AdamantBalanceFormat.full.format(wallet.balance, withCurrencySymbol: symbol)
-			} else {
-				$0.value = "0"
-			}
+            if let service = self?.service, let wallet = service.wallet {
+                let symbol = type(of: service).currencySymbol
+                let rate = currencyInfoService.getRate(for: symbol)
+                let fiat = wallet.balance.doubleValue * rate
+                
+                $0.value = AdamantBalanceFormat.full.format(wallet.balance, withCurrencySymbol: symbol) + " (" + AdamantBalanceFormat.short.format(fiat, withCurrencySymbol: currencyInfoService.currentCurrency.symbol) + ")"
+            } else {
+                $0.value = "0"
+            }
 		}
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.WalletViewController.balanceUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.updateWalletBalance()
+        }
 		
 		if service is WalletServiceWithTransfers {
 			balanceRow.cell.selectionStyle = .gray
@@ -346,6 +354,18 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         }
         
         currentUiState = state
+    }
+    
+    func updateWalletBalance() {
+        if let row: AlertLabelRow = form.rowBy(tag: BaseRows.balance.tag), let service = self.service, let wallet = service.wallet {
+            let symbol = type(of: service).currencySymbol
+            let rate = currencyInfoService.getRate(for: symbol)
+            let fiat = wallet.balance.doubleValue * rate
+            
+            DispatchQueue.main.async { [weak self] in
+                row.cell.detailTextLabel?.text = AdamantBalanceFormat.full.format(wallet.balance, withCurrencySymbol: symbol) + " (" + AdamantBalanceFormat.short.format(fiat, withCurrencySymbol: self?.currencyInfoService.currentCurrency.symbol) + ")"
+            }
+        }
     }
 }
 

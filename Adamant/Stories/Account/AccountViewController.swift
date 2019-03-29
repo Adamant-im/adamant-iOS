@@ -58,7 +58,7 @@ class AccountViewController: FormViewController {
 	
 	enum Rows {
 		case balance, sendTokens // Wallet
-		case security, nodes, theme, about // Application
+		case security, nodes, theme, currency, about // Application
 		case voteForDelegates, generateQr, logout // Actions
         case stayIn, biometry, notifications // Security
 		
@@ -68,6 +68,7 @@ class AccountViewController: FormViewController {
 			case .sendTokens: return "sndTkns"
 			case .security: return "scrt"
             case .theme: return "thm"
+            case .currency: return "crrnc"
 			case .nodes: return "nds"
 			case .about: return "bt"
 			case .logout: return "lgtrw"
@@ -85,6 +86,7 @@ class AccountViewController: FormViewController {
 			case .sendTokens: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
 			case .security: return NSLocalizedString("AccountTab.Row.Security", comment: "Account tab: 'Security' row")
             case .theme: return NSLocalizedString("AccountTab.Row.Theme", comment: "Account tab: 'Theme' row")
+            case .currency: return NSLocalizedString("AccountTab.Row.Cyrrency", comment: "Account tab: 'Currency' row")
 			case .nodes: return String.adamantLocalized.nodesList.nodesListButton
 			case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
 			case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
@@ -101,6 +103,7 @@ class AccountViewController: FormViewController {
 			case .security: return #imageLiteral(resourceName: "row_security")
 			case .about: return #imageLiteral(resourceName: "row_about")
 			case .theme: return #imageLiteral(resourceName: "row_themes.png")
+            case .currency: return nil
             case .nodes: return #imageLiteral(resourceName: "row_nodes")
 			case .balance: return #imageLiteral(resourceName: "row_balance")
             case .voteForDelegates: return #imageLiteral(resourceName: "row_vote-delegates")
@@ -123,6 +126,8 @@ class AccountViewController: FormViewController {
     var localAuth: LocalAuthentication!
 	
     var avatarService: AvatarService!
+    
+    var currencyInfoService: CurrencyInfoService!
 	
 	// MARK: - Properties
 	
@@ -347,6 +352,25 @@ class AccountViewController: FormViewController {
         }
         
 		appSection.append(themeRow)
+        
+        // Currency select
+        let currencyRow = PushRow<Currency>() {
+            $0.title = Rows.currency.localized
+            $0.tag = Rows.currency.tag
+            $0.options = [Currency.USD, Currency.EUR, Currency.RUB, Currency.CNY, Currency.JPY]
+            $0.value = currencyInfoService.currentCurrency
+            $0.selectorTitle = Rows.currency.localized
+        }.onPresent { from, to in
+            to.selectableRowCellUpdate = { cell, row in
+                cell.textLabel?.text = "\(row.selectableValue!.rawValue) (\(row.selectableValue!.symbol))"
+            }
+        }.onChange { row in
+            if let value = row.value {
+                self.currencyInfoService.currentCurrency = value
+            }
+        }
+        
+        appSection.append(currencyRow)
 
 		// About
 		let aboutRow = LabelRow() {
