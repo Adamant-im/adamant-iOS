@@ -79,9 +79,6 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         tableView.tableFooterView = UIView()
         
         let section = Section()
-
-        tableView.setStyle(.baseTable)
-        walletTitleLabel.setStyle(.secondaryText)
 		
 		// MARK: Address
 		let addressRow = LabelRow() {
@@ -94,9 +91,6 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			}
 		}.cellUpdate { (cell, _) in
 			cell.accessoryType = .disclosureIndicator
-            cell.textLabel?.setStyle(.primaryText)
-            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
-            cell.detailTextLabel?.setStyle(.secondaryText)
         }.onCellSelection { [weak self] (cell, row) in
             row.deselect()
 			let completion = { [weak self] in
@@ -164,10 +158,6 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 			balanceRow.cell.selectionStyle = .gray
 			balanceRow.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
-                cell.textLabel?.setStyle(.primaryText)
-                cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
-                cell.detailTextLabel?.setStyle(.secondaryText)
-                cell.alertLabel.setStyle(.notificationBubble)
             }.onCellSelection { [weak self] (_, row) in
                 guard let service = self?.service as? WalletServiceWithTransfers else {
 					return
@@ -199,8 +189,6 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 				$0.cell.selectionStyle = .gray
 			}.cellUpdate { (cell, _) in
 				cell.accessoryType = .disclosureIndicator
-                cell.textLabel?.setStyle(.primaryText)
-                cell.style = AdamantThemeStyle.commonTableViewCell
 			}.onCellSelection { [weak self] (_, row) in
 				guard let service = self?.service as? WalletServiceWithSend else {
 					return

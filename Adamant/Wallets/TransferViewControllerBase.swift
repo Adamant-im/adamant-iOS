@@ -240,10 +240,6 @@ class TransferViewControllerBase: FormViewController {
         super.viewDidLoad()
 		
 		// MARK: UI
-        tableView.setStyle(.baseTable)
-        navigationController?.navigationBar.setStyle(.baseNavigationBar)
-        tabBarController?.tabBar.setStyle(.baseBarTint)
-        view.setStyles([.primaryBackground, .primaryTint])
         navigationItem.title = defaultSceneTitle()
 		
 		// MARK: Sections
@@ -274,25 +270,14 @@ class TransferViewControllerBase: FormViewController {
 			}
 		}.onCellSelection { [weak self] (cell, row) in
 			self?.confirmSendFunds()
-        }.cellUpdate { (cell, _) in
-            cell.textLabel?.setStyle(.primaryText)
-            cell.setStyle(.secondaryBackground)
         }
     }
 	
 	// MARK: - Form constructors
 	
 	func walletSection() -> Section {
-		let section = Section() {
+		let section = Section(Sections.wallet.localized) {
 			$0.tag = Sections.wallet.tag
-            
-            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
-            header.title = Sections.wallet.localized
-            header.onSetupView = {view, _ in
-                view.textLabel?.setStyle(.secondaryText)
-            }
-            header.height = { 50 }
-            $0.header = header
 		}
 		
 		section.append(defaultRowFor(baseRow: BaseRows.balance))
@@ -302,16 +287,8 @@ class TransferViewControllerBase: FormViewController {
 	}
 	
 	func recipientSection() -> Section {
-		let section = Section() {
+		let section = Section(Sections.recipient.localized) {
 			$0.tag = Sections.recipient.tag
-            
-            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
-            header.title = Sections.recipient.localized
-            header.onSetupView = {view, _ in
-                view.textLabel?.setStyle(.secondaryText)
-            }
-            header.height = { 50 }
-            $0.header = header
 		}
 		
         // Name row
@@ -338,16 +315,8 @@ class TransferViewControllerBase: FormViewController {
 	}
 	
 	func transactionInfoSection() -> Section {
-		let section = Section() {
+		let section = Section(Sections.transferInfo.localized) {
 			$0.tag = Sections.transferInfo.tag
-            
-            var header = HeaderFooterView<UITableViewHeaderFooterView>(.class)
-            header.title = Sections.transferInfo.localized
-            header.onSetupView = {view, _ in
-                view.textLabel?.setStyle(.secondaryText)
-            }
-            header.height = { 50 }
-            $0.header = header
 		}
 		
 		section.append(defaultRowFor(baseRow: .amount))
@@ -452,7 +421,7 @@ class TransferViewControllerBase: FormViewController {
 	}
 	
 	func markRow(_ row: BaseRowType, valid: Bool) {
-		row.baseCell.textLabel?.textColor = valid ? UIColor.adamant.primary : UIColor.adamant.alertColor
+		row.baseCell.textLabel?.textColor = valid ? UIColor.adamant.primary : UIColor.adamant.alert
 	}
     
 	
@@ -497,8 +466,6 @@ class TransferViewControllerBase: FormViewController {
 		alert.addAction(cancelAction)
 		alert.addAction(sendAction)
 		
-        alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
-        
 		present(alert, animated: true, completion: nil)
 	}
 	
@@ -597,11 +564,7 @@ extension TransferViewControllerBase {
 				} else {
 					$0.value = 0
 				}
-            }.cellUpdate({ (cell, _) in
-                cell.textLabel?.setStyle(.primaryText)
-                cell.textField?.setStyle(.primaryText)
-                cell.setStyle(.secondaryBackground)
-            })
+            }
 			
         case .name:
             let row = LabelRow() { [weak self] in
@@ -615,10 +578,6 @@ extension TransferViewControllerBase {
                         return true
                     }
                 })
-            }.cellUpdate { (cell, _) in
-                cell.textLabel?.setStyle(.primaryText)
-                cell.detailTextLabel?.setStyle(.secondaryText)
-                cell.setStyle(.secondaryBackground)
             }
             
             return row
@@ -637,11 +596,7 @@ extension TransferViewControllerBase {
 				if let maxToTransfer = self?.maxToTransfer {
 					$0.value = maxToTransfer.doubleValue
 				}
-            }.cellUpdate({ (cell, _) in
-                cell.textLabel?.setStyle(.primaryText)
-                cell.textField?.setStyle(.primaryText)
-                cell.setStyle(.secondaryBackground)
-            }).onCellSelection { [weak self] (cell, row) in
+            }.onCellSelection { [weak self] (cell, row) in
                 guard let value = row.value, value > 0, let presenter = self else {
                     row.deselect(animated: true)
                     return
@@ -661,11 +616,9 @@ extension TransferViewControllerBase {
                 alert.addAction(cancelAction)
                 alert.addAction(confirmAction)
                 
-                alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
-                
-                presenter.present(alert, animated: true, completion: {
+                presenter.present(alert, animated: true) {
                     row.deselect(animated: true)
-                })
+                }
             }
             
             return row
@@ -683,11 +636,7 @@ extension TransferViewControllerBase {
 				}
 			}.onChange { [weak self] (row) in
 				self?.validateForm()
-            }.cellUpdate({ (cell, _) in
-                cell.textLabel?.setStyle(.primaryText)
-                cell.textField?.setStyle(.input)
-                cell.setStyle(.secondaryBackground)
-            })
+            }
 		
 		case .fee:
 			return DecimalRow() { [weak self] in
@@ -701,11 +650,7 @@ extension TransferViewControllerBase {
 				} else {
 					$0.value = 0
 				}
-            }.cellUpdate({ (cell, _) in
-                cell.textLabel?.setStyle(.primaryText)
-                cell.textField?.setStyle(.primaryText)
-                cell.setStyle(.secondaryBackground)
-            })
+            }
 			
 		case .total:
 			return DecimalRow() { [weak self] in
@@ -718,20 +663,14 @@ extension TransferViewControllerBase {
 				if let balance = self?.service?.wallet?.balance {
 					$0.add(rule: RuleSmallerOrEqualThan<Double>(max: balance.doubleValue))
 				}
-            }.cellUpdate({ (cell, _) in
-                cell.textLabel?.setStyle(.primaryText)
-                cell.textField?.setStyle(.primaryText)
-                cell.setStyle(.secondaryBackground)
-            })
+            }
 		
 		case .comments:
             let row = TextAreaRow() {
                 $0.tag = BaseRows.comments.tag
                 $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
             }.cellUpdate { (cell, _) in
-                cell.textView?.setStyle(.primaryText)
                 cell.textView?.backgroundColor = UIColor.clear
-                cell.setStyle(.secondaryBackground)
             }
             
             return row
@@ -754,10 +693,7 @@ extension TransferViewControllerBase {
 				}
 			}.onCellSelection { [weak self] (cell, row) in
 				self?.confirmSendFunds()
-            }.cellUpdate({ (cell, _) in
-                cell.textLabel?.setStyle(.primaryText)
-                cell.style = AdamantThemeStyle.commonTableViewCell
-            })
+            }
 		}
 	}
 }

@@ -9,14 +9,15 @@
 import UIKit
 
 extension UIColor {
-	public struct adamantDefault {
+	public struct adamant {
         
         // MARK: Colors from Adamant Guideline
         static let first = UIColor(hex: "#474a5f")
         static let fourth = UIColor(hex: "#eeeeee")
 
-        static let activeColor = UIColor(hex: "#179cec")
+        static let active = UIColor(hex: "#179cec")
         static let background = UIColor(hex: "#f2f6fa")
+        static let alert = UIColor(hex: "#faa05a")
         
 		// MARK: Global colors
 		
@@ -32,9 +33,9 @@ extension UIColor {
 		/// Table row icons color, ~45% gray
 		static let tableRowIcons = UIColor(red: 0.45, green: 0.45, blue: 0.45, alpha: 1)
         
-        static let active = UIColor(hex: "#179cec")
-		
-		
+        /// Switch onTintColor
+        static let switchColor = UIColor(hex: "#179cec")
+        
 		// MARK: Chat colors
 		
 		/// User chat bubble background, ~4% gray
@@ -58,8 +59,4 @@ extension UIColor {
 		// Outcome transfer icon background, light red
 		static let transferOutcomeIconBackground = UIColor(red: 0.94, green: 0.52, blue: 0.53, alpha: 1)
 	}
-    
-    class var adamant: AdamantTheme {
-        return ThemesManager.shared.currentTheme
-    }
 }

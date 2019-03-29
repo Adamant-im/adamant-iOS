@@ -8,7 +8,7 @@
 
 import UIKit
 import CoreData
-import Haring
+import MarkdownKit
 
 extension String.adamantLocalized {
 	struct chatList {
@@ -53,14 +53,20 @@ class ChatListViewController: UIViewController {
 	
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action:
-            #selector(self.handleRefresh(_:)),
-                                 for: UIControl.Event.valueChanged)
-        refreshControl.setStyle(.primaryTint)
+        refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
+        refreshControl.tintColor = UIColor.adamant.primary
         return refreshControl
     }()
     
-    private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize))
+    private lazy var markdownParser: MarkdownParser = {
+        let parser = MarkdownParser(font: UIFont.systemFont(ofSize: ChatTableViewCell.shortDescriptionTextSize),
+                                    color: UIColor.adamant.primary,
+                                    enabledElements: .disabledAutomaticLink)
+        
+        parser.link.color = UIColor.adamant.active
+        
+        return parser
+    }()
 	
     // MARK: Busy indicator
     
@@ -96,11 +102,6 @@ class ChatListViewController: UIViewController {
 		tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         tableView.refreshControl = refreshControl
         
-        tableView.styles = [AdamantThemeStyle.baseTable.rawValue]
-        navigationController?.navigationBar.setStyle(.baseNavigationBar)
-        tabBarController?.tabBar.setStyle(.baseBarTint)
-        view.style = AdamantThemeStyle.primaryTintAndBackground
-		
 		if self.accountService.account != nil {
 			initFetchedRequestControllers(provider: chatsProvider)
 		}
@@ -129,8 +130,6 @@ class ChatListViewController: UIViewController {
             searchController!.searchBar.sizeToFit()
         }
         
-        ThemesManager.shared.manage(for: self)
-		
 		// MARK: Login/Logout
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
 			self?.initFetchedRequestControllers(provider: self?.chatsProvider)
@@ -398,8 +397,6 @@ extension ChatListViewController {
         cell.lastMessageLabel.textColor = UIColor.adamant.primary
 		cell.borderWidth = 1
         
-        cell.setupStyles()
-		
 		return cell
 	}
 	
@@ -664,10 +661,6 @@ extension ChatListViewController {
 	}
     
     private func shortDescription(for transaction: ChatTransaction) -> NSAttributedString? {
-        markdownParser.color = UIColor.adamant.primary
-        markdownParser.link.color = UIColor.adamant.activeColor
-        markdownParser.automaticLinkDetectionEnabled = false
-        
         switch transaction {
         case let message as MessageTransaction:
             guard let text = message.message else {
@@ -775,8 +768,6 @@ extension ChatListViewController {
 					})
 					
 					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-					
-                    alert.view.tintColor = ThemesManager.shared.currentTheme.uiAlertTextColor
 					self?.present(alert, animated: true, completion: nil)
 				}
 				
@@ -789,7 +780,7 @@ extension ChatListViewController {
 		}
 		
 		more.image = #imageLiteral(resourceName: "swipe_more")
-		more.backgroundColor = ThemesManager.shared.currentTheme.trailingSwipeActionsBackground
+		more.backgroundColor = UIColor.adamant.primary
 		
 		// Mark as read
 		if chatroom.hasUnreadMessages {
@@ -805,7 +796,7 @@ extension ChatListViewController {
 			}
 			
 			markAsRead.image = #imageLiteral(resourceName: "swipe_mark-as-read")
-			markAsRead.backgroundColor = ThemesManager.shared.currentTheme.trailingSwipeActionsBackground
+			markAsRead.backgroundColor = UIColor.adamant.primary
 			
 			actions = [markAsRead, more]
 		} else {
@@ -828,8 +819,6 @@ extension ChatListViewController {
 			item = tabBarItem
 		}
         
-        item.setStyle(.tabItem)
-		
 		if let value = value, value > 0 {
 			item.badgeValue = String(value)
 			notificationsService.setBadge(number: value)
@@ -962,12 +951,5 @@ extension ChatListViewController {
             tableView.contentInset = contentInsets
             tableView.scrollIndicatorInsets = contentInsets
         }
-    }
-}
-
-extension ChatListViewController: Themeable {
-    public func apply(theme: AdamantTheme) {
-        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: ThemesManager.shared.currentTheme.primary]
-        searchController.searchBar.keyboardAppearance = ThemesManager.shared.currentTheme.darkKeyboard ? .dark : .light
     }
 }

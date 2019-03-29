@@ -41,10 +41,6 @@ extension AdamantScene {
             c.dialogService = r.resolve(DialogService.self)
             return c
         }
-        
-        static let themes = AdamantScene(identifier: "Themes") { r in
-            return ThemesViewController()
-        }
 		
 		private init() {}
 	}
