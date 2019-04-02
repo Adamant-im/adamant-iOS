@@ -23,9 +23,6 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ovl-eE-zdS">
                     <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                     <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="string" keyPath="style" value="primaryBackground,primaryTint"/>
-                    </userDefinedRuntimeAttributes>
                 </view>
                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Adamant-logo" translatesAutoresizingMaskIntoConstraints="NO" id="feU-Ca-gLt">
                     <rect key="frame" x="94" y="240" width="187.5" height="187.5"/>

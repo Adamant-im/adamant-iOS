@@ -117,8 +117,6 @@ class AdamantDelegateCell: UITableViewCell {
 		checkboxExpander.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onExpanderTap)))
 		checkmarkBackgroundView.layer.borderWidth = 1
 		checkmarkBackgroundView.layer.cornerRadius = checkmarkBackgroundView.frame.height / 2
-        
-        self.setStyle(.baseTableViewCell)
     }
 	
 	@objc func onExpanderTap() {

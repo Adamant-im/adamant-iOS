@@ -173,20 +173,17 @@ class DogeTransferViewController: TransferViewControllerBase {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
             }
-            }.cellUpdate { (cell, row) in
-                cell.textField?.setStyle(.input)
-                cell.setStyle(.secondaryBackground)
-            }.onChange { [weak self] row in
-                if let text = row.value {
-                    self?._recipient = text
-                }
-                
-                if let skip = self?.skipValueChange, skip {
-                    self?.skipValueChange = false
-                    return
-                }
-                
-                self?.validateForm()
+        }.onChange { [weak self] row in
+            if let text = row.value {
+                self?._recipient = text
+            }
+            
+            if let skip = self?.skipValueChange, skip {
+                self?.skipValueChange = false
+                return
+            }
+            
+            self?.validateForm()
         }
         
         return row

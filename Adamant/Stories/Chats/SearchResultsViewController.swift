@@ -8,7 +8,7 @@
 
 import UIKit
 import Swinject
-import Haring
+import MarkdownKit
 
 extension String.adamantLocalized {
     struct search {
@@ -46,9 +46,6 @@ class SearchResultsViewController: UITableViewController {
         }
         
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: "resultCell")
-        
-        tableView.styles = [AdamantThemeStyle.baseTable.rawValue]
-        view.style = AdamantThemeStyle.primaryTintAndBackground
     }
     
     func updateResult(contacts: [Chatroom]?, messages: [MessageTransaction]?, searchText: String) {
@@ -86,7 +83,7 @@ class SearchResultsViewController: UITableViewController {
         switch defineSection(for: indexPath) {
         case .contacts:
             let contact = contacts[indexPath.row]
-            cell.lastMessageLabel.textColor = ThemesManager.shared.currentTheme.primary
+            cell.lastMessageLabel.textColor = UIColor.adamant.primary
             configureCell(cell, for: contact)
             
         case .messages:
@@ -97,10 +94,6 @@ class SearchResultsViewController: UITableViewController {
         case .none:
             break
         }
-        
-        cell.setStyle(.chatCell)
-        cell.accountLabel.setStyle(.primaryText)
-        cell.dateLabel.setStyle(.secondaryText)
         
         return cell
     }
@@ -203,12 +196,12 @@ class SearchResultsViewController: UITableViewController {
             
             let attributedString = markdownParser.parse(raw).mutableCopy() as! NSMutableAttributedString
             attributedString.addAttribute(.foregroundColor,
-                                          value: ThemesManager.shared.currentTheme.primary,
+                                          value: UIColor.adamant.primary,
                                           range: NSRange(location: 0, length: attributedString.length))
             
             if let ranges = attributedString.string.range(of: searchText, options: .caseInsensitive) {
                 attributedString.addAttribute(.foregroundColor,
-                                              value: ThemesManager.shared.currentTheme.activeColor,
+                                              value: UIColor.adamant.active,
                                               range: NSRange(ranges, in: attributedString.string))
             }
             

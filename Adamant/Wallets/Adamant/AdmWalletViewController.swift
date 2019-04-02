@@ -90,10 +90,6 @@ class AdmWalletViewController: WalletViewControllerBase {
             $0.cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-            cell.imageView?.setStyle(.primaryTint)
-            cell.textLabel?.setStyle(.primaryText)
-            cell.detailTextLabel?.setStyle(.secondaryText)
-            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onCellSelection { [weak self] (_, row) in
             guard let vc = self?.router.get(scene: AdamantScene.Wallets.Adamant.buyAndSell) else {
                 fatalError("Failed to get BuyAndSell scele")
@@ -120,10 +116,6 @@ class AdmWalletViewController: WalletViewControllerBase {
             })
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-            cell.imageView?.setStyle(.primaryTint)
-            cell.textLabel?.setStyle(.primaryText)
-            cell.detailTextLabel?.setStyle(.secondaryText)
-            cell.setStyles([.baseTableViewCell, .secondaryBackground, .primaryTint])
         }.onCellSelection { [weak self] (_, _) in
             let urlRaw = String.adamantLocalized.wallets.getFreeTokensUrl(for: address)
             guard let url = URL(string: urlRaw) else {
@@ -133,7 +125,6 @@ class AdmWalletViewController: WalletViewControllerBase {
             
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
-            safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
             self?.present(safari, animated: true, completion: nil)
         }
         

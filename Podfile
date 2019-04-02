@@ -8,7 +8,7 @@ target 'Adamant' do
   pod 'KeychainAccess' # Keychain
   pod 'Swinject' # Dependency Injection
   pod 'ReachabilitySwift' # Network status
-  pod 'Haring' # Markdown parser
+  pod 'MarkdownKit', :git => 'https://github.com/RealBonus/MarkdownKit' # Markdown parser, forked fixing whitespaces '5 * 5 * 6'
   pod 'DateToolsSwift' # Date formatter tools
   pod 'ProcedureKit' # Async programming tools
   
@@ -21,7 +21,6 @@ target 'Adamant' do
   pod 'PMAlertController' # Custom alert controller
   pod 'Parchment' # Paging menu
   pod 'SwiftyOnboard', :git => 'https://github.com/RealBonus/SwiftyOnboard', :branch => 'feature/customStyle' # wellcome screen
-  pod 'Stylist' # Style tool
 
   # QR
   pod 'EFQRCode' # QR generator

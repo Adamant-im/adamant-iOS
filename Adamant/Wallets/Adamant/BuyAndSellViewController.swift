@@ -62,11 +62,6 @@ class BuyAndSellViewController: FormViewController {
 
         navigationItem.title = AdmWalletViewController.Rows.buyTokens.localized
         
-        // Themes
-        tableView.setStyle(.baseTable)
-        navigationController?.navigationBar.setStyle(.baseNavigationBar)
-        view.style = AdamantThemeStyle.primaryTintAndBackground
-        
         let section = Section()
         
         // MARK: Adamant
@@ -109,10 +104,6 @@ class BuyAndSellViewController: FormViewController {
             $0.cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-            cell.setStyles([.secondaryBackground, .primaryTint])
-            cell.textLabel?.setStyle(.primaryText)
-            cell.detailTextLabel?.setStyle(.primaryText)
-            cell.imageView?.setStyle(.primaryTint)
         }.onCellSelection { [weak self] (_, _) in
             guard let url = URL(string: urlRaw) else {
                 self?.dialogService.showError(withMessage: "Failed to create URL with string: \(urlRaw)", error: nil)
@@ -121,7 +112,6 @@ class BuyAndSellViewController: FormViewController {
             
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
-            safari.preferredBarTintColor = UIColor.adamant.secondaryBackground
             self?.present(safari, animated: true, completion: nil)
         }
         
