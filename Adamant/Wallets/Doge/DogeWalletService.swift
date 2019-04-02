@@ -62,7 +62,7 @@ class DogeWalletService: WalletService {
     static var currencySymbol = "DOGE"
     static var currencyLogo = #imageLiteral(resourceName: "wallet_doge")
     
-    static let multiplier = 1e8
+    static let multiplier = Decimal(sign: .plus, exponent: -8, significand: 1)
     static let chunkSize = 20
     
     private (set) var transactionFee: Decimal = 1.0 // 1 DOGE per transaction
@@ -159,7 +159,16 @@ class DogeWalletService: WalletService {
                 }
                 
             case .failure(let error):
-                self?.dialogService.showRichError(error: error)
+                switch error {
+                case .networkError:
+                    break
+                    
+                case .remoteServiceError(let message) where message.contains("Server not yet ready"):
+                    break
+                    
+                default:
+                    self?.dialogService.showRichError(error: error)
+                }
             }
             
             self?.setState(.upToDate)
@@ -272,7 +281,7 @@ extension DogeWalletService {
         }
         
         guard let address = self.dogeWallet?.address else {
-            completion(.failure(error: .internalError(message: "DOGE Wallet: not found", error: nil)))
+            completion(.failure(error: .walletNotInitiated))
             return
         }
         
@@ -290,10 +299,10 @@ extension DogeWalletService {
             switch response.result {
             case .success(let data):
                 if let raw = Decimal(string: data) {
-                    let balance = raw / Decimal(DogeWalletService.multiplier)
+                    let balance = raw * DogeWalletService.multiplier
                     completion(.success(result: balance))
                 } else {
-                    completion(.failure(error: .internalError(message: "DOGE Wallet: balance not found", error: nil)))
+                    completion(.failure(error: .remoteServiceError(message: "DOGE Wallet: \(data)")))
                 }
                 
             case .failure:
@@ -397,57 +406,58 @@ extension DogeWalletService {
             fatalError("Failed to build DOGE endpoint URL")
         }
         
-        if let address = self.wallet?.address {
-            // Headers
-            let headers = [
-                "Content-Type": "application/json"
-            ]
+        guard let address = self.wallet?.address else {
+            completion(.failure(.internalError(message: "DOGE Wallet: not found", error: nil)))
+            return
+        }
+        
+        // Headers
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        
+        let to = from + DogeWalletService.chunkSize
+        
+        let parameters = [
+            "from": from,
+            "to": to
+        ]
+        
+        // Request url
+        let endpoint = url.appendingPathComponent(DogeApiCommands.getTransactions(address: address))
+        
+        // MARK: Sending request
+        Alamofire.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
             
-            let to = from + DogeWalletService.chunkSize
-            
-            let parameters = [
-                "from": from,
-                "to": to
-            ]
-            
-            // Request url
-            let endpoint = url.appendingPathComponent(DogeApiCommands.getTransactions(address: address))
-            
-            // MARK: Sending request
-            Alamofire.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+            switch response.result {
+            case .success(let data):
                 
-                switch response.result {
-                case .success(let data):
+                if let result = data as? [String: Any], let items = result["items"] as? [[String: Any]], let totalItems = result["totalItems"] as? NSNumber {
                     
-                    if let result = data as? [String: Any], let items = result["items"] as? [[String: Any]], let totalItems = result["totalItems"] as? NSNumber {
-                        
-                        let hasMore = to < totalItems.intValue
-                        
-                        var newTransactions = [DogeTransaction]()
-                        for item in items {
-                            newTransactions.append(DogeTransaction.from(item, with: address))
-                        }
-                        
-                        update(newTransactions)
-                        
-                        var transactions = prevTransactions
-                        transactions.append(contentsOf: newTransactions)
-                        
-                        if hasMore {
-                            self.getNewTransactions(from: to, prevTransactions: transactions, update: update, completion: completion)
-                        } else {
-                            completion(.success(transactions))
-                        }
-                    } else {
-                        completion(.failure(.internalError(message: "DOGE Wallet: not valid response", error: nil)))
+                    let hasMore = to < totalItems.intValue
+                    
+                    var newTransactions = [DogeTransaction]()
+                    for item in items {
+                        newTransactions.append(DogeTransaction.from(item, with: address))
                     }
                     
-                case .failure:
-                    completion(.failure(.internalError(message: "DOGE Wallet: server not response", error: nil)))
+                    update(newTransactions)
+                    
+                    var transactions = prevTransactions
+                    transactions.append(contentsOf: newTransactions)
+                    
+                    if hasMore {
+                        self.getNewTransactions(from: to, prevTransactions: transactions, update: update, completion: completion)
+                    } else {
+                        completion(.success(transactions))
+                    }
+                } else {
+                    completion(.failure(.internalError(message: "DOGE Wallet: not valid response", error: nil)))
                 }
+                
+            case .failure:
+                completion(.failure(.internalError(message: "DOGE Wallet: server not response", error: nil)))
             }
-        } else {
-            completion(.failure(.internalError(message: "DOGE Wallet: not found", error: nil)))
         }
     }
     
@@ -488,7 +498,7 @@ extension DogeWalletService {
                             let vout = item["vout"] as? NSNumber,
                             let amount = item["amount"] as? NSNumber {
                             
-                            let value = NSDecimalNumber(decimal: (amount.decimalValue * Decimal(DogeWalletService.multiplier))).uint64Value
+                            let value = NSDecimalNumber(decimal: (amount.decimalValue * DogeWalletService.multiplier)).uint64Value
                             
                             let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
                             let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()

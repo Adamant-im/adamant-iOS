@@ -45,8 +45,8 @@ extension DogeWalletService: WalletServiceTwoStepSend {
             return
         }
         
-        let rawAmount = NSDecimalNumber(decimal: amount * Decimal(DogeWalletService.multiplier)).uint64Value
-        let fee = NSDecimalNumber(decimal: self.transactionFee * Decimal(DogeWalletService.multiplier)).uint64Value
+        let rawAmount = NSDecimalNumber(decimal: amount * DogeWalletService.multiplier).uint64Value
+        let fee = NSDecimalNumber(decimal: self.transactionFee * DogeWalletService.multiplier).uint64Value
         
         // MARK: Go background
         defaultDispatchQueue.async {
