@@ -90,6 +90,8 @@ class DogeWalletService: WalletService {
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dogeWalletService", qos: .utility, attributes: [.concurrent])
     let stateSemaphore = DispatchSemaphore(value: 1)
     
+    private static let jsonDecoder = JSONDecoder()
+    
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
@@ -397,26 +399,36 @@ extension DogeWalletService {
 
 // MARK: - Transactions
 extension DogeWalletService {
-    func getTransactions(update:  @escaping ([DogeTransaction]) -> Void, completion: @escaping (ApiServiceResult<[DogeTransaction]>) -> Void) {
-        self.getNewTransactions(update: update, completion: completion)
-    }
-    
-    private func getNewTransactions(from: Int = 0, prevTransactions: [DogeTransaction] = [DogeTransaction](), update:  @escaping ([DogeTransaction]) -> Void, completion: @escaping (ApiServiceResult<[DogeTransaction]>) -> Void) {
-        guard let raw = AdamantResources.dogeServers.randomElement(), let url = URL(string: raw) else {
-            fatalError("Failed to build DOGE endpoint URL")
+    func getTransactions(from: Int, completion: @escaping (ApiServiceResult<(transactions: [DogeTransaction], hasMore: Bool)>) -> Void) {
+        guard let address = self.wallet?.address else {
+            completion(.failure(.notLogged))
+            return
         }
         
-        guard let address = self.wallet?.address else {
-            completion(.failure(.internalError(message: "DOGE Wallet: not found", error: nil)))
-            return
+        getTransactions(for: address, from: from, to: from + DogeWalletService.chunkSize) { response in
+            switch response {
+            case .success(let doge):
+                let hasMore = doge.to < doge.totalItems
+                
+                let transactions = doge.items.map { DogeTransaction.map(from: $0, for: address, with: nil) }.reduce([], +)
+                
+                completion(.success((transactions: transactions, hasMore: hasMore)))
+                
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    private func getTransactions(for address: String, from: Int, to: Int, completion: @escaping (ApiServiceResult<DogeGetTransactionsResponse>) -> Void) {
+        guard let raw = AdamantResources.dogeServers.randomElement(), let url = URL(string: raw) else {
+            fatalError("Failed to build DOGE endpoint URL")
         }
         
         // Headers
         let headers = [
             "Content-Type": "application/json"
         ]
-        
-        let to = from + DogeWalletService.chunkSize
         
         let parameters = [
             "from": from,
@@ -427,33 +439,15 @@ extension DogeWalletService {
         let endpoint = url.appendingPathComponent(DogeApiCommands.getTransactions(address: address))
         
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
-            
+        Alamofire.request(endpoint, method: .get, parameters: parameters, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
-                
-                if let result = data as? [String: Any], let items = result["items"] as? [[String: Any]], let totalItems = result["totalItems"] as? NSNumber {
-                    
-                    let hasMore = to < totalItems.intValue
-                    
-                    var newTransactions = [DogeTransaction]()
-                    for item in items {
-                        newTransactions.append(DogeTransaction.from(item, with: address))
-                    }
-                    
-                    update(newTransactions)
-                    
-                    var transactions = prevTransactions
-                    transactions.append(contentsOf: newTransactions)
-                    
-                    if hasMore {
-                        self.getNewTransactions(from: to, prevTransactions: transactions, update: update, completion: completion)
-                    } else {
-                        completion(.success(transactions))
-                    }
-                } else {
+                guard let dogeResponse = try? DogeWalletService.jsonDecoder.decode(DogeGetTransactionsResponse.self, from: data) else {
                     completion(.failure(.internalError(message: "DOGE Wallet: not valid response", error: nil)))
+                    break
                 }
+                
+                completion(.success(dogeResponse))
                 
             case .failure:
                 completion(.failure(.internalError(message: "DOGE Wallet: server not response", error: nil)))
@@ -524,6 +518,7 @@ extension DogeWalletService {
         }
     }
     
+    /*
     func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<DogeTransaction>) -> Void) {
         guard let raw = AdamantResources.dogeServers.randomElement(), let url = URL(string: raw) else {
             fatalError("Failed to build DOGE endpoint URL")
@@ -544,7 +539,8 @@ extension DogeWalletService {
                 switch response.result {
                 case .success(let data):
                     if let item = data as? [String: Any] {
-                        completion(.success(DogeTransaction.from(item, with: address)))
+                        let transfers = DogeTransaction.transactions(from: item, for: address)
+                        completion(.success(transfers))
                     } else {
                         completion(.failure(.internalError(message: "No transaction", error: nil)))
                     }
@@ -556,8 +552,10 @@ extension DogeWalletService {
             completion(.failure(.internalError(message: "DOGE Wallet: not found", error: nil)))
         }
     }
+ */
 }
 
+// MARK: - WalletServiceWithTransfers
 extension DogeWalletService: WalletServiceWithTransfers {
     func transferListViewController() -> UIViewController {
         guard let vc = router.get(scene: AdamantScene.Wallets.Doge.transactionsList) as? DogeTransactionsViewController else {
@@ -569,6 +567,7 @@ extension DogeWalletService: WalletServiceWithTransfers {
     }
 }
 
+// MARK: - Mainnet configuration
 class DogeMainnet: Network {
     override var name: String {
         return "livenet"

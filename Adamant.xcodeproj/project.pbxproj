@@ -135,6 +135,7 @@
 		E926E034213EC454005E536B /* FullscreenAlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = E926E033213EC454005E536B /* FullscreenAlertView.xib */; };
 		E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927171D20C04613002BB9A6 /* UIColor+hex.swift */; };
 		E9332B8921F1FA4400D56E72 /* OnboardRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9332B8821F1FA4400D56E72 /* OnboardRoutes.swift */; };
+		E933475B225539390083839E /* DogeGetTransactionsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E933475A225539390083839E /* DogeGetTransactionsResponse.swift */; };
 		E9393FA82055C92700EE6F30 /* Decimal+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */; };
 		E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA92055D03300EE6F30 /* AdamantMessage.swift */; };
 		E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D732028B21400126346 /* ChatsProvider.swift */; };
@@ -462,6 +463,7 @@
 		E926E033213EC454005E536B /* FullscreenAlertView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FullscreenAlertView.xib; sourceTree = "<group>"; };
 		E927171D20C04613002BB9A6 /* UIColor+hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+hex.swift"; sourceTree = "<group>"; };
 		E9332B8821F1FA4400D56E72 /* OnboardRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardRoutes.swift; sourceTree = "<group>"; };
+		E933475A225539390083839E /* DogeGetTransactionsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeGetTransactionsResponse.swift; sourceTree = "<group>"; };
 		E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+adamant.swift"; sourceTree = "<group>"; };
 		E9393FA92055D03300EE6F30 /* AdamantMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantMessage.swift; sourceTree = "<group>"; };
 		E93B0D732028B21400126346 /* ChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsProvider.swift; sourceTree = "<group>"; };
@@ -898,6 +900,7 @@
 				E95F85792007F0260070534A /* ServerResponse.swift */,
 				E9C51EEE20139DC600385EB7 /* TransactionIdResponse.swift */,
 				E95F856E2007B61D0070534A /* GetPublicKeyResponse.swift */,
+				E933475A225539390083839E /* DogeGetTransactionsResponse.swift */,
 			);
 			path = ServerResponses;
 			sourceTree = "<group>";
@@ -1588,6 +1591,7 @@
 				E9960B3321F5154300C840A8 /* BaseAccount+CoreDataClass.swift in Sources */,
 				E9FCA1E6218334C00005E83D /* SimpleTransactionDetails.swift in Sources */,
 				64A223DA20F7A14B005157CB /* AdamantLskApiService.swift in Sources */,
+				E933475B225539390083839E /* DogeGetTransactionsResponse.swift in Sources */,
 				648DD7A02236A59200B811FD /* DogeTransactionDetailsViewController.swift in Sources */,
 				6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */,
 				E9204B5020C94C4A00F3B9AB /* Date+humanizedString.swift in Sources */,

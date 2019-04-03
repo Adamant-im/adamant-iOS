@@ -29,37 +29,54 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.transactions.removeAll()
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
+        transactions.removeAll()
+        
+        walletService.getTransactions(from: 0) { [weak self] result in
+            switch result {
+            case .success(let tuple):
+                self?.transactions = tuple.transactions
+                
+                DispatchQueue.main.async {
+                    self?.tableView.reloadData()
+                    self?.refreshControl.endRefreshing()
+                }
+                
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self?.tableView.reloadData()
+                    self?.refreshControl.endRefreshing()
+                }
+                
+                self?.dialogService.showRichError(error: error)
+            }
         }
         
-        self.walletService.getTransactions(update: { transactions in
-            self.transactions.append(contentsOf: transactions)
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
-        }, completion: { (result) in
-            switch result {
-            case .success(let transactions):
-                self.transactions = transactions
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-                break
-            case .failure(let error):
-                if case .internalError(let message, _ ) = error {
-                    let localizedErrorMessage = NSLocalizedString(message, comment: "TransactionList: 'Transactions not found' message.")
-                    self.dialogService.showWarning(withMessage: localizedErrorMessage)
-                } else {
-                    self.dialogService.showError(withMessage: String.adamantLocalized.transactionList.notFound, error: error)
-                }
-                break
-            }
-            DispatchQueue.main.async {
-                self.refreshControl.endRefreshing()
-            }
-        })
+//        self.walletService.getTransactions(update: { transactions in
+//            self.transactions.append(contentsOf: transactions)
+//            DispatchQueue.main.async {
+//                self.tableView.reloadData()
+//            }
+//        }, completion: { (result) in
+//            switch result {
+//            case .success(let transactions):
+//                self.transactions = transactions
+//                DispatchQueue.main.async {
+//                    self.tableView.reloadData()
+//                }
+//                break
+//            case .failure(let error):
+//                if case .internalError(let message, _ ) = error {
+//                    let localizedErrorMessage = NSLocalizedString(message, comment: "TransactionList: 'Transactions not found' message.")
+//                    self.dialogService.showWarning(withMessage: localizedErrorMessage)
+//                } else {
+//                    self.dialogService.showError(withMessage: String.adamantLocalized.transactionList.notFound, error: error)
+//                }
+//                break
+//            }
+//            DispatchQueue.main.async {
+//                self.refreshControl.endRefreshing()
+//            }
+//        })
     }
     
     
@@ -107,7 +124,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     func configureCell(_ cell: TransactionTableViewCell, for transaction: DogeTransaction) {
-        let outgoing = isOutgoing(transaction)
+        let outgoing = transaction.isOutgoing
         let partnerId = outgoing ? transaction.recipientAddress : transaction.senderAddress
         
         configureCell(cell,
@@ -116,9 +133,5 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                       partnerName: nil,
                       amount: transaction.amountValue,
                       date: transaction.dateValue)
-    }
-    
-    private func isOutgoing(_ transaction: DogeTransaction) -> Bool {
-        return transaction.senderAddress.lowercased() == walletService.wallet?.address.lowercased()
     }
 }
