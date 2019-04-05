@@ -522,41 +522,65 @@ extension DogeWalletService {
         }
     }
     
-    /*
-    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<DogeTransaction>) -> Void) {
-        guard let raw = AdamantResources.dogeServers.randomElement(), let url = URL(string: raw) else {
-            fatalError("Failed to build DOGE endpoint URL")
+    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<DogeRawTransaction>) -> Void) {
+        guard let url = AdamantResources.dogeServers.randomElement() else {
+            fatalError("Failed to get DOGE endpoint URL")
         }
         
-        if let address = self.wallet?.address {
-            // Headers
-            let headers = [
-                "Content-Type": "application/json"
-            ]
-            
-            // Request url
-            let endpoint = url.appendingPathComponent(DogeApiCommands.getTransaction(txId: hash))
-            
-            // MARK: Sending request
-            Alamofire.request(endpoint, method: .get, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
-                
-                switch response.result {
-                case .success(let data):
-                    if let item = data as? [String: Any] {
-                        let transfers = DogeTransaction.transactions(from: item, for: address)
-                        completion(.success(transfers))
-                    } else {
-                        completion(.failure(.internalError(message: "No transaction", error: nil)))
-                    }
-                case .failure:
-                    completion(.failure(.internalError(message: "No transaction", error: nil)))
+        // Headers
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        
+        // Request url
+        let endpoint = url.appendingPathComponent(DogeApiCommands.getTransaction(by: hash))
+        
+        // MARK: Sending request
+        Alamofire.request(endpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+            switch response.result {
+            case .success(let data):
+                do {
+                    let transfers = try DogeWalletService.jsonDecoder.decode(DogeRawTransaction.self, from: data)
+                    completion(.success(transfers))
+                } catch {
+                    completion(.failure(.internalError(message: "DOGE: Parsing transaction error", error: error)))
                 }
+                
+            case .failure(let error):
+                completion(.failure(.internalError(message: "No transaction", error: error)))
             }
-        } else {
-            completion(.failure(.internalError(message: "DOGE Wallet: not found", error: nil)))
         }
     }
- */
+    
+    func getBlockId(by hash: String, completion: @escaping (ApiServiceResult<String>) -> Void) {
+        guard let url = AdamantResources.dogeServers.randomElement() else {
+            fatalError("Failed to get DOGE endpoint URL")
+        }
+        
+        // Headers
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        
+        // Request url
+        let endpoint = url.appendingPathComponent(DogeApiCommands.getBlock(by: hash))
+        Alamofire.request(endpoint, method: .get, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+            switch response.result {
+            case .success(let json as [String: Any]):
+                if let height = json["height"] as? NSNumber {
+                    completion(.success(height.stringValue))
+                } else {
+                    completion(.failure(.internalError(message: "Failed to parse block", error: nil)))
+                }
+                
+            case .failure(let error):
+                completion(.failure(.internalError(message: "No block", error: error)))
+                
+            default:
+                completion(.failure(.internalError(message: "No block", error: nil)))
+            }
+        }
+    }
 }
 
 // MARK: - WalletServiceWithTransfers

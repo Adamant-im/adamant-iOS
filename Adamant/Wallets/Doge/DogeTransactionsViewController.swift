@@ -50,33 +50,6 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                 self?.dialogService.showRichError(error: error)
             }
         }
-        
-//        self.walletService.getTransactions(update: { transactions in
-//            self.transactions.append(contentsOf: transactions)
-//            DispatchQueue.main.async {
-//                self.tableView.reloadData()
-//            }
-//        }, completion: { (result) in
-//            switch result {
-//            case .success(let transactions):
-//                self.transactions = transactions
-//                DispatchQueue.main.async {
-//                    self.tableView.reloadData()
-//                }
-//                break
-//            case .failure(let error):
-//                if case .internalError(let message, _ ) = error {
-//                    let localizedErrorMessage = NSLocalizedString(message, comment: "TransactionList: 'Transactions not found' message.")
-//                    self.dialogService.showWarning(withMessage: localizedErrorMessage)
-//                } else {
-//                    self.dialogService.showError(withMessage: String.adamantLocalized.transactionList.notFound, error: error)
-//                }
-//                break
-//            }
-//            DispatchQueue.main.async {
-//                self.refreshControl.endRefreshing()
-//            }
-//        })
     }
     
     
@@ -87,26 +60,32 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        
-        let transaction = transactions[indexPath.row]
-        
         guard let controller = router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController else {
-            return
+            fatalError("Failed to get DogeTransactionDetailsViewController")
         }
         
-        controller.transaction = transaction
-        controller.service = walletService
+        controller.service = self.walletService
+        dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+        let txId = transactions[indexPath.row].txId
         
-        if let address = walletService.wallet?.address {
-            if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
-                controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
-            } else if transaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
-                controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+        walletService.getTransaction(by: txId) { result in
+            DispatchQueue.main.async {
+                self.tableView.deselectRow(at: indexPath, animated: true)
+                self.dialogService.dismissProgress()
+            }
+            
+            switch result {
+            case .success(let dogeTransaction):
+                controller.transaction = dogeTransaction
+                
+                DispatchQueue.main.async {
+                    self.navigationController?.pushViewController(controller, animated: true)
+                }
+                
+            case .failure(let error):
+                self.dialogService.showRichError(error: error)
             }
         }
-        
-        navigationController?.pushViewController(controller, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

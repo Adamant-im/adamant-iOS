@@ -30,38 +30,6 @@ extension DogeWalletService: RichMessageProvider {
             comment = nil
         }
         
-        // MARK: 1. Sender & recipient names
-        
-        let senderName: String?
-        let recipientName: String?
-        
-        if let address = accountService.account?.address {
-            if let senderId = transaction.senderId, senderId.caseInsensitiveCompare(address) == .orderedSame {
-                senderName = String.adamantLocalized.transactionDetails.yourAddress
-            } else {
-                senderName = transaction.chatroom?.partner?.name
-            }
-            
-            if let recipientId = transaction.recipientId, recipientId.caseInsensitiveCompare(address) == .orderedSame {
-                recipientName = String.adamantLocalized.transactionDetails.yourAddress
-            } else {
-                recipientName = transaction.chatroom?.partner?.name
-            }
-        } else if let partner = transaction.chatroom?.partner, let id = partner.address {
-            if transaction.senderId == id {
-                senderName = partner.name
-                recipientName = nil
-            } else {
-                recipientName = partner.name
-                senderName = nil
-            }
-        } else {
-            senderName = nil
-            recipientName = nil
-        }
-        
-        // MARK: 2. Go go transaction
-        
         getTransaction(by: hash) { [weak self] result in
             dialogService.dismissProgress()
             guard let vc = self?.router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController else {
@@ -69,8 +37,6 @@ extension DogeWalletService: RichMessageProvider {
             }
             
             vc.service = self
-            vc.senderName = senderName
-            vc.recipientName = recipientName
             vc.comment = comment
             
             switch result {
@@ -104,7 +70,6 @@ extension DogeWalletService: RichMessageProvider {
                     self?.dialogService.showRichError(error: error)
                     return
                 }
-                break
             }
             
             DispatchQueue.main.async {

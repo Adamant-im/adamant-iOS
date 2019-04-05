@@ -93,7 +93,7 @@ struct DogeTransaction: TransactionDetails {
 
 
 // MARK: - Raw Doge Transaction, for easy parsing
-struct DogeRawTransaction {
+struct DogeRawTransaction: TransactionDetails {
     let txId: String
     let date: Date
     
@@ -106,6 +106,19 @@ struct DogeRawTransaction {
     
     let inputs: [DogeInput]
     let outputs: [DogeOutput]
+    
+    // MARK: Transaction Details
+    var feeValue: Decimal? { return fee }
+    var dateValue: Date? { return date }
+    var confirmationsValue: String? { return String(confirmations) }
+    var transactionStatus: TransactionStatus? { return .success }
+    var blockValue: String? { return nil }
+    
+    // Not used in details
+    var senderAddress: String { return "" }
+    var recipientAddress: String { return "" }
+    var amountValue: Decimal { return 0 }
+    var isOutgoing: Bool { return false }
 }
 
 extension DogeRawTransaction: Decodable {
