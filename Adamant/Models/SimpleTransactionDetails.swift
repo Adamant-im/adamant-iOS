@@ -28,6 +28,4 @@ struct SimpleTransactionDetails: TransactionDetails {
     var isOutgoing: Bool
     
     var transactionStatus: TransactionStatus?
-    
-    
 }

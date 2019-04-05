@@ -74,6 +74,7 @@
 		E905D39D204C13B900DDB504 /* SecuredStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39C204C13B900DDB504 /* SecuredStore.swift */; };
 		E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39E204C281400DDB504 /* LoginViewController.swift */; };
 		E9061B97207501E40011F104 /* AdamantUserInfoKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9061B96207501E40011F104 /* AdamantUserInfoKey.swift */; };
+		E907350E2256779C00BF02CC /* DogeMainnet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E907350D2256779C00BF02CC /* DogeMainnet.swift */; };
 		E908471B2196FE590095825D /* Adamant.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E90847192196FE590095825D /* Adamant.xcdatamodeld */; };
 		E908472A2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E908471C2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift */; };
 		E908472B2196FEA80095825D /* RichMessageTransaction+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = E908471D2196FEA80095825D /* RichMessageTransaction+CoreDataProperties.swift */; };
@@ -387,6 +388,7 @@
 		E905D39E204C281400DDB504 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		E9061B96207501E40011F104 /* AdamantUserInfoKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantUserInfoKey.swift; sourceTree = "<group>"; };
 		E9061B982077AF8E0011F104 /* Adamant.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Adamant.entitlements; sourceTree = "<group>"; };
+		E907350D2256779C00BF02CC /* DogeMainnet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeMainnet.swift; sourceTree = "<group>"; };
 		E908471A2196FE590095825D /* Adamant.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Adamant.xcdatamodel; sourceTree = "<group>"; };
 		E908471C2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichMessageTransaction+CoreDataClass.swift"; sourceTree = "<group>"; };
 		E908471D2196FEA80095825D /* RichMessageTransaction+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichMessageTransaction+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -681,6 +683,7 @@
 		64E1C82B222E958C006C4DA7 /* Doge */ = {
 			isa = PBXGroup;
 			children = (
+				E907350D2256779C00BF02CC /* DogeMainnet.swift */,
 				64E1C82C222E95E2006C4DA7 /* DogeWalletRoutes.swift */,
 				64E1C82E222E95F6006C4DA7 /* DogeWallet.swift */,
 				64E1C830222E9617006C4DA7 /* DogeWalletService.swift */,
@@ -1613,6 +1616,7 @@
 				6416B19F21AD7CBE006089AC /* LskWalletViewController.swift in Sources */,
 				64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */,
 				E9147B612050599000145913 /* LoginViewController+QR.swift in Sources */,
+				E907350E2256779C00BF02CC /* DogeMainnet.swift in Sources */,
 				E9147B6F205088DE00145913 /* LoginViewController+Pinpad.swift in Sources */,
 				E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */,
 				E983AE2120E655C500497E1A /* AccountHeaderView.swift in Sources */,

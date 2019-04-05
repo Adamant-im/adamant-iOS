@@ -57,8 +57,8 @@ struct AdamantResources {
         "https://lisknode1.adamant.im"
     ]
     
-    static let dogeServers = [
-        "https://dogenode1.adamant.im/api"
+    static let dogeServers: [URL] = [
+        URL(string: "https://dogenode1.adamant.im/api")!
     ]
 	
     // MARK: ADAMANT Addresses

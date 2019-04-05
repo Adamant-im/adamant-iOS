@@ -13,19 +13,23 @@ import BitcoinKit
 import BitcoinKit.Private
 
 struct DogeApiCommands {
-    static func balance(address: String) -> String {
+    static func balance(for address: String) -> String {
         return "/addr/\(address)/balance"
     }
     
-    static func getTransactions(address: String) -> String {
+    static func getTransactions(for address: String) -> String {
         return "/addrs/\(address)/txs"
     }
     
-    static func getTransaction(txId: String) -> String {
-        return "/tx/\(txId)"
+    static func getTransaction(by hash: String) -> String {
+        return "/tx/\(hash)"
     }
     
-    static func getUnspentTransactions(address: String) -> String {
+    static func getBlock(by hash: String) -> String {
+        return "/block/\(hash)"
+    }
+    
+    static func getUnspentTransactions(for address: String) -> String {
         return "/addr/\(address)/utxo"
     }
     
@@ -278,8 +282,8 @@ extension DogeWalletService: SwinjectDependentService {
 // MARK: - Balances & addresses
 extension DogeWalletService {
     func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        guard let raw = AdamantResources.dogeServers.randomElement(), let url = URL(string: raw) else {
-            fatalError("Failed to build DOGE endpoint URL")
+        guard let url = AdamantResources.dogeServers.randomElement() else {
+            fatalError("Failed to get DOGE endpoint URL")
         }
         
         guard let address = self.dogeWallet?.address else {
@@ -293,7 +297,7 @@ extension DogeWalletService {
         ]
         
         // Request url
-        let endpoint = url.appendingPathComponent(DogeApiCommands.balance(address: address))
+        let endpoint = url.appendingPathComponent(DogeApiCommands.balance(for: address))
         
         // MARK: Sending request
         Alamofire.request(endpoint, method: .get, headers: headers).responseString(queue: defaultDispatchQueue) { response in
@@ -421,8 +425,8 @@ extension DogeWalletService {
     }
     
     private func getTransactions(for address: String, from: Int, to: Int, completion: @escaping (ApiServiceResult<DogeGetTransactionsResponse>) -> Void) {
-        guard let raw = AdamantResources.dogeServers.randomElement(), let url = URL(string: raw) else {
-            fatalError("Failed to build DOGE endpoint URL")
+        guard let url = AdamantResources.dogeServers.randomElement() else {
+            fatalError("Failed to get DOGE endpoint URL")
         }
         
         // Headers
@@ -436,7 +440,7 @@ extension DogeWalletService {
         ]
         
         // Request url
-        let endpoint = url.appendingPathComponent(DogeApiCommands.getTransactions(address: address))
+        let endpoint = url.appendingPathComponent(DogeApiCommands.getTransactions(for: address))
         
         // MARK: Sending request
         Alamofire.request(endpoint, method: .get, parameters: parameters, headers: headers).responseData(queue: defaultDispatchQueue) { response in
@@ -456,8 +460,8 @@ extension DogeWalletService {
     }
     
     func getUnspentTransactions(_ completion: @escaping (ApiServiceResult<[UnspentTransaction]>) -> Void) {
-        guard let raw = AdamantResources.dogeServers.randomElement(), let url = URL(string: raw) else {
-            fatalError("Failed to build DOGE endpoint URL")
+        guard let url = AdamantResources.dogeServers.randomElement() else {
+            fatalError("Failed to get DOGE endpoint URL")
         }
         
         guard let wallet = self.dogeWallet else {
@@ -473,7 +477,7 @@ extension DogeWalletService {
         ]
         
         // Request url
-        let endpoint = url.appendingPathComponent(DogeApiCommands.getUnspentTransactions(address: address))
+        let endpoint = url.appendingPathComponent(DogeApiCommands.getUnspentTransactions(for: address))
         
         let parameters = [
             "noCache": "1"
@@ -564,54 +568,5 @@ extension DogeWalletService: WalletServiceWithTransfers {
         
         vc.walletService = self
         return vc
-    }
-}
-
-// MARK: - Mainnet configuration
-class DogeMainnet: Network {
-    override var name: String {
-        return "livenet"
-    }
-    
-    override var alias: String {
-        return "mainnet"
-    }
-    
-    override var scheme: String {
-        return "dogecoin"
-    }
-    
-    override var magic: UInt32 {
-        return 0xc0c0c0c0
-    }
-    
-    override var pubkeyhash: UInt8 {
-        return 0x1e
-    }
-    
-    override var privatekey: UInt8 {
-        return 0x9e
-    }
-    
-    override var scripthash: UInt8 {
-        return 0x16
-    }
-    
-    override var xpubkey: UInt32 {
-        return 0x02facafd
-    }
-    
-    override var xprivkey: UInt32 {
-        return 0x02fac398
-    }
-    
-    override var port: UInt32 {
-        return 22556
-    }
-    
-    override var dnsSeeds: [String] {
-        return [
-            "dogenode1.adamant.im"
-        ]
     }
 }

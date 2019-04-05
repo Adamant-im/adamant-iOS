@@ -7,8 +7,6 @@
 //
 
 import Foundation
-import web3swift
-import BigInt
 
 /// A standard protocol representing a Transaction details.
 protocol TransactionDetails {
@@ -41,7 +39,7 @@ protocol TransactionDetails {
     var transactionStatus: TransactionStatus? { get }
 }
 
-extension TransactionDetails {
+//extension TransactionDetails {
 //    func getSummary() -> String {
 //        return """
 //        Transaction #\(id)
@@ -57,4 +55,4 @@ extension TransactionDetails {
 //        URL: \(explorerUrl?.absoluteString ?? "")
 //        """
 //    }
-}
+//}
