@@ -743,6 +743,8 @@ private class StatusUpdateProcedure: Procedure {
         self.provider = provider
         self.controller = controller
         super.init()
+        
+        log.severity = .warning
     }
     
     override func execute() {

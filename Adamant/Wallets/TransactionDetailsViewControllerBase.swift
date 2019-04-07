@@ -112,8 +112,14 @@ class TransactionDetailsViewControllerBase: FormViewController {
     // MARK: - Properties
     
     var transaction: TransactionDetails? = nil
+    private lazy var dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        dateFormatter.timeStyle = .short
+        return dateFormatter
+    }()
     
-    private static let awaitingValueString = "⏱"
+    static let awaitingValueString = "⏱"
     
     private lazy var currencyFormatter: NumberFormatter = {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
@@ -267,26 +273,31 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(recipientRow)
         
         // MARK: Date
-        let dateRow = DateTimeRow() {
+        let dateRow = LabelRow() { [weak self] in
             $0.disabled = true
             $0.tag = Rows.date.tag
             $0.title = Rows.date.localized
-            $0.value = transaction?.dateValue
             
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateStyle = .medium
-            dateFormatter.timeStyle = .short
-            $0.dateFormatter = dateFormatter
+            if let raw = transaction?.dateValue, let value = self?.dateFormatter.string(from: raw) {
+                $0.value = value
+            } else {
+                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
         }.onCellSelection { [weak self] (cell, row) in
-            if let value = row.value {
+            if let value = self?.transaction?.dateValue {
                 let text = value.humanizedDateTimeFull()
                 self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
-            row.value = self?.transaction?.dateValue
+            
+            if let raw = self?.transaction?.dateValue, let value = self?.dateFormatter.string(from: raw) {
+                row.value = value
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }
             
         detailsSection.append(dateRow)
