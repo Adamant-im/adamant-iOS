@@ -66,7 +66,7 @@ class DogeWalletService: WalletService {
     static var currencySymbol = "DOGE"
     static var currencyLogo = #imageLiteral(resourceName: "wallet_doge")
     
-    static let multiplier = Decimal(sign: .plus, exponent: -8, significand: 1)
+    static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20
     
     private (set) var transactionFee: Decimal = 1.0 // 1 DOGE per transaction
@@ -305,7 +305,7 @@ extension DogeWalletService {
             switch response.result {
             case .success(let data):
                 if let raw = Decimal(string: data) {
-                    let balance = raw * DogeWalletService.multiplier
+                    let balance = raw / DogeWalletService.multiplier
                     completion(.success(result: balance))
                 } else {
                     completion(.failure(error: .remoteServiceError(message: "DOGE Wallet: \(data)")))
@@ -485,36 +485,35 @@ extension DogeWalletService {
         
         // MARK: Sending request
         Alamofire.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
-            
             switch response.result {
             case .success(let data):
-                
-                if let items = data as? [[String: Any]] {
-                    var utxos = [UnspentTransaction]()
-                    for item in items {
-                        if let txid = item["txid"] as? String,
-                            let vout = item["vout"] as? NSNumber,
-                            let amount = item["amount"] as? NSNumber {
-                            
-                            let value = NSDecimalNumber(decimal: (amount.decimalValue * DogeWalletService.multiplier)).uint64Value
-                            
-                            let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
-                            let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
-                            let txIndex = vout.uint32Value
-                            
-                            print(txid, txIndex, lockScript.hex, value)
-                            
-                            let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
-                            let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
-                            let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
-                            
-                            utxos.append(utxo)
-                        }
-                    }
-                    completion(.success(utxos))
-                } else {
+                guard let items = data as? [[String: Any]] else {
                     completion(.failure(.internalError(message: "DOGE Wallet: not valid response", error: nil)))
+                    break
                 }
+                
+                var utxos = [UnspentTransaction]()
+                for item in items {
+                    guard let txid = item["txid"] as? String,
+                        let vout = item["vout"] as? NSNumber,
+                        let amount = item["amount"] as? NSNumber else {
+                        continue
+                    }
+                        
+                    let value = NSDecimalNumber(decimal: (amount.decimalValue * DogeWalletService.multiplier)).uint64Value
+                    
+                    let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
+                    let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
+                    let txIndex = vout.uint32Value
+                    
+                    let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
+                    let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
+                    let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
+                    
+                    utxos.append(utxo)
+                }
+                
+                completion(.success(utxos))
                 
             case .failure:
                 completion(.failure(.internalError(message: "DOGE Wallet: server not response", error: nil)))

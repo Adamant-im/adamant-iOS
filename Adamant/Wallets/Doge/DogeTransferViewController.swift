@@ -76,42 +76,46 @@ class DogeTransferViewController: TransferViewControllerBase {
                             case .success(let transaction):
                                 vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
                                 
-                                if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController {
-                                    detailsVc.transaction = transaction
-                                    detailsVc.service = service
-                                    detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                                    detailsVc.recipientName = self?.recipientName
-                                    
-                                    if comments.count > 0 {
-                                        detailsVc.comment = comments
-                                    }
-                                    
-                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-                                } else {
+                                guard let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController else {
                                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
+                                    break
                                 }
                                 
+                                detailsVc.transaction = transaction
+                                detailsVc.service = service
+                                detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                                detailsVc.recipientName = self?.recipientName
+                                
+                                if comments.count > 0 {
+                                    detailsVc.comment = comments
+                                }
+                                
+                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+                                
                             case .failure(let error):
-                                if case let .internalError(message, _) = error, message == "No transaction" {
-                                    vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                                    if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController {
-                                        detailsVc.transaction = transaction
-                                        detailsVc.service = service
-                                        detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                                        detailsVc.recipientName = self?.recipientName
-                                        
-                                        if comments.count > 0 {
-                                            detailsVc.comment = comments
-                                        }
-                                        
-                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-                                    } else {
-                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-                                    }
-                                } else {
+                                guard case let .internalError(message, _) = error, message == "No transaction" else {
                                     vc.dialogService.showRichError(error: error)
                                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
+                                    break
                                 }
+                                
+                                vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                                
+                                guard let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController else {
+                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
+                                    break
+                                }
+                                
+                                detailsVc.transaction = transaction
+                                detailsVc.service = service
+                                detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                                detailsVc.recipientName = self?.recipientName
+                                
+                                if comments.count > 0 {
+                                    detailsVc.comment = comments
+                                }
+                                
+                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
                             }
                         }
                         

@@ -94,33 +94,11 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
     }
     
     @objc func refresh() {
-        guard let id = transaction?.txId, let service = service else {
-            refreshControl.endRefreshing()
-            return
-        }
-        
-        service.getTransaction(by: id) { [weak self] result in
-            switch result {
-            case .success(let trs):
-                self?.transaction = trs
-                
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                    self?.refreshControl.endRefreshing()
-                }
-                
-                if let blockInfo = self?.blockInfo, blockInfo.hash == trs.blockHash {
-                    // No need to update block id
-                } else {
-                    self?.updateBlockNumber()
-                }
-                
-            case .failure(let error):
+        updateTransaction { [weak self] error in
+            self?.refreshControl.endRefreshing()
+            
+            if let error = error {
                 self?.dialogService.showRichError(error: error)
-                
-                DispatchQueue.main.async {
-                    self?.refreshControl.endRefreshing()
-                }
             }
         }
     }
@@ -130,23 +108,7 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
     func startUpdate() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            guard let id = self?.transaction?.txId, let service = self?.service else {
-                return
-            }
-            
-            service.getTransaction(by: id) { result in
-                switch result {
-                case .success(let trs):
-                    self?.transaction = trs
-                    
-                    DispatchQueue.main.async {
-                        self?.tableView.reloadData()
-                    }
-                    
-                case .failure:
-                    break
-                }
-            }
+            self?.updateTransaction() // Silent, without errors
         }
     }
     
@@ -154,11 +116,49 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
         timer?.invalidate()
     }
     
-    // MARK: - Update block number
+    // MARK: Updating methods
+    
+    func updateTransaction(completion: ((RichError?) -> Void)? = nil) {
+        guard let service = service, let id = transaction?.txId else {
+            completion?(nil)
+            return
+        }
+
+        service.getTransaction(by: id) { [weak self] result in
+            switch result {
+            case .success(let trs):
+                self?.transaction = trs
+                
+                if let blockInfo = self?.blockInfo, blockInfo.hash == trs.blockHash {
+                    // No need to update block id
+                } else {
+                    self?.updateBlockNumber()
+                }
+                
+                DispatchQueue.main.async { [weak self] in
+                    self?.tableView.reloadData()
+                }
+                
+                completion?(nil)
+                
+            case .failure(let error):
+                completion?(error)
+            }
+        }
+    }
+    
     func updateBlockNumber() {
         guard let blockHash = (transaction as? DogeRawTransaction)?.blockHash else {
-            blockInfo = nil
-            form.rowBy(tag: Rows.block.tag)?.updateCell()
+            if blockInfo != nil {
+                blockInfo = nil
+                
+                if let row = form.rowBy(tag: Rows.block.tag) {
+                    DispatchQueue.main.async {
+                        row.updateCell()
+                    }
+                }
+            }
+            
             return
         }
         

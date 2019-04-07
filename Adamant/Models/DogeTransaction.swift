@@ -30,8 +30,17 @@ struct DogeTransaction: TransactionDetails {
         let txId = dogeTransaction.txId
         let dateValue = dogeTransaction.date
         let feeValue = dogeTransaction.fee
-        let confirmationsValue = String(dogeTransaction.confirmations)
-        let transactionStatus: TransactionStatus = dogeTransaction.confirmations > 0 ? .success : .pending
+        
+        let confirmationsValue: String?
+        let transactionStatus: TransactionStatus
+        
+        if let confirmations = dogeTransaction.confirmations {
+            confirmationsValue = String(confirmations)
+            transactionStatus = confirmations > 0 ? .success : .pending
+        } else {
+            confirmationsValue = nil
+            transactionStatus = .pending
+        }
         
         // Transfers
         let myInputs = dogeTransaction.inputs.filter { $0.sender == address }
@@ -95,14 +104,14 @@ struct DogeTransaction: TransactionDetails {
 // MARK: - Raw Doge Transaction, for easy parsing
 struct DogeRawTransaction: TransactionDetails {
     let txId: String
-    let date: Date
+    let date: Date?
     
     let valueIn: Decimal
     let valueOut: Decimal
     let fee: Decimal
     
-    let confirmations: Int
-    let blockHash: String
+    let confirmations: Int?
+    let blockHash: String?
     
     let inputs: [DogeInput]
     let outputs: [DogeOutput]
@@ -110,9 +119,16 @@ struct DogeRawTransaction: TransactionDetails {
     // MARK: Transaction Details
     var feeValue: Decimal? { return fee }
     var dateValue: Date? { return date }
-    var confirmationsValue: String? { return String(confirmations) }
     var transactionStatus: TransactionStatus? { return .success }
     var blockValue: String? { return nil }
+    
+    var confirmationsValue: String? {
+        if let confirmations = confirmations {
+            return String(confirmations)
+        } else {
+            return nil
+        }
+    }
     
     // Not used in details
     var senderAddress: String { return "" }
@@ -137,17 +153,21 @@ extension DogeRawTransaction: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
-        // MARK: Base
+        // MARK: Required
         self.txId = try container.decode(String.self, forKey: .txId)
-        
-        let timeInterval = try container.decode(TimeInterval.self, forKey: .date)
-        self.date = Date(timeIntervalSince1970: timeInterval)
-        
         self.valueIn = try container.decode(Decimal.self, forKey: .valueIn)
         self.valueOut = try container.decode(Decimal.self, forKey: .valueOut)
         self.fee = try container.decode(Decimal.self, forKey: .fee)
-        self.confirmations = try container.decode(Int.self, forKey: .confirmations)
-        self.blockHash = try container.decode(String.self, forKey: .blockHash)
+        
+        // MARK: Optionals for new transactions
+        if let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) {
+            self.date = Date(timeIntervalSince1970: timeInterval)
+        } else {
+            self.date = nil
+        }
+        
+        self.confirmations = try? container.decode(Int.self, forKey: .confirmations)
+        self.blockHash = try? container.decode(String.self, forKey: .blockHash)
         
         // MARK: Inputs & Outputs
         
@@ -235,6 +255,20 @@ struct DogeOutput: Decodable {
     "fees": 1,
     "firstSeenTs": 1554298214
 }
+ 
+new transaction:
+{
+    "txid": "60cd612335c9797ea67689b9cde4a41e20c20c1b96eb0731c59c5b0eab8bad31",
+    "version": 1,
+    "locktime": 0,
+    "vin": [],
+    "vout": [],
+    "valueOut": 283,
+    "size": 225,
+    "valueIn": 284,
+    "fees": 1
+}
+ 
 */
 
 /* Inputs

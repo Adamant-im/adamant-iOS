@@ -48,21 +48,18 @@ extension DogeWalletService: WalletServiceTwoStepSend {
         let rawAmount = NSDecimalNumber(decimal: amount * DogeWalletService.multiplier).uint64Value
         let fee = NSDecimalNumber(decimal: self.transactionFee * DogeWalletService.multiplier).uint64Value
         
-        // MARK: Go background
-        defaultDispatchQueue.async {
-            // MARK: 2. Search for unspent transactions
-            self.getUnspentTransactions({ result in
-                switch result {
-                case .success(let utxos):
-                    // MARK: 3. Create local transaction
-                    let transaction = BitcoinKit.Transaction.createNewTransaction(toAddress: toAddress, amount: rawAmount, fee: fee, changeAddress: changeAddress, utxos: utxos, keys: [key])
-                    completion(.success(result: transaction))
-                    break
-                case .failure:
-                    completion(.failure(error: .notEnoughMoney))
-                    break
-                }
-            })
+        // MARK: 2. Search for unspent transactions
+        self.getUnspentTransactions { result in
+            switch result {
+            case .success(let utxos):
+                // MARK: 3. Create local transaction
+                let transaction = BitcoinKit.Transaction.createNewTransaction(toAddress: toAddress, amount: rawAmount, fee: fee, changeAddress: changeAddress, utxos: utxos, keys: [key])
+                completion(.success(result: transaction))
+                break
+            case .failure:
+                completion(.failure(error: .notEnoughMoney))
+                break
+            }
         }
     }
     
@@ -71,37 +68,33 @@ extension DogeWalletService: WalletServiceTwoStepSend {
             fatalError("Failed to get DOGE endpoint URL")
         }
         
+        // Request url
+        let endpoint = url.appendingPathComponent(DogeApiCommands.sendTransaction())
+        
         // Headers
         let headers = [
             "Content-Type": "application/json"
         ]
         
-        // Request url
-        let endpoint = url.appendingPathComponent(DogeApiCommands.sendTransaction())
+        // MARK: Prepare params
+        let txHex = transaction.serialized().hex
         
-        defaultDispatchQueue.async {
-            // MARK: Prepare params
-            let txHex = transaction.serialized().hex
-            
-            let parameters: [String : Any] = [
-                "rawtx": txHex
-            ]
-            
-            // MARK: Sending request
-            Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: self.defaultDispatchQueue) { response in
-                
-                switch response.result {
-                case .success(let data):
-                    
-                    if let result = data as? [String: Any], let txid = result["txid"] as? String {
-                        completion(.success(result: txid))
-                    } else {
-                        completion(.failure(error: .internalError(message: "DOGE Wallet: not valid response", error: nil)))
-                    }
-                    
-                case .failure:
-                    completion(.failure(error: .internalError(message: "DOGE Wallet: server not response", error: nil)))
+        let parameters: [String : Any] = [
+            "rawtx": txHex
+        ]
+        
+        // MARK: Sending request
+        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+            switch response.result {
+            case .success(let data):
+                if let result = data as? [String: Any], let txid = result["txid"] as? String {
+                    completion(.success(result: txid))
+                } else {
+                    completion(.failure(error: .internalError(message: "DOGE Wallet: not valid response", error: nil)))
                 }
+                
+            case .failure(let error):
+                completion(.failure(error: .remoteServiceError(message: error.localizedDescription)))
             }
         }
     }
