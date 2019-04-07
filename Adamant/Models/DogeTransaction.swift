@@ -43,18 +43,40 @@ struct DogeTransaction: TransactionDetails {
         }
         
         // Transfers
-        let myInputs = dogeTransaction.inputs.filter { $0.sender == address }
-        let myOutputs = dogeTransaction.outputs.filter { $0.addresses.contains(address) }
+        var myInputs = dogeTransaction.inputs.filter { $0.sender == address }
+        var myOutputs: [DogeOutput] = dogeTransaction.outputs.filter { $0.addresses.contains(address) }
+        
+        var totalInputsValue = myInputs.map { $0.value }.reduce(0, +) - dogeTransaction.fee
+        var totalOutputsValue = myOutputs.map { $0.value }.reduce(0, +)
+        
+        if totalInputsValue > totalOutputsValue {
+            while let out = myOutputs.first {
+                totalInputsValue -= out.value
+                totalOutputsValue -= out.value
+                
+                myOutputs.removeFirst()
+            }
+        }
+        
+        if totalInputsValue < totalOutputsValue {
+            while let i = myInputs.first {
+                totalInputsValue -= i.value
+                totalOutputsValue -= i.value
+                
+                myInputs.removeFirst()
+            }
+        }
+        
+        let senders = Set(dogeTransaction.inputs.map { $0.sender }.filter { $0 != address })
+        let recipients = Set(dogeTransaction.outputs.compactMap { $0.addresses.first }.filter { $0 != address })
         
         // MARK: Inputs
         if myInputs.count > 0 {
-            let amountValue = myInputs.map { $0.value }.reduce(0, +)
-            
             let recipient: String
-            if dogeTransaction.outputs.count == 1 {
-                recipient = dogeTransaction.outputs.first?.addresses.first ?? ""
+            if recipients.count == 1, let name = recipients.first {
+                recipient = name
             } else {
-                recipient = "\(dogeTransaction.outputs.count) recipients"
+                recipient = "\(recipients.count) recipients"
             }
             
             let inputTransaction =  DogeTransaction(txId: txId,
@@ -62,7 +84,7 @@ struct DogeTransaction: TransactionDetails {
                                                     blockValue: blockId,
                                                     senderAddress: address,
                                                     recipientAddress: recipient,
-                                                    amountValue: amountValue,
+                                                    amountValue: totalInputsValue,
                                                     feeValue: feeValue,
                                                     confirmationsValue: confirmationsValue,
                                                     isOutgoing: true,
@@ -73,13 +95,11 @@ struct DogeTransaction: TransactionDetails {
         
         // MARK: Outputs
         if myOutputs.count > 0 {
-            let amountValue = myOutputs.map { $0.value }.reduce(0, +)
-            
             let sender: String
-            if dogeTransaction.inputs.count == 1 {
-                sender = dogeTransaction.inputs.first?.sender ?? ""
+            if senders.count == 1, let name = senders.first {
+                sender = name
             } else {
-                sender = "\(dogeTransaction.inputs.count) senders"
+                sender = "\(senders.count) senders"
             }
             
             let outputTransaction = DogeTransaction(txId: txId,
@@ -87,7 +107,7 @@ struct DogeTransaction: TransactionDetails {
                                                     blockValue: blockId,
                                                     senderAddress: sender,
                                                     recipientAddress: address,
-                                                    amountValue: amountValue,
+                                                    amountValue: totalOutputsValue,
                                                     feeValue: feeValue,
                                                     confirmationsValue: confirmationsValue,
                                                     isOutgoing: false,
