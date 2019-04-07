@@ -15,6 +15,11 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
             return
         }
         
+        guard let walletAddress = dogeWallet?.address else {
+            completion(.failure(error: .notLogged))
+            return
+        }
+        
         getTransaction(by: hash) { result in
             switch result {
             case .success(let dogeTransaction):
@@ -29,27 +34,13 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
                     return
                 }
                 
-                // MARK: Check address
-                if transaction.isOutgoing {
-                    guard dogeTransaction.senderAddress == self.dogeWallet?.address else {
-                        completion(.success(result: .warning))
-                        return
-                    }
-                } else {
-                    guard dogeTransaction.recipientAddress == self.dogeWallet?.address else {
-                        completion(.success(result: .warning))
-                        return
-                    }
-                }
-                
-                
-                
+                // MARK: Check date
                 guard let sentDate = dogeTransaction.dateValue else {
                     let timeAgo = -1 * date.timeIntervalSinceNow
                     
                     let result: TransactionStatus
-                    if timeAgo > 60 * 60 * 3 {
-                        // 3h waiting for pending status
+                    if timeAgo > 60 * 10 {
+                        // 10m waiting for pending status
                         result = .failed
                     } else {
                         // Note: No info about processing transactions
@@ -59,7 +50,6 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
                     return
                 }
                 
-                // MARK: Check date
                 let start = date.addingTimeInterval(-60 * 5)
                 let end = date.addingTimeInterval(60 * 5)
                 let range = start...end
@@ -69,23 +59,50 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
                     return
                 }
                 
-                // MARK: Check amount
-                if let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reported = AdamantBalanceFormat.deserializeBalance(from: raw) {
-                    guard reported == dogeTransaction.amountValue else {
-                        completion(.success(result: .warning))
-                        return
+                // MARK: Check amount & address
+                guard let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw) else {
+                    completion(.success(result: .warning))
+                    return
+                }
+                
+                var result: TransactionStatus = .warning
+                if transaction.isOutgoing {
+                    var totalIncome: Decimal = 0
+                    for input in dogeTransaction.inputs {
+                        guard input.sender == walletAddress else {
+                            continue
+                        }
+                        
+                        totalIncome += input.value
+                    }
+                    
+                    if totalIncome >= reportedValue {
+                        result = .success
+                    }
+                } else {
+                    var totalOutcome: Decimal = 0
+                    for output in dogeTransaction.outputs {
+                        guard output.addresses.contains(walletAddress) else {
+                            continue
+                        }
+                        
+                        totalOutcome += output.value
+                    }
+                    
+                    if totalOutcome >= reportedValue {
+                        result = .success
                     }
                 }
                 
-                completion(.success(result: .success))
+                completion(.success(result: result))
                 
             case .failure(let error):
                 if case let .internalError(message, _) = error, message == "No transaction" {
                     let timeAgo = -1 * date.timeIntervalSinceNow
                     
                     let result: TransactionStatus
-                    if timeAgo > 60 * 60 * 3 {
-                        // 3h waiting for pending status
+                    if timeAgo > 60 * 10 {
+                        // 10m waiting for pending status
                         result = .failed
                     } else {
                         // Note: No info about processing transactions

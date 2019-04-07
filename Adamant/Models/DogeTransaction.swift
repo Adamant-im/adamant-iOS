@@ -119,7 +119,16 @@ struct DogeRawTransaction: TransactionDetails {
     // MARK: Transaction Details
     var feeValue: Decimal? { return fee }
     var dateValue: Date? { return date }
-    var transactionStatus: TransactionStatus? { return .success }
+    var transactionStatus: TransactionStatus? {
+        if let confirmations = confirmations {
+            return confirmations > 0 ? .success : .pending
+        } else if let date = date {
+            // oldter than 15m
+            return date.timeIntervalSinceNow > -60 * 15 ? .pending : TransactionStatus.failed
+        } else {
+            return .pending
+        }
+    }
     var blockValue: String? { return nil }
     
     var confirmationsValue: String? {
