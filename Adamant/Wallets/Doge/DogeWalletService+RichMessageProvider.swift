@@ -41,19 +41,28 @@ extension DogeWalletService: RichMessageProvider {
             vc.comment = comment
             
             switch result {
-            case .success(let transaction):
-                guard let blockHash = transaction.blockHash else {
-                    vc.transaction = transaction.asDogeTransaction(for: address)
+            case .success(let dogeTransaction):
+                let transaction = dogeTransaction.asDogeTransaction(for: address)
+                
+                // Sender name
+                if transaction.senderAddress == address {
+                    vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                } else if transaction.recipientAddress == address {
+                    vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                }
+                
+                guard let blockHash = dogeTransaction.blockHash else {
+                    vc.transaction = transaction
                     break
                 }
                 
                 self?.getBlockId(by: blockHash) { result in
                     switch result {
                     case .success(let id):
-                        vc.transaction = transaction.asDogeTransaction(for: address, blockId: id)
+                        vc.transaction = dogeTransaction.asDogeTransaction(for: address, blockId: id)
                         
                     case .failure:
-                        vc.transaction = transaction.asDogeTransaction(for: address)
+                        vc.transaction = transaction
                     }
                     
                     DispatchQueue.main.async {

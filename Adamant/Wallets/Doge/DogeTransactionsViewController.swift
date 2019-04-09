@@ -75,8 +75,17 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         walletService.getTransaction(by: txId) { result in
             switch result {
             case .success(let dogeTransaction):
+                let transaction = dogeTransaction.asDogeTransaction(for: sender)
+                
+                // Sender name
+                if transaction.senderAddress == sender {
+                    controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                } else if transaction.recipientAddress == sender {
+                    controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                }
+                
                 guard let blockHash = dogeTransaction.blockHash else {
-                    controller.transaction = dogeTransaction.asDogeTransaction(for: sender)
+                    controller.transaction = transaction
                     DispatchQueue.main.async {
                         self.navigationController?.pushViewController(controller, animated: true)
                         self.tableView.deselectRow(at: indexPath, animated: true)
@@ -86,16 +95,13 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                 }
                 
                 walletService.getBlockId(by: blockHash) { result in
-                    let transaction: DogeTransaction
                     switch result {
                     case .success(let id):
-                        transaction = dogeTransaction.asDogeTransaction(for: sender, blockId: id)
+                        controller.transaction = dogeTransaction.asDogeTransaction(for: sender, blockId: id)
                         
                     case .failure:
-                        transaction = dogeTransaction.asDogeTransaction(for: sender)
+                        controller.transaction = transaction
                     }
-                    
-                    controller.transaction = transaction
                     
                     DispatchQueue.main.async {
                         self.tableView.deselectRow(at: indexPath, animated: true)
