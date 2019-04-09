@@ -64,26 +64,52 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
             fatalError("Failed to get DogeTransactionDetailsViewController")
         }
         
+        guard let walletService = walletService, let sender = walletService.wallet?.address else {
+            return
+        }
+        
         controller.service = self.walletService
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         let txId = transactions[indexPath.row].txId
         
         walletService.getTransaction(by: txId) { result in
-            DispatchQueue.main.async {
-                self.tableView.deselectRow(at: indexPath, animated: true)
-                self.dialogService.dismissProgress()
-            }
-            
             switch result {
             case .success(let dogeTransaction):
-                controller.transaction = dogeTransaction
+                guard let blockHash = dogeTransaction.blockHash else {
+                    controller.transaction = dogeTransaction.asDogeTransaction(for: sender)
+                    DispatchQueue.main.async {
+                        self.navigationController?.pushViewController(controller, animated: true)
+                        self.tableView.deselectRow(at: indexPath, animated: true)
+                        self.dialogService.dismissProgress()
+                    }
+                    break
+                }
                 
-                DispatchQueue.main.async {
-                    self.navigationController?.pushViewController(controller, animated: true)
+                walletService.getBlockId(by: blockHash) { result in
+                    let transaction: DogeTransaction
+                    switch result {
+                    case .success(let id):
+                        transaction = dogeTransaction.asDogeTransaction(for: sender, blockId: id)
+                        
+                    case .failure:
+                        transaction = dogeTransaction.asDogeTransaction(for: sender)
+                    }
+                    
+                    controller.transaction = transaction
+                    
+                    DispatchQueue.main.async {
+                        self.tableView.deselectRow(at: indexPath, animated: true)
+                        self.dialogService.dismissProgress()
+                        self.navigationController?.pushViewController(controller, animated: true)
+                    }
                 }
                 
             case .failure(let error):
-                self.dialogService.showRichError(error: error)
+                DispatchQueue.main.async {
+                    self.tableView.deselectRow(at: indexPath, animated: true)
+                    self.dialogService.dismissProgress()
+                    self.dialogService.showRichError(error: error)
+                }
             }
         }
     }

@@ -23,19 +23,14 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
         getTransaction(by: hash) { result in
             switch result {
             case .success(let dogeTransaction):
-                // MARK: Check status
-                guard let status = dogeTransaction.transactionStatus else {
-                    completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))
-                    return
-                }
-                
-                guard status == .success else {
-                    completion(.success(result: status))
+                // MARK: Check confirmations
+                guard let confirmations = dogeTransaction.confirmations, let dogeDate = dogeTransaction.date, (confirmations > 0 || dogeDate.timeIntervalSinceNow > -60 * 15) else {
+                    completion(.success(result: .pending))
                     return
                 }
                 
                 // MARK: Check date
-                guard let sentDate = dogeTransaction.dateValue else {
+                guard let sentDate = dogeTransaction.date else {
                     let timeAgo = -1 * date.timeIntervalSinceNow
                     
                     let result: TransactionStatus
@@ -50,8 +45,10 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
                     return
                 }
                 
-                let start = date.addingTimeInterval(-60 * 5)
-                let end = date.addingTimeInterval(60 * 5)
+                // 1 day
+                let dayInterval = TimeInterval(60 * 60 * 24)
+                let start = date.addingTimeInterval(-dayInterval)
+                let end = date.addingTimeInterval(dayInterval)
                 let range = start...end
                 
                 guard range.contains(sentDate) else {

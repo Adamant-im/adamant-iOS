@@ -22,19 +22,30 @@ struct DogeTransaction: TransactionDetails {
     
     let isOutgoing: Bool
     let transactionStatus: TransactionStatus?
+}
+
+
+// MARK: - Raw Doge Transaction, for easy parsing
+struct DogeRawTransaction {
+    let txId: String
+    let date: Date?
     
-    static func map(from dogeTransaction: DogeRawTransaction, for address: String, with blockId: String?) -> [DogeTransaction] {
-        var transactions = [DogeTransaction]()
-        
+    let valueIn: Decimal
+    let valueOut: Decimal
+    let fee: Decimal
+    
+    let confirmations: Int?
+    let blockHash: String?
+    
+    let inputs: [DogeInput]
+    let outputs: [DogeOutput]
+    
+    func asDogeTransaction(for address: String, blockId: String? = nil) -> DogeTransaction {
         // MARK: Known values
-        let txId = dogeTransaction.txId
-        let dateValue = dogeTransaction.date
-        let feeValue = dogeTransaction.fee
-        
         let confirmationsValue: String?
         let transactionStatus: TransactionStatus
         
-        if let confirmations = dogeTransaction.confirmations {
+        if let confirmations = confirmations {
             confirmationsValue = String(confirmations)
             transactionStatus = confirmations > 0 ? .success : .pending
         } else {
@@ -43,10 +54,10 @@ struct DogeTransaction: TransactionDetails {
         }
         
         // Transfers
-        var myInputs = dogeTransaction.inputs.filter { $0.sender == address }
-        var myOutputs: [DogeOutput] = dogeTransaction.outputs.filter { $0.addresses.contains(address) }
+        var myInputs = inputs.filter { $0.sender == address }
+        var myOutputs = outputs.filter { $0.addresses.contains(address) }
         
-        var totalInputsValue = myInputs.map { $0.value }.reduce(0, +) - dogeTransaction.fee
+        var totalInputsValue = myInputs.map { $0.value }.reduce(0, +) - fee
         var totalOutputsValue = myOutputs.map { $0.value }.reduce(0, +)
         
         if totalInputsValue > totalOutputsValue {
@@ -67,8 +78,8 @@ struct DogeTransaction: TransactionDetails {
             }
         }
         
-        let senders = Set(dogeTransaction.inputs.map { $0.sender }.filter { $0 != address })
-        let recipients = Set(dogeTransaction.outputs.compactMap { $0.addresses.first }.filter { $0 != address })
+        let senders = Set(inputs.map { $0.sender }.filter { $0 != address })
+        let recipients = Set(outputs.compactMap { $0.addresses.first }.filter { $0 != address })
         
         // MARK: Inputs
         if myInputs.count > 0 {
@@ -80,90 +91,40 @@ struct DogeTransaction: TransactionDetails {
             }
             
             let inputTransaction =  DogeTransaction(txId: txId,
-                                                    dateValue: dateValue,
+                                                    dateValue: date,
                                                     blockValue: blockId,
                                                     senderAddress: address,
                                                     recipientAddress: recipient,
                                                     amountValue: totalInputsValue,
-                                                    feeValue: feeValue,
+                                                    feeValue: fee,
                                                     confirmationsValue: confirmationsValue,
                                                     isOutgoing: true,
                                                     transactionStatus: transactionStatus)
             
-            transactions.append(inputTransaction)
+            return inputTransaction
         }
         
         // MARK: Outputs
-        if myOutputs.count > 0 {
-            let sender: String
-            if senders.count == 1, let name = senders.first {
-                sender = name
-            } else {
-                sender = "\(senders.count) senders"
-            }
-            
-            let outputTransaction = DogeTransaction(txId: txId,
-                                                    dateValue: dateValue,
-                                                    blockValue: blockId,
-                                                    senderAddress: sender,
-                                                    recipientAddress: address,
-                                                    amountValue: totalOutputsValue,
-                                                    feeValue: feeValue,
-                                                    confirmationsValue: confirmationsValue,
-                                                    isOutgoing: false,
-                                                    transactionStatus: transactionStatus)
-            
-            transactions.append(outputTransaction)
+        let sender: String
+        if senders.count == 1, let name = senders.first {
+            sender = name
+        } else {
+            sender = "\(senders.count) senders"
         }
         
-        return transactions
+        let outputTransaction = DogeTransaction(txId: txId,
+                                                dateValue: date,
+                                                blockValue: blockId,
+                                                senderAddress: sender,
+                                                recipientAddress: address,
+                                                amountValue: totalOutputsValue,
+                                                feeValue: fee,
+                                                confirmationsValue: confirmationsValue,
+                                                isOutgoing: false,
+                                                transactionStatus: transactionStatus)
+        
+        return outputTransaction
     }
-}
-
-
-// MARK: - Raw Doge Transaction, for easy parsing
-struct DogeRawTransaction: TransactionDetails {
-    let txId: String
-    let date: Date?
-    
-    let valueIn: Decimal
-    let valueOut: Decimal
-    let fee: Decimal
-    
-    let confirmations: Int?
-    let blockHash: String?
-    
-    let inputs: [DogeInput]
-    let outputs: [DogeOutput]
-    
-    // MARK: Transaction Details
-    var feeValue: Decimal? { return fee }
-    var dateValue: Date? { return date }
-    var transactionStatus: TransactionStatus? {
-        if let confirmations = confirmations {
-            return confirmations > 0 ? .success : .pending
-        } else if let date = date {
-            // oldter than 15m
-            return date.timeIntervalSinceNow > -60 * 15 ? .pending : TransactionStatus.failed
-        } else {
-            return .pending
-        }
-    }
-    var blockValue: String? { return nil }
-    
-    var confirmationsValue: String? {
-        if let confirmations = confirmations {
-            return String(confirmations)
-        } else {
-            return nil
-        }
-    }
-    
-    // Not used in details
-    var senderAddress: String { return "" }
-    var recipientAddress: String { return "" }
-    var amountValue: Decimal { return 0 }
-    var isOutgoing: Bool { return false }
 }
 
 extension DogeRawTransaction: Decodable {

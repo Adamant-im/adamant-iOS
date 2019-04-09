@@ -17,7 +17,8 @@ extension DogeWalletService: RichMessageProvider {
         // MARK: 0. Prepare
         guard let richContent = transaction.richContent,
             let hash = richContent[RichContentKeys.transfer.hash],
-            let dialogService = dialogService else {
+            let dialogService = dialogService,
+            let address = wallet?.address else {
                 return
         }
         
@@ -41,7 +42,26 @@ extension DogeWalletService: RichMessageProvider {
             
             switch result {
             case .success(let transaction):
-                vc.transaction = transaction
+                guard let blockHash = transaction.blockHash else {
+                    vc.transaction = transaction.asDogeTransaction(for: address)
+                    break
+                }
+                
+                self?.getBlockId(by: blockHash) { result in
+                    switch result {
+                    case .success(let id):
+                        vc.transaction = transaction.asDogeTransaction(for: address, blockId: id)
+                        
+                    case .failure:
+                        vc.transaction = transaction.asDogeTransaction(for: address)
+                    }
+                    
+                    DispatchQueue.main.async {
+                        chat.navigationController?.pushViewController(vc, animated: true)
+                    }
+                }
+                
+                return
                 
             case .failure(let error):
                 switch error {
