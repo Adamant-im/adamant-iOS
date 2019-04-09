@@ -8,6 +8,20 @@
 
 import Foundation
 
+extension String.adamantLocalized {
+    struct dogeTransaction {
+        static func recipients(_ recipients: Int) -> String {
+            return String.localizedStringWithFormat(NSLocalizedString("Doge.TransactionDetails.RecipientsFormat", comment: "DogeTransaction: amount of recipients, if more than one."), recipients)
+        }
+        
+        static func senders(_ senders: Int) -> String {
+            return String.localizedStringWithFormat(NSLocalizedString("Doge.TransactionDetails.SendersFormat", comment: "DogeTransaction: amount of senders, if more than one."), senders)
+        }
+        
+        private init() {}
+    }
+}
+
 struct DogeTransaction: TransactionDetails {
     let txId: String
     let dateValue: Date?
@@ -87,7 +101,7 @@ struct DogeRawTransaction {
             if recipients.count == 1, let name = recipients.first {
                 recipient = name
             } else {
-                recipient = "\(recipients.count) recipients"
+                recipient = String.adamantLocalized.dogeTransaction.recipients(recipients.count)
             }
             
             let inputTransaction =  DogeTransaction(txId: txId,
@@ -109,7 +123,7 @@ struct DogeRawTransaction {
         if senders.count == 1, let name = senders.first {
             sender = name
         } else {
-            sender = "\(senders.count) senders"
+            sender = String.adamantLocalized.dogeTransaction.senders(senders.count)
         }
         
         let outputTransaction = DogeTransaction(txId: txId,
