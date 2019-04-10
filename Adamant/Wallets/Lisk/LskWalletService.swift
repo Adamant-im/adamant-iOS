@@ -463,7 +463,11 @@ extension LskWalletService {
                     }
                     
                 case .error(response: let error):
-                    completion(.failure(error: .internalError(message: error.message, error: nil)))
+                    if error.message == "Unexpected Error" {
+                        completion(.failure(error: .networkError))
+                    } else {
+                        completion(.failure(error: .internalError(message: error.message, error: nil)))
+                    }
                 }
             }
         }

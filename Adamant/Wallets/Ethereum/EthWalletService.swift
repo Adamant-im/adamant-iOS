@@ -22,6 +22,9 @@ extension Web3Error {
 		case .nodeError(let message):
 			return .remoteServiceError(message: message)
 			
+        case .generalError(_ as URLError):
+            return .networkError
+            
 		case .generalError(let error),
 			 .keystoreError(let error as Error):
 			return .internalError(message: error.localizedDescription, error: error)
@@ -199,7 +202,13 @@ class EthWalletService: WalletService {
                 }
 				
 			case .failure(let error):
-				self?.dialogService.showRichError(error: error)
+                switch error {
+                case .networkError:
+                    break
+                    
+                default:
+                    self?.dialogService.showRichError(error: error)
+                }
 			}
             
             self?.setState(.upToDate)
