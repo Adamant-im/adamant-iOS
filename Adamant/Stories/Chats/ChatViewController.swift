@@ -545,7 +545,7 @@ extension ChatViewController {
 				return
 			}
 			
-			let text = "~\(AdamantUtilities.format(balance: fee))"
+			let text = "~\(AdamantBalanceFormat.full.format(fee, withCurrencySymbol: AdmWalletService.currencySymbol))"
 			prevFee = fee
 			
 			feeLabel.title = text

@@ -26,9 +26,6 @@ protocol LskApiService: class {
     
     var account: LskAccount? { get }
     
-    // MARK: - Accounts
-    func newAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<LskAccount>) -> Void)
-    
     // MARK: - Transactions
     func createTransaction(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<LocalTransaction>) -> Void)
     func sendTransaction(transaction: LocalTransaction, completion: @escaping (ApiServiceResult<String>) -> Void)

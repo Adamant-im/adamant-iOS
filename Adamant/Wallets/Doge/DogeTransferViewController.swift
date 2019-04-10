@@ -41,11 +41,11 @@ class DogeTransferViewController: TransferViewControllerBase {
             comments = ""
         }
         
-        guard let service = service as? DogeWalletService, let recipient = recipientAddress, let amount = amount else {
+        guard let service = service as? DogeWalletService, let recipient = recipientAddress, let amount = amount, let dialogService = dialogService else {
             return
         }
         
-        guard let dialogService = dialogService else {
+        guard let sender = service.wallet?.address else {
             return
         }
         
@@ -73,8 +73,10 @@ class DogeTransferViewController: TransferViewControllerBase {
                         
                         service.getTransaction(by: hash) { result in
                             switch result {
-                            case .success(let transaction):
+                            case .success(let dogeRawTransaction):
                                 vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                                
+                                let transaction = dogeRawTransaction.asDogeTransaction(for: sender)
                                 
                                 guard let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController else {
                                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)

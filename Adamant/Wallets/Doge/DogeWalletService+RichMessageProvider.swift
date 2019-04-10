@@ -17,7 +17,8 @@ extension DogeWalletService: RichMessageProvider {
         // MARK: 0. Prepare
         guard let richContent = transaction.richContent,
             let hash = richContent[RichContentKeys.transfer.hash],
-            let dialogService = dialogService else {
+            let dialogService = dialogService,
+            let address = wallet?.address else {
                 return
         }
         
@@ -40,8 +41,36 @@ extension DogeWalletService: RichMessageProvider {
             vc.comment = comment
             
             switch result {
-            case .success(let transaction):
-                vc.transaction = transaction
+            case .success(let dogeTransaction):
+                let transaction = dogeTransaction.asDogeTransaction(for: address)
+                
+                // Sender name
+                if transaction.senderAddress == address {
+                    vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                } else if transaction.recipientAddress == address {
+                    vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                }
+                
+                guard let blockHash = dogeTransaction.blockHash else {
+                    vc.transaction = transaction
+                    break
+                }
+                
+                self?.getBlockId(by: blockHash) { result in
+                    switch result {
+                    case .success(let id):
+                        vc.transaction = dogeTransaction.asDogeTransaction(for: address, blockId: id)
+                        
+                    case .failure:
+                        vc.transaction = transaction
+                    }
+                    
+                    DispatchQueue.main.async {
+                        chat.navigationController?.pushViewController(vc, animated: true)
+                    }
+                }
+                
+                return
                 
             case .failure(let error):
                 switch error {

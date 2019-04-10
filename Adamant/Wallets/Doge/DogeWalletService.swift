@@ -414,7 +414,7 @@ extension DogeWalletService {
             case .success(let doge):
                 let hasMore = doge.to < doge.totalItems
                 
-                let transactions = doge.items.map { DogeTransaction.map(from: $0, for: address, with: nil) }.reduce([], +)
+                let transactions = doge.items.map { $0.asDogeTransaction(for: address) }
                 
                 completion(.success((transactions: transactions, hasMore: hasMore)))
                 
@@ -453,8 +453,8 @@ extension DogeWalletService {
                 
                 completion(.success(dogeResponse))
                 
-            case .failure:
-                completion(.failure(.internalError(message: "DOGE Wallet: server not response", error: nil)))
+            case .failure(let error):
+                completion(.failure(.internalError(message: "DOGE Wallet: server not responding", error: error)))
             }
         }
     }

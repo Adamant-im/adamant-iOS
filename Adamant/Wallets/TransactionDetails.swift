@@ -37,22 +37,48 @@ protocol TransactionDetails {
     var isOutgoing: Bool { get }
     
     var transactionStatus: TransactionStatus? { get }
+    
+    static var defaultCurrencySymbol: String? { get }
+    func summary(with url: String?) -> String
 }
 
-//extension TransactionDetails {
-//    func getSummary() -> String {
-//        return """
-//        Transaction #\(id)
-//
-//        Summary
-//        Sender: \(senderAddress)
-//        Recipient: \(recipientAddress)
-//        Date: \(DateFormatter.localizedString(from: sentDate, dateStyle: .short, timeStyle: .medium))
-//        Amount: \(formattedAmount())
-//        Fee: \(formattedFee())
-//        Confirmations: \(String(confirmationsValue))
-//        Block: \(block)
-//        URL: \(explorerUrl?.absoluteString ?? "")
-//        """
-//    }
-//}
+extension TransactionDetails {
+    func summary(with url: String? = nil) -> String {
+        let symbol = type(of: self).defaultCurrencySymbol
+        
+        var summary = """
+        Transaction \(txId)
+        
+        Summary
+        Sender: \(senderAddress)
+        Recipient: \(recipientAddress)
+        Amount: \(AdamantBalanceFormat.full.format(amountValue, withCurrencySymbol: symbol))
+        """
+        
+        if let fee = feeValue {
+            summary += "\nFee: \(AdamantBalanceFormat.full.format(fee, withCurrencySymbol: symbol))"
+        }
+        
+        if let date = dateValue {
+            summary += "\nDate: \(DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .medium))"
+        }
+        
+        if let confirmations = confirmationsValue {
+            summary += "\nConfirmations: \(confirmations)"
+        }
+        
+        if let block = blockValue {
+            summary += "\nBlock: \(block)"
+        }
+        
+        if let status = transactionStatus {
+            summary += "\nStatus: \(status.localized)"
+        }
+        
+        if let url = url {
+            summary += "\nURL: \(url)"
+        }
+        
+        return summary
+    }
+}

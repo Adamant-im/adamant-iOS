@@ -559,6 +559,6 @@ class TransactionDetailsViewControllerBase: FormViewController {
     }
     
     func summary(for transaction: TransactionDetails) -> String? {
-        return AdamantFormattingTools.summaryFor(transaction: transaction, url: explorerUrl(for: transaction))
+        return transaction.summary(with: explorerUrl(for: transaction)?.absoluteString)
     }
 }

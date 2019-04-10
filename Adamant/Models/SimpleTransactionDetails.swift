@@ -9,6 +9,8 @@
 import Foundation
 
 struct SimpleTransactionDetails: TransactionDetails {
+    static var defaultCurrencySymbol: String? { return nil }
+    
     var txId: String
     
     var senderAddress: String
