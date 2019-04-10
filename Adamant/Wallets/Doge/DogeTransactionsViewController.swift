@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import ProcedureKit
 
 class DogeTransactionsViewController: TransactionsListViewControllerBase {
     
@@ -18,23 +19,35 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Properties
     var transactions: [DogeTransaction] = []
     
+    private let limit = 200 // Limit autoload, as some wallets can have thousands of transactions.
+    private(set) var loadedTo: Int = 0
+    private let procedureQueue = ProcedureQueue()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.refreshControl.beginRefreshing()
-        
         currencySymbol = DogeWalletService.currencySymbol
         
-        handleRefresh(self.refreshControl)
+        refreshControl.beginRefreshing()
+        handleRefresh(refreshControl)
+    }
+    
+    deinit {
+        procedureQueue.cancelAllOperations()
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
         transactions.removeAll()
         
+        loadedTo = 0
         walletService.getTransactions(from: 0) { [weak self] result in
             switch result {
             case .success(let tuple):
                 self?.transactions = tuple.transactions
+                self?.loadedTo = tuple.transactions.count
+                
+                if tuple.hasMore {
+                    self?.loadMoreTransactions(from: tuple.transactions.count)
+                }
                 
                 DispatchQueue.main.async {
                     self?.tableView.reloadData()
@@ -144,5 +157,69 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                       partnerName: nil,
                       amount: transaction.amountValue,
                       date: transaction.dateValue)
+    }
+    
+    // MARK: - Load more
+    private func loadMoreTransactions(from: Int) {
+        let procedure = LoadMoreDogeTransactionsProcedure(service: walletService, from: from)
+        print("getting from \(from)")
+        procedure.addDidFinishBlockObserver { [weak self] (procedure, error) in
+            guard let result = procedure.result else {
+                return
+            }
+            
+            guard let vc = self else {
+                return
+            }
+            
+            let total = vc.loadedTo + result.transactions.count
+            vc.loadedTo = total
+            vc.transactions.append(contentsOf: result.transactions)
+            
+            var indexPaths = [IndexPath]()
+            for index in from..<total {
+                indexPaths.append(IndexPath(row: index, section: 0))
+            }
+            
+            DispatchQueue.main.async {
+                vc.tableView.insertRows(at: indexPaths, with: .fade)
+            }
+            
+            if result.hasMore && total < vc.limit {
+                vc.loadMoreTransactions(from: total)
+            }
+        }
+        
+        procedureQueue.addOperation(procedure)
+    }
+}
+
+
+private class LoadMoreDogeTransactionsProcedure: Procedure {
+    let from: Int
+    let service: DogeWalletService
+    
+    private(set) var result: (transactions: [DogeTransaction], hasMore: Bool)? = nil
+    
+    init(service: DogeWalletService, from: Int) {
+        self.from = from
+        self.service = service
+        
+        super.init()
+        log.severity = .warning
+    }
+    
+    override func execute() {
+        service.getTransactions(from: from) { result in
+            switch result {
+            case .success(let result):
+                self.result = result
+                self.finish()
+                
+            case .failure(let error):
+                self.result = nil
+                self.finish(with: error)
+            }
+        }
     }
 }
