@@ -446,15 +446,18 @@ extension DogeWalletService {
         Alamofire.request(endpoint, method: .get, parameters: parameters, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
-                guard let dogeResponse = try? DogeWalletService.jsonDecoder.decode(DogeGetTransactionsResponse.self, from: data) else {
-                    completion(.failure(.internalError(message: "DOGE Wallet: not valid response", error: nil)))
-                    break
+                do {
+                    let dogeResponse = try DogeWalletService.jsonDecoder.decode(DogeGetTransactionsResponse.self, from: data)
+                    completion(.success(dogeResponse))
+                } catch {
+                    completion(.failure(.internalError(message: "DOGE Wallet: not a valid response", error: error)))
                 }
                 
-                completion(.success(dogeResponse))
+            case .failure(let error as URLError):
+                completion(.failure(.networkError(error: error)))
                 
             case .failure(let error):
-                completion(.failure(.internalError(message: "DOGE Wallet: server not responding", error: error)))
+                completion(.failure(.serverError(error: error.localizedDescription)))
             }
         }
     }

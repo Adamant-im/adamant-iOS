@@ -57,10 +57,12 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
     
     @objc func refresh() {
         updateTransaction { [weak self] error in
-            self?.refreshControl.endRefreshing()
-            
-            if let error = error {
-                self?.dialogService.showRichError(error: error)
+            DispatchQueue.main.async {
+                self?.refreshControl.endRefreshing()
+                
+                if let error = error {
+                    self?.dialogService.showRichError(error: error)
+                }
             }
         }
     }
