@@ -101,6 +101,8 @@ extension DogeWalletService: WalletServiceTwoStepSend {
 }
 
 extension BitcoinKit.Transaction: TransactionDetails {
+    static var defaultCurrencySymbol: String? { return "DOGE" }
+    
     var txId: String {
         return txID
     }

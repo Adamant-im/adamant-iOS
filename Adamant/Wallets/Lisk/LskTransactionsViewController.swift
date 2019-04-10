@@ -117,6 +117,8 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
 }
 
 extension Transactions.TransactionModel: TransactionDetails {
+    static var defaultCurrencySymbol: String? { return "LSK" }
+    
     var txId: String {
         return id
     }
@@ -170,6 +172,8 @@ extension Transactions.TransactionModel: TransactionDetails {
 }
 
 extension LocalTransaction: TransactionDetails {
+    static var defaultCurrencySymbol: String? { return "LSK" }
+    
     var txId: String {
         return id ?? ""
     }

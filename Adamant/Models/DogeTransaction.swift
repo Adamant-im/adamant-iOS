@@ -23,6 +23,8 @@ extension String.adamantLocalized {
 }
 
 struct DogeTransaction: TransactionDetails {
+    static var defaultCurrencySymbol: String? { return "DOGE" }
+    
     let txId: String
     let dateValue: Date?
     let blockValue: String?
