@@ -445,30 +445,27 @@ extension LskWalletService: SwinjectDependentService {
 // MARK: - Balances & addresses
 extension LskWalletService {
     func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        if let address = self.lskWallet?.address, let accountApi = accountApi {
-            defaultDispatchQueue.async {
-                accountApi.accounts(address: address) { (response) in
-                    switch response {
-                    case .success(response: let response):
-                        if let account = response.data.first {
-                            let balance = BigUInt(account.balance ?? "0") ?? BigUInt(0)
-                            
-                            completion(.success(result: balance.asDecimal(exponent: LskWalletService.currencyExponent)))
-                        } else {
-                            completion(.success(result: 0))
-                        }
+        guard let address = self.lskWallet?.address, let accountApi = accountApi else {
+            completion(.failure(error: .notLogged))
+            return
+        }
+        
+        defaultDispatchQueue.async {
+            accountApi.accounts(address: address) { (response) in
+                switch response {
+                case .success(response: let response):
+                    if let account = response.data.first {
+                        let balance = BigUInt(account.balance ?? "0") ?? BigUInt(0)
                         
-                        break
-                    case .error(response: let error):
-                        print(error)
-                        
-                        completion(.failure(error: .internalError(message: error.message, error: nil)))
-                        break
+                        completion(.success(result: balance.asDecimal(exponent: LskWalletService.currencyExponent)))
+                    } else {
+                        completion(.success(result: 0))
                     }
+                    
+                case .error(response: let error):
+                    completion(.failure(error: .internalError(message: error.message, error: nil)))
                 }
             }
-        } else {
-            completion(.failure(error: .internalError(message: "LSK Wallet: not found", error: nil)))
         }
     }
     

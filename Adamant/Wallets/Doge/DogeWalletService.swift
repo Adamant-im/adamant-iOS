@@ -453,8 +453,8 @@ extension DogeWalletService {
                 
                 completion(.success(dogeResponse))
                 
-            case .failure:
-                completion(.failure(.internalError(message: "DOGE Wallet: server not response", error: nil)))
+            case .failure(let error):
+                completion(.failure(.internalError(message: "DOGE Wallet: server not responding", error: error)))
             }
         }
     }
