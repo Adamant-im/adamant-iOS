@@ -76,6 +76,11 @@ struct DogeRawTransaction {
         var totalInputsValue = myInputs.map { $0.value }.reduce(0, +) - fee
         var totalOutputsValue = myOutputs.map { $0.value }.reduce(0, +)
         
+        if totalInputsValue == totalOutputsValue {
+            totalInputsValue = 0
+            totalOutputsValue = 0
+        }
+        
         if totalInputsValue > totalOutputsValue {
             while let out = myOutputs.first {
                 totalInputsValue -= out.value
