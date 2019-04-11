@@ -31,46 +31,77 @@ extension DogeWalletService: RichMessageProvider {
             comment = nil
         }
         
+        // MARK: Get transaction
         getTransaction(by: hash) { [weak self] result in
-            dialogService.dismissProgress()
-            guard let vc = self?.router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController else {
+            guard let vc = self?.router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController, let service = self else {
                 return
             }
             
-            vc.service = self
+            // MARK: 1. Prepare details view controller
+            vc.service = service
             vc.comment = comment
             
             switch result {
-            case .success(let dogeTransaction):
-                let transaction = dogeTransaction.asDogeTransaction(for: address)
+            case .success(let dogeRawTransaction):
+                let dogeTransaction = dogeRawTransaction.asDogeTransaction(for: address)
                 
-                // Sender name
-                if transaction.senderAddress == address {
+                // MARK: 2. Self name
+                if dogeTransaction.senderAddress == address {
                     vc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                } else if transaction.recipientAddress == address {
+                }
+                if dogeTransaction.recipientAddress == address {
                     vc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
                 }
                 
-                guard let blockHash = dogeTransaction.blockHash else {
-                    vc.transaction = transaction
-                    break
-                }
+                vc.transaction = dogeTransaction
                 
-                self?.getBlockId(by: blockHash) { result in
-                    switch result {
-                    case .success(let id):
-                        vc.transaction = dogeTransaction.asDogeTransaction(for: address, blockId: id)
+                let group = DispatchGroup()
+                
+                // MARK: 3. Get partner name async
+                if let partner = transaction.partner, let partnerAddress = partner.address, let partnerName = partner.name {
+                    group.enter() // Enter 1
+                    service.getDogeAddress(byAdamandAddress: partnerAddress) { result in
+                        switch result {
+                        case .success(let address):
+                            if dogeTransaction.senderAddress == address {
+                                vc.senderName = partnerName
+                            }
+                            if dogeTransaction.recipientAddress == address {
+                                vc.recipientName = partnerName
+                            }
+                            
+                        case .failure:
+                            break
+                        }
                         
-                    case .failure:
-                        vc.transaction = transaction
-                    }
-                    
-                    DispatchQueue.main.async {
-                        chat.navigationController?.pushViewController(vc, animated: true)
+                        group.leave() // Leave 1
                     }
                 }
                 
-                return
+                // MARK: 4. Get block id async
+                if let blockHash = dogeRawTransaction.blockHash {
+                    group.enter() // Enter 2
+                    service.getBlockId(by: blockHash) { result in
+                        switch result {
+                        case .success(let id):
+                            vc.transaction = dogeRawTransaction.asDogeTransaction(for: address, blockId: id)
+                            
+                        case .failure:
+                            break
+                        }
+                        
+                        group.leave() // Leave 2
+                    }
+                }
+                
+                // MARK: 5. Wait async operations
+                group.wait()
+                
+                // MARK: 6. Display details view controller
+                DispatchQueue.main.async {
+                    dialogService.dismissProgress()
+                    chat.navigationController?.pushViewController(vc, animated: true)
+                }
                 
             case .failure(let error):
                 switch error {
@@ -95,15 +126,17 @@ extension DogeWalletService: RichMessageProvider {
                     
                     vc.transaction = failedTransaction
                     
+                    DispatchQueue.main.async {
+                        dialogService.dismissProgress()
+                        chat.navigationController?.pushViewController(vc, animated: true)
+                    }
+                    
                 default:
-                    self?.dialogService.showRichError(error: error)
-                    return
+                    dialogService.dismissProgress()
+                    dialogService.showRichError(error: error)
                 }
             }
             
-            DispatchQueue.main.async {
-                chat.navigationController?.pushViewController(vc, animated: true)
-            }
         }
     }
     
