@@ -36,31 +36,38 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        transactions.removeAll()
+        procedureQueue.cancelAllOperations()
         
         loadedTo = 0
-        walletService.getTransactions(from: 0) { [weak self] result in
+        walletService.getTransactions(from: loadedTo) { [weak self] result in
+            guard let vc = self else {
+                refreshControl.endRefreshing()
+                return
+            }
+            
             switch result {
             case .success(let tuple):
-                self?.transactions = tuple.transactions
-                self?.loadedTo = tuple.transactions.count
-                
-                if tuple.hasMore {
-                    self?.loadMoreTransactions(from: tuple.transactions.count)
-                }
+                vc.transactions = tuple.transactions
+                vc.loadedTo = tuple.transactions.count
                 
                 DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                    self?.refreshControl.endRefreshing()
+                    vc.tableView.reloadData()
+                    refreshControl.endRefreshing()
+                    
+                    // Update tableView, then call loadMore()
+                    if tuple.hasMore {
+                        vc.loadMoreTransactions(from: tuple.transactions.count)
+                    }
                 }
                 
             case .failure(let error):
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                    self?.refreshControl.endRefreshing()
-                }
+                vc.transactions.removeAll()
+                vc.dialogService.showRichError(error: error)
                 
-                self?.dialogService.showRichError(error: error)
+                DispatchQueue.main.async {
+                    vc.tableView.reloadData()
+                    refreshControl.endRefreshing()
+                }
             }
         }
     }
@@ -179,17 +186,11 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         let procedure = LoadMoreDogeTransactionsProcedure(service: walletService, from: from)
         
         procedure.addDidFinishBlockObserver { [weak self] (procedure, error) in
-            guard let result = procedure.result else {
-                return
-            }
-            
-            guard let vc = self else {
+            guard let vc = self, let result = procedure.result else {
                 return
             }
             
             let total = vc.loadedTo + result.transactions.count
-            vc.loadedTo = total
-            vc.transactions.append(contentsOf: result.transactions)
             
             var indexPaths = [IndexPath]()
             for index in from..<total {
@@ -197,11 +198,14 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
             }
             
             DispatchQueue.main.async {
+                vc.loadedTo = total
+                vc.transactions.append(contentsOf: result.transactions)
                 vc.tableView.insertRows(at: indexPaths, with: .fade)
-            }
-            
-            if result.hasMore && total < vc.limit {
-                vc.loadMoreTransactions(from: total)
+                
+                // Update everything, and then call loadMore()
+                if result.hasMore && total < vc.limit {
+                    vc.loadMoreTransactions(from: total)
+                }
             }
         }
         
