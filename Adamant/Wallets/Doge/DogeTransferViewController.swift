@@ -133,7 +133,6 @@ class DogeTransferViewController: TransferViewControllerBase {
                 }
                 
             case .failure(let error):
-                dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
         }

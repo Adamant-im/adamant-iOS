@@ -49,16 +49,22 @@ extension DogeWalletService: WalletServiceTwoStepSend {
         let fee = NSDecimalNumber(decimal: self.transactionFee * DogeWalletService.multiplier).uint64Value
         
         // MARK: 2. Search for unspent transactions
-        self.getUnspentTransactions { result in
+        getUnspentTransactions { result in
             switch result {
             case .success(let utxos):
-                // MARK: 3. Create local transaction
+                // MARK: 3. Check if we have enought money
+                let totalAmount: UInt64 = UInt64(utxos.reduce(0) { $0 + $1.output.value })
+                guard totalAmount >= rawAmount + fee else { // This shit can crash BitcoinKit
+                    completion(.failure(error: .notEnoughMoney))
+                    break
+                }
+                
+                // MARK: 4. Create local transaction
                 let transaction = BitcoinKit.Transaction.createNewTransaction(toAddress: toAddress, amount: rawAmount, fee: fee, changeAddress: changeAddress, utxos: utxos, keys: [key])
                 completion(.success(result: transaction))
-                break
+                
             case .failure:
                 completion(.failure(error: .notEnoughMoney))
-                break
             }
         }
     }
