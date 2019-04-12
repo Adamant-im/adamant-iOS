@@ -21,4 +21,12 @@ class DogeWallet: WalletAccount {
         self.publicKey = privateKey.publicKey()
         self.address = publicKey.toCashaddr().base58
     }
+    
+    init(address: String, privateKey: PrivateKey, publicKey: PublicKey, balance: Decimal, notifications: Int) {
+        self.address = address
+        self.privateKey = privateKey
+        self.publicKey = publicKey
+        self.balance = balance
+        self.notifications = notifications
+    }
 }

@@ -222,7 +222,7 @@ extension DogeRawTransaction: Decodable {
 struct DogeInput: Decodable {
     enum CodingKeys: String, CodingKey {
         case sender = "addr"
-        case value
+        case value = "valueSat"
         case txId = "txid"
         case vOut = "vout"
     }
@@ -246,7 +246,7 @@ struct DogeInput: Decodable {
         self.vOut = try container.decode(Int.self, forKey: .vOut)
         
         if let raw = try? container.decode(Decimal.self, forKey: .value) {
-            self.value = raw
+            self.value = Decimal(sign: .plus, exponent: DogeWalletService.currencyExponent, significand: raw)
         } else {
             self.value = 0
         }
