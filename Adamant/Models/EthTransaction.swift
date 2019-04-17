@@ -134,6 +134,8 @@ extension EthTransaction: Decodable {
 
 // MARK: - TransactionDetails
 extension EthTransaction: TransactionDetails {
+    static var defaultCurrencySymbol: String? { return EthWalletService.currencySymbol }
+    
     var txId: String { return hash }
     var senderAddress: String { return from }
     var recipientAddress: String { return to }

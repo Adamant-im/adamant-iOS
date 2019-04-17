@@ -40,6 +40,6 @@ protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
 
 extension RichMessageProviderWithStatusCheck {
     var delayBetweenChecks: TimeInterval {
-        return 10.0
+        return 30.0
     }
 }

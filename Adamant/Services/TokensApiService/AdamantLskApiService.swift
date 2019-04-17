@@ -36,71 +36,6 @@ class AdamantLskApiService: LskApiService {
         }
     }
     
-    func newAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<LskAccount>) -> Void) {
-        /*
-        do {
-            let keys: KeyPair! = try Crypto.keyPair(fromPassphrase: passphrase)
-            let address: String! = Crypto.address(fromPublicKey: keys.publicKeyString)
-            let account = LskAccount(keys: keys, address: address, balance: BigUInt(0), balanceString: "0")
-            self.account = account
-//            print(address)
-            completion(.success(account))
-        } catch {
-            print("\(error)")
-            completion(.failure(.accountNotFound))
-            return
-        }
-        
-        NotificationCenter.default.post(name: Notification.Name.LskApiService.userLoggedIn, object: self)
-        
-        self.getBalance({ _ in })
-        
-        if let account = self.account, let address = self.accountService.account?.address, let keypair = self.accountService.keypair {
-            self.getLskAddress(byAdamandAddress: address) { (result) in
-                switch result {
-                case .success(let value):
-                    if value == nil {
-                        guard let loggedAccount = self.accountService.account else {
-                            DispatchQueue.main.async {
-                                completion(.failure(.notLogged))
-                            }
-                            return
-                        }
-                        
-                        guard loggedAccount.balance >= AdamantApiService.KvsFee else {
-                            DispatchQueue.main.async {
-                                completion(.failure(.internalError(message: "LSK Wallet: Not enought ADM to save address to KVS", error: nil)))
-                            }
-                            return
-                        }
-                        
-                        self.apiService.store(key: AdamantLskApiService.kvsAddress, value: account.address, type: StateType.keyValue, sender: address, keypair: keypair, completion: { (result) in
-                            switch result {
-                            case .success(let transactionId):
-                                print("SAVED LSK in KVS: \(transactionId)")
-                                break
-                            case .failure(let error):
-                                DispatchQueue.main.async {
-                                    completion(.failure(.internalError(message: "LSK Wallet: fail to save address to KVS", error: error)))
-                                }
-                                break
-                            }
-                        })
-                    } else {
-                        print("FOUND LSK in KVS: \(value!)")
-                    }
-                    break
-                case .failure(let error):
-                    DispatchQueue.main.async {
-                        completion(.failure(.internalError(message: "LSK Wallet: fail to get address from KVS", error: error)))
-                    }
-                    break
-                }
-            }
-        }
- */
-    }
-    
     func createTransaction(toAddress address: String, amount: Double, completion: @escaping (ApiServiceResult<LocalTransaction>) -> Void) {
         if let keys = self.account?.keys {
             do {
@@ -206,32 +141,31 @@ class AdamantLskApiService: LskApiService {
     
     // MARK: - Tools
     func getBalance(_ completion: @escaping (ApiServiceResult<String>) -> Void) {
-        if let address = self.account?.address {
-            accountApi.accounts(address: address) { (response) in
-                switch response {
-                case .success(response: let response):
-                    if let account = response.data.first {
-                        let balance = BigUInt(account.balance ?? "0") ?? BigUInt(0)
-                        
-                        self.account?.balance = balance
-                        self.account?.balanceString = self.fromRawLsk(value: balance)
-                        
-                        if let balanceString = self.account?.balanceString, let balance = Double(balanceString) {
-                            self.account?.balanceString = "\(balance)"
-                        }
+        guard let address = self.account?.address else {
+            completion(.failure(.notLogged))
+            return
+        }
+        
+        accountApi.accounts(address: address) { (response) in
+            switch response {
+            case .success(response: let response):
+                if let account = response.data.first {
+                    let balance = BigUInt(account.balance ?? "0") ?? BigUInt(0)
+                    
+                    self.account?.balance = balance
+                    self.account?.balanceString = self.fromRawLsk(value: balance)
+                    
+                    if let balanceString = self.account?.balanceString, let balance = Double(balanceString) {
+                        self.account?.balanceString = "\(balance)"
                     }
-                    
-                    completion(.success("\(self.account?.balanceString ?? "--") LSK"))
-                    
-                    break
-                case .error(response: let error):
-                    print(error)
-                    completion(.failure(.serverError(error: error.message)))
-                    break
                 }
+                
+                completion(.success("\(self.account?.balanceString ?? "--") LSK"))
+                
+            case .error(response: let error):
+                print(error)
+                completion(.failure(.serverError(error: error.message)))
             }
-        } else {
-            completion(.failure(.internalError(message: "LSK Wallet: not found", error: nil)))
         }
     }
     

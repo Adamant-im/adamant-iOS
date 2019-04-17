@@ -17,8 +17,9 @@ class AdmWalletService: NSObject, WalletService {
 	let addressRegex = try! NSRegularExpression(pattern: "^U([0-9]{6,20})$")
 	
 	let transactionFee: Decimal = 0.5
-	static var currencySymbol = "ADM"
-	static var currencyLogo = #imageLiteral(resourceName: "wallet_adm")
+	static let currencySymbol = "ADM"
+	static let currencyLogo = #imageLiteral(resourceName: "wallet_adm")
+    static let currencyExponent: Int = -8
 	
 	// MARK: - Dependencies
 	weak var accountService: AccountService!

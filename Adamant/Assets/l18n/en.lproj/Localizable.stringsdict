@@ -2,6 +2,38 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>Doge.TransactionDetails.SendersFormat</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@senders@</string>
+		<key>senders</key>
+		<dict>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>other</key>
+			<string>%d senders</string>
+			<key>one</key>
+			<string>%d sender</string>
+		</dict>
+	</dict>
+	<key>Doge.TransactionDetails.RecipientsFormat</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@recipients@</string>
+		<key>recipients</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>other</key>
+			<string>%d recipients</string>
+			<key>one</key>
+			<string>%d recipient</string>
+		</dict>
+	</dict>
 	<key>NotificationsService.NewMessage.BodyFormat</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
