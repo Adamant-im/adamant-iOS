@@ -28,6 +28,8 @@ extension String.adamantLocalized {
         
         static let noMailAppWarning = NSLocalizedString("ChatScene.Warning.NoMailApp", comment: "Chat: warning message for opening email link without mail app configurated on device")
         static let unsupportedUrlWarning = NSLocalizedString("ChatScene.Warning.UnsupportedUrl", comment: "Chat: warning message for opening unsupported url schemes")
+        
+        static let unreadedSeparatorText = NSLocalizedString("ChatScene.MessageStatus.Unreaded", comment: "Chat: unreaded message for separator")
 		
 		private init() { }
 	}
@@ -55,6 +57,7 @@ class ChatViewController: MessagesViewController {
 	var account: AdamantAccount?
 	var chatroom: Chatroom?
     var messageToShow: MessageTransaction?
+    var lastReadedMessage: ChatTransaction?
 	var dateFormatter: DateFormatter {
 		let formatter = DateFormatter()
 		formatter.dateStyle = .short
@@ -306,7 +309,7 @@ class ChatViewController: MessagesViewController {
 		}
         
         // MARK: 4.1 Rich messages
-        if let fetched = controller.fetchedObjects {
+        if let fetched = objects() {
             for case let rich as RichMessageTransaction in fetched {
                 rich.kind = messageKind(for: rich)
             }
@@ -356,7 +359,7 @@ class ChatViewController: MessagesViewController {
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
 		isOnTop = true
-		chatroom?.markAsReaded()
+//        chatroom?.markAsReaded()
 	}
 	
 	override func viewDidDisappear(_ animated: Bool) {
