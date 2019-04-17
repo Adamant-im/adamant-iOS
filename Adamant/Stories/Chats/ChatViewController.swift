@@ -56,8 +56,7 @@ class ChatViewController: MessagesViewController {
 	weak var delegate: ChatViewControllerDelegate?
 	var account: AdamantAccount?
 	var chatroom: Chatroom?
-    var messageToShow: MessageTransaction?
-    var lastReadedMessage: ChatTransaction?
+    var messageToShow: ChatTransaction?
 	var dateFormatter: DateFormatter {
 		let formatter = DateFormatter()
 		formatter.dateStyle = .short
@@ -359,7 +358,7 @@ class ChatViewController: MessagesViewController {
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
 		isOnTop = true
-//        chatroom?.markAsReaded()
+        chatroom?.markAsReaded()
 	}
 	
 	override func viewDidDisappear(_ animated: Bool) {
