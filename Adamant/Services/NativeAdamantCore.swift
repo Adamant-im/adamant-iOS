@@ -8,7 +8,6 @@
 
 import Foundation
 import CryptoSwift
-import ByteBackpacker
 
 class NativeAdamantCore : AdamantCore {
     

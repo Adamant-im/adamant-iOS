@@ -7,7 +7,6 @@ PODS:
     - GRDBCipher (~> 3.6.2)
     - GRKOpenSSLFramework (~> 1.0.2.15)
     - secp256k1_swift (~> 1.0.3)
-  - ByteBackpacker (1.2.1)
   - CryptoSwift (0.12.0)
   - DateToolsSwift (4.0.0)
   - EFQRCode (4.4.2):
@@ -79,7 +78,6 @@ PODS:
 DEPENDENCIES:
   - Alamofire
   - BitcoinKit (from `https://github.com/boyarkin-anton/BitcoinKit.git`, branch `dev`)
-  - ByteBackpacker
   - CryptoSwift
   - DateToolsSwift
   - EFQRCode
@@ -106,7 +104,6 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
     - BigInt
-    - ByteBackpacker
     - CryptoSwift
     - DateToolsSwift
     - EFQRCode
@@ -168,7 +165,6 @@ SPEC CHECKSUMS:
   Alamofire: 3ec537f71edc9804815215393ae2b1a8ea33a844
   BigInt: 76b5dfdfa3e2e478d4ffdf161aeede5502e2742f
   BitcoinKit: af68da8b2c9a23bc355c711fdc6bbd0abc8cc447
-  ByteBackpacker: df001da117faacdbf09b69a116ec480f6651c9ec
   CryptoSwift: 1c07ca50843dd48bc54e6ea53d7a4dba3b645716
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   EFQRCode: e65a9eb6c7137ed6db4cfce37f0cee47938e44f0
@@ -203,6 +199,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: d80d1b9a3feca16e614acec9eea47ec26310d37d
 
-PODFILE CHECKSUM: e2142b4b30c5188f99e941771fd278f74c36dcda
+PODFILE CHECKSUM: 9af8f3629d8e6a389d6e0e698f6a8bf501dbb12e
 
-COCOAPODS: 1.6.0
+COCOAPODS: 1.6.1

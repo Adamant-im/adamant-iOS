@@ -9,7 +9,6 @@
 import Foundation
 import libsodium
 import CryptoSwift
-import ByteBackpacker
 
 public typealias Bytes = Array<UInt8>
 

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
+		6403F5DB2272389800D58779 /* ByteBackpacker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5DA2272389700D58779 /* ByteBackpacker.swift */; };
 		6406D74A21C7F06000196713 /* SearchResultsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6406D74821C7F06000196713 /* SearchResultsViewController.xib */; };
 		6406D74D21CE3AC100196713 /* KeyboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6406D74C21CE3AC100196713 /* KeyboardManager.swift */; };
 		6414C18E217DF43100373FA6 /* String+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6414C18D217DF43100373FA6 /* String+adamant.swift */; };
@@ -321,6 +322,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6403F5DA2272389700D58779 /* ByteBackpacker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteBackpacker.swift; sourceTree = "<group>"; };
 		6406D74821C7F06000196713 /* SearchResultsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchResultsViewController.xib; sourceTree = "<group>"; };
 		6406D74C21CE3AC100196713 /* KeyboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardManager.swift; sourceTree = "<group>"; };
 		6414C18D217DF43100373FA6 /* String+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+adamant.swift"; sourceTree = "<group>"; };
@@ -1048,6 +1050,7 @@
 		E950651F20404997008352E5 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				6403F5DA2272389700D58779 /* ByteBackpacker.swift */,
 				E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */,
 				E9E7CDB62003994E00DFC4DB /* AdamantUtilities.swift */,
 				E950652220404C84008352E5 /* AdamantUriTools.swift */,
@@ -1444,7 +1447,6 @@
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/BigInt/BigInt.framework",
 				"${BUILT_PRODUCTS_DIR}/BitcoinKit/BitcoinKit.framework",
-				"${BUILT_PRODUCTS_DIR}/ByteBackpacker/ByteBackpacker.framework",
 				"${BUILT_PRODUCTS_DIR}/CryptoSwift/CryptoSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/DateToolsSwift/DateToolsSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/EFQRCode/EFQRCode.framework",
@@ -1484,7 +1486,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BigInt.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BitcoinKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ByteBackpacker.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CryptoSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DateToolsSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/EFQRCode.framework",
@@ -1643,6 +1644,7 @@
 				E96BBE3121F70F5E009AA738 /* ReadonlyTextView.swift in Sources */,
 				E926E032213EC43B005E536B /* FullscreenAlertView.swift in Sources */,
 				644EC35B20EFB8E900F40C73 /* AdamantDelegateCell.swift in Sources */,
+				6403F5DB2272389800D58779 /* ByteBackpacker.swift in Sources */,
 				6416B1A521AEE157006089AC /* LskWalletService+Transfers.swift in Sources */,
 				648DD7A62237DC4000B811FD /* DogeTransferViewController.swift in Sources */,
 				E9960B3421F5154300C840A8 /* BaseAccount+CoreDataProperties.swift in Sources */,
