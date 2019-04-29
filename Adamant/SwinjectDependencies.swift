@@ -109,6 +109,11 @@ extension Container {
 		self.register(CoreDataStack.self) { _ in
 			try! InMemoryCoreDataStack(modelUrl: AdamantResources.coreDataModel)
 		}.inObjectScope(.container)
+        
+        // MARK: ChatSeparatorProvider
+        self.register(MessageSeparatorProvider.self) { _ in
+            return MessageSeparatorProvider()
+        }
 		
 		// MARK: Accounts
 		self.register(AccountsProvider.self) { r in
