@@ -89,7 +89,8 @@ class AdamantAccountService: AccountService {
 	var wallets: [WalletService] = [
 		AdmWalletService(),
 		EthWalletService(),
-        LskWalletService(mainnet: true, origins: AdamantResources.lskServers)
+        LskWalletService(mainnet: true, origins: AdamantResources.lskServers),
+        DogeWalletService()
         
         // Testnet
 //        LskWalletService(mainnet: false)
@@ -100,7 +101,11 @@ class AdamantAccountService: AccountService {
             fatalError("Failed to get EthWalletService")
         }
         
-        ethWallet.initiateNetwork(apiUrl: AdamantResources.ethServers.first!) { result in
+        guard let url = AdamantResources.ethServers.randomElement() else {
+            fatalError("Failed to get ETH endpoint")
+        }
+        
+        ethWallet.initiateNetwork(apiUrl: url) { result in
             switch result {
             case .success:
                 break
@@ -118,7 +123,7 @@ class AdamantAccountService: AccountService {
                             break
                             
                         case .wifi, .cellular:
-                            ethWallet.initiateNetwork(apiUrl: AdamantResources.ethServers.first!) { result in
+                            ethWallet.initiateNetwork(apiUrl: url) { result in
                                 switch result {
                                 case .success:
                                     NotificationCenter.default.removeObserver(self, name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: nil)

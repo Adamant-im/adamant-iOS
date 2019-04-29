@@ -130,8 +130,11 @@
 /* Account tab: 'Send ETH tokens' button */
 "AccountTab.Row.SendEth" = "ETH senden";
 
-/* Account tab: 'Send ETH tokens' button */
+/* Account tab: 'Send LSK tokens' button */
 "AccountTab.Row.SendLsk" = "LSK senden";
+
+/* Account tab: 'Send DOGE tokens' button */
+"AccountTab.Row.SendDoge" = "DOGE senden";
 
 /* Account tab: Anonymously buy ADM tokens */
 "AccountTab.Row.AnonymouslyBuyADM" = "Kaufen Sie ADM anonym";
@@ -158,7 +161,7 @@
 "AccountTab.Row.About" = "Über ADAMANT";
 
 /* Account tab: 'Vote for delegates' button */
-"AccountTab.Row.VoteForDelegates" = "Delegate wählen";
+"AccountTab.Row.VoteForDelegates" = "Delegierte wählen";
 
 /* Account tab: Actions section title */
 "AccountTab.Section.Actions" = "Aktionen";
@@ -175,11 +178,14 @@
 /* Account tab: Lisk wallet */
 "AccountTab.Wallets.lisk_wallet" = "Lisk Wallet";
 
+/* Account tab: Doge wallet */
+"AccountTab.Wallets.doge_wallet" = "Doge Wallet";
+
 /* Account page: scene title */
 "AccountTab.Title" = "Konto";
 
 /* Account tab: Delegates section title */
-"AccountTab.Section.Delegates" = "Delegate";
+"AccountTab.Section.Delegates" = "Delegierte";
 
 /* Product name */
 "ADAMANT" = "ADAMANT";
@@ -287,7 +293,7 @@
 "ChatScene.Warning.UnsupportedUrl" = "Nicht unterstütztes URL-Protokoll";
 
 /* Delegates page: scene title */
-"Delegates.Title" = "Delegate";
+"Delegates.Title" = "Delegierte";
 
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Nicht genug Tokens für die Abstimmung. Sie brauchen mindestens 50 ADM auf Ihrem Konto";

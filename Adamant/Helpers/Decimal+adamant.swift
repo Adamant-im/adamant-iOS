@@ -10,11 +10,11 @@ import Foundation
 
 extension Decimal {
 	func shiftedFromAdamant() -> Decimal {
-		return Decimal(sign: self.isSignMinus ? .minus : .plus, exponent: AdamantUtilities.currencyExponent, significand: self)
+		return Decimal(sign: self.isSignMinus ? .minus : .plus, exponent: AdmWalletService.currencyExponent, significand: self)
 	}
 	
 	func shiftedToAdamant() -> Decimal {
-		return Decimal(sign: self.isSignMinus ? .minus : .plus, exponent: -AdamantUtilities.currencyExponent, significand: self)
+		return Decimal(sign: self.isSignMinus ? .minus : .plus, exponent: -AdmWalletService.currencyExponent, significand: self)
 	}
 	
 	var doubleValue: Double {

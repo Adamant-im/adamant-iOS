@@ -366,7 +366,9 @@ extension AdamantTransfersProvider {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = stack.container.viewContext
         
-        guard let id = recipientAccount.chatroom?.objectID, let chatroom = context.object(with: id) as? Chatroom else {
+        guard let id = recipientAccount.chatroom?.objectID,
+            let chatroom = context.object(with: id) as? Chatroom,
+            let partner = context.object(with: recipientAccount.objectID) as? BaseAccount else {
             completion(.failure(.accountNotFound(address: recipient)))
             return
         }
@@ -384,6 +386,7 @@ extension AdamantTransfersProvider {
         transaction.statusEnum = MessageStatus.pending
         transaction.comment = comment
         transaction.fee = transferFee as NSDecimalNumber
+        transaction.partner = partner
         
         chatroom.addToTransactions(transaction)
         

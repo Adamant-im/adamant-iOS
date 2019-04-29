@@ -1002,9 +1002,13 @@ extension AdamantChatsProvider {
                 if let data = decodedMessage.data(using: String.Encoding.utf8), let jsonRaw = try? JSONSerialization.jsonObject(with: data, options: []) {
                     switch jsonRaw {
                     // MARK: Valid json
-                    case let json as [String:String]:
+                    case var json as [String:String]:
                         // Supported rich message type
-                        if let type = json[RichContentKeys.type] {
+                        if var type = json[RichContentKeys.type] {
+                            // Fix lowercase
+                            type = type.lowercased()
+                            json[RichContentKeys.type] = type
+                            
                             let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
                             trs.richContent = json
                             trs.richType = type
@@ -1022,7 +1026,10 @@ extension AdamantChatsProvider {
                     // MARK: Bad json, try to fix it
                     case let json as [String:Any]:
                         // Supported type but in wrong format
-                        if let type = json[RichContentKeys.type] as? String {
+                        if var type = json[RichContentKeys.type] as? String {
+                            // Fix lowercase
+                            type = type.lowercased()
+                            
                             var fixedJson = [String:String]()
                             
                             for (key, raw) in json {
@@ -1034,6 +1041,8 @@ extension AdamantChatsProvider {
                                     fixedJson[key] = String(describing: raw)
                                 }
                             }
+                            
+                            fixedJson[RichContentKeys.type] = type // Lowercased
                             
                             let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
                             trs.richContent = fixedJson
