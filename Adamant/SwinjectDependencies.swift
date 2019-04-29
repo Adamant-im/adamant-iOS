@@ -35,6 +35,8 @@ extension Container {
 		// MARK: Reachability
 		self.register(ReachabilityMonitor.self) { r in AdamantReachability() }.inObjectScope(.container)
 		
+        // MARK: AdamantAvatarService
+        self.register(AvatarService.self) { r in AdamantAvatarService() }.inObjectScope(.container)
 		
 		// MARK: - Services with dependencies
 		// MARK: DialogService
@@ -100,11 +102,6 @@ extension Container {
 			service.dialogService = r.resolve(DialogService.self)!
             return service
         }.inObjectScope(.container)
-		
-        // MARK: AdamantAvatarService
-        self.register(AvatarService.self) { r in
-            return AdamantAvatarService()
-        }
         
         // MARK: CurrencyInfoService
         self.register(CurrencyInfoService.self) { r in
