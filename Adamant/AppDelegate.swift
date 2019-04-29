@@ -60,6 +60,8 @@ struct AdamantResources {
     static let dogeServers: [URL] = [
         URL(string: "https://dogenode1.adamant.im/api")!
     ]
+    
+    static let coinsInfoSrvice = "https://info.adamant.im/get"
 	
     // MARK: ADAMANT Addresses
 	static let supportEmail = "ios@adamant.im"

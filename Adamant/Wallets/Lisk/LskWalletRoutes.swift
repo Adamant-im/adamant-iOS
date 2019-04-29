@@ -14,6 +14,7 @@ extension AdamantScene.Wallets {
         static let wallet = AdamantScene(identifier: "LskWalletViewController") { r in
             let c = LskWalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
             c.dialogService = r.resolve(DialogService.self)
+            c.currencyInfoService = r.resolve(CurrencyInfoService.self)
             return c
         }
         

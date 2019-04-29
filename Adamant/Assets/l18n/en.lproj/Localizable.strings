@@ -70,6 +70,9 @@
 /* About scene: Show Welcome screens */
 "About.Row.Welcome" = "Welcome screens";
 
+/* Account tab: 'Currency' row */
+"AccountTab.Row.Currency" = "Currency";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Welcome to ADAMANT";
 

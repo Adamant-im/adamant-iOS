@@ -14,6 +14,7 @@ extension AdamantScene.Wallets {
         static let wallet = AdamantScene(identifier: "DogeWalletViewController") { r in
             let c = DogeWalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
             c.dialogService = r.resolve(DialogService.self)
+            c.currencyInfoService = r.resolve(CurrencyInfoService.self)
             return c
         }
         

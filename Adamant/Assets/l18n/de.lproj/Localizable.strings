@@ -154,6 +154,9 @@
 /* Account tab: 'Theme' row value 'Dark' */
 "AccountTab.Row.Theme.Dark" = "Dark";
 
+/* Account tab: 'Currency' row */
+"AccountTab.Row.Currency" = "Währung";
+
 /* Account tab: 'About' row */
 "AccountTab.Row.About" = "Über ADAMANT";
 

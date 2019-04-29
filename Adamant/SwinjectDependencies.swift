@@ -79,6 +79,8 @@ extension Container {
 			service.adamantCore = r.resolve(AdamantCore.self)!
 			service.securedStore = r.resolve(SecuredStore.self)!
             service.dialogService = r.resolve(DialogService.self)!
+            service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
+            
             return service
         }.inObjectScope(.container).initCompleted { (r, c) in
             let service = c as! AdamantAccountService
@@ -102,6 +104,18 @@ extension Container {
         // MARK: AdamantAvatarService
         self.register(AvatarService.self) { r in
             return AdamantAvatarService()
+        }
+        
+        // MARK: CurrencyInfoService
+        self.register(CurrencyInfoService.self) { r in
+            let service = AdamantCurrencyInfoService()
+            service.securedStore = r.resolve(SecuredStore.self)
+            return service
+        }.inObjectScope(.container).initCompleted { (r, service) in
+            let accountService = r.resolve(AccountService.self)
+            if let coins = accountService?.wallets.map({ s -> String in type(of: s).currencySymbol }) {
+                service.loadUpdate(for: coins)
+            }
         }
 
 		// MARK: - Data Providers

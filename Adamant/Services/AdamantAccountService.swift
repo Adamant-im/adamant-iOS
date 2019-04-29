@@ -15,6 +15,7 @@ class AdamantAccountService: AccountService {
 	var apiService: ApiService!
 	var adamantCore: AdamantCore!
 	weak var notificationsService: NotificationsService!
+    weak var currencyInfoService: CurrencyInfoService!
     var dialogService: DialogService!
 	var securedStore: SecuredStore! {
 		didSet {

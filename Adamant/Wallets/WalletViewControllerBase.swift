@@ -48,6 +48,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 	// MARK: - Dependencies
 	
 	var dialogService: DialogService!
+    var currencyInfoService: CurrencyInfoService!
 	
 	
 	// MARK: - Properties, WalletViewController
@@ -138,12 +139,14 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 				}
 			}
 			
-			if let service = self?.service, let wallet = service.wallet {
-				let symbol = type(of: service).currencySymbol
-				$0.value = AdamantBalanceFormat.full.format(wallet.balance, withCurrencySymbol: symbol)
-			} else {
-				$0.value = "0"
-			}
+            if let service = self?.service, let wallet = service.wallet {
+                let symbol = type(of: service).currencySymbol
+                let value = self?.stringFor(balance: wallet.balance, symbol: symbol)
+                
+                $0.value = value
+            } else {
+                $0.value = "0"
+            }
 		}
 		
 		if service is WalletServiceWithTransfers {
@@ -222,7 +225,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 
 				if let row: AlertLabelRow = self?.form.rowBy(tag: BaseRows.balance.tag) {
 					let symbol = type(of: service).currencySymbol
-					row.value = AdamantBalanceFormat.full.format(wallet.balance, withCurrencySymbol: symbol)
+                    row.value = self?.stringFor(balance: wallet.balance, symbol: symbol)
 					
 					if wallet.notifications > 0 {
 						row.cell.alertLabel.text = String(wallet.notifications)
@@ -242,6 +245,11 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 												   object: service,
 												   queue: OperationQueue.main,
 												   using: walletUpdatedCallback)
+            
+            NotificationCenter.default.addObserver(forName: Notification.Name.AdamantCurrencyInfoService.currencyRatesUpdated,
+                                                   object: service,
+                                                   queue: OperationQueue.main,
+                                                   using: walletUpdatedCallback)
             
             // MARK: Wallet state updated
             let stateUpdatedCallback = { [weak self] (notification: Notification) in
@@ -334,6 +342,19 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         }
         
         currentUiState = state
+    }
+    
+    private func stringFor(balance: Decimal, symbol: String?) -> String {
+        var value = AdamantBalanceFormat.full.format(balance, withCurrencySymbol: symbol)
+        
+        if balance > 0, let symbol = symbol, let rate = currencyInfoService.getRate(for: symbol) {
+            let fiat = balance * rate
+            let fiatString = AdamantBalanceFormat.short.format(fiat, withCurrencySymbol: currencyInfoService.currentCurrency.symbol)
+            
+            value = "\(value) (\(fiatString))"
+        }
+        
+        return value
     }
 }
 
