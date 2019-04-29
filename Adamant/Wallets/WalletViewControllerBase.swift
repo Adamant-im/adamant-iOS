@@ -219,7 +219,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 		if let service = service {
             // MARK: Wallet updated
 			let walletUpdatedCallback = { [weak self] (notification: Notification) in
-				guard let wallet = notification.userInfo?[AdamantUserInfoKey.WalletService.wallet] as? WalletAccount else {
+                guard let service = self?.service, let wallet = service.wallet else {
 					return
 				}
                 
@@ -247,7 +247,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 												   using: walletUpdatedCallback)
             
             NotificationCenter.default.addObserver(forName: Notification.Name.AdamantCurrencyInfoService.currencyRatesUpdated,
-                                                   object: service,
+                                                   object: nil,
                                                    queue: OperationQueue.main,
                                                    using: walletUpdatedCallback)
             
