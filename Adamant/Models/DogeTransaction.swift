@@ -76,6 +76,11 @@ struct DogeRawTransaction {
         var totalInputsValue = myInputs.map { $0.value }.reduce(0, +) - fee
         var totalOutputsValue = myOutputs.map { $0.value }.reduce(0, +)
         
+        if totalInputsValue == totalOutputsValue {
+            totalInputsValue = 0
+            totalOutputsValue = 0
+        }
+        
         if totalInputsValue > totalOutputsValue {
             while let out = myOutputs.first {
                 totalInputsValue -= out.value
@@ -94,18 +99,39 @@ struct DogeRawTransaction {
             }
         }
         
-        let senders = Set(inputs.map { $0.sender }.filter { $0 != address })
-        let recipients = Set(outputs.compactMap { $0.addresses.first }.filter { $0 != address })
+        let senders = Set(inputs.map { $0.sender } )
+        let recipients = Set(outputs.compactMap { $0.addresses.first } )
         
-        // MARK: Inputs
-        if myInputs.count > 0 {
-            let recipient: String
-            if recipients.count == 1, let name = recipients.first {
-                recipient = name
+        let sender: String
+        let recipient: String
+        
+        if senders.count == 1 {
+            sender = senders.first!
+        } else {
+            let filtered = senders.filter { $0 != address }
+            
+            if filtered.count == 1 {
+                sender = filtered.first!
+            } else {
+                sender = String.adamantLocalized.dogeTransaction.senders(senders.count)
+            }
+        }
+        
+        if recipients.count == 1 {
+            recipient = recipients.first!
+        } else {
+            let filtered = recipients.filter { $0 != address }
+            
+            if filtered.count == 1 {
+                recipient = filtered.first!
             } else {
                 recipient = String.adamantLocalized.dogeTransaction.recipients(recipients.count)
             }
-            
+        }
+        
+        
+        // MARK: Inputs
+        if myInputs.count > 0 {
             let inputTransaction =  DogeTransaction(txId: txId,
                                                     dateValue: date,
                                                     blockValue: blockId,
@@ -121,13 +147,6 @@ struct DogeRawTransaction {
         }
         
         // MARK: Outputs
-        let sender: String
-        if senders.count == 1, let name = senders.first {
-            sender = name
-        } else {
-            sender = String.adamantLocalized.dogeTransaction.senders(senders.count)
-        }
-        
         let outputTransaction = DogeTransaction(txId: txId,
                                                 dateValue: date,
                                                 blockValue: blockId,
@@ -161,9 +180,6 @@ extension DogeRawTransaction: Decodable {
         
         // MARK: Required
         self.txId = try container.decode(String.self, forKey: .txId)
-        self.valueIn = try container.decode(Decimal.self, forKey: .valueIn)
-        self.valueOut = try container.decode(Decimal.self, forKey: .valueOut)
-        self.fee = try container.decode(Decimal.self, forKey: .fee)
         
         // MARK: Optionals for new transactions
         if let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) {
@@ -176,9 +192,28 @@ extension DogeRawTransaction: Decodable {
         self.blockHash = try? container.decode(String.self, forKey: .blockHash)
         
         // MARK: Inputs & Outputs
-        
-        self.inputs = try container.decode([DogeInput].self, forKey: .inputs)
+        let inputs = try container.decode([DogeInput].self, forKey: .inputs)
+        self.inputs = inputs.filter { !$0.sender.isEmpty }  // Filter incomplete transactions without sender
         self.outputs = try container.decode([DogeOutput].self, forKey: .outputs)
+        
+        // Total In & Out. Can be null sometimes...
+        if let raw = try? container.decode(Decimal.self, forKey: .valueIn) {
+            self.valueIn = raw
+        } else {
+            self.valueIn = self.inputs.map { $0.value }.reduce(0, +)
+        }
+        
+        if let raw = try? container.decode(Decimal.self, forKey: .valueOut) {
+            self.valueOut = raw
+        } else {
+            self.valueOut = self.outputs.map { $0.value }.reduce(0, +)
+        }
+        
+        if let raw = try? container.decode(Decimal.self, forKey: .fee) {
+            self.fee = raw
+        } else {
+            self.fee = self.valueIn - self.valueOut
+        }
     }
 }
 
@@ -187,7 +222,7 @@ extension DogeRawTransaction: Decodable {
 struct DogeInput: Decodable {
     enum CodingKeys: String, CodingKey {
         case sender = "addr"
-        case value
+        case value = "valueSat"
         case txId = "txid"
         case vOut = "vout"
     }
@@ -200,10 +235,21 @@ struct DogeInput: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
-        self.sender = try container.decode(String.self, forKey: .sender)
-        self.value = try container.decode(Decimal.self, forKey: .value)
+        // Incomplete inputs doesn't contains address. We will filter them out
+        if let raw = try? container.decode(String.self, forKey: .sender) {
+            self.sender = raw
+        } else {
+            self.sender = ""
+        }
+        
         self.txId = try container.decode(String.self, forKey: .txId)
         self.vOut = try container.decode(Int.self, forKey: .vOut)
+        
+        if let raw = try? container.decode(Decimal.self, forKey: .value) {
+            self.value = Decimal(sign: .plus, exponent: DogeWalletService.currencyExponent, significand: raw)
+        } else {
+            self.value = 0
+        }
     }
 }
 

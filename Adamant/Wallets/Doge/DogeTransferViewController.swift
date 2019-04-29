@@ -85,8 +85,14 @@ class DogeTransferViewController: TransferViewControllerBase {
                                 
                                 detailsVc.transaction = transaction
                                 detailsVc.service = service
+                                
                                 detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                                detailsVc.recipientName = self?.recipientName
+                                
+                                if let recipientName = self?.recipientName {
+                                    detailsVc.recipientName = recipientName
+                                } else if transaction.recipientAddress == sender {
+                                    detailsVc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                                }
                                 
                                 if comments.count > 0 {
                                     detailsVc.comment = comments
@@ -127,7 +133,6 @@ class DogeTransferViewController: TransferViewControllerBase {
                 }
                 
             case .failure(let error):
-                dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
         }

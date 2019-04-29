@@ -15,6 +15,7 @@ enum CellSource {
 }
 
 protocol RichMessageProvider: class {
+    /// Lowercased!!
     static var richMessageType: String { get }
     
     var cellIdentifierSent: String { get }

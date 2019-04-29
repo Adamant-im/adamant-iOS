@@ -36,31 +36,38 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        transactions.removeAll()
+        procedureQueue.cancelAllOperations()
         
         loadedTo = 0
-        walletService.getTransactions(from: 0) { [weak self] result in
+        walletService.getTransactions(from: loadedTo) { [weak self] result in
+            guard let vc = self else {
+                refreshControl.endRefreshing()
+                return
+            }
+            
             switch result {
             case .success(let tuple):
-                self?.transactions = tuple.transactions
-                self?.loadedTo = tuple.transactions.count
-                
-                if tuple.hasMore {
-                    self?.loadMoreTransactions(from: tuple.transactions.count)
-                }
+                vc.transactions = tuple.transactions
+                vc.loadedTo = tuple.transactions.count
                 
                 DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                    self?.refreshControl.endRefreshing()
+                    vc.tableView.reloadData()
+                    refreshControl.endRefreshing()
+                    
+                    // Update tableView, then call loadMore()
+                    if tuple.hasMore {
+                        vc.loadMoreTransactions(from: tuple.transactions.count)
+                    }
                 }
                 
             case .failure(let error):
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                    self?.refreshControl.endRefreshing()
-                }
+                vc.transactions.removeAll()
+                vc.dialogService.showRichError(error: error)
                 
-                self?.dialogService.showRichError(error: error)
+                DispatchQueue.main.async {
+                    vc.tableView.reloadData()
+                    refreshControl.endRefreshing()
+                }
             }
         }
     }
@@ -77,7 +84,8 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
             fatalError("Failed to get DogeTransactionDetailsViewController")
         }
         
-        guard let walletService = walletService, let sender = walletService.wallet?.address else {
+        // Hold reference
+        guard let sender = walletService.wallet?.address else {
             return
         }
         
@@ -85,7 +93,11 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
         let txId = transactions[indexPath.row].txId
         
-        walletService.getTransaction(by: txId) { result in
+        walletService.getTransaction(by: txId) { [weak self] result in
+            guard let vc = self else {
+                return
+            }
+            
             switch result {
             case .success(let dogeTransaction):
                 let transaction = dogeTransaction.asDogeTransaction(for: sender)
@@ -93,21 +105,24 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                 // Sender name
                 if transaction.senderAddress == sender {
                     controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                } else if transaction.recipientAddress == sender {
+                }
+                
+                if transaction.recipientAddress == sender {
                     controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
                 }
                 
+                // Block Id
                 guard let blockHash = dogeTransaction.blockHash else {
                     controller.transaction = transaction
                     DispatchQueue.main.async {
-                        self.navigationController?.pushViewController(controller, animated: true)
-                        self.tableView.deselectRow(at: indexPath, animated: true)
-                        self.dialogService.dismissProgress()
+                        vc.navigationController?.pushViewController(controller, animated: true)
+                        vc.tableView.deselectRow(at: indexPath, animated: true)
+                        vc.dialogService.dismissProgress()
                     }
                     break
                 }
                 
-                walletService.getBlockId(by: blockHash) { result in
+                vc.walletService.getBlockId(by: blockHash) { result in
                     switch result {
                     case .success(let id):
                         controller.transaction = dogeTransaction.asDogeTransaction(for: sender, blockId: id)
@@ -117,17 +132,17 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                     }
                     
                     DispatchQueue.main.async {
-                        self.tableView.deselectRow(at: indexPath, animated: true)
-                        self.dialogService.dismissProgress()
-                        self.navigationController?.pushViewController(controller, animated: true)
+                        vc.tableView.deselectRow(at: indexPath, animated: true)
+                        vc.dialogService.dismissProgress()
+                        vc.navigationController?.pushViewController(controller, animated: true)
                     }
                 }
                 
             case .failure(let error):
                 DispatchQueue.main.async {
-                    self.tableView.deselectRow(at: indexPath, animated: true)
-                    self.dialogService.dismissProgress()
-                    self.dialogService.showRichError(error: error)
+                    vc.tableView.deselectRow(at: indexPath, animated: true)
+                    vc.dialogService.dismissProgress()
+                    vc.dialogService.showRichError(error: error)
                 }
             }
         }
@@ -151,10 +166,17 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         let outgoing = transaction.isOutgoing
         let partnerId = outgoing ? transaction.recipientAddress : transaction.senderAddress
         
+        let partnerName: String?
+        if let address = walletService.wallet?.address, partnerId == address {
+            partnerName = String.adamantLocalized.transactionDetails.yourAddress
+        } else {
+            partnerName = nil
+        }
+        
         configureCell(cell,
                       isOutgoing: outgoing,
                       partnerId: partnerId,
-                      partnerName: nil,
+                      partnerName: partnerName,
                       amount: transaction.amountValue,
                       date: transaction.dateValue)
     }
@@ -162,19 +184,13 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Load more
     private func loadMoreTransactions(from: Int) {
         let procedure = LoadMoreDogeTransactionsProcedure(service: walletService, from: from)
-        print("getting from \(from)")
+        
         procedure.addDidFinishBlockObserver { [weak self] (procedure, error) in
-            guard let result = procedure.result else {
-                return
-            }
-            
-            guard let vc = self else {
+            guard let vc = self, let result = procedure.result else {
                 return
             }
             
             let total = vc.loadedTo + result.transactions.count
-            vc.loadedTo = total
-            vc.transactions.append(contentsOf: result.transactions)
             
             var indexPaths = [IndexPath]()
             for index in from..<total {
@@ -182,11 +198,14 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
             }
             
             DispatchQueue.main.async {
+                vc.loadedTo = total
+                vc.transactions.append(contentsOf: result.transactions)
                 vc.tableView.insertRows(at: indexPaths, with: .fade)
-            }
-            
-            if result.hasMore && total < vc.limit {
-                vc.loadMoreTransactions(from: total)
+                
+                // Update everything, and then call loadMore()
+                if result.hasMore && total < vc.limit {
+                    vc.loadMoreTransactions(from: total)
+                }
             }
         }
         
