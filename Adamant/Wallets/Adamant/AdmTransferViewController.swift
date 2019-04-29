@@ -27,7 +27,11 @@ class AdmTransferViewController: TransferViewControllerBase {
 	// MARK: Properties
 	
 	override var balanceFormatter: NumberFormatter {
-		return AdamantUtilities.currencyFormatter
+        if let service = service {
+            return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: type(of: service).currencySymbol)
+        } else {
+            return AdamantBalanceFormat.currencyFormatterFull
+        }
 	}
 	
 	private var skipValueChange: Bool = false

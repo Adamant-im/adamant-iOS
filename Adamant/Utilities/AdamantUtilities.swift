@@ -37,45 +37,6 @@ class AdamantUtilities {
 }
 
 
-// MARK: - Currency
-extension AdamantUtilities {
-	static let currencyExponent: Int = -8
-	static let currencyCode = "ADM"
-	
-	static var currencyFormatter: NumberFormatter = {
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .decimal
-		formatter.roundingMode = .floor
-		formatter.positiveFormat = "#.######## \(currencyCode)"
-		return formatter
-	}()
-	
-	static func currencyFormatter(currencyCode: String) -> NumberFormatter {
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .decimal
-		formatter.roundingMode = .floor
-		formatter.positiveFormat = "#.######## \(currencyCode)"
-		return formatter
-	}
-	
-	static func format(balance: Decimal) -> String {
-		return currencyFormatter.string(from: balance as NSNumber)!
-	}
-	
-	static func format(balance: NSDecimalNumber) -> String {
-		return currencyFormatter.string(from: balance as NSNumber)!
-	}
-	
-	static func validateAmount(amount: Decimal) -> Bool {
-		if amount < Decimal(sign: .plus, exponent: AdamantUtilities.currencyExponent, significand: 1) {
-			return false
-		}
-		
-		return true
-	}
-}
-
-
 // MARK: - Validating Addresses and Passphrases
 extension AdamantUtilities {
 	static let addressRegexString = "^U([0-9]{6,20})$"
