@@ -36,8 +36,6 @@
 		645E7B062111DF3A006CC9FD /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645E7B052111DF3A006CC9FD /* Crypto.swift */; };
 		645FEB34213E72C100D6BA2D /* OnboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645FEB32213E72C100D6BA2D /* OnboardViewController.swift */; };
 		645FEB35213E72C100D6BA2D /* OnboardViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 645FEB33213E72C100D6BA2D /* OnboardViewController.xib */; };
-		64721AC222633812005C22C3 /* SeparatorCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64721AC022633812005C22C3 /* SeparatorCollectionViewCell.swift */; };
-		64721AC322633812005C22C3 /* SeparatorCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 64721AC122633812005C22C3 /* SeparatorCollectionViewCell.xib */; };
 		648BCA6B213D37A900875EB5 /* AdamantAvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */; };
 		648BCA6D213D384F00875EB5 /* AvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648BCA6C213D384F00875EB5 /* AvatarService.swift */; };
 		648DD79E2236A0B500B811FD /* DogeTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648DD79D2236A0B500B811FD /* DogeTransactionsViewController.swift */; };
@@ -345,8 +343,6 @@
 		645E7B052111DF3A006CC9FD /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
 		645FEB32213E72C100D6BA2D /* OnboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardViewController.swift; sourceTree = "<group>"; };
 		645FEB33213E72C100D6BA2D /* OnboardViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OnboardViewController.xib; sourceTree = "<group>"; };
-		64721AC022633812005C22C3 /* SeparatorCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeparatorCollectionViewCell.swift; sourceTree = "<group>"; };
-		64721AC122633812005C22C3 /* SeparatorCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SeparatorCollectionViewCell.xib; sourceTree = "<group>"; };
 		648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantAvatarService.swift; sourceTree = "<group>"; };
 		648BCA6C213D384F00875EB5 /* AvatarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarService.swift; sourceTree = "<group>"; };
 		648DD79D2236A0B500B811FD /* DogeTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeTransactionsViewController.swift; sourceTree = "<group>"; };
@@ -1220,8 +1216,6 @@
 				E926E033213EC454005E536B /* FullscreenAlertView.xib */,
 				E9FEECA72143C371007DD7C8 /* TransferCollectionViewCell.swift */,
 				E9FEECA82143C371007DD7C8 /* TransferCollectionViewCell.xib */,
-				64721AC022633812005C22C3 /* SeparatorCollectionViewCell.swift */,
-				64721AC122633812005C22C3 /* SeparatorCollectionViewCell.xib */,
 				E9FEECAB2143CEED007DD7C8 /* TransferMessageSizeCalculator.swift */,
 				E9B4E1A7210F079E007E77FC /* DoubleDetailsTableViewCell.swift */,
 				E9B4E1A9210F08BE007E77FC /* DoubleDetailsTableViewCell.xib */,
@@ -1396,7 +1390,6 @@
 				6458548C211B3AB1004C5909 /* WelcomeViewController.xib in Resources */,
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
 				E9A174B920587B84003667CD /* notification.mp3 in Resources */,
-				64721AC322633812005C22C3 /* SeparatorCollectionViewCell.xib in Resources */,
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
 				645FEB35213E72C100D6BA2D /* OnboardViewController.xib in Resources */,
 				E948E0482024F02700975D6B /* VersionFooter.xib in Resources */,
@@ -1692,7 +1685,6 @@
 				E9E7CDCA20040CC200DFC4DB /* Transaction.swift in Sources */,
 				E9AA8BFC212C169200F9249F /* EthWalletService+Transfers.swift in Sources */,
 				64E1C82D222E95E2006C4DA7 /* DogeWalletRoutes.swift in Sources */,
-				64721AC222633812005C22C3 /* SeparatorCollectionViewCell.swift in Sources */,
 				649E9A152111B3C200686B01 /* Mnemonic.swift in Sources */,
 				E95F85692006AB9D0070534A /* NormalizedTransaction.swift in Sources */,
 				E913C90D1FFFA99B001A83F7 /* Keypair.swift in Sources */,

@@ -289,9 +289,6 @@
 /* Chat: warning message for opening unsupported url schemes */
 "ChatScene.Warning.UnsupportedUrl" = "Nicht unterstütztes URL-Protokoll";
 
-/* Chat: Unreaded message for separator */
-"ChatScene.MessageStatus.Unreaded" = "Ungelesen";
-
 /* Delegates page: scene title */
 "Delegates.Title" = "Delegierte";
 

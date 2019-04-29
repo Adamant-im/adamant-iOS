@@ -16,18 +16,11 @@ import MarkdownKit
 // MARK: - Tools
 extension ChatViewController {
     private func getRichMessageType(of message: MessageType) -> String? {
-        guard case .custom(let raw) = message.kind else {
+        guard case .custom(let raw) = message.kind, let transfer = raw as? RichMessageTransfer else {
             return nil
         }
         
-        switch raw {
-        case let transfer as RichMessageTransfer:
-            return transfer.type
-        case let separator as RichMessageSeparator:
-            return separator.type
-        default:
-            return nil
-        }
+        return transfer.type
     }
 }
 
@@ -44,28 +37,15 @@ extension ChatViewController: MessagesDataSource {
 	}
 	
 	func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
-        guard let message = objects()?[indexPath.section] else {
+		guard let message = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) as? MessageType else {
 			fatalError("Data not synced")
 		}
 		
 		return message
 	}
-    
-    func objects() -> [MessageType]? {
-        let objects: [ChatTransaction]? = chatController?.fetchedObjects
-        var messages = objects?.compactMap({ (t) -> MessageType? in
-            return t as? MessageType
-        })
-        if objects?.count == messages?.count, let index = objects?.firstIndex(where: { $0.isUnread }) {
-            messageToShow = objects?[index] as? MessageTransaction
-            messages?.insert(MessageSeparator(), at: index)
-        }
-        
-        return messages
-    }
 	
     func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
-		if let objects = objects() {
+		if let objects = chatController?.fetchedObjects {
 			return objects.count
 		} else {
 			return 0
@@ -693,79 +673,4 @@ extension TransferTransaction: MessageType {
                                                       hash: "",
                                                       comments: comment ?? ""))
 	}
-}
-
-struct RichMessageSeparator: RichMessage {
-    var type: String
-    
-    init(type: String) {
-        self.type = type
-    }
-    
-    func content() -> [String : String] {
-        return [
-            CodingKeys.type.stringValue: type
-        ]
-    }
-}
-
-class MessageSeparator: MessageType {
-    var sender: Sender = Sender(id: "", displayName: "")
-    
-    var messageId: String = ""
-    
-    var sentDate: Date = Date()
-    
-    var kind: MessageKind = .custom(RichMessageSeparator(type: MessageSeparatorProvider.richMessageType))
-}
-
-class MessageSeparatorProvider: RichMessageProvider {
-    static var richMessageType: String = "message_separator"
-    
-    var cellIdentifierSent: String = "message_separator_sent"
-    
-    var cellIdentifierReceived: String = "message_separator_received"
-    
-    var cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "SeparatorCollectionViewCell", bundle: nil))
-    
-    func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController) { }
-    
-    func shortDescription(for transaction: RichMessageTransaction) -> NSAttributedString {
-        return NSAttributedString(string: "")
-    }
-    
-    func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator {
-        let calculator = FixHeightCellSizeCalculator(layout: messagesCollectionViewFlowLayout, height: 20)
-        return calculator
-    }
-    
-    func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
-        guard case .custom(let raw) = message.kind, let _ = raw as? RichMessageSeparator else {
-            fatalError("ADM service tried to render wrong message kind: \(message.kind)")
-        }
-        guard let cell = messagesCollectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifierSent, for: indexPath) as? SeparatorCollectionViewCell else {
-            fatalError("Can't dequeue \(cellIdentifierSent) cell")
-        }
-        
-        cell.label.text = String.adamantLocalized.chat.unreadedSeparatorText
-        cell.color = UIColor.adamant.active
-        
-        return cell
-    }
-}
-
-class FixHeightCellSizeCalculator: CellSizeCalculator {
-    private var cellheight: CGFloat = 20
-    
-    public init(layout: MessagesCollectionViewFlowLayout? = nil, height: CGFloat) {
-        super.init()
-        
-        self.layout = layout
-        self.cellheight = height
-    }
-    
-    override func sizeForItem(at indexPath: IndexPath) -> CGSize {
-        let width = layout?.collectionView?.bounds.width ?? UIScreen.main.bounds.width
-        return CGSize(width: width, height: self.cellheight)
-    }
 }
