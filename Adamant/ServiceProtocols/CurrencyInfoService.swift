@@ -8,6 +8,12 @@
 
 import Foundation
 
+extension Notification.Name {
+    struct AdamantCurrencyInfoService {
+        static let currencyRatesUpdated = Notification.Name("adamant.currencyInfo.rateUpdated")
+    }
+}
+
 protocol CurrencyInfoService: class {
     var currentCurrency: Currency { get set }
     
@@ -15,5 +21,5 @@ protocol CurrencyInfoService: class {
     func loadUpdate(for coins: [String])
     
     // Get rate for pair Crypto / Fiat currencies
-    func getRate(for coin: String) -> Double
+    func getRate(for coin: String) -> Decimal?
 }

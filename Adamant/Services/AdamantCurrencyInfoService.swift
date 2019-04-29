@@ -31,25 +31,22 @@ enum Currency: String {
         case .JPY: return "¥"
         }
     }
+    
+    static var `default` = Currency.USD
 }
 
 class CoinInfoServerResponse: Decodable {
-    struct CodingKeys: CodingKey {
-        var intValue: Int?
-        var stringValue: String
-        
-        init?(intValue: Int) { self.intValue = intValue; self.stringValue = "\(intValue)" }
-        init?(stringValue: String) { self.stringValue = stringValue }
-        
-        static let success = CodingKeys(stringValue: "success")!
-        static let date = CodingKeys(stringValue: "date")!
+    enum CodingKeys: String, CodingKey {
+        case success
+        case date
+        case result
     }
     
     let success: Bool
     let date: TimeInterval
-    let result: [String: Double]
+    let result: [String: Decimal]?
     
-    init(success: Bool, date: TimeInterval, result: [String: Double]) {
+    init(success: Bool, date: TimeInterval, result: [String: Decimal]) {
         self.success = success
         self.date = date
         self.result = result
@@ -58,21 +55,21 @@ class CoinInfoServerResponse: Decodable {
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
-        self.success = try container.decode(Bool.self, forKey: CodingKeys.success)
-        self.date = try container.decode(TimeInterval.self, forKey: CodingKeys.date)
-        
-        self.result = try container.decode([String: Double].self, forKey: CodingKeys(stringValue: "result")!)
+        self.success = try container.decode(Bool.self, forKey: .success)
+        self.date = try container.decode(TimeInterval.self, forKey: .date)
+        self.result = try? container.decode([String: Decimal].self, forKey: .result)
     }
 }
 
 class AdamantCurrencyInfoService: CurrencyInfoService {
     // MARK: - Properties
-    private var rates = [String: Double]()
+    private var rates = [String: Decimal]()
     private let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.info-coins-response-queue", qos: .utility, attributes: [.concurrent])
-    public var currentCurrency: Currency = Currency.USD {
+    
+    public var currentCurrency: Currency = Currency.default {
         didSet {
             securedStore?.set(currentCurrency.rawValue, for: StoreKey.CoinInfo.selectedCurrency)
-            NotificationCenter.default.post(name: Notification.Name.WalletViewController.balanceUpdated, object: nil)
+            NotificationCenter.default.post(name: Notification.Name.AdamantCurrencyInfoService.currencyRatesUpdated, object: nil)
         }
     }
     
@@ -81,31 +78,32 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
         didSet {
             if let securedStore = securedStore, let id = securedStore.get(StoreKey.CoinInfo.selectedCurrency), let currency = Currency(rawValue: id) {
                 currentCurrency = currency
+            } else {
+                currentCurrency = Currency.default
             }
         }
     }
     
     func loadUpdate(for coins: [String]) {
-        self.loadRates(for: coins) { [weak self] result in
+        loadRates(for: coins) { [weak self] result in
             switch result {
             case .success(let rates):
-                print("rates: \(rates)")
                 self?.rates = rates
-                break
+                
             case .failure(let error):
                 print("Fail to load rates from server with error: \(error.localizedDescription)")
             }
         }
     }
     
-    func getRate(for coin: String) -> Double {
-        let currency = self.currentCurrency.rawValue
+    func getRate(for coin: String) -> Decimal? {
+        let currency = currentCurrency.rawValue
         let pair = "\(coin)/\(currency)"
-        let rate = self.rates[pair]
-        return rate ?? 0
+        
+        return rates[pair]
     }
     
-    private func loadRates(for coins: [String], completion: @escaping (ApiServiceResult<[String: Double]>) -> Void) {
+    private func loadRates(for coins: [String], completion: @escaping (ApiServiceResult<[String: Decimal]>) -> Void) {
         let parameters = [
             "coin": coins.joined(separator: ",")
         ]
@@ -119,7 +117,11 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
             case .success(let data):
                 do {
                     let model: CoinInfoServerResponse = try JSONDecoder().decode(CoinInfoServerResponse.self, from: data)
-                    completion(.success(model.result))
+                    if let result = model.result {
+                        completion(.success(result))
+                    } else {
+                        completion(.failure(.serverError(error: "Coin info API result: Parsing error")))
+                    }
                 } catch {
                     completion(.failure(.serverError(error: "Coin info API result: Parsing error")))
                 }

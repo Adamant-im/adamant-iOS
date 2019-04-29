@@ -174,7 +174,6 @@ extension AdamantUserInfoKey {
 extension Notification.Name {
 	struct WalletViewController {
 		static let heightUpdated = Notification.Name("adamant.walletViewController")
-        static let balanceUpdated = Notification.Name("adamant.walletViewController.balanceUpdated")
 		
 		private init() {}
 	}

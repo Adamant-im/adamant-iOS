@@ -716,22 +716,22 @@
 			children = (
 				E9B3D398201F90320019EB36 /* DataProviders */,
 				E9E7CD8A20026B0600DFC4DB /* AccountService.swift */,
-				648BCA6C213D384F00875EB5 /* AvatarService.swift */,
 				E913C9071FFFA943001A83F7 /* AdamantCore.swift */,
 				6455E9F021075D3600B2E94C /* AddressBookService.swift */,
 				E91947AB20001A9A001362F8 /* ApiService.swift */,
+				648BCA6C213D384F00875EB5 /* AvatarService.swift */,
+				E9A174B22057EC47003667CD /* BackgroundFetchService.swift */,
 				E9E7CDBD2003AEFB00DFC4DB /* CellFactory.swift */,
+				64EAB37322463E020018D9B2 /* CurrencyInfoService.swift */,
 				E9E7CD8C20026B6600DFC4DB /* DialogService.swift */,
-				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
-				E905D39C204C13B900DDB504 /* SecuredStore.swift */,
 				E90A494C204DA932009F6A65 /* LocalAuthentication.swift */,
+				64A223D720F7A08E005157CB /* LskApiService.swift */,
 				E9A03FD920DC0B14007653A1 /* NodesSource.swift */,
 				E93D7ABD2052CEE1005D19DC /* NotificationsService.swift */,
-				E9A174B22057EC47003667CD /* BackgroundFetchService.swift */,
 				E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */,
-				64A223D720F7A08E005157CB /* LskApiService.swift */,
 				E9FEECA321413659007DD7C8 /* RichMessageProvider.swift */,
-				64EAB37322463E020018D9B2 /* CurrencyInfoService.swift */,
+				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
+				E905D39C204C13B900DDB504 /* SecuredStore.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -739,23 +739,23 @@
 		E913C9061FFFA92E001A83F7 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				64D05A0020D515CA003AD655 /* TokensApiService */,
 				E9CAE8D02018AA5000345E76 /* ApiService */,
 				E9B3D39F201FA2090019EB36 /* DataProviders */,
+				64D05A0020D515CA003AD655 /* TokensApiService */,
 				E9E7CD922002740500DFC4DB /* AdamantAccountService.swift */,
 				6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */,
 				E90A494A204D9EB8009F6A65 /* AdamantAuthentication.swift */,
+				648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */,
 				E9E7CDBF2003AF6D00DFC4DB /* AdamantCellFactory.swift */,
+				64EAB37522463F680018D9B2 /* AdamantCurrencyInfoService.swift */,
 				E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */,
 				E9A03FD720DC0ABA007653A1 /* AdamantNodesSource.swift */,
 				E93D7ABF2052CF63005D19DC /* AdamantNotificationService.swift */,
 				E921597420611A6A0000CA5C /* AdamantReachability.swift */,
-				643ED0B02109F4BD005A9FDA /* NativeAdamantCore.swift */,
-				648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */,
 				E905D39A2048A9BD00DDB504 /* KeychainStore.swift */,
+				643ED0B02109F4BD005A9FDA /* NativeAdamantCore.swift */,
 				E950273F202E257E002C1098 /* RepeaterService.swift */,
 				E9E7CDB42002BA6900DFC4DB /* SwinjectedRouter.swift */,
-				64EAB37522463F680018D9B2 /* AdamantCurrencyInfoService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
