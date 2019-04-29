@@ -47,9 +47,7 @@ extension AdamantScene {
                     c.richMessageProviders[type(of: provider).richMessageType] = provider
                 }
             }
-            
-			c.richMessageProviders[MessageSeparatorProvider.richMessageType] = r.resolve(MessageSeparatorProvider.self)
-            
+			
             return c
 		})
 		
