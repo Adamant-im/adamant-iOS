@@ -189,15 +189,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
             } else {
                 $0.value = nil
             }
-        }.cellSetup { [weak self] (cell, _) in
+            
+            let height = self?.senderName != nil ? DoubleDetailsTableViewCell.fullHeight : DoubleDetailsTableViewCell.compactHeight
+            $0.cell.height = { height }
+        }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-            cell.height = {
-                if self?.senderName != nil {
-                    return DoubleDetailsTableViewCell.fullHeight
-                } else {
-                    return DoubleDetailsTableViewCell.compactHeight
-                }
-            }
         }.onCellSelection { [weak self] (cell, row) in
             guard let value = row.value else {
                 return
@@ -244,15 +240,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
             } else {
                 $0.value = nil
             }
-        }.cellSetup { [weak self] (cell, _) in
+            
+            let height = self?.recipientName != nil ? DoubleDetailsTableViewCell.fullHeight : DoubleDetailsTableViewCell.compactHeight
+            $0.cell.height = { height }
+        }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-            cell.height = {
-                if self?.recipientName != nil {
-                    return DoubleDetailsTableViewCell.fullHeight
-                } else {
-                    return DoubleDetailsTableViewCell.compactHeight
-                }
-            }
         }.onCellSelection { [weak self] (cell, row) in
             guard let value = row.value else {
                 return
