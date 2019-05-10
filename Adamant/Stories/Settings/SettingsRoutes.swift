@@ -25,6 +25,13 @@ extension AdamantScene {
 			c.dialogService = r.resolve(DialogService.self)
 			return c
 		}
+        
+        static let pkGenerator = AdamantScene(identifier: "PKGeneratorViewController") { r in
+            let c = PKGeneratorViewController()
+            c.dialogService = r.resolve(DialogService.self)
+            c.accountService = r.resolve(AccountService.self)
+            return c
+        }
 		
 		static let about = AdamantScene(identifier: "About") { r in
 			let c = AboutViewController()

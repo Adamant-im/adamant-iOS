@@ -596,3 +596,24 @@ extension DogeWalletService: WalletServiceWithTransfers {
         return vc
     }
 }
+
+// MARK: - PrivateKey generator
+extension DogeWalletService: PrivateKeyGenerator {
+    var rowTitle: String {
+        return "Doge"
+    }
+    
+    var rowImage: UIImage? {
+        return #imageLiteral(resourceName: "wallet_doge_row")
+    }
+    
+    func generatePrivateKeyFor(passphrase: String) -> String? {
+        guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase), let privateKeyData = passphrase.data(using: .utf8)?.sha256() else {
+            return nil
+        }
+            
+        let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
+        
+        return privateKey.data.toHexString()
+    }
+}

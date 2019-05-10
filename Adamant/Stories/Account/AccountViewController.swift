@@ -59,7 +59,7 @@ class AccountViewController: FormViewController {
 	enum Rows {
 		case balance, sendTokens // Wallet
 		case security, nodes, theme, currency, about // Application
-		case voteForDelegates, generateQr, logout // Actions
+		case voteForDelegates, generateQr, generatePk, logout // Actions
         case stayIn, biometry, notifications // Security
 		
 		var tag: String {
@@ -74,6 +74,7 @@ class AccountViewController: FormViewController {
 			case .logout: return "lgtrw"
             case .voteForDelegates: return "vtFrDlgts"
             case .generateQr: return "qr"
+            case .generatePk: return "pk"
             case .stayIn: return "stayin"
             case .biometry: return "biometry"
             case .notifications: return "notifications"
@@ -92,6 +93,7 @@ class AccountViewController: FormViewController {
 			case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
 			case .voteForDelegates: return NSLocalizedString("AccountTab.Row.VoteForDelegates", comment: "Account tab: 'Votes for delegates' button")
             case .generateQr: return NSLocalizedString("SecurityPage.Row.GenerateQr", comment: "Security: Generate QR with passphrase row")
+            case .generatePk: return NSLocalizedString("SecurityPage.Row.GeneratePk", comment: "Security: Generate PrivateKey with passphrase row")
             case .stayIn: return SecurityViewController.Rows.stayIn.localized
             case .biometry: return SecurityViewController.Rows.biometry.localized
             case .notifications: return SecurityViewController.Rows.notificationsMode.localized
@@ -110,6 +112,7 @@ class AccountViewController: FormViewController {
             case .logout: return #imageLiteral(resourceName: "row_logout")
 			case .sendTokens: return nil
             case .generateQr: return #imageLiteral(resourceName: "row_QR.png")
+            case .generatePk: return #imageLiteral(resourceName: "privateKey_row")
             case .stayIn: return #imageLiteral(resourceName: "row_security")
             case .biometry: return nil // Determined by localAuth service
             case .notifications: return #imageLiteral(resourceName: "row_Notifications.png")
@@ -368,7 +371,35 @@ class AccountViewController: FormViewController {
         }
 
         actionsSection.append(generateQrRow)
-
+        
+        // Generatte private keys
+        let generatePkRow = LabelRow() {
+            $0.title = Rows.generatePk.localized
+            $0.tag = Rows.generatePk.tag
+            $0.cell.imageView?.image = Rows.generatePk.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (_, _) in
+            guard let vc = self?.router.get(scene: AdamantScene.Settings.pkGenerator) else {
+                return
+            }
+            
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else if let nav = self?.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                self?.present(vc, animated: true, completion: nil)
+            }
+            
+            self?.deselectWalletViewControllers()
+        }
+        
+        actionsSection.append(generatePkRow)
+        
+        
 		// Logout
 		let logoutRow = LabelRow() {
 			$0.title = Rows.logout.localized
