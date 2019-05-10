@@ -122,32 +122,28 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 		section.append(addressRow)
 		
 		// MARK: Balance
-		let balanceRow = AlertLabelRow() { [weak self] in
-			$0.tag = BaseRows.balance.tag
-			$0.title = BaseRows.balance.localized
-			
-			if let alertLabel = $0.cell.alertLabel {
-				alertLabel.backgroundColor = UIColor.adamant.primary
-				alertLabel.textColor = UIColor.white
-				alertLabel.clipsToBounds = true
-				alertLabel.textInsets = UIEdgeInsets(top: 1, left: 5, bottom: 1, right: 5)
-				
-				if let count = self?.service?.wallet?.notifications, count > 0 {
-					alertLabel.text = String(count)
-				} else {
-					alertLabel.isHidden = true
-				}
-			}
-			
+        let balanceRow = BalanceRow() { [weak self] in
+            $0.tag = BaseRows.balance.tag
+            $0.cell.titleLabel.text = BaseRows.balance.localized
+            
+            $0.alertBackgroundColor = UIColor.adamant.primary
+            $0.alertTextColor = UIColor.white
+            
             if let service = self?.service, let wallet = service.wallet {
                 let symbol = type(of: service).currencySymbol
-                let value = self?.stringFor(balance: wallet.balance, symbol: symbol)
-                
-                $0.value = value
+                $0.value = self?.balanceRowValueFor(balance: wallet.balance, symbol: symbol, alert: wallet.notifications)
             } else {
-                $0.value = "0"
+                $0.value = nil
             }
-		}
+            
+            let height = $0.value?.fiat != nil ? BalanceTableViewCell.fullHeight : BalanceTableViewCell.compactHeight
+            
+            $0.cell.height = { height }
+        }.cellUpdate { (cell, row) in
+            let height = row.value?.fiat != nil ? BalanceTableViewCell.fullHeight : BalanceTableViewCell.compactHeight
+            
+            cell.height = { height }
+        }
 		
 		if service is WalletServiceWithTransfers {
 			balanceRow.cell.selectionStyle = .gray
@@ -219,26 +215,16 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 		if let service = service {
             // MARK: Wallet updated
 			let walletUpdatedCallback = { [weak self] (notification: Notification) in
-                guard let service = self?.service, let wallet = service.wallet else {
+                guard let service = self?.service,
+                    let wallet = service.wallet,
+                    let vc = self,
+                    let row: BalanceRow = vc.form.rowBy(tag: BaseRows.balance.tag) else {
 					return
 				}
                 
-				if let row: AlertLabelRow = self?.form.rowBy(tag: BaseRows.balance.tag) {
-					let symbol = type(of: service).currencySymbol
-                    row.value = self?.stringFor(balance: wallet.balance, symbol: symbol)
-					
-					if wallet.notifications > 0 {
-						row.cell.alertLabel.text = String(wallet.notifications)
-						
-						if row.cell.alertLabel.isHidden {
-							row.cell.alertLabel.isHidden = false
-						}
-					} else {
-						row.cell.alertLabel.isHidden = true
-					}
-					
-					row.updateCell()
-				}
+                let symbol = type(of: service).currencySymbol
+                row.value = vc.balanceRowValueFor(balance: wallet.balance, symbol: symbol, alert: wallet.notifications)
+                row.updateCell()
 			}
 			
 			NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,
@@ -342,6 +328,24 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         }
         
         currentUiState = state
+    }
+    
+    private func balanceRowValueFor(balance: Decimal, symbol: String?, alert: Int?) -> BalanceRowValue {
+        let cryptoString = AdamantBalanceFormat.full.format(balance, withCurrencySymbol: symbol)
+        
+        let fiatString: String?
+        if balance > 0, let symbol = symbol, let rate = currencyInfoService.getRate(for: symbol) {
+            let fiat = balance * rate
+            fiatString = AdamantBalanceFormat.short.format(fiat, withCurrencySymbol: currencyInfoService.currentCurrency.symbol)
+        } else {
+            fiatString = nil
+        }
+        
+        if let alert = alert, alert > 0 {
+            return BalanceRowValue(crypto: cryptoString, fiat: fiatString, alert: alert)
+        } else {
+            return BalanceRowValue(crypto: cryptoString, fiat: fiatString, alert: nil)
+        }
     }
     
     private func stringFor(balance: Decimal, symbol: String?) -> String {

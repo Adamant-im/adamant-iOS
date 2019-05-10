@@ -164,6 +164,8 @@
 		E941CCDB20E786D800C96220 /* AccountHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = E941CCDA20E786D700C96220 /* AccountHeader.xib */; };
 		E941CCDE20E7B70200C96220 /* WalletCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E941CCDC20E7B70200C96220 /* WalletCollectionViewCell.swift */; };
 		E941CCDF20E7B70200C96220 /* WalletCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E941CCDD20E7B70200C96220 /* WalletCollectionViewCell.xib */; };
+		E9484B79227C617E008E10F0 /* BalanceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9484B77227C617D008E10F0 /* BalanceTableViewCell.swift */; };
+		E9484B7A227CA93B008E10F0 /* BalanceTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9484B78227C617E008E10F0 /* BalanceTableViewCell.xib */; };
 		E94883E7203F07CD00F6E1B0 /* PassphraseValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */; };
 		E948E03B20235E2300975D6B /* SettingsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E948E03A20235E2300975D6B /* SettingsRoutes.swift */; };
 		E948E0482024F02700975D6B /* VersionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = E948E0472024F02700975D6B /* VersionFooter.xib */; };
@@ -494,6 +496,8 @@
 		E941CCDA20E786D700C96220 /* AccountHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AccountHeader.xib; sourceTree = "<group>"; };
 		E941CCDC20E7B70200C96220 /* WalletCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCollectionViewCell.swift; sourceTree = "<group>"; };
 		E941CCDD20E7B70200C96220 /* WalletCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WalletCollectionViewCell.xib; sourceTree = "<group>"; };
+		E9484B77227C617D008E10F0 /* BalanceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceTableViewCell.swift; sourceTree = "<group>"; };
+		E9484B78227C617E008E10F0 /* BalanceTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BalanceTableViewCell.xib; sourceTree = "<group>"; };
 		E94883E6203F07CD00F6E1B0 /* PassphraseValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassphraseValidation.swift; sourceTree = "<group>"; };
 		E948E03A20235E2300975D6B /* SettingsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRoutes.swift; sourceTree = "<group>"; };
 		E948E0472024F02700975D6B /* VersionFooter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VersionFooter.xib; sourceTree = "<group>"; };
@@ -978,6 +982,8 @@
 				64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */,
 				E9E7CDC52003F6D200DFC4DB /* TransactionTableViewCell.swift */,
 				E9E7CDC62003F6D200DFC4DB /* TransactionTableViewCell.xib */,
+				E9484B77227C617D008E10F0 /* BalanceTableViewCell.swift */,
+				E9484B78227C617E008E10F0 /* BalanceTableViewCell.xib */,
 			);
 			path = Wallets;
 			sourceTree = "<group>";
@@ -1386,6 +1392,7 @@
 				E9EC3416200524CA00C0E546 /* Exo+2_300_normal.ttf in Resources */,
 				E9EC341C200524CA00C0E546 /* Roboto_400_italic.ttf in Resources */,
 				E94E7B0C205D5E4A0042B639 /* TransactionsListViewControllerBase.xib in Resources */,
+				E9484B7A227CA93B008E10F0 /* BalanceTableViewCell.xib in Resources */,
 				6406D74A21C7F06000196713 /* SearchResultsViewController.xib in Resources */,
 				E9EC3415200524CA00C0E546 /* Exo+2_100_normal.ttf in Resources */,
 				E9EC341A200524CA00C0E546 /* Exo+2_700_normal.ttf in Resources */,
@@ -1776,6 +1783,7 @@
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
 				E9EC342120052ABB00C0E546 /* TransferViewControllerBase.swift in Sources */,
 				E921534E20EE1E8700C0843F /* EurekaAlertLabelRow.swift in Sources */,
+				E9484B79227C617E008E10F0 /* BalanceTableViewCell.swift in Sources */,
 				E90847352196FEA80095825D /* MessageTransaction+CoreDataProperties.swift in Sources */,
 				E9A03FD420DBC824007653A1 /* NodeVersion.swift in Sources */,
 				E90847342196FEA80095825D /* MessageTransaction+CoreDataClass.swift in Sources */,
