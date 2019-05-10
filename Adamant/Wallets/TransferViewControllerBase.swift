@@ -437,6 +437,11 @@ class TransferViewControllerBase: FormViewController {
 			return
 		}
 		
+        guard amount > 0 else {
+            dialogService.showWarning(withMessage: String.adamantLocalized.transfer.amountZeroError)
+            return
+        }
+        
 		guard amount <= maxToTransfer else {
 			dialogService.showWarning(withMessage: String.adamantLocalized.transfer.amountTooHigh)
 			return
