@@ -614,6 +614,6 @@ extension DogeWalletService: PrivateKeyGenerator {
             
         let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
         
-        return privateKey.data.toHexString()
+        return privateKey.toWIF()
     }
 }
