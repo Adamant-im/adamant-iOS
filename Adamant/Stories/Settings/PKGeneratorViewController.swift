@@ -137,10 +137,17 @@ class PKGeneratorViewController: FormViewController {
         
         section.removeAll()
         
+        let passphraseLower = passphrase.lowercased()
+        
+        guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphraseLower) else {
+            dialogService.showToastMessage(String.adamantLocalized.qrGenerator.wrongPassphraseError)
+            return
+        }
+        
         var index = 0
         var rows = [LabelRow]()
         for case let generator as PrivateKeyGenerator in accountService.wallets {
-            guard let privateKey = generator.generatePrivateKeyFor(passphrase: passphrase) else {
+            guard let privateKey = generator.generatePrivateKeyFor(passphrase: passphraseLower) else {
                 continue
             }
             

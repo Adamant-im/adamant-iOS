@@ -559,8 +559,8 @@
 /* Security: Generate QR with passphrase row */
 "SecurityPage.Row.GenerateQr" = "Einen QR-Code mit der Passphrase generieren";
 
-/* Security: Generate QR with passphrase row */
-"SecurityPage.Row.GenerateQr" = "Generate Private Keys";
+/* Security: Generate PrivateKey with passphrase row */
+"SecurityPage.Row.GeneratePk" = "Export Private Keys";
 
 /* PrivateKeyGenerator: Generate button */
 "PkGeneratorScene.GenerateButton" = "Generate Keys";

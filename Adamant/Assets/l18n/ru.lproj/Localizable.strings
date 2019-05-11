@@ -596,7 +596,7 @@
 "SecurityPage.Row.GenerateQr" = "Создать QR-код с паролем";
 
 /* Security: Generate PrivateKey with passphrase row */
-"SecurityPage.Row.GeneratePk" = "Создать приватные ключи";
+"SecurityPage.Row.GeneratePk" = "Экспортировать приватные ключи";
 
 /* Security: Show notifications */
 "SecurityPage.Row.Notifications" = "Уведомления";

@@ -266,17 +266,22 @@ class AccountViewController: FormViewController {
         appSection.append(nodesRow)
 
         // Currency select
-        let currencyRow = PushRow<Currency>() {
+        let currencyRow = ActionSheetRow<Currency>() {
             $0.title = Rows.currency.localized
             $0.tag = Rows.currency.tag
             $0.cell.imageView?.image = Rows.currency.image
             $0.options = [Currency.USD, Currency.EUR, Currency.RUB, Currency.CNY, Currency.JPY]
             $0.value = currencyInfoService.currentCurrency
-            $0.selectorTitle = Rows.currency.localized
-        }.onPresent { from, to in
-            to.selectableRowCellUpdate = { cell, row in
-                cell.textLabel?.text = "\(row.selectableValue!.rawValue) (\(row.selectableValue!.symbol))"
+            
+            $0.displayValueFor = { currency in
+                guard let currency = currency else {
+                    return nil
+                }
+                
+                return "\(currency.rawValue) (\(currency.symbol))"
             }
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
         }.onChange { row in
             if let value = row.value {
                 self.currencyInfoService.currentCurrency = value
