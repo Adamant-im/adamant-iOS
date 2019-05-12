@@ -42,6 +42,7 @@ extension AdamantScene.Wallets {
 		static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewControllerBase") { r in
 			let c = EthTransactionDetailsViewController()
 			c.dialogService = r.resolve(DialogService.self)
+            c.currencyInfo = r.resolve(CurrencyInfoService.self)
 			return c
 		}
 	}

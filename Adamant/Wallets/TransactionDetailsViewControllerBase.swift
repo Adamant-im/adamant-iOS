@@ -39,6 +39,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         case openInExplorer
         case openChat
         case comment
+        case fiat
         
         var tag: String {
             switch self {
@@ -54,6 +55,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .openInExplorer: return "openInExplorer"
             case .openChat: return "openChat"
             case .comment: return "comment"
+            case .fiat: return "fiat"
             }
         }
         
@@ -71,6 +73,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
             case .openChat: return ""
             case .comment: return ""
+            case .fiat: return NSLocalizedString("TransactionDetailsScene.Row.Fiat", comment: "Transaction details: fiat value at the time")
             }
         }
         
@@ -108,6 +111,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Dependencies
     var dialogService: DialogService!
+    var currencyInfo: CurrencyInfoService!
     
     // MARK: - Properties
     
@@ -424,6 +428,25 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         detailsSection.append(statusRow)
         
+        // MARK: Fiat
+        let fiatRow = LabelRow() {
+            $0.disabled = true
+            $0.tag = Rows.fiat.tag
+            $0.title = Rows.fiat.localized
+            
+            $0.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }.cellSetup { (cell, _) in
+                cell.selectionStyle = .gray
+            }.onCellSelection { [weak self] (cell, row) in
+                if let text = row.value {
+                    self?.shareValue(text, from: cell)
+                }
+            }.cellUpdate { (cell, _) in
+                cell.textLabel?.textColor = .black
+        }
+        
+        detailsSection.append(fiatRow)
+        
         form.append(detailsSection)
         
         // MARK: Comments section
@@ -491,6 +514,31 @@ class TransactionDetailsViewControllerBase: FormViewController {
         actionsSection.append(explorerRow)
         
         form.append(actionsSection)
+        
+        // Get fiat value
+        if let date = transaction?.dateValue, let currencySymbol = currencySymbol, let amount = transaction?.amountValue {
+            let currentFiat = currencyInfo.currentCurrency.rawValue
+            currencyInfo.getHistory(for: currencySymbol, timestamp: date) { [weak self] (result) in
+                switch result {
+                case .success(let tickers):
+                    guard let tickers = tickers, let ticker = tickers["\(currencySymbol)/\(currentFiat)"] else {
+                        break
+                    }
+                    
+                    let totalFiat = amount * ticker
+                    
+                    if let row: LabelRow = self?.form.rowBy(tag: Rows.fiat.tag) {
+                        DispatchQueue.main.async {
+                            row.value = AdamantBalanceFormat.short.format(totalFiat, withCurrencySymbol: currentFiat)
+                            row.updateCell()
+                        }
+                    }
+                    
+                case .failure:
+                    break
+                }
+            }
+        }
     }
     
     // MARK: - Actions

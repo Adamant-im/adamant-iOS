@@ -727,6 +727,9 @@
 /* Transaction details: sender row. */
 "TransactionDetailsScene.Row.From" = "From";
 
+/* Transaction details: fiat value at the time */
+"TransactionDetailsScene.Row.Fiat" = "Fiat";
+
 /* Transaction details: Id row. */
 "TransactionDetailsScene.Row.Id" = "Id";
 

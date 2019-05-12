@@ -15,6 +15,7 @@ extension StoreKey {
     }
 }
 
+// MARK: - Currencies
 enum Currency: String {
     case RUB = "RUB"
     case USD = "USD"
@@ -35,34 +36,32 @@ enum Currency: String {
     static var `default` = Currency.USD
 }
 
-class CoinInfoServerResponse: Decodable {
-    enum CodingKeys: String, CodingKey {
-        case success
-        case date
-        case result
-    }
-    
-    let success: Bool
-    let date: TimeInterval
-    let result: [String: Decimal]?
-    
-    init(success: Bool, date: TimeInterval, result: [String: Decimal]) {
-        self.success = success
-        self.date = date
-        self.result = result
-    }
-    
-    required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        
-        self.success = try container.decode(Bool.self, forKey: .success)
-        self.date = try container.decode(TimeInterval.self, forKey: .date)
-        self.result = try? container.decode([String: Decimal].self, forKey: .result)
-    }
-}
 
+// MARK: - Service
 class AdamantCurrencyInfoService: CurrencyInfoService {
+    // MARK: - API
+    private lazy var infoServiceUrl: URL = {
+        return URL(string: AdamantResources.coinsInfoSrvice)!
+    }()
+    
+    private enum InfoServiceApiCommands: String {
+        case get = "/get"
+        case history = "/getHistory"
+    }
+    
+    private func url(for command: InfoServiceApiCommands, with queryItems: [URLQueryItem]? = nil) -> URL? {
+        guard var components = URLComponents(url: infoServiceUrl, resolvingAgainstBaseURL: false) else {
+            fatalError("Failed to build InfoService url")
+        }
+        
+        components.path = command.rawValue
+        components.queryItems = queryItems
+        
+        return try? components.asURL()
+    }
+    
     // MARK: - Properties
+    private static let historyThreshold = Double(exactly: 60*60*24)!
     private var rates = [String: Decimal]()
     private let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.info-coins-response-queue", qos: .utility, attributes: [.concurrent])
     
@@ -84,6 +83,7 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
         }
     }
     
+    // MARK: - Info service
     func loadUpdate(for coins: [String]) {
         loadRates(for: coins) { [weak self] result in
             switch result {
@@ -104,19 +104,20 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     }
     
     private func loadRates(for coins: [String], completion: @escaping (ApiServiceResult<[String: Decimal]>) -> Void) {
-        let parameters = [
-            "coin": coins.joined(separator: ",")
-        ]
+        guard let url = url(for: .get, with: [URLQueryItem(name: "coin", value: coins.joined(separator: ","))]) else {
+            completion(.failure(.internalError(message: "Failed to build URL", error: nil)))
+            return
+        }
         
         let headers = [
             "Content-Type": "application/json"
         ]
         
-        Alamofire.request(AdamantResources.coinsInfoSrvice, method: .get, parameters: parameters, headers: headers).responseData(queue: defaultResponseDispatchQueue) { response in
+        Alamofire.request(url, method: .get, headers: headers).responseData(queue: defaultResponseDispatchQueue) { response in
             switch response.result {
             case .success(let data):
                 do {
-                    let model: CoinInfoServerResponse = try JSONDecoder().decode(CoinInfoServerResponse.self, from: data)
+                    let model: CoinInfoServiceResponseGet = try JSONDecoder().decode(CoinInfoServiceResponseGet.self, from: data)
                     if let result = model.result {
                         completion(.success(result))
                     } else {
@@ -129,6 +130,114 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
             case .failure(let error):
                 completion(.failure(.networkError(error: error)))
             }
+        }
+    }
+    
+    func getHistory(for coin: String, timestamp: Date, completion: @escaping (ApiServiceResult<[String:Decimal]?>) -> Void) {
+        guard let url = url(for: .history, with: [URLQueryItem(name: "timestamp", value: String(format: "%.0f", timestamp.timeIntervalSince1970)), URLQueryItem(name: "coin", value: coin)]) else {
+            completion(.failure(.internalError(message: "Failed to build URL", error: nil)))
+            return
+        }
+        
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        
+        Alamofire.request(url, method: .get, headers: headers).responseData(queue: defaultResponseDispatchQueue) { response in
+            switch response.result {
+            case .success(let data):
+                do {
+                    let model: CoinInfoServiceResponseHistory = try JSONDecoder().decode(CoinInfoServiceResponseHistory.self, from: data)
+                    guard let result = model.result?.first, abs(timestamp.timeIntervalSince(result.date)) < AdamantCurrencyInfoService.historyThreshold else {   // Разница в датах не должна превышать суток
+                        completion(.success(nil))
+                        return
+                    }
+                    
+                    completion(.success(result.tickers))
+                } catch {
+                    completion(.failure(.serverError(error: "Coin info API result: Parsing error")))
+                }
+                
+            case .failure(let error):
+                completion(.failure(.networkError(error: error)))
+            }
+        }
+    }
+}
+
+
+// MARK: - Server responses
+struct CoinInfoServiceResponseGet: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case success
+        case date
+        case result
+    }
+    
+    let success: Bool
+    let date: Date
+    let result: [String: Decimal]?
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.success = try container.decode(Bool.self, forKey: .success)
+        self.result = try? container.decode([String: Decimal].self, forKey: .result)
+        
+        if let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) {
+            self.date = Date(timeIntervalSince1970: timeInterval)
+        } else {
+            self.date = Date()
+        }
+    }
+}
+
+struct CoinInfoServiceResponseHistory: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case success
+        case date
+        case result
+    }
+    
+    let success: Bool
+    let date: Date
+    let result: [CoinInfoServiceHistoryResult]?
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.success = try container.decode(Bool.self, forKey: .success)
+        self.result = try? container.decode([CoinInfoServiceHistoryResult].self, forKey: .result)
+        
+        if let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) {
+            self.date = Date(timeIntervalSince1970: timeInterval)
+        } else {
+            self.date = Date()
+        }
+    }
+}
+
+struct CoinInfoServiceHistoryResult: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case id = "_id"
+        case date
+        case tickers
+    }
+    
+    let id: String
+    let tickers: [String: Decimal]?
+    let date: Date
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.id = try container.decode(String.self, forKey: .id)
+        self.tickers = try? container.decode([String: Decimal].self, forKey: .tickers)
+        
+        if let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) {
+            self.date = Date(timeIntervalSince1970: timeInterval / 1000) // ms, just because
+        } else {
+            self.date = Date()
         }
     }
 }

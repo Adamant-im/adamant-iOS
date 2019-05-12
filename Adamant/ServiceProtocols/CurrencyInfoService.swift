@@ -22,4 +22,6 @@ protocol CurrencyInfoService: class {
     
     // Get rate for pair Crypto / Fiat currencies
     func getRate(for coin: String) -> Decimal?
+    
+    func getHistory(for coin: String, timestamp: Date, completion: @escaping (ApiServiceResult<[String:Decimal]?>) -> Void)
 }

@@ -685,6 +685,9 @@
 /* Transaction details: recipient row. */
 "TransactionDetailsScene.Row.To" = "Zu";
 
+/* Transaction details: fiat value at the time */
+"TransactionDetailsScene.Row.Fiat" = "Fiat";
+
 /* Export transaction: 'Share transaction summary' button */
 "TransactionDetailsScene.Share.Summary" = "Gesamt";
 
