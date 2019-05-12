@@ -728,7 +728,10 @@
 "TransactionDetailsScene.Row.From" = "Отправитель";
 
 /* Transaction details: fiat value at the time */
-"TransactionDetailsScene.Row.Fiat" = "Фиат";
+"TransactionDetailsScene.Row.HistoryFiat" = "Ценность на момент перевода";
+
+/* Transaction details: fiat value at the time */
+"TransactionDetailsScene.Row.CurrentFiat" = "Текущая ценность";
 
 /* Transaction details: Id row. */
 "TransactionDetailsScene.Row.Id" = "Id";

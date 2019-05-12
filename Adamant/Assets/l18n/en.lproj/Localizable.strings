@@ -728,7 +728,10 @@
 "TransactionDetailsScene.Row.From" = "From";
 
 /* Transaction details: fiat value at the time */
-"TransactionDetailsScene.Row.Fiat" = "Fiat";
+"TransactionDetailsScene.Row.HistoryFiat" = "Value at time of Txn";
+
+/* Transaction details: fiat value at the time */
+"TransactionDetailsScene.Row.CurrentFiat" = "Current value";
 
 /* Transaction details: Id row. */
 "TransactionDetailsScene.Row.Id" = "Id";

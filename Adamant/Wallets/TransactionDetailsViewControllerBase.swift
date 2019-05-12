@@ -39,7 +39,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
         case openInExplorer
         case openChat
         case comment
-        case fiat
+        case historyFiat
+        case currentFiat
         
         var tag: String {
             switch self {
@@ -55,7 +56,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .openInExplorer: return "openInExplorer"
             case .openChat: return "openChat"
             case .comment: return "comment"
-            case .fiat: return "fiat"
+            case .historyFiat: return "hfiat"
+            case .currentFiat: return "cfiat"
             }
         }
         
@@ -73,7 +75,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
             case .openChat: return ""
             case .comment: return ""
-            case .fiat: return NSLocalizedString("TransactionDetailsScene.Row.Fiat", comment: "Transaction details: fiat value at the time")
+            case .historyFiat: return NSLocalizedString("TransactionDetailsScene.Row.HistoryFiat", comment: "Transaction details: fiat value at the time")
+            case .currentFiat: return NSLocalizedString("TransactionDetailsScene.Row.CurrentFiat", comment: "Transaction details: current fiat value")
             }
         }
         
@@ -428,11 +431,37 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         detailsSection.append(statusRow)
         
-        // MARK: Fiat
+        // MARK: Current Fiat
+        let currentFiatRow = LabelRow() {
+            $0.disabled = true
+            $0.tag = Rows.currentFiat.tag
+            $0.title = Rows.currentFiat.localized
+            
+            if let amount = transaction?.amountValue, let symbol = currencySymbol, let rate = currencyInfo.getRate(for: symbol) {
+                let value = amount * rate
+                $0.value = AdamantBalanceFormat.short.format(value, withCurrencySymbol: currencyInfo.currentCurrency.rawValue)
+            } else {
+                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.onCellSelection { [weak self] (cell, row) in
+            if let text = row.value {
+                self?.shareValue(text, from: cell)
+            }
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = .black
+        }
+        
+        detailsSection.append(currentFiatRow)
+        
+        form.append(detailsSection)
+        
+        // MARK: History Fiat
         let fiatRow = LabelRow() {
             $0.disabled = true
-            $0.tag = Rows.fiat.tag
-            $0.title = Rows.fiat.localized
+            $0.tag = Rows.historyFiat.tag
+            $0.title = Rows.historyFiat.localized
             
             $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }.cellSetup { (cell, _) in
@@ -446,8 +475,6 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }
         
         detailsSection.append(fiatRow)
-        
-        form.append(detailsSection)
         
         // MARK: Comments section
         
@@ -527,7 +554,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     
                     let totalFiat = amount * ticker
                     
-                    if let row: LabelRow = self?.form.rowBy(tag: Rows.fiat.tag) {
+                    if let row: LabelRow = self?.form.rowBy(tag: Rows.historyFiat.tag) {
                         DispatchQueue.main.async {
                             row.value = AdamantBalanceFormat.short.format(totalFiat, withCurrencySymbol: currentFiat)
                             row.updateCell()
