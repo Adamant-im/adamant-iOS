@@ -108,10 +108,9 @@ extension Container {
             let service = AdamantCurrencyInfoService()
             service.securedStore = r.resolve(SecuredStore.self)
             return service
-        }.inObjectScope(.container).initCompleted { (r, service) in
-            let accountService = r.resolve(AccountService.self)
-            if let coins = accountService?.wallets.map({ s -> String in type(of: s).currencySymbol }) {
-                service.loadUpdate(for: coins)
+        }.inObjectScope(.container).initCompleted { (r, c) in
+            if let service = c as? AdamantCurrencyInfoService {
+                service.accountService = r.resolve(AccountService.self)
             }
         }
 

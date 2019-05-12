@@ -18,7 +18,7 @@ protocol CurrencyInfoService: class {
     var currentCurrency: Currency { get set }
     
     // Check rates for list of coins
-    func loadUpdate(for coins: [String])
+    func update()
     
     // Get rate for pair Crypto / Fiat currencies
     func getRate(for coin: String) -> Decimal?

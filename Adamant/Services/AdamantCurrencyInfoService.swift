@@ -62,7 +62,10 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     
     // MARK: - Properties
     private static let historyThreshold = Double(exactly: 60*60*24)!
+    
+    private var rateCoins: [String]? = nil
     private var rates = [String: Decimal]()
+    
     private let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.info-coins-response-queue", qos: .utility, attributes: [.concurrent])
     
     public var currentCurrency: Currency = Currency.default {
@@ -73,6 +76,16 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     }
     
     // MARK: - Dependencies
+    var accountService: AccountService! {
+        didSet {
+            if let accountService = accountService {
+                rateCoins = accountService.wallets.map { s -> String in type(of: s).currencySymbol }
+            } else {
+                rateCoins = nil
+            }
+        }
+    }
+    
     var securedStore: SecuredStore? {
         didSet {
             if let securedStore = securedStore, let id = securedStore.get(StoreKey.CoinInfo.selectedCurrency), let currency = Currency(rawValue: id) {
@@ -84,11 +97,16 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     }
     
     // MARK: - Info service
-    func loadUpdate(for coins: [String]) {
+    func update() {
+        guard let coins = rateCoins else {
+            return
+        }
+        
         loadRates(for: coins) { [weak self] result in
             switch result {
             case .success(let rates):
                 self?.rates = rates
+                NotificationCenter.default.post(name: Notification.Name.AdamantCurrencyInfoService.currencyRatesUpdated, object: nil)
                 
             case .failure(let error):
                 print("Fail to load rates from server with error: \(error.localizedDescription)")
