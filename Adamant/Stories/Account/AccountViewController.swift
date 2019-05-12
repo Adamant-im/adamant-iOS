@@ -142,7 +142,7 @@ class AccountViewController: FormViewController {
 	
 	private var initiated = false
 	
-    private var walletViewControllers = [WalletViewControllerBase]()
+    private var walletViewControllers = [WalletViewController]()
     
     // MARK: StayIn
     
@@ -209,7 +209,11 @@ class AccountViewController: FormViewController {
 			tableView.tableFooterView = footer
 		}
 		
-		// MARK: Wallet view
+		// MARK: Wallet pages
+        for walletService in accountService.wallets {
+            walletViewControllers.append(walletService.walletViewController)
+        }
+        
 		pagingViewController = PagingViewController<WalletPagingItem>()
 		
 		pagingViewController.menuItemSource = .nib(nib: UINib(nibName: "WalletCollectionViewCell", bundle: nil))
@@ -225,10 +229,12 @@ class AccountViewController: FormViewController {
         
         pagingViewController.borderColor = UIColor.clear
 		
-		for wallet in accountService.wallets {
-			NotificationCenter.default.addObserver(forName: wallet.walletUpdatedNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-				self?.pagingViewController.reloadData()
-			}
+        let callback: ((Notification) -> Void) = { [weak self] _ in
+            self?.pagingViewController.reloadData()
+        }
+        
+		for walletService in accountService.wallets {
+            NotificationCenter.default.addObserver(forName: walletService.walletUpdatedNotification, object: nil, queue: OperationQueue.main, using: callback)
 		}
 		
         // MARK: Rows&Sections
@@ -727,7 +733,11 @@ class AccountViewController: FormViewController {
     }
     
     private func deselectWalletViewControllers() {
-        for vc in walletViewControllers {
+        for controller in walletViewControllers {
+            guard let vc = controller.viewController as? WalletViewControllerBase else {
+                continue
+            }
+            
             if let indexPath = vc.tableView.indexPathForSelectedRow {
                 vc.tableView.deselectRow(at: indexPath, animated: true)
             }
@@ -771,22 +781,18 @@ extension AccountViewController: NSFetchedResultsControllerDelegate {
 // MARK: - PagingViewControllerDataSource
 extension AccountViewController: PagingViewControllerDataSource, PagingViewControllerDelegate {
 	func numberOfViewControllers<T>(in pagingViewController: PagingViewController<T>) -> Int {
-		return accountService.wallets.count
+		return walletViewControllers.count
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
-        let vc = accountService.wallets[index].walletViewController.viewController
-        
-        if let wallet = vc as? WalletViewControllerBase {
-            wallet.delegate = self
-            walletViewControllers.append(wallet)
-        }
-        
-        return vc
+        return walletViewControllers[index].viewController
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, pagingItemForIndex index: Int) -> T {
-		let service = accountService.wallets[index]
+        guard let service = walletViewControllers[index].service else {
+            return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm")) as! T
+        }
+        
         let serviceType = type(of: service)
         
         let item = WalletPagingItem(index: index, currencySymbol: serviceType.currencySymbol, currencyImage: serviceType.currencyLogo)
@@ -812,7 +818,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 		updateHeaderSize(with: second, animated: true)
 	}
 	
-	func updateHeaderSize(with walletViewController: WalletViewController, animated: Bool) {
+	private func updateHeaderSize(with walletViewController: WalletViewController, animated: Bool) {
 		guard case let .fixed(_, menuHeight) = pagingViewController.menuItemSize else {
 			return
 		}
@@ -823,7 +829,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 		headerBounds.size.height = accountHeaderView.walletViewContainer.frame.origin.y + pagingHeight
 		
 		if animated {
-			UIView.animate(withDuration: 0.2) { [unowned self] in
+			UIView.animate(withDuration: 0.2) {
 				self.accountHeaderView.bounds = headerBounds
 				self.tableView.tableHeaderView = self.accountHeaderView
 			}
@@ -840,8 +846,12 @@ extension AccountViewController: WalletViewControllerDelegate {
             tableView.deselectRow(at: indexPath, animated: true)
         }
         
-        for vc in walletViewControllers {
-            if vc != viewController, let indexPath = vc.tableView.indexPathForSelectedRow {
+        for controller in walletViewControllers {
+            guard controller.viewController != viewController, let vc = controller.viewController as? WalletViewControllerBase else {
+                continue
+            }
+            
+            if let indexPath = vc.tableView.indexPathForSelectedRow {
                 vc.tableView.deselectRow(at: indexPath, animated: true)
             }
         }
