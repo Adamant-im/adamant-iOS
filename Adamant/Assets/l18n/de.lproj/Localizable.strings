@@ -686,10 +686,10 @@
 "TransactionDetailsScene.Row.To" = "Zu";
 
 /* Transaction details: fiat value at the time */
-"TransactionDetailsScene.Row.HistoryFiat" = "Value at time of Txn";
+"TransactionDetailsScene.Row.HistoryFiat" = "Wert zum Zeitpunkt";
 
 /* Transaction details: fiat value at the time */
-"TransactionDetailsScene.Row.CurrentFiat" = "Current value";
+"TransactionDetailsScene.Row.CurrentFiat" = "Aktueller Wert";
 
 /* Export transaction: 'Share transaction summary' button */
 "TransactionDetailsScene.Share.Summary" = "Gesamt";
