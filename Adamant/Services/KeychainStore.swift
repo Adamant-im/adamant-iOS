@@ -38,4 +38,8 @@ class KeychainStore: SecuredStore {
 	func remove(_ key: String) {
 		try? keychain.remove(key)
 	}
+    
+    func purgeStore() {
+        try? keychain.removeAll()
+    }
 }

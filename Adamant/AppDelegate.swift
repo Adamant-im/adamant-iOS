@@ -28,6 +28,7 @@ extension StoreKey {
 	struct application {
 		static let deviceTokenHash = "app.deviceTokenHash"
         static let welcomeScreensIsShown = "app.welcomeScreensIsShown"
+        static let firstRun = "app.firstRun"
 		
 		private init() {}
 	}
@@ -120,6 +121,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		notificationService = container.resolve(NotificationsService.self)
         dialogService = container.resolve(DialogService.self)
         addressBookService = container.resolve(AddressBookService.self)
+        
+        // MARK: 1.1. First run flag
+        let firstRun = UserDefaults.standard.bool(forKey: StoreKey.application.firstRun)
+
+        if !firstRun {
+            UserDefaults.standard.set(true, forKey: StoreKey.application.firstRun)
+
+            if let securedStore = container.resolve(SecuredStore.self) {
+                securedStore.purgeStore()
+            }
+        }
         
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
