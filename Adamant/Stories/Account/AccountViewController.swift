@@ -738,8 +738,9 @@ class AccountViewController: FormViewController {
                 continue
             }
             
-            if let indexPath = vc.tableView.indexPathForSelectedRow {
-                vc.tableView.deselectRow(at: indexPath, animated: true)
+            // ViewController can be not yet initialized
+            if let tableView = vc.tableView, let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
             }
         }
     }
@@ -851,8 +852,9 @@ extension AccountViewController: WalletViewControllerDelegate {
                 continue
             }
             
-            if let indexPath = vc.tableView.indexPathForSelectedRow {
-                vc.tableView.deselectRow(at: indexPath, animated: true)
+            // Better check it
+            if let tableView = vc.tableView, let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
             }
         }
     }
