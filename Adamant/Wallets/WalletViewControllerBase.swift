@@ -60,6 +60,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 	
     weak var delegate: WalletViewControllerDelegate?
     
+    private lazy var fiatFormatter: NumberFormatter = {
+        return AdamantBalanceFormat.fiatFormatter(for: currencyInfoService.currentCurrency)
+    }()
+    
 	// MARK: - IBOutlets
 	
 	@IBOutlet weak var walletTitleLabel: UILabel!
@@ -222,6 +226,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 					return
 				}
                 
+                if let currentCurrency = self?.currencyInfoService.currentCurrency {
+                    self?.fiatFormatter.currencyCode = currentCurrency.rawValue
+                }
+                
                 let symbol = type(of: service).currencySymbol
                 row.value = vc.balanceRowValueFor(balance: wallet.balance, symbol: symbol, alert: wallet.notifications)
                 row.updateCell()
@@ -336,7 +344,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         let fiatString: String?
         if balance > 0, let symbol = symbol, let rate = currencyInfoService.getRate(for: symbol) {
             let fiat = balance * rate
-            fiatString = AdamantBalanceFormat.short.format(fiat, withCurrencySymbol: currencyInfoService.currentCurrency.symbol)
+            fiatString = fiatFormatter.string(fromDecimal: fiat)
         } else {
             fiatString = nil
         }

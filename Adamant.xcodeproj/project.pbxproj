@@ -995,8 +995,8 @@
 		E94008792114ECF100CD2D67 /* Ethereum */ = {
 			isa = PBXGroup;
 			children = (
-				E993302121354BC300CD5200 /* EthWalletRoutes.swift */,
 				E940087C2114EDEE00CD2D67 /* EthWallet.swift */,
+				E993302121354BC300CD5200 /* EthWalletRoutes.swift */,
 				E940087A2114ED0600CD2D67 /* EthWalletService.swift */,
 				E9AA8BF9212C166600F9249F /* EthWalletService+Send.swift */,
 				E9AA8BFB212C169200F9249F /* EthWalletService+Transfers.swift */,
@@ -1013,8 +1013,8 @@
 		E94008812114EE3900CD2D67 /* Lisk */ = {
 			isa = PBXGroup;
 			children = (
-				6416B19C21AD7B92006089AC /* LskWalletRoutes.swift */,
 				E94008822114EE4700CD2D67 /* LskWallet.swift */,
+				6416B19C21AD7B92006089AC /* LskWalletRoutes.swift */,
 				E94008842114EE7500CD2D67 /* LskWalletService.swift */,
 				6416B1A621B024B6006089AC /* LskWalletService+Send.swift */,
 				6416B1A421AEE157006089AC /* LskWalletService+Transfers.swift */,
@@ -1031,8 +1031,8 @@
 		E94008902119D22400CD2D67 /* Adamant */ = {
 			isa = PBXGroup;
 			children = (
-				E993301F21354B1800CD5200 /* AdmWalletRoutes.swift */,
 				E940087F2114EE2000CD2D67 /* AdmWallet.swift */,
+				E993301F21354B1800CD5200 /* AdmWalletRoutes.swift */,
 				E94008882114F0F700CD2D67 /* AdmWalletService.swift */,
 				E9AA8C01212C5BF500F9249F /* AdmWalletService+Send.swift */,
 				E9240BF4215D686500187B09 /* AdmWalletService+RichMessageProvider.swift */,

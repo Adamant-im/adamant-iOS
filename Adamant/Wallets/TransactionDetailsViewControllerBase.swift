@@ -132,6 +132,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
     }()
     
+    private lazy var fiatFormatter: NumberFormatter = {
+        return AdamantBalanceFormat.fiatFormatter(for: currencyInfo.currentCurrency)
+    }()
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -439,7 +443,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             if let amount = transaction?.amountValue, let symbol = currencySymbol, let rate = currencyInfo.getRate(for: symbol) {
                 let value = amount * rate
-                $0.value = AdamantBalanceFormat.short.format(value, withCurrencySymbol: currencyInfo.currentCurrency.rawValue)
+                $0.value = fiatFormatter.string(fromDecimal: value)
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -553,10 +557,11 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     }
                     
                     let totalFiat = amount * ticker
+                    let fiatString = self?.fiatFormatter.string(fromDecimal: totalFiat)
                     
                     if let row: LabelRow = self?.form.rowBy(tag: Rows.historyFiat.tag) {
                         DispatchQueue.main.async {
-                            row.value = AdamantBalanceFormat.short.format(totalFiat, withCurrencySymbol: currentFiat)
+                            row.value = fiatString
                             row.updateCell()
                         }
                     }

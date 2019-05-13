@@ -62,6 +62,16 @@ enum AdamantBalanceFormat {
 		return currencyFormatter(for: .short, currencySymbol: nil)
 	}()
 	
+    
+    /// General fiat currency formatter, without currency specified
+    static func fiatFormatter(for currency: Currency) -> NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.maximumFractionDigits = 2
+        formatter.minimumFractionDigits = 2
+        formatter.currencyCode = currency.rawValue
+        return formatter
+    }
 	
 	// MARK: Methods
 	
