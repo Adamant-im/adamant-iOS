@@ -60,6 +60,7 @@ class TransferViewControllerBase: FormViewController {
 	enum BaseRows {
 		case balance
 		case amount
+        case fiat
 		case maxToTransfer
         case name
 		case address
@@ -72,6 +73,7 @@ class TransferViewControllerBase: FormViewController {
 			switch self {
 			case .balance: return "balance"
 			case .amount: return "amount"
+            case .fiat: return "fiat"
 			case .maxToTransfer: return "max"
             case .name: return "name"
 			case .address: return "recipient"
@@ -86,6 +88,7 @@ class TransferViewControllerBase: FormViewController {
 			switch self {
 			case .balance: return NSLocalizedString("TransferScene.Row.Balance", comment: "Transfer: logged user balance.")
 			case .amount: return NSLocalizedString("TransferScene.Row.Amount", comment: "Transfer: amount of adamant to transfer.")
+            case .fiat: return NSLocalizedString("TransferScene.Row.Fiat", comment: "Transfer: fiat value of crypto-amout")
 			case .maxToTransfer: return NSLocalizedString("TransferScene.Row.MaxToTransfer", comment: "Transfer: maximum amount to transfer: available account money substracting transfer fee")
             case .name: return NSLocalizedString("TransferScene.Row.RecipientName", comment: "Transfer: recipient name")
 			case .address: return NSLocalizedString("TransferScene.Row.RecipientAddress", comment: "Transfer: recipient address")
@@ -129,6 +132,7 @@ class TransferViewControllerBase: FormViewController {
     var accountsProvider: AccountsProvider!
 	var dialogService: DialogService!
     var router: Router!
+    var currencyInfoService: CurrencyInfoService!
     
 	
 	// MARK: - Properties
@@ -193,6 +197,8 @@ class TransferViewControllerBase: FormViewController {
 	
 	var recipientIsReadonly = false
 	
+    var rate: Decimal? = nil
+    
 	var maxToTransfer: Decimal {
 		guard let service = service, let balance = service.wallet?.balance else {
 			return 0
@@ -239,6 +245,9 @@ class TransferViewControllerBase: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 		
+        // MARK: Fiat rate
+        rate = currencyInfoService.getRate(for: currencyCode)
+        
 		// MARK: UI
         navigationItem.title = defaultSceneTitle()
 		
@@ -251,7 +260,7 @@ class TransferViewControllerBase: FormViewController {
             form.append(commentsSection())
         }
 		
-        // MARK: - Button section
+        // MARK: Button section
 		form +++ Section()
 		<<< ButtonRow() { [weak self] in
 			$0.title = BaseRows.sendButton.localized
@@ -271,6 +280,26 @@ class TransferViewControllerBase: FormViewController {
 		}.onCellSelection { [weak self] (cell, row) in
 			self?.confirmSendFunds()
         }
+        
+        // MARK: Notifications
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantCurrencyInfoService.currencyRatesUpdated,
+                                               object: nil,
+                                               queue: OperationQueue.main,
+                                               using: { [weak self] _ in
+                                                guard let vc = self else {
+                                                    return
+                                                }
+                                                
+                                                vc.rate = vc.currencyInfoService.getRate(for: vc.currencyCode)
+                                                
+                                                if let row: DecimalRow = vc.form.rowBy(tag: BaseRows.fiat.tag) {
+                                                    if let formatter = row.formatter as? NumberFormatter {
+                                                        formatter.currencyCode = vc.currencyInfoService.currentCurrency.rawValue
+                                                    }
+                                                    
+                                                    row.updateCell()
+                                                }
+        })
     }
 	
 	// MARK: - Form constructors
@@ -320,6 +349,7 @@ class TransferViewControllerBase: FormViewController {
 		}
 		
 		section.append(defaultRowFor(baseRow: .amount))
+        section.append(defaultRowFor(baseRow: .fiat))
 		section.append(defaultRowFor(baseRow: .fee))
 		section.append(defaultRowFor(baseRow: .total))
 		
@@ -477,10 +507,24 @@ class TransferViewControllerBase: FormViewController {
 	
 	
 	// MARK: - 'Virtual' methods with basic implementation
-	
+    
+    /// Currency code, used to get fiat rates
+    /// Default implementation tries to get currency symbol from service. If no service present - its fails
+    var currencyCode: String {
+        if let service = service {
+            return type(of: service).currencySymbol
+        } else {
+            return ""
+        }
+    }
+    
 	/// Override this to provide custom balance formatter
 	var balanceFormatter: NumberFormatter {
-		return AdamantBalanceFormat.full.defaultFormatter
+        if let service = service {
+            return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: type(of: service).currencySymbol)
+        } else {
+            return AdamantBalanceFormat.full.defaultFormatter
+        }
 	}
 	
 	/// Override this to provide custom validation logic
@@ -640,7 +684,36 @@ extension TransferViewControllerBase {
 					$0.value = amount.doubleValue
 				}
 			}.onChange { [weak self] (row) in
+                if let rate = self?.rate, let fiatRow: DecimalRow = self?.form.rowBy(tag: BaseRows.fiat.tag) {
+                    if let value = row.value {
+                        fiatRow.value = value * rate.doubleValue
+                    } else {
+                        fiatRow.value = nil
+                    }
+                    
+                    fiatRow.updateCell()
+                }
+                
 				self?.validateForm()
+            }
+            
+        case .fiat:
+            return DecimalRow { [weak self] in
+                $0.title = BaseRows.fiat.localized
+                $0.tag = BaseRows.fiat.tag
+                $0.disabled = true
+                
+                let formatter = AdamantBalanceFormat.fiatFormatter(for: currencyInfoService.currentCurrency)
+                
+                $0.formatter = formatter
+                
+                if let rate = self?.rate, let amount = self?.amount {
+                    $0.value = amount.doubleValue * rate.doubleValue
+                }
+                
+                $0.hidden = Condition.function([]) { [weak self] _ -> Bool in
+                    return self?.rate == nil
+                }
             }
 		
 		case .fee:

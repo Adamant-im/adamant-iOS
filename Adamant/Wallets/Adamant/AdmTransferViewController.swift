@@ -26,14 +26,6 @@ extension String.adamantLocalized {
 class AdmTransferViewController: TransferViewControllerBase {
 	// MARK: Properties
 	
-	override var balanceFormatter: NumberFormatter {
-        if let service = service {
-            return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: type(of: service).currencySymbol)
-        } else {
-            return AdamantBalanceFormat.currencyFormatterFull
-        }
-	}
-	
 	private var skipValueChange: Bool = false
 	
 	static let invalidCharactersSet = CharacterSet.decimalDigits.inverted
@@ -76,7 +68,7 @@ class AdmTransferViewController: TransferViewControllerBase {
                     alert.addAction(faq)
                 }
                 
-                let send = UIAlertAction(title: TransferViewControllerBase.BaseRows.sendButton.localized,
+                let send = UIAlertAction(title: BaseRows.sendButton.localized,
                                          style: .default) { _ in
                     self.dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
                     self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)

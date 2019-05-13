@@ -10,7 +10,6 @@ import Foundation
 
 extension AdamantScene.Wallets {
 	struct Ethereum {
-		
 		/// Wallet preview
 		static let wallet = AdamantScene(identifier: "EthWalletViewController") { r in
 			let c = EthWalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
@@ -27,6 +26,7 @@ extension AdamantScene.Wallets {
 			c.accountService = r.resolve(AccountService.self)
             c.accountsProvider = r.resolve(AccountsProvider.self)
             c.router = r.resolve(Router.self)
+            c.currencyInfoService = r.resolve(CurrencyInfoService.self)
 			return c
 		}
 		

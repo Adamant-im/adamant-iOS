@@ -18,15 +18,7 @@ class EthTransferViewController: TransferViewControllerBase {
 	
 	// MARK: Properties
 	
-	override var balanceFormatter: NumberFormatter {
-		if let service = service {
-			return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: type(of: service).currencySymbol)
-		} else {
-			return AdamantBalanceFormat.currencyFormatterFull
-		}
-	}
-	
-	private var skipValueChange: Bool = false
+    private var skipValueChange: Bool = false
 	
 	static let invalidCharacters: CharacterSet = {
 		CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789").inverted

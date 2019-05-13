@@ -787,6 +787,9 @@
 /* Transfer: amount of adamant to transfer. */
 "TransferScene.Row.Amount" = "Amount";
 
+/* Transfer: fiat value of crypto-amout */
+"TransferScene.Row.Fiat" = "Value";
+
 /* Transfer: logged user balance. */
 "TransferScene.Row.Balance" = "Balance";
 
