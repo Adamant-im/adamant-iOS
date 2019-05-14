@@ -8,8 +8,20 @@
 
 import Foundation
 
+// For extensions in other classes
 struct StoreKey {
 	private init() {}
+}
+
+// MARK: - Notifications
+
+extension Notification.Name {
+    struct SecuredStore {
+        /// Raised when store is purged
+        static let securedStorePurged = Notification.Name("adamant.SecuredStore.purged")
+        
+        private init() {}
+    }
 }
 
 protocol SecuredStore: class {

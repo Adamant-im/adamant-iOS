@@ -23,7 +23,11 @@ class AdamantAccountService: AccountService {
 			defer {
 				securedStoreSemaphore.signal()
 			}
-			
+            
+            if let old = oldValue {
+                NotificationCenter.default.removeObserver(self, name: Notification.Name.SecuredStore.securedStorePurged, object: old)
+            }
+            
             if securedStore.get(.passphrase) != nil {
                 hasStayInAccount = true
                 _useBiometry = securedStore.get(.useBiometry) != nil
@@ -37,6 +41,20 @@ class AdamantAccountService: AccountService {
 				hasStayInAccount = false
 				_useBiometry = false
 			}
+            
+            NotificationCenter.default.addObserver(forName: Notification.Name.SecuredStore.securedStorePurged, object: securedStore, queue: OperationQueue.main) { [weak self] notification in
+                guard let store = notification.object as? SecuredStore else {
+                    return
+                }
+                
+                if store.get(.passphrase) != nil {
+                    self?.hasStayInAccount = true
+                    self?._useBiometry = store.get(.useBiometry) != nil
+                } else {
+                    self?.hasStayInAccount = false
+                    self?._useBiometry = false
+                }
+            }
 		}
 	}
 	

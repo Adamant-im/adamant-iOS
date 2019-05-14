@@ -41,5 +41,6 @@ class KeychainStore: SecuredStore {
     
     func purgeStore() {
         try? keychain.removeAll()
+        NotificationCenter.default.post(name: Notification.Name.SecuredStore.securedStorePurged, object: self)
     }
 }
