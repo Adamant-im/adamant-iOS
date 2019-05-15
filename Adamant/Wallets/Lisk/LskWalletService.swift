@@ -569,3 +569,23 @@ extension LskWalletService {
         }
     }
 }
+
+// MARK: - PrivateKey generator
+extension LskWalletService: PrivateKeyGenerator {
+    var rowTitle: String {
+        return "Lisk"
+    }
+    
+    var rowImage: UIImage? {
+        return #imageLiteral(resourceName: "wallet_lsk_row")
+    }
+    
+    
+    func generatePrivateKeyFor(passphrase: String) -> String? {
+        guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase), let keypair = try? Lisk.Crypto.keyPair(fromPassphrase: passphrase, salt: "adm") else {
+            return nil
+        }
+        
+        return keypair.privateKeyString
+    }
+}

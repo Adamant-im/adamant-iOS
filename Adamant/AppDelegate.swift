@@ -28,6 +28,7 @@ extension StoreKey {
 	struct application {
 		static let deviceTokenHash = "app.deviceTokenHash"
         static let welcomeScreensIsShown = "app.welcomeScreensIsShown"
+        static let firstRun = "app.firstRun"
 		
 		private init() {}
 	}
@@ -61,7 +62,7 @@ struct AdamantResources {
         URL(string: "https://dogenode1.adamant.im/api")!
     ]
     
-    static let coinsInfoSrvice = "https://info.adamant.im/get"
+    static let coinsInfoSrvice = "https://info.adamant.im"
 	
     // MARK: ADAMANT Addresses
 	static let supportEmail = "ios@adamant.im"
@@ -120,6 +121,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		notificationService = container.resolve(NotificationsService.self)
         dialogService = container.resolve(DialogService.self)
         addressBookService = container.resolve(AddressBookService.self)
+        
+        // MARK: 1.1. First run flag
+        let firstRun = UserDefaults.standard.bool(forKey: StoreKey.application.firstRun)
+
+        if !firstRun {
+            UserDefaults.standard.set(true, forKey: StoreKey.application.firstRun)
+
+            /* For future updates
+            if let securedStore = container.resolve(SecuredStore.self) {
+                securedStore.purgeStore()
+            }
+             */
+        }
         
 		// MARK: 2. Init UI
 		window = UIWindow(frame: UIScreen.main.bounds)
@@ -238,6 +252,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		} else {
 			dialogService.showError(withMessage: "Failed to register AddressBookService autoupdate. Please, report a bug", error: nil)
 		}
+        
+        if let currencyInfoService = container.resolve(CurrencyInfoService.self) {
+            currencyInfoService.update() // Initial update
+            repeater.registerForegroundCall(label: "currencyInfoService", interval: 60, queue: .global(qos: .utility), callback: currencyInfoService.update)
+        } else {
+            dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", error: nil)
+        }
 		
 		
 		// MARK: 6. Logout reset

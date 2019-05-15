@@ -18,7 +18,7 @@ public final class DoubleDetailsTableViewCell: Cell<DoubleDetail>, CellType {
 	
 	// MARK: Constants
 	static let compactHeight: CGFloat = 50.0
-	static let fullHeight: CGFloat = 70.0
+	static let fullHeight: CGFloat = 65.0
 	
 	// MARK: IBOutlets
 	@IBOutlet var titleLabel: UILabel!

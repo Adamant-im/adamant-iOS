@@ -26,6 +26,7 @@ extension AdamantScene.Wallets {
             c.accountService = r.resolve(AccountService.self)
             c.accountsProvider = r.resolve(AccountsProvider.self)
             c.router = r.resolve(Router.self)
+            c.currencyInfoService = r.resolve(CurrencyInfoService.self)
             return c
         }
         
@@ -41,6 +42,7 @@ extension AdamantScene.Wallets {
         static let transactionDetails = AdamantScene(identifier: "TransactionDetailsViewControllerBase") { r in
             let c = DogeTransactionDetailsViewController()
             c.dialogService = r.resolve(DialogService.self)
+            c.currencyInfo = r.resolve(CurrencyInfoService.self)
             return c
         }
     }

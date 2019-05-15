@@ -38,4 +38,9 @@ class KeychainStore: SecuredStore {
 	func remove(_ key: String) {
 		try? keychain.remove(key)
 	}
+    
+    func purgeStore() {
+        try? keychain.removeAll()
+        NotificationCenter.default.post(name: Notification.Name.SecuredStore.securedStorePurged, object: self)
+    }
 }
