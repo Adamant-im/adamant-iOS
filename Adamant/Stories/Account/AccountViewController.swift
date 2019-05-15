@@ -58,8 +58,8 @@ class AccountViewController: FormViewController {
 	
 	enum Rows {
 		case balance, sendTokens // Wallet
-		case security, nodes, theme, about // Application
-		case voteForDelegates, generateQr, logout // Actions
+		case security, nodes, theme, currency, about // Application
+		case voteForDelegates, generateQr, generatePk, logout // Actions
         case stayIn, biometry, notifications // Security
 		
 		var tag: String {
@@ -68,11 +68,13 @@ class AccountViewController: FormViewController {
 			case .sendTokens: return "sndTkns"
 			case .security: return "scrt"
             case .theme: return "thm"
+            case .currency: return "crrnc"
 			case .nodes: return "nds"
 			case .about: return "bt"
 			case .logout: return "lgtrw"
             case .voteForDelegates: return "vtFrDlgts"
             case .generateQr: return "qr"
+            case .generatePk: return "pk"
             case .stayIn: return "stayin"
             case .biometry: return "biometry"
             case .notifications: return "notifications"
@@ -85,11 +87,13 @@ class AccountViewController: FormViewController {
 			case .sendTokens: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
 			case .security: return NSLocalizedString("AccountTab.Row.Security", comment: "Account tab: 'Security' row")
             case .theme: return NSLocalizedString("AccountTab.Row.Theme", comment: "Account tab: 'Theme' row")
+            case .currency: return NSLocalizedString("AccountTab.Row.Currency", comment: "Account tab: 'Currency' row")
 			case .nodes: return String.adamantLocalized.nodesList.nodesListButton
 			case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
 			case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
 			case .voteForDelegates: return NSLocalizedString("AccountTab.Row.VoteForDelegates", comment: "Account tab: 'Votes for delegates' button")
             case .generateQr: return NSLocalizedString("SecurityPage.Row.GenerateQr", comment: "Security: Generate QR with passphrase row")
+            case .generatePk: return NSLocalizedString("SecurityPage.Row.GeneratePk", comment: "Security: Generate PrivateKey with passphrase row")
             case .stayIn: return SecurityViewController.Rows.stayIn.localized
             case .biometry: return SecurityViewController.Rows.biometry.localized
             case .notifications: return SecurityViewController.Rows.notificationsMode.localized
@@ -101,12 +105,14 @@ class AccountViewController: FormViewController {
 			case .security: return #imageLiteral(resourceName: "row_security")
 			case .about: return #imageLiteral(resourceName: "row_about")
 			case .theme: return #imageLiteral(resourceName: "row_themes.png")
+            case .currency: return #imageLiteral(resourceName: "row_currency")
             case .nodes: return #imageLiteral(resourceName: "row_nodes")
 			case .balance: return #imageLiteral(resourceName: "row_balance")
             case .voteForDelegates: return #imageLiteral(resourceName: "row_vote-delegates")
             case .logout: return #imageLiteral(resourceName: "row_logout")
 			case .sendTokens: return nil
             case .generateQr: return #imageLiteral(resourceName: "row_QR.png")
+            case .generatePk: return #imageLiteral(resourceName: "privateKey_row")
             case .stayIn: return #imageLiteral(resourceName: "row_security")
             case .biometry: return nil // Determined by localAuth service
             case .notifications: return #imageLiteral(resourceName: "row_Notifications.png")
@@ -123,6 +129,8 @@ class AccountViewController: FormViewController {
     var localAuth: LocalAuthentication!
 	
     var avatarService: AvatarService!
+    
+    var currencyInfoService: CurrencyInfoService!
 	
 	// MARK: - Properties
 	
@@ -134,7 +142,7 @@ class AccountViewController: FormViewController {
 	
 	private var initiated = false
 	
-    private var walletViewControllers = [WalletViewControllerBase]()
+    private var walletViewControllers = [WalletViewController]()
     
     // MARK: StayIn
     
@@ -201,7 +209,11 @@ class AccountViewController: FormViewController {
 			tableView.tableFooterView = footer
 		}
 		
-		// MARK: Wallet view
+		// MARK: Wallet pages
+        for walletService in accountService.wallets {
+            walletViewControllers.append(walletService.walletViewController)
+        }
+        
 		pagingViewController = PagingViewController<WalletPagingItem>()
 		
 		pagingViewController.menuItemSource = .nib(nib: UINib(nibName: "WalletCollectionViewCell", bundle: nil))
@@ -217,10 +229,12 @@ class AccountViewController: FormViewController {
         
         pagingViewController.borderColor = UIColor.clear
 		
-		for wallet in accountService.wallets {
-			NotificationCenter.default.addObserver(forName: wallet.walletUpdatedNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-				self?.pagingViewController.reloadData()
-			}
+        let callback: ((Notification) -> Void) = { [weak self] _ in
+            self?.pagingViewController.reloadData()
+        }
+        
+		for walletService in accountService.wallets {
+            NotificationCenter.default.addObserver(forName: walletService.walletUpdatedNotification, object: nil, queue: OperationQueue.main, using: callback)
 		}
 		
         // MARK: Rows&Sections
@@ -256,7 +270,32 @@ class AccountViewController: FormViewController {
         }
 
         appSection.append(nodesRow)
+
+        // Currency select
+        let currencyRow = ActionSheetRow<Currency>() {
+            $0.title = Rows.currency.localized
+            $0.tag = Rows.currency.tag
+            $0.cell.imageView?.image = Rows.currency.image
+            $0.options = [Currency.USD, Currency.EUR, Currency.RUB, Currency.CNY, Currency.JPY]
+            $0.value = currencyInfoService.currentCurrency
+            
+            $0.displayValueFor = { currency in
+                guard let currency = currency else {
+                    return nil
+                }
+                
+                return "\(currency.rawValue) (\(currency.symbol))"
+            }
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onChange { row in
+            if let value = row.value {
+                self.currencyInfoService.currentCurrency = value
+            }
+        }
         
+        appSection.append(currencyRow)
+
 		// About
 		let aboutRow = LabelRow() {
 			$0.title = Rows.about.localized
@@ -343,7 +382,35 @@ class AccountViewController: FormViewController {
         }
 
         actionsSection.append(generateQrRow)
-
+        
+        // Generatte private keys
+        let generatePkRow = LabelRow() {
+            $0.title = Rows.generatePk.localized
+            $0.tag = Rows.generatePk.tag
+            $0.cell.imageView?.image = Rows.generatePk.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (_, _) in
+            guard let vc = self?.router.get(scene: AdamantScene.Settings.pkGenerator) else {
+                return
+            }
+            
+            if let split = self?.splitViewController {
+                let details = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(details, sender: self)
+            } else if let nav = self?.navigationController {
+                nav.pushViewController(vc, animated: true)
+            } else {
+                self?.present(vc, animated: true, completion: nil)
+            }
+            
+            self?.deselectWalletViewControllers()
+        }
+        
+        actionsSection.append(generatePkRow)
+        
+        
 		// Logout
 		let logoutRow = LabelRow() {
 			$0.title = Rows.logout.localized
@@ -666,9 +733,14 @@ class AccountViewController: FormViewController {
     }
     
     private func deselectWalletViewControllers() {
-        for vc in walletViewControllers {
-            if let indexPath = vc.tableView.indexPathForSelectedRow {
-                vc.tableView.deselectRow(at: indexPath, animated: true)
+        for controller in walletViewControllers {
+            guard let vc = controller.viewController as? WalletViewControllerBase else {
+                continue
+            }
+            
+            // ViewController can be not yet initialized
+            if let tableView = vc.tableView, let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
             }
         }
     }
@@ -710,22 +782,18 @@ extension AccountViewController: NSFetchedResultsControllerDelegate {
 // MARK: - PagingViewControllerDataSource
 extension AccountViewController: PagingViewControllerDataSource, PagingViewControllerDelegate {
 	func numberOfViewControllers<T>(in pagingViewController: PagingViewController<T>) -> Int {
-		return accountService.wallets.count
+		return walletViewControllers.count
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
-        let vc = accountService.wallets[index].walletViewController.viewController
-        
-        if let wallet = vc as? WalletViewControllerBase {
-            wallet.delegate = self
-            walletViewControllers.append(wallet)
-        }
-        
-        return vc
+        return walletViewControllers[index].viewController
 	}
 	
 	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, pagingItemForIndex index: Int) -> T {
-		let service = accountService.wallets[index]
+        guard let service = walletViewControllers[index].service else {
+            return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm")) as! T
+        }
+        
         let serviceType = type(of: service)
         
         let item = WalletPagingItem(index: index, currencySymbol: serviceType.currencySymbol, currencyImage: serviceType.currencyLogo)
@@ -751,7 +819,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 		updateHeaderSize(with: second, animated: true)
 	}
 	
-	func updateHeaderSize(with walletViewController: WalletViewController, animated: Bool) {
+	private func updateHeaderSize(with walletViewController: WalletViewController, animated: Bool) {
 		guard case let .fixed(_, menuHeight) = pagingViewController.menuItemSize else {
 			return
 		}
@@ -762,7 +830,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
 		headerBounds.size.height = accountHeaderView.walletViewContainer.frame.origin.y + pagingHeight
 		
 		if animated {
-			UIView.animate(withDuration: 0.2) { [unowned self] in
+			UIView.animate(withDuration: 0.2) {
 				self.accountHeaderView.bounds = headerBounds
 				self.tableView.tableHeaderView = self.accountHeaderView
 			}
@@ -779,9 +847,14 @@ extension AccountViewController: WalletViewControllerDelegate {
             tableView.deselectRow(at: indexPath, animated: true)
         }
         
-        for vc in walletViewControllers {
-            if vc != viewController, let indexPath = vc.tableView.indexPathForSelectedRow {
-                vc.tableView.deselectRow(at: indexPath, animated: true)
+        for controller in walletViewControllers {
+            guard controller.viewController != viewController, let vc = controller.viewController as? WalletViewControllerBase else {
+                continue
+            }
+            
+            // Better check it
+            if let tableView = vc.tableView, let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
             }
         }
     }

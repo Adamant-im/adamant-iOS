@@ -148,6 +148,9 @@
 /* Account tab: 'Theme' row */
 "AccountTab.Row.Theme" = "Тема";
 
+/* Account tab: 'Currency' row */
+"AccountTab.Row.Currency" = "Валюта";
+
 /* Account tab: 'Theme' row value 'Light' */
 "AccountTab.Row.Theme.Light" = "Светлая";
 
@@ -571,6 +574,15 @@
 /* QRGenerator: scene title */
 "QrGeneratorScene.Title" = "Генератор QR";
 
+/* PrivateKeyGenerator: scene title */
+"PkGeneratorScene.Title" = "Генератор Приватных ключей";
+
+/* PrivateKeyGenerator: Security alert. Keep your passphrase safe */
+"PkGeneratorScene.Alert" = "В аккаунте АДАМАНТа несколько встроенных криптокошельков. Все они объединены вашей пассфразой, и только у вас есть доступ к ним. Вы можете экспортировать приватные ключи, чтобы использовать эти кошельки в других приложениях. Храните ключи в надежном месте.";
+
+/* PrivateKeyGenerator: Generate button */
+"PkGeneratorScene.GenerateButton" = "Сгенерировать ключи";
+
 /* Security: scene title */
 "SecurityPage.Title" = "Безопасность";
 
@@ -582,6 +594,9 @@
 
 /* Security: Generate QR with passphrase row */
 "SecurityPage.Row.GenerateQr" = "Создать QR-код с паролем";
+
+/* Security: Generate PrivateKey with passphrase row */
+"SecurityPage.Row.GeneratePk" = "Экспортировать приватные ключи";
 
 /* Security: Show notifications */
 "SecurityPage.Row.Notifications" = "Уведомления";
@@ -712,6 +727,12 @@
 /* Transaction details: sender row. */
 "TransactionDetailsScene.Row.From" = "Отправитель";
 
+/* Transaction details: fiat value at the time */
+"TransactionDetailsScene.Row.HistoryFiat" = "Ценность на момент";
+
+/* Transaction details: fiat value at the time */
+"TransactionDetailsScene.Row.CurrentFiat" = "Текущая ценность";
+
 /* Transaction details: Id row. */
 "TransactionDetailsScene.Row.Id" = "Id";
 
@@ -765,6 +786,9 @@
 
 /* Transfer: amount of adamant to transfer. */
 "TransferScene.Row.Amount" = "Количество";
+
+/* Transfer: fiat value of crypto-amout */
+"TransferScene.Row.Fiat" = "Ценность";
 
 /* Transfer: logged user balance. */
 "TransferScene.Row.Balance" = "Баланс";

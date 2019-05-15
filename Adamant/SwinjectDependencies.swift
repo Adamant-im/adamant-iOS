@@ -35,6 +35,8 @@ extension Container {
 		// MARK: Reachability
 		self.register(ReachabilityMonitor.self) { r in AdamantReachability() }.inObjectScope(.container)
 		
+        // MARK: AdamantAvatarService
+        self.register(AvatarService.self) { r in AdamantAvatarService() }.inObjectScope(.container)
 		
 		// MARK: - Services with dependencies
 		// MARK: DialogService
@@ -79,6 +81,8 @@ extension Container {
 			service.adamantCore = r.resolve(AdamantCore.self)!
 			service.securedStore = r.resolve(SecuredStore.self)!
             service.dialogService = r.resolve(DialogService.self)!
+            service.currencyInfoService = r.resolve(CurrencyInfoService.self)!
+            
             return service
         }.inObjectScope(.container).initCompleted { (r, c) in
             let service = c as! AdamantAccountService
@@ -98,10 +102,16 @@ extension Container {
 			service.dialogService = r.resolve(DialogService.self)!
             return service
         }.inObjectScope(.container)
-		
-        // MARK: AdamantAvatarService
-        self.register(AvatarService.self) { r in
-            return AdamantAvatarService()
+        
+        // MARK: CurrencyInfoService
+        self.register(CurrencyInfoService.self) { r in
+            let service = AdamantCurrencyInfoService()
+            service.securedStore = r.resolve(SecuredStore.self)
+            return service
+        }.inObjectScope(.container).initCompleted { (r, c) in
+            if let service = c as? AdamantCurrencyInfoService {
+                service.accountService = r.resolve(AccountService.self)
+            }
         }
 
 		// MARK: - Data Providers

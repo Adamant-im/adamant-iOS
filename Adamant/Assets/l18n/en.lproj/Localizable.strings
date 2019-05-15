@@ -70,6 +70,9 @@
 /* About scene: Show Welcome screens */
 "About.Row.Welcome" = "Welcome screens";
 
+/* Account tab: 'Currency' row */
+"AccountTab.Row.Currency" = "Currency";
+
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Welcome to ADAMANT";
 
@@ -571,6 +574,15 @@
 /* QRGenerator: scene title */
 "QrGeneratorScene.Title" = "QR Generator";
 
+/* PrivateKeyGenerator: scene title */
+"PkGeneratorScene.Title" = "PrivateKey Generator";
+
+/* PrivateKeyGenerator: Security alert. Keep your passphrase safe */
+"PkGeneratorScene.Alert" = "ADAMANT account includes crypto wallets. All of them are connected with your Passphrase, and only you have access to these wallets. You can export private key to use them in other applications. Store keys in secure place.";
+
+/* PrivateKeyGenerator: Generate button */
+"PkGeneratorScene.GenerateButton" = "Generate Keys";
+
 /* Security: scene title */
 "SecurityPage.Title" = "Security";
 
@@ -582,6 +594,9 @@
 
 /* Security: Generate QR with passphrase row */
 "SecurityPage.Row.GenerateQr" = "Generate QR with passphrase";
+
+/* Security: Generate PrivateKey with passphrase row */
+"SecurityPage.Row.GeneratePk" = "Export Private Keys";
 
 /* Security: Show notifications */
 "SecurityPage.Row.Notifications" = "Notifications";
@@ -712,6 +727,12 @@
 /* Transaction details: sender row. */
 "TransactionDetailsScene.Row.From" = "From";
 
+/* Transaction details: fiat value at the time */
+"TransactionDetailsScene.Row.HistoryFiat" = "Value at time of Txn";
+
+/* Transaction details: fiat value at the time */
+"TransactionDetailsScene.Row.CurrentFiat" = "Current value";
+
 /* Transaction details: Id row. */
 "TransactionDetailsScene.Row.Id" = "Id";
 
@@ -765,6 +786,9 @@
 
 /* Transfer: amount of adamant to transfer. */
 "TransferScene.Row.Amount" = "Amount";
+
+/* Transfer: fiat value of crypto-amout */
+"TransferScene.Row.Fiat" = "Value";
 
 /* Transfer: logged user balance. */
 "TransferScene.Row.Balance" = "Balance";
