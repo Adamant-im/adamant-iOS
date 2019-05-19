@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		4411402421C8B290703B13EB /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C107D5CB65B4D728B9D97C0F /* Pods_Adamant.framework */; };
 		6403F5DB2272389800D58779 /* ByteBackpacker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5DA2272389700D58779 /* ByteBackpacker.swift */; };
+		6403F5DE22723C6800D58779 /* DashMainnet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5DD22723C6800D58779 /* DashMainnet.swift */; };
+		6403F5E022723F6400D58779 /* DashWalletRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5DF22723F6400D58779 /* DashWalletRouter.swift */; };
+		6403F5E222723F7500D58779 /* DashWallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5E122723F7500D58779 /* DashWallet.swift */; };
+		6403F5E422723F8C00D58779 /* DashWalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5E322723F8C00D58779 /* DashWalletService.swift */; };
+		6403F5E622723FDA00D58779 /* DashWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5E522723FDA00D58779 /* DashWalletViewController.swift */; };
 		6406D74A21C7F06000196713 /* SearchResultsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6406D74821C7F06000196713 /* SearchResultsViewController.xib */; };
 		6406D74D21CE3AC100196713 /* KeyboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6406D74C21CE3AC100196713 /* KeyboardManager.swift */; };
 		6414C18E217DF43100373FA6 /* String+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6414C18D217DF43100373FA6 /* String+adamant.swift */; };
@@ -323,6 +328,11 @@
 
 /* Begin PBXFileReference section */
 		6403F5DA2272389700D58779 /* ByteBackpacker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteBackpacker.swift; sourceTree = "<group>"; };
+		6403F5DD22723C6800D58779 /* DashMainnet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashMainnet.swift; sourceTree = "<group>"; };
+		6403F5DF22723F6400D58779 /* DashWalletRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashWalletRouter.swift; sourceTree = "<group>"; };
+		6403F5E122723F7500D58779 /* DashWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashWallet.swift; sourceTree = "<group>"; };
+		6403F5E322723F8C00D58779 /* DashWalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashWalletService.swift; sourceTree = "<group>"; };
+		6403F5E522723FDA00D58779 /* DashWalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashWalletViewController.swift; sourceTree = "<group>"; };
 		6406D74821C7F06000196713 /* SearchResultsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchResultsViewController.xib; sourceTree = "<group>"; };
 		6406D74C21CE3AC100196713 /* KeyboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardManager.swift; sourceTree = "<group>"; };
 		6414C18D217DF43100373FA6 /* String+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+adamant.swift"; sourceTree = "<group>"; };
@@ -670,6 +680,18 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		6403F5DC22723C2800D58779 /* Dash */ = {
+			isa = PBXGroup;
+			children = (
+				6403F5DD22723C6800D58779 /* DashMainnet.swift */,
+				6403F5DF22723F6400D58779 /* DashWalletRouter.swift */,
+				6403F5E122723F7500D58779 /* DashWallet.swift */,
+				6403F5E322723F8C00D58779 /* DashWalletService.swift */,
+				6403F5E522723FDA00D58779 /* DashWalletViewController.swift */,
+			);
+			path = Dash;
+			sourceTree = "<group>";
+		};
 		644EC35020EFA96700F40C73 /* Delegates */ = {
 			isa = PBXGroup;
 			children = (
@@ -974,6 +996,7 @@
 				E94008792114ECF100CD2D67 /* Ethereum */,
 				E94008812114EE3900CD2D67 /* Lisk */,
 				64E1C82B222E958C006C4DA7 /* Doge */,
+				6403F5DC22723C2800D58779 /* Dash */,
 				E94008712114EACF00CD2D67 /* WalletAccount.swift */,
 				E940086D2114AA2E00CD2D67 /* WalletService.swift */,
 				E9B1AA582122D59600080A2A /* WalletsRoutes.swift */,
@@ -1587,8 +1610,10 @@
 				E9960B3621F5154300C840A8 /* DummyAccount+CoreDataProperties.swift in Sources */,
 				E9CAE8D22018AA7700345E76 /* AdamantApi+Accounts.swift in Sources */,
 				E987024920C2B1F700E393F4 /* AdamantChatsProvider+fakeMessages.swift in Sources */,
+				6403F5E222723F7500D58779 /* DashWallet.swift in Sources */,
 				648DD7A42237DB9E00B811FD /* DogeWalletService+Send.swift in Sources */,
 				E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */,
+				6403F5E422723F8C00D58779 /* DashWalletService.swift in Sources */,
 				E908472F2196FEA80095825D /* BaseTransaction+CoreDataProperties.swift in Sources */,
 				E94008872114F05B00CD2D67 /* AddressValidationResult.swift in Sources */,
 				E974D168215D033C003AD7E8 /* ChatCell.swift in Sources */,
@@ -1667,6 +1692,7 @@
 				E9E7CDAF2002B8A100DFC4DB /* Router.swift in Sources */,
 				E940088F2119A9E800CD2D67 /* BigInt+Decimal.swift in Sources */,
 				E9E7CDC72003F6D200DFC4DB /* TransactionTableViewCell.swift in Sources */,
+				6403F5DE22723C6800D58779 /* DashMainnet.swift in Sources */,
 				649D6BEA21B9627B009E727B /* LskWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
 				E940088B2114F63000CD2D67 /* NSRegularExpression+adamant.swift in Sources */,
 				E9484B7F2285C016008E10F0 /* PKGeneratorViewController.swift in Sources */,
@@ -1698,6 +1724,7 @@
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
 				E9D1BE1A211DA25300E86B72 /* UIView+constraints.swift in Sources */,
 				E9DFB71C21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift in Sources */,
+				6403F5E022723F6400D58779 /* DashWalletRouter.swift in Sources */,
 				E94008722114EACF00CD2D67 /* WalletAccount.swift in Sources */,
 				E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */,
 				E9CAE8D42018AC1800345E76 /* AdamantApi+Keys.swift in Sources */,
@@ -1728,6 +1755,7 @@
 				E9E7CDCC20040FDC00DFC4DB /* TransactionType.swift in Sources */,
 				E95F85852008CB3A0070534A /* ChatListViewController.swift in Sources */,
 				E9FEECA62143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift in Sources */,
+				6403F5E622723FDA00D58779 /* DashWalletViewController.swift in Sources */,
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,
 				6414C18E217DF43100373FA6 /* String+adamant.swift in Sources */,
 				E993302221354BC300CD5200 /* EthWalletRoutes.swift in Sources */,

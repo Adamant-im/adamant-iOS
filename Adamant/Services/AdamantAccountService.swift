@@ -108,7 +108,8 @@ class AdamantAccountService: AccountService {
 		AdmWalletService(),
 		EthWalletService(),
         LskWalletService(mainnet: true, origins: AdamantResources.lskServers),
-        DogeWalletService()
+        DogeWalletService(),
+        DashWalletService()
         
         // Testnet
 //        LskWalletService(mainnet: false)
