@@ -296,7 +296,7 @@ class AdamantAddressBookService: AddressBookService {
 		// MARK: 1. Pack and ecode address book
 		let packed = AdamantAddressBookService.packAddressBook(book: book)
 		if let encodeResult = adamantCore.encodeValue(packed, privateKey: keypair.privateKey) {
-			let value = JSONStringify(value: ["message": encodeResult.message,
+			let value = AdamantUtilities.JSONStringify(value: ["message": encodeResult.message,
 											  "nonce": encodeResult.nonce] as AnyObject)
 			
 			// MARK: 2. Submit to KVS

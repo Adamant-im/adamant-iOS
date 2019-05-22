@@ -13,19 +13,19 @@ import ByteBackpacker
 
 public typealias Bytes = Array<UInt8>
 
-public struct Crypto {
-    public static let sign = Sign()
-    public static let box = Box()
-    public static let secretBox = SecretBox()
-    public static let ed2Curve = ED2Curve()
+struct Crypto {
+    static let sign = Sign()
+    static let box = Box()
+    static let secretBox = SecretBox()
+    static let ed2Curve = ED2Curve()
 }
 
-public struct Sign {
-    public var SignBytes: Int { return Int(crypto_sign_bytes()) }
-    public var PublicKeyBytes: Int { return Int(crypto_sign_publickeybytes()) }
-    public var SecretKeyBytes: Int { return Int(crypto_sign_secretkeybytes()) }
+struct Sign {
+    var SignBytes: Int { return Int(crypto_sign_bytes()) }
+    var PublicKeyBytes: Int { return Int(crypto_sign_publickeybytes()) }
+    var SecretKeyBytes: Int { return Int(crypto_sign_secretkeybytes()) }
     
-    public func keypair(from seed: Bytes) -> (publicKey: Bytes, privateKey: Bytes)? {
+    func keypair(from seed: Bytes) -> (publicKey: Bytes, privateKey: Bytes)? {
         var publicKey = Bytes(count: PublicKeyBytes)
         var privateKey = Bytes(count: SecretKeyBytes)
         
@@ -38,7 +38,7 @@ public struct Sign {
         return (publicKey: publicKey, privateKey: privateKey)
     }
     
-    public func signature(message: Bytes, secretKey: Bytes) -> Bytes? {
+    func signature(message: Bytes, secretKey: Bytes) -> Bytes? {
         guard secretKey.count == SecretKeyBytes else { return nil }
         var signature = Array<UInt8>(count: SignBytes)
         
@@ -53,10 +53,10 @@ public struct Sign {
     }
 }
 
-public struct ED2Curve {
-    private var KeyBytes: Int { return Int(crypto_scalarmult_curve25519_bytes()) }
+struct ED2Curve {
+    var KeyBytes: Int { return Int(crypto_scalarmult_curve25519_bytes()) }
     
-    public func publicKey(_ key: Bytes) -> Bytes? {
+    func publicKey(_ key: Bytes) -> Bytes? {
         var publicKey = Bytes(count: KeyBytes)
         
         guard .SUCCESS == crypto_sign_ed25519_pk_to_curve25519(
@@ -67,7 +67,7 @@ public struct ED2Curve {
         return publicKey
     }
     
-    public func privateKey(_ key: Bytes) -> Bytes? {
+    func privateKey(_ key: Bytes) -> Bytes? {
         var privateKey = Bytes(count: KeyBytes)
         
         guard .SUCCESS == crypto_sign_ed25519_sk_to_curve25519(
@@ -79,13 +79,13 @@ public struct ED2Curve {
     }
 }
 
-public struct Box: NonceGenerator {
-    public var MacBytes: Int { return Int(crypto_box_macbytes()) }
-    public var NonceBytes: Int { return Int(crypto_box_noncebytes()) }
-    public var PublicKeyBytes: Int { return Int(crypto_box_publickeybytes()) }
-    public var SecretKeyBytes: Int { return Int(crypto_box_secretkeybytes()) }
+struct Box: NonceGenerator {
+    var MacBytes: Int { return Int(crypto_box_macbytes()) }
+    var NonceBytes: Int { return Int(crypto_box_noncebytes()) }
+    var PublicKeyBytes: Int { return Int(crypto_box_publickeybytes()) }
+    var SecretKeyBytes: Int { return Int(crypto_box_secretkeybytes()) }
     
-    public func seal(message: Bytes, recipientPublicKey: Bytes, senderSecretKey: Bytes) -> (authenticatedCipherText: Bytes, nonce: Bytes)? {
+    func seal(message: Bytes, recipientPublicKey: Bytes, senderSecretKey: Bytes) -> (authenticatedCipherText: Bytes, nonce: Bytes)? {
         guard recipientPublicKey.count == PublicKeyBytes,
             senderSecretKey.count == SecretKeyBytes
             else { return nil }
@@ -105,7 +105,7 @@ public struct Box: NonceGenerator {
         return (authenticatedCipherText: authenticatedCipherText, nonce: nonce)
     }
     
-    public func open(authenticatedCipherText: Bytes, senderPublicKey: Bytes, recipientSecretKey: Bytes, nonce: Bytes) -> Bytes? {
+    func open(authenticatedCipherText: Bytes, senderPublicKey: Bytes, recipientSecretKey: Bytes, nonce: Bytes) -> Bytes? {
         guard nonce.count == NonceBytes,
             authenticatedCipherText.count >= MacBytes,
             senderPublicKey.count == PublicKeyBytes,
@@ -126,12 +126,12 @@ public struct Box: NonceGenerator {
     }
 }
 
-public struct SecretBox: NonceGenerator {
-    public var MacBytes: Int { return Int(crypto_secretbox_macbytes()) }
-    public var NonceBytes: Int { return Int(crypto_secretbox_noncebytes()) }
-    public var KeyBytes: Int { return Int(crypto_secretbox_keybytes()) }
+struct SecretBox: NonceGenerator {
+    var MacBytes: Int { return Int(crypto_secretbox_macbytes()) }
+    var NonceBytes: Int { return Int(crypto_secretbox_noncebytes()) }
+    var KeyBytes: Int { return Int(crypto_secretbox_keybytes()) }
 
-    public func seal(message: Bytes, secretKey: Bytes) -> (authenticatedCipherText: Bytes, nonce: Bytes)? {
+    func seal(message: Bytes, secretKey: Bytes) -> (authenticatedCipherText: Bytes, nonce: Bytes)? {
         guard secretKey.count == KeyBytes else { return nil }
         var authenticatedCipherText = Bytes(count: message.count + MacBytes)
         let nonce = self.nonce()
@@ -146,7 +146,7 @@ public struct SecretBox: NonceGenerator {
         return (authenticatedCipherText: authenticatedCipherText, nonce: nonce)
     }
     
-    public func open(authenticatedCipherText: Bytes, secretKey: Bytes, nonce: Bytes) -> Bytes? {
+    func open(authenticatedCipherText: Bytes, secretKey: Bytes, nonce: Bytes) -> Bytes? {
         guard authenticatedCipherText.count >= MacBytes else { return nil }
         var message = Bytes(count: authenticatedCipherText.count - MacBytes)
         
@@ -161,23 +161,16 @@ public struct SecretBox: NonceGenerator {
     }
 }
 
-public protocol NonceGenerator {
+protocol NonceGenerator {
     var NonceBytes: Int { get }
 }
 
 extension NonceGenerator {
     /// Generates a random nonce.
-    public func nonce() -> Bytes {
+    func nonce() -> Bytes {
         var nonce = Bytes(count: NonceBytes)
         randombytes_buf(&nonce, NonceBytes)
         return nonce
-    }
-}
-
-// MARK:- Helpers
-extension Data {
-    func toString() -> String? {
-        return String(data: self, encoding: .utf8)
     }
 }
 
@@ -199,58 +192,7 @@ extension ArraySlice where Element == UInt8 {
     var bytes: Bytes { return Bytes(self) }
 }
 
-extension String {
-    var bytes: Bytes { return Bytes(self.utf8) }
-    
-    func hexBytes() -> [UInt8] {
-        return (0..<count/2).reduce([]) { res, i in
-            let indexStart = index(startIndex, offsetBy: i * 2)
-            let indexEnd = index(indexStart, offsetBy: 2)
-            let substring = self[indexStart..<indexEnd]
-            return res + [UInt8(substring, radix: 16) ?? 0]
-        }
-    }
-    
-    func toDictionary() -> [String: Any]? {
-        if let data = self.data(using: .utf8) {
-            do {
-                return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
-        return nil
-    }
-    
-    func matches(for regex: String) -> [String] {
-        do {
-            let regex = try NSRegularExpression(pattern: regex)
-            let results = regex.matches(in: self,
-                                        range: NSRange(self.startIndex..., in: self))
-            return results.map {
-                String(self[Range($0.range, in: self)!])
-            }
-        } catch let error {
-            print("invalid regex: \(error.localizedDescription)")
-            return []
-        }
-    }
-    
-    subscript (i: Int) -> Character
-    {
-        return self[index(startIndex, offsetBy:i)]
-    }
-    
-    static func random(length: Int = 32, alphabet: String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") -> String
-    {
-        let upperBound = UInt32(alphabet.count)
-        return String((0..<length).map { _ -> Character in
-            return alphabet[Int(arc4random_uniform(upperBound))]
-        })
-    }
-}
-
-enum ExitCode {
+fileprivate enum ExitCode {
     case SUCCESS
     case FAILURE
     
@@ -262,7 +204,7 @@ enum ExitCode {
     }
 }
 
-extension Int32 {
+fileprivate extension Int32 {
     var exitCode: ExitCode { return ExitCode(from: self) }
 }
 

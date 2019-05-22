@@ -107,7 +107,7 @@ class NativeAdamantCore : AdamantCore {
     func encodeValue(_ value: [String: Any], privateKey privateKeyHex: String) -> (message: String, nonce: String)? {
         let data = ["payload": value]
         
-        let padded: String = String.random(length: Int(arc4random_uniform(10)), alphabet: "abcdefghijklmnopqrstuvwxyz") + JSONStringify(value: data as AnyObject) + String.random(length: Int(arc4random_uniform(10)), alphabet: "abcdefghijklmnopqrstuvwxyz")
+        let padded: String = String.random(length: Int(arc4random_uniform(10)), alphabet: "abcdefghijklmnopqrstuvwxyz") + AdamantUtilities.JSONStringify(value: data as AnyObject) + String.random(length: Int(arc4random_uniform(10)), alphabet: "abcdefghijklmnopqrstuvwxyz")
 
         let message = padded.bytes
         let privateKey = privateKeyHex.hexBytes()
@@ -159,22 +159,31 @@ class NativeAdamantCore : AdamantCore {
     }
 }
 
-func JSONStringify(value: AnyObject, prettyPrinted: Bool = false) -> String {
-    let options = prettyPrinted ? JSONSerialization.WritingOptions.prettyPrinted : []
+// MARK: - String
+
+fileprivate extension String {
+    var bytes: Bytes { return Bytes(self.utf8) }
     
-    if JSONSerialization.isValidJSONObject(value) {
-        if let data = try? JSONSerialization.data(withJSONObject: value, options: options) {
-            if let string = String(data: data, encoding: .utf8) {
-                return string
-            }
-        }
+    static func random(length: Int = 32, alphabet: String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") -> String {
+        let upperBound = UInt32(alphabet.count)
+        return String((0..<length).map { _ -> Character in
+            let index = alphabet.index(alphabet.startIndex, offsetBy: Int(arc4random_uniform(upperBound)))
+            return alphabet[index]
+        })
     }
     
-    return ""
+    func hexBytes() -> [UInt8] {
+        return (0..<count/2).reduce([]) { res, i in
+            let indexStart = index(startIndex, offsetBy: i * 2)
+            let indexEnd = index(indexStart, offsetBy: 2)
+            let substring = self[indexStart..<indexEnd]
+            return res + [UInt8(substring, radix: 16) ?? 0]
+        }
+    }
 }
 
 // MARK: - Bytes
-extension SignableTransaction {
+fileprivate extension SignableTransaction {
     
     var bytes: [UInt8] {
         return

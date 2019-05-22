@@ -20,14 +20,12 @@ struct VotesAsset {
 	}
 }
 
-extension VotesAsset: Decodable {
-	init(from decoder: Decoder) throws {
-		let container = try decoder.singleValueContainer()
-		self.votes = try container.decode([String].self)
-	}
-}
-
-extension VotesAsset: Encodable {
+extension VotesAsset: Codable {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.votes = try container.decode([String].self)
+    }
+    
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 		try container.encode(votes)

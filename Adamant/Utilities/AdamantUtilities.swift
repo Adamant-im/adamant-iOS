@@ -152,4 +152,18 @@ extension AdamantUtilities {
         }
         return nil
     }
+    
+    static func JSONStringify(value: AnyObject, prettyPrinted: Bool = false) -> String {
+        let options = prettyPrinted ? JSONSerialization.WritingOptions.prettyPrinted : []
+        
+        if JSONSerialization.isValidJSONObject(value) {
+            if let data = try? JSONSerialization.data(withJSONObject: value, options: options) {
+                if let string = String(data: data, encoding: .utf8) {
+                    return string
+                }
+            }
+        }
+        
+        return ""
+    }
 }
