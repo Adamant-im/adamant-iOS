@@ -68,7 +68,7 @@ class DogeTransferViewController: TransferViewControllerBase {
                             case .success(let dogeRawTransaction):
                                 vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
                                 
-                                let transaction = dogeRawTransaction.asDogeTransaction(DogeTransaction.self, for: sender)
+                                let transaction = dogeRawTransaction.asBtcTransaction(DogeTransaction.self, for: sender)
                                 
                                 guard let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController else {
                                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)

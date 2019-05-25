@@ -414,7 +414,7 @@ extension DogeWalletService {
             case .success(let doge):
                 let hasMore = doge.to < doge.totalItems
                 
-                let transactions = doge.items.map { $0.asDogeTransaction(DogeTransaction.self, for: address) }
+                let transactions = doge.items.map { $0.asBtcTransaction(DogeTransaction.self, for: address) }
                 
                 completion(.success((transactions: transactions, hasMore: hasMore)))
                 

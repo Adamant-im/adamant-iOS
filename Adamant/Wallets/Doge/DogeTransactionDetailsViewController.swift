@@ -92,7 +92,7 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
             switch result {
             case .success(let trs):
                 if let blockInfo = self?.cachedBlockInfo, blockInfo.hash == trs.blockHash {
-                    self?.transaction = trs.asDogeTransaction(DogeTransaction.self, for: address, blockId: blockInfo.height)
+                    self?.transaction = trs.asBtcTransaction(DogeTransaction.self, for: address, blockId: blockInfo.height)
                     
                     DispatchQueue.main.async { [weak self] in
                         self?.tableView.reloadData()
@@ -110,7 +110,7 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
                             blockInfo = nil
                         }
                         
-                        self?.transaction = trs.asDogeTransaction(DogeTransaction.self, for: address, blockId: blockInfo?.height)
+                        self?.transaction = trs.asBtcTransaction(DogeTransaction.self, for: address, blockId: blockInfo?.height)
                         self?.cachedBlockInfo = blockInfo
                         
                         DispatchQueue.main.async { [weak self] in
@@ -120,7 +120,7 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
                         completion?(nil)
                     }
                 } else {
-                    self?.transaction = trs.asDogeTransaction(DogeTransaction.self, for: address)
+                    self?.transaction = trs.asBtcTransaction(DogeTransaction.self, for: address)
                     
                     DispatchQueue.main.async { [weak self] in
                         self?.tableView.reloadData()

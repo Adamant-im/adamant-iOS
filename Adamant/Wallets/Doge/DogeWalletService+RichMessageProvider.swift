@@ -43,7 +43,7 @@ extension DogeWalletService: RichMessageProvider {
             
             switch result {
             case .success(let dogeRawTransaction):
-                let dogeTransaction = dogeRawTransaction.asDogeTransaction(DogeTransaction.self, for: address)
+                let dogeTransaction = dogeRawTransaction.asBtcTransaction(DogeTransaction.self, for: address)
                 
                 // MARK: 2. Self name
                 if dogeTransaction.senderAddress == address {
@@ -84,7 +84,7 @@ extension DogeWalletService: RichMessageProvider {
                     service.getBlockId(by: blockHash) { result in
                         switch result {
                         case .success(let id):
-                            vc.transaction = dogeRawTransaction.asDogeTransaction(DogeTransaction.self, for: address, blockId: id)
+                            vc.transaction = dogeRawTransaction.asBtcTransaction(DogeTransaction.self, for: address, blockId: id)
                             
                         case .failure:
                             break
