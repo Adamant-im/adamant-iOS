@@ -53,6 +53,6 @@ struct Node: Equatable, Codable {
 			components.port = port ?? scheme.defaultPort
 		}
 		
-		return try? components.asURL()
+		return components.url
 	}
 }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-class AdamantUtilities {
+extension AdamantUtilities {
 	// MARK: Application version
 	static var applicationVersion: String = {
 		if let infoDictionary = Bundle.main.infoDictionary,
@@ -32,8 +32,6 @@ class AdamantUtilities {
         }
         return modelCode ?? "Unknown"
     }
-	
-	private init() { }
 }
 
 
@@ -96,24 +94,6 @@ extension AdamantUtilities {
 }
 
 
-// MARK: - Dates
-extension AdamantUtilities {
-	static func encodeAdamant(date: Date) -> TimeInterval {
-		return date.timeIntervalSince1970 - magicAdamantTimeInterval
-	}
-	
-	static func decodeAdamant(timestamp: TimeInterval) -> Date {
-		return Date(timeIntervalSince1970: timestamp + magicAdamantTimeInterval)
-	}
-	
-	private static var magicAdamantTimeInterval: TimeInterval = {
-		// JS handles moth as 0-based number, swift handles month as 1-based number.
-		let components = DateComponents(calendar: Calendar(identifier: .gregorian), timeZone: TimeZone(abbreviation: "UTC"), year: 2017, month: 9, day: 2, hour: 17)
-		return components.date!.timeIntervalSince1970
-	}()
-}
-
-
 // MARK: - Hex
 extension AdamantUtilities {
 	static func getHexString(from bytes: [UInt8]) -> String {
@@ -151,19 +131,5 @@ extension AdamantUtilities {
             }
         }
         return nil
-    }
-    
-    static func JSONStringify(value: AnyObject, prettyPrinted: Bool = false) -> String {
-        let options = prettyPrinted ? JSONSerialization.WritingOptions.prettyPrinted : []
-        
-        if JSONSerialization.isValidJSONObject(value) {
-            if let data = try? JSONSerialization.data(withJSONObject: value, options: options) {
-                if let string = String(data: data, encoding: .utf8) {
-                    return string
-                }
-            }
-        }
-        
-        return ""
     }
 }

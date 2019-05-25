@@ -13,7 +13,10 @@ enum MnemonicError : Error {
     case randomBytesError
 }
 
-class Mnemonic {
+extension Mnemonic {
+    
+    // MARK: - Generating passphrases
+    
     static func generate() throws -> [String] {
         let byteCount = 16
         var bytes = Data(count: byteCount)
@@ -41,24 +44,4 @@ class Mnemonic {
         
         return mnemonic
     }
-    
-    static func seed(mnemonic m: [String], passphrase: String = "") -> [UInt8]? {
-        let mnemonic = m.joined(separator: " ")
-        let salt = ("mnemonic" + passphrase)
-        
-        return seed(passphrase: mnemonic, salt: salt)
-    }
-    
-    static func seed(passphrase: String, salt: String = "mnemonic") -> [UInt8]? {
-        let password = passphrase.decomposedStringWithCompatibilityMapping
-        let salt = salt.decomposedStringWithCompatibilityMapping
-        
-        if let seed = try? PKCS5.PBKDF2(password: password.bytes, salt: salt.bytes, iterations: 2048, keyLength: 64, variant: HMAC.Variant.sha512).calculate() {
-            return seed
-        } else {
-            return nil
-        }
-    }
-    
-    private init() {}
 }

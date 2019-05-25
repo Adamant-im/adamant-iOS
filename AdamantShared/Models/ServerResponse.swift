@@ -16,7 +16,7 @@ protocol WrappableCollection: Decodable {
 	static var CollectionKey: String { get }
 }
 
-class ServerResponse: Decodable, ServerResponseWithTimestamp {
+class ServerResponse: Decodable {
 	struct CodingKeys: CodingKey {
 		var intValue: Int?
 		var stringValue: String

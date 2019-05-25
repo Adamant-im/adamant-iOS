@@ -7,6 +7,14 @@ def keychain_pods
   pod 'KeychainAccess' # Keychain
 end
 
+# NativeCore pods
+def core_pods
+  pod 'CryptoSwift' # MD5 hash
+  pod 'ByteBackpacker' # Utility to pack value types into a Byte array
+  pod 'libsodium' # Sodium crypto library
+end
+
+ # ADAMANT Messenger iOS app
 target 'Adamant' do
   use_frameworks!
 
@@ -32,19 +40,19 @@ target 'Adamant' do
   pod 'QRCodeReader.swift' # QR reader
   
   # Crypto
-  pod 'CryptoSwift' # MD5 hash
-  pod 'libsodium' # Sodium crypto library
   pod 'web3swift' # ETH Web3 Swift Port
   pod 'Lisk', :git => 'https://github.com/adamant-im/lisk-swift.git' # LSK
   pod 'BitcoinKit', :git => 'https://github.com/boyarkin-anton/BitcoinKit.git', :branch => 'dev' # BTC
 
-  # Utility
-  pod 'ByteBackpacker' # Utility to pack value types into a Byte array
+  # Shared
   keychain_pods
+  core_pods
 
 end
 
+# Adamant NotificationServiceExtension - readable notifications
 target 'NotificationServiceExtension' do
   use_frameworks!
   keychain_pods
+  core_pods
 end
