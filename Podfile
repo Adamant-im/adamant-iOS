@@ -1,11 +1,16 @@
 
 platform :ios, '10.0'
 
+# Keychain secured store pods
+def keychain_pods
+  pod 'RNCryptor' # Cryptor
+  pod 'KeychainAccess' # Keychain
+end
+
 target 'Adamant' do
   use_frameworks!
 
   pod 'Alamofire' # Network
-  pod 'KeychainAccess' # Keychain
   pod 'Swinject' # Dependency Injection
   pod 'ReachabilitySwift' # Network status
   pod 'MarkdownKit', :git => 'https://github.com/RealBonus/MarkdownKit' # Markdown parser, forked fixing whitespaces '5 * 5 * 6'
@@ -27,7 +32,6 @@ target 'Adamant' do
   pod 'QRCodeReader.swift' # QR reader
   
   # Crypto
-  pod 'RNCryptor' # Cryptor
   pod 'CryptoSwift' # MD5 hash
   pod 'libsodium' # Sodium crypto library
   pod 'web3swift' # ETH Web3 Swift Port
@@ -36,5 +40,11 @@ target 'Adamant' do
 
   # Utility
   pod 'ByteBackpacker' # Utility to pack value types into a Byte array
+  keychain_pods
 
+end
+
+target 'NotificationServiceExtension' do
+  use_frameworks!
+  keychain_pods
 end

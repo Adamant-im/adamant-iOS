@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1DDD23FEDFC7A122D2EA5E39 /* Pods_NotificationServiceExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53D3CE61AE0A5F67EEF5270A /* Pods_NotificationServiceExtension.framework */; };
 		3C06931576393125C61FB8F6 /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */; };
 		6406D74A21C7F06000196713 /* SearchResultsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6406D74821C7F06000196713 /* SearchResultsViewController.xib */; };
 		6406D74D21CE3AC100196713 /* KeyboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6406D74C21CE3AC100196713 /* KeyboardManager.swift */; };
@@ -211,6 +212,10 @@
 		E96D64D12295C82B00CA5587 /* TransactionChat.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85BD200A503A0070534A /* TransactionChat.json */; };
 		E96D64D22295C82B00CA5587 /* TransactionSend.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85B9200A4DC90070534A /* TransactionSend.json */; };
 		E96D64D62295C9CB00CA5587 /* NativeAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96D64D52295C9CA00CA5587 /* NativeAdamantCore.swift */; };
+		E96D64DE2295CD4700CA5587 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96D64DD2295CD4700CA5587 /* NotificationService.swift */; };
+		E96D64E22295CD4700CA5587 /* NotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E96D64DB2295CD4700CA5587 /* NotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E96D64E72295CF4600CA5587 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39A2048A9BD00DDB504 /* KeychainStore.swift */; };
+		E96D64E82295CFA100CA5587 /* SecuredStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39C204C13B900DDB504 /* SecuredStore.swift */; };
 		E96E86B821679C120061F80A /* EthTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96E86B721679C120061F80A /* EthTransactionDetailsViewController.swift */; };
 		E971591A21681D6900A5F904 /* TransactionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E971591921681D6900A5F904 /* TransactionStatus.swift */; };
 		E971591C2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = E971591B2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift */; };
@@ -218,6 +223,8 @@
 		E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */; };
 		E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E972206A201F44CA004F2AAD /* TransfersProvider.swift */; };
 		E974D168215D033C003AD7E8 /* ChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E974D167215D033C003AD7E8 /* ChatCell.swift */; };
+		E9771D7B2299456A0099AAC7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9771D7A2299456A0099AAC7 /* AdamantSecret.swift */; };
+		E9771D7C2299514C0099AAC7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9771D7A2299456A0099AAC7 /* AdamantSecret.swift */; };
 		E983AE2120E655C500497E1A /* AccountHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E983AE2020E655C500497E1A /* AccountHeaderView.swift */; };
 		E983AE2A20E65F3200497E1A /* AccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E983AE2820E65F3200497E1A /* AccountViewController.swift */; };
 		E983AE2D20E6720D00497E1A /* AccountFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = E983AE2C20E6720D00497E1A /* AccountFooter.xib */; };
@@ -315,6 +322,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		E96D64E02295CD4700CA5587 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E913C8E61FFFA51D001A83F7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E96D64DA2295CD4700CA5587;
+			remoteInfo = NotificationServiceExtension;
+		};
 		E9EC344920066D4A00C0E546 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E913C8E61FFFA51D001A83F7 /* Project object */;
@@ -324,10 +338,26 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		E96D64E62295CD4700CA5587 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E96D64E22295CD4700CA5587 /* NotificationServiceExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		36AB8CE9537B3B873972548B /* Pods_AdmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AdmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.release.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.release.xcconfig"; sourceTree = "<group>"; };
+		53D3CE61AE0A5F67EEF5270A /* Pods_NotificationServiceExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NotificationServiceExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		574F8302871CE64C213242AB /* Pods-NotificationServiceExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationServiceExtension.release.xcconfig"; path = "Target Support Files/Pods-NotificationServiceExtension/Pods-NotificationServiceExtension.release.xcconfig"; sourceTree = "<group>"; };
 		6406D74821C7F06000196713 /* SearchResultsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchResultsViewController.xib; sourceTree = "<group>"; };
 		6406D74C21CE3AC100196713 /* KeyboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardManager.swift; sourceTree = "<group>"; };
 		6414C18D217DF43100373FA6 /* String+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+adamant.swift"; sourceTree = "<group>"; };
@@ -387,6 +417,7 @@
 		64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewControllerBase.swift; sourceTree = "<group>"; };
+		742D9BA5B194D115A9EBED8C /* Pods-NotificationServiceExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationServiceExtension.debug.xcconfig"; path = "Target Support Files/Pods-NotificationServiceExtension/Pods-NotificationServiceExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		74D5744703A7ECC98E244B14 /* Pods-AdmCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.debug.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.debug.xcconfig"; sourceTree = "<group>"; };
 		AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
 		ADDFD2FA17E41CCBD11A1733 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
@@ -552,6 +583,9 @@
 		E96D64C72295C44400CA5587 /* Data+utilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+utilites.swift"; sourceTree = "<group>"; };
 		E96D64C92295C4A800CA5587 /* WordList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordList.swift; sourceTree = "<group>"; };
 		E96D64D52295C9CA00CA5587 /* NativeAdamantCore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NativeAdamantCore.swift; sourceTree = "<group>"; };
+		E96D64DB2295CD4700CA5587 /* NotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E96D64DD2295CD4700CA5587 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		E96D64DF2295CD4700CA5587 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E96E86B721679C120061F80A /* EthTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionDetailsViewController.swift; sourceTree = "<group>"; };
 		E971591921681D6900A5F904 /* TransactionStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionStatus.swift; sourceTree = "<group>"; };
 		E971591B2168209800A5F904 /* EthWalletService+RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EthWalletService+RichMessageProviderWithStatusCheck.swift"; sourceTree = "<group>"; };
@@ -559,6 +593,8 @@
 		E9722067201F42CC004F2AAD /* InMemoryCoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InMemoryCoreDataStack.swift; sourceTree = "<group>"; };
 		E972206A201F44CA004F2AAD /* TransfersProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransfersProvider.swift; sourceTree = "<group>"; };
 		E974D167215D033C003AD7E8 /* ChatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCell.swift; sourceTree = "<group>"; };
+		E9771D7A2299456A0099AAC7 /* AdamantSecret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantSecret.swift; sourceTree = "<group>"; };
+		E9771D7D22995C870099AAC7 /* NotificationServiceExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotificationServiceExtension.entitlements; sourceTree = "<group>"; };
 		E983AE2020E655C500497E1A /* AccountHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountHeaderView.swift; sourceTree = "<group>"; };
 		E983AE2820E65F3200497E1A /* AccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewController.swift; sourceTree = "<group>"; };
 		E983AE2C20E6720D00497E1A /* AccountFooter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AccountFooter.xib; sourceTree = "<group>"; };
@@ -658,6 +694,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E96D64D82295CD4700CA5587 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1DDD23FEDFC7A122D2EA5E39 /* Pods_NotificationServiceExtension.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E9EC344120066D4A00C0E546 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -675,6 +719,8 @@
 				AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */,
 				74D5744703A7ECC98E244B14 /* Pods-AdmCore.debug.xcconfig */,
 				4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */,
+				742D9BA5B194D115A9EBED8C /* Pods-NotificationServiceExtension.debug.xcconfig */,
+				574F8302871CE64C213242AB /* Pods-NotificationServiceExtension.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -724,6 +770,7 @@
 			children = (
 				33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */,
 				36AB8CE9537B3B873972548B /* Pods_AdmCore.framework */,
+				53D3CE61AE0A5F67EEF5270A /* Pods_NotificationServiceExtension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -733,6 +780,7 @@
 			children = (
 				E913C8F01FFFA51D001A83F7 /* Adamant */,
 				E9EC344520066D4A00C0E546 /* AdamantTests */,
+				E96D64DC2295CD4700CA5587 /* NotificationServiceExtension */,
 				E913C8EF1FFFA51D001A83F7 /* Products */,
 				E9220E0C21988D9A009C9642 /* Recovered References */,
 				0C42C8036B708BFC84C34963 /* Pods */,
@@ -745,6 +793,7 @@
 			children = (
 				E913C8EE1FFFA51D001A83F7 /* Adamant.app */,
 				E9EC344420066D4A00C0E546 /* AdamantTests.xctest */,
+				E96D64DB2295CD4700CA5587 /* NotificationServiceExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -765,6 +814,7 @@
 				E913C9111FFFAB05001A83F7 /* Assets */,
 				E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */,
 				E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */,
+				E9771D7A2299456A0099AAC7 /* AdamantSecret.swift */,
 				E913C8FD1FFFA51E001A83F7 /* Info.plist */,
 				E9061B982077AF8E0011F104 /* Adamant.entitlements */,
 			);
@@ -1150,6 +1200,16 @@
 			path = Mnemonic;
 			sourceTree = "<group>";
 		};
+		E96D64DC2295CD4700CA5587 /* NotificationServiceExtension */ = {
+			isa = PBXGroup;
+			children = (
+				E9771D7D22995C870099AAC7 /* NotificationServiceExtension.entitlements */,
+				E96D64DD2295CD4700CA5587 /* NotificationService.swift */,
+				E96D64DF2295CD4700CA5587 /* Info.plist */,
+			);
+			path = NotificationServiceExtension;
+			sourceTree = "<group>";
+		};
 		E982F69820235AF000566AC7 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -1302,21 +1362,39 @@
 			buildConfigurationList = E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant" */;
 			buildPhases = (
 				47866E9AB7D201F2CED0064C /* [CP] Check Pods Manifest.lock */,
-				E9204B4120C6C10000F3B9AB /* [ADAMANT] Set AppStore passphrase for KeychainStore */,
 				E913C8EA1FFFA51D001A83F7 /* Sources */,
 				E913C8EB1FFFA51D001A83F7 /* Frameworks */,
 				E913C8EC1FFFA51D001A83F7 /* Resources */,
-				E9204B4420C6D80900F3B9AB /* [ADAMANT] Set Debug passphrase for KeychainStore */,
 				629616F00016639A2AFC5FC7 /* [CP] Embed Pods Frameworks */,
+				E96D64E62295CD4700CA5587 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E96D64E12295CD4700CA5587 /* PBXTargetDependency */,
 			);
 			name = Adamant;
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
 			productType = "com.apple.product-type.application";
+		};
+		E96D64DA2295CD4700CA5587 /* NotificationServiceExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E96D64E32295CD4700CA5587 /* Build configuration list for PBXNativeTarget "NotificationServiceExtension" */;
+			buildPhases = (
+				D9B923322F5439B665D162F8 /* [CP] Check Pods Manifest.lock */,
+				E96D64D72295CD4700CA5587 /* Sources */,
+				E96D64D82295CD4700CA5587 /* Frameworks */,
+				E96D64D92295CD4700CA5587 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NotificationServiceExtension;
+			productName = NotificationServiceExtension;
+			productReference = E96D64DB2295CD4700CA5587 /* NotificationServiceExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		E9EC344320066D4A00C0E546 /* AdamantTests */ = {
 			isa = PBXNativeTarget;
@@ -1354,7 +1432,19 @@
 							com.apple.BackgroundModes = {
 								enabled = 1;
 							};
+							com.apple.Keychain = {
+								enabled = 1;
+							};
 							com.apple.Push = {
+								enabled = 1;
+							};
+						};
+					};
+					E96D64DA2295CD4700CA5587 = {
+						CreatedOnToolsVersion = 10.1;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Keychain = {
 								enabled = 1;
 							};
 						};
@@ -1383,6 +1473,7 @@
 			targets = (
 				E913C8ED1FFFA51D001A83F7 /* Adamant */,
 				E9EC344320066D4A00C0E546 /* AdamantTests */,
+				E96D64DA2295CD4700CA5587 /* NotificationServiceExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -1438,6 +1529,13 @@
 				E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */,
 				E921534F20EE1E8700C0843F /* AlertLabelCell.xib in Resources */,
 				644EC35820EFAAB700F40C73 /* DelegatesListViewController.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E96D64D92295CD4700CA5587 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1573,33 +1671,27 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E9204B4120C6C10000F3B9AB /* [ADAMANT] Set AppStore passphrase for KeychainStore */ = {
+		D9B923322F5439B665D162F8 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputPaths = (
+			inputFileListPaths = (
 			);
-			name = "[ADAMANT] Set AppStore passphrase for KeychainStore";
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-NotificationServiceExtension-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    ${SOURCE_ROOT}/keychain-toAppstore.sh\nfi";
-		};
-		E9204B4420C6D80900F3B9AB /* [ADAMANT] Set Debug passphrase for KeychainStore */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[ADAMANT] Set Debug passphrase for KeychainStore";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    ${SOURCE_ROOT}/keychain-toDebug.sh\nfi";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1809,6 +1901,7 @@
 				E9FEECA92143C371007DD7C8 /* TransferCollectionViewCell.swift in Sources */,
 				E9502740202E257E002C1098 /* RepeaterService.swift in Sources */,
 				E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */,
+				E9771D7B2299456A0099AAC7 /* AdamantSecret.swift in Sources */,
 				649D6BEC21BD5A53009E727B /* UISuffixTextField.swift in Sources */,
 				E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */,
 				E993302021354B1800CD5200 /* AdmWalletRoutes.swift in Sources */,
@@ -1851,6 +1944,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E96D64D72295CD4700CA5587 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E96D64DE2295CD4700CA5587 /* NotificationService.swift in Sources */,
+				E96D64E72295CF4600CA5587 /* KeychainStore.swift in Sources */,
+				E9771D7C2299514C0099AAC7 /* AdamantSecret.swift in Sources */,
+				E96D64E82295CFA100CA5587 /* SecuredStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E9EC344020066D4A00C0E546 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1873,6 +1977,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		E96D64E12295CD4700CA5587 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E96D64DA2295CD4700CA5587 /* NotificationServiceExtension */;
+			targetProxy = E96D64E02295CD4700CA5587 /* PBXContainerItemProxy */;
+		};
 		E9EC344A20066D4A00C0E546 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E913C8ED1FFFA51D001A83F7 /* Adamant */;
@@ -2075,6 +2184,50 @@
 			};
 			name = Release;
 		};
+		E96D64E42295CD4700CA5587 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 742D9BA5B194D115A9EBED8C /* Pods-NotificationServiceExtension.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/NotificationServiceExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J2L77FMN46;
+				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.NotificationServiceExtension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E96D64E52295CD4700CA5587 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 574F8302871CE64C213242AB /* Pods-NotificationServiceExtension.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/NotificationServiceExtension.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J2L77FMN46;
+				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.NotificationServiceExtension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		E9EC344C20066D4A00C0E546 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2128,6 +2281,15 @@
 			buildConfigurations = (
 				E913C9011FFFA51E001A83F7 /* Debug */,
 				E913C9021FFFA51E001A83F7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E96D64E32295CD4700CA5587 /* Build configuration list for PBXNativeTarget "NotificationServiceExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E96D64E42295CD4700CA5587 /* Debug */,
+				E96D64E52295CD4700CA5587 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
