@@ -100,7 +100,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
             
             switch result {
             case .success(let dogeTransaction):
-                let transaction = dogeTransaction.asDogeTransaction(for: sender)
+                let transaction = dogeTransaction.asDogeTransaction(DogeTransaction.self, for: sender)
                 
                 // Sender name
                 if transaction.senderAddress == sender {
@@ -125,7 +125,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                 vc.walletService.getBlockId(by: blockHash) { result in
                     switch result {
                     case .success(let id):
-                        controller.transaction = dogeTransaction.asDogeTransaction(for: sender, blockId: id)
+                        controller.transaction = dogeTransaction.asDogeTransaction(DogeTransaction.self, for: sender, blockId: id)
                         
                     case .failure:
                         controller.transaction = transaction

@@ -13,7 +13,7 @@ class DogeGetTransactionsResponse: Decodable {
     let from: Int
     let to: Int
     
-    let items: [DogeRawTransaction]
+    let items: [BTCRawTransaction]
 }
 
 /* Json

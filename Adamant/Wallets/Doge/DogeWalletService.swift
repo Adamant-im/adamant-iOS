@@ -414,7 +414,7 @@ extension DogeWalletService {
             case .success(let doge):
                 let hasMore = doge.to < doge.totalItems
                 
-                let transactions = doge.items.map { $0.asDogeTransaction(for: address) }
+                let transactions = doge.items.map { $0.asDogeTransaction(DogeTransaction.self, for: address) }
                 
                 completion(.success((transactions: transactions, hasMore: hasMore)))
                 
@@ -524,7 +524,7 @@ extension DogeWalletService {
         }
     }
     
-    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<DogeRawTransaction>) -> Void) {
+    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<BTCRawTransaction>) -> Void) {
         guard let url = AdamantResources.dogeServers.randomElement() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
@@ -542,7 +542,7 @@ extension DogeWalletService {
             switch response.result {
             case .success(let data):
                 do {
-                    let transfers = try DogeWalletService.jsonDecoder.decode(DogeRawTransaction.self, from: data)
+                    let transfers = try DogeWalletService.jsonDecoder.decode(BTCRawTransaction.self, from: data)
                     completion(.success(transfers))
                 } catch {
                     completion(.failure(.internalError(message: "DOGE: Parsing transaction error", error: error)))
