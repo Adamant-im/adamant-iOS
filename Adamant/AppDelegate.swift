@@ -114,6 +114,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	// MARK: - Lifecycle
 	
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // MARK: 0. Migrate keychain if needed
+        KeychainStore.migrateIfNeeded()
+        
 		// MARK: 1. Initiating Swinject
 		container = Container()
 		container.registerAdamantServices()
