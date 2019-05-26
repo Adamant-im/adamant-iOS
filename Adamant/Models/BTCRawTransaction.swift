@@ -23,7 +23,7 @@ struct BTCRawTransaction {
     let inputs: [BTCInput]
     let outputs: [BTCOutput]
     
-    func asDogeTransaction<T: BaseBtcTransaction>(_ as:T.Type, for address: String, blockId: String? = nil) -> T {
+    func asBtcTransaction<T: BaseBtcTransaction>(_ as:T.Type, for address: String, blockId: String? = nil) -> T {
         // MARK: Known values
         let confirmationsValue: String?
         let transactionStatus: TransactionStatus

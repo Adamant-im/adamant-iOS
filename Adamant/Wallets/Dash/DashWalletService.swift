@@ -47,6 +47,8 @@ class DashWalletService: WalletService {
     
     static let kvsAddress = "dash:address"
     
+    private var transatrionsIds = [String]()
+    
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.dashWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.dashWallet.enabledChanged")
@@ -389,20 +391,51 @@ extension DashWalletService {
 
 // MARK: - Transactions
 extension DashWalletService {
-    func getTransactions(from: Int, completion: @escaping (ApiServiceResult<(transactions: [DogeTransaction], hasMore: Bool)>) -> Void) {
+    func getTransactions(from: Int, completion: @escaping (ApiServiceResult<(transactions: [DashTransaction], hasMore: Bool)>) -> Void) {
         guard let address = self.wallet?.address else {
             completion(.failure(.notLogged))
             return
         }
-
-        getTransactionsIds(for: address) { response in
-            switch response {
-            case .success(let ids):
-                //
-                break
-
-            case .failure(let error):
-                completion(.failure(error))
+        
+        if from == 0 {
+            self.transatrionsIds.removeAll()
+        }
+        
+        if self.transatrionsIds.count > 0, let id = self.transatrionsIds.first {
+            self.getTransaction(by: id, completion: { response in
+                switch response {
+                case .success(let transaction):
+                    if let idx = self.transatrionsIds.index(of: id) {
+                        self.transatrionsIds.remove(at: idx)
+                    }
+                    completion(.success((transactions: [transaction.asBtcTransaction(DashTransaction.self, for: address)], hasMore: self.transatrionsIds.count > 0)))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            })
+        } else {
+            getTransactionsIds(for: address) { response in
+                switch response {
+                case .success(let ids):
+                    
+                    self.transatrionsIds = ids
+                    if let id = ids.first {
+                        self.getTransaction(by: id, completion: { r in
+                            switch r {
+                            case .success(let transaction):
+                                if let idx = self.transatrionsIds.index(of: id) {
+                                    self.transatrionsIds.remove(at: idx)
+                                }
+                                completion(.success((transactions: [transaction.asBtcTransaction(DashTransaction.self, for: address)], hasMore: self.transatrionsIds.count > 0)))
+                            case .failure(let error):
+                                completion(.failure(error))
+                            }
+                        })
+                    }
+                    
+                case .failure(let error):
+                    completion(.failure(error))
+                }
             }
         }
     }
@@ -430,21 +463,20 @@ extension DashWalletService {
         ]
 
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             
             switch response.result {
             case .success(let data):
-                if let object = data as? [String: Any] {
-                    let result = object["result"] as? [String]
-                    let error = object["error"]
+                do {
+                    let response = try DashWalletService.jsonDecoder.decode(BTCRPCServerResponce<[String]>.self, from: data)
                     
-                    if error is NSNull, let result = result {
+                    if let result = response.result {
                         completion(.success(result))
-                    } else {
-                        completion(.failure(.internalError(message: "DASH Wallet: not valid response", error: nil)))
+                    } else if let error = response.error {
+                        completion(.failure(.internalError(message: error, error: nil)))
                     }
-                } else {
-                    completion(.failure(.internalError(message: "DASH Wallet: not valid response", error: nil)))
+                } catch {
+                    completion(.failure(.internalError(message: "DASH Wallet: not a valid response", error: error)))
                 }
                 
             case .failure(let error):
@@ -454,5 +486,94 @@ extension DashWalletService {
     }
 
     func getUnspentTransactions(_ completion: @escaping (ApiServiceResult<[UnspentTransaction]>) -> Void) {
+    }
+
+    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<BTCRawTransaction>) -> Void) {
+        guard let endpoint = AdamantResources.dashServers.randomElement() else {
+            fatalError("Failed to get DASH endpoint URL")
+        }
+        
+        // Headers
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        
+        let parameters: Parameters = [
+            "method": "getrawtransaction",
+            "params": [
+                hash, true
+            ]
+        ]
+
+        // MARK: Sending request
+        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+            switch response.result {
+            case .success(let data):
+                do {
+                    let result = try DashWalletService.jsonDecoder.decode(BTCRPCServerResponce<BTCRawTransaction>.self, from: data)
+                    if let transaction = result.result {
+                        completion(.success(transaction))
+                    } else {
+                        completion(.failure(.internalError(message: "DASH: Parsing transaction error", error: nil)))
+                    }
+                } catch {
+                    completion(.failure(.internalError(message: "DAHS: Parsing transaction error", error: error)))
+                }
+
+            case .failure(let error):
+                completion(.failure(.internalError(message: "No transaction", error: error)))
+            }
+        }
+    }
+
+    func getBlockId(by hash: String, completion: @escaping (ApiServiceResult<String>) -> Void) {
+        guard let endpoint = AdamantResources.dashServers.randomElement() else {
+            fatalError("Failed to get DASH endpoint URL")
+        }
+        
+        // Headers
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        
+        let parameters: Parameters = [
+            "method": "getblock",
+            "params": [
+                hash
+            ]
+        ]
+        
+        // MARK: Sending request
+        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+            switch response.result {
+            case .success(let data):
+                do {
+                    let result = try DashWalletService.jsonDecoder.decode(BTCRPCServerResponce<BtcBlock>.self, from: data)
+                    if let block = result.result {
+                        completion(.success(String(block.height)))
+                    } else {
+                        completion(.failure(.internalError(message: "DASH: Parsing block error", error: nil)))
+                    }
+                } catch {
+                    completion(.failure(.internalError(message: "DASH: Parsing bloc error", error: error)))
+                }
+                
+            case .failure(let error):
+                completion(.failure(.internalError(message: "No block", error: error)))
+            }
+            
+        }
+    }
+}
+
+// MARK: - WalletServiceWithTransfers
+extension DashWalletService: WalletServiceWithTransfers {
+    func transferListViewController() -> UIViewController {
+        guard let vc = router.get(scene: AdamantScene.Wallets.Dash.transactionsList) as? DashTransactionsViewController else {
+            fatalError("Can't get DashTransactionsViewController")
+        }
+
+        vc.walletService = self
+        return vc
     }
 }
