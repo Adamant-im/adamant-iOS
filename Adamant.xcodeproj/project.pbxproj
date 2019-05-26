@@ -182,6 +182,11 @@
 		E957E108229AF7CB0019732A /* doge_notification.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E104229AF7CA0019732A /* doge_notification.png */; };
 		E957E109229AF7CB0019732A /* lsk_notification.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E105229AF7CA0019732A /* lsk_notification.png */; };
 		E957E10A229AF7CB0019732A /* eth_notification.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E106229AF7CB0019732A /* eth_notification.png */; };
+		E957E111229B04280019732A /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E957E110229B04280019732A /* UserNotifications.framework */; };
+		E957E113229B04280019732A /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E957E112229B04280019732A /* UserNotificationsUI.framework */; };
+		E957E116229B04280019732A /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E115229B04280019732A /* NotificationViewController.swift */; };
+		E957E119229B04280019732A /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E957E117229B04280019732A /* MainInterface.storyboard */; };
+		E957E11D229B04280019732A /* NotificationContentExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E957E10F229B04280019732A /* NotificationContentExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E95CB451205D77B200A7218E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E95CB453205D77B200A7218E /* InfoPlist.strings */; };
 		E95CB456205D77B500A7218E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E95CB458205D77B500A7218E /* Localizable.strings */; };
 		E95CB45E205D7F9600A7218E /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = E95CB460205D7F9600A7218E /* Localizable.stringsdict */; };
@@ -357,6 +362,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		E957E11B229B04280019732A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E913C8E61FFFA51D001A83F7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E957E10E229B04280019732A;
+			remoteInfo = NotificationContentExtension;
+		};
 		E96D64E02295CD4700CA5587 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E913C8E61FFFA51D001A83F7 /* Project object */;
@@ -381,6 +393,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				E96D64E22295CD4700CA5587 /* NotificationServiceExtension.appex in Embed App Extensions */,
+				E957E11D229B04280019732A /* NotificationContentExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -592,6 +605,13 @@
 		E957E104229AF7CA0019732A /* doge_notification.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = doge_notification.png; sourceTree = "<group>"; };
 		E957E105229AF7CA0019732A /* lsk_notification.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lsk_notification.png; sourceTree = "<group>"; };
 		E957E106229AF7CB0019732A /* eth_notification.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eth_notification.png; sourceTree = "<group>"; };
+		E957E10F229B04280019732A /* NotificationContentExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationContentExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E957E110229B04280019732A /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		E957E112229B04280019732A /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
+		E957E115229B04280019732A /* NotificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewController.swift; sourceTree = "<group>"; };
+		E957E118229B04280019732A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		E957E11A229B04280019732A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E957E121229B04520019732A /* NotificationContentExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotificationContentExtension.entitlements; sourceTree = "<group>"; };
 		E95CB452205D77B200A7218E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E95CB457205D77B500A7218E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E95CB459205D77DC00A7218E /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -744,6 +764,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E957E10C229B04280019732A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E957E113229B04280019732A /* UserNotificationsUI.framework in Frameworks */,
+				E957E111229B04280019732A /* UserNotifications.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E96D64D82295CD4700CA5587 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -821,6 +850,8 @@
 				33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */,
 				36AB8CE9537B3B873972548B /* Pods_AdmCore.framework */,
 				53D3CE61AE0A5F67EEF5270A /* Pods_NotificationServiceExtension.framework */,
+				E957E110229B04280019732A /* UserNotifications.framework */,
+				E957E112229B04280019732A /* UserNotificationsUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -832,6 +863,7 @@
 				E913C8F01FFFA51D001A83F7 /* Adamant */,
 				E9EC344520066D4A00C0E546 /* AdamantTests */,
 				E96D64DC2295CD4700CA5587 /* NotificationServiceExtension */,
+				E957E114229B04280019732A /* NotificationContentExtension */,
 				E913C8EF1FFFA51D001A83F7 /* Products */,
 				E9220E0C21988D9A009C9642 /* Recovered References */,
 				0C42C8036B708BFC84C34963 /* Pods */,
@@ -845,6 +877,7 @@
 				E913C8EE1FFFA51D001A83F7 /* Adamant.app */,
 				E9EC344420066D4A00C0E546 /* AdamantTests.xctest */,
 				E96D64DB2295CD4700CA5587 /* NotificationServiceExtension.appex */,
+				E957E10F229B04280019732A /* NotificationContentExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1165,6 +1198,17 @@
 				E957E105229AF7CA0019732A /* lsk_notification.png */,
 			);
 			path = WalletImages;
+			sourceTree = "<group>";
+		};
+		E957E114229B04280019732A /* NotificationContentExtension */ = {
+			isa = PBXGroup;
+			children = (
+				E957E117229B04280019732A /* MainInterface.storyboard */,
+				E957E115229B04280019732A /* NotificationViewController.swift */,
+				E957E11A229B04280019732A /* Info.plist */,
+				E957E121229B04520019732A /* NotificationContentExtension.entitlements */,
+			);
+			path = NotificationContentExtension;
 			sourceTree = "<group>";
 		};
 		E95CB45B205D7DFD00A7218E /* l18n */ = {
@@ -1493,11 +1537,29 @@
 			);
 			dependencies = (
 				E96D64E12295CD4700CA5587 /* PBXTargetDependency */,
+				E957E11C229B04280019732A /* PBXTargetDependency */,
 			);
 			name = Adamant;
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
 			productType = "com.apple.product-type.application";
+		};
+		E957E10E229B04280019732A /* NotificationContentExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E957E11E229B04280019732A /* Build configuration list for PBXNativeTarget "NotificationContentExtension" */;
+			buildPhases = (
+				E957E10B229B04280019732A /* Sources */,
+				E957E10C229B04280019732A /* Frameworks */,
+				E957E10D229B04280019732A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NotificationContentExtension;
+			productName = NotificationContentExtension;
+			productReference = E957E10F229B04280019732A /* NotificationContentExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		E96D64DA2295CD4700CA5587 /* NotificationServiceExtension */ = {
 			isa = PBXNativeTarget;
@@ -1561,6 +1623,15 @@
 							};
 						};
 					};
+					E957E10E229B04280019732A = {
+						CreatedOnToolsVersion = 10.1;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Keychain = {
+								enabled = 1;
+							};
+						};
+					};
 					E96D64DA2295CD4700CA5587 = {
 						CreatedOnToolsVersion = 10.1;
 						ProvisioningStyle = Automatic;
@@ -1586,6 +1657,7 @@
 				en,
 				ru,
 				de,
+				Base,
 			);
 			mainGroup = E913C8E51FFFA51D001A83F7;
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
@@ -1595,6 +1667,7 @@
 				E913C8ED1FFFA51D001A83F7 /* Adamant */,
 				E9EC344320066D4A00C0E546 /* AdamantTests */,
 				E96D64DA2295CD4700CA5587 /* NotificationServiceExtension */,
+				E957E10E229B04280019732A /* NotificationContentExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -1650,6 +1723,14 @@
 				E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */,
 				E921534F20EE1E8700C0843F /* AlertLabelCell.xib in Resources */,
 				644EC35820EFAAB700F40C73 /* DelegatesListViewController.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E957E10D229B04280019732A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E957E119229B04280019732A /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2074,6 +2155,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E957E10B229B04280019732A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E957E116229B04280019732A /* NotificationViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E96D64D72295CD4700CA5587 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2133,6 +2222,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		E957E11C229B04280019732A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E957E10E229B04280019732A /* NotificationContentExtension */;
+			targetProxy = E957E11B229B04280019732A /* PBXContainerItemProxy */;
+		};
 		E96D64E12295CD4700CA5587 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E96D64DA2295CD4700CA5587 /* NotificationServiceExtension */;
@@ -2146,6 +2240,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		E957E117229B04280019732A /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E957E118229B04280019732A /* Base */,
+			);
+			name = MainInterface.storyboard;
+			sourceTree = "<group>";
+		};
 		E95CB453205D77B200A7218E /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -2300,6 +2402,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = ADDFD2FA17E41CCBD11A1733 /* Pods-Adamant.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Adamant/Adamant.entitlements;
 				CODE_SIGN_STYLE = Manual;
@@ -2321,6 +2424,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Adamant/Adamant.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
@@ -2340,6 +2444,48 @@
 			};
 			name = Release;
 		};
+		E957E11F229B04280019732A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = NotificationContentExtension/NotificationContentExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J2L77FMN46;
+				INFOPLIST_FILE = NotificationContentExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.NotificationContentExtension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E957E120229B04280019732A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = NotificationContentExtension/NotificationContentExtension.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J2L77FMN46;
+				INFOPLIST_FILE = NotificationContentExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.NotificationContentExtension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		E96D64E42295CD4700CA5587 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 742D9BA5B194D115A9EBED8C /* Pods-NotificationServiceExtension.debug.xcconfig */;
@@ -2349,7 +2495,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -2372,7 +2518,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.NotificationServiceExtension";
@@ -2437,6 +2583,15 @@
 			buildConfigurations = (
 				E913C9011FFFA51E001A83F7 /* Debug */,
 				E913C9021FFFA51E001A83F7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E957E11E229B04280019732A /* Build configuration list for PBXNativeTarget "NotificationContentExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E957E11F229B04280019732A /* Debug */,
+				E957E120229B04280019732A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
