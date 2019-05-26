@@ -9,7 +9,17 @@
 import UserNotifications
 
 class NotificationService: UNNotificationServiceExtension {
-
+    // MARK: - Rich providers
+    private lazy var adamantProvider: AdamantProvider = {
+        return AdamantProvider()
+    }()
+    
+    private lazy var richMessageProviders: [String: RichMessageNotificationProvider] = {
+        return [EthProvider.richMessageType: EthProvider(),
+                LskProvider.richMessageType: LskProvider(),
+                DogeProvider.richMessageType: DogeProvider()]
+    }()
+    
     // MARK: - Store keys
     private struct StoreKeys {
         static let nodes = "nodesSource.nodes"
@@ -95,39 +105,39 @@ class NotificationService: UNNotificationServiceExtension {
         // ******
         // Waiting for API...
         // ******
-        var collection: ServerCollectionResponse<Transaction>? = nil
-        
-        do {
-            guard var components = URLComponents(url: nodeUrl, resolvingAgainstBaseURL: false) else {
+        if transaction.type == .chatMessage {
+            var collection: ServerCollectionResponse<Transaction>? = nil
+            
+            do {
+                guard var components = URLComponents(url: nodeUrl, resolvingAgainstBaseURL: false) else {
+                    contentHandler(bestAttemptContent)
+                    return
+                }
+                
+                components.path = "/api/chats/get"
+                components.queryItems = [URLQueryItem(name: "isIn", value: pushRecipient),
+                                         URLQueryItem(name: "orderBy", value: "timestamp:asc"),
+                                         URLQueryItem(name: "fromHeight", value: "\(transaction.height - 1)"),
+                                         URLQueryItem(name: "limit", value: "1"),
+                ]
+                
+                if let url = components.url {
+                    let data = try Data(contentsOf: url)
+                    collection = try JSONDecoder().decode(ServerCollectionResponse<Transaction>.self, from: data)
+                }
+            } catch {
                 contentHandler(bestAttemptContent)
                 return
             }
             
-            components.path = "/api/chats/get"
-            components.queryItems = [URLQueryItem(name: "isIn", value: pushRecipient),
-                                     URLQueryItem(name: "orderBy", value: "timestamp:asc"),
-                                     URLQueryItem(name: "fromHeight", value: "\(transaction.height - 1)"),
-                                     URLQueryItem(name: "limit", value: "1"),
-            ]
-            
-            if let url = components.url {
-                let data = try Data(contentsOf: url)
-                collection = try JSONDecoder().decode(ServerCollectionResponse<Transaction>.self, from: data)
+            if let t = collection?.collection?.first {
+                transaction = t
+            } else {
+                contentHandler(bestAttemptContent)
+                return
             }
-        } catch {
-            contentHandler(bestAttemptContent)
-            return
         }
         
-        if let t = collection?.collection?.first {
-            transaction = t
-        } else {
-            contentHandler(bestAttemptContent)
-            return
-        }
-
-        
-        // https://endless.adamant.im/api/chats/get?isIn=U2279741505997340299&orderBy=timestamp:asc&fromHeight=8979346&limit=1
         
         // ******
         // Waiting for API...
@@ -158,17 +168,39 @@ class NotificationService: UNNotificationServiceExtension {
             }
             
             switch chat.type {
-                
             // MARK: Simple messages
             case .messageOld:
                 fallthrough
             case .message:
-                bestAttemptContent.title = partner
-                bestAttemptContent.body = message
+                if transaction.amount > 0 { // ADM Transfer with comments
+                    handleAdamantTransfer(notificationContent: bestAttemptContent, partner: partner, amount: transaction.amount, comment: message)
+                } else { // Message
+                    bestAttemptContent.title = partner
+                    bestAttemptContent.body = message
+                }
             
             // MARK: Rich messages
             case .richMessage:
-                break
+                guard let data = message.data(using: String.Encoding.utf8),
+                    let richContent = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String:String],
+                    let key = richContent[RichContentKeys.type]?.lowercased(),
+                    let provider = richMessageProviders[key],
+                    let content = provider.notificationContent(for: transaction, partner: partner, richContent: richContent) else {
+                        bestAttemptContent.title = partner
+                        bestAttemptContent.body = message
+                        break
+                }
+                
+                bestAttemptContent.title = content.title
+                bestAttemptContent.body = content.body
+                
+                if let subtitle = content.subtitle {
+                    bestAttemptContent.subtitle = subtitle
+                }
+                
+                if let attachments = content.attachments {
+                    bestAttemptContent.attachments = attachments
+                }
                 
             case .unknown: break
             case .signal: break
@@ -176,7 +208,7 @@ class NotificationService: UNNotificationServiceExtension {
             
         // MARK: Transfers
         case .send:
-            break
+            handleAdamantTransfer(notificationContent: bestAttemptContent, partner: partner, amount: transaction.amount, comment: nil)
             
         default:
             break
@@ -193,6 +225,23 @@ class NotificationService: UNNotificationServiceExtension {
         // Use this as an opportunity to deliver your "best attempt" at modified content, otherwise the original push payload will be used.
         if let contentHandler = contentHandler, let bestAttemptContent =  bestAttemptContent {
             contentHandler(bestAttemptContent)
+        }
+    }
+    
+    private func handleAdamantTransfer(notificationContent: UNMutableNotificationContent, partner: String, amount: Decimal, comment: String?) {
+        guard let content = adamantProvider.notificationContent(partner: partner, amount: amount, comment: comment) else {
+            return
+        }
+        
+        notificationContent.title = content.title
+        notificationContent.body = content.body
+        
+        if let subtitle = content.subtitle {
+            notificationContent.subtitle = subtitle
+        }
+        
+        if let attachments = content.attachments {
+            notificationContent.attachments = attachments
         }
     }
 }

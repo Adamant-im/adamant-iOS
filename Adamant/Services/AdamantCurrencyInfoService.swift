@@ -15,27 +15,6 @@ extension StoreKey {
     }
 }
 
-// MARK: - Currencies
-enum Currency: String {
-    case RUB = "RUB"
-    case USD = "USD"
-    case EUR = "EUR"
-    case CNY = "CNY"
-    case JPY = "JPY"
-    
-    var symbol: String {
-        switch self {
-        case .RUB: return "₽"
-        case .USD: return "$"
-        case .EUR: return "€"
-        case .CNY: return "¥"
-        case .JPY: return "¥"
-        }
-    }
-    
-    static var `default` = Currency.USD
-}
-
 
 // MARK: - Service
 class AdamantCurrencyInfoService: CurrencyInfoService {
