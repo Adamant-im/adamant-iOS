@@ -1,6 +1,6 @@
 //
 //  NotificationViewController.swift
-//  NotificationContentExtension
+//  TransferNotificationContentExtension
 //
 //  Created by Anokhov Pavel on 26/05/2019.
 //  Copyright © 2019 Adamant. All rights reserved.
