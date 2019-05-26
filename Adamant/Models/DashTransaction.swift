@@ -7,20 +7,7 @@
 //
 
 import Foundation
-
-extension String.adamantLocalized {
-    struct dashTransaction {
-        static func recipients(_ recipients: Int) -> String {
-            return String.localizedStringWithFormat(NSLocalizedString("Dash.TransactionDetails.RecipientsFormat", comment: "DashTransaction: amount of recipients, if more than one."), recipients)
-        }
-        
-        static func senders(_ senders: Int) -> String {
-            return String.localizedStringWithFormat(NSLocalizedString("Dash.TransactionDetails.SendersFormat", comment: "DashTransaction: amount of senders, if more than one."), senders)
-        }
-        
-        private init() {}
-    }
-}
+import BitcoinKit
 
 class DashTransaction: BaseBtcTransaction {
     override class var defaultCurrencySymbol: String? { return DashWalletService.currencySymbol }
@@ -45,3 +32,40 @@ struct BtcBlock: Decodable {
         self.time = try container.decode(Int64.self, forKey: .time)
     }
 }
+
+struct DashUnspentTransaction: Decodable {
+    let address: String
+    let txid: String
+    let outputIndex: UInt32
+    let script: String
+    let amount: UInt64
+    let height: UInt64
+    
+    enum CodingKeys: String, CodingKey {
+        case address
+        case txid
+        case outputIndex
+        case script
+        case amount = "satoshis"
+        case height
+    }
+    
+    func asUnspentTransaction(with publicKeyHash: Data) -> UnspentTransaction {
+        let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: publicKeyHash)
+        let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
+        
+        let unspentOutput = TransactionOutput(value: amount, lockingScript: lockScript)
+        let unspentOutpoint = TransactionOutPoint(hash: txHash, index: outputIndex)
+        let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
+        return utxo
+    }
+}
+
+//{
+//    "address": "Xp6kFbogHMD4QRBDLQdqRp5zUgzmfj1KPn",
+//    "txid": "4270bdbdcf89c0a39fd3e81f8b8bd991507d66c643703a007f8f6b466504de83",
+//    "outputIndex": 0,
+//    "script": "76a914931ef5cbdad28723ba9596de5da1145ae969a71888ac",
+//    "satoshis": 3000000,
+//    "height": 1009632
+//}

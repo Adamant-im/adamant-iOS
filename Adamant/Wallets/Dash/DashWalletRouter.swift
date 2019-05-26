@@ -19,16 +19,16 @@ extension AdamantScene.Wallets {
         }
         
         /// Send tokens
-//        static let transfer = AdamantScene(identifier: "DashTransferViewController") { r in
-//            let c = DashTransferViewController()
-//            c.dialogService = r.resolve(DialogService.self)
-//            c.chatsProvider = r.resolve(ChatsProvider.self)
-//            c.accountService = r.resolve(AccountService.self)
-//            c.accountsProvider = r.resolve(AccountsProvider.self)
-//            c.router = r.resolve(Router.self)
-//            c.currencyInfoService = r.resolve(CurrencyInfoService.self)
-//            return c
-//        }
+        static let transfer = AdamantScene(identifier: "DashTransferViewController") { r in
+            let c = DashTransferViewController()
+            c.dialogService = r.resolve(DialogService.self)
+            c.chatsProvider = r.resolve(ChatsProvider.self)
+            c.accountService = r.resolve(AccountService.self)
+            c.accountsProvider = r.resolve(AccountsProvider.self)
+            c.router = r.resolve(Router.self)
+            c.currencyInfoService = r.resolve(CurrencyInfoService.self)
+            return c
+        }
         
         /// List of transactions
         static let transactionsList = AdamantScene(identifier: "DashTransactionsViewController") { r in

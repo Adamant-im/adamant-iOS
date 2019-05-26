@@ -136,6 +136,9 @@
 /* Account tab: 'Send DOGE tokens' button */
 "AccountTab.Row.SendDoge" = "Send DOGE";
 
+/* Account tab: 'Send DASH tokens' button */
+"AccountTab.Row.SendDash" = "Send DASH";
+
 /* Account tab: Anonymously buy ADM tokens */
 "AccountTab.Row.AnonymouslyBuyADM" = "Buy ADM anonymously";
 
@@ -177,6 +180,9 @@
 
 /* Account tab: Doge wallet */
 "AccountTab.Wallets.doge_wallet" = "Doge Wallet";
+
+/* Account tab: Dash wallet */
+"AccountTab.Wallets.dash_wallet" = "Dash Wallet";
 
 /* Account page: scene title */
 "AccountTab.Title" = "Account";

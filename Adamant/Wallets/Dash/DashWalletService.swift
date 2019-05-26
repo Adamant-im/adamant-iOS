@@ -472,7 +472,7 @@ extension DashWalletService {
                     
                     if let result = response.result {
                         completion(.success(result))
-                    } else if let error = response.error {
+                    } else if let error = response.error?.message {
                         completion(.failure(.internalError(message: error, error: nil)))
                     }
                 } catch {
@@ -486,6 +486,49 @@ extension DashWalletService {
     }
 
     func getUnspentTransactions(_ completion: @escaping (ApiServiceResult<[UnspentTransaction]>) -> Void) {
+        guard let endpoint = AdamantResources.dashServers.randomElement() else {
+            fatalError("Failed to get DASH endpoint URL")
+        }
+        
+        guard let wallet = self.dashWallet else {
+            completion(.failure(.internalError(message: "DASH Wallet not found", error: nil)))
+            return
+        }
+        
+        // Headers
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        
+        let parameters: Parameters = [
+            "method": "getaddressutxos",
+            "params": [
+                wallet.address
+            ]
+        ]
+        
+        // MARK: Sending request
+        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+            
+            switch response.result {
+            case .success(let data):
+                do {
+                    let response = try DashWalletService.jsonDecoder.decode(BTCRPCServerResponce<[DashUnspentTransaction]>.self, from: data)
+                    
+                    if let result = response.result {
+                        let transactions = result.map { $0.asUnspentTransaction(with: wallet.publicKey.toCashaddr().data) }
+                        completion(.success(transactions))
+                    } else if let error = response.error?.message {
+                        completion(.failure(.internalError(message: error, error: nil)))
+                    }
+                } catch {
+                    completion(.failure(.internalError(message: "DASH Wallet: not a valid response", error: error)))
+                }
+                
+            case .failure(let error):
+                completion(.failure(.internalError(message: "DASH Wallet: server not responding", error: error)))
+            }
+        }
     }
 
     func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<BTCRawTransaction>) -> Void) {

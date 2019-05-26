@@ -10,6 +10,11 @@ import Foundation
 
 class BTCRPCServerResponce<T:Decodable>: Decodable {
     let result: T?
-    let error: String?
+    let error: BTCRPCError?
     let id: String?
+}
+
+class BTCRPCError: Decodable {
+    let code: Int
+    let message: String
 }
