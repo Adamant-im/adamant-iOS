@@ -182,6 +182,9 @@
 		E957E108229AF7CB0019732A /* doge_notification.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E104229AF7CA0019732A /* doge_notification.png */; };
 		E957E109229AF7CB0019732A /* lsk_notification.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E105229AF7CA0019732A /* lsk_notification.png */; };
 		E957E10A229AF7CB0019732A /* eth_notification.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E106229AF7CB0019732A /* eth_notification.png */; };
+		E957E124229B0C330019732A /* AdamantNotificationCategories.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E123229B0C330019732A /* AdamantNotificationCategories.swift */; };
+		E957E126229B0C610019732A /* AdamantNotificationCategories.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E123229B0C330019732A /* AdamantNotificationCategories.swift */; };
+		E957E128229B0CF10019732A /* NotificationContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E127229B0CF10019732A /* NotificationContent.swift */; };
 		E957E12E229B10F80019732A /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E957E110229B04280019732A /* UserNotifications.framework */; };
 		E957E12F229B10F80019732A /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E957E112229B04280019732A /* UserNotificationsUI.framework */; };
 		E957E132229B10F80019732A /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E131229B10F80019732A /* NotificationViewController.swift */; };
@@ -607,6 +610,8 @@
 		E957E106229AF7CB0019732A /* eth_notification.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eth_notification.png; sourceTree = "<group>"; };
 		E957E110229B04280019732A /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		E957E112229B04280019732A /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
+		E957E123229B0C330019732A /* AdamantNotificationCategories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantNotificationCategories.swift; sourceTree = "<group>"; };
+		E957E127229B0CF10019732A /* NotificationContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationContent.swift; sourceTree = "<group>"; };
 		E957E12D229B10F80019732A /* TransferNotificationContentExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TransferNotificationContentExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E957E131229B10F80019732A /* NotificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewController.swift; sourceTree = "<group>"; };
 		E957E134229B10F80019732A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
@@ -1308,6 +1313,7 @@
 				E957E102229AF01E0019732A /* WalletImages */,
 				E957E0F1229999DA0019732A /* RichMessageNotificationProvider.swift */,
 				E96D64DD2295CD4700CA5587 /* NotificationService.swift */,
+				E957E127229B0CF10019732A /* NotificationContent.swift */,
 				E96D64DF2295CD4700CA5587 /* Info.plist */,
 				E9771D7D22995C870099AAC7 /* NotificationServiceExtension.entitlements */,
 			);
@@ -1323,6 +1329,7 @@
 				E9771D84229960E30099AAC7 /* Services */,
 				E9771D802299602D0099AAC7 /* AdamantResources.swift */,
 				E9771D7A2299456A0099AAC7 /* AdamantSecret.swift */,
+				E957E123229B0C330019732A /* AdamantNotificationCategories.swift */,
 			);
 			path = AdamantShared;
 			sourceTree = "<group>";
@@ -1966,6 +1973,7 @@
 				E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */,
 				6455E9F121075D3600B2E94C /* AddressBookService.swift in Sources */,
 				E983AE2A20E65F3200497E1A /* AccountViewController.swift in Sources */,
+				E957E126229B0C610019732A /* AdamantNotificationCategories.swift in Sources */,
 				E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */,
 				6416B19F21AD7CBE006089AC /* LskWalletViewController.swift in Sources */,
 				64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */,
@@ -2189,6 +2197,8 @@
 				E9771D9A229974EA0099AAC7 /* NativeAdamantCore.swift in Sources */,
 				E9771D9022996FEB0099AAC7 /* Node.swift in Sources */,
 				E9771D9722996FEB0099AAC7 /* TransactionType.swift in Sources */,
+				E957E128229B0CF10019732A /* NotificationContent.swift in Sources */,
+				E957E124229B0C330019732A /* AdamantNotificationCategories.swift in Sources */,
 				E957E0ED229982FF0019732A /* Keypair.swift in Sources */,
 				E957E0FB229AB9310019732A /* AdamantProvider.swift in Sources */,
 				E957E0F722999BD50019732A /* TransferBaseProvider.swift in Sources */,
@@ -2456,7 +2466,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.TransferNotificationContentExtension";
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.TransferNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.2;

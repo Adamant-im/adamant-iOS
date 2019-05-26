@@ -42,7 +42,7 @@ class TransferBaseProvider: RichMessageNotificationProvider {
             attachments = nil
         }
         
-        return NotificationContent(title: "Новый перевод", subtitle: partner, body: body, attachments: attachments)
+        return NotificationContent(title: "Новый перевод", subtitle: partner, body: body, attachments: attachments, categoryIdentifier: AdamantNotificationCategories.transfer)
     }
     
     // MARK: - To override

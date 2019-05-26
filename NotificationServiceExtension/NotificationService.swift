@@ -177,6 +177,7 @@ class NotificationService: UNNotificationServiceExtension {
                 } else { // Message
                     bestAttemptContent.title = partner
                     bestAttemptContent.body = message
+                    bestAttemptContent.categoryIdentifier = AdamantNotificationCategories.message
                 }
             
             // MARK: Rich messages
@@ -194,13 +195,9 @@ class NotificationService: UNNotificationServiceExtension {
                 bestAttemptContent.title = content.title
                 bestAttemptContent.body = content.body
                 
-                if let subtitle = content.subtitle {
-                    bestAttemptContent.subtitle = subtitle
-                }
-                
-                if let attachments = content.attachments {
-                    bestAttemptContent.attachments = attachments
-                }
+                if let subtitle = content.subtitle { bestAttemptContent.subtitle = subtitle }
+                if let attachments = content.attachments { bestAttemptContent.attachments = attachments }
+                if let categoryIdentifier = content.categoryIdentifier { bestAttemptContent.categoryIdentifier = categoryIdentifier }
                 
             case .unknown: break
             case .signal: break
@@ -243,5 +240,7 @@ class NotificationService: UNNotificationServiceExtension {
         if let attachments = content.attachments {
             notificationContent.attachments = attachments
         }
+        
+        notificationContent.categoryIdentifier = AdamantNotificationCategories.transfer
     }
 }
