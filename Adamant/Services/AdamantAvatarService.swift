@@ -46,9 +46,15 @@ class AdamantAvatarService: AvatarService {
         ]
     ]
     
+    private var cacheSemaphore = DispatchSemaphore(value: 1)
     private var cache: [String: UIImage] = [String: UIImage]()
     
     func avatar(for key:String, size: Double = 200) -> UIImage {
+        cacheSemaphore.wait()
+        defer {
+            cacheSemaphore.signal()
+        }
+        
         if let image = cache[key] {
             return image
         }
@@ -58,9 +64,9 @@ class AdamantAvatarService: AvatarService {
         
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
+        
         if let image = image {
             cache[key] = image
-            
             return image
         } else {
             return UIImage()
