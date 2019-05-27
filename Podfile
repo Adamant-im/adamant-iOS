@@ -47,7 +47,11 @@ target 'Adamant' do
   # Shared
   keychain_pods
   core_pods
+end
 
+target 'AdamantTests' do
+  use_frameworks!
+  pod 'GRDB.swift'
 end
 
 # Adamant NotificationServiceExtension - readable notifications
