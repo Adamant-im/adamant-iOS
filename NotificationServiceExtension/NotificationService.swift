@@ -9,6 +9,8 @@
 import UserNotifications
 
 class NotificationService: UNNotificationServiceExtension {
+    private let passphraseStoreKey = "accountService.passphrase"
+    
     // MARK: - Rich providers
     private lazy var adamantProvider: AdamantProvider = {
         return AdamantProvider()
@@ -20,14 +22,6 @@ class NotificationService: UNNotificationServiceExtension {
                 DogeProvider.richMessageType: DogeProvider()]
     }()
     
-    // MARK: - Store keys
-    private struct StoreKeys {
-        static let nodes = "nodesSource.nodes"
-        static let passphrase = "accountService.passphrase"
-        
-        private init() {}
-    }
-    
     // MARK: - Hanlder
     var contentHandler: ((UNNotificationContent) -> Void)?
     var bestAttemptContent: UNMutableNotificationContent?
@@ -37,116 +31,34 @@ class NotificationService: UNNotificationServiceExtension {
         bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
         
         guard let bestAttemptContent = bestAttemptContent,
-            let txnId = bestAttemptContent.userInfo["txn-id"] as? String,
-            let pushRecipient = bestAttemptContent.userInfo["push-recipient"] as? String else {
+            let txnId = bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
+            let pushRecipient = bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String else {
             contentHandler(request.content)
             return
         }
         
-        // MARK: 0. Getting services
+        // MARK: 1. Getting services
         let securedStore = KeychainStore()
         let core = NativeAdamantCore()
         
         // No passphrase - no point of trying to get and decode
-        guard let passphrase = securedStore.get(StoreKeys.passphrase),
+        guard let passphrase = securedStore.get(passphraseStoreKey),
             let keypair = core.createKeypairFor(passphrase: passphrase) else {
                 contentHandler(bestAttemptContent)
                 return
         }
         
-        // MARK: 1. Nodes
-        var nodes: [Node]
-        
-        if let raw = securedStore.get(StoreKeys.nodes), let data = raw.data(using: String.Encoding.utf8) {
-            do {
-                nodes = try JSONDecoder().decode([Node].self, from: data)
-            } catch {
-                nodes = AdamantResources.nodes
-            }
-        } else {
-            nodes = AdamantResources.nodes
-        }
-        
-        // MARK: 2. Get the transaction
-
-        var response: ServerModelResponse<Transaction>? = nil
-        var nodeUrl: URL! = nil
-        
-        repeat {
-            guard let node = nodes.popLast(), let url = node.asURL() else {
-                continue
-            }
-            nodeUrl = url
-            
-            do {
-                guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-                    continue
-                }
-                
-                components.path = "/api/transactions/get"
-                components.queryItems = [URLQueryItem(name: "id", value: txnId)]
-                
-                if let url = components.url {
-                    let data = try Data(contentsOf: url)
-                    response = try JSONDecoder().decode(ServerModelResponse<Transaction>.self, from: data)
-                } else {
-                    continue
-                }
-            } catch {
-                continue
-            }
-        } while response == nil && nodes.count > 0 // Try until we have a transaction, or we run out of nodes
-        
-        guard var transaction = response?.model else {
+        // MARK: 2. Get transaction
+        let api = ExtensionsApi(keychainStore: securedStore)
+        guard let transaction = api.getTransaction(by: txnId) else {
             contentHandler(bestAttemptContent)
             return
         }
         
-        // ******
-        // Waiting for API...
-        // ******
-        if transaction.type == .chatMessage {
-            var collection: ServerCollectionResponse<Transaction>? = nil
-            
-            do {
-                guard var components = URLComponents(url: nodeUrl, resolvingAgainstBaseURL: false) else {
-                    contentHandler(bestAttemptContent)
-                    return
-                }
-                
-                components.path = "/api/chats/get"
-                components.queryItems = [URLQueryItem(name: "isIn", value: pushRecipient),
-                                         URLQueryItem(name: "orderBy", value: "timestamp:asc"),
-                                         URLQueryItem(name: "fromHeight", value: "\(transaction.height - 1)"),
-                                         URLQueryItem(name: "limit", value: "1"),
-                ]
-                
-                if let url = components.url {
-                    let data = try Data(contentsOf: url)
-                    collection = try JSONDecoder().decode(ServerCollectionResponse<Transaction>.self, from: data)
-                }
-            } catch {
-                contentHandler(bestAttemptContent)
-                return
-            }
-            
-            if let t = collection?.collection?.first {
-                transaction = t
-            } else {
-                contentHandler(bestAttemptContent)
-                return
-            }
-        }
-        
-        
-        // ******
-        // Waiting for API...
-        // ******
-        
-        
         // MARK: 3. Working on transaction
         let partner: String
         let partnerPublicKey: String
+        var decodedMessage: String? = nil
         
         if transaction.senderId == pushRecipient {
             partner = transaction.recipientId
@@ -166,6 +78,8 @@ class NotificationService: UNNotificationServiceExtension {
                                                  privateKey: keypair.privateKey) else {
                 break
             }
+            
+            decodedMessage = message
             
             switch chat.type {
             // MARK: Simple messages
@@ -213,6 +127,12 @@ class NotificationService: UNNotificationServiceExtension {
         
         // MARK: Other configurations
         bestAttemptContent.threadIdentifier = partner
+        
+        // Caching downloaded transaction, to avoid downloading ang decoding it in ContentExtensions
+        if let data = try? JSONEncoder().encode(transaction), let transactionRaw = String(data: data, encoding: .utf8) {
+            bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.transaction] = transactionRaw
+        }
+        bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.decodedMessage] = decodedMessage
         
         contentHandler(bestAttemptContent)
     }
