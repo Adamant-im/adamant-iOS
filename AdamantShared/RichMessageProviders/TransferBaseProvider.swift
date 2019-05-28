@@ -51,7 +51,7 @@ class TransferBaseProvider: TransferNotificationContentProvider {
         fatalError("Provide richMessageType")
     }
     
-    var currencyLogo: UIImage {
+    var currencyLogoLarge: UIImage {
         fatalError("Provide currency logo")
     }
     

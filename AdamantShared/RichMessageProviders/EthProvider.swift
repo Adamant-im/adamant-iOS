@@ -21,7 +21,7 @@ class EthProvider: TransferBaseProvider {
         return "ETH"
     }
     
-    override var currencyLogo: UIImage {
-        return #imageLiteral(resourceName: "wallet_eth")
+    override var currencyLogoLarge: UIImage {
+        return #imageLiteral(resourceName: "wallet_eth_notification")
     }
 }

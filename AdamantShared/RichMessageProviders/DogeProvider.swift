@@ -21,7 +21,7 @@ class DogeProvider: TransferBaseProvider {
         return "DOGE"
     }
     
-    override var currencyLogo: UIImage {
-        return #imageLiteral(resourceName: "wallet_doge")
+    override var currencyLogoLarge: UIImage {
+        return #imageLiteral(resourceName: "wallet_doge_notification")
     }
 }

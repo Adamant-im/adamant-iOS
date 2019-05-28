@@ -15,6 +15,6 @@ protocol RichMessageNotificationProvider {
 }
 
 protocol TransferNotificationContentProvider: RichMessageNotificationProvider {
-    var currencyLogo: UIImage { get }
+    var currencyLogoLarge: UIImage { get }
     var currencySymbol: String { get }
 }

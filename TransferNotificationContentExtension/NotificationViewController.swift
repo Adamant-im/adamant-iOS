@@ -155,7 +155,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         recipientAddressLabel.text = recipientAddress
         dateLabel.text = date.humanizedDateTime()
 
-        currencyImageView.image = provider.currencyLogo
+        currencyImageView.image = provider.currencyLogoLarge
         amountLabel.text = AdamantBalanceFormat.full.format(amount)
         currencySymbolLabel.text = provider.currencySymbol
         

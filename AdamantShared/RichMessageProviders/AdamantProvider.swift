@@ -21,7 +21,7 @@ class AdamantProvider: TransferBaseProvider {
         return "ADM"
     }
     
-    override var currencyLogo: UIImage {
-        return #imageLiteral(resourceName: "wallet_adm")
+    override var currencyLogoLarge: UIImage {
+        return #imageLiteral(resourceName: "wallet_adm_notification")
     }
 }
