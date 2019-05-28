@@ -54,9 +54,17 @@ target 'AdamantTests' do
   pod 'GRDB.swift'
 end
 
-# Adamant NotificationServiceExtension - readable notifications
+# Adamant NotificationServiceExtension - real notifications
 target 'NotificationServiceExtension' do
   use_frameworks!
   keychain_pods
   core_pods
+end
+
+# Adamant TransferNotificationContentExtension - Notification Content Extension for transfers
+target 'TransferNotificationContentExtension' do
+  use_frameworks!
+  keychain_pods
+  core_pods
+  pod 'DateToolsSwift' # Date formatter tools
 end

@@ -86,6 +86,7 @@ DEPENDENCIES:
   - Eureka
   - FreakingSimpleRoundImageView
   - FTIndicator
+  - GRDB.swift
   - KeychainAccess
   - libsodium
   - Lisk (from `https://github.com/adamant-im/lisk-swift.git`)
@@ -203,6 +204,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: d80d1b9a3feca16e614acec9eea47ec26310d37d
 
-PODFILE CHECKSUM: 4eefc66bd224120c38d5fa559e133407ff451ca9
+PODFILE CHECKSUM: 3232ead44a449e851535a76d93fbb85f2da1b456
 
 COCOAPODS: 1.6.2

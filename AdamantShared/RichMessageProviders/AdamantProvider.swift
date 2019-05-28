@@ -6,7 +6,7 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 class AdamantProvider: TransferBaseProvider {
     override class var richMessageType: String {
@@ -19,5 +19,9 @@ class AdamantProvider: TransferBaseProvider {
     
     override var currencySymbol: String {
         return "ADM"
+    }
+    
+    override var currencyLogo: UIImage {
+        return #imageLiteral(resourceName: "wallet_adm")
     }
 }

@@ -9,7 +9,7 @@
 import UIKit
 import UserNotifications
 
-class TransferBaseProvider: RichMessageNotificationProvider {
+class TransferBaseProvider: TransferNotificationContentProvider {
     func notificationContent(for transaction: Transaction, partner: String, richContent: [String:String]) -> NotificationContent? {
         guard let amountRaw = richContent[RichContentKeys.transfer.amount], let amount = Decimal(string: amountRaw) else {
             return nil
@@ -49,6 +49,10 @@ class TransferBaseProvider: RichMessageNotificationProvider {
     
     class var richMessageType: String {
         fatalError("Provide richMessageType")
+    }
+    
+    var currencyLogo: UIImage {
+        fatalError("Provide currency logo")
     }
     
     var currencyLogoUrl: URL? {

@@ -9,9 +9,8 @@
 import UIKit
 import CoreGraphics
 import CryptoSwift
-import GameplayKit
 
-class AdamantAvatarService: AvatarService {
+class AdamantAvatarService {
     
     private let colors: [[UIColor]] = [
         [
@@ -297,7 +296,8 @@ class AdamantAvatarService: AvatarService {
     }
     
     func getValue(from string: String, by index: Int) -> Int {
-        let s = String(string[index % string.count])
+        let index = string.index(string.startIndex, offsetBy: index % string.count)
+        let s = String(string[index])
         return Int([UInt8](s.utf8).first ?? 0)
     }
     

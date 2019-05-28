@@ -10,6 +10,11 @@ import Foundation
 import DateToolsSwift
 
 extension Date {
+    // MARK: - Constants
+    static let adamantNullDate = Date(timeIntervalSince1970: 0)
+    
+    // MARK: - Humanized dates
+    
 	/// Returns readable date with time.
     func humanizedDateTime(withWeekday: Bool = true) -> String {
 		if yearsAgo < 1 {

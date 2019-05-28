@@ -1,5 +1,5 @@
 //
-//  EthProvider.swift
+//  LskProvider.swift
 //  NotificationServiceExtension
 //
 //  Created by Anokhov Pavel on 26/05/2019.
@@ -8,16 +8,20 @@
 
 import UIKit
 
-class EthProvider: TransferBaseProvider {
+class LskProvider: TransferBaseProvider {
     override class var richMessageType: String {
-        return "eth_transaction"
+        return "lsk_transaction"
     }
     
     override var currencyLogoUrl: URL? {
-        return Bundle.main.url(forResource: "eth_notification", withExtension: "png")
+        return Bundle.main.url(forResource: "lsk_notification", withExtension: "png")
     }
     
     override var currencySymbol: String {
-        return "ETH"
+        return "LSK"
+    }
+    
+    override var currencyLogo: UIImage {
+        return #imageLiteral(resourceName: "wallet_lsk")
     }
 }

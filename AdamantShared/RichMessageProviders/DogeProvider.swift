@@ -20,4 +20,8 @@ class DogeProvider: TransferBaseProvider {
     override var currencySymbol: String {
         return "DOGE"
     }
+    
+    override var currencyLogo: UIImage {
+        return #imageLiteral(resourceName: "wallet_doge")
+    }
 }

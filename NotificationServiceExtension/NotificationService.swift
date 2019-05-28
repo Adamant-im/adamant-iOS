@@ -103,6 +103,7 @@ class NotificationService: UNNotificationServiceExtension {
                     let content = provider.notificationContent(for: transaction, partner: partner, richContent: richContent) else {
                         bestAttemptContent.title = partner
                         bestAttemptContent.body = message
+                        bestAttemptContent.categoryIdentifier = AdamantNotificationCategories.message
                         break
                 }
                 
