@@ -68,3 +68,11 @@ target 'TransferNotificationContentExtension' do
   core_pods
   pod 'DateToolsSwift' # Date formatter tools
 end
+
+# Adamant MessageNotificationContentExtension - Notification Content Extension for messages
+target 'MessageNotificationContentExtension' do
+  use_frameworks!
+  keychain_pods
+  core_pods
+  pod 'DateToolsSwift' # Date formatter tools
+end

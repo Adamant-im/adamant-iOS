@@ -76,8 +76,6 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         }
         
         // MARK: 2.1 Variables for UI
-        let senderAddress = transaction.senderId
-        let recipientAddress = transaction.recipientId
         let date = transaction.date
         let comments: String?
         let amount: Decimal
@@ -151,8 +149,8 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         
         // MARK: 3. Setting up UI
         
-        senderAddressLabel.text = senderAddress
-        recipientAddressLabel.text = recipientAddress
+        senderAddressLabel.text = transaction.senderId
+        recipientAddressLabel.text = transaction.recipientId
         dateLabel.text = date.humanizedDateTime()
 
         currencyImageView.image = provider.currencyLogoLarge

@@ -67,6 +67,7 @@
 		64FA53D120E24942006783C9 /* TransactionDetailsViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */; };
 		91017F173E189A507AE0F55A /* Pods_AdamantTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFFA13D24AFABA6D1ABE5A09 /* Pods_AdamantTests.framework */; };
 		DF9B89D86F388ACECB6510E4 /* Pods_TransferNotificationContentExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A859F802E1FF27AB24AAA85 /* Pods_TransferNotificationContentExtension.framework */; };
+		E52B2FE0A7C5F57BDC0ED6D7 /* Pods_MessageNotificationContentExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B4FCB53B8B58FE5FB00AD91 /* Pods_MessageNotificationContentExtension.framework */; };
 		E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */; };
 		E90055F720EC200900D0CB2D /* SecurityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F620EC200900D0CB2D /* SecurityViewController.swift */; };
 		E90055F920ECD86800D0CB2D /* SecurityViewController+StayIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F820ECD86800D0CB2D /* SecurityViewController+StayIn.swift */; };
@@ -76,6 +77,37 @@
 		E905D39F204C281400DDB504 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39E204C281400DDB504 /* LoginViewController.swift */; };
 		E9061B97207501E40011F104 /* AdamantUserInfoKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9061B96207501E40011F104 /* AdamantUserInfoKey.swift */; };
 		E907350E2256779C00BF02CC /* DogeMainnet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E907350D2256779C00BF02CC /* DogeMainnet.swift */; };
+		E9079A7C229DEF9C0022CA0D /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E957E110229B04280019732A /* UserNotifications.framework */; };
+		E9079A7D229DEF9C0022CA0D /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E957E112229B04280019732A /* UserNotificationsUI.framework */; };
+		E9079A80229DEF9C0022CA0D /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9079A7F229DEF9C0022CA0D /* NotificationViewController.swift */; };
+		E9079A83229DEF9C0022CA0D /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9079A81229DEF9C0022CA0D /* MainInterface.storyboard */; };
+		E9079A87229DEF9C0022CA0D /* MessageNotificationContentExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E9079A7B229DEF9C0022CA0D /* MessageNotificationContentExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E9079A8C229DF19A0022CA0D /* AdamantAvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */; };
+		E9079A8D229DF19A0022CA0D /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39A2048A9BD00DDB504 /* KeychainStore.swift */; };
+		E9079A8E229DF1A40022CA0D /* NativeAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96D64D52295C9CA00CA5587 /* NativeAdamantCore.swift */; };
+		E9079A8F229DF1A40022CA0D /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645E7B052111DF3A006CC9FD /* Crypto.swift */; };
+		E9079A90229DF1A40022CA0D /* Mnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E0EE2299832E0019732A /* Mnemonic.swift */; };
+		E9079A91229DF1AC0022CA0D /* Date+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9204B4F20C94C4A00F3B9AB /* Date+adamant.swift */; };
+		E9079A92229DF1B80022CA0D /* UIColor+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927171D20C04613002BB9A6 /* UIColor+hex.swift */; };
+		E9079A93229DF1CB0022CA0D /* ExtensionsApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E155229C3F630019732A /* ExtensionsApi.swift */; };
+		E9079A94229DF1DA0022CA0D /* ServerResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85792007F0260070534A /* ServerResponse.swift */; };
+		E9079A95229DF1DA0022CA0D /* Keypair.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913C90C1FFFA99B001A83F7 /* Keypair.swift */; };
+		E9079A96229DF1DA0022CA0D /* ChatAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F85862008FDBF0070534A /* ChatAsset.swift */; };
+		E9079A97229DF1DA0022CA0D /* ChatType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F8588200900B10070534A /* ChatType.swift */; };
+		E9079A98229DF1DA0022CA0D /* DelegateVote.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98FC34720F921EA00032D65 /* DelegateVote.swift */; };
+		E9079A99229DF1DA0022CA0D /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93EB0A220DA4CCA001F9601 /* Node.swift */; };
+		E9079A9A229DF1DA0022CA0D /* StateAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53320B833A00041A3EA /* StateAsset.swift */; };
+		E9079A9B229DF1DA0022CA0D /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53120B82C850041A3EA /* StateType.swift */; };
+		E9079A9C229DF1DA0022CA0D /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDC920040CC200DFC4DB /* Transaction.swift */; };
+		E9079A9D229DF1DA0022CA0D /* TransactionAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = E965A53520B8370C0041A3EA /* TransactionAsset.swift */; };
+		E9079A9E229DF1DA0022CA0D /* TransactionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CDCB20040FDC00DFC4DB /* TransactionType.swift */; };
+		E9079A9F229DF1DA0022CA0D /* VotesAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E8304F20F5FEEF006FA590 /* VotesAsset.swift */; };
+		E9079AA0229DF2380022CA0D /* AdamantNotificationKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E123229B0C330019732A /* AdamantNotificationKeys.swift */; };
+		E9079AA1229DF23B0022CA0D /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9771D7A2299456A0099AAC7 /* AdamantSecret.swift */; };
+		E9079AA2229DF2420022CA0D /* AdamantResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9771D802299602D0099AAC7 /* AdamantResources.swift */; };
+		E9079AA3229DF6720022CA0D /* Decimal+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */; };
+		E9079AA4229DF6850022CA0D /* AdamantUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9771D9F22997D320099AAC7 /* AdamantUtilities.swift */; };
+		E9079AA5229DF6950022CA0D /* SecuredStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39C204C13B900DDB504 /* SecuredStore.swift */; };
 		E908471B2196FE590095825D /* Adamant.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E90847192196FE590095825D /* Adamant.xcdatamodeld */; };
 		E908472A2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E908471C2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift */; };
 		E908472B2196FEA80095825D /* RichMessageTransaction+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = E908471D2196FEA80095825D /* RichMessageTransaction+CoreDataProperties.swift */; };
@@ -404,6 +436,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		E9079A85229DEF9C0022CA0D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E913C8E61FFFA51D001A83F7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E9079A7A229DEF9C0022CA0D;
+			remoteInfo = MessageNotificationContentExtension;
+		};
 		E957E137229B10F80019732A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E913C8E61FFFA51D001A83F7 /* Project object */;
@@ -435,6 +474,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				E957E139229B10F80019732A /* TransferNotificationContentExtension.appex in Embed App Extensions */,
+				E9079A87229DEF9C0022CA0D /* MessageNotificationContentExtension.appex in Embed App Extensions */,
 				E96D64E22295CD4700CA5587 /* NotificationServiceExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
@@ -444,6 +484,7 @@
 
 /* Begin PBXFileReference section */
 		33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adamant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3443FEA540D1541301322210 /* Pods-MessageNotificationContentExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MessageNotificationContentExtension.release.xcconfig"; path = "Target Support Files/Pods-MessageNotificationContentExtension/Pods-MessageNotificationContentExtension.release.xcconfig"; sourceTree = "<group>"; };
 		36AB8CE9537B3B873972548B /* Pods_AdmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AdmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A859F802E1FF27AB24AAA85 /* Pods_TransferNotificationContentExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TransferNotificationContentExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.release.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.release.xcconfig"; sourceTree = "<group>"; };
@@ -508,6 +549,7 @@
 		64F085D820E2D7600006DE68 /* AdmTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransactionsViewController.swift; sourceTree = "<group>"; };
 		64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionDetailsViewControllerBase.swift; sourceTree = "<group>"; };
+		6B4FCB53B8B58FE5FB00AD91 /* Pods_MessageNotificationContentExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MessageNotificationContentExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		742D9BA5B194D115A9EBED8C /* Pods-NotificationServiceExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationServiceExtension.debug.xcconfig"; path = "Target Support Files/Pods-NotificationServiceExtension/Pods-NotificationServiceExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		74D5744703A7ECC98E244B14 /* Pods-AdmCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.debug.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.debug.xcconfig"; sourceTree = "<group>"; };
 		AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
@@ -515,6 +557,7 @@
 		AFFA13D24AFABA6D1ABE5A09 /* Pods_AdamantTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AdamantTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBD275E24E812102D864B2FC /* Pods-AdamantTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdamantTests.debug.xcconfig"; path = "Target Support Files/Pods-AdamantTests/Pods-AdamantTests.debug.xcconfig"; sourceTree = "<group>"; };
 		D741A9D5A7D96E2BEE5F129A /* Pods-TransferNotificationContentExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TransferNotificationContentExtension.release.xcconfig"; path = "Target Support Files/Pods-TransferNotificationContentExtension/Pods-TransferNotificationContentExtension.release.xcconfig"; sourceTree = "<group>"; };
+		D9C7E139AC9998DCD11782D9 /* Pods-MessageNotificationContentExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MessageNotificationContentExtension.debug.xcconfig"; path = "Target Support Files/Pods-MessageNotificationContentExtension/Pods-MessageNotificationContentExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		E876A5F384672F2858E55A81 /* Pods-TransferNotificationContentExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TransferNotificationContentExtension.debug.xcconfig"; path = "Target Support Files/Pods-TransferNotificationContentExtension/Pods-TransferNotificationContentExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		E90055F620EC200900D0CB2D /* SecurityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityViewController.swift; sourceTree = "<group>"; };
@@ -526,6 +569,11 @@
 		E9061B96207501E40011F104 /* AdamantUserInfoKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantUserInfoKey.swift; sourceTree = "<group>"; };
 		E9061B982077AF8E0011F104 /* Adamant.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Adamant.entitlements; sourceTree = "<group>"; };
 		E907350D2256779C00BF02CC /* DogeMainnet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeMainnet.swift; sourceTree = "<group>"; };
+		E9079A7B229DEF9C0022CA0D /* MessageNotificationContentExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MessageNotificationContentExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E9079A7F229DEF9C0022CA0D /* NotificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewController.swift; sourceTree = "<group>"; };
+		E9079A82229DEF9C0022CA0D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		E9079A84229DEF9C0022CA0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E9079A8B229DEFE40022CA0D /* MessageNotificationContentExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MessageNotificationContentExtension.entitlements; sourceTree = "<group>"; };
 		E908471A2196FE590095825D /* Adamant.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Adamant.xcdatamodel; sourceTree = "<group>"; };
 		E908471C2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichMessageTransaction+CoreDataClass.swift"; sourceTree = "<group>"; };
 		E908471D2196FEA80095825D /* RichMessageTransaction+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichMessageTransaction+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -807,6 +855,16 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		E9079A78229DEF9C0022CA0D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E9079A7D229DEF9C0022CA0D /* UserNotificationsUI.framework in Frameworks */,
+				E9079A7C229DEF9C0022CA0D /* UserNotifications.framework in Frameworks */,
+				E52B2FE0A7C5F57BDC0ED6D7 /* Pods_MessageNotificationContentExtension.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E913C8EB1FFFA51D001A83F7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -857,6 +915,8 @@
 				D741A9D5A7D96E2BEE5F129A /* Pods-TransferNotificationContentExtension.release.xcconfig */,
 				CBD275E24E812102D864B2FC /* Pods-AdamantTests.debug.xcconfig */,
 				F61A99D335F5C53509263502 /* Pods-AdamantTests.release.xcconfig */,
+				D9C7E139AC9998DCD11782D9 /* Pods-MessageNotificationContentExtension.debug.xcconfig */,
+				3443FEA540D1541301322210 /* Pods-MessageNotificationContentExtension.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -911,8 +971,20 @@
 				E957E112229B04280019732A /* UserNotificationsUI.framework */,
 				3A859F802E1FF27AB24AAA85 /* Pods_TransferNotificationContentExtension.framework */,
 				AFFA13D24AFABA6D1ABE5A09 /* Pods_AdamantTests.framework */,
+				6B4FCB53B8B58FE5FB00AD91 /* Pods_MessageNotificationContentExtension.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E9079A7E229DEF9C0022CA0D /* MessageNotificationContentExtension */ = {
+			isa = PBXGroup;
+			children = (
+				E9079A8B229DEFE40022CA0D /* MessageNotificationContentExtension.entitlements */,
+				E9079A7F229DEF9C0022CA0D /* NotificationViewController.swift */,
+				E9079A81229DEF9C0022CA0D /* MainInterface.storyboard */,
+				E9079A84229DEF9C0022CA0D /* Info.plist */,
+			);
+			path = MessageNotificationContentExtension;
 			sourceTree = "<group>";
 		};
 		E913C8E51FFFA51D001A83F7 = {
@@ -923,6 +995,7 @@
 				E9EC344520066D4A00C0E546 /* AdamantTests */,
 				E96D64DC2295CD4700CA5587 /* NotificationServiceExtension */,
 				E957E130229B10F80019732A /* TransferNotificationContentExtension */,
+				E9079A7E229DEF9C0022CA0D /* MessageNotificationContentExtension */,
 				E913C8EF1FFFA51D001A83F7 /* Products */,
 				E9220E0C21988D9A009C9642 /* Recovered References */,
 				0C42C8036B708BFC84C34963 /* Pods */,
@@ -937,6 +1010,7 @@
 				E9EC344420066D4A00C0E546 /* AdamantTests.xctest */,
 				E96D64DB2295CD4700CA5587 /* NotificationServiceExtension.appex */,
 				E957E12D229B10F80019732A /* TransferNotificationContentExtension.appex */,
+				E9079A7B229DEF9C0022CA0D /* MessageNotificationContentExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -983,7 +1057,6 @@
 				E9215972206119FB0000CA5C /* ReachabilityMonitor.swift */,
 				E9FEECA321413659007DD7C8 /* RichMessageProvider.swift */,
 				E9E7CDAE2002B8A100DFC4DB /* Router.swift */,
-				E905D39C204C13B900DDB504 /* SecuredStore.swift */,
 			);
 			path = ServiceProtocols;
 			sourceTree = "<group>";
@@ -1434,6 +1507,7 @@
 		E9771D9B229979800099AAC7 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				E905D39C204C13B900DDB504 /* SecuredStore.swift */,
 				E96D64D52295C9CA00CA5587 /* NativeAdamantCore.swift */,
 				645E7B052111DF3A006CC9FD /* Crypto.swift */,
 				E957E0EE2299832E0019732A /* Mnemonic.swift */,
@@ -1600,6 +1674,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		E9079A7A229DEF9C0022CA0D /* MessageNotificationContentExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E9079A8A229DEF9C0022CA0D /* Build configuration list for PBXNativeTarget "MessageNotificationContentExtension" */;
+			buildPhases = (
+				9B5ECFE80220AAF1AA3E5FB1 /* [CP] Check Pods Manifest.lock */,
+				E9079A77229DEF9C0022CA0D /* Sources */,
+				E9079A78229DEF9C0022CA0D /* Frameworks */,
+				E9079A79229DEF9C0022CA0D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MessageNotificationContentExtension;
+			productName = MessageNotificationContentExtension;
+			productReference = E9079A7B229DEF9C0022CA0D /* MessageNotificationContentExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		E913C8ED1FFFA51D001A83F7 /* Adamant */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E913C9001FFFA51E001A83F7 /* Build configuration list for PBXNativeTarget "Adamant" */;
@@ -1616,6 +1708,7 @@
 			dependencies = (
 				E96D64E12295CD4700CA5587 /* PBXTargetDependency */,
 				E957E138229B10F80019732A /* PBXTargetDependency */,
+				E9079A86229DEF9C0022CA0D /* PBXTargetDependency */,
 			);
 			name = Adamant;
 			productName = Adamant;
@@ -1688,6 +1781,15 @@
 				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = Adamant;
 				TargetAttributes = {
+					E9079A7A229DEF9C0022CA0D = {
+						CreatedOnToolsVersion = 10.1;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Keychain = {
+								enabled = 1;
+							};
+						};
+					};
 					E913C8ED1FFFA51D001A83F7 = {
 						CreatedOnToolsVersion = 9.2;
 						LastSwiftMigration = 1000;
@@ -1749,11 +1851,20 @@
 				E9EC344320066D4A00C0E546 /* AdamantTests */,
 				E96D64DA2295CD4700CA5587 /* NotificationServiceExtension */,
 				E957E12C229B10F80019732A /* TransferNotificationContentExtension */,
+				E9079A7A229DEF9C0022CA0D /* MessageNotificationContentExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		E9079A79229DEF9C0022CA0D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E9079A83229DEF9C0022CA0D /* MainInterface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E913C8EC1FFFA51D001A83F7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1982,6 +2093,28 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		9B5ECFE80220AAF1AA3E5FB1 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-MessageNotificationContentExtension-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		A12074B1204A5CC873A0E538 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -2051,6 +2184,40 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		E9079A77229DEF9C0022CA0D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E9079A8E229DF1A40022CA0D /* NativeAdamantCore.swift in Sources */,
+				E9079A92229DF1B80022CA0D /* UIColor+hex.swift in Sources */,
+				E9079A8D229DF19A0022CA0D /* KeychainStore.swift in Sources */,
+				E9079AA4229DF6850022CA0D /* AdamantUtilities.swift in Sources */,
+				E9079A8F229DF1A40022CA0D /* Crypto.swift in Sources */,
+				E9079A90229DF1A40022CA0D /* Mnemonic.swift in Sources */,
+				E9079AA0229DF2380022CA0D /* AdamantNotificationKeys.swift in Sources */,
+				E9079A95229DF1DA0022CA0D /* Keypair.swift in Sources */,
+				E9079A9F229DF1DA0022CA0D /* VotesAsset.swift in Sources */,
+				E9079A99229DF1DA0022CA0D /* Node.swift in Sources */,
+				E9079A9B229DF1DA0022CA0D /* StateType.swift in Sources */,
+				E9079AA2229DF2420022CA0D /* AdamantResources.swift in Sources */,
+				E9079A9D229DF1DA0022CA0D /* TransactionAsset.swift in Sources */,
+				E9079A9C229DF1DA0022CA0D /* Transaction.swift in Sources */,
+				E9079A80229DEF9C0022CA0D /* NotificationViewController.swift in Sources */,
+				E9079A91229DF1AC0022CA0D /* Date+adamant.swift in Sources */,
+				E9079A8C229DF19A0022CA0D /* AdamantAvatarService.swift in Sources */,
+				E9079A93229DF1CB0022CA0D /* ExtensionsApi.swift in Sources */,
+				E9079A96229DF1DA0022CA0D /* ChatAsset.swift in Sources */,
+				E9079A9A229DF1DA0022CA0D /* StateAsset.swift in Sources */,
+				E9079A9E229DF1DA0022CA0D /* TransactionType.swift in Sources */,
+				E9079A97229DF1DA0022CA0D /* ChatType.swift in Sources */,
+				E9079A98229DF1DA0022CA0D /* DelegateVote.swift in Sources */,
+				E9079AA1229DF23B0022CA0D /* AdamantSecret.swift in Sources */,
+				E9079A94229DF1DA0022CA0D /* ServerResponse.swift in Sources */,
+				E9079AA3229DF6720022CA0D /* Decimal+adamant.swift in Sources */,
+				E9079AA5229DF6950022CA0D /* SecuredStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E913C8EA1FFFA51D001A83F7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2409,6 +2576,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		E9079A86229DEF9C0022CA0D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E9079A7A229DEF9C0022CA0D /* MessageNotificationContentExtension */;
+			targetProxy = E9079A85229DEF9C0022CA0D /* PBXContainerItemProxy */;
+		};
 		E957E138229B10F80019732A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E957E12C229B10F80019732A /* TransferNotificationContentExtension */;
@@ -2427,6 +2599,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		E9079A81229DEF9C0022CA0D /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E9079A82229DEF9C0022CA0D /* Base */,
+			);
+			name = MainInterface.storyboard;
+			sourceTree = "<group>";
+		};
 		E957E133229B10F80019732A /* MainInterface.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -2468,6 +2648,50 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		E9079A88229DEF9C0022CA0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D9C7E139AC9998DCD11782D9 /* Pods-MessageNotificationContentExtension.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/MessageNotificationContentExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J2L77FMN46;
+				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.MessageNotificationContentExtension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E9079A89229DEF9C0022CA0D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3443FEA540D1541301322210 /* Pods-MessageNotificationContentExtension.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/MessageNotificationContentExtension.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J2L77FMN46;
+				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.MessageNotificationContentExtension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		E913C8FE1FFFA51E001A83F7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2758,6 +2982,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		E9079A8A229DEF9C0022CA0D /* Build configuration list for PBXNativeTarget "MessageNotificationContentExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E9079A88229DEF9C0022CA0D /* Debug */,
+				E9079A89229DEF9C0022CA0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E913C8E91FFFA51D001A83F7 /* Build configuration list for PBXProject "Adamant" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
