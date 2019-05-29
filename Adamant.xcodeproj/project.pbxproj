@@ -982,10 +982,10 @@
 		E9079A7E229DEF9C0022CA0D /* MessageNotificationContentExtension */ = {
 			isa = PBXGroup;
 			children = (
-				E9079A8B229DEFE40022CA0D /* MessageNotificationContentExtension.entitlements */,
 				E9079A7F229DEF9C0022CA0D /* NotificationViewController.swift */,
 				E9079A81229DEF9C0022CA0D /* MainInterface.storyboard */,
 				E9079A84229DEF9C0022CA0D /* Info.plist */,
+				E9079A8B229DEFE40022CA0D /* MessageNotificationContentExtension.entitlements */,
 			);
 			path = MessageNotificationContentExtension;
 			sourceTree = "<group>";

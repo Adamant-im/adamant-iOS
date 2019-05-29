@@ -35,6 +35,11 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     @IBOutlet weak var recipientNameLabel: UILabel!
     @IBOutlet weak var recipientImageView: UIImageView!
     
+    @IBOutlet weak var outcomeArrowImageView: UIImageView!
+    @IBOutlet weak var outcomeArrowView: UIView!
+    @IBOutlet weak var incomeArrowImageView: UIImageView!
+    @IBOutlet weak var incomeArrowView: UIView!
+    
     @IBOutlet weak var amountLabel: UILabel!
     @IBOutlet weak var currencySymbolLabel: UILabel!
     @IBOutlet weak var currencyImageView: UIImageView!
@@ -47,7 +52,18 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         senderImageView.tintColor = UIColor.adamant.primary
         recipientImageView.tintColor = UIColor.adamant.primary
         currencyImageView.tintColor = UIColor.adamant.primary
-
+        
+        incomeArrowImageView.tintColor = UIColor.white
+        outcomeArrowImageView.tintColor = UIColor.white
+        
+        incomeArrowView.backgroundColor = UIColor(hex: "36C436")
+        incomeArrowView.layer.cornerRadius = incomeArrowView.frame.height/2
+        createBorder(for: incomeArrowView, width: 2.5, color: UIColor.white)
+        
+        outcomeArrowView.backgroundColor = UIColor(hex: "F44444")
+        outcomeArrowView.layer.cornerRadius = outcomeArrowView.frame.height/2
+        createBorder(for: outcomeArrowView, width: 2.5, color: UIColor.white)
+        
         senderAddressLabel.text = ""
         senderNameLabel.text = ""
         recipientAddressLabel.text = ""
@@ -56,6 +72,16 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         currencySymbolLabel.text = ""
         dateLabel.text = ""
         commentLabel.text = ""
+    }
+    
+    private func createBorder(for view: UIView, width: CGFloat, color: UIColor) {
+        let border = CAShapeLayer()
+        border.frame = view.bounds
+        border.lineWidth = width
+        border.path = UIBezierPath(ovalIn: border.bounds).cgPath
+        border.strokeColor = UIColor.white.cgColor
+        border.fillColor = UIColor.clear.cgColor
+        view.layer.addSublayer(border)
     }
     
     func didReceive(_ notification: UNNotification) {
