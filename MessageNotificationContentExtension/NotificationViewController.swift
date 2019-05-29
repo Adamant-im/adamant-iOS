@@ -13,7 +13,7 @@ import UserNotificationsUI
 class NotificationViewController: UIViewController, UNNotificationContentExtension {
     
     private let passphraseStoreKey = "accountService.passphrase"
-    private let sizeWithoutMessageLabel: CGFloat = 119.0
+    private let sizeWithoutMessageLabel: CGFloat = 123.0
     
     // MARK: - IBOutlets
     

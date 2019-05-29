@@ -212,10 +212,10 @@
 		E957E0FB229AB9310019732A /* AdamantProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E0FA229AB9310019732A /* AdamantProvider.swift */; };
 		E957E0FF229AC1C80019732A /* LskProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E0FE229AC1C80019732A /* LskProvider.swift */; };
 		E957E101229AC2050019732A /* EthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E100229AC2050019732A /* EthProvider.swift */; };
-		E957E107229AF7CB0019732A /* adm_notification.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E103229AF7CA0019732A /* adm_notification.png */; };
-		E957E108229AF7CB0019732A /* doge_notification.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E104229AF7CA0019732A /* doge_notification.png */; };
-		E957E109229AF7CB0019732A /* lsk_notification.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E105229AF7CA0019732A /* lsk_notification.png */; };
-		E957E10A229AF7CB0019732A /* eth_notification.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E106229AF7CB0019732A /* eth_notification.png */; };
+		E957E107229AF7CB0019732A /* adm_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E103229AF7CA0019732A /* adm_notificationContent.png */; };
+		E957E108229AF7CB0019732A /* doge_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E104229AF7CA0019732A /* doge_notificationContent.png */; };
+		E957E109229AF7CB0019732A /* lsk_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E105229AF7CA0019732A /* lsk_notificationContent.png */; };
+		E957E10A229AF7CB0019732A /* eth_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = E957E106229AF7CB0019732A /* eth_notificationContent.png */; };
 		E957E124229B0C330019732A /* AdamantNotificationKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E123229B0C330019732A /* AdamantNotificationKeys.swift */; };
 		E957E128229B0CF10019732A /* NotificationContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E127229B0CF10019732A /* NotificationContent.swift */; };
 		E957E12E229B10F80019732A /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E957E110229B04280019732A /* UserNotifications.framework */; };
@@ -397,6 +397,7 @@
 		E9D1BE1C211DABE100E86B72 /* WalletPagingItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D1BE1B211DABE100E86B72 /* WalletPagingItem.swift */; };
 		E9D664BC229EAA9400733F8A /* UIColor+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98FC34120F9209900032D65 /* UIColor+adamant.swift */; };
 		E9D664BD229EAA9700733F8A /* UIColor+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98FC34120F9209900032D65 /* UIColor+adamant.swift */; };
+		E9D664BF229EDBB300733F8A /* Shared.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E957E170229C56EE0019732A /* Shared.xcassets */; };
 		E9DFB71C21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9DFB71B21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift */; };
 		E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* AccountService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
@@ -698,10 +699,10 @@
 		E957E0FA229AB9310019732A /* AdamantProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantProvider.swift; sourceTree = "<group>"; };
 		E957E0FE229AC1C80019732A /* LskProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskProvider.swift; sourceTree = "<group>"; };
 		E957E100229AC2050019732A /* EthProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthProvider.swift; sourceTree = "<group>"; };
-		E957E103229AF7CA0019732A /* adm_notification.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = adm_notification.png; sourceTree = "<group>"; };
-		E957E104229AF7CA0019732A /* doge_notification.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = doge_notification.png; sourceTree = "<group>"; };
-		E957E105229AF7CA0019732A /* lsk_notification.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lsk_notification.png; sourceTree = "<group>"; };
-		E957E106229AF7CB0019732A /* eth_notification.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eth_notification.png; sourceTree = "<group>"; };
+		E957E103229AF7CA0019732A /* adm_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = adm_notificationContent.png; sourceTree = "<group>"; };
+		E957E104229AF7CA0019732A /* doge_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = doge_notificationContent.png; sourceTree = "<group>"; };
+		E957E105229AF7CA0019732A /* lsk_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lsk_notificationContent.png; sourceTree = "<group>"; };
+		E957E106229AF7CB0019732A /* eth_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eth_notificationContent.png; sourceTree = "<group>"; };
 		E957E110229B04280019732A /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		E957E112229B04280019732A /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
 		E957E123229B0C330019732A /* AdamantNotificationKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantNotificationKeys.swift; sourceTree = "<group>"; };
@@ -1309,10 +1310,10 @@
 		E957E102229AF01E0019732A /* WalletImages */ = {
 			isa = PBXGroup;
 			children = (
-				E957E103229AF7CA0019732A /* adm_notification.png */,
-				E957E104229AF7CA0019732A /* doge_notification.png */,
-				E957E106229AF7CB0019732A /* eth_notification.png */,
-				E957E105229AF7CA0019732A /* lsk_notification.png */,
+				E957E103229AF7CA0019732A /* adm_notificationContent.png */,
+				E957E104229AF7CA0019732A /* doge_notificationContent.png */,
+				E957E106229AF7CB0019732A /* eth_notificationContent.png */,
+				E957E105229AF7CA0019732A /* lsk_notificationContent.png */,
 			);
 			path = WalletImages;
 			sourceTree = "<group>";
@@ -1863,6 +1864,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9D664BF229EDBB300733F8A /* Shared.xcassets in Resources */,
 				E9079A83229DEF9C0022CA0D /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1934,10 +1936,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E957E107229AF7CB0019732A /* adm_notification.png in Resources */,
-				E957E108229AF7CB0019732A /* doge_notification.png in Resources */,
-				E957E10A229AF7CB0019732A /* eth_notification.png in Resources */,
-				E957E109229AF7CB0019732A /* lsk_notification.png in Resources */,
+				E957E107229AF7CB0019732A /* adm_notificationContent.png in Resources */,
+				E957E108229AF7CB0019732A /* doge_notificationContent.png in Resources */,
+				E957E10A229AF7CB0019732A /* eth_notificationContent.png in Resources */,
+				E957E109229AF7CB0019732A /* lsk_notificationContent.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

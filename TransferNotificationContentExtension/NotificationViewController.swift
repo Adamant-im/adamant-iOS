@@ -12,6 +12,7 @@ import UserNotificationsUI
 
 class NotificationViewController: UIViewController, UNNotificationContentExtension {
     private let passphraseStoreKey = "accountService.passphrase"
+    private let sizeWithoutCommentLabel: CGFloat = 386.0
     
     // MARK: - Rich providers
     private lazy var adamantProvider: AdamantProvider = {
@@ -42,7 +43,19 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any required interface initialization here.
+
+        senderImageView.tintColor = UIColor.adamant.primary
+        recipientImageView.tintColor = UIColor.adamant.primary
+        currencyImageView.tintColor = UIColor.adamant.primary
+
+        senderAddressLabel.text = ""
+        senderNameLabel.text = ""
+        recipientAddressLabel.text = ""
+        recipientNameLabel.text = ""
+        amountLabel.text = ""
+        currencySymbolLabel.text = ""
+        dateLabel.text = ""
+        commentLabel.text = ""
     }
     
     func didReceive(_ notification: UNNotification) {
@@ -149,8 +162,25 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         
         // MARK: 3. Setting up UI
         
-        senderAddressLabel.text = transaction.senderId
-        recipientAddressLabel.text = transaction.recipientId
+        let senderName: String? = nil // TODO:
+        let recipientName: String? = nil
+        
+        if let name = senderName {
+            senderNameLabel.text = name
+            senderAddressLabel.text = transaction.senderId
+        } else {
+            senderNameLabel.text = transaction.senderId
+            senderAddressLabel.text = nil
+        }
+        
+        if let name = recipientName {
+            recipientNameLabel.text = name
+            recipientAddressLabel.text = transaction.recipientId
+        } else {
+            recipientNameLabel.text = transaction.recipientId
+            recipientAddressLabel.text = nil
+        }
+        
         dateLabel.text = date.humanizedDateTime()
 
         currencyImageView.image = provider.currencyLogoLarge
@@ -163,33 +193,26 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             commentLabel.isHidden = true
         }
         
-        let group = DispatchGroup()
-        
-        var senderAvatar: UIImage! = nil
-        var recipientAvatar: UIImage! = nil
         let size = Double(senderImageView.frame.height)
+        senderImageView.image = avatarService.avatar(for: transaction.senderPublicKey, size: size)
+        recipientImageView.image = avatarService.avatar(for: keypair.publicKey, size: size)
         
-        group.enter()
-        DispatchQueue.global(qos: .utility).async {
-            defer { group.leave() }
-            senderAvatar = avatarService.avatar(for: transaction.senderPublicKey, size: size)
-            recipientAvatar = avatarService.avatar(for: keypair.publicKey, size: size)
+        // MARK: 4. View size
+        if comments != nil {
+            commentLabel.setNeedsLayout()
+            commentLabel.layoutIfNeeded()
+            preferredContentSize = CGSize(width: view.frame.width, height: sizeWithoutCommentLabel + commentLabel.frame.height)
+        } else {
+            commentLabel.isHidden = true
+            preferredContentSize = CGSize(width: view.frame.width, height: sizeWithoutCommentLabel)
         }
         
-        group.notify(queue: DispatchQueue.main) {
-            self.senderImageView.image = senderAvatar
-            self.recipientImageView.image = recipientAvatar
-            
-            self.hideProgress()
-        }
+        view.setNeedsUpdateConstraints()
+        view.setNeedsLayout()
     }
     
     // MARK: - UI
     private func showError(error: String? = nil) {
-        
-    }
-    
-    private func hideProgress() {
         
     }
 }

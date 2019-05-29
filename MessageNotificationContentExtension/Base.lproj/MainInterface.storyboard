@@ -19,21 +19,25 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="oqg-M6-GZT" userLabel="Sender stack">
-                                <rect key="frame" x="78" y="14.5" width="94" height="45"/>
+                                <rect key="frame" x="78" y="14.5" width="226" height="45"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your friend" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RBx-dR-fi4">
-                                        <rect key="frame" x="0.0" y="0.0" width="94" height="24"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="226" height="24"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="U1234567890" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pjh-Us-Axn">
-                                        <rect key="frame" x="0.0" y="28" width="93.5" height="17"/>
+                                        <rect key="frame" x="0.0" y="28" width="226" height="17"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
+                                <constraints>
+                                    <constraint firstItem="RBx-dR-fi4" firstAttribute="width" secondItem="oqg-M6-GZT" secondAttribute="width" id="i0Z-C3-DYr"/>
+                                    <constraint firstItem="Pjh-Us-Axn" firstAttribute="width" secondItem="oqg-M6-GZT" secondAttribute="width" id="lHl-2Z-uL5"/>
+                                </constraints>
                             </stackView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="notification_avatar_placeholder" translatesAutoresizingMaskIntoConstraints="NO" id="VnQ-VA-hY0">
                                 <rect key="frame" x="16" y="12" width="50" height="50"/>
@@ -43,7 +47,7 @@
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="01.01.1970" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H6l-IS-msC">
-                                <rect key="frame" x="226" y="108.5" width="76" height="19.5"/>
+                                <rect key="frame" x="226" y="110.5" width="76" height="19.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -57,8 +61,9 @@
                         </subviews>
                         <constraints>
                             <constraint firstItem="VST-3y-2gq" firstAttribute="top" secondItem="VnQ-VA-hY0" secondAttribute="bottom" constant="12" id="0sj-Yh-XiO"/>
+                            <constraint firstItem="2BE-c3-nQJ" firstAttribute="trailing" secondItem="oqg-M6-GZT" secondAttribute="trailing" constant="16" id="49t-oR-Alt"/>
                             <constraint firstItem="VST-3y-2gq" firstAttribute="leading" secondItem="VnQ-VA-hY0" secondAttribute="leading" id="7S6-7d-PbE"/>
-                            <constraint firstItem="H6l-IS-msC" firstAttribute="top" secondItem="VST-3y-2gq" secondAttribute="bottom" constant="14" id="7o6-Kh-x7b"/>
+                            <constraint firstItem="H6l-IS-msC" firstAttribute="top" secondItem="VST-3y-2gq" secondAttribute="bottom" constant="16" id="7o6-Kh-x7b"/>
                             <constraint firstItem="VnQ-VA-hY0" firstAttribute="top" secondItem="2BE-c3-nQJ" secondAttribute="top" constant="12" id="I35-XD-cUW"/>
                             <constraint firstItem="oqg-M6-GZT" firstAttribute="centerY" secondItem="VnQ-VA-hY0" secondAttribute="centerY" id="LH6-Eh-N19"/>
                             <constraint firstItem="oqg-M6-GZT" firstAttribute="leading" secondItem="VnQ-VA-hY0" secondAttribute="trailing" constant="12" id="RTj-M5-GZV"/>

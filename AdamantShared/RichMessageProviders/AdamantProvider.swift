@@ -14,7 +14,7 @@ class AdamantProvider: TransferBaseProvider {
     }
     
     override var currencyLogoUrl: URL? {
-        return Bundle.main.url(forResource: "adm_notification", withExtension: "png")
+        return Bundle.main.url(forResource: "adm_notificationContent", withExtension: "png")
     }
     
     override var currencySymbol: String {
@@ -22,6 +22,6 @@ class AdamantProvider: TransferBaseProvider {
     }
     
     override var currencyLogoLarge: UIImage {
-        return #imageLiteral(resourceName: "wallet_adm_notification")
+        return #imageLiteral(resourceName: "adm_notification")
     }
 }

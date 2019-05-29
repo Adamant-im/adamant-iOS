@@ -14,7 +14,7 @@ class DogeProvider: TransferBaseProvider {
     }
     
     override var currencyLogoUrl: URL? {
-        return Bundle.main.url(forResource: "doge_notification", withExtension: "png")
+        return Bundle.main.url(forResource: "doge_notificationContent", withExtension: "png")
     }
     
     override var currencySymbol: String {
@@ -22,6 +22,6 @@ class DogeProvider: TransferBaseProvider {
     }
     
     override var currencyLogoLarge: UIImage {
-        return #imageLiteral(resourceName: "wallet_doge_notification")
+        return #imageLiteral(resourceName: "doge_notification")
     }
 }

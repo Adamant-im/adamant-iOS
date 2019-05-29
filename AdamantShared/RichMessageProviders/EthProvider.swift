@@ -14,7 +14,7 @@ class EthProvider: TransferBaseProvider {
     }
     
     override var currencyLogoUrl: URL? {
-        return Bundle.main.url(forResource: "eth_notification", withExtension: "png")
+        return Bundle.main.url(forResource: "eth_notificationContent", withExtension: "png")
     }
     
     override var currencySymbol: String {
@@ -22,6 +22,6 @@ class EthProvider: TransferBaseProvider {
     }
     
     override var currencyLogoLarge: UIImage {
-        return #imageLiteral(resourceName: "wallet_eth_notification")
+        return #imageLiteral(resourceName: "eth_notification")
     }
 }
