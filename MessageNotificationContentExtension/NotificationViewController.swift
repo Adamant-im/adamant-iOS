@@ -13,6 +13,7 @@ import UserNotificationsUI
 class NotificationViewController: UIViewController, UNNotificationContentExtension {
     
     private let passphraseStoreKey = "accountService.passphrase"
+    private let sizeWithoutMessageLabel: CGFloat = 119.0
     
     // MARK: - IBOutlets
     
@@ -23,9 +24,16 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     @IBOutlet weak var messageLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
     
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any required interface initialization here.
+        
+        senderAvatarImageView.tintColor = UIColor.adamant.primary
+        senderNameLabel.text = ""
+        senderAddressLabel.text = ""
+        messageLabel.text = ""
+        dateLabel.text = ""
     }
     
     func didReceive(_ notification: UNNotification) {
@@ -81,10 +89,26 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         
         // MARK: 3. Setting UI
         
-        senderAddressLabel.text = transaction.senderId
+        let senderName: String? = nil   // TODO:
+        
+        if let name = senderName {
+            senderNameLabel.text = name
+            senderAddressLabel.text = transaction.senderId
+        } else {
+            senderNameLabel.text = transaction.senderId
+            senderAddressLabel.text = nil
+        }
+        
         senderAvatarImageView.image = avatarService.avatar(for: transaction.senderPublicKey, size: Double(senderAvatarImageView.frame.height))
         messageLabel.text = message
         dateLabel.text = transaction.date.humanizedDateTime()
+        
+        // MARK: 4. View size
+        messageLabel.setNeedsLayout()
+        messageLabel.layoutIfNeeded()
+        preferredContentSize = CGSize(width: view.frame.width, height: sizeWithoutMessageLabel + messageLabel.frame.height)
+        view.setNeedsUpdateConstraints()
+        view.setNeedsLayout()
     }
 
     // MARK: - UI

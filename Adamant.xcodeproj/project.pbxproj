@@ -395,6 +395,8 @@
 		E9CAE8DA2018ACD300345E76 /* AdamantApi+Chats.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CAE8D92018ACD300345E76 /* AdamantApi+Chats.swift */; };
 		E9D1BE1A211DA25300E86B72 /* UIView+constraints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D1BE19211DA25300E86B72 /* UIView+constraints.swift */; };
 		E9D1BE1C211DABE100E86B72 /* WalletPagingItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D1BE1B211DABE100E86B72 /* WalletPagingItem.swift */; };
+		E9D664BC229EAA9400733F8A /* UIColor+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98FC34120F9209900032D65 /* UIColor+adamant.swift */; };
+		E9D664BD229EAA9700733F8A /* UIColor+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98FC34120F9209900032D65 /* UIColor+adamant.swift */; };
 		E9DFB71C21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9DFB71B21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift */; };
 		E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8A20026B0600DFC4DB /* AccountService.swift */; };
 		E9E7CD8D20026B6600DFC4DB /* DialogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7CD8C20026B6600DFC4DB /* DialogService.swift */; };
@@ -1118,7 +1120,6 @@
 				6414C18D217DF43100373FA6 /* String+adamant.swift */,
 				E9256F5E2034C21100DE86E9 /* String+localized.swift */,
 				E96D64B02295A88400CA5587 /* String+utilites.swift */,
-				E98FC34120F9209900032D65 /* UIColor+adamant.swift */,
 				E98FC34320F920BD00032D65 /* UIFont+adamant.swift */,
 				645AE06521E67D3300AD3623 /* UITextField+adamant.swift */,
 				E9D1BE19211DA25300E86B72 /* UIView+constraints.swift */,
@@ -1522,6 +1523,7 @@
 				E9771D9F22997D320099AAC7 /* AdamantUtilities.swift */,
 				E9204B4F20C94C4A00F3B9AB /* Date+adamant.swift */,
 				E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */,
+				E98FC34120F9209900032D65 /* UIColor+adamant.swift */,
 				E927171D20C04613002BB9A6 /* UIColor+hex.swift */,
 			);
 			path = Helpers;
@@ -2214,6 +2216,7 @@
 				E9079AA1229DF23B0022CA0D /* AdamantSecret.swift in Sources */,
 				E9079A94229DF1DA0022CA0D /* ServerResponse.swift in Sources */,
 				E9079AA3229DF6720022CA0D /* Decimal+adamant.swift in Sources */,
+				E9D664BC229EAA9400733F8A /* UIColor+adamant.swift in Sources */,
 				E9079AA5229DF6950022CA0D /* SecuredStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2484,6 +2487,7 @@
 				E957E150229C3E530019732A /* Transaction.swift in Sources */,
 				E957E151229C3E530019732A /* TransactionAsset.swift in Sources */,
 				E957E16D229C53980019732A /* TransferBaseProvider.swift in Sources */,
+				E9D664BD229EAA9700733F8A /* UIColor+adamant.swift in Sources */,
 				E957E162229C4BEA0019732A /* Mnemonic.swift in Sources */,
 				E957E159229C405F0019732A /* AdamantResources.swift in Sources */,
 				E957E16E229C53CB0019732A /* RichMessageNotificationProvider.swift in Sources */,
