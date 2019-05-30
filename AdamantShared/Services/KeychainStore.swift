@@ -26,7 +26,7 @@ class KeychainStore: SecuredStore {
     }
 
     func set(_ value: String, for key: String) {
-        guard let encryptedValue = KeychainStore.encrypt(string: key, password: AdamantSecret.keychainValuePassword) else {
+        guard let encryptedValue = KeychainStore.encrypt(string: value, password: AdamantSecret.keychainValuePassword) else {
             return
         }
 
