@@ -27,7 +27,7 @@ class TransferBaseProvider: TransferNotificationContentProvider {
     
     func notificationContent(partner: String, amount: Decimal, comment: String?) -> NotificationContent? {
         let amountFormated = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
-        var body = "Перевёл вам \(amountFormated)"
+        var body = String.adamantLocalized.notifications.yourTransferBody(with: amountFormated)
         
         if let comment = comment {
             body = "\(body)\n\(comment)"
@@ -42,7 +42,11 @@ class TransferBaseProvider: TransferNotificationContentProvider {
             attachments = nil
         }
         
-        return NotificationContent(title: "Новый перевод", subtitle: partner, body: body, attachments: attachments, categoryIdentifier: AdamantNotificationCategories.transfer)
+        return NotificationContent(title: String.adamantLocalized.notifications.newTransfer,
+                                   subtitle: partner,
+                                   body: body,
+                                   attachments: attachments,
+                                   categoryIdentifier: AdamantNotificationCategories.transfer)
     }
     
     // MARK: - To override

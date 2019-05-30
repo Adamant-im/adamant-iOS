@@ -438,6 +438,8 @@
 		E9EC341F200524CA00C0E546 /* Roboto_700_normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E91947A7200010DF001362F8 /* Roboto_700_normal.ttf */; };
 		E9EC342120052ABB00C0E546 /* TransferViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC342020052ABB00C0E546 /* TransferViewControllerBase.swift */; };
 		E9EC344720066D4A00C0E546 /* AddressValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EC344620066D4A00C0E546 /* AddressValidationTests.swift */; };
+		E9EF7A8022A02DBC00F2E1C2 /* AdamantLocalized.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D664CF22A009AB00733F8A /* AdamantLocalized.swift */; };
+		E9EF7A8122A02DC600F2E1C2 /* notificationContent.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9D664DA22A00E2800733F8A /* notificationContent.strings */; };
 		E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FAE5D9203DBFEF008D3A6B /* Comparable+clamped.swift */; };
 		E9FAE5E2203ED1AE008D3A6B /* ShareQrViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FAE5E0203ED1AE008D3A6B /* ShareQrViewController.swift */; };
 		E9FAE5E3203ED1AE008D3A6B /* ShareQrViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9FAE5E1203ED1AE008D3A6B /* ShareQrViewController.xib */; };
@@ -1478,18 +1480,18 @@
 		E9771D7E22995D410099AAC7 /* AdamantShared */ = {
 			isa = PBXGroup;
 			children = (
+				E9771D9B229979800099AAC7 /* Core */,
+				E957E154229C3F440019732A /* ExtensionsTools */,
+				E9771DA322997DAB0099AAC7 /* Helpers */,
 				E9D664CE22A0099100733F8A /* Localization */,
-				E9D664C222A0037600733F8A /* View */,
+				E9771D85229960F90099AAC7 /* Models */,
 				E957E167229C52750019732A /* ProvidersCore */,
 				E957E166229C52110019732A /* RichMessageProviders */,
-				E9771DA322997DAB0099AAC7 /* Helpers */,
-				E9771D9B229979800099AAC7 /* Core */,
-				E9771D85229960F90099AAC7 /* Models */,
 				E9771D84229960E30099AAC7 /* Services */,
-				E957E154229C3F440019732A /* ExtensionsTools */,
+				E9D664C222A0037600733F8A /* View */,
+				E957E123229B0C330019732A /* AdamantNotificationKeys.swift */,
 				E9771D802299602D0099AAC7 /* AdamantResources.swift */,
 				E9771D7A2299456A0099AAC7 /* AdamantSecret.swift */,
-				E957E123229B0C330019732A /* AdamantNotificationKeys.swift */,
 				E957E170229C56EE0019732A /* Shared.xcassets */,
 			);
 			path = AdamantShared;
@@ -1981,6 +1983,7 @@
 				E957E108229AF7CB0019732A /* doge_notificationContent.png in Resources */,
 				E957E10A229AF7CB0019732A /* eth_notificationContent.png in Resources */,
 				E957E109229AF7CB0019732A /* lsk_notificationContent.png in Resources */,
+				E9EF7A8122A02DC600F2E1C2 /* notificationContent.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2594,6 +2597,7 @@
 				E9771D9822996FEB0099AAC7 /* VotesAsset.swift in Sources */,
 				E9771D9A229974EA0099AAC7 /* NativeAdamantCore.swift in Sources */,
 				E9771D9022996FEB0099AAC7 /* Node.swift in Sources */,
+				E9EF7A8022A02DBC00F2E1C2 /* AdamantLocalized.swift in Sources */,
 				E9771D9722996FEB0099AAC7 /* TransactionType.swift in Sources */,
 				E957E128229B0CF10019732A /* NotificationContent.swift in Sources */,
 				E957E124229B0C330019732A /* AdamantNotificationKeys.swift in Sources */,

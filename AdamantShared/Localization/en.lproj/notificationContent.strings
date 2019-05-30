@@ -7,7 +7,13 @@
 */
 
 /* Notification content: error working with transaction */
-"NotificationContent.error" = "Something gone wrong!";
+"content.error" = "Something went wrong!";
 
 /* Notification content: error format */
-"NotificationContent.errorFormat" = "Something gone wrong: %@";
+"content.error.format" = "Something went wrong: %@";
+
+/* New transfer notification title */
+"transfer.notificationTitle" = "New Transfer";
+
+/* Transfer notification body format */
+"transfer.notificationBody.format" = "User has transferred you %@";

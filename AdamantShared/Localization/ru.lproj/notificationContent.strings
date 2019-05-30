@@ -7,7 +7,13 @@
 */
 
 /* Notification content: error working with transaction */
-"NotificationContent.error" = "Что-то пошло не так!";
+"content.error" = "Что-то пошло не так!";
 
 /* Notification content: error format */
-"NotificationContent.errorFormat" = "Что-то пошло не так: %@";
+"content.error.format" = "Что-то пошло не так: %@";
+
+/* New transfer notification title */
+"transfer.notificationTitle" = "Новый перевод";
+
+/* Transfer notification body format */
+"transfer.notificationBody.format" = "Пользователь отправил вам %@";
