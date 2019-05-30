@@ -20,14 +20,14 @@ extension Date {
 		if yearsAgo < 1 {
 			let dateString: String
 			if isToday {
-				dateString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
+				dateString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), comment: "")
 			} else if daysAgo < 2 {
 				/*
 					We can't use 'self.timeAgoSinceNow' here, because after midnight, when it is already not 'isToday',
 					but less than 24 hours has passed, so it is technically not 'Yesterday' yet,
 					it will display something like '6 hours ago'
 				*/
-				dateString = NSLocalizedString("Yesterday", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
+				dateString = NSLocalizedString("Yesterday", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), comment: "")
 			} else if withWeekday && weeksAgo < 1 { // This week, show weekday, month and date
 				dateString = Date.formatterWeekDayMonth.string(from: self)
 			} else { // This year, long ago: show month and date
@@ -50,7 +50,7 @@ extension Date {
 		let dateString: String
 		
 		if isToday { // Today
-			dateString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
+			dateString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), comment: "")
 		} else if daysAgo < 2 { // Yesterday
 			dateString = self.timeAgoSinceNow
 		} else if weeksAgo < 1 { // This week, show weekday, month and date
@@ -74,10 +74,10 @@ extension Date {
 		
 		let seconds = secondsAgo
 		if seconds < 30 {
-			timeString = NSLocalizedString("Just now", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
+			timeString = NSLocalizedString("Just now", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), comment: "")
 			expire = TimeInterval(30 - seconds)
 		} else if seconds < 90 {
-			timeString = NSLocalizedString("A minute ago", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
+			timeString = NSLocalizedString("A minute ago", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), comment: "")
 			expire = TimeInterval(60 - (seconds % 60))
 		} else if minutesAgo < 5 {
 			timeString = timeAgoSinceNow
