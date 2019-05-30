@@ -16,10 +16,11 @@ class NotificationService: UNNotificationServiceExtension {
         return AdamantProvider()
     }()
     
-    private lazy var richMessageProviders: [String: RichMessageNotificationProvider] = {
-        return [EthProvider.richMessageType: EthProvider(),
-                LskProvider.richMessageType: LskProvider(),
-                DogeProvider.richMessageType: DogeProvider()]
+    /// Lazy constructors
+    private lazy var richMessageProviders: [String: () -> RichMessageNotificationProvider] = {
+        return [EthProvider.richMessageType: { EthProvider() },
+                LskProvider.richMessageType: { LskProvider() },
+                DogeProvider.richMessageType: { DogeProvider() }]
     }()
     
     // MARK: - Hanlder
@@ -99,7 +100,7 @@ class NotificationService: UNNotificationServiceExtension {
                 guard let data = message.data(using: String.Encoding.utf8),
                     let richContent = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String:String],
                     let key = richContent[RichContentKeys.type]?.lowercased(),
-                    let provider = richMessageProviders[key],
+                    let provider = richMessageProviders[key]?(),
                     let content = provider.notificationContent(for: transaction, partner: partner, richContent: richContent) else {
                         bestAttemptContent.title = partner
                         bestAttemptContent.body = message

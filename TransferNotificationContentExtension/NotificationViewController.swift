@@ -19,10 +19,12 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         return AdamantProvider()
     }()
     
-    private lazy var richMessageProviders: [String: TransferNotificationContentProvider] = {
-        return [EthProvider.richMessageType: EthProvider(),
-                LskProvider.richMessageType: LskProvider(),
-                DogeProvider.richMessageType: DogeProvider()]
+    
+    /// Lazy contstructors
+    private lazy var richMessageProviders: [String: () -> TransferNotificationContentProvider] = {
+        return [EthProvider.richMessageType: { EthProvider() },
+                LskProvider.richMessageType: { LskProvider() },
+                DogeProvider.richMessageType: { DogeProvider() }]
     }()
     
     // MARK: - IBOutlets
@@ -162,7 +164,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
                         return
                 }
                 
-                provider = p
+                provider = p()
                 
                 if let raw = richContent[RichContentKeys.transfer.comments], raw.count > 0 {
                     comments = raw
