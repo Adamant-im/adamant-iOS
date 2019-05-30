@@ -61,10 +61,12 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         incomeArrowView.backgroundColor = UIColor(hex: "36C436")
         incomeArrowView.layer.cornerRadius = incomeArrowView.frame.height/2
         createBorder(for: incomeArrowView, width: 2.5, color: UIColor.white)
+        incomeArrowView.isHidden = true
         
         outcomeArrowView.backgroundColor = UIColor(hex: "F44444")
         outcomeArrowView.layer.cornerRadius = outcomeArrowView.frame.height/2
         createBorder(for: outcomeArrowView, width: 2.5, color: UIColor.white)
+        outcomeArrowView.isHidden = true
         
         senderAddressLabel.text = ""
         senderNameLabel.text = ""
@@ -235,12 +237,26 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             preferredContentSize = CGSize(width: view.frame.width, height: sizeWithoutCommentLabel)
         }
         
+        incomeArrowView.isHidden = false
+        outcomeArrowView.isHidden = false
+        
         view.setNeedsUpdateConstraints()
         view.setNeedsLayout()
     }
     
     // MARK: - UI
-    private func showError(error: String? = nil) {
+    private func showError(with message: String? = nil) {
+        guard let warningView = UINib(nibName: "Warning", bundle: nil).instantiate(withOwner: nil, options: nil).first as? WarningView else {
+            return
+        }
         
+        if let message = message {
+            warningView.messageLabel.text = String.adamantLocalized.notifications.error(with: message)
+        } else {
+            warningView.messageLabel.text = String.adamantLocalized.notifications.error
+        }
+        
+        view.addSubview(warningView)
+        view.constrainToEdges(warningView)
     }
 }

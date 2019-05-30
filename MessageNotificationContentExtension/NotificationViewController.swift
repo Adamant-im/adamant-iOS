@@ -112,7 +112,18 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     }
 
     // MARK: - UI
-    private func showError() {
+    private func showError(with message: String? = nil) {
+        guard let warningView = UINib(nibName: "Warning", bundle: nil).instantiate(withOwner: nil, options: nil).first as? WarningView else {
+            return
+        }
         
+        if let message = message {
+            warningView.messageLabel.text = String.adamantLocalized.notifications.error(with: message)
+        } else {
+            warningView.messageLabel.text = String.adamantLocalized.notifications.error
+        }
+        
+        view.addSubview(warningView)
+        view.constrainToEdges(warningView)
     }
 }
