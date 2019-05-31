@@ -119,7 +119,7 @@
                                 </constraints>
                             </stackView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="01.01.1970" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="B3L-63-gIz">
-                                <rect key="frame" x="222" y="448.5" width="80" height="20.5"/>
+                                <rect key="frame" x="222" y="404.5" width="80" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -153,15 +153,8 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="status_success" translatesAutoresizingMaskIntoConstraints="NO" id="qrJ-WG-J0H">
-                                <rect key="frame" x="145" y="300" width="30" height="30"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="30" id="Vbe-va-dkO"/>
-                                    <constraint firstAttribute="width" secondItem="qrJ-WG-J0H" secondAttribute="height" multiplier="1:1" id="awZ-hR-Aqo"/>
-                                </constraints>
-                            </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalCompressionResistancePriority="250" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="P5F-e9-L6w">
-                                <rect key="frame" x="16" y="356" width="288" height="76.5"/>
+                                <rect key="frame" x="16" y="312" width="288" height="76.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -170,23 +163,21 @@
                         <constraints>
                             <constraint firstItem="rJQ-Us-B8m" firstAttribute="leading" secondItem="2BE-c3-nQJ" secondAttribute="leading" constant="16" id="Bbw-1X-THA"/>
                             <constraint firstItem="2BE-c3-nQJ" firstAttribute="trailing" secondItem="B3L-63-gIz" secondAttribute="trailing" constant="18" id="Bea-G1-6G6"/>
-                            <constraint firstItem="P5F-e9-L6w" firstAttribute="top" secondItem="qrJ-WG-J0H" secondAttribute="bottom" constant="26" id="CZB-nC-vmE"/>
                             <constraint firstItem="rJQ-Us-B8m" firstAttribute="top" secondItem="2BE-c3-nQJ" secondAttribute="top" constant="12" id="Ccc-Kt-Zmu"/>
-                            <constraint firstItem="P5F-e9-L6w" firstAttribute="centerX" secondItem="qrJ-WG-J0H" secondAttribute="centerX" id="IJb-mv-LcO"/>
                             <constraint firstItem="c0c-gU-PhS" firstAttribute="top" secondItem="dpx-BH-4zi" secondAttribute="bottom" constant="26" id="Jqd-qs-NMS"/>
                             <constraint firstItem="4Mb-pb-p1b" firstAttribute="centerY" secondItem="dpx-BH-4zi" secondAttribute="centerY" id="Sja-er-ScE"/>
-                            <constraint firstItem="B3L-63-gIz" firstAttribute="top" relation="greaterThanOrEqual" secondItem="qrJ-WG-J0H" secondAttribute="bottom" constant="26" id="VHh-eh-lZd"/>
                             <constraint firstItem="4Mb-pb-p1b" firstAttribute="leading" secondItem="dpx-BH-4zi" secondAttribute="trailing" constant="12" id="Va3-1A-aU7"/>
                             <constraint firstItem="Uns-D2-ORf" firstAttribute="leading" secondItem="rJQ-Us-B8m" secondAttribute="trailing" constant="12" id="XBq-ct-AiV"/>
-                            <constraint firstItem="qrJ-WG-J0H" firstAttribute="top" secondItem="c0c-gU-PhS" secondAttribute="bottom" constant="6" id="e5G-9D-hrN"/>
+                            <constraint firstItem="P5F-e9-L6w" firstAttribute="top" secondItem="c0c-gU-PhS" secondAttribute="bottom" constant="18" id="cTH-1N-U3u"/>
                             <constraint firstItem="dpx-BH-4zi" firstAttribute="leading" secondItem="AuK-jP-8Ic" secondAttribute="leading" id="hci-E7-OZP"/>
                             <constraint firstItem="Uns-D2-ORf" firstAttribute="centerY" secondItem="rJQ-Us-B8m" secondAttribute="centerY" id="hsc-6a-xjn"/>
                             <constraint firstItem="c0c-gU-PhS" firstAttribute="centerX" secondItem="2BE-c3-nQJ" secondAttribute="centerX" id="kAC-0k-Xn9"/>
+                            <constraint firstItem="P5F-e9-L6w" firstAttribute="centerX" secondItem="c0c-gU-PhS" secondAttribute="centerX" id="m8T-hs-l0Q"/>
                             <constraint firstItem="2BE-c3-nQJ" firstAttribute="trailing" secondItem="4Mb-pb-p1b" secondAttribute="trailing" constant="16" id="mcK-j4-cZo"/>
                             <constraint firstItem="2BE-c3-nQJ" firstAttribute="trailing" secondItem="Uns-D2-ORf" secondAttribute="trailing" constant="16" id="rsT-YG-yxg"/>
                             <constraint firstItem="P5F-e9-L6w" firstAttribute="width" secondItem="S3S-Oj-5AN" secondAttribute="width" constant="-32" id="rvH-FD-s1f"/>
                             <constraint firstItem="B3L-63-gIz" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2BE-c3-nQJ" secondAttribute="leading" constant="18" id="sIh-Nc-udo"/>
-                            <constraint firstItem="qrJ-WG-J0H" firstAttribute="centerX" secondItem="c0c-gU-PhS" secondAttribute="centerX" id="wyZ-DY-Do0"/>
+                            <constraint firstItem="B3L-63-gIz" firstAttribute="top" relation="greaterThanOrEqual" secondItem="c0c-gU-PhS" secondAttribute="bottom" constant="18" id="yJB-KA-yiE"/>
                             <constraint firstItem="B3L-63-gIz" firstAttribute="top" secondItem="P5F-e9-L6w" secondAttribute="bottom" constant="16" id="zQV-kl-bGF"/>
                             <constraint firstItem="dpx-BH-4zi" firstAttribute="top" secondItem="AuK-jP-8Ic" secondAttribute="bottom" constant="18" id="zuj-ON-KKt"/>
                         </constraints>
@@ -222,6 +213,5 @@
         <image name="Income_arrow" width="20" height="20"/>
         <image name="Outcome_arrow" width="20" height="20"/>
         <image name="notification_avatar_placeholder" width="50" height="50"/>
-        <image name="status_success" width="30" height="30"/>
     </resources>
 </document>

@@ -12,7 +12,7 @@ import UserNotificationsUI
 
 class NotificationViewController: UIViewController, UNNotificationContentExtension {
     private let passphraseStoreKey = "accountService.passphrase"
-    private let sizeWithoutCommentLabel: CGFloat = 386.0
+    private let sizeWithoutCommentLabel: CGFloat = 350.0
     
     // MARK: - Rich providers
     private lazy var adamantProvider: AdamantProvider = {
