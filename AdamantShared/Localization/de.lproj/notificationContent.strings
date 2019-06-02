@@ -7,13 +7,13 @@
 */
 
 /* Notification content: error working with transaction */
-"content.error" = "Something gone wrong!";
+"content.error" = "Etwas ist schiefgelaufen!";
 
 /* Notification content: error format */
-"content.error.format" = "Something gone wrong: %@";
+"content.error.format" = "Etwas ist schiefgelaufen: %@";
 
 /* New transfer notification title */
 "transfer.notificationTitle" = "Neue Transaktion";
 
 /* Transfer notification body format */
-"transfer.notificationBody.format" = "Der Benutzer hat Ihnen %@ übertragen";
+"transfer.notificationBody.format" = "Ein Nutzer hat Ihnen %@ gesendet";
