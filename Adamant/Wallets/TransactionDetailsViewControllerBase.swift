@@ -14,7 +14,7 @@ import SafariServices
 extension String.adamantLocalized {
     struct transactionDetails {
         static let title = NSLocalizedString("TransactionDetailsScene.Title", comment: "Transaction details: scene title")
-        static let yourAddress = NSLocalizedString("TransactionDetailsScene.YourAddress", comment: "Transaction details: 'Your address' flag.")
+        static let yourAddress = String.adamantLocalized.notifications.yourAddress
         static let requestingDataProgressMessage = NSLocalizedString("TransactionDetailsScene.RequestingData", comment: "Transaction details: 'Requesting Data' progress message.")
     }
 }

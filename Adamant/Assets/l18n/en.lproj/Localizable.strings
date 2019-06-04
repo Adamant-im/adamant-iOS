@@ -596,7 +596,7 @@
 "SecurityPage.Row.GenerateQr" = "Generate QR with passphrase";
 
 /* Security: Generate PrivateKey with passphrase row */
-"SecurityPage.Row.GeneratePk" = "Export Private Keys";
+"SecurityPage.Row.GeneratePk" = "Private Schlüssel exportieren";
 
 /* Security: Show notifications */
 "SecurityPage.Row.Notifications" = "Notifications";

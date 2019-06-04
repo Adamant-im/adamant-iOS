@@ -92,8 +92,7 @@ class AdamantNodesSource: NodesSource {
 		}
 		
 		do {
-			let nds = try JSONDecoder().decode([Node].self, from: data)
-			nodes = nds
+			nodes = try JSONDecoder().decode([Node].self, from: data)
 		} catch {
 			nodes = defaultNodes
 			print(error.localizedDescription)

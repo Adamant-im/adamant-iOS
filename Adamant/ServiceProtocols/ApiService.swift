@@ -104,10 +104,6 @@ extension ApiServiceError: Equatable {
 	}
 }
 
-protocol ServerResponseWithTimestamp {
-    var nodeTimestamp: TimeInterval { get }
-}
-
 
 // - MARK: ApiService
 protocol ApiService: class {
