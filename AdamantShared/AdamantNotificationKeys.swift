@@ -22,6 +22,12 @@ struct AdamantNotificationUserInfoKeys {
     /// Address, registered for pushes
     static let pushRecipient = "push-recipient"
     
+    /// Partner(sender) display name
+    static let partnerDisplayName = "partner.displayName"
+    
+    // Chache flag, that display name were checked, and partner has none - no need to ckeck again
+    static let partnerNoDislpayNameKey = "partner.noDisplayName"
+    static let partnerNoDisplayNameValue = "true"
     
     /// Downloaded by NotificationServiceExtension transaction, serialized in JSON format
     static let transaction = "cache.transaction"

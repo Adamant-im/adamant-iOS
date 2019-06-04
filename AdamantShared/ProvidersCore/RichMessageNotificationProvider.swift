@@ -11,7 +11,7 @@ import UIKit
 protocol RichMessageNotificationProvider {
     static var richMessageType: String { get }
     
-    func notificationContent(for transaction: Transaction, partner: String, richContent: [String:String]) -> NotificationContent?
+    func notificationContent(for transaction: Transaction, partnerAddress: String, partnerName: String?, richContent: [String:String]) -> NotificationContent?
 }
 
 protocol TransferNotificationContentProvider: RichMessageNotificationProvider {

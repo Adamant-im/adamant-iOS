@@ -41,6 +41,7 @@ class NotificationService: UNNotificationServiceExtension {
         // MARK: 1. Getting services
         let securedStore = KeychainStore()
         let core = NativeAdamantCore()
+        let api = ExtensionsApi(keychainStore: securedStore)
         
         // No passphrase - no point of trying to get and decode
         guard let passphrase = securedStore.get(passphraseStoreKey),
@@ -50,25 +51,36 @@ class NotificationService: UNNotificationServiceExtension {
         }
         
         // MARK: 2. Get transaction
-        let api = ExtensionsApi(keychainStore: securedStore)
         guard let transaction = api.getTransaction(by: txnId) else {
             contentHandler(bestAttemptContent)
             return
         }
         
         // MARK: 3. Working on transaction
-        let partner: String
+        let partnerAddress: String
         let partnerPublicKey: String
+        let partnerName: String?
         var decodedMessage: String? = nil
         
         if transaction.senderId == pushRecipient {
-            partner = transaction.recipientId
+            partnerAddress = transaction.recipientId
             partnerPublicKey = transaction.recipientPublicKey ?? keypair.publicKey
         } else {
-            partner = transaction.senderId
+            partnerAddress = transaction.senderId
             partnerPublicKey = transaction.senderPublicKey
         }
         
+        // MARK: 4. Address book
+        if let addressBook = api.getAddressBook(for: pushRecipient, core: core, keypair: keypair),
+            let displayName = addressBook[partnerAddress]?.displayName {
+            partnerName = displayName
+            bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.partnerDisplayName] = displayName
+        } else {
+            partnerName = nil
+            bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.partnerNoDislpayNameKey] = AdamantNotificationUserInfoKeys.partnerNoDisplayNameValue
+        }
+        
+        // MARK: 5. Content
         switch transaction.type {
         // MARK: Messages
         case .chatMessage:
@@ -88,9 +100,9 @@ class NotificationService: UNNotificationServiceExtension {
                 fallthrough
             case .message:
                 if transaction.amount > 0 { // ADM Transfer with comments
-                    handleAdamantTransfer(notificationContent: bestAttemptContent, partner: partner, amount: transaction.amount, comment: message)
+                    handleAdamantTransfer(notificationContent: bestAttemptContent, partnerAddress: partnerAddress, partnerName: partnerName, amount: transaction.amount, comment: message)
                 } else { // Message
-                    bestAttemptContent.title = partner
+                    bestAttemptContent.title = partnerName ?? partnerAddress
                     bestAttemptContent.body = message
                     bestAttemptContent.categoryIdentifier = AdamantNotificationCategories.message
                 }
@@ -101,8 +113,8 @@ class NotificationService: UNNotificationServiceExtension {
                     let richContent = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String:String],
                     let key = richContent[RichContentKeys.type]?.lowercased(),
                     let provider = richMessageProviders[key]?(),
-                    let content = provider.notificationContent(for: transaction, partner: partner, richContent: richContent) else {
-                        bestAttemptContent.title = partner
+                    let content = provider.notificationContent(for: transaction, partnerAddress: partnerAddress, partnerName: partnerName, richContent: richContent) else {
+                        bestAttemptContent.title = partnerAddress
                         bestAttemptContent.body = message
                         bestAttemptContent.categoryIdentifier = AdamantNotificationCategories.message
                         break
@@ -121,20 +133,22 @@ class NotificationService: UNNotificationServiceExtension {
             
         // MARK: Transfers
         case .send:
-            handleAdamantTransfer(notificationContent: bestAttemptContent, partner: partner, amount: transaction.amount, comment: nil)
+            handleAdamantTransfer(notificationContent: bestAttemptContent, partnerAddress: partnerAddress, partnerName: partnerName, amount: transaction.amount, comment: nil)
             
         default:
             break
         }
         
-        // MARK: Other configurations
-        bestAttemptContent.threadIdentifier = partner
+        // MARK: 6. Other configurations
+        bestAttemptContent.threadIdentifier = partnerAddress
         
         // Caching downloaded transaction, to avoid downloading ang decoding it in ContentExtensions
         if let data = try? JSONEncoder().encode(transaction), let transactionRaw = String(data: data, encoding: .utf8) {
             bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.transaction] = transactionRaw
         }
         bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.decodedMessage] = decodedMessage
+        
+        
         
         contentHandler(bestAttemptContent)
     }
@@ -147,8 +161,8 @@ class NotificationService: UNNotificationServiceExtension {
         }
     }
     
-    private func handleAdamantTransfer(notificationContent: UNMutableNotificationContent, partner: String, amount: Decimal, comment: String?) {
-        guard let content = adamantProvider.notificationContent(partner: partner, amount: amount, comment: comment) else {
+    private func handleAdamantTransfer(notificationContent: UNMutableNotificationContent, partnerAddress address: String, partnerName name: String?, amount: Decimal, comment: String?) {
+        guard let content = adamantProvider.notificationContent(partnerAddress: address, partnerName: name, amount: amount, comment: comment) else {
             return
         }
         

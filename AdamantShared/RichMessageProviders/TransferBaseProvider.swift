@@ -10,7 +10,7 @@ import UIKit
 import UserNotifications
 
 class TransferBaseProvider: TransferNotificationContentProvider {
-    func notificationContent(for transaction: Transaction, partner: String, richContent: [String:String]) -> NotificationContent? {
+    func notificationContent(for transaction: Transaction, partnerAddress: String, partnerName: String?, richContent: [String:String]) -> NotificationContent? {
         guard let amountRaw = richContent[RichContentKeys.transfer.amount], let amount = Decimal(string: amountRaw) else {
             return nil
         }
@@ -22,10 +22,10 @@ class TransferBaseProvider: TransferNotificationContentProvider {
             comment = nil
         }
         
-        return notificationContent(partner: partner, amount: amount, comment: comment)
+        return notificationContent(partnerAddress: partnerAddress, partnerName: partnerName, amount: amount, comment: comment)
     }
     
-    func notificationContent(partner: String, amount: Decimal, comment: String?) -> NotificationContent? {
+    func notificationContent(partnerAddress: String, partnerName: String?, amount: Decimal, comment: String?) -> NotificationContent? {
         let amountFormated = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
         var body = String.adamantLocalized.notifications.yourTransferBody(with: amountFormated)
         
@@ -42,8 +42,8 @@ class TransferBaseProvider: TransferNotificationContentProvider {
             attachments = nil
         }
         
-        return NotificationContent(title: String.adamantLocalized.notifications.newTransfer,
-                                   subtitle: partner,
+        return NotificationContent(title: partnerName ?? partnerAddress,
+                                   subtitle: String.adamantLocalized.notifications.newTransfer,
                                    body: body,
                                    attachments: attachments,
                                    categoryIdentifier: AdamantNotificationCategories.transfer)

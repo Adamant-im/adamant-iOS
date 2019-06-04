@@ -29,6 +29,8 @@ public extension String {
                 return String.localizedStringWithFormat(NSLocalizedString("transfer.notificationBody.format", tableName: "notificationContent", comment: "Transfer notification body format"), amount)
             }
             
+            static let yourAddress = NSLocalizedString("transfer.notificationBody.yourAddress", tableName: "notificationContent", comment: "Transfer notification: 'Your address'")
+            
             private init() {}
         }
     }

@@ -93,6 +93,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         let keychain = KeychainStore()
         let core = NativeAdamantCore()
         let avatarService = AdamantAvatarService()
+        var api: ExtensionsApi? = nil
         
         guard let passphrase = keychain.get(passphraseStoreKey), let keypair = core.createKeypairFor(passphrase: passphrase) else {
             showError()
@@ -109,8 +110,8 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
                 return
             }
             
-            let api = ExtensionsApi(keychainStore: keychain)
-            trs = api.getTransaction(by: id)
+            api = ExtensionsApi(keychainStore: keychain)
+            trs = api!.getTransaction(by: id)
         }
         
         guard let transaction = trs else {
@@ -190,10 +191,23 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             return
         }
         
-        // MARK: 3. Setting up UI
+        // MARK: 3. Names
+        let senderName: String?
         
-        let senderName: String? = nil // TODO:
-        let recipientName: String? = nil
+        // Cached
+        if let name = notification.request.content.userInfo[AdamantNotificationUserInfoKeys.partnerDisplayName] as? String {
+            senderName = name
+        }
+        // No name, but we have flag - skip it
+        else if let flag = notification.request.content.userInfo[AdamantNotificationUserInfoKeys.partnerNoDislpayNameKey] as? String, flag == AdamantNotificationUserInfoKeys.partnerNoDisplayNameValue {
+            senderName = nil
+        } else {
+            let _api = api ?? ExtensionsApi(keychainStore: keychain)
+            checkName(of: transaction.senderId, for: transaction.recipientId, api: _api, core: core, keypair: keypair)
+            senderName = nil
+        }
+        
+        // MARK: 3. Setting up UI
         
         if let name = senderName {
             senderNameLabel.text = name
@@ -203,13 +217,8 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             senderAddressLabel.text = nil
         }
         
-        if let name = recipientName {
-            recipientNameLabel.text = name
-            recipientAddressLabel.text = transaction.recipientId
-        } else {
-            recipientNameLabel.text = transaction.recipientId
-            recipientAddressLabel.text = nil
-        }
+        recipientNameLabel.text = String.adamantLocalized.notifications.yourAddress
+        recipientAddressLabel.text = transaction.recipientId
         
         dateLabel.text = date.humanizedDateTime()
 
@@ -258,5 +267,33 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         
         view.addSubview(warningView)
         view.constrainToEdges(warningView)
+    }
+    
+    private func checkName(of sender: String, for recipient: String, api: ExtensionsApi, core: NativeAdamantCore, keypair: Keypair) {
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let addressBook = api.getAddressBook(for: recipient, core: core, keypair: keypair), let name = addressBook[sender]?.displayName else {
+                return
+            }
+            
+            DispatchQueue.main.async {
+                guard let vc = self else {
+                    return
+                }
+                
+                let address = self?.senderNameLabel.text
+                
+                UIView.transition(with: vc.senderAddressLabel,
+                                  duration: 0.1,
+                                  options: .transitionCrossDissolve,
+                                  animations: { vc.senderAddressLabel.text = address },
+                                  completion: nil)
+                
+                UIView.transition(with: vc.senderNameLabel,
+                                  duration: 0.1,
+                                  options: .transitionCrossDissolve,
+                                  animations: { vc.senderNameLabel.text = name },
+                                  completion: nil)
+            }
+        }
     }
 }

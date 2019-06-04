@@ -17,3 +17,6 @@
 
 /* Transfer notification body format */
 "transfer.notificationBody.format" = "User has transferred you %@";
+
+/* Transfer notification: 'Your address' */
+"transfer.notificationBody.yourAddress" = "You";
