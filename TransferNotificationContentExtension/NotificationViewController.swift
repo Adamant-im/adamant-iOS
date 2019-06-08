@@ -160,7 +160,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             // Rich message
             case .richMessage:
                 guard let data = message.data(using: String.Encoding.utf8),
-                    let richContent = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String:String],
+                    let richContent = RichMessageTools.richContent(from: data),
                     let key = richContent[RichContentKeys.type]?.lowercased(),
                     let p = richMessageProviders[key] else {
                         showError()

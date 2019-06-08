@@ -111,11 +111,11 @@ class NotificationService: UNNotificationServiceExtension {
             // MARK: Rich messages
             case .richMessage:
                 guard let data = message.data(using: String.Encoding.utf8),
-                    let richContent = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String:String],
+                    let richContent = RichMessageTools.richContent(from: data),
                     let key = richContent[RichContentKeys.type]?.lowercased(),
                     let provider = richMessageProviders[key]?(),
                     let content = provider.notificationContent(for: transaction, partnerAddress: partnerAddress, partnerName: partnerName, richContent: richContent) else {
-                        bestAttemptContent.title = partnerAddress
+                        bestAttemptContent.title = partnerName ?? partnerAddress
                         bestAttemptContent.body = message
                         bestAttemptContent.categoryIdentifier = AdamantNotificationCategories.message
                         break
