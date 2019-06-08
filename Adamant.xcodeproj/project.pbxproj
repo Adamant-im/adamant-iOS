@@ -164,6 +164,7 @@
 		E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927171D20C04613002BB9A6 /* UIColor+hex.swift */; };
 		E9332B8921F1FA4400D56E72 /* OnboardRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9332B8821F1FA4400D56E72 /* OnboardRoutes.swift */; };
 		E933475B225539390083839E /* DogeGetTransactionsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E933475A225539390083839E /* DogeGetTransactionsResponse.swift */; };
+		E935C84B22ABE65100A8CA2F /* notificationContent.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9D664DA22A00E2800733F8A /* notificationContent.strings */; };
 		E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA92055D03300EE6F30 /* AdamantMessage.swift */; };
 		E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D732028B21400126346 /* ChatsProvider.swift */; };
 		E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */; };
@@ -1927,6 +1928,7 @@
 				E9981898212096ED0018C84C /* WalletViewControllerBase.xib in Resources */,
 				E983AE2D20E6720D00497E1A /* AccountFooter.xib in Resources */,
 				644793C52166315900FC4CF5 /* OnboardPage.xib in Resources */,
+				E935C84B22ABE65100A8CA2F /* notificationContent.strings in Resources */,
 				E9EC341B200524CA00C0E546 /* Roboto_300_normal.ttf in Resources */,
 				E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
