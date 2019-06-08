@@ -17,13 +17,13 @@ struct AdamantResources {
         Node(scheme: .https, host: "endless.adamant.im", port: nil),
         Node(scheme: .https, host: "clown.adamant.im", port: nil),
         Node(scheme: .https, host: "lake.adamant.im", port: nil),
-        //        Node(scheme: .http, host: "80.211.177.181", port: nil), // Bugged one
-        //      Node(scheme: .http, host: "163.172.132.38", port: 36667) // Testnet
+//        Node(scheme: .http, host: "80.211.177.181", port: nil), // Bugged one
+//        Node(scheme: .http, host: "163.172.132.38", port: 36667) // Testnet
     ]
     
     static let ethServers = [
         "https://ethnode1.adamant.im/"
-        //        "https://ropsten.infura.io/"  // test network
+//        "https://ropsten.infura.io/"  // test network
     ]
     
     static let lskServers = [
