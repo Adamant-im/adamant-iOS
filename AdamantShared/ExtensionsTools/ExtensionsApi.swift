@@ -62,7 +62,8 @@ class ExtensionsApi {
                 }
                 
                 components.path = "/api/transactions/get"
-                components.queryItems = [URLQueryItem(name: "id", value: "\(id)")]
+                components.queryItems = [URLQueryItem(name: "id", value: "\(id)"),
+                                         URLQueryItem(name: "returnAsset", value: "1")]
                 
                 if let url = components.url {
                     let data = try Data(contentsOf: url)
