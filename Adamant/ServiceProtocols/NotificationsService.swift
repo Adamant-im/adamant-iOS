@@ -8,20 +8,18 @@
 
 import Foundation
 
-extension String.adamantLocalized {
-	struct notifications {
-		static let notificationsDisabled = NSLocalizedString("NotificationsService.NotificationsDisabled", comment: "Notifications: User has disabled notifications. Head him into settings")
-		
-		static let newMessageTitle = NSLocalizedString("NotificationsService.NewMessage.Title", comment: "Notifications: New message notification title")
-		static let newMessageBody = NSLocalizedString("NotificationsService.NewMessage.BodyFormat", comment: "Notifications: new messages notification body. Using %d for amount")
-		
-		static let newTransferTitle = NSLocalizedString("NotificationsService.NewTransfer.Title", comment: "Notifications: New transfer transaction title")
-		static let newTransferBody = NSLocalizedString("NotificationsService.NewTransfer.BodyFormat", comment: "Notifications: New transfer notification body. Using %d for amount")
-		
-		static let registerRemotesError = NSLocalizedString("NotificationsService.Error.RegistrationRemotesFormat", comment: "Notifications: while registering remote notifications. %@ for description")
-		
-		private init() {}
-	}
+extension String.adamantLocalized.notifications {
+    static let notificationsDisabled = NSLocalizedString("NotificationsService.NotificationsDisabled", comment: "Notifications: User has disabled notifications. Head him into settings")
+    
+    static let newMessageTitle = NSLocalizedString("NotificationsService.NewMessage.Title", comment: "Notifications: New message notification title")
+    static let newMessageBody = NSLocalizedString("NotificationsService.NewMessage.BodyFormat", comment: "Notifications: new messages notification body. Using %d for amount")
+    
+    static let newTransferTitle = NSLocalizedString("NotificationsService.NewTransfer.Title", comment: "Notifications: New transfer transaction title")
+    static let newTransferBody = NSLocalizedString("NotificationsService.NewTransfer.BodyFormat", comment: "Notifications: New transfer notification body. Using %d for amount")
+    
+    static let registerRemotesError = NSLocalizedString("NotificationsService.Error.RegistrationRemotesFormat", comment: "Notifications: while registering remote notifications. %@ for description")
+    
+    private init() {}
 }
 
 extension StoreKey {

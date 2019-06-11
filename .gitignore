@@ -103,4 +103,4 @@ xcuserdata/
 # End of https://www.gitignore.io/api/macos,xcode,cocoapods,sublimetext
 
 ### Here we store Release password. It's super-secret, not for git. ###
-appstorepass.txt
+AdamantSecret.swift

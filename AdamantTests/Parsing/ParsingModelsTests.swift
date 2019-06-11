@@ -55,6 +55,35 @@ class ParsingModelsTests: XCTestCase {
 		XCTAssertEqual(t.asset.chat!.ownMessage, "898e0bd7d8008fb0396195a911d19a24a7234d2e2a00cdf9")
 		XCTAssertEqual(t.asset.chat!.type, ChatType.message)
 	}
+    
+    func testEncodingTransactionChat() {
+        let t: Transaction = TestTools.LoadJsonAndDecode(filename: "TransactionChat")
+        
+        let rawTransaction = try! JSONEncoder().encode(t)
+        
+        let newT = try! JSONDecoder().decode(Transaction.self, from: rawTransaction)
+        
+        XCTAssertEqual(t.id, newT.id)
+        XCTAssertEqual(t.height, newT.height)
+        XCTAssertEqual(t.blockId, newT.blockId)
+        XCTAssertEqual(t.type, newT.type)
+        XCTAssertEqual(t.timestamp, newT.timestamp)
+        XCTAssertEqual(t.senderPublicKey, newT.senderPublicKey)
+        XCTAssertEqual(t.senderId, newT.senderId)
+        XCTAssertEqual(t.recipientId, newT.recipientId)
+        XCTAssertEqual(t.amount, newT.amount)
+        XCTAssertEqual(t.fee, newT.fee)
+        XCTAssertEqual(t.signature, newT.signature)
+        XCTAssertEqual(t.confirmations, newT.confirmations)
+        XCTAssertEqual(t.asset.chat!.message, newT.asset.chat!.message)
+        XCTAssertEqual(t.asset.chat!.ownMessage, newT.asset.chat!.ownMessage)
+        XCTAssertEqual(t.asset.chat!.type, newT.asset.chat!.type)
+
+        XCTAssertNil(newT.requesterPublicKey)
+        XCTAssertNil(newT.recipientPublicKey)
+        XCTAssertNil(newT.signSignature)
+        XCTAssert(newT.signatures.count == 0)
+    }
 
 	func testAccount() {
 		let t: AdamantAccount = TestTools.LoadJsonAndDecode(filename: "Account")

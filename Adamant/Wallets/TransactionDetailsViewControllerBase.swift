@@ -14,7 +14,7 @@ import SafariServices
 extension String.adamantLocalized {
     struct transactionDetails {
         static let title = NSLocalizedString("TransactionDetailsScene.Title", comment: "Transaction details: scene title")
-        static let yourAddress = NSLocalizedString("TransactionDetailsScene.YourAddress", comment: "Transaction details: 'Your address' flag.")
+        static let yourAddress = String.adamantLocalized.notifications.yourAddress
         static let requestingDataProgressMessage = NSLocalizedString("TransactionDetailsScene.RequestingData", comment: "Transaction details: 'Requesting Data' progress message.")
     }
 }
@@ -333,7 +333,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.title = Rows.fee.localized
             
             if let value = transaction?.feeValue {
-                $0.value = currencyFormatter.string(fromDecimal: value)
+                $0.value = currencyFormatter.string(from: value)
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -347,7 +347,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             cell.textLabel?.textColor = .black
             
             if let value = self?.transaction?.feeValue, let formatter = self?.currencyFormatter {
-                row.value = formatter.string(fromDecimal: value)
+                row.value = formatter.string(from: value)
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -443,7 +443,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             if let amount = transaction?.amountValue, let symbol = currencySymbol, let rate = currencyInfo.getRate(for: symbol) {
                 let value = amount * rate
-                $0.value = fiatFormatter.string(fromDecimal: value)
+                $0.value = fiatFormatter.string(from: value)
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -557,7 +557,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     }
                     
                     let totalFiat = amount * ticker
-                    let fiatString = self?.fiatFormatter.string(fromDecimal: totalFiat)
+                    let fiatString = self?.fiatFormatter.string(from: totalFiat)
                     
                     if let row: LabelRow = self?.form.rowBy(tag: Rows.historyFiat.tag) {
                         DispatchQueue.main.async {

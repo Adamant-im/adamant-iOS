@@ -1,0 +1,22 @@
+/* 
+  notificationContent.strings
+  Adamant
+
+  Created by Anokhov Pavel on 30/05/2019.
+  Copyright © 2019 Adamant. All rights reserved.
+*/
+
+/* Notification content: error working with transaction */
+"content.error" = "Etwas ist schiefgelaufen!";
+
+/* Notification content: error format */
+"content.error.format" = "Etwas ist schiefgelaufen: %@";
+
+/* New transfer notification title */
+"transfer.notificationTitle" = "Neue Transaktion";
+
+/* Transfer notification body format */
+"transfer.notificationBody.format" = "Ein Nutzer hat Ihnen %@ gesendet";
+
+/* Transfer notification: 'Your address' */
+"transfer.notificationBody.yourAddress" = "Sie";

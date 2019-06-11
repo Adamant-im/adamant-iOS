@@ -1,0 +1,22 @@
+/* 
+  notificationContent.strings
+  Adamant
+
+  Created by Anokhov Pavel on 30/05/2019.
+  Copyright © 2019 Adamant. All rights reserved.
+*/
+
+/* Notification content: error working with transaction */
+"content.error" = "Something went wrong!";
+
+/* Notification content: error format */
+"content.error.format" = "Something went wrong: %@";
+
+/* New transfer notification title */
+"transfer.notificationTitle" = "New Transfer";
+
+/* Transfer notification body format */
+"transfer.notificationBody.format" = "User has transferred you %@";
+
+/* Transfer notification: 'Your address' */
+"transfer.notificationBody.yourAddress" = "You";
