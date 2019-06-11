@@ -141,6 +141,6 @@ extension RichMessageTransfer {
 
 extension RichMessageTransfer {
     static func serialize(balance: Decimal) -> String {
-        return AdamantBalanceFormat.rawNumberDotFormatter.string(fromDecimal: balance) ?? "0"
+        return AdamantBalanceFormat.rawNumberDotFormatter.string(from: balance) ?? "0"
     }
 }

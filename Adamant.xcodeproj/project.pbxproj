@@ -164,6 +164,10 @@
 		E927171E20C04614002BB9A6 /* UIColor+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927171D20C04613002BB9A6 /* UIColor+hex.swift */; };
 		E9332B8921F1FA4400D56E72 /* OnboardRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9332B8821F1FA4400D56E72 /* OnboardRoutes.swift */; };
 		E933475B225539390083839E /* DogeGetTransactionsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E933475A225539390083839E /* DogeGetTransactionsResponse.swift */; };
+		E935C84B22ABE65100A8CA2F /* notificationContent.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9D664DA22A00E2800733F8A /* notificationContent.strings */; };
+		E935C84D22AC06E500A8CA2F /* RichMessageTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E935C84C22AC06E500A8CA2F /* RichMessageTools.swift */; };
+		E935C84E22AC079D00A8CA2F /* RichMessageTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E935C84C22AC06E500A8CA2F /* RichMessageTools.swift */; };
+		E935C84F22AC079F00A8CA2F /* RichMessageTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E935C84C22AC06E500A8CA2F /* RichMessageTools.swift */; };
 		E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9393FA92055D03300EE6F30 /* AdamantMessage.swift */; };
 		E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D732028B21400126346 /* ChatsProvider.swift */; };
 		E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93B0D752028B28E00126346 /* AdamantChatsProvider.swift */; };
@@ -673,6 +677,7 @@
 		E927171D20C04613002BB9A6 /* UIColor+hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+hex.swift"; sourceTree = "<group>"; };
 		E9332B8821F1FA4400D56E72 /* OnboardRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardRoutes.swift; sourceTree = "<group>"; };
 		E933475A225539390083839E /* DogeGetTransactionsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeGetTransactionsResponse.swift; sourceTree = "<group>"; };
+		E935C84C22AC06E500A8CA2F /* RichMessageTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichMessageTools.swift; sourceTree = "<group>"; };
 		E9393FA72055C92700EE6F30 /* Decimal+adamant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal+adamant.swift"; sourceTree = "<group>"; };
 		E9393FA92055D03300EE6F30 /* AdamantMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantMessage.swift; sourceTree = "<group>"; };
 		E93B0D732028B21400126346 /* ChatsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsProvider.swift; sourceTree = "<group>"; };
@@ -1555,6 +1560,7 @@
 				E98FC34120F9209900032D65 /* UIColor+adamant.swift */,
 				E927171D20C04613002BB9A6 /* UIColor+hex.swift */,
 				E9D1BE19211DA25300E86B72 /* UIView+constraints.swift */,
+				E935C84C22AC06E500A8CA2F /* RichMessageTools.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -1833,7 +1839,7 @@
 				TargetAttributes = {
 					E9079A7A229DEF9C0022CA0D = {
 						CreatedOnToolsVersion = 10.1;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.Keychain = {
 								enabled = 1;
@@ -1858,7 +1864,7 @@
 					};
 					E957E12C229B10F80019732A = {
 						CreatedOnToolsVersion = 10.1;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.Keychain = {
 								enabled = 1;
@@ -1867,7 +1873,7 @@
 					};
 					E96D64DA2295CD4700CA5587 = {
 						CreatedOnToolsVersion = 10.1;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.Keychain = {
 								enabled = 1;
@@ -1927,6 +1933,7 @@
 				E9981898212096ED0018C84C /* WalletViewControllerBase.xib in Resources */,
 				E983AE2D20E6720D00497E1A /* AccountFooter.xib in Resources */,
 				644793C52166315900FC4CF5 /* OnboardPage.xib in Resources */,
+				E935C84B22ABE65100A8CA2F /* notificationContent.strings in Resources */,
 				E9EC341B200524CA00C0E546 /* Roboto_300_normal.ttf in Resources */,
 				E95F85C8200A9B070070534A /* ChatTableViewCell.xib in Resources */,
 				E913C8F91FFFA51D001A83F7 /* Assets.xcassets in Resources */,
@@ -2373,6 +2380,7 @@
 				E96D64B62295BED700CA5587 /* NormalizedTransaction.swift in Sources */,
 				E9E7CDB52002BA6900DFC4DB /* SwinjectedRouter.swift in Sources */,
 				E908472C2196FEA80095825D /* CoreDataAccount+CoreDataClass.swift in Sources */,
+				E935C84D22AC06E500A8CA2F /* RichMessageTools.swift in Sources */,
 				E9A03FD220DBC0F2007653A1 /* NodeEditorViewController.swift in Sources */,
 				E96D64B82295BED700CA5587 /* ChatType.swift in Sources */,
 				E9393FAA2055D03300EE6F30 /* AdamantMessage.swift in Sources */,
@@ -2556,6 +2564,7 @@
 				E957E15E229C43EE0019732A /* Decimal+adamant.swift in Sources */,
 				E957E141229BFF920019732A /* Date+adamant.swift in Sources */,
 				E957E148229C3E530019732A /* ServerResponse.swift in Sources */,
+				E935C84F22AC079F00A8CA2F /* RichMessageTools.swift in Sources */,
 				E957E140229BFF210019732A /* AdamantBalanceFormat.swift in Sources */,
 				E957E132229B10F80019732A /* NotificationViewController.swift in Sources */,
 				E9D664CC22A0075B00733F8A /* UIView+constraints.swift in Sources */,
@@ -2614,6 +2623,7 @@
 				E9EF7A8022A02DBC00F2E1C2 /* AdamantLocalized.swift in Sources */,
 				E9771D9722996FEB0099AAC7 /* TransactionType.swift in Sources */,
 				E957E128229B0CF10019732A /* NotificationContent.swift in Sources */,
+				E935C84E22AC079D00A8CA2F /* RichMessageTools.swift in Sources */,
 				E957E124229B0C330019732A /* AdamantNotificationKeys.swift in Sources */,
 				E957E0ED229982FF0019732A /* Keypair.swift in Sources */,
 				E957E0FB229AB9310019732A /* AdamantProvider.swift in Sources */,
@@ -2736,15 +2746,16 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/MessageNotificationContentExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.MessageNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev ext MessageNotification";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2759,14 +2770,15 @@
 				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/MessageNotificationContentExtension.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.MessageNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger ext MessageNotification";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 4.2;
@@ -2906,7 +2918,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "e4233bbf-3705-44fe-95b0-e77475672c60";
-				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Debug Dev";
+				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2929,7 +2941,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "bedd1b75-2f23-4a85-a0b2-14c424fcff42";
-				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev";
+				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2941,15 +2953,16 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = TransferNotificationContentExtension/TransferNotificationContentExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.TransferNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev ext TransferNotification";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2964,14 +2977,15 @@
 				CODE_SIGN_ENTITLEMENTS = TransferNotificationContentExtension/TransferNotificationContentExtension.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.TransferNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger ext TransferNotification";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 4.2;
@@ -2985,7 +2999,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/NotificationServiceExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -2994,6 +3008,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.NotificationServiceExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev ext NotificationService";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3008,7 +3023,7 @@
 				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/NotificationServiceExtension.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -3016,6 +3031,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.NotificationServiceExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger ext NotificationService";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 4.2;

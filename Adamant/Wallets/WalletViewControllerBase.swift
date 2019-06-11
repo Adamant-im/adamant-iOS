@@ -344,7 +344,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         let fiatString: String?
         if balance > 0, let symbol = symbol, let rate = currencyInfoService.getRate(for: symbol) {
             let fiat = balance * rate
-            fiatString = fiatFormatter.string(fromDecimal: fiat)
+            fiatString = fiatFormatter.string(from: fiat)
         } else {
             fiatString = nil
         }

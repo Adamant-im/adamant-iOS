@@ -40,7 +40,7 @@ class ExtensionsApi {
     // MARK: - API
     
     // MARK: Transactions
-    func getTransaction(by id: String) -> Transaction? {
+    func getTransaction(by id: UInt64) -> Transaction? {
         // MARK: 1. Getting Transaction
         var response: ServerModelResponse<Transaction>? = nil
         var nodeUrl: URL! = nil
@@ -62,7 +62,8 @@ class ExtensionsApi {
                 }
                 
                 components.path = "/api/transactions/get"
-                components.queryItems = [URLQueryItem(name: "id", value: id)]
+                components.queryItems = [URLQueryItem(name: "id", value: "\(id)"),
+                                         URLQueryItem(name: "returnAsset", value: "1")]
                 
                 if let url = components.url {
                     let data = try Data(contentsOf: url)
@@ -83,27 +84,23 @@ class ExtensionsApi {
         
         // MARK: 2. Working on transaction
         
-        // ******
-        // Waiting for API...
-        // ******
-        
-        if transaction.type == .chatMessage {
+        // For old nodes - if /api/transaction/get doesn't return chat asset - get it from /api/chats/
+        if transaction.type == .chatMessage, transaction.asset.chat == nil {
             do {
                 guard var components = URLComponents(url: nodeUrl, resolvingAgainstBaseURL: false) else {
                     return nil
                 }
                 
                 components.path = "/api/chats/get"
-                components.queryItems = [URLQueryItem(name: "isIn", value: transaction.recipientId),
+                components.queryItems = [URLQueryItem(name: "recipientId", value: transaction.recipientId),
                                          URLQueryItem(name: "orderBy", value: "timestamp:asc"),
-                                         URLQueryItem(name: "fromHeight", value: "\(transaction.height - 1)"),
-                                         URLQueryItem(name: "limit", value: "1"),
+                                         URLQueryItem(name: "fromHeight", value: "\(transaction.height - 1)")
                 ]
                 
                 if let url = components.url {
                     let data = try Data(contentsOf: url)
                     let collection = try JSONDecoder().decode(ServerCollectionResponse<Transaction>.self, from: data)
-                    return collection.collection?.first
+                    return collection.collection?.first { $0.id == id }
                 } else {
                     return nil
                 }
@@ -113,10 +110,6 @@ class ExtensionsApi {
         } else {
             return transaction
         }
-        
-        // ******
-        // Waiting for API...
-        // ******
     }
     
     // MARK: Address book

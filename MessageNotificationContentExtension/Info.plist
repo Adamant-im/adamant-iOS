@@ -17,17 +17,17 @@
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>1.7</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>84</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionAttributes</key>
 		<dict>
-			<key>UNNotificationExtensionDefaultContentHidden</key>
-			<true/>
 			<key>UNNotificationExtensionCategory</key>
 			<string>message</string>
+			<key>UNNotificationExtensionDefaultContentHidden</key>
+			<true/>
 			<key>UNNotificationExtensionInitialContentSizeRatio</key>
 			<real>0.38</real>
 		</dict>

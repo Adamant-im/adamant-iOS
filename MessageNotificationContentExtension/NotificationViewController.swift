@@ -49,7 +49,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         if let transactionRaw = notification.request.content.userInfo[AdamantNotificationUserInfoKeys.transaction] as? String, let data = transactionRaw.data(using: .utf8) {
             trs = try? JSONDecoder().decode(Transaction.self, from: data)
         } else {
-            guard let id = notification.request.content.userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String else {
+            guard let raw = notification.request.content.userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String, let id = UInt64(raw) else {
                 showError()
                 return
             }

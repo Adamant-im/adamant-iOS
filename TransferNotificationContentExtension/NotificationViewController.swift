@@ -105,7 +105,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         if let transactionRaw = notification.request.content.userInfo[AdamantNotificationUserInfoKeys.transaction] as? String, let data = transactionRaw.data(using: .utf8) {
             trs = try? JSONDecoder().decode(Transaction.self, from: data)
         } else {
-            guard let id = notification.request.content.userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String else {
+            guard let raw = notification.request.content.userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String, let id = UInt64(raw) else {
                 showError()
                 return
             }
@@ -160,7 +160,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             // Rich message
             case .richMessage:
                 guard let data = message.data(using: String.Encoding.utf8),
-                    let richContent = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String:String],
+                    let richContent = RichMessageTools.richContent(from: data),
                     let key = richContent[RichContentKeys.type]?.lowercased(),
                     let p = richMessageProviders[key] else {
                         showError()

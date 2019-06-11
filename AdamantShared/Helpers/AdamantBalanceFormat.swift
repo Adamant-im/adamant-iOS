@@ -66,17 +66,17 @@ enum AdamantBalanceFormat {
 	
 	var defaultFormatter: NumberFormatter {
 		switch self {
-		case .full: return AdamantBalanceFormat.currencyFormatterFull
-		case .compact: return AdamantBalanceFormat.currencyFormatterCompact
-		case .short: return AdamantBalanceFormat.currencyFormatterShort
+		case .full: return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: nil)
+		case .compact: return AdamantBalanceFormat.currencyFormatter(for: .compact, currencySymbol: nil)
+		case .short: return AdamantBalanceFormat.currencyFormatter(for: .short, currencySymbol: nil)
 		}
 	}
 	
 	func format(_ value: Decimal, withCurrencySymbol symbol: String? = nil) -> String {
 		if let symbol = symbol {
-			return "\(defaultFormatter.string(fromDecimal: value)!) \(symbol)"
+			return "\(defaultFormatter.string(from: value)!) \(symbol)"
 		} else {
-			return defaultFormatter.string(fromDecimal: value)!
+			return defaultFormatter.string(from: value)!
 		}
 	}
     
@@ -132,7 +132,7 @@ enum AdamantBalanceFormat {
 
 // MARK: - Helper
 extension NumberFormatter {
-	func string(fromDecimal decimal: Decimal) -> String? {
+	func string(from decimal: Decimal) -> String? {
 		return string(from: decimal as NSNumber)
 	}
 }
