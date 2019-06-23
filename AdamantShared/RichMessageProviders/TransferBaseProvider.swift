@@ -8,8 +8,11 @@
 
 import UIKit
 import UserNotifications
+import MarkdownKit
 
 class TransferBaseProvider: TransferNotificationContentProvider {
+    
+    /// Create notification content for Rich messages
     func notificationContent(for transaction: Transaction, partnerAddress: String, partnerName: String?, richContent: [String:String]) -> NotificationContent? {
         guard let amountRaw = richContent[RichContentKeys.transfer.amount], let amount = Decimal(string: amountRaw) else {
             return nil
@@ -25,12 +28,15 @@ class TransferBaseProvider: TransferNotificationContentProvider {
         return notificationContent(partnerAddress: partnerAddress, partnerName: partnerName, amount: amount, comment: comment)
     }
     
+    
+    /// Create notification content for rich transfers with comments, such as ADM transfer
     func notificationContent(partnerAddress: String, partnerName: String?, amount: Decimal, comment: String?) -> NotificationContent? {
         let amountFormated = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
         var body = String.adamantLocalized.notifications.yourTransferBody(with: amountFormated)
         
         if let comment = comment {
-            body = "\(body)\n\(comment)"
+            let stripped = MarkdownParser().parse(comment).string
+            body = "\(body)\n\(stripped)"
         }
         
         let identifier = type(of: self).richMessageType

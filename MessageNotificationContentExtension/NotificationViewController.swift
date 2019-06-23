@@ -9,6 +9,7 @@
 import UIKit
 import UserNotifications
 import UserNotificationsUI
+import MarkdownKit
 
 class NotificationViewController: UIViewController, UNNotificationContentExtension {
     
@@ -140,7 +141,14 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         }
         
         senderAvatarImageView.image = avatarService.avatar(for: transaction.senderPublicKey, size: Double(senderAvatarImageView.frame.height))
-        messageLabel.text = message
+        
+        let parsed = MarkdownParser(font: messageLabel.font).parse(message)
+        if parsed.string.count != message.count {
+            messageLabel.attributedText = parsed
+        } else {
+            messageLabel.text = message
+        }
+        
         dateLabel.text = transaction.date.humanizedDateTime()
         
         // MARK: 4. View size
