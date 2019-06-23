@@ -593,13 +593,13 @@
 		E905D39C204C13B900DDB504 /* SecuredStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuredStore.swift; sourceTree = "<group>"; };
 		E905D39E204C281400DDB504 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		E9061B96207501E40011F104 /* AdamantUserInfoKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantUserInfoKey.swift; sourceTree = "<group>"; };
-		E9061B982077AF8E0011F104 /* Adamant.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Adamant.entitlements; sourceTree = "<group>"; };
+		E9061B982077AF8E0011F104 /* Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Debug.entitlements; sourceTree = "<group>"; };
 		E907350D2256779C00BF02CC /* DogeMainnet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeMainnet.swift; sourceTree = "<group>"; };
 		E9079A7B229DEF9C0022CA0D /* MessageNotificationContentExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MessageNotificationContentExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9079A7F229DEF9C0022CA0D /* NotificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewController.swift; sourceTree = "<group>"; };
 		E9079A82229DEF9C0022CA0D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		E9079A84229DEF9C0022CA0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E9079A8B229DEFE40022CA0D /* MessageNotificationContentExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MessageNotificationContentExtension.entitlements; sourceTree = "<group>"; };
+		E9079A8B229DEFE40022CA0D /* Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Release.entitlements; sourceTree = "<group>"; };
 		E908471A2196FE590095825D /* Adamant.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Adamant.xcdatamodel; sourceTree = "<group>"; };
 		E908471C2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichMessageTransaction+CoreDataClass.swift"; sourceTree = "<group>"; };
 		E908471D2196FEA80095825D /* RichMessageTransaction+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichMessageTransaction+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -736,7 +736,7 @@
 		E957E131229B10F80019732A /* NotificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewController.swift; sourceTree = "<group>"; };
 		E957E134229B10F80019732A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		E957E136229B10F80019732A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E957E13D229B118E0019732A /* TransferNotificationContentExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TransferNotificationContentExtension.entitlements; sourceTree = "<group>"; };
+		E957E13D229B118E0019732A /* Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Release.entitlements; sourceTree = "<group>"; };
 		E957E155229C3F630019732A /* ExtensionsApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionsApi.swift; sourceTree = "<group>"; };
 		E957E170229C56EE0019732A /* Shared.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Shared.xcassets; sourceTree = "<group>"; };
 		E95CB452205D77B200A7218E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -787,7 +787,7 @@
 		E972206A201F44CA004F2AAD /* TransfersProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransfersProvider.swift; sourceTree = "<group>"; };
 		E974D167215D033C003AD7E8 /* ChatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCell.swift; sourceTree = "<group>"; };
 		E9771D7A2299456A0099AAC7 /* AdamantSecret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantSecret.swift; sourceTree = "<group>"; };
-		E9771D7D22995C870099AAC7 /* NotificationServiceExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotificationServiceExtension.entitlements; sourceTree = "<group>"; };
+		E9771D7D22995C870099AAC7 /* Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Debug.entitlements; sourceTree = "<group>"; };
 		E9771D802299602D0099AAC7 /* AdamantResources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantResources.swift; sourceTree = "<group>"; };
 		E9771D9D22997A6F0099AAC7 /* NativeCore+AdamantCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NativeCore+AdamantCore.swift"; sourceTree = "<group>"; };
 		E9771D9F22997D320099AAC7 /* AdamantUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantUtilities.swift; sourceTree = "<group>"; };
@@ -837,6 +837,10 @@
 		E9B3D3A8202082450019EB36 /* AdamantTransfersProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantTransfersProvider.swift; sourceTree = "<group>"; };
 		E9B4E1A7210F079E007E77FC /* DoubleDetailsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoubleDetailsTableViewCell.swift; sourceTree = "<group>"; };
 		E9B4E1A9210F08BE007E77FC /* DoubleDetailsTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DoubleDetailsTableViewCell.xib; sourceTree = "<group>"; };
+		E9B994BF22BFD678004CD645 /* Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Debug.entitlements; sourceTree = "<group>"; };
+		E9B994C022BFD6F9004CD645 /* Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Debug.entitlements; sourceTree = "<group>"; };
+		E9B994C122BFD723004CD645 /* Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Release.entitlements; sourceTree = "<group>"; };
+		E9B994C222BFD73F004CD645 /* Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Release.entitlements; sourceTree = "<group>"; };
 		E9C51ECE200E2D1100385EB7 /* FeeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeeTests.swift; sourceTree = "<group>"; };
 		E9C51EEE20139DC600385EB7 /* TransactionIdResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionIdResponse.swift; sourceTree = "<group>"; };
 		E9C51EF02013F18000385EB7 /* NewChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewChatViewController.swift; sourceTree = "<group>"; };
@@ -1016,7 +1020,8 @@
 				E9079A7F229DEF9C0022CA0D /* NotificationViewController.swift */,
 				E9079A81229DEF9C0022CA0D /* MainInterface.storyboard */,
 				E9079A84229DEF9C0022CA0D /* Info.plist */,
-				E9079A8B229DEFE40022CA0D /* MessageNotificationContentExtension.entitlements */,
+				E9079A8B229DEFE40022CA0D /* Release.entitlements */,
+				E9B994BF22BFD678004CD645 /* Debug.entitlements */,
 			);
 			path = MessageNotificationContentExtension;
 			sourceTree = "<group>";
@@ -1066,7 +1071,8 @@
 				E913C8F11FFFA51D001A83F7 /* AppDelegate.swift */,
 				E9E7CD9020026FA100DFC4DB /* SwinjectDependencies.swift */,
 				E913C8FD1FFFA51E001A83F7 /* Info.plist */,
-				E9061B982077AF8E0011F104 /* Adamant.entitlements */,
+				E9B994C222BFD73F004CD645 /* Release.entitlements */,
+				E9061B982077AF8E0011F104 /* Debug.entitlements */,
 			);
 			path = Adamant;
 			sourceTree = "<group>";
@@ -1353,7 +1359,8 @@
 				E957E131229B10F80019732A /* NotificationViewController.swift */,
 				E957E133229B10F80019732A /* MainInterface.storyboard */,
 				E957E136229B10F80019732A /* Info.plist */,
-				E957E13D229B118E0019732A /* TransferNotificationContentExtension.entitlements */,
+				E957E13D229B118E0019732A /* Release.entitlements */,
+				E9B994C022BFD6F9004CD645 /* Debug.entitlements */,
 			);
 			path = TransferNotificationContentExtension;
 			sourceTree = "<group>";
@@ -1483,7 +1490,8 @@
 				E957E102229AF01E0019732A /* WalletImages */,
 				E96D64DD2295CD4700CA5587 /* NotificationService.swift */,
 				E96D64DF2295CD4700CA5587 /* Info.plist */,
-				E9771D7D22995C870099AAC7 /* NotificationServiceExtension.entitlements */,
+				E9B994C122BFD723004CD645 /* Release.entitlements */,
+				E9771D7D22995C870099AAC7 /* Debug.entitlements */,
 			);
 			path = NotificationServiceExtension;
 			sourceTree = "<group>";
@@ -2745,7 +2753,7 @@
 			baseConfigurationReference = D9C7E139AC9998DCD11782D9 /* Pods-MessageNotificationContentExtension.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/MessageNotificationContentExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/Debug.entitlements;
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
@@ -2767,7 +2775,7 @@
 			baseConfigurationReference = 3443FEA540D1541301322210 /* Pods-MessageNotificationContentExtension.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/MessageNotificationContentExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/Release.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
@@ -2908,7 +2916,7 @@
 			baseConfigurationReference = ADDFD2FA17E41CCBD11A1733 /* Pods-Adamant.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Adamant/Adamant.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Adamant/Debug.entitlements;
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = ADM.Dev;
@@ -2929,7 +2937,7 @@
 			baseConfigurationReference = AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Adamant/Adamant.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Adamant/Release.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
@@ -2952,7 +2960,7 @@
 			baseConfigurationReference = E876A5F384672F2858E55A81 /* Pods-TransferNotificationContentExtension.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_ENTITLEMENTS = TransferNotificationContentExtension/TransferNotificationContentExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = TransferNotificationContentExtension/Debug.entitlements;
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
@@ -2974,7 +2982,7 @@
 			baseConfigurationReference = D741A9D5A7D96E2BEE5F129A /* Pods-TransferNotificationContentExtension.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_ENTITLEMENTS = TransferNotificationContentExtension/TransferNotificationContentExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = TransferNotificationContentExtension/Release.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
@@ -2998,7 +3006,7 @@
 			baseConfigurationReference = 742D9BA5B194D115A9EBED8C /* Pods-NotificationServiceExtension.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/NotificationServiceExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/Debug.entitlements;
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
@@ -3020,7 +3028,7 @@
 			baseConfigurationReference = 574F8302871CE64C213242AB /* Pods-NotificationServiceExtension.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/NotificationServiceExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/Release.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
