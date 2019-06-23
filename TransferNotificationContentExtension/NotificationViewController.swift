@@ -9,6 +9,7 @@
 import UIKit
 import UserNotifications
 import UserNotificationsUI
+import MarkdownKit
 
 class NotificationViewController: UIViewController, UNNotificationContentExtension {
     private let passphraseStoreKey = "accountService.passphrase"
@@ -227,7 +228,13 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         currencySymbolLabel.text = provider.currencySymbol
         
         if let comments = comments {
-            commentLabel.text = comments
+            let parsed = MarkdownParser(font: commentLabel.font).parse(comments)
+            
+            if parsed.string.count != comments.count {
+                commentLabel.attributedText = parsed
+            } else {
+                commentLabel.text = comments
+            }
         } else {
             commentLabel.isHidden = true
         }
