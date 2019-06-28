@@ -14,6 +14,11 @@ def core_pods
   pod 'libsodium' # Sodium crypto library
 end
 
+# Markdown parser, forked with fixed whitespaces. '5 * 5 * 6'
+def markdown_pods
+  pod 'MarkdownKit', :git => 'https://github.com/RealBonus/MarkdownKit'
+end
+
  # ADAMANT Messenger iOS app
 target 'Adamant' do
   use_frameworks!
@@ -21,7 +26,6 @@ target 'Adamant' do
   pod 'Alamofire' # Network
   pod 'Swinject' # Dependency Injection
   pod 'ReachabilitySwift' # Network status
-  pod 'MarkdownKit', :git => 'https://github.com/RealBonus/MarkdownKit' # Markdown parser, forked fixing whitespaces '5 * 5 * 6'
   pod 'DateToolsSwift' # Date formatter tools
   pod 'ProcedureKit' # Async programming tools
   
@@ -47,6 +51,7 @@ target 'Adamant' do
   # Shared
   keychain_pods
   core_pods
+  markdown_pods
 end
 
 target 'AdamantTests' do
@@ -59,6 +64,7 @@ target 'NotificationServiceExtension' do
   use_frameworks!
   keychain_pods
   core_pods
+  markdown_pods
 end
 
 # Adamant TransferNotificationContentExtension - Notification Content Extension for transfers
@@ -66,6 +72,7 @@ target 'TransferNotificationContentExtension' do
   use_frameworks!
   keychain_pods
   core_pods
+  markdown_pods
   pod 'DateToolsSwift' # Date formatter tools
 end
 
@@ -74,5 +81,6 @@ target 'MessageNotificationContentExtension' do
   use_frameworks!
   keychain_pods
   core_pods
+  markdown_pods
   pod 'DateToolsSwift' # Date formatter tools
 end
