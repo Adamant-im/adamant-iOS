@@ -191,6 +191,10 @@ protocol WalletService: class {
 	// MARK: Currency
 	static var currencySymbol: String { get }
 	static var currencyLogo: UIImage { get }
+    
+    var tokenSymbol: String { get }
+    var tokenName: String { get }
+    var tokenLogo: UIImage { get }
 	
 	// MARK: Notifications
 	

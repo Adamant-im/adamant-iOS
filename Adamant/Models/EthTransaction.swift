@@ -213,6 +213,9 @@ struct EthTransactionShort {
     let value: Decimal
     let blockNumber: String
     
+    let contract_to: String
+    let contract_value: Decimal
+    
     func asEthTransaction(isOutgoing: Bool) -> EthTransaction {
         return EthTransaction(date: date,
                               hash: hash,
@@ -239,6 +242,8 @@ extension EthTransactionShort: Decodable {
         case block
         case txhash
         case value
+        case contract_to
+        case contract_value
     }
     
     init(from decoder: Decoder) throws {
@@ -269,6 +274,12 @@ extension EthTransactionShort: Decodable {
         // Value
         let valueRaw = try container.decode(Decimal.self, forKey: .value)
         value = Decimal(sign: .plus, exponent: EthWalletService.currencyExponent, significand: valueRaw)
+        
+        contract_to = try container.decode(String.self, forKey: .contract_to)
+        
+        let contractValueRaw = try container.decode(String.self, forKey: .contract_value)
+        contract_value = BigUInt(contractValueRaw, radix: 16)?.asDecimal(exponent: EthWalletService.currencyExponent) ?? 0
+        
     }
 }
 

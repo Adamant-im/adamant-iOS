@@ -25,7 +25,7 @@ extension AdamantScene {
             // Transfer handlers from accountService' wallet services
             if let accountService = r.resolve(AccountService.self) {
                 for case let provider as RichMessageProvider in accountService.wallets {
-                    c.richMessageProviders[type(of: provider).richMessageType] = provider
+                    c.richMessageProviders[provider.dynamicRichMessageType] = provider
                 }
             }
             
@@ -44,7 +44,7 @@ extension AdamantScene {
             // Transfer handlers from accountService' wallet services
             if let accountService = r.resolve(AccountService.self) {
                 for case let provider as RichMessageProvider in accountService.wallets {
-                    c.richMessageProviders[type(of: provider).richMessageType] = provider
+                    c.richMessageProviders[provider.dynamicRichMessageType] = provider
                 }
             }
 			

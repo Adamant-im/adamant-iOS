@@ -69,6 +69,18 @@ class DogeWalletService: WalletService {
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
     static let chunkSize = 20
     
+    var tokenSymbol: String {
+        return type(of: self).currencySymbol
+    }
+    
+    var tokenName: String {
+        return ""
+    }
+    
+    var tokenLogo: UIImage {
+        return type(of: self).currencyLogo
+    }
+    
     private (set) var transactionFee: Decimal = 1.0 // 1 DOGE per transaction
     
     static let kvsAddress = "doge:address"

@@ -794,9 +794,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
             return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm")) as! T
         }
         
-        let serviceType = type(of: service)
-        
-        let item = WalletPagingItem(index: index, currencySymbol: serviceType.currencySymbol, currencyImage: serviceType.currencyLogo)
+        let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo)
         
         if let wallet = service.wallet {
             item.balance = wallet.balance

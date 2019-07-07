@@ -20,6 +20,18 @@ class AdmWalletService: NSObject, WalletService {
 	static let currencySymbol = "ADM"
 	static let currencyLogo = #imageLiteral(resourceName: "wallet_adm")
     static let currencyExponent: Int = AdamantUtilities.admCurrencyExponent
+    
+    var tokenSymbol: String {
+        return type(of: self).currencySymbol
+    }
+    
+    var tokenName: String {
+        return ""
+    }
+    
+    var tokenLogo: UIImage {
+        return type(of: self).currencyLogo
+    }
 	
 	// MARK: - Dependencies
 	weak var accountService: AccountService!

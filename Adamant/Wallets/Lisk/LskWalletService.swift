@@ -58,6 +58,17 @@ class LskWalletService: WalletService {
     static let kvsAddress = "lsk:address"
     static let defaultFee = 0.1
 	
+    var tokenSymbol: String {
+        return type(of: self).currencySymbol
+    }
+    
+    var tokenName: String {
+        return ""
+    }
+    
+    var tokenLogo: UIImage {
+        return type(of: self).currencyLogo
+    }
 	
 	// MARK: - Properties
 	let transferAvailable: Bool = true

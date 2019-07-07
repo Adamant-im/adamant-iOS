@@ -18,6 +18,8 @@ protocol RichMessageProvider: class {
     /// Lowercased!!
     static var richMessageType: String { get }
     
+    var dynamicRichMessageType: String { get }
+    
     var cellIdentifierSent: String { get }
     var cellIdentifierReceived: String { get }
     var cellSource: CellSource? { get }
@@ -31,6 +33,12 @@ protocol RichMessageProvider: class {
     // MARK: MessageKit
     func cellSizeCalculator(for messagesCollectionViewFlowLayout: MessagesCollectionViewFlowLayout) -> CellSizeCalculator
     func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell
+}
+
+extension RichMessageProvider {
+    var dynamicRichMessageType: String {
+        return type(of: self).richMessageType
+    }
 }
 
 protocol RichMessageProviderWithStatusCheck: RichMessageProvider {

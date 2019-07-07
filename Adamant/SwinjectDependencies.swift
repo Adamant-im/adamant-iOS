@@ -157,7 +157,7 @@ extension Container {
             provider.accountService = accountService
             var richProviders = [String: RichMessageProviderWithStatusCheck]()
             for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
-                richProviders[type(of: provider).richMessageType] = provider
+                richProviders[provider.dynamicRichMessageType] = provider
             }
             provider.richProviders = richProviders
 			return provider

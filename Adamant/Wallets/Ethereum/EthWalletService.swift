@@ -48,6 +48,18 @@ class EthWalletService: WalletService {
 	static let currencySymbol = "ETH"
 	static let currencyLogo = #imageLiteral(resourceName: "wallet_eth")
 	static let currencyExponent = -18
+    
+    var tokenSymbol: String {
+        return type(of: self).currencySymbol
+    }
+    
+    var tokenName: String {
+        return ""
+    }
+    
+    var tokenLogo: UIImage {
+        return type(of: self).currencyLogo
+    }
 	
 	private (set) var transactionFee: Decimal = 0.0
 	
@@ -79,7 +91,7 @@ class EthWalletService: WalletService {
     
 	// MARK: - Properties
 	
-    private static let transactionsListApiSubpath = "ethtxs"
+    public static let transactionsListApiSubpath = "ethtxs"
     
 	private(set) var web3: web3!
 	private var baseUrl: String!
