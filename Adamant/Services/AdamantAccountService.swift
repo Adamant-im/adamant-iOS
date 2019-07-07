@@ -108,7 +108,15 @@ class AdamantAccountService: AccountService {
 		AdmWalletService(),
 		EthWalletService(),
         LskWalletService(mainnet: true, origins: AdamantResources.lskServers),
-        DogeWalletService()
+        DogeWalletService(),
+        
+        ERC20WalletService(token: ERC20Token.BNB),
+        ERC20WalletService(token: ERC20Token.BZ),
+        ERC20WalletService(token: ERC20Token.KCS)
+        
+        // Test ERC20 Tokens in Ropsten testnet
+//        ERC20WalletService(token: ERC20Token.BOKKY),
+//        ERC20WalletService(token: ERC20Token.WEENUS)
         
         // Testnet
 //        LskWalletService(mainnet: false)

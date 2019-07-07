@@ -133,6 +133,9 @@
 /* Account tab: 'Send DOGE tokens' button */
 "AccountTab.Row.SendDoge" = "Отправить DOGE";
 
+/* Account tab: 'Send ERC20 tokens' button */
+"AccountTab.Row.SendToken" = "Отправить %@";
+
 /* Account tab: Anonymously buy ADM tokens */
 "AccountTab.Row.AnonymouslyBuyADM" = "Купить ADM анонимно";
 
@@ -177,6 +180,9 @@
 
 /* Account tab: Doge wallet */
 "AccountTab.Wallets.doge_wallet" = "Кошелек Doge";
+
+/* Account tab: ERC20 wallet */
+"AccountTab.Wallets.erc20_wallet" = "Кошелек %@";
 
 /* Account tab: Delegates section title */
 "AccountTab.Section.Delegates" = "Делегаты";
