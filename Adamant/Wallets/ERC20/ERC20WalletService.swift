@@ -142,10 +142,10 @@ class ERC20WalletService: WalletService {
         }
         
         DispatchQueue.global(qos: .userInitiated).async {
-//            guard let url = URL(string: apiUrl), let web3 = Web3.new(url) else {
-//                return
-//            }
-            let web3 = Web3.InfuraRopstenWeb3()
+            guard let url = URL(string: apiUrl), let web3 = Web3.new(url) else {
+                return
+            }
+//            let web3 = Web3.InfuraRopstenWeb3()
             self.web3 = web3
             self.baseUrl = ERC20WalletService.buildBaseUrl(for: web3.provider.network)
             
