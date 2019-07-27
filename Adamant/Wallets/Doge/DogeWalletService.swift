@@ -117,6 +117,19 @@ class DogeWalletService: WalletService {
         self.network = DogeMainnet()
         
         self.setState(.notInitiated)
+        
+        // MARK: Notifications
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
+            self?.update()
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
+            self?.update()
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
+            self?.dogeWallet = nil
+        }
     }
     
     func update() {

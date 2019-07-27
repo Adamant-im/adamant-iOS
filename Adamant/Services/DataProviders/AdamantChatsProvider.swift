@@ -670,6 +670,10 @@ extension AdamantChatsProvider {
 				// Leave 1
 				dispatchGroup.leave()
 			}
+            
+            if self.accountService.account == nil {
+                return
+            }
 			
 			switch result {
 			case .success(let transactions):
