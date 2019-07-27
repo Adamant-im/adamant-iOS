@@ -78,7 +78,7 @@ class AdmWalletService: NSObject, WalletService {
 	}
 	
 	func update() {
-		guard let account = accountService.account else {
+		guard let accountService = accountService, let account = accountService.account else {
 			wallet = nil
 			return
 		}
