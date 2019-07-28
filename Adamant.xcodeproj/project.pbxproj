@@ -860,7 +860,6 @@
 		E9D664DB22A00E2E00733F8A /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/notificationContent.strings; sourceTree = "<group>"; };
 		E9D664DC22A00E4300733F8A /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/notificationContent.strings; sourceTree = "<group>"; };
 		E9DFB71B21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdmTransactionDetailsViewController.swift; sourceTree = "<group>"; };
-		E9DFB71D21651FBD00CF8C7C /* JSAdamantCore+Native.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "JSAdamantCore+Native.swift"; sourceTree = "<group>"; };
 		E9E7CD8A20026B0600DFC4DB /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 		E9E7CD8C20026B6600DFC4DB /* DialogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogService.swift; sourceTree = "<group>"; };
 		E9E7CD8E20026CD300DFC4DB /* AdamantDialogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantDialogService.swift; sourceTree = "<group>"; };
@@ -1222,7 +1221,6 @@
 		E9220E0C21988D9A009C9642 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
-				E9DFB71D21651FBD00CF8C7C /* JSAdamantCore+Native.swift */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
