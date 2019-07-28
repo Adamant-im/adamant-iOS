@@ -129,6 +129,11 @@ class DogeWalletService: WalletService {
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
             self?.dogeWallet = nil
+            self?.initialBalanceCheck = false
+            if let balanceObserver = self?.balanceObserver {
+                NotificationCenter.default.removeObserver(balanceObserver)
+                self?.balanceObserver = nil
+            }
         }
     }
     
