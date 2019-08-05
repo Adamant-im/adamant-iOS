@@ -531,6 +531,13 @@ extension ChatListViewController: NewChatViewControllerDelegate {
 		guard let chatroom = account.chatroom else {
 			fatalError("No chatroom?")
 		}
+        
+        if let name = account.name, let address = account.address {
+            let oldName = self.addressBook.addressBook[address]
+            if oldName == nil || oldName != name {
+                self.addressBook.set(name: name, for: address)
+            }
+        }
 		
 		DispatchQueue.main.async { [weak self] in
             guard let vc = self?.chatViewController(for: chatroom) else {

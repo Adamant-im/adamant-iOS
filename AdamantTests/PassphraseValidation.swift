@@ -18,7 +18,7 @@ class PassphraseValidation: XCTestCase {
 	
 	func testTwelveWords() {
 		let eleven = "one two three four five six seven eight nine ten eleven"
-		let twelve = "one two three four five six seven eight nine ten eleven twelve"
+		let twelve = "bring hurry funny hamster fever observe cat property crawl mule course lizard"
 		let thirteen = "one two three four five six seven eight nine ten eleven twelve thirteen"
 		
 		XCTAssertFalse(AdamantUtilities.validateAdamantPassphrase(passphrase: eleven))

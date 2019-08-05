@@ -19,7 +19,7 @@ class AdmWalletService: NSObject, WalletService {
 	let transactionFee: Decimal = 0.5
 	static let currencySymbol = "ADM"
 	static let currencyLogo = #imageLiteral(resourceName: "wallet_adm")
-    static let currencyExponent: Int = -8
+    static let currencyExponent: Int = AdamantUtilities.admCurrencyExponent
 	
 	// MARK: - Dependencies
 	weak var accountService: AccountService!
@@ -78,7 +78,7 @@ class AdmWalletService: NSObject, WalletService {
 	}
 	
 	func update() {
-		guard let account = accountService.account else {
+		guard let accountService = accountService, let account = accountService.account else {
 			wallet = nil
 			return
 		}

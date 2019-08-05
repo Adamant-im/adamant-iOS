@@ -219,6 +219,12 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 		if let service = service {
             // MARK: Wallet updated
 			let walletUpdatedCallback = { [weak self] (notification: Notification) in
+                if let row: LabelRow = self?.form.rowBy(tag: BaseRows.address.tag) {
+                    if let wallet = service.wallet {
+                        row.value = wallet.address
+                    }
+                }
+                
                 guard let service = self?.service,
                     let wallet = service.wallet,
                     let vc = self,
@@ -344,7 +350,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         let fiatString: String?
         if balance > 0, let symbol = symbol, let rate = currencyInfoService.getRate(for: symbol) {
             let fiat = balance * rate
-            fiatString = fiatFormatter.string(fromDecimal: fiat)
+            fiatString = fiatFormatter.string(from: fiat)
         } else {
             fiatString = nil
         }

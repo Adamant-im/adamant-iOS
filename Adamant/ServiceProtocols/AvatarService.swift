@@ -12,3 +12,7 @@ import UIKit
 protocol AvatarService {
     func avatar(for key:String, size: Double) -> UIImage
 }
+
+extension AdamantAvatarService: AvatarService {
+    
+}

@@ -84,6 +84,7 @@ DEPENDENCIES:
   - Eureka
   - FreakingSimpleRoundImageView
   - FTIndicator
+  - GRDB.swift
   - KeychainAccess
   - libsodium
   - Lisk (from `https://github.com/adamant-im/lisk-swift.git`)
@@ -164,7 +165,8 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   Alamofire: 3ec537f71edc9804815215393ae2b1a8ea33a844
   BigInt: 76b5dfdfa3e2e478d4ffdf161aeede5502e2742f
-  BitcoinKit: af68da8b2c9a23bc355c711fdc6bbd0abc8cc447
+  BitcoinKit: 2c6049a1e8319aabd0cb1db9172cbb5412c4ee3f
+  ByteBackpacker: df001da117faacdbf09b69a116ec480f6651c9ec
   CryptoSwift: 1c07ca50843dd48bc54e6ea53d7a4dba3b645716
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   EFQRCode: e65a9eb6c7137ed6db4cfce37f0cee47938e44f0
@@ -199,6 +201,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: d80d1b9a3feca16e614acec9eea47ec26310d37d
 
-PODFILE CHECKSUM: 9af8f3629d8e6a389d6e0e698f6a8bf501dbb12e
+PODFILE CHECKSUM: 0bf602086adfe27d6043b83dcfd57b5bcc8a03ab
 
-COCOAPODS: 1.6.1
+COCOAPODS: 1.7.1

@@ -110,9 +110,9 @@ extension AdmWalletService: RichMessageProvider {
     
     private func shortDescription(isOutgoing: Bool, balance: Decimal) -> String {
         if isOutgoing {
-            return "⬅️  \(AdmWalletService.formatter.string(fromDecimal: balance)!)"
+            return "⬅️  \(AdmWalletService.formatter.string(from: balance)!)"
         } else {
-            return "➡️  \(AdmWalletService.formatter.string(fromDecimal: balance)!)"
+            return "➡️  \(AdmWalletService.formatter.string(from: balance)!)"
         }
     }
 }

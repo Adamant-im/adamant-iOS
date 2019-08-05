@@ -670,6 +670,10 @@ extension AdamantChatsProvider {
 				// Leave 1
 				dispatchGroup.leave()
 			}
+            
+            if self.accountService.account == nil {
+                return
+            }
 			
 			switch result {
 			case .success(let transactions):
@@ -979,94 +983,46 @@ extension AdamantChatsProvider {
 		
         let messageTransaction: ChatTransaction
         // MARK: Decode message, message must contain data
-        if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)?.trimmingCharacters(in: .whitespacesAndNewlines), !decodedMessage.isEmpty {
-            switch chat.type {
-            // MARK: Text message
-            case .message, .messageOld, .signal, .unknown:
-                if transaction.amount > 0 {
-                    let trs = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
-                    trs.comment = decodedMessage
-                    messageTransaction = trs
-                } else {
-                    let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                    trs.message = decodedMessage
-                    messageTransaction = trs
-                    
-                    let markdown = markdownParser.parse(decodedMessage)
-                    
-                    trs.isMarkdown = markdown.length != decodedMessage.count
-                }
-                
-            // MARK: Rich message
-            case .richMessage:
-                if let data = decodedMessage.data(using: String.Encoding.utf8), let jsonRaw = try? JSONSerialization.jsonObject(with: data, options: []) {
-                    switch jsonRaw {
-                    // MARK: Valid json
-                    case var json as [String:String]:
-                        // Supported rich message type
-                        if var type = json[RichContentKeys.type] {
-                            // Fix lowercase
-                            type = type.lowercased()
-                            json[RichContentKeys.type] = type
-                            
-                            let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
-                            trs.richContent = json
-                            trs.richType = type
-                            trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
-                            messageTransaction = trs
-                        }
-                            
-                            // Not supported, show as text message
-                        else {
-                            let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                            trs.message = decodedMessage
-                            messageTransaction = trs
-                        }
+        if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)?.trimmingCharacters(in: .whitespacesAndNewlines) {
+            if (decodedMessage.isEmpty && transaction.amount > 0) || !decodedMessage.isEmpty {
+                switch chat.type {
+                // MARK: Text message
+                case .message, .messageOld, .signal, .unknown:
+                    if transaction.amount > 0 {
+                        let trs = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
+                        trs.comment = decodedMessage
+                        messageTransaction = trs
+                    } else {
+                        let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                        trs.message = decodedMessage
+                        messageTransaction = trs
                         
-                    // MARK: Bad json, try to fix it
-                    case let json as [String:Any]:
-                        // Supported type but in wrong format
-                        if var type = json[RichContentKeys.type] as? String {
-                            // Fix lowercase
-                            type = type.lowercased()
-                            
-                            var fixedJson = [String:String]()
-                            
-                            for (key, raw) in json {
-                                if let value = raw as? String {
-                                    fixedJson[key] = value
-                                } else if let value = raw as? NSNumber, let amount = AdamantBalanceFormat.currencyFormatterFull.string(from: value) {
-                                    fixedJson[key] = amount
-                                } else {
-                                    fixedJson[key] = String(describing: raw)
-                                }
-                            }
-                            
-                            fixedJson[RichContentKeys.type] = type // Lowercased
-                            
-                            let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
-                            trs.richContent = fixedJson
-                            trs.richType = type
-                            trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
-                            messageTransaction = trs
-                        }
-                            // Not supported, show as text message
-                        else {
-                            let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                            trs.message = decodedMessage
-                            messageTransaction = trs
-                        }
+                        let markdown = markdownParser.parse(decodedMessage)
                         
-                    default:
+                        trs.isMarkdown = markdown.length != decodedMessage.count
+                    }
+                    
+                // MARK: Rich message
+                case .richMessage:
+                    if let data = decodedMessage.data(using: String.Encoding.utf8),
+                        let richContent = RichMessageTools.richContent(from: data),
+                        let type = richContent[RichContentKeys.type] {
+                        let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
+                        trs.richContent = richContent
+                        trs.richType = type
+                        trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
+                        messageTransaction = trs
+                    } else {
                         let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                         trs.message = decodedMessage
                         messageTransaction = trs
                     }
-                } else {
-                    let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                    trs.message = decodedMessage
-                    messageTransaction = trs
                 }
+            } else {
+                let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
+                trs.message = ""
+                trs.isHidden = true
+                messageTransaction = trs
             }
         }
         // MARK: Failed to decode, or message was empty
