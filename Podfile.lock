@@ -7,6 +7,7 @@ PODS:
     - GRDBCipher (~> 3.6.2)
     - GRKOpenSSLFramework (~> 1.0.2.15)
     - secp256k1_swift (~> 1.0.3)
+  - ByteBackpacker (1.2.1)
   - CryptoSwift (0.12.0)
   - DateToolsSwift (4.0.0)
   - EFQRCode (4.4.2):
@@ -78,6 +79,7 @@ PODS:
 DEPENDENCIES:
   - Alamofire
   - BitcoinKit (from `https://github.com/boyarkin-anton/BitcoinKit.git`, branch `dev`)
+  - ByteBackpacker
   - CryptoSwift
   - DateToolsSwift
   - EFQRCode
@@ -105,6 +107,7 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
     - BigInt
+    - ByteBackpacker
     - CryptoSwift
     - DateToolsSwift
     - EFQRCode
