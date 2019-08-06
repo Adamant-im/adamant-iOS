@@ -795,7 +795,8 @@ extension AdamantChatsProvider {
 		
 		for (account, transactions) in partners {
 			// We can't save whole context while we are mass creating MessageTransactions.
-			let privateChatroom = privateContext.object(with: account.chatroom!.objectID) as! Chatroom
+            guard let chatroom = account.chatroom else { continue }
+			let privateChatroom = privateContext.object(with: chatroom.objectID) as! Chatroom
 			
 			// MARK: Transactions
 			var messages = Set<ChatTransaction>()
