@@ -199,7 +199,18 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
             DispatchQueue.main.async {
                 vc.loadedTo = total
                 vc.transactions.append(contentsOf: result.transactions)
-                vc.tableView.insertRows(at: indexPaths, with: .fade)
+                vc.transactions.sort(by: { (t1, t2) -> Bool in
+                    return t1.dateValue ?? Date() > t2.dateValue ?? Date()
+                })
+                
+                for transaction in result.transactions {
+                    if let index = vc.transactions.firstIndex(where: { (tr) -> Bool in
+                        return tr.txId == transaction.txId
+                    }) {
+                        let indexPath = IndexPath(row: index, section: 0)
+                        vc.tableView.insertRows(at: [indexPath], with: .fade)
+                    }
+                }
                 
                 // Update everything, and then call loadMore()
                 if result.hasMore && total < vc.limit {

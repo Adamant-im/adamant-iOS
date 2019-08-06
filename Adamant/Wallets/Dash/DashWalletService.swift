@@ -419,7 +419,7 @@ extension DashWalletService {
                 case .success(let ids):
                     
                     self.transatrionsIds = ids
-                    if let id = ids.first {
+                    if let id = ids.last {
                         self.getTransaction(by: id, completion: { r in
                             switch r {
                             case .success(let transaction):
