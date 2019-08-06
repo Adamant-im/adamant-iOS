@@ -68,11 +68,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if !firstRun {
             UserDefaults.standard.set(true, forKey: StoreKey.application.firstRun)
 
-            /* For future updates
             if let securedStore = container.resolve(SecuredStore.self) {
                 securedStore.purgeStore()
             }
-             */
         }
         
 		// MARK: 2. Init UI
