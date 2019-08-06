@@ -620,3 +620,24 @@ extension DashWalletService: WalletServiceWithTransfers {
         return vc
     }
 }
+
+// MARK: - PrivateKey generator
+extension DashWalletService: PrivateKeyGenerator {
+    var rowTitle: String {
+        return "Dash"
+    }
+    
+    var rowImage: UIImage? {
+        return #imageLiteral(resourceName: "wallet_dash_row")
+    }
+    
+    func generatePrivateKeyFor(passphrase: String) -> String? {
+        guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase), let privateKeyData = passphrase.data(using: .utf8)?.sha256() else {
+            return nil
+        }
+        
+        let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
+        
+        return privateKey.toWIF()
+    }
+}
