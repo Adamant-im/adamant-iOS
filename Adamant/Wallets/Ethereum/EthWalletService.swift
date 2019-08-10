@@ -316,6 +316,8 @@ extension EthWalletService: InitiatedWithPassphraseService {
 			stateSemaphore.signal()
 			return
 		}
+        
+        guard let web3 = web3 else { return }
 		
 		web3.addKeystoreManager(KeystoreManager([keystore]))
 		
