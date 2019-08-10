@@ -31,7 +31,7 @@ class DashMainnet: Network {
     }
     
     override var privatekey: UInt8 {
-        return 0x4c
+        return 0xcc
     }
     
     override var scripthash: UInt8 {
