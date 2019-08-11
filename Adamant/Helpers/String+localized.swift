@@ -55,6 +55,8 @@ extension String.adamantLocalized {
         
         static let notEnoughMoney = NSLocalizedString("WalletServices.SharedErrors.notEnoughMoney", comment: "Wallet Services: Shared error, user do not have enought money.")
         
+        static let transactionUnavailable = NSLocalizedString("WalletServices.SharedErrors.transactionUnavailable", comment: "Wallet Services: Transaction unavailable")
+        
         static func internalError(message: String) -> String {
             return String.localizedStringWithFormat(NSLocalizedString("Error.InternalErrorFormat", comment: "Shared error: Internal error format, %@ for message"), message)
         }

@@ -810,6 +810,10 @@
 
 /* Wallet Services: Shared error, transaction not found */
 "WalletServices.SharedErrors.TransactionNotFound" = "Transaktion nicht gefunden";
+
+/* Wallet Services: Transaction unavailable */
+"WalletServices.SharedErrors.transactionUnavailable" = "Transaktion nicht verfügbar";
+
 /* Welcome: Skip button */
 "WelcomeScene.Skip" = "überspringen";
 
