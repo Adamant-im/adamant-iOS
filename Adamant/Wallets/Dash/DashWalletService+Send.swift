@@ -94,7 +94,11 @@ extension DashWalletService: WalletServiceTwoStepSend {
                     if let result = response.result {
                         completion(.success(result: result))
                     } else if let error = response.error?.message {
-                        completion(.failure(error: .internalError(message: error, error: nil)))
+                        if error.lowercased().contains("16: tx-txlock-conflict") {
+                            completion(.failure(error: .internalError(message: String.adamantLocalized.sharedErrors.walletFrezzed, error: nil)))
+                        } else {
+                            completion(.failure(error: .internalError(message: error, error: nil)))
+                        }
                     } else {
                         completion(.failure(error: .internalError(message: "DASH Wallet: not valid response", error: nil)))
                     }
