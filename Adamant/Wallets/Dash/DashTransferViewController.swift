@@ -9,6 +9,10 @@
 import UIKit
 import Eureka
 
+extension String.adamantLocalized.transfer {
+        static let minAmountError = NSLocalizedString("TransferScene.Error.MinAmount", comment: "Transfer: Minimal transaction amount is 0.00001")
+}
+
 class DashTransferViewController: TransferViewControllerBase {
     
     // MARK: Dependencies
@@ -34,6 +38,11 @@ class DashTransferViewController: TransferViewControllerBase {
         }
         
         guard let service = service as? DashWalletService, let recipient = recipientAddress, let amount = amount, let dialogService = dialogService else {
+            return
+        }
+        
+        guard amount > 0.00001 else {
+            dialogService.showAlert(title: nil, message: String.adamantLocalized.transfer.minAmountError, style: AdamantAlertStyle.alert, actions: nil, from: nil)
             return
         }
         

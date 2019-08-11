@@ -781,6 +781,9 @@
 /* Transfer: Amount is zero, or even negative notification */
 "TransferScene.Error.TooLittleMoney" = "Вам следует отправить больше токенов";
 
+/* Transfer: Minimal transaction amount is 0.00001 */
+"TransferScene.Error.MinAmount" = "Минимальная сумма перевода 0.00001";
+
 /* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
 "TransferScene.unsafeTransferAlert.title" = "Не удалось проверить адрес %@";
 

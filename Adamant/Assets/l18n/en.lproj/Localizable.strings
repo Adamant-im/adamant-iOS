@@ -766,6 +766,9 @@
 /* TransfersProvider: Transaction not found error. %@ for transaction's ID */
 "TransfersProvider.Error.TransactionNotFoundFormat" = "Transaction with ID %@ not found";
 
+/* Transfer: Minimal transaction amount is 0.00001 */
+"TransferScene.Error.MinAmount" = "Minimum transaction amount is 0.00001";
+
 /* Transfer: transfer amount placeholder */
 "TransferScene.Amount.Placeholder" = "to send";
 
