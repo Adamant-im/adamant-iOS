@@ -21,7 +21,8 @@ class NotificationService: UNNotificationServiceExtension {
     private lazy var richMessageProviders: [String: () -> RichMessageNotificationProvider] = {
         return [EthProvider.richMessageType: { EthProvider() },
                 LskProvider.richMessageType: { LskProvider() },
-                DogeProvider.richMessageType: { DogeProvider() }]
+                DogeProvider.richMessageType: { DogeProvider() },
+                DogeProvider.richMessageType: { DashProvider() }]
     }()
     
     // MARK: - Hanlder

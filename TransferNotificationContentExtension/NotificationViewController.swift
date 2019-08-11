@@ -25,7 +25,8 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     private lazy var richMessageProviders: [String: () -> TransferNotificationContentProvider] = {
         return [EthProvider.richMessageType: { EthProvider() },
                 LskProvider.richMessageType: { LskProvider() },
-                DogeProvider.richMessageType: { DogeProvider() }]
+                DogeProvider.richMessageType: { DogeProvider() },
+                DogeProvider.richMessageType: { DashProvider() }]
     }()
     
     // MARK: - IBOutlets

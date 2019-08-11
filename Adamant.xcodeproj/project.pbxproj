@@ -68,6 +68,8 @@
 		64A223D620F760BB005157CB /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D520F760BB005157CB /* Localization.swift */; };
 		64A223D820F7A08E005157CB /* LskApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D720F7A08E005157CB /* LskApiService.swift */; };
 		64A223DA20F7A14B005157CB /* AdamantLskApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D920F7A14B005157CB /* AdamantLskApiService.swift */; };
+		64AE84612300012400F38FBD /* DashProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64AE845F2300012200F38FBD /* DashProvider.swift */; };
+		64AE84622300012400F38FBD /* DashProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64AE845F2300012200F38FBD /* DashProvider.swift */; };
 		64BD2B7520E2814B00E2CD36 /* EthTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */; };
 		64BD2B7720E2820300E2CD36 /* TransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */; };
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
@@ -593,6 +595,7 @@
 		64A223D520F760BB005157CB /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		64A223D720F7A08E005157CB /* LskApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskApiService.swift; sourceTree = "<group>"; };
 		64A223D920F7A14B005157CB /* AdamantLskApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantLskApiService.swift; sourceTree = "<group>"; };
+		64AE845F2300012200F38FBD /* DashProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashProvider.swift; sourceTree = "<group>"; };
 		64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransaction.swift; sourceTree = "<group>"; };
 		64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetails.swift; sourceTree = "<group>"; };
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
@@ -1433,6 +1436,7 @@
 			children = (
 				E957E0FA229AB9310019732A /* AdamantProvider.swift */,
 				E957E0F422999A5D0019732A /* DogeProvider.swift */,
+				64AE845F2300012200F38FBD /* DashProvider.swift */,
 				E957E100229AC2050019732A /* EthProvider.swift */,
 				E957E0FE229AC1C80019732A /* LskProvider.swift */,
 				E957E0F622999BD50019732A /* TransferBaseProvider.swift */,
@@ -2658,6 +2662,7 @@
 				E957E14F229C3E530019732A /* StateType.swift in Sources */,
 				E957E14B229C3E530019732A /* ChatType.swift in Sources */,
 				E957E15A229C406F0019732A /* AdamantSecret.swift in Sources */,
+				64AE84622300012400F38FBD /* DashProvider.swift in Sources */,
 				E957E16C229C53980019732A /* LskProvider.swift in Sources */,
 				E9D664D022A009AB00733F8A /* AdamantLocalized.swift in Sources */,
 				E957E14D229C3E530019732A /* Node.swift in Sources */,
@@ -2692,6 +2697,7 @@
 				E9771D9822996FEB0099AAC7 /* VotesAsset.swift in Sources */,
 				E9771D9A229974EA0099AAC7 /* NativeAdamantCore.swift in Sources */,
 				E9771D9022996FEB0099AAC7 /* Node.swift in Sources */,
+				64AE84612300012400F38FBD /* DashProvider.swift in Sources */,
 				E9EF7A8022A02DBC00F2E1C2 /* AdamantLocalized.swift in Sources */,
 				E9771D9722996FEB0099AAC7 /* TransactionType.swift in Sources */,
 				E957E128229B0CF10019732A /* NotificationContent.swift in Sources */,
