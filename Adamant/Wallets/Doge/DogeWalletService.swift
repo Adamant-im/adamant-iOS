@@ -567,7 +567,7 @@ extension DogeWalletService {
                 }
                 
             case .failure(let error):
-                completion(.failure(.internalError(message: "Unaviable transaction", error: error)))
+                completion(.failure(.internalError(message: "No transaction", error: error)))
             }
         }
     }
