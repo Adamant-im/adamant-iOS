@@ -557,14 +557,14 @@ extension DashWalletService {
                     if let transaction = result.result {
                         completion(.success(transaction))
                     } else {
-                        completion(.failure(.internalError(message: String.adamantLocalized.sharedErrors.transactionUnavailable, error: nil)))
+                        completion(.failure(.internalError(message: "Unaviable transaction", error: nil)))
                     }
                 } catch {
-                    completion(.failure(.internalError(message: String.adamantLocalized.sharedErrors.transactionUnavailable, error: error)))
+                    completion(.failure(.internalError(message: "Unaviable transaction", error: error)))
                 }
 
             case .failure(let error):
-                completion(.failure(.internalError(message: String.adamantLocalized.sharedErrors.transactionUnavailable, error: error)))
+                completion(.failure(.internalError(message: "Unaviable transaction", error: error)))
             }
         }
     }

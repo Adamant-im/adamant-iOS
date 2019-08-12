@@ -563,11 +563,11 @@ extension DogeWalletService {
                     let transfers = try DogeWalletService.jsonDecoder.decode(BTCRawTransaction.self, from: data)
                     completion(.success(transfers))
                 } catch {
-                    completion(.failure(.internalError(message: String.adamantLocalized.sharedErrors.transactionUnavailable, error: error)))
+                    completion(.failure(.internalError(message: "Unaviable transaction", error: error)))
                 }
                 
             case .failure(let error):
-                completion(.failure(.internalError(message: String.adamantLocalized.sharedErrors.transactionUnavailable, error: error)))
+                completion(.failure(.internalError(message: "Unaviable transaction", error: error)))
             }
         }
     }

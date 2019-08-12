@@ -557,7 +557,7 @@ extension LskWalletService {
                     if let transaction = result.data.first {
                         completion(.success(transaction))
                     } else {
-                        completion(.failure(.internalError(message: String.adamantLocalized.sharedErrors.transactionUnavailable, error: nil)))
+                        completion(.failure(.internalError(message: "No transaction", error: nil)))
                     }
                     break
                 case .error(response: let error):
