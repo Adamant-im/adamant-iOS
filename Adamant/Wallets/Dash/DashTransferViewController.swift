@@ -41,7 +41,7 @@ class DashTransferViewController: TransferViewControllerBase {
             return
         }
         
-        guard amount > 0.00001 else {
+        guard amount >= 0.00001 else {
             dialogService.showAlert(title: nil, message: String.adamantLocalized.transfer.minAmountError, style: AdamantAlertStyle.alert, actions: nil, from: nil)
             return
         }
