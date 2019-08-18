@@ -12,6 +12,7 @@ def core_pods
   pod 'CryptoSwift' # MD5 hash
   pod 'ByteBackpacker' # Utility to pack value types into a Byte array
   pod 'libsodium' # Sodium crypto library
+  pod 'GRKOpenSSLFramework', '1.0.2.15'
 end
 
 # Markdown parser, forked with fixed whitespaces. '5 * 5 * 6'
@@ -32,7 +33,7 @@ target 'Adamant' do
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars
   pod 'FTIndicator' # Notifications and activity indicator
-  pod 'Eureka' # Forms
+  pod 'Eureka', :git => 'https://github.com/boyarkin-anton/Eureka.git', :branch => 'develop' # Forms
   pod 'MessageKit' # Chat UI
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
