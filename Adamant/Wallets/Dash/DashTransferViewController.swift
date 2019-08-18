@@ -52,7 +52,7 @@ class DashTransferViewController: TransferViewControllerBase {
         
         dialogService.showProgress(withMessage: String.adamantLocalized.transfer.transferProcessingMessage, userInteractionEnable: false)
         
-        service.createTransaction(recipient: recipient, amount: amount) { [weak self] result in
+        service.create(recipient: recipient, amount: amount) { [weak self] result in
             guard let vc = self else {
                 dialogService.dismissProgress()
                 dialogService.showError(withMessage: String.adamantLocalized.sharedErrors.unknownError, error: nil)
@@ -134,7 +134,12 @@ class DashTransferViewController: TransferViewControllerBase {
                 }
                 
             case .failure(let error):
-                dialogService.showRichError(error: error)
+                if case let .internalError(message, _) = error, message == "WAIT_FOR_COMPLETION" {
+                    dialogService.dismissProgress()
+                    dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.walletFrezzed, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+                } else {
+                    dialogService.showRichError(error: error)
+                }
             }
         }
     }

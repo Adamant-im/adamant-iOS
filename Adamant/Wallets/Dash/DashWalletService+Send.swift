@@ -25,6 +25,25 @@ extension DashWalletService: WalletServiceTwoStepSend {
     
     
     // MARK: Create & Send
+    func create(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<DashWalletService.T>) -> Void) {
+        if let lastTransaction = self.lastTransactionId {
+            self.getTransaction(by: lastTransaction) { result in
+                switch result {
+                case .success(let transaction):
+                    if let confirmations = transaction.confirmations, confirmations >= 1 {
+                        self.createTransaction(recipient: recipient, amount: amount, completion: completion)
+                    } else {
+                        completion(.failure(error: WalletServiceError.internalError(message: "WAIT_FOR_COMPLETION", error: nil)))
+                    }
+                case .failure:
+                    completion(.failure(error: WalletServiceError.internalError(message: "WAIT_FOR_COMPLETION", error: nil)))
+                }
+            }
+        } else {
+            self.createTransaction(recipient: recipient, amount: amount, completion: completion)
+        }
+    }
+    
     func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<BitcoinKit.Transaction>) -> Void) {
         // MARK: 1. Prepare
         guard let wallet = self.dashWallet else {
@@ -92,6 +111,7 @@ extension DashWalletService: WalletServiceTwoStepSend {
                     let response = try JSONDecoder().decode(BTCRPCServerResponce<String>.self, from: data)
                     
                     if let result = response.result {
+                        self.lastTransactionId = transaction.txID
                         completion(.success(result: result))
                     } else if let error = response.error?.message {
                         if error.lowercased().contains("16: tx-txlock-conflict") {
