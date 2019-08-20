@@ -57,7 +57,7 @@ class DashWalletService: WalletService {
             let date = Date(timeIntervalSince1970: TimeInterval(timestamp))
             let timeAgo = -1 * date.timeIntervalSinceNow
             
-            if timeAgo > 60 * 60 { // 60m waiting for transaction complete
+            if timeAgo > 10 * 60 { // 10m waiting for transaction complete
                 self.securedStore.remove("lastDashTransactionTime")
                 self.securedStore.remove("lastDashTransactionId")
                 return nil
