@@ -191,6 +191,8 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
             
             let total = vc.loadedTo + result.transactions.count
             
+            guard from < total else { return }
+            
             var indexPaths = [IndexPath]()
             for index in from..<total {
                 indexPaths.append(IndexPath(row: index, section: 0))
