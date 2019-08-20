@@ -227,6 +227,7 @@ struct BTCOutput: Decodable {
     enum CodingKeys: String, CodingKey {
         case signature = "scriptPubKey"
         case value
+        case valueSat
         case spentTxId
         case spentIndex
     }
@@ -236,7 +237,7 @@ struct BTCOutput: Decodable {
     }
     
     let addresses: [String]
-    let value: Decimal
+    var value: Decimal
     let spentTxId: String?
     let spentIndex: Int?
     
@@ -252,6 +253,12 @@ struct BTCOutput: Decodable {
             self.value = raw
         } else  {
             self.value = 0
+        }
+        
+        if let raw = try? container.decode(String.self, forKey: .valueSat), let value = Decimal(string: raw) {
+            self.value = Decimal(sign: .plus, exponent: DogeWalletService.currencyExponent, significand: value)
+        } else if let raw = try? container.decode(Decimal.self, forKey: .valueSat) {
+            self.value = Decimal(sign: .plus, exponent: DogeWalletService.currencyExponent, significand: raw)
         }
         
         self.spentTxId = try? container.decode(String.self, forKey: .spentTxId)
