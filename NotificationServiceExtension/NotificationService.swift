@@ -22,7 +22,7 @@ class NotificationService: UNNotificationServiceExtension {
         return [EthProvider.richMessageType: { EthProvider() },
                 LskProvider.richMessageType: { LskProvider() },
                 DogeProvider.richMessageType: { DogeProvider() },
-                DogeProvider.richMessageType: { DashProvider() }]
+                DashProvider.richMessageType: { DashProvider() }]
     }()
     
     // MARK: - Hanlder

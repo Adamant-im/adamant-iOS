@@ -26,7 +26,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         return [EthProvider.richMessageType: { EthProvider() },
                 LskProvider.richMessageType: { LskProvider() },
                 DogeProvider.richMessageType: { DogeProvider() },
-                DogeProvider.richMessageType: { DashProvider() }]
+                DashProvider.richMessageType: { DashProvider() }]
     }()
     
     // MARK: - IBOutlets
