@@ -8,7 +8,6 @@
 
 import Foundation
 import CryptoSwift
-import ByteBackpacker
 
 /*
  * Native Adamanat Core

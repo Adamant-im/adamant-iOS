@@ -34,6 +34,10 @@ struct AdamantResources {
         URL(string: "https://dogenode1.adamant.im/api")!
     ]
     
+    static let dashServers: [URL] = [
+        URL(string: "https://dashnode1.adamant.im/")!
+    ]
+    
     static let coinsInfoSrvice = "https://info.adamant.im"
     
     // MARK: ADAMANT Addresses
@@ -65,6 +69,7 @@ struct AdamantResources {
     //    static let liskExplorerAddress = "https://testnet-explorer.lisk.io/tx/" // LISK Testnet
     
     static let dogeExplorerAddress = "https://dogechain.info/tx/"
+    static let dashExplorerAddress = "https://explorer.dash.org/tx/"
     
     private init() {}
 }

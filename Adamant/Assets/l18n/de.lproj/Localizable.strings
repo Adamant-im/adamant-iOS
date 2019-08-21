@@ -136,6 +136,9 @@
 /* Account tab: 'Send DOGE tokens' button */
 "AccountTab.Row.SendDoge" = "DOGE senden";
 
+/* Account tab: 'Send DASH tokens' button */
+"AccountTab.Row.SendDash" = "DASH senden";
+
 /* Account tab: Anonymously buy ADM tokens */
 "AccountTab.Row.AnonymouslyBuyADM" = "Kaufen Sie ADM anonym";
 
@@ -180,6 +183,9 @@
 
 /* Account tab: Doge wallet */
 "AccountTab.Wallets.doge_wallet" = "Doge Wallet";
+
+/* Account tab: Dash wallet */
+"AccountTab.Wallets.dash_wallet" = "Dash Wallet";
 
 /* Account page: scene title */
 "AccountTab.Title" = "Konto";
@@ -724,6 +730,9 @@
 /* Transfer: Amount is zero, or even negative notification */
 "TransferScene.Error.TooLittleMoney" = "Sie müssen mehr Tokens senden";
 
+/* Transfer: Minimal transaction amount is 0.00001 */
+"TransferScene.Error.MinAmount" = "Der Mindesttransaktionsbetrag beträgt 0,00001";
+
 /* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
 "TransferScene.unsafeTransferAlert.title" = "Adresse %@ konnte nicht überprüft werden";
 
@@ -801,6 +810,13 @@
 
 /* Wallet Services: Shared error, transaction not found */
 "WalletServices.SharedErrors.TransactionNotFound" = "Transaktion nicht gefunden";
+
+/* Wallet Services: Wait until other transactions approved */
+"WalletServices.SharedErrors.walletFrezzed" = "Warten Sie, bis andere Transaktionen genehmigt wurden";
+
+/* Wallet Services: Transaction unavailable */
+"WalletServices.SharedErrors.transactionUnavailable" = "Transaktion nicht verfügbar";
+
 /* Welcome: Skip button */
 "WelcomeScene.Skip" = "überspringen";
 

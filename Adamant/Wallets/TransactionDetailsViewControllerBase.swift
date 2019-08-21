@@ -118,7 +118,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Properties
     
-    var transaction: TransactionDetails? = nil
+    var transaction: TransactionDetails? = nil {
+        didSet {
+            if !isFiatSet {
+                self.updateFiat()
+            }
+        }
+    }
     private lazy var dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
@@ -135,6 +141,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
     private lazy var fiatFormatter: NumberFormatter = {
         return AdamantBalanceFormat.fiatFormatter(for: currencyInfo.currentCurrency)
     }()
+    
+    private var isFiatSet = false
     
     // MARK: - Lifecycle
     
@@ -547,11 +555,17 @@ class TransactionDetailsViewControllerBase: FormViewController {
         form.append(actionsSection)
         
         // Get fiat value
+        self.updateFiat()
+    }
+    
+    func updateFiat() {
         if let date = transaction?.dateValue, let currencySymbol = currencySymbol, let amount = transaction?.amountValue {
+            self.isFiatSet = true
             let currentFiat = currencyInfo.currentCurrency.rawValue
             currencyInfo.getHistory(for: currencySymbol, timestamp: date) { [weak self] (result) in
                 switch result {
                 case .success(let tickers):
+                    self?.isFiatSet = true
                     guard let tickers = tickers, let ticker = tickers["\(currencySymbol)/\(currentFiat)"] else {
                         break
                     }
@@ -567,6 +581,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     }
                     
                 case .failure:
+                    self?.isFiatSet = false
                     break
                 }
             }

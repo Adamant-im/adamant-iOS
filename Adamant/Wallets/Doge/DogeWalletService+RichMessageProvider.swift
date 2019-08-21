@@ -43,7 +43,7 @@ extension DogeWalletService: RichMessageProvider {
             
             switch result {
             case .success(let dogeRawTransaction):
-                let dogeTransaction = dogeRawTransaction.asDogeTransaction(for: address)
+                let dogeTransaction = dogeRawTransaction.asBtcTransaction(DogeTransaction.self, for: address)
                 
                 // MARK: 2. Self name
                 if dogeTransaction.senderAddress == address {
@@ -84,7 +84,7 @@ extension DogeWalletService: RichMessageProvider {
                     service.getBlockId(by: blockHash) { result in
                         switch result {
                         case .success(let id):
-                            vc.transaction = dogeRawTransaction.asDogeTransaction(for: address, blockId: id)
+                            vc.transaction = dogeRawTransaction.asBtcTransaction(DogeTransaction.self, for: address, blockId: id)
                             
                         case .failure:
                             break
@@ -105,6 +105,10 @@ extension DogeWalletService: RichMessageProvider {
                 
             case .failure(let error):
                 switch error {
+                case .internalError(let message, _) where message == "Unaviable transaction":
+                    dialogService.dismissProgress()
+                    dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.transactionUnavailable, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+                    break
                 case .internalError(let message, _) where message == "No transaction":
                     let amount: Decimal
                     if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {

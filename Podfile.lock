@@ -12,7 +12,7 @@ PODS:
   - DateToolsSwift (4.0.0)
   - EFQRCode (4.4.2):
     - swift_qrcodejs (~> 1.0.1)
-  - Eureka (4.3.1)
+  - Eureka (5.0.0)
   - FreakingSimpleRoundImageView (1.3)
   - FTIndicator (1.2.9):
     - FTIndicator/FTNotificationIndicator (= 1.2.9)
@@ -83,10 +83,11 @@ DEPENDENCIES:
   - CryptoSwift
   - DateToolsSwift
   - EFQRCode
-  - Eureka
+  - Eureka (from `https://github.com/boyarkin-anton/Eureka.git`, branch `develop`)
   - FreakingSimpleRoundImageView
   - FTIndicator
   - GRDB.swift
+  - GRKOpenSSLFramework (= 1.0.2.15)
   - KeychainAccess
   - libsodium
   - Lisk (from `https://github.com/adamant-im/lisk-swift.git`)
@@ -111,7 +112,6 @@ SPEC REPOS:
     - CryptoSwift
     - DateToolsSwift
     - EFQRCode
-    - Eureka
     - FreakingSimpleRoundImageView
     - FTIndicator
     - GRDB.swift
@@ -143,6 +143,9 @@ EXTERNAL SOURCES:
   BitcoinKit:
     :branch: dev
     :git: https://github.com/boyarkin-anton/BitcoinKit.git
+  Eureka:
+    :branch: develop
+    :git: https://github.com/boyarkin-anton/Eureka.git
   Lisk:
     :git: https://github.com/adamant-im/lisk-swift.git
   MarkdownKit:
@@ -153,8 +156,11 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   BitcoinKit:
-    :commit: b78dd8df08bee99bdd75eef5cb5e8de0e27638e8
+    :commit: 48589d409715da8be93df83d7866132a2ec50d58
     :git: https://github.com/boyarkin-anton/BitcoinKit.git
+  Eureka:
+    :commit: 796b430ada97851a17cac0ae4acf4abf42da8186
+    :git: https://github.com/boyarkin-anton/Eureka.git
   Lisk:
     :commit: 154a3af05772136b776ff14ae05f92c8d844ea20
     :git: https://github.com/adamant-im/lisk-swift.git
@@ -173,7 +179,7 @@ SPEC CHECKSUMS:
   CryptoSwift: 1c07ca50843dd48bc54e6ea53d7a4dba3b645716
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   EFQRCode: e65a9eb6c7137ed6db4cfce37f0cee47938e44f0
-  Eureka: 28ea296f06710f6745266b71f17862048941a32d
+  Eureka: e7b9a83e08867f8336176247bdc4c199b1f68e5e
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   GRDB.swift: e10787d857b6b8135354b9e08fb23b4bb8e2fab7
@@ -204,6 +210,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: d80d1b9a3feca16e614acec9eea47ec26310d37d
 
-PODFILE CHECKSUM: 0bf602086adfe27d6043b83dcfd57b5bcc8a03ab
+PODFILE CHECKSUM: 283e1a68ad9840052cad586d08b05308ac88d41e
 
 COCOAPODS: 1.7.1
