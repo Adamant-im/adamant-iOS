@@ -868,8 +868,11 @@
 /* Wallet Services: Transaction unavailable */
 "WalletServices.SharedErrors.transactionUnavailable" = "Transaction unavailable";
 
-/* "Wallet Services: Duplicated transaction */
+/* Wallet Services: Duplicated transaction */
 "WalletServices.SharedErrors.duplicatedTransaction" = "Duplicated transaction";
+
+/* Wallet Services: Cannot verify transaction */
+"WalletServices.SharedErrors.inconsistentTransaction" = "Cannot verify transaction";
 
 /* Welcome: Skip button */
 "WelcomeScene.Skip" = "skip";
