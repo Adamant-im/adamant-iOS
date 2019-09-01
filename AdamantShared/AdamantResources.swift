@@ -17,6 +17,9 @@ struct AdamantResources {
         Node(scheme: .https, host: "endless.adamant.im", port: nil),
         Node(scheme: .https, host: "clown.adamant.im", port: nil),
         Node(scheme: .https, host: "lake.adamant.im", port: nil),
+        Node(scheme: .https, host: "debate.adamant.im", port: nil),
+        Node(scheme: .https, host: "bid.adamant.im", port: nil),
+        Node(scheme: .https, host: "unusual.adamant.im", port: nil),
 //        Node(scheme: .http, host: "80.211.177.181", port: nil), // Bugged one
 //        Node(scheme: .http, host: "163.172.132.38", port: 36667) // Testnet
     ]
