@@ -348,7 +348,12 @@ extension ChatViewController: MessageCellDelegate {
                 break
             }
             
-            provider.richMessageTapped(for: richMessage, at: indexPath, in: self)
+            if richMessage.transactionStatus == .dublicate {
+                dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.duplicatedTransaction, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+            } else {
+                provider.richMessageTapped(for: richMessage, at: indexPath, in: self)
+            }
+            
             
 		default:
 			break
@@ -398,7 +403,11 @@ extension ChatViewController: CustomCellDelegate {
                 break
             }
             
-            provider.richMessageTapped(for: richTransaction, at: indexPath, in: self)
+            if richTransaction.transactionStatus == .dublicate {
+                dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.duplicatedTransaction, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+            } else {
+                provider.richMessageTapped(for: richTransaction, at: indexPath, in: self)
+            }
             
         default:
             return
@@ -428,7 +437,11 @@ extension ChatViewController: TransferCellDelegate {
                 break
             }
             
-            provider.richMessageTapped(for: richTransaction, at: indexPath, in: self)
+            if richTransaction.transactionStatus == .dublicate {
+                dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.duplicatedTransaction, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+            } else {
+                provider.richMessageTapped(for: richTransaction, at: indexPath, in: self)
+            }
             
         default:
             return

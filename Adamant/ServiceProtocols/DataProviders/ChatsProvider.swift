@@ -202,4 +202,5 @@ protocol ChatsProvider: DataProvider {
     
     // MARK: - Search
     func getMessages(containing text: String, in chatroom: Chatroom?) -> [MessageTransaction]?
+    func isTransactionUnique(_ transaction: RichMessageTransaction) -> Bool
 }

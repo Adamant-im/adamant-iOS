@@ -755,6 +755,14 @@ private class StatusUpdateProcedure: Procedure {
             return
         }
         
+        guard controller?.chatsProvider.isTransactionUnique(transaction) ?? true else {
+            transaction.transactionStatus = .dublicate
+            self.controller?.removeRichMessageStatusUpdating(id: self.objectId)
+            try? privateContext.save()
+            self.finish()
+            return
+        }
+        
         provider.statusFor(transaction: transaction) { result in
             switch result {
             case .success(let status):
