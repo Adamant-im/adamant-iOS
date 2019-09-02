@@ -62,6 +62,9 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
                     return
                 }
                 
+                let min = reportedValue - reportedValue*0.005
+                let max = reportedValue + reportedValue*0.005
+                
                 var result: TransactionStatus = .warning
                 if transaction.isOutgoing {
                     var totalIncome: Decimal = 0
@@ -73,7 +76,7 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
                         totalIncome += input.value
                     }
                     
-                    if totalIncome >= reportedValue {
+                    if (min...max).contains(totalIncome) {
                         result = .success
                     }
                 } else {
@@ -86,7 +89,7 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
                         totalOutcome += output.value
                     }
                     
-                    if totalOutcome >= reportedValue {
+                    if (min...max).contains(totalOutcome) {
                         result = .success
                     }
                 }
