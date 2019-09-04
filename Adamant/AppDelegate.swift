@@ -406,6 +406,38 @@ extension AppDelegate {
 		} else {
 			unread = true
 		}
+        
+        if let exchenge = AdamantContacts.adamantExchange.messages["chats.welcome_message"] {
+            chatProvider.fakeReceived(message: exchenge.message,
+                                      senderId: AdamantContacts.adamantExchange.name,
+                                      date: Date.adamantNullDate,
+                                      unread: false,
+                                      silent: exchenge.silentNotification,
+                                      showsChatroom: true,
+                                      completion: { result in
+                                        guard case let .failure(error) = result else {
+                                            return
+                                        }
+                                        
+                                        print("ERROR showing exchenge message: \(error.message)")
+            })
+        }
+        
+        if let betOnBitcoin = AdamantContacts.betOnBitcoin.messages["chats.welcome_message"] {
+            chatProvider.fakeReceived(message: betOnBitcoin.message,
+                                      senderId: AdamantContacts.betOnBitcoin.name,
+                                      date: Date.adamantNullDate,
+                                      unread: false,
+                                      silent: betOnBitcoin.silentNotification,
+                                      showsChatroom: true,
+                                      completion: { result in
+                                        guard case let .failure(error) = result else {
+                                            return
+                                        }
+                                        
+                                        print("ERROR showing exchenge message: \(error.message)")
+            })
+        }
 		
 		if let welcome = AdamantContacts.adamantBountyWallet.messages["chats.welcome_message"] {
 			chatProvider.fakeReceived(message: welcome.message,

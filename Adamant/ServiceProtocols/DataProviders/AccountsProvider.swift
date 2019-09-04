@@ -79,9 +79,11 @@ enum AdamantContacts {
     case adamantBountyWallet
     case adamantIco
     case iosSupport
+    case adamantExchange
+    case betOnBitcoin
     
     static let systemAddresses: [String] = {
-		return [AdamantContacts.adamantIco.name, AdamantContacts.adamantBountyWallet.name]
+		return [AdamantContacts.adamantExchange.name, AdamantContacts.betOnBitcoin.name, AdamantContacts.adamantIco.name, AdamantContacts.adamantBountyWallet.name]
 	}()
 	
 	static func messagesFor(address: String) -> [String:SystemMessage]? {
@@ -91,6 +93,12 @@ enum AdamantContacts {
 			
 		case AdamantContacts.adamantIco.address, AdamantContacts.adamantIco.name:
 			return AdamantContacts.adamantIco.messages
+            
+        case AdamantContacts.adamantExchange.address, AdamantContacts.adamantExchange.name:
+            return AdamantContacts.adamantExchange.messages
+            
+        case AdamantContacts.betOnBitcoin.address, AdamantContacts.betOnBitcoin.name:
+            return AdamantContacts.betOnBitcoin.messages
 			
 		default:
 			return nil
@@ -102,6 +110,9 @@ enum AdamantContacts {
 		case .adamantBountyWallet: return NSLocalizedString("Accounts.AdamantTokens", comment: "System accounts: ADAMANT Tokens")
 		case .adamantIco: return "Adamant ICO"
 		case .iosSupport: return NSLocalizedString("Accounts.iOSSupport", comment: "System accounts: ADAMANT iOS Support")
+            
+        case .adamantExchange: return NSLocalizedString("Accounts.AdamantExchange", comment: "System accounts: ADAMANT Exchange")
+        case .betOnBitcoin: return NSLocalizedString("Accounts.BetOnBitcoin", comment: "System accounts: Bet on Bitcoin Price")
 		}
 	}
 	
@@ -110,20 +121,22 @@ enum AdamantContacts {
 		case .adamantBountyWallet: return AdamantResources.contacts.adamantBountyWallet
 		case .adamantIco: return AdamantResources.contacts.adamantIco
 		case .iosSupport: return AdamantResources.contacts.iosSupport
+        case .adamantExchange: return AdamantResources.contacts.adamantExchange
+        case .betOnBitcoin: return AdamantResources.contacts.betOnBitcoin
 		}
 	}
 	
 	var isReadonly: Bool {
 		switch self {
 		case .adamantBountyWallet, .adamantIco: return true
-		case .iosSupport: return false
+		case .iosSupport, .adamantExchange, .betOnBitcoin: return false
 		}
 	}
 	
 	var isHidden: Bool {
 		switch self {
 		case .adamantBountyWallet: return true
-		case .adamantIco, .iosSupport: return false
+		case .adamantIco, .iosSupport, .adamantExchange, .betOnBitcoin: return false
 		}
 	}
 	
@@ -147,6 +160,14 @@ enum AdamantContacts {
 			
 		case .iosSupport:
 			return [:]
+            
+        case .adamantExchange:
+            return ["chats.welcome_message": SystemMessage(message: AdamantMessage.markdownText(NSLocalizedString("Chats.Exchange.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported.")),
+                                                           silentNotification: true)]
+            
+        case .betOnBitcoin:
+            return ["chats.welcome_message": SystemMessage(message: AdamantMessage.markdownText(NSLocalizedString("Chats.BetOnBitcoin.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported.")),
+                                                           silentNotification: true)]
 		}
 	}
 }

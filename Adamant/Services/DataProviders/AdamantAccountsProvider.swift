@@ -49,13 +49,22 @@ class AdamantAccountsProvider: AccountsProvider {
 		let ico = KnownContact(contact: AdamantContacts.adamantIco)
 		let bounty = KnownContact(contact: AdamantContacts.adamantBountyWallet)
 		let iosSupport = KnownContact(contact: AdamantContacts.iosSupport)
+        
+        let adamantExchange = KnownContact(contact: AdamantContacts.adamantExchange)
+        let betOnBitcoin = KnownContact(contact: AdamantContacts.betOnBitcoin)
 		
 		self.knownContacts = [
 			AdamantContacts.adamantIco.address: ico,
 			AdamantContacts.adamantIco.name: ico,
 			AdamantContacts.adamantBountyWallet.address: bounty,
 			AdamantContacts.adamantBountyWallet.name: bounty,
-			AdamantContacts.iosSupport.address: iosSupport
+            AdamantContacts.iosSupport.address: iosSupport,
+            
+            AdamantContacts.adamantExchange.address: adamantExchange,
+            AdamantContacts.adamantExchange.name: adamantExchange,
+            
+            AdamantContacts.betOnBitcoin.address: betOnBitcoin,
+            AdamantContacts.betOnBitcoin.name: betOnBitcoin
 		]
 		
 		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.addressBookUpdated, object: nil, queue: nil) { [weak self] notification in

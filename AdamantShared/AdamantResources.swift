@@ -53,6 +53,9 @@ struct AdamantResources {
         static let adamantIco = "U7047165086065693428"
         static let iosSupport = "U15738334853882270577"
         
+        static let adamantExchange = "U5149447931090026688"
+        static let betOnBitcoin = "U17840858470710371662"
+        
         static let ansAddress = "U10629337621822775991"
         static let ansPublicKey = "188b24bd116a556ac8ba905bbbdaa16e237dfb14269f5a4f9a26be77537d977c"
         
