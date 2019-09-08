@@ -37,15 +37,27 @@ extension ChatViewController: MessagesDataSource {
 	}
 	
 	func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
-		guard let message = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) as? MessageType else {
+        guard let message = objects()?[indexPath.section] else {
 			fatalError("Data not synced")
 		}
 		
 		return message
 	}
+    
+    func objects() -> [MessageType]? {
+        let objects: [ChatTransaction]? = chatController?.fetchedObjects
+        let messages = objects?.compactMap({ (t) -> MessageType? in
+            return t as? MessageType
+        })
+        if objects?.count == messages?.count, let index = objects?.firstIndex(where: { $0.isUnread }) {
+            messageToShow = objects?[index] as? MessageTransaction
+        }
+        
+        return messages
+    }
 	
     func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
-		if let objects = chatController?.fetchedObjects {
+		if let objects = objects() {
 			return objects.count
 		} else {
 			return 0

@@ -306,7 +306,7 @@ class ChatViewController: MessagesViewController {
 		}
         
         // MARK: 4.1 Rich messages
-        if let fetched = controller.fetchedObjects {
+        if let fetched = objects() {
             for case let rich as RichMessageTransaction in fetched {
                 rich.kind = messageKind(for: rich)
             }
@@ -377,7 +377,9 @@ class ChatViewController: MessagesViewController {
                     transaction.transactionId == messageToShow.transactionId
                 }) {
                     let indexPath = IndexPath(item: 0, section: idx)
-                    messagesCollectionView.scrollToItem(at: indexPath, at: [.centeredVertically, .centeredHorizontally], animated: true)
+                    messagesCollectionView.performBatchUpdates(nil) { _ in
+                        self.messagesCollectionView.scrollToItem(at: indexPath, at: [.centeredVertically, .centeredHorizontally], animated: false)
+                    }
                     
                     return
                 }
@@ -391,8 +393,9 @@ class ChatViewController: MessagesViewController {
                 messagesCollectionView.contentInset.bottom = barHeight
                 messagesCollectionView.scrollIndicatorInsets.bottom = barHeight - (tabBarController?.tabBar.bounds.height ?? 0)
             }
-            
-			messagesCollectionView.scrollToBottom(animated: false)
+            if self.messageToShow == nil {
+                messagesCollectionView.scrollToBottom(animated: false)
+            }
 		}
 	}
     
