@@ -115,6 +115,15 @@ enum AdamantContacts {
         case .betOnBitcoin: return NSLocalizedString("Accounts.BetOnBitcoin", comment: "System accounts: Bet on Bitcoin Price")
 		}
 	}
+    
+    var isSystem: Bool {
+        switch self {
+        case .adamantExchange, .betOnBitcoin:
+            return false
+        default:
+            return true
+        }
+    }
 	
 	var address: String {
 		switch self {
@@ -125,6 +134,15 @@ enum AdamantContacts {
         case .betOnBitcoin: return AdamantResources.contacts.betOnBitcoin
 		}
 	}
+    
+    var publicKey: String? {
+        switch self {
+        case .adamantExchange: return AdamantResources.contacts.adamantExchangePK
+        case .betOnBitcoin: return AdamantResources.contacts.betOnBitcoinPK
+        default:
+            return nil
+        }
+    }
 	
 	var isReadonly: Bool {
 		switch self {
@@ -141,7 +159,12 @@ enum AdamantContacts {
 	}
 	
 	var avatar: String {
-		return "avatar_bots"
+        switch self {
+        case .adamantExchange, .betOnBitcoin:
+            return ""
+        default:
+            return "avatar_bots"
+        }
 	}
 	
 	var messages: [String: SystemMessage] {

@@ -409,7 +409,7 @@ extension AppDelegate {
         
         if let exchenge = AdamantContacts.adamantExchange.messages["chats.welcome_message"] {
             chatProvider.fakeReceived(message: exchenge.message,
-                                      senderId: AdamantContacts.adamantExchange.name,
+                                      senderId: AdamantContacts.adamantExchange.address,
                                       date: Date.adamantNullDate,
                                       unread: false,
                                       silent: exchenge.silentNotification,
@@ -425,7 +425,7 @@ extension AppDelegate {
         
         if let betOnBitcoin = AdamantContacts.betOnBitcoin.messages["chats.welcome_message"] {
             chatProvider.fakeReceived(message: betOnBitcoin.message,
-                                      senderId: AdamantContacts.betOnBitcoin.name,
+                                      senderId: AdamantContacts.betOnBitcoin.address,
                                       date: Date.adamantNullDate,
                                       unread: false,
                                       silent: betOnBitcoin.silentNotification,
