@@ -577,7 +577,7 @@ extension ChatViewController: MessageInputBarDelegate {
 			return
 		}
 		
-        chatsProvider.sendMessage(message, recipientId: partner, completion: { [weak self] result in
+        chatsProvider.sendMessage(message, recipientId: partner, from: chatroom, completion: { [weak self] result in
 			switch result {
 			case .success: break
 				
