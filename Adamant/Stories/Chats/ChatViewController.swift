@@ -306,9 +306,13 @@ class ChatViewController: MessagesViewController {
 		}
         
         // MARK: 4.1 Rich messages
-        if let fetched = objects() {
+        if let fetched = controller.fetchedObjects {
             for case let rich as RichMessageTransaction in fetched {
                 rich.kind = messageKind(for: rich)
+            }
+            
+            if let chatroom = self.chatroom, let message = chatroom.getFirstUnread() as? MessageTransaction {
+                messageToShow = message
             }
         }
 		
@@ -372,17 +376,10 @@ class ChatViewController: MessagesViewController {
 		
         // MARK: 4.2 Scroll to message
         if let messageToShow = self.messageToShow {
-            if let fetched = chatController?.fetchedObjects {
-                if let idx = fetched.firstIndex(where: { (transaction) -> Bool in
-                    transaction.transactionId == messageToShow.transactionId
-                }) {
-                    let indexPath = IndexPath(item: 0, section: idx)
-                    messagesCollectionView.performBatchUpdates(nil) { _ in
-                        self.messagesCollectionView.scrollToItem(at: indexPath, at: [.centeredVertically, .centeredHorizontally], animated: false)
-                    }
-                    
-                    return
-                }
+            if let indexPath = chatController?.indexPath(forObject: messageToShow) {
+                self.messagesCollectionView.scrollToItem(at: IndexPath(item: 0, section: indexPath.row), at: [.centeredVertically, .centeredHorizontally], animated: false)
+                
+                return
             }
         }
         
