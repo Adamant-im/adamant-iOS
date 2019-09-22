@@ -123,6 +123,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let login = router.get(scene: AdamantScene.Login.login) as! LoginViewController
         let welcomeIsShown = UserDefaults.standard.bool(forKey: StoreKey.application.welcomeScreensIsShown)
         login.requestBiometryOnFirstTimeActive = welcomeIsShown
+        login.modalPresentationStyle = .overFullScreen
         window!.rootViewController?.present(login, animated: false, completion: nil)
         
         if !welcomeIsShown {

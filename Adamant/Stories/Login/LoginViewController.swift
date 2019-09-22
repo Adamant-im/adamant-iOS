@@ -389,11 +389,13 @@ extension LoginViewController {
 		accountService.loginWith(passphrase: passphrase, completion: { [weak self] result in
 			switch result {
 			case .success(_, let alert):
-				if let nav = self?.navigationController {
-					nav.popViewController(animated: true)
-				} else {
-					self?.dismiss(animated: true, completion: nil)
-				}
+                DispatchQueue.main.async {
+                    if let nav = self?.navigationController {
+                        nav.popViewController(animated: true)
+                    } else {
+                            self?.dismiss(animated: true, completion: nil)
+                    }
+                }
 				
 				self?.dialogService.dismissProgress()
 				

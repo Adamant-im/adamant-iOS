@@ -435,6 +435,7 @@ class AccountViewController: FormViewController {
 			let logout = UIAlertAction(title: String.adamantLocalized.alert.logoutButton, style: .default) { [weak self] _ in
 				self?.accountService.logout()
 				if let vc = self?.router.get(scene: AdamantScene.Login.login) {
+                    vc.modalPresentationStyle = .overFullScreen
 					self?.dialogService.present(vc, animated: true, completion: nil)
 				}
 			}

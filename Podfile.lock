@@ -156,7 +156,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   BitcoinKit:
-    :commit: 48589d409715da8be93df83d7866132a2ec50d58
+    :commit: de0accb08af2d95546ea83c54ce8d0b9c6cc0c94
     :git: https://github.com/boyarkin-anton/BitcoinKit.git
   Eureka:
     :commit: 796b430ada97851a17cac0ae4acf4abf42da8186
