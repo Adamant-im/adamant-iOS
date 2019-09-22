@@ -68,12 +68,12 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
                 var result: TransactionStatus = .warning
                 if transaction.isOutgoing {
                     var totalIncome: Decimal = 0
-                    for input in dogeTransaction.inputs {
-                        guard input.sender == walletAddress else {
+                    for output in dogeTransaction.outputs {
+                        guard !output.addresses.contains(walletAddress) else {
                             continue
                         }
                         
-                        totalIncome += input.value
+                        totalIncome += output.value
                     }
                     
                     if (min...max).contains(totalIncome) {
