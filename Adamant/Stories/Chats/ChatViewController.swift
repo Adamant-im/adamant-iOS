@@ -49,6 +49,7 @@ class ChatViewController: MessagesViewController {
 	var router: Router!
     var addressBookService: AddressBookService!
     var stack: CoreDataStack!
+    var securedStore: SecuredStore!
 	
 	// MARK: Properties
 	weak var delegate: ChatViewControllerDelegate?
@@ -94,6 +95,8 @@ class ChatViewController: MessagesViewController {
 	
 	// Content insets are broken after modal view dissapears
 	private var fixKeyboardInsets = false
+    
+    private var canSavePosition = false
 	
     // MARK: Rich Messages
     var richMessageProviders = [String:RichMessageProvider]()
@@ -373,12 +376,21 @@ class ChatViewController: MessagesViewController {
 	
 	override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
-		
+        
+        guard let address = chatroom?.partner?.address else { return }
+        
+        if isFirstLayout {
+            Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
+                self.canSavePosition = true
+            }
+        }
+        
         // MARK: 4.2 Scroll to message
         if let messageToShow = self.messageToShow {
             if let indexPath = chatController?.indexPath(forObject: messageToShow) {
                 self.messagesCollectionView.scrollToItem(at: IndexPath(item: 0, section: indexPath.row), at: [.centeredVertically, .centeredHorizontally], animated: false)
-                
+                isFirstLayout = false
+                securedStore.remove("chatPosition::\(address)")
                 return
             }
         }
@@ -390,8 +402,19 @@ class ChatViewController: MessagesViewController {
                 messagesCollectionView.contentInset.bottom = barHeight
                 messagesCollectionView.scrollIndicatorInsets.bottom = barHeight - (tabBarController?.tabBar.bounds.height ?? 0)
             }
+            
             if self.messageToShow == nil {
-                messagesCollectionView.scrollToBottom(animated: false)
+                if let value = securedStore.get("chatPosition::\(address)"), let offset = Double(string: value) {
+                    
+                    let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom)
+                    
+                    messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
+                    }
+                } else {
+                    messagesCollectionView.scrollToBottom(animated: false)
+                }
+            } else {
+                securedStore.remove("chatPosition::\(address)")
             }
 		}
 	}
@@ -725,6 +748,20 @@ extension ChatViewController {
             richQueueSemaphore.wait()
             richStatusOperationQueue.addOperation(operation)
             richQueueSemaphore.signal()
+        }
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard let address = chatroom?.partner?.address, canSavePosition else { return }
+        
+        let offset = scrollView.contentSize.height - (scrollView.bounds.height - scrollView.scrollIndicatorInsets.bottom - scrollView.contentInset.bottom) - scrollView.contentOffset.y
+        
+        if offset > -15 {
+            print("Need to save")
+            securedStore.set("\(offset)", for: "chatPosition::\(address)")
+        } else {
+            print("Need to delete")
+            securedStore.remove("chatPosition::\(address)")
         }
     }
 }
