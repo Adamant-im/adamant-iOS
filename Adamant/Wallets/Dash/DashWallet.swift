@@ -10,15 +10,17 @@ import Foundation
 import BitcoinKit
 
 class DashWallet: WalletAccount {
-    let address: String
+    lazy var address: String = {
+        return publicKey.toCashaddr().base58
+    }()
     let privateKey: PrivateKey
-    let publicKey: PublicKey
+    lazy var publicKey: PublicKey = {
+        return privateKey.publicKey()
+    }()
     var balance: Decimal = 0.0
     var notifications: Int = 0
     
     init(privateKey: PrivateKey) {
         self.privateKey = privateKey
-        self.publicKey = privateKey.publicKey()
-        self.address = publicKey.toCashaddr().base58
     }
 }
