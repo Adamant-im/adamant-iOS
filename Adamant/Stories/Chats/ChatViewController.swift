@@ -96,7 +96,7 @@ class ChatViewController: MessagesViewController {
 	// Content insets are broken after modal view dissapears
 	private var fixKeyboardInsets = false
     
-    private var canSavePosition = false
+    private var chatPositionOffset: CGFloat = 0
 	
     // MARK: Rich Messages
     var richMessageProviders = [String:RichMessageProvider]()
@@ -372,18 +372,20 @@ class ChatViewController: MessagesViewController {
 		if let delegate = delegate, let message = messageInputBar.inputTextView.text, let address = chatroom?.partner?.address {
 			delegate.preserveMessage(message, forAddress: address)
 		}
+        
+        guard let address = chatroom?.partner?.address else { return }
+        
+        if self.chatPositionOffset > 0 {
+            securedStore.set("\(self.chatPositionOffset)", for: "chatPosition::\(address)")
+        } else {
+            securedStore.remove("chatPosition::\(address)")
+        }
 	}
 	
 	override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
         
         guard let address = chatroom?.partner?.address else { return }
-        
-        if isFirstLayout {
-            Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
-                self.canSavePosition = true
-            }
-        }
         
         // MARK: 4.2 Scroll to message
         if let messageToShow = self.messageToShow {
@@ -405,7 +407,7 @@ class ChatViewController: MessagesViewController {
             
             if self.messageToShow == nil {
                 if let value = securedStore.get("chatPosition::\(address)"), let offset = Double(string: value) {
-                    
+                    self.chatPositionOffset = CGFloat(offset)
                     let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom)
                     
                     messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
@@ -752,16 +754,12 @@ extension ChatViewController {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard let address = chatroom?.partner?.address, canSavePosition else { return }
-        
         let offset = scrollView.contentSize.height - (scrollView.bounds.height - scrollView.scrollIndicatorInsets.bottom - scrollView.contentInset.bottom) - scrollView.contentOffset.y
         
         if offset > -15 {
-            print("Need to save")
-            securedStore.set("\(offset)", for: "chatPosition::\(address)")
+            chatPositionOffset = offset
         } else {
-            print("Need to delete")
-            securedStore.remove("chatPosition::\(address)")
+            chatPositionOffset = 0
         }
     }
 }
