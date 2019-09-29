@@ -96,7 +96,14 @@ class ChatViewController: MessagesViewController {
 	// Content insets are broken after modal view dissapears
 	private var fixKeyboardInsets = false
     
-    private var chatPositionOffset: CGFloat = 0
+    private var keyboardHeight: CGFloat = 0
+    private var chatPositionOffset: CGFloat = 0 {
+        didSet {
+            self.scrollToBottomBtn.isHidden = chatPositionOffset < 50
+        }
+    }
+    
+    let scrollToBottomBtn = UIButton(type: .custom)
 	
     // MARK: Rich Messages
     var richMessageProviders = [String:RichMessageProvider]()
@@ -323,6 +330,10 @@ class ChatViewController: MessagesViewController {
 		// MARK: 5. Notifications
 		// Fixing content insets after modal window
         NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
+            if #available(iOS 13, *) {
+                self?.fixKeyboardInsets = false
+            }
+            
 			guard let fixIt = self?.fixKeyboardInsets, fixIt else {
 				return
 			}
@@ -340,7 +351,7 @@ class ChatViewController: MessagesViewController {
 			scrollIndicatorInsets.bottom = frame.size.height
 			scrollView.scrollIndicatorInsets = scrollIndicatorInsets
 			
-			scrollView.scrollToBottom(animated: true)
+//			scrollView.scrollToBottom(animated: true)
 			
 			self?.fixKeyboardInsets = false
 		}
@@ -359,12 +370,43 @@ class ChatViewController: MessagesViewController {
                 }
             }
         }
+        
+        scrollToBottomBtn.backgroundColor = .clear
+        scrollToBottomBtn.setImage(#imageLiteral(resourceName: "ScrollDown"), for: .normal)
+        scrollToBottomBtn.frame = CGRect(x: view.bounds.width - 70, y: view.bounds.height - 100, width: 50, height: 50)
+        scrollToBottomBtn.translatesAutoresizingMaskIntoConstraints = false
+        scrollToBottomBtn.addTarget(self, action: #selector(scrollDown), for: .touchUpInside)
+        
+        self.view.addSubview(scrollToBottomBtn)
+        
+        keyboardManager.bind(to: messagesCollectionView)
+        keyboardManager.on(event: .willChangeFrame) { [weak self] (notification) in
+            let barHeight = self?.messageInputBar.bounds.height ?? 0
+            let keyboardHeight = notification.endFrame.height
+            
+            self?.scrollToBottomBtn.frame.origin.y = (self?.messagesCollectionView.bounds.height ?? 0) - 70 - keyboardHeight
+            
+            self?.keyboardHeight = keyboardHeight - barHeight
+        }
+        
+        NSLayoutConstraint.activate([
+            scrollToBottomBtn.heightAnchor.constraint(equalToConstant: 50),
+            scrollToBottomBtn.widthAnchor.constraint(equalToConstant: 50),
+            scrollToBottomBtn.bottomAnchor.constraint(equalTo: messagesCollectionView.topAnchor, constant: -10),
+            scrollToBottomBtn.rightAnchor.constraint(equalTo: messagesCollectionView.rightAnchor, constant: -20)
+        ])
 	}
+    
+    @objc func scrollDown() {
+        messagesCollectionView.scrollToBottom(animated: true)
+    }
 	
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
 		isOnTop = true
 		chatroom?.markAsReaded()
+        
+        scrollToBottomBtn.frame.origin.y = self.messagesCollectionView.bounds.height - 70
 	}
 	
 	override func viewDidDisappear(_ animated: Bool) {
@@ -755,10 +797,10 @@ extension ChatViewController {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offset = scrollView.contentSize.height - (scrollView.bounds.height - scrollView.scrollIndicatorInsets.bottom - scrollView.contentInset.bottom) - scrollView.contentOffset.y
+        var offset = scrollView.contentSize.height - scrollView.bounds.height - scrollView.contentOffset.y + messageInputBar.bounds.height
+        offset += self.keyboardHeight
         
-//        print("offset :\(offset)")
-        if offset > -15 {
+        if offset > 50 {
             chatPositionOffset = offset
         } else {
             chatPositionOffset = 0
