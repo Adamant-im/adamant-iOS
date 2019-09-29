@@ -641,7 +641,7 @@ extension ChatListViewController {
 		// MARK: 1. Create and config ViewController
         let vc = chatViewController(for: chatroom, with: message)
         
-        if let split = self.splitViewController {
+        if let split = self.splitViewController, UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             let chat = UINavigationController(rootViewController:vc)
             split.showDetailViewController(chat, sender: self)
         } else {
@@ -661,7 +661,10 @@ extension ChatListViewController {
             
             // MARK: 3. Present ViewController
             if let nav = navigationController {
-                nav.pushViewController(vc, animated: animated)
+                nav.dismiss(animated: true) {
+                    nav.popToRootViewController(animated: true)
+                    nav.pushViewController(vc, animated: animated)
+                }
             } else {
                 present(vc, animated: true)
             }
