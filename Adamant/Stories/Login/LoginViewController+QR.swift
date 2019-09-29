@@ -26,11 +26,13 @@ extension LoginViewController {
 					if Thread.isMainThread {
 						let reader = QRCodeReaderViewController.adamantQrCodeReader()
 						reader.delegate = self
+                        reader.modalPresentationStyle = .overFullScreen
 						self?.present(reader, animated: true, completion: nil)
 					} else {
 						DispatchQueue.main.async {
 							let reader = QRCodeReaderViewController.adamantQrCodeReader()
 							reader.delegate = self
+                            reader.modalPresentationStyle = .overFullScreen
 							self?.present(reader, animated: true, completion: nil)
 						}
 					}
@@ -55,6 +57,7 @@ extension LoginViewController {
 			picker.delegate = self
 			picker.allowsEditing = false
 			picker.sourceType = .photoLibrary
+            picker.modalPresentationStyle = .overFullScreen
 			self?.present(picker, animated: true, completion: nil)
 		}
 		

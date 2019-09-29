@@ -71,6 +71,7 @@ extension SecurityViewController {
 				pinpad.delegate = self
 				
 				DispatchQueue.main.async {
+                    pinpad.modalPresentationStyle = .overFullScreen
 					self?.present(pinpad, animated: true, completion: nil)
 				}
 				

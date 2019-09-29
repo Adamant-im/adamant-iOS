@@ -547,6 +547,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
             self?.present(safari, animated: true, completion: nil)
         }
         
@@ -602,6 +603,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             // URL
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportUrlButton, style: .default) { [weak self] _ in
                 let alert = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+                alert.modalPresentationStyle = .overFullScreen
                 self?.present(alert, animated: true, completion: nil)
             })
         }
@@ -611,6 +613,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportSummaryButton, style: .default) { [weak self] _ in
                 let text = summary
                 let alert = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+                alert.modalPresentationStyle = .overFullScreen
                 self?.present(alert, animated: true, completion: nil)
             })
         }

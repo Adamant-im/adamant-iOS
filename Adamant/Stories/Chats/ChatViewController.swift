@@ -156,6 +156,7 @@ class ChatViewController: MessagesViewController {
 				vc.transferDelegate = self
 				
 				let navigator = UINavigationController(rootViewController: vc)
+                navigator.modalPresentationStyle = .overFullScreen
 				self?.present(navigator, animated: true, completion: nil)
             }
     }()
@@ -522,7 +523,7 @@ class ChatViewController: MessagesViewController {
 			})
 			
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-			
+			alert.modalPresentationStyle = .overFullScreen
 			self?.present(alert, animated: true, completion: nil)
 		}
 		
@@ -756,6 +757,7 @@ extension ChatViewController {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offset = scrollView.contentSize.height - (scrollView.bounds.height - scrollView.scrollIndicatorInsets.bottom - scrollView.contentInset.bottom) - scrollView.contentOffset.y
         
+//        print("offset :\(offset)")
         if offset > -15 {
             chatPositionOffset = offset
         } else {

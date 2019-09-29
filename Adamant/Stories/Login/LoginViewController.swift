@@ -300,6 +300,7 @@ class LoginViewController: FormViewController {
 			}
 			
 			let nav = UINavigationController(rootViewController: vc)
+            nav.modalPresentationStyle = .overFullScreen
 			self?.present(nav, animated: true, completion: nil)
 		}
 		

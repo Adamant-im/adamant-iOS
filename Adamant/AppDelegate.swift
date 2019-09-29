@@ -128,6 +128,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if !welcomeIsShown {
             let welcome = router.get(scene: AdamantScene.Onboard.welcome)
+            welcome.modalPresentationStyle = .overFullScreen
             login.present(welcome, animated: true, completion: nil)
             UserDefaults.standard.set(true, forKey: StoreKey.application.welcomeScreensIsShown)
         }

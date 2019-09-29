@@ -111,6 +111,7 @@ class QRGeneratorViewController: FormViewController {
 						self?.dialogService.showToastMessage(error.localizedDescription)
 					}
 				}
+                vc.modalPresentationStyle = .overFullScreen
 				self?.present(vc, animated: true, completion: nil)
 			})
 			
@@ -121,6 +122,7 @@ class QRGeneratorViewController: FormViewController {
 			alert.addAction(share)
 			alert.addAction(cancel)
             alert.popoverPresentationController?.sourceView = cell
+            alert.modalPresentationStyle = .overFullScreen
 			self?.present(alert, animated: true, completion: nil)
 		}
 		

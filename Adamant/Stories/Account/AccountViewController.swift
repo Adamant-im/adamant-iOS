@@ -263,6 +263,7 @@ class AccountViewController: FormViewController {
             } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true, completion: nil)
             }
             
@@ -315,6 +316,7 @@ class AccountViewController: FormViewController {
             } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true, completion: nil)
             }
             
@@ -348,6 +350,7 @@ class AccountViewController: FormViewController {
             } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true, completion: nil)
             }
             
@@ -375,6 +378,7 @@ class AccountViewController: FormViewController {
             } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true, completion: nil)
             }
             
@@ -402,6 +406,7 @@ class AccountViewController: FormViewController {
             } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true, completion: nil)
             }
             
@@ -442,6 +447,7 @@ class AccountViewController: FormViewController {
 			
 			alert.addAction(cancel)
 			alert.addAction(logout)
+            alert.modalPresentationStyle = .overFullScreen
 			self?.present(alert, animated: true, completion: nil)
 		}
         
@@ -530,6 +536,7 @@ class AccountViewController: FormViewController {
             } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true, completion: nil)
             }
             

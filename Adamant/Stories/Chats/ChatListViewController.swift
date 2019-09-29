@@ -550,6 +550,7 @@ extension ChatListViewController: NewChatViewControllerDelegate {
             } else if let nav = self?.navigationController {
                 navigator = nav
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true) {
                     vc.becomeFirstResponder()
                     
@@ -775,6 +776,7 @@ extension ChatListViewController {
 					})
 					
 					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+                    alert.modalPresentationStyle = .overFullScreen
 					self?.present(alert, animated: true, completion: nil)
 				}
 				

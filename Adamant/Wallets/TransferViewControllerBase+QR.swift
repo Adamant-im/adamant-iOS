@@ -23,6 +23,7 @@ extension TransferViewControllerBase {
 		case .notDetermined:
 			AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
 				if granted, let qrReader = self?.qrReader {
+                    qrReader.modalPresentationStyle = .overFullScreen
 					if Thread.isMainThread {
 						self?.present(qrReader, animated: true, completion: nil)
 					} else {
@@ -63,6 +64,7 @@ extension TransferViewControllerBase {
 			picker.delegate = self
 			picker.allowsEditing = false
 			picker.sourceType = .photoLibrary
+            picker.modalPresentationStyle = .overFullScreen
 			self?.present(picker, animated: true, completion: nil)
 		}
 		

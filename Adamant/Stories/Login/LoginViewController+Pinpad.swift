@@ -19,7 +19,7 @@ extension LoginViewController {
 			pinpad.commentLabel.text = String.adamantLocalized.login.loginIntoPrevAccount
 			pinpad.commentLabel.isHidden = false
 			pinpad.delegate = self
-			
+			pinpad.modalPresentationStyle = .overFullScreen
 			self?.present(pinpad, animated: true, completion: nil)
 		}
 	}
@@ -74,6 +74,7 @@ extension LoginViewController {
 					presenter.dismiss(animated: true, completion: nil)
 					
 					if let alertVc = alertVc {
+                        alertVc.modalPresentationStyle = .overFullScreen
 						presenter.present(alertVc, animated: true, completion: nil)
 					}
 				} else {
@@ -81,6 +82,7 @@ extension LoginViewController {
 						presenter.dismiss(animated: true, completion: nil)
 						
 						if let alertVc = alertVc {
+                            alertVc.modalPresentationStyle = .overFullScreen
 							presenter.present(alertVc, animated: true, completion: nil)
 						}
 					}

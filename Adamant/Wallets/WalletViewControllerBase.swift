@@ -201,6 +201,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                     if let nav = self?.navigationController {
                         nav.pushViewController(vc, animated: true)
                     } else {
+                        vc.modalPresentationStyle = .overFullScreen
                         self?.present(vc, animated: true)
                     }
                 }
@@ -418,6 +419,7 @@ extension WalletViewControllerBase: TransferViewControllerDelegate {
                 self?.dismiss(animated: true, completion: nil)
                 
                 if let detailsViewController = detailsViewController {
+                    detailsViewController.modalPresentationStyle = .overFullScreen
                     self?.present(detailsViewController, animated: true, completion: nil)
                 }
             }

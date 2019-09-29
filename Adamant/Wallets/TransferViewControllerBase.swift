@@ -664,7 +664,7 @@ extension TransferViewControllerBase {
                 
                 alert.addAction(cancelAction)
                 alert.addAction(confirmAction)
-                
+                alert.modalPresentationStyle = .overFullScreen
                 presenter.present(alert, animated: true) {
                     row.deselect(animated: true)
                 }

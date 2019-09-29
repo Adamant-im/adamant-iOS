@@ -206,6 +206,7 @@ class NewChatViewController: FormViewController {
 					vc.qrCode = qr
 					vc.sharingTip = address
 					vc.excludedActivityTypes = ShareContentType.address.excludedActivityTypes
+                    vc.modalPresentationStyle = .overFullScreen
 					self?.present(vc, animated: true, completion: nil)
 					
 				case .failure(error: let error):
@@ -305,6 +306,7 @@ class NewChatViewController: FormViewController {
                     
                     let safari = SFSafariViewController(url: url)
                     safari.preferredControlTintColor = UIColor.adamant.primary
+                    safari.modalPresentationStyle = .overFullScreen
                     self?.present(safari, animated: true, completion: nil)
                 })
                 
@@ -312,6 +314,7 @@ class NewChatViewController: FormViewController {
                 alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
                 
                 DispatchQueue.main.async {
+                    alert.modalPresentationStyle = .overFullScreen
                     self.present(alert, animated: true, completion: nil)
                 }
                 
@@ -360,6 +363,7 @@ extension NewChatViewController {
 		case .notDetermined:
 			AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
 				if granted, let qrReader = self?.qrReader {
+                    qrReader.modalPresentationStyle = .overFullScreen
 					if Thread.isMainThread {
 						self?.present(qrReader, animated: true, completion: nil)
 					} else {
@@ -400,6 +404,7 @@ extension NewChatViewController {
 			picker.delegate = self
 			picker.allowsEditing = false
 			picker.sourceType = .photoLibrary
+            picker.modalPresentationStyle = .overFullScreen
 			self?.present(picker, animated: true, completion: nil)
 		}
 		

@@ -62,6 +62,7 @@ class AdmTransferViewController: TransferViewControllerBase {
                                             style: UIAlertAction.Style.default) { [weak self] _ in
                         let safari = SFSafariViewController(url: url)
                         safari.preferredControlTintColor = UIColor.adamant.primary
+                        safari.modalPresentationStyle = .overFullScreen
                         self?.present(safari, animated: true, completion: nil)
                     }
                     
@@ -78,7 +79,7 @@ class AdmTransferViewController: TransferViewControllerBase {
                 
                 alert.addAction(send)
                 alert.addAction(cancel)
-                
+                alert.modalPresentationStyle = .overFullScreen
                 DispatchQueue.main.async {
                     self.present(alert, animated: true, completion: nil)
                     self.dialogService.dismissProgress()

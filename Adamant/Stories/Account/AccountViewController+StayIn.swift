@@ -69,7 +69,7 @@ extension AccountViewController {
 				
 				pinpad.commentLabel.isHidden = false
 				pinpad.delegate = self
-				
+				pinpad.modalPresentationStyle = .overFullScreen
 				DispatchQueue.main.async {
 					self?.present(pinpad, animated: true, completion: nil)
 				}
