@@ -51,7 +51,7 @@ extension SecurityViewController {
 		})
 		
 		alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-		
+		alert.modalPresentationStyle = .overFullScreen
 		present(alert, animated: true, completion: nil)
 	}
 }

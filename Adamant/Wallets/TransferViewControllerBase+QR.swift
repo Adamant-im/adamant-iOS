@@ -18,6 +18,7 @@ extension TransferViewControllerBase {
 	func scanQr() {
 		switch AVCaptureDevice.authorizationStatus(for: .video) {
 		case .authorized:
+            qrReader.modalPresentationStyle = .overFullScreen
 			present(qrReader, animated: true, completion: nil)
 			
 		case .notDetermined:
@@ -39,6 +40,7 @@ extension TransferViewControllerBase {
 		case .restricted:
 			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+            alert.modalPresentationStyle = .overFullScreen
 			present(alert, animated: true, completion: nil)
 			
 		case .denied:
@@ -53,7 +55,7 @@ extension TransferViewControllerBase {
 			})
 			
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-			 
+            alert.modalPresentationStyle = .overFullScreen
 			present(alert, animated: true, completion: nil)
 		}
 	}
@@ -65,6 +67,11 @@ extension TransferViewControllerBase {
 			picker.allowsEditing = false
 			picker.sourceType = .photoLibrary
             picker.modalPresentationStyle = .overFullScreen
+            // overrideUserInterfaceStyle is available with iOS 13
+            if #available(iOS 13.0, *) {
+                // Always adopt a light interface style.
+                picker.overrideUserInterfaceStyle = .light
+            }
 			self?.present(picker, animated: true, completion: nil)
 		}
 		

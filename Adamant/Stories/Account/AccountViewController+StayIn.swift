@@ -22,6 +22,7 @@ extension AccountViewController {
 			pinpad.commentLabel.text = String.adamantLocalized.pinpad.createPin
 			pinpad.commentLabel.isHidden = false
 			pinpad.delegate = self
+            pinpad.modalPresentationStyle = .overFullScreen
 			present(pinpad, animated: true, completion: nil)
 		} else { // Validate pin and turn off Stay In
 			pinpadRequest = .turnOffPin
@@ -30,7 +31,7 @@ extension AccountViewController {
 			pinpad.commentLabel.text = String.adamantLocalized.security.stayInTurnOff
 			pinpad.commentLabel.isHidden = false
 			pinpad.delegate = self
-			
+			pinpad.modalPresentationStyle = .overFullScreen
 			present(pinpad, animated: true, completion: nil)
 		}
 	}

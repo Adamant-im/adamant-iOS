@@ -207,6 +207,7 @@ class ChatListViewController: UIViewController {
         if let split = self.splitViewController {
             split.showDetailViewController(controller, sender: self)
         } else {
+            controller.modalPresentationStyle = .overFullScreen
             present(controller, animated: true)
         }
 	}
@@ -376,6 +377,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
             } else if let nav = navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 present(vc, animated: true)
             }
 		}
@@ -666,6 +668,7 @@ extension ChatListViewController {
                     nav.pushViewController(vc, animated: animated)
                 }
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 present(vc, animated: true)
             }
         }

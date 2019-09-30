@@ -366,6 +366,7 @@ extension ChatViewController: MessageCellDelegate {
         if url.absoluteString.starts(with: "http") {
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
             present(safari, animated: true, completion: nil)
         } else if url.absoluteString.starts(with: "mailto") {
             if UIApplication.shared.canOpenURL(url) {

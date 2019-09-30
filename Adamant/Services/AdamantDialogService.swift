@@ -182,7 +182,7 @@ extension AdamantDialogService {
         alertVC.alertActionStackView.axis = .vertical
         alertVC.alertActionStackView.spacing = 0
         alertVC.alertActionStackViewHeightConstraint.constant = 100
-        
+        alertVC.modalPresentationStyle = .overFullScreen
         present(alertVC, animated: true, completion: nil)
     }
     
@@ -239,7 +239,7 @@ extension AdamantDialogService {
             alert.popoverPresentationController?.sourceRect = sourceView.bounds
             alert.popoverPresentationController?.canOverlapSourceViewRect = false
         }
-        
+        alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
     }
     
@@ -256,7 +256,7 @@ extension AdamantDialogService {
         if let sourceView = from {
             alert.popoverPresentationController?.barButtonItem = sourceView
         }
-        
+        alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
     }
     

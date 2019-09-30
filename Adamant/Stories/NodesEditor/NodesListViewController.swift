@@ -209,7 +209,7 @@ extension NodesListViewController {
 			self?.setNodes(nodes: nodes)
 			self?.nodesSource.saveNodes()
 		}))
-		
+		alert.modalPresentationStyle = .overFullScreen
 		present(alert, animated: true, completion: nil)
 	}
 	
@@ -365,6 +365,7 @@ extension NodesListViewController {
             self.navigationController?.pushViewController(editor, animated: true)
         } else {
             let navigator = UINavigationController(rootViewController: editor)
+            navigator.modalPresentationStyle = .overFullScreen
             present(navigator, animated: true, completion: nil)
         }
 	}

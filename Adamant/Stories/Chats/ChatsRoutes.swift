@@ -60,6 +60,7 @@ extension AdamantScene {
 			c.router = r.resolve(Router.self)
 			
 			let navigator = UINavigationController(rootViewController: c)
+            navigator.modalPresentationStyle = .overFullScreen
 			return navigator
 		})
 		

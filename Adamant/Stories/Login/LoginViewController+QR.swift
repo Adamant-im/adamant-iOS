@@ -18,6 +18,7 @@ extension LoginViewController {
 		case .authorized:
 			let reader = QRCodeReaderViewController.adamantQrCodeReader()
 			reader.delegate = self
+            reader.modalPresentationStyle = .overFullScreen
 			present(reader, animated: true, completion: nil)
 			
 		case .notDetermined:

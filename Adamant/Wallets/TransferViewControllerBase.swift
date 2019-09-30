@@ -500,7 +500,7 @@ class TransferViewControllerBase: FormViewController {
 		
 		alert.addAction(cancelAction)
 		alert.addAction(sendAction)
-		
+		alert.modalPresentationStyle = .overFullScreen
 		present(alert, animated: true, completion: nil)
 	}
 	
