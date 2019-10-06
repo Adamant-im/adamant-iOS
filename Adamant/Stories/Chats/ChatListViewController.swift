@@ -650,7 +650,7 @@ extension ChatListViewController {
             // MARK: 2. Config TabBarController
             let animated: Bool
             if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController {
-                if let navigator = navigationController, selectedView != navigator, let index = tabVC.viewControllers?.index(of: navigator) {
+                if let navigator = self.splitViewController ?? self.navigationController, selectedView != navigator, let index = tabVC.viewControllers?.index(of: navigator) {
                     animated = false
                     tabVC.selectedIndex = index
                 } else {
@@ -659,7 +659,6 @@ extension ChatListViewController {
             } else {
                 animated = true
             }
-            
             
             // MARK: 3. Present ViewController
             if let nav = navigationController {
