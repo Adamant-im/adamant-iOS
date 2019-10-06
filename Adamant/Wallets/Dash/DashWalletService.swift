@@ -177,7 +177,7 @@ class DashWalletService: WalletService {
                     break
                     
                 default:
-                    self?.dialogService.showRichError(error: error)
+                    print("\(error.localizedDescription)")
                 }
             }
             
@@ -412,7 +412,7 @@ extension DashWalletService {
                 balanceObserver = observer
 
             default:
-                dialogService.showRichError(error: error)
+                print("\(error.localizedDescription)")
             }
         }
     }
