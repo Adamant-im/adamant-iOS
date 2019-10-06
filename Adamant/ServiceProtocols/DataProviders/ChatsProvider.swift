@@ -170,6 +170,8 @@ protocol ChatsProvider: DataProvider {
 	var receivedLastHeight: Int64? { get }
 	var readedLastHeight: Int64? { get }
 	var isInitiallySynced: Bool { get }
+    
+    var chatPositon: [String: Double] { get set }
 	
 	// MARK: - Getting chats and messages
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>

@@ -97,9 +97,10 @@ class ChatViewController: MessagesViewController {
 	private var fixKeyboardInsets = false
     
     private var keyboardHeight: CGFloat = 0
+    private let chatPositionDelata: CGFloat = 150
     private var chatPositionOffset: CGFloat = 0 {
         didSet {
-            self.scrollToBottomBtn.isHidden = chatPositionOffset < 50
+            self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
         }
     }
     
@@ -371,9 +372,12 @@ class ChatViewController: MessagesViewController {
             }
         }
         
+        let h = messageInputBar.bounds.height
+        
         scrollToBottomBtn.backgroundColor = .clear
         scrollToBottomBtn.setImage(#imageLiteral(resourceName: "ScrollDown"), for: .normal)
-        scrollToBottomBtn.frame = CGRect(x: view.bounds.width - 70, y: view.bounds.height - 100, width: 50, height: 50)
+        scrollToBottomBtn.alpha = 0.5
+        scrollToBottomBtn.frame = CGRect(x: view.bounds.width - 50, y: view.bounds.height - 50 - h, width: 30, height: 30)
         scrollToBottomBtn.translatesAutoresizingMaskIntoConstraints = false
         scrollToBottomBtn.addTarget(self, action: #selector(scrollDown), for: .touchUpInside)
         
@@ -384,15 +388,14 @@ class ChatViewController: MessagesViewController {
             let barHeight = self?.messageInputBar.bounds.height ?? 0
             let keyboardHeight = notification.endFrame.height
             
-            self?.scrollToBottomBtn.frame.origin.y = (self?.messagesCollectionView.bounds.height ?? 0) - 70 - keyboardHeight
+            self?.scrollToBottomBtn.frame.origin.y = (self?.messagesCollectionView.bounds.height ?? 0) - (self?.scrollToBottomBtn.bounds.height ?? 30) - 20 - keyboardHeight
             
             self?.keyboardHeight = keyboardHeight - barHeight
         }
         
         NSLayoutConstraint.activate([
-            scrollToBottomBtn.heightAnchor.constraint(equalToConstant: 50),
-            scrollToBottomBtn.widthAnchor.constraint(equalToConstant: 50),
-            scrollToBottomBtn.bottomAnchor.constraint(equalTo: messagesCollectionView.topAnchor, constant: -10),
+            scrollToBottomBtn.heightAnchor.constraint(equalToConstant: 30),
+            scrollToBottomBtn.widthAnchor.constraint(equalToConstant: 30),
             scrollToBottomBtn.rightAnchor.constraint(equalTo: messagesCollectionView.rightAnchor, constant: -20)
         ])
 	}
@@ -406,7 +409,8 @@ class ChatViewController: MessagesViewController {
 		isOnTop = true
 		chatroom?.markAsReaded()
         
-        scrollToBottomBtn.frame.origin.y = self.messagesCollectionView.bounds.height - 70
+        scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
+        scrollToBottomBtn.frame.origin.y = self.messagesCollectionView.bounds.height - self.scrollToBottomBtn.bounds.height - 20 - self.messageInputBar.bounds.height
 	}
 	
 	override func viewDidDisappear(_ animated: Bool) {
@@ -419,9 +423,9 @@ class ChatViewController: MessagesViewController {
         guard let address = chatroom?.partner?.address else { return }
         
         if self.chatPositionOffset > 0 {
-            securedStore.set("\(self.chatPositionOffset)", for: "chatPosition::\(address)")
+            self.chatsProvider.chatPositon[address] = Double(self.chatPositionOffset)
         } else {
-            securedStore.remove("chatPosition::\(address)")
+            self.chatsProvider.chatPositon.removeValue(forKey: address)
         }
 	}
 	
@@ -435,7 +439,7 @@ class ChatViewController: MessagesViewController {
             if let indexPath = chatController?.indexPath(forObject: messageToShow) {
                 self.messagesCollectionView.scrollToItem(at: IndexPath(item: 0, section: indexPath.row), at: [.centeredVertically, .centeredHorizontally], animated: false)
                 isFirstLayout = false
-                securedStore.remove("chatPosition::\(address)")
+                self.chatsProvider.chatPositon.removeValue(forKey: address)
                 return
             }
         }
@@ -449,8 +453,9 @@ class ChatViewController: MessagesViewController {
             }
             
             if self.messageToShow == nil {
-                if let value = securedStore.get("chatPosition::\(address)"), let offset = Double(string: value) {
+                if let offset = self.chatsProvider.chatPositon[address] {
                     self.chatPositionOffset = CGFloat(offset)
+                    self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
                     let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom)
                     
                     messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
@@ -459,7 +464,7 @@ class ChatViewController: MessagesViewController {
                     messagesCollectionView.scrollToBottom(animated: false)
                 }
             } else {
-                securedStore.remove("chatPosition::\(address)")
+                self.chatsProvider.chatPositon.removeValue(forKey: address)
             }
 		}
 	}
@@ -687,7 +692,11 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 	private func performBatchChanges(_ changes: [ControllerChange]) {
         let chat = messagesCollectionView
         
-        let scrollToBottom = changes.first { $0.type == .insert } != nil
+        var scrollToBottom = changes.first { $0.type == .insert } != nil
+        
+        if !isFirstLayout {
+            scrollToBottom = scrollToBottomBtn.isHidden
+        }
         
         chat.performBatchUpdates({
             for change in changes {
@@ -698,7 +707,9 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
                     }
                     
                     chat.insertSections(IndexSet(integer: newIndexPath.row))
-                    chat.scrollToBottom(animated: true)
+                    if scrollToBottom {
+                        chat.scrollToBottom(animated: true)
+                    }
                     
                 case .delete:
                     guard let indexPath = change.indexPath else {
@@ -730,10 +741,16 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 
 extension ChatViewController: TransferViewControllerDelegate, ComplexTransferViewControllerDelegate {
     func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?) {
+        DispatchQueue.main.async {
+            self.scrollDown()
+        }
         dismissTransferViewController(andPresent: detailsViewController)
     }
 	
     func complexTransferViewController(_ viewController: ComplexTransferViewController, didFinishWithTransfer: TransactionDetails?, detailsViewController: UIViewController?) {
+        DispatchQueue.main.async {
+            self.scrollDown()
+        }
         dismissTransferViewController(andPresent: detailsViewController)
     }
 	
@@ -800,7 +817,7 @@ extension ChatViewController {
         var offset = scrollView.contentSize.height - scrollView.bounds.height - scrollView.contentOffset.y + messageInputBar.bounds.height
         offset += self.keyboardHeight
         
-        if offset > 50 {
+        if offset > chatPositionDelata {
             chatPositionOffset = offset
         } else {
             chatPositionOffset = 0

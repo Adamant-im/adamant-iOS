@@ -28,6 +28,8 @@ class AdamantChatsProvider: ChatsProvider {
     private let apiTransactions = 100
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
     
+    public var chatPositon: [String : Double] = [:]
+    
     private(set) var isInitiallySynced: Bool = false {
         didSet {
             NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: self, userInfo: [AdamantUserInfoKey.ChatProvider.initiallySynced : isInitiallySynced])
