@@ -607,8 +607,16 @@ extension ChatViewController: MessageInputBarDelegate {
 	
 	func messageInputBar(_ inputBar: MessageInputBar, textViewTextDidChangeTo text: String) {
 		if text.count > 0 {
-			let fee = AdamantMessage.text(text).fee
-			setEstimatedFee(fee)
+            feeUpdateTimer?.invalidate()
+            feeUpdateTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { _ in
+                print("update fee")
+                DispatchQueue.background.async {
+                    let fee = AdamantMessage.text(text).fee
+                    DispatchQueue.main.async {
+                        self.setEstimatedFee(fee)
+                    }
+                }
+            })
 		} else {
 			setEstimatedFee(0)
 		}

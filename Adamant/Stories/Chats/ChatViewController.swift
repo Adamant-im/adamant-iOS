@@ -105,6 +105,8 @@ class ChatViewController: MessagesViewController {
     }
     
     let scrollToBottomBtn = UIButton(type: .custom)
+    
+    var feeUpdateTimer: Timer?
 	
     // MARK: Rich Messages
     var richMessageProviders = [String:RichMessageProvider]()
