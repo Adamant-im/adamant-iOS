@@ -743,15 +743,19 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 
 extension ChatViewController: TransferViewControllerDelegate, ComplexTransferViewControllerDelegate {
     func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?) {
-        DispatchQueue.main.async {
-            self.scrollDown()
+        if transfer != nil {
+            DispatchQueue.main.async {
+                self.scrollDown()
+            }
         }
         dismissTransferViewController(andPresent: detailsViewController)
     }
 	
     func complexTransferViewController(_ viewController: ComplexTransferViewController, didFinishWithTransfer: TransactionDetails?, detailsViewController: UIViewController?) {
-        DispatchQueue.main.async {
-            self.scrollDown()
+        if didFinishWithTransfer != nil {
+            DispatchQueue.main.async {
+                self.scrollDown()
+            }
         }
         dismissTransferViewController(andPresent: detailsViewController)
     }
