@@ -662,10 +662,9 @@ extension ChatListViewController {
             
             // MARK: 3. Present ViewController
             if let nav = navigationController {
-                nav.dismiss(animated: true) {
-                    nav.popToRootViewController(animated: true)
-                    nav.pushViewController(vc, animated: animated)
-                }
+                nav.dismiss(animated: true)
+                nav.popToRootViewController(animated: true)
+                nav.pushViewController(vc, animated: animated)
             } else {
                 vc.modalPresentationStyle = .overFullScreen
                 present(vc, animated: true)
