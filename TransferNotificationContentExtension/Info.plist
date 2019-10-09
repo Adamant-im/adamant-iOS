@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>UIUserInterfaceStyle</key>
-	<string>Light</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -31,12 +29,14 @@
 			<key>UNNotificationExtensionDefaultContentHidden</key>
 			<true/>
 			<key>UNNotificationExtensionInitialContentSizeRatio</key>
-			<real>0.95</real>
+			<real>0.94999999999999996</real>
 		</dict>
 		<key>NSExtensionMainStoryboard</key>
 		<string>MainInterface</string>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.usernotifications.content-extension</string>
 	</dict>
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string>
 </dict>
 </plist>

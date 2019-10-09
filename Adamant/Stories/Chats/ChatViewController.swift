@@ -103,6 +103,7 @@ class ChatViewController: MessagesViewController {
             self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
         }
     }
+    var scrollToBottomBtnOffetConstraint: NSLayoutConstraint?
     
     let scrollToBottomBtn = UIButton(type: .custom)
     
@@ -379,26 +380,28 @@ class ChatViewController: MessagesViewController {
         scrollToBottomBtn.backgroundColor = .clear
         scrollToBottomBtn.setImage(#imageLiteral(resourceName: "ScrollDown"), for: .normal)
         scrollToBottomBtn.alpha = 0.5
-        scrollToBottomBtn.frame = CGRect(x: view.bounds.width - 50, y: view.bounds.height - 50 - h, width: 30, height: 30)
+        scrollToBottomBtn.frame = CGRect.zero
         scrollToBottomBtn.translatesAutoresizingMaskIntoConstraints = false
         scrollToBottomBtn.addTarget(self, action: #selector(scrollDown), for: .touchUpInside)
         
         self.view.addSubview(scrollToBottomBtn)
         
-        keyboardManager.bind(to: messagesCollectionView)
         keyboardManager.on(event: .willChangeFrame) { [weak self] (notification) in
             let barHeight = self?.messageInputBar.bounds.height ?? 0
             let keyboardHeight = notification.endFrame.height
             
-            self?.scrollToBottomBtn.frame.origin.y = (self?.messagesCollectionView.bounds.height ?? 0) - (self?.scrollToBottomBtn.bounds.height ?? 30) - 20 - keyboardHeight
+            self?.scrollToBottomBtnOffetConstraint?.constant = -20 - keyboardHeight
             
             self?.keyboardHeight = keyboardHeight - barHeight
         }
         
+        scrollToBottomBtnOffetConstraint = scrollToBottomBtn.bottomAnchor.constraint(equalTo: messagesCollectionView.bottomAnchor, constant: (-20 - h))
+        
         NSLayoutConstraint.activate([
             scrollToBottomBtn.heightAnchor.constraint(equalToConstant: 30),
             scrollToBottomBtn.widthAnchor.constraint(equalToConstant: 30),
-            scrollToBottomBtn.rightAnchor.constraint(equalTo: messagesCollectionView.rightAnchor, constant: -20)
+            scrollToBottomBtn.rightAnchor.constraint(equalTo: messagesCollectionView.rightAnchor, constant: -20),
+            scrollToBottomBtnOffetConstraint!
         ])
 	}
     
@@ -412,7 +415,7 @@ class ChatViewController: MessagesViewController {
 		chatroom?.markAsReaded()
         
         scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
-        scrollToBottomBtn.frame.origin.y = self.messagesCollectionView.bounds.height - self.scrollToBottomBtn.bounds.height - 20 - self.messageInputBar.bounds.height
+        scrollToBottomBtnOffetConstraint?.constant = -20 - self.messageInputBar.bounds.height
 	}
 	
 	override func viewDidDisappear(_ animated: Bool) {
@@ -823,6 +826,13 @@ extension ChatViewController {
         var offset = scrollView.contentSize.height - scrollView.bounds.height - scrollView.contentOffset.y + messageInputBar.bounds.height
         offset += self.keyboardHeight
         
+        print("scrollView.contentSize.height :\(scrollView.contentSize.height)")
+        print("scrollView.bounds.height :\(scrollView.bounds.height)")
+        print("keyboardHeight :\(keyboardHeight)")
+        print("scrollView.contentOffset.y :\(scrollView.contentOffset.y)")
+        print("messageInputBar.bounds.height: \(messageInputBar.bounds.height)")
+        print("offset :\(offset)")
+        print("-----------------------")
         if offset > chatPositionDelata {
             chatPositionOffset = offset
         } else {
