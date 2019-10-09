@@ -130,6 +130,7 @@ class LoginViewController: FormViewController {
 	// MARK: Properties
 	private var hideNewPassphrase: Bool = true
 	private var firstTimeActive: Bool = true
+    internal var hidingImagePicker: Bool = false
     
     
     /// On launch, request user biometry (TouchID/FaceID) if has an account with biometry active
