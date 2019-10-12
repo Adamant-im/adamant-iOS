@@ -139,6 +139,9 @@ enum AdamantContacts {
         switch self {
         case .adamantExchange: return AdamantResources.contacts.adamantExchangePK
         case .betOnBitcoin: return AdamantResources.contacts.betOnBitcoinPK
+        case .adamantBountyWallet: return AdamantResources.contacts.adamantBountyWalletPK
+        case .iosSupport: return AdamantResources.contacts.iosSupportPK
+        case .adamantIco: return AdamantResources.contacts.adamantIcoPK
         default:
             return nil
         }

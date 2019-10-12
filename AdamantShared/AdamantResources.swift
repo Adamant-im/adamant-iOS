@@ -52,11 +52,17 @@ struct AdamantResources {
     // MARK: Contacts
     struct contacts {
         static let adamantBountyWallet = "U15423595369615486571"
+        static let adamantBountyWalletPK = "cdab95b082b9774bd975677c868261618c7ce7bea97d02e0f56d483e30c077b6"
+        
         static let adamantIco = "U7047165086065693428"
+        static let adamantIcoPK = "1e214309cc659646ecf1d90fa37be23fe76854a76e3b4da9e4d6b65a718baf8b"
+        
         static let iosSupport = "U15738334853882270577"
+        static let iosSupportPK = "acb4234d456d56d2694bd72a1aae80285f62287265f78629ecbaa4eb8d97d3d3"
         
         static let adamantExchange = "U5149447931090026688"
         static let adamantExchangePK = "c61b50a5c72a1ee52a3060014478a5693ec69de15594a985a2b41d6f084caa9d"
+        
         static let betOnBitcoin = "U17840858470710371662"
         static let betOnBitcoinPK = "ed1a7d9a8b0cd1485ae92fb78cebd45f852a24af1c983039904f765a1d581f0e"
         
