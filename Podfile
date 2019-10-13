@@ -12,7 +12,7 @@ def core_pods
   pod 'CryptoSwift' # MD5 hash
   pod 'ByteBackpacker' # Utility to pack value types into a Byte array
   pod 'libsodium' # Sodium crypto library
-  pod 'GRKOpenSSLFramework', '1.0.2.19'
+  pod 'GRKOpenSSLFramework', '1.0.2.18'
 end
 
 # Markdown parser, forked with fixed whitespaces. '5 * 5 * 6'

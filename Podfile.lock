@@ -24,7 +24,7 @@ PODS:
   - GRDB.swift (3.6.2)
   - GRDBCipher (3.6.2):
     - SQLCipher (~> 3.4.1)
-  - GRKOpenSSLFramework (1.0.2.19)
+  - GRKOpenSSLFramework (1.0.2.18)
   - KeychainAccess (3.1.2)
   - libsodium (1.0.12)
   - Lisk (1.1.0):
@@ -87,7 +87,7 @@ DEPENDENCIES:
   - FreakingSimpleRoundImageView
   - FTIndicator
   - GRDB.swift
-  - GRKOpenSSLFramework (= 1.0.2.19)
+  - GRKOpenSSLFramework (= 1.0.2.18)
   - KeychainAccess
   - libsodium
   - Lisk (from `https://github.com/adamant-im/lisk-swift.git`)
@@ -184,7 +184,7 @@ SPEC CHECKSUMS:
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   GRDB.swift: e10787d857b6b8135354b9e08fb23b4bb8e2fab7
   GRDBCipher: caccb02f13acd7f745e595cf84a70be3e91fb5f3
-  GRKOpenSSLFramework: 4abc733a8fcbc37060619a86a54202d2938dd70e
+  GRKOpenSSLFramework: 1d65e55d569af7b23074373041a92cc8bc768a92
   KeychainAccess: b3816fddcf28aa29d94b10ec305cd52be14c472b
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   Lisk: 2b21f9a60f4b1583349a1b1677d83781ec32ca70
@@ -210,6 +210,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: d80d1b9a3feca16e614acec9eea47ec26310d37d
 
-PODFILE CHECKSUM: 722560d499f2daabde9cfc553e3ae0bf6faf7152
+PODFILE CHECKSUM: 28ad3c28ab607705b5dbf8b7b68105b6422080a1
 
 COCOAPODS: 1.7.1
