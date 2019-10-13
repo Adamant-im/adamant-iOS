@@ -460,6 +460,8 @@ extension DashWalletService {
                                 completion(.failure(error))
                             }
                         })
+                    } else {
+                        completion(.success((transactions: [], hasMore: false)))
                     }
                     
                 case .failure(let error):
