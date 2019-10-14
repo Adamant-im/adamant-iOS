@@ -166,6 +166,7 @@ extension DelegateDetailsViewController: UITableViewDelegate, UITableViewDataSou
 			
 			let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
 			present(safari, animated: true, completion: nil)
 			
 		default:

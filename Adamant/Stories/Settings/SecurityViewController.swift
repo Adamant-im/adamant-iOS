@@ -251,6 +251,7 @@ class SecurityViewController: FormViewController {
 			
 			let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
 			self?.present(safari, animated: true, completion: nil)
 		}
 		

@@ -207,6 +207,7 @@ class ChatListViewController: UIViewController {
         if let split = self.splitViewController {
             split.showDetailViewController(controller, sender: self)
         } else {
+            controller.modalPresentationStyle = .overFullScreen
             present(controller, animated: true)
         }
 	}
@@ -376,6 +377,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
             } else if let nav = navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 present(vc, animated: true)
             }
 		}
@@ -550,6 +552,7 @@ extension ChatListViewController: NewChatViewControllerDelegate {
             } else if let nav = self?.navigationController {
                 navigator = nav
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true) {
                     vc.becomeFirstResponder()
                     
@@ -640,14 +643,14 @@ extension ChatListViewController {
 		// MARK: 1. Create and config ViewController
         let vc = chatViewController(for: chatroom, with: message)
         
-        if let split = self.splitViewController {
+        if let split = self.splitViewController, UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             let chat = UINavigationController(rootViewController:vc)
             split.showDetailViewController(chat, sender: self)
         } else {
             // MARK: 2. Config TabBarController
             let animated: Bool
             if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController {
-                if let navigator = navigationController, selectedView != navigator, let index = tabVC.viewControllers?.index(of: navigator) {
+                if let navigator = self.splitViewController ?? self.navigationController, selectedView != navigator, let index = tabVC.viewControllers?.index(of: navigator) {
                     animated = false
                     tabVC.selectedIndex = index
                 } else {
@@ -657,11 +660,13 @@ extension ChatListViewController {
                 animated = true
             }
             
-            
             // MARK: 3. Present ViewController
             if let nav = navigationController {
+                nav.dismiss(animated: true)
+                nav.popToRootViewController(animated: true)
                 nav.pushViewController(vc, animated: animated)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 present(vc, animated: true)
             }
         }
@@ -775,6 +780,7 @@ extension ChatListViewController {
 					})
 					
 					alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+                    alert.modalPresentationStyle = .overFullScreen
 					self?.present(alert, animated: true, completion: nil)
 				}
 				

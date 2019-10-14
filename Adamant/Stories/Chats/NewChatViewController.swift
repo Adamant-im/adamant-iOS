@@ -206,6 +206,7 @@ class NewChatViewController: FormViewController {
 					vc.qrCode = qr
 					vc.sharingTip = address
 					vc.excludedActivityTypes = ShareContentType.address.excludedActivityTypes
+                    vc.modalPresentationStyle = .overFullScreen
 					self?.present(vc, animated: true, completion: nil)
 					
 				case .failure(error: let error):
@@ -305,6 +306,7 @@ class NewChatViewController: FormViewController {
                     
                     let safari = SFSafariViewController(url: url)
                     safari.preferredControlTintColor = UIColor.adamant.primary
+                    safari.modalPresentationStyle = .overFullScreen
                     self?.present(safari, animated: true, completion: nil)
                 })
                 
@@ -312,6 +314,7 @@ class NewChatViewController: FormViewController {
                 alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
                 
                 DispatchQueue.main.async {
+                    alert.modalPresentationStyle = .overFullScreen
                     self.present(alert, animated: true, completion: nil)
                 }
                 
@@ -355,11 +358,13 @@ extension NewChatViewController {
 	func scanQr() {
 		switch AVCaptureDevice.authorizationStatus(for: .video) {
 		case .authorized:
+            qrReader.modalPresentationStyle = .overFullScreen
 			present(qrReader, animated: true, completion: nil)
 			
 		case .notDetermined:
 			AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
 				if granted, let qrReader = self?.qrReader {
+                    qrReader.modalPresentationStyle = .overFullScreen
 					if Thread.isMainThread {
 						self?.present(qrReader, animated: true, completion: nil)
 					} else {
@@ -375,6 +380,7 @@ extension NewChatViewController {
 		case .restricted:
 			let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+            alert.modalPresentationStyle = .overFullScreen
 			present(alert, animated: true, completion: nil)
 			
 		case .denied:
@@ -389,7 +395,7 @@ extension NewChatViewController {
 			})
 			
 			alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-			
+			alert.modalPresentationStyle = .overFullScreen
 			present(alert, animated: true, completion: nil)
 		}
 	}
@@ -400,6 +406,12 @@ extension NewChatViewController {
 			picker.delegate = self
 			picker.allowsEditing = false
 			picker.sourceType = .photoLibrary
+            picker.modalPresentationStyle = .overFullScreen
+            // overrideUserInterfaceStyle is available with iOS 13
+            if #available(iOS 13.0, *) {
+                // Always adopt a light interface style.
+                picker.overrideUserInterfaceStyle = .light
+            }
 			self?.present(picker, animated: true, completion: nil)
 		}
 		

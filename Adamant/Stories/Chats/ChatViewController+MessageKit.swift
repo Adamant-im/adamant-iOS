@@ -348,7 +348,14 @@ extension ChatViewController: MessageCellDelegate {
                 break
             }
             
-            provider.richMessageTapped(for: richMessage, at: indexPath, in: self)
+            if richMessage.transactionStatus == .dublicate {
+                dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.duplicatedTransaction, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+            } else  if richMessage.transactionStatus == .failed {
+                dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.inconsistentTransaction, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+            } else {
+                provider.richMessageTapped(for: richMessage, at: indexPath, in: self)
+            }
+            
             
 		default:
 			break
@@ -359,6 +366,7 @@ extension ChatViewController: MessageCellDelegate {
         if url.absoluteString.starts(with: "http") {
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
             present(safari, animated: true, completion: nil)
         } else if url.absoluteString.starts(with: "mailto") {
             if UIApplication.shared.canOpenURL(url) {
@@ -398,7 +406,13 @@ extension ChatViewController: CustomCellDelegate {
                 break
             }
             
-            provider.richMessageTapped(for: richTransaction, at: indexPath, in: self)
+            if richTransaction.transactionStatus == .dublicate {
+                dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.duplicatedTransaction, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+            } else if richTransaction.transactionStatus == .failed {
+                dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.inconsistentTransaction, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+            } else {
+                provider.richMessageTapped(for: richTransaction, at: indexPath, in: self)
+            }
             
         default:
             return
@@ -428,7 +442,13 @@ extension ChatViewController: TransferCellDelegate {
                 break
             }
             
-            provider.richMessageTapped(for: richTransaction, at: indexPath, in: self)
+            if richTransaction.transactionStatus == .dublicate {
+                dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.duplicatedTransaction, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+            } else  if richTransaction.transactionStatus == .failed {
+                dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.inconsistentTransaction, style: AdamantAlertStyle.alert, actions: nil, from: nil)
+            } else {
+                provider.richMessageTapped(for: richTransaction, at: indexPath, in: self)
+            }
             
         default:
             return
@@ -558,9 +578,13 @@ extension ChatViewController: MessageInputBarDelegate {
 			return
 		}
 		
-        chatsProvider.sendMessage(message, recipientId: partner, completion: { [weak self] result in
+        chatsProvider.sendMessage(message, recipientId: partner, from: chatroom, completion: { [weak self] result in
 			switch result {
-			case .success: break
+			case .success:
+                DispatchQueue.main.async {
+                    self?.scrollDown()
+                }
+                break
 				
 			case .failure(let error):
 				switch error {
@@ -583,8 +607,16 @@ extension ChatViewController: MessageInputBarDelegate {
 	
 	func messageInputBar(_ inputBar: MessageInputBar, textViewTextDidChangeTo text: String) {
 		if text.count > 0 {
-			let fee = AdamantMessage.text(text).fee
-			setEstimatedFee(fee)
+            feeUpdateTimer?.invalidate()
+            feeUpdateTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { _ in
+                print("update fee")
+                DispatchQueue.background.async {
+                    let fee = AdamantMessage.text(text).fee
+                    DispatchQueue.main.async {
+                        self.setEstimatedFee(fee)
+                    }
+                }
+            })
 		} else {
 			setEstimatedFee(0)
 		}

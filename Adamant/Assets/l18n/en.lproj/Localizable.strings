@@ -79,6 +79,12 @@
 /* System accounts: ADAMANT iOS Support */
 "Accounts.iOSSupport" = "ADAMANT iOS Support";
 
+/* System accounts: ADAMANT Exchange */
+"Accounts.AdamantExchange" = "ADAMANT Exchange";
+
+/* System accounts: Bet on Bitcoin Price */
+"Accounts.BetOnBitcoin" = "Bet on Bitcoin price";
+
 /* AccountsProvider: Address not valid error, %@ for address */
 "AccountsProvider.Error.AddressNotValidFormat" = "Invalid address: %@";
 
@@ -249,6 +255,12 @@
 
 /* Known contacts: Adamant welcome message. Markdown supported. */
 "Chats.WelcomeMessage" = "ADAMANT is a true Blockchain messenger, independent from governments, corporations and even developers. It is possible due to a decentralized network infrastructure, fully open source and run by users. That's why every action, including sending message or saving contact name, has its network fee of 0.001 ADM.\n\nBlockchain offers superior security and privacy, not available for typical P2P and centralized messengers. Also, Blockchain provides new possibilities. You can store and transfer cryptos In-Chat with full control of your private keys, use ADAMANT as 2FA and more.\n\nIn ADAMANT, nobody can control, block, deactivate, restrict or censor accounts. Users take full responsibility for content, messages, media, and goals and intentions of using the Messenger.\n\nRemember, your security and anonymity is up to you. Do not follow links you receive, otherwise your IP can be compromised. Set a password on your device. Learn more about security and anonymity at https://adamant.im/staysecured/.\n\nMake sure you've saved the passPhrase for this account — logout and login again. Write your passPhrase on a sheet of paper as well. Only **you are responsible for passPhrase safety**. It cannot be recovered. And if other person will get it, your tokens will be stolen and correspondence read. Treat this question with outmost importance, as if tokens in your wallet will cost a billion dollars some time.\n\nTo start messaging now, **get free welcome tokens** on Account tab. Then create new chat and put your friend's ADM address. It is recommended to share your ADM address personally, not using other messengers.";
+
+/* Known contacts: Adamant Exchenge message. Markdown supported. */
+"Chats.Exchange.WelcomeMessage" = "Hi! 😊 I'm your exchange bot. I operate instantly and anonymously. Type **/help** to see what I can do. I ask for a higher fee than my fellow bots, so I recommend that you set up your own bot with a competitive fee. ℹ️ You can learn more on ADAMANT blog. I'm highly reliable but if you have any troubles, please leave a message here U15738334853882270577.";
+
+/* Known contacts: Adamant Bet On Bitcoin message. Markdown supported. */
+"Chats.BetOnBitcoin.WelcomeMessage" = "Hi! 😊 I'm anonymous and Blockchain-proved bet bot. I accept bets on BTC rate and pay rewards to winners. ℹ️ Learn more on ADAMANT’s blog or type **/help** to start betting. Support via U15738334853882270577.";
 
 /* Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them */
 "Chats.RetryOrDelete.Title" = "Retry or delete?";
@@ -867,6 +879,12 @@
 
 /* Wallet Services: Transaction unavailable */
 "WalletServices.SharedErrors.transactionUnavailable" = "Transaction unavailable";
+
+/* Wallet Services: Duplicated transaction */
+"WalletServices.SharedErrors.duplicatedTransaction" = "Duplicated transaction";
+
+/* Wallet Services: Cannot verify transaction */
+"WalletServices.SharedErrors.inconsistentTransaction" = "Cannot verify transaction";
 
 /* Welcome: Skip button */
 "WelcomeScene.Skip" = "skip";

@@ -355,7 +355,7 @@ extension NodeEditorViewController {
 				self.delegate?.nodeEditorViewController(self, didFinishEditingWithResult: .cancel)
 			}
 		}))
-		
+		alert.modalPresentationStyle = .overFullScreen
 		present(alert, animated: true, completion: nil)
 	}
 }

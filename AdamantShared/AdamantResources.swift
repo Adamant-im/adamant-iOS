@@ -17,6 +17,11 @@ struct AdamantResources {
         Node(scheme: .https, host: "endless.adamant.im", port: nil),
         Node(scheme: .https, host: "clown.adamant.im", port: nil),
         Node(scheme: .https, host: "lake.adamant.im", port: nil),
+        Node(scheme: .https, host: "debate.adamant.im", port: nil),
+        Node(scheme: .https, host: "bid.adamant.im", port: nil),
+        Node(scheme: .https, host: "unusual.adamant.im", port: nil),
+        Node(scheme: .http, host: "185.231.245.26", port: 36666),
+//        Node(scheme: .http, host: "80.211.177.181", port: 36666),
 //        Node(scheme: .http, host: "80.211.177.181", port: nil), // Bugged one
 //        Node(scheme: .http, host: "163.172.132.38", port: 36667) // Testnet
     ]
@@ -47,8 +52,19 @@ struct AdamantResources {
     // MARK: Contacts
     struct contacts {
         static let adamantBountyWallet = "U15423595369615486571"
+        static let adamantBountyWalletPK = "cdab95b082b9774bd975677c868261618c7ce7bea97d02e0f56d483e30c077b6"
+        
         static let adamantIco = "U7047165086065693428"
+        static let adamantIcoPK = "1e214309cc659646ecf1d90fa37be23fe76854a76e3b4da9e4d6b65a718baf8b"
+        
         static let iosSupport = "U15738334853882270577"
+        static let iosSupportPK = "acb4234d456d56d2694bd72a1aae80285f62287265f78629ecbaa4eb8d97d3d3"
+        
+        static let adamantExchange = "U5149447931090026688"
+        static let adamantExchangePK = "c61b50a5c72a1ee52a3060014478a5693ec69de15594a985a2b41d6f084caa9d"
+        
+        static let betOnBitcoin = "U17840858470710371662"
+        static let betOnBitcoinPK = "ed1a7d9a8b0cd1485ae92fb78cebd45f852a24af1c983039904f765a1d581f0e"
         
         static let ansAddress = "U10629337621822775991"
         static let ansPublicKey = "188b24bd116a556ac8ba905bbbdaa16e237dfb14269f5a4f9a26be77537d977c"

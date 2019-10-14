@@ -202,13 +202,7 @@ class EthWalletService: WalletService {
                 }
 				
 			case .failure(let error):
-                switch error {
-                case .networkError:
-                    break
-                    
-                default:
-                    self?.dialogService.showRichError(error: error)
-                }
+                print("\(error.localizedDescription)")
 			}
             
             self?.setState(.upToDate)
@@ -418,7 +412,7 @@ extension EthWalletService: InitiatedWithPassphraseService {
                 balanceObserver = observer
                 
             default:
-                dialogService.showRichError(error: error)
+                print("\(error.localizedDescription)")
             }
         }
     }

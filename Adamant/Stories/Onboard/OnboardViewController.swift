@@ -150,6 +150,7 @@ extension OnboardViewController: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         let safari = SFSafariViewController(url: URL)
         safari.preferredControlTintColor = UIColor.adamant.primary
+        safari.modalPresentationStyle = .overFullScreen
         present(safari, animated: true, completion: nil)
         return false
     }

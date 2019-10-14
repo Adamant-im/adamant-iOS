@@ -191,7 +191,7 @@ class DogeWalletService: WalletService {
                     break
                     
                 default:
-                    self?.dialogService.showRichError(error: error)
+                    print("\(error.localizedDescription)")
                 }
             }
             
@@ -413,7 +413,7 @@ extension DogeWalletService {
                 balanceObserver = observer
                 
             default:
-                dialogService.showRichError(error: error)
+                print("\(error.localizedDescription)")
             }
         }
     }
