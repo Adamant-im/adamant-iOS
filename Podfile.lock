@@ -12,7 +12,7 @@ PODS:
   - DateToolsSwift (4.0.0)
   - EFQRCode (4.4.2):
     - swift_qrcodejs (~> 1.0.1)
-  - Eureka (4.3.1)
+  - Eureka (5.0.0)
   - FreakingSimpleRoundImageView (1.3)
   - FTIndicator (1.2.9):
     - FTIndicator/FTNotificationIndicator (= 1.2.9)
@@ -24,7 +24,7 @@ PODS:
   - GRDB.swift (3.6.2)
   - GRDBCipher (3.6.2):
     - SQLCipher (~> 3.4.1)
-  - GRKOpenSSLFramework (1.0.2.15)
+  - GRKOpenSSLFramework (1.0.2.18)
   - KeychainAccess (3.1.2)
   - libsodium (1.0.12)
   - Lisk (1.1.0):
@@ -83,10 +83,11 @@ DEPENDENCIES:
   - CryptoSwift
   - DateToolsSwift
   - EFQRCode
-  - Eureka
+  - Eureka (from `https://github.com/boyarkin-anton/Eureka.git`, branch `develop`)
   - FreakingSimpleRoundImageView
   - FTIndicator
   - GRDB.swift
+  - GRKOpenSSLFramework (= 1.0.2.18)
   - KeychainAccess
   - libsodium
   - Lisk (from `https://github.com/adamant-im/lisk-swift.git`)
@@ -111,7 +112,6 @@ SPEC REPOS:
     - CryptoSwift
     - DateToolsSwift
     - EFQRCode
-    - Eureka
     - FreakingSimpleRoundImageView
     - FTIndicator
     - GRDB.swift
@@ -143,6 +143,9 @@ EXTERNAL SOURCES:
   BitcoinKit:
     :branch: dev
     :git: https://github.com/boyarkin-anton/BitcoinKit.git
+  Eureka:
+    :branch: develop
+    :git: https://github.com/boyarkin-anton/Eureka.git
   Lisk:
     :git: https://github.com/adamant-im/lisk-swift.git
   MarkdownKit:
@@ -153,8 +156,11 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   BitcoinKit:
-    :commit: b78dd8df08bee99bdd75eef5cb5e8de0e27638e8
+    :commit: de0accb08af2d95546ea83c54ce8d0b9c6cc0c94
     :git: https://github.com/boyarkin-anton/BitcoinKit.git
+  Eureka:
+    :commit: 796b430ada97851a17cac0ae4acf4abf42da8186
+    :git: https://github.com/boyarkin-anton/Eureka.git
   Lisk:
     :commit: 154a3af05772136b776ff14ae05f92c8d844ea20
     :git: https://github.com/adamant-im/lisk-swift.git
@@ -168,17 +174,17 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   Alamofire: 3ec537f71edc9804815215393ae2b1a8ea33a844
   BigInt: 76b5dfdfa3e2e478d4ffdf161aeede5502e2742f
-  BitcoinKit: af68da8b2c9a23bc355c711fdc6bbd0abc8cc447
+  BitcoinKit: 2c6049a1e8319aabd0cb1db9172cbb5412c4ee3f
   ByteBackpacker: df001da117faacdbf09b69a116ec480f6651c9ec
   CryptoSwift: 1c07ca50843dd48bc54e6ea53d7a4dba3b645716
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   EFQRCode: e65a9eb6c7137ed6db4cfce37f0cee47938e44f0
-  Eureka: 28ea296f06710f6745266b71f17862048941a32d
+  Eureka: e7b9a83e08867f8336176247bdc4c199b1f68e5e
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   GRDB.swift: e10787d857b6b8135354b9e08fb23b4bb8e2fab7
   GRDBCipher: caccb02f13acd7f745e595cf84a70be3e91fb5f3
-  GRKOpenSSLFramework: 8180d66833be66fc0f2d4942757d095edb0778d0
+  GRKOpenSSLFramework: 1d65e55d569af7b23074373041a92cc8bc768a92
   KeychainAccess: b3816fddcf28aa29d94b10ec305cd52be14c472b
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   Lisk: 2b21f9a60f4b1583349a1b1677d83781ec32ca70
@@ -204,6 +210,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3swift: d80d1b9a3feca16e614acec9eea47ec26310d37d
 
-PODFILE CHECKSUM: 3e8a43c238a3ec1b7e8509d6cd102d80eef12777
+PODFILE CHECKSUM: 28ad3c28ab607705b5dbf8b7b68105b6422080a1
 
-COCOAPODS: 1.6.2
+COCOAPODS: 1.7.1

@@ -68,7 +68,7 @@ class DogeTransferViewController: TransferViewControllerBase {
                             case .success(let dogeRawTransaction):
                                 vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
                                 
-                                let transaction = dogeRawTransaction.asDogeTransaction(for: sender)
+                                let transaction = dogeRawTransaction.asBtcTransaction(DogeTransaction.self, for: sender)
                                 
                                 guard let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Doge.transactionDetails) as? DogeTransactionDetailsViewController else {
                                     vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
@@ -223,7 +223,7 @@ class DogeTransferViewController: TransferViewControllerBase {
         let payload = RichMessageTransfer(type: DogeWalletService.richMessageType, amount: amount, hash: hash, comments: comments)
         
         let message = AdamantMessage.richMessage(payload: payload)
-        
+        chatsProvider.chatPositon.removeValue(forKey: admAddress)
         chatsProvider.sendMessage(message, recipientId: admAddress) { [weak self] result in
             if case .failure(let error) = result {
                 self?.dialogService.showRichError(error: error)

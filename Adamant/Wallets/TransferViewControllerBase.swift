@@ -500,7 +500,7 @@ class TransferViewControllerBase: FormViewController {
 		
 		alert.addAction(cancelAction)
 		alert.addAction(sendAction)
-		
+		alert.modalPresentationStyle = .overFullScreen
 		present(alert, animated: true, completion: nil)
 	}
 	
@@ -664,7 +664,7 @@ extension TransferViewControllerBase {
                 
                 alert.addAction(cancelAction)
                 alert.addAction(confirmAction)
-                
+                alert.modalPresentationStyle = .overFullScreen
                 presenter.present(alert, animated: true) {
                     row.deselect(animated: true)
                 }
@@ -673,15 +673,24 @@ extension TransferViewControllerBase {
             return row
 			
 		case .amount:
-			return DecimalRow { [weak self] in
-				$0.title = BaseRows.amount.localized
-				$0.placeholder = String.adamantLocalized.transfer.amountPlaceholder
-				$0.tag = BaseRows.amount.tag
-				$0.formatter = self?.balanceFormatter
-                $0.useFormatterDuringInput = false
+			return DecimalRow { [weak self] row in
+                row.title = BaseRows.amount.localized
+				row.placeholder = String.adamantLocalized.transfer.amountPlaceholder
+				row.tag = BaseRows.amount.tag
+                row.formatter = self?.balanceFormatter
+                row.useFormatterDuringInput = false
+                row.useFormatterOnDidBeginEditing = true
+                row.displayValueFor = { value in
+                    guard let v = value else { return nil }
+                    let formatter = AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: nil)
+                    
+                    let d = Decimal(v)
+                    let s = formatter.string(from: d)
+                    return s
+                }
 				
 				if let amount = self?.amount {
-					$0.value = amount.doubleValue
+					row.value = amount.doubleValue
 				}
 			}.onChange { [weak self] (row) in
                 if let rate = self?.rate, let fiatRow: DecimalRow = self?.form.rowBy(tag: BaseRows.fiat.tag) {

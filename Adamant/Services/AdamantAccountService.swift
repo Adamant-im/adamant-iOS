@@ -109,6 +109,7 @@ class AdamantAccountService: AccountService {
 		EthWalletService(),
         LskWalletService(mainnet: true, origins: AdamantResources.lskServers),
         DogeWalletService(),
+        DashWalletService(),
         
         ERC20WalletService(token: ERC20Token.BNB),
         ERC20WalletService(token: ERC20Token.BZ),

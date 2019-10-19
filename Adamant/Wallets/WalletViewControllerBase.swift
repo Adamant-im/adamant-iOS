@@ -201,6 +201,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                     if let nav = self?.navigationController {
                         nav.pushViewController(vc, animated: true)
                     } else {
+                        vc.modalPresentationStyle = .overFullScreen
                         self?.present(vc, animated: true)
                     }
                 }
@@ -219,6 +220,12 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 		if let service = service {
             // MARK: Wallet updated
 			let walletUpdatedCallback = { [weak self] (notification: Notification) in
+                if let row: LabelRow = self?.form.rowBy(tag: BaseRows.address.tag) {
+                    if let wallet = service.wallet {
+                        row.value = wallet.address
+                    }
+                }
+                
                 guard let service = self?.service,
                     let wallet = service.wallet,
                     let vc = self,
@@ -412,6 +419,7 @@ extension WalletViewControllerBase: TransferViewControllerDelegate {
                 self?.dismiss(animated: true, completion: nil)
                 
                 if let detailsViewController = detailsViewController {
+                    detailsViewController.modalPresentationStyle = .overFullScreen
                     self?.present(detailsViewController, animated: true, completion: nil)
                 }
             }

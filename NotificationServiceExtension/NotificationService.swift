@@ -7,6 +7,7 @@
 //
 
 import UserNotifications
+import MarkdownKit
 
 class NotificationService: UNNotificationServiceExtension {
     private let passphraseStoreKey = "accountService.passphrase"
@@ -20,7 +21,8 @@ class NotificationService: UNNotificationServiceExtension {
     private lazy var richMessageProviders: [String: () -> RichMessageNotificationProvider] = {
         return [EthProvider.richMessageType: { EthProvider() },
                 LskProvider.richMessageType: { LskProvider() },
-                DogeProvider.richMessageType: { DogeProvider() }]
+                DogeProvider.richMessageType: { DogeProvider() },
+                DashProvider.richMessageType: { DashProvider() }]
     }()
     
     // MARK: - Hanlder
@@ -100,11 +102,13 @@ class NotificationService: UNNotificationServiceExtension {
             case .messageOld:
                 fallthrough
             case .message:
+                // Strip markdown symbols
                 if transaction.amount > 0 { // ADM Transfer with comments
+                    // Also will strip markdown
                     handleAdamantTransfer(notificationContent: bestAttemptContent, partnerAddress: partnerAddress, partnerName: partnerName, amount: transaction.amount, comment: message)
                 } else { // Message
                     bestAttemptContent.title = partnerName ?? partnerAddress
-                    bestAttemptContent.body = message
+                    bestAttemptContent.body = MarkdownParser().parse(message).string // Strip markdown
                     bestAttemptContent.categoryIdentifier = AdamantNotificationCategories.message
                 }
             
@@ -143,7 +147,7 @@ class NotificationService: UNNotificationServiceExtension {
         // MARK: 6. Other configurations
         bestAttemptContent.threadIdentifier = partnerAddress
         
-        // Caching downloaded transaction, to avoid downloading ang decoding it in ContentExtensions
+        // MARK: 7. Caching downloaded transaction, to avoid downloading ang decoding it in ContentExtensions
         if let data = try? JSONEncoder().encode(transaction), let transactionRaw = String(data: data, encoding: .utf8) {
             bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.transaction] = transactionRaw
         }

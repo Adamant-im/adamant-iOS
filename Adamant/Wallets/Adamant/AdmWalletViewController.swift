@@ -76,7 +76,7 @@ class AdmWalletViewController: WalletViewControllerBase {
             hideFreeTokensRow = true
         }
         
-        guard let section = form.allSections.last, let address = service?.wallet?.address else {
+        guard let section = form.allSections.last else {
             return
         }
         
@@ -117,15 +117,18 @@ class AdmWalletViewController: WalletViewControllerBase {
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
-            let urlRaw = String.adamantLocalized.wallets.getFreeTokensUrl(for: address)
-            guard let url = URL(string: urlRaw) else {
-                self?.dialogService.showError(withMessage: "Failed to create URL with string: \(urlRaw)", error: nil)
-                return
+            if let address = self?.service?.wallet?.address {
+                let urlRaw = String.adamantLocalized.wallets.getFreeTokensUrl(for: address)
+                guard let url = URL(string: urlRaw) else {
+                    self?.dialogService.showError(withMessage: "Failed to create URL with string: \(urlRaw)", error: nil)
+                    return
+                }
+                
+                let safari = SFSafariViewController(url: url)
+                safari.preferredControlTintColor = UIColor.adamant.primary
+                safari.modalPresentationStyle = .overFullScreen
+                self?.present(safari, animated: true, completion: nil)
             }
-            
-            let safari = SFSafariViewController(url: url)
-            safari.preferredControlTintColor = UIColor.adamant.primary
-            self?.present(safari, animated: true, completion: nil)
         }
         
         section.append(buyTokensRow)

@@ -186,7 +186,7 @@ class LskWalletService: WalletService {
                 }
                 
             case .failure(let error):
-                self?.dialogService.showRichError(error: error)
+                print("\(error.localizedDescription)")
             }
             
             self?.setState(.upToDate)
@@ -437,7 +437,7 @@ extension LskWalletService: InitiatedWithPassphraseService {
                 balanceObserver = observer
                 
             default:
-                dialogService.showRichError(error: error)
+                print("\(error.localizedDescription)")
             }
         }
     }

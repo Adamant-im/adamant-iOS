@@ -263,6 +263,7 @@ class AccountViewController: FormViewController {
             } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true, completion: nil)
             }
             
@@ -315,6 +316,7 @@ class AccountViewController: FormViewController {
             } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true, completion: nil)
             }
             
@@ -348,6 +350,7 @@ class AccountViewController: FormViewController {
             } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true, completion: nil)
             }
             
@@ -375,6 +378,7 @@ class AccountViewController: FormViewController {
             } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true, completion: nil)
             }
             
@@ -402,6 +406,7 @@ class AccountViewController: FormViewController {
             } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true, completion: nil)
             }
             
@@ -435,12 +440,14 @@ class AccountViewController: FormViewController {
 			let logout = UIAlertAction(title: String.adamantLocalized.alert.logoutButton, style: .default) { [weak self] _ in
 				self?.accountService.logout()
 				if let vc = self?.router.get(scene: AdamantScene.Login.login) {
+                    vc.modalPresentationStyle = .overFullScreen
 					self?.dialogService.present(vc, animated: true, completion: nil)
 				}
 			}
 			
 			alert.addAction(cancel)
 			alert.addAction(logout)
+            alert.modalPresentationStyle = .overFullScreen
 			self?.present(alert, animated: true, completion: nil)
 		}
         
@@ -529,6 +536,7 @@ class AccountViewController: FormViewController {
             } else if let nav = self?.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self?.present(vc, animated: true, completion: nil)
             }
             

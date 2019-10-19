@@ -68,11 +68,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if !firstRun {
             UserDefaults.standard.set(true, forKey: StoreKey.application.firstRun)
 
-            /* For future updates
             if let securedStore = container.resolve(SecuredStore.self) {
                 securedStore.purgeStore()
             }
-             */
         }
         
 		// MARK: 2. Init UI
@@ -125,10 +123,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let login = router.get(scene: AdamantScene.Login.login) as! LoginViewController
         let welcomeIsShown = UserDefaults.standard.bool(forKey: StoreKey.application.welcomeScreensIsShown)
         login.requestBiometryOnFirstTimeActive = welcomeIsShown
+        login.modalPresentationStyle = .overFullScreen
         window!.rootViewController?.present(login, animated: false, completion: nil)
         
         if !welcomeIsShown {
             let welcome = router.get(scene: AdamantScene.Onboard.welcome)
+            welcome.modalPresentationStyle = .overFullScreen
             login.present(welcome, animated: true, completion: nil)
             UserDefaults.standard.set(true, forKey: StoreKey.application.welcomeScreensIsShown)
         }
@@ -408,6 +408,38 @@ extension AppDelegate {
 		} else {
 			unread = true
 		}
+        
+        if let exchenge = AdamantContacts.adamantExchange.messages["chats.welcome_message"] {
+            chatProvider.fakeReceived(message: exchenge.message,
+                                      senderId: AdamantContacts.adamantExchange.address,
+                                      date: Date.adamantNullDate,
+                                      unread: false,
+                                      silent: exchenge.silentNotification,
+                                      showsChatroom: true,
+                                      completion: { result in
+                                        guard case let .failure(error) = result else {
+                                            return
+                                        }
+                                        
+                                        print("ERROR showing exchenge message: \(error.message)")
+            })
+        }
+        
+        if let betOnBitcoin = AdamantContacts.betOnBitcoin.messages["chats.welcome_message"] {
+            chatProvider.fakeReceived(message: betOnBitcoin.message,
+                                      senderId: AdamantContacts.betOnBitcoin.address,
+                                      date: Date.adamantNullDate,
+                                      unread: false,
+                                      silent: betOnBitcoin.silentNotification,
+                                      showsChatroom: true,
+                                      completion: { result in
+                                        guard case let .failure(error) = result else {
+                                            return
+                                        }
+                                        
+                                        print("ERROR showing exchenge message: \(error.message)")
+            })
+        }
 		
 		if let welcome = AdamantContacts.adamantBountyWallet.messages["chats.welcome_message"] {
 			chatProvider.fakeReceived(message: welcome.message,

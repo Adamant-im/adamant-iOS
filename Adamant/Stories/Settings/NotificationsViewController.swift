@@ -134,6 +134,7 @@ class NotificationsViewController: FormViewController {
             
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
             self?.present(safari, animated: true, completion: nil)
         }
         
@@ -200,7 +201,7 @@ class NotificationsViewController: FormViewController {
             })
             
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-            
+            alert.modalPresentationStyle = .overFullScreen
             self?.present(alert, animated: true, completion: nil)
         }
     }

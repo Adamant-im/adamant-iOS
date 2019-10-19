@@ -223,6 +223,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             if let nav = self.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self.present(vc, animated: true)
             }
         }
@@ -269,6 +270,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             if let nav = self.navigationController {
                 nav.pushViewController(vc, animated: true)
             } else {
+                vc.modalPresentationStyle = .overFullScreen
                 self.present(vc, animated: true)
             }
         })

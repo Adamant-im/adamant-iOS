@@ -22,6 +22,7 @@ extension SecurityViewController {
 			pinpad.commentLabel.text = String.adamantLocalized.pinpad.createPin
 			pinpad.commentLabel.isHidden = false
 			pinpad.delegate = self
+            pinpad.modalPresentationStyle = .overFullScreen
 			present(pinpad, animated: true, completion: nil)
 		} else { // Validate pin and turn off Stay In
 			pinpadRequest = .turnOffPin
@@ -30,7 +31,7 @@ extension SecurityViewController {
 			pinpad.commentLabel.text = String.adamantLocalized.security.stayInTurnOff
 			pinpad.commentLabel.isHidden = false
 			pinpad.delegate = self
-			
+			pinpad.modalPresentationStyle = .overFullScreen
 			present(pinpad, animated: true, completion: nil)
 		}
 	}
@@ -71,6 +72,7 @@ extension SecurityViewController {
 				pinpad.delegate = self
 				
 				DispatchQueue.main.async {
+                    pinpad.modalPresentationStyle = .overFullScreen
 					self?.present(pinpad, animated: true, completion: nil)
 				}
 				

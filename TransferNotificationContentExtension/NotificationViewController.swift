@@ -9,6 +9,7 @@
 import UIKit
 import UserNotifications
 import UserNotificationsUI
+import MarkdownKit
 
 class NotificationViewController: UIViewController, UNNotificationContentExtension {
     private let passphraseStoreKey = "accountService.passphrase"
@@ -24,7 +25,8 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     private lazy var richMessageProviders: [String: () -> TransferNotificationContentProvider] = {
         return [EthProvider.richMessageType: { EthProvider() },
                 LskProvider.richMessageType: { LskProvider() },
-                DogeProvider.richMessageType: { DogeProvider() }]
+                DogeProvider.richMessageType: { DogeProvider() },
+                DashProvider.richMessageType: { DashProvider() }]
     }()
     
     // MARK: - IBOutlets
@@ -227,7 +229,13 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         currencySymbolLabel.text = provider.currencySymbol
         
         if let comments = comments {
-            commentLabel.text = comments
+            let parsed = MarkdownParser(font: commentLabel.font).parse(comments)
+            
+            if parsed.string.count != comments.count {
+                commentLabel.attributedText = parsed
+            } else {
+                commentLabel.text = comments
+            }
         } else {
             commentLabel.isHidden = true
         }

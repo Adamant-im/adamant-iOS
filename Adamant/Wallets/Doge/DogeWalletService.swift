@@ -129,6 +129,24 @@ class DogeWalletService: WalletService {
         self.network = DogeMainnet()
         
         self.setState(.notInitiated)
+        
+        // MARK: Notifications
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
+            self?.update()
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
+            self?.update()
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
+            self?.dogeWallet = nil
+            self?.initialBalanceCheck = false
+            if let balanceObserver = self?.balanceObserver {
+                NotificationCenter.default.removeObserver(balanceObserver)
+                self?.balanceObserver = nil
+            }
+        }
     }
     
     func update() {
@@ -185,7 +203,7 @@ class DogeWalletService: WalletService {
                     break
                     
                 default:
-                    self?.dialogService.showRichError(error: error)
+                    print("\(error.localizedDescription)")
                 }
             }
             
@@ -407,7 +425,7 @@ extension DogeWalletService {
                 balanceObserver = observer
                 
             default:
-                dialogService.showRichError(error: error)
+                print("\(error.localizedDescription)")
             }
         }
     }
@@ -426,7 +444,7 @@ extension DogeWalletService {
             case .success(let doge):
                 let hasMore = doge.to < doge.totalItems
                 
-                let transactions = doge.items.map { $0.asDogeTransaction(for: address) }
+                let transactions = doge.items.map { $0.asBtcTransaction(DogeTransaction.self, for: address) }
                 
                 completion(.success((transactions: transactions, hasMore: hasMore)))
                 
@@ -536,7 +554,7 @@ extension DogeWalletService {
         }
     }
     
-    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<DogeRawTransaction>) -> Void) {
+    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<BTCRawTransaction>) -> Void) {
         guard let url = AdamantResources.dogeServers.randomElement() else {
             fatalError("Failed to get DOGE endpoint URL")
         }
@@ -554,10 +572,10 @@ extension DogeWalletService {
             switch response.result {
             case .success(let data):
                 do {
-                    let transfers = try DogeWalletService.jsonDecoder.decode(DogeRawTransaction.self, from: data)
+                    let transfers = try DogeWalletService.jsonDecoder.decode(BTCRawTransaction.self, from: data)
                     completion(.success(transfers))
                 } catch {
-                    completion(.failure(.internalError(message: "DOGE: Parsing transaction error", error: error)))
+                    completion(.failure(.internalError(message: "Unaviable transaction", error: error)))
                 }
                 
             case .failure(let error):

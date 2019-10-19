@@ -30,6 +30,7 @@ class AdamantDialogService: DialogService {
 // MARK: - Modal dialogs
 extension AdamantDialogService {
     func present(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
+        viewController.modalPresentationStyle = .overFullScreen
         if Thread.isMainThread {
             getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
         } else {
@@ -160,7 +161,7 @@ extension AdamantDialogService {
                 }
                 
                 mailVC.setMessageBody(body, isHTML: false)
-                
+                mailVC.modalPresentationStyle = .overFullScreen
                 presenter.present(mailVC, animated: true, completion: nil)
             }
         }
@@ -181,7 +182,7 @@ extension AdamantDialogService {
         alertVC.alertActionStackView.axis = .vertical
         alertVC.alertActionStackView.spacing = 0
         alertVC.alertActionStackViewHeightConstraint.constant = 100
-        
+        alertVC.modalPresentationStyle = .overFullScreen
         present(alertVC, animated: true, completion: nil)
     }
     
@@ -238,7 +239,7 @@ extension AdamantDialogService {
             alert.popoverPresentationController?.sourceRect = sourceView.bounds
             alert.popoverPresentationController?.canOverlapSourceViewRect = false
         }
-        
+        alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
     }
     
@@ -255,7 +256,7 @@ extension AdamantDialogService {
         if let sourceView = from {
             alert.popoverPresentationController?.barButtonItem = sourceView
         }
-        
+        alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
     }
     
@@ -293,7 +294,7 @@ extension AdamantDialogService {
                     default:
                         break
                     }
-                    
+                    vc.modalPresentationStyle = .overFullScreen
                     self?.present(vc, animated: true, completion: completion)
                 })
                 
@@ -308,6 +309,7 @@ extension AdamantDialogService {
                         vc.qrCode = qr
                         vc.sharingTip = sharingTip
                         vc.excludedActivityTypes = excludedActivityTypes
+                        vc.modalPresentationStyle = .overFullScreen
                         self?.present(vc, animated: true, completion: completion)
                         
                     case .failure(error: let error):
@@ -349,7 +351,7 @@ extension AdamantDialogService {
         })
         
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-        
+        alert.modalPresentationStyle = .overFullScreen
         if Thread.isMainThread {
             present(alert, animated: true, completion: nil)
         } else {
@@ -479,7 +481,7 @@ extension AdamantDialogService {
             
             alertVC.alertActionStackViewHeightConstraint.constant = 50
         }
-        
+        alertVC.modalPresentationStyle = .overFullScreen
         if Thread.isMainThread {
             present(alertVC, animated: true, completion: nil)
         } else {

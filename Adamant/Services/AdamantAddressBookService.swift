@@ -275,7 +275,7 @@ class AdamantAddressBookService: AddressBookService {
                 }
 				
 			case .failure(let error):
-				self.dialogService.showRichError(error: error)
+				print("\(error.localizedDescription)")
 			}
 		}
 	}

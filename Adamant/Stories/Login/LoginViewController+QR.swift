@@ -18,6 +18,7 @@ extension LoginViewController {
 		case .authorized:
 			let reader = QRCodeReaderViewController.adamantQrCodeReader()
 			reader.delegate = self
+            reader.modalPresentationStyle = .overFullScreen
 			present(reader, animated: true, completion: nil)
 			
 		case .notDetermined:
@@ -26,11 +27,13 @@ extension LoginViewController {
 					if Thread.isMainThread {
 						let reader = QRCodeReaderViewController.adamantQrCodeReader()
 						reader.delegate = self
+                        reader.modalPresentationStyle = .overFullScreen
 						self?.present(reader, animated: true, completion: nil)
 					} else {
 						DispatchQueue.main.async {
 							let reader = QRCodeReaderViewController.adamantQrCodeReader()
 							reader.delegate = self
+                            reader.modalPresentationStyle = .overFullScreen
 							self?.present(reader, animated: true, completion: nil)
 						}
 					}
@@ -55,6 +58,7 @@ extension LoginViewController {
 			picker.delegate = self
 			picker.allowsEditing = false
 			picker.sourceType = .photoLibrary
+            picker.modalPresentationStyle = .overFullScreen
 			self?.present(picker, animated: true, completion: nil)
 		}
 		
@@ -103,7 +107,11 @@ extension LoginViewController: QRCodeReaderViewControllerDelegate {
 // MARK: - UIImagePickerControllerDelegate
 extension LoginViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
 	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-		dismiss(animated: true, completion: nil)
+        guard !hidingImagePicker else { return }
+        hidingImagePicker = true
+        dismiss(animated: true) {
+            self.hidingImagePicker = false
+        }
 		
 		guard let image = info[.originalImage] as? UIImage else {
 			return

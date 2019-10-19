@@ -202,7 +202,7 @@ class AboutViewController: FormViewController {
                 }
                 return
             }
-            
+            vc.modalPresentationStyle = .overFullScreen
             self?.present(vc, animated: true, completion: nil)
         }
 			
@@ -279,6 +279,7 @@ class AboutViewController: FormViewController {
 			
 			mailVC.setSubject("ADAMANT iOS")
 			mailVC.setMessageBody(deviceInfo, isHTML: false)
+            mailVC.modalPresentationStyle = .overFullScreen
 			self?.present(mailVC, animated: true, completion: nil)
 		}
 		
@@ -350,6 +351,7 @@ extension AboutViewController {
 			
 			let safari = SFSafariViewController(url: url)
 			safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
 			self?.present(safari, animated: true, completion: nil)
 		}
 		

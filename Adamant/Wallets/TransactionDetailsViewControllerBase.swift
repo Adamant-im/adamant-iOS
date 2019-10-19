@@ -118,7 +118,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Properties
     
-    var transaction: TransactionDetails? = nil
+    var transaction: TransactionDetails? = nil {
+        didSet {
+            if !isFiatSet {
+                self.updateFiat()
+            }
+        }
+    }
     private lazy var dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
@@ -135,6 +141,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
     private lazy var fiatFormatter: NumberFormatter = {
         return AdamantBalanceFormat.fiatFormatter(for: currencyInfo.currentCurrency)
     }()
+    
+    private var isFiatSet = false
     
     // MARK: - Lifecycle
     
@@ -539,6 +547,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
+            safari.modalPresentationStyle = .overFullScreen
             self?.present(safari, animated: true, completion: nil)
         }
         
@@ -547,11 +556,17 @@ class TransactionDetailsViewControllerBase: FormViewController {
         form.append(actionsSection)
         
         // Get fiat value
+        self.updateFiat()
+    }
+    
+    func updateFiat() {
         if let date = transaction?.dateValue, let currencySymbol = currencySymbol, let amount = transaction?.amountValue {
+            self.isFiatSet = true
             let currentFiat = currencyInfo.currentCurrency.rawValue
             currencyInfo.getHistory(for: currencySymbol, timestamp: date) { [weak self] (result) in
                 switch result {
                 case .success(let tickers):
+                    self?.isFiatSet = true
                     guard let tickers = tickers, let ticker = tickers["\(currencySymbol)/\(currentFiat)"] else {
                         break
                     }
@@ -567,6 +582,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     }
                     
                 case .failure:
+                    self?.isFiatSet = false
                     break
                 }
             }
@@ -587,6 +603,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             // URL
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportUrlButton, style: .default) { [weak self] _ in
                 let alert = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+                alert.modalPresentationStyle = .overFullScreen
                 self?.present(alert, animated: true, completion: nil)
             })
         }
@@ -596,6 +613,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.exportSummaryButton, style: .default) { [weak self] _ in
                 let text = summary
                 let alert = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+                alert.modalPresentationStyle = .overFullScreen
                 self?.present(alert, animated: true, completion: nil)
             })
         }

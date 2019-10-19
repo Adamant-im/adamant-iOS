@@ -43,6 +43,7 @@ extension AdmWalletService: RichMessageProvider {
         if let nav = chat.navigationController {
             nav.pushViewController(controller, animated: true)
         } else {
+            controller.modalPresentationStyle = .overFullScreen
             chat.present(controller, animated: true, completion: nil)
         }
     }

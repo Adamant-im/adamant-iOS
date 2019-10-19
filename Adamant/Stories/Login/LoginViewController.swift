@@ -130,6 +130,7 @@ class LoginViewController: FormViewController {
 	// MARK: Properties
 	private var hideNewPassphrase: Bool = true
 	private var firstTimeActive: Bool = true
+    internal var hidingImagePicker: Bool = false
     
     
     /// On launch, request user biometry (TouchID/FaceID) if has an account with biometry active
@@ -300,6 +301,7 @@ class LoginViewController: FormViewController {
 			}
 			
 			let nav = UINavigationController(rootViewController: vc)
+            nav.modalPresentationStyle = .overFullScreen
 			self?.present(nav, animated: true, completion: nil)
 		}
 		
@@ -389,11 +391,13 @@ extension LoginViewController {
 		accountService.loginWith(passphrase: passphrase, completion: { [weak self] result in
 			switch result {
 			case .success(_, let alert):
-				if let nav = self?.navigationController {
-					nav.popViewController(animated: true)
-				} else {
-					self?.dismiss(animated: true, completion: nil)
-				}
+                DispatchQueue.main.async {
+                    if let nav = self?.navigationController {
+                        nav.popViewController(animated: true)
+                    } else {
+                            self?.dismiss(animated: true, completion: nil)
+                    }
+                }
 				
 				self?.dialogService.dismissProgress()
 				

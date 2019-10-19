@@ -54,7 +54,10 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
                     
                 // MARK: Check amount
                 if let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reported = AdamantBalanceFormat.deserializeBalance(from: raw) {
-                    guard reported == lskTransaction.amountValue else {
+                    let min = reported - reported*0.005
+                    let max = reported + reported*0.005
+                    
+                    guard (min...max).contains(lskTransaction.amountValue) else {
                         completion(.success(result: .warning))
                         return
                     }

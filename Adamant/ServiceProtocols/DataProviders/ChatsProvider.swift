@@ -170,6 +170,8 @@ protocol ChatsProvider: DataProvider {
 	var receivedLastHeight: Int64? { get }
 	var readedLastHeight: Int64? { get }
 	var isInitiallySynced: Bool { get }
+    
+    var chatPositon: [String: Double] { get set }
 	
 	// MARK: - Getting chats and messages
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>
@@ -184,6 +186,7 @@ protocol ChatsProvider: DataProvider {
 	
 	// MARK: - Sending messages
     func sendMessage(_ message: AdamantMessage, recipientId: String, completion: @escaping (ChatsProviderResultWithTransaction) -> Void )
+    func sendMessage(_ message: AdamantMessage, recipientId: String, from chatroom: Chatroom?, completion: @escaping (ChatsProviderResultWithTransaction) -> Void )
 	func retrySendMessage(_ message: ChatTransaction, completion: @escaping (ChatsProviderRetryCancelResult) -> Void)
     
     // MARK: - Delete local message
@@ -202,4 +205,5 @@ protocol ChatsProvider: DataProvider {
     
     // MARK: - Search
     func getMessages(containing text: String, in chatroom: Chatroom?) -> [MessageTransaction]?
+    func isTransactionUnique(_ transaction: RichMessageTransaction) -> Bool
 }

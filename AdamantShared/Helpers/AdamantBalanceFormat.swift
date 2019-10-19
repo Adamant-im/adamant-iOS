@@ -133,6 +133,6 @@ enum AdamantBalanceFormat {
 // MARK: - Helper
 extension NumberFormatter {
 	func string(from decimal: Decimal) -> String? {
-		return string(from: decimal as NSNumber)
+		return string(from: NSNumber(value: decimal.doubleValue))
 	}
 }
