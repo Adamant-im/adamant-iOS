@@ -113,7 +113,8 @@ class AdamantAccountService: AccountService {
         
         ERC20WalletService(token: ERC20Token.BNB),
         ERC20WalletService(token: ERC20Token.BZ),
-        ERC20WalletService(token: ERC20Token.KCS)
+        ERC20WalletService(token: ERC20Token.KCS),
+        ERC20WalletService(token: ERC20Token.USDS)
         
         // Test ERC20 Tokens in Ropsten testnet
 //        ERC20WalletService(token: ERC20Token.BOKKY),
