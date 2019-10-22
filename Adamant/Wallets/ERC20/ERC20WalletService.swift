@@ -142,7 +142,7 @@ class ERC20WalletService: WalletService {
         }
         
         DispatchQueue.global(qos: .userInitiated).async {
-            guard let url = URL(string: apiUrl), let web3 = Web3.new(url) else {
+            guard let url = URL(string: apiUrl), let web3 = try? Web3.new(url) else {
                 return
             }
 //            let web3 = Web3.InfuraRopstenWeb3()
@@ -245,12 +245,10 @@ class ERC20WalletService: WalletService {
     }
     
     func getGasPrices(completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        switch web3.eth.getGasPrice() {
-        case .success(let price):
+        web3.eth.getGasPricePromise().done { price in
             completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
-            
-        case .failure(let error):
-            completion(.failure(error: error.asWalletServiceError()))
+        }.catch { error in
+            completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
         }
     }
     
@@ -439,11 +437,11 @@ extension ERC20WalletService {
             
             let walletAddress = EthereumAddress(address)!
             let exploredAddress = EthereumAddress(address)!
-            var options = Web3Options.defaultOptions()
+            var options = TransactionOptions.defaultOptions
             options.from = walletAddress
             
             let method = "balanceOf"
-            let tx = contract.method(method, parameters: [exploredAddress] as [AnyObject], extraData: Data(), options: options)
+            let tx = contract.method(method, parameters:  [exploredAddress] as [AnyObject], extraData: Data(), transactionOptions: options)
             
             do {
                 let balance = try tx?.callPromise().then({ result throws -> Promise<BigUInt> in

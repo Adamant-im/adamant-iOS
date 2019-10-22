@@ -57,33 +57,21 @@ extension EthWalletService: WalletServiceTwoStepSend {
 		defaultDispatchQueue.async {
 			// MARK: 2. Create contract
 			
-			var options = Web3Options.defaultOptions()
+			var options = TransactionOptions.defaultOptions
 			options.from = ethWallet.ethAddress
 			options.value = bigUIntAmount
+            options.gasLimit = .automatic
+            options.gasPrice = .automatic
 			
 			guard let contract = self.web3.contract(Web3.Utils.coldWalletABI, at: ethRecipient) else {
 				completion(.failure(error: .internalError(message: "ETH Wallet: Send - contract loading error", error: nil)))
 				return
 			}
-			
-			guard let estimatedGas = contract.method(options: options)?.estimateGas(options: nil).value else {
-				completion(.failure(error: .internalError(message: "ETH Wallet: Send - retrieving estimated gas error", error: nil)))
-				return
-			}
-			
-			options.gasLimit = estimatedGas
-			
-			guard let gasPrice = self.web3.eth.getGasPrice().value else {
-				completion(.failure(error: .internalError(message: "ETH Wallet: Send - retrieving gas price error", error: nil)))
-				return
-			}
-			
-			options.gasPrice = gasPrice
-			
-			guard let intermediate = contract.method(options: options) else {
-				completion(.failure(error: .internalError(message: "ETH Wallet: Send - create transaction issue", error: nil)))
-				return
-			}
+            
+            guard let intermediate = contract.write("fallback", parameters: [AnyObject](), extraData: Data(), transactionOptions: options) else {
+                completion(.failure(error: .internalError(message: "ETH Wallet: Send - create transaction issue", error: nil)))
+                return
+            }
 			
 			do {
 				let transaction = try intermediate.assemblePromise().then { transaction throws -> Promise<EthereumTransaction> in
@@ -103,13 +91,11 @@ extension EthWalletService: WalletServiceTwoStepSend {
 	
 	func sendTransaction(_ transaction: EthereumTransaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
 		defaultDispatchQueue.async {
-			switch self.web3.eth.sendRawTransaction(transaction) {
-			case .success(let result):
-				completion(.success(result: result.hash))
-				
-			case .failure(let error):
-				completion(.failure(error: error.asWalletServiceError()))
-			}
+            self.web3.eth.sendRawTransactionPromise(transaction).done { result in
+                completion(.success(result: result.hash))
+            }.catch { error in
+                completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
+            }
 		}
 	}
 }

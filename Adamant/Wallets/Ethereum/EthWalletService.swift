@@ -158,7 +158,7 @@ class EthWalletService: WalletService {
     
     func initiateNetwork(apiUrl: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            guard let url = URL(string: apiUrl), let web3 = Web3.new(url) else {
+            guard let url = URL(string: apiUrl), let web3 = try? Web3.new(url) else {
                 completion(.failure(error: WalletServiceError.networkError))
                 return
             }
@@ -250,13 +250,11 @@ class EthWalletService: WalletService {
 	}
 	
 	func getGasPrices(completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-		switch web3.eth.getGasPrice() {
-		case .success(let price):
-			completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
-			
-		case .failure(let error):
-			completion(.failure(error: error.asWalletServiceError()))
-		}
+        web3.eth.getGasPricePromise().done { price in
+            completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
+        }.catch { error in
+            completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
+        }
 	}
 	
 	private static func buildBaseUrl(for network: Networks?) -> String {
@@ -451,15 +449,11 @@ extension EthWalletService {
 				return
 			}
 			
-			let result = web3.eth.getBalance(address: address)
-			
-			switch result {
-			case .success(let balance):
-				completion(.success(result: balance.asDecimal(exponent: EthWalletService.currencyExponent)))
-				
-			case .failure(let error):
-				completion(.failure(error: error.asWalletServiceError()))
-			}
+			web3.eth.getBalancePromise(address: address).done { balance in
+                completion(.success(result: balance.asDecimal(exponent: EthWalletService.currencyExponent)))
+            }.catch { error in
+                completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
+            }
 		}
 	}
 	

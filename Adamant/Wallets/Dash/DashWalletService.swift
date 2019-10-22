@@ -13,6 +13,18 @@ import BitcoinKit
 import BitcoinKit.Private
 
 class DashWalletService: WalletService {
+    var tokenSymbol: String {
+        return type(of: self).currencySymbol
+    }
+    
+    var tokenName: String {
+        return ""
+    }
+    
+    var tokenLogo: UIImage {
+        return type(of: self).currencyLogo
+    }
+    
     var wallet: WalletAccount? { return dashWallet }
     
     var walletViewController: WalletViewController {

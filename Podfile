@@ -9,7 +9,7 @@ end
 
 # NativeCore pods
 def core_pods
-  pod 'CryptoSwift' # MD5 hash
+  pod 'CryptoSwift', '1.0.0' # MD5 hash
   pod 'ByteBackpacker' # Utility to pack value types into a Byte array
   pod 'libsodium' # Sodium crypto library
   pod 'GRKOpenSSLFramework', '1.0.2.18'
@@ -34,7 +34,7 @@ target 'Adamant' do
   pod 'FreakingSimpleRoundImageView' # Round avatars
   pod 'FTIndicator' # Notifications and activity indicator
   pod 'Eureka', :git => 'https://github.com/boyarkin-anton/Eureka.git', :branch => 'develop' # Forms
-  pod 'MessageKit' # Chat UI
+  pod 'MessageKit', '2.0.0' # Chat UI
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
   pod 'Parchment' # Paging menu
@@ -45,9 +45,9 @@ target 'Adamant' do
   pod 'QRCodeReader.swift' # QR reader
   
   # Crypto
-  pod 'web3swift' # ETH Web3 Swift Port
+  pod 'web3.swift.pod', '~> 2.2.0' # ETH Web3 Swift Port
   pod 'Lisk', :git => 'https://github.com/adamant-im/lisk-swift.git' # LSK
-  pod 'BitcoinKit', :git => 'https://github.com/boyarkin-anton/BitcoinKit.git', :branch => 'dev' # BTC
+  pod 'BitcoinKit', :path => '../BitcoinKit/'#, :git => 'https://github.com/boyarkin-anton/BitcoinKit.git', :branch => 'dev' # BTC
 
   # Shared
   keychain_pods
