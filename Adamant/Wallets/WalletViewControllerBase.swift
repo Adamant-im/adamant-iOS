@@ -134,7 +134,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             $0.alertTextColor = UIColor.white
             
             if let service = self?.service, let wallet = service.wallet {
-                let symbol = type(of: service).currencySymbol
+                let symbol = service.tokenSymbol
                 $0.value = self?.balanceRowValueFor(balance: wallet.balance, symbol: symbol, alert: wallet.notifications)
             } else {
                 $0.value = nil
@@ -237,7 +237,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                     self?.fiatFormatter.currencyCode = currentCurrency.rawValue
                 }
                 
-                let symbol = type(of: service).currencySymbol
+                let symbol = service.tokenSymbol
                 row.value = vc.balanceRowValueFor(balance: wallet.balance, symbol: symbol, alert: wallet.notifications)
                 row.updateCell()
 			}

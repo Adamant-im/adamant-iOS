@@ -512,7 +512,7 @@ class TransferViewControllerBase: FormViewController {
     /// Default implementation tries to get currency symbol from service. If no service present - its fails
     var currencyCode: String {
         if let service = service {
-            return type(of: service).currencySymbol
+            return service.tokenSymbol
         } else {
             return ""
         }
@@ -521,7 +521,7 @@ class TransferViewControllerBase: FormViewController {
 	/// Override this to provide custom balance formatter
 	var balanceFormatter: NumberFormatter {
         if let service = service {
-            return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: type(of: service).currencySymbol)
+            return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: service.tokenSymbol)
         } else {
             return AdamantBalanceFormat.full.defaultFormatter
         }

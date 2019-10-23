@@ -66,6 +66,7 @@ class ERC20WalletService: WalletService {
     // MARK: - Properties
     
     private (set) var token: ERC20Token?
+    private (set) var erc20: ERC20?
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.erc20WalletService", qos: .utility, attributes: [.concurrent])
     private (set) var enabled = true
@@ -145,16 +146,14 @@ class ERC20WalletService: WalletService {
             guard let url = URL(string: apiUrl), let web3 = try? Web3.new(url) else {
                 return
             }
-//            let web3 = Web3.InfuraRopstenWeb3()
+            
             self.web3 = web3
             self.baseUrl = ERC20WalletService.buildBaseUrl(for: web3.provider.network)
             
             if let address = EthereumAddress(token.contractAddress) {
-//            self.contract = web3.contract(erc20ABI, at: address, abiVersion: 2)
                 self.contract = web3.contract(Web3.Utils.erc20ABI, at: address, abiVersion: 2)
                 
-                let erc20 = ERC20(web3: web3, provider: web3.provider, address: address)
-                print("\(erc20.name) - \(erc20.symbol) - \(erc20.decimals)")
+                self.erc20 = ERC20(web3: web3, provider: web3.provider, address: address)
             }
         }
     }
@@ -430,35 +429,15 @@ extension ERC20WalletService {
     
     func getBalance(forAddress address: EthereumAddress, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
         DispatchQueue.global(qos: .utility).async { [weak self] in
-            guard let address = self?.ethWallet?.address, let contract = self?.contract else {
+            guard let address = self?.ethWallet?.address, let walletAddress = EthereumAddress(address), let erc20 = self?.erc20 else {
                 print("Can't get address")
                 return
             }
-            
-            let walletAddress = EthereumAddress(address)!
-            let exploredAddress = EthereumAddress(address)!
-            var options = TransactionOptions.defaultOptions
-            options.from = walletAddress
-            
-            let method = "balanceOf"
-            let tx = contract.method(method, parameters:  [exploredAddress] as [AnyObject], extraData: Data(), transactionOptions: options)
-            
+
             do {
-                let balance = try tx?.callPromise().then({ result throws -> Promise<BigUInt> in
-                    let balanceBigUInt = result["0"] as! BigUInt
-                    
-                    let promise = Promise<BigUInt>.pending()
-                    promise.resolver.fulfill(balanceBigUInt)
-                    return promise.promise
-                }).wait()
-                
-                if let balance = balance {
-                    let value = balance.asDecimal(exponent: EthWalletService.currencyExponent)
-                    print("\(self?.token?.name ?? "") = \(value)")
-                    completion(.success(result:value))
-                } else {
-                    completion(.success(result: 0))
-                }
+                let balance = try erc20.getBalance(account: walletAddress)
+                let value = balance.asDecimal(exponent: EthWalletService.currencyExponent)
+                completion(.success(result:value))
             } catch {
                 completion(.failure(error: WalletServiceError.internalError(message: "ERC 20 Service - Fail to get balance", error: error)))
             }

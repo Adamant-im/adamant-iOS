@@ -58,7 +58,7 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     var accountService: AccountService! {
         didSet {
             if let accountService = accountService {
-                rateCoins = accountService.wallets.map { s -> String in type(of: s).currencySymbol }
+                rateCoins = accountService.wallets.map { s -> String in s.tokenSymbol }
             } else {
                 rateCoins = nil
             }

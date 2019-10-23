@@ -232,7 +232,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
     }
     
     func reportTransferTo(admAddress: String, amount: Decimal, comments: String, hash: String) {
-        guard let type = (self as? RichMessageProvider)?.dynamicRichMessageType else {
+        guard let type = (self.service as? RichMessageProvider)?.dynamicRichMessageType else {
             return
         }
         let payload = RichMessageTransfer(type: type, amount: amount, hash: hash, comments: comments)
