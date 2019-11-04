@@ -159,12 +159,19 @@ extension EthTransaction: TransactionDetails {
 
 // MARK: - From EthereumTransaction
 extension EthereumTransaction {
-    func asEthTransaction(date: Date?, gasUsed: BigUInt?, blockNumber: String?, confirmations: String?, receiptStatus: TransactionReceipt.TXStatus, isOutgoing: Bool) -> EthTransaction {
+    func asEthTransaction(date: Date?, gasUsed: BigUInt?, blockNumber: String?, confirmations: String?, receiptStatus: TransactionReceipt.TXStatus, isOutgoing: Bool, hash: String? = nil) -> EthTransaction {
+        
+        let addressRaw = Data(data[16 ..< 36]).toHexString()
+        let address = EthereumAddress("0x\(addressRaw)")
+        let erc20RawValue = Data(data[37 ..< 68]).toHexString()
+        let erc20To = address ?? self.to
+        let erc20Value = BigUInt(erc20RawValue, radix: 16) ?? value
+        
         return EthTransaction(date: date,
-                              hash: txhash ?? "",
-                              value: value.asDecimal(exponent: EthWalletService.currencyExponent),
+                              hash: hash ?? txhash ?? "",
+                              value: erc20Value.asDecimal(exponent: EthWalletService.currencyExponent),
                               from: sender?.address ?? "",
-                              to: to.address,
+                              to: erc20To.address,
                               gasUsed: gasUsed?.asDecimal(exponent: 0),
                               gasPrice: gasPrice.asDecimal(exponent: EthWalletService.currencyExponent),
                               confirmations: confirmations,
@@ -207,10 +214,10 @@ struct EthTransactionShort {
     let date: Date
     let hash: String
     let from: String
-    let to: String
+    var to: String
     let gasUsed: Decimal
     let gasPrice: Decimal
-    let value: Decimal
+    var value: Decimal
     let blockNumber: String
     
     let contract_to: String
@@ -222,6 +229,21 @@ struct EthTransactionShort {
                               value: value,
                               from: from,
                               to: to,
+                              gasUsed: gasUsed,
+                              gasPrice: gasPrice,
+                              confirmations: nil,
+                              isError: false,
+                              receiptStatus: .ok,
+                              blockNumber: blockNumber,
+                              isOutgoing: isOutgoing)
+    }
+    
+    func asERCTransaction(isOutgoing: Bool) -> EthTransaction {
+        return EthTransaction(date: date,
+                              hash: hash,
+                              value: contract_value,
+                              from: from,
+                              to: contract_to,
                               gasUsed: gasUsed,
                               gasPrice: gasPrice,
                               confirmations: nil,
@@ -280,6 +302,10 @@ extension EthTransactionShort: Decodable {
         let contractValueRaw = try container.decode(String.self, forKey: .contract_value)
         contract_value = BigUInt(contractValueRaw, radix: 16)?.asDecimal(exponent: EthWalletService.currencyExponent) ?? 0
         
+        if !contract_to.isEmpty {
+            let address = "0x" + contract_to.reversed()[..<40].reversed()
+            to = address
+        }
     }
 }
 

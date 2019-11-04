@@ -367,12 +367,6 @@ extension ERC20WalletService {
             // MARK: 1. Transaction details
             do {
                 details = try eth.getTransactionDetailsPromise(hash).wait()
-                
-                if let sender = sender {
-                    isOutgoing = details.transaction.to.address != sender
-                } else {
-                    isOutgoing = false
-                }
             } catch let error as Web3Error {
                 completion(.failure(error: error.asWalletServiceError()))
                 return
@@ -387,7 +381,7 @@ extension ERC20WalletService {
                 
                 // MARK: 3. Check if transaction is delivered
                 guard receipt.status == .ok, let blockNumber = details.blockNumber else {
-                    let transaction = details.transaction.asEthTransaction(date: nil, gasUsed: receipt.gasUsed, blockNumber: nil, confirmations: nil, receiptStatus: receipt.status, isOutgoing: isOutgoing)
+                    let transaction = details.transaction.asEthTransaction(date: nil, gasUsed: receipt.gasUsed, blockNumber: nil, confirmations: nil, receiptStatus: receipt.status, isOutgoing: false)
                     completion(.success(result: transaction))
                     return
                 }
@@ -397,13 +391,14 @@ extension ERC20WalletService {
                 let block = try eth.getBlockByNumberPromise(blockNumber).wait()
                 let confirmations = currentBlock - blockNumber
                 
-                var transaction = details.transaction
-                let data = details.transaction.data
-                let addressRaw = Data(data[16 ..< 36]).toHexString()
-                let address = EthereumAddress("0x\(addressRaw)")
-                let value = Data(data[37 ..< 68]).toHexString()
-                transaction.to = address ?? transaction.to
-                transaction.value = BigUInt(value, radix: 16) ?? BigUInt(0)
+                let transaction = details.transaction
+                
+                if let sender = sender {
+                    isOutgoing = transaction.sender?.address == sender
+                } else {
+                    isOutgoing = false
+                }
+                
                 let ethTransaction = transaction.asEthTransaction(date: block.timestamp, gasUsed: receipt.gasUsed, blockNumber: String(blockNumber), confirmations: String(confirmations), receiptStatus: receipt.status, isOutgoing: isOutgoing)
                 
                 completion(.success(result: ethTransaction))
@@ -413,7 +408,7 @@ extension ERC20WalletService {
                 switch error {
                 // Transaction not delivired yet
                 case .inputError, .nodeError:
-                    let transaction = details.transaction.asEthTransaction(date: nil, gasUsed: nil, blockNumber: nil, confirmations: nil, receiptStatus: TransactionReceipt.TXStatus.notYetProcessed, isOutgoing: isOutgoing)
+                    let transaction = details.transaction.asEthTransaction(date: nil, gasUsed: nil, blockNumber: nil, confirmations: nil, receiptStatus: TransactionReceipt.TXStatus.notYetProcessed, isOutgoing: false)
                     result = .success(result: transaction)
                     
                 default:

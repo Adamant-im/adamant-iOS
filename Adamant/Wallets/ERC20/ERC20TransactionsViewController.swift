@@ -140,8 +140,6 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
         let outgoing = isOutgoing(transaction)
         let partnerId = outgoing ? transaction.to : transaction.from
         
-        
-        
         configureCell(cell,
                       isOutgoing: outgoing,
                       partnerId: partnerId,
@@ -155,6 +153,6 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
 // MARK: - Tools
 extension ERC20TransactionsViewController {
     private func isOutgoing(_ transaction: EthTransactionShort) -> Bool {
-        return transaction.from.lowercased() == ethAddress.lowercased()
+        return transaction.contract_to.lowercased() == ethAddress.lowercased()
     }
 }
