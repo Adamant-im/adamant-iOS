@@ -70,7 +70,7 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire
-  - BitcoinKit (from `../BitcoinKit/`)
+  - BitcoinKit (from `https://github.com/boyarkin-anton/BitcoinKit.git`, branch `dev`)
   - ByteBackpacker
   - CryptoSwift (= 1.0.0)
   - DateToolsSwift
@@ -131,7 +131,8 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   BitcoinKit:
-    :path: "../BitcoinKit/"
+    :branch: dev
+    :git: https://github.com/boyarkin-anton/BitcoinKit.git
   Eureka:
     :branch: develop
     :git: https://github.com/boyarkin-anton/Eureka.git
@@ -144,6 +145,9 @@ EXTERNAL SOURCES:
     :git: https://github.com/RealBonus/SwiftyOnboard
 
 CHECKOUT OPTIONS:
+  BitcoinKit:
+    :commit: ea93c7423729653aa52aaca199341619fe6a1065
+    :git: https://github.com/boyarkin-anton/BitcoinKit.git
   Eureka:
     :commit: 796b430ada97851a17cac0ae4acf4abf42da8186
     :git: https://github.com/boyarkin-anton/Eureka.git
@@ -193,6 +197,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3.swift.pod: 66048c11416c2e7a9a4b35fe42254d0f0d9db4b1
 
-PODFILE CHECKSUM: 40d17625153f5223339bec4958fa5d49df4e4119
+PODFILE CHECKSUM: b0d00ca350bbddc457c319a422626e0d198da7cf
 
 COCOAPODS: 1.8.4

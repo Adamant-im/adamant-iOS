@@ -161,17 +161,24 @@ extension EthTransaction: TransactionDetails {
 extension EthereumTransaction {
     func asEthTransaction(date: Date?, gasUsed: BigUInt?, blockNumber: String?, confirmations: String?, receiptStatus: TransactionReceipt.TXStatus, isOutgoing: Bool, hash: String? = nil) -> EthTransaction {
         
-        let addressRaw = Data(data[16 ..< 36]).toHexString()
-        let address = EthereumAddress("0x\(addressRaw)")
-        let erc20RawValue = Data(data[37 ..< 68]).toHexString()
-        let erc20To = address ?? self.to
-        let erc20Value = BigUInt(erc20RawValue, radix: 16) ?? value
+        var recipient = self.to
+        var txValue = value
+        
+        if data.count > 0 {
+            let addressRaw = Data(data[16 ..< 36]).toHexString()
+            let erc20RawValue = Data(data[37 ..< 68]).toHexString()
+            
+            if let address = EthereumAddress("0x\(addressRaw)"), let v = BigUInt(erc20RawValue, radix: 16) {
+                recipient = address
+                txValue = v
+            }
+        }
         
         return EthTransaction(date: date,
                               hash: hash ?? txhash ?? "",
-                              value: erc20Value.asDecimal(exponent: EthWalletService.currencyExponent),
+                              value: txValue.asDecimal(exponent: EthWalletService.currencyExponent),
                               from: sender?.address ?? "",
-                              to: erc20To.address,
+                              to: recipient.address,
                               gasUsed: gasUsed?.asDecimal(exponent: 0),
                               gasPrice: gasPrice.asDecimal(exponent: EthWalletService.currencyExponent),
                               confirmations: confirmations,
@@ -297,9 +304,9 @@ extension EthTransactionShort: Decodable {
         let valueRaw = try container.decode(Decimal.self, forKey: .value)
         value = Decimal(sign: .plus, exponent: EthWalletService.currencyExponent, significand: valueRaw)
         
-        contract_to = try container.decode(String.self, forKey: .contract_to)
+        contract_to = try container.decodeIfPresent(String.self, forKey: .contract_to) ?? ""
         
-        let contractValueRaw = try container.decode(String.self, forKey: .contract_value)
+        let contractValueRaw = try container.decodeIfPresent(String.self, forKey: .contract_value) ?? "0"
         contract_value = BigUInt(contractValueRaw, radix: 16)?.asDecimal(exponent: EthWalletService.currencyExponent) ?? 0
         
         if !contract_to.isEmpty {
