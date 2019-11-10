@@ -82,28 +82,28 @@ class AdmWalletViewController: WalletViewControllerBase {
         
         // MARK: Rows
         
-        let buyTokensRow = LabelRow() {
-            $0.tag = Rows.buyTokens.tag
-            $0.title = Rows.buyTokens.localized
-            $0.cell.imageView?.image = Rows.buyTokens.image
-            $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
-            $0.cell.selectionStyle = .gray
-        }.cellUpdate { (cell, _) in
-            cell.accessoryType = .disclosureIndicator
-        }.onCellSelection { [weak self] (_, row) in
-            guard let vc = self?.router.get(scene: AdamantScene.Wallets.Adamant.buyAndSell) else {
-                fatalError("Failed to get BuyAndSell scele")
-            }
-            
-            row.deselect()
-            
-            if let split = self?.splitViewController {
-                let details = UINavigationController(rootViewController:vc)
-                split.showDetailViewController(details, sender: self)
-            } else {
-                self?.navigationController?.pushViewController(vc, animated: true )
-            }
-        }
+//        let buyTokensRow = LabelRow() {
+//            $0.tag = Rows.buyTokens.tag
+//            $0.title = Rows.buyTokens.localized
+//            $0.cell.imageView?.image = Rows.buyTokens.image
+//            $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
+//            $0.cell.selectionStyle = .gray
+//        }.cellUpdate { (cell, _) in
+//            cell.accessoryType = .disclosureIndicator
+//        }.onCellSelection { [weak self] (_, row) in
+//            guard let vc = self?.router.get(scene: AdamantScene.Wallets.Adamant.buyAndSell) else {
+//                fatalError("Failed to get BuyAndSell scele")
+//            }
+//
+//            row.deselect()
+//
+//            if let split = self?.splitViewController {
+//                let details = UINavigationController(rootViewController:vc)
+//                split.showDetailViewController(details, sender: self)
+//            } else {
+//                self?.navigationController?.pushViewController(vc, animated: true )
+//            }
+//        }
         
         let freeTokensRow = LabelRow() {
             $0.tag = Rows.freeTokens.tag
@@ -131,7 +131,7 @@ class AdmWalletViewController: WalletViewControllerBase {
             }
         }
         
-        section.append(buyTokensRow)
+//        section.append(buyTokensRow)
         section.append(freeTokensRow)
         
          // Notifications
