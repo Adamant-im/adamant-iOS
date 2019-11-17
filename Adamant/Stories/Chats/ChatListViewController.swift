@@ -734,7 +734,7 @@ extension ChatListViewController {
 			return nil
 		}
 		
-		let actions: [UIContextualAction]
+		var actions: [UIContextualAction] = []
 		
 		// More
 		let more = UIContextualAction(style: .normal, title: nil) { [weak self] (_, view, completionHandler: (Bool) -> Void) in
@@ -815,6 +815,23 @@ extension ChatListViewController {
 		} else {
 			actions = [more]
 		}
+        
+        let block = UIContextualAction(style: .destructive, title: "Block") { [weak self] (action, view, completionHandler) in
+            guard let chatroom = self?.chatsController?.object(at: indexPath), let address = chatroom.partner?.address else {
+                completionHandler(false)
+                return
+            }
+            
+            self?.chatsProvider.blockChat(with: address)
+            
+            chatroom.isHidden = true
+            try? chatroom.managedObjectContext?.save()
+            
+            completionHandler(true)
+        }
+        block.image = #imageLiteral(resourceName: "swipe_block")
+        
+        actions.append(block)
 		
 		return UISwipeActionsConfiguration(actions: actions)
 	}

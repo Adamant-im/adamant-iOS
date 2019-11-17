@@ -24,9 +24,41 @@ class KeychainStore: SecuredStore {
 
         return decryptedValue
     }
+    
+    func getArray(_ key: String) -> [String]? {
+        guard let encryptedValue = KeychainStore.keychain[key],
+            let decryptedValue = KeychainStore.decrypt(string: encryptedValue, password: AdamantSecret.keychainValuePassword), let data = decryptedValue.data(using: .utf8) else {
+                return nil
+        }
+        
+        do {
+            return try JSONDecoder().decode([String].self, from: data)
+        } catch {
+            print("FAIL to decode array from keychain")
+        }
+
+        return nil
+    }
 
     func set(_ value: String, for key: String) {
         guard let encryptedValue = KeychainStore.encrypt(string: value, password: AdamantSecret.keychainValuePassword) else {
+            return
+        }
+
+        try? KeychainStore.keychain.set(encryptedValue, key: key)
+    }
+    
+    func set(_ value: [String], for key: String) {
+        var strValue = ""
+        do {
+            let data = try JSONEncoder().encode(value)
+            strValue = String(data: data, encoding: .utf8) ?? ""
+        } catch {
+            print("FAIL to encode array from keychain")
+            return
+        }
+        
+        guard let encryptedValue = KeychainStore.encrypt(string: strValue, password: AdamantSecret.keychainValuePassword) else {
             return
         }
 

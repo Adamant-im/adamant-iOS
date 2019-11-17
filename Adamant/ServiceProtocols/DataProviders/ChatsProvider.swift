@@ -172,6 +172,7 @@ protocol ChatsProvider: DataProvider {
 	var isInitiallySynced: Bool { get }
     
     var chatPositon: [String: Double] { get set }
+    var blackList: [String] { get }
 	
 	// MARK: - Getting chats and messages
 	func getChatroomsController() -> NSFetchedResultsController<Chatroom>
@@ -194,6 +195,7 @@ protocol ChatsProvider: DataProvider {
 	
 	// MARK: - Tools
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
+    func blockChat(with address: String)
 	
     // MARK: - Unconfirmed Transaction
     func addUnconfirmed(transactionId: UInt64, managedObjectId: NSManagedObjectID)

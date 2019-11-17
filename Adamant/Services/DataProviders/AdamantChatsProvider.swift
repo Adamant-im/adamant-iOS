@@ -17,7 +17,11 @@ class AdamantChatsProvider: ChatsProvider {
 	var stack: CoreDataStack!
 	var adamantCore: AdamantCore!
 	var accountsProvider: AccountsProvider!
-	var securedStore: SecuredStore!
+    var securedStore: SecuredStore! {
+        didSet {
+            self.blackList = self.securedStore.getArray("blackList") ?? []
+        }
+    }
 	
     var richProviders: [String:RichMessageProviderWithStatusCheck]!
     
@@ -29,6 +33,7 @@ class AdamantChatsProvider: ChatsProvider {
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
     
     public var chatPositon: [String : Double] = [:]
+    private(set) var blackList: [String] = []
     
     private(set) var isInitiallySynced: Bool = false {
         didSet {
@@ -79,7 +84,21 @@ class AdamantChatsProvider: ChatsProvider {
 			
 			// BackgroundFetch
 			self?.dropStateData()
+            
+            self?.blackList = []
 		}
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: nil) { [weak self] notification in
+            guard let state = notification.userInfo?[AdamantUserInfoKey.AccountService.newStayInState] as? Bool, state else {
+                return
+            }
+            
+            if state {
+                if let blackList = self?.blackList {
+                    self?.securedStore.set(blackList, for: "blackList")
+                }
+            }
+        }
 	}
 	
 	deinit {
@@ -933,6 +952,9 @@ extension AdamantChatsProvider {
 			}
 			
 			privateChatroom.addToTransactions(messages as NSSet)
+            if let address = privateChatroom.partner?.address {
+                chatroom.isHidden = self.blackList.contains(address)
+            }
 		}
 		
 		
@@ -942,6 +964,9 @@ extension AdamantChatsProvider {
 			let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom! }))
 			
 			for (chatroom, trs) in chatrooms {
+                if let address = chatroom.partner?.address {
+                    chatroom.isHidden = self.blackList.contains(address)
+                }
 				chatroom.hasUnreadMessages = true
 				trs.forEach { $0.isUnread = true }
 			}
@@ -1149,4 +1174,14 @@ extension AdamantChatsProvider {
 			self.receivedLastHeight = height
 		}
 	}
+    
+    public func blockChat(with address: String) {
+        if !self.blackList.contains(address) {
+            self.blackList.append(address)
+            
+            if self.accountService.hasStayInAccount {
+                self.securedStore.set(blackList, for: "blackList")
+            }
+        }
+    }
 }
