@@ -38,6 +38,8 @@
 		6455E9F121075D3600B2E94C /* AddressBookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6455E9F021075D3600B2E94C /* AddressBookService.swift */; };
 		6455E9F321075D8000B2E94C /* AdamantAddressBookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */; };
 		6458548C211B3AB1004C5909 /* WelcomeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6458548A211B3AB1004C5909 /* WelcomeViewController.xib */; };
+		645938942378395E00A2BE7C /* EulaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645938922378395E00A2BE7C /* EulaViewController.swift */; };
+		645938952378395E00A2BE7C /* EulaViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 645938932378395E00A2BE7C /* EulaViewController.xib */; };
 		645AE06621E67D3300AD3623 /* UITextField+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645AE06521E67D3300AD3623 /* UITextField+adamant.swift */; };
 		645FEB34213E72C100D6BA2D /* OnboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645FEB32213E72C100D6BA2D /* OnboardViewController.swift */; };
 		645FEB35213E72C100D6BA2D /* OnboardViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 645FEB33213E72C100D6BA2D /* OnboardViewController.xib */; };
@@ -563,6 +565,8 @@
 		6455E9F021075D3600B2E94C /* AddressBookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBookService.swift; sourceTree = "<group>"; };
 		6455E9F221075D8000B2E94C /* AdamantAddressBookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantAddressBookService.swift; sourceTree = "<group>"; };
 		6458548A211B3AB1004C5909 /* WelcomeViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WelcomeViewController.xib; sourceTree = "<group>"; };
+		645938922378395E00A2BE7C /* EulaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EulaViewController.swift; sourceTree = "<group>"; };
+		645938932378395E00A2BE7C /* EulaViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EulaViewController.xib; sourceTree = "<group>"; };
 		645AE06521E67D3300AD3623 /* UITextField+adamant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITextField+adamant.swift"; sourceTree = "<group>"; };
 		645E7B052111DF3A006CC9FD /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
 		645FEB32213E72C100D6BA2D /* OnboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardViewController.swift; sourceTree = "<group>"; };
@@ -1285,6 +1289,8 @@
 			isa = PBXGroup;
 			children = (
 				E9332B8821F1FA4400D56E72 /* OnboardRoutes.swift */,
+				645938922378395E00A2BE7C /* EulaViewController.swift */,
+				645938932378395E00A2BE7C /* EulaViewController.xib */,
 				645FEB32213E72C100D6BA2D /* OnboardViewController.swift */,
 				645FEB33213E72C100D6BA2D /* OnboardViewController.xib */,
 				644793C22166314A00FC4CF5 /* OnboardPage.swift */,
@@ -2036,6 +2042,7 @@
 				E9981892212088DE0018C84C /* NodeCell.xib in Resources */,
 				E9B4E1AA210F1803007E77FC /* DoubleDetailsTableViewCell.xib in Resources */,
 				6458548C211B3AB1004C5909 /* WelcomeViewController.xib in Resources */,
+				645938952378395E00A2BE7C /* EulaViewController.xib in Resources */,
 				E9EC341D200524CA00C0E546 /* Roboto_400_normal.ttf in Resources */,
 				E9A174B920587B84003667CD /* notification.mp3 in Resources */,
 				E9EC3418200524CA00C0E546 /* Exo+2_400_normal.ttf in Resources */,
@@ -2573,6 +2580,7 @@
 				E9502740202E257E002C1098 /* RepeaterService.swift in Sources */,
 				E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */,
 				E9771D7B2299456A0099AAC7 /* AdamantSecret.swift in Sources */,
+				645938942378395E00A2BE7C /* EulaViewController.swift in Sources */,
 				649D6BEC21BD5A53009E727B /* UISuffixTextField.swift in Sources */,
 				E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */,
 				E993302021354B1800CD5200 /* AdmWalletRoutes.swift in Sources */,

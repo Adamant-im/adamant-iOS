@@ -28,6 +28,7 @@ extension StoreKey {
 	struct application {
 		static let deviceTokenHash = "app.deviceTokenHash"
         static let welcomeScreensIsShown = "app.welcomeScreensIsShown"
+        static let eulaScreensIsShown = "app.eulaScreensIsShown"
         static let firstRun = "app.firstRun"
 		
 		private init() {}
@@ -131,6 +132,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             welcome.modalPresentationStyle = .overFullScreen
             login.present(welcome, animated: true, completion: nil)
             UserDefaults.standard.set(true, forKey: StoreKey.application.welcomeScreensIsShown)
+        }
+        
+        let eulaIsShow = UserDefaults.standard.bool(forKey: StoreKey.application.eulaScreensIsShown)
+        if !eulaIsShow {
+            let eula = router.get(scene: AdamantScene.Onboard.eula)
+            eula.modalPresentationStyle = .overFullScreen
+            login.present(eula, animated: true, completion: nil)
         }
     
 		// MARK: 5 Reachability & Autoupdate
