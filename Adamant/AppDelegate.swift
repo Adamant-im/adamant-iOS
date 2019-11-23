@@ -28,7 +28,7 @@ extension StoreKey {
 	struct application {
 		static let deviceTokenHash = "app.deviceTokenHash"
         static let welcomeScreensIsShown = "app.welcomeScreensIsShown"
-        static let eulaScreensIsShown = "app.eulaScreensIsShown"
+        static let eulaAccepted = "app.eulaAccepted"
         static let firstRun = "app.firstRun"
 		
 		private init() {}
@@ -122,7 +122,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // MARK: 4. Show login
         let login = router.get(scene: AdamantScene.Login.login) as! LoginViewController
+        
         let welcomeIsShown = UserDefaults.standard.bool(forKey: StoreKey.application.welcomeScreensIsShown)
+        let eulaAccepted = UserDefaults.standard.bool(forKey: StoreKey.application.eulaAccepted)
+        
         login.requestBiometryOnFirstTimeActive = welcomeIsShown
         login.modalPresentationStyle = .overFullScreen
         window!.rootViewController?.present(login, animated: false, completion: nil)
@@ -132,11 +135,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             welcome.modalPresentationStyle = .overFullScreen
             login.present(welcome, animated: true, completion: nil)
             UserDefaults.standard.set(true, forKey: StoreKey.application.welcomeScreensIsShown)
-        }
-        
-        let eulaIsShow = UserDefaults.standard.bool(forKey: StoreKey.application.eulaScreensIsShown)
-        if !eulaIsShow {
-            let eula = router.get(scene: AdamantScene.Onboard.eula)
+        } else if !eulaAccepted {
+            let eula = EulaViewController(nibName: "EulaViewController", bundle: nil)
+            eula.onAccept = {
+                UserDefaults.standard.set(true, forKey: StoreKey.application.eulaAccepted)
+            }
+            
             eula.modalPresentationStyle = .overFullScreen
             login.present(eula, animated: true, completion: nil)
         }

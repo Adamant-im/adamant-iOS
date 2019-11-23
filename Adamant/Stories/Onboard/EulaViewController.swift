@@ -9,18 +9,19 @@
 import UIKit
 
 class EulaViewController: UIViewController {
+    
+    var onAccept: (()->Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        view.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "stripeBg"))
     }
     
     @IBAction func handleAccept() {
         DispatchQueue.main.async { [weak self] in
-            UserDefaults.standard.set(true, forKey: StoreKey.application.eulaScreensIsShown)
+            self?.onAccept?()
             self?.dismiss(animated: true, completion: nil)
         }
     }
-
 }

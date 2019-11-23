@@ -74,6 +74,7 @@
 		64AE84622300012400F38FBD /* DashProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64AE845F2300012200F38FBD /* DashProvider.swift */; };
 		64BD2B7520E2814B00E2CD36 /* EthTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */; };
 		64BD2B7720E2820300E2CD36 /* TransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */; };
+		64C65F4523893C7600DC0425 /* OnboardOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64C65F4423893C7600DC0425 /* OnboardOverlay.swift */; };
 		64D059FF20D3116B003AD655 /* NodesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D059FE20D3116A003AD655 /* NodesListViewController.swift */; };
 		64E1C82D222E95E2006C4DA7 /* DogeWalletRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E1C82C222E95E2006C4DA7 /* DogeWalletRoutes.swift */; };
 		64E1C82F222E95F6006C4DA7 /* DogeWallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E1C82E222E95F6006C4DA7 /* DogeWallet.swift */; };
@@ -602,6 +603,7 @@
 		64AE845F2300012200F38FBD /* DashProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashProvider.swift; sourceTree = "<group>"; };
 		64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransaction.swift; sourceTree = "<group>"; };
 		64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetails.swift; sourceTree = "<group>"; };
+		64C65F4423893C7600DC0425 /* OnboardOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardOverlay.swift; sourceTree = "<group>"; };
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
 		64E1C82C222E95E2006C4DA7 /* DogeWalletRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletRoutes.swift; sourceTree = "<group>"; };
 		64E1C82E222E95F6006C4DA7 /* DogeWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWallet.swift; sourceTree = "<group>"; };
@@ -1288,6 +1290,7 @@
 		E9332B8721F1F9D100D56E72 /* Onboard */ = {
 			isa = PBXGroup;
 			children = (
+				64C65F4423893C7600DC0425 /* OnboardOverlay.swift */,
 				E9332B8821F1FA4400D56E72 /* OnboardRoutes.swift */,
 				645938922378395E00A2BE7C /* EulaViewController.swift */,
 				645938932378395E00A2BE7C /* EulaViewController.xib */,
@@ -2597,6 +2600,7 @@
 				E96D64B42295BED700CA5587 /* StateAsset.swift in Sources */,
 				E9771D9E22997A6F0099AAC7 /* NativeCore+AdamantCore.swift in Sources */,
 				E921534E20EE1E8700C0843F /* EurekaAlertLabelRow.swift in Sources */,
+				64C65F4523893C7600DC0425 /* OnboardOverlay.swift in Sources */,
 				E9484B79227C617E008E10F0 /* BalanceTableViewCell.swift in Sources */,
 				E90847352196FEA80095825D /* MessageTransaction+CoreDataProperties.swift in Sources */,
 				E9771DA722997F310099AAC7 /* ServerResponseWithTimestamp.swift in Sources */,
