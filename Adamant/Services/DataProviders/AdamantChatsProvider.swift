@@ -20,6 +20,7 @@ class AdamantChatsProvider: ChatsProvider {
     var securedStore: SecuredStore! {
         didSet {
             self.blackList = self.securedStore.getArray("blackList") ?? []
+            self.removedMessages = self.securedStore.getArray("removedMessages") ?? []
         }
     }
 	
@@ -34,6 +35,7 @@ class AdamantChatsProvider: ChatsProvider {
     
     public var chatPositon: [String : Double] = [:]
     private(set) var blackList: [String] = []
+    private(set) var removedMessages: [String] = []
     
     private(set) var isInitiallySynced: Bool = false {
         didSet {
@@ -86,6 +88,7 @@ class AdamantChatsProvider: ChatsProvider {
 			self?.dropStateData()
             
             self?.blackList = []
+            self?.removedMessages = []
 		}
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: nil) { [weak self] notification in
@@ -96,6 +99,10 @@ class AdamantChatsProvider: ChatsProvider {
             if state {
                 if let blackList = self?.blackList {
                     self?.securedStore.set(blackList, for: "blackList")
+                }
+                
+                if let removedMessages = self?.removedMessages {
+                    self?.securedStore.set(removedMessages, for: "removedMessages")
                 }
             }
         }
@@ -1148,6 +1155,10 @@ extension AdamantChatsProvider {
         messageTransaction.fee = transaction.fee as NSDecimalNumber
         messageTransaction.statusEnum = MessageStatus.delivered
         messageTransaction.partner = partner
+        
+        if let transactionId = messageTransaction.transactionId {
+            messageTransaction.isHidden = self.removedMessages.contains(transactionId)
+        }
 		
 		return messageTransaction
 	}
@@ -1181,6 +1192,16 @@ extension AdamantChatsProvider {
             
             if self.accountService.hasStayInAccount {
                 self.securedStore.set(blackList, for: "blackList")
+            }
+        }
+    }
+    
+    public func removeMessage(with id: String) {
+        if !self.removedMessages.contains(id) {
+            self.removedMessages.append(id)
+            
+            if self.accountService.hasStayInAccount {
+                self.securedStore.set(removedMessages, for: "removedMessages")
             }
         }
     }

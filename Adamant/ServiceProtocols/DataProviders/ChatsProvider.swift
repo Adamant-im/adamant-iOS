@@ -196,6 +196,7 @@ protocol ChatsProvider: DataProvider {
 	// MARK: - Tools
 	func validateMessage(_ message: AdamantMessage) -> ValidateMessageResult
     func blockChat(with address: String)
+    func removeMessage(with id: String)
 	
     // MARK: - Unconfirmed Transaction
     func addUnconfirmed(transactionId: UInt64, managedObjectId: NSManagedObjectID)

@@ -30,6 +30,12 @@ extension String.adamantLocalized {
         static let unsupportedUrlWarning = NSLocalizedString("ChatScene.Warning.UnsupportedUrl", comment: "Chat: warning message for opening unsupported url schemes")
         
         static let block = NSLocalizedString("Chats.Block", comment: "Block")
+        
+        static let remove = NSLocalizedString("Chats.Remove", comment: "Remove")
+        static let removeMessage = NSLocalizedString("Chats.RemoveMessage", comment: "Delete this message?")
+        static let report = NSLocalizedString("Chats.Report", comment: "Report")
+        static let reportMessage = NSLocalizedString("Chats.ReportMessage", comment: "Report as inappropriate?")
+        static let reportSent = NSLocalizedString("Chats.ReportSent", comment: "Report has been sent")
 		
 		private init() { }
 	}
@@ -405,7 +411,82 @@ class ChatViewController: MessagesViewController {
             scrollToBottomBtn.rightAnchor.constraint(equalTo: messagesCollectionView.rightAnchor, constant: -20),
             scrollToBottomBtnOffetConstraint!
         ])
+        
+        UIMenuController.shared.menuItems = [
+            UIMenuItem(title: String.adamantLocalized.chat.remove, action: NSSelectorFromString("remove:")),
+            UIMenuItem(title: String.adamantLocalized.chat.report, action: NSSelectorFromString("report:"))]
 	}
+    
+    override func canPerformAction(_ action: Selector, withSender sender: Any!) -> Bool {
+        return false
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+
+    override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
+
+        switch action {
+        case NSSelectorFromString("remove:"): return true
+        case NSSelectorFromString("report:"): return true
+        default:
+            return super.collectionView(collectionView, canPerformAction: action, forItemAt: indexPath, withSender: sender)
+        }
+    }
+
+    override func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
+
+        switch action {
+        case NSSelectorFromString("remove:"): removeMessage(at: indexPath)
+        case NSSelectorFromString("report:"): reportMessage(at: indexPath)
+        default:
+            super.collectionView(collectionView, performAction: action, forItemAt: indexPath, withSender: sender)
+        }
+    }
+    
+    func removeMessage(at indexPath: IndexPath) {
+        self.dialogService.showAlert(title: String.adamantLocalized.chat.removeMessage, message: nil, style: .alert, actions: [
+            AdamantAlertAction(title: String.adamantLocalized.alert.ok, style: .destructive, handler: {
+            self.hideMessage(at: indexPath)
+        }),
+        AdamantAlertAction(title: String.adamantLocalized.alert.cancel, style: .default, handler: {
+            //
+        })], from: nil)
+    }
+    
+    func reportMessage(at indexPath: IndexPath) {
+        self.dialogService.showAlert(title: String.adamantLocalized.chat.reportMessage, message: nil, style: .alert, actions: [
+            AdamantAlertAction(title: String.adamantLocalized.alert.ok, style: .destructive, handler: {
+                self.hideMessage(at: indexPath, show: true)
+        }),
+        AdamantAlertAction(title: String.adamantLocalized.alert.cancel, style: .default, handler: {
+            //
+        })], from: nil)
+    }
+    
+    func hideMessage(at indexPath: IndexPath, show: Bool = false) {
+        let message = messageForItem(at: indexPath, in: self.messagesCollectionView)
+        
+        if let item = message as? ChatTransaction {
+            print("\(message.messageId)")
+            print(type(of: message.self))
+            print(item.isHidden)
+            
+            item.isHidden = true
+            try? item.managedObjectContext?.save()
+            
+            chatroom?.updateLastTransaction()
+            
+            if let transactionId = item.transactionId {
+                chatsProvider.removeMessage(with: transactionId)
+            }
+            
+            if show {
+                self.dialogService.showToastMessage( String.adamantLocalized.chat.reportSent )
+            }
+        }
+    }
     
     @objc func scrollDown() {
         messagesCollectionView.scrollToBottom(animated: true)

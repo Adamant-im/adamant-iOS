@@ -275,6 +275,21 @@
 /* Alert "Block this user?" */
 "Chats.BlockUser" = "Заблокировать пользователя?";
 
+/* Button "Remove" */
+"Chats.Remove" = "Удалить";
+
+/* Alert "Delete this message?" */
+"Chats.RemoveMessage" = "Удалить сообщение?";
+
+/* Button "Report" */
+"Chats.Report" = "Пожаловаться";
+
+/* Alert "Report as inappropriate?" */
+"Chats.ReportMessage" = "Пожаловаться на сообщение?";
+
+/* Alert "Report has been sent" */
+"Chats.ReportSent" = "Запрос отправлен";
+
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Сообщение уже отправлено";
 

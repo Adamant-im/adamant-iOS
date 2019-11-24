@@ -274,6 +274,21 @@
 /* Alert "Block this user?" */
 "Chats.BlockUser" = "Block this user?";
 
+/* Button "Remove" */
+"Chats.Remove" = "Remove";
+
+/* Alert "Delete this message?" */
+"Chats.RemoveMessage" = "Delete this message?";
+
+/* Button "Report" */
+"Chats.Report" = "Report";
+
+/* Alert "Report as inappropriate?" */
+"Chats.ReportMessage" = "Report as inappropriate?";
+
+/* Alert "Report has been sent" */
+"Chats.ReportSent" = "Report has been sent";
+
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Message is already sent";
 
