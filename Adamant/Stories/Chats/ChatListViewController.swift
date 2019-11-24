@@ -17,6 +17,8 @@ extension String.adamantLocalized {
         static let syncingChats = NSLocalizedString("ChatListPage.SyncingChats", comment: "ChatList: First syncronization is in progress")
         static let searchPlaceholder = NSLocalizedString("ChatListPage.SearchBar.Placeholder", comment: "ChatList: SearchBar placeholder text")
         
+        static let blockUser = NSLocalizedString("Chats.BlockUser", comment: "Block this user?")
+        
 		private init() {}
 	}
 }
@@ -822,12 +824,18 @@ extension ChatListViewController {
                 return
             }
             
-            self?.chatsProvider.blockChat(with: address)
-            
-            chatroom.isHidden = true
-            try? chatroom.managedObjectContext?.save()
-            
-            completionHandler(true)
+            self?.dialogService.showAlert(title: String.adamantLocalized.chatList.blockUser, message: nil, style: .alert, actions: [
+                    AdamantAlertAction(title: String.adamantLocalized.alert.ok, style: .destructive, handler: {
+                    self?.chatsProvider.blockChat(with: address)
+                    
+                    chatroom.isHidden = true
+                    try? chatroom.managedObjectContext?.save()
+                    
+                    completionHandler(true)
+                }),
+                AdamantAlertAction(title: String.adamantLocalized.alert.cancel, style: .default, handler: {
+                    completionHandler(true)
+                })], from: nil)
         }
         block.image = #imageLiteral(resourceName: "swipe_block")
         

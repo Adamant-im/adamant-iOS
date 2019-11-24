@@ -271,6 +271,12 @@
 /* Alert 'Retry Or Delete' body message. Used in caht for sending failed messages again or delete them */
 "Chats.RetryOrDelete.Body" = "Möchten Sie versuchen, die Nachricht nochmal zu versenden oder diese löschen?";
 
+/* Button "Block" */
+"Chats.Block" = "Block";
+
+/* Alert "Block this user?" */
+"Chats.BlockUser" = "Diesen Benutzer sperren?";
+
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Nachricht bereits versendet";
 

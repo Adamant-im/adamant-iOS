@@ -28,6 +28,8 @@ extension String.adamantLocalized {
         
         static let noMailAppWarning = NSLocalizedString("ChatScene.Warning.NoMailApp", comment: "Chat: warning message for opening email link without mail app configurated on device")
         static let unsupportedUrlWarning = NSLocalizedString("ChatScene.Warning.UnsupportedUrl", comment: "Chat: warning message for opening unsupported url schemes")
+        
+        static let block = NSLocalizedString("Chats.Block", comment: "Block")
 		
 		private init() { }
 	}
@@ -525,6 +527,14 @@ class ChatViewController: MessagesViewController {
             }
         }
     }
+    
+    func close() {
+        if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController, let nav = selectedView.children.first as? UINavigationController  {
+                nav.popToRootViewController(animated: true)
+        } else {
+            self.navigationController?.popViewController(animated: true)
+        }
+    }
 	
 	// MARK: IBAction
 	
@@ -545,6 +555,21 @@ class ChatViewController: MessagesViewController {
 			
 			return
 		}
+        
+        let block = UIAlertAction(title: String.adamantLocalized.chat.block, style: .destructive) { _ in
+            self.dialogService.showAlert(title: String.adamantLocalized.chatList.blockUser, message: nil, style: .alert, actions: [
+                AdamantAlertAction(title: String.adamantLocalized.alert.ok, style: .destructive, handler: {
+                    self.chatsProvider.blockChat(with: address)
+                
+                    self.chatroom?.isHidden = true
+                    try? self.chatroom?.managedObjectContext?.save()
+                    
+                    self.close()
+            }),
+            AdamantAlertAction(title: String.adamantLocalized.alert.cancel, style: .default, handler: {
+                //
+            })], from: nil)
+        }
 		
 		let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
 			self?.dialogService.presentShareAlertFor(string: address,
@@ -581,7 +606,7 @@ class ChatViewController: MessagesViewController {
 		
         let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil)
         
-        dialogService?.showAlert(title: nil, message: nil, style: .actionSheet, actions: [share, rename, cancel], from: sender)
+        dialogService?.showAlert(title: nil, message: nil, style: .actionSheet, actions: [block, share, rename, cancel], from: sender)
 	}
     
     
