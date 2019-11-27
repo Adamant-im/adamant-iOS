@@ -105,8 +105,12 @@ class OnboardViewController: UIViewController {
                     self?.handleSkip()
                 }
             }
-            eula.modalPresentationStyle = .overFullScreen
-            self?.present(eula, animated: true, completion: nil)
+            eula.onDecline = {
+                self?.agreeSwitch?.isOn = false
+            }
+            let vc = UINavigationController(rootViewController: eula)
+            vc.modalPresentationStyle = .overFullScreen
+            self?.present(vc, animated: true, completion: nil)
         }
     }
 }

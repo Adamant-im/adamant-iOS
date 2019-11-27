@@ -24,20 +24,23 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Text" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u9T-NN-FZw" customClass="ReadonlyTextView" customModule="Adamant" customModuleProvider="target">
-                    <rect key="frame" x="20" y="81" width="374" height="733"/>
-                    <color key="textColor" red="0.26666666666666666" green="0.26666666666666666" blue="0.26666666666666666" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="12"/>
+                    <rect key="frame" x="16" y="44" width="382" height="770"/>
+                    <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="16"/>
                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="string" keyPath="xibLocKey" value="EULA.Text"/>
                     </userDefinedRuntimeAttributes>
                 </textView>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="okW-9c-qaM">
-                    <rect key="frame" x="20" y="822" width="374" height="40"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="okW-9c-qaM">
+                    <rect key="frame" x="211" y="822" width="183" height="40"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="40" id="azc-H1-2Lv"/>
                     </constraints>
-                    <state key="normal" title="Button"/>
+                    <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="18"/>
+                    <state key="normal" title="Accept">
+                        <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </state>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="string" keyPath="xibLocKey" value="EULA.Accept"/>
                     </userDefinedRuntimeAttributes>
@@ -45,26 +48,31 @@
                         <action selector="handleAccept" destination="-2" eventType="touchUpInside" id="v0x-oJ-7zB"/>
                     </connections>
                 </button>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="W9n-M3-4S0">
-                    <rect key="frame" x="20" y="44" width="374" height="29"/>
-                    <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="24"/>
-                    <color key="textColor" red="0.2666666667" green="0.2666666667" blue="0.2666666667" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    <nil key="highlightedColor"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yEd-IT-sBf">
+                    <rect key="frame" x="20" y="822" width="183" height="40"/>
+                    <fontDescription key="fontDescription" name="Exo2-Regular" family="Exo 2" pointSize="18"/>
+                    <state key="normal" title="Decline">
+                        <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </state>
                     <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="string" keyPath="xibLocKey" value="EULA.Title"/>
+                        <userDefinedRuntimeAttribute type="string" keyPath="xibLocKey" value="EULA.Decline"/>
                     </userDefinedRuntimeAttributes>
-                </label>
+                    <connections>
+                        <action selector="handleDecline" destination="-1" eventType="touchUpInside" id="jBK-1R-G1Y"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstItem="okW-9c-qaM" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="20" id="ABH-MV-AZf"/>
                 <constraint firstItem="okW-9c-qaM" firstAttribute="bottom" secondItem="fnl-2z-Ty3" secondAttribute="bottom" id="Bb4-c2-n3a"/>
-                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="u9T-NN-FZw" secondAttribute="trailing" constant="20" id="Pmu-v0-bgu"/>
-                <constraint firstItem="W9n-M3-4S0" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" id="Uq7-AK-Aem"/>
-                <constraint firstItem="W9n-M3-4S0" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="20" id="Wb0-iS-XMf"/>
-                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="W9n-M3-4S0" secondAttribute="trailing" constant="20" id="eaT-rM-dYx"/>
-                <constraint firstItem="u9T-NN-FZw" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="20" id="gVs-GI-i2w"/>
-                <constraint firstItem="u9T-NN-FZw" firstAttribute="top" secondItem="W9n-M3-4S0" secondAttribute="bottom" constant="8" id="nnL-gJ-uFK"/>
+                <constraint firstAttribute="centerX" secondItem="yEd-IT-sBf" secondAttribute="trailing" constant="4" id="GcX-88-dew"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="u9T-NN-FZw" secondAttribute="trailing" constant="16" id="Pmu-v0-bgu"/>
+                <constraint firstItem="u9T-NN-FZw" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" id="ZNp-uc-7Pw"/>
+                <constraint firstItem="yEd-IT-sBf" firstAttribute="top" secondItem="u9T-NN-FZw" secondAttribute="bottom" constant="8" id="b6a-XQ-A3v"/>
+                <constraint firstItem="okW-9c-qaM" firstAttribute="leading" secondItem="yEd-IT-sBf" secondAttribute="trailing" constant="8" id="dE9-tr-0Zz"/>
+                <constraint firstItem="yEd-IT-sBf" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="20" id="gL5-3O-p23"/>
+                <constraint firstItem="u9T-NN-FZw" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="16" id="gVs-GI-i2w"/>
+                <constraint firstItem="yEd-IT-sBf" firstAttribute="bottom" secondItem="fnl-2z-Ty3" secondAttribute="bottom" id="smu-qU-sjv"/>
                 <constraint firstItem="okW-9c-qaM" firstAttribute="top" secondItem="u9T-NN-FZw" secondAttribute="bottom" constant="8" id="uEh-iI-J1g"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="okW-9c-qaM" secondAttribute="trailing" constant="20" id="vi5-Kr-WS2"/>
             </constraints>

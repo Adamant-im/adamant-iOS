@@ -141,6 +141,11 @@ class AdmWalletViewController: WalletViewControllerBase {
                                                    queue: OperationQueue.main,
                                                    using: { [weak self] _ in self?.updateRows() })
         }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.updateRows()
+            self?.tableView.reloadData()
+        }
 	}
     
     override func sendRowLocalizedLabel() -> String {

@@ -834,7 +834,7 @@ extension ChatListViewController {
                     completionHandler(true)
                 }),
                 AdamantAlertAction(title: String.adamantLocalized.alert.cancel, style: .default, handler: {
-                    completionHandler(true)
+                    completionHandler(false)
                 })], from: nil)
         }
         block.image = #imageLiteral(resourceName: "swipe_block")

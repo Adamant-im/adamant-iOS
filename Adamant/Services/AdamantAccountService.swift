@@ -232,6 +232,7 @@ extension AdamantAccountService {
 		securedStore.remove(.passphrase)
         securedStore.remove(.showedV12)
         securedStore.remove("blackList")
+        securedStore.remove("removedMessages")
 		hasStayInAccount = false
 		NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.stayInChanged, object: self, userInfo: [AdamantUserInfoKey.AccountService.newStayInState : false])
 		notificationsService.setNotificationsMode(.disabled, completion: nil)

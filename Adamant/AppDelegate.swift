@@ -122,9 +122,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // MARK: 4. Show login
         let login = router.get(scene: AdamantScene.Login.login) as! LoginViewController
-        
         let welcomeIsShown = UserDefaults.standard.bool(forKey: StoreKey.application.welcomeScreensIsShown)
-        let eulaAccepted = UserDefaults.standard.bool(forKey: StoreKey.application.eulaAccepted)
         
         login.requestBiometryOnFirstTimeActive = welcomeIsShown
         login.modalPresentationStyle = .overFullScreen
@@ -135,14 +133,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             welcome.modalPresentationStyle = .overFullScreen
             login.present(welcome, animated: true, completion: nil)
             UserDefaults.standard.set(true, forKey: StoreKey.application.welcomeScreensIsShown)
-        } else if !eulaAccepted {
-            let eula = EulaViewController(nibName: "EulaViewController", bundle: nil)
-            eula.onAccept = {
-                UserDefaults.standard.set(true, forKey: StoreKey.application.eulaAccepted)
-            }
-            
-            eula.modalPresentationStyle = .overFullScreen
-            login.present(eula, animated: true, completion: nil)
         }
     
 		// MARK: 5 Reachability & Autoupdate
