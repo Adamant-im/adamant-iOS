@@ -48,7 +48,7 @@ public class Chatroom: NSManagedObject {
             semaphore?.signal()
         }
         
-        if let transactions = transactions as? Set<ChatTransaction> {
+        if let transactions = transactions?.filtered(using: NSPredicate(format: "isHidden == false")) as? Set<ChatTransaction> {
             if let newest = transactions.sorted(by: { (lhs: ChatTransaction, rhs: ChatTransaction) in
                 guard let l = lhs.date as Date? else {
                     return true

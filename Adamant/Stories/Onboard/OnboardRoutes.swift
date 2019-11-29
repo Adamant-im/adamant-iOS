@@ -14,5 +14,10 @@ extension AdamantScene {
             let c = OnboardViewController(nibName: "OnboardViewController", bundle: nil)
             return c
         }
+        
+        static let eula = AdamantScene(identifier: "EulaViewController") { r in
+            let c = EulaViewController(nibName: "EulaViewController", bundle: nil)
+            return c
+        }
     }
 }

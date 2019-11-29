@@ -17,6 +17,8 @@ extension String.adamantLocalized {
         static let syncingChats = NSLocalizedString("ChatListPage.SyncingChats", comment: "ChatList: First syncronization is in progress")
         static let searchPlaceholder = NSLocalizedString("ChatListPage.SearchBar.Placeholder", comment: "ChatList: SearchBar placeholder text")
         
+        static let blockUser = NSLocalizedString("Chats.BlockUser", comment: "Block this user?")
+        
 		private init() {}
 	}
 }
@@ -734,7 +736,7 @@ extension ChatListViewController {
 			return nil
 		}
 		
-		let actions: [UIContextualAction]
+		var actions: [UIContextualAction] = []
 		
 		// More
 		let more = UIContextualAction(style: .normal, title: nil) { [weak self] (_, view, completionHandler: (Bool) -> Void) in
@@ -815,6 +817,29 @@ extension ChatListViewController {
 		} else {
 			actions = [more]
 		}
+        
+        let block = UIContextualAction(style: .destructive, title: "Block") { [weak self] (action, view, completionHandler) in
+            guard let chatroom = self?.chatsController?.object(at: indexPath), let address = chatroom.partner?.address else {
+                completionHandler(false)
+                return
+            }
+            
+            self?.dialogService.showAlert(title: String.adamantLocalized.chatList.blockUser, message: nil, style: .alert, actions: [
+                    AdamantAlertAction(title: String.adamantLocalized.alert.ok, style: .destructive, handler: {
+                    self?.chatsProvider.blockChat(with: address)
+                    
+                    chatroom.isHidden = true
+                    try? chatroom.managedObjectContext?.save()
+                    
+                    completionHandler(true)
+                }),
+                AdamantAlertAction(title: String.adamantLocalized.alert.cancel, style: .default, handler: {
+                    completionHandler(false)
+                })], from: nil)
+        }
+        block.image = #imageLiteral(resourceName: "swipe_block")
+        
+        actions.append(block)
 		
 		return UISwipeActionsConfiguration(actions: actions)
 	}
