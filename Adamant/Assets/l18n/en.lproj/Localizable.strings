@@ -334,6 +334,9 @@
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Not enought tokens to vote. You need 50 ADM";
 
+/* Delegates tab: Message about time out for new vote */
+"Delegates.timeOutBeforeNewVote" = "Please wait until previous vote will be processed";
+
 /* Delegate details: scene title */
 "DelegateDetails.Title" = "Details";
 

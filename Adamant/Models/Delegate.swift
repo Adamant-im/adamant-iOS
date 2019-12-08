@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Delegate: Decodable {
+class Delegate: Decodable {
     let username: String
     let address: String
     let publicKey: String

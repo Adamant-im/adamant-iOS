@@ -335,6 +335,9 @@
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Нужно 50 ADM";
 
+/* Delegates tab: Message about time out for new vote */
+"Delegates.timeOutBeforeNewVote" = "Пожалуйста, подождите, пока будет обработан предыдущий голос";
+
 /* Delegate details: scene title */
 "DelegateDetails.Title" = "Подробности";
 

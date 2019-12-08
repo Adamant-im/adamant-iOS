@@ -15,6 +15,8 @@ extension String.adamantLocalized {
         
         static let notEnoughtTokensForVote = NSLocalizedString("Delegates.NotEnoughtTokensForVote", comment: "Delegates tab: Message about 50 ADM fee for vote")
         
+        static let timeOutBeforeNewVote = NSLocalizedString("Delegates.timeOutBeforeNewVote", comment: "Delegates tab: Message about time out for new vote")
+        
         static let success = NSLocalizedString("Delegates.Vote.Success", comment: "Delegates: Message for Successfull voting")
 		
         private init() { }
@@ -282,6 +284,11 @@ extension DelegatesListViewController: AdamantDelegateCellDelegate {
 // MARK: - Voting
 extension DelegatesListViewController {
 	@IBAction func vote(_ sender: Any) {
+        if forcedUpdateTimer != nil {
+            self.dialogService.showWarning(withMessage: String.adamantLocalized.delegates.timeOutBeforeNewVote)
+            return
+        }
+        
 		// MARK: Prepare
 		let checkedDelegates = delegates.enumerated().filter { $1.isChecked }
 		guard checkedDelegates.count > 0 else {
@@ -318,15 +325,12 @@ extension DelegatesListViewController {
 			case .success:
 				self.dialogService.showSuccess(withMessage: String.adamantLocalized.delegates.success)
 
-				DispatchQueue.main.async {
-					checkedDelegates.forEach {
-						$1.isChecked = false
-						
-						var delegate = $1.delegate
-						delegate.voted = !delegate.voted
-						$1.delegate = delegate
-					}
-					
+				checkedDelegates.forEach {
+                    $1.isChecked = false
+                    $1.delegate.voted = !$1.delegate.voted
+                }
+                
+                DispatchQueue.main.async {
 					self.tableView.reloadData()
 					self.updateVotePanel()
 					self.scheduleUpdate()
@@ -381,7 +385,7 @@ extension DelegatesListViewController {
 			forcedUpdateTimer = nil
 		}
 		
-		let timer = Timer.scheduledTimer(timeInterval: 10.0, target: self, selector: #selector(updateTimerCallback), userInfo: nil, repeats: false)
+		let timer = Timer.scheduledTimer(timeInterval: 20.0, target: self, selector: #selector(updateTimerCallback), userInfo: nil, repeats: false)
 		forcedUpdateTimer = timer
 	}
 	

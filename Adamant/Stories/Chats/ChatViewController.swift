@@ -932,13 +932,6 @@ extension ChatViewController {
         var offset = scrollView.contentSize.height - scrollView.bounds.height - scrollView.contentOffset.y + messageInputBar.bounds.height
         offset += self.keyboardHeight
         
-        print("scrollView.contentSize.height :\(scrollView.contentSize.height)")
-        print("scrollView.bounds.height :\(scrollView.bounds.height)")
-        print("keyboardHeight :\(keyboardHeight)")
-        print("scrollView.contentOffset.y :\(scrollView.contentOffset.y)")
-        print("messageInputBar.bounds.height: \(messageInputBar.bounds.height)")
-        print("offset :\(offset)")
-        print("-----------------------")
         if offset > chatPositionDelata {
             chatPositionOffset = offset
         } else {
