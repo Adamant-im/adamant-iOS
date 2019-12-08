@@ -366,7 +366,9 @@ extension AdamantAddressBookService {
 		var processedBook = [String:String]()
 		for key in rawBook.keys {
 			if let value = rawBook[key] as? [String:Any], let displayName = value["displayName"] as? String {
-				processedBook[key] = displayName
+                if !displayName.trimmingCharacters(in: .whitespaces).isEmpty {
+                    processedBook[key] = displayName
+                }
 			}
 		}
 		return processedBook
