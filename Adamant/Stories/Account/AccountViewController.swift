@@ -162,6 +162,11 @@ class AccountViewController: FormViewController {
     
     var pinpadRequest: SecurityViewController.PinpadRequest?
     
+    private lazy var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
+        return refreshControl
+    }()
     
 	// MARK: - Lifecycle
 	
@@ -204,6 +209,8 @@ class AccountViewController: FormViewController {
 		updateAccountInfo()
 		
 		tableView.tableHeaderView = header
+        
+        tableView.refreshControl = self.refreshControl
 		
 		if let footer = UINib(nibName: "AccountFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
 			tableView.tableFooterView = footer
@@ -756,6 +763,12 @@ class AccountViewController: FormViewController {
                 tableView.deselectRow(at: indexPath, animated: true)
             }
         }
+    }
+    
+    @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
+        accountService.reloadWallets()
+        
+        refreshControl.endRefreshing()
     }
 }
 

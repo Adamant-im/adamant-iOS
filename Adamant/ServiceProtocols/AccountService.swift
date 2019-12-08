@@ -173,6 +173,9 @@ protocol AccountService: class {
 	
 	/// Logout
 	func logout()
+    
+    /// Reload current wallets state
+    func reloadWallets()
 	
 	
 	// MARK: Stay in functions

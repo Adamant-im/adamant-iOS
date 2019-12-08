@@ -484,6 +484,16 @@ extension AdamantAccountService {
 			}
 		}
 	}
+    
+    func reloadWallets() {
+        guard let passphrase = passphrase else {
+            print("No passphrase found")
+            return
+        }
+        for case let wallet as InitiatedWithPassphraseService in wallets {
+            wallet.initWallet(withPassphrase: passphrase, completion: { _ in })
+        }
+    }
 }
 
 
