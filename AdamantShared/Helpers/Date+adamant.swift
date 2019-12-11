@@ -17,7 +17,7 @@ extension Date {
     
 	/// Returns readable date with time.
     func humanizedDateTime(withWeekday: Bool = true) -> String {
-		if yearsAgo < 1 {
+		if year == Date().year {
 			let dateString: String
 			if isToday {
 				dateString = NSLocalizedString("Today", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), comment: "")
