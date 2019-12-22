@@ -127,8 +127,10 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let f = controller?.fetchedObjects {
+            self.emptyLabel.isHidden = f.count > 0
             return f.count
         } else {
+            self.emptyLabel.isHidden = false
             return 0
         }
     }

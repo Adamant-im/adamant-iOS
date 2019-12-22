@@ -682,6 +682,9 @@
 /* TransactionList: scene title */
 "TransactionListScene.Title" = "Transaktionen";
 
+/* TransactionList: 'No transactions yet' message. */
+"TransactionListScene.NoTransactionYet" = "Noch keine Transaktionen";
+
 /* Transaction status: updating in progress */
 "TransactionStatus.Updating" = "Aktualisieren…";
 

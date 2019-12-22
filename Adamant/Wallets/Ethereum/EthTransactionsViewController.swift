@@ -79,6 +79,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - UITableView
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        self.emptyLabel.isHidden = transactions.count > 0
         return transactions.count
     }
     

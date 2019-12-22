@@ -728,6 +728,9 @@
 /* TransactionList: 'Transactions not found' message. */
 "TransactionListScene.Error.NotFound" = "Транзакции не найдены";
 
+/* TransactionList: 'No transactions yet' message. */
+"TransactionListScene.NoTransactionYet" = "Транзакций пока нет";
+
 /* TransactionList: 'Transactions not found' localize error message from API. */
 "No transactions found" = "Транзакции не найдены";
 

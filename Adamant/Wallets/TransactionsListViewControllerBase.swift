@@ -15,6 +15,8 @@ extension String.adamantLocalized {
         static let toChat = NSLocalizedString("TransactionListScene.ToChat", comment: "TransactionList: To Chat button")
         static let startChat = NSLocalizedString("TransactionListScene.StartChat", comment: "TransactionList: Start Chat button")
         static let notFound = NSLocalizedString("TransactionListScene.Error.NotFound", comment: "TransactionList: 'Transactions not found' message.")
+        static let noTransactionYet = NSLocalizedString("TransactionListScene.NoTransactionYet", comment: "TransactionList: 'No Transaction Yet' message.")
+        
 	}
 }
 
@@ -34,6 +36,7 @@ class TransactionsListViewControllerBase: UIViewController {
     
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var emptyLabel: UILabel!
     
     
     // MARK: - Lifecycle
@@ -46,6 +49,7 @@ class TransactionsListViewControllerBase: UIViewController {
         }
         
         navigationItem.title = String.adamantLocalized.transactionList.title
+        emptyLabel.text = String.adamantLocalized.transactionList.noTransactionYet
         
         // MARK: Configure tableView
         let nib = UINib.init(nibName: "TransactionTableViewCell", bundle: nil)
