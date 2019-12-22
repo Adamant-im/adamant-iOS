@@ -766,9 +766,10 @@ class AccountViewController: FormViewController {
     }
     
     @objc private func handleRefresh(_ refreshControl: UIRefreshControl) {
-        accountService.reloadWallets()
-        
         refreshControl.endRefreshing()
+        DispatchQueue.background.async {
+            self.accountService.reloadWallets()
+        }
     }
 }
 
