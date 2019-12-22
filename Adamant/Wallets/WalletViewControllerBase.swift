@@ -223,6 +223,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 if let row: LabelRow = self?.form.rowBy(tag: BaseRows.address.tag) {
                     if let wallet = service.wallet {
                         row.value = wallet.address
+                        row.updateCell()
                     }
                 }
                 
