@@ -36,6 +36,7 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
+        self.emptyLabel.isHidden = true
         procedureQueue.cancelAllOperations()
         
         loadedTo = 0
@@ -51,6 +52,7 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
                 vc.loadedTo = tuple.transactions.count
                 
                 DispatchQueue.main.async {
+                    vc.emptyLabel.isHidden = vc.transactions.count > 0
                     vc.tableView.reloadData()
                     refreshControl.endRefreshing()
                     
@@ -65,6 +67,7 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
                 vc.dialogService.showRichError(error: error)
                 
                 DispatchQueue.main.async {
+                    vc.emptyLabel.isHidden = vc.transactions.count > 0
                     vc.tableView.reloadData()
                     refreshControl.endRefreshing()
                 }
@@ -75,7 +78,6 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - UITableView
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        self.emptyLabel.isHidden = transactions.count > 0
         return transactions.count
     }
     

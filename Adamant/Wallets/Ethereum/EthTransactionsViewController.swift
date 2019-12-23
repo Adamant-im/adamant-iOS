@@ -38,6 +38,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Overrides
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
+        self.emptyLabel.isHidden = true
 		guard let address = ethWalletService.wallet?.address else {
 			transactions = []
 			return
@@ -58,6 +59,7 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
 			}
 
 			DispatchQueue.main.async {
+                vc.emptyLabel.isHidden = vc.transactions.count > 0
 				vc.tableView.reloadData()
 				vc.refreshControl.endRefreshing()
 			}
@@ -79,7 +81,6 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - UITableView
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        self.emptyLabel.isHidden = transactions.count > 0
         return transactions.count
     }
     

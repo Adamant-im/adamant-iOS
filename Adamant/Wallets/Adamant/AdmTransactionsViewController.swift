@@ -74,6 +74,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
+        self.emptyLabel.isHidden = true
         self.transfersProvider.update { [weak self] (result) in
             guard let result = result else {
                 DispatchQueue.main.async {
@@ -127,7 +128,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let f = controller?.fetchedObjects {
-            self.emptyLabel.isHidden = f.count > 0
+            self.emptyLabel.isHidden = f.count > 0 && !refreshControl.isRefreshing
             return f.count
         } else {
             self.emptyLabel.isHidden = false

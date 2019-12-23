@@ -32,6 +32,7 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
+        self.emptyLabel.isHidden = true
         self.lskWalletService.getTransactions({ (result) in
             switch result {
             case .success(let transactions):
@@ -50,6 +51,7 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
                 break
             }
             DispatchQueue.main.async {
+                self.emptyLabel.isHidden = self.transactions.count > 0
                 self.refreshControl.endRefreshing()
             }
         })
@@ -59,7 +61,6 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - UITableView
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        self.emptyLabel.isHidden = transactions.count > 0
         return transactions.count
     }
     

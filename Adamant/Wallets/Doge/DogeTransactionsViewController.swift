@@ -36,6 +36,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
+        self.emptyLabel.isHidden = true
         procedureQueue.cancelAllOperations()
         
         loadedTo = 0
