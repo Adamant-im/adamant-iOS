@@ -51,7 +51,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                 vc.transactions = tuple.transactions
                 vc.loadedTo = tuple.transactions.count
                 
-                DispatchQueue.main.async {
+                DispatchQueue.main.async {                    vc.emptyLabel.isHidden = vc.transactions.count > 0
                     vc.tableView.reloadData()
                     refreshControl.endRefreshing()
                     
@@ -66,6 +66,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                 vc.dialogService.showRichError(error: error)
                 
                 DispatchQueue.main.async {
+                    vc.emptyLabel.isHidden = vc.transactions.count > 0
                     vc.tableView.reloadData()
                     refreshControl.endRefreshing()
                 }
@@ -77,7 +78,6 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - UITableView
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        self.emptyLabel.isHidden = transactions.count > 0
         return transactions.count
     }
     
