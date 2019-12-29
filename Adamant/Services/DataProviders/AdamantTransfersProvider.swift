@@ -769,6 +769,9 @@ extension AdamantTransfersProvider {
         // MARK: 2. Let AccountProvider get all partners from server.
         let partnersGroup = DispatchGroup()
         var errors: [ProcessingResult] = []
+        
+        var ignorList: Set<String> = []
+        
         for id in partnerIds {
             partnersGroup.enter() // Enter 1
             
@@ -788,7 +791,9 @@ extension AdamantTransfersProvider {
                             break
                         
                         case .invalidAddress(let address):
-                            errors.append(ProcessingResult.accountNotFound(address: address))
+//                            errors.append(ProcessingResult.accountNotFound(address: address))
+                            ignorList.insert(address)
+                            break
                         
                         case .internalError(let error):
                             errors.append(ProcessingResult.error(error))
@@ -810,6 +815,9 @@ extension AdamantTransfersProvider {
             return
         }
         
+        ignorList.forEach { address in
+            partnerIds.remove(address)
+        }
         
         // MARK: 3. Create private context, and process transactions
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -828,6 +836,10 @@ extension AdamantTransfersProvider {
         var transfers = [TransferTransaction]()
         var height: Int64 = 0
         for t in transactions {
+            if ignorList.contains(t.senderId) || ignorList.contains(t.recipientId) {
+                continue
+            }
+            
             unconfirmedsSemaphore.wait()
             if let objectId = unconfirmedTransactions[t.id], let transaction = context.object(with: objectId) as? TransferTransaction {
                 transaction.isConfirmed = true
