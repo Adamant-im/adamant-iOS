@@ -759,6 +759,9 @@ extension AdamantTransfersProvider {
         var partnerIds: Set<String> = []
         
         for t in transactions {
+            if t.recipientPublicKey == nil {
+                continue
+            }
             if t.senderId == address {
                 partnerIds.insert(t.recipientId)
             } else {
@@ -836,6 +839,10 @@ extension AdamantTransfersProvider {
         var transfers = [TransferTransaction]()
         var height: Int64 = 0
         for t in transactions {
+            if t.recipientPublicKey == nil {
+                continue
+            }
+            
             if ignorList.contains(t.senderId) || ignorList.contains(t.recipientId) {
                 continue
             }
