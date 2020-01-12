@@ -840,13 +840,16 @@ extension AdamantChatsProvider {
 		let predicates = grouppedTransactions.keys.map { NSPredicate(format: "address = %@", $0) }
 		request.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
 		
-		if let results = try? context.fetch(request) {
-			for account in results {
-				if let address = account.address, let transactions = grouppedTransactions[address] {
-					partners[account] = transactions
-				}
-			}
-		}
+        do {
+            let results = try context.fetch(request)
+            for account in results {
+                if let address = account.address, let transactions = grouppedTransactions[address] {
+                    partners[account] = transactions
+                }
+            }
+        } catch {
+            print("NSPredicate fetch error \(error.localizedDescription)")
+        }
 		
 		// MARK: 2.5 Get accounts, that we did not found.
 		if partners.count != grouppedTransactions.keys.count {
