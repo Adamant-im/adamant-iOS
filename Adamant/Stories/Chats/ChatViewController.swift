@@ -528,6 +528,7 @@ class ChatViewController: MessagesViewController {
                 self.messagesCollectionView.scrollToItem(at: IndexPath(item: 0, section: indexPath.row), at: [.centeredVertically, .centeredHorizontally], animated: false)
                 isFirstLayout = false
                 self.chatsProvider.chatPositon.removeValue(forKey: address)
+                self.messageToShow = nil
                 return
             }
         }
