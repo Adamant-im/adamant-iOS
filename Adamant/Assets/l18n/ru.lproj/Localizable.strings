@@ -236,7 +236,7 @@
 "ChatListPage.Title" = "Чаты";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.notEnoughMoney" = "Баланс нулевой. Получите бесплатные ADM-токены.";
+"ChatsProvider.Error.notEnoughMoney" = "Баланс нулевой. Получите бесплатные ADM-токены";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "Сообщение с идентификатором %@ не найдено";
