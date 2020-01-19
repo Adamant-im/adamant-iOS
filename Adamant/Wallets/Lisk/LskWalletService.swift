@@ -227,7 +227,7 @@ class LskWalletService: WalletService {
 // MARK: - Nodes
 extension LskWalletService {
     private func initiateNodes(completion: @escaping (Bool) -> Void) {
-        getAliveNodes(from: nodes, timeout: 2.0) { nodes in
+        getAliveNodes(from: nodes, timeout: 20.0) { nodes in
             if nodes.count > 0 {
                 self.accountApi = Accounts(client: APIClient(options: APIOptions(nodes: nodes, nethash: APINethash.mainnet, randomNode: true)))
                 self.transactionApi = Transactions(client:  APIClient(options: APIOptions(nodes: nodes, nethash: APINethash.mainnet, randomNode: true)))
