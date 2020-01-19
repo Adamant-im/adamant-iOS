@@ -236,7 +236,7 @@
 "ChatListPage.Title" = "Chats";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.notEnoughMoney" = "You don't have enough tokens to send a message";
+"ChatsProvider.Error.notEnoughMoney" = "Zero balance. Get free ADM tokens";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "Message with id %@ not found";
