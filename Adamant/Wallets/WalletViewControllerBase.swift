@@ -133,11 +133,13 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             $0.alertBackgroundColor = UIColor.adamant.primary
             $0.alertTextColor = UIColor.white
             
-            if let service = self?.service, let wallet = service.wallet {
-                let symbol = type(of: service).currencySymbol
+            guard let service = self?.service else { return }
+            
+            let symbol = type(of: service).currencySymbol
+            if let wallet = service.wallet {
                 $0.value = self?.balanceRowValueFor(balance: wallet.balance, symbol: symbol, alert: wallet.notifications)
             } else {
-                $0.value = nil
+                $0.value = self?.balanceRowValueFor(balance: 0, symbol: symbol, alert: 0)
             }
             
             let height = $0.value?.fiat != nil ? BalanceTableViewCell.fullHeight : BalanceTableViewCell.compactHeight

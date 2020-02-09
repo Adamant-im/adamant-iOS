@@ -175,12 +175,7 @@ class EthWalletService: WalletService {
         setState(.updating)
 		
 		getBalance(forAddress: wallet.ethAddress) { [weak self] result in
-            if let stateSemaphore = self?.stateSemaphore {
-                defer {
-                    stateSemaphore.signal()
-                }
-                stateSemaphore.wait()
-            }
+            defer { self?.stateSemaphore.signal() }
             
 			switch result {
 			case .success(let balance):
