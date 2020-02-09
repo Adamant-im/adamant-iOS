@@ -323,6 +323,12 @@
 /* Chat: 'Name' field in actions menu */
 "ChatScene.Actions.NamePlaceholder" = "Имя";
 
+/* Chat: 'Free Tokens' button */
+"ChatScene.FreeTokensAlert.FreeTokens" = "Бесплатные токены";
+
+/* Chat: 'Free Tokens' message */
+"ChatScene.FreeTokensAlert.Message" = "АДАМАНТ — мессенджер, полностью работающий на блокчейне, независимый от государств, корпораций и даже разработчиков. Это возможно благодаря децентрализованной сетевой инфраструктуре, с полностью открытым исходным кодом и поддерживаемой пользователями. Поэтому каждое действие, включая отправку сообщения или сохранение адресной книги, имеет комиссию сети 0.001 ADM. Чтобы начать общение, получите бесплатные токены.";
+
 /* Chat: warning message for opening email link without mail app configurated on device */
 "ChatScene.Warning.NoMailApp" = "Не удалось открыть почтовое приложение. Проверьте настройки.";
 

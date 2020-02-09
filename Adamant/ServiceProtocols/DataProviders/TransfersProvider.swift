@@ -132,6 +132,8 @@ protocol TransfersProvider: DataProvider {
 	var isInitiallySynced: Bool { get }
 	
 	var transferFee: Decimal { get }
+    
+    var hasTransactions: Bool { get }
 	
 	// MARK: Controller
 	func transfersController() -> NSFetchedResultsController<TransferTransaction>

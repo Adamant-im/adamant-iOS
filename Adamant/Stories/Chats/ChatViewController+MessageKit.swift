@@ -587,18 +587,24 @@ extension ChatViewController: MessageInputBarDelegate {
                 break
 				
 			case .failure(let error):
+                var showFreeToken = false
 				switch error {
-				case .messageNotValid, .notEnoughMoneyToSend:
-					DispatchQueue.main.async {
-						if inputBar.inputTextView.text.count == 0 {
-							inputBar.inputTextView.text = text
-						}
-					}
+                case .messageNotValid:
+                    self?.setText(text, to: inputBar)
+                case .notEnoughMoneyToSend:
+					self?.setText(text, to: inputBar)
+                    if let transfersProvider = self?.transfersProvider, !transfersProvider.hasTransactions {
+                        showFreeToken = true
+                    }
 				default:
 					break
 				}
-				
-				self?.dialogService.showRichError(error: error)
+                
+                if showFreeToken {
+                    self?.showFreeTokenAlert()
+                } else {
+                    self?.dialogService.showRichError(error: error)
+                }
 			}
 		})
 		
@@ -621,6 +627,35 @@ extension ChatViewController: MessageInputBarDelegate {
 			setEstimatedFee(0)
 		}
 	}
+    
+    func setText(_ text: String, to inputBar: MessageInputBar) {
+        DispatchQueue.main.async {
+            if inputBar.inputTextView.text.count == 0 {
+                inputBar.inputTextView.text = text
+            }
+        }
+    }
+    
+    func showFreeTokenAlert() {
+        let alert = UIAlertController(title: "", message: String.adamantLocalized.chat.freeTokensMessage, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: String.adamantLocalized.chat.freeTokens, style: .default, handler: { [weak self] (_) in
+            if let address = self?.account?.address {
+                let urlRaw = String.adamantLocalized.wallets.getFreeTokensUrl(for: address)
+                guard let url = URL(string: urlRaw) else {
+                    self?.dialogService.showError(withMessage: "Failed to create URL with string: \(urlRaw)", error: nil)
+                    return
+                }
+                
+                let safari = SFSafariViewController(url: url)
+                safari.preferredControlTintColor = UIColor.adamant.primary
+                safari.modalPresentationStyle = .overFullScreen
+                self?.present(safari, animated: true, completion: nil)
+            }
+        }))
+        alert.modalPresentationStyle = .overFullScreen
+        present(alert, animated: true, completion: nil)
+    }
 }
 
 

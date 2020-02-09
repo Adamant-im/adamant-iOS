@@ -36,6 +36,9 @@ extension String.adamantLocalized {
         static let report = NSLocalizedString("Chats.Report", comment: "Report")
         static let reportMessage = NSLocalizedString("Chats.ReportMessage", comment: "Report as inappropriate?")
         static let reportSent = NSLocalizedString("Chats.ReportSent", comment: "Report has been sent")
+        
+        static let freeTokens = NSLocalizedString("ChatScene.FreeTokensAlert.FreeTokens", comment: "Chat: 'Free Tokens' button")
+        static let freeTokensMessage = NSLocalizedString("ChatScene.FreeTokensAlert.Message", comment: "Chat: 'Free Tokens' message")
 		
 		private init() { }
 	}
@@ -53,6 +56,7 @@ protocol ChatViewControllerDelegate: class {
 class ChatViewController: MessagesViewController {
 	// MARK: Dependencies
 	var chatsProvider: ChatsProvider!
+    var transfersProvider: TransfersProvider!
 	var dialogService: DialogService!
 	var router: Router!
     var addressBookService: AddressBookService!

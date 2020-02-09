@@ -26,6 +26,7 @@ class AdamantTransfersProvider: TransfersProvider {
 	private(set) var isInitiallySynced: Bool = false
 	private(set) var receivedLastHeight: Int64?
 	private(set) var readedLastHeight: Int64?
+    private(set) var hasTransactions: Bool = false
     private let apiTransactions = 100
     
     private let processingHeightSemaphore = DispatchSemaphore(value: 1)
@@ -235,6 +236,7 @@ extension AdamantTransfersProvider {
 	}
 	
 	private func reset(notify: Bool) {
+        hasTransactions = false
 		isInitiallySynced = false
 		let prevState = self.state
 		setState(.updating, previous: prevState, notify: false)	// Block update calls
@@ -754,6 +756,8 @@ extension AdamantTransfersProvider {
         guard transactions.count > 0 else {
             return
         }
+        
+        hasTransactions = true
         
         // MARK: 1. Collect all partners
         var partnerIds: Set<String> = []
