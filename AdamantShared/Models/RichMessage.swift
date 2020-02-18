@@ -11,20 +11,20 @@ import Foundation
 // MARK: - RichMessage
 
 protocol RichMessage: Codable {
-	var type: String { get }
+    var type: String { get }
     
     func content() -> [String:String]
-	func serialized() -> String
+    func serialized() -> String
 }
 
 extension RichMessage {
-	func serialized() -> String {
-		if let data = try? JSONEncoder().encode(self), let raw = String(data: data, encoding: String.Encoding.utf8) {
-			return raw
-		} else {
-			return ""
-		}
-	}
+    func serialized() -> String {
+        if let data = try? JSONEncoder().encode(self), let raw = String(data: data, encoding: String.Encoding.utf8) {
+            return raw
+        } else {
+            return ""
+        }
+    }
 }
 
 struct RichContentKeys {
@@ -37,10 +37,10 @@ struct RichContentKeys {
 // MARK: - RichMessageTransfer
 
 struct RichMessageTransfer: RichMessage {
-	let type: String
-	let amount: Decimal
-	let hash: String
-	let comments: String
+    let type: String
+    let amount: Decimal
+    let hash: String
+    let comments: String
     
     func content() -> [String:String] {
         return [
@@ -108,21 +108,21 @@ extension RichContentKeys {
 
 extension RichMessageTransfer {
     enum CodingKeys: String, CodingKey {
-		case type, amount, hash, comments
-	}
-	
-	func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(type, forKey: .type)
-		try container.encode(hash, forKey: .hash)
-		try container.encode(comments, forKey: .comments)
+        case type, amount, hash, comments
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(type, forKey: .type)
+        try container.encode(hash, forKey: .hash)
+        try container.encode(comments, forKey: .comments)
         try container.encode(amount, forKey: .amount)
-	}
-	
-	init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		self.type = try container.decode(String.self, forKey: .type)
-		self.hash = try container.decode(String.self, forKey: .hash)
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.type = try container.decode(String.self, forKey: .type)
+        self.hash = try container.decode(String.self, forKey: .hash)
         self.comments = try container.decode(String.self, forKey: .comments)
         
         if let raw = try? container.decode(String.self, forKey: .amount) {
@@ -136,7 +136,7 @@ extension RichMessageTransfer {
         } else {
             self.amount = 0
         }
-	}
+    }
 }
 
 extension RichMessageTransfer {

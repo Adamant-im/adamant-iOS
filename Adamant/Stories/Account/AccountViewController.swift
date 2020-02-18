@@ -15,133 +15,133 @@ import Parchment
 
 // MARK: - Localization
 extension String.adamantLocalized {
-	struct account {
-		static let title = NSLocalizedString("AccountTab.Title", comment: "Account page: scene title")
-		
+    struct account {
+        static let title = NSLocalizedString("AccountTab.Title", comment: "Account page: scene title")
+        
         static let updatingBalance = "…"
         
-		private init() { }
-	}
+        private init() { }
+    }
 }
 
 extension String.adamantLocalized.alert {
-	static let logoutMessageFormat = NSLocalizedString("AccountTab.ConfirmLogout.MessageFormat", comment: "Account tab: Confirm logout alert")
-	static let logoutButton = NSLocalizedString("AccountTab.ConfirmLogout.Logout", comment: "Account tab: Confirm logout alert: Logout (Ok) button")
+    static let logoutMessageFormat = NSLocalizedString("AccountTab.ConfirmLogout.MessageFormat", comment: "Account tab: Confirm logout alert")
+    static let logoutButton = NSLocalizedString("AccountTab.ConfirmLogout.Logout", comment: "Account tab: Confirm logout alert: Logout (Ok) button")
 }
 
 // MARK: AccountViewController
 class AccountViewController: FormViewController {
-	// MARK: - Rows & Sections
-	enum Sections {
-		case wallet, application, delegates, actions, security
-		
-		var tag: String {
-			switch self {
-			case .wallet: return "wllt"
-			case .application: return "app"
-			case .actions: return "actns"
+    // MARK: - Rows & Sections
+    enum Sections {
+        case wallet, application, delegates, actions, security
+        
+        var tag: String {
+            switch self {
+            case .wallet: return "wllt"
+            case .application: return "app"
+            case .actions: return "actns"
             case .delegates: return "dlgts"
             case .security: return "scrty"
-			}
-		}
-		
-		var localized: String {
-			switch self {
-			case .wallet: return "Wallet"	// Depends on selected wallet
-			case .application: return NSLocalizedString("AccountTab.Section.Application", comment: "Account tab: Application section title")
-			case .actions: return NSLocalizedString("AccountTab.Section.Actions", comment: "Account tab: Actions section title")
+            }
+        }
+        
+        var localized: String {
+            switch self {
+            case .wallet: return "Wallet"    // Depends on selected wallet
+            case .application: return NSLocalizedString("AccountTab.Section.Application", comment: "Account tab: Application section title")
+            case .actions: return NSLocalizedString("AccountTab.Section.Actions", comment: "Account tab: Actions section title")
             case .delegates: return NSLocalizedString("AccountTab.Section.Delegates", comment: "Account tab: Delegates section title")
             case .security: return Rows.security.localized
-			}
-		}
-	}
-	
-	enum Rows {
-		case balance, sendTokens // Wallet
-		case security, nodes, theme, currency, about // Application
-		case voteForDelegates, generateQr, generatePk, logout // Actions
+            }
+        }
+    }
+    
+    enum Rows {
+        case balance, sendTokens // Wallet
+        case security, nodes, theme, currency, about // Application
+        case voteForDelegates, generateQr, generatePk, logout // Actions
         case stayIn, biometry, notifications // Security
-		
-		var tag: String {
-			switch self {
-			case .balance: return "blnc"
-			case .sendTokens: return "sndTkns"
-			case .security: return "scrt"
+        
+        var tag: String {
+            switch self {
+            case .balance: return "blnc"
+            case .sendTokens: return "sndTkns"
+            case .security: return "scrt"
             case .theme: return "thm"
             case .currency: return "crrnc"
-			case .nodes: return "nds"
-			case .about: return "bt"
-			case .logout: return "lgtrw"
+            case .nodes: return "nds"
+            case .about: return "bt"
+            case .logout: return "lgtrw"
             case .voteForDelegates: return "vtFrDlgts"
             case .generateQr: return "qr"
             case .generatePk: return "pk"
             case .stayIn: return "stayin"
             case .biometry: return "biometry"
             case .notifications: return "notifications"
-			}
-		}
-		
-		var localized: String {
-			switch self {
-			case .balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
-			case .sendTokens: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
-			case .security: return NSLocalizedString("AccountTab.Row.Security", comment: "Account tab: 'Security' row")
+            }
+        }
+        
+        var localized: String {
+            switch self {
+            case .balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
+            case .sendTokens: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
+            case .security: return NSLocalizedString("AccountTab.Row.Security", comment: "Account tab: 'Security' row")
             case .theme: return NSLocalizedString("AccountTab.Row.Theme", comment: "Account tab: 'Theme' row")
             case .currency: return NSLocalizedString("AccountTab.Row.Currency", comment: "Account tab: 'Currency' row")
-			case .nodes: return String.adamantLocalized.nodesList.nodesListButton
-			case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
-			case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
-			case .voteForDelegates: return NSLocalizedString("AccountTab.Row.VoteForDelegates", comment: "Account tab: 'Votes for delegates' button")
+            case .nodes: return String.adamantLocalized.nodesList.nodesListButton
+            case .about: return NSLocalizedString("AccountTab.Row.About", comment: "Account tab: 'About' row")
+            case .logout: return NSLocalizedString("AccountTab.Row.Logout", comment: "Account tab: 'Logout' button")
+            case .voteForDelegates: return NSLocalizedString("AccountTab.Row.VoteForDelegates", comment: "Account tab: 'Votes for delegates' button")
             case .generateQr: return NSLocalizedString("SecurityPage.Row.GenerateQr", comment: "Security: Generate QR with passphrase row")
             case .generatePk: return NSLocalizedString("SecurityPage.Row.GeneratePk", comment: "Security: Generate PrivateKey with passphrase row")
             case .stayIn: return SecurityViewController.Rows.stayIn.localized
             case .biometry: return SecurityViewController.Rows.biometry.localized
             case .notifications: return SecurityViewController.Rows.notificationsMode.localized
-			}
-		}
-		
-		var image: UIImage? {
-			switch self {
-			case .security: return #imageLiteral(resourceName: "row_security")
-			case .about: return #imageLiteral(resourceName: "row_about")
-			case .theme: return #imageLiteral(resourceName: "row_themes.png")
+            }
+        }
+        
+        var image: UIImage? {
+            switch self {
+            case .security: return #imageLiteral(resourceName: "row_security")
+            case .about: return #imageLiteral(resourceName: "row_about")
+            case .theme: return #imageLiteral(resourceName: "row_themes.png")
             case .currency: return #imageLiteral(resourceName: "row_currency")
             case .nodes: return #imageLiteral(resourceName: "row_nodes")
-			case .balance: return #imageLiteral(resourceName: "row_balance")
+            case .balance: return #imageLiteral(resourceName: "row_balance")
             case .voteForDelegates: return #imageLiteral(resourceName: "row_vote-delegates")
             case .logout: return #imageLiteral(resourceName: "row_logout")
-			case .sendTokens: return nil
+            case .sendTokens: return nil
             case .generateQr: return #imageLiteral(resourceName: "row_QR.png")
             case .generatePk: return #imageLiteral(resourceName: "privateKey_row")
             case .stayIn: return #imageLiteral(resourceName: "row_security")
             case .biometry: return nil // Determined by localAuth service
             case .notifications: return #imageLiteral(resourceName: "row_Notifications.png")
-			}
-		}
-	}
-	
-	// MARK: - Dependencies
-	var accountService: AccountService!
-	var dialogService: DialogService!
-	var router: Router!
-	var notificationsService: NotificationsService!
-	var transfersProvider: TransfersProvider!
+            }
+        }
+    }
+    
+    // MARK: - Dependencies
+    var accountService: AccountService!
+    var dialogService: DialogService!
+    var router: Router!
+    var notificationsService: NotificationsService!
+    var transfersProvider: TransfersProvider!
     var localAuth: LocalAuthentication!
-	
+    
     var avatarService: AvatarService!
     
     var currencyInfoService: CurrencyInfoService!
-	
-	// MARK: - Properties
-	
-	let walletCellIdentifier = "wllt"
-	private (set) var accountHeaderView: AccountHeaderView!
-	
-	private var transfersController: NSFetchedResultsController<TransferTransaction>?
-	private var pagingViewController: PagingViewController<WalletPagingItem>!
-	
-	private var initiated = false
-	
+    
+    // MARK: - Properties
+    
+    let walletCellIdentifier = "wllt"
+    private (set) var accountHeaderView: AccountHeaderView!
+    
+    private var transfersController: NSFetchedResultsController<TransferTransaction>?
+    private var pagingViewController: PagingViewController<WalletPagingItem>!
+    
+    private var initiated = false
+    
     private var walletViewControllers = [WalletViewController]()
     
     // MARK: StayIn
@@ -168,102 +168,102 @@ class AccountViewController: FormViewController {
         return refreshControl
     }()
     
-	// MARK: - Lifecycle
-	
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-		navigationOptions = .Disabled
-		navigationController?.setNavigationBarHidden(true, animated: false)
+        navigationOptions = .Disabled
+        navigationController?.setNavigationBarHidden(true, animated: false)
         
         if #available(iOS 11.0, *) {
             navigationController?.navigationBar.prefersLargeTitles = true
             navigationItem.largeTitleDisplayMode = .never
         }
-		
-		// MARK: Status Bar
-		let statusBarView = UIView(frame: UIApplication.shared.statusBarFrame)
-		statusBarView.backgroundColor = UIColor.white
-		view.addSubview(statusBarView)
         
-		// MARK: Transfers controller
-		let controller = transfersProvider.unreadTransfersController()
-		controller.delegate = self
-		transfersController = controller
-		
-		do {
-			try controller.performFetch()
-		} catch {
-			dialogService.showError(withMessage: "Error fetching transfers: report a bug", error: error)
-		}
+        // MARK: Status Bar
+        let statusBarView = UIView(frame: UIApplication.shared.statusBarFrame)
+        statusBarView.backgroundColor = UIColor.white
+        view.addSubview(statusBarView)
+        
+        // MARK: Transfers controller
+        let controller = transfersProvider.unreadTransfersController()
+        controller.delegate = self
+        transfersController = controller
+        
+        do {
+            try controller.performFetch()
+        } catch {
+            dialogService.showError(withMessage: "Error fetching transfers: report a bug", error: error)
+        }
 
-		
-		// MARK: Header&Footer
-		guard let header = UINib(nibName: "AccountHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? AccountHeaderView else {
-			fatalError("Can't load AccountHeaderView")
-		}
-		
-		accountHeaderView = header
-		accountHeaderView.delegate = self
-		
-		updateAccountInfo()
-		
-		tableView.tableHeaderView = header
+        
+        // MARK: Header&Footer
+        guard let header = UINib(nibName: "AccountHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? AccountHeaderView else {
+            fatalError("Can't load AccountHeaderView")
+        }
+        
+        accountHeaderView = header
+        accountHeaderView.delegate = self
+        
+        updateAccountInfo()
+        
+        tableView.tableHeaderView = header
         
         tableView.refreshControl = self.refreshControl
-		
-		if let footer = UINib(nibName: "AccountFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
-			tableView.tableFooterView = footer
-		}
-		
-		// MARK: Wallet pages
+        
+        if let footer = UINib(nibName: "AccountFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
+            tableView.tableFooterView = footer
+        }
+        
+        // MARK: Wallet pages
         for walletService in accountService.wallets {
             walletViewControllers.append(walletService.walletViewController)
         }
         
-		pagingViewController = PagingViewController<WalletPagingItem>()
-		
-		pagingViewController.menuItemSource = .nib(nib: UINib(nibName: "WalletCollectionViewCell", bundle: nil))
-		pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
-		pagingViewController.indicatorColor = UIColor.adamant.primary
-		pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
-		pagingViewController.dataSource = self
-		pagingViewController.delegate = self
-		pagingViewController.select(index: 0)
-		accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
-		accountHeaderView.walletViewContainer.constrainToEdges(pagingViewController.view)
+        pagingViewController = PagingViewController<WalletPagingItem>()
+        
+        pagingViewController.menuItemSource = .nib(nib: UINib(nibName: "WalletCollectionViewCell", bundle: nil))
+        pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
+        pagingViewController.indicatorColor = UIColor.adamant.primary
+        pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
+        pagingViewController.dataSource = self
+        pagingViewController.delegate = self
+        pagingViewController.select(index: 0)
+        accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
+        accountHeaderView.walletViewContainer.constrainToEdges(pagingViewController.view)
         addChild(pagingViewController)
         
         pagingViewController.borderColor = UIColor.clear
-		
+        
         let callback: ((Notification) -> Void) = { [weak self] _ in
             self?.pagingViewController.reloadData()
         }
         
-		for walletService in accountService.wallets {
+        for walletService in accountService.wallets {
             NotificationCenter.default.addObserver(forName: walletService.walletUpdatedNotification, object: nil, queue: OperationQueue.main, using: callback)
-		}
-		
+        }
+        
         // MARK: Rows&Sections
         
-		// MARK: Application
+        // MARK: Application
         let appSection = Section(Sections.application.localized) {
-			$0.tag = Sections.application.tag
-		}
+            $0.tag = Sections.application.tag
+        }
 
-		// Node list
-		let nodesRow = LabelRow() {
-			$0.title = Rows.nodes.localized
-			$0.tag = Rows.nodes.tag
-			$0.cell.imageView?.image = Rows.nodes.image
-			$0.cell.selectionStyle = .gray
-		}.cellUpdate { (cell, _) in
-			cell.accessoryType = .disclosureIndicator
+        // Node list
+        let nodesRow = LabelRow() {
+            $0.title = Rows.nodes.localized
+            $0.tag = Rows.nodes.tag
+            $0.cell.imageView?.image = Rows.nodes.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
-			guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
-				return
-			}
-			
+            guard let vc = self?.router.get(scene: AdamantScene.NodesEditor.nodesList) else {
+                return
+            }
+            
             if let split = self?.splitViewController {
                 let details = UINavigationController(rootViewController:vc)
                 split.showDetailViewController(details, sender: self)
@@ -304,19 +304,19 @@ class AccountViewController: FormViewController {
         
         appSection.append(currencyRow)
 
-		// About
-		let aboutRow = LabelRow() {
-			$0.title = Rows.about.localized
-			$0.tag = Rows.about.tag
-			$0.cell.imageView?.image = Rows.about.image
-			$0.cell.selectionStyle = .gray
-		}.cellUpdate { (cell, _) in
-			cell.accessoryType = .disclosureIndicator
+        // About
+        let aboutRow = LabelRow() {
+            $0.title = Rows.about.localized
+            $0.tag = Rows.about.tag
+            $0.cell.imageView?.image = Rows.about.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
-			guard let vc = self?.router.get(scene: AdamantScene.Settings.about) else {
-				return
-			}
-			
+            guard let vc = self?.router.get(scene: AdamantScene.Settings.about) else {
+                return
+            }
+            
             if let split = self?.splitViewController {
                 let details = UINavigationController(rootViewController:vc)
                 split.showDetailViewController(details, sender: self)
@@ -328,28 +328,28 @@ class AccountViewController: FormViewController {
             }
             
             self?.deselectWalletViewControllers()
-		}
-		
+        }
+        
         appSection.append(aboutRow)
-			
-		// MARK: Actions
-		let actionsSection = Section(Sections.actions.localized) {
-			$0.tag = Sections.actions.tag
-		}
-		
-		// Delegates
-		let delegatesRow = LabelRow() {
-			$0.tag = Rows.voteForDelegates.tag
-			$0.title = Rows.voteForDelegates.localized
-			$0.cell.imageView?.image = Rows.voteForDelegates.image
-			$0.cell.selectionStyle = .gray
-		}.cellUpdate { (cell, _) in
-			cell.accessoryType = .disclosureIndicator
+            
+        // MARK: Actions
+        let actionsSection = Section(Sections.actions.localized) {
+            $0.tag = Sections.actions.tag
+        }
+        
+        // Delegates
+        let delegatesRow = LabelRow() {
+            $0.tag = Rows.voteForDelegates.tag
+            $0.title = Rows.voteForDelegates.localized
+            $0.cell.imageView?.image = Rows.voteForDelegates.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, row) in
-			guard let vc = self?.router.get(scene: AdamantScene.Delegates.delegates) else {
-				return
-			}
-			
+            guard let vc = self?.router.get(scene: AdamantScene.Delegates.delegates) else {
+                return
+            }
+            
             if let split = self?.splitViewController {
                 let details = UINavigationController(rootViewController:vc)
                 details.definesPresentationContext = true
@@ -362,7 +362,7 @@ class AccountViewController: FormViewController {
             }
             
             self?.deselectWalletViewControllers()
-		}
+        }
         
         actionsSection.append(delegatesRow)
             
@@ -423,43 +423,43 @@ class AccountViewController: FormViewController {
         actionsSection.append(generatePkRow)
         
         
-		// Logout
-		let logoutRow = LabelRow() {
-			$0.title = Rows.logout.localized
-			$0.tag = Rows.logout.tag
-			$0.cell.imageView?.image = Rows.logout.image
-			$0.cell.selectionStyle = .gray
-		}.cellUpdate { (cell, _) in
-			cell.accessoryType = .disclosureIndicator
+        // Logout
+        let logoutRow = LabelRow() {
+            $0.title = Rows.logout.localized
+            $0.tag = Rows.logout.tag
+            $0.cell.imageView?.image = Rows.logout.image
+            $0.cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, row) in
-			guard let address = self?.accountService.account?.address else {
-				return
-			}
-			
-			let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.logoutMessageFormat, address), message: nil, preferredStyle: .alert)
-			let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { _ in
-				guard let indexPath = row.indexPath else {
-					return
-				}
-				
-				self?.tableView.deselectRow(at: indexPath, animated: true)
-			}
-			let logout = UIAlertAction(title: String.adamantLocalized.alert.logoutButton, style: .default) { [weak self] _ in
-				self?.accountService.logout()
-				if let vc = self?.router.get(scene: AdamantScene.Login.login) {
+            guard let address = self?.accountService.account?.address else {
+                return
+            }
+            
+            let alert = UIAlertController(title: String.localizedStringWithFormat(String.adamantLocalized.alert.logoutMessageFormat, address), message: nil, preferredStyle: .alert)
+            let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel) { _ in
+                guard let indexPath = row.indexPath else {
+                    return
+                }
+                
+                self?.tableView.deselectRow(at: indexPath, animated: true)
+            }
+            let logout = UIAlertAction(title: String.adamantLocalized.alert.logoutButton, style: .default) { [weak self] _ in
+                self?.accountService.logout()
+                if let vc = self?.router.get(scene: AdamantScene.Login.login) {
                     vc.modalPresentationStyle = .overFullScreen
-					self?.dialogService.present(vc, animated: true, completion: nil)
-				}
-			}
-			
-			alert.addAction(cancel)
-			alert.addAction(logout)
+                    self?.dialogService.present(vc, animated: true, completion: nil)
+                }
+            }
+            
+            alert.addAction(cancel)
+            alert.addAction(logout)
             alert.modalPresentationStyle = .overFullScreen
-			self?.present(alert, animated: true, completion: nil)
-		}
+            self?.present(alert, animated: true, completion: nil)
+        }
         
         actionsSection.append(logoutRow)
-		
+        
         // MARK: Security section
         
         let securitySection = Section(Sections.security.localized) {
@@ -557,26 +557,26 @@ class AccountViewController: FormViewController {
         form.append(actionsSection)
         form.append(appSection)
         
-		form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamant.tableRowIcons }
-		
-		
-		// MARK: Notification Center
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			self?.updateAccountInfo()
-			self?.tableView.setContentOffset(CGPoint.zero, animated: false)
+        form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamant.tableRowIcons }
+        
+        
+        // MARK: Notification Center
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.updateAccountInfo()
+            self?.tableView.setContentOffset(CGPoint.zero, animated: false)
             self?.pagingViewController.reloadData()
             self?.tableView.reloadData()
             if let vc = self?.pagingViewController.pageViewController.selectedViewController as? WalletViewController {
                 self?.updateHeaderSize(with: vc, animated: false)
             }
-		}
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			self?.updateAccountInfo()
-		}
-		
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
-			self?.updateAccountInfo()
-		}
+        }
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.updateAccountInfo()
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.updateAccountInfo()
+        }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
             guard let form = self?.form, let accountService = self?.accountService else {
@@ -611,58 +611,58 @@ class AccountViewController: FormViewController {
             row.value = newMode.localized
             row.updateCell()
         }
-		
-		NotificationCenter.default.addObserver(forName: Notification.Name.WalletViewController.heightUpdated, object: nil, queue: OperationQueue.main) { [weak self] notification in
-			if let vc = notification.object as? WalletViewController,
-				let cvc = self?.pagingViewController.pageViewController.selectedViewController,
-				vc.viewController == cvc {
-				
-				if let initiated = self?.initiated {
-					self?.updateHeaderSize(with: vc, animated: initiated)
-				} else {
-					self?.updateHeaderSize(with: vc, animated: false)
-				}
-			}
-		}
         
-		for (index, service) in accountService.wallets.enumerated() {
-			NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,
-												   object: service,
-												   queue: OperationQueue.main) { [weak self] _ in
-													self?.pagingViewController.collectionView.reloadItems(at: [IndexPath(row: index, section: 0)])
-			}
-		}
+        NotificationCenter.default.addObserver(forName: Notification.Name.WalletViewController.heightUpdated, object: nil, queue: OperationQueue.main) { [weak self] notification in
+            if let vc = notification.object as? WalletViewController,
+                let cvc = self?.pagingViewController.pageViewController.selectedViewController,
+                vc.viewController == cvc {
+                
+                if let initiated = self?.initiated {
+                    self?.updateHeaderSize(with: vc, animated: initiated)
+                } else {
+                    self?.updateHeaderSize(with: vc, animated: false)
+                }
+            }
+        }
+        
+        for (index, service) in accountService.wallets.enumerated() {
+            NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,
+                                                   object: service,
+                                                   queue: OperationQueue.main) { [weak self] _ in
+                                                    self?.pagingViewController.collectionView.reloadItems(at: [IndexPath(row: index, section: 0)])
+            }
+        }
         
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             layoutTableHeaderView()
         }
     }
-	
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-		navigationController?.setNavigationBarHidden(true, animated: animated)
-		
-		if let indexPath = tableView.indexPathForSelectedRow {
-			tableView.deselectRow(at: indexPath, animated: animated)
-		}
-		
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+        
+        if let indexPath = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: indexPath, animated: animated)
+        }
+        
         for vc in pagingViewController.pageViewController.children {
-			vc.viewWillAppear(animated)
-		}
-	}
-	
-	override func viewWillDisappear(_ animated: Bool) {
-		super.viewWillDisappear(animated)
-		navigationController?.setNavigationBarHidden(false, animated: animated)
-	}
-	
-	override func viewDidAppear(_ animated: Bool) {
-		super.viewDidAppear(animated)
-		
-		if !initiated {
-			initiated = true
-		}
-	}
+            vc.viewWillAppear(animated)
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if !initiated {
+            initiated = true
+        }
+    }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -678,34 +678,34 @@ class AccountViewController: FormViewController {
         
         pagingViewController?.indicatorColor = UIColor.adamant.primary
     }
-	
-	deinit {
-		NotificationCenter.default.removeObserver(self)
-	}
-	
-	
-	// MARK: TableView configuration
-	
-	override func insertAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
-		return .fade
-	}
-	
-	override func deleteAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
-		return .fade
-	}
-	
-	
-	// MARK: Other
-	func updateAccountInfo() {
-		let address: String
-		
-		if let account = accountService.account {
-			address = account.address
-		} else {
-			address = ""
-		}
-		
-		accountHeaderView.addressButton.setTitle(address, for: .normal)
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    
+    // MARK: TableView configuration
+    
+    override func insertAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
+        return .fade
+    }
+    
+    override func deleteAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
+        return .fade
+    }
+    
+    
+    // MARK: Other
+    func updateAccountInfo() {
+        let address: String
+        
+        if let account = accountService.account {
+            address = account.address
+        } else {
+            address = ""
+        }
+        
+        accountHeaderView.addressButton.setTitle(address, for: .normal)
         
         if let publickey = accountService.keypair?.publicKey {
             DispatchQueue.global().async {
@@ -715,7 +715,7 @@ class AccountViewController: FormViewController {
                 }
             }
         }
-	}
+    }
     
     func layoutTableHeaderView() {
         guard let view = tableView.tableHeaderView else { return }
@@ -777,46 +777,46 @@ class AccountViewController: FormViewController {
 // MARK: - AccountHeaderViewDelegate
 extension AccountViewController: AccountHeaderViewDelegate {
     func addressLabelTapped(from: UIView) {
-		guard let address = accountService.account?.address else {
-			return
-		}
-		
-		let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
-		dialogService.presentShareAlertFor(string: address,
+        guard let address = accountService.account?.address else {
+            return
+        }
+        
+        let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+        dialogService.presentShareAlertFor(string: address,
                                            types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
-										   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                                           excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                                            animated: true, from: from,
-										   completion: nil)
-	}
+                                           completion: nil)
+    }
 }
 
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension AccountViewController: NSFetchedResultsControllerDelegate {
-	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-		if let row: AlertLabelRow = form.rowBy(tag: Rows.balance.tag), let alertLabel = row.cell.alertLabel, let count = controller.fetchedObjects?.count {
-			if count > 0 {
-				alertLabel.isHidden = false
-				alertLabel.text = String(count)
-			} else {
-				alertLabel.isHidden = true
-			}
-		}
-	}
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        if let row: AlertLabelRow = form.rowBy(tag: Rows.balance.tag), let alertLabel = row.cell.alertLabel, let count = controller.fetchedObjects?.count {
+            if count > 0 {
+                alertLabel.isHidden = false
+                alertLabel.text = String(count)
+            } else {
+                alertLabel.isHidden = true
+            }
+        }
+    }
 }
 
 
 // MARK: - PagingViewControllerDataSource
 extension AccountViewController: PagingViewControllerDataSource, PagingViewControllerDelegate {
-	func numberOfViewControllers<T>(in pagingViewController: PagingViewController<T>) -> Int {
-		return walletViewControllers.count
-	}
-	
-	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
+    func numberOfViewControllers<T>(in pagingViewController: PagingViewController<T>) -> Int {
+        return walletViewControllers.count
+    }
+    
+    func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
         return walletViewControllers[index].viewController
-	}
-	
-	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, pagingItemForIndex index: Int) -> T {
+    }
+    
+    func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, pagingItemForIndex index: Int) -> T {
         guard let service = walletViewControllers[index].service else {
             return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm")) as! T
         }
@@ -833,39 +833,39 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         }
         
         return item as! T
-	}
-	
-	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, didScrollToItem pagingItem: T, startingViewController: UIViewController?, destinationViewController: UIViewController, transitionSuccessful: Bool) {
-		guard transitionSuccessful,
-			let first = startingViewController as? WalletViewController,
-			let second = destinationViewController as? WalletViewController,
-			first.height != second.height else {
-			return
-		}
+    }
+    
+    func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, didScrollToItem pagingItem: T, startingViewController: UIViewController?, destinationViewController: UIViewController, transitionSuccessful: Bool) {
+        guard transitionSuccessful,
+            let first = startingViewController as? WalletViewController,
+            let second = destinationViewController as? WalletViewController,
+            first.height != second.height else {
+            return
+        }
 
-		updateHeaderSize(with: second, animated: true)
-	}
-	
-	private func updateHeaderSize(with walletViewController: WalletViewController, animated: Bool) {
-		guard case let .fixed(_, menuHeight) = pagingViewController.menuItemSize else {
-			return
-		}
-		
-		let pagingHeight = menuHeight + walletViewController.height
-		
-		var headerBounds = accountHeaderView.bounds
-		headerBounds.size.height = accountHeaderView.walletViewContainer.frame.origin.y + pagingHeight
-		
-		if animated {
-			UIView.animate(withDuration: 0.2) {
-				self.accountHeaderView.bounds = headerBounds
-				self.tableView.tableHeaderView = self.accountHeaderView
-			}
-		} else {
-			accountHeaderView.frame = headerBounds
-			tableView.tableHeaderView = accountHeaderView
-		}
-	}
+        updateHeaderSize(with: second, animated: true)
+    }
+    
+    private func updateHeaderSize(with walletViewController: WalletViewController, animated: Bool) {
+        guard case let .fixed(_, menuHeight) = pagingViewController.menuItemSize else {
+            return
+        }
+        
+        let pagingHeight = menuHeight + walletViewController.height
+        
+        var headerBounds = accountHeaderView.bounds
+        headerBounds.size.height = accountHeaderView.walletViewContainer.frame.origin.y + pagingHeight
+        
+        if animated {
+            UIView.animate(withDuration: 0.2) {
+                self.accountHeaderView.bounds = headerBounds
+                self.tableView.tableHeaderView = self.accountHeaderView
+            }
+        } else {
+            accountHeaderView.frame = headerBounds
+            tableView.tableHeaderView = accountHeaderView
+        }
+    }
 }
 
 extension AccountViewController: WalletViewControllerDelegate {

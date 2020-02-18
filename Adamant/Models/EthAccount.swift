@@ -11,8 +11,8 @@ import web3swift
 import struct BigInt.BigUInt
 
 struct EthAccount {
-	let wallet: BIP32Keystore
-	let address: String?
-	var balance: BigUInt?
-	var balanceString: String?
+    let wallet: BIP32Keystore
+    let address: String?
+    var balance: BigUInt?
+    var balanceString: String?
 }

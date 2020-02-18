@@ -10,14 +10,14 @@ import UIKit
 import CoreData
 
 extension String.adamantLocalized {
-	struct transactionList {
-		static let title = NSLocalizedString("TransactionListScene.Title", comment: "TransactionList: scene title")
+    struct transactionList {
+        static let title = NSLocalizedString("TransactionListScene.Title", comment: "TransactionList: scene title")
         static let toChat = NSLocalizedString("TransactionListScene.ToChat", comment: "TransactionList: To Chat button")
         static let startChat = NSLocalizedString("TransactionListScene.StartChat", comment: "TransactionList: Start Chat button")
         static let notFound = NSLocalizedString("TransactionListScene.Error.NotFound", comment: "TransactionList: 'Transactions not found' message.")
         static let noTransactionYet = NSLocalizedString("TransactionListScene.NoTransactionYet", comment: "TransactionList: 'No Transaction Yet' message.")
         
-	}
+    }
 }
 
 // Extensions for a generic classes is limited, so delegates implemented right in class declaration
@@ -85,7 +85,7 @@ class TransactionsListViewControllerBase: UIViewController {
             tableView.setEditing(false, animated: false)
         }
     }
-	
+    
     
     // MARK: - To override
     

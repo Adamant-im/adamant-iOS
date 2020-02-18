@@ -9,15 +9,15 @@
 import Foundation
 
 extension Comparable {
-	func clamped(min: Self, max: Self) -> Self {
-		if self < min {
-			return min
-		}
-		
-		if self > max {
-			return max
-		}
-		
-		return self
-	}
+    func clamped(min: Self, max: Self) -> Self {
+        if self < min {
+            return min
+        }
+        
+        if self > max {
+            return max
+        }
+        
+        return self
+    }
 }

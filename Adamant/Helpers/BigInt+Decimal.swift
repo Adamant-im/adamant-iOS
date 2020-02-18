@@ -10,25 +10,25 @@ import Foundation
 import BigInt
 
 extension BigInt {
-	func asDecimal(exponent: Int) -> Decimal {
-		let decim = Decimal(floatLiteral: Double(self))
-		
-		if exponent != 0 {
-			return Decimal(sign: decim.sign, exponent: exponent, significand: decim)
-		} else {
-			return decim
-		}
-	}
+    func asDecimal(exponent: Int) -> Decimal {
+        let decim = Decimal(floatLiteral: Double(self))
+        
+        if exponent != 0 {
+            return Decimal(sign: decim.sign, exponent: exponent, significand: decim)
+        } else {
+            return decim
+        }
+    }
 }
 
 extension BigUInt {
-	func asDecimal(exponent: Int) -> Decimal {
-		let decim = Decimal(floatLiteral: Double(self))
-		
-		if exponent != 0 {
-			return Decimal(sign: .plus, exponent: exponent, significand: decim)
-		} else {
-			return decim
-		}
-	}
+    func asDecimal(exponent: Int) -> Decimal {
+        let decim = Decimal(floatLiteral: Double(self))
+        
+        if exponent != 0 {
+            return Decimal(sign: .plus, exponent: exponent, significand: decim)
+        } else {
+            return decim
+        }
+    }
 }

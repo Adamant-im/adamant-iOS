@@ -40,11 +40,11 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         currencySymbol = AdmWalletService.currencySymbol
     }
     
-	override func viewDidAppear(_ animated: Bool) {
-		super.viewDidAppear(animated)
-		isOnTop = true
-		markTransfersAsRead()
-	}
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        isOnTop = true
+        markTransfersAsRead()
+    }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)

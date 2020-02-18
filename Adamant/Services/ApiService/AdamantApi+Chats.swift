@@ -10,48 +10,48 @@ import Foundation
 import UIKit
 
 extension AdamantApiService.ApiCommands {
-	static let Chats = (
-		root: "/api/chats",
-		get: "/api/chats/get",
-		normalizeTransaction: "/api/chats/normalize",
-		processTransaction: "/api/chats/process"
-	)
+    static let Chats = (
+        root: "/api/chats",
+        get: "/api/chats/get",
+        normalizeTransaction: "/api/chats/normalize",
+        processTransaction: "/api/chats/process"
+    )
 }
 
 extension AdamantApiService {
-	func getMessageTransactions(address: String, height: Int64?, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
-		// MARK: 1. Prepare params
-		var queryItems: [URLQueryItem] = [URLQueryItem(name: "isIn", value: address),
-										  URLQueryItem(name: "orderBy", value: "timestamp:desc")]
-		if let height = height, height > 0 { queryItems.append(URLQueryItem(name: "fromHeight", value: String(height))) }
-		if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
-		
-		// MARK: 2. Build endpoint
-		let endpoint: URL
-		do {
-			endpoint = try buildUrl(path: ApiCommands.Chats.get, queryItems: queryItems)
-		} catch {
-			let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-			completion(.failure(err))
-			return
-		}
-		
-		// MARK: 3. Send
-		sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
-			switch serverResponse {
-			case .success(let response):
-				if let collection = response.collection {
-					completion(.success(collection))
-				} else {
-					let error = AdamantApiService.translateServerError(response.error)
-					completion(.failure(error))
-				}
-				
-			case .failure(let error):
-				completion(.failure(.networkError(error: error)))
-			}
-		}
-	}
+    func getMessageTransactions(address: String, height: Int64?, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void) {
+        // MARK: 1. Prepare params
+        var queryItems: [URLQueryItem] = [URLQueryItem(name: "isIn", value: address),
+                                          URLQueryItem(name: "orderBy", value: "timestamp:desc")]
+        if let height = height, height > 0 { queryItems.append(URLQueryItem(name: "fromHeight", value: String(height))) }
+        if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
+        
+        // MARK: 2. Build endpoint
+        let endpoint: URL
+        do {
+            endpoint = try buildUrl(path: ApiCommands.Chats.get, queryItems: queryItems)
+        } catch {
+            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+            completion(.failure(err))
+            return
+        }
+        
+        // MARK: 3. Send
+        sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
+            switch serverResponse {
+            case .success(let response):
+                if let collection = response.collection {
+                    completion(.success(collection))
+                } else {
+                    let error = AdamantApiService.translateServerError(response.error)
+                    completion(.failure(error))
+                }
+                
+            case .failure(let error):
+                completion(.failure(.networkError(error: error)))
+            }
+        }
+    }
     
     func sendMessage(senderId: String, recipientId: String, keypair: Keypair, message: String, type: ChatType, nonce: String, amount: Decimal?, completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
         

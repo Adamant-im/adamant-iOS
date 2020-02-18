@@ -9,19 +9,19 @@
 import UIKit
 
 struct SharedCell: Equatable, Hashable {
-	let cellIdentifier: String
-	let defaultXibName: String
-	let defaultRowHeight: CGFloat
-	
-	init(cellIdentifier: String, xibName: String, rowHeight: CGFloat) {
-		self.cellIdentifier = cellIdentifier
-		self.defaultXibName = xibName
-		self.defaultRowHeight = rowHeight
-	}
+    let cellIdentifier: String
+    let defaultXibName: String
+    let defaultRowHeight: CGFloat
+    
+    init(cellIdentifier: String, xibName: String, rowHeight: CGFloat) {
+        self.cellIdentifier = cellIdentifier
+        self.defaultXibName = xibName
+        self.defaultRowHeight = rowHeight
+    }
 }
 
 
 protocol CellFactory: class {
-	func nib(for sharedCell: SharedCell) -> UINib?
-	func cellInstance(for sharedCell: SharedCell) -> UITableViewCell?
+    func nib(for sharedCell: SharedCell) -> UINib?
+    func cellInstance(for sharedCell: SharedCell) -> UITableViewCell?
 }

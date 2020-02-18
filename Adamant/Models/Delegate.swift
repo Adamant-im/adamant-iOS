@@ -141,16 +141,16 @@ extension Block: WrappableCollection {
 
 /*
 {
-	"username": "permit",
-	"address": "U8339394976025567725",
-	"publicKey": "01c5079a2234f69feca1b00daf4ddbd8904e13dfb67ce47c21f26377468706fa",
-	"producedblocks": 11153,
-	"missedblocks": 3,
-	"vote": "13373617430543",
-	"votesWeight": "13373617430543",
-	"rate": 1,
-	"rank": 1,
-	"approval": 0.95,
-	"productivity": 99.97
+    "username": "permit",
+    "address": "U8339394976025567725",
+    "publicKey": "01c5079a2234f69feca1b00daf4ddbd8904e13dfb67ce47c21f26377468706fa",
+    "producedblocks": 11153,
+    "missedblocks": 3,
+    "vote": "13373617430543",
+    "votesWeight": "13373617430543",
+    "rate": 1,
+    "rank": 1,
+    "approval": 0.95,
+    "productivity": 99.97
 }
 */

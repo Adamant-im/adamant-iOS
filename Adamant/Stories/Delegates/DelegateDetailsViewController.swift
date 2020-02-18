@@ -12,9 +12,9 @@ import DateToolsSwift
 
 // MARK: - Localization
 extension String.adamantLocalized {
-	struct delegateDetails {
-		static let title = NSLocalizedString("DelegateDetails.Title", comment: "Delegate details: scene title")
-	}
+    struct delegateDetails {
+        static let title = NSLocalizedString("DelegateDetails.Title", comment: "Delegate details: scene title")
+    }
 }
 
 
@@ -24,7 +24,7 @@ class DelegateDetailsViewController: UIViewController {
     // MARK: - Rows
     fileprivate enum Row: Int {
         case username = 0
-		case rank
+        case rank
         case address
         case publicKey
         case vote
@@ -36,38 +36,38 @@ class DelegateDetailsViewController: UIViewController {
         case forgingTime
         case forged
         case openInExplorer
-		
-		static let total = 12
-		
+        
+        static let total = 12
+        
         var localized: String {
             switch self {
-			case .username: return NSLocalizedString("DelegateDetails.Row.Username", comment: "Delegate Details Screen: Rows title for 'Username'")
-			case .address: return NSLocalizedString("DelegateDetails.Row.Address", comment: "Delegate Details Screen: Rows title for 'Address'")
-			case .publicKey: return NSLocalizedString("DelegateDetails.Row.PublicKey", comment: "Delegate Details Screen: Rows title for 'Public Key'")
-			case .vote: return NSLocalizedString("DelegateDetails.Row.VoteWeight", comment: "Delegate Details Screen: Rows title for 'Vote weight'")
-			case .producedblocks: return NSLocalizedString("DelegateDetails.Row.ProducedBlocks", comment: "Delegate Details Screen: Rows title for 'Produced blocks'")
-			case .missedblocks: return NSLocalizedString("DelegateDetails.Row.MissedBlocks", comment: "Delegate Details Screen: Rows title for 'Missed blocks'")
-			case .rank: return NSLocalizedString("DelegateDetails.Row.Rank", comment: "Delegate Details Screen: Rows title for 'Rank'")
-			case .approval: return NSLocalizedString("DelegateDetails.Row.Approval", comment: "Delegate Details Screen: Rows title for 'Approval'")
-			case .productivity: return NSLocalizedString("DelegateDetails.Row.Productivity", comment: "Delegate Details Screen: Rows title for 'Productivity'")
-			case .forgingTime: return NSLocalizedString("DelegateDetails.Row.ForgingTime", comment: "Delegate Details Screen: Rows title for 'Forging time'")
-			case .forged: return NSLocalizedString("DelegateDetails.Row.Forged", comment: "Delegate Details Screen: Rows title for 'Forged'")
-			case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
-//			case .rate: return NSLocalizedString("DelegateDetails.Row.Rate", comment: "Delegate Details Screen: Rows title for 'Rate'")
+            case .username: return NSLocalizedString("DelegateDetails.Row.Username", comment: "Delegate Details Screen: Rows title for 'Username'")
+            case .address: return NSLocalizedString("DelegateDetails.Row.Address", comment: "Delegate Details Screen: Rows title for 'Address'")
+            case .publicKey: return NSLocalizedString("DelegateDetails.Row.PublicKey", comment: "Delegate Details Screen: Rows title for 'Public Key'")
+            case .vote: return NSLocalizedString("DelegateDetails.Row.VoteWeight", comment: "Delegate Details Screen: Rows title for 'Vote weight'")
+            case .producedblocks: return NSLocalizedString("DelegateDetails.Row.ProducedBlocks", comment: "Delegate Details Screen: Rows title for 'Produced blocks'")
+            case .missedblocks: return NSLocalizedString("DelegateDetails.Row.MissedBlocks", comment: "Delegate Details Screen: Rows title for 'Missed blocks'")
+            case .rank: return NSLocalizedString("DelegateDetails.Row.Rank", comment: "Delegate Details Screen: Rows title for 'Rank'")
+            case .approval: return NSLocalizedString("DelegateDetails.Row.Approval", comment: "Delegate Details Screen: Rows title for 'Approval'")
+            case .productivity: return NSLocalizedString("DelegateDetails.Row.Productivity", comment: "Delegate Details Screen: Rows title for 'Productivity'")
+            case .forgingTime: return NSLocalizedString("DelegateDetails.Row.ForgingTime", comment: "Delegate Details Screen: Rows title for 'Forging time'")
+            case .forged: return NSLocalizedString("DelegateDetails.Row.Forged", comment: "Delegate Details Screen: Rows title for 'Forged'")
+            case .openInExplorer: return NSLocalizedString("TransactionDetailsScene.Row.Explorer", comment: "Transaction details: 'Open transaction in explorer' row.")
+//            case .rate: return NSLocalizedString("DelegateDetails.Row.Rate", comment: "Delegate Details Screen: Rows title for 'Rate'")
             }
         }
-		
-		func indexPathFor(section: Int) -> IndexPath {
-			return IndexPath(item: rawValue, section: section)
-		}
-		
-		var image: UIImage? {
-			switch self {
-			case .openInExplorer: return #imageLiteral(resourceName: "row_explorer")
-				
-			default: return nil
-			}
-		}
+        
+        func indexPathFor(section: Int) -> IndexPath {
+            return IndexPath(item: rawValue, section: section)
+        }
+        
+        var image: UIImage? {
+            switch self {
+            case .openInExplorer: return #imageLiteral(resourceName: "row_explorer")
+                
+            default: return nil
+            }
+        }
     }
     
     // MARK: - Dependencies
@@ -79,249 +79,249 @@ class DelegateDetailsViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     
     // MARK: - Properties
-	private let delegateUrl = "https://explorer.adamant.im/delegate/"
-	private let cellIdentifier = "cell"
-	
+    private let delegateUrl = "https://explorer.adamant.im/delegate/"
+    private let cellIdentifier = "cell"
+    
     var delegate: Delegate?
     
     private let autoupdateInterval: TimeInterval = 5.0
     
     weak var timer: Timer?
 
-	lazy var percentFormatter: NumberFormatter = {
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .percent
-		formatter.minimumFractionDigits = 0
-		formatter.maximumFractionDigits = 2
-		return formatter
-	}()
-	
-	lazy var durationFormatter: DateComponentsFormatter = {
-		let formatter = DateComponentsFormatter()
-		formatter.allowedUnits = [ .hour, .minute, .second ]
-		formatter.unitsStyle = .brief
-		formatter.zeroFormattingBehavior = .dropLeading
+    lazy var percentFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .percent
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }()
+    
+    lazy var durationFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [ .hour, .minute, .second ]
+        formatter.unitsStyle = .brief
+        formatter.zeroFormattingBehavior = .dropLeading
 
-		return formatter
-	}()
-	
-	private var forged: Decimal? = nil
-	private var forgingTime: TimeInterval? = nil
-	
-	// Double error fix
-	private var prevApiError: (date: Date, error: ApiServiceError)? = nil
-	
-	
-	// MARK: - Lifecycle
-	
+        return formatter
+    }()
+    
+    private var forged: Decimal? = nil
+    private var forgingTime: TimeInterval? = nil
+    
+    // Double error fix
+    private var prevApiError: (date: Date, error: ApiServiceError)? = nil
+    
+    
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         if let delegate = delegate {
-			refreshData(with: delegate)
-			navigationItem.title = delegate.username
-		} else {
-			navigationItem.title = String.adamantLocalized.delegateDetails.title
-		}
+            refreshData(with: delegate)
+            navigationItem.title = delegate.username
+        } else {
+            navigationItem.title = String.adamantLocalized.delegateDetails.title
+        }
     }
-	
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-		
-		if let indexPath = tableView.indexPathForSelectedRow {
-			tableView.deselectRow(at: indexPath, animated: true)
-		}
-	}
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let indexPath = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
+    }
 }
 
 
 // MARK: - TableView data & delegate
 extension DelegateDetailsViewController: UITableViewDelegate, UITableViewDataSource {
-	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		if delegate != nil {
-			return Row.total
-		} else {
-			return 0
-		}
-	}
-	
-	func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-		return UIView()
-	}
-	
-	func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
-		return true
-	}
-	
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if delegate != nil {
+            return Row.total
+        } else {
+            return 0
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    
+    func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		guard let row = Row(rawValue: indexPath.row) else {
-			return
-		}
-		
-		switch row {
-		case .openInExplorer:
-			guard let address = delegate?.address, let url = URL(string: delegateUrl + address) else {
-				return
-			}
-			
-			let safari = SFSafariViewController(url: url)
+        guard let row = Row(rawValue: indexPath.row) else {
+            return
+        }
+        
+        switch row {
+        case .openInExplorer:
+            guard let address = delegate?.address, let url = URL(string: delegateUrl + address) else {
+                return
+            }
+            
+            let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
             safari.modalPresentationStyle = .overFullScreen
-			present(safari, animated: true, completion: nil)
-			
-		default:
-			guard let cell = tableView.cellForRow(at: indexPath), let value = cell.detailTextLabel?.text, value.count > 0 else {
-				tableView.deselectRow(at: indexPath, animated: true)
-				return
-			}
-			
-			let completion = { [weak self] in
-				guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
-					return
-				}
-				tableView.deselectRow(at: indexPath, animated: true)
-			}
-			
-			dialogService.presentShareAlertFor(string: value,
-											   types: [.copyToPasteboard, .share],
-											   excludedActivityTypes: nil,
+            present(safari, animated: true, completion: nil)
+            
+        default:
+            guard let cell = tableView.cellForRow(at: indexPath), let value = cell.detailTextLabel?.text, value.count > 0 else {
+                tableView.deselectRow(at: indexPath, animated: true)
+                return
+            }
+            
+            let completion = { [weak self] in
+                guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
+                    return
+                }
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+            
+            dialogService.presentShareAlertFor(string: value,
+                                               types: [.copyToPasteboard, .share],
+                                               excludedActivityTypes: nil,
                                                animated: true, from: cell,
-											   completion: completion)
-		}
-	}
+                                               completion: completion)
+        }
+    }
 }
 
 
 // MARK: - Cells
 extension DelegateDetailsViewController {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		guard let delegate = delegate, let row = Row(rawValue: indexPath.row) else {
-			return UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
-		}
-		
-		let cell: UITableViewCell
-		if let c = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
-			cell = c
-			cell.accessoryType = .none
-		} else {
-			cell = UITableViewCell(style: .value1, reuseIdentifier: cellIdentifier)
-		}
-		
-		cell.textLabel?.text = row.localized
-		cell.accessoryType = .none
-		cell.imageView?.image = row.image
+        guard let delegate = delegate, let row = Row(rawValue: indexPath.row) else {
+            return UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
+        }
         
-		switch row {
-		case .username:
-			cell.detailTextLabel?.text = delegate.username
-			
-		case .address:
-			cell.detailTextLabel?.text = delegate.address
-			
-		case .publicKey:
-			cell.detailTextLabel?.text = delegate.publicKey
-			
-		case .vote:
-			let weight = Decimal(string: delegate.voteFair)?.shiftedFromAdamant() ?? 0
-			cell.detailTextLabel?.text = AdamantBalanceFormat.short.format(weight)
-			
-		case .producedblocks:
-			cell.detailTextLabel?.text = String(delegate.producedblocks)
-			
-		case .missedblocks:
-			cell.detailTextLabel?.text = String(delegate.missedblocks)
-			
-		case .rank:
-			cell.detailTextLabel?.text = String(delegate.rank)
-			
-		case .approval:
-			let text = percentFormatter.string(for: (delegate.approval / 100.0))
-			cell.detailTextLabel?.text = text
-			
-		case .productivity:
-			let text = percentFormatter.string(for: (delegate.productivity / 100.0))
-			cell.detailTextLabel?.text = text
-			
-		case .openInExplorer:
-			cell.accessoryType = .disclosureIndicator
-			cell.detailTextLabel?.text = nil
-			
-		case .forgingTime:
-			if let forgingTime = forgingTime {
-				if forgingTime > 0 {
-					cell.detailTextLabel?.text = durationFormatter.string(from: forgingTime)
-				} else {
-					cell.detailTextLabel?.text = NSLocalizedString("Just now", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
-				}
-				
-			} else {
-				cell.detailTextLabel?.text = ""
-			}
-			
-		case .forged:
-			cell.detailTextLabel?.text = AdamantBalanceFormat.short.defaultFormatter.string(for: forged)
-		}
-		
-		return cell
-	}
+        let cell: UITableViewCell
+        if let c = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
+            cell = c
+            cell.accessoryType = .none
+        } else {
+            cell = UITableViewCell(style: .value1, reuseIdentifier: cellIdentifier)
+        }
+        
+        cell.textLabel?.text = row.localized
+        cell.accessoryType = .none
+        cell.imageView?.image = row.image
+        
+        switch row {
+        case .username:
+            cell.detailTextLabel?.text = delegate.username
+            
+        case .address:
+            cell.detailTextLabel?.text = delegate.address
+            
+        case .publicKey:
+            cell.detailTextLabel?.text = delegate.publicKey
+            
+        case .vote:
+            let weight = Decimal(string: delegate.voteFair)?.shiftedFromAdamant() ?? 0
+            cell.detailTextLabel?.text = AdamantBalanceFormat.short.format(weight)
+            
+        case .producedblocks:
+            cell.detailTextLabel?.text = String(delegate.producedblocks)
+            
+        case .missedblocks:
+            cell.detailTextLabel?.text = String(delegate.missedblocks)
+            
+        case .rank:
+            cell.detailTextLabel?.text = String(delegate.rank)
+            
+        case .approval:
+            let text = percentFormatter.string(for: (delegate.approval / 100.0))
+            cell.detailTextLabel?.text = text
+            
+        case .productivity:
+            let text = percentFormatter.string(for: (delegate.productivity / 100.0))
+            cell.detailTextLabel?.text = text
+            
+        case .openInExplorer:
+            cell.accessoryType = .disclosureIndicator
+            cell.detailTextLabel?.text = nil
+            
+        case .forgingTime:
+            if let forgingTime = forgingTime {
+                if forgingTime > 0 {
+                    cell.detailTextLabel?.text = durationFormatter.string(from: forgingTime)
+                } else {
+                    cell.detailTextLabel?.text = NSLocalizedString("Just now", tableName: "DateTools", bundle: Bundle.dateToolsBundle(), value: "", comment: "")
+                }
+                
+            } else {
+                cell.detailTextLabel?.text = ""
+            }
+            
+        case .forged:
+            cell.detailTextLabel?.text = AdamantBalanceFormat.short.defaultFormatter.string(for: forged)
+        }
+        
+        return cell
+    }
 }
 
 
 // MARK: - Tools
 extension DelegateDetailsViewController {
-	private func refreshData(with delegate: Delegate) {
-		// Get forged amount
-		apiService.getForgedByAccount(publicKey: delegate.publicKey) { [weak self] result in
-			switch result {
-			case .success(let details):
-				self?.forged = details.forged
-				
-				DispatchQueue.main.async {
-					guard let tableView = self?.tableView else {
-						return
-					}
-					
-					let indexPath = Row.forged.indexPathFor(section: 0)
-					tableView.reloadRows(at: [indexPath], with: .none)
-				}
-			case .failure(let error):
-				self?.apiServiceFailed(with: error)
-			}
-		}
-		
-		// Get forging time
-		apiService.getForgingTime(for: delegate) { [weak self] result in
-			switch result {
-			case .success(let seconds):
-				if seconds >= 0 {
-					self?.forgingTime = TimeInterval(exactly: seconds)
-				} else {
-					self?.forgingTime = nil
-				}
-				
-				DispatchQueue.main.async {
-					guard let tableView = self?.tableView else {
-						return
-					}
-					
-					let indexPath = Row.forgingTime.indexPathFor(section: 0)
-					tableView.reloadRows(at: [indexPath], with: .none)
-				}
-				
-			case .failure(let error):
-				self?.apiServiceFailed(with: error)
-			}
-		}
-	}
-	
-	private func apiServiceFailed(with error: ApiServiceError) {
-		DispatchQueue.main.async { [unowned self] in
-			if let prevApiError = self.prevApiError, Date().timeIntervalSince(prevApiError.date) < 1, prevApiError.error == error { // if less than a second ago, return
-				return
-			}
-			
-			self.prevApiError = (date: Date(), error: error)
-			self.dialogService.showRichError(error: error)
-		}
-	}
+    private func refreshData(with delegate: Delegate) {
+        // Get forged amount
+        apiService.getForgedByAccount(publicKey: delegate.publicKey) { [weak self] result in
+            switch result {
+            case .success(let details):
+                self?.forged = details.forged
+                
+                DispatchQueue.main.async {
+                    guard let tableView = self?.tableView else {
+                        return
+                    }
+                    
+                    let indexPath = Row.forged.indexPathFor(section: 0)
+                    tableView.reloadRows(at: [indexPath], with: .none)
+                }
+            case .failure(let error):
+                self?.apiServiceFailed(with: error)
+            }
+        }
+        
+        // Get forging time
+        apiService.getForgingTime(for: delegate) { [weak self] result in
+            switch result {
+            case .success(let seconds):
+                if seconds >= 0 {
+                    self?.forgingTime = TimeInterval(exactly: seconds)
+                } else {
+                    self?.forgingTime = nil
+                }
+                
+                DispatchQueue.main.async {
+                    guard let tableView = self?.tableView else {
+                        return
+                    }
+                    
+                    let indexPath = Row.forgingTime.indexPathFor(section: 0)
+                    tableView.reloadRows(at: [indexPath], with: .none)
+                }
+                
+            case .failure(let error):
+                self?.apiServiceFailed(with: error)
+            }
+        }
+    }
+    
+    private func apiServiceFailed(with error: ApiServiceError) {
+        DispatchQueue.main.async { [unowned self] in
+            if let prevApiError = self.prevApiError, Date().timeIntervalSince(prevApiError.date) < 1, prevApiError.error == error { // if less than a second ago, return
+                return
+            }
+            
+            self.prevApiError = (date: Date(), error: error)
+            self.dialogService.showRichError(error: error)
+        }
+    }
 }

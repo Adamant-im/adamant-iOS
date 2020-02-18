@@ -9,7 +9,7 @@
 import Foundation
 
 enum AddressValidationResult {
-	case valid
-	case system
-	case invalid
+    case valid
+    case system
+    case invalid
 }

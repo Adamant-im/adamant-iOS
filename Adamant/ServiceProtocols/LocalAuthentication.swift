@@ -9,26 +9,26 @@
 import Foundation
 
 enum BiometryType {
-	case none, touchID, faceID
-	
-	var localized: String {
-		switch self {
-		case .none: return "None"
-		case .touchID: return "Touch ID"
-		case .faceID: return "Face ID"
-		}
-	}
+    case none, touchID, faceID
+    
+    var localized: String {
+        switch self {
+        case .none: return "None"
+        case .touchID: return "Touch ID"
+        case .faceID: return "Face ID"
+        }
+    }
 }
 
 enum AuthenticationResult {
-	case success
-	case cancel
-	case fallback
-	case failed
+    case success
+    case cancel
+    case fallback
+    case failed
 }
 
 protocol LocalAuthentication: class {
-	var biometryType: BiometryType { get }
-	
-	func authorizeUser(reason: String, completion: @escaping (AuthenticationResult) -> Void)
+    var biometryType: BiometryType { get }
+    
+    func authorizeUser(reason: String, completion: @escaping (AuthenticationResult) -> Void)
 }

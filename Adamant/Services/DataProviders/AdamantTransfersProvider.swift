@@ -10,113 +10,113 @@ import Foundation
 import CoreData
 
 class AdamantTransfersProvider: TransfersProvider {
-	// MARK: Dependencies
-	var apiService: ApiService!
-	var stack: CoreDataStack!
+    // MARK: Dependencies
+    var apiService: ApiService!
+    var stack: CoreDataStack!
     var adamantCore: AdamantCore!
-	var accountService: AccountService!
-	var accountsProvider: AccountsProvider!
-	var securedStore: SecuredStore!
+    var accountService: AccountService!
+    var accountsProvider: AccountsProvider!
+    var securedStore: SecuredStore!
     weak var chatsProvider: ChatsProvider?
-	
-	// MARK: Properties
-	let transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
-	
-	private(set) var state: State = .empty
-	private(set) var isInitiallySynced: Bool = false
-	private(set) var receivedLastHeight: Int64?
-	private(set) var readedLastHeight: Int64?
+    
+    // MARK: Properties
+    let transferFee: Decimal = Decimal(sign: .plus, exponent: -1, significand: 5)
+    
+    private(set) var state: State = .empty
+    private(set) var isInitiallySynced: Bool = false
+    private(set) var receivedLastHeight: Int64?
+    private(set) var readedLastHeight: Int64?
     private(set) var hasTransactions: Bool = false
     private let apiTransactions = 100
     
     private let processingHeightSemaphore = DispatchSemaphore(value: 1)
-	
-	private let processingQueue = DispatchQueue(label: "im.adamant.processing.transfers", qos: .utility, attributes: [.concurrent])
+    
+    private let processingQueue = DispatchQueue(label: "im.adamant.processing.transfers", qos: .utility, attributes: [.concurrent])
     private let sendingQueue = DispatchQueue(label: "im.adamant.sending.transfers", qos: .utility, attributes: [.concurrent])
-	private let stateSemaphore = DispatchSemaphore(value: 1)
-	
+    private let stateSemaphore = DispatchSemaphore(value: 1)
+    
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
     private let unconfirmedsSemaphore = DispatchSemaphore(value: 1)
     
-	// MARK: Tools
-	
-	/// Free stateSemaphore before calling this method, or you will deadlock.
-	private func setState(_ state: State, previous prevState: State, notify: Bool = true) {
-		stateSemaphore.wait()
-		self.state = state
-		stateSemaphore.signal()
-		
-		if notify {
-			switch prevState {
-			case .failedToUpdate(_):
-				NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
-																													 AdamantUserInfoKey.TransfersProvider.prevState: prevState])
-				
-			default:
-				if prevState != self.state {
-					NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
-																														 AdamantUserInfoKey.TransfersProvider.prevState: prevState])
-				}
-			}
-		}
-	}
-	
-	
-	// MARK: Lifecycle
-	init() {
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
-			guard let store = self?.securedStore else {
-				return
-			}
-			
-			guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
-				store.remove(StoreKey.transfersProvider.address)
-				store.remove(StoreKey.transfersProvider.receivedLastHeight)
-				store.remove(StoreKey.transfersProvider.readedLastHeight)
-				self?.dropStateData()
-				return
-			}
-			
-			if let savedAddress = store.get(StoreKey.transfersProvider.address), savedAddress == loggedAddress {
-				if let raw = store.get(StoreKey.transfersProvider.readedLastHeight), let h = Int64(raw) {
-					self?.readedLastHeight = h
-				}
-			} else {
-				store.remove(StoreKey.transfersProvider.receivedLastHeight)
-				store.remove(StoreKey.transfersProvider.readedLastHeight)
-				self?.dropStateData()
-				store.set(loggedAddress, for: StoreKey.transfersProvider.address)
-			}
-			
-			self?.update()
-		}
-		
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-			// Drop everything
-			self?.reset()
-			
-			// BackgroundFetch
-			self?.dropStateData()
-		}
-	}
-	
-	deinit {
-		NotificationCenter.default.removeObserver(self)
-	}
+    // MARK: Tools
+    
+    /// Free stateSemaphore before calling this method, or you will deadlock.
+    private func setState(_ state: State, previous prevState: State, notify: Bool = true) {
+        stateSemaphore.wait()
+        self.state = state
+        stateSemaphore.signal()
+        
+        if notify {
+            switch prevState {
+            case .failedToUpdate(_):
+                NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
+                                                                                                                     AdamantUserInfoKey.TransfersProvider.prevState: prevState])
+                
+            default:
+                if prevState != self.state {
+                    NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
+                                                                                                                         AdamantUserInfoKey.TransfersProvider.prevState: prevState])
+                }
+            }
+        }
+    }
+    
+    
+    // MARK: Lifecycle
+    init() {
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
+            guard let store = self?.securedStore else {
+                return
+            }
+            
+            guard let loggedAddress = notification.userInfo?[AdamantUserInfoKey.AccountService.loggedAccountAddress] as? String else {
+                store.remove(StoreKey.transfersProvider.address)
+                store.remove(StoreKey.transfersProvider.receivedLastHeight)
+                store.remove(StoreKey.transfersProvider.readedLastHeight)
+                self?.dropStateData()
+                return
+            }
+            
+            if let savedAddress = store.get(StoreKey.transfersProvider.address), savedAddress == loggedAddress {
+                if let raw = store.get(StoreKey.transfersProvider.readedLastHeight), let h = Int64(raw) {
+                    self?.readedLastHeight = h
+                }
+            } else {
+                store.remove(StoreKey.transfersProvider.receivedLastHeight)
+                store.remove(StoreKey.transfersProvider.readedLastHeight)
+                self?.dropStateData()
+                store.set(loggedAddress, for: StoreKey.transfersProvider.address)
+            }
+            
+            self?.update()
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
+            // Drop everything
+            self?.reset()
+            
+            // BackgroundFetch
+            self?.dropStateData()
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
 }
 
 
 // MARK: - DataProvider
 extension AdamantTransfersProvider {
-	func reload() {
-		reset(notify: false)
-		
-		update()
-	}
-	
-	func update() {
-		self.update(completion: nil)
-	}
+    func reload() {
+        reset(notify: false)
+        
+        update()
+    }
+    
+    func update() {
+        self.update(completion: nil)
+    }
     
     func update(completion: ((TransfersProviderResult?) -> Void)?) {
         stateSemaphore.wait()
@@ -153,7 +153,7 @@ extension AdamantTransfersProvider {
             }
             
             switch state {
-			case .empty, .updating, .upToDate:
+            case .empty, .updating, .upToDate:
                 self?.setState(.upToDate, previous: prevState)
                 
                 if prevHeight != self?.receivedLastHeight, let h = self?.receivedLastHeight {
@@ -198,59 +198,59 @@ extension AdamantTransfersProvider {
                 }
                 
                 completion?(.success)
-				
-				
-			case .failedToUpdate(let error): // Processing failed
-				let err: TransfersProviderError
-				
-				switch error {
-				case let error as ApiServiceError:
-					switch error {
-					case .notLogged:
-						err = .notLogged
-						
-					case .accountNotFound:
-						err = .accountNotFound(address: address)
-						
-					case .serverError(_):
-						err = .serverError(error)
-						
-					case .internalError(let message, _):
-						err = .dependencyError(message: message)
-						
-					case .networkError(_):
-						err = .networkError
-					}
-					
-				default:
-					err = TransfersProviderError.internalError(message: String.adamantLocalized.sharedErrors.internalError(message: error.localizedDescription), error: error)
-				}
-				
-				completion?(.failure(err))
+                
+                
+            case .failedToUpdate(let error): // Processing failed
+                let err: TransfersProviderError
+                
+                switch error {
+                case let error as ApiServiceError:
+                    switch error {
+                    case .notLogged:
+                        err = .notLogged
+                        
+                    case .accountNotFound:
+                        err = .accountNotFound(address: address)
+                        
+                    case .serverError(_):
+                        err = .serverError(error)
+                        
+                    case .internalError(let message, _):
+                        err = .dependencyError(message: message)
+                        
+                    case .networkError(_):
+                        err = .networkError
+                    }
+                    
+                default:
+                    err = TransfersProviderError.internalError(message: String.adamantLocalized.sharedErrors.internalError(message: error.localizedDescription), error: error)
+                }
+                
+                completion?(.failure(err))
             }
         }
     }
-	
-	func reset() {
-		reset(notify: true)
-	}
-	
-	private func reset(notify: Bool) {
+    
+    func reset() {
+        reset(notify: true)
+    }
+    
+    private func reset(notify: Bool) {
         hasTransactions = false
-		isInitiallySynced = false
-		let prevState = self.state
-		setState(.updating, previous: prevState, notify: false)	// Block update calls
-		
-		// Drop props
-		receivedLastHeight = nil
-		readedLastHeight = nil
-		
-		// Drop store
-		securedStore.remove(StoreKey.transfersProvider.address)
-		securedStore.remove(StoreKey.transfersProvider.receivedLastHeight)
-		securedStore.remove(StoreKey.transfersProvider.readedLastHeight)
-		
-		// Drop CoreData
+        isInitiallySynced = false
+        let prevState = self.state
+        setState(.updating, previous: prevState, notify: false)    // Block update calls
+        
+        // Drop props
+        receivedLastHeight = nil
+        readedLastHeight = nil
+        
+        // Drop store
+        securedStore.remove(StoreKey.transfersProvider.address)
+        securedStore.remove(StoreKey.transfersProvider.receivedLastHeight)
+        securedStore.remove(StoreKey.transfersProvider.readedLastHeight)
+        
+        // Drop CoreData
 //        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
 //        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 //        context.parent = stack.container.viewContext
@@ -262,47 +262,47 @@ extension AdamantTransfersProvider {
 //
 //            try? context.save()
 //        }
-		
-		// Set state
-		setState(.empty, previous: prevState, notify: notify)
-	}
+        
+        // Set state
+        setState(.empty, previous: prevState, notify: notify)
+    }
 }
 
 
 // MARK: - TransfersProvider
 extension AdamantTransfersProvider {
-	// MARK: Controllers
-	func transfersController() -> NSFetchedResultsController<TransferTransaction> {
-		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
-		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false),
-								   NSSortDescriptor(key: "transactionId", ascending: false)]
-		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-		
-		return controller
-	}
-	
-	func transfersController(for account: CoreDataAccount) -> NSFetchedResultsController<TransferTransaction> {
-		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
-		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false),
-								   NSSortDescriptor(key: "transactionId", ascending: false)]
-		request.predicate = NSPredicate(format: "partner = %@", account)
-		
-		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-		try! controller.performFetch()
-		return controller
-	}
-	
-	func unreadTransfersController() -> NSFetchedResultsController<TransferTransaction> {
-		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
-		request.predicate = NSPredicate(format: "isUnread == true")
-		request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false),
-								   NSSortDescriptor(key: "transactionId", ascending: false)]
-		let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-		
-		return controller
-	}
-	
-	// MARK: Sending Funds
+    // MARK: Controllers
+    func transfersController() -> NSFetchedResultsController<TransferTransaction> {
+        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false),
+                                   NSSortDescriptor(key: "transactionId", ascending: false)]
+        let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        
+        return controller
+    }
+    
+    func transfersController(for account: CoreDataAccount) -> NSFetchedResultsController<TransferTransaction> {
+        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false),
+                                   NSSortDescriptor(key: "transactionId", ascending: false)]
+        request.predicate = NSPredicate(format: "partner = %@", account)
+        
+        let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        try! controller.performFetch()
+        return controller
+    }
+    
+    func unreadTransfersController() -> NSFetchedResultsController<TransferTransaction> {
+        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+        request.predicate = NSPredicate(format: "isUnread == true")
+        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false),
+                                   NSSortDescriptor(key: "transactionId", ascending: false)]
+        let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        
+        return controller
+    }
+    
+    // MARK: Sending Funds
     
     // Wrapper
     func transferFunds(toAddress recipient: String, amount: Decimal, comment: String?, completion: @escaping (TransfersProviderTransferResult) -> Void) {
@@ -450,10 +450,10 @@ extension AdamantTransfersProvider {
     
     private func transferFundsInternal(toAddress recipient: String, amount: Decimal, completion: @escaping (TransfersProviderTransferResult) -> Void) {
         // MARK: 0. Prepare
-		guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
-			completion(.failure(.notLogged))
-			return
-		}
+        guard let loggedAccount = accountService.account, let keypair = accountService.keypair else {
+            completion(.failure(.notLogged))
+            return
+        }
         
         guard loggedAccount.balance > amount + transferFee else {
             completion(.failure(.notEnoughMoney))
@@ -574,9 +574,9 @@ extension AdamantTransfersProvider {
         }
         
         // MARK: 5. Send
-		apiService.transferFunds(sender: loggedAccount.address, recipient: recipient, amount: amount, keypair: keypair) { result in
-			switch result {
-			case .success(let id):
+        apiService.transferFunds(sender: loggedAccount.address, recipient: recipient, amount: amount, keypair: keypair) { result in
+            switch result {
+            case .success(let id):
                 // Update ID with recieved, add to unconfirmed transactions.
                 transaction.transactionId = String(id)
                 
@@ -598,91 +598,91 @@ extension AdamantTransfersProvider {
                 } else {
                     completion(.failure(.internalError(message: "Failed to get transaction in viewContext", error: nil)))
                 }
-				
-			case .failure(let error):
-				completion(.failure(.serverError(error)))
-			}
-		}
-	}
-	
-	// MARK: Getting & refreshing transfers
-	
-	/// Search transaction in local storage
-	///
-	/// - Parameter id: Transacton ID
-	/// - Returns: Transaction, if found
-	func getTransfer(id: String) -> TransferTransaction? {
-		let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
-		request.predicate = NSPredicate(format: "transactionId == %@", String(id))
-		request.fetchLimit = 1
-		
-		do {
-			let result = try stack.container.viewContext.fetch(request)
-			return result.first
-		} catch {
-			return nil
-		}
-	}
-	
-	
-	/// Call Server, check if transaction updated
-	///
-	/// - Parameters:
-	///   - id: Transaction ID
-	///   - completion: callback
-	func refreshTransfer(id: String, completion: @escaping (TransfersProviderResult) -> Void) {
-		guard let transfer = getTransfer(id: id) else {
-			completion(.failure(.transactionNotFound(id: id)))
-			return
-		}
-		
-		guard let intId = UInt64(id) else {
-			completion(.failure(.internalError(message: "Can't parse transaction id: \(id)", error: nil)))
-			return
-		}
-		
-		apiService.getTransaction(id: intId) { result in
-			switch result {
-			case .success(let transaction):
-				guard transfer.confirmations != transaction.confirmations else {
-					completion(.success)
-					return
-				}
-				
-				// Update transaction
-				
-				let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-				context.parent = self.stack.container.viewContext
-				
-				guard let trsfr = context.object(with: transfer.objectID) as? TransferTransaction else {
-					completion(.failure(.internalError(message: "Failed to update transaction: CoreData context changed", error: nil)))
-					return
-				}
-				
-				trsfr.confirmations = transaction.confirmations
-				
-				do {
-					try context.save()
-					completion(.success)
-				} catch {
-					completion(.failure(.internalError(message: "Failed saving changes to CoreData: \(error.localizedDescription)", error: error)))
-				}
-				
-			case .failure(let error):
-				completion(.failure(.serverError(error)))
-			}
-		}
-	}
+                
+            case .failure(let error):
+                completion(.failure(.serverError(error)))
+            }
+        }
+    }
+    
+    // MARK: Getting & refreshing transfers
+    
+    /// Search transaction in local storage
+    ///
+    /// - Parameter id: Transacton ID
+    /// - Returns: Transaction, if found
+    func getTransfer(id: String) -> TransferTransaction? {
+        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        
+        do {
+            let result = try stack.container.viewContext.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
+    
+    
+    /// Call Server, check if transaction updated
+    ///
+    /// - Parameters:
+    ///   - id: Transaction ID
+    ///   - completion: callback
+    func refreshTransfer(id: String, completion: @escaping (TransfersProviderResult) -> Void) {
+        guard let transfer = getTransfer(id: id) else {
+            completion(.failure(.transactionNotFound(id: id)))
+            return
+        }
+        
+        guard let intId = UInt64(id) else {
+            completion(.failure(.internalError(message: "Can't parse transaction id: \(id)", error: nil)))
+            return
+        }
+        
+        apiService.getTransaction(id: intId) { result in
+            switch result {
+            case .success(let transaction):
+                guard transfer.confirmations != transaction.confirmations else {
+                    completion(.success)
+                    return
+                }
+                
+                // Update transaction
+                
+                let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+                context.parent = self.stack.container.viewContext
+                
+                guard let trsfr = context.object(with: transfer.objectID) as? TransferTransaction else {
+                    completion(.failure(.internalError(message: "Failed to update transaction: CoreData context changed", error: nil)))
+                    return
+                }
+                
+                trsfr.confirmations = transaction.confirmations
+                
+                do {
+                    try context.save()
+                    completion(.success)
+                } catch {
+                    completion(.failure(.internalError(message: "Failed saving changes to CoreData: \(error.localizedDescription)", error: error)))
+                }
+                
+            case .failure(let error):
+                completion(.failure(.serverError(error)))
+            }
+        }
+    }
 }
 
 
 // MARK: - Data processing
 extension AdamantTransfersProvider {
-	private enum ProcessingResult {
-		case success(new: Int)
-		case accountNotFound(address: String)
-		case error(Error)
-	}
+    private enum ProcessingResult {
+        case success(new: Int)
+        case accountNotFound(address: String)
+        case error(Error)
+    }
     
     /// Get transactions
     ///
@@ -747,7 +747,7 @@ extension AdamantTransfersProvider {
             }
         }
     }
-	
+    
     private func processRawTransactions(_ transactions: [Transaction],
                                         currentAddress address: String,
                                         context: NSManagedObjectContext,
@@ -806,7 +806,7 @@ extension AdamantTransfersProvider {
                             errors.append(ProcessingResult.error(error))
                         }
                     }
-					
+                    
                 case .networkError(let error), .serverError(let error):
                     errors.append(ProcessingResult.error(error))
                     partnersGroup.leave() // Leave 1
@@ -947,9 +947,9 @@ extension AdamantTransfersProvider {
                     viewContextChatrooms.forEach { $0.updateLastTransaction() }
                 }
             } catch {
-				print("TransferProvider: Failed to save changes to CoreData: \(error.localizedDescription)")
+                print("TransferProvider: Failed to save changes to CoreData: \(error.localizedDescription)")
             }
         }
     }
-	
+    
 }

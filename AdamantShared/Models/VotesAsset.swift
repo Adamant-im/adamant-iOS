@@ -10,14 +10,14 @@ import Foundation
 
 struct VotesAsset {
     let votes: [String]
-	
-	init(votes: [String]) {
-		self.votes = votes
-	}
-	
-	init(votes: [DelegateVote]) {
-		self.votes = votes.map { $0.asString() }
-	}
+    
+    init(votes: [String]) {
+        self.votes = votes
+    }
+    
+    init(votes: [DelegateVote]) {
+        self.votes = votes.map { $0.asString() }
+    }
 }
 
 extension VotesAsset: Codable {
@@ -26,8 +26,8 @@ extension VotesAsset: Codable {
         self.votes = try container.decode([String].self)
     }
     
-	func encode(to encoder: Encoder) throws {
-		var container = encoder.singleValueContainer()
-		try container.encode(votes)
-	}
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(votes)
+    }
 }

@@ -14,62 +14,62 @@ import Alamofire
 import BigInt
 
 extension Web3Error {
-	func asWalletServiceError() -> WalletServiceError {
-		switch self {
-		case .connectionError:
-			return .networkError
-			
-		case .nodeError(let message):
-			return .remoteServiceError(message: message)
-			
+    func asWalletServiceError() -> WalletServiceError {
+        switch self {
+        case .connectionError:
+            return .networkError
+            
+        case .nodeError(let message):
+            return .remoteServiceError(message: message)
+            
         case .generalError(_ as URLError):
             return .networkError
             
-		case .generalError(let error),
-			 .keystoreError(let error as Error):
-			return .internalError(message: error.localizedDescription, error: error)
-			
-		case .inputError(let message), .processingError(let message):
-			return .internalError(message: message, error: nil)
-			
-		case .transactionSerializationError,
-			 .dataError,
-			 .walletError,
-			 .unknownError:
-			return .internalError(message: "Unknown error", error: nil)
-		}
-	}
+        case .generalError(let error),
+             .keystoreError(let error as Error):
+            return .internalError(message: error.localizedDescription, error: error)
+            
+        case .inputError(let message), .processingError(let message):
+            return .internalError(message: message, error: nil)
+            
+        case .transactionSerializationError,
+             .dataError,
+             .walletError,
+             .unknownError:
+            return .internalError(message: "Unknown error", error: nil)
+        }
+    }
 }
 
 class EthWalletService: WalletService {
-	// MARK: - Constants
-	let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
-	
-	static let currencySymbol = "ETH"
-	static let currencyLogo = #imageLiteral(resourceName: "wallet_eth")
-	static let currencyExponent = -18
-	
-	private (set) var transactionFee: Decimal = 0.0
-	
-	static let transferGas: Decimal = 21000
-	static let kvsAddress = "eth:address"
+    // MARK: - Constants
+    let addressRegex = try! NSRegularExpression(pattern: "^0x[a-fA-F0-9]{40}$")
+    
+    static let currencySymbol = "ETH"
+    static let currencyLogo = #imageLiteral(resourceName: "wallet_eth")
+    static let currencyExponent = -18
+    
+    private (set) var transactionFee: Decimal = 0.0
+    
+    static let transferGas: Decimal = 21000
+    static let kvsAddress = "eth:address"
     
     static let walletPath = "m/44'/60'/3'/1"
-	static let walletPassword = ""
-	
-	// MARK: - Dependencies
-	weak var accountService: AccountService!
-	var apiService: ApiService!
-	var dialogService: DialogService!
-	var router: Router!
-	
-	
-	// MARK: - Notifications
-	let walletUpdatedNotification = Notification.Name("adamant.ethWallet.walletUpdated")
-	let serviceEnabledChanged = Notification.Name("adamant.ethWallet.enabledChanged")
-	let transactionFeeUpdated = Notification.Name("adamant.ethWallet.feeUpdated")
+    static let walletPassword = ""
+    
+    // MARK: - Dependencies
+    weak var accountService: AccountService!
+    var apiService: ApiService!
+    var dialogService: DialogService!
+    var router: Router!
+    
+    
+    // MARK: - Notifications
+    let walletUpdatedNotification = Notification.Name("adamant.ethWallet.walletUpdated")
+    let serviceEnabledChanged = Notification.Name("adamant.ethWallet.enabledChanged")
+    let transactionFeeUpdated = Notification.Name("adamant.ethWallet.feeUpdated")
     let serviceStateChanged = Notification.Name("adamant.ethWallet.stateChanged")
-	
+    
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "eth_transaction"
@@ -77,29 +77,29 @@ class EthWalletService: WalletService {
     let cellIdentifierReceived = "ethTransferReceived"
     let cellSource: CellSource? = CellSource.nib(nib: UINib(nibName: "TransferCollectionViewCell", bundle: nil))
     
-	// MARK: - Properties
-	
+    // MARK: - Properties
+    
     private static let transactionsListApiSubpath = "ethtxs"
     
-	private(set) var web3: web3!
-	private var baseUrl: String!
-	let defaultDispatchQueue = DispatchQueue(label: "im.adamant.ethWalletService", qos: .utility, attributes: [.concurrent])
-	private (set) var enabled = true
-	
-	let stateSemaphore = DispatchSemaphore(value: 1)
-	
-	var walletViewController: WalletViewController {
-		guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.wallet) as? EthWalletViewController else {
-			fatalError("Can't get EthWalletViewController")
-		}
-		
-		vc.service = self
-		return vc
-	}
+    private(set) var web3: web3!
+    private var baseUrl: String!
+    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.ethWalletService", qos: .utility, attributes: [.concurrent])
+    private (set) var enabled = true
+    
+    let stateSemaphore = DispatchSemaphore(value: 1)
+    
+    var walletViewController: WalletViewController {
+        guard let vc = router.get(scene: AdamantScene.Wallets.Ethereum.wallet) as? EthWalletViewController else {
+            fatalError("Can't get EthWalletViewController")
+        }
+        
+        vc.service = self
+        return vc
+    }
     
     private var initialBalanceCheck = false
-	
-	// MARK: - State
+    
+    // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
     
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
@@ -116,33 +116,33 @@ class EthWalletService: WalletService {
         }
     }
     
-	private (set) var ethWallet: EthWallet? = nil
-	
-	var wallet: WalletAccount? { return ethWallet }
-	
+    private (set) var ethWallet: EthWallet? = nil
+    
+    var wallet: WalletAccount? { return ethWallet }
+    
     // MARK: - Delayed KVS save
     private var balanceObserver: NSObjectProtocol? = nil
     
-	// MARK: - Logic
-	init() {
-		// Notifications
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
-			self?.update()
-		}
-		
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
-			self?.update()
-		}
-		
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
-			self?.ethWallet = nil
+    // MARK: - Logic
+    init() {
+        // Notifications
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
+            self?.update()
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.accountDataUpdated, object: nil, queue: nil) { [weak self] _ in
+            self?.update()
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
+            self?.ethWallet = nil
             self?.initialBalanceCheck = false
             if let balanceObserver = self?.balanceObserver {
                 NotificationCenter.default.removeObserver(balanceObserver)
                 self?.balanceObserver = nil
             }
-		}
-	}
+        }
+    }
     
     func initiateNetwork(apiUrl: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
@@ -155,34 +155,34 @@ class EthWalletService: WalletService {
             self.baseUrl = EthWalletService.buildBaseUrl(for: web3.provider.network)
         }
     }
-	
-	func update() {
-		guard let wallet = ethWallet else {
-			return
-		}
-		
-		defer { stateSemaphore.signal() }
-		stateSemaphore.wait()
-		
-		switch state {
-		case .notInitiated, .updating, .initiationFailed(_):
-			return
-			
-		case .upToDate:
-			break
-		}
-		
+    
+    func update() {
+        guard let wallet = ethWallet else {
+            return
+        }
+        
+        defer { stateSemaphore.signal() }
+        stateSemaphore.wait()
+        
+        switch state {
+        case .notInitiated, .updating, .initiationFailed(_):
+            return
+            
+        case .upToDate:
+            break
+        }
+        
         setState(.updating)
-		
-		getBalance(forAddress: wallet.ethAddress) { [weak self] result in
+        
+        getBalance(forAddress: wallet.ethAddress) { [weak self] result in
             defer { self?.stateSemaphore.signal() }
             
-			switch result {
-			case .success(let balance):
+            switch result {
+            case .success(let balance):
                 let notification: Notification.Name?
                 
-				if wallet.balance != balance {
-					wallet.balance = balance
+                if wallet.balance != balance {
+                    wallet.balance = balance
                     notification = self?.walletUpdatedNotification
                     self?.initialBalanceCheck = false
                 } else if let initialBalanceCheck = self?.initialBalanceCheck, initialBalanceCheck {
@@ -195,80 +195,80 @@ class EthWalletService: WalletService {
                 if let notification = notification {
                     NotificationCenter.default.post(name: notification, object: self, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
                 }
-				
-			case .failure(let error):
+                
+            case .failure(let error):
                 print("\(error.localizedDescription)")
-			}
+            }
             
             self?.setState(.upToDate)
-		}
-		
-		getGasPrices { [weak self] result in
-			switch result {
-			case .success(let price):
-				guard let fee = self?.transactionFee else {
-					return
-				}
-				
-				let newFee = price * EthWalletService.transferGas
-				
-				if fee != newFee {
-					self?.transactionFee = newFee
-					
-					if let notification = self?.transactionFeeUpdated {
-						NotificationCenter.default.post(name: notification, object: self, userInfo: nil)
-					}
-				}
-				
-			case .failure:
-				break
-			}
-		}
-	}
-	
-	// MARK: - Tools
-	
-	func validate(address: String) -> AddressValidationResult {
-		return addressRegex.perfectMatch(with: address) ? .valid : .invalid
-	}
-	
-	func getGasPrices(completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-		switch web3.eth.getGasPrice() {
-		case .success(let price):
-			completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
-			
-		case .failure(let error):
-			completion(.failure(error: error.asWalletServiceError()))
-		}
-	}
-	
-	private static func buildBaseUrl(for network: Networks?) -> String {
-		let suffix: String
-		
-		guard let network = network else {
-			return "https://api.etherscan.io/api"
-		}
-		
-		switch network {
-		case .Mainnet:
-			suffix = ""
-			
-		default:
-			suffix = "-\(network)"
-		}
-		
-		return "https://api\(suffix).etherscan.io/api"
-	}
-	
+        }
+        
+        getGasPrices { [weak self] result in
+            switch result {
+            case .success(let price):
+                guard let fee = self?.transactionFee else {
+                    return
+                }
+                
+                let newFee = price * EthWalletService.transferGas
+                
+                if fee != newFee {
+                    self?.transactionFee = newFee
+                    
+                    if let notification = self?.transactionFeeUpdated {
+                        NotificationCenter.default.post(name: notification, object: self, userInfo: nil)
+                    }
+                }
+                
+            case .failure:
+                break
+            }
+        }
+    }
+    
+    // MARK: - Tools
+    
+    func validate(address: String) -> AddressValidationResult {
+        return addressRegex.perfectMatch(with: address) ? .valid : .invalid
+    }
+    
+    func getGasPrices(completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
+        switch web3.eth.getGasPrice() {
+        case .success(let price):
+            completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
+            
+        case .failure(let error):
+            completion(.failure(error: error.asWalletServiceError()))
+        }
+    }
+    
+    private static func buildBaseUrl(for network: Networks?) -> String {
+        let suffix: String
+        
+        guard let network = network else {
+            return "https://api.etherscan.io/api"
+        }
+        
+        switch network {
+        case .Mainnet:
+            suffix = ""
+            
+        default:
+            suffix = "-\(network)"
+        }
+        
+        return "https://api\(suffix).etherscan.io/api"
+    }
+    
     private func buildUrl(url: URL, queryItems: [URLQueryItem]? = nil) throws -> URL {
-		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-			throw AdamantApiService.InternalError.endpointBuildFailed
-		}
-		
-		components.queryItems = queryItems
-		
-		return try components.asURL()
-	}
+        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            throw AdamantApiService.InternalError.endpointBuildFailed
+        }
+        
+        components.queryItems = queryItems
+        
+        return try components.asURL()
+    }
 }
 
 
@@ -280,54 +280,54 @@ extension EthWalletService: InitiatedWithPassphraseService {
             return
         }
         
-		// MARK: 1. Prepare
-		stateSemaphore.wait()
+        // MARK: 1. Prepare
+        stateSemaphore.wait()
         
         setState(.notInitiated)
-		
-		if enabled {
-			enabled = false
-			NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
-		}
-		
-		// MARK: 2. Create keys and addresses
-		let keystore: BIP32Keystore
-		do {
+        
+        if enabled {
+            enabled = false
+            NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
+        }
+        
+        // MARK: 2. Create keys and addresses
+        let keystore: BIP32Keystore
+        do {
             guard let store = try BIP32Keystore(mnemonics: passphrase, password: EthWalletService.walletPassword, mnemonicsPassword: "", language: .english, prefixPath: EthWalletService.walletPath) else {
-				completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
-				stateSemaphore.signal()
-				return
-			}
-			
-			keystore = store
-		} catch {
-			completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: error)))
-			stateSemaphore.signal()
-			return
-		}
+                completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
+                stateSemaphore.signal()
+                return
+            }
+            
+            keystore = store
+        } catch {
+            completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: error)))
+            stateSemaphore.signal()
+            return
+        }
         
         guard let web3 = web3 else { return }
-		
-		web3.addKeystoreManager(KeystoreManager([keystore]))
-		
-		guard let ethAddress = keystore.addresses?.first else {
-			completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
-			stateSemaphore.signal()
-			return
-		}
-		
-		// MARK: 3. Update
+        
+        web3.addKeystoreManager(KeystoreManager([keystore]))
+        
+        guard let ethAddress = keystore.addresses?.first else {
+            completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
+            stateSemaphore.signal()
+            return
+        }
+        
+        // MARK: 3. Update
         let eWallet = EthWallet(address: ethAddress.address, ethAddress: ethAddress, keystore: keystore)
-		ethWallet = eWallet
-		
-		if !enabled {
-			enabled = true
-			NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
-		}
-		
-		stateSemaphore.signal()
-		
-		// MARK: 4. Save into KVS
+        ethWallet = eWallet
+        
+        if !enabled {
+            enabled = true
+            NotificationCenter.default.post(name: serviceEnabledChanged, object: self)
+        }
+        
+        stateSemaphore.signal()
+        
+        // MARK: 4. Save into KVS
         getWalletAddress(byAdamantAddress: adamant.address) { [weak self] result in
             guard let service = self else {
                 return
@@ -368,7 +368,7 @@ extension EthWalletService: InitiatedWithPassphraseService {
                 }
             }
         }
-	}
+    }
     
     func setInitiationFailed(reason: String) {
         stateSemaphore.wait()
@@ -416,67 +416,67 @@ extension EthWalletService: InitiatedWithPassphraseService {
 
 // MARK: - Dependencies
 extension EthWalletService: SwinjectDependentService {
-	func injectDependencies(from container: Container) {
-		accountService = container.resolve(AccountService.self)
-		apiService = container.resolve(ApiService.self)
-		dialogService = container.resolve(DialogService.self)
-		router = container.resolve(Router.self)
-	}
+    func injectDependencies(from container: Container) {
+        accountService = container.resolve(AccountService.self)
+        apiService = container.resolve(ApiService.self)
+        dialogService = container.resolve(DialogService.self)
+        router = container.resolve(Router.self)
+    }
 }
 
 
 // MARK: - Balances & addresses
 extension EthWalletService {
-	func getBalance(forAddress address: EthereumAddress, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-		DispatchQueue.global(qos: .utility).async { [weak self] in
-			guard let web3 = self?.web3 else {
-				print("Can't get web3 service")
-				return
-			}
-			
-			let result = web3.eth.getBalance(address: address)
-			
-			switch result {
-			case .success(let balance):
-				completion(.success(result: balance.asDecimal(exponent: EthWalletService.currencyExponent)))
-				
-			case .failure(let error):
-				completion(.failure(error: error.asWalletServiceError()))
-			}
-		}
-	}
-	
-	
-	func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
-		apiService.get(key: EthWalletService.kvsAddress, sender: address) { (result) in
-			switch result {
-			case .success(let value):
-				if let address = value {
-					completion(.success(result: address))
-				} else {
-					completion(.failure(error: .walletNotInitiated))
-				}
-				
-			case .failure(let error):
-				completion(.failure(error: .internalError(message: "ETH Wallet: fail to get address from KVS", error: error)))
-			}
-		}
-	}
+    func getBalance(forAddress address: EthereumAddress, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            guard let web3 = self?.web3 else {
+                print("Can't get web3 service")
+                return
+            }
+            
+            let result = web3.eth.getBalance(address: address)
+            
+            switch result {
+            case .success(let balance):
+                completion(.success(result: balance.asDecimal(exponent: EthWalletService.currencyExponent)))
+                
+            case .failure(let error):
+                completion(.failure(error: error.asWalletServiceError()))
+            }
+        }
+    }
+    
+    
+    func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
+        apiService.get(key: EthWalletService.kvsAddress, sender: address) { (result) in
+            switch result {
+            case .success(let value):
+                if let address = value {
+                    completion(.success(result: address))
+                } else {
+                    completion(.failure(error: .walletNotInitiated))
+                }
+                
+            case .failure(let error):
+                completion(.failure(error: .internalError(message: "ETH Wallet: fail to get address from KVS", error: error)))
+            }
+        }
+    }
 }
 
 
 // MARK: - KVS
 extension EthWalletService {
-	/// - Parameters:
-	///   - ethAddress: Ethereum address to save into KVS
-	///   - adamantAddress: Owner of Ethereum address
-	///   - completion: success
+    /// - Parameters:
+    ///   - ethAddress: Ethereum address to save into KVS
+    ///   - adamantAddress: Owner of Ethereum address
+    ///   - completion: success
     private func save(ethAddress: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
-		guard let adamant = accountService.account, let keypair = accountService.keypair else {
-			completion(.failure(error: .notLogged))
-			return
-		}
-		
+        guard let adamant = accountService.account, let keypair = accountService.keypair else {
+            completion(.failure(error: .notLogged))
+            return
+        }
+        
         guard adamant.balance >= AdamantApiService.KvsFee else {
             completion(.failure(error: .notEnoughMoney))
             return
@@ -491,7 +491,7 @@ extension EthWalletService {
                 completion(.failure(error: .apiError(error)))
             }
         }
-	}
+    }
 }
 
 

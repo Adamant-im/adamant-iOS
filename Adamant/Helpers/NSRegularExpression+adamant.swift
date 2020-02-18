@@ -9,7 +9,7 @@
 import Foundation
 
 extension NSRegularExpression {
-	func perfectMatch(with string: String) -> Bool {
-		return matches(in: string, options: [], range: NSRange(location: 0, length: string.count)).count == 1
-	}
+    func perfectMatch(with string: String) -> Bool {
+        return matches(in: string, options: [], range: NSRange(location: 0, length: string.count)).count == 1
+    }
 }

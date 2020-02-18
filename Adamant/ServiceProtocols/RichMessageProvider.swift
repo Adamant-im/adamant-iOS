@@ -21,7 +21,7 @@ protocol RichMessageProvider: class {
     var cellIdentifierSent: String { get }
     var cellIdentifierReceived: String { get }
     var cellSource: CellSource? { get }
-	
+    
     // MARK: Events
     func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController)
     

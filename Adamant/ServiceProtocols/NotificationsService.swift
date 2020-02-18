@@ -23,31 +23,31 @@ extension String.adamantLocalized.notifications {
 }
 
 extension StoreKey {
-	struct notificationsService {
-		static let notificationsMode = "notifications.mode"
-		static let customBadgeNumber = "notifications.number"
-		
-		private init() {}
-	}
+    struct notificationsService {
+        static let notificationsMode = "notifications.mode"
+        static let customBadgeNumber = "notifications.number"
+        
+        private init() {}
+    }
 }
 
 enum NotificationsMode: Int {
-	case disabled
-	case backgroundFetch
-	case push
-	
-	var localized: String {
-		switch self {
-		case .disabled:
-			return NSLocalizedString("Notifications.Mode.NotificationsDisabled", comment: "Notifications: Disable notifications")
-			
-		case .backgroundFetch:
-			return NSLocalizedString("Notifications.Mode.BackgroundFetch", comment: "Notifications: Use Background fetch notifications")
-			
-		case .push:
-			return NSLocalizedString("Notifications.Mode.ApplePush", comment: "Notifications: Use Apple Push notifications")
-		}
-	}
+    case disabled
+    case backgroundFetch
+    case push
+    
+    var localized: String {
+        switch self {
+        case .disabled:
+            return NSLocalizedString("Notifications.Mode.NotificationsDisabled", comment: "Notifications: Disable notifications")
+            
+        case .backgroundFetch:
+            return NSLocalizedString("Notifications.Mode.BackgroundFetch", comment: "Notifications: Use Background fetch notifications")
+            
+        case .push:
+            return NSLocalizedString("Notifications.Mode.ApplePush", comment: "Notifications: Use Apple Push notifications")
+        }
+    }
 }
 
 
@@ -57,60 +57,60 @@ enum NotificationsMode: Int {
 /// - transaction: token transaction
 /// - custom: other
 enum AdamantNotificationType {
-	case newMessages(count: Int)
-	case newTransactions(count: Int)
-	case custom(identifier: String, badge: Int?)
-	
-	var identifier: String {
-		switch self {
-		case .newMessages:
-			return "newMessages"
-			
-		case .newTransactions:
-			return "newTransactions"
-			
-		case .custom(let identifier, _):
-			return identifier
-		}
-	}
-	
-	var badge: Int? {
-		switch self {
-		case .newMessages(let count):
-			return count
-			
-		case .newTransactions(let count):
-			return count
-			
-		case .custom(_, let badge):
-			return badge
-		}
-	}
+    case newMessages(count: Int)
+    case newTransactions(count: Int)
+    case custom(identifier: String, badge: Int?)
+    
+    var identifier: String {
+        switch self {
+        case .newMessages:
+            return "newMessages"
+            
+        case .newTransactions:
+            return "newTransactions"
+            
+        case .custom(let identifier, _):
+            return identifier
+        }
+    }
+    
+    var badge: Int? {
+        switch self {
+        case .newMessages(let count):
+            return count
+            
+        case .newTransactions(let count):
+            return count
+            
+        case .custom(_, let badge):
+            return badge
+        }
+    }
 }
 
 // MARK: - Notifications
 extension Notification.Name {
-	struct AdamantNotificationService {
-		/// Raised when user has logged out.
-		static let notificationsModeChanged = Notification.Name("adamant.notificationService.notificationsMode")
-		
-		private init() {}
-	}
+    struct AdamantNotificationService {
+        /// Raised when user has logged out.
+        static let notificationsModeChanged = Notification.Name("adamant.notificationService.notificationsMode")
+        
+        private init() {}
+    }
 }
 
 
 extension AdamantUserInfoKey {
-	struct NotificationsService {
-		static let newNotificationsMode = "adamant.notificationsService.notificationsMode"
-		
-		private init() {}
-	}
+    struct NotificationsService {
+        static let newNotificationsMode = "adamant.notificationsService.notificationsMode"
+        
+        private init() {}
+    }
 }
 
 
 // MARK: - Protocol
 enum NotificationsServiceResult {
-	case success
+    case success
     case failure(error: NotificationsServiceError)
 }
 
@@ -143,18 +143,18 @@ extension NotificationsServiceError: RichError {
 }
 
 protocol NotificationsService: class {
-	var notificationsMode: NotificationsMode { get }
-	
-	func setNotificationsMode(_ mode: NotificationsMode, completion: ((NotificationsServiceResult) -> Void)?)
-	
-	func showNotification(title: String, body: String, type: AdamantNotificationType)
-	
-	func setBadge(number: Int?)
-	
-	func removeAllPendingNotificationRequests()
-	func removeAllDeliveredNotifications()
-	
-	// MARK: Background batch notifications
-	func startBackgroundBatchNotifications()
-	func stopBackgroundBatchNotifications()
+    var notificationsMode: NotificationsMode { get }
+    
+    func setNotificationsMode(_ mode: NotificationsMode, completion: ((NotificationsServiceResult) -> Void)?)
+    
+    func showNotification(title: String, body: String, type: AdamantNotificationType)
+    
+    func setBadge(number: Int?)
+    
+    func removeAllPendingNotificationRequests()
+    func removeAllDeliveredNotifications()
+    
+    // MARK: Background batch notifications
+    func startBackgroundBatchNotifications()
+    func stopBackgroundBatchNotifications()
 }

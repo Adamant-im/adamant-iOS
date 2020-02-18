@@ -21,52 +21,52 @@ protocol WalletViewControllerDelegate: class {
 }
 
 class WalletViewControllerBase: FormViewController, WalletViewController {
-	// MARK: - Rows
-	enum BaseRows {
-		case address, balance, send
-		
-		var tag: String {
-			switch self {
-			case .address: return "a"
-			case .balance: return "b"
-			case .send: return "s"
-			}
-		}
-		
-		var localized: String {
-			switch self {
-			case .address: return NSLocalizedString("AccountTab.Row.Address", comment: "Account tab: 'Address' row")
-			case .balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
-			case .send: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
-			}
-		}
-	}
-	
-	private let cellIdentifier = "cell"
-	
-	
-	// MARK: - Dependencies
-	
-	var dialogService: DialogService!
+    // MARK: - Rows
+    enum BaseRows {
+        case address, balance, send
+        
+        var tag: String {
+            switch self {
+            case .address: return "a"
+            case .balance: return "b"
+            case .send: return "s"
+            }
+        }
+        
+        var localized: String {
+            switch self {
+            case .address: return NSLocalizedString("AccountTab.Row.Address", comment: "Account tab: 'Address' row")
+            case .balance: return NSLocalizedString("AccountTab.Row.Balance", comment: "Account tab: Balance row title")
+            case .send: return NSLocalizedString("AccountTab.Row.SendTokens", comment: "Account tab: 'Send tokens' button")
+            }
+        }
+    }
+    
+    private let cellIdentifier = "cell"
+    
+    
+    // MARK: - Dependencies
+    
+    var dialogService: DialogService!
     var currencyInfoService: CurrencyInfoService!
-	
-	
-	// MARK: - Properties, WalletViewController
-	
-	var viewController: UIViewController { return self }
-	var height: CGFloat { return tableView.frame.origin.y + tableView.contentSize.height }
-	
-	var service: WalletService?
-	
+    
+    
+    // MARK: - Properties, WalletViewController
+    
+    var viewController: UIViewController { return self }
+    var height: CGFloat { return tableView.frame.origin.y + tableView.contentSize.height }
+    
+    var service: WalletService?
+    
     weak var delegate: WalletViewControllerDelegate?
     
     private lazy var fiatFormatter: NumberFormatter = {
         return AdamantBalanceFormat.fiatFormatter(for: currencyInfoService.currentCurrency)
     }()
     
-	// MARK: - IBOutlets
-	
-	@IBOutlet weak var walletTitleLabel: UILabel!
+    // MARK: - IBOutlets
+    
+    @IBOutlet weak var walletTitleLabel: UILabel!
     @IBOutlet weak var initiatingActivityIndicator: UIActivityIndicatorView!
     
     // MARK: Error view
@@ -75,37 +75,37 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     @IBOutlet weak var errorImageView: UIImageView!
     @IBOutlet weak var errorLabel: UILabel!
     
-	// MARK: - Lifecycle
-	
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.tableFooterView = UIView()
         
         let section = Section()
-		
-		// MARK: Address
-		let addressRow = LabelRow() {
-			$0.tag = BaseRows.address.tag
-			$0.title = BaseRows.address.localized
-			$0.cell.selectionStyle = .gray
-			
-			if let wallet = service?.wallet {
-				$0.value = wallet.address
-			}
-		}.cellUpdate { (cell, _) in
-			cell.accessoryType = .disclosureIndicator
+        
+        // MARK: Address
+        let addressRow = LabelRow() {
+            $0.tag = BaseRows.address.tag
+            $0.title = BaseRows.address.localized
+            $0.cell.selectionStyle = .gray
+            
+            if let wallet = service?.wallet {
+                $0.value = wallet.address
+            }
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (cell, row) in
             row.deselect()
-			let completion = { [weak self] in
-				guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
-					return
-				}
-				
-				tableView.deselectRow(at: indexPath, animated: true)
-			}
-			
-			if let address = self?.service?.wallet?.address {
+            let completion = { [weak self] in
+                guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
+                    return
+                }
+                
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+            
+            if let address = self?.service?.wallet?.address {
                 let types: [ShareType]
                 let withLogo = self?.includeLogoInQR() ?? false
                 
@@ -115,17 +115,17 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                     types = [.copyToPasteboard, .share]
                 }
                 
-				self?.dialogService.presentShareAlertFor(string: address,
-														 types: types,
-														 excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                self?.dialogService.presentShareAlertFor(string: address,
+                                                         types: types,
+                                                         excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
                                                          animated: true, from: cell,
-														 completion: completion)
-			}
-		}
-		
-		section.append(addressRow)
-		
-		// MARK: Balance
+                                                         completion: completion)
+            }
+        }
+        
+        section.append(addressRow)
+        
+        // MARK: Balance
         let balanceRow = BalanceRow() { [weak self] in
             $0.tag = BaseRows.balance.tag
             $0.cell.titleLabel.text = BaseRows.balance.localized
@@ -150,16 +150,16 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             
             cell.height = { height }
         }
-		
-		if service is WalletServiceWithTransfers {
-			balanceRow.cell.selectionStyle = .gray
-			balanceRow.cellUpdate { (cell, _) in
-				cell.accessoryType = .disclosureIndicator
+        
+        if service is WalletServiceWithTransfers {
+            balanceRow.cell.selectionStyle = .gray
+            balanceRow.cellUpdate { (cell, _) in
+                cell.accessoryType = .disclosureIndicator
             }.onCellSelection { [weak self] (_, row) in
                 guard let service = self?.service as? WalletServiceWithTransfers else {
-					return
-				}
-				
+                    return
+                }
+                
                 let vc = service.transferListViewController()
                 if let split = self?.splitViewController {
                     let details = UINavigationController(rootViewController:vc)
@@ -171,31 +171,31 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 if let vc = self, let delegate = vc.delegate {
                     delegate.walletViewControllerSelectedRow(vc)
                 }
-			}
-		}
-		
-		section.append(balanceRow)
-		
-		// MARK: Send
-		if service is WalletServiceWithSend {
+            }
+        }
+        
+        section.append(balanceRow)
+        
+        // MARK: Send
+        if service is WalletServiceWithSend {
             let label = sendRowLocalizedLabel()
             
-			let sendRow = LabelRow() {
-				$0.tag = BaseRows.send.tag
-				$0.title = label
-				$0.cell.selectionStyle = .gray
-			}.cellUpdate { (cell, _) in
-				cell.accessoryType = .disclosureIndicator
-			}.onCellSelection { [weak self] (_, row) in
-				guard let service = self?.service as? WalletServiceWithSend else {
-					return
-				}
-				
-				let vc = service.transferViewController()
-				if let v = vc as? TransferViewControllerBase {
-					v.delegate = self
-				}
-				
+            let sendRow = LabelRow() {
+                $0.tag = BaseRows.send.tag
+                $0.title = label
+                $0.cell.selectionStyle = .gray
+            }.cellUpdate { (cell, _) in
+                cell.accessoryType = .disclosureIndicator
+            }.onCellSelection { [weak self] (_, row) in
+                guard let service = self?.service as? WalletServiceWithSend else {
+                    return
+                }
+                
+                let vc = service.transferViewController()
+                if let v = vc as? TransferViewControllerBase {
+                    v.delegate = self
+                }
+                
                 if let split = self?.splitViewController {
                     let details = UINavigationController(rootViewController:vc)
                     split.showDetailViewController(details, sender: self)
@@ -211,17 +211,17 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 if let vc = self, let delegate = vc.delegate {
                     delegate.walletViewControllerSelectedRow(vc)
                 }
-			}
-			
-			section.append(sendRow)
-		}
-		
-		form.append(section)
-		
-		// MARK: Notification
-		if let service = service {
+            }
+            
+            section.append(sendRow)
+        }
+        
+        form.append(section)
+        
+        // MARK: Notification
+        if let service = service {
             // MARK: Wallet updated
-			let walletUpdatedCallback = { [weak self] (notification: Notification) in
+            let walletUpdatedCallback = { [weak self] (notification: Notification) in
                 if let row: LabelRow = self?.form.rowBy(tag: BaseRows.address.tag) {
                     if let wallet = service.wallet {
                         row.value = wallet.address
@@ -233,8 +233,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                     let wallet = service.wallet,
                     let vc = self,
                     let row: BalanceRow = vc.form.rowBy(tag: BaseRows.balance.tag) else {
-					return
-				}
+                    return
+                }
                 
                 if let currentCurrency = self?.currencyInfoService.currentCurrency {
                     self?.fiatFormatter.currencyCode = currentCurrency.rawValue
@@ -243,12 +243,12 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 let symbol = type(of: service).currencySymbol
                 row.value = vc.balanceRowValueFor(balance: wallet.balance, symbol: symbol, alert: wallet.notifications)
                 row.updateCell()
-			}
-			
-			NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,
-												   object: service,
-												   queue: OperationQueue.main,
-												   using: walletUpdatedCallback)
+            }
+            
+            NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,
+                                                   object: service,
+                                                   queue: OperationQueue.main,
+                                                   using: walletUpdatedCallback)
             
             NotificationCenter.default.addObserver(forName: Notification.Name.AdamantCurrencyInfoService.currencyRatesUpdated,
                                                    object: nil,
@@ -268,7 +268,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                                                    object: service,
                                                    queue: OperationQueue.main,
                                                    using: stateUpdatedCallback)
-		}
+        }
         
         if let state = service?.state {
             switch state {
@@ -282,22 +282,22 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             setUiToWalletServiceState(.notInitiated)
         }
     }
-	
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-		
-		if let indexPath = tableView.indexPathForSelectedRow {
-			tableView.deselectRow(at: indexPath, animated: animated)
-		}
-	}
-	
-	override func viewDidLayoutSubviews() {
-		NotificationCenter.default.post(name: Notification.Name.WalletViewController.heightUpdated, object: self)
-	}
-	
-	override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-		return UIView()
-	}
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let indexPath = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: indexPath, animated: animated)
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        NotificationCenter.default.post(name: Notification.Name.WalletViewController.heightUpdated, object: self)
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        return UIView()
+    }
     
     
     // MARK: - To override

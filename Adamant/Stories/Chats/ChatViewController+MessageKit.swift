@@ -27,30 +27,30 @@ extension ChatViewController {
 
 // MARK: - MessagesDataSource
 extension ChatViewController: MessagesDataSource {
-	func currentSender() -> Sender {
-		guard let account = account else {
+    func currentSender() -> Sender {
+        guard let account = account else {
             // Until we will update our network to procedures
             return(Sender(id: "your moma", displayName: ""))
 //            fatalError("No account")
-		}
-		return Sender(id: account.address, displayName: account.address)
-	}
-	
-	func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
-		guard let message = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) as? MessageType else {
-			fatalError("Data not synced")
-		}
-		
-		return message
-	}
-	
+        }
+        return Sender(id: account.address, displayName: account.address)
+    }
+    
+    func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
+        guard let message = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) as? MessageType else {
+            fatalError("Data not synced")
+        }
+        
+        return message
+    }
+    
     func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
-		if let objects = chatController?.fetchedObjects {
-			return objects.count
-		} else {
-			return 0
-		}
-	}
+        if let objects = chatController?.fetchedObjects {
+            return objects.count
+        } else {
+            return 0
+        }
+    }
     
     func cellTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
         if self.shouldDisplayHeader(for: message, at: indexPath, in: self.messagesCollectionView) {
@@ -79,40 +79,40 @@ extension ChatViewController: MessagesDataSource {
             return nil
         }
     }
-	
-	func messageBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
-		if message.sentDate == Date.adamantNullDate {
-			return nil
-		}
+    
+    func messageBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+        if message.sentDate == Date.adamantNullDate {
+            return nil
+        }
         
         if let message = message as? MessageTransaction, message.statusEnum == .failed {
             return nil
         }
-		
-		let humanizedTime = message.sentDate.humanizedTime()
-		
-		if let expire = humanizedTime.expireIn {
-			if !cellsUpdating.contains(indexPath) {
-				cellsUpdating.append(indexPath)
-				
-				let timer = Timer.scheduledTimer(withTimeInterval: expire + 1, repeats: false) { [weak self] timer in
-					self?.messagesCollectionView.reloadItems(at: [indexPath])
-					
-					if let index = self?.cellsUpdating.index(of: indexPath) {
-						self?.cellsUpdating.remove(at: index)
-					}
-					
-					if let index = self?.cellUpdateTimers.index(of: timer) {
-						self?.cellUpdateTimers.remove(at: index)
-					}
-				}
-				
-				cellUpdateTimers.append(timer)
-			}
-		}
-		
-		return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption2), NSAttributedString.Key.foregroundColor: UIColor.adamant.secondary])
-	}
+        
+        let humanizedTime = message.sentDate.humanizedTime()
+        
+        if let expire = humanizedTime.expireIn {
+            if !cellsUpdating.contains(indexPath) {
+                cellsUpdating.append(indexPath)
+                
+                let timer = Timer.scheduledTimer(withTimeInterval: expire + 1, repeats: false) { [weak self] timer in
+                    self?.messagesCollectionView.reloadItems(at: [indexPath])
+                    
+                    if let index = self?.cellsUpdating.index(of: indexPath) {
+                        self?.cellsUpdating.remove(at: index)
+                    }
+                    
+                    if let index = self?.cellUpdateTimers.index(of: timer) {
+                        self?.cellUpdateTimers.remove(at: index)
+                    }
+                }
+                
+                cellUpdateTimers.append(timer)
+            }
+        }
+        
+        return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption2), NSAttributedString.Key.foregroundColor: UIColor.adamant.secondary])
+    }
     
     func customCell(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
         guard let type = getRichMessageType(of: message), let provider = richMessageProviders[type] else {
@@ -201,13 +201,13 @@ extension ChatViewController: MessagesDataSource {
 
 // MARK: - MessagesDisplayDelegate
 extension ChatViewController: MessagesDisplayDelegate {
-	func messageStyle(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageStyle {
-		let corner: MessageStyle.TailCorner = isFromCurrentSender(message: message) ? .bottomRight : .bottomLeft
-		return .bubbleTail(corner, .curved)
-	}
-	
-	func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
-		if isFromCurrentSender(message: message) {
+    func messageStyle(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageStyle {
+        let corner: MessageStyle.TailCorner = isFromCurrentSender(message: message) ? .bottomRight : .bottomLeft
+        return .bubbleTail(corner, .curved)
+    }
+    
+    func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
+        if isFromCurrentSender(message: message) {
             guard let transaction = message as? ChatTransaction else {
                 return UIColor.adamant.chatSenderBackground
             }
@@ -215,25 +215,25 @@ extension ChatViewController: MessagesDisplayDelegate {
             switch transaction.statusEnum {
             case .failed:
                 return UIColor.adamant.failChatBackground
-				
-			case .pending:
-				return UIColor.adamant.pendingChatBackground
-				
+                
+            case .pending:
+                return UIColor.adamant.pendingChatBackground
+                
             case .delivered:
                 return UIColor.adamant.chatSenderBackground
             }
-		} else {
-			return UIColor.adamant.chatRecipientBackground
-		}
-	}
-	
-	func textColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
-		return UIColor.adamant.primary
-	}
-	
-	func enabledDetectors(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> [DetectorType] {
-		return [.url]
-	}
+        } else {
+            return UIColor.adamant.chatRecipientBackground
+        }
+    }
+    
+    func textColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
+        return UIColor.adamant.primary
+    }
+    
+    func enabledDetectors(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> [DetectorType] {
+        return [.url]
+    }
     
     func detectorAttributes(for detector: DetectorType, and message: MessageType, at indexPath: IndexPath) -> [NSAttributedString.Key : Any] {
         if detector == .url {
@@ -268,13 +268,13 @@ extension ChatViewController: MessagesDisplayDelegate {
         }
         
         guard let dataSource = messagesCollectionView.messagesDataSource else {
-			return false
-		}
-		
+            return false
+        }
+        
         if indexPath.section == 0 {
-			return true
-		}
-		
+            return true
+        }
+        
         let previousSection = indexPath.section - 1
         let previousIndexPath = IndexPath(item: 0, section: previousSection)
         let previousMessage = dataSource.messageForItem(at: previousIndexPath, in: messagesCollectionView)
@@ -284,55 +284,55 @@ extension ChatViewController: MessagesDisplayDelegate {
 }
 
 extension ChatViewController: MessageCellDelegate {
-	func didTapMessage(in cell: MessageCollectionViewCell) {
-		guard let indexPath = messagesCollectionView.indexPath(for: cell),
-			let message = messagesCollectionView.messagesDataSource?.messageForItem(at: indexPath, in: messagesCollectionView) else {
-			return
-		}
-		
-		switch message {
+    func didTapMessage(in cell: MessageCollectionViewCell) {
+        guard let indexPath = messagesCollectionView.indexPath(for: cell),
+            let message = messagesCollectionView.messagesDataSource?.messageForItem(at: indexPath, in: messagesCollectionView) else {
+            return
+        }
+        
+        switch message {
         // MARK: Show Retry/Cancel action sheet
         case let message as MessageTransaction:
             // Only for failed messages
             guard message.messageStatus == .failed else {
                 break
             }
-			
-			let retry = UIAlertAction(title: String.adamantLocalized.alert.retry, style: .default, handler: { [weak self] action in
-				self?.chatsProvider.retrySendMessage(message) { result in
-					switch result {
-					case .success: break
-						
-					case .failure(let error):
-						self?.dialogService.showRichError(error: error)
-						
-					case .invalidTransactionStatus(_):
-						break
-					}
-				}
-			})
-			
-			let cancelMessage = UIAlertAction(title: String.adamantLocalized.alert.delete, style: .default, handler: { [weak self] action in
-				self?.chatsProvider.cancelMessage(message) { result in
-					switch result {
-					case .success:
-						DispatchQueue.main.async {
-							self?.messagesCollectionView.reloadDataAndKeepOffset()
-						}
-						
-					case .invalidTransactionStatus(_):
-						self?.dialogService.showWarning(withMessage: String.adamantLocalized.chat.cancelError)
-						
-					case .failure(let error):
-						self?.dialogService.showRichError(error: error)
-					}
-				}
-			})
-			
-			let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
-			
+            
+            let retry = UIAlertAction(title: String.adamantLocalized.alert.retry, style: .default, handler: { [weak self] action in
+                self?.chatsProvider.retrySendMessage(message) { result in
+                    switch result {
+                    case .success: break
+                        
+                    case .failure(let error):
+                        self?.dialogService.showRichError(error: error)
+                        
+                    case .invalidTransactionStatus(_):
+                        break
+                    }
+                }
+            })
+            
+            let cancelMessage = UIAlertAction(title: String.adamantLocalized.alert.delete, style: .default, handler: { [weak self] action in
+                self?.chatsProvider.cancelMessage(message) { result in
+                    switch result {
+                    case .success:
+                        DispatchQueue.main.async {
+                            self?.messagesCollectionView.reloadDataAndKeepOffset()
+                        }
+                        
+                    case .invalidTransactionStatus(_):
+                        self?.dialogService.showWarning(withMessage: String.adamantLocalized.chat.cancelError)
+                        
+                    case .failure(let error):
+                        self?.dialogService.showRichError(error: error)
+                    }
+                }
+            })
+            
+            let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
+            
             dialogService?.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, style: .actionSheet, actions: [retry, cancelMessage, cancel], from: cell)
-			
+            
             
         // MARK: Show ADM transfer details
         case let transfer as TransferTransaction:
@@ -357,12 +357,12 @@ extension ChatViewController: MessageCellDelegate {
             }
             
             
-		default:
-			break
-		}
-	}
-	
-	func didSelectURL(_ url: URL) {
+        default:
+            break
+        }
+    }
+    
+    func didSelectURL(_ url: URL) {
         if url.absoluteString.starts(with: "http") {
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
@@ -381,7 +381,7 @@ extension ChatViewController: MessageCellDelegate {
                 dialogService.showWarning(withMessage:String.adamantLocalized.chat.unsupportedUrlWarning)
             }
         }
-	}
+    }
 }
 
 // MARK: - TransferCollectionViewCellDelegate
@@ -550,7 +550,7 @@ extension ChatViewController: MessagesLayoutDelegate {
 extension ChatViewController: MessageInputBarDelegate {
     private static let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
     
-	func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
+    func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
         let parsedText = ChatViewController.markdownParser.parse(text)
         
         let message: AdamantMessage
@@ -560,59 +560,59 @@ extension ChatViewController: MessageInputBarDelegate {
             message = .markdownText(text)
         }
         
-		let valid = chatsProvider.validateMessage(message)
-		switch valid {
-		case .isValid:
-			break
-			
-		case .empty:
-			return
-			
-		case .tooLong:
-			dialogService.showToastMessage(valid.localized)
-			return
-		}
-		
-		guard text.count > 0, let partner = chatroom?.partner?.address else {
-			// TODO show warning
-			return
-		}
-		
+        let valid = chatsProvider.validateMessage(message)
+        switch valid {
+        case .isValid:
+            break
+            
+        case .empty:
+            return
+            
+        case .tooLong:
+            dialogService.showToastMessage(valid.localized)
+            return
+        }
+        
+        guard text.count > 0, let partner = chatroom?.partner?.address else {
+            // TODO show warning
+            return
+        }
+        
         chatsProvider.sendMessage(message, recipientId: partner, from: chatroom, completion: { [weak self] result in
-			switch result {
-			case .success:
+            switch result {
+            case .success:
                 DispatchQueue.main.async {
                     self?.scrollDown()
                 }
                 break
-				
-			case .failure(let error):
+                
+            case .failure(let error):
                 var showFreeToken = false
-				switch error {
+                switch error {
                 case .messageNotValid:
                     self?.setText(text, to: inputBar)
                 case .notEnoughMoneyToSend:
-					self?.setText(text, to: inputBar)
+                    self?.setText(text, to: inputBar)
                     if let transfersProvider = self?.transfersProvider, !transfersProvider.hasTransactions {
                         showFreeToken = true
                     }
-				default:
-					break
-				}
+                default:
+                    break
+                }
                 
                 if showFreeToken {
                     self?.showFreeTokenAlert()
                 } else {
                     self?.dialogService.showRichError(error: error)
                 }
-			}
-		})
-		
-		inputBar.inputTextView.text = String()
-	}
-	
-	func messageInputBar(_ inputBar: MessageInputBar, textViewTextDidChangeTo text: String) {
-		if text.count > 0 {
+            }
+        })
+        
+        inputBar.inputTextView.text = String()
+    }
+    
+    func messageInputBar(_ inputBar: MessageInputBar, textViewTextDidChangeTo text: String) {
+        if text.count > 0 {
             feeUpdateTimer?.invalidate()
             feeUpdateTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { _ in
                 print("update fee")
@@ -623,10 +623,10 @@ extension ChatViewController: MessageInputBarDelegate {
                     }
                 }
             })
-		} else {
-			setEstimatedFee(0)
-		}
-	}
+        } else {
+            setEstimatedFee(0)
+        }
+    }
     
     func setText(_ text: String, to inputBar: MessageInputBar) {
         DispatchQueue.main.async {
@@ -662,33 +662,33 @@ extension ChatViewController: MessageInputBarDelegate {
 // MARK: - MessageType
 // MARK: MessageTransaction
 extension MessageTransaction: MessageType {
-	public var sender: Sender {
-		let id = self.senderId!
-		return Sender(id: id, displayName: id)
-	}
-	
-	public var messageId: String {
-		return chatMessageId!
-	}
-	
-	public var sentDate: Date {
-		return date! as Date
-	}
-	
-	public var kind: MessageKind {
-		guard let message = message else {
+    public var sender: Sender {
+        let id = self.senderId!
+        return Sender(id: id, displayName: id)
+    }
+    
+    public var messageId: String {
+        return chatMessageId!
+    }
+    
+    public var sentDate: Date {
+        return date! as Date
+    }
+    
+    public var kind: MessageKind {
+        guard let message = message else {
             isHidden = true
             try? managedObjectContext?.save()
-			return MessageKind.text("")
-		}
-		
+            return MessageKind.text("")
+        }
+        
         if isMarkdown {
             let markdown = MessageTransaction.markdownParser.parse(message)
             return MessageKind.attributedText(markdown)
         } else {
             return MessageKind.text(message)
         }
-	}
+    }
     
     public var messageStatus: MessageStatus {
         return self.statusEnum
@@ -721,23 +721,23 @@ extension RichMessageTransaction: MessageType {
 
 // MARK: TransferTransaction
 extension TransferTransaction: MessageType {
-	public var sender: Sender {
-		let id = self.senderId!
-		return Sender(id: id, displayName: id)
-	}
-	
-	public var messageId: String {
-		return chatMessageId!
-	}
-	
-	public var sentDate: Date {
-		return date! as Date
-	}
-	
-	public var kind: MessageKind {
+    public var sender: Sender {
+        let id = self.senderId!
+        return Sender(id: id, displayName: id)
+    }
+    
+    public var messageId: String {
+        return chatMessageId!
+    }
+    
+    public var sentDate: Date {
+        return date! as Date
+    }
+    
+    public var kind: MessageKind {
         return MessageKind.custom(RichMessageTransfer(type: AdmWalletService.richMessageType,
                                                       amount: amount as Decimal? ?? 0,
                                                       hash: "",
                                                       comments: comment ?? ""))
-	}
+    }
 }

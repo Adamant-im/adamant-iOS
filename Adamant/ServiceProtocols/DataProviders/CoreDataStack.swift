@@ -10,5 +10,5 @@ import Foundation
 import CoreData
 
 protocol CoreDataStack {
-	var container: NSPersistentContainer { get }
+    var container: NSPersistentContainer { get }
 }

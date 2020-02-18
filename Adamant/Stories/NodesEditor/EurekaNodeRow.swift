@@ -10,14 +10,14 @@ import UIKit
 import Eureka
 
 class NodeCell: Cell<Node>, CellType {
-	public override func update() {
-		textLabel?.text = row.value?.asString()
-	}
+    public override func update() {
+        textLabel?.text = row.value?.asString()
+    }
 }
 
 final class NodeRow: Row<NodeCell>, RowType {
-	required public init(tag: String?) {
-		super.init(tag: tag)
-		cellProvider = CellProvider<NodeCell>(nibName: "NodeCell")
-	}
+    required public init(tag: String?) {
+        super.init(tag: tag)
+        cellProvider = CellProvider<NodeCell>(nibName: "NodeCell")
+    }
 }

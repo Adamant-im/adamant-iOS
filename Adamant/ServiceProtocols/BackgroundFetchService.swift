@@ -9,12 +9,12 @@
 import Foundation
 
 enum FetchResult {
-	case newData
-	case noData
-	case failed
+    case newData
+    case noData
+    case failed
 }
 
 protocol BackgroundFetchService {
-	func fetchBackgroundData(notificationsService: NotificationsService, completion: @escaping (FetchResult) -> Void)
-	func dropStateData()
+    func fetchBackgroundData(notificationsService: NotificationsService, completion: @escaping (FetchResult) -> Void)
+    func dropStateData()
 }

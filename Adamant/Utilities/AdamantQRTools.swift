@@ -10,14 +10,14 @@ import Foundation
 import EFQRCode
 
 enum QRToolGenerateResult {
-	case success(UIImage)
-	case failure(error: Error)
+    case success(UIImage)
+    case failure(error: Error)
 }
 
 enum QRToolDecodeResult {
-	case success(String)
-	case none
-	case failure(error: Error)
+    case success(String)
+    case none
+    case failure(error: Error)
 }
 
 class AdamantQRTools {
@@ -33,26 +33,26 @@ class AdamantQRTools {
             generator.setIcon(icon: UIImage(named: "logo")?.toCGImage(), size: logoSize)
         }
         
-		if let qr = generator.generate() {
-			let image = UIImage(cgImage: qr)
-			return .success(image)
-		}
-		
-		return .failure(error: AdamantError(message: "Failed to generate QR from: \(string)"))
-	}
-	
-	static func readQR(_ qr: UIImage) -> QRToolDecodeResult {
-		guard let image = qr.cgImage else {
-			print("Failed to get image?")
-			return .none
-		}
-		
-		if let result = EFQRCode.recognize(image: image)?.first {
-			return .success(result)
-		}
-		
-		return .none
-	}
-	
-	private init() {}
+        if let qr = generator.generate() {
+            let image = UIImage(cgImage: qr)
+            return .success(image)
+        }
+        
+        return .failure(error: AdamantError(message: "Failed to generate QR from: \(string)"))
+    }
+    
+    static func readQR(_ qr: UIImage) -> QRToolDecodeResult {
+        guard let image = qr.cgImage else {
+            print("Failed to get image?")
+            return .none
+        }
+        
+        if let result = EFQRCode.recognize(image: image)?.first {
+            return .success(result)
+        }
+        
+        return .none
+    }
+    
+    private init() {}
 }

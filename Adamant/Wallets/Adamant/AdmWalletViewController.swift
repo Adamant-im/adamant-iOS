@@ -64,11 +64,11 @@ class AdmWalletViewController: WalletViewControllerBase {
     var hideFreeTokensRow = false
     
     // MARK: - Lifecycle
-	
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		
-		walletTitleLabel.text = String.adamantLocalized.wallets.adamant
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        walletTitleLabel.text = String.adamantLocalized.wallets.adamant
         
         if let balance = service?.wallet?.balance {
             hideFreeTokensRow = balance > 0
@@ -146,7 +146,7 @@ class AdmWalletViewController: WalletViewControllerBase {
             self?.updateRows()
             self?.tableView.reloadData()
         }
-	}
+    }
     
     override func sendRowLocalizedLabel() -> String {
         return String.adamantLocalized.wallets.sendAdm

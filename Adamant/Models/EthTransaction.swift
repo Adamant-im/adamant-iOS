@@ -18,31 +18,31 @@ struct EthResponse {
 
 // MARK: - Decodable
 extension EthResponse: Decodable {
-	enum CodingKeys: String, CodingKey {
-		case status
-		case message
-		case result
-	}
-	
-	init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		
-		if let raw = try? container.decode(String.self, forKey: .status), let status = Int(raw) {
-			self.status = status
-		} else {
-			self.status = 0
-		}
-		
-		message = (try? container.decode(String.self, forKey: .message)) ?? ""
-		result = (try? container.decode([EthTransaction].self, forKey: .result)) ?? []
-	}
+    enum CodingKeys: String, CodingKey {
+        case status
+        case message
+        case result
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        if let raw = try? container.decode(String.self, forKey: .status), let status = Int(raw) {
+            self.status = status
+        } else {
+            self.status = 0
+        }
+        
+        message = (try? container.decode(String.self, forKey: .message)) ?? ""
+        result = (try? container.decode([EthTransaction].self, forKey: .result)) ?? []
+    }
 }
 
 
 // MARK: - Eth Transaction
 
 struct EthTransaction {
-	let date: Date?
+    let date: Date?
     let hash: String
     let value: Decimal
     let from: String
@@ -60,23 +60,23 @@ struct EthTransaction {
 
 // MARK: Decodable
 extension EthTransaction: Decodable {
-	enum CodingKeys: String, CodingKey {
-		case timeStamp
-		case hash
-		case value
-		case from
-		case to
-		case gasUsed
-		case gasPrice
-		case confirmations
-		case isError
-		case receiptStatus = "txreceipt_status"
-		case blockNumber
-	}
-	
-	init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		
+    enum CodingKeys: String, CodingKey {
+        case timeStamp
+        case hash
+        case value
+        case from
+        case to
+        case gasUsed
+        case gasPrice
+        case confirmations
+        case isError
+        case receiptStatus = "txreceipt_status"
+        case blockNumber
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
         hash = try container.decode(String.self, forKey: .hash)
         from = try container.decode(String.self, forKey: .from)
         to = try container.decode(String.self, forKey: .to)
@@ -128,7 +128,7 @@ extension EthTransaction: Decodable {
         } else {
             self.gasPrice = 0
         }
-	}
+    }
 }
 
 
@@ -179,24 +179,24 @@ extension EthereumTransaction {
 // MARK: Sample JSON
 /*
  {
-	 "blockNumber":"3455267",
-	 "timeStamp":"1529241530",
-	 "hash":"0x9e2092aa9a278ebdd5cc4e37d626533ec1a480397c101add069817c0934cfa76",
-	 "nonce":"561145",
-	 "blockHash":"0xf828955a0911da4a2c207f96b8bffabac804eab7888ec88149ab9867db19b7dd",
-	 "transactionIndex":"16",
-	 "from":"0x687422eea2cb73b5d3e242ba5456b782919afc85",
-	 "to":"0x700bc74dd49044446bcb6a25ae5e725d14538825",
-	 "value":"1000000000000000000",
-	 "gas":"314150",
-	 "gasPrice":"5000000000",
-	 "isError":"0",
-	 "txreceipt_status":"1",
-	 "input":"0x",
-	 "contractAddress":"",
-	 "cumulativeGasUsed":"381927",
-	 "gasUsed":"21000",
-	 "confirmations":"32316"
+     "blockNumber":"3455267",
+     "timeStamp":"1529241530",
+     "hash":"0x9e2092aa9a278ebdd5cc4e37d626533ec1a480397c101add069817c0934cfa76",
+     "nonce":"561145",
+     "blockHash":"0xf828955a0911da4a2c207f96b8bffabac804eab7888ec88149ab9867db19b7dd",
+     "transactionIndex":"16",
+     "from":"0x687422eea2cb73b5d3e242ba5456b782919afc85",
+     "to":"0x700bc74dd49044446bcb6a25ae5e725d14538825",
+     "value":"1000000000000000000",
+     "gas":"314150",
+     "gasPrice":"5000000000",
+     "isError":"0",
+     "txreceipt_status":"1",
+     "input":"0x",
+     "contractAddress":"",
+     "cumulativeGasUsed":"381927",
+     "gasUsed":"21000",
+     "confirmations":"32316"
  }
  
  */
