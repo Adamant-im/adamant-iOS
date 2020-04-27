@@ -133,8 +133,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             $0.alertBackgroundColor = UIColor.adamant.primary
             $0.alertTextColor = UIColor.white
             
+            let symbol = self?.service?.tokenSymbol ?? ""
+            
             if let service = self?.service, let wallet = service.wallet {
-                let symbol = service.tokenSymbol
                 $0.value = self?.balanceRowValueFor(balance: wallet.balance, symbol: symbol, alert: wallet.notifications)
             } else {
                 $0.value = self?.balanceRowValueFor(balance: 0, symbol: symbol, alert: 0)
