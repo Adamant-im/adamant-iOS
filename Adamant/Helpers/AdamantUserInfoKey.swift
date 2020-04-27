@@ -9,5 +9,5 @@
 import Foundation
 
 struct AdamantUserInfoKey {
-	private init() {}
+    private init() {}
 }

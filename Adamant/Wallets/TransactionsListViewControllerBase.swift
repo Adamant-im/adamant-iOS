@@ -10,12 +10,14 @@ import UIKit
 import CoreData
 
 extension String.adamantLocalized {
-	struct transactionList {
-		static let title = NSLocalizedString("TransactionListScene.Title", comment: "TransactionList: scene title")
+    struct transactionList {
+        static let title = NSLocalizedString("TransactionListScene.Title", comment: "TransactionList: scene title")
         static let toChat = NSLocalizedString("TransactionListScene.ToChat", comment: "TransactionList: To Chat button")
         static let startChat = NSLocalizedString("TransactionListScene.StartChat", comment: "TransactionList: Start Chat button")
         static let notFound = NSLocalizedString("TransactionListScene.Error.NotFound", comment: "TransactionList: 'Transactions not found' message.")
-	}
+        static let noTransactionYet = NSLocalizedString("TransactionListScene.NoTransactionYet", comment: "TransactionList: 'No Transaction Yet' message.")
+        
+    }
 }
 
 // Extensions for a generic classes is limited, so delegates implemented right in class declaration
@@ -34,6 +36,7 @@ class TransactionsListViewControllerBase: UIViewController {
     
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var emptyLabel: UILabel!
     
     
     // MARK: - Lifecycle
@@ -46,6 +49,7 @@ class TransactionsListViewControllerBase: UIViewController {
         }
         
         navigationItem.title = String.adamantLocalized.transactionList.title
+        emptyLabel.text = String.adamantLocalized.transactionList.noTransactionYet
         
         // MARK: Configure tableView
         let nib = UINib.init(nibName: "TransactionTableViewCell", bundle: nil)
@@ -71,6 +75,8 @@ class TransactionsListViewControllerBase: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.emptyLabel.isHidden = true
+        
         if let indexPath = tableView.indexPathForSelectedRow {
             tableView.deselectRow(at: indexPath, animated: animated)
         }
@@ -79,7 +85,7 @@ class TransactionsListViewControllerBase: UIViewController {
             tableView.setEditing(false, animated: false)
         }
     }
-	
+    
     
     // MARK: - To override
     

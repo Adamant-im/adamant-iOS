@@ -13,15 +13,15 @@ protocol AccountHeaderViewDelegate: class {
 }
 
 class AccountHeaderView: UIView {
-	
-	// MARK: - IBOutlets
-	@IBOutlet weak var avatarImageView: UIImageView!
-	@IBOutlet weak var addressButton: UIButton!
-	@IBOutlet weak var walletViewContainer: UIView!
-	
-	weak var delegate: AccountHeaderViewDelegate?
-	
-	@IBAction func addressButtonTapped(_ sender: UIButton) {
+    
+    // MARK: - IBOutlets
+    @IBOutlet weak var avatarImageView: UIImageView!
+    @IBOutlet weak var addressButton: UIButton!
+    @IBOutlet weak var walletViewContainer: UIView!
+    
+    weak var delegate: AccountHeaderViewDelegate?
+    
+    @IBAction func addressButtonTapped(_ sender: UIButton) {
         delegate?.addressLabelTapped(from: sender)
-	}
+    }
 }

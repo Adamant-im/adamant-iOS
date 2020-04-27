@@ -9,13 +9,13 @@
 import Foundation
 
 extension AdamantScene {
-	struct Shared {
-		static let shareQr = AdamantScene(identifier: "ShareQrViewController", factory: { r in
-			let controller = ShareQrViewController(nibName: "ShareQrViewController", bundle: nil)
-			controller.dialogService = r.resolve(DialogService.self)
-			return controller
-		})
-		
-		private init() {}
-	}
+    struct Shared {
+        static let shareQr = AdamantScene(identifier: "ShareQrViewController", factory: { r in
+            let controller = ShareQrViewController(nibName: "ShareQrViewController", bundle: nil)
+            controller.dialogService = r.resolve(DialogService.self)
+            return controller
+        })
+        
+        private init() {}
+    }
 }

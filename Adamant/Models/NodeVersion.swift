@@ -9,10 +9,10 @@
 import Foundation
 
 struct NodeVersion: Codable {
-	let success: Bool
-	let build: String
-	let commit: String
-	let version: String
+    let success: Bool
+    let build: String
+    let commit: String
+    let version: String
     let nodeTimestamp: TimeInterval
     
     var nodeDate: Date {

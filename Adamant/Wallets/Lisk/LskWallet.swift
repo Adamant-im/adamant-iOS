@@ -10,13 +10,13 @@ import Foundation
 import Lisk
 
 class LskWallet: WalletAccount {
-	let address: String
+    let address: String
     let keyPair: KeyPair
-	var balance: Decimal = 0.0
-	var notifications: Int = 0
-	
+    var balance: Decimal = 0.0
+    var notifications: Int = 0
+    
     init(address: String, keyPair: KeyPair) {
-		self.address = address
+        self.address = address
         self.keyPair = keyPair
-	}
+    }
 }

@@ -454,7 +454,7 @@ extension AdamantDialogService {
         alertVC.alertTitle.textColor = UIColor.adamant.primary
         alertVC.alertDescription.textColor = UIColor.adamant.secondary
         alertVC.alertTitle.font = UIFont.systemFont(ofSize: 20)
-		alertVC.alertDescription.font = UIFont.systemFont(ofSize: 14, weight: .light)
+        alertVC.alertDescription.font = UIFont.systemFont(ofSize: 14, weight: .light)
         
         if let actions = actions {
             for action in actions {

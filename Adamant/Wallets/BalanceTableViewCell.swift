@@ -19,18 +19,18 @@ public struct BalanceRowValue: Equatable {
 
 // MARK: - Cell
 public final class BalanceTableViewCell: Cell<BalanceRowValue>, CellType {
-	
-	// MARK: Constants
-	static let compactHeight: CGFloat = 50.0
-	static let fullHeight: CGFloat = 58.0
-	
-	// MARK: IBOutlets
-	@IBOutlet var titleLabel: UILabel!
+    
+    // MARK: Constants
+    static let compactHeight: CGFloat = 50.0
+    static let fullHeight: CGFloat = 58.0
+    
+    // MARK: IBOutlets
+    @IBOutlet var titleLabel: UILabel!
     @IBOutlet var cryptoBalanceLabel: UILabel!
     @IBOutlet var fiatBalanceLabel: UILabel!
     @IBOutlet var alertLabel: RoundedLabel!
     
-	// MARK: Properties
+    // MARK: Properties
     var cryptoValue: String? {
         get {
             return cryptoBalanceLabel.text
@@ -40,15 +40,15 @@ public final class BalanceTableViewCell: Cell<BalanceRowValue>, CellType {
         }
     }
     
-	var fiatValue: String? {
-		get {
-			return fiatBalanceLabel.text
-		}
-		set {
-			fiatBalanceLabel.text = newValue
+    var fiatValue: String? {
+        get {
+            return fiatBalanceLabel.text
+        }
+        set {
+            fiatBalanceLabel.text = newValue
             fiatBalanceLabel.isHidden = newValue == nil
-		}
-	}
+        }
+    }
     
     var alertValue: Int? {
         get {

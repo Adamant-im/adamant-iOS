@@ -9,36 +9,36 @@
 import Foundation
 
 enum StateType {
-	case unknown(raw: Int)
-	case keyValue // 0
-	
-	var rawValue: Int {
-		switch self {
-		case .keyValue: return 0
-		case .unknown(let raw): return raw
-		}
-	}
+    case unknown(raw: Int)
+    case keyValue // 0
+    
+    var rawValue: Int {
+        switch self {
+        case .keyValue: return 0
+        case .unknown(let raw): return raw
+        }
+    }
 }
 
 extension StateType: Codable {
-	init(from decoder: Decoder) throws {
-		let container = try decoder.singleValueContainer()
-		let type = try container.decode(Int.self)
-		self = type.toStateType()
-	}
-	
-	func encode(to encoder: Encoder) throws {
-		var container = encoder.singleValueContainer()
-		try container.encode(self.rawValue)
-	}
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let type = try container.decode(Int.self)
+        self = type.toStateType()
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
 }
 
 fileprivate extension Int {
-	func toStateType() -> StateType {
-		switch self {
-		case 0: return .keyValue
-			
-		default: return .unknown(raw: self)
-		}
-	}
+    func toStateType() -> StateType {
+        switch self {
+        case 0: return .keyValue
+            
+        default: return .unknown(raw: self)
+        }
+    }
 }

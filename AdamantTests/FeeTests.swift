@@ -11,31 +11,31 @@ import XCTest
 
 class FeeTests: XCTestCase {
     func testTransferFee() {
-		let estimatedFee = Decimal(0.5)
-		XCTAssertEqual(estimatedFee, AdamantTransfersProvider().transferFee)
+        let estimatedFee = Decimal(0.5)
+        XCTAssertEqual(estimatedFee, AdamantTransfersProvider().transferFee)
     }
-	
-	func testShortMessageFee() {
-		let message = "A quick brown fox bought bitcoins in 2009. Good for you, mr fox. You quick brown mother fucker."
-		let estimatedFee = Decimal(0.001)
-		
-		XCTAssertEqual(estimatedFee, AdamantMessage.text(message).fee)
-	}
-	
-	func testLongMessageFee() {
-		let message = """
+    
+    func testShortMessageFee() {
+        let message = "A quick brown fox bought bitcoins in 2009. Good for you, mr fox. You quick brown mother fucker."
+        let estimatedFee = Decimal(0.001)
+        
+        XCTAssertEqual(estimatedFee, AdamantMessage.text(message).fee)
+    }
+    
+    func testLongMessageFee() {
+        let message = """
 The sperm whale's cerebrum is the largest in all mammalia, both in absolute and relative terms.
 The olfactory system is reduced, suggesting that the sperm whale has a poor sense of taste and smell.
 By contrast, the auditory system is enlarged.
 The pyramidal tract is poorly developed, reflecting the reduction of its limbs.
 """
-		let estimatedFee = Decimal(0.002)
-		
-		XCTAssertEqual(estimatedFee, AdamantMessage.text(message).fee)
-	}
-	
-	func testVeryLongMessageFee() {
-		let message = """
+        let estimatedFee = Decimal(0.002)
+        
+        XCTAssertEqual(estimatedFee, AdamantMessage.text(message).fee)
+    }
+    
+    func testVeryLongMessageFee() {
+        let message = """
 Lift you up again
 Give you to the trees
 All sound and visions are
@@ -83,8 +83,8 @@ I'll tell you when
 Mastodon / The Hunter / All The Heavy Lifting
 Brann Timothy Dailor / Troy Jayson Sanders / William Breen Kelliher / William Brent Hinds
 """
-		let estimatedFee = Decimal(0.004)
-		
-		XCTAssertEqual(estimatedFee, AdamantMessage.text(message).fee)
-	}
+        let estimatedFee = Decimal(0.004)
+        
+        XCTAssertEqual(estimatedFee, AdamantMessage.text(message).fee)
+    }
 }

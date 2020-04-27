@@ -15,28 +15,28 @@ public struct DoubleDetail: Equatable {
 }
 
 public final class DoubleDetailsTableViewCell: Cell<DoubleDetail>, CellType {
-	
-	// MARK: Constants
-	static let compactHeight: CGFloat = 50.0
-	static let fullHeight: CGFloat = 65.0
-	
-	// MARK: IBOutlets
-	@IBOutlet var titleLabel: UILabel!
-	@IBOutlet var detailsLabel: UILabel!
-	@IBOutlet var secondDetailsLabel: UILabel!
-	
-	// MARK: Properties
-	var secondValue: String? {
-		get {
-			return secondDetailsLabel.text
-		}
-		set {
-			secondDetailsLabel.text = newValue
-			if newValue == nil {
-				secondDetailsLabel.isHidden = true
-			}
-		}
-	}
+    
+    // MARK: Constants
+    static let compactHeight: CGFloat = 50.0
+    static let fullHeight: CGFloat = 65.0
+    
+    // MARK: IBOutlets
+    @IBOutlet var titleLabel: UILabel!
+    @IBOutlet var detailsLabel: UILabel!
+    @IBOutlet var secondDetailsLabel: UILabel!
+    
+    // MARK: Properties
+    var secondValue: String? {
+        get {
+            return secondDetailsLabel.text
+        }
+        set {
+            secondDetailsLabel.text = newValue
+            if newValue == nil {
+                secondDetailsLabel.isHidden = true
+            }
+        }
+    }
     
     public override func update() {
         super.update()

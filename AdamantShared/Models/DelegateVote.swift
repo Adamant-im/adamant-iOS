@@ -9,13 +9,13 @@
 import Foundation
 
 enum DelegateVote {
-	case upvote(publicKey: String)
-	case downvote(publicKey: String)
-	
-	func asString() -> String {
-		switch self {
-		case .upvote(let key): return "+\(key)"
-		case .downvote(let key): return "-\(key)"
-		}
-	}
+    case upvote(publicKey: String)
+    case downvote(publicKey: String)
+    
+    func asString() -> String {
+        switch self {
+        case .upvote(let key): return "+\(key)"
+        case .downvote(let key): return "-\(key)"
+        }
+    }
 }

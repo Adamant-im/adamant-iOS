@@ -10,9 +10,9 @@ import Foundation
 
 // MARK: - Wallet Account
 protocol WalletAccount {
-	// MARK: Account
-	var address: String { get }
-	var balance: Decimal { get }
-	
-	var notifications: Int { get }
+    // MARK: Account
+    var address: String { get }
+    var balance: Decimal { get }
+    
+    var notifications: Int { get }
 }

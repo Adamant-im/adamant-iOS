@@ -10,21 +10,21 @@ import Foundation
 import CoreData
 
 class InMemoryCoreDataStack: CoreDataStack {
-	let container: NSPersistentContainer
-	
-	init(modelUrl url: URL) throws {
-		guard let model = NSManagedObjectModel(contentsOf: url) else {
-			throw AdamantError(message: "Can't load ManagedObjectModel")
-		}
-		
-		let description = NSPersistentStoreDescription()
-		description.type = NSInMemoryStoreType
-		
-		container = NSPersistentContainer(name: "Adamant", managedObjectModel: model)
-		container.persistentStoreDescriptions = [description]
-		container.loadPersistentStores { (_, _) in }
-		
-		NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
+    let container: NSPersistentContainer
+    
+    init(modelUrl url: URL) throws {
+        guard let model = NSManagedObjectModel(contentsOf: url) else {
+            throw AdamantError(message: "Can't load ManagedObjectModel")
+        }
+        
+        let description = NSPersistentStoreDescription()
+        description.type = NSInMemoryStoreType
+        
+        container = NSPersistentContainer(name: "Adamant", managedObjectModel: model)
+        container.persistentStoreDescriptions = [description]
+        container.loadPersistentStores { (_, _) in }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
             guard let context = self?.container.viewContext else {
                 return
             }
@@ -41,6 +41,6 @@ class InMemoryCoreDataStack: CoreDataStack {
             } catch {
                 print("Got error saving context after reset")
             }
-		}
-	}
+        }
+    }
 }

@@ -9,15 +9,15 @@
 import Foundation
 
 struct StateAsset: Codable {
-	let key: String
-	let value: String
-	let type: StateType
+    let key: String
+    let value: String
+    let type: StateType
 }
 
 /* JSON
 "state": {
-	"value": "myValue",
-	"key": "myKey",
-	"type": 0
+    "value": "myValue",
+    "key": "myKey",
+    "type": 0
 }
 */

@@ -11,15 +11,15 @@ import Lisk
 
 // MARK: - Notifications
 extension Notification.Name {
-	struct LskApiService {
-		/// Raised when user has logged out.
-		static let userLoggedOut = Notification.Name("adamant.lskApiService.userHasLoggedOut")
-		
-		/// Raised when user has successfully logged in.
-		static let userLoggedIn = Notification.Name("adamant.lskApiService.userHasLoggedIn")
-		
-		private init() {}
-	}
+    struct LskApiService {
+        /// Raised when user has logged out.
+        static let userLoggedOut = Notification.Name("adamant.lskApiService.userHasLoggedOut")
+        
+        /// Raised when user has successfully logged in.
+        static let userLoggedIn = Notification.Name("adamant.lskApiService.userHasLoggedIn")
+        
+        private init() {}
+    }
 }
 
 protocol LskApiService: class {

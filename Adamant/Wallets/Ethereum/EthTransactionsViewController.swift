@@ -33,35 +33,37 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
         
         handleRefresh(self.refreshControl)
     }
-	
+    
     
     // MARK: - Overrides
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
-		guard let address = ethWalletService.wallet?.address else {
-			transactions = []
-			return
-		}
-		
-		ethWalletService.getTransactionsHistory(address: address) { [weak self] result in
-			guard let vc = self else {
-				return
-			}
+        self.emptyLabel.isHidden = true
+        guard let address = ethWalletService.wallet?.address else {
+            transactions = []
+            return
+        }
+        
+        ethWalletService.getTransactionsHistory(address: address) { [weak self] result in
+            guard let vc = self else {
+                return
+            }
 
-			switch result {
-			case .success(let transactions):
-				vc.transactions = transactions
+            switch result {
+            case .success(let transactions):
+                vc.transactions = transactions
 
-			case .failure(let error):
-				vc.transactions = []
-				vc.dialogService.showRichError(error: error)
-			}
+            case .failure(let error):
+                vc.transactions = []
+                vc.dialogService.showRichError(error: error)
+            }
 
-			DispatchQueue.main.async {
-				vc.tableView.reloadData()
-				vc.refreshControl.endRefreshing()
-			}
-		}
+            DispatchQueue.main.async {
+                vc.emptyLabel.isHidden = vc.transactions.count > 0
+                vc.tableView.reloadData()
+                vc.refreshControl.endRefreshing()
+            }
+        }
     }
     
     override func reloadData() {

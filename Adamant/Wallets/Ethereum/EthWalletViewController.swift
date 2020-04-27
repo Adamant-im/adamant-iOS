@@ -15,13 +15,13 @@ extension String.adamantLocalized.wallets {
 }
 
 class EthWalletViewController: WalletViewControllerBase {
-	// MARK: Lifecycle
-	
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		
-		walletTitleLabel.text = String.adamantLocalized.wallets.ethereum
-	}
+    // MARK: Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        walletTitleLabel.text = String.adamantLocalized.wallets.ethereum
+    }
     
     override func sendRowLocalizedLabel() -> String {
         return String.adamantLocalized.wallets.sendEth

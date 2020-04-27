@@ -12,9 +12,9 @@ import struct BigInt.BigUInt
 import PromiseKit
 
 extension EthereumTransaction: RawTransaction {
-	var txHash: String? {
-		return txhash
-	}
+    var txHash: String? {
+        return txhash
+    }
 }
 
 extension EthWalletService: WalletServiceTwoStepSend {

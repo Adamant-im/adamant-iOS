@@ -9,18 +9,18 @@
 import Foundation
 
 extension AdamantScene {
-	struct Login {
+    struct Login {
         static let login = AdamantScene(identifier: "LoginViewController", factory: { r in
-			let c = LoginViewController()
-			c.accountService = r.resolve(AccountService.self)
-			c.adamantCore = r.resolve(AdamantCore.self)
-			c.dialogService = r.resolve(DialogService.self)
-			c.localAuth = r.resolve(LocalAuthentication.self)
+            let c = LoginViewController()
+            c.accountService = r.resolve(AccountService.self)
+            c.adamantCore = r.resolve(AdamantCore.self)
+            c.dialogService = r.resolve(DialogService.self)
+            c.localAuth = r.resolve(LocalAuthentication.self)
             c.router = r.resolve(Router.self)
             c.apiService = r.resolve(ApiService.self)
-			return c
-		})
-		
-		private init() {}
-	}
+            return c
+        })
+        
+        private init() {}
+    }
 }

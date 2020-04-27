@@ -11,8 +11,8 @@ import BigInt
 import Lisk
 
 struct LskAccount {
-	let keys: KeyPair
-	let address: String
-	var balance: BigUInt?
-	var balanceString: String?
+    let keys: KeyPair
+    let address: String
+    var balance: BigUInt?
+    var balanceString: String?
 }

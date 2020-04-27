@@ -26,7 +26,7 @@ class LskWalletService: WalletService {
         vc.service = self
         return vc
     }
-	
+    
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.lskhWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.lskWallet.enabledChanged")
@@ -44,15 +44,15 @@ class LskWalletService: WalletService {
     var accountService: AccountService!
     var dialogService: DialogService!
     var router: Router!
-	
-	// MARK: - Constants
-	let addressRegex = try! NSRegularExpression(pattern: "^([0-9]{2,22})L$", options: [])
+    
+    // MARK: - Constants
+    let addressRegex = try! NSRegularExpression(pattern: "^([0-9]{2,22})L$", options: [])
     let maxAddressNumber = BigUInt("18446744073709551615")!
-	let transactionFee: Decimal = 0.1
-	private (set) var enabled = true
-	
-	static var currencySymbol = "LSK"
-	static var currencyLogo = #imageLiteral(resourceName: "wallet_lsk")
+    let transactionFee: Decimal = 0.1
+    private (set) var enabled = true
+    
+    static var currencySymbol = "LSK"
+    static var currencyLogo = #imageLiteral(resourceName: "wallet_lsk")
     static let currencyExponent = -8
     
     static let kvsAddress = "lsk:address"
@@ -80,12 +80,12 @@ class LskWalletService: WalletService {
     private (set) var lskWallet: LskWallet? = nil
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.lskWalletService", qos: .utility, attributes: [.concurrent])
-	
+    
     private let mainnet: Bool
     private let nodes: [APINode]
     
-	// MARK: - State
-	private (set) var state: WalletServiceState = .notInitiated
+    // MARK: - State
+    private (set) var state: WalletServiceState = .notInitiated
     
     private func setState(_ newState: WalletServiceState, silent: Bool = false) {
         guard newState != state else {
@@ -105,9 +105,9 @@ class LskWalletService: WalletService {
     
     // MARK: - Delayed KVS save
     private var balanceObserver: NSObjectProtocol? = nil
-	
-	
-	// MARK: - Logic
+    
+    
+    // MARK: - Logic
     convenience init(mainnet: Bool = true) {
         let nodes = mainnet ? APIOptions.mainnet.nodes : APIOptions.testnet.nodes
         self.init(mainnet: mainnet, nodes: nodes)
@@ -140,7 +140,7 @@ class LskWalletService: WalletService {
         }
     }
     
-	func update() {
+    func update() {
         guard let wallet = lskWallet else {
             return
         }
@@ -191,11 +191,11 @@ class LskWalletService: WalletService {
             
             self?.setState(.upToDate)
         }
-	}
-	
-	
-	// MARK: - Tools
-	func validate(address: String) -> AddressValidationResult {
+    }
+    
+    
+    // MARK: - Tools
+    func validate(address: String) -> AddressValidationResult {
         let full: String
         let short: String
         
@@ -216,7 +216,7 @@ class LskWalletService: WalletService {
         } else {
             return .invalid
         }
-	}
+    }
     
     func fromRawLsk(value: BigInt.BigUInt) -> String {
         if let formattedAmount = Web3.Utils.formatToPrecision(value, numberDecimals: 8, formattingDecimals: 8, decimalSeparator: ".", fallbackToScientific: false) {
@@ -238,16 +238,14 @@ class LskWalletService: WalletService {
 // MARK: - Nodes
 extension LskWalletService {
     private func initiateNodes(completion: @escaping (Bool) -> Void) {
-        getAliveNodes(from: nodes, timeout: 2.0) { nodes in
-            if nodes.count > 0 {
-                self.accountApi = Accounts(client: APIClient(options: APIOptions(nodes: nodes, nethash: APINethash.mainnet, randomNode: true)))
-                self.transactionApi = Transactions(client:  APIClient(options: APIOptions(nodes: nodes, nethash: APINethash.mainnet, randomNode: true)))
-                completion(true)
-            } else {
-                self.accountApi = nil
-                self.transactionApi = nil
-                completion(false)
-            }
+        if nodes.count > 0 {
+            self.accountApi = Accounts(client: APIClient(options: APIOptions(nodes: nodes, nethash: APINethash.mainnet, randomNode: true)))
+            self.transactionApi = Transactions(client:  APIClient(options: APIOptions(nodes: nodes, nethash: APINethash.mainnet, randomNode: true)))
+            completion(true)
+        } else {
+            self.accountApi = nil
+            self.transactionApi = nil
+            completion(false)
         }
     }
     

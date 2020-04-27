@@ -9,6 +9,6 @@
 import Foundation
 
 struct Keypair: Equatable {
-	let publicKey: String
-	let privateKey: String
+    let publicKey: String
+    let privateKey: String
 }

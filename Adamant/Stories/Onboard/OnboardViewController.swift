@@ -41,6 +41,7 @@ class OnboardViewController: UIViewController {
     // MARK: Outlets
     @IBOutlet weak var onboarding: SwiftyOnboard!
     @IBOutlet var skipButton: UIButton!
+    weak var agreeSwitch: UISwitch?
     
     // MARK: Properties
     fileprivate let items = [
@@ -69,6 +70,13 @@ class OnboardViewController: UIViewController {
     }
     
     @objc func handleSkip() {
+        guard self.agreeSwitch?.isOn == true else {
+            handleEula(true)
+            return
+        }
+        
+        UserDefaults.standard.set(true, forKey: StoreKey.application.eulaAccepted)
+        
         DispatchQueue.main.async { [weak self] in
             self?.dismiss(animated: true, completion: nil)
         }
@@ -85,6 +93,24 @@ class OnboardViewController: UIViewController {
             } else {
                 onboarding.goToPage(index: onboarding.currentPage + 1, animated: true)
             }
+        }
+    }
+    
+    @objc func handleEula(_ skip: Bool = false) {
+        DispatchQueue.main.async { [weak self] in
+            let eula = EulaViewController(nibName: "EulaViewController", bundle: nil)
+            eula.onAccept = {
+                self?.agreeSwitch?.isOn = true
+                if skip {
+                    self?.handleSkip()
+                }
+            }
+            eula.onDecline = {
+                self?.agreeSwitch?.isOn = false
+            }
+            let vc = UINavigationController(rootViewController: eula)
+            vc.modalPresentationStyle = .overFullScreen
+            self?.present(vc, animated: true, completion: nil)
         }
     }
 }
@@ -114,11 +140,14 @@ extension OnboardViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
     }
     
     func swiftyOnboardViewForOverlay(_ swiftyOnboard: SwiftyOnboard) -> SwiftyOnboardOverlay? {
-        let overlay = SwiftyOnboardOverlay()
+        let overlay = OnboardOverlay()
+        overlay.setUp()
         
         //Setup targets for the buttons on the overlay view:
         overlay.skipButton.addTarget(self, action: #selector(handleSkip), for: .touchUpInside)
         overlay.continueButton.addTarget(self, action: #selector(handleContinue), for: .touchUpInside)
+        
+        agreeSwitch = overlay.agreeSwitch
         
         //Setup for the overlay buttons:
         overlay.continueButton.titleLabel?.font = OnboardViewController.buttonsFont
@@ -126,6 +155,8 @@ extension OnboardViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
         
         overlay.skipButton.titleLabel?.font = OnboardViewController.buttonsFont
         overlay.skipButton.setTitle(String.adamantLocalized.Onboard.skipButton, for: .normal)
+        
+        overlay.eulaButton.addTarget(self, action: #selector(handleEula), for: .touchUpInside)
         
         return overlay
     }

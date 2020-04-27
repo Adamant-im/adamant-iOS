@@ -39,3 +39,11 @@ extension UIButton: XIBLocalizable {
         }
     }
 }
+extension UITextView: XIBLocalizable {
+    @IBInspectable var xibLocKey: String? {
+        get { return nil }
+        set(key) {
+            text = key?.localized
+        }
+    }
+}

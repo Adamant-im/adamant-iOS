@@ -9,8 +9,8 @@
 import Foundation
 
 extension AdamantScene {
-	struct Wallets {
-		
-		private init() { }
-	}
+    struct Wallets {
+        
+        private init() { }
+    }
 }

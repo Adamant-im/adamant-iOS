@@ -242,7 +242,7 @@
 "ChatListPage.Title" = "Чаты";
 
 /* ChatsProvider: Notify user that he doesn't have money to pay a message fee */
-"ChatsProvider.Error.notEnoughMoney" = "Недостаточно токенов для отправки сообщения";
+"ChatsProvider.Error.notEnoughMoney" = "Баланс нулевой. Получите бесплатные ADM-токены";
 
 /* ChatsProvider: Transaction not found error. %@ for transaction's ID */
 "ChatsProvider.Error.TransactionNotFoundFormat" = "Сообщение с идентификатором %@ не найдено";
@@ -274,6 +274,27 @@
 
 /* Alert 'Retry Or Delete' body message. Used in chat for sending failed messages again or delete them */
 "Chats.RetryOrDelete.Body" = "Попробовать отправить сообщение еще раз, или удалить его?";
+
+/* Button "Block" */
+"Chats.Block" = "Заблокировать";
+
+/* Alert "Block this user?" */
+"Chats.BlockUser" = "Заблокировать пользователя?";
+
+/* Button "Remove" */
+"Chats.Remove" = "Удалить";
+
+/* Alert "Delete this message?" */
+"Chats.RemoveMessage" = "Удалить сообщение?";
+
+/* Button "Report" */
+"Chats.Report" = "Пожаловаться";
+
+/* Alert "Report as inappropriate?" */
+"Chats.ReportMessage" = "Пожаловаться на сообщение?";
+
+/* Alert "Report has been sent" */
+"Chats.ReportSent" = "Запрос отправлен";
 
 /* Chat: inform user that he can't cancel transaction, that was sent */
 "ChatScene.Error.cancelError" = "Сообщение уже отправлено";
@@ -308,6 +329,12 @@
 /* Chat: 'Name' field in actions menu */
 "ChatScene.Actions.NamePlaceholder" = "Имя";
 
+/* Chat: 'Free Tokens' button */
+"ChatScene.FreeTokensAlert.FreeTokens" = "Бесплатные токены";
+
+/* Chat: 'Free Tokens' message */
+"ChatScene.FreeTokensAlert.Message" = "АДАМАНТ — мессенджер, полностью работающий на блокчейне, независимый от государств, корпораций и даже разработчиков. Это возможно благодаря децентрализованной сетевой инфраструктуре, с полностью открытым исходным кодом и поддерживаемой пользователями. Поэтому каждое действие, включая отправку сообщения или сохранение адресной книги, имеет комиссию сети 0.001 ADM. Чтобы начать общение, получите бесплатные токены.";
+
 /* Chat: warning message for opening email link without mail app configurated on device */
 "ChatScene.Warning.NoMailApp" = "Не удалось открыть почтовое приложение. Проверьте настройки.";
 
@@ -319,6 +346,9 @@
 
 /* Delegates tab: Message about 50 ADM fee for vote */
 "Delegates.NotEnoughtTokensForVote" = "Недостаточно токенов для голосования. Нужно 50 ADM";
+
+/* Delegates tab: Message about time out for new vote */
+"Delegates.timeOutBeforeNewVote" = "Пожалуйста, подождите, пока будет обработан предыдущий голос";
 
 /* Delegate details: scene title */
 "DelegateDetails.Title" = "Подробности";
@@ -710,6 +740,9 @@
 /* TransactionList: 'Transactions not found' message. */
 "TransactionListScene.Error.NotFound" = "Транзакции не найдены";
 
+/* TransactionList: 'No transactions yet' message. */
+"TransactionListScene.NoTransactionYet" = "Транзакций пока нет";
+
 /* TransactionList: 'Transactions not found' localize error message from API. */
 "No transactions found" = "Транзакции не найдены";
 
@@ -919,3 +952,9 @@
 
 /* Welcome: Skip button" */
 "WelcomeScene.Description.SkipButton" = "Пропустить";
+
+/* EULA */
+"EULA.Title" = "Условия использования";
+"EULA.Accept" = "Принять";
+"EULA.Decline" = "Отказаться";
+"EULA.Text" = "ADAMANT Messenger основан на децентрализованных технологиях и блокчейне, вследствие чего:\n\n✓ ADAMANT Messenger не допускает незаконный контент или оскорбляющих пользователей\n✓ ADAMANT Messenger изначально сосредоточен на безопасности обмена сообщениями и конфиденциальности своих пользователей.\n✓ Исходный код ADAMANT Messenger всегда в полном объеме доступен под лицензией GPL-3.0. Исходный код доступен в GitHub: github.com/adamant-im\n✓ Использование ADAMANT Messenger предполагается без гарантии, по модели «как есть».\n✓ Разработчики лишь вносят вклад в развитие ADAMANT Messenger.\n✓ Разработчики не имеют возможности контролировать действия пользователей ADAMANT Messenger.\n✓ Разработчики не имеют никаких привилегий в использовании ADAMANT Messenger.\n✓ Разработчики не имеют возможности ограничивать, отключать или блокировать какие-либо учетные записи в ADAMANT Messenger.\n✓ Разработчики не имеют возможности получить ключи шифрования или читать сообщения, или другую информацию пользователей ADAMANT Messenger.\n✓ Разработчики не имеют возможности восстановить доступ к любой учетной записи пользователя в случае ее утери. Только сами пользователи несут ответственность за безопасность и защиту данных своих учетных записей.\n✓ Разработчики не несут ответственности за контент, вносимый пользователем, его сообщения, данные мультимедиа, а также за цели и намерения пользователей при использовании ADAMANT Messenger.\n✓ Разработчики не имеют возможности хранить информацию, передаваемую между пользователями (сообщения, мультимедиа) и не несут ответственности за ее хранение в блокчейне.\n✓ Разработчики не несут ответственности за какие-либо ценные активы (включая, но не ограничиваясь криптовалютами), связанные с или отправленные посредством ADAMANT Messenger, и не имеют возможности доступа к ним.\n✓ ADAMANT Messenger сохраняет метаданные, как факты отправки сообщений, записи о которых доступны публично в блокчейне.\n✓ Разработчики не сотрудничают ни с третьими сторонами, ни с внешними сервисами и компаниями с точки зрения предоставления данных об использовании ADAMANT Messenger.\n✓ Инфраструктура ADAMANT Messenger (узлы блокчейна) принадлежит пользователям и управляется пользователями.\n✓ Разработчики не имеют возможности деактивировать, остановить или приостановить работу ADAMANT Messenger. Разработчики не предоставляют никаких гарантий на безошибочную работу и запуск ADAMANT Messenger и не несут ответственность за стабильную работу ADAMANT Messenger.\n✓ Разработчики не несут ответственности за возможные риски, издержки и проблемы, связанные с ADAMANT Messenger.\n✓ Пользователи ADAMANT Messenger впредь берут на себя всю ответственность за его использование, включая, но не ограничиваясь перечисленным: легитимность блокчейна и других технологий, применяемых в ADAMANT Messenger, использование анонимных сервисов обмена сообщениями, и другие законы, связанные с использованием подобных сервисов.\n\nИспользуя ADAMANT Messenger, вы принимаете настоящие Условия использования и согласны с ними в дальнейшем.";

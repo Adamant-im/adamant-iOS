@@ -214,25 +214,25 @@ extension AdamantApiService {
         }
     }
     
-	func voteForDelegates(from address: String, keypair: Keypair, votes: [DelegateVote], completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
+    func voteForDelegates(from address: String, keypair: Keypair, votes: [DelegateVote], completion: @escaping (ApiServiceResult<UInt64>) -> Void) {
         self.sendingMsgTaskId = UIApplication.shared.beginBackgroundTask {
             UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
             self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
         }
         
-		// MARK: 0. Prepare
-		var votesOrdered = votes
-		_ = votesOrdered.partition {
-			switch $0 {
-			case .upvote: return false
-			case .downvote: return true
-			}
-		}
-		
-		let votesAsset = VotesAsset(votes: votesOrdered)
-		
+        // MARK: 0. Prepare
+        var votesOrdered = votes
+        _ = votesOrdered.partition {
+            switch $0 {
+            case .upvote: return false
+            case .downvote: return true
+            }
+        }
+        
+        let votesAsset = VotesAsset(votes: votesOrdered)
+        
         // MARK: 1. Create and sign transaction
-		let asset = TransactionAsset(votes: votesAsset)
+        let asset = TransactionAsset(votes: votesAsset)
         let transaction = NormalizedTransaction(type: .vote,
                                                 amount: 0,
                                                 senderPublicKey: keypair.publicKey,
@@ -244,7 +244,7 @@ extension AdamantApiService {
             completion(.failure(.internalError(message: "Failed to sign transaction", error: nil)))
             return
         }
-		
+        
         // MARK: 2. Prepare params
         let params: [String: Any] = [
             "type": transaction.type.rawValue,
@@ -272,7 +272,7 @@ extension AdamantApiService {
             completion(.failure(err))
             return
         }
-		
+        
         // MARK: 4. Send
         sendRequest(url: endpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerResponse>) in
             switch serverResponse {

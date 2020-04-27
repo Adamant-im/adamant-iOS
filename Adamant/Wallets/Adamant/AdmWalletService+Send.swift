@@ -9,20 +9,20 @@
 import UIKit
 
 extension AdmWalletService: WalletServiceSimpleSend {
-	/// Transaction ID
-	typealias T = Int
-	
-	func transferViewController() -> UIViewController {
-		guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.transfer) as? AdmTransferViewController else {
-			fatalError("Can't get AdmTransferViewController")
-		}
-		
-		vc.service = self
-		return vc
-	}
-	
-	
-	func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<TransactionDetails>) -> Void) {
+    /// Transaction ID
+    typealias T = Int
+    
+    func transferViewController() -> UIViewController {
+        guard let vc = router.get(scene: AdamantScene.Wallets.Adamant.transfer) as? AdmTransferViewController else {
+            fatalError("Can't get AdmTransferViewController")
+        }
+        
+        vc.service = self
+        return vc
+    }
+    
+    
+    func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<TransactionDetails>) -> Void) {
         transfersProvider.transferFunds(toAddress: recipient, amount: amount, comment: comments) { result in
             switch result {
             case .success(let transaction):
@@ -32,7 +32,7 @@ extension AdmWalletService: WalletServiceSimpleSend {
                 completion(.failure(error: error.asWalletServiceError()))
             }
         }
-	}
+    }
 }
 
 extension TransfersProviderError {
