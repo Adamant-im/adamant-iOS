@@ -137,6 +137,10 @@ class TransactionDetailsViewControllerBase: FormViewController {
     private lazy var currencyFormatter: NumberFormatter = {
         return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
     }()
+
+    var feeFormatter: NumberFormatter {
+        return currencyFormatter
+    }
     
     private lazy var fiatFormatter: NumberFormatter = {
         return AdamantBalanceFormat.fiatFormatter(for: currencyInfo.currentCurrency)
@@ -341,7 +345,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.title = Rows.fee.localized
             
             if let value = transaction?.feeValue {
-                $0.value = currencyFormatter.string(from: value)
+                $0.value = feeFormatter.string(from: value)
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
@@ -354,7 +358,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
             
-            if let value = self?.transaction?.feeValue, let formatter = self?.currencyFormatter {
+            if let value = self?.transaction?.feeValue, let formatter = self?.feeFormatter {
                 row.value = formatter.string(from: value)
             } else {
                 row.value = TransactionDetailsViewControllerBase.awaitingValueString

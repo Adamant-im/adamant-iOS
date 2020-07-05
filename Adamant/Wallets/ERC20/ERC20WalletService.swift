@@ -34,6 +34,7 @@ class ERC20WalletService: WalletService {
     }
     
     private (set) var transactionFee: Decimal = 0.0
+    private (set) var diplayTransactionFee: Decimal = 0.0
     
     static let transferGas: Decimal = 21000
     static let kvsAddress = "eth:address"
@@ -219,14 +220,14 @@ class ERC20WalletService: WalletService {
         getGasPrices { [weak self] result in
             switch result {
             case .success(let price):
-                guard let fee = self?.transactionFee else {
+                guard let fee = self?.diplayTransactionFee else {
                     return
                 }
                 
                 let newFee = price * EthWalletService.transferGas
                 
                 if fee != newFee {
-                    self?.transactionFee = newFee
+                    self?.diplayTransactionFee = newFee
                     
                     if let notification = self?.transactionFeeUpdated {
                         NotificationCenter.default.post(name: notification, object: self, userInfo: nil)

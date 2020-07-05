@@ -17,6 +17,9 @@ class ERC20TransactionDetailsViewController: TransactionDetailsViewControllerBas
     
     private let autoupdateInterval: TimeInterval = 5.0
     weak var timer: Timer?
+    override var feeFormatter: NumberFormatter {
+        return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: EthWalletService.currencySymbol)
+    }
     
     private lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()

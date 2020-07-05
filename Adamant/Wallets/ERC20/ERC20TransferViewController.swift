@@ -23,7 +23,10 @@ class ERC20TransferViewController: TransferViewControllerBase {
     static let invalidCharacters: CharacterSet = {
         CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789").inverted
     }()
-    
+
+    override var feeBalanceFormatter: NumberFormatter {
+        return AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: EthWalletService.currencySymbol)
+    }
     
     // MARK: Send
     
@@ -69,19 +72,21 @@ class ERC20TransferViewController: TransferViewControllerBase {
                             case .success(let transaction):
                                 vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
 
-                                if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController {
-                                    detailsVc.transaction = transaction
-                                    detailsVc.service = service
-                                    detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                                    detailsVc.recipientName = self?.recipientName
+                                DispatchQueue.main.async {
+                                    if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController {
+                                        detailsVc.transaction = transaction
+                                        detailsVc.service = service
+                                        detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                                        detailsVc.recipientName = self?.recipientName
 
-                                    if comments.count > 0 {
-                                        detailsVc.comment = comments
+                                        if comments.count > 0 {
+                                            detailsVc.comment = comments
+                                        }
+
+                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+                                    } else {
+                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
                                     }
-
-                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-                                } else {
-                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
                                 }
 
                             case .failure(let error):

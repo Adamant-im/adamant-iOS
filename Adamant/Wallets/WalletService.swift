@@ -242,12 +242,16 @@ protocol WalletServiceWithTransfers: WalletService {
 protocol WalletServiceWithSend: WalletService {
     var transactionFeeUpdated: Notification.Name { get }
     
+    var diplayTransactionFee : Decimal { get }
     var transactionFee : Decimal { get }
     var commentsEnabledForRichMessages: Bool { get }
     func transferViewController() -> UIViewController
 }
 
 extension WalletServiceWithSend {
+    var diplayTransactionFee: Decimal {
+        return transactionFee
+    }
     var commentsEnabledForRichMessages: Bool {
         return true
     }

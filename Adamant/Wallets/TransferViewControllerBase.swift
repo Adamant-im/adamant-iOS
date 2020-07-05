@@ -200,17 +200,13 @@ class TransferViewControllerBase: FormViewController {
     var rate: Decimal? = nil
     
     var maxToTransfer: Decimal {
-        guard let service = service, let balance = service.wallet?.balance else {
+        guard
+            let service = service,
+            let balance = service.wallet?.balance,
+            balance > 0 else {
             return 0
         }
-        
-        let max = balance - service.transactionFee
-        
-        if max >= 0 {
-            return max
-        } else {
-            return 0
-        }
+        return balance
     }
     
     override var customNavigationAccessoryView: (UIView & NavigationAccessory)? {
@@ -526,6 +522,10 @@ class TransferViewControllerBase: FormViewController {
             return AdamantBalanceFormat.full.defaultFormatter
         }
     }
+
+    var feeBalanceFormatter: NumberFormatter {
+        return balanceFormatter
+    }
     
     /// Override this to provide custom validation logic
     /// Default - positive number, amount + fee less than or equal to wallet balance
@@ -730,9 +730,9 @@ extension TransferViewControllerBase {
                 $0.tag = BaseRows.fee.tag
                 $0.title = BaseRows.fee.localized
                 $0.disabled = true
-                $0.formatter = self?.balanceFormatter
+                $0.formatter = self?.feeBalanceFormatter
             
-                if let fee = self?.service?.transactionFee {
+                if let fee = self?.service?.diplayTransactionFee {
                     $0.value = fee.doubleValue
                 } else {
                     $0.value = 0
