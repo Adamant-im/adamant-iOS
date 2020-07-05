@@ -23,10 +23,20 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     
     /// Lazy contstructors
     private lazy var richMessageProviders: [String: () -> TransferNotificationContentProvider] = {
-        return [EthProvider.richMessageType: { EthProvider() },
-                LskProvider.richMessageType: { LskProvider() },
-                DogeProvider.richMessageType: { DogeProvider() },
-                DashProvider.richMessageType: { DashProvider() }]
+        var providers: [String: () -> TransferNotificationContentProvider] = [
+            EthProvider.richMessageType: { EthProvider() },
+            LskProvider.richMessageType: { LskProvider() },
+            DogeProvider.richMessageType: { DogeProvider() },
+            DashProvider.richMessageType: { DashProvider() }
+        ]
+        
+        for token in ERC20Token.supportedTokens {
+            let key = "\(token.symbol.lowercased())_transaction"
+            let block = { ERC20Provider(token) }
+            providers[key] = block
+        }
+        
+        return providers
     }()
     
     // MARK: - IBOutlets

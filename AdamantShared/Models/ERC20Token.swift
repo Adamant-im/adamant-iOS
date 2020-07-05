@@ -9,6 +9,14 @@
 import UIKit
 
 struct ERC20Token {
+
+    static let supportedTokens: [ERC20Token] = [
+        .BNB,
+        .BZ,
+        .KCS,
+        .USDS,
+        .RES
+    ]
     
     static let BNB = ERC20Token(symbol: "BNB", name: "Binance Coin", contractAddress: "0xB8c77482e45F1F44dE1745F52C74426C631bDD52", decimals: 18, logo: #imageLiteral(resourceName: "wallet_bnb_row"))
     static let BZ = ERC20Token(symbol: "BZ", name: "Bit-Z", contractAddress: "0x4375e7ad8a01b8ec3ed041399f62d9cd120e0063", decimals: 18, logo: #imageLiteral(resourceName: "wallet_bz_row"))
