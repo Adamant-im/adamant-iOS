@@ -38,28 +38,29 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Overrides
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
+        emptyLabel.isHidden = true
+        
         guard let address = walletService.wallet?.address else {
             transactions = []
             return
         }
         
         walletService.getTransactionsHistory(address: address) { [weak self] result in
-            guard let vc = self else {
-                return
-            }
+            guard let self = self else { return }
             
             switch result {
             case .success(let transactions):
-                vc.transactions = transactions
+                self.transactions = transactions
                 
             case .failure(let error):
-                vc.transactions = []
-                vc.dialogService.showRichError(error: error)
+                self.transactions = []
+                self.dialogService.showRichError(error: error)
             }
             
             DispatchQueue.main.async {
-                vc.tableView.reloadData()
-                vc.refreshControl.endRefreshing()
+                self.emptyLabel.isHidden = self.transactions.count > 0
+                self.tableView.reloadData()
+                self.refreshControl.endRefreshing()
             }
         }
     }
