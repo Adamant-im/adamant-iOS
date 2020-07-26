@@ -159,10 +159,15 @@ extension EthTransaction: TransactionDetails {
 
 // MARK: - From EthereumTransaction
 extension EthereumTransaction {
-    func asEthTransaction(date: Date?, gasUsed: BigUInt?, blockNumber: String?, confirmations: String?, receiptStatus: TransactionReceipt.TXStatus, isOutgoing: Bool, hash: String? = nil) -> EthTransaction {
+    func asEthTransaction(date: Date?, gasUsed: BigUInt?, blockNumber: String?, confirmations: String?, receiptStatus: TransactionReceipt.TXStatus, isOutgoing: Bool, hash: String? = nil, for token: ERC20Token? = nil) -> EthTransaction {
         
         var recipient = self.to
         var txValue = value
+        
+        var exponent = EthWalletService.currencyExponent
+        if let naturalUnits = token?.naturalUnits {
+            exponent = -naturalUnits
+        }
         
         if data.count > 0 {
             let addressRaw = Data(data[16 ..< 36]).toHexString()
@@ -176,7 +181,7 @@ extension EthereumTransaction {
         
         return EthTransaction(date: date,
                               hash: hash ?? txhash ?? "",
-                              value: txValue.asDecimal(exponent: EthWalletService.currencyExponent),
+                              value: txValue.asDecimal(exponent: exponent),
                               from: sender?.address ?? "",
                               to: recipient.address,
                               gasUsed: gasUsed?.asDecimal(exponent: 0),

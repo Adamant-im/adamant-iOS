@@ -400,7 +400,7 @@ extension ERC20WalletService {
                     isOutgoing = false
                 }
                 
-                let ethTransaction = transaction.asEthTransaction(date: block.timestamp, gasUsed: receipt.gasUsed, blockNumber: String(blockNumber), confirmations: String(confirmations), receiptStatus: receipt.status, isOutgoing: isOutgoing)
+                let ethTransaction = transaction.asEthTransaction(date: block.timestamp, gasUsed: receipt.gasUsed, blockNumber: String(blockNumber), confirmations: String(confirmations), receiptStatus: receipt.status, isOutgoing: isOutgoing, for: self.token)
                 
                 completion(.success(result: ethTransaction))
             } catch let error as Web3Error {
