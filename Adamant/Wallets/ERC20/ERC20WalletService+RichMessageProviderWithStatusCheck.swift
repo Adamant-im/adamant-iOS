@@ -57,7 +57,15 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
                 }
                 
                 // MARK: Compare amounts
-                guard let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reported = AdamantBalanceFormat.deserializeBalance(from: raw), reported == tx.value else {
+                guard let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reportedValue = AdamantBalanceFormat.deserializeBalance(from: raw) else {
+                    completion(.success(result: .warning))
+                    return
+                }
+                
+                let min = reportedValue - reportedValue*0.005
+                let max = reportedValue + reportedValue*0.005
+                
+                guard (min...max).contains(tx.value) else {
                     completion(.success(result: .warning))
                     return
                 }
