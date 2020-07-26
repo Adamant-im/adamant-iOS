@@ -1354,16 +1354,6 @@
 		E9220E0C21988D9A009C9642 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
-				64DD07EF22D10A0E00818FD5 /* ERC20WalletService+RichMessageProvider.swift */,
-				64DD07E922D0C5B500818FD5 /* ERC20TransactionsViewController.swift */,
-				646DF92A22C3CE3900DCC864 /* ERC20WalletRouter.swift */,
-				646DF92822C33AAE00DCC864 /* ERC20WalletService.swift */,
-				646DF92C22C3D15800DCC864 /* ERC20WalletViewController.swift */,
-				646DF92622C33A9F00DCC864 /* ERC20Wallet.swift */,
-				64DD07F122D10A2800818FD5 /* ERC20WalletService+RichMessageProviderWithStatusCheck.swift */,
-				64DD07EB22D0C65800818FD5 /* ERC20TransactionDetailsViewController.swift */,
-				64DD07ED22D109F500818FD5 /* ERC20WalletService+Send.swift */,
-				64DD07F322D1F95400818FD5 /* ERC20TransferViewController.swift */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
