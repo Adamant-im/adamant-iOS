@@ -604,10 +604,6 @@
 		6489794A24CE00C000C33A68 /* SwiftyOnboardPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftyOnboardPage.swift; sourceTree = "<group>"; };
 		6489794B24CE00C000C33A68 /* SwiftyOnboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftyOnboard.swift; sourceTree = "<group>"; };
 		6489794C24CE00C000C33A68 /* SwiftyOnboardOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftyOnboardOverlay.swift; sourceTree = "<group>"; };
-		646DF92622C33A9F00DCC864 /* ERC20Wallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20Wallet.swift; sourceTree = "<group>"; };
-		646DF92822C33AAE00DCC864 /* ERC20WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20WalletService.swift; sourceTree = "<group>"; };
-		646DF92A22C3CE3900DCC864 /* ERC20WalletRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20WalletRouter.swift; sourceTree = "<group>"; };
-		646DF92C22C3D15800DCC864 /* ERC20WalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20WalletViewController.swift; sourceTree = "<group>"; };
 		648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantAvatarService.swift; sourceTree = "<group>"; };
 		648BCA6C213D384F00875EB5 /* AvatarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarService.swift; sourceTree = "<group>"; };
 		648C696E22915A12006645F5 /* DashTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashTransaction.swift; sourceTree = "<group>"; };
@@ -641,12 +637,6 @@
 		64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetails.swift; sourceTree = "<group>"; };
 		64C65F4423893C7600DC0425 /* OnboardOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardOverlay.swift; sourceTree = "<group>"; };
 		64D059FE20D3116A003AD655 /* NodesListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodesListViewController.swift; sourceTree = "<group>"; };
-		64DD07E922D0C5B500818FD5 /* ERC20TransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20TransactionsViewController.swift; sourceTree = "<group>"; };
-		64DD07EB22D0C65800818FD5 /* ERC20TransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20TransactionDetailsViewController.swift; sourceTree = "<group>"; };
-		64DD07ED22D109F500818FD5 /* ERC20WalletService+Send.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ERC20WalletService+Send.swift"; sourceTree = "<group>"; };
-		64DD07EF22D10A0E00818FD5 /* ERC20WalletService+RichMessageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ERC20WalletService+RichMessageProvider.swift"; sourceTree = "<group>"; };
-		64DD07F122D10A2800818FD5 /* ERC20WalletService+RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ERC20WalletService+RichMessageProviderWithStatusCheck.swift"; sourceTree = "<group>"; };
-		64DD07F322D1F95400818FD5 /* ERC20TransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERC20TransferViewController.swift; sourceTree = "<group>"; };
 		64E1C82C222E95E2006C4DA7 /* DogeWalletRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletRoutes.swift; sourceTree = "<group>"; };
 		64E1C82E222E95F6006C4DA7 /* DogeWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWallet.swift; sourceTree = "<group>"; };
 		64E1C830222E9617006C4DA7 /* DogeWalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogeWalletService.swift; sourceTree = "<group>"; };
@@ -3144,7 +3134,7 @@
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.9.2;
+				MARKETING_VERSION = 2.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.TransferNotificationContentExtension";
@@ -3170,7 +3160,7 @@
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.9.2;
+				MARKETING_VERSION = 2.0.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.TransferNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3194,7 +3184,7 @@
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.9.2;
+				MARKETING_VERSION = 2.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.NotificationServiceExtension";
