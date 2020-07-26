@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		1DDD23FEDFC7A122D2EA5E39 /* Pods_NotificationServiceExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53D3CE61AE0A5F67EEF5270A /* Pods_NotificationServiceExtension.framework */; };
 		3C06931576393125C61FB8F6 /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */; };
-		6403F5DB2272389800D58779 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		6403F5DB2272389800D58779 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		6403F5DE22723C6800D58779 /* DashMainnet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5DD22723C6800D58779 /* DashMainnet.swift */; };
 		6403F5E022723F6400D58779 /* DashWalletRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5DF22723F6400D58779 /* DashWalletRouter.swift */; };
 		6403F5E222723F7500D58779 /* DashWallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5E122723F7500D58779 /* DashWallet.swift */; };
@@ -2527,7 +2527,7 @@
 				E96BBE3121F70F5E009AA738 /* ReadonlyTextView.swift in Sources */,
 				E926E032213EC43B005E536B /* FullscreenAlertView.swift in Sources */,
 				644EC35B20EFB8E900F40C73 /* AdamantDelegateCell.swift in Sources */,
-				6403F5DB2272389800D58779 /* BuildFile in Sources */,
+				6403F5DB2272389800D58779 /* (null) in Sources */,
 				6416B1A521AEE157006089AC /* LskWalletService+Transfers.swift in Sources */,
 				648DD7A62237DC4000B811FD /* DogeTransferViewController.swift in Sources */,
 				E9960B3421F5154300C840A8 /* BaseAccount+CoreDataProperties.swift in Sources */,
@@ -2932,12 +2932,12 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/Debug.entitlements;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 119;
+				CURRENT_PROJECT_VERSION = 121;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.9.2;
+				MARKETING_VERSION = 2.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.MessageNotificationContentExtension";
@@ -2958,12 +2958,12 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 119;
+				CURRENT_PROJECT_VERSION = 121;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.9.2;
+				MARKETING_VERSION = 2.0.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.MessageNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3099,15 +3099,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Debug;
 				CODE_SIGN_ENTITLEMENTS = Adamant/Debug.entitlements;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 119;
+				CURRENT_PROJECT_VERSION = 121;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = ADM.Dev;
 				EXCLUDED_SOURCE_FILE_NAMES = "";
 				INFOPLIST_FILE = Adamant/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.9.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev";
+				MARKETING_VERSION = 2.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "e4233bbf-3705-44fe-95b0-e77475672c60";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev";
@@ -3125,7 +3125,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 119;
+				CURRENT_PROJECT_VERSION = 121;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = Adamant;
 				EXCLUDED_SOURCE_FILE_NAMES = Debug.xcassets;
@@ -3149,7 +3149,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = TransferNotificationContentExtension/Debug.entitlements;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 119;
+				CURRENT_PROJECT_VERSION = 121;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -3175,7 +3175,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 119;
+				CURRENT_PROJECT_VERSION = 121;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -3199,7 +3199,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/Debug.entitlements;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 119;
+				CURRENT_PROJECT_VERSION = 121;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -3225,12 +3225,12 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 119;
+				CURRENT_PROJECT_VERSION = 121;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.9.2;
+				MARKETING_VERSION = 2.0.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.NotificationServiceExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
