@@ -210,7 +210,7 @@ class ERC20WalletService: WalletService {
                     break
                     
                 default:
-                    self?.dialogService.showRichError(error: error)
+                    print("\(error.localizedDescription)")
                 }
             }
             
