@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import SwiftyOnboard
 
 class OnboardOverlay: SwiftyOnboardOverlay {
     
@@ -40,7 +39,7 @@ class OnboardOverlay: SwiftyOnboardOverlay {
         return button
     }()
     
-    func setUp() {
+    func configure() {
         let margin = self.layoutMarginsGuide
         
         let stack = UIStackView(arrangedSubviews: [agreeSwitch, agreeLabel, eulaButton])

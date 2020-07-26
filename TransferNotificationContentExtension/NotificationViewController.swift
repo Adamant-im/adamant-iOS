@@ -31,7 +31,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         ]
         
         for token in ERC20Token.supportedTokens {
-            let key = "\(token.symbol.lowercased())_transaction"
+            let key = "\(token.symbol)_transaction".lowercased()
             let block = { ERC20Provider(token) }
             providers[key] = block
         }

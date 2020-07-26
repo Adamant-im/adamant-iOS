@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import SwiftyOnboard
 
 class OnboardPage: SwiftyOnboardPage {
 

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import SwiftyOnboard
 import SafariServices
 
 fileprivate class OnboardingPageItem {
@@ -40,7 +39,6 @@ class OnboardViewController: UIViewController {
     
     // MARK: Outlets
     @IBOutlet weak var onboarding: SwiftyOnboard!
-    @IBOutlet var skipButton: UIButton!
     weak var agreeSwitch: UISwitch?
     
     // MARK: Properties
@@ -140,8 +138,8 @@ extension OnboardViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
     }
     
     func swiftyOnboardViewForOverlay(_ swiftyOnboard: SwiftyOnboard) -> SwiftyOnboardOverlay? {
-        let overlay = OnboardOverlay()
-        overlay.setUp()
+        let overlay = OnboardOverlay(frame: .zero)
+        overlay.configure()
         
         //Setup targets for the buttons on the overlay view:
         overlay.skipButton.addTarget(self, action: #selector(handleSkip), for: .touchUpInside)

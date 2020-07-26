@@ -11,7 +11,7 @@ PODS:
   - DateToolsSwift (4.0.0)
   - EFQRCode (4.4.2):
     - swift_qrcodejs (~> 1.0.1)
-  - Eureka (5.0.0)
+  - Eureka (5.2.1)
   - FreakingSimpleRoundImageView (1.3)
   - FTIndicator (1.2.9):
     - FTIndicator/FTNotificationIndicator (= 1.2.9)
@@ -59,7 +59,6 @@ PODS:
     - SQLCipher/common
   - Starscream (3.1.1)
   - swift_qrcodejs (1.0.1)
-  - SwiftyOnboard (1.3.8)
   - Swinject (2.5.0)
   - web3.swift.pod (2.2.1):
     - BigInt (~> 4.0)
@@ -75,7 +74,7 @@ DEPENDENCIES:
   - CryptoSwift (= 1.0.0)
   - DateToolsSwift
   - EFQRCode
-  - Eureka (from `https://github.com/boyarkin-anton/Eureka.git`, branch `develop`)
+  - Eureka (= 5.2.1)
   - FreakingSimpleRoundImageView
   - FTIndicator
   - GRDB.swift
@@ -92,7 +91,6 @@ DEPENDENCIES:
   - QRCodeReader.swift
   - ReachabilitySwift
   - RNCryptor
-  - SwiftyOnboard (from `https://github.com/RealBonus/SwiftyOnboard`, branch `feature/customStyle`)
   - Swinject
   - web3.swift.pod (~> 2.2.0)
 
@@ -122,6 +120,7 @@ SPEC REPOS:
   trunk:
     - BigInt
     - CryptoSwift
+    - Eureka
     - GRDBCipher
     - PromiseKit
     - secp256k1.c
@@ -133,33 +132,21 @@ EXTERNAL SOURCES:
   BitcoinKit:
     :branch: dev
     :git: https://github.com/boyarkin-anton/BitcoinKit.git
-  Eureka:
-    :branch: develop
-    :git: https://github.com/boyarkin-anton/Eureka.git
   Lisk:
     :git: https://github.com/adamant-im/lisk-swift.git
   MarkdownKit:
     :git: https://github.com/RealBonus/MarkdownKit
-  SwiftyOnboard:
-    :branch: feature/customStyle
-    :git: https://github.com/RealBonus/SwiftyOnboard
 
 CHECKOUT OPTIONS:
   BitcoinKit:
     :commit: ea93c7423729653aa52aaca199341619fe6a1065
     :git: https://github.com/boyarkin-anton/BitcoinKit.git
-  Eureka:
-    :commit: 796b430ada97851a17cac0ae4acf4abf42da8186
-    :git: https://github.com/boyarkin-anton/Eureka.git
   Lisk:
     :commit: b4b0cee3d202850b23f927be1e55dd2a3fbc569e
     :git: https://github.com/adamant-im/lisk-swift.git
   MarkdownKit:
     :commit: 2703e13ed4cfbb031713711dd5ce6a9da62a2a1c
     :git: https://github.com/RealBonus/MarkdownKit
-  SwiftyOnboard:
-    :commit: 8341eff1eb918e904a915be8dac5d5a1545887f2
-    :git: https://github.com/RealBonus/SwiftyOnboard
 
 SPEC CHECKSUMS:
   Alamofire: 3ec537f71edc9804815215393ae2b1a8ea33a844
@@ -169,7 +156,7 @@ SPEC CHECKSUMS:
   CryptoSwift: d81eeaa59dc5a8d03720fe919a6fd07b51f7439f
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   EFQRCode: e65a9eb6c7137ed6db4cfce37f0cee47938e44f0
-  Eureka: e7b9a83e08867f8336176247bdc4c199b1f68e5e
+  Eureka: c883105488e05bc65539f583246ecf9657cabbfe
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   GRDB.swift: e10787d857b6b8135354b9e08fb23b4bb8e2fab7
@@ -193,10 +180,9 @@ SPEC CHECKSUMS:
   SQLCipher: f9fcf29b2e59ced7defc2a2bdd0ebe79b40d4990
   Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
   swift_qrcodejs: c181fe5c849d30c699546a23762d7e3dd143ab37
-  SwiftyOnboard: de60e90c2af23dd61b01ec0c6a8d0be3370f857b
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3.swift.pod: 66048c11416c2e7a9a4b35fe42254d0f0d9db4b1
 
-PODFILE CHECKSUM: b0d00ca350bbddc457c319a422626e0d198da7cf
+PODFILE CHECKSUM: 1491c94f3db8bc7f1e447cc44b19f2e905b0abf6
 
 COCOAPODS: 1.9.1

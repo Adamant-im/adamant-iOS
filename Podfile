@@ -33,12 +33,12 @@ target 'Adamant' do
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars
   pod 'FTIndicator' # Notifications and activity indicator
-  pod 'Eureka', :git => 'https://github.com/boyarkin-anton/Eureka.git', :branch => 'develop' # Forms
+  pod 'Eureka', '5.2.1'#, :git => 'https://github.com/boyarkin-anton/Eureka.git', :branch => 'develop' # Forms
   pod 'MessageKit', '2.0.0' # Chat UI
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
   pod 'Parchment' # Paging menu
-  pod 'SwiftyOnboard', :git => 'https://github.com/RealBonus/SwiftyOnboard', :branch => 'feature/customStyle' # wellcome screen
+#  pod 'SwiftyOnboard', :git => 'https://github.com/RealBonus/SwiftyOnboard', :branch => 'feature/customStyle' # wellcome screen
 
   # QR
   pod 'EFQRCode' # QR generator
