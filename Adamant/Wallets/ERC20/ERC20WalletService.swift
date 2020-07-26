@@ -430,9 +430,14 @@ extension ERC20WalletService {
                 return
             }
 
+            var exponent = EthWalletService.currencyExponent
+            if let naturalUnits = self?.token?.naturalUnits {
+                exponent = -naturalUnits
+            }
+            
             do {
                 let balance = try erc20.getBalance(account: walletAddress)
-                let value = balance.asDecimal(exponent: EthWalletService.currencyExponent)
+                let value = balance.asDecimal(exponent: exponent)
                 completion(.success(result:value))
             } catch {
                 completion(.failure(error: WalletServiceError.internalError(message: "ERC 20 Service - Fail to get balance", error: error)))
