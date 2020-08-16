@@ -23,6 +23,13 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Properties
     var transactions: [EthTransactionShort] = []
     private var ethAddress: String = ""
+    private lazy var exponent: Int = {
+        var exponent = EthWalletService.currencyExponent
+        if let naturalUnits = walletService.token?.naturalUnits {
+            exponent = -naturalUnits
+        }
+        return exponent
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -145,7 +152,7 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
                       isOutgoing: outgoing,
                       partnerId: partnerId,
                       partnerName: nil,
-                      amount: transaction.contract_value,
+                      amount: transaction.contract_value.asDecimal(exponent: exponent),
                       date: transaction.date)
     }
 }

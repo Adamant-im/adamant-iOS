@@ -233,7 +233,7 @@ struct EthTransactionShort {
     let blockNumber: String
     
     let contract_to: String
-    let contract_value: Decimal
+    let contract_value: BigUInt
     
     func asEthTransaction(isOutgoing: Bool) -> EthTransaction {
         return EthTransaction(date: date,
@@ -250,10 +250,12 @@ struct EthTransactionShort {
                               isOutgoing: isOutgoing)
     }
     
-    func asERCTransaction(isOutgoing: Bool) -> EthTransaction {
+    func asERCTransaction(isOutgoing: Bool, token: ERC20Token) -> EthTransaction {
+        let exponent = -token.naturalUnits
+        
         return EthTransaction(date: date,
                               hash: hash,
-                              value: contract_value,
+                              value: contract_value.asDecimal(exponent: exponent),
                               from: from,
                               to: contract_to,
                               gasUsed: gasUsed,
@@ -312,7 +314,7 @@ extension EthTransactionShort: Decodable {
         contract_to = try container.decodeIfPresent(String.self, forKey: .contract_to) ?? ""
         
         let contractValueRaw = try container.decodeIfPresent(String.self, forKey: .contract_value) ?? "0"
-        contract_value = BigUInt(contractValueRaw, radix: 16)?.asDecimal(exponent: EthWalletService.currencyExponent) ?? 0
+        contract_value = BigUInt(contractValueRaw, radix: 16) ?? BigUInt.zero
         
         if !contract_to.isEmpty {
             let address = "0x" + contract_to.reversed()[..<40].reversed()
