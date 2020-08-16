@@ -586,7 +586,8 @@ extension EthWalletService {
                                                 URLQueryItem(name: "limit", value: String(limit)),
                                                 URLQueryItem(name: "txfrom", value: "eq.\(address)"),
                                                 URLQueryItem(name: "offset", value: String(offset)),
-                                                URLQueryItem(name: "order", value: order)
+                                                URLQueryItem(name: "order", value: order),
+                                                URLQueryItem(name: "contract_to", value: "eq.")
         ]
         
         let txFromEndpoint: URL
@@ -603,7 +604,8 @@ extension EthWalletService {
                                               URLQueryItem(name: "limit", value: String(limit)),
                                               URLQueryItem(name: "txto", value: "eq.\(address)"),
                                               URLQueryItem(name: "offset", value: String(offset)),
-                                              URLQueryItem(name: "order", value: order)
+                                              URLQueryItem(name: "order", value: order),
+                                              URLQueryItem(name: "contract_to", value: "eq.")
         ]
         
         let txToEndpoint: URL
