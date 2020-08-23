@@ -19,10 +19,20 @@ class NotificationService: UNNotificationServiceExtension {
     
     /// Lazy constructors
     private lazy var richMessageProviders: [String: () -> RichMessageNotificationProvider] = {
-        return [EthProvider.richMessageType: { EthProvider() },
-                LskProvider.richMessageType: { LskProvider() },
-                DogeProvider.richMessageType: { DogeProvider() },
-                DashProvider.richMessageType: { DashProvider() }]
+        var providers: [String: () -> TransferNotificationContentProvider] = [
+            EthProvider.richMessageType: { EthProvider() },
+            LskProvider.richMessageType: { LskProvider() },
+            DogeProvider.richMessageType: { DogeProvider() },
+            DashProvider.richMessageType: { DashProvider() }
+        ]
+        
+        for token in ERC20Token.supportedTokens {
+            let key = "\(token.symbol)_transaction".lowercased()
+            let block = { ERC20Provider(token) }
+            providers[key] = block
+        }
+        
+        return providers
     }()
     
     // MARK: - Hanlder
