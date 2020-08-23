@@ -28,7 +28,7 @@ class LskWalletService: WalletService {
     }
     
     // MARK: - Notifications
-    let walletUpdatedNotification = Notification.Name("adamant.lskhWallet.walletUpdated")
+    let walletUpdatedNotification = Notification.Name("adamant.lskWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.lskWallet.enabledChanged")
     let transactionFeeUpdated = Notification.Name("adamant.lskWallet.feeUpdated")
     let serviceStateChanged = Notification.Name("adamant.lskWallet.stateChanged")

@@ -625,12 +625,19 @@ class AccountViewController: FormViewController {
             }
         }
         
-        for (index, service) in accountService.wallets.enumerated() {
-            NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification,
-                                                   object: service,
-                                                   queue: OperationQueue.main) { [weak self] _ in
-                                                    self?.pagingViewController.collectionView.reloadItems(at: [IndexPath(row: index, section: 0)])
+        for vc in walletViewControllers {
+            guard let service = vc.service else { return }
+            let notification = service.walletUpdatedNotification
+            let callback: ((Notification) -> Void) = { [weak self] _ in
+                guard let self = self else { return }
+                let collectionView = self.pagingViewController.collectionView
+                collectionView.reloadData()
             }
+
+            NotificationCenter.default.addObserver(forName: notification,
+                                                   object: service,
+                                                   queue: OperationQueue.main,
+                                                   using: callback)
         }
         
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
