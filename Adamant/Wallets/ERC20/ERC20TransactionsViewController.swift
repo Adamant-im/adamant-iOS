@@ -161,6 +161,6 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
 // MARK: - Tools
 extension ERC20TransactionsViewController {
     private func isOutgoing(_ transaction: EthTransactionShort) -> Bool {
-        return transaction.contract_to.lowercased() == ethAddress.lowercased()
+        return transaction.to.lowercased() == ethAddress.lowercased()
     }
 }
