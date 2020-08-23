@@ -223,8 +223,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
             
             let text: String
-            if let name = value.second {
-                text = "\(name) (\(value.first))"
+            if let address = value.second {
+                text = address
             } else {
                 text = value.first
             }
@@ -274,8 +274,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
             
             let text: String
-            if let name = value.second {
-                text = "\(name) (\(value.first))"
+            if let address = value.second {
+                text = address
             } else {
                 text = value.first
             }
