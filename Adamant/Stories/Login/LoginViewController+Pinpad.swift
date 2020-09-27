@@ -58,10 +58,6 @@ extension LoginViewController {
             case .success(_, let alert):
                 self?.dialogService.dismissProgress()
                 
-                guard let presenter = self?.presentingViewController else {
-                    return
-                }
-                
                 let alertVc: UIAlertController?
                 if let alert = alert {
                     alertVc = UIAlertController(title: alert.title, message: alert.message, preferredStyle: .alert)
@@ -70,21 +66,15 @@ extension LoginViewController {
                     alertVc = nil
                 }
                 
-                if Thread.isMainThread {
+                DispatchQueue.main.async {
+                    guard let presenter = self?.presentingViewController else {
+                        return
+                    }
                     presenter.dismiss(animated: true, completion: nil)
                     
                     if let alertVc = alertVc {
                         alertVc.modalPresentationStyle = .overFullScreen
                         presenter.present(alertVc, animated: true, completion: nil)
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        presenter.dismiss(animated: true, completion: nil)
-                        
-                        if let alertVc = alertVc {
-                            alertVc.modalPresentationStyle = .overFullScreen
-                            presenter.present(alertVc, animated: true, completion: nil)
-                        }
                     }
                 }
                 

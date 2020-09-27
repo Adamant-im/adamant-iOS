@@ -9,7 +9,7 @@
 import Foundation
 
 public extension String {
-    public struct adamantLocalized {
+    struct adamantLocalized {
         private init() { }
         
         struct notifications {

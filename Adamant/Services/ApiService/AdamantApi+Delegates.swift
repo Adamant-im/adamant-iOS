@@ -287,7 +287,7 @@ extension AdamantApiService {
                 completion(.failure(.networkError(error: error)))
             }
             
-            defer {
+            do {
                 UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
                 self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
             }
