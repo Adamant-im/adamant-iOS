@@ -90,7 +90,7 @@ class QRGeneratorViewController: FormViewController {
             let save = UIAlertAction(title: String.adamantLocalized.alert.saveToPhotolibrary, style: .default, handler: { _ in
                 
                 switch PHPhotoLibrary.authorizationStatus() {
-                case .authorized:
+                case .authorized, .limited:
                     UIImageWriteToSavedPhotosAlbum(qr, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
                     
                 case .notDetermined:

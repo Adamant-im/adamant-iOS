@@ -33,7 +33,7 @@ target 'Adamant' do
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars
   pod 'FTIndicator' # Notifications and activity indicator
-  pod 'Eureka', '5.2.1'#, :git => 'https://github.com/boyarkin-anton/Eureka.git', :branch => 'develop' # Forms
+  pod 'Eureka', '5.3.0'#, :git => 'https://github.com/boyarkin-anton/Eureka.git', :branch => 'develop' # Forms
   pod 'MessageKit', '2.0.0' # Chat UI
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller

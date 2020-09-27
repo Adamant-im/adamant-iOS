@@ -11,7 +11,7 @@ PODS:
   - DateToolsSwift (4.0.0)
   - EFQRCode (4.4.2):
     - swift_qrcodejs (~> 1.0.1)
-  - Eureka (5.2.1)
+  - Eureka (5.3.0)
   - FreakingSimpleRoundImageView (1.3)
   - FTIndicator (1.2.9):
     - FTIndicator/FTNotificationIndicator (= 1.2.9)
@@ -74,7 +74,7 @@ DEPENDENCIES:
   - CryptoSwift (= 1.0.0)
   - DateToolsSwift
   - EFQRCode
-  - Eureka (= 5.2.1)
+  - Eureka (= 5.3.0)
   - FreakingSimpleRoundImageView
   - FTIndicator
   - GRDB.swift
@@ -156,7 +156,7 @@ SPEC CHECKSUMS:
   CryptoSwift: d81eeaa59dc5a8d03720fe919a6fd07b51f7439f
   DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
   EFQRCode: e65a9eb6c7137ed6db4cfce37f0cee47938e44f0
-  Eureka: c883105488e05bc65539f583246ecf9657cabbfe
+  Eureka: 49239596c9d2eed9ab523990c34de62b6feac9f0
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   GRDB.swift: e10787d857b6b8135354b9e08fb23b4bb8e2fab7
@@ -183,6 +183,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3.swift.pod: 66048c11416c2e7a9a4b35fe42254d0f0d9db4b1
 
-PODFILE CHECKSUM: 1491c94f3db8bc7f1e447cc44b19f2e905b0abf6
+PODFILE CHECKSUM: b543728ccc3835fabed471459775001f50da7657
 
 COCOAPODS: 1.9.1

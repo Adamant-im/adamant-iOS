@@ -117,7 +117,7 @@ class ShareQrViewController: FormViewController {
             }
             
             switch PHPhotoLibrary.authorizationStatus() {
-            case .authorized:
+            case .authorized, .limited:
                 UIImageWriteToSavedPhotosAlbum(qrCode, self, #selector(self?.image(_: didFinishSavingWithError: contextInfo:)), nil)
                 
             case .notDetermined:

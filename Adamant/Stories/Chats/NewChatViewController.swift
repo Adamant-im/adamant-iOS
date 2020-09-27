@@ -419,7 +419,7 @@ extension NewChatViewController {
             presenter()
         } else {
             switch PHPhotoLibrary.authorizationStatus() {
-            case .authorized:
+            case .authorized, .limited:
                 presenter()
                 
             case .notDetermined:

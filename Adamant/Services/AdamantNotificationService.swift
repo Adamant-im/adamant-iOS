@@ -122,7 +122,7 @@ extension AdamantNotificationsService {
     private func authorizeNotifications(completion: @escaping (Bool, Error?) -> Void) {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             switch settings.authorizationStatus {
-            case .authorized:
+            case .authorized, .ephemeral:
                 completion(true, nil)
                 
             case .denied, .provisional:
