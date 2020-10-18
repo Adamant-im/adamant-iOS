@@ -35,11 +35,6 @@ protocol RichMessageProvider: class {
     func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell
 }
 
-extension RichMessageProvider {
-    var dynamicRichMessageType: String {
-        return type(of: self).richMessageType
-    }
-}
 
 protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
     func statusFor(transaction: RichMessageTransaction, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void)

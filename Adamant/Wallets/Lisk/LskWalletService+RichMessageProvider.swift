@@ -11,6 +11,10 @@ import MessageKit
 
 extension LskWalletService: RichMessageProvider {
     
+    var dynamicRichMessageType: String {
+        return type(of: self).richMessageType
+    }
+    
     // MARK: Events
     
     func richMessageTapped(for transaction: RichMessageTransaction, at indexPath: IndexPath, in chat: ChatViewController) {

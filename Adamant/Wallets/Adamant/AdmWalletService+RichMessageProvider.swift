@@ -11,6 +11,10 @@ import MessageKit
 
 extension AdmWalletService: RichMessageProvider {
     
+    var dynamicRichMessageType: String {
+        return type(of: self).richMessageType
+    }
+    
     // MARK: Events
     
     /// Not supported yet

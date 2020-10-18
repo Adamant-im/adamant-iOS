@@ -10,6 +10,10 @@ import Foundation
 import MessageKit
 
 extension DogeWalletService: RichMessageProvider {
+
+    var dynamicRichMessageType: String {
+        return type(of: self).richMessageType
+    }
     
     // MARK: Events
     
