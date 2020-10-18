@@ -45,11 +45,6 @@ class ComplexTransferViewController: UIViewController {
         // MARK: Services
         services = accountService.wallets.compactMap { $0 as? WalletServiceWithSend }
         
-        for service in services {
-            NotificationCenter.default.addObserver(forName: service.walletUpdatedNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-                self?.pagingViewController.reloadData()
-            }
-        }
         
         // MARK: PagingViewController
         pagingViewController = PagingViewController<WalletPagingItem>()

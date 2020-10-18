@@ -143,6 +143,7 @@ class TransferViewControllerBase: FormViewController {
         didSet {
             if let prev = oldValue {
                 NotificationCenter.default.removeObserver(self, name: prev.transactionFeeUpdated, object: prev)
+                NotificationCenter.default.removeObserver(self, name: prev.walletUpdatedNotification, object: prev)
             }
             
             if let new = service {
@@ -161,6 +162,10 @@ class TransferViewControllerBase: FormViewController {
                     }
                     
                     self?.validateForm()
+                }
+                
+                NotificationCenter.default.addObserver(forName: new.walletUpdatedNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+                    self?.reloadFormData()
                 }
             }
         }
@@ -450,6 +455,28 @@ class TransferViewControllerBase: FormViewController {
         row.baseCell.textLabel?.textColor = valid ? UIColor.adamant.primary : UIColor.adamant.alert
     }
     
+    func reloadFormData() {
+        if let fee = service?.transactionFee, let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
+            row.value = fee.doubleValue
+            row.updateCell()
+        }
+        
+        if let row: DecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
+            row.updateCell()
+        }
+        
+        if let row: DecimalRow = form.rowBy(tag: BaseRows.balance.tag) {
+            if let wallet = service?.wallet {
+                row.value = wallet.balance.doubleValue
+            } else {
+                row.value = 0
+            }
+            
+            row.updateCell()
+        }
+        
+        validateForm()
+    }
     
     // MARK: - Send Actions
     
