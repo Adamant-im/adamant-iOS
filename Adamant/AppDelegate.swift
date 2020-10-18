@@ -259,9 +259,9 @@ extension AppDelegate {
         let token: String
         
         #if DEBUG
-            let provider: String = "apns-sandbox"
+            var provider: String = "apns-sandbox"
         #else
-            let provider: String = "apns"
+            var provider: String = "apns"
         #endif
     }
     
