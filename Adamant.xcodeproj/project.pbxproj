@@ -17,6 +17,16 @@
 		6403F5E622723FDA00D58779 /* DashWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5E522723FDA00D58779 /* DashWalletViewController.swift */; };
 		6406D74A21C7F06000196713 /* SearchResultsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6406D74821C7F06000196713 /* SearchResultsViewController.xib */; };
 		6406D74D21CE3AC100196713 /* KeyboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6406D74C21CE3AC100196713 /* KeyboardManager.swift */; };
+		640EFA902558612100E9724B /* RichMessageNotificationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E0F1229999DA0019732A /* RichMessageNotificationProvider.swift */; };
+		640EFA962558612400E9724B /* NotificationContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E127229B0CF10019732A /* NotificationContent.swift */; };
+		640EFA9C2558613200E9724B /* AdamantProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E0FA229AB9310019732A /* AdamantProvider.swift */; };
+		640EFA9D2558613400E9724B /* DogeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E0F422999A5D0019732A /* DogeProvider.swift */; };
+		640EFA9E2558613700E9724B /* DashProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64AE845F2300012200F38FBD /* DashProvider.swift */; };
+		640EFAA42558613A00E9724B /* EthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E100229AC2050019732A /* EthProvider.swift */; };
+		640EFAA52558613D00E9724B /* ERC20Provider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E3D52424B258F800660641 /* ERC20Provider.swift */; };
+		640EFAA62558613F00E9724B /* LskProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E0FE229AC1C80019732A /* LskProvider.swift */; };
+		640EFAA72558614300E9724B /* TransferBaseProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E0F622999BD50019732A /* TransferBaseProvider.swift */; };
+		640EFB3625611A7D00E9724B /* Shared.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E957E170229C56EE0019732A /* Shared.xcassets */; };
 		6414C18E217DF43100373FA6 /* String+adamant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6414C18D217DF43100373FA6 /* String+adamant.swift */; };
 		6416B19D21AD7B92006089AC /* LskWalletRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B19C21AD7B92006089AC /* LskWalletRoutes.swift */; };
 		6416B19F21AD7CBE006089AC /* LskWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6416B19E21AD7CBE006089AC /* LskWalletViewController.swift */; };
@@ -2141,6 +2151,7 @@
 				E957E108229AF7CB0019732A /* doge_notificationContent.png in Resources */,
 				E957E10A229AF7CB0019732A /* eth_notificationContent.png in Resources */,
 				E957E109229AF7CB0019732A /* lsk_notificationContent.png in Resources */,
+				640EFB3625611A7D00E9724B /* Shared.xcassets in Resources */,
 				E9EF7A8122A02DC600F2E1C2 /* notificationContent.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2436,6 +2447,7 @@
 				E9942B84203CBFCE00C163AF /* AdamantQRTools.swift in Sources */,
 				6403F5E422723F8C00D58779 /* DashWalletService.swift in Sources */,
 				E908472F2196FEA80095825D /* BaseTransaction+CoreDataProperties.swift in Sources */,
+				640EFA902558612100E9724B /* RichMessageNotificationProvider.swift in Sources */,
 				E96D64B92295BED700CA5587 /* StateType.swift in Sources */,
 				E94008872114F05B00CD2D67 /* AddressValidationResult.swift in Sources */,
 				E974D168215D033C003AD7E8 /* ChatCell.swift in Sources */,
@@ -2475,7 +2487,9 @@
 				E96D64BC2295BED700CA5587 /* Transaction.swift in Sources */,
 				6449BA69235CA0930033B936 /* ERC20TransferViewController.swift in Sources */,
 				E9E7CD8B20026B0600DFC4DB /* AccountService.swift in Sources */,
+				640EFAA42558613A00E9724B /* EthProvider.swift in Sources */,
 				648CE3AC229AD2190070A2CC /* DashTransferViewController.swift in Sources */,
+				640EFA9C2558613200E9724B /* AdamantProvider.swift in Sources */,
 				64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */,
 				648DD7AA2239150E00B811FD /* DogeWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
 				E96D64CB2295C51900CA5587 /* Decimal+adamant.swift in Sources */,
@@ -2491,6 +2505,7 @@
 				E983AE2A20E65F3200497E1A /* AccountViewController.swift in Sources */,
 				6449BA70235CA0930033B936 /* ERC20WalletRouter.swift in Sources */,
 				E957E13F229BFEBB0019732A /* AdamantNotificationKeys.swift in Sources */,
+				640EFA9D2558613400E9724B /* DogeProvider.swift in Sources */,
 				E9E7CD932002740500DFC4DB /* AdamantAccountService.swift in Sources */,
 				6416B19F21AD7CBE006089AC /* LskWalletViewController.swift in Sources */,
 				64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */,
@@ -2511,6 +2526,7 @@
 				6416B1A521AEE157006089AC /* LskWalletService+Transfers.swift in Sources */,
 				648DD7A62237DC4000B811FD /* DogeTransferViewController.swift in Sources */,
 				E9960B3421F5154300C840A8 /* BaseAccount+CoreDataProperties.swift in Sources */,
+				640EFAA62558613F00E9724B /* LskProvider.swift in Sources */,
 				E90A494B204D9EB8009F6A65 /* AdamantAuthentication.swift in Sources */,
 				E9215973206119FB0000CA5C /* ReachabilityMonitor.swift in Sources */,
 				E91947B420002809001362F8 /* AdamantAccount.swift in Sources */,
@@ -2572,6 +2588,7 @@
 				E9DFB71C21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift in Sources */,
 				6403F5E022723F6400D58779 /* DashWalletRouter.swift in Sources */,
 				E94008722114EACF00CD2D67 /* WalletAccount.swift in Sources */,
+				640EFA9E2558613700E9724B /* DashProvider.swift in Sources */,
 				E93B0D742028B21400126346 /* ChatsProvider.swift in Sources */,
 				E9CAE8D42018AC1800345E76 /* AdamantApi+Keys.swift in Sources */,
 				E96D64B22295BED600CA5587 /* TransactionAsset.swift in Sources */,
@@ -2600,6 +2617,7 @@
 				E95F85852008CB3A0070534A /* ChatListViewController.swift in Sources */,
 				E9FEECA62143C300007DD7C8 /* EthWalletService+RichMessageProvider.swift in Sources */,
 				6403F5E622723FDA00D58779 /* DashWalletViewController.swift in Sources */,
+				640EFAA52558613D00E9724B /* ERC20Provider.swift in Sources */,
 				E91947AC20001A9A001362F8 /* ApiService.swift in Sources */,
 				E96D64B72295BED700CA5587 /* DelegateVote.swift in Sources */,
 				E993302221354BC300CD5200 /* EthWalletRoutes.swift in Sources */,
@@ -2667,6 +2685,7 @@
 				E90847302196FEA80095825D /* ChatTransaction+CoreDataClass.swift in Sources */,
 				E913C9081FFFA943001A83F7 /* AdamantCore.swift in Sources */,
 				E9EC342120052ABB00C0E546 /* TransferViewControllerBase.swift in Sources */,
+				640EFA962558612400E9724B /* NotificationContent.swift in Sources */,
 				E96D64B42295BED700CA5587 /* StateAsset.swift in Sources */,
 				E9771D9E22997A6F0099AAC7 /* NativeCore+AdamantCore.swift in Sources */,
 				E921534E20EE1E8700C0843F /* EurekaAlertLabelRow.swift in Sources */,
@@ -2690,6 +2709,7 @@
 				E9E7CDB12002B97B00DFC4DB /* AccountRoutes.swift in Sources */,
 				E9240BF9215D813A00187B09 /* CustomCellDeleage.swift in Sources */,
 				E9AA8BF82129F13000F9249F /* ComplexTransferViewController.swift in Sources */,
+				640EFAA72558614300E9724B /* TransferBaseProvider.swift in Sources */,
 				E9A174B52057EDCE003667CD /* AdamantTransfersProvider+backgroundFetch.swift in Sources */,
 				E9147B5F20500E9300145913 /* MyLittlePinpad+adamant.swift in Sources */,
 				E9981896212095CA0018C84C /* EthWalletViewController.swift in Sources */,

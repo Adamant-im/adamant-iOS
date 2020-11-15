@@ -14,7 +14,7 @@ class ERC20Provider: TransferBaseProvider {
     }
     
     override var currencyLogoUrl: URL? {
-        return Bundle.main.url(forResource: "\(token.symbol.lowercased())_notificationContent", withExtension: "png")
+        return Bundle.main.url(forResource: "wallet_\(token.symbol.lowercased())", withExtension: "png")
     }
     
     override var currencySymbol: String {
@@ -22,7 +22,7 @@ class ERC20Provider: TransferBaseProvider {
     }
     
     override var currencyLogoLarge: UIImage {
-        return UIImage(named: "wallet_\(token.symbol.lowercased())") ?? UIImage()
+        return token.logo
     }
     
     private let token: ERC20Token

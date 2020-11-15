@@ -18,18 +18,17 @@ class NotificationService: UNNotificationServiceExtension {
     }()
     
     /// Lazy constructors
-    private lazy var richMessageProviders: [String: () -> RichMessageNotificationProvider] = {
-        var providers: [String: () -> TransferNotificationContentProvider] = [
-            EthProvider.richMessageType: { EthProvider() },
-            LskProvider.richMessageType: { LskProvider() },
-            DogeProvider.richMessageType: { DogeProvider() },
-            DashProvider.richMessageType: { DashProvider() }
+    private lazy var richMessageProviders: [String: TransferNotificationContentProvider] = {
+        var providers: [String: TransferNotificationContentProvider] = [
+            EthProvider.richMessageType: EthProvider(),
+            LskProvider.richMessageType: LskProvider(),
+            DogeProvider.richMessageType: DogeProvider(),
+            DashProvider.richMessageType: DashProvider()
         ]
         
         for token in ERC20Token.supportedTokens {
             let key = "\(token.symbol)_transaction".lowercased()
-            let block = { ERC20Provider(token) }
-            providers[key] = block
+            providers[key] = ERC20Provider(token)
         }
         
         return providers
@@ -132,8 +131,9 @@ class NotificationService: UNNotificationServiceExtension {
                 guard let data = message.data(using: String.Encoding.utf8),
                     let richContent = RichMessageTools.richContent(from: data),
                     let key = richContent[RichContentKeys.type]?.lowercased(),
-                    let provider = richMessageProviders[key]?(),
-                    let content = provider.notificationContent(for: transaction, partnerAddress: partnerAddress, partnerName: partnerName, richContent: richContent) else {
+                    let provider = richMessageProviders[key],
+                    let content = provider.notificationContent(for: transaction, partnerAddress: partnerAddress, partnerName: partnerName, richContent: richContent)
+                else {
                         bestAttemptContent.title = partnerName ?? partnerAddress
                         bestAttemptContent.body = message
                         bestAttemptContent.categoryIdentifier = AdamantNotificationCategories.message
