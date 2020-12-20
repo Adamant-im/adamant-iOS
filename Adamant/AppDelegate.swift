@@ -459,6 +459,36 @@ extension AppDelegate {
             })
         }
         
+        chatProvider.fakeReceived(message: AdamantMessage.text(AdamantContacts.donate.name),
+                                  senderId: AdamantContacts.donate.address,
+                                  date: Date.adamantNullDate,
+                                  unread: false,
+                                  silent: true,
+                                  showsChatroom: true,
+                                  completion: { result in
+                                    guard case let .failure(error) = result else {
+                                        return
+                                    }
+                                    
+                                    print("ERROR showing donate message: \(error.message)")
+        })
+        
+        if let welcome = AdamantContacts.adamantBountyWallet.messages["chats.welcome_message"] {
+            chatProvider.fakeReceived(message: welcome.message,
+                                      senderId: AdamantContacts.adamantBountyWallet.name,
+                                      date: Date.adamantNullDate,
+                                      unread: unread,
+                                      silent: welcome.silentNotification,
+                                      showsChatroom: true,
+                                      completion: { result in
+                                        guard case let .failure(error) = result else {
+                                            return
+                                        }
+                                        
+                                        print("ERROR showing welcome message: \(error.message)")
+            })
+        }
+        
         /*
         if let ico = AdamantContacts.adamantIco.messages["chats.ico_message"] {
             chatProvider.fakeReceived(message: ico.message,

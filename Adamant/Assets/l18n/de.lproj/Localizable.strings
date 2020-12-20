@@ -82,6 +82,9 @@
 /* System accounts: Bet on Bitcoin Price */
 "Accounts.BetOnBitcoin" = "Bet on Bitcoin price";
 
+/* System accounts: Donates ADAMANT Foundation */
+"Accounts.DonateADMFoundation" = "Spenden an ADAMANT Foundation";
+
 /* AccountsProvider: Address not valid error, %@ for address */
 "AccountsProvider.Error.AddressNotValidFormat" = "Ungültige Adresse: %@";
 

@@ -69,6 +69,9 @@ struct AdamantResources {
         static let ansAddress = "U10629337621822775991"
         static let ansPublicKey = "188b24bd116a556ac8ba905bbbdaa16e237dfb14269f5a4f9a26be77537d977c"
         
+        static let donateWallet = "U380651761819723095"
+        static let donateWalletPK = "3af27b283de3ce76bdcb0d4a341208b6bc1a375c46610dfa11ca20a106ed43a8"
+        
         private init() {}
     }
     
