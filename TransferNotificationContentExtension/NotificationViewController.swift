@@ -20,20 +20,18 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         return AdamantProvider()
     }()
     
-    
     /// Lazy contstructors
-    private lazy var richMessageProviders: [String: () -> TransferNotificationContentProvider] = {
-        var providers: [String: () -> TransferNotificationContentProvider] = [
-            EthProvider.richMessageType: { EthProvider() },
-            LskProvider.richMessageType: { LskProvider() },
-            DogeProvider.richMessageType: { DogeProvider() },
-            DashProvider.richMessageType: { DashProvider() }
+    private lazy var richMessageProviders: [String: TransferNotificationContentProvider] = {
+        var providers: [String: TransferNotificationContentProvider] = [
+            EthProvider.richMessageType: EthProvider(),
+            LskProvider.richMessageType: LskProvider(),
+            DogeProvider.richMessageType: DogeProvider(),
+            DashProvider.richMessageType: DashProvider()
         ]
         
         for token in ERC20Token.supportedTokens {
             let key = "\(token.symbol)_transaction".lowercased()
-            let block = { ERC20Provider(token) }
-            providers[key] = block
+            providers[key] = ERC20Provider(token)
         }
         
         return providers
@@ -179,7 +177,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
                         return
                 }
                 
-                provider = p()
+                provider = p
                 
                 if let raw = richContent[RichContentKeys.transfer.comments], raw.count > 0 {
                     comments = raw
