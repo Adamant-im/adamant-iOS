@@ -211,7 +211,10 @@ class TransferViewControllerBase: FormViewController {
             balance > 0 else {
             return 0
         }
-        return balance
+        
+        let max = balance - service.transactionFee
+        
+        return max >= 0 ? max : 0
     }
     
     override var customNavigationAccessoryView: (UIView & NavigationAccessory)? {
