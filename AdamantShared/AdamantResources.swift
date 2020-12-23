@@ -46,7 +46,7 @@ struct AdamantResources {
     static let coinsInfoSrvice = "https://info.adamant.im"
     
     // MARK: ADAMANT Addresses
-    static let supportEmail = "ios@adamant.im"
+    static let supportEmail = "pr@adamant.im"
     static let ansReadmeUrl = "https://github.com/Adamant-im/AdamantNotificationService/blob/master/README.md"
     
     // MARK: Contacts
