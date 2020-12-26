@@ -85,3 +85,18 @@ target 'MessageNotificationContentExtension' do
   markdown_pods
   pod 'DateToolsSwift' # Date formatter tools
 end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    if target.name == 'ByteBackpacker'
+      target.build_configurations.each do |config|
+        config.build_settings['SWIFT_VERSION'] = '5.0'
+      end
+    end
+    if target.name == 'MessageKit'
+      target.build_configurations.each do |config|
+        config.build_settings['SWIFT_VERSION'] = '4.2'
+      end
+    end
+  end
+end
