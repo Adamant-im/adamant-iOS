@@ -166,7 +166,7 @@ extension EthereumTransaction {
         
         var exponent = EthWalletService.currencyExponent
         if let naturalUnits = token?.naturalUnits {
-            exponent = -naturalUnits
+            exponent = -1 * naturalUnits
         }
         
         if data.count > 0 {
