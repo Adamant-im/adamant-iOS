@@ -37,7 +37,10 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
             return
         }
 
-        guard let bigUIntAmount = Web3.Utils.parseToBigUInt(String(format: "%.18f", amount.doubleValue), units: .eth) else {
+        let rawAmount = String(format: "%.f", amount.doubleValue)
+        guard
+            let decimals = token?.decimals,
+            let bigUIntAmount = Web3.Utils.parseToBigUInt(rawAmount, decimals: decimals) else {
             completion(.failure(error: .invalidAmount(amount)))
             return
         }
