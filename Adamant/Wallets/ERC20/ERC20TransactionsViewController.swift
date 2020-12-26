@@ -26,7 +26,7 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
     private lazy var exponent: Int = {
         var exponent = EthWalletService.currencyExponent
         if let naturalUnits = walletService.token?.naturalUnits {
-            exponent = -naturalUnits
+            exponent = -1 * naturalUnits
         }
         return exponent
     }()

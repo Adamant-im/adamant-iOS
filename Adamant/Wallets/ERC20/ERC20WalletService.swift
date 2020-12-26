@@ -432,7 +432,7 @@ extension ERC20WalletService {
 
             var exponent = EthWalletService.currencyExponent
             if let naturalUnits = self?.token?.naturalUnits {
-                exponent = -naturalUnits
+                exponent = -1 * naturalUnits
             }
             
             do {

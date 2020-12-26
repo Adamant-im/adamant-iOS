@@ -251,7 +251,7 @@ struct EthTransactionShort {
     }
     
     func asERCTransaction(isOutgoing: Bool, token: ERC20Token) -> EthTransaction {
-        let exponent = -token.naturalUnits
+        let exponent = -1 * token.naturalUnits
         
         return EthTransaction(date: date,
                               hash: hash,
