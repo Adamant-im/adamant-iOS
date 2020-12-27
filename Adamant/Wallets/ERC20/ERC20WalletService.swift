@@ -36,6 +36,10 @@ class ERC20WalletService: WalletService {
     private (set) var transactionFee: Decimal = 0.0
     private (set) var diplayTransactionFee: Decimal = 0.0
     
+    var isTransactionFeeValid: Bool {
+        return ethWallet?.balance ?? 0 > diplayTransactionFee
+    }
+    
     static let transferGas: Decimal = 21000
     static let kvsAddress = "eth:address"
     

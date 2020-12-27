@@ -148,7 +148,7 @@ class TransferViewControllerBase: FormViewController {
             
             if let new = service {
                 NotificationCenter.default.addObserver(forName: new.transactionFeeUpdated, object: new, queue: OperationQueue.main) { [weak self] _ in
-                    guard let fee = self?.service?.transactionFee, let form = self?.form else {
+                    guard let fee = self?.service?.diplayTransactionFee, let form = self?.form else {
                         return
                     }
                     
@@ -378,6 +378,10 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
+        if let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
+            markRow(row, valid: service.isTransactionFeeValid)
+        }
+        
         if let row: DecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
             markRow(row, valid: wallet.balance > service.transactionFee)
         }
@@ -502,6 +506,10 @@ class TransferViewControllerBase: FormViewController {
             dialogService.showWarning(withMessage: String.adamantLocalized.transfer.amountTooHigh)
             return
         }
+
+        guard service?.isTransactionFeeValid ?? true else {
+            return
+        }
         
         if admReportRecipient != nil, let account = accountService.account, account.balance < 0.001 {
             dialogService.showWarning(withMessage: "Not enought money to send report")
@@ -574,7 +582,10 @@ class TransferViewControllerBase: FormViewController {
     }
     
     func formIsValid() -> Bool {
-        if let recipient = recipientAddress, validateRecipient(recipient), let amount = amount, validateAmount(amount), recipientAddressIsValid {
+        if let recipient = recipientAddress, validateRecipient(recipient),
+           let amount = amount, validateAmount(amount),
+           recipientAddressIsValid,
+           service?.isTransactionFeeValid ?? true {
             return true
         } else {
             return false
