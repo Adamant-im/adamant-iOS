@@ -66,7 +66,6 @@ class AdamantAccountsProvider: AccountsProvider {
             AdamantContacts.adamantBountyWallet.address: bounty,
             AdamantContacts.adamantBountyWallet.name: bounty,
             AdamantContacts.adamantNewBountyWallet.address: newBounty,
-            AdamantContacts.adamantNewBountyWallet.name: newBounty,
             AdamantContacts.iosSupport.address: iosSupport,
             
             AdamantContacts.adamantExchange.address: adamantExchange,
