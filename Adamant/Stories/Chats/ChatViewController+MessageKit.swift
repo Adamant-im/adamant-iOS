@@ -638,7 +638,6 @@ extension ChatViewController: MessageInputBarDelegate {
     
     func showFreeTokenAlert() {
         let alert = UIAlertController(title: "", message: String.adamantLocalized.chat.freeTokensMessage, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: String.adamantLocalized.chat.freeTokens, style: .default, handler: { [weak self] (_) in
             if let address = self?.account?.address {
                 let urlRaw = String.adamantLocalized.wallets.getFreeTokensUrl(for: address)
@@ -653,6 +652,7 @@ extension ChatViewController: MessageInputBarDelegate {
                 self?.present(safari, animated: true, completion: nil)
             }
         }))
+        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .default, handler: nil))
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: true, completion: nil)
     }
