@@ -52,6 +52,7 @@ class AdamantAccountsProvider: AccountsProvider {
     init() {
         let ico = KnownContact(contact: AdamantContacts.adamantIco)
         let bounty = KnownContact(contact: AdamantContacts.adamantBountyWallet)
+        let newBounty = KnownContact(contact: AdamantContacts.adamantNewBountyWallet)
         let iosSupport = KnownContact(contact: AdamantContacts.iosSupport)
         
         let adamantExchange = KnownContact(contact: AdamantContacts.adamantExchange)
@@ -64,6 +65,8 @@ class AdamantAccountsProvider: AccountsProvider {
             AdamantContacts.adamantIco.name: ico,
             AdamantContacts.adamantBountyWallet.address: bounty,
             AdamantContacts.adamantBountyWallet.name: bounty,
+            AdamantContacts.adamantNewBountyWallet.address: newBounty,
+            AdamantContacts.adamantNewBountyWallet.name: newBounty,
             AdamantContacts.iosSupport.address: iosSupport,
             
             AdamantContacts.adamantExchange.address: adamantExchange,

@@ -54,6 +54,9 @@ struct AdamantResources {
         static let adamantBountyWallet = "U15423595369615486571"
         static let adamantBountyWalletPK = "cdab95b082b9774bd975677c868261618c7ce7bea97d02e0f56d483e30c077b6"
         
+        static let adamantNewBountyWallet = "U1835325601873095435"
+        static let adamantNewBountyWalletPK = "17c03b201dc2c26f5dbb712958132c90382ab6385d674b79b8718ba1a7eb5905"
+        
         static let adamantIco = "U7047165086065693428"
         static let adamantIcoPK = "1e214309cc659646ecf1d90fa37be23fe76854a76e3b4da9e4d6b65a718baf8b"
         

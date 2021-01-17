@@ -77,6 +77,7 @@ struct SystemMessage {
 
 enum AdamantContacts {
     case adamantBountyWallet
+    case adamantNewBountyWallet
     case adamantIco
     case iosSupport
     case adamantExchange
@@ -84,12 +85,15 @@ enum AdamantContacts {
     case donate
     
     static let systemAddresses: [String] = {
-        return [AdamantContacts.adamantExchange.name, AdamantContacts.betOnBitcoin.name, AdamantContacts.adamantIco.name, AdamantContacts.adamantBountyWallet.name, AdamantContacts.donate.name]
+        return [AdamantContacts.adamantExchange.name, AdamantContacts.betOnBitcoin.name, AdamantContacts.adamantIco.name, AdamantContacts.adamantBountyWallet.name, AdamantContacts.adamantNewBountyWallet.name, AdamantContacts.donate.name]
     }()
     
     static func messagesFor(address: String) -> [String:SystemMessage]? {
         switch address {
-        case AdamantContacts.adamantBountyWallet.address, AdamantContacts.adamantBountyWallet.name:
+        case AdamantContacts.adamantBountyWallet.address,
+             AdamantContacts.adamantBountyWallet.name,
+             AdamantContacts.adamantNewBountyWallet.address,
+             AdamantContacts.adamantNewBountyWallet.name:
             return AdamantContacts.adamantBountyWallet.messages
             
         case AdamantContacts.adamantIco.address, AdamantContacts.adamantIco.name:
@@ -108,7 +112,8 @@ enum AdamantContacts {
     
     var name: String {
         switch self {
-        case .adamantBountyWallet: return NSLocalizedString("Accounts.AdamantTokens", comment: "System accounts: ADAMANT Tokens")
+        case .adamantBountyWallet, .adamantNewBountyWallet:
+            return NSLocalizedString("Accounts.AdamantTokens", comment: "System accounts: ADAMANT Tokens")
         case .adamantIco:
             return "Adamant ICO"
         case .iosSupport:
@@ -135,6 +140,7 @@ enum AdamantContacts {
     var address: String {
         switch self {
         case .adamantBountyWallet: return AdamantResources.contacts.adamantBountyWallet
+        case .adamantNewBountyWallet: return AdamantResources.contacts.adamantNewBountyWallet
         case .adamantIco: return AdamantResources.contacts.adamantIco
         case .iosSupport: return AdamantResources.contacts.iosSupport
         case .adamantExchange: return AdamantResources.contacts.adamantExchange
@@ -148,6 +154,7 @@ enum AdamantContacts {
         case .adamantExchange: return AdamantResources.contacts.adamantExchangePK
         case .betOnBitcoin: return AdamantResources.contacts.betOnBitcoinPK
         case .adamantBountyWallet: return AdamantResources.contacts.adamantBountyWalletPK
+        case .adamantNewBountyWallet: return AdamantResources.contacts.adamantNewBountyWalletPK
         case .iosSupport: return AdamantResources.contacts.iosSupportPK
         case .adamantIco: return AdamantResources.contacts.adamantIcoPK
         case .donate: return AdamantResources.contacts.donateWalletPK
@@ -156,14 +163,14 @@ enum AdamantContacts {
     
     var isReadonly: Bool {
         switch self {
-        case .adamantBountyWallet, .adamantIco: return true
+        case .adamantBountyWallet, .adamantNewBountyWallet, .adamantIco: return true
         case .iosSupport, .adamantExchange, .betOnBitcoin, .donate: return false
         }
     }
     
     var isHidden: Bool {
         switch self {
-        case .adamantBountyWallet: return true
+        case .adamantBountyWallet, .adamantNewBountyWallet: return true
         case .adamantIco, .iosSupport, .adamantExchange, .betOnBitcoin, .donate: return false
         }
     }
@@ -179,7 +186,7 @@ enum AdamantContacts {
     
     var messages: [String: SystemMessage] {
         switch self {
-        case .adamantBountyWallet:
+        case .adamantBountyWallet, .adamantNewBountyWallet:
             return ["chats.welcome_message": SystemMessage(message: AdamantMessage.markdownText(NSLocalizedString("Chats.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported.")),
                                                            silentNotification: true)]
             
@@ -191,8 +198,12 @@ enum AdamantContacts {
                                                    silentNotification: true)
             ]
             
-        case .iosSupport, .donate:
+        case .iosSupport:
             return [:]
+            
+        case .donate:
+            return ["chats.welcome_message": SystemMessage(message: AdamantMessage.markdownText(NSLocalizedString("Chats.Donate.WelcomeMessage", comment: "Known contacts: Adamant donate welcome message. Markdown supported.")),
+                                                           silentNotification: true)]
             
         case .adamantExchange:
             return ["chats.welcome_message": SystemMessage(message: AdamantMessage.markdownText(NSLocalizedString("Chats.Exchange.WelcomeMessage", comment: "Known contacts: Adamant welcome message. Markdown supported.")),
