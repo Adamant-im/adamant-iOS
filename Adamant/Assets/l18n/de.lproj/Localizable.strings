@@ -335,7 +335,7 @@
 "ChatScene.Actions.NamePlaceholder" = "Name";
 
 /* Chat: 'Free Tokens' button */
-"ChatScene.FreeTokensAlert.FreeTokens" = "Free tokens";
+"ChatScene.FreeTokensAlert.FreeTokens" = "🎁 Free tokens";
 
 /* Chat: 'Free Tokens' message */
 "ChatScene.FreeTokensAlert.Message" = "ADAMANT is a unique Blockchain messenger that is independent from government, corporations and even its developers. It is possible due to a decentralized network, fully open source and run by users. That's why every action, including messaging or saving new contacts, has a network fee of 0.001 ADM. To start messaging now, get your free welcoming tokens.";
