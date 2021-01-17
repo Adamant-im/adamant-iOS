@@ -271,6 +271,9 @@
 /* Known contacts: Adamant Bet On Bitcoin message. Markdown supported. */
 "Chats.BetOnBitcoin.WelcomeMessage" = "Hi! 😊 I'm anonymous and Blockchain-proved bet bot. I accept bets on BTC rate and pay rewards to winners. ℹ️ Learn more on ADAMANT’s blog or type **/help** to start betting. Support via U6386412615727665758.";
 
+/* Known contacts: Adamant donate welcome message. Markdown supported. */
+"Chats.Donate.WelcomeMessage" = "We develop decentralized ADAMANT Messenger due to your support—transfer ADM, ETH and other tokens in this chat. Additional wallets for donations see on adamant.im.";
+
 /* Alert 'Retry Or Delete' title. Used in caht for sending failed messages again or delete them */
 "Chats.RetryOrDelete.Title" = "Retry or delete?";
 
