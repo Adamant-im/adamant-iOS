@@ -19,7 +19,7 @@ class OnboardOverlay: SwiftyOnboardOverlay {
     lazy var agreeLabel: UILabel = {
         let view = UILabel()
         view.text = "  I accept"
-        view.font = UIFont(name: "Exo2-Regular", size: 18)
+        view.font = UIFont.adamantPrimary(ofSize: 18)//UIFont(name: "Exo2-Regular", size: 18)
         view.textColor = UIColor.black
         return view
     }()

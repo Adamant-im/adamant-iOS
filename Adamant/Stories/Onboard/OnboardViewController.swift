@@ -33,7 +33,7 @@ class OnboardViewController: UIViewController {
     
     // MARK: Constants
     private static let titleFont = UIFont.adamantPrimary(ofSize: 18)
-    private static let buttonsFont = UIFont.adamantPrimary(ofSize: 16)
+    private static let buttonsFont = UIFont.adamantPrimary(ofSize: 16, weight: .bold)
     private static let themeColor = UIColor.adamant.primary
     
     
