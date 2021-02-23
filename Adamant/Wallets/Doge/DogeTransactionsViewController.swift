@@ -51,7 +51,8 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
                 vc.transactions = tuple.transactions
                 vc.loadedTo = tuple.transactions.count
                 
-                DispatchQueue.main.async {                    vc.emptyLabel.isHidden = vc.transactions.count > 0
+                DispatchQueue.main.async {
+                    vc.emptyLabel.isHidden = vc.transactions.count > 0
                     vc.tableView.reloadData()
                     refreshControl.endRefreshing()
                     

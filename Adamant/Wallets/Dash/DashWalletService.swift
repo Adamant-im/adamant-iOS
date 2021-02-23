@@ -449,6 +449,12 @@ extension DashWalletService {
                     if let idx = self.transatrionsIds.index(of: id) {
                         self.transatrionsIds.remove(at: idx)
                     }
+                    
+                    guard !transaction.isDoubleSpend else {
+                        completion(.success((transactions: [], hasMore: self.transatrionsIds.count > 0)))
+                        return
+                    }
+                    
                     completion(.success((transactions: [transaction.asBtcTransaction(DashTransaction.self, for: address)], hasMore: self.transatrionsIds.count > 0)))
                 case .failure(let error):
                     completion(.failure(error))

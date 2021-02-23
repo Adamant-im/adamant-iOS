@@ -22,6 +22,8 @@ struct BTCRawTransaction {
     
     let inputs: [BTCInput]
     let outputs: [BTCOutput]
+
+    let isDoubleSpend: Bool
     
     func asBtcTransaction<T: BaseBtcTransaction>(_ as:T.Type, for address: String, blockId: String? = nil) -> T {
         // MARK: Known values
@@ -132,6 +134,7 @@ struct BTCRawTransaction {
 extension BTCRawTransaction: Decodable {
     enum CodingKeys: String, CodingKey {
         case txId = "txid"
+        case possibleDoubleSpend = "possibleDoubleSpend"
         case date = "time"
         case valueIn
         case valueOut
@@ -146,7 +149,21 @@ extension BTCRawTransaction: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         // MARK: Required
-        self.txId = try container.decode(String.self, forKey: .txId)
+        txId = try container.decode(String.self, forKey: .txId)
+        
+        isDoubleSpend = (try? container.decode(Bool.self, forKey: .possibleDoubleSpend)) ?? false
+        
+        guard !isDoubleSpend else {
+            date = nil
+            valueIn = 0
+            valueOut = 0
+            fee = 0
+            confirmations = nil
+            blockHash = nil
+            inputs = []
+            outputs = []
+            return
+        }
         
         // MARK: Optionals for new transactions
         if let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) {
