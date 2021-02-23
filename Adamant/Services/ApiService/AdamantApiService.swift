@@ -52,6 +52,7 @@ class AdamantApiService: ApiService {
     var adamantCore: AdamantCore!
     var nodesSource: NodesSource! {
         didSet {
+            nodesSource.migrate()
             refreshNode()
         }
     }

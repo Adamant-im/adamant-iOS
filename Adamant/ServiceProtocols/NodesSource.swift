@@ -45,4 +45,6 @@ protocol NodesSource {
     
     func saveNodes()
     func reloadNodes()
+
+    func migrate()
 }

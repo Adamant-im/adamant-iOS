@@ -21,10 +21,20 @@ enum URLScheme: String, Codable {
     }
 }
 
-struct Node: Equatable, Codable {
-    let scheme: URLScheme
-    let host: String
-    let port: Int?
+class Node: Equatable, Codable {
+    static func == (lhs: Node, rhs: Node) -> Bool {
+        return lhs.host == rhs.host && lhs.port == rhs.port && lhs.scheme == rhs.scheme
+    }
+    
+    init(scheme: URLScheme, host: String, port: Int?) {
+        self.scheme = scheme
+        self.host = host
+        self.port = port
+    }
+    
+    var scheme: URLScheme
+    var host: String
+    var port: Int?
     
     func asString() -> String {
         if let url = asURL(forcePort: scheme != URLScheme.default) {

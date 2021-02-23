@@ -99,6 +99,16 @@ class AdamantNodesSource: NodesSource {
         }
     }
     
+    func migrate() {
+        reloadNodes()
+        nodes.forEach { node in
+            if node.host == "185.231.245.26", node.port == 36666 {
+                node.host = "23.226.231.225"
+            }
+        }
+        saveNodes()
+    }
+    
     private func testNode(node: Node, completion: @escaping ((NodeEditorViewController.TestState) -> Void)) {
         var components = URLComponents()
         
