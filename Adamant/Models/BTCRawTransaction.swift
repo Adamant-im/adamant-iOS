@@ -134,6 +134,7 @@ struct BTCRawTransaction {
 extension BTCRawTransaction: Decodable {
     enum CodingKeys: String, CodingKey {
         case txId = "txid"
+        case hash = "hash"
         case possibleDoubleSpend = "possibleDoubleSpend"
         case date = "time"
         case valueIn
@@ -151,9 +152,15 @@ extension BTCRawTransaction: Decodable {
         // MARK: Required
         txId = try container.decode(String.self, forKey: .txId)
         
-        isDoubleSpend = (try? container.decode(Bool.self, forKey: .possibleDoubleSpend)) ?? false
+        let possibleDoubleSpend = (try? container.decode(Bool.self, forKey: .possibleDoubleSpend)) ?? false
         
-        guard !isDoubleSpend else {
+        guard
+            !possibleDoubleSpend,
+            let _ = try? container.decode(String.self, forKey: .hash),
+            let timeInterval = try? container.decode(TimeInterval.self, forKey: .date),
+            let rawValueIn = try? container.decode(Decimal.self, forKey: .valueIn),
+            let rawValueOut = try? container.decode(Decimal.self, forKey: .valueOut) else {
+            isDoubleSpend = true
             date = nil
             valueIn = 0
             valueOut = 0
@@ -165,39 +172,45 @@ extension BTCRawTransaction: Decodable {
             return
         }
         
-        // MARK: Optionals for new transactions
-        if let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) {
-            self.date = Date(timeIntervalSince1970: timeInterval)
-        } else {
-            self.date = nil
-        }
+        date = Date(timeIntervalSince1970: timeInterval)
+        valueIn = rawValueIn
+        valueOut = rawValueOut
         
-        self.confirmations = try? container.decode(Int.self, forKey: .confirmations)
-        self.blockHash = try? container.decode(String.self, forKey: .blockHash)
+//        // MARK: Optionals for new transactions
+//        if let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) {
+//            date = Date(timeIntervalSince1970: timeInterval)
+//        } else {
+//            date = nil
+//        }
+        
+        confirmations = try? container.decode(Int.self, forKey: .confirmations)
+        blockHash = try? container.decode(String.self, forKey: .blockHash)
         
         // MARK: Inputs & Outputs
-        let inputs = try container.decode([BTCInput].self, forKey: .inputs)
-        self.inputs = inputs.filter { !$0.sender.isEmpty }  // Filter incomplete transactions without sender
-        self.outputs = try container.decode([BTCOutput].self, forKey: .outputs)
+        let rawInputs = try container.decode([BTCInput].self, forKey: .inputs)
+        inputs = rawInputs.filter { !$0.sender.isEmpty }  // Filter incomplete transactions without sender
+        outputs = try container.decode([BTCOutput].self, forKey: .outputs)
         
-        // Total In & Out. Can be null sometimes...
-        if let raw = try? container.decode(Decimal.self, forKey: .valueIn) {
-            self.valueIn = raw
-        } else {
-            self.valueIn = self.inputs.map { $0.value }.reduce(0, +)
-        }
-        
-        if let raw = try? container.decode(Decimal.self, forKey: .valueOut) {
-            self.valueOut = raw
-        } else {
-            self.valueOut = self.outputs.map { $0.value }.reduce(0, +)
-        }
+//        // Total In & Out. Can be null sometimes...
+//        if let raw = try? container.decode(Decimal.self, forKey: .valueIn) {
+//            valueIn = raw
+//        } else {
+//            valueIn = self.inputs.map { $0.value }.reduce(0, +)
+//        }
+//
+//        if let raw = try? container.decode(Decimal.self, forKey: .valueOut) {
+//            valueOut = raw
+//        } else {
+//            valueOut = outputs.map { $0.value }.reduce(0, +)
+//        }
         
         if let raw = try? container.decode(Decimal.self, forKey: .fee) {
-            self.fee = raw
+            fee = raw
         } else {
-            self.fee = self.valueIn - self.valueOut
+            fee = valueIn - valueOut
         }
+        
+        isDoubleSpend = false
     }
 }
 
