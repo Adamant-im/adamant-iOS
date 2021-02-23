@@ -29,7 +29,7 @@ PODS:
   - Lisk (1.1.1):
     - CryptoSwift
     - libsodium
-  - MarkdownKit (1.5)
+  - MarkdownKit (1.6)
   - MessageInputBar/Core (0.4.1)
   - MessageKit (2.0.0):
     - MessageInputBar/Core
@@ -82,7 +82,7 @@ DEPENDENCIES:
   - KeychainAccess
   - libsodium
   - Lisk (from `https://github.com/adamant-im/lisk-swift.git`)
-  - MarkdownKit (from `https://github.com/RealBonus/MarkdownKit`)
+  - MarkdownKit
   - MessageKit (= 2.0.0)
   - MyLittlePinpad
   - Parchment
@@ -95,37 +95,37 @@ DEPENDENCIES:
   - web3.swift.pod (~> 2.2.0)
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  trunk:
     - Alamofire
+    - BigInt
     - ByteBackpacker
+    - CryptoSwift
     - DateToolsSwift
     - EFQRCode
+    - Eureka
     - FreakingSimpleRoundImageView
     - FTIndicator
     - GRDB.swift
+    - GRDBCipher
     - GRKOpenSSLFramework
     - KeychainAccess
     - libsodium
+    - MarkdownKit
     - MessageInputBar
     - MessageKit
     - MyLittlePinpad
     - Parchment
     - PMAlertController
     - ProcedureKit
+    - PromiseKit
     - QRCodeReader.swift
     - ReachabilitySwift
     - RNCryptor
-    - swift_qrcodejs
-    - Swinject
-  trunk:
-    - BigInt
-    - CryptoSwift
-    - Eureka
-    - GRDBCipher
-    - PromiseKit
     - secp256k1.c
     - SQLCipher
     - Starscream
+    - swift_qrcodejs
+    - Swinject
     - web3.swift.pod
 
 EXTERNAL SOURCES:
@@ -134,8 +134,6 @@ EXTERNAL SOURCES:
     :git: https://github.com/boyarkin-anton/BitcoinKit.git
   Lisk:
     :git: https://github.com/adamant-im/lisk-swift.git
-  MarkdownKit:
-    :git: https://github.com/RealBonus/MarkdownKit
 
 CHECKOUT OPTIONS:
   BitcoinKit:
@@ -144,9 +142,6 @@ CHECKOUT OPTIONS:
   Lisk:
     :commit: b4b0cee3d202850b23f927be1e55dd2a3fbc569e
     :git: https://github.com/adamant-im/lisk-swift.git
-  MarkdownKit:
-    :commit: 2703e13ed4cfbb031713711dd5ce6a9da62a2a1c
-    :git: https://github.com/RealBonus/MarkdownKit
 
 SPEC CHECKSUMS:
   Alamofire: 3ec537f71edc9804815215393ae2b1a8ea33a844
@@ -165,7 +160,7 @@ SPEC CHECKSUMS:
   KeychainAccess: b3816fddcf28aa29d94b10ec305cd52be14c472b
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   Lisk: dafc2334fd9395dcbc3e7a4e406f82881a1ee6d4
-  MarkdownKit: 379028e9cd3ebf05ccac87205cd9aead446159d4
+  MarkdownKit: 6aa4aee263c7efae3de570cded0767f85c38fc78
   MessageInputBar: e81c7535347f1f7b923de7080409a535a004b6e4
   MessageKit: 29c1c87e5a396d2ca7a3f712e5171dc9aba42a1e
   MyLittlePinpad: 5d57cb5a092ddbeb5c4e6fa0b46df83bd3e88b0c
@@ -183,6 +178,6 @@ SPEC CHECKSUMS:
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
   web3.swift.pod: 66048c11416c2e7a9a4b35fe42254d0f0d9db4b1
 
-PODFILE CHECKSUM: b543728ccc3835fabed471459775001f50da7657
+PODFILE CHECKSUM: a0198c5305b6a810062f31c3b0c406283a8cdf77
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.10.1

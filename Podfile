@@ -17,7 +17,7 @@ end
 
 # Markdown parser, forked with fixed whitespaces. '5 * 5 * 6'
 def markdown_pods
-  pod 'MarkdownKit', :git => 'https://github.com/RealBonus/MarkdownKit'
+  pod 'MarkdownKit'#, :git => 'https://github.com/RealBonus/MarkdownKit'
 end
 
  # ADAMANT Messenger iOS app
