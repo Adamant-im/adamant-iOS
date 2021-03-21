@@ -10,7 +10,7 @@ import UIKit
 
 extension UIFont {
     static func adamantPrimary(ofSize size: CGFloat) -> UIFont {
-        return UIFont(name: "Exo 2", size: size)!
+        return UIFont(name: "Exo 2", size: size)  ?? .systemFont(ofSize: size)
     }
     
     static func adamantPrimary(ofSize size: CGFloat, weight: UIFont.Weight) -> UIFont {
@@ -33,7 +33,7 @@ extension UIFont {
             name = "Exo 2"
         }
         
-        return UIFont(name: name, size: size)!
+        return UIFont(name: name, size: size) ?? .systemFont(ofSize: size, weight: weight)
     }
     
     static var adamantChatDefault = UIFont.systemFont(ofSize: 17)

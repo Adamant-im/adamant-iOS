@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MarkdownKit
 
 class OnboardPage: SwiftyOnboardPage {
 
@@ -65,45 +66,32 @@ class OnboardPage: SwiftyOnboardPage {
     }
     
     private func adjustTextView() {
-        guard let rawRichText = rawRichText else {
+        guard
+            let rawRichText = rawRichText,
+            let defaultFont = UIFont(name: fontName, size: maxFontSize) else {
             return
         }
         
-        let richText = "<span style=\"font-family: \(fontName); font-size: \(maxFontSize)\">\(rawRichText)</span>"
+        let attributedString = NSMutableAttributedString(attributedString: MarkdownParser().parse(rawRichText))
         
-        guard let defaultFont = UIFont(name: fontName, size: maxFontSize) else {
-            return
-        }
-        
-        guard let htmlData = richText.data(using: String.Encoding.unicode),
-            let attributedString = try? NSMutableAttributedString(data: htmlData, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) else {
-            return
-        }
+        attributedString.apply(font: defaultFont, alignment: .center)
         
         let pureText = attributedString.string
         text.font = defaultFont
         text.text = pureText
         adjustTextViewFontSize()
+        
         let fontSize = text.font!.pointSize
         
         guard maxFontSize != fontSize else {
-            let style = NSMutableParagraphStyle()
-            style.alignment = .center
-            attributedString.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: attributedString.length))
-            
             text.text = nil
             text.font = nil
             text.attributedText = attributedString
             return
         }
-        
-        let adjustedText = "<span style=\"font-family: \(fontName); font-size: \(fontSize)\">\(rawRichText)</span>"
-        
-        if let htmlData = adjustedText.data(using: String.Encoding.unicode), let attributedString = try? NSMutableAttributedString(data: htmlData, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
-            let style = NSMutableParagraphStyle()
-            style.alignment = .center
-            attributedString.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: attributedString.length))
-            
+
+        if let font = UIFont(name: fontName, size: fontSize) {
+            attributedString.apply(font: font, alignment: .center)
             text.text = nil
             text.font = nil
             text.attributedText = attributedString
