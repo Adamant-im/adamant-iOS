@@ -184,7 +184,7 @@ class DelegatesListViewController: UIViewController {
                 let checkedNames = self.delegates.filter { $0.isChecked }.map { $0.delegate.username }
                 let checkedDelegates = delegates.map { CheckedDelegate(delegate: $0) }
                 for name in checkedNames {
-                    if let i = delegates.index(where: { $0.username == name }) {
+                    if let i = delegates.firstIndex(where: { $0.username == name }) {
                         checkedDelegates[i].isChecked = true
                     }
                 }

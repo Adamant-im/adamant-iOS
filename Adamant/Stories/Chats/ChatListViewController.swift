@@ -510,6 +510,8 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
                     }
                     tableView.moveRow(at: indexPath, to: newIndexPath)
                 }
+            @unknown default:
+                break
             }
             
         // MARK: Unread controller
@@ -652,7 +654,7 @@ extension ChatListViewController {
             // MARK: 2. Config TabBarController
             let animated: Bool
             if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController {
-                if let navigator = self.splitViewController ?? self.navigationController, selectedView != navigator, let index = tabVC.viewControllers?.index(of: navigator) {
+                if let navigator = self.splitViewController ?? self.navigationController, selectedView != navigator, let index = tabVC.viewControllers?.firstIndex(of: navigator) {
                     animated = false
                     tabVC.selectedIndex = index
                 } else {

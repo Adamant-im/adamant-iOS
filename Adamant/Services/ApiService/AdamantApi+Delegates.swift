@@ -77,7 +77,6 @@ extension AdamantApiService {
                     case .success(let delegates):
                         var delegatesWithVotes = [Delegate]()
                         delegates.forEach({ (delegate) in
-                            var delegate = delegate
                             delegate.voted = votes.contains(delegate.address)
                             delegatesWithVotes.append(delegate)
                         })
@@ -127,7 +126,7 @@ extension AdamantApiService {
             switch result {
             case .success(let nextForgers):
                 var forgingTime = -1
-                if let fIndex = nextForgers.delegates.index(of: delegate.publicKey) {
+                if let fIndex = nextForgers.delegates.firstIndex(of: delegate.publicKey) {
                     forgingTime = fIndex * 10
                 }
                 completion(.success(forgingTime))
@@ -332,7 +331,7 @@ extension AdamantApiService {
     private func getRoundDelegates(delegates: [String], height: UInt64) -> [String] {
         let currentRound = round(height)
         return delegates.filter({ (delegate) -> Bool in
-            if let index = delegates.index(of: delegate) {
+            if let index = delegates.firstIndex(of: delegate) {
                 return currentRound == round(height + UInt64(index) + 1)
             }
             return false

@@ -191,7 +191,7 @@ class AdamantLskApiService: LskApiService {
     
     private static let addressRegexString = "^([0-9]{2,22})L$"
     private static let addressRegex = try! NSRegularExpression(pattern: addressRegexString, options: [])
-    private static let maxAddressNumber = BigUInt("18446744073709551615")!
+    private static let maxAddressNumber = BigUInt("18446744073709551615")
     
     /// Rules are simple:
     ///

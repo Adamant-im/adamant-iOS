@@ -845,6 +845,8 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
                     }
                     
                     chat.reloadItems(at: [IndexPath(row: 0, section: section)])
+                @unknown default:
+                    break
                 }
             }
         }, completion: { animationSuccess in

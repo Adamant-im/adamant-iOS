@@ -446,7 +446,7 @@ extension DashWalletService {
             self.getTransaction(by: id, completion: { response in
                 switch response {
                 case .success(let transaction):
-                    if let idx = self.transatrionsIds.index(of: id) {
+                    if let idx = self.transatrionsIds.firstIndex(of: id) {
                         self.transatrionsIds.remove(at: idx)
                     }
                     
@@ -470,7 +470,7 @@ extension DashWalletService {
                         self.getTransaction(by: id, completion: { r in
                             switch r {
                             case .success(let transaction):
-                                if let idx = self.transatrionsIds.index(of: id) {
+                                if let idx = self.transatrionsIds.firstIndex(of: id) {
                                     self.transatrionsIds.remove(at: idx)
                                 }
                                 completion(.success((transactions: [transaction.asBtcTransaction(DashTransaction.self, for: address)], hasMore: self.transatrionsIds.count > 0)))

@@ -252,7 +252,7 @@ extension NodesListViewController: NodeEditorDelegate {
                 return
             }
             
-            if let prevNode = row.value, let index = nodes.index(of: prevNode) {
+            if let prevNode = row.value, let index = nodes.firstIndex(of: prevNode) {
                 nodes.remove(at: index)
             }
             
@@ -266,13 +266,13 @@ extension NodesListViewController: NodeEditorDelegate {
                 return
             }
             
-            if let index = nodes.index(of: node) {
+            if let index = nodes.firstIndex(of: node) {
                 nodes.remove(at: index)
-            } else if let index = nodes.index(of: editorNode) {
+            } else if let index = nodes.firstIndex(of: editorNode) {
                 nodes.remove(at:index)
             }
             
-            if let section = form.sectionBy(tag: Sections.nodes.tag), let index = section.index(of: row) {
+            if let section = form.sectionBy(tag: Sections.nodes.tag), let index = section.firstIndex(of: row) {
                 section.remove(at: index)
             }
             
@@ -324,7 +324,7 @@ extension NodesListViewController {
             $0.tag = tag
             
             let deleteAction = SwipeAction(style: .destructive, title: "Delete") { [weak self] (action, row, completionHandler) in
-                if let node = row.baseValue as? Node, let index = self?.nodes.index(of: node) {
+                if let node = row.baseValue as? Node, let index = self?.nodes.firstIndex(of: node) {
                     self?.nodes.remove(at: index)
                     self?.saveNodes()
                 }

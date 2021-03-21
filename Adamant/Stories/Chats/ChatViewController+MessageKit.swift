@@ -98,11 +98,11 @@ extension ChatViewController: MessagesDataSource {
                 let timer = Timer.scheduledTimer(withTimeInterval: expire + 1, repeats: false) { [weak self] timer in
                     self?.messagesCollectionView.reloadItems(at: [indexPath])
                     
-                    if let index = self?.cellsUpdating.index(of: indexPath) {
+                    if let index = self?.cellsUpdating.firstIndex(of: indexPath) {
                         self?.cellsUpdating.remove(at: index)
                     }
                     
-                    if let index = self?.cellUpdateTimers.index(of: timer) {
+                    if let index = self?.cellUpdateTimers.firstIndex(of: timer) {
                         self?.cellUpdateTimers.remove(at: index)
                     }
                 }

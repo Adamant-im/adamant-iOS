@@ -47,7 +47,7 @@ class LskWalletService: WalletService {
     
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^([0-9]{2,22})L$", options: [])
-    let maxAddressNumber = BigUInt("18446744073709551615")!
+    let maxAddressNumber = BigUInt("18446744073709551615")
     let transactionFee: Decimal = 0.1
     private (set) var enabled = true
     

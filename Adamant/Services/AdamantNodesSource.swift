@@ -59,7 +59,7 @@ class AdamantNodesSource: NodesSource {
                     completion(node)
                     break
                 case .failed, .notTested:
-                    if let index = self.currentNodes.index(of: node) {
+                    if let index = self.currentNodes.firstIndex(of: node) {
                         self.currentNodes.remove(at: index)
                     }
                     self.getValidNode(completion: completion)

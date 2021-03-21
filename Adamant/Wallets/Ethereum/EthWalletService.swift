@@ -754,11 +754,11 @@ extension EthWalletService: PrivateKeyGenerator {
         }
         
         guard let keystore = try? BIP32Keystore(mnemonics: passphrase, password: EthWalletService.walletPassword, mnemonicsPassword: "", language: .english, prefixPath: EthWalletService.walletPath),
-            let account = keystore?.addresses?.first,
-            let privateKeyData = try? keystore?.UNSAFE_getPrivateKeyData(password: EthWalletService.walletPassword, account: account) else {
+            let account = keystore.addresses?.first,
+            let privateKeyData = try? keystore.UNSAFE_getPrivateKeyData(password: EthWalletService.walletPassword, account: account) else {
             return nil
         }
         
-        return privateKeyData?.toHexString()
+        return privateKeyData.toHexString()
     }
 }
