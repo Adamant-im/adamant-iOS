@@ -719,16 +719,6 @@ extension TransferViewControllerBase {
                 row.placeholder = String.adamantLocalized.transfer.amountPlaceholder
                 row.tag = BaseRows.amount.tag
                 row.formatter = self?.balanceFormatter
-                row.useFormatterDuringInput = false
-                row.useFormatterOnDidBeginEditing = true
-                row.displayValueFor = { value in
-                    guard let v = value else { return nil }
-                    let formatter = AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: nil)
-                    
-                    let d = Decimal(v)
-                    let s = formatter.string(from: d)
-                    return s
-                }
                 
                 if let amount = self?.amount {
                     row.value = amount.doubleValue
