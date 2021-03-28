@@ -411,7 +411,7 @@ extension ERC20WalletService {
                 let result: WalletServiceResult<EthTransaction>
                 
                 switch error {
-                // Transaction not delivired yet
+                // Transaction not delivered yet
                 case .inputError, .nodeError:
                     let transaction = details.transaction.asEthTransaction(date: nil, gasUsed: nil, blockNumber: nil, confirmations: nil, receiptStatus: TransactionReceipt.TXStatus.notYetProcessed, isOutgoing: false)
                     result = .success(result: transaction)

@@ -18,7 +18,7 @@ class BaseBtcTransaction: TransactionDetails {
     let senderAddress: String
     let recipientAddress: String
     
-    let amountValue: Decimal
+    let amountValue: Decimal?
     let feeValue: Decimal?
     let confirmationsValue: String?
     

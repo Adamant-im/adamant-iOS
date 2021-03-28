@@ -57,7 +57,7 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
                     let min = reported - reported*0.005
                     let max = reported + reported*0.005
                     
-                    guard (min...max).contains(lskTransaction.amountValue) else {
+                    guard (min...max).contains(lskTransaction.amountValue ?? 0) else {
                         completion(.success(result: .warning))
                         return
                     }

@@ -65,7 +65,7 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
                 let min = reportedValue - reportedValue*0.005
                 let max = reportedValue + reportedValue*0.005
                 
-                guard (min...max).contains(tx.value) else {
+                guard (min...max).contains(tx.value ?? 0) else {
                     completion(.success(result: .warning))
                     return
                 }

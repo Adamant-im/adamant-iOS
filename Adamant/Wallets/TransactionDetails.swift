@@ -23,7 +23,7 @@ protocol TransactionDetails {
     var dateValue: Date? { get }
     
     /// The amount of currency that was sent.
-    var amountValue: Decimal { get }
+    var amountValue: Decimal? { get }
     
     /// The amount of fee that taken for transaction process.
     var feeValue: Decimal? { get }
@@ -52,7 +52,7 @@ extension TransactionDetails {
         Summary
         Sender: \(senderAddress)
         Recipient: \(recipientAddress)
-        Amount: \(AdamantBalanceFormat.full.format(amountValue, withCurrencySymbol: symbol))
+        Amount: \(AdamantBalanceFormat.full.format(amountValue ?? 0, withCurrencySymbol: symbol))
         """
         
         if let fee = feeValue {

@@ -124,7 +124,7 @@ extension BitcoinKit.Transaction: TransactionDetails {
         }
     }
     
-    var amountValue: Decimal {
+    var amountValue: Decimal? {
         return Decimal(outputs[0].value) / Decimal(100000000)
     }
     

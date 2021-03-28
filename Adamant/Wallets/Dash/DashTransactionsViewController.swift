@@ -179,7 +179,7 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
                       isOutgoing: outgoing,
                       partnerId: partnerId,
                       partnerName: partnerName,
-                      amount: transaction.amountValue,
+                      amount: transaction.amountValue ?? 0,
                       date: transaction.dateValue)
     }
     

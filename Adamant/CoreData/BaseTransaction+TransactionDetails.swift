@@ -20,7 +20,7 @@ extension BaseTransaction: TransactionDetails {
     var confirmationsValue: String? { return isConfirmed ? String(confirmations) : nil }
     var blockValue: String? { return isConfirmed ? blockId : nil }
     
-    var amountValue: Decimal {
+    var amountValue: Decimal? {
         if let amount = self.amount {
             return amount.decimalValue
         } else {

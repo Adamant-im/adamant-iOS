@@ -19,7 +19,7 @@ struct SimpleTransactionDetails: TransactionDetails {
     
     var dateValue: Date?
     
-    var amountValue: Decimal
+    var amountValue: Decimal?
     
     var feeValue: Decimal?
     

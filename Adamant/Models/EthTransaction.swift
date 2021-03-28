@@ -44,7 +44,7 @@ extension EthResponse: Decodable {
 struct EthTransaction {
     let date: Date?
     let hash: String
-    let value: Decimal
+    let value: Decimal?
     let from: String
     let to: String
     let gasUsed: Decimal?
@@ -140,7 +140,7 @@ extension EthTransaction: TransactionDetails {
     var senderAddress: String { return from }
     var recipientAddress: String { return to }
     var dateValue: Date? { return date }
-    var amountValue: Decimal { return value }
+    var amountValue: Decimal? { return value }
     var confirmationsValue: String? { return confirmations }
     var blockValue: String? { return blockNumber}
     
@@ -161,8 +161,8 @@ extension EthTransaction: TransactionDetails {
 extension EthereumTransaction {
     func asEthTransaction(date: Date?, gasUsed: BigUInt?, blockNumber: String?, confirmations: String?, receiptStatus: TransactionReceipt.TXStatus, isOutgoing: Bool, hash: String? = nil, for token: ERC20Token? = nil) -> EthTransaction {
         
-        var recipient = self.to
-        var txValue = value
+        var recipient = to
+        var txValue: BigUInt? = value
         
         var exponent = EthWalletService.currencyExponent
         if let naturalUnits = token?.naturalUnits {
@@ -178,10 +178,14 @@ extension EthereumTransaction {
                 txValue = v
             }
         }
+
+        if receiptStatus == .notYetProcessed {
+            txValue = nil
+        }
         
         return EthTransaction(date: date,
                               hash: hash ?? txhash ?? "",
-                              value: txValue.asDecimal(exponent: exponent),
+                              value: txValue?.asDecimal(exponent: exponent),
                               from: sender?.address ?? "",
                               to: recipient.address,
                               gasUsed: gasUsed?.asDecimal(exponent: 0),

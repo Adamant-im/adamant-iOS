@@ -109,7 +109,7 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
                       isOutgoing: outgoing,
                       partnerId: partnerId ?? "",
                       partnerName: nil,
-                      amount: transaction.amountValue,
+                      amount: transaction.amountValue ?? 0,
                       date: transaction.dateValue)
     }
     
@@ -129,7 +129,7 @@ extension Transactions.TransactionModel: TransactionDetails {
         return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
     }
     
-    var amountValue: Decimal {
+    var amountValue: Decimal? {
         let value = BigUInt(self.amount) ?? BigUInt(0)
         
         return value.asDecimal(exponent: LskWalletService.currencyExponent)
@@ -192,7 +192,7 @@ extension LocalTransaction: TransactionDetails {
         return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
     }
     
-    var amountValue: Decimal {
+    var amountValue: Decimal? {
         let value = BigUInt(self.amount)
         
         return value.asDecimal(exponent: LskWalletService.currencyExponent)

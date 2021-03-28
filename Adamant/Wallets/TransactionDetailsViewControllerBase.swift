@@ -318,22 +318,29 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(dateRow)
         
         // MARK: Amount
-        let amountRow = DecimalRow() {
+        let amountRow = LabelRow() {
             $0.disabled = true
             $0.tag = Rows.amount.tag
             $0.title = Rows.amount.localized
-            $0.formatter = AdamantBalanceFormat.currencyFormatter(for: .full, currencySymbol: currencySymbol)
-            $0.value = transaction?.amountValue.doubleValue
+            if let value = transaction?.amountValue {
+                $0.value = currencyFormatter.string(from: value)
+            } else {
+                $0.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
         }.onCellSelection { [weak self] (cell, row) in
             if let value = row.value {
-                let text = AdamantBalanceFormat.full.format(value, withCurrencySymbol: self?.currencySymbol ?? nil)
-                self?.shareValue(text, from: cell)
+                self?.shareValue(value, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
-            row.value = self?.transaction?.amountValue.doubleValue
+            
+            if let value = self?.transaction?.amountValue, let formatter = self?.currencyFormatter {
+                row.value = formatter.string(from: value)
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }
             
         detailsSection.append(amountRow)
