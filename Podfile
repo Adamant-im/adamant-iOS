@@ -98,5 +98,15 @@ post_install do |installer|
         config.build_settings['SWIFT_VERSION'] = '4.2'
       end
     end
+    if target.name == 'GRDB.swift'
+      target.build_configurations.each do |config|
+        config.build_settings['SWIFT_VERSION'] = '4.2'
+      end
+    end
+    if target.name == 'GRDBCipher'
+      target.build_configurations.each do |config|
+        config.build_settings['SWIFT_VERSION'] = '4.2'
+      end
+    end
   end
 end
