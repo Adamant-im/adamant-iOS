@@ -19,8 +19,6 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
     // MARK: - Properties
     var transactions: [DashTransaction] = []
     
-    private let limit = 200 // Limit autoload, as some wallets can have thousands of transactions.
-    private(set) var loadedTo: Int = 0
     private let procedureQueue = ProcedureQueue()
     
     override func viewDidLoad() {
@@ -36,11 +34,11 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.emptyLabel.isHidden = true
+        emptyLabel.isHidden = true
         procedureQueue.cancelAllOperations()
-        
-        loadedTo = 0
-        walletService.getTransactions(from: loadedTo) { [weak self] result in
+        transactions.removeAll()
+
+        walletService.getTransactions { [weak self] result in
             guard let vc = self else {
                 refreshControl.endRefreshing()
                 return
@@ -48,8 +46,7 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
             
             switch result {
             case .success(let tuple):
-                vc.transactions = tuple.transactions
-                vc.loadedTo = tuple.transactions.count
+                vc.transactions += tuple.transactions
                 
                 DispatchQueue.main.async {
                     vc.emptyLabel.isHidden = vc.transactions.count > 0
@@ -58,7 +55,7 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
                     
                     // Update tableView, then call loadMore()
                     if tuple.hasMore {
-                        vc.loadMoreTransactions(from: tuple.transactions.count)
+                        vc.loadMoreTransactions()
                     }
                 }
                 
@@ -184,25 +181,15 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     // MARK: - Load more
-    private func loadMoreTransactions(from: Int) {
-        let procedure = LoadMoreDashTransactionsProcedure(service: walletService, from: from)
+    private func loadMoreTransactions() {
+        let procedure = LoadMoreDashTransactionsProcedure(service: walletService)
 
         procedure.addDidFinishBlockObserver { [weak self] (procedure, error) in
             guard let vc = self, let result = procedure.result else {
                 return
             }
             
-            let total = vc.loadedTo + result.transactions.count
-            
-            guard from < total else { return }
-            
-            var indexPaths = [IndexPath]()
-            for index in from..<total {
-                indexPaths.append(IndexPath(row: index, section: 0))
-            }
-            
             DispatchQueue.main.async {
-                vc.loadedTo = total
                 vc.transactions.append(contentsOf: result.transactions)
                 vc.transactions.sort(by: { (t1, t2) -> Bool in
                     return t1.dateValue ?? Date() > t2.dateValue ?? Date()
@@ -217,9 +204,8 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
                     }
                 }
                 
-                // Update everything, and then call loadMore()
-                if result.hasMore && total < vc.limit {
-                    vc.loadMoreTransactions(from: total)
+                if result.hasMore {
+                    vc.loadMoreTransactions()
                 }
             }
         }
@@ -230,21 +216,20 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
 
 
 private class LoadMoreDashTransactionsProcedure: Procedure {
-    let from: Int
     let service: DashWalletService
     
-    private(set) var result: (transactions: [DashTransaction], hasMore: Bool)? = nil
+    private(set) var result: DashTransactionsPointer? = nil
     
-    init(service: DashWalletService, from: Int) {
-        self.from = from
+    init(service: DashWalletService) {
         self.service = service
         
         super.init()
+        
         log.severity = .warning
     }
     
     override func execute() {
-        service.getTransactions(from: from) { result in
+        service.getNextTransaction { result in
             switch result {
             case .success(let result):
                 self.result = result
