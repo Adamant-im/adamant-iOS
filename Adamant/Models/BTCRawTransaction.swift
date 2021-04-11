@@ -156,10 +156,7 @@ extension BTCRawTransaction: Decodable {
         
         guard
             !possibleDoubleSpend,
-            let _ = try? container.decode(String.self, forKey: .hash),
-            let timeInterval = try? container.decode(TimeInterval.self, forKey: .date),
-            let rawValueIn = try? container.decode(Decimal.self, forKey: .valueIn),
-            let rawValueOut = try? container.decode(Decimal.self, forKey: .valueOut) else {
+            let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) else {
             isDoubleSpend = true
             date = nil
             valueIn = 0
@@ -173,8 +170,6 @@ extension BTCRawTransaction: Decodable {
         }
         
         date = Date(timeIntervalSince1970: timeInterval)
-        valueIn = rawValueIn
-        valueOut = rawValueOut
         
 //        // MARK: Optionals for new transactions
 //        if let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) {
@@ -191,18 +186,24 @@ extension BTCRawTransaction: Decodable {
         inputs = rawInputs.filter { !$0.sender.isEmpty }  // Filter incomplete transactions without sender
         outputs = try container.decode([BTCOutput].self, forKey: .outputs)
         
-//        // Total In & Out. Can be null sometimes...
-//        if let raw = try? container.decode(Decimal.self, forKey: .valueIn) {
-//            valueIn = raw
-//        } else {
-//            valueIn = self.inputs.map { $0.value }.reduce(0, +)
-//        }
-//
-//        if let raw = try? container.decode(Decimal.self, forKey: .valueOut) {
-//            valueOut = raw
-//        } else {
-//            valueOut = outputs.map { $0.value }.reduce(0, +)
-//        }
+        if let rawValueIn = try? container.decode(Decimal.self, forKey: .valueIn),
+           let rawValueOut = try? container.decode(Decimal.self, forKey: .valueOut) {
+            valueIn = rawValueIn
+            valueOut = rawValueOut
+        } else {
+            // Total In & Out. Can be null sometimes...
+            if let raw = try? container.decode(Decimal.self, forKey: .valueIn) {
+                valueIn = raw
+            } else {
+                valueIn = self.inputs.map { $0.value }.reduce(0, +)
+            }
+
+            if let raw = try? container.decode(Decimal.self, forKey: .valueOut) {
+                valueOut = raw
+            } else {
+                valueOut = outputs.map { $0.value }.reduce(0, +)
+            }
+        }
         
         if let raw = try? container.decode(Decimal.self, forKey: .fee) {
             fee = raw
