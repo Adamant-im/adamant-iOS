@@ -93,7 +93,17 @@ class EthWalletService: WalletService {
 	
     public static let transactionsListApiSubpath = "ethtxs"
     
-    private(set) var web3: web3!
+    private var _ethNodeUrl: String?
+    private var _web3: web3?
+    var web3: web3? {
+        if _web3 != nil {
+            return _web3
+        }
+        guard let url = _ethNodeUrl else {
+            return nil
+        }
+        return setupEthNode(with: url)
+    }
     private var baseUrl: String!
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.ethWalletService", qos: .utility, attributes: [.concurrent])
     private (set) var enabled = true
@@ -158,14 +168,22 @@ class EthWalletService: WalletService {
     
     func initiateNetwork(apiUrl: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            guard let url = URL(string: apiUrl), let web3 = try? Web3.new(url) else {
+            guard let _ = self.setupEthNode(with: apiUrl) else {
                 completion(.failure(error: WalletServiceError.networkError))
                 return
             }
-            
-            self.web3 = web3
-            self.baseUrl = EthWalletService.buildBaseUrl(for: web3.provider.network)
         }
+    }
+    
+    func setupEthNode(with apiUrl: String) -> web3? {
+        guard let url = URL(string: apiUrl), let web3 = try? Web3.new(url) else {
+            return nil
+        }
+        
+        self._web3 = web3
+        self.baseUrl = EthWalletService.buildBaseUrl(for: web3.provider.network)
+        
+        return web3
     }
     
     func update() {
@@ -245,7 +263,7 @@ class EthWalletService: WalletService {
 	}
 	
 	func getGasPrices(completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        web3.eth.getGasPricePromise().done { price in
+        web3?.eth.getGasPricePromise().done { price in
             completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
         }.catch { error in
             completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))
@@ -505,7 +523,10 @@ extension EthWalletService {
 extension EthWalletService {
     func getTransaction(by hash: String, completion: @escaping (WalletServiceResult<EthTransaction>) -> Void) {
         let sender = wallet?.address
-        let eth = web3.eth
+        guard let eth = web3?.eth else {
+            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))
+            return
+        }
         
         DispatchQueue.global(qos: .utility).async {
             let isOutgoing: Bool

@@ -76,7 +76,17 @@ class ERC20WalletService: WalletService {
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.erc20WalletService", qos: .utility, attributes: [.concurrent])
     private (set) var enabled = true
     
-    private(set) var web3: web3!
+    private var _ethNodeUrl: String?
+    private var _web3: web3?
+    var web3: web3? {
+        if _web3 != nil {
+            return _web3
+        }
+        guard let url = _ethNodeUrl else {
+            return nil
+        }
+        return setupEthNode(with: url)
+    }
     private var baseUrl: String!
     let stateSemaphore = DispatchSemaphore(value: 1)
     
@@ -146,21 +156,30 @@ class ERC20WalletService: WalletService {
         guard let apiUrl = AdamantResources.ethServers.randomElement() else {
             fatalError("Failed to get ETH endpoint")
         }
-        
+        _ethNodeUrl = apiUrl
         DispatchQueue.global(qos: .userInitiated).async {
-            guard let url = URL(string: apiUrl), let web3 = try? Web3.new(url) else {
-                return
-            }
-            
-            self.web3 = web3
-            self.baseUrl = ERC20WalletService.buildBaseUrl(for: web3.provider.network)
-            
-            if let address = EthereumAddress(token.contractAddress) {
-                self.contract = web3.contract(Web3.Utils.erc20ABI, at: address, abiVersion: 2)
-                
-                self.erc20 = ERC20(web3: web3, provider: web3.provider, address: address)
-            }
+            _ = self.setupEthNode(with: apiUrl)
         }
+    }
+    
+    func setupEthNode(with apiUrl: String) -> web3? {
+        guard
+            let url = URL(string: apiUrl),
+            let web3 = try? Web3.new(url),
+            let token = self.token else {
+            return nil
+        }
+        
+        self._web3 = web3
+        self.baseUrl = ERC20WalletService.buildBaseUrl(for: web3.provider.network)
+        
+        if let address = EthereumAddress(token.contractAddress) {
+            self.contract = web3.contract(Web3.Utils.erc20ABI, at: address, abiVersion: 2)
+            
+            self.erc20 = ERC20(web3: web3, provider: web3.provider, address: address)
+        }
+        
+        return web3
     }
     
     func update() {
@@ -249,6 +268,10 @@ class ERC20WalletService: WalletService {
     }
     
     func getGasPrices(completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
+        guard let web3 = self.web3 else {
+            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get Gas Price", error: nil)))
+            return
+        }
         web3.eth.getGasPricePromise().done { price in
             completion(.success(result: price.asDecimal(exponent: EthWalletService.currencyExponent)))
         }.catch { error in
@@ -315,7 +338,7 @@ extension ERC20WalletService: InitiatedWithPassphraseService {
             return
         }
         
-        web3.addKeystoreManager(KeystoreManager([keystore]))
+        web3?.addKeystoreManager(KeystoreManager([keystore]))
         
         guard let ethAddress = keystore.addresses?.first else {
             completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
@@ -363,7 +386,10 @@ extension ERC20WalletService: SwinjectDependentService {
 extension ERC20WalletService {
     func getTransaction(by hash: String, completion: @escaping (WalletServiceResult<EthTransaction>) -> Void) {
         let sender = wallet?.address
-        let eth = web3.eth
+        guard let eth = web3?.eth else {
+            completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))
+            return
+        }
         
         DispatchQueue.global(qos: .utility).async {
             let isOutgoing: Bool

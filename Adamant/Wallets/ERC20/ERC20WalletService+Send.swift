@@ -44,7 +44,7 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
             return
         }
 
-        guard let keystoreManager = web3.provider.attachedKeystoreManager else {
+        guard let keystoreManager = web3?.provider.attachedKeystoreManager else {
             completion(.failure(error: .internalError(message: "Failed to get web3.provider.KeystoreManager", error: nil)))
             return
         }
@@ -85,7 +85,7 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
     
     func sendTransaction(_ transaction: EthereumTransaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
         defaultDispatchQueue.async {
-            self.web3.eth.sendRawTransactionPromise(transaction).done { result in
+            self.web3?.eth.sendRawTransactionPromise(transaction).done { result in
                 completion(.success(result: result.hash))
             }.catch { error in
                 completion(.failure(error: .internalError(message: error.localizedDescription, error: error)))

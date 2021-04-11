@@ -11,7 +11,7 @@ import web3swift
 
 extension EthWalletService: RichMessageProviderWithStatusCheck {
     func statusFor(transaction: RichMessageTransaction, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void) {
-        guard let hash = transaction.richContent?[RichContentKeys.transfer.hash] else {
+        guard let web3 = self.web3, let hash = transaction.richContent?[RichContentKeys.transfer.hash] else {
             completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction hash", error: nil)))
             return
         }
