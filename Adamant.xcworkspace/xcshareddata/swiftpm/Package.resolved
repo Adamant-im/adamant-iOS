@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "Alamofire",
+        "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
+        "state": {
+          "branch": null,
+          "revision": "4d19ad82f80cc71ff829b941ded114c56f4f604c",
+          "version": "5.4.2"
+        }
+      },
+      {
         "package": "BigInt",
         "repositoryURL": "https://github.com/attaswift/BigInt.git",
         "state": {
@@ -47,6 +56,24 @@
         }
       },
       {
+        "package": "EFQRCode",
+        "repositoryURL": "https://github.com/EFPrefix/EFQRCode.git",
+        "state": {
+          "branch": null,
+          "revision": "4a72d79f9cae6d2f189f768178cc8594b427c190",
+          "version": "6.1.0"
+        }
+      },
+      {
+        "package": "MarkdownKit",
+        "repositoryURL": "https://github.com/bmoliveira/MarkdownKit.git",
+        "state": {
+          "branch": null,
+          "revision": "828e99602285c9547ceb01a014bf2d0bd7bc545e",
+          "version": "1.7.0"
+        }
+      },
+      {
         "package": "OpenSSL",
         "repositoryURL": "https://github.com/krzyzanowskim/OpenSSL.git",
         "state": {
@@ -62,6 +89,15 @@
           "branch": null,
           "revision": "aea48ea1855f5d82e2dffa6027afce3aab8f3dd7",
           "version": "6.13.3"
+        }
+      },
+      {
+        "package": "QRCodeReader",
+        "repositoryURL": "https://github.com/yannickl/QRCodeReader.swift.git",
+        "state": {
+          "branch": null,
+          "revision": "5020b5a47199d8ba80c83a4b4fafd70e9dc9dc7f",
+          "version": "10.1.1"
         }
       },
       {
@@ -107,6 +143,15 @@
           "branch": null,
           "revision": "4f9164a0a2c9a6a7ff53a2833d54a5c79c957342",
           "version": "0.9.1"
+        }
+      },
+      {
+        "package": "swift_qrcodejs",
+        "repositoryURL": "https://github.com/ApolloZhu/swift_qrcodejs.git",
+        "state": {
+          "branch": null,
+          "revision": "374dc7f7b9e76c6aeb393f6a84590c6d387e1ecb",
+          "version": "2.2.2"
         }
       },
       {

@@ -466,11 +466,13 @@ extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerCo
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         dismiss(animated: true, completion: nil)
         
-        guard let image = info[.originalImage] as? UIImage else {
+        guard let image = info[.originalImage] as? UIImage, let cgImage = image.cgImage else {
             return
         }
         
-        if let cgImage = image.toCGImage(), let codes = EFQRCode.recognize(image: cgImage), codes.count > 0 {
+        let codes = EFQRCode.recognize(cgImage)
+        
+        if codes.count > 0 {
             for aCode in codes {
                 if let admAddress = aCode.getAdamantAddress() {
                     startNewChat(with: admAddress.address, name: admAddress.name)

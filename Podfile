@@ -17,7 +17,7 @@ end
 
 # Markdown parser, forked with fixed whitespaces. '5 * 5 * 6'
 def markdown_pods
-  pod 'MarkdownKit'#, :git => 'https://github.com/RealBonus/MarkdownKit'
+#  pod 'MarkdownKit'#, :git => 'https://github.com/RealBonus/MarkdownKit'
 end
 
  # ADAMANT Messenger iOS app
@@ -41,8 +41,8 @@ target 'Adamant' do
 #  pod 'SwiftyOnboard', :git => 'https://github.com/RealBonus/SwiftyOnboard', :branch => 'feature/customStyle' # wellcome screen
 
   # QR
-  pod 'EFQRCode' # QR generator
-  pod 'QRCodeReader.swift' # QR reader
+#  pod 'EFQRCode' # QR generator
+#  pod 'QRCodeReader.swift' # QR reader
   
   # Crypto
 #  pod 'web3.swift.pod', '~> 2.2.0' # ETH Web3 Swift Port
