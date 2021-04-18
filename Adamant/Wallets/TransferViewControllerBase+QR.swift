@@ -93,6 +93,8 @@ extension TransferViewControllerBase {
                 
             case .restricted, .denied:
                 dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.login.photolibraryNotAuthorized)
+            @unknown default:
+                break
             }
         }
     }

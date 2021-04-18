@@ -98,6 +98,8 @@ class QRGeneratorViewController: FormViewController {
                     
                 case .restricted, .denied:
                     self?.dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.shared.photolibraryNotAuthorized)
+                @unknown default:
+                    break
                 }
             })
             

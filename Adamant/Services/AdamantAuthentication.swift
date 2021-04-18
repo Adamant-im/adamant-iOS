@@ -45,6 +45,8 @@ class AdamantAuthentication: LocalAuthentication {
                     
                 case .faceID:
                     return .faceID
+                @unknown default:
+                    return .none
                 }
             } else {
                 return .touchID

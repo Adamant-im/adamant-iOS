@@ -24,7 +24,7 @@ open class TransferMessageSizeCalculator: MessageSizeCalculator {
         var messageContainerSize = CGSize(width: cellWidth, height: TransferCollectionViewCell.cellHeightCompact)
         
         let maxWidth = messageContainerMaxWidth(for: message)
-        let attributedText = NSAttributedString(string: amount, attributes: [.font: font])
+        let attributedText = NSAttributedString(string: amount, attributes: [.font: font ?? .systemFont(ofSize: 24)])
         let constraintBox = CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
         let rect = attributedText.boundingRect(with: constraintBox, options: [.usesLineFragmentOrigin, .usesFontLeading], context: nil).integral
         

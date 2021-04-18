@@ -132,6 +132,8 @@ extension AdamantNotificationsService {
                 UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound], completionHandler: { (granted, error) in
                     completion(granted, error)
                 })
+            @unknown default:
+                completion(false, nil)
             }
         }
     }

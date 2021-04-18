@@ -47,7 +47,7 @@ class AdamantQRTools {
             return .none
         }
         
-        if let result = EFQRCode.recognize(image: image)?.first {
+        if let result = EFQRCode.recognize(image).first {
             return .success(result)
         }
         

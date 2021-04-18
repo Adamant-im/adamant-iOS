@@ -98,7 +98,7 @@ extension AdamantUtilities {
 extension AdamantUtilities {
     static func getHexString(from bytes: [UInt8]) -> String {
         if bytes.count > 0 {
-            return Data(bytes: bytes).reduce("") {$0 + String(format: "%02x", $1)}
+            return Data(bytes).reduce("") {$0 + String(format: "%02x", $1)}
         } else {
             return ""
         }
