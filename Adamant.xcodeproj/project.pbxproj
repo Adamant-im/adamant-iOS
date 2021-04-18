@@ -116,6 +116,7 @@
 		A50AEB04262C815200B37C22 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A50AEB03262C815200B37C22 /* SwiftPackageProductDependency */; };
 		A50AEB0C262C81E300B37C22 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A50AEB0B262C81E300B37C22 /* SwiftPackageProductDependency */; };
 		A50AEB14262C837900B37C22 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A50AEB13262C837900B37C22 /* SwiftPackageProductDependency */; };
+		A544F0D4262C9878001F1A6D /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A544F0D3262C9878001F1A6D /* SwiftPackageProductDependency */; };
 		A57282CA262C94CD00C96FA8 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A57282C9262C94CD00C96FA8 /* SwiftPackageProductDependency */; };
 		A57282D1262C94DA00C96FA8 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A57282D0262C94DA00C96FA8 /* SwiftPackageProductDependency */; };
 		A57282D3262C94DF00C96FA8 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A57282D2262C94DF00C96FA8 /* SwiftPackageProductDependency */; };
@@ -1020,6 +1021,7 @@
 				A50AEB0C262C81E300B37C22 /* BuildFile in Frameworks */,
 				A5F92994262C855B00C3E60A /* BuildFile in Frameworks */,
 				A50AEB04262C815200B37C22 /* BuildFile in Frameworks */,
+				A544F0D4262C9878001F1A6D /* BuildFile in Frameworks */,
 				A5785ADF262C63580001BC66 /* BuildFile in Frameworks */,
 				A57839FB262C95BF00428183 /* BuildFile in Frameworks */,
 				A5DBBABD262C7221004AC028 /* BuildFile in Frameworks */,
@@ -1975,6 +1977,7 @@
 				A57282C9262C94CD00C96FA8 /* SwiftPackageProductDependency */,
 				A57839FA262C95BF00428183 /* SwiftPackageProductDependency */,
 				A5783A0D262C964500428183 /* SwiftPackageProductDependency */,
+				A544F0D3262C9878001F1A6D /* SwiftPackageProductDependency */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -2134,6 +2137,7 @@
 				A57282C8262C94CD00C96FA8 /* RemoteSwiftPackageReference */,
 				A57839F9262C95BF00428183 /* RemoteSwiftPackageReference */,
 				A5783A0C262C964500428183 /* RemoteSwiftPackageReference */,
+				A544F0D2262C9878001F1A6D /* RemoteSwiftPackageReference */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
 			projectDirPath = "";
@@ -2286,7 +2290,6 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
 				"${BUILT_PRODUCTS_DIR}/FTIndicator/FTIndicator.framework",
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageInputBar/MessageInputBar.framework",
@@ -2300,7 +2303,6 @@
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Eureka.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FTIndicator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageInputBar.framework",
@@ -3227,7 +3229,6 @@
 		};
 		E9EC344D20066D4A00C0E546 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F61A99D335F5C53509263502 /* Pods-AdamantTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -3332,6 +3333,14 @@
 				minimumVersion = 5.4.2;
 			};
 		};
+		A544F0D2262C9878001F1A6D /* RemoteSwiftPackageReference */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/xmartlabs/Eureka.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 5.3.3;
+			};
+		};
 		A57282C8262C94CD00C96FA8 /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/maniramezan/DateTools.git";
@@ -3405,6 +3414,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A50AEB12262C837900B37C22 /* RemoteSwiftPackageReference */;
 			productName = Alamofire;
+		};
+		A544F0D3262C9878001F1A6D /* SwiftPackageProductDependency */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A544F0D2262C9878001F1A6D /* RemoteSwiftPackageReference */;
+			productName = Eureka;
 		};
 		A57282C9262C94CD00C96FA8 /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
