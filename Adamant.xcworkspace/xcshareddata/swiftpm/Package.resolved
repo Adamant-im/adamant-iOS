@@ -47,6 +47,15 @@
         }
       },
       {
+        "package": "DateToolsSwift",
+        "repositoryURL": "https://github.com/maniramezan/DateTools.git",
+        "state": {
+          "branch": "mani_swiftpm_5_3",
+          "revision": "b7f0415ecb9a2b684fc53a2e4093fc09d368356a",
+          "version": null
+        }
+      },
+      {
         "package": "Debugging",
         "repositoryURL": "https://github.com/vapor/debugging.git",
         "state": {

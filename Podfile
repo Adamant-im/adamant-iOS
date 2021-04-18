@@ -8,17 +8,17 @@ def keychain_pods
 end
 
 # NativeCore pods
-def core_pods
+#def core_pods
 #  pod 'CryptoSwift', '1.0.0' # MD5 hash
 #  pod 'ByteBackpacker' # Utility to pack value types into a Byte array
 #  pod 'libsodium' # Sodium crypto library
 #  pod 'GRKOpenSSLFramework', '1.0.2.18'
-end
+#end
 
 # Markdown parser, forked with fixed whitespaces. '5 * 5 * 6'
-def markdown_pods
+#def markdown_pods
 #  pod 'MarkdownKit'#, :git => 'https://github.com/RealBonus/MarkdownKit'
-end
+#end
 
  # ADAMANT Messenger iOS app
 target 'Adamant' do
@@ -27,7 +27,7 @@ target 'Adamant' do
 #  pod 'Alamofire' # Network
   pod 'Swinject' # Dependency Injection
   pod 'ReachabilitySwift' # Network status
-  pod 'DateToolsSwift' # Date formatter tools
+#  pod 'DateToolsSwift', '4.0.0' # Date formatter tools
   pod 'ProcedureKit' # Async programming tools
   
   # UI
@@ -51,8 +51,8 @@ target 'Adamant' do
 
   # Shared
   keychain_pods
-  core_pods
-  markdown_pods
+#  core_pods
+#  markdown_pods
 end
 
 target 'AdamantTests' do
@@ -64,26 +64,26 @@ end
 target 'NotificationServiceExtension' do
   use_frameworks!
   keychain_pods
-  core_pods
-  markdown_pods
+#  core_pods
+#  markdown_pods
 end
 
 # Adamant TransferNotificationContentExtension - Notification Content Extension for transfers
 target 'TransferNotificationContentExtension' do
   use_frameworks!
   keychain_pods
-  core_pods
-  markdown_pods
-  pod 'DateToolsSwift' # Date formatter tools
+#  core_pods
+#  markdown_pods
+#  pod 'DateToolsSwift', '4.0.0' # Date formatter tools
 end
 
 # Adamant MessageNotificationContentExtension - Notification Content Extension for messages
 target 'MessageNotificationContentExtension' do
   use_frameworks!
   keychain_pods
-  core_pods
-  markdown_pods
-  pod 'DateToolsSwift' # Date formatter tools
+#  core_pods
+#  markdown_pods
+#  pod 'DateToolsSwift', '4.0.0' # Date formatter tools
 end
 
 post_install do |installer|
