@@ -148,7 +148,9 @@ class AdamantApiService: ApiService {
             encoding = JSONEncoding.default
         }
         
-        Alamofire.request(url, method: method, parameters: parameters, encoding: encoding, headers: headers)
+        let headers: HTTPHeaders = HTTPHeaders(headers ?? [:])
+        
+        AF.request(url, method: method, parameters: parameters, encoding: encoding, headers: headers)
             .responseData(queue: defaultResponseDispatchQueue) { [weak self] response in
                 switch response.result {
                 case .success(let data):

@@ -614,7 +614,7 @@ extension EthWalletService {
         }
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
@@ -667,7 +667,7 @@ extension EthWalletService {
         let semaphore = DispatchSemaphore(value: 1)
         
         dispatchGroup.enter() // Enter for txFrom
-        Alamofire.request(txFromEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(txFromEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             defer {
                 dispatchGroup.leave() // Exit for txFrom
             }
@@ -690,7 +690,7 @@ extension EthWalletService {
         }
         
         dispatchGroup.enter() // Enter for txTo
-        Alamofire.request(txToEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(txToEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             defer {
                 dispatchGroup.leave() // Enter for txTo
             }
@@ -749,7 +749,7 @@ extension EthWalletService {
             return
         }
         
-        Alamofire.request(endpoint).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint).responseData(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
                 do {

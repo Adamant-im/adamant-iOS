@@ -24,7 +24,7 @@ end
 target 'Adamant' do
   use_frameworks!
 
-  pod 'Alamofire' # Network
+#  pod 'Alamofire' # Network
   pod 'Swinject' # Dependency Injection
   pod 'ReachabilitySwift' # Network status
   pod 'DateToolsSwift' # Date formatter tools
@@ -57,7 +57,7 @@ end
 
 target 'AdamantTests' do
   use_frameworks!
-  pod 'GRDB.swift'
+#  pod 'GRDB.swift'
 end
 
 # Adamant NotificationServiceExtension - real notifications
@@ -88,25 +88,25 @@ end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
-    if target.name == 'ByteBackpacker'
-      target.build_configurations.each do |config|
-        config.build_settings['SWIFT_VERSION'] = '5.0'
-      end
-    end
+#    if target.name == 'ByteBackpacker'
+#      target.build_configurations.each do |config|
+#        config.build_settings['SWIFT_VERSION'] = '5.0'
+#      end
+#    end
     if target.name == 'MessageKit'
       target.build_configurations.each do |config|
         config.build_settings['SWIFT_VERSION'] = '4.2'
       end
     end
-    if target.name == 'GRDB.swift'
-      target.build_configurations.each do |config|
-        config.build_settings['SWIFT_VERSION'] = '4.2'
-      end
-    end
-    if target.name == 'GRDBCipher'
-      target.build_configurations.each do |config|
-        config.build_settings['SWIFT_VERSION'] = '4.2'
-      end
-    end
+#    if target.name == 'GRDB.swift'
+#      target.build_configurations.each do |config|
+#        config.build_settings['SWIFT_VERSION'] = '4.2'
+#      end
+#    end
+#    if target.name == 'GRDBCipher'
+#      target.build_configurations.each do |config|
+#        config.build_settings['SWIFT_VERSION'] = '4.2'
+#      end
+#    end
   end
 end

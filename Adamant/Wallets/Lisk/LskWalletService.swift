@@ -262,7 +262,7 @@ extension LskWalletService {
                 
                 group.enter() // Enter 1
                 
-                Alamofire.request(request).responseData { response in
+                AF.request(request).responseData { response in
                     defer { group.leave() } // Leave 1
                     
                     switch response.result {

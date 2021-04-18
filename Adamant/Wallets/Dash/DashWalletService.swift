@@ -309,7 +309,7 @@ extension DashWalletService {
         }
 
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
@@ -322,7 +322,7 @@ extension DashWalletService {
         ]
         
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
 
             switch response.result {
             case .success(let data):

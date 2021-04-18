@@ -79,19 +79,19 @@ extension DogeWalletService: WalletServiceTwoStepSend {
         let endpoint = url.appendingPathComponent(DogeApiCommands.sendTransaction())
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
         // MARK: Prepare params
         let txHex = transaction.serialized().hex
         
-        let parameters: [String : Any] = [
+        let parameters: Parameters = [
             "rawtx": txHex
         ]
         
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
                 if let result = data as? [String: Any], let txid = result["txid"] as? String {
