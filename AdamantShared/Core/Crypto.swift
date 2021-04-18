@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import libsodium
+import Clibsodium
 import CryptoSwift
 
 public typealias Bytes = Array<UInt8>

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -115,7 +115,20 @@
 		64FA53CD20E1300B006783C9 /* EthTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53CC20E1300A006783C9 /* EthTransactionsViewController.swift */; };
 		64FA53D120E24942006783C9 /* TransactionDetailsViewControllerBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FA53D020E24941006783C9 /* TransactionDetailsViewControllerBase.swift */; };
 		91017F173E189A507AE0F55A /* Pods_AdamantTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFFA13D24AFABA6D1ABE5A09 /* Pods_AdamantTests.framework */; };
+		A5785ADF262C63580001BC66 /* web3swift in Frameworks */ = {isa = PBXBuildFile; productRef = A5785ADE262C63580001BC66 /* web3swift */; };
 		A578BDE52623051C00090141 /* DashWalletService+Transactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A578BDE42623051C00090141 /* DashWalletService+Transactions.swift */; };
+		A5BBD811262C657300B5C40C /* ByteBackpacker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5BBD810262C657300B5C40C /* ByteBackpacker.swift */; };
+		A5DBBABD262C7221004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBABC262C7221004AC028 /* Clibsodium */; };
+		A5DBBABF262C7221004AC028 /* Sodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBABE262C7221004AC028 /* Sodium */; };
+		A5DBBAC6262C7253004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAC5262C7253004AC028 /* Clibsodium */; };
+		A5DBBACD262C725A004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBACC262C725A004AC028 /* Clibsodium */; };
+		A5DBBAD4262C7261004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAD3262C7261004AC028 /* Clibsodium */; };
+		A5DBBADC262C729B004AC028 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBADB262C729B004AC028 /* CryptoSwift */; };
+		A5DBBAE3262C72B0004AC028 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAE2262C72B0004AC028 /* CryptoSwift */; };
+		A5DBBAE5262C72B7004AC028 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAE4262C72B7004AC028 /* CryptoSwift */; };
+		A5DBBAE7262C72BD004AC028 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAE6262C72BD004AC028 /* CryptoSwift */; };
+		A5DBBAEE262C72EF004AC028 /* BitcoinKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAED262C72EF004AC028 /* BitcoinKit */; };
+		A5DBBAF0262C72EF004AC028 /* LiskKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAEF262C72EF004AC028 /* LiskKit */; };
 		DF9B89D86F388ACECB6510E4 /* Pods_TransferNotificationContentExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A859F802E1FF27AB24AAA85 /* Pods_TransferNotificationContentExtension.framework */; };
 		E52B2FE0A7C5F57BDC0ED6D7 /* Pods_MessageNotificationContentExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B4FCB53B8B58FE5FB00AD91 /* Pods_MessageNotificationContentExtension.framework */; };
 		E90055F520EBF5DA00D0CB2D /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */; };
@@ -985,7 +998,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9079A7D229DEF9C0022CA0D /* UserNotificationsUI.framework in Frameworks */,
+				A5DBBAD4262C7261004AC028 /* Clibsodium in Frameworks */,
 				E9079A7C229DEF9C0022CA0D /* UserNotifications.framework in Frameworks */,
+				A5DBBAE7262C72BD004AC028 /* CryptoSwift in Frameworks */,
 				E52B2FE0A7C5F57BDC0ED6D7 /* Pods_MessageNotificationContentExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -995,6 +1010,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				3C06931576393125C61FB8F6 /* Pods_Adamant.framework in Frameworks */,
+				A5785ADF262C63580001BC66 /* web3swift in Frameworks */,
+				A5DBBABD262C7221004AC028 /* Clibsodium in Frameworks */,
+				A5DBBADC262C729B004AC028 /* CryptoSwift in Frameworks */,
+				A5DBBAF0262C72EF004AC028 /* LiskKit in Frameworks */,
+				A5DBBAEE262C72EF004AC028 /* BitcoinKit in Frameworks */,
+				A5DBBABF262C7221004AC028 /* Sodium in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1003,7 +1024,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				E957E12F229B10F80019732A /* UserNotificationsUI.framework in Frameworks */,
+				A5DBBACD262C725A004AC028 /* Clibsodium in Frameworks */,
 				E957E12E229B10F80019732A /* UserNotifications.framework in Frameworks */,
+				A5DBBAE5262C72B7004AC028 /* CryptoSwift in Frameworks */,
 				DF9B89D86F388ACECB6510E4 /* Pods_TransferNotificationContentExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1013,6 +1036,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1DDD23FEDFC7A122D2EA5E39 /* Pods_NotificationServiceExtension.framework in Frameworks */,
+				A5DBBAC6262C7253004AC028 /* Clibsodium in Frameworks */,
+				A5DBBAE3262C72B0004AC028 /* CryptoSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1900,6 +1925,10 @@
 			dependencies = (
 			);
 			name = MessageNotificationContentExtension;
+			packageProductDependencies = (
+				A5DBBAD3262C7261004AC028 /* Clibsodium */,
+				A5DBBAE6262C72BD004AC028 /* CryptoSwift */,
+			);
 			productName = MessageNotificationContentExtension;
 			productReference = E9079A7B229DEF9C0022CA0D /* MessageNotificationContentExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -1923,6 +1952,14 @@
 				E9079A86229DEF9C0022CA0D /* PBXTargetDependency */,
 			);
 			name = Adamant;
+			packageProductDependencies = (
+				A5785ADE262C63580001BC66 /* web3swift */,
+				A5DBBABC262C7221004AC028 /* Clibsodium */,
+				A5DBBABE262C7221004AC028 /* Sodium */,
+				A5DBBADB262C729B004AC028 /* CryptoSwift */,
+				A5DBBAED262C72EF004AC028 /* BitcoinKit */,
+				A5DBBAEF262C72EF004AC028 /* LiskKit */,
+			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
 			productType = "com.apple.product-type.application";
@@ -1941,6 +1978,10 @@
 			dependencies = (
 			);
 			name = TransferNotificationContentExtension;
+			packageProductDependencies = (
+				A5DBBACC262C725A004AC028 /* Clibsodium */,
+				A5DBBAE4262C72B7004AC028 /* CryptoSwift */,
+			);
 			productName = TransferNotificationContentExtension;
 			productReference = E957E12D229B10F80019732A /* TransferNotificationContentExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -1959,6 +2000,10 @@
 			dependencies = (
 			);
 			name = NotificationServiceExtension;
+			packageProductDependencies = (
+				A5DBBAC5262C7253004AC028 /* Clibsodium */,
+				A5DBBAE2262C72B0004AC028 /* CryptoSwift */,
+			);
 			productName = NotificationServiceExtension;
 			productReference = E96D64DB2295CD4700CA5587 /* NotificationServiceExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -2058,6 +2103,11 @@
 				Base,
 			);
 			mainGroup = E913C8E51FFFA51D001A83F7;
+			packageReferences = (
+				A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */,
+				A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */,
+				A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
+			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -2232,20 +2282,12 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Adamant/Pods-Adamant-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
-				"${BUILT_PRODUCTS_DIR}/BigInt/BigInt.framework",
-				"${BUILT_PRODUCTS_DIR}/BitcoinKit/BitcoinKit.framework",
-				"${BUILT_PRODUCTS_DIR}/ByteBackpacker/ByteBackpacker.framework",
-				"${BUILT_PRODUCTS_DIR}/CryptoSwift/CryptoSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/DateToolsSwift/DateToolsSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/EFQRCode/EFQRCode.framework",
 				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
 				"${BUILT_PRODUCTS_DIR}/FTIndicator/FTIndicator.framework",
 				"${BUILT_PRODUCTS_DIR}/FreakingSimpleRoundImageView/FreakingSimpleRoundImageView.framework",
-				"${BUILT_PRODUCTS_DIR}/GRDB.swift/GRDB.framework",
-				"${BUILT_PRODUCTS_DIR}/GRDBCipher/GRDBCipher.framework",
-				"${PODS_ROOT}/GRKOpenSSLFramework/OpenSSL-iOS/bin/openssl.framework",
 				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
-				"${BUILT_PRODUCTS_DIR}/Lisk/Lisk.framework",
 				"${BUILT_PRODUCTS_DIR}/MarkdownKit/MarkdownKit.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageInputBar/MessageInputBar.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
@@ -2253,35 +2295,21 @@
 				"${BUILT_PRODUCTS_DIR}/PMAlertController/PMAlertController.framework",
 				"${BUILT_PRODUCTS_DIR}/Parchment/Parchment.framework",
 				"${BUILT_PRODUCTS_DIR}/ProcedureKit/ProcedureKit.framework",
-				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/QRCodeReader.swift/QRCodeReader.framework",
 				"${BUILT_PRODUCTS_DIR}/RNCryptor/RNCryptor.framework",
 				"${BUILT_PRODUCTS_DIR}/ReachabilitySwift/Reachability.framework",
-				"${BUILT_PRODUCTS_DIR}/SQLCipher/SQLCipher.framework",
-				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
-				"${BUILT_PRODUCTS_DIR}/libsodium/libsodium.framework",
-				"${BUILT_PRODUCTS_DIR}/secp256k1.c/secp256k1.framework",
 				"${BUILT_PRODUCTS_DIR}/swift_qrcodejs/swift_qrcodejs.framework",
-				"${BUILT_PRODUCTS_DIR}/web3.swift.pod/web3swift.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BigInt.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BitcoinKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ByteBackpacker.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CryptoSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DateToolsSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/EFQRCode.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Eureka.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FTIndicator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FreakingSimpleRoundImageView.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GRDB.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GRDBCipher.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lisk.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MarkdownKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageInputBar.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
@@ -2289,17 +2317,11 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PMAlertController.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Parchment.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProcedureKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCodeReader.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCryptor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SQLCipher.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/secp256k1.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/swift_qrcodejs.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/web3swift.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -2946,7 +2968,11 @@
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MARKETING_VERSION = 2.0.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -2972,7 +2998,11 @@
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MARKETING_VERSION = 2.0.1;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.MessageNotificationContentExtension";
@@ -3115,7 +3145,10 @@
 				EXCLUDED_SOURCE_FILE_NAMES = "";
 				INFOPLIST_FILE = Adamant/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 2.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3141,7 +3174,10 @@
 				EXCLUDED_SOURCE_FILE_NAMES = Debug.xcassets;
 				INFOPLIST_FILE = Adamant/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 2.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3163,7 +3199,11 @@
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MARKETING_VERSION = 2.0.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -3189,7 +3229,11 @@
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MARKETING_VERSION = 2.0.1;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.TransferNotificationContentExtension";
@@ -3213,7 +3257,11 @@
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MARKETING_VERSION = 2.0.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -3239,7 +3287,11 @@
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MARKETING_VERSION = 2.0.1;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.NotificationServiceExtension";
@@ -3261,7 +3313,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = AdamantTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = im.adamant.AdamantTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3280,7 +3336,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = AdamantTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = im.adamant.AdamantTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3348,6 +3408,94 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/skywinder/web3swift.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 2.2.0;
+			};
+		};
+		A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jedisct1/swift-sodium.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.9.1;
+			};
+		};
+		A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzyzanowskim/CryptoSwift.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.3.8;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A5785ADE262C63580001BC66 /* web3swift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */;
+			productName = web3swift;
+		};
+		A5DBBABC262C7221004AC028 /* Clibsodium */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			productName = Clibsodium;
+		};
+		A5DBBABE262C7221004AC028 /* Sodium */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			productName = Sodium;
+		};
+		A5DBBAC5262C7253004AC028 /* Clibsodium */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			productName = Clibsodium;
+		};
+		A5DBBACC262C725A004AC028 /* Clibsodium */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			productName = Clibsodium;
+		};
+		A5DBBAD3262C7261004AC028 /* Clibsodium */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			productName = Clibsodium;
+		};
+		A5DBBADB262C729B004AC028 /* CryptoSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			productName = CryptoSwift;
+		};
+		A5DBBAE2262C72B0004AC028 /* CryptoSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			productName = CryptoSwift;
+		};
+		A5DBBAE4262C72B7004AC028 /* CryptoSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			productName = CryptoSwift;
+		};
+		A5DBBAE6262C72BD004AC028 /* CryptoSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			productName = CryptoSwift;
+		};
+		A5DBBAED262C72EF004AC028 /* BitcoinKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BitcoinKit;
+		};
+		A5DBBAEF262C72EF004AC028 /* LiskKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LiskKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		E90847192196FE590095825D /* Adamant.xcdatamodeld */ = {

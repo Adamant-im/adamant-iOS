@@ -45,7 +45,7 @@ target 'Adamant' do
   pod 'QRCodeReader.swift' # QR reader
   
   # Crypto
-  pod 'web3.swift.pod', '~> 2.2.0' # ETH Web3 Swift Port
+#  pod 'web3.swift.pod', '~> 2.2.0' # ETH Web3 Swift Port
 #  pod 'Lisk', :git => 'https://github.com/adamant-im/lisk-swift.git' # LSK
 #  pod 'BitcoinKit', :git => 'https://github.com/boyarkin-anton/BitcoinKit.git', :branch => 'dev' # BTC
 
