@@ -2,10 +2,10 @@
 platform :ios, '10.0'
 
 # Keychain secured store pods
-def keychain_pods
-  pod 'RNCryptor' # Cryptor
-  pod 'KeychainAccess' # Keychain
-end
+#def keychain_pods
+#  pod 'RNCryptor' # Cryptor
+#  pod 'KeychainAccess' # Keychain
+#end
 
 # NativeCore pods
 #def core_pods
@@ -50,41 +50,41 @@ target 'Adamant' do
 #  pod 'BitcoinKit', :git => 'https://github.com/boyarkin-anton/BitcoinKit.git', :branch => 'dev' # BTC
 
   # Shared
-  keychain_pods
+#  keychain_pods
 #  core_pods
 #  markdown_pods
 end
 
-target 'AdamantTests' do
-  use_frameworks!
+#target 'AdamantTests' do
+#  use_frameworks!
 #  pod 'GRDB.swift'
-end
+#end
 
 # Adamant NotificationServiceExtension - real notifications
-target 'NotificationServiceExtension' do
-  use_frameworks!
-  keychain_pods
+#target 'NotificationServiceExtension' do
+#  use_frameworks!
+#  keychain_pods
 #  core_pods
 #  markdown_pods
-end
+#end
 
 # Adamant TransferNotificationContentExtension - Notification Content Extension for transfers
-target 'TransferNotificationContentExtension' do
-  use_frameworks!
-  keychain_pods
+#target 'TransferNotificationContentExtension' do
+#  use_frameworks!
+#  keychain_pods
 #  core_pods
 #  markdown_pods
 #  pod 'DateToolsSwift', '4.0.0' # Date formatter tools
-end
+#end
 
 # Adamant MessageNotificationContentExtension - Notification Content Extension for messages
-target 'MessageNotificationContentExtension' do
-  use_frameworks!
-  keychain_pods
+#target 'MessageNotificationContentExtension' do
+#  use_frameworks!
+#  keychain_pods
 #  core_pods
 #  markdown_pods
 #  pod 'DateToolsSwift', '4.0.0' # Date formatter tools
-end
+#end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|

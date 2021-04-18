@@ -74,6 +74,15 @@
         }
       },
       {
+        "package": "KeychainAccess",
+        "repositoryURL": "https://github.com/kishikawakatsumi/KeychainAccess.git",
+        "state": {
+          "branch": null,
+          "revision": "84e546727d66f1adc5439debad16270d0fdd04e7",
+          "version": "4.2.2"
+        }
+      },
+      {
         "package": "MarkdownKit",
         "repositoryURL": "https://github.com/bmoliveira/MarkdownKit.git",
         "state": {
@@ -116,6 +125,15 @@
           "branch": null,
           "revision": "d7c4397d125caba795d14d956efacfe2a27a63d0",
           "version": "1.2.0"
+        }
+      },
+      {
+        "package": "RNCryptor",
+        "repositoryURL": "https://github.com/RNCryptor/RNCryptor.git",
+        "state": {
+          "branch": null,
+          "revision": "5e3bbf44f08bf90049537cb8902d8f4fa911a79a",
+          "version": "5.1.0"
         }
       },
       {

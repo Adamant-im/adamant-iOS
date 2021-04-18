@@ -8,7 +8,6 @@ PODS:
   - FTIndicator/FTNotificationIndicator (1.2.9)
   - FTIndicator/FTProgressIndicator (1.2.9)
   - FTIndicator/FTToastIndicator (1.2.9)
-  - KeychainAccess (3.1.2)
   - MessageInputBar/Core (0.4.1)
   - MessageKit (2.0.0):
     - MessageInputBar/Core
@@ -19,21 +18,18 @@ PODS:
     - ProcedureKit/Standard (= 5.0.0)
   - ProcedureKit/Standard (5.0.0)
   - ReachabilitySwift (4.3.0)
-  - RNCryptor (5.0.3)
   - Swinject (2.5.0)
 
 DEPENDENCIES:
   - Eureka (= 5.3.0)
   - FreakingSimpleRoundImageView
   - FTIndicator
-  - KeychainAccess
   - MessageKit (= 2.0.0)
   - MyLittlePinpad
   - Parchment
   - PMAlertController
   - ProcedureKit
   - ReachabilitySwift
-  - RNCryptor
   - Swinject
 
 SPEC REPOS:
@@ -41,7 +37,6 @@ SPEC REPOS:
     - Eureka
     - FreakingSimpleRoundImageView
     - FTIndicator
-    - KeychainAccess
     - MessageInputBar
     - MessageKit
     - MyLittlePinpad
@@ -49,14 +44,12 @@ SPEC REPOS:
     - PMAlertController
     - ProcedureKit
     - ReachabilitySwift
-    - RNCryptor
     - Swinject
 
 SPEC CHECKSUMS:
   Eureka: 49239596c9d2eed9ab523990c34de62b6feac9f0
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
-  KeychainAccess: b3816fddcf28aa29d94b10ec305cd52be14c472b
   MessageInputBar: e81c7535347f1f7b923de7080409a535a004b6e4
   MessageKit: 29c1c87e5a396d2ca7a3f712e5171dc9aba42a1e
   MyLittlePinpad: 5d57cb5a092ddbeb5c4e6fa0b46df83bd3e88b0c
@@ -64,9 +57,8 @@ SPEC CHECKSUMS:
   PMAlertController: 06dab8160066fc4ce991c880e3722cd403e2926a
   ProcedureKit: f412f6edf88f62b986dcfca87842f36bde6e3e83
   ReachabilitySwift: 408477d1b6ed9779dba301953171e017c31241f3
-  RNCryptor: c93d19029dcf7ff160aca0f24d6c9e7b0d82f664
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
 
-PODFILE CHECKSUM: 02dcfb129e59d5ddabbf080eb360474229bab2e0
+PODFILE CHECKSUM: 0786a9a3d0465728fb6ea67c9d32f9ffb34f3bd3
 
 COCOAPODS: 1.10.1
