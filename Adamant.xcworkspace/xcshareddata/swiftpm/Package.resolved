@@ -119,6 +119,15 @@
         }
       },
       {
+        "package": "ProcedureKit",
+        "repositoryURL": "https://github.com/ProcedureKit/ProcedureKit.git",
+        "state": {
+          "branch": null,
+          "revision": "a7fa565e648d90083c7f10c0c6be9bf249dcdbde",
+          "version": "5.2.0"
+        }
+      },
+      {
         "package": "PromiseKit",
         "repositoryURL": "https://github.com/mxcl/PromiseKit.git",
         "state": {

@@ -28,7 +28,7 @@ target 'Adamant' do
 #  pod 'Swinject' # Dependency Injection
 #  pod 'ReachabilitySwift' # Network status
 #  pod 'DateToolsSwift', '4.0.0' # Date formatter tools
-  pod 'ProcedureKit' # Async programming tools
+#  pod 'ProcedureKit' # Async programming tools
   
   # UI
   pod 'FreakingSimpleRoundImageView' # Round avatars

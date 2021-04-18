@@ -12,9 +12,6 @@ PODS:
     - MessageInputBar/Core
   - MyLittlePinpad (0.3)
   - PMAlertController (3.5.0)
-  - ProcedureKit (5.0.0):
-    - ProcedureKit/Standard (= 5.0.0)
-  - ProcedureKit/Standard (5.0.0)
 
 DEPENDENCIES:
   - FreakingSimpleRoundImageView
@@ -22,7 +19,6 @@ DEPENDENCIES:
   - MessageKit (= 2.0.0)
   - MyLittlePinpad
   - PMAlertController
-  - ProcedureKit
 
 SPEC REPOS:
   trunk:
@@ -32,7 +28,6 @@ SPEC REPOS:
     - MessageKit
     - MyLittlePinpad
     - PMAlertController
-    - ProcedureKit
 
 SPEC CHECKSUMS:
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
@@ -41,8 +36,7 @@ SPEC CHECKSUMS:
   MessageKit: 29c1c87e5a396d2ca7a3f712e5171dc9aba42a1e
   MyLittlePinpad: 5d57cb5a092ddbeb5c4e6fa0b46df83bd3e88b0c
   PMAlertController: 06dab8160066fc4ce991c880e3722cd403e2926a
-  ProcedureKit: f412f6edf88f62b986dcfca87842f36bde6e3e83
 
-PODFILE CHECKSUM: 95f2e0e4964143a4460c2b64bb2b679a27fe3a64
+PODFILE CHECKSUM: ce041b88f1d3b699f4162ed61bad1d4c18c29013
 
 COCOAPODS: 1.10.1
