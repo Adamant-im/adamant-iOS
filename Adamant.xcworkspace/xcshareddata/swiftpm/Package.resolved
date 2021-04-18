@@ -110,6 +110,15 @@
         }
       },
       {
+        "package": "Parchment",
+        "repositoryURL": "https://github.com/rechsteiner/Parchment.git",
+        "state": {
+          "branch": null,
+          "revision": "689ecaa80b7b0f712887ec87746f8598f2e12907",
+          "version": "3.0.1"
+        }
+      },
+      {
         "package": "PromiseKit",
         "repositoryURL": "https://github.com/mxcl/PromiseKit.git",
         "state": {

@@ -131,6 +131,7 @@
 		A5783A1E262C965D00428183 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A5783A1D262C965D00428183 /* SwiftPackageProductDependency */; };
 		A5785ADF262C63580001BC66 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A5785ADE262C63580001BC66 /* SwiftPackageProductDependency */; };
 		A578BDE52623051C00090141 /* DashWalletService+Transactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A578BDE42623051C00090141 /* DashWalletService+Transactions.swift */; };
+		A59A7ECF262C992200040E94 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A59A7ECE262C992200040E94 /* SwiftPackageProductDependency */; };
 		A5BBD811262C657300B5C40C /* ByteBackpacker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5BBD810262C657300B5C40C /* ByteBackpacker.swift */; };
 		A5DBBABD262C7221004AC028 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBABC262C7221004AC028 /* SwiftPackageProductDependency */; };
 		A5DBBABF262C7221004AC028 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBABE262C7221004AC028 /* SwiftPackageProductDependency */; };
@@ -1027,6 +1028,7 @@
 				A5DBBABD262C7221004AC028 /* BuildFile in Frameworks */,
 				A50AEB14262C837900B37C22 /* BuildFile in Frameworks */,
 				A5DBBADC262C729B004AC028 /* BuildFile in Frameworks */,
+				A59A7ECF262C992200040E94 /* BuildFile in Frameworks */,
 				A5DBBAF0262C72EF004AC028 /* BuildFile in Frameworks */,
 				A5DBBAEE262C72EF004AC028 /* BuildFile in Frameworks */,
 				A57282CA262C94CD00C96FA8 /* BuildFile in Frameworks */,
@@ -1978,6 +1980,7 @@
 				A57839FA262C95BF00428183 /* SwiftPackageProductDependency */,
 				A5783A0D262C964500428183 /* SwiftPackageProductDependency */,
 				A544F0D3262C9878001F1A6D /* SwiftPackageProductDependency */,
+				A59A7ECE262C992200040E94 /* SwiftPackageProductDependency */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -2138,6 +2141,7 @@
 				A57839F9262C95BF00428183 /* RemoteSwiftPackageReference */,
 				A5783A0C262C964500428183 /* RemoteSwiftPackageReference */,
 				A544F0D2262C9878001F1A6D /* RemoteSwiftPackageReference */,
+				A59A7ECD262C992200040E94 /* RemoteSwiftPackageReference */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
 			projectDirPath = "";
@@ -2296,7 +2300,6 @@
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
 				"${BUILT_PRODUCTS_DIR}/MyLittlePinpad/MyLittlePinpad.framework",
 				"${BUILT_PRODUCTS_DIR}/PMAlertController/PMAlertController.framework",
-				"${BUILT_PRODUCTS_DIR}/Parchment/Parchment.framework",
 				"${BUILT_PRODUCTS_DIR}/ProcedureKit/ProcedureKit.framework",
 				"${BUILT_PRODUCTS_DIR}/ReachabilitySwift/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
@@ -2309,7 +2312,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MyLittlePinpad.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PMAlertController.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Parchment.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProcedureKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
@@ -3373,6 +3375,14 @@
 				minimumVersion = 2.2.0;
 			};
 		};
+		A59A7ECD262C992200040E94 /* RemoteSwiftPackageReference */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rechsteiner/Parchment.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 3.0.1;
+			};
+		};
 		A5DBBABB262C7221004AC028 /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jedisct1/swift-sodium.git";
@@ -3484,6 +3494,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A5785ADD262C63580001BC66 /* RemoteSwiftPackageReference */;
 			productName = web3swift;
+		};
+		A59A7ECE262C992200040E94 /* SwiftPackageProductDependency */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A59A7ECD262C992200040E94 /* RemoteSwiftPackageReference */;
+			productName = Parchment;
 		};
 		A5DBBABC262C7221004AC028 /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;

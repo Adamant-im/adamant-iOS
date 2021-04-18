@@ -20,7 +20,7 @@ class ComplexTransferViewController: UIViewController {
     
     
     // MARK: - Properties
-    var pagingViewController: PagingViewController<WalletPagingItem>!
+    var pagingViewController: PagingViewController!
     
     weak var transferDelegate: ComplexTransferViewControllerDelegate?
     var services: [WalletServiceWithSend]!
@@ -47,8 +47,8 @@ class ComplexTransferViewController: UIViewController {
         
         
         // MARK: PagingViewController
-        pagingViewController = PagingViewController<WalletPagingItem>()
-        pagingViewController.menuItemSource = .nib(nib: UINib(nibName: "WalletCollectionViewCell", bundle: nil))
+        pagingViewController = PagingViewController()
+        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletPagingItem.self)
         pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
         pagingViewController.indicatorColor = UIColor.adamant.primary
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
@@ -74,7 +74,7 @@ class ComplexTransferViewController: UIViewController {
 }
 
 extension ComplexTransferViewController: PagingViewControllerDataSource {
-    func numberOfViewControllers<T>(in pagingViewController: PagingViewController<T>) -> Int {
+    func numberOfViewControllers(in pagingViewController: PagingViewController) -> Int {
         if let services = services {
             return services.count
         } else {
@@ -82,7 +82,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         }
     }
     
-    func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
+    func pagingViewController(_ pagingViewController: PagingViewController, viewControllerAt index: Int) -> UIViewController {
         let service = services[index]
         
         let vc = service.transferViewController()
@@ -115,17 +115,17 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 		return vc
 	}
 	
-	func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, pagingItemForIndex index: Int) -> T {
+    func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
 		let service = accountService.wallets[index]
 		
 		guard let wallet = service.wallet else {
-			return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm")) as! T
+			return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm"))
 		}
 		
 		let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo)
 		item.balance = wallet.balance
 		
-		return item as! T
+		return item
 	}
 }
 

@@ -37,7 +37,7 @@ target 'Adamant' do
   pod 'MessageKit', '2.0.0' # Chat UI
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
-  pod 'Parchment' # Paging menu
+#  pod 'Parchment' # Paging menu
 #  pod 'SwiftyOnboard', :git => 'https://github.com/RealBonus/SwiftyOnboard', :branch => 'feature/customStyle' # wellcome screen
 
   # QR

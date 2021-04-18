@@ -138,7 +138,7 @@ class AccountViewController: FormViewController {
     private (set) var accountHeaderView: AccountHeaderView!
     
     private var transfersController: NSFetchedResultsController<TransferTransaction>?
-    private var pagingViewController: PagingViewController<WalletPagingItem>!
+    private var pagingViewController: PagingViewController!
     
     private var initiated = false
     
@@ -221,9 +221,8 @@ class AccountViewController: FormViewController {
             walletViewControllers.append(walletService.walletViewController)
         }
         
-        pagingViewController = PagingViewController<WalletPagingItem>()
-        
-        pagingViewController.menuItemSource = .nib(nib: UINib(nibName: "WalletCollectionViewCell", bundle: nil))
+        pagingViewController = PagingViewController()
+        pagingViewController.register(UINib(nibName: "WalletCollectionViewCell", bundle: nil), for: WalletPagingItem.self)
         pagingViewController.menuItemSize = .fixed(width: 110, height: 110)
         pagingViewController.indicatorColor = UIColor.adamant.primary
         pagingViewController.indicatorOptions = .visible(height: 2, zIndex: Int.max, spacing: UIEdgeInsets.zero, insets: UIEdgeInsets.zero)
@@ -815,17 +814,17 @@ extension AccountViewController: NSFetchedResultsControllerDelegate {
 
 // MARK: - PagingViewControllerDataSource
 extension AccountViewController: PagingViewControllerDataSource, PagingViewControllerDelegate {
-    func numberOfViewControllers<T>(in pagingViewController: PagingViewController<T>) -> Int {
+    func numberOfViewControllers(in pagingViewController: PagingViewController) -> Int {
         return walletViewControllers.count
     }
     
-    func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, viewControllerForIndex index: Int) -> UIViewController {
+    func pagingViewController(_ pagingViewController: PagingViewController, viewControllerAt index: Int) -> UIViewController {
         return walletViewControllers[index].viewController
     }
-    
-    func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, pagingItemForIndex index: Int) -> T {
+
+    func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
         guard let service = walletViewControllers[index].service else {
-            return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm")) as! T
+            return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm"))
         }
         
         let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo)
@@ -837,10 +836,10 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
             item.balance = nil
         }
         
-        return item as! T
+        return item
     }
     
-    func pagingViewController<T>(_ pagingViewController: PagingViewController<T>, didScrollToItem pagingItem: T, startingViewController: UIViewController?, destinationViewController: UIViewController, transitionSuccessful: Bool) {
+    func pagingViewController(_ pagingViewController: PagingViewController, didScrollToItem pagingItem: PagingItem, startingViewController: UIViewController?, destinationViewController: UIViewController, transitionSuccessful: Bool) {
         guard transitionSuccessful,
             let first = startingViewController as? WalletViewController,
             let second = destinationViewController as? WalletViewController,

@@ -11,7 +11,6 @@ PODS:
   - MessageKit (2.0.0):
     - MessageInputBar/Core
   - MyLittlePinpad (0.3)
-  - Parchment (1.5.0)
   - PMAlertController (3.5.0)
   - ProcedureKit (5.0.0):
     - ProcedureKit/Standard (= 5.0.0)
@@ -24,7 +23,6 @@ DEPENDENCIES:
   - FTIndicator
   - MessageKit (= 2.0.0)
   - MyLittlePinpad
-  - Parchment
   - PMAlertController
   - ProcedureKit
   - ReachabilitySwift
@@ -37,7 +35,6 @@ SPEC REPOS:
     - MessageInputBar
     - MessageKit
     - MyLittlePinpad
-    - Parchment
     - PMAlertController
     - ProcedureKit
     - ReachabilitySwift
@@ -49,12 +46,11 @@ SPEC CHECKSUMS:
   MessageInputBar: e81c7535347f1f7b923de7080409a535a004b6e4
   MessageKit: 29c1c87e5a396d2ca7a3f712e5171dc9aba42a1e
   MyLittlePinpad: 5d57cb5a092ddbeb5c4e6fa0b46df83bd3e88b0c
-  Parchment: 5a8c9c73549a6d73a7c1b606c27246910d2e5720
   PMAlertController: 06dab8160066fc4ce991c880e3722cd403e2926a
   ProcedureKit: f412f6edf88f62b986dcfca87842f36bde6e3e83
   ReachabilitySwift: 408477d1b6ed9779dba301953171e017c31241f3
   Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
 
-PODFILE CHECKSUM: 0836d2c520d8b18b3716d019ada432569e8867db
+PODFILE CHECKSUM: 91322cb80197d6de24bc73f0481ee5a7444e53b5
 
 COCOAPODS: 1.10.1
