@@ -153,7 +153,8 @@ class AdamantAccountService: AccountService {
                                     NotificationCenter.default.removeObserver(self, name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: nil)
                                     
                                 case .failure(let error):
-                                    self.dialogService.showRichError(error: error)
+//                                    self.dialogService.showRichError(error: error)
+                                    print(error)
                                 }
                             }
                         }
