@@ -8,7 +8,7 @@
 
 import Foundation
 import OpenSSL
-import secp256k1_c
+import secp256k1
 
 public class _Hash {
     public static func sha1(_ data: Data) -> Data {
