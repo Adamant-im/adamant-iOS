@@ -15,7 +15,6 @@ PODS:
   - ProcedureKit (5.0.0):
     - ProcedureKit/Standard (= 5.0.0)
   - ProcedureKit/Standard (5.0.0)
-  - ReachabilitySwift (4.3.0)
 
 DEPENDENCIES:
   - FreakingSimpleRoundImageView
@@ -24,7 +23,6 @@ DEPENDENCIES:
   - MyLittlePinpad
   - PMAlertController
   - ProcedureKit
-  - ReachabilitySwift
 
 SPEC REPOS:
   trunk:
@@ -35,7 +33,6 @@ SPEC REPOS:
     - MyLittlePinpad
     - PMAlertController
     - ProcedureKit
-    - ReachabilitySwift
 
 SPEC CHECKSUMS:
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
@@ -45,8 +42,7 @@ SPEC CHECKSUMS:
   MyLittlePinpad: 5d57cb5a092ddbeb5c4e6fa0b46df83bd3e88b0c
   PMAlertController: 06dab8160066fc4ce991c880e3722cd403e2926a
   ProcedureKit: f412f6edf88f62b986dcfca87842f36bde6e3e83
-  ReachabilitySwift: 408477d1b6ed9779dba301953171e017c31241f3
 
-PODFILE CHECKSUM: a3b7c280e6cb4ab954dfc738b4d14f8aebb9385c
+PODFILE CHECKSUM: 95f2e0e4964143a4460c2b64bb2b679a27fe3a64
 
 COCOAPODS: 1.10.1

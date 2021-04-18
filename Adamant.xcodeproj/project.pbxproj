@@ -133,6 +133,7 @@
 		A578BDE52623051C00090141 /* DashWalletService+Transactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A578BDE42623051C00090141 /* DashWalletService+Transactions.swift */; };
 		A59A7ECF262C992200040E94 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A59A7ECE262C992200040E94 /* SwiftPackageProductDependency */; };
 		A5BBD811262C657300B5C40C /* ByteBackpacker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5BBD810262C657300B5C40C /* ByteBackpacker.swift */; };
+		A5C99E0E262C9E3A00F7B1B7 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A5C99E0D262C9E3A00F7B1B7 /* SwiftPackageProductDependency */; };
 		A5DBBABD262C7221004AC028 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBABC262C7221004AC028 /* SwiftPackageProductDependency */; };
 		A5DBBABF262C7221004AC028 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBABE262C7221004AC028 /* SwiftPackageProductDependency */; };
 		A5DBBAC6262C7253004AC028 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAC5262C7253004AC028 /* SwiftPackageProductDependency */; };
@@ -1031,6 +1032,7 @@
 				A50AEB14262C837900B37C22 /* BuildFile in Frameworks */,
 				A5DBBADC262C729B004AC028 /* BuildFile in Frameworks */,
 				A59A7ECF262C992200040E94 /* BuildFile in Frameworks */,
+				A5C99E0E262C9E3A00F7B1B7 /* BuildFile in Frameworks */,
 				A5DBBAF0262C72EF004AC028 /* BuildFile in Frameworks */,
 				A5DBBAEE262C72EF004AC028 /* BuildFile in Frameworks */,
 				A57282CA262C94CD00C96FA8 /* BuildFile in Frameworks */,
@@ -1984,6 +1986,7 @@
 				A544F0D3262C9878001F1A6D /* SwiftPackageProductDependency */,
 				A59A7ECE262C992200040E94 /* SwiftPackageProductDependency */,
 				A5F0A04A262C9CA90009672A /* SwiftPackageProductDependency */,
+				A5C99E0D262C9E3A00F7B1B7 /* SwiftPackageProductDependency */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -2146,6 +2149,7 @@
 				A544F0D2262C9878001F1A6D /* RemoteSwiftPackageReference */,
 				A59A7ECD262C992200040E94 /* RemoteSwiftPackageReference */,
 				A5F0A049262C9CA90009672A /* RemoteSwiftPackageReference */,
+				A5C99E0C262C9E3A00F7B1B7 /* RemoteSwiftPackageReference */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
 			projectDirPath = "";
@@ -2305,7 +2309,6 @@
 				"${BUILT_PRODUCTS_DIR}/MyLittlePinpad/MyLittlePinpad.framework",
 				"${BUILT_PRODUCTS_DIR}/PMAlertController/PMAlertController.framework",
 				"${BUILT_PRODUCTS_DIR}/ProcedureKit/ProcedureKit.framework",
-				"${BUILT_PRODUCTS_DIR}/ReachabilitySwift/Reachability.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -2316,7 +2319,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MyLittlePinpad.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PMAlertController.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProcedureKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3385,6 +3387,14 @@
 				minimumVersion = 3.0.1;
 			};
 		};
+		A5C99E0C262C9E3A00F7B1B7 /* RemoteSwiftPackageReference */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ashleymills/Reachability.swift";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 5.1.0;
+			};
+		};
 		A5DBBABB262C7221004AC028 /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jedisct1/swift-sodium.git";
@@ -3509,6 +3519,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A59A7ECD262C992200040E94 /* RemoteSwiftPackageReference */;
 			productName = Parchment;
+		};
+		A5C99E0D262C9E3A00F7B1B7 /* SwiftPackageProductDependency */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5C99E0C262C9E3A00F7B1B7 /* RemoteSwiftPackageReference */;
+			productName = Reachability;
 		};
 		A5DBBABC262C7221004AC028 /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
