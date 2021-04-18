@@ -91,7 +91,7 @@ struct AdamantResources {
     //    static let liskExplorerAddress = "https://testnet-explorer.lisk.io/tx/" // LISK Testnet
     
     static let dogeExplorerAddress = "https://dogechain.info/tx/"
-    static let dashExplorerAddress = "https://explorer.dash.org/tx/"
+    static let dashExplorerAddress = "https://dashblockexplorer.com/"
     
     private init() {}
 }
