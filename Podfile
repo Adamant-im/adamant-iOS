@@ -9,8 +9,8 @@ end
 
 # NativeCore pods
 def core_pods
-  pod 'ByteBackpacker' # Utility to pack value types into a Byte array
 #  pod 'CryptoSwift', '1.0.0' # MD5 hash
+#  pod 'ByteBackpacker' # Utility to pack value types into a Byte array
 #  pod 'libsodium' # Sodium crypto library
 #  pod 'GRKOpenSSLFramework', '1.0.2.18'
 end

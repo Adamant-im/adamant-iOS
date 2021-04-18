@@ -664,6 +664,7 @@
 		742D9BA5B194D115A9EBED8C /* Pods-NotificationServiceExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationServiceExtension.debug.xcconfig"; path = "Target Support Files/Pods-NotificationServiceExtension/Pods-NotificationServiceExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		74D5744703A7ECC98E244B14 /* Pods-AdmCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.debug.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.debug.xcconfig"; sourceTree = "<group>"; };
 		A578BDE42623051C00090141 /* DashWalletService+Transactions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DashWalletService+Transactions.swift"; sourceTree = "<group>"; };
+		A5BBD810262C657300B5C40C /* ByteBackpacker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteBackpacker.swift; sourceTree = "<group>"; };
 		AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
 		ADDFD2FA17E41CCBD11A1733 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
 		AFFA13D24AFABA6D1ABE5A09 /* Pods_AdamantTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AdamantTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1475,6 +1476,7 @@
 		E950651F20404997008352E5 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				A5BBD810262C657300B5C40C /* ByteBackpacker.swift */,
 				E9942B83203CBFCE00C163AF /* AdamantQRTools.swift */,
 				E950652220404C84008352E5 /* AdamantUriTools.swift */,
 				E9E7CDB62003994E00DFC4DB /* AdamantUtilities+extended.swift */,
@@ -2553,6 +2555,7 @@
 				E96D64D62295C9CB00CA5587 /* NativeAdamantCore.swift in Sources */,
 				E90A494D204DA932009F6A65 /* LocalAuthentication.swift in Sources */,
 				E96D64C62295C3ED00CA5587 /* Mnemonic+extended.swift in Sources */,
+				A5BBD811262C657300B5C40C /* ByteBackpacker.swift in Sources */,
 				648BCA6D213D384F00875EB5 /* AvatarService.swift in Sources */,
 				E95F856F2007B61D0070534A /* GetPublicKeyResponse.swift in Sources */,
 				644EC34D20EFA60900F40C73 /* AdamantApi+Delegates.swift in Sources */,
