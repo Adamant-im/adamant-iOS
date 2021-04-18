@@ -6,7 +6,7 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit

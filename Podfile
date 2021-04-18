@@ -25,7 +25,7 @@ target 'Adamant' do
   use_frameworks!
 
 #  pod 'Alamofire' # Network
-  pod 'Swinject' # Dependency Injection
+#  pod 'Swinject' # Dependency Injection
   pod 'ReachabilitySwift' # Network status
 #  pod 'DateToolsSwift', '4.0.0' # Date formatter tools
   pod 'ProcedureKit' # Async programming tools

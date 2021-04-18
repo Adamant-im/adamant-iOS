@@ -16,7 +16,6 @@ PODS:
     - ProcedureKit/Standard (= 5.0.0)
   - ProcedureKit/Standard (5.0.0)
   - ReachabilitySwift (4.3.0)
-  - Swinject (2.5.0)
 
 DEPENDENCIES:
   - FreakingSimpleRoundImageView
@@ -26,7 +25,6 @@ DEPENDENCIES:
   - PMAlertController
   - ProcedureKit
   - ReachabilitySwift
-  - Swinject
 
 SPEC REPOS:
   trunk:
@@ -38,7 +36,6 @@ SPEC REPOS:
     - PMAlertController
     - ProcedureKit
     - ReachabilitySwift
-    - Swinject
 
 SPEC CHECKSUMS:
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
@@ -49,8 +46,7 @@ SPEC CHECKSUMS:
   PMAlertController: 06dab8160066fc4ce991c880e3722cd403e2926a
   ProcedureKit: f412f6edf88f62b986dcfca87842f36bde6e3e83
   ReachabilitySwift: 408477d1b6ed9779dba301953171e017c31241f3
-  Swinject: 82cdb851f63f91bba974e3eca1d69780f2f7677e
 
-PODFILE CHECKSUM: 91322cb80197d6de24bc73f0481ee5a7444e53b5
+PODFILE CHECKSUM: a3b7c280e6cb4ab954dfc738b4d14f8aebb9385c
 
 COCOAPODS: 1.10.1

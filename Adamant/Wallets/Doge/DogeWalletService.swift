@@ -6,7 +6,7 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit
@@ -483,8 +483,8 @@ extension DogeWalletService {
                     completion(.failure(.internalError(message: "DOGE Wallet: not a valid response", error: error)))
                 }
                 
-            case .failure(let error as URLError):
-                completion(.failure(.networkError(error: error)))
+//            case .failure(let error as URLError):
+//                completion(.failure(.networkError(error: error)))
                 
             case .failure(let error):
                 completion(.failure(.serverError(error: error.localizedDescription)))
