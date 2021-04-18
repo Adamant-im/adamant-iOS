@@ -6,7 +6,7 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import web3swift
 import struct BigInt.BigUInt
 import PromiseKit

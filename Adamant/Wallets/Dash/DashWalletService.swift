@@ -10,7 +10,7 @@ import Foundation
 import Swinject
 import Alamofire
 import BitcoinKit
-import BitcoinKit.Private
+import BitcoinKitPrivate
 
 class DashWalletService: WalletService {
     var tokenSymbol: String {

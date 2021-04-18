@@ -6,7 +6,7 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import AVFoundation
 import Photos
 import QRCodeReader
@@ -49,6 +49,8 @@ extension LoginViewController {
             
         case .denied:
             dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized)
+        @unknown default:
+            break
         }
     }
     

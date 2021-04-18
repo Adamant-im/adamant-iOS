@@ -8,7 +8,6 @@
 
 import Foundation
 import CryptoSwift
-import ByteBackpacker
 
 extension NativeAdamantCore: AdamantCore {
     // MARK: - Passphrases

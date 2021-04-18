@@ -397,6 +397,8 @@ extension NewChatViewController {
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
             present(alert, animated: true, completion: nil)
+        @unknown default:
+            break
         }
     }
     
@@ -431,6 +433,8 @@ extension NewChatViewController {
                 
             case .restricted, .denied:
                 dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.login.photolibraryNotAuthorized)
+            @unknown default:
+                break
             }
         }
     }

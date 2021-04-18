@@ -6,8 +6,8 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
-import libsodium
+import UIKit
+import Clibsodium
 
 class AdamantAddressBookService: AddressBookService {
     let addressBookKey = "contact_list"

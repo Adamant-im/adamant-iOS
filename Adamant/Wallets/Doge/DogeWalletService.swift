@@ -10,7 +10,7 @@ import Foundation
 import Swinject
 import Alamofire
 import BitcoinKit
-import BitcoinKit.Private
+import BitcoinKitPrivate
 
 struct DogeApiCommands {
     static func balance(for address: String) -> String {

@@ -6,9 +6,9 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import BitcoinKit
-import BitcoinKit.Private
+import BitcoinKitPrivate
 import Alamofire
 
 extension DashWalletService: WalletServiceTwoStepSend {

@@ -6,8 +6,9 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
+import UIKit
 import BitcoinKit
-import BitcoinKit.Private
+import BitcoinKitPrivate
 import Alamofire
 
 extension BitcoinKit.Transaction: RawTransaction {

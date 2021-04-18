@@ -6,7 +6,7 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import QRCodeReader
 import EFQRCode
 import AVFoundation
@@ -57,6 +57,8 @@ extension TransferViewControllerBase {
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
             present(alert, animated: true, completion: nil)
+        @unknown default:
+            break
         }
     }
     
