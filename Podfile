@@ -9,9 +9,9 @@ end
 
 # NativeCore pods
 def core_pods
-  pod 'CryptoSwift', '1.0.0' # MD5 hash
   pod 'ByteBackpacker' # Utility to pack value types into a Byte array
-  pod 'libsodium' # Sodium crypto library
+#  pod 'CryptoSwift', '1.0.0' # MD5 hash
+#  pod 'libsodium' # Sodium crypto library
 #  pod 'GRKOpenSSLFramework', '1.0.2.18'
 end
 
@@ -46,8 +46,7 @@ target 'Adamant' do
   
   # Crypto
   pod 'web3.swift.pod', '~> 2.2.0' # ETH Web3 Swift Port
-  pod 'Lisk', :git => 'https://github.com/adamant-im/lisk-swift.git' # LSK
-  pod 'BitcoinKit', :git => 'https://github.com/boyarkin-anton/BitcoinKit.git', :branch => 'dev' # BTC
+#  pod 'Lisk', :git => 'https://github.com/adamant-im/lisk-swift.git' # LSK
 #  pod 'BitcoinKit', :git => 'https://github.com/boyarkin-anton/BitcoinKit.git', :branch => 'dev' # BTC
 
   # Shared
