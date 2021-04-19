@@ -116,6 +116,9 @@
 		A50AEB04262C815200B37C22 /* EFQRCode in Frameworks */ = {isa = PBXBuildFile; productRef = A50AEB03262C815200B37C22 /* EFQRCode */; };
 		A50AEB0C262C81E300B37C22 /* QRCodeReader in Frameworks */ = {isa = PBXBuildFile; productRef = A50AEB0B262C81E300B37C22 /* QRCodeReader */; };
 		A50AEB14262C837900B37C22 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = A50AEB13262C837900B37C22 /* Alamofire */; };
+		A5241B70262DEDE1009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B6F262DEDE1009FA43E /* Clibsodium */; };
+		A5241B77262DEDEF009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B76262DEDEF009FA43E /* Clibsodium */; };
+		A5241B7E262DEDFE009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B7D262DEDFE009FA43E /* Clibsodium */; };
 		A544F0D4262C9878001F1A6D /* Eureka in Frameworks */ = {isa = PBXBuildFile; productRef = A544F0D3262C9878001F1A6D /* Eureka */; };
 		A57282CA262C94CD00C96FA8 /* DateToolsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A57282C9262C94CD00C96FA8 /* DateToolsSwift */; };
 		A57282D1262C94DA00C96FA8 /* DateToolsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A57282D0262C94DA00C96FA8 /* DateToolsSwift */; };
@@ -136,9 +139,6 @@
 		A5C99E0E262C9E3A00F7B1B7 /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = A5C99E0D262C9E3A00F7B1B7 /* Reachability */; };
 		A5D87BA3262CA01D00DC28F0 /* ProcedureKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5D87BA2262CA01D00DC28F0 /* ProcedureKit */; };
 		A5DBBABD262C7221004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBABC262C7221004AC028 /* Clibsodium */; };
-		A5DBBAC6262C7253004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAC5262C7253004AC028 /* Clibsodium */; };
-		A5DBBACD262C725A004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBACC262C725A004AC028 /* Clibsodium */; };
-		A5DBBAD4262C7261004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAD3262C7261004AC028 /* Clibsodium */; };
 		A5DBBADC262C729B004AC028 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBADB262C729B004AC028 /* CryptoSwift */; };
 		A5DBBAE3262C72B0004AC028 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAE2262C72B0004AC028 /* CryptoSwift */; };
 		A5DBBAE5262C72B7004AC028 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAE4262C72B7004AC028 /* CryptoSwift */; };
@@ -1005,11 +1005,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9079A7D229DEF9C0022CA0D /* UserNotificationsUI.framework in Frameworks */,
-				A5DBBAD4262C7261004AC028 /* Clibsodium in Frameworks */,
 				E9079A7C229DEF9C0022CA0D /* UserNotifications.framework in Frameworks */,
 				A5DBBAE7262C72BD004AC028 /* CryptoSwift in Frameworks */,
 				A5783A0B262C95D500428183 /* KeychainAccess in Frameworks */,
 				A5F929B8262C858F00C3E60A /* MarkdownKit in Frameworks */,
+				A5241B77262DEDEF009FA43E /* Clibsodium in Frameworks */,
 				A57282D5262C94E500C96FA8 /* DateToolsSwift in Frameworks */,
 				A5783A1E262C965D00428183 /* RNCryptor in Frameworks */,
 			);
@@ -1045,11 +1045,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				E957E12F229B10F80019732A /* UserNotificationsUI.framework in Frameworks */,
-				A5DBBACD262C725A004AC028 /* Clibsodium in Frameworks */,
 				E957E12E229B10F80019732A /* UserNotifications.framework in Frameworks */,
 				A5DBBAE5262C72B7004AC028 /* CryptoSwift in Frameworks */,
 				A5783A09262C95D000428183 /* KeychainAccess in Frameworks */,
 				A5F929B6262C858700C3E60A /* MarkdownKit in Frameworks */,
+				A5241B70262DEDE1009FA43E /* Clibsodium in Frameworks */,
 				A57282D3262C94DF00C96FA8 /* DateToolsSwift in Frameworks */,
 				A5783A1C262C965600428183 /* RNCryptor in Frameworks */,
 			);
@@ -1062,9 +1062,9 @@
 				A5783A15262C965000428183 /* RNCryptor in Frameworks */,
 				A57282D1262C94DA00C96FA8 /* DateToolsSwift in Frameworks */,
 				A5783A02262C95CA00428183 /* KeychainAccess in Frameworks */,
-				A5DBBAC6262C7253004AC028 /* Clibsodium in Frameworks */,
 				A5F929AF262C857D00C3E60A /* MarkdownKit in Frameworks */,
 				A5DBBAE3262C72B0004AC028 /* CryptoSwift in Frameworks */,
+				A5241B7E262DEDFE009FA43E /* Clibsodium in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1939,12 +1939,12 @@
 			);
 			name = MessageNotificationContentExtension;
 			packageProductDependencies = (
-				A5DBBAD3262C7261004AC028 /* Clibsodium */,
 				A5DBBAE6262C72BD004AC028 /* CryptoSwift */,
 				A5F929B7262C858F00C3E60A /* MarkdownKit */,
 				A57282D4262C94E500C96FA8 /* DateToolsSwift */,
 				A5783A0A262C95D500428183 /* KeychainAccess */,
 				A5783A1D262C965D00428183 /* RNCryptor */,
+				A5241B76262DEDEF009FA43E /* Clibsodium */,
 			);
 			productName = MessageNotificationContentExtension;
 			productReference = E9079A7B229DEF9C0022CA0D /* MessageNotificationContentExtension.appex */;
@@ -2006,12 +2006,12 @@
 			);
 			name = TransferNotificationContentExtension;
 			packageProductDependencies = (
-				A5DBBACC262C725A004AC028 /* Clibsodium */,
 				A5DBBAE4262C72B7004AC028 /* CryptoSwift */,
 				A5F929B5262C858700C3E60A /* MarkdownKit */,
 				A57282D2262C94DF00C96FA8 /* DateToolsSwift */,
 				A5783A08262C95D000428183 /* KeychainAccess */,
 				A5783A1B262C965600428183 /* RNCryptor */,
+				A5241B6F262DEDE1009FA43E /* Clibsodium */,
 			);
 			productName = TransferNotificationContentExtension;
 			productReference = E957E12D229B10F80019732A /* TransferNotificationContentExtension.appex */;
@@ -2031,12 +2031,12 @@
 			);
 			name = NotificationServiceExtension;
 			packageProductDependencies = (
-				A5DBBAC5262C7253004AC028 /* Clibsodium */,
 				A5DBBAE2262C72B0004AC028 /* CryptoSwift */,
 				A5F929AE262C857D00C3E60A /* MarkdownKit */,
 				A57282D0262C94DA00C96FA8 /* DateToolsSwift */,
 				A5783A01262C95CA00428183 /* KeychainAccess */,
 				A5783A14262C965000428183 /* RNCryptor */,
+				A5241B7D262DEDFE009FA43E /* Clibsodium */,
 			);
 			productName = NotificationServiceExtension;
 			productReference = E96D64DB2295CD4700CA5587 /* NotificationServiceExtension.appex */;
@@ -3452,6 +3452,21 @@
 			package = A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
 		};
+		A5241B6F262DEDE1009FA43E /* Clibsodium */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			productName = Clibsodium;
+		};
+		A5241B76262DEDEF009FA43E /* Clibsodium */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			productName = Clibsodium;
+		};
+		A5241B7D262DEDFE009FA43E /* Clibsodium */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			productName = Clibsodium;
+		};
 		A544F0D3262C9878001F1A6D /* Eureka */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka" */;
@@ -3538,21 +3553,6 @@
 			productName = ProcedureKit;
 		};
 		A5DBBABC262C7221004AC028 /* Clibsodium */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
-			productName = Clibsodium;
-		};
-		A5DBBAC5262C7253004AC028 /* Clibsodium */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
-			productName = Clibsodium;
-		};
-		A5DBBACC262C725A004AC028 /* Clibsodium */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
-			productName = Clibsodium;
-		};
-		A5DBBAD3262C7261004AC028 /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Clibsodium;
