@@ -136,7 +136,6 @@
 		A5C99E0E262C9E3A00F7B1B7 /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = A5C99E0D262C9E3A00F7B1B7 /* Reachability */; };
 		A5D87BA3262CA01D00DC28F0 /* ProcedureKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5D87BA2262CA01D00DC28F0 /* ProcedureKit */; };
 		A5DBBABD262C7221004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBABC262C7221004AC028 /* Clibsodium */; };
-		A5DBBABF262C7221004AC028 /* Sodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBABE262C7221004AC028 /* Sodium */; };
 		A5DBBAC6262C7253004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAC5262C7253004AC028 /* Clibsodium */; };
 		A5DBBACD262C725A004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBACC262C725A004AC028 /* Clibsodium */; };
 		A5DBBAD4262C7261004AC028 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAD3262C7261004AC028 /* Clibsodium */; };
@@ -1038,7 +1037,6 @@
 				A5DBBAF0262C72EF004AC028 /* LiskKit in Frameworks */,
 				A5DBBAEE262C72EF004AC028 /* BitcoinKit in Frameworks */,
 				A57282CA262C94CD00C96FA8 /* DateToolsSwift in Frameworks */,
-				A5DBBABF262C7221004AC028 /* Sodium in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1974,7 +1972,6 @@
 			packageProductDependencies = (
 				A5785ADE262C63580001BC66 /* web3swift */,
 				A5DBBABC262C7221004AC028 /* Clibsodium */,
-				A5DBBABE262C7221004AC028 /* Sodium */,
 				A5DBBADB262C729B004AC028 /* CryptoSwift */,
 				A5DBBAED262C72EF004AC028 /* BitcoinKit */,
 				A5DBBAEF262C72EF004AC028 /* LiskKit */,
@@ -3544,11 +3541,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Clibsodium;
-		};
-		A5DBBABE262C7221004AC028 /* Sodium */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
-			productName = Sodium;
 		};
 		A5DBBAC5262C7253004AC028 /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;

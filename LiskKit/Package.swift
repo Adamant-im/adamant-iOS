@@ -6,7 +6,8 @@ import PackageDescription
 let package = Package(
     name: "LiskKit",
     platforms: [
-        .iOS(.v10)
+        .iOS(.v10),
+        .macOS(.v10_12)
     ],
     products: [
         .library(
@@ -20,7 +21,10 @@ let package = Package(
     targets: [
         .target(
             name: "LiskKit",
-            dependencies: ["Sodium", "CryptoSwift"],
+            dependencies: [
+                .product(name: "Clibsodium", package: "Sodium"),
+                "CryptoSwift"
+            ],
             path: "Sources"
         ),
         .testTarget(

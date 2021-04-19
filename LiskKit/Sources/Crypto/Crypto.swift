@@ -7,7 +7,6 @@
 
 import Foundation
 import Clibsodium
-import Sodium
 import CryptoSwift
 
 public struct Crypto {
