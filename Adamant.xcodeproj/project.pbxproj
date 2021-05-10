@@ -135,6 +135,8 @@
 		A5785ADF262C63580001BC66 /* web3swift in Frameworks */ = {isa = PBXBuildFile; productRef = A5785ADE262C63580001BC66 /* web3swift */; };
 		A578BDE52623051C00090141 /* DashWalletService+Transactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A578BDE42623051C00090141 /* DashWalletService+Transactions.swift */; };
 		A59A7ECF262C992200040E94 /* Parchment in Frameworks */ = {isa = PBXBuildFile; productRef = A59A7ECE262C992200040E94 /* Parchment */; };
+		A5AC8DFF262E0B030053A7E2 /* SipHash in Frameworks */ = {isa = PBXBuildFile; productRef = A5AC8DFE262E0B030053A7E2 /* SipHash */; };
+		A5AC8E00262E0B030053A7E2 /* SipHash in Embed Frameworks */ = {isa = PBXBuildFile; productRef = A5AC8DFE262E0B030053A7E2 /* SipHash */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A5BBD811262C657300B5C40C /* ByteBackpacker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5BBD810262C657300B5C40C /* ByteBackpacker.swift */; };
 		A5C99E0E262C9E3A00F7B1B7 /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = A5C99E0D262C9E3A00F7B1B7 /* Reachability */; };
 		A5D87BA3262CA01D00DC28F0 /* ProcedureKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5D87BA2262CA01D00DC28F0 /* ProcedureKit */; };
@@ -576,6 +578,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		A5AC8E01262E0B030053A7E2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				A5AC8E00262E0B030053A7E2 /* SipHash in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E96D64E62295CD4700CA5587 /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1019,6 +1032,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5AC8DFF262E0B030053A7E2 /* SipHash in Frameworks */,
 				A5783A0E262C964500428183 /* RNCryptor in Frameworks */,
 				3C06931576393125C61FB8F6 /* Pods_Adamant.framework in Frameworks */,
 				A50AEB0C262C81E300B37C22 /* QRCodeReader in Frameworks */,
@@ -1960,6 +1974,7 @@
 				E913C8EC1FFFA51D001A83F7 /* Resources */,
 				629616F00016639A2AFC5FC7 /* [CP] Embed Pods Frameworks */,
 				E96D64E62295CD4700CA5587 /* Embed App Extensions */,
+				A5AC8E01262E0B030053A7E2 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1987,6 +2002,7 @@
 				A5F0A04A262C9CA90009672A /* Swinject */,
 				A5C99E0D262C9E3A00F7B1B7 /* Reachability */,
 				A5D87BA2262CA01D00DC28F0 /* ProcedureKit */,
+				A5AC8DFE262E0B030053A7E2 /* SipHash */,
 			);
 			productName = Adamant;
 			productReference = E913C8EE1FFFA51D001A83F7 /* Adamant.app */;
@@ -2151,6 +2167,7 @@
 				A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject" */,
 				A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */,
 				A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit" */,
+				A5AC8DFD262E0B030053A7E2 /* XCRemoteSwiftPackageReference "SipHash" */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
 			projectDirPath = "";
@@ -3386,6 +3403,14 @@
 				minimumVersion = 3.0.1;
 			};
 		};
+		A5AC8DFD262E0B030053A7E2 /* XCRemoteSwiftPackageReference "SipHash" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/attaswift/SipHash";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.2;
+			};
+		};
 		A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ashleymills/Reachability.swift";
@@ -3541,6 +3566,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A59A7ECD262C992200040E94 /* XCRemoteSwiftPackageReference "Parchment" */;
 			productName = Parchment;
+		};
+		A5AC8DFE262E0B030053A7E2 /* SipHash */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5AC8DFD262E0B030053A7E2 /* XCRemoteSwiftPackageReference "SipHash" */;
+			productName = SipHash;
 		};
 		A5C99E0D262C9E3A00F7B1B7 /* Reachability */ = {
 			isa = XCSwiftPackageProductDependency;
