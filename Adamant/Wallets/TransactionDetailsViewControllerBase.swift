@@ -472,8 +472,17 @@ class TransactionDetailsViewControllerBase: FormViewController {
             if let text = row.value {
                 self?.shareValue(text, from: cell)
             }
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
+            
+            if let amount = self?.transaction?.amountValue,
+               let symbol = self?.currencySymbol,
+               let rate = self?.currencyInfo.getRate(for: symbol),
+               let value = self?.fiatFormatter.string(from: amount * rate) {
+                row.value = value
+            } else {
+                row.value = TransactionDetailsViewControllerBase.awaitingValueString
+            }
         }
         
         detailsSection.append(currentFiatRow)
