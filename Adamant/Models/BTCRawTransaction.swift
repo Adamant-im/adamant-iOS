@@ -154,11 +154,15 @@ extension BTCRawTransaction: Decodable {
         
         let possibleDoubleSpend = (try? container.decode(Bool.self, forKey: .possibleDoubleSpend)) ?? false
         
-        guard
-            !possibleDoubleSpend,
-            let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) else {
-            isDoubleSpend = true
+        // MARK: Optionals for new transactions
+        if let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) {
+            date = Date(timeIntervalSince1970: timeInterval)
+        } else {
             date = nil
+        }
+        
+        guard !possibleDoubleSpend else {
+            isDoubleSpend = true
             valueIn = 0
             valueOut = 0
             fee = 0
@@ -168,15 +172,6 @@ extension BTCRawTransaction: Decodable {
             outputs = []
             return
         }
-        
-        date = Date(timeIntervalSince1970: timeInterval)
-        
-//        // MARK: Optionals for new transactions
-//        if let timeInterval = try? container.decode(TimeInterval.self, forKey: .date) {
-//            date = Date(timeIntervalSince1970: timeInterval)
-//        } else {
-//            date = nil
-//        }
         
         confirmations = try? container.decode(Int.self, forKey: .confirmations)
         blockHash = try? container.decode(String.self, forKey: .blockHash)
