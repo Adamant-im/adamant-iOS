@@ -33,7 +33,7 @@ public struct Crypto {
         let password = passphrase.decomposedStringWithCompatibilityMapping
         let salt = salt.decomposedStringWithCompatibilityMapping
         
-        return try PKCS5.PBKDF2(password: password.hexBytes(), salt: salt.hexBytes(), iterations: 2048, keyLength: 32, variant: HMAC.Variant.sha256).calculate()
+        return try PKCS5.PBKDF2(password: password.bytes, salt: salt.bytes, iterations: 2048, keyLength: 32, variant: HMAC.Variant.sha256).calculate()
     }
 
     /// Extract Lisk address from a public key
