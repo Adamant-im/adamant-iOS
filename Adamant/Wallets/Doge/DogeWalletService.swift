@@ -527,7 +527,10 @@ extension DogeWalletService {
                 
                 var utxos = [UnspentTransaction]()
                 for item in items {
-                    guard let txid = item["txid"] as? String,
+                    guard
+                        let txid = item["txid"] as? String,
+                        let confirmations = item["confirmations"] as? NSNumber,
+                        confirmations.intValue > 0,
                         let vout = item["vout"] as? NSNumber,
                         let amount = item["amount"] as? NSNumber else {
                         continue
