@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Lisk
+import LiskKit
 import web3swift
 import struct BigInt.BigUInt
 

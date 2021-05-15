@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 import Swinject
-import Lisk
+import LiskKit
 import web3swift
 import Alamofire
 import struct BigInt.BigUInt
@@ -262,7 +262,7 @@ extension LskWalletService {
                 
                 group.enter() // Enter 1
                 
-                Alamofire.request(request).responseData { response in
+                AF.request(request).responseData { response in
                     defer { group.leave() } // Leave 1
                     
                     switch response.result {
@@ -330,8 +330,8 @@ extension LskWalletService: InitiatedWithPassphraseService {
         
         // MARK: 2. Create keys and addresses
         do {
-            let keyPair = try Lisk.Crypto.keyPair(fromPassphrase: passphrase, salt: "adm")
-            let address = Lisk.Crypto.address(fromPublicKey: keyPair.publicKeyString)
+            let keyPair = try LiskKit.Crypto.keyPair(fromPassphrase: passphrase, salt: "adm")
+            let address = LiskKit.Crypto.address(fromPublicKey: keyPair.publicKeyString)
             
             // MARK: 3. Update
             let wallet = LskWallet(address: address, keyPair: keyPair)
@@ -591,7 +591,7 @@ extension LskWalletService: PrivateKeyGenerator {
     
     
     func generatePrivateKeyFor(passphrase: String) -> String? {
-        guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase), let keypair = try? Lisk.Crypto.keyPair(fromPassphrase: passphrase, salt: "adm") else {
+        guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase), let keypair = try? LiskKit.Crypto.keyPair(fromPassphrase: passphrase, salt: "adm") else {
             return nil
         }
         

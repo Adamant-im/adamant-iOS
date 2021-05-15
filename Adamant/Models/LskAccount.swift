@@ -8,7 +8,7 @@
 
 import Foundation
 import BigInt
-import Lisk
+import LiskKit
 
 struct LskAccount {
     let keys: KeyPair

@@ -6,11 +6,11 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit
-import BitcoinKit.Private
+import BitcoinKitPrivate
 
 struct DogeApiCommands {
     static func balance(for address: String) -> String {
@@ -322,7 +322,7 @@ extension DogeWalletService {
         }
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
@@ -330,7 +330,7 @@ extension DogeWalletService {
         let endpoint = url.appendingPathComponent(DogeApiCommands.balance(for: address))
         
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .get, headers: headers).responseString(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .get, headers: headers).responseString(queue: defaultDispatchQueue) { response in
             
             switch response.result {
             case .success(let data):
@@ -460,11 +460,11 @@ extension DogeWalletService {
         }
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
-        let parameters = [
+        let parameters: Parameters = [
             "from": from,
             "to": to
         ]
@@ -473,7 +473,7 @@ extension DogeWalletService {
         let endpoint = url.appendingPathComponent(DogeApiCommands.getTransactions(for: address))
         
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .get, parameters: parameters, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
                 do {
@@ -483,8 +483,8 @@ extension DogeWalletService {
                     completion(.failure(.internalError(message: "DOGE Wallet: not a valid response", error: error)))
                 }
                 
-            case .failure(let error as URLError):
-                completion(.failure(.networkError(error: error)))
+//            case .failure(let error as URLError):
+//                completion(.failure(.networkError(error: error)))
                 
             case .failure(let error):
                 completion(.failure(.serverError(error: error.localizedDescription)))
@@ -505,19 +505,19 @@ extension DogeWalletService {
         let address = wallet.address
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
         // Request url
         let endpoint = url.appendingPathComponent(DogeApiCommands.getUnspentTransactions(for: address))
         
-        let parameters = [
+        let parameters: Parameters = [
             "noCache": "1"
         ]
         
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
                 guard let items = data as? [[String: Any]] else {
@@ -527,7 +527,10 @@ extension DogeWalletService {
                 
                 var utxos = [UnspentTransaction]()
                 for item in items {
-                    guard let txid = item["txid"] as? String,
+                    guard
+                        let txid = item["txid"] as? String,
+                        let confirmations = item["confirmations"] as? NSNumber,
+                        confirmations.intValue > 0,
                         let vout = item["vout"] as? NSNumber,
                         let amount = item["amount"] as? NSNumber else {
                         continue
@@ -560,7 +563,7 @@ extension DogeWalletService {
         }
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
@@ -568,7 +571,7 @@ extension DogeWalletService {
         let endpoint = url.appendingPathComponent(DogeApiCommands.getTransaction(by: hash))
         
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
                 do {
@@ -590,13 +593,13 @@ extension DogeWalletService {
         }
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
         // Request url
         let endpoint = url.appendingPathComponent(DogeApiCommands.getBlock(by: hash))
-        Alamofire.request(endpoint, method: .get, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .get, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let json as [String: Any]):
                 if let height = json["height"] as? NSNumber {

@@ -329,6 +329,8 @@ extension AdmTransactionsViewController: NSFetchedResultsControllerDelegate {
             if let at = indexPath, let to = newIndexPath {
                 tableView.moveRow(at: at, to: to)
             }
+        @unknown default:
+            break
         }
     }
 }

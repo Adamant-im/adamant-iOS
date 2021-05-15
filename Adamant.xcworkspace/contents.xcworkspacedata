@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:LiskKit">
+   </FileRef>
+   <FileRef
+      location = "group:BitcoinKit">
+   </FileRef>
+   <FileRef
       location = "group:Adamant.xcodeproj">
    </FileRef>
    <FileRef

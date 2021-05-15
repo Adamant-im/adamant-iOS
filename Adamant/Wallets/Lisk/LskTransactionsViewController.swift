@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import Lisk
+import LiskKit
 import web3swift
 import BigInt
 

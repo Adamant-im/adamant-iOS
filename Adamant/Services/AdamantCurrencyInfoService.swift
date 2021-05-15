@@ -106,11 +106,11 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
             return
         }
         
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
-        Alamofire.request(url, method: .get, headers: headers).responseData(queue: defaultResponseDispatchQueue) { response in
+        AF.request(url, method: .get, headers: headers).responseData(queue: defaultResponseDispatchQueue) { response in
             switch response.result {
             case .success(let data):
                 do {
@@ -136,11 +136,11 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
             return
         }
         
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
-        Alamofire.request(url, method: .get, headers: headers).responseData(queue: defaultResponseDispatchQueue) { response in
+        AF.request(url, method: .get, headers: headers).responseData(queue: defaultResponseDispatchQueue) { response in
             switch response.result {
             case .success(let data):
                 do {

@@ -505,7 +505,7 @@ extension ERC20WalletService {
         }
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
@@ -537,7 +537,7 @@ extension ERC20WalletService {
         let semaphore = DispatchSemaphore(value: 1)
         
         dispatchGroup.enter()
-        Alamofire.request(txEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(txEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             defer {
                 dispatchGroup.leave()
             }

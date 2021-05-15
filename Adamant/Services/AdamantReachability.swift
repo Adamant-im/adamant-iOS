@@ -13,7 +13,7 @@ import Reachability
 extension Reachability.Connection {
     var adamantConnection: AdamantConnection {
         switch self {
-        case .none:
+        case .none, .unavailable:
             return .none
         
         case .wifi:
@@ -36,7 +36,7 @@ class AdamantReachability: ReachabilityMonitor {
     }
     
     init() {
-        reachability = Reachability()!
+        reachability = try! Reachability() // TODO: remove force try and make safe init
         reachability.whenReachable = { [weak self] reachability in
             let userInfo: [String:Any] = [AdamantUserInfoKey.ReachabilityMonitor.connection:reachability.connection.adamantConnection]
             NotificationCenter.default.post(name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: self, userInfo: userInfo)

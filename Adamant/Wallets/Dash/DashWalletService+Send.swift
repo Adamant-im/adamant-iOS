@@ -6,9 +6,9 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import BitcoinKit
-import BitcoinKit.Private
+import BitcoinKitPrivate
 import Alamofire
 
 extension DashWalletService: WalletServiceTwoStepSend {
@@ -91,7 +91,7 @@ extension DashWalletService: WalletServiceTwoStepSend {
         let txHex = transaction.serialized().hex
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
@@ -103,7 +103,7 @@ extension DashWalletService: WalletServiceTwoStepSend {
         ]
         
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             
             switch response.result {
             case .success(let data):

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import Lisk
+import LiskKit
 import PromiseKit
 
 extension LocalTransaction: RawTransaction {

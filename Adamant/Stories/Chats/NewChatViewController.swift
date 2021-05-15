@@ -397,6 +397,8 @@ extension NewChatViewController {
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
             present(alert, animated: true, completion: nil)
+        @unknown default:
+            break
         }
     }
     
@@ -431,6 +433,8 @@ extension NewChatViewController {
                 
             case .restricted, .denied:
                 dialogService.presentGoToSettingsAlert(title: nil, message: String.adamantLocalized.login.photolibraryNotAuthorized)
+            @unknown default:
+                break
             }
         }
     }
@@ -462,11 +466,13 @@ extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerCo
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         dismiss(animated: true, completion: nil)
         
-        guard let image = info[.originalImage] as? UIImage else {
+        guard let image = info[.originalImage] as? UIImage, let cgImage = image.cgImage else {
             return
         }
         
-        if let cgImage = image.toCGImage(), let codes = EFQRCode.recognize(image: cgImage), codes.count > 0 {
+        let codes = EFQRCode.recognize(cgImage)
+        
+        if codes.count > 0 {
             for aCode in codes {
                 if let admAddress = aCode.getAdamantAddress() {
                     startNewChat(with: admAddress.address, name: admAddress.name)

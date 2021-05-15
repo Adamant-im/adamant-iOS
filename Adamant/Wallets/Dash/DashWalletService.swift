@@ -6,11 +6,11 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit
-import BitcoinKit.Private
+import BitcoinKitPrivate
 
 class DashWalletService: WalletService {
     var tokenSymbol: String {
@@ -309,7 +309,7 @@ extension DashWalletService {
         }
 
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
@@ -322,7 +322,7 @@ extension DashWalletService {
         ]
         
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
 
             switch response.result {
             case .success(let data):

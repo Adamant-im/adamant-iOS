@@ -6,7 +6,7 @@
 //  Copyright © 2018 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import EFQRCode
 
 enum QRToolGenerateResult {
@@ -26,11 +26,11 @@ class AdamantQRTools {
             content: string,
             size: EFIntSize(width: 600, height: 600)
         )
-        generator.setColors(backgroundColor: CGColor.EFWhite(), foregroundColor: CGColor.EFBlack())
+        generator.withColors(backgroundColor: UIColor.white.cgColor, foregroundColor: UIColor.black.cgColor)
         if withLogo {
             let hasAdm = string.contains("adm:")
             let logoSize = hasAdm ? EFIntSize(width: 156, height: 156) : EFIntSize(width: 138, height: 138)
-            generator.setIcon(icon: UIImage(named: "logo")?.toCGImage(), size: logoSize)
+            generator.withIcon(UIImage(named: "logo")?.cgImage, size: logoSize)
         }
         
         if let qr = generator.generate() {
@@ -47,7 +47,7 @@ class AdamantQRTools {
             return .none
         }
         
-        if let result = EFQRCode.recognize(image: image)?.first {
+        if let result = EFQRCode.recognize(image).first {
             return .success(result)
         }
         

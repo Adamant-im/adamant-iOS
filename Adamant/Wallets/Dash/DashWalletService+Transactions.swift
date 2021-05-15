@@ -9,7 +9,7 @@
 import Foundation
 import Alamofire
 import BitcoinKit
-import BitcoinKit.Private
+import BitcoinKitPrivate
 
 struct DashTransactionsPointer {
     let total: Int
@@ -46,7 +46,7 @@ extension DashWalletService {
         }
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
@@ -58,7 +58,7 @@ extension DashWalletService {
         ]
 
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
                 do {
@@ -84,7 +84,7 @@ extension DashWalletService {
         }
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
@@ -96,7 +96,7 @@ extension DashWalletService {
         ]
         
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
                 do {
@@ -128,7 +128,7 @@ extension DashWalletService {
         }
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
@@ -140,7 +140,7 @@ extension DashWalletService {
         ]
         
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             
             switch response.result {
             case .success(let data):
@@ -214,7 +214,7 @@ private extension DashWalletService {
         }
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
 
@@ -226,7 +226,7 @@ private extension DashWalletService {
         ]
 
         // MARK: Sending request
-        Alamofire.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             
             switch response.result {
             case .success(let data):

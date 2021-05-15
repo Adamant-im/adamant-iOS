@@ -372,7 +372,8 @@ extension NodesListViewController {
     
     private func generateRandomTag() -> String {
         let capacity = 6
-        var nums = [UInt32](reserveCapacity: capacity);
+        var nums: [UInt32] = []
+        nums.reserveCapacity(capacity)
         
         for _ in 0...capacity {
             nums.append(arc4random_uniform(10))

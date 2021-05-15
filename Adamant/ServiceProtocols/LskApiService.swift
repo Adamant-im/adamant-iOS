@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Lisk
+import LiskKit
 
 // MARK: - Notifications
 extension Notification.Name {

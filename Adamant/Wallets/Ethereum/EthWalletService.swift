@@ -13,6 +13,20 @@ import Swinject
 import Alamofire
 import BigInt
 
+struct EthWalletStorage {
+    let keystore: BIP32Keystore
+
+    func getWalet(with web3: web3) -> EthWallet? {
+        web3.addKeystoreManager(KeystoreManager([keystore]))
+        
+        guard let ethAddress = keystore.addresses?.first else {
+            return nil
+        }
+        
+        return EthWallet(address: ethAddress.address, ethAddress: ethAddress, keystore: keystore)
+    }
+}
+
 extension Web3Error {
     func asWalletServiceError() -> WalletServiceError {
         switch self {
@@ -139,6 +153,7 @@ class EthWalletService: WalletService {
     }
     
     private (set) var ethWallet: EthWallet? = nil
+    private var waletStorage: EthWalletStorage?
     
     var wallet: WalletAccount? { return ethWallet }
     
@@ -168,6 +183,7 @@ class EthWalletService: WalletService {
     
     func initiateNetwork(apiUrl: String, completion: @escaping (WalletServiceSimpleResult) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
+            self._ethNodeUrl = apiUrl
             guard let _ = self.setupEthNode(with: apiUrl) else {
                 completion(.failure(error: WalletServiceError.networkError))
                 return
@@ -186,8 +202,18 @@ class EthWalletService: WalletService {
         return web3
     }
     
+    func getWallet() -> EthWallet? {
+        if let wallet = ethWallet {
+            return wallet
+        }
+        guard let storage = waletStorage, let web3 = web3 else {
+            return nil
+        }
+        return storage.getWalet(with: web3)
+    }
+    
     func update() {
-        guard let wallet = ethWallet else {
+        guard let wallet = getWallet() else {
             return
         }
         
@@ -319,7 +345,6 @@ extension EthWalletService: InitiatedWithPassphraseService {
         }
         
         // MARK: 2. Create keys and addresses
-        let keystore: BIP32Keystore
         do {
             guard let store = try BIP32Keystore(mnemonics: passphrase, password: EthWalletService.walletPassword, mnemonicsPassword: "", language: .english, prefixPath: EthWalletService.walletPath) else {
                 completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
@@ -327,25 +352,20 @@ extension EthWalletService: InitiatedWithPassphraseService {
                 return
             }
             
-            keystore = store
+            waletStorage = .init(keystore: store)
         } catch {
             completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: error)))
             stateSemaphore.signal()
             return
         }
         
-        guard let web3 = web3 else { return }
-        
-        web3.addKeystoreManager(KeystoreManager([keystore]))
-        
-        guard let ethAddress = keystore.addresses?.first else {
+        guard let web3 = web3, let eWallet = waletStorage?.getWalet(with: web3) else {
             completion(.failure(error: .internalError(message: "ETH Wallet: failed to create Keystore", error: nil)))
             stateSemaphore.signal()
             return
         }
         
         // MARK: 3. Update
-        let eWallet = EthWallet(address: ethAddress.address, ethAddress: ethAddress, keystore: keystore)
         ethWallet = eWallet
         
         if !enabled {
@@ -364,9 +384,9 @@ extension EthWalletService: InitiatedWithPassphraseService {
             switch result {
             case .success(let address):
                 // ETH already saved
-                if ethAddress.address.caseInsensitiveCompare(address) != .orderedSame {
-                    service.save(ethAddress: ethAddress.address) { result in
-                        service.kvsSaveCompletionRecursion(ethAddress: ethAddress.address.lowercased(), result: result)
+                if eWallet.address.caseInsensitiveCompare(address) != .orderedSame {
+                    service.save(ethAddress: eWallet.address) { result in
+                        service.kvsSaveCompletionRecursion(ethAddress: eWallet.address.lowercased(), result: result)
                     }
                 }
                 
@@ -384,8 +404,8 @@ extension EthWalletService: InitiatedWithPassphraseService {
                         NotificationCenter.default.post(name: service.walletUpdatedNotification, object: service, userInfo: [AdamantUserInfoKey.WalletService.wallet: wallet])
                     }
                     
-                    service.save(ethAddress: ethAddress.address) { result in
-                        service.kvsSaveCompletionRecursion(ethAddress: ethAddress.address, result: result)
+                    service.save(ethAddress: eWallet.address) { result in
+                        service.kvsSaveCompletionRecursion(ethAddress: eWallet.address, result: result)
                     }
                     service.setState(.upToDate)
                     completion(.success(result: eWallet))
@@ -594,7 +614,7 @@ extension EthWalletService {
         }
         
         // Headers
-        let headers = [
+        let headers: HTTPHeaders = [
             "Content-Type": "application/json"
         ]
         
@@ -647,7 +667,7 @@ extension EthWalletService {
         let semaphore = DispatchSemaphore(value: 1)
         
         dispatchGroup.enter() // Enter for txFrom
-        Alamofire.request(txFromEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(txFromEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             defer {
                 dispatchGroup.leave() // Exit for txFrom
             }
@@ -670,7 +690,7 @@ extension EthWalletService {
         }
         
         dispatchGroup.enter() // Enter for txTo
-        Alamofire.request(txToEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(txToEndpoint, method: .get, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             defer {
                 dispatchGroup.leave() // Enter for txTo
             }
@@ -729,7 +749,7 @@ extension EthWalletService {
             return
         }
         
-        Alamofire.request(endpoint).responseData(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint).responseData(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
                 do {

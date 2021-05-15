@@ -373,6 +373,8 @@ fileprivate extension UIAlertAction.Style {
         case .default,
              .destructive:
             return .default
+        @unknown default:
+            return .default
         }
     }
 }
