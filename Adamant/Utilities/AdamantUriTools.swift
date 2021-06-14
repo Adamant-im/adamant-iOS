@@ -14,6 +14,7 @@ enum AdamantUri {
 }
 
 enum AdamantAddressParam {
+    case address(String)
     case label(String)
     
     init?(raw: String) {
@@ -23,6 +24,8 @@ enum AdamantAddressParam {
         }
         
         switch keyValue[0] {
+        case "address":
+            self = .address(String(keyValue[1]))
         case "label":
             self = AdamantAddressParam.label(keyValue[1].replacingOccurrences(of: "+", with: " "))
         
@@ -33,6 +36,8 @@ enum AdamantAddressParam {
     
     var encoded: String {
         switch self {
+        case .address(let value):
+            return "address=\(value)"
         case .label(let value):
             return "label=\(value.replacingOccurrences(of: " ", with: "+"))"
         }
@@ -41,6 +46,7 @@ enum AdamantAddressParam {
 
 class AdamantUriTools {
     static let AdamantProtocol = "adm"
+    static let AdamantHost = "https://msg.adamant.im"
     
     static func encode(request: AdamantUri) -> String {
         switch request {
@@ -48,12 +54,23 @@ class AdamantUriTools {
             return passphrase
             
         case .address(address: let address, params: let params):
-            var uri = "\(AdamantProtocol):\(address)"
-            
-            if let encodedParams = params?.map({$0.encoded}).joined(separator: "&"), encodedParams.count > 0 {
-                uri = "\(uri)?\(encodedParams)"
+            var components = URLComponents()
+            components.scheme = "https"
+            components.host = "msg.adamant.im"
+            components.queryItems = [
+                .init(name: "address", value: address)
+            ]
+            guard let uri = components.url?.absoluteString else { return "" }
+
+            params?.forEach {
+                switch $0 {
+                case .address(let value):
+                    components.queryItems?.append(.init(name: "address", value: value))
+                case .label(let value):
+                    components.queryItems?.append(.init(name: "label", value: value))
+                }
             }
-            
+
             return uri
         }
     }

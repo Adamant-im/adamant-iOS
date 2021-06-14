@@ -628,8 +628,16 @@ class ChatViewController: MessagesViewController {
         guard let partner = chatroom?.partner, let address = partner.address else {
             return
         }
-        
-        let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+
+        let params: [AdamantAddressParam]?
+        if let name = partner.name {
+            params = [.label(name)]
+        } else {
+            params = nil
+        }
+
+        let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address,
+                                                                                params: params))
         
         if partner.isSystem {
             dialogService.presentShareAlertFor(string: address,

@@ -16,6 +16,21 @@ struct AdamantAddress {
 
 extension String {
     func getAdamantAddress() -> AdamantAddress? {
+        guard
+            let urlString = self.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+            let components = URLComponents(string: urlString),
+            components.host == "msg.adamant.im",
+            let queryItems = components.queryItems,
+            let address = queryItems.filter({$0.name == "address"}).first?.value else {
+            return nil
+        }
+
+        let name = queryItems.filter({$0.name == "label"}).first?.value
+
+        return AdamantAddress(address: address, name: name)
+    }
+
+    func getLegacyAdamantAddress() -> AdamantAddress? {
         let address: String?
         var name: String? = nil
         
@@ -27,6 +42,8 @@ extension String {
                 if let params = params {
                     for param in params {
                         switch param {
+                        case .address:
+                            break
                         case .label(let label):
                             name = label
                             break
