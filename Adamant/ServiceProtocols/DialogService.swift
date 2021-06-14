@@ -92,7 +92,7 @@ struct AdamantAlertAction {
     let handler: (() -> Void)?
 }
 
-protocol DialogService: class {
+protocol DialogService: AnyObject {
     
     func getTopmostViewController() -> UIViewController?
     

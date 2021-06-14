@@ -46,7 +46,7 @@ extension String.adamantLocalized {
 
 
 // MARK: - Delegate
-protocol ChatViewControllerDelegate: class {
+protocol ChatViewControllerDelegate: AnyObject {
     func preserveMessage(_ message: String, forAddress address: String)
     func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String?
 }

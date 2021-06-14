@@ -34,7 +34,7 @@ extension String.adamantLocalized {
 
 
 // MARK: - Delegate
-protocol NewChatViewControllerDelegate: class {
+protocol NewChatViewControllerDelegate: AnyObject {
     func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount)
 }
 

@@ -13,7 +13,7 @@ import QRCodeReader
 
 // MARK: - Transfer Delegate Protocol
 
-protocol TransferViewControllerDelegate: class {
+protocol TransferViewControllerDelegate: AnyObject {
     func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?)
 }
 

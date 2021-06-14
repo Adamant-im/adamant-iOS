@@ -106,7 +106,7 @@ extension ApiServiceError: Equatable {
 
 
 // - MARK: ApiService
-protocol ApiService: class {
+protocol ApiService: AnyObject {
     
     /// Default is async queue with .utilities priority.
     var defaultResponseDispatchQueue: DispatchQueue { get }

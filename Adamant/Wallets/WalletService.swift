@@ -187,7 +187,7 @@ protocol WalletViewController {
 
 
 // MARK: - Wallet Service
-protocol WalletService: class {
+protocol WalletService: AnyObject {
 	// MARK: Currency
 	static var currencySymbol: String { get }
 	static var currencyLogo: UIImage { get }

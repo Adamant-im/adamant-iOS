@@ -31,7 +31,7 @@ enum NodeEditorResult {
     case delete(node: Node, tag: String)
 }
 
-protocol NodeEditorDelegate: class {
+protocol NodeEditorDelegate: AnyObject {
     func nodeEditorViewController(_ editor: NodeEditorViewController, didFinishEditingWithResult result: NodeEditorResult)
 }
 

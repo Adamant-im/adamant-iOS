@@ -56,7 +56,7 @@ typealias Stripe = [StripeButtonType]
 
 
 // MARK: - Delegate
-protocol ButtonsStripeViewDelegate: class {
+protocol ButtonsStripeViewDelegate: AnyObject {
     func buttonsStripe(_ stripe: ButtonsStripeView, didTapButton button: StripeButtonType)
 }
 
