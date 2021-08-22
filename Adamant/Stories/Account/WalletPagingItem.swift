@@ -28,6 +28,11 @@ class WalletPagingItem: PagingItem, Hashable, Comparable {
         return index.hashValue &+ currencySymbol.hashValue
     }
     
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(index)
+        hasher.combine(currencySymbol)
+    }
+    
     static func < (lhs: WalletPagingItem, rhs: WalletPagingItem) -> Bool {
         return lhs.index < rhs.index
     }

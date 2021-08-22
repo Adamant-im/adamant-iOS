@@ -134,7 +134,7 @@ extension Encoding {
         let size = sizeFromBase(size: string.lengthOfBytes(using: .utf8) - zerosCount)
         var decodedBytes: [UInt8] = Array(repeating: 0, count: size)
         for c in string {
-            guard let baseIndex = baseAlphabets.index(of: c) else { return nil }
+            guard let baseIndex = baseAlphabets.firstIndex(of: c) else { return nil }
 
             var carry = baseIndex.utf16Offset(in: baseAlphabets)
             var i = 0
@@ -196,14 +196,14 @@ public struct Bech32 {
         var decodedIn5bit: [UInt8] = [UInt8]()
         for c in base32.lowercased() {
             // We can't have characters other than base32 alphabets.
-            guard let baseIndex = base32Alphabets.index(of: c)?.utf16Offset(in: base32Alphabets) else {
+            guard let baseIndex = base32Alphabets.firstIndex(of: c)?.utf16Offset(in: base32Alphabets) else {
                 return nil
             }
             decodedIn5bit.append(UInt8(baseIndex))
         }
 
         // We can't have invalid checksum
-        let payload = Data(bytes: decodedIn5bit)
+        let payload = Data(decodedIn5bit)
         guard verifyChecksum(prefix: prefix, payload: payload) else {
             return nil
         }
@@ -272,7 +272,7 @@ public struct Bech32 {
         if pad && bits > 0 {
             converted.append(lastBits)
         }
-        return Data(bytes: converted)
+        return Data(converted)
     }
 
     internal static func convertFrom5bit(data: Data) throws -> Data {
@@ -298,7 +298,7 @@ public struct Bech32 {
             throw DecodeError.invalidBits
         }
 
-        return Data(bytes: converted)
+        return Data(converted)
     }
 
     private enum DecodeError: Error {
