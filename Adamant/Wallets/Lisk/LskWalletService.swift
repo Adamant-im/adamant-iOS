@@ -48,7 +48,7 @@ class LskWalletService: WalletService {
     // MARK: - Constants
     let addressRegex = try! NSRegularExpression(pattern: "^([0-9]{2,22})L$", options: [])
     let maxAddressNumber = BigUInt("18446744073709551615")
-    let transactionFee: Decimal = 0.1
+    var transactionFee: Decimal = 0.1
     private (set) var enabled = true
     
     static var currencySymbol = "LSK"
@@ -76,6 +76,16 @@ class LskWalletService: WalletService {
     
     internal var accountApi: Accounts!
     internal var transactionApi: Transactions!
+    internal var serviceApi: Service!
+    internal var nodeApi: LiskKit.Node!
+    internal var netHash: String = ""
+
+    internal var isNewApi = true {
+        didSet {
+            lskWallet?.isNewApi = isNewApi
+            serviceApi = Service(client: serviceApi.client, version: isNewApi ? .v2 : .v1)
+        }
+    }
     
     private (set) var lskWallet: LskWallet? = nil
     
@@ -120,6 +130,8 @@ class LskWalletService: WalletService {
     init(mainnet: Bool, nodes: [APINode]) {
         self.mainnet = mainnet
         self.nodes = nodes
+
+        setupApi()
         
         // Notifications
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] _ in
@@ -158,6 +170,18 @@ class LskWalletService: WalletService {
         
         setState(.updating)
         
+        serviceApi.getFees { result in
+            switch result {
+            case .success(response: let value):
+                let tempTransaction = TransactionEntity(amount: 100000000.0, fee: 0.1, nonce: wallet.nounce, senderPublicKey: wallet.keyPair.publicKeyString, recipientAddress: wallet.binaryAddress).signed(with: wallet.keyPair, for: self.netHash)
+                let value = tempTransaction.getFee(with: value.data.minFeePerByte)
+
+                self.transactionFee = BigUInt(value).asDecimal(exponent: LskWalletService.currencyExponent)
+            case .error:
+                break
+            }
+        }
+        
         getBalance { [weak self] result in
             if let stateSemaphore = self?.stateSemaphore {
                 defer {
@@ -193,9 +217,12 @@ class LskWalletService: WalletService {
         }
     }
     
-    
     // MARK: - Tools
     func validate(address: String) -> AddressValidationResult {
+        return isNewApi ? validateAddress(address) : validateLegacyAddress(address)
+    }
+
+    func validateLegacyAddress(_ address: String) -> AddressValidationResult {
         let full: String
         let short: String
         
@@ -216,6 +243,10 @@ class LskWalletService: WalletService {
         } else {
             return .invalid
         }
+    }
+
+    func validateAddress(_ address: String) -> AddressValidationResult {
+        return LiskKit.Crypto.isValidBase32(address: address) ? .valid : .invalid
     }
     
     func fromRawLsk(value: BigInt.BigUInt) -> String {
@@ -239,12 +270,17 @@ class LskWalletService: WalletService {
 extension LskWalletService {
     private func initiateNodes(completion: @escaping (Bool) -> Void) {
         if nodes.count > 0 {
-            self.accountApi = Accounts(client: APIClient(options: APIOptions(nodes: nodes, nethash: APINethash.mainnet, randomNode: true)))
-            self.transactionApi = Transactions(client:  APIClient(options: APIOptions(nodes: nodes, nethash: APINethash.mainnet, randomNode: true)))
+            netHash = Constants.Nethash.main
+            let client = APIClient(options: APIOptions(nodes: nodes, nethash: APINethash.mainnet, randomNode: true))
+            self.accountApi = Accounts(client: client)
+            self.transactionApi = Transactions(client: client)
+            self.nodeApi = LiskKit.Node(client: client)
             completion(true)
         } else {
             self.accountApi = nil
             self.transactionApi = nil
+            self.nodeApi = nil
+            self.serviceApi = nil
             completion(false)
         }
     }
@@ -280,6 +316,33 @@ extension LskWalletService {
             completion(aliveNodes)
         }
     }
+    
+    func setupApi() {
+        serviceApi = Service(client: mainnet ? .Service.mainnet : .Service.testnet, version: isNewApi ? .v2 : .v1)
+        if mainnet {
+            let group = DispatchGroup()
+            group.enter()
+            
+            initiateNodes { result in
+                group.leave()
+            }
+            
+            group.wait()
+        } else {
+            netHash = Constants.Nethash.test
+            accountApi = Accounts(client: .testnet)
+            transactionApi = Transactions(client: .testnet)
+            nodeApi = LiskKit.Node(client: .testnet)
+        }
+        
+//        nodeApi.info { result in
+//            switch result {
+//            case .error: self.isNewApi = false
+//            case .success(let model):
+//                self.isNewApi = model.data.version == "3.0.0"
+//            }
+//        }
+    }
 }
 
 // MARK: - WalletInitiatedWithPassphrase
@@ -294,28 +357,6 @@ extension LskWalletService: InitiatedWithPassphraseService {
         guard let adamant = accountService.account else {
             completion(.failure(error: .notLogged))
             return
-        }
-        
-        // MARK: 0. Nodes
-        if mainnet {
-            var success = false
-            let group = DispatchGroup()
-            group.enter()
-            
-            initiateNodes { result in
-                defer { group.leave() }
-                success = result
-            }
-            
-            group.wait()
-            
-            if !success {
-                completion(.failure(error: .networkError))
-                return
-            }
-        } else {
-            accountApi = Accounts(client: .testnet)
-            transactionApi = Transactions(client: .testnet)
         }
         
         // MARK: 1. Prepare
@@ -334,7 +375,7 @@ extension LskWalletService: InitiatedWithPassphraseService {
             let address = LiskKit.Crypto.address(fromPublicKey: keyPair.publicKeyString)
             
             // MARK: 3. Update
-            let wallet = LskWallet(address: address, keyPair: keyPair)
+            let wallet = LskWallet(address: address, keyPair: keyPair, nounce: "", isNewApi: isNewApi)
             self.lskWallet = wallet
         } catch {
             print("\(error)")
@@ -454,36 +495,55 @@ extension LskWalletService: SwinjectDependentService {
 // MARK: - Balances & addresses
 extension LskWalletService {
     func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        guard let address = self.lskWallet?.address, let accountApi = accountApi else {
+        guard let wallet = self.lskWallet, let accountApi = accountApi else {
             completion(.failure(error: .notLogged))
             return
         }
         
         defaultDispatchQueue.async {
-            accountApi.accounts(address: address) { (response) in
-                switch response {
-                case .success(response: let response):
-                    if let account = response.data.first {
-                        let balance = BigUInt(account.balance ?? "0") ?? BigUInt(0)
+            if self.isNewApi {
+                accountApi.accounts(address: wallet.binaryAddress) { response in
+                    switch response {
+                    case .success(response: let response):
+                        self.lskWallet?.nounce = response.data.nonce
+                        self.handleAccountSuccess(with: response.data.balance, completion: completion)
                         
-                        completion(.success(result: balance.asDecimal(exponent: LskWalletService.currencyExponent)))
-                    } else {
-                        completion(.success(result: 0))
+                    case .error(response: let error):
+                        self.handleAccountError(with: error, completion: completion)
                     }
-                    
-                case .error(response: let error):
-                    if error.message == "Unexpected Error" {
-                        completion(.failure(error: .networkError))
-                    } else {
-                        completion(.failure(error: .internalError(message: error.message, error: nil)))
+                }
+            } else {
+                accountApi.legacyAccounts(address: wallet.binaryAddress) { response in
+                    switch response {
+                    case .success(response: let response):
+                        if let account = response.data.first {
+                            self.handleAccountSuccess(with: account.balance, completion: completion)
+                        } else {
+                            completion(.success(result: 0))
+                        }
+                        
+                    case .error(response: let error):
+                        self.handleAccountError(with: error, completion: completion)
                     }
                 }
             }
         }
     }
+
+    func handleAccountSuccess(with balance: String?, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
+        let balance = BigUInt(balance ?? "0") ?? BigUInt(0)
+        completion(.success(result: balance.asDecimal(exponent: LskWalletService.currencyExponent)))
+    }
+    func handleAccountError(with error: APIError, completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
+        if error.message == "Unexpected Error" {
+            completion(.failure(error: .networkError))
+        } else {
+            completion(.failure(error: .internalError(message: error.message, error: nil)))
+        }
+    }
     
     func getLskAddress(byAdamandAddress address: String, completion: @escaping (ApiServiceResult<String?>) -> Void) {
-        apiService.get(key: AdamantLskApiService.kvsAddress, sender: address, completion: completion)
+        apiService.get(key: LskWalletService.kvsAddress, sender: address, completion: completion)
     }
     
     func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
@@ -536,12 +596,12 @@ extension LskWalletService {
 // MARK: - Transactions
 extension LskWalletService {
     func getTransactions(_ completion: @escaping (ApiServiceResult<[Transactions.TransactionModel]>) -> Void) {
-        if let address = self.wallet?.address, let transactionApi = transactionApi {
+        if let address = self.lskWallet?.address, let transactionApi = serviceApi {
             defaultDispatchQueue.async {
                 transactionApi.transactions(senderIdOrRecipientId: address, limit: 100, offset: 0, sort: APIRequest.Sort("timestamp", direction: .descending)) { (response) in
                     switch response {
                     case .success(response: let result):
-                        completion(.success(result.data))
+                        completion(.success(result))
                         
                     case .error(response: let error):
                         completion(.failure(.internalError(message: error.message, error: nil)))
@@ -554,7 +614,7 @@ extension LskWalletService {
     }
     
     func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<Transactions.TransactionModel>) -> Void) {
-        guard let api = transactionApi else {
+        guard let api = serviceApi else {
             completion(ApiServiceResult.failure(ApiServiceError.networkError(error: AdamantError(message: "Problem with accessing LSK nodes, try later"))))
             return
         }
@@ -563,7 +623,7 @@ extension LskWalletService {
             api.transactions(id: hash, limit: 1, offset: 0) { (response) in
                 switch response {
                 case .success(response: let result):
-                    if let transaction = result.data.first {
+                    if let transaction = result.first {
                         completion(.success(transaction))
                     } else {
                         completion(.failure(.internalError(message: "No transaction", error: nil)))

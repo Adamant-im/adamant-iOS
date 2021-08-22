@@ -221,3 +221,52 @@ extension LocalTransaction: TransactionDetails {
     }
     
 }
+
+extension TransactionEntity: TransactionDetails {
+    static var defaultCurrencySymbol: String? { return LskWalletService.currencySymbol }
+    
+    var txId: String {
+        return id
+    }
+    
+    var senderAddress: String {
+        return LiskKit.Crypto.getBase32Address(from: senderPublicKey)
+    }
+    
+    var recipientAddress: String {
+        return self.asset.recipientAddress
+    }
+    
+    var dateValue: Date? {
+        return nil
+    }
+    
+    var amountValue: Decimal? {
+        let value = BigUInt(self.asset.amount)
+        
+        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+    }
+    
+    var feeValue: Decimal? {
+        let value = BigUInt(self.fee)
+        
+        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+    }
+    
+    var confirmationsValue: String? {
+        return nil
+    }
+    
+    var blockValue: String? {
+        return nil
+    }
+    
+    var isOutgoing: Bool {
+        return true
+    }
+    
+    var transactionStatus: TransactionStatus? {
+        return .pending
+    }
+    
+}

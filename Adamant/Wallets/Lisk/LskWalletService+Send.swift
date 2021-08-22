@@ -16,8 +16,14 @@ extension LocalTransaction: RawTransaction {
     }
 }
 
+extension TransactionEntity: RawTransaction {
+    var txHash: String? {
+        return id
+    }
+}
+
 extension LskWalletService: WalletServiceTwoStepSend {
-    typealias T = LocalTransaction
+    typealias T = TransactionEntity
     
     func transferViewController() -> UIViewController {
         guard let vc = router.get(scene: AdamantScene.Wallets.Lisk.transfer) as? LskTransferViewController else {
@@ -30,9 +36,9 @@ extension LskWalletService: WalletServiceTwoStepSend {
     
     
     // MARK: Create & Send
-    func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<LocalTransaction>) -> Void) {
+    func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<TransactionEntity>) -> Void) {
         // MARK: 1. Prepare
-        guard let wallet = lskWallet else {
+        guard let wallet = lskWallet, let binaryAddress = LiskKit.Crypto.getBinaryAddressFromBase32(recipient) else {
             completion(.failure(error: .notLogged))
             return
         }
@@ -42,26 +48,23 @@ extension LskWalletService: WalletServiceTwoStepSend {
         // MARK: Go background
         defaultDispatchQueue.async {
             // MARK: 2. Create local transaction
-            do {
-                let transaction = LocalTransaction(.transfer, lsk: amount.doubleValue, recipientId: recipient)
-                let signedTransaction = try transaction.signed(keyPair: keys)
-                
-                completion(.success(result: signedTransaction))
-            } catch {
-                completion(.failure(error: WalletServiceError.internalError(message: "Transaction sign error", error: error)))
-            }
+            
+            let transaction = TransactionEntity(amount: amount.doubleValue, fee: self.transactionFee.doubleValue, nonce: wallet.nounce, senderPublicKey: wallet.keyPair.publicKeyString, recipientAddress: binaryAddress)
+            let signedTransaction = transaction.signed(with: keys, for: self.netHash)
+            
+            completion(.success(result: signedTransaction))
         }
     }
     
-    func sendTransaction(_ transaction: LocalTransaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
+    func sendTransaction(_ transaction: TransactionEntity, completion: @escaping (WalletServiceResult<String>) -> Void) {
         defaultDispatchQueue.async {
-            self.transactionApi.submit(signedTransaction: transaction) { response in
+            self.transactionApi.submit(signedTransaction: transaction.requestOptions) { response in
                 switch response {
                 case .success(let result):
                     print(result.data.hashValue)
-                    print(result.data.message)
+                    print(result.data.id)
                     
-                    completion(.success(result: transaction.id ?? ""))
+                    completion(.success(result: result.data.id))
                 case .error(let error):
                     print("ERROR: " + error.message)
                     completion(.failure(error: .internalError(message: error.message, error: nil)))

@@ -20,8 +20,6 @@ class LskTransferViewController: TransferViewControllerBase {
     
     private var skipValueChange: Bool = false
     
-    static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
-    
     
     // MARK: Send
     
@@ -52,15 +50,14 @@ class LskTransferViewController: TransferViewControllerBase {
             
             switch result {
             case .success(let transaction):
-                // MARK: 1. Send adm report
-                if let reportRecipient = vc.admReportRecipient, let hash = transaction.id {
-                    self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
-                }
-                
-                // MARK: 2. Send LSK transaction
+                // MARK: Send LSK transaction
                 service.sendTransaction(transaction) { result in
                     switch result {
                     case .success(let hash):
+                        // MARK: Send adm report
+                        if let reportRecipient = vc.admReportRecipient {
+                            self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
+                        }
                         service.update()
                         
                         service.getTransaction(by: hash) { result in
@@ -126,11 +123,7 @@ class LskTransferViewController: TransferViewControllerBase {
     
     override var recipientAddress: String? {
         set {
-            if let recipient = newValue, let last = recipient.last, last != "L" {
-                _recipient = "\(recipient)L"
-            } else {
-                _recipient = newValue
-            }
+            _recipient = newValue
             
             if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
@@ -160,12 +153,10 @@ class LskTransferViewController: TransferViewControllerBase {
         let row = SuffixTextRow() {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = UIKeyboardType.numberPad
-            $0.cell.suffix = "L"
+            $0.cell.textField.keyboardType = UIKeyboardType.alphabet
             
             if let recipient = recipientAddress {
-                let trimmed = recipient.components(separatedBy: LskTransferViewController.invalidCharacters).joined()
-                $0.value = trimmed
+                $0.value = recipient
             }
             
             if recipientIsReadonly {
@@ -174,7 +165,7 @@ class LskTransferViewController: TransferViewControllerBase {
             }
             }.cellUpdate { (cell, row) in
                 if let text = cell.textField.text {
-                    cell.textField.text = text.components(separatedBy: LskTransferViewController.invalidCharacters).joined()
+                    cell.textField.text = text
                 }
             }.onChange { [weak self] row in
                 if let skip = self?.skipValueChange, skip {
@@ -183,18 +174,11 @@ class LskTransferViewController: TransferViewControllerBase {
                 }
                 
                 if let text = row.value {
-                    var trimmed = text.components(separatedBy: LskTransferViewController.invalidCharacters).joined()
-                    if let last = text.last, last == "L" {
-                        trimmed = text.replacingOccurrences(of: "L", with: "")
-                    }
+                    self?.skipValueChange = true
                     
-                    if text != trimmed {
-                        self?.skipValueChange = true
-                        
-                        DispatchQueue.main.async {
-                            row.value = trimmed
-                            row.updateCell()
-                        }
+                    DispatchQueue.main.async {
+                        row.value = text
+                        row.updateCell()
                     }
                 }
                 
