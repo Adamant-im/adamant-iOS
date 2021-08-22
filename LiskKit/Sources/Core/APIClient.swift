@@ -13,6 +13,11 @@ public enum Response<R: APIResponse> {
     case error(response: APIError)
 }
 
+public enum Result<R: Any> {
+    case success(response: R)
+    case error(response: APIError)
+}
+
 /// Type to represent request body/url options
 public typealias RequestOptions = [String: Any]
 
@@ -40,6 +45,11 @@ public struct APIClient {
 
     /// Client that connects to Betanet
     public static let betanet = APIClient(options: .betanet)
+    
+    public struct Service {
+        public static let mainnet = APIClient(options: .Service.mainnet)
+        public static let testnet = APIClient(options: .Service.testnet)
+    }
 
     // MARK: - Init
 

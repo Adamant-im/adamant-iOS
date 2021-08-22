@@ -44,6 +44,10 @@ extension Transactions {
 
         client.post(path: "transactions", options: signedTransaction.requestOptions, completionHandler: completionHandler)
     }
+    
+    public func submit(signedTransaction: RequestOptions, completionHandler: @escaping (Response<TransactionSubmitResponse>) -> Void) {
+        client.post(path: "transactions", options: signedTransaction, completionHandler: completionHandler)
+    }
 }
 
 // MARK: - Send
