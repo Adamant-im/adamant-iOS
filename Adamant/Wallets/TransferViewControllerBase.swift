@@ -325,8 +325,8 @@ class TransferViewControllerBase: FormViewController {
         }
         
         // Name row
-        let nameRow = defaultRowFor(baseRow: BaseRows.name)
-        section.append(nameRow)
+//        let nameRow = defaultRowFor(baseRow: BaseRows.name)
+//        section.append(nameRow)
         
         // Address row
         section.append(defaultRowFor(baseRow: BaseRows.address))
