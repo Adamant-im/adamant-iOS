@@ -108,7 +108,7 @@ class AdamantAccountService: AccountService {
         var wallets: [WalletService] = [
             AdmWalletService(),
             EthWalletService(),
-            LskWalletService(mainnet: true, origins: AdamantResources.lskServers),
+            LskWalletService(mainnet: true, nodes: AdamantResources.lskServers, services: AdamantResources.lskServiceServers),
             DogeWalletService(),
             DashWalletService()
         ]

@@ -79,13 +79,6 @@ class LskWalletService: WalletService {
     internal var serviceApi: Service!
     internal var nodeApi: LiskKit.Node!
     internal var netHash: String = ""
-
-    internal var isNewApi = true {
-        didSet {
-            lskWallet?.isNewApi = isNewApi
-            serviceApi = Service(client: serviceApi.client, version: isNewApi ? .v2 : .v1)
-        }
-    }
     
     private (set) var lskWallet: LskWallet? = nil
     
@@ -120,16 +113,20 @@ class LskWalletService: WalletService {
     // MARK: - Logic
     convenience init(mainnet: Bool = true) {
         let nodes = mainnet ? APIOptions.mainnet.nodes : APIOptions.testnet.nodes
-        self.init(mainnet: mainnet, nodes: nodes)
+        let serviceNode = mainnet ? APIOptions.Service.mainnet.nodes : APIOptions.Service.testnet.nodes
+        self.init(mainnet: mainnet, nodes: nodes, serviceNode: serviceNode)
     }
     
-    convenience init(mainnet: Bool, origins: [String]) {
-        self.init(mainnet: mainnet, nodes: origins.map { APINode(origin: $0) })
+    convenience init(mainnet: Bool, nodes: [String], services: [String]) {
+        self.init(mainnet: mainnet, nodes: nodes.map { APINode(origin: $0) }, serviceNode: services.map { APINode(origin: $0) })
     }
     
-    init(mainnet: Bool, nodes: [APINode]) {
+    init(mainnet: Bool, nodes: [APINode], serviceNode: [APINode]) {
         self.mainnet = mainnet
         self.nodes = nodes
+
+        let client = APIClient(options: APIOptions(nodes: serviceNode, nethash: mainnet ? .mainnet : .testnet, randomNode: true))
+        self.serviceApi = Service(client: client, version: .v2)
 
         setupApi()
         
@@ -219,30 +216,7 @@ class LskWalletService: WalletService {
     
     // MARK: - Tools
     func validate(address: String) -> AddressValidationResult {
-        return isNewApi ? validateAddress(address) : validateLegacyAddress(address)
-    }
-
-    func validateLegacyAddress(_ address: String) -> AddressValidationResult {
-        let full: String
-        let short: String
-        
-        guard let last = address.last else {
-            return .invalid
-        }
-        
-        if last == "L" {
-            full = address
-            short = address.replacingOccurrences(of: "L", with: "")
-        } else {
-            full = "\(address)L"
-            short = address
-        }
-        
-        if addressRegex.perfectMatch(with: full), let number = BigUInt(short), number < maxAddressNumber {
-            return .valid
-        } else {
-            return .invalid
-        }
+        return validateAddress(address)
     }
 
     func validateAddress(_ address: String) -> AddressValidationResult {
@@ -318,7 +292,6 @@ extension LskWalletService {
     }
     
     func setupApi() {
-        serviceApi = Service(client: mainnet ? .Service.mainnet : .Service.testnet, version: isNewApi ? .v2 : .v1)
         if mainnet {
             let group = DispatchGroup()
             group.enter()
@@ -375,7 +348,7 @@ extension LskWalletService: InitiatedWithPassphraseService {
             let address = LiskKit.Crypto.address(fromPublicKey: keyPair.publicKeyString)
             
             // MARK: 3. Update
-            let wallet = LskWallet(address: address, keyPair: keyPair, nounce: "", isNewApi: isNewApi)
+            let wallet = LskWallet(address: address, keyPair: keyPair, nounce: "", isNewApi: true)
             self.lskWallet = wallet
         } catch {
             print("\(error)")
@@ -501,30 +474,14 @@ extension LskWalletService {
         }
         
         defaultDispatchQueue.async {
-            if self.isNewApi {
-                accountApi.accounts(address: wallet.binaryAddress) { response in
-                    switch response {
-                    case .success(response: let response):
-                        self.lskWallet?.nounce = response.data.nonce
-                        self.handleAccountSuccess(with: response.data.balance, completion: completion)
-                        
-                    case .error(response: let error):
-                        self.handleAccountError(with: error, completion: completion)
-                    }
-                }
-            } else {
-                accountApi.legacyAccounts(address: wallet.binaryAddress) { response in
-                    switch response {
-                    case .success(response: let response):
-                        if let account = response.data.first {
-                            self.handleAccountSuccess(with: account.balance, completion: completion)
-                        } else {
-                            completion(.success(result: 0))
-                        }
-                        
-                    case .error(response: let error):
-                        self.handleAccountError(with: error, completion: completion)
-                    }
+            accountApi.accounts(address: wallet.binaryAddress) { response in
+                switch response {
+                case .success(response: let response):
+                    self.lskWallet?.nounce = response.data.nonce
+                    self.handleAccountSuccess(with: response.data.balance, completion: completion)
+                    
+                case .error(response: let error):
+                    self.handleAccountError(with: error, completion: completion)
                 }
             }
         }

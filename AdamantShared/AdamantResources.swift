@@ -32,7 +32,11 @@ struct AdamantResources {
     ]
     
     static let lskServers = [
-        "https://lisknode1.adamant.im"
+        "https://lisknode3.adamant.im"
+    ]
+    
+    static let lskServiceServers = [
+        "https://liskservice3.adamant.im"
     ]
     
     static let dogeServers: [URL] = [
