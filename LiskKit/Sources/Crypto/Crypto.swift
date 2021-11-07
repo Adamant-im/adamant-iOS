@@ -189,6 +189,10 @@ public struct Crypto {
         return UInt64(amount * Constants.fixedPoint)
     }
 
+    public static func fixedPoint(amount: Decimal) -> UInt64 {
+        return NSDecimalNumber(decimal: amount * Constants.fixedPointDecimal).uint64Value
+    }
+
     internal static func byteIdentifier(from bytes: [UInt8]) -> String {
         guard bytes.count >= 8 else { return "" }
         let leadingBytes = bytes[0..<8].reversed()

@@ -46,9 +46,10 @@ class LskWalletService: WalletService {
     var router: Router!
     
     // MARK: - Constants
-    let addressRegex = try! NSRegularExpression(pattern: "^([0-9]{2,22})L$", options: [])
-    let maxAddressNumber = BigUInt("18446744073709551615")
-    var transactionFee: Decimal = 0.1
+    var transactionFee: Decimal {
+        return transactionFeeRaw.asDecimal(exponent: LskWalletService.currencyExponent)
+    }
+    var transactionFeeRaw: BigUInt = BigUInt(integerLiteral: 141000)
     private (set) var enabled = true
     
     static var currencySymbol = "LSK"
@@ -56,7 +57,7 @@ class LskWalletService: WalletService {
     static let currencyExponent = -8
     
     static let kvsAddress = "lsk:address"
-    static let defaultFee = 0.1
+    static let defaultFee: BigUInt = 141000
 	
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -170,10 +171,11 @@ class LskWalletService: WalletService {
         serviceApi.getFees { result in
             switch result {
             case .success(response: let value):
-                let tempTransaction = TransactionEntity(amount: 100000000.0, fee: 0.1, nonce: wallet.nounce, senderPublicKey: wallet.keyPair.publicKeyString, recipientAddress: wallet.binaryAddress).signed(with: wallet.keyPair, for: self.netHash)
+                let tempTransaction = TransactionEntity(amount: 100000000.0, fee: 0.00141, nonce: wallet.nounce, senderPublicKey: wallet.keyPair.publicKeyString, recipientAddress: wallet.binaryAddress).signed(with: wallet.keyPair, for: self.netHash)
                 let value = tempTransaction.getFee(with: value.data.minFeePerByte)
-
-                self.transactionFee = BigUInt(value).asDecimal(exponent: LskWalletService.currencyExponent)
+                let fee = BigUInt(value)
+                
+                self.transactionFeeRaw = fee > LskWalletService.defaultFee ? fee : LskWalletService.defaultFee
             case .error:
                 break
             }

@@ -83,7 +83,7 @@ public struct TransactionEntity {
         self.signatures = signatures
     }
 
-    public init(amount: Double, fee: Double, nonce: String, senderPublicKey: String, recipientAddress: String) {
+    public init(amount: Decimal, fee: Decimal, nonce: String, senderPublicKey: String, recipientAddress: String) {
         let amount = Crypto.fixedPoint(amount: amount)
         let fee = Crypto.fixedPoint(amount: fee)
         self.init(amount: amount, fee: fee, nonce: nonce, senderPublicKey: senderPublicKey, recipientAddress: recipientAddress)

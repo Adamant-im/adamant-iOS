@@ -14,6 +14,7 @@ public struct Constants {
     public static let version = "2.0.0"
 
     public static let fixedPoint: Double = pow(10, 8)
+    public static let fixedPointDecimal: Decimal = pow(10, 8)
 
     public struct Fee {
         public static let transfer = UInt64(0.1 * fixedPoint)

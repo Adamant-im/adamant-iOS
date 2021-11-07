@@ -49,7 +49,7 @@ extension LskWalletService: WalletServiceTwoStepSend {
         defaultDispatchQueue.async {
             // MARK: 2. Create local transaction
             
-            let transaction = TransactionEntity(amount: amount.doubleValue, fee: self.transactionFee.doubleValue, nonce: wallet.nounce, senderPublicKey: wallet.keyPair.publicKeyString, recipientAddress: binaryAddress)
+            let transaction = TransactionEntity(amount: amount, fee: self.transactionFee, nonce: wallet.nounce, senderPublicKey: wallet.keyPair.publicKeyString, recipientAddress: binaryAddress)
             let signedTransaction = transaction.signed(with: keys, for: self.netHash)
             
             completion(.success(result: signedTransaction))
