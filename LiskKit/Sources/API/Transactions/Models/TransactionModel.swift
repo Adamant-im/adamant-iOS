@@ -10,16 +10,16 @@ import Foundation
 extension Transactions {
     
     public struct TransactionSubmitModel: APIModel {
-        public let id: String
+        public let transactionId: String
 
         // MARK: - Hashable
 
         public static func == (lhs: TransactionSubmitModel, rhs: TransactionSubmitModel) -> Bool {
-            return lhs.id == rhs.id
+            return lhs.transactionId == rhs.transactionId
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
+            hasher.combine(transactionId)
         }
     }
 
@@ -49,7 +49,7 @@ extension Transactions {
 
         public let signature: String
 
-        public let confirmations: UInt64
+        public var confirmations: UInt64?
 
         // MARK: - Hashable
 
@@ -63,6 +63,10 @@ extension Transactions {
         
         public func hash(into hasher: inout Hasher) {
             hasher.combine(id)
+        }
+        
+        public mutating func updateConfirmations(value: UInt64){
+            confirmations = value
         }
     }
 }

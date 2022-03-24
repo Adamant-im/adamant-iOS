@@ -225,6 +225,14 @@ extension String {
             return res + [UInt8(substring, radix: 16) ?? 0]
         }
     }
+    internal func allHexBytes() -> [UInt8] {
+        return (0..<count/2).reduce([]) { res, i in
+            let indexStart = index(startIndex, offsetBy: i * 2)
+            let indexEnd = index(indexStart, offsetBy: 2)
+            let substring = self[indexStart..<indexEnd]
+            return res + [UInt8(substring, radix: 16) ?? 0]
+        }
+    }
 }
 
 extension Sequence where Self.Element == UInt8 {

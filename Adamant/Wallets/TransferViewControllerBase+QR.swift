@@ -19,7 +19,14 @@ extension TransferViewControllerBase {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             qrReader.modalPresentationStyle = .overFullScreen
-            present(qrReader, animated: true, completion: nil)
+           // present(qrReader, animated: true, completion: nil)
+            if Thread.isMainThread {
+                self.present(qrReader, animated: true, completion: nil)
+            } else {
+                DispatchQueue.main.async {
+                    self.present(self.qrReader, animated: true, completion: nil)
+                }
+            }
             
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
@@ -41,7 +48,14 @@ extension TransferViewControllerBase {
             let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
-            present(alert, animated: true, completion: nil)
+           // present(alert, animated: true, completion: nil)
+            if Thread.isMainThread {
+                self.present(alert, animated: true, completion: nil)
+            } else {
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true, completion: nil)
+                }
+            }
             
         case .denied:
             let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotAuthorized, preferredStyle: .alert)
@@ -56,7 +70,14 @@ extension TransferViewControllerBase {
             
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
-            present(alert, animated: true, completion: nil)
+           // present(alert, animated: true, completion: nil)
+            if Thread.isMainThread {
+                self.present(alert, animated: true, completion: nil)
+            } else {
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true, completion: nil)
+                }
+            }
         @unknown default:
             break
         }

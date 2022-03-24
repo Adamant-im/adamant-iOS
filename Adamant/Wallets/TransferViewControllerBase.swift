@@ -208,11 +208,12 @@ class TransferViewControllerBase: FormViewController {
         guard
             let service = service,
             let balance = service.wallet?.balance,
-            balance > 0 else {
+            let minBalance = service.wallet?.minBalance,
+            balance > minBalance else {
             return 0
         }
         
-        let max = balance - service.transactionFee
+        let max = balance - service.transactionFee - minBalance
         
         return max >= 0 ? max : 0
     }
@@ -535,7 +536,14 @@ class TransferViewControllerBase: FormViewController {
         alert.addAction(cancelAction)
         alert.addAction(sendAction)
         alert.modalPresentationStyle = .overFullScreen
-        present(alert, animated: true, completion: nil)
+        if Thread.isMainThread {
+            present(alert, animated: true, completion: nil)
+        } else {
+            DispatchQueue.main.async {
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
+        //present(alert, animated: true, completion: nil)
     }
     
     

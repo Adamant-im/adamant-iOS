@@ -187,6 +187,11 @@ class DogeTransferViewController: TransferViewControllerBase {
             }
             
             self?.validateForm()
+        }.onCellSelection { [weak self] (cell, row) in
+            if let recipient = self?.recipientAddress {
+                let text = recipient
+                self?.shareValue(text, from: cell)
+            }
         }
         
         return row
@@ -233,5 +238,19 @@ class DogeTransferViewController: TransferViewControllerBase {
     
     override func defaultSceneTitle() -> String? {
         return String.adamantLocalized.sendDoge
+    }
+    
+    // MARK: - Tools
+    
+    func shareValue(_ value: String, from: UIView) {
+        dialogService.presentShareAlertFor(string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: from) { [weak self] in
+            guard let tableView = self?.tableView else {
+                return
+            }
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+        }
     }
 }

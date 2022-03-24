@@ -155,6 +155,10 @@ extension EthTransaction: TransactionDetails {
     var transactionStatus: TransactionStatus? {
         return receiptStatus.asTransactionStatus()
     }
+    
+    var blockHeight: UInt64? {
+        return nil
+    }
 }
 
 // MARK: - From EthereumTransaction

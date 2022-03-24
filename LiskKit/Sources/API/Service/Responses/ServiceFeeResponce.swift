@@ -10,4 +10,5 @@ import Foundation
 public struct ServiceFeeResponse: APIResponse {
 
     public let data: ServiceFeeModel
+    public let meta: ServiceMetaFeeModel
 }

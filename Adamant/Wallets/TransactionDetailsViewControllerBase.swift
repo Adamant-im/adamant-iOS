@@ -385,6 +385,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
+            
+            
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
         }.onCellSelection { [weak self] (cell, row) in
@@ -565,10 +567,14 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 return
             }
             
-            let safari = SFSafariViewController(url: url)
-            safari.preferredControlTintColor = UIColor.adamant.primary
-            safari.modalPresentationStyle = .overFullScreen
-            self?.present(safari, animated: true, completion: nil)
+            if #available(iOS 13.0, *) {
+                let safari = SFSafariViewController(url: url)
+                safari.preferredControlTintColor = UIColor.adamant.primary
+                safari.modalPresentationStyle = .overFullScreen
+                self?.present(safari, animated: true, completion: nil)
+            }else {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
         }
         
         actionsSection.append(explorerRow)

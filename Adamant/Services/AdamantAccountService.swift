@@ -115,8 +115,11 @@ class AdamantAccountService: AccountService {
         let erc20WalletServices = ERC20Token.supportedTokens.map { ERC20WalletService(token: $0) }
         wallets.append(contentsOf: erc20WalletServices)
         
+        
+        //LskWalletService(mainnet: false)
         // Testnet
-//        wallets.append(contentsOf: LskWalletService(mainnet: false))
+       // wallets.append(contentsOf: LskWalletService(mainnet: false))
+        
         return wallets
     }()
     

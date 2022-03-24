@@ -58,6 +58,8 @@ class LskWalletService: WalletService {
     
     static let kvsAddress = "lsk:address"
     static let defaultFee: BigUInt = 141000
+    
+    var lastHeight: UInt64 = 0
 	
     var tokenSymbol: String {
         return type(of: self).currencySymbol
@@ -171,6 +173,8 @@ class LskWalletService: WalletService {
         serviceApi.getFees { result in
             switch result {
             case .success(response: let value):
+                self.lastHeight = value.meta.lastBlockHeight
+                
                 let tempTransaction = TransactionEntity(amount: 100000000.0, fee: 0.00141, nonce: wallet.nounce, senderPublicKey: wallet.keyPair.publicKeyString, recipientAddress: wallet.binaryAddress).signed(with: wallet.keyPair, for: self.netHash)
                 let value = tempTransaction.getFee(with: value.data.minFeePerByte)
                 let fee = BigUInt(value)
@@ -348,7 +352,7 @@ extension LskWalletService: InitiatedWithPassphraseService {
         do {
             let keyPair = try LiskKit.Crypto.keyPair(fromPassphrase: passphrase, salt: "adm")
             let address = LiskKit.Crypto.address(fromPublicKey: keyPair.publicKeyString)
-            
+         
             // MARK: 3. Update
             let wallet = LskWallet(address: address, keyPair: keyPair, nounce: "", isNewApi: true)
             self.lskWallet = wallet
@@ -389,7 +393,6 @@ extension LskWalletService: InitiatedWithPassphraseService {
                 service.initialBalanceCheck = true
                 service.setState(.upToDate, silent: true)
                 service.update()
-                
                 completion(.success(result: eWallet))
                 
             case .failure(let error):
@@ -405,7 +408,6 @@ extension LskWalletService: InitiatedWithPassphraseService {
                     }
                     service.setState(.upToDate)
                     completion(.success(result: eWallet))
-                    
                 default:
                     service.setState(.upToDate)
                     completion(.failure(error: error))

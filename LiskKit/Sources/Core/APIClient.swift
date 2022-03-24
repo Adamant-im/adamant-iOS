@@ -115,7 +115,21 @@ public struct APIClient {
 
     /// Create a json data task
     private func dataTask<R>(_ request: URLRequest, completionHandler: @escaping (Response<R>) -> Void) -> URLSessionDataTask {
+        
+#if DEBUG
+        if let url = request.url {
+            print("url path=", url)
+        }
+#endif
         let task = urlSession.dataTask(with: request) { data, _, _ in
+#if DEBUG
+            if let data = data {
+                let str = String(decoding: data, as: UTF8.self)
+                print("response=", str)
+            }
+#endif
+           
+            
             let response: Response<R> = self.processRequestCompletion(data)
             DispatchQueue.main.async { completionHandler(response) }
         }
@@ -176,8 +190,13 @@ public struct APIClient {
         }
 
         guard let result = try? JSONDecoder().decode(R.self, from: data) else {
-            let error = try? JSONDecoder().decode(APIError.self, from: data)
-            return .error(response: error ?? .unknown)
+            if let error = try? JSONDecoder().decode(APIError.self, from: data) {
+                return .error(response: error)
+            }else if let error = try? JSONDecoder().decode(APIErrors.self, from: data),
+                     let first = error.errors.first {
+                return .error(response: first)
+            }
+            return .error(response: .unknown)
         }
 
         return .success(response: result)

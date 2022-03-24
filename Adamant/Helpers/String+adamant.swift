@@ -12,6 +12,7 @@ import UIKit
 struct AdamantAddress {
     let address: String
     let name: String?
+    let amount: String?
 }
 
 extension String {
@@ -26,8 +27,9 @@ extension String {
         }
 
         let name = queryItems.filter({$0.name == "label"}).first?.value
-
-        return AdamantAddress(address: address, name: name)
+        let amount = queryItems.filter({$0.name == "amount"}).first?.value
+        
+        return AdamantAddress(address: address, name: name, amount: amount)
     }
 
     func getLegacyAdamantAddress() -> AdamantAddress? {
@@ -65,7 +67,7 @@ extension String {
         }
         
         if let address = address {
-            return AdamantAddress(address: address, name: name)
+            return AdamantAddress(address: address, name: name, amount: "")
         } else {
             return nil
         }

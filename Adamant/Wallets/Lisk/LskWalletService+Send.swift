@@ -62,9 +62,12 @@ extension LskWalletService: WalletServiceTwoStepSend {
                 switch response {
                 case .success(let result):
                     print(result.data.hashValue)
-                    print(result.data.id)
+                    print(result.data.transactionId)
                     
-                    completion(.success(result: result.data.id))
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
+                        completion(.success(result: result.data.transactionId))
+                    }
+                    
                 case .error(let error):
                     print("ERROR: " + error.message)
                     completion(.failure(error: .internalError(message: error.message, error: nil)))

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import JavaScriptCore
 
 infix operator >>> : BitwiseShiftPrecedence
 
@@ -15,7 +16,8 @@ func >>> (lhs: Int64, rhs: Int64) -> Int64 {
 
 internal func generateKey(for fieldNumber: UInt32, with wireType: UInt32) -> [UInt8] {
     let value = (fieldNumber << 3) | wireType
-    return (Data() + value).bytes
+    let hValue = writeUInt32(value)
+    return hValue //(Data() + hValue).bytes
 }
 
 let msg: UInt8 = 0x80
@@ -24,15 +26,39 @@ let rest: UInt32 = 0x7f
 internal func writeUInt32(_ value: UInt32) -> [UInt8] {
     var result = [UInt8]()
     var value = value
+    var index = 0
     while (value > rest) {
         result.append(msg | UInt8((Int64((value & rest)) >>> 0)))
         value = UInt32((Int64(value) >>> 7) >>> 0)
+        index += 1
     }
 
     result.append(UInt8(value))
-
     return result
 };
+
+internal func writeUInt64(_ value: UInt64) -> [UInt8] {
+    var result = [UInt8]()
+    var value = value
+    var index = 0
+    while (value > UInt64(rest)) {
+        result.append(msg | UInt8((Int64((value & UInt64(rest))) )))
+        value = UInt64(Int64(value) >>> 7)
+        index += 1
+    }
+
+    result.append(UInt8(value))
+    return result
+};
+
+extension Data {
+    var bytes: Array<UInt8> {
+        let count = self.count / MemoryLayout<UInt8>.size
+         var byteArray = [UInt8](repeating: 0, count: count)
+        self.copyBytes(to: &byteArray, count:count)
+        return byteArray
+      }
+}
 
 public struct TransactionEntity {
 
@@ -44,13 +70,15 @@ public struct TransactionEntity {
         public func bytes() -> [UInt8] {
             var value = Data()
             value += generateKey(for: 1, with: 0)
-            value += amount
+            value += writeUInt64(amount)
             value += generateKey(for: 2, with: 2)
-            value += UInt32(recipientAddress.hexBytes().count)
-            value += recipientAddress.hexBytes()
+            value += writeUInt32(UInt32(recipientAddress.allHexBytes().count))
+            value += recipientAddress.allHexBytes()
             value += generateKey(for: 3, with: 2)
-            value += UInt32(data.bytes.count)
-            value += data
+            value += writeUInt32(UInt32(data.bytes.count))
+            if data.count > 0 {
+                value += data
+            }
             return value.bytes
         }
         
@@ -99,33 +127,41 @@ public struct TransactionEntity {
     
     public func bytes() -> [UInt8] {
         var value = Data()
-        
         value += generateKey(for: 1, with: 0)
-        value += moduleID
+        value += writeUInt32(moduleID)
         value += generateKey(for: 2, with: 0)
-        value += assetID
+        value += writeUInt32(assetID)
         value += generateKey(for: 3, with: 0)
-        value += fee
+        value += writeUInt64(nonce)
         value += generateKey(for: 4, with: 0)
-        value += nonce
+        value += writeUInt64(fee)
+        
         value += generateKey(for: 5, with: 2)
-        value += UInt32(senderPublicKey.hexBytes().count)
-        value += senderPublicKey.hexBytes()
+        value += writeUInt32(UInt32(senderPublicKey.allHexBytes().count))
+        value += senderPublicKey.allHexBytes()
         value += generateKey(for: 6, with: 2)
-        value += asset.bytes()
-
-//        if !signatures.isEmpty {
-//            value += generateKey(for: 7, with: 2)
-//            value += signatures.first?.hexBytes() ?? []
-//        }
-
+        let assetBytes = asset.bytes()
+        value += writeUInt32(UInt32(assetBytes.count))
+        value += assetBytes
+        
+        if !signatures.isEmpty {
+            signatures.forEach { sign in
+                value += generateKey(for: 7, with: 2)
+                value += writeUInt32(UInt32(sign.allHexBytes().count))
+                value += sign.allHexBytes()
+            }
+        }
+        
         return value.bytes
     }
     
     public func signature(with keyPair: KeyPair, for netHash: String) -> String {
-        let bytes = "LSK_TX".bytes + netHash.hexBytes() + bytes()
-//        let hash = SHA256(bytes).digest()
-        return keyPair.sign(bytes).hexString()
+        let bytesArray = bytes()
+        let bytes = netHash.allHexBytes() + bytesArray
+        
+        let signBytes = keyPair.sign(bytes)
+        let sign = signBytes.hexString()
+        return sign
     }
     
     public func signed(with keyPair: KeyPair, for netHash: String) -> TransactionEntity {

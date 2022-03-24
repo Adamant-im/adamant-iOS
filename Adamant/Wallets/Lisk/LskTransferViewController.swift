@@ -62,9 +62,9 @@ class LskTransferViewController: TransferViewControllerBase {
                         
                         service.getTransaction(by: hash) { result in
                             switch result {
-                            case .success(let transaction):
+                            case .success(var transaction):
                                 vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-
+                                transaction.updateConfirmations(value: service.lastHeight)
                                 if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController {
                                     detailsVc.transaction = transaction
                                     detailsVc.service = service
@@ -81,7 +81,7 @@ class LskTransferViewController: TransferViewControllerBase {
                                 }
 
                             case .failure(let error):
-                                if case let .internalError(message, _) = error, message == "No transaction" {
+                                if error.message.contains("does not exist") {
                                     vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
                                     if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController {
                                         detailsVc.transaction = transaction
@@ -105,7 +105,12 @@ class LskTransferViewController: TransferViewControllerBase {
                         }
                         
                     case .failure(let error):
-                        vc.dialogService.showRichError(error: error)
+                        if error.message.contains("does not meet the minimum remaining balance requirement") {
+                            let localizedErrorMessage = NSLocalizedString("TransactionSend.Minimum.Balance", comment: "Transaction send: recipient minimum remaining balance requirement")
+                            vc.dialogService.showWarning(withMessage: localizedErrorMessage)
+                        }else {
+                            vc.dialogService.showRichError(error: error)
+                        }
                     }
                 }
                 
@@ -183,7 +188,12 @@ class LskTransferViewController: TransferViewControllerBase {
                 }
                 
                 self?.validateForm()
-        }
+            }.onCellSelection { [weak self] (cell, row) in
+                if let recipient = self?.recipientAddress {
+                    let text = recipient
+                    self?.shareValue(text, from: cell)
+                }
+            }
         
         return row
     }
@@ -194,7 +204,7 @@ class LskTransferViewController: TransferViewControllerBase {
         }
         
         let parsedAddress: String
-        if address.hasPrefix("lisk:"), let firstIndex = address.firstIndex(of: ":") {
+        if address.hasPrefix("lisk:") || address.hasPrefix("lsk:"), let firstIndex = address.firstIndex(of: ":") {
             let index = address.index(firstIndex, offsetBy: 1)
             parsedAddress = String(address[index...])
         } else {
@@ -229,5 +239,20 @@ class LskTransferViewController: TransferViewControllerBase {
     
     override func defaultSceneTitle() -> String? {
         return String.adamantLocalized.sendLsk
+    }
+    
+    
+    // MARK: - Tools
+    
+    func shareValue(_ value: String, from: UIView) {
+        dialogService.presentShareAlertFor(string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: from) { [weak self] in
+            guard let tableView = self?.tableView else {
+                return
+            }
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+        }
     }
 }

@@ -20,5 +20,4 @@ public struct ServiceFeeModel: APIModel {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(minFeePerByte)
     }
-
 }
