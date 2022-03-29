@@ -46,7 +46,6 @@ enum AdamantAddressParam {
 
 class AdamantUriTools {
     static let AdamantProtocol = "adm"
-    static let AdamantHost = "https://msg.adamant.im"
     
     static func encode(request: AdamantUri) -> String {
         switch request {

@@ -115,21 +115,7 @@ public struct APIClient {
 
     /// Create a json data task
     private func dataTask<R>(_ request: URLRequest, completionHandler: @escaping (Response<R>) -> Void) -> URLSessionDataTask {
-        
-#if DEBUG
-        if let url = request.url {
-            print("url path=", url)
-        }
-#endif
         let task = urlSession.dataTask(with: request) { data, _, _ in
-#if DEBUG
-            if let data = data {
-                let str = String(decoding: data, as: UTF8.self)
-                print("response=", str)
-            }
-#endif
-           
-            
             let response: Response<R> = self.processRequestCompletion(data)
             DispatchQueue.main.async { completionHandler(response) }
         }

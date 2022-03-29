@@ -572,7 +572,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 safari.preferredControlTintColor = UIColor.adamant.primary
                 safari.modalPresentationStyle = .overFullScreen
                 self?.present(safari, animated: true, completion: nil)
-            }else {
+            } else {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }
         }

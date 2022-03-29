@@ -325,10 +325,6 @@ class TransferViewControllerBase: FormViewController {
             $0.tag = Sections.recipient.tag
         }
         
-        // Name row
-//        let nameRow = defaultRowFor(baseRow: BaseRows.name)
-//        section.append(nameRow)
-        
         // Address row
         section.append(defaultRowFor(baseRow: BaseRows.address))
         
@@ -543,7 +539,6 @@ class TransferViewControllerBase: FormViewController {
                 self.present(alert, animated: true, completion: nil)
             }
         }
-        //present(alert, animated: true, completion: nil)
     }
     
     
@@ -819,6 +814,20 @@ extension TransferViewControllerBase {
                 }
             }.onCellSelection { [weak self] (cell, row) in
                 self?.confirmSendFunds()
+            }
+        }
+    }
+    
+    // MARK: - Tools
+    
+    func shareValue(_ value: String, from: UIView) {
+        dialogService.presentShareAlertFor(string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: from) { [weak self] in
+            guard let tableView = self?.tableView else {
+                return
+            }
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
             }
         }
     }

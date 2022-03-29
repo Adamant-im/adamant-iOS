@@ -172,7 +172,7 @@ extension Transactions.TransactionModel: TransactionDetails {
             let conf = (confirmations - self.height) + 1
             if conf > 1 {
                 return .success
-            }else {
+            } else {
                 return .pending
             }
         }
