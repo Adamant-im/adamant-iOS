@@ -22,7 +22,7 @@ extension Notification.Name {
     }
 }
 
-protocol LskApiService: class {
+protocol LskApiService: AnyObject {
     
     var account: LskAccount? { get }
     

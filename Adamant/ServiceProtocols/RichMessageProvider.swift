@@ -14,7 +14,7 @@ enum CellSource {
     case nib(nib: UINib)
 }
 
-protocol RichMessageProvider: class {
+protocol RichMessageProvider: AnyObject {
     /// Lowercased!!
     static var richMessageType: String { get }
     

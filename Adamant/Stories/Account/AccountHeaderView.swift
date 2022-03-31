@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol AccountHeaderViewDelegate: class {
+protocol AccountHeaderViewDelegate: AnyObject {
     func addressLabelTapped(from: UIView)
 }
 

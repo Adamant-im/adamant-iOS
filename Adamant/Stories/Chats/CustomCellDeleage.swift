@@ -9,22 +9,22 @@
 import Foundation
 
 // MARK: - Custom cell
-protocol TapRecognizerCustomCell: class {
+protocol TapRecognizerCustomCell: AnyObject {
     /// Must be a weak reference
     var delegate: CustomCellDelegate? { get set }
 }
 
-protocol CustomCellDelegate: class {
+protocol CustomCellDelegate: AnyObject {
     func didTapCustomCell(_ cell: TapRecognizerCustomCell)
 }
 
 // MARK: - Transfer cell
-protocol TapRecognizerTransferCell: class {
+protocol TapRecognizerTransferCell: AnyObject {
     // Must be a weak reference
     var delegate: TransferCellDelegate? { get set }
 }
 
-protocol TransferCellDelegate: class {
+protocol TransferCellDelegate: AnyObject {
     func didTapTransferCell(_ cell: TapRecognizerTransferCell)
     func didTapTransferCellStatus(_ cell: TapRecognizerTransferCell)
 }

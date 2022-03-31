@@ -16,7 +16,7 @@ extension String.adamantLocalized {
     }
 }
 
-protocol WalletViewControllerDelegate: class {
+protocol WalletViewControllerDelegate: AnyObject {
     func walletViewControllerSelectedRow(_ viewController: WalletViewControllerBase)
 }
 

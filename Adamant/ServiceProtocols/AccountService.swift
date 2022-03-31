@@ -143,7 +143,7 @@ extension AccountServiceError: RichError {
 
 
 // MARK: - Protocol
-protocol AccountService: class {
+protocol AccountService: AnyObject {
     // MARK: State
     
     var state: AccountServiceState { get }

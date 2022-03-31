@@ -24,7 +24,7 @@ public struct Accounts: APIService {
 extension Accounts {
 
     /// Retrieve accounts
-    public func accounts(address: String? = nil, publicKey: String? = nil, secondPublicKey: String? = nil, username: String? = nil, limit: Int? = nil, offset: Int? = nil, sort: APIRequest.Sort? = nil, completionHandler: @escaping (Response<AccountsResponse>) -> Void) {
+    public func legacyAccounts(address: String? = nil, publicKey: String? = nil, secondPublicKey: String? = nil, username: String? = nil, limit: Int? = nil, offset: Int? = nil, sort: APIRequest.Sort? = nil, completionHandler: @escaping (Response<LegacyAccountsResponse>) -> Void) {
         var options: RequestOptions = [:]
         if let value = address { options["address"] = value }
         if let value = publicKey { options["publicKey"] = value }
@@ -35,5 +35,11 @@ extension Accounts {
         if let value = sort?.value { options["sort"] = value }
 
         client.get(path: "accounts", options: options, completionHandler: completionHandler)
+    }
+
+    // New API
+
+    public func accounts(address: String, completionHandler: @escaping (Response<AccountsResponse>) -> Void) {
+        client.get(path: "accounts/\(address)", options: nil, completionHandler: completionHandler)
     }
 }

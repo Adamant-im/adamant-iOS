@@ -12,10 +12,27 @@ import UIKit
 struct AdamantAddress {
     let address: String
     let name: String?
+    let amount: String?
 }
 
 extension String {
     func getAdamantAddress() -> AdamantAddress? {
+        guard
+            let urlString = self.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+            let components = URLComponents(string: urlString),
+            components.host == "msg.adamant.im",
+            let queryItems = components.queryItems,
+            let address = queryItems.filter({$0.name == "address"}).first?.value else {
+            return nil
+        }
+
+        let name = queryItems.filter({$0.name == "label"}).first?.value
+        let amount = queryItems.filter({$0.name == "amount"}).first?.value
+        
+        return AdamantAddress(address: address, name: name, amount: amount)
+    }
+
+    func getLegacyAdamantAddress() -> AdamantAddress? {
         let address: String?
         var name: String? = nil
         
@@ -27,6 +44,8 @@ extension String {
                 if let params = params {
                     for param in params {
                         switch param {
+                        case .address:
+                            break
                         case .label(let label):
                             name = label
                             break
@@ -48,7 +67,7 @@ extension String {
         }
         
         if let address = address {
-            return AdamantAddress(address: address, name: name)
+            return AdamantAddress(address: address, name: name, amount: "")
         } else {
             return nil
         }

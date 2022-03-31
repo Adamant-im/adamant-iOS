@@ -23,7 +23,7 @@ extension BigInt {
 
 extension BigUInt {
     func asDecimal(exponent: Int) -> Decimal {
-        let decim = Decimal(floatLiteral: Double(self))
+        let decim = Decimal(string: String(self)) ?? 0
         
         if exponent != 0 {
             return Decimal(sign: .plus, exponent: exponent, significand: decim)

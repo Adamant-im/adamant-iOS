@@ -83,7 +83,7 @@ extension AddressBookServiceError: RichError {
 
 
 // MARK: -
-protocol AddressBookService: class {
+protocol AddressBookService: AnyObject {
     // MARK: Work with Address book
     func set(name: String, for: String)
     var addressBook: [String:String] { get }

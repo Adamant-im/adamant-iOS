@@ -82,28 +82,40 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
     
     func startUpdate() {
         timer?.invalidate()
+        update()
         timer = Timer.scheduledTimer(withTimeInterval: autoupdateInterval, repeats: true) { [weak self] _ in
-            guard let id = self?.transaction?.txId, let service = self?.service else {
-                return
-            }
-            
-            service.getTransaction(by: id) { result in
-                switch result {
-                case .success(let trs):
-                    self?.transaction = trs
-                    
-                    DispatchQueue.main.async {
-                        self?.tableView.reloadData()
-                    }
-                    
-                case .failure:
-                    break
-                }
-            }
+            self?.update()
         }
     }
     
     func stopUpdate() {
         timer?.invalidate()
+    }
+    
+    func update(){
+        guard let id = self.transaction?.txId, let service = self.service else {
+            return
+        }
+        service.getTransaction(by: id) { result in
+            switch result {
+            case .success(var trs):
+                service.serviceApi.getFees { result in
+                    switch result {
+                    case .success(response: let value):
+                        let lastHeight = value.meta.lastBlockHeight
+                        trs.updateConfirmations(value: lastHeight)
+                        self.transaction = trs
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
+                    case .error:
+                        break
+                    }
+                }
+                
+            case .failure:
+                break
+            }
+        }
     }
 }

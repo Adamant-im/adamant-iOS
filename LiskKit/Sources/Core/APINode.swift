@@ -34,7 +34,7 @@ extension Array where Element == APINode {
 
     /// Testnet nodes
     public static let testnet: [APINode] = [
-        .init(origin: "http://testnet.lisk.io:7000")
+        .init(origin: "https://testnet.lisk.io")
     ]
 
     /// Betanet nodes
@@ -42,6 +42,16 @@ extension Array where Element == APINode {
         .init(origin: "http://94.237.42.109:5000"),
         .init(origin: "http://83.136.252.99:5000")
     ]
+
+    public struct Service {
+        public static let mainnet: [APINode] = [
+            .init(origin: "https://service.lisk.io")
+        ]
+        public static let testnet: [APINode] = [
+            .init(origin: "https://testnet-service.lisk.io")
+        ]
+    }
+    
 }
 
 extension Array where Element == APINode {

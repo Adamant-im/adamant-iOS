@@ -13,4 +13,9 @@ extension Transactions {
 
         public let data: APIMessageModel
     }
+    
+    public struct TransactionSubmitResponse: APIResponse {
+        
+        public let data: TransactionSubmitModel
+    }
 }

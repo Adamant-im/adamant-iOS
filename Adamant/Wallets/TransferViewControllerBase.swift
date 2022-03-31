@@ -13,7 +13,7 @@ import QRCodeReader
 
 // MARK: - Transfer Delegate Protocol
 
-protocol TransferViewControllerDelegate: class {
+protocol TransferViewControllerDelegate: AnyObject {
     func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?)
 }
 
@@ -208,11 +208,12 @@ class TransferViewControllerBase: FormViewController {
         guard
             let service = service,
             let balance = service.wallet?.balance,
-            balance > 0 else {
+            let minBalance = service.wallet?.minBalance,
+            balance > minBalance else {
             return 0
         }
         
-        let max = balance - service.transactionFee
+        let max = balance - service.transactionFee - minBalance
         
         return max >= 0 ? max : 0
     }
@@ -323,10 +324,6 @@ class TransferViewControllerBase: FormViewController {
         let section = Section(Sections.recipient.localized) {
             $0.tag = Sections.recipient.tag
         }
-        
-        // Name row
-        let nameRow = defaultRowFor(baseRow: BaseRows.name)
-        section.append(nameRow)
         
         // Address row
         section.append(defaultRowFor(baseRow: BaseRows.address))
@@ -535,7 +532,13 @@ class TransferViewControllerBase: FormViewController {
         alert.addAction(cancelAction)
         alert.addAction(sendAction)
         alert.modalPresentationStyle = .overFullScreen
-        present(alert, animated: true, completion: nil)
+        if Thread.isMainThread {
+            present(alert, animated: true, completion: nil)
+        } else {
+            DispatchQueue.main.async {
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
     }
     
     
@@ -811,6 +814,20 @@ extension TransferViewControllerBase {
                 }
             }.onCellSelection { [weak self] (cell, row) in
                 self?.confirmSendFunds()
+            }
+        }
+    }
+    
+    // MARK: - Tools
+    
+    func shareValue(_ value: String, from: UIView) {
+        dialogService.presentShareAlertFor(string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: from) { [weak self] in
+            guard let tableView = self?.tableView else {
+                return
+            }
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                tableView.deselectRow(at: indexPath, animated: true)
             }
         }
     }

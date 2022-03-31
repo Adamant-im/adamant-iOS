@@ -36,4 +36,8 @@ extension Node {
     public func status(completionHandler: @escaping (Response<NodeStatusResponse>) -> Void) {
         client.get(path: "node/status", completionHandler: completionHandler)
     }
+    
+    public func info(completionHandler: @escaping (Response<NodeInfoResponse>) -> Void) {
+        client.get(path: "node/info", completionHandler: completionHandler)
+    }
 }

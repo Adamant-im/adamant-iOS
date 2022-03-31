@@ -10,13 +10,30 @@ import Foundation
 import LiskKit
 
 class LskWallet: WalletAccount {
-    let address: String
+
+    var address: String {
+        return isNewApi ? lisk32Address : legacyAddress
+    }
+
+    var binaryAddress: String {
+        return isNewApi ? LiskKit.Crypto.getBinaryAddressFromBase32(lisk32Address) ?? "" : legacyAddress
+    }
+
+    let legacyAddress: String
+    let lisk32Address: String
     let keyPair: KeyPair
     var balance: Decimal = 0.0
     var notifications: Int = 0
+    var isNewApi: Bool = true
+    var nounce: String
+    var minBalance: Decimal = 0.05
     
-    init(address: String, keyPair: KeyPair) {
-        self.address = address
+    init(address: String, keyPair: KeyPair, nounce: String, isNewApi: Bool) {
+        self.legacyAddress = address
         self.keyPair = keyPair
+        self.lisk32Address = LiskKit.Crypto.getBase32Address(from: keyPair.publicKeyString)
+        self.isNewApi = isNewApi
+        self.nounce = nounce
     }
+
 }

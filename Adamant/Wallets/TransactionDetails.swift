@@ -31,6 +31,8 @@ protocol TransactionDetails {
     /// The confirmations of the transaction.
     var confirmationsValue: String? { get }
     
+    var blockHeight: UInt64? { get }
+    
     /// The block of the transaction.
     var blockValue: String? { get }
     

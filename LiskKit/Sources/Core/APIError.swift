@@ -8,6 +8,25 @@
 import Foundation
 
 /// Protocol describing an error
+public struct APIErrors: Decodable {
+
+    public let errors: [APIError]
+
+    private enum Keys: String, CodingKey {
+        case errors
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: Keys.self)
+            self.errors = try container.decode([APIError].self, forKey: .errors)
+    }
+    
+    public init(errors: [APIError]) {
+        self.errors = errors
+    }
+}
+
+/// Protocol describing an error
 public struct APIError {
 
     public let message: String

@@ -119,6 +119,7 @@ class LskTransactionsViewController: TransactionsListViewControllerBase {
 }
 
 extension Transactions.TransactionModel: TransactionDetails {
+    
     static var defaultCurrencySymbol: String? { return LskWalletService.currencySymbol }
     
     var txId: String {
@@ -126,7 +127,7 @@ extension Transactions.TransactionModel: TransactionDetails {
     }
     
     var dateValue: Date? {
-        return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
+        return Date(timeIntervalSince1970: TimeInterval(self.timestamp))
     }
     
     var amountValue: Decimal? {
@@ -142,7 +143,17 @@ extension Transactions.TransactionModel: TransactionDetails {
     }
     
     var confirmationsValue: String? {
-        return "\(self.confirmations)"
+        guard let confirmations = confirmations else { return "0" }
+        if confirmations < self.height { return "0" }
+        if confirmations > 0 {
+            return "\(confirmations - self.height + 1)"
+        }
+        
+        return "\(confirmations)"
+    }
+    
+    var blockHeight: UInt64? {
+        return self.height
     }
     
     var blockValue: String? {
@@ -154,8 +165,16 @@ extension Transactions.TransactionModel: TransactionDetails {
     }
     
     var transactionStatus: TransactionStatus? {
-        if confirmations >= 1 {
-            return .success
+        guard let confirmations = confirmations else { return .pending }
+        if confirmations < self.height { return .pending }
+        
+        if confirmations > 0 && self.height > 0 {
+            let conf = (confirmations - self.height) + 1
+            if conf > 1 {
+                return .success
+            } else {
+                return .pending
+            }
         }
         return .pending
     }
@@ -169,11 +188,12 @@ extension Transactions.TransactionModel: TransactionDetails {
     }
 
     var sentDate: Date {
-        return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
+        return Date(timeIntervalSince1970: TimeInterval(self.timestamp))
     }
 }
 
 extension LocalTransaction: TransactionDetails {
+
     static var defaultCurrencySymbol: String? { return LskWalletService.currencySymbol }
     
     var txId: String {
@@ -189,7 +209,7 @@ extension LocalTransaction: TransactionDetails {
     }
     
     var dateValue: Date? {
-        return Date(timeIntervalSince1970: TimeInterval(self.timestamp) + Constants.Time.epochSeconds)
+        return Date(timeIntervalSince1970: TimeInterval(self.timestamp))
     }
     
     var amountValue: Decimal? {
@@ -205,6 +225,64 @@ extension LocalTransaction: TransactionDetails {
     }
     
     var confirmationsValue: String? {
+        return nil
+    }
+    
+    var blockHeight: UInt64? {
+        return nil
+    }
+    
+    var blockValue: String? {
+        return nil
+    }
+    
+    var isOutgoing: Bool {
+        return true
+    }
+    
+    var transactionStatus: TransactionStatus? {
+        return .pending
+    }
+    
+}
+
+extension TransactionEntity: TransactionDetails {
+    
+    static var defaultCurrencySymbol: String? { return LskWalletService.currencySymbol }
+    
+    var txId: String {
+        return id
+    }
+    
+    var senderAddress: String {
+        return LiskKit.Crypto.getBase32Address(from: senderPublicKey)
+    }
+    
+    var recipientAddress: String {
+        return self.asset.recipientAddress
+    }
+    
+    var dateValue: Date? {
+        return nil
+    }
+    
+    var amountValue: Decimal? {
+        let value = BigUInt(self.asset.amount)
+        
+        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+    }
+    
+    var feeValue: Decimal? {
+        let value = BigUInt(self.fee)
+        
+        return value.asDecimal(exponent: LskWalletService.currencyExponent)
+    }
+    
+    var confirmationsValue: String? {
+        return nil
+    }
+    
+    var blockHeight: UInt64? {
         return nil
     }
     

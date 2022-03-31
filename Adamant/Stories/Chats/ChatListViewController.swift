@@ -746,8 +746,15 @@ extension ChatListViewController {
                 completionHandler(false)
                 return
             }
-            
-            let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+
+            let params: [AdamantAddressParam]?
+            if let name = partner.name {
+                params = [.label(name)]
+            } else {
+                params = nil
+            }
+
+            let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: params))
             
             if partner.isSystem {
                 self?.dialogService.presentShareAlertFor(string: address,

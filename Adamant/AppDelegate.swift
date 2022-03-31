@@ -115,6 +115,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 accounts.viewControllers = [account]
             }
             
+            if #available(iOS 13.0, *) {
+                let tabBarAppearance: UITabBarAppearance = UITabBarAppearance()
+                tabBarAppearance.configureWithDefaultBackground()
+                UITabBar.appearance().standardAppearance = tabBarAppearance
+
+                if #available(iOS 15.0, *) {
+                    UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+                }
+            }
+            
             tabbar.setViewControllers([chats, accounts], animated: false)
         }
         

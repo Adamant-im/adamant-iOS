@@ -204,6 +204,11 @@ class ERC20TransferViewController: TransferViewControllerBase {
                 }
                 
                 self?.validateForm()
+        }.onCellSelection { [weak self] (cell, row) in
+            if let recipient = self?.recipientAddress {
+                let text = recipient
+                self?.shareValue(text, from: cell)
+            }
         }
         
         return row

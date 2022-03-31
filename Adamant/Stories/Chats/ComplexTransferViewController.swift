@@ -9,7 +9,7 @@
 import UIKit
 import Parchment
 
-protocol ComplexTransferViewControllerDelegate: class {
+protocol ComplexTransferViewControllerDelegate: AnyObject {
     func complexTransferViewController(_ viewController: ComplexTransferViewController, didFinishWithTransfer: TransactionDetails?, detailsViewController: UIViewController?)
 }
 

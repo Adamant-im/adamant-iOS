@@ -142,7 +142,7 @@ extension NotificationsServiceError: RichError {
     }
 }
 
-protocol NotificationsService: class {
+protocol NotificationsService: AnyObject {
     var notificationsMode: NotificationsMode { get }
     
     func setNotificationsMode(_ mode: NotificationsMode, completion: ((NotificationsServiceResult) -> Void)?)
