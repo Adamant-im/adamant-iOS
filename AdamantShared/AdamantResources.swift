@@ -32,7 +32,11 @@ struct AdamantResources {
     ]
     
     static let lskServers = [
-        "https://lisknode1.adamant.im"
+        "https://lisknode3.adamant.im"
+    ]
+    
+    static let lskServiceServers = [
+        "https://liskservice3.adamant.im"
     ]
     
     static let dogeServers: [URL] = [
@@ -47,7 +51,7 @@ struct AdamantResources {
     
     // MARK: ADAMANT Addresses
     static let supportEmail = "pr@adamant.im"
-    static let ansReadmeUrl = "https://github.com/Adamant-im/AdamantNotificationService/blob/master/README.md"
+    static let ansReadmeUrl = "https://github.com/Adamant-im/adamant-notificationService"
     
     // MARK: Contacts
     struct contacts {
@@ -87,7 +91,7 @@ struct AdamantResources {
     //    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
     
     // MARK: LSK
-    static let liskExplorerAddress = "https://explorer.lisk.io/tx/"
+    static let liskExplorerAddress = "https://liskscan.com/transaction/" //"https://explorer.lisk.io/tx/"
     //    static let liskExplorerAddress = "https://testnet-explorer.lisk.io/tx/" // LISK Testnet
     
     static let dogeExplorerAddress = "https://dogechain.info/tx/"

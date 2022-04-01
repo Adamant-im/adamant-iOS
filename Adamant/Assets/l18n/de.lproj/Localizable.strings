@@ -733,6 +733,9 @@
 /* Transaction details: date row. */
 "TransactionDetailsScene.Row.Date" = "Datum";
 
+/* Transaction send: recipient minimum remaining balance requirement */
+"TransactionSend.Minimum.Balance" = "Der Empfänger muss mindestens 0,05 LSK haben – Senden Sie mehr Token";
+
 /* Transaction details: 'Open transaction in explorer' row. */
 "TransactionDetailsScene.Row.Explorer" = "Im Explorer öffnen";
 

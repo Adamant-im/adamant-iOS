@@ -24,7 +24,7 @@ extension Notification.Name {
     }
 }
 
-protocol SecuredStore: class {
+protocol SecuredStore: AnyObject {
     func get(_ key: String) -> String?
     func getArray(_ key: String) -> [String]?
     func set(_ value: String, for key: String)

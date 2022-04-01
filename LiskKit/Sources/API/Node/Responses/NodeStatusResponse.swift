@@ -13,4 +13,9 @@ extension Node {
 
         public let data: NodeStatusModel
     }
+    
+    public struct NodeInfoResponse: APIResponse {
+
+        public let data: NodeInfoModel
+    }
 }

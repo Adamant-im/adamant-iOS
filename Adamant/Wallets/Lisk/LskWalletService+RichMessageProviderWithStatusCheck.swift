@@ -17,8 +17,10 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
         
         getTransaction(by: hash) { result in
             switch result {
-            case .success(let lskTransaction):
+            case .success(var lskTransaction):
                 // MARK: Check status
+                lskTransaction.updateConfirmations(value: self.lastHeight)
+                
                 guard let status = lskTransaction.transactionStatus else {
                     completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: nil)))
                     return
@@ -66,7 +68,7 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
                 completion(.success(result: .success))
                 
             case .failure(let error):
-                if case let .internalError(message, _) = error, message == "No transaction" {
+                if error.message.contains("does not exist") {
                     let timeAgo = -1 * date.timeIntervalSinceNow
                     
                     let result: TransactionStatus

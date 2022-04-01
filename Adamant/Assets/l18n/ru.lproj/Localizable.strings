@@ -784,6 +784,9 @@
 /* Transaction details: 'Open transaction in explorer' row. */
 "TransactionDetailsScene.Row.Explorer" = "Открыть в Explorer";
 
+/* Transaction send: recipient minimum remaining balance requirement */
+"TransactionSend.Minimum.Balance" = "На кошельке получателя должно быть больше 0.05 LSK — Отправьте больше токенов";
+
 /* Transaction details: fee row. */
 "TransactionDetailsScene.Row.Fee" = "Комиссия";
 

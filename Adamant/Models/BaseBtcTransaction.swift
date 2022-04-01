@@ -25,6 +25,8 @@ class BaseBtcTransaction: TransactionDetails {
     let isOutgoing: Bool
     let transactionStatus: TransactionStatus?
     
+    var blockHeight: UInt64?
+    
     required init(txId: String, dateValue: Date?, blockValue: String?, senderAddress: String, recipientAddress: String, amountValue: Decimal, feeValue: Decimal?, confirmationsValue: String?, isOutgoing: Bool, transactionStatus: TransactionStatus?) {
         self.txId = txId
         self.dateValue = dateValue
@@ -36,5 +38,6 @@ class BaseBtcTransaction: TransactionDetails {
         self.confirmationsValue = confirmationsValue
         self.isOutgoing = isOutgoing
         self.transactionStatus = transactionStatus
+        self.blockHeight = nil
     }
 }

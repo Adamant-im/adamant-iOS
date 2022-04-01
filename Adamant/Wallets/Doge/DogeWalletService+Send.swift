@@ -145,6 +145,10 @@ extension BitcoinKit.Transaction: TransactionDetails {
         return true
     }
     
+    var blockHeight: UInt64? {
+        return nil
+    }
+    
     var transactionStatus: TransactionStatus? {
         return .pending
     }

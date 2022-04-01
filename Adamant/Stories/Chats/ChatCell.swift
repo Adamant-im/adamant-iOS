@@ -9,7 +9,7 @@
 import Foundation
 import MessageKit
 
-protocol ChatCell: class {
+protocol ChatCell: AnyObject {
 //    var bubbleStyle: MessageStyle { get set }
     var bubbleBackgroundColor: UIColor? { get set }
 }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol AdamantCore: class {
+protocol AdamantCore: AnyObject {
     // MARK: - Keys
     func createHashFor(passphrase: String) -> String?
     func createKeypairFor(passphrase: String) -> Keypair?

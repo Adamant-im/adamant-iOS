@@ -35,4 +35,8 @@ extension BaseTransaction: TransactionDetails {
             return 0
         }
     }
+    
+    var blockHeight: UInt64? {
+        return nil
+    }
 }

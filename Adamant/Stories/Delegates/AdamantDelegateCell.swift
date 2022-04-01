@@ -10,7 +10,7 @@ import UIKit
 
 
 // MARK: Cell's Delegate
-protocol AdamantDelegateCellDelegate: class {
+protocol AdamantDelegateCellDelegate: AnyObject {
     func delegateCell(_ cell: AdamantDelegateCell, didChangeCheckedStateTo state: Bool)
 }
 

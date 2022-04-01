@@ -34,7 +34,7 @@ extension String.adamantLocalized {
 
 
 // MARK: - Delegate
-protocol NewChatViewControllerDelegate: class {
+protocol NewChatViewControllerDelegate: AnyObject {
     func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount)
 }
 
@@ -337,6 +337,8 @@ class NewChatViewController: FormViewController {
         case .address(address: let addr, params: let params):
             if let params = params?.first {
                 switch params {
+                case .address:
+                    break
                 case .label(label: let label):
                     startNewChat(with: addr, name: label)
                 }
@@ -475,6 +477,9 @@ extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerCo
         if codes.count > 0 {
             for aCode in codes {
                 if let admAddress = aCode.getAdamantAddress() {
+                    startNewChat(with: admAddress.address, name: admAddress.name)
+                    return
+                } else if let admAddress = aCode.getLegacyAdamantAddress() {
                     startNewChat(with: admAddress.address, name: admAddress.name)
                     return
                 }

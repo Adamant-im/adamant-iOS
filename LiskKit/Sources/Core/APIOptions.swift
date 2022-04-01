@@ -41,4 +41,12 @@ extension APIOptions {
 
     /// Betanet options
     public static let betanet: APIOptions = .init(nodes: .betanet, nethash: .mainnet, randomNode: true)
+    
+    public struct Service {
+        /// Mainnet options
+        public static let mainnet: APIOptions = .init(nodes: .Service.mainnet, nethash: .mainnet, randomNode: true)
+
+        /// Testnet options
+        public static let testnet: APIOptions = .init(nodes: .Service.testnet, nethash: .testnet, randomNode: true)
+    }
 }

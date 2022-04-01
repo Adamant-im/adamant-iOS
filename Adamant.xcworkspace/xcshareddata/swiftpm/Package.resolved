@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
         "state": {
           "branch": null,
-          "revision": "4d19ad82f80cc71ff829b941ded114c56f4f604c",
-          "version": "5.4.2"
+          "revision": "d120af1e8638c7da36c8481fd61a66c0c08dc4fc",
+          "version": "5.4.4"
         }
       },
       {
@@ -78,8 +78,8 @@
         "repositoryURL": "https://github.com/xmartlabs/Eureka.git",
         "state": {
           "branch": null,
-          "revision": "523af88efc83cdaf39b415446be1ca1529f5664d",
-          "version": "5.3.3"
+          "revision": "975e8d5e0ea3c86aff828537b2d4abe4430d6312",
+          "version": "5.3.4"
         }
       },
       {
@@ -96,8 +96,8 @@
         "repositoryURL": "https://github.com/bmoliveira/MarkdownKit.git",
         "state": {
           "branch": null,
-          "revision": "828e99602285c9547ceb01a014bf2d0bd7bc545e",
-          "version": "1.7.0"
+          "revision": "5056f3305d3499f44d8815530d560b87082e0cf5",
+          "version": "1.7.1"
         }
       },
       {
@@ -105,17 +105,17 @@
         "repositoryURL": "https://github.com/krzyzanowskim/OpenSSL.git",
         "state": {
           "branch": null,
-          "revision": "e88deedfc37501f03ae3a08b3b8cf497d0340197",
-          "version": "1.1.1100"
+          "revision": "4ae145c1446851cda62fa4b09c7b5e5c540d7b20",
+          "version": "1.1.1300"
         }
       },
       {
         "package": "Parchment",
-        "repositoryURL": "https://github.com/rechsteiner/Parchment.git",
+        "repositoryURL": "https://github.com/rechsteiner/Parchment",
         "state": {
-          "branch": null,
-          "revision": "689ecaa80b7b0f712887ec87746f8598f2e12907",
-          "version": "3.0.1"
+          "branch": "main",
+          "revision": "cad6924f8a292eecaedc1bdefb57006f7979b9eb",
+          "version": null
         }
       },
       {
@@ -132,8 +132,8 @@
         "repositoryURL": "https://github.com/mxcl/PromiseKit.git",
         "state": {
           "branch": null,
-          "revision": "aea48ea1855f5d82e2dffa6027afce3aab8f3dd7",
-          "version": "6.13.3"
+          "revision": "7b07b214dacecb22ca4b680531c7e981d52483f9",
+          "version": "6.16.3"
         }
       },
       {

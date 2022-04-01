@@ -13,6 +13,11 @@ public enum Response<R: APIResponse> {
     case error(response: APIError)
 }
 
+public enum Result<R: Any> {
+    case success(response: R)
+    case error(response: APIError)
+}
+
 /// Type to represent request body/url options
 public typealias RequestOptions = [String: Any]
 
@@ -40,6 +45,11 @@ public struct APIClient {
 
     /// Client that connects to Betanet
     public static let betanet = APIClient(options: .betanet)
+    
+    public struct Service {
+        public static let mainnet = APIClient(options: .Service.mainnet)
+        public static let testnet = APIClient(options: .Service.testnet)
+    }
 
     // MARK: - Init
 
@@ -166,8 +176,13 @@ public struct APIClient {
         }
 
         guard let result = try? JSONDecoder().decode(R.self, from: data) else {
-            let error = try? JSONDecoder().decode(APIError.self, from: data)
-            return .error(response: error ?? .unknown)
+            if let error = try? JSONDecoder().decode(APIError.self, from: data) {
+                return .error(response: error)
+            }else if let error = try? JSONDecoder().decode(APIErrors.self, from: data),
+                     let first = error.errors.first {
+                return .error(response: first)
+            }
+            return .error(response: .unknown)
         }
 
         return .success(response: result)

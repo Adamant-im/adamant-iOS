@@ -360,7 +360,6 @@ extension ERC20WalletService: InitiatedWithPassphraseService {
         self.initialBalanceCheck = true
         self.setState(.upToDate, silent: true)
         self.update()
-        
         completion(.success(result: eWallet))
     }
     

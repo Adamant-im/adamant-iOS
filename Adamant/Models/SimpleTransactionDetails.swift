@@ -30,4 +30,8 @@ struct SimpleTransactionDetails: TransactionDetails {
     var isOutgoing: Bool
     
     var transactionStatus: TransactionStatus?
+    
+    var blockHeight: UInt64? {
+        return nil
+    }
 }

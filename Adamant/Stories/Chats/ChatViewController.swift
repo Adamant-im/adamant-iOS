@@ -46,7 +46,7 @@ extension String.adamantLocalized {
 
 
 // MARK: - Delegate
-protocol ChatViewControllerDelegate: class {
+protocol ChatViewControllerDelegate: AnyObject {
     func preserveMessage(_ message: String, forAddress address: String)
     func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String?
 }
@@ -628,8 +628,16 @@ class ChatViewController: MessagesViewController {
         guard let partner = chatroom?.partner, let address = partner.address else {
             return
         }
-        
-        let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
+
+        let params: [AdamantAddressParam]?
+        if let name = partner.name {
+            params = [.label(name)]
+        } else {
+            params = nil
+        }
+
+        let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address,
+                                                                                params: params))
         
         if partner.isSystem {
             dialogService.presentShareAlertFor(string: address,

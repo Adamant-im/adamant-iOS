@@ -9,8 +9,13 @@ import Foundation
 
 extension Accounts {
 
+    public struct LegacyAccountsResponse: APIResponse {
+
+        public let data: [LegacyAccountModel]
+    }
+    
     public struct AccountsResponse: APIResponse {
 
-        public let data: [AccountModel]
+        public let data: AccountModel
     }
 }

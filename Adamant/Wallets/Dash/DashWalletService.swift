@@ -258,7 +258,6 @@ extension DashWalletService: InitiatedWithPassphraseService {
                     service.initialBalanceCheck = true
                     service.setState(.upToDate, silent: true)
                     service.update()
-                    
                     completion(.success(result: eWallet))
                     
                 case .failure(let error):

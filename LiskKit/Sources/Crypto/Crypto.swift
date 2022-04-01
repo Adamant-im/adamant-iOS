@@ -43,6 +43,99 @@ public struct Crypto {
         return "\(identifier)L"
     }
 
+    static let PREFIX_LISK = "lsk"
+    static let CHARSET = Array("zxvcpmbn3465o978uyrtkqew2adsjhfg")
+    static let GENERATOR: [UInt] = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3]
+
+    public static func getAddress(from publicKey: String) -> String {
+        return getBinaryAddress(from: publicKey).hexString()
+    }
+
+    public static func getBase32Address(from publicKey: String) -> String {
+        let binaryAddress = getBinaryAddress(from: publicKey)
+        let uint5Address = convertUIntArray(binaryAddress.map { UInt($0) }, 8, 5)
+        let uint5Checksum = createChecksum(uint5Address)
+        let identifier = convertUInt5ToBase32(uint5Address + uint5Checksum)
+        return "\(PREFIX_LISK)\(identifier)"
+    }
+
+    public static func getBinaryAddressFromBase32(_ base32Address: String) -> String? {
+        guard isValidBase32(address: base32Address) else { return nil }
+
+        let addressArray = Array(base32Address)[PREFIX_LISK.count..<(base32Address.count - 6)]
+        let integerSequence = addressArray.compactMap { CHARSET.firstIndex(of: $0) }.map { UInt($0) }
+
+        guard integerSequence.count == 32 else { return nil }
+
+        return convertUIntArray(integerSequence, 5, 8).map { UInt8($0) }.hexString()
+    }
+
+    public static func isValidBase32(address: String) -> Bool {
+        guard address.prefix(3) == "lsk", address.count == 41 else { return false }
+
+        let content = String(address.suffix(38))
+        let bytes = covertBase32toUInt5(content)
+        let address = Array(bytes[0..<32])
+        let checksum = Array(bytes[32..<38])
+
+        guard createChecksum(address) == checksum else { return false }
+
+        return true
+    }
+    
+    internal static func getBinaryAddress(from publicKey: String) -> [UInt8] {
+        let bytes = SHA256(publicKey.hexBytes()).digest()[0..<20]
+        return Array(bytes)
+    }
+
+    internal static func convertUIntArray(_ array: [UInt], _ from: UInt, _ to: UInt) -> [UInt] {
+        let maxValue: UInt = (1 << to) - 1;
+        var accumulator: UInt = 0
+        var bits: UInt = 0
+        var result = [UInt]()
+        for byte in array {
+            accumulator = (accumulator << from) | byte
+            bits += from
+            while (bits >= to) {
+                bits -= to
+                result.append((accumulator >> bits) & maxValue)
+            }
+        }
+        return result
+    }
+
+    internal static func createChecksum(_ array: [UInt]) -> [UInt] {
+        let values = array + [0, 0, 0, 0, 0, 0]
+        let mod: UInt = polymod(values) ^ 1
+        var result = [UInt]()
+        for p: UInt in 0..<6 {
+            result.append((mod >> (5 * (5 - p))) & 31)
+        }
+        return result
+    }
+
+    internal static func polymod(_ array: [UInt]) -> UInt {
+        var chk: UInt = 1
+        for value in array {
+            let top: UInt = chk >> 25
+            chk = ((chk & 0x1ffffff) << 5) ^ value
+            for i: UInt8 in 0..<6 {
+                if (((top >> i) & 1) != 0) {
+                    chk ^= GENERATOR[Int(i)]
+                }
+            }
+        }
+        return chk
+    }
+
+    internal static func convertUInt5ToBase32(_ array: [UInt]) -> String {
+        return array.map { String(CHARSET[Int($0)]) }.joined()
+    }
+    
+    internal static func covertBase32toUInt5(_ value:String) -> [UInt] {
+        return value.enumerated().map { UInt(CHARSET.firstIndex(of: Character(String($0.element))) ?? 0) }
+    }
+
     /// Sign a message
     public static func signMessage(_ message: String, passphrase: String) throws -> String {
         let keyPair = try self.keyPair(fromPassphrase: passphrase)
@@ -70,6 +163,20 @@ public struct Crypto {
         return true
     }
 
+    public static func verify(message: [UInt8], signature: [UInt8], publicKey: [UInt8]) throws -> Bool {
+        guard signature.count == 64 else {
+            throw CryptoError.invalidSignatureLength
+        }
+        
+        guard .SUCCESS == crypto_sign_verify_detached(
+            signature,
+            message,
+            UInt64(message.count),
+            publicKey).exitCode else { throw CryptoError.invalidSignature }
+        
+        return true
+    }
+
     /// Epoch time relative to genesis block
     public static func timeIntervalSinceGenesis(offset: TimeInterval = 0) -> UInt32 {
         let now = Date().timeIntervalSince1970 + offset
@@ -80,6 +187,10 @@ public struct Crypto {
     /// Multiplies a given amount by Lisk fixed point
     public static func fixedPoint(amount: Double) -> UInt64 {
         return UInt64(amount * Constants.fixedPoint)
+    }
+
+    public static func fixedPoint(amount: Decimal) -> UInt64 {
+        return NSDecimalNumber(decimal: amount * Constants.fixedPointDecimal).uint64Value
     }
 
     internal static func byteIdentifier(from bytes: [UInt8]) -> String {
@@ -107,6 +218,14 @@ extension KeyPair {
 extension String {
 
     internal func hexBytes() -> [UInt8] {
+        return (0..<count/2).reduce([]) { res, i in
+            let indexStart = index(startIndex, offsetBy: i * 2)
+            let indexEnd = index(indexStart, offsetBy: 2)
+            let substring = self[indexStart..<indexEnd]
+            return res + [UInt8(substring, radix: 16) ?? 0]
+        }
+    }
+    internal func allHexBytes() -> [UInt8] {
         return (0..<count/2).reduce([]) { res, i in
             let indexStart = index(startIndex, offsetBy: i * 2)
             let indexEnd = index(indexStart, offsetBy: 2)

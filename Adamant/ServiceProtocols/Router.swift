@@ -23,6 +23,6 @@ struct AdamantScene {
 
 
 // MARK: - Adamant Router
-protocol Router: class {
+protocol Router: AnyObject {
     func get(scene: AdamantScene) -> UIViewController
 }

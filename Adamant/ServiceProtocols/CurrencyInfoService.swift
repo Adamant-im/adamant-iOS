@@ -38,7 +38,7 @@ enum Currency: String {
 
 
 // MARK: - protocol
-protocol CurrencyInfoService: class {
+protocol CurrencyInfoService: AnyObject {
     var currentCurrency: Currency { get set }
     
     // Check rates for list of coins
