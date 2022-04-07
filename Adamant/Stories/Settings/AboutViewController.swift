@@ -146,7 +146,7 @@ class AboutViewController: FormViewController {
         
         if let footer = UINib(nibName: "VersionFooter", bundle: nil).instantiate(withOwner: nil, options: nil).first as? UIView {
             if let label = footer.viewWithTag(555) as? UILabel {
-                label.text = AdamantUtilities.applicationReleaseVersion
+                label.text = AdamantUtilities.applicationVersion
                 label.textColor = UIColor.adamant.primary
                 tableView.tableFooterView = footer
             }

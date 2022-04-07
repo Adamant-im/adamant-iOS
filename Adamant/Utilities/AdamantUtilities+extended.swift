@@ -20,10 +20,6 @@ extension AdamantUtilities {
         return ""
     }()
     
-    static var applicationReleaseVersion: String = {
-        return "2.3.0"
-    }()
-    
     // MARK: Device model
     static var deviceModelCode: String {
         var systemInfo = utsname()
