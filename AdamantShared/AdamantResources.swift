@@ -91,8 +91,7 @@ struct AdamantResources {
     //    static let ethereumExplorerAddress = "https://ropsten.etherscan.io/tx/" // Testnet
     
     // MARK: LSK
-    static let liskExplorerAddress = "https://liskscan.com/transaction/" //"https://explorer.lisk.io/tx/"
-    //    static let liskExplorerAddress = "https://testnet-explorer.lisk.io/tx/" // LISK Testnet
+    static let liskExplorerAddress = "https://liskscan.com/transaction/"
     
     static let dogeExplorerAddress = "https://dogechain.info/tx/"
     static let dashExplorerAddress = "https://dashblockexplorer.com/tx/"

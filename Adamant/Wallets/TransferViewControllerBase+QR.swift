@@ -19,7 +19,6 @@ extension TransferViewControllerBase {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             qrReader.modalPresentationStyle = .overFullScreen
-           // present(qrReader, animated: true, completion: nil)
             if Thread.isMainThread {
                 self.present(qrReader, animated: true, completion: nil)
             } else {
@@ -48,7 +47,6 @@ extension TransferViewControllerBase {
             let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
-           // present(alert, animated: true, completion: nil)
             if Thread.isMainThread {
                 self.present(alert, animated: true, completion: nil)
             } else {
@@ -70,7 +68,6 @@ extension TransferViewControllerBase {
             
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
-           // present(alert, animated: true, completion: nil)
             if Thread.isMainThread {
                 self.present(alert, animated: true, completion: nil)
             } else {

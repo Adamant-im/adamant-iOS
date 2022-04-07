@@ -16,6 +16,7 @@ enum AdamantUri {
 enum AdamantAddressParam {
     case address(String)
     case label(String)
+    case message(String)
     
     init?(raw: String) {
         let keyValue = raw.split(separator: "=")
@@ -27,7 +28,9 @@ enum AdamantAddressParam {
         case "address":
             self = .address(String(keyValue[1]))
         case "label":
-            self = AdamantAddressParam.label(keyValue[1].replacingOccurrences(of: "+", with: " "))
+            self = AdamantAddressParam.label(keyValue[1].replacingOccurrences(of: "+", with: " ").replacingOccurrences(of: "%20", with: " "))
+        case "message":
+            self = AdamantAddressParam.message(keyValue[1].replacingOccurrences(of: "+", with: " ").replacingOccurrences(of: "%20", with: " "))
         
         default:
             return nil
@@ -40,6 +43,8 @@ enum AdamantAddressParam {
             return "address=\(value)"
         case .label(let value):
             return "label=\(value.replacingOccurrences(of: " ", with: "+"))"
+        case .message(let value):
+            return "message=\(value.replacingOccurrences(of: " ", with: "+"))"
         }
     }
 }
@@ -67,6 +72,8 @@ class AdamantUriTools {
                     components.queryItems?.append(.init(name: "address", value: value))
                 case .label(let value):
                     components.queryItems?.append(.init(name: "label", value: value))
+                case .message(let value):
+                    components.queryItems?.append(.init(name: "message", value: value))
                 }
             }
 

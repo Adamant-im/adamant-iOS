@@ -12,7 +12,8 @@ import UIKit
 struct AdamantAddress {
     let address: String
     let name: String?
-    let amount: String?
+    let amount: Double?
+    let message: String?
 }
 
 extension String {
@@ -20,27 +21,26 @@ extension String {
         guard
             let urlString = self.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let components = URLComponents(string: urlString),
-            components.host == "msg.adamant.im",
             let queryItems = components.queryItems,
             let address = queryItems.filter({$0.name == "address"}).first?.value else {
             return nil
         }
-
-        let name = queryItems.filter({$0.name == "label"}).first?.value
-        let amount = queryItems.filter({$0.name == "amount"}).first?.value
         
-        return AdamantAddress(address: address, name: name, amount: amount)
+        let name = queryItems.filter({$0.name == "label"}).first?.value?.replacingOccurrences(of: "+", with: " ").replacingOccurrences(of: "%20", with: " ")
+        let amount = queryItems.filter({$0.name == "amount"}).first?.value
+        let message = queryItems.filter({$0.name == "message"}).first?.value?.replacingOccurrences(of: "+", with: " ").replacingOccurrences(of: "%20", with: " ")
+        return AdamantAddress(address: address, name: name, amount: amount?.double, message: message)
     }
 
     func getLegacyAdamantAddress() -> AdamantAddress? {
         let address: String?
         var name: String? = nil
+        var message: String? = nil
         
         if let uri = AdamantUriTools.decode(uri: self) {
             switch uri {
             case .address(address: let addr, params: let params):
                 address = addr
-                
                 if let params = params {
                     for param in params {
                         switch param {
@@ -48,7 +48,8 @@ extension String {
                             break
                         case .label(let label):
                             name = label
-                            break
+                        case .message(let urlMessage):
+                            message = urlMessage
                         }
                     }
                 }
@@ -67,7 +68,7 @@ extension String {
         }
         
         if let address = address {
-            return AdamantAddress(address: address, name: name, amount: "")
+            return AdamantAddress(address: address, name: name, amount: nil, message: message)
         } else {
             return nil
         }

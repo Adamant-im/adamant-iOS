@@ -309,7 +309,9 @@ class ChatViewController: MessagesViewController {
         }
         
         if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
-            messageInputBar.inputTextView.text = message
+            if !message.isEmpty {
+                messageInputBar.inputTextView.text = message
+            }
             setEstimatedFee(AdamantMessage.text(message).fee)
         }
         

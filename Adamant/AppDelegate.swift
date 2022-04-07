@@ -504,3 +504,61 @@ extension AppDelegate {
         */
     }
 }
+
+// MARK: - Universal Links
+extension AppDelegate {
+    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        if userActivity.activityType == NSUserActivityTypeBrowsingWeb {
+            let url = userActivity.webpageURL
+            if let adamantAdr = url?.absoluteString.getAdamantAddress() {
+                if let tabbar = window?.rootViewController as? UITabBarController,
+                   let chats = tabbar.viewControllers?.first as? UISplitViewController,
+                   let chatList = chats.viewControllers.first as? UINavigationController,
+                   let router = container.resolve(Router.self),
+                   let list = chatList.viewControllers.first as? ChatListViewController {
+                 
+                    switch list.accountService.state {
+                    case .loggedIn:
+                        self.openDialog(chatList: chatList, tabbar: tabbar, router: router, list: list, adamantAdr: adamantAdr)
+                    case .notLogged:
+                        break
+                    case .isLoggingIn:
+                        break
+                    case .updating:
+                        break
+                    }
+                    
+                    // if not logged in
+                    list.didLoadedMessages = {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            self.openDialog(chatList: chatList, tabbar: tabbar, router: router, list: list, adamantAdr: adamantAdr)
+                        }
+                    }
+                }
+                
+            }
+        }
+        return true
+    }
+    
+    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, router: Router, list: ChatListViewController, adamantAdr: AdamantAddress){
+        chatList.popToRootViewController(animated: false)
+        chatList.dismiss(animated: false, completion: nil)
+        tabbar.selectedIndex = 0
+        
+        let controller = router.get(scene: AdamantScene.Chats.newChat)
+        guard let nav = controller as? UINavigationController,
+              let c = nav.viewControllers.last as? NewChatViewController else {
+                  return
+              }
+        
+        c.delegate = list.self
+        
+        if let split = list.splitViewController {
+            split.showDetailViewController(controller, sender: list.self)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                c.startNewChat(with: adamantAdr.address, name: adamantAdr.name, message: adamantAdr.message)
+            }
+        }
+    }
+}

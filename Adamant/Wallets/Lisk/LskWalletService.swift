@@ -313,14 +313,6 @@ extension LskWalletService {
             transactionApi = Transactions(client: .testnet)
             nodeApi = LiskKit.Node(client: .testnet)
         }
-        
-//        nodeApi.info { result in
-//            switch result {
-//            case .error: self.isNewApi = false
-//            case .success(let model):
-//                self.isNewApi = model.data.version == "3.0.0"
-//            }
-//        }
     }
 }
 

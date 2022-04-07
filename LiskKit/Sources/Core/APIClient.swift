@@ -178,7 +178,7 @@ public struct APIClient {
         guard let result = try? JSONDecoder().decode(R.self, from: data) else {
             if let error = try? JSONDecoder().decode(APIError.self, from: data) {
                 return .error(response: error)
-            }else if let error = try? JSONDecoder().decode(APIErrors.self, from: data),
+            } else if let error = try? JSONDecoder().decode(APIErrors.self, from: data),
                      let first = error.errors.first {
                 return .error(response: first)
             }

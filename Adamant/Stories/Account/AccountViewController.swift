@@ -788,10 +788,14 @@ extension AccountViewController: AccountHeaderViewDelegate {
         }
         
         let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
-        dialogService.presentShareAlertFor(string: address,
-                                           types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
+        dialogService.presentShareAlertFor(string: encodedAddress,
+                                           types: [.copyToPasteboard,
+                                                   .share,
+                                                   .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)
+                                                  ],
                                            excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                           animated: true, from: from,
+                                           animated: true,
+                                           from: from,
                                            completion: nil)
     }
 }
