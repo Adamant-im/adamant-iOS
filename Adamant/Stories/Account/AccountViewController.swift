@@ -788,7 +788,9 @@ extension AccountViewController: AccountHeaderViewDelegate {
         }
         
         let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
-        dialogService.presentShareAlertFor(string: encodedAddress,
+        dialogService.presentShareAlertFor(stringForPasteboard: address,
+                                           stringForShare: encodedAddress,
+                                           stringForQR: encodedAddress,
                                            types: [.copyToPasteboard,
                                                    .share,
                                                    .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)
@@ -858,7 +860,6 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         guard case let .fixed(_, menuHeight) = pagingViewController.menuItemSize else {
             return
         }
-        
         let pagingHeight = menuHeight + walletViewController.height
         
         var headerBounds = accountHeaderView.bounds

@@ -233,7 +233,7 @@ extension AdamantDialogService {
             source = nil
         }
         
-        let alert = createShareAlertFor(string: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
+        let alert = createShareAlertFor(stringForPasteboard: string, stringForShare: string, stringForQR: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
         
         if let sourceView = from {
             alert.popoverPresentationController?.sourceView = sourceView
@@ -252,10 +252,29 @@ extension AdamantDialogService {
             source = nil
         }
         
-        let alert = createShareAlertFor(string: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
+        let alert = createShareAlertFor(stringForPasteboard: string, stringForShare: string, stringForQR: string, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
         
         if let sourceView = from {
             alert.popoverPresentationController?.barButtonItem = sourceView
+        }
+        alert.modalPresentationStyle = .overFullScreen
+        present(alert, animated: animated, completion: completion)
+    }
+    
+    func presentShareAlertFor(stringForPasteboard: String, stringForShare: String, stringForQR: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
+        let source: ViewSource?
+        if let from = from {
+            source = .view(from)
+        } else {
+            source = nil
+        }
+        
+        let alert = createShareAlertFor(stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, animated: animated, from: source, completion: completion)
+        
+        if let sourceView = from {
+            alert.popoverPresentationController?.sourceView = sourceView
+            alert.popoverPresentationController?.sourceRect = sourceView.bounds
+            alert.popoverPresentationController?.canOverlapSourceViewRect = false
         }
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: animated, completion: completion)
@@ -267,20 +286,20 @@ extension AdamantDialogService {
         case barButtonItem(UIBarButtonItem)
     }
     
-    private func createShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: ViewSource?, completion: (() -> Void)?) -> UIAlertController {
+    private func createShareAlertFor(stringForPasteboard: String, stringForShare: String, stringForQR: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: ViewSource?, completion: (() -> Void)?) -> UIAlertController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         for type in types {
             switch type {
             case .copyToPasteboard:
                 alert.addAction(UIAlertAction(title: type.localized , style: .default) { [weak self] _ in
-                    UIPasteboard.general.string = string
+                    UIPasteboard.general.string = stringForPasteboard
                     self?.showToastMessage(String.adamantLocalized.alert.copiedToPasteboardNotification)
                 })
                 
             case .share:
                 alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-                    let vc = UIActivityViewController(activityItems: [string], applicationActivities: nil)
+                    let vc = UIActivityViewController(activityItems: [stringForShare], applicationActivities: nil)
                     vc.excludedActivityTypes = excludedActivityTypes
                     
                     switch from {
@@ -301,7 +320,7 @@ extension AdamantDialogService {
                 
             case .generateQr(let encodedContent, let sharingTip, let withLogo):
                 alert.addAction(UIAlertAction(title: type.localized, style: .default) { [weak self] _ in
-                    switch AdamantQRTools.generateQrFrom(string: encodedContent ?? string, withLogo: withLogo) {
+                    switch AdamantQRTools.generateQrFrom(string: encodedContent ?? stringForQR, withLogo: withLogo) {
                     case .success(let qr):
                         guard let vc = self?.router.get(scene: AdamantScene.Shared.shareQr) as? ShareQrViewController else {
                             fatalError("Can't find ShareQrViewController")

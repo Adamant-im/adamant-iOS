@@ -219,7 +219,7 @@ class ChatListViewController: UIViewController {
     
     
     // MARK: Helpers
-    private func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil) -> ChatViewController {
+    func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil) -> ChatViewController {
         guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
             fatalError("Can't get ChatViewController")
         }

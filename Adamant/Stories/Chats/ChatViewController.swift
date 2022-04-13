@@ -611,7 +611,7 @@ class ChatViewController: MessagesViewController {
             }
             
             if let address = partner.address, let name = self.addressBookService.addressBook[address] {
-                self.navigationItem.title = name
+                self.navigationItem.title = name.checkAndReplaceSystemWallets()
             }
         }
     }
@@ -684,7 +684,7 @@ class ChatViewController: MessagesViewController {
                 textField.autocapitalizationType = .words
                 
                 if let name = self?.addressBookService.addressBook[address] {
-                    textField.text = name
+                    textField.text = name.checkAndReplaceSystemWallets()
                 }
             }
             

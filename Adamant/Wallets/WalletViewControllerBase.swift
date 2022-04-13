@@ -83,45 +83,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         tableView.tableFooterView = UIView()
         
         let section = Section()
-        
         // MARK: Address
-        let addressRow = LabelRow() {
-            $0.tag = BaseRows.address.tag
-            $0.title = BaseRows.address.localized
-            $0.cell.selectionStyle = .gray
-            
-            if let wallet = service?.wallet {
-                $0.value = wallet.address
-            }
-        }.cellUpdate { (cell, _) in
-            cell.accessoryType = .disclosureIndicator
-        }.onCellSelection { [weak self] (cell, row) in
-            row.deselect()
-            let completion = { [weak self] in
-                guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
-                    return
-                }
-                
-                tableView.deselectRow(at: indexPath, animated: true)
-            }
-            
-            if let address = self?.service?.wallet?.address {
-                let types: [ShareType]
-                let withLogo = self?.includeLogoInQR() ?? false
-                
-                if let encodedAddress = self?.encodeForQr(address: address) {
-                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: withLogo)]
-                } else {
-                    types = [.copyToPasteboard, .share]
-                }
-                
-                self?.dialogService.presentShareAlertFor(string: address,
-                                                         types: types,
-                                                         excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
-                                                         animated: true, from: cell,
-                                                         completion: completion)
-            }
-        }
+        let addressRow = adressRow()
         
         section.append(addressRow)
         
@@ -313,6 +276,47 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         return false
     }
     
+    func adressRow() -> LabelRow {
+        let addressRow = LabelRow() {
+            $0.tag = BaseRows.address.tag
+            $0.title = BaseRows.address.localized
+            $0.cell.selectionStyle = .gray
+            
+            if let wallet = service?.wallet {
+                $0.value = wallet.address
+            }
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] (cell, row) in
+            row.deselect()
+            let completion = { [weak self] in
+                guard let tableView = self?.tableView, let indexPath = tableView.indexPathForSelectedRow else {
+                    return
+                }
+                
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+            
+            if let address = self?.service?.wallet?.address {
+                let types: [ShareType]
+                let withLogo = self?.includeLogoInQR() ?? false
+                
+                if let encodedAddress = self?.encodeForQr(address: address) {
+                    types = [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: withLogo)]
+                } else {
+                    types = [.copyToPasteboard, .share]
+                }
+                
+                self?.dialogService.presentShareAlertFor(string: address,
+                                                         types: types,
+                                                         excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                                                         animated: true,
+                                                         from: cell,
+                                                         completion: completion)
+            }
+        }
+        return addressRow
+    }
     
     // MARK: - Other
     

@@ -470,7 +470,7 @@ extension AdamantAccountsProvider {
         
         if let address = coreAccount.address, let name = addressBookService.addressBook[address] {
             coreAccount.name = name
-            chatroom.title = name
+            chatroom.title = name.checkAndReplaceSystemWallets()
         }
         
         return coreAccount
