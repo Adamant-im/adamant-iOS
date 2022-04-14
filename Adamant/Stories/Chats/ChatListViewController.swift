@@ -83,6 +83,8 @@ class ChatListViewController: UIViewController {
     private var originalInsets: UIEdgeInsets?
     private var didShow: Bool = false
     
+    var didLoadedMessages: (() ->())?
+    
     // MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -153,6 +155,7 @@ class ChatListViewController: UIViewController {
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: chatsProvider, queue: OperationQueue.main) { [weak self] notification in
             if let synced = notification.userInfo?[AdamantUserInfoKey.ChatProvider.initiallySynced] as? Bool {
+                self?.didLoadedMessages?()
                 self?.setIsBusy(!synced)
             } else if let synced = self?.chatsProvider.isInitiallySynced {
                 self?.setIsBusy(!synced)
@@ -216,7 +219,7 @@ class ChatListViewController: UIViewController {
     
     
     // MARK: Helpers
-    private func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil) -> ChatViewController {
+    func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil) -> ChatViewController {
         guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
             fatalError("Can't get ChatViewController")
         }
@@ -533,7 +536,7 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
 
 // MARK: - NewChatViewControllerDelegate
 extension ChatListViewController: NewChatViewControllerDelegate {
-    func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount) {
+    func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount, preMessage: String?) {
         guard let chatroom = account.chatroom else {
             fatalError("No chatroom?")
         }
@@ -576,6 +579,10 @@ extension ChatListViewController: NewChatViewControllerDelegate {
             
             if let count = vc.chatroom?.transactions?.count, count == 0 {
                 vc.messageInputBar.inputTextView.becomeFirstResponder()
+            }
+            
+            if let preMessage = preMessage {
+                vc.messageInputBar.inputTextView.text = preMessage
             }
         }
         

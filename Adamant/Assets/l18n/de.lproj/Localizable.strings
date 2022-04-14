@@ -122,7 +122,7 @@
 "AccountTab.Row.Balance" = "Kontostand";
 
 /* Account tab: 'Buy tokens' button */
-"AccountTab.Row.BuyTokens" = "Token kaufen & verkaufen";
+"AccountTab.Row.BuyTokens" = "Token tauschen";
 
 /* Account tab: 'Logout' button */
 "AccountTab.Row.Logout" = "Ausloggen";
@@ -152,7 +152,10 @@
 "AccountTab.Row.SendToken" = "%@ senden";
 
 /* Account tab: Anonymously buy ADM tokens */
-"AccountTab.Row.AnonymouslyBuyADM" = "Kaufen Sie ADM anonym";
+"AccountTab.Row.AnonymouslyBuyADM" = "Ändern Sie ADM anonym";
+
+/* Account tab: Exchange ADM tokens in chat */
+"AccountTab.Row.ExchangeADMInChat" = "Austauscher im Chat";
 
 /* Account tab: 'Address' row */
 "AccountTab.Row.Address" = "Addresse";
