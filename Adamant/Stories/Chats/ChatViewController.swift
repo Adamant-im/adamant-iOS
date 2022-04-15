@@ -309,7 +309,9 @@ class ChatViewController: MessagesViewController {
         }
         
         if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
-            messageInputBar.inputTextView.text = message
+            if !message.isEmpty {
+                messageInputBar.inputTextView.text = message
+            }
             setEstimatedFee(AdamantMessage.text(message).fee)
         }
         
@@ -609,7 +611,7 @@ class ChatViewController: MessagesViewController {
             }
             
             if let address = partner.address, let name = self.addressBookService.addressBook[address] {
-                self.navigationItem.title = name
+                self.navigationItem.title = name.checkAndReplaceSystemWallets()
             }
         }
     }
@@ -682,7 +684,7 @@ class ChatViewController: MessagesViewController {
                 textField.autocapitalizationType = .words
                 
                 if let name = self?.addressBookService.addressBook[address] {
-                    textField.text = name
+                    textField.text = name.checkAndReplaceSystemWallets()
                 }
             }
             

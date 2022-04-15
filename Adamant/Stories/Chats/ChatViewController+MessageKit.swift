@@ -615,7 +615,6 @@ extension ChatViewController: MessageInputBarDelegate {
         if text.count > 0 {
             feeUpdateTimer?.invalidate()
             feeUpdateTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { _ in
-                print("update fee")
                 DispatchQueue.background.async {
                     let fee = AdamantMessage.text(text).fee
                     DispatchQueue.main.async {

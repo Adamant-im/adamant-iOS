@@ -13,39 +13,39 @@ import SafariServices
 class BuyAndSellViewController: FormViewController {
     // MARK: Rows
     enum Rows {
-        case adamant
-        case bitz
-        case idcm
+        case adamantMessage
+        case adamantSite
+        case coinDeal
         
         var tag: String {
             switch self {
-            case .adamant: return "adm"
-            case .bitz: return "bitz"
-            case .idcm: return "idcm"
+            case .adamantMessage: return "admChat"
+            case .adamantSite: return "admSite"
+            case .coinDeal: return "cDeal"
             }
         }
         
         var image: UIImage? {
             switch self {
-            case .adamant: return #imageLiteral(resourceName: "row_logo")
-            case .bitz: return #imageLiteral(resourceName: "bitz_row_logo.png")
-            case .idcm: return #imageLiteral(resourceName: "idcm_row_logo.png")
+            case .adamantMessage: return #imageLiteral(resourceName: "row_logo")
+            case .adamantSite: return #imageLiteral(resourceName: "row_logo")
+            case .coinDeal: return #imageLiteral(resourceName: "idcm_row_logo.png")
             }
         }
         
         var localized: String {
             switch self {
-            case .adamant: return String.adamantLocalized.wallets.buyAdmTokens
-            case .bitz: return "Bit-Z"
-            case .idcm: return "IDCM"
+            case .adamantMessage: return String.adamantLocalized.wallets.exchangeInChatAdmTokens
+            case .adamantSite: return String.adamantLocalized.wallets.buyAdmTokens
+            case .coinDeal: return "CoinDeal"
             }
         }
         
         var url: String {
             switch self {
-            case .adamant: return "https://adamant.im/buy-tokens/"
-            case .bitz: return "https://www.bit-z.com/exchange/adm_usdt"
-            case .idcm: return "https://www.idcm.io/trading/ADM_BTC"
+            case .adamantMessage: return ""
+            case .adamantSite: return "https://adamant.im/buy-tokens/"
+            case .coinDeal: return "https://coindeal.com/ref/9WZN"
             }
         }
     }
@@ -70,20 +70,22 @@ class BuyAndSellViewController: FormViewController {
         if let account = accountService.account {
             admUrl = String.adamantLocalized.wallets.buyTokensUrl(for: account.address)
         } else {
-            admUrl = Rows.adamant.url
+            admUrl = Rows.adamantSite.url
         }
         
-        let admRow = buildUrlRow(title: Rows.adamant.localized, value: nil, tag: Rows.adamant.tag, urlRaw: admUrl, image: Rows.adamant.image)
+        // MARK: Adamant Chat
+        let admChatRow = buildUrlRow(title: Rows.adamantMessage.localized, value: nil, tag: Rows.adamantMessage.tag, urlRaw: admUrl, image: Rows.adamantMessage.image)
+        
+        section.append(admChatRow)
+        
+        // MARK: Adamant Site
+        let admRow = buildUrlRow(title: Rows.adamantSite.localized, value: nil, tag: Rows.adamantSite.tag, urlRaw: admUrl, image: Rows.adamantSite.image)
         
         section.append(admRow)
         
-        // MARK: Bit-Z
-        let bitzRow = buildUrlRow(for: .bitz)
-        section.append(bitzRow)
-        
-        // MARK: IDCM
-        let idcmRow = buildUrlRow(for: .idcm)
-        section.append(idcmRow)
+        // MARK: CoinDeal
+        let coinRow = buildUrlRow(for: .coinDeal)
+        section.append(coinRow)
         
         form.append(section)
     }
@@ -104,7 +106,12 @@ class BuyAndSellViewController: FormViewController {
             $0.cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-        }.onCellSelection { [weak self] (_, _) in
+        }.onCellSelection { [weak self] (_, row) in
+            row.deselect()
+            if tag == Rows.adamantMessage.tag {
+                self?.openExchangeChat()
+                return
+            }
             guard let url = URL(string: urlRaw) else {
                 self?.dialogService.showError(withMessage: "Failed to create URL with string: \(urlRaw)", error: nil)
                 return
@@ -117,5 +124,32 @@ class BuyAndSellViewController: FormViewController {
         }
         
         return row
+    }
+    
+    private func openExchangeChat() {
+        if let tabbar = self.tabBarController,
+           let chats = tabbar.viewControllers?.first as? UISplitViewController,
+           let chatList = chats.viewControllers.first as? UINavigationController,
+           let chatlistVC = chatList.viewControllers.first as? ChatListViewController {
+            chatList.popToRootViewController(animated: false)
+            chatList.dismiss(animated: false, completion: nil)
+            tabbar.selectedIndex = 0
+            let chatroom = chatlistVC.chatsController?.fetchedObjects?.first(where: { room in
+                return room.partner?.address == AdamantContacts.adamantExchange.address
+            })
+            if let chatroom = chatroom {
+                let vc = chatlistVC.chatViewController(for: chatroom)
+                
+                if let split = chatlistVC.splitViewController {
+                    let chat = UINavigationController(rootViewController:vc)
+                    split.showDetailViewController(chat, sender: self)
+                } else if let nav = chatlistVC.navigationController {
+                    nav.pushViewController(vc, animated: true)
+                } else {
+                    vc.modalPresentationStyle = .overFullScreen
+                    chatlistVC.present(vc, animated: true)
+                }
+            }
+        }
     }
 }

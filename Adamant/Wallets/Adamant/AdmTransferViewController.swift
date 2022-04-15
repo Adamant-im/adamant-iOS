@@ -202,7 +202,14 @@ class AdmTransferViewController: TransferViewControllerBase {
             }
             
             if let text = row.value {
-                let trimmed = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
+                var trimmed = ""
+                if let admAddress = text.getAdamantAddress() {
+                    trimmed = admAddress.address.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
+                }  else if let admAddress = text.getLegacyAdamantAddress() {
+                    trimmed = admAddress.address.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
+                } else {
+                    trimmed = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
+                }
                 
                 if text != trimmed {
                     self?.skipValueChange = true
@@ -243,21 +250,27 @@ class AdmTransferViewController: TransferViewControllerBase {
     }
     
     override func handleRawAddress(_ address: String) -> Bool {
-        guard let admAddress = address.getAdamantAddress() else {
-            return false
+        if let admAddress = address.getAdamantAddress() {
+            if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
+                row.value = admAddress.address
+                row.updateCell()
+            }
+            
+            if let row: DecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
+                row.value = admAddress.amount
+                row.updateCell()
+                reloadFormData()
+            }
+            return true
+        } else if let admAddress = address.getLegacyAdamantAddress() {
+            if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
+                row.value = admAddress.address
+                row.updateCell()
+            }
+            return true
         }
         
-        if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
-            row.value = admAddress.address
-            row.updateCell()
-        }
-        
-        if let row: TextRow = form.rowBy(tag: BaseRows.amount.tag) {
-            row.value = admAddress.amount
-            row.updateCell()
-        }
-        
-        return true
+        return false
     }
     
     override func defaultSceneTitle() -> String? {
