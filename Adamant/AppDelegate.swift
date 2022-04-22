@@ -182,7 +182,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Register repeater services
         if let chatsProvider = container.resolve(ChatsProvider.self) {
-            repeater.registerForegroundCall(label: "chatsProvider", interval: 3, queue: .global(qos: .utility), callback: chatsProvider.update)
+            repeater.registerForegroundCall(label: "chatsProvider", interval: 10, queue: .global(qos: .utility), callback: chatsProvider.update)
+            
         } else {
             dialogService.showError(withMessage: "Failed to register ChatsProvider autoupdate. Please, report a bug", error: nil)
         }

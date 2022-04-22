@@ -14,6 +14,7 @@ class AdamantChatsProvider: ChatsProvider {
     // MARK: Dependencies
     var accountService: AccountService!
     var apiService: ApiService!
+    var socketService: SocketService!
     var stack: CoreDataStack!
     var adamantCore: AdamantCore!
     var accountsProvider: AccountsProvider!
@@ -76,8 +77,8 @@ class AdamantChatsProvider: ChatsProvider {
                 self?.dropStateData()
                 store.set(loggedAddress, for: StoreKey.chatProvider.address)
             }
-            
             self?.update()
+            self?.connectToSocket()
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
@@ -181,6 +182,34 @@ extension AdamantChatsProvider {
     
     func update() {
         self.update(completion: nil)
+    }
+    
+    func connectToSocket() {
+        // MARK: 2. Prepare
+        guard let address = accountService.account?.address,
+              let privateKey = accountService.keypair?.privateKey else {
+            return
+        }
+        let cms = DispatchSemaphore(value: 1)
+        // MARK: 3. Get transactions
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = self.stack.container.viewContext
+        self.socketService.connect(address: address)
+        self.socketService.receiveNewTransaction { result in
+            switch result {
+            case .success(let trans):
+                self.processingQueue.async {
+                    
+                    self.process(messageTransactions: [trans],
+                                 senderId: address,
+                                 privateKey: privateKey,
+                                 context: privateContext,
+                                 contextMutatingSemaphore: cms)
+                }
+            case .failure(_):
+                break
+            }
+        }
     }
     
     func update(completion: ((ChatsProviderResult?) -> Void)?) {
@@ -931,8 +960,14 @@ extension AdamantChatsProvider {
                         height = chatTransaction.height
                     }
                     
+                    let trans = privateChatroom.transactions?.first(where: { message in
+                        return (message as? ChatTransaction)?.txId == chatTransaction.txId
+                    }) as? ChatTransaction
+                    
                     if !trs.isOut {
-                        newMessageTransactions.append(chatTransaction)
+                        if trans == nil {
+                            newMessageTransactions.append(chatTransaction)
+                        }
                         
                         // Preset messages
                         if account.isSystem, let address = account.address,
@@ -957,22 +992,29 @@ extension AdamantChatsProvider {
                         }
                     }
                     
-                    messages.insert(chatTransaction)
+                    if trans == nil {
+                        messages.insert(chatTransaction)
+                    } else {
+                        trans?.height = chatTransaction.height
+                        trans?.blockId = chatTransaction.blockId
+                        trans?.confirmations = chatTransaction.confirmations
+                    }
                 }
             }
             
-            privateChatroom.addToTransactions(messages as NSSet)
+            if !messages.isEmpty {
+                privateChatroom.addToTransactions(messages as NSSet)
+            }
+            
             if let address = privateChatroom.partner?.address {
                 chatroom.isHidden = self.blackList.contains(address)
             }
         }
         
-        
         // MARK: 4. Unread messagess
         if let readedLastHeight = readedLastHeight {
             let unreadTransactions = newMessageTransactions.filter { $0.height > readedLastHeight }
             let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom! }))
-            
             for (chatroom, trs) in chatrooms {
                 if let address = chatroom.partner?.address {
                     chatroom.isHidden = self.blackList.contains(address)
@@ -981,7 +1023,6 @@ extension AdamantChatsProvider {
                 trs.forEach { $0.isUnread = true }
             }
         }
-        
         
         // MARK: 5. Dump new transactions
         if privateContext.hasChanges {
@@ -997,7 +1038,6 @@ extension AdamantChatsProvider {
                 print(error)
             }
         }
-        
         
         // MARK: 6. Save to main!
         if context.hasChanges {
