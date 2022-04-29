@@ -199,7 +199,6 @@ extension AdamantChatsProvider {
             switch result {
             case .success(let trans):
                 self.processingQueue.async {
-                    
                     self.process(messageTransactions: [trans],
                                  senderId: address,
                                  privateKey: privateKey,
@@ -551,6 +550,7 @@ extension AdamantChatsProvider {
             switch result {
             case .success(let transaction):
                 do {
+                    transaction.statusEnum = MessageStatus.delivered
                     try context.save()
                     completion(.success(transaction: transaction))
                 } catch {
@@ -941,7 +941,6 @@ extension AdamantChatsProvider {
                     if height < h {
                         height = h
                     }
-                    
                     unconfirmedsSemaphore.signal()
                     continue
                 } else {
@@ -993,11 +992,15 @@ extension AdamantChatsProvider {
                     }
                     
                     if trans == nil {
+                        if (chatTransaction.blockId?.isEmpty ?? true) && (chatTransaction.amountValue ?? 0.0 > 0.0) {
+                            chatTransaction.statusEnum = .pending
+                        }
                         messages.insert(chatTransaction)
                     } else {
                         trans?.height = chatTransaction.height
                         trans?.blockId = chatTransaction.blockId
                         trans?.confirmations = chatTransaction.confirmations
+                        trans?.statusEnum = .delivered
                     }
                 }
             }
@@ -1013,7 +1016,10 @@ extension AdamantChatsProvider {
         
         // MARK: 4. Unread messagess
         if let readedLastHeight = readedLastHeight {
-            let unreadTransactions = newMessageTransactions.filter { $0.height > readedLastHeight }
+            var unreadTransactions = newMessageTransactions.filter { $0.height > readedLastHeight }
+            if unreadTransactions.count == 0 {
+                unreadTransactions = newMessageTransactions.filter { $0.height == 0 }
+            }
             let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom! }))
             for (chatroom, trs) in chatrooms {
                 if let address = chatroom.partner?.address {
@@ -1217,11 +1223,9 @@ extension AdamantChatsProvider {
             return
         }
         
-        transaction.isConfirmed = true
         transaction.height = height
         transaction.blockId = blockId
         transaction.confirmations = confirmations
-        transaction.statusEnum = .delivered
         self.unconfirmedTransactions.removeValue(forKey: id)
         
         if let lastHeight = receivedLastHeight, lastHeight < height {

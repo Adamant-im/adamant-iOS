@@ -126,7 +126,7 @@ extension AdmWalletService: RichMessageProvider {
 extension MessageStatus {
     func toTransactionStatus() -> TransactionStatus {
         switch self {
-        case .pending: return TransactionStatus.updating
+        case .pending: return TransactionStatus.pending
         case .delivered: return TransactionStatus.success
         case .failed: return TransactionStatus.failed
         }

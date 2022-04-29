@@ -16,17 +16,34 @@ class AdamantSocketService: SocketService {
     var adamantCore: AdamantCore!
     var nodesSource: NodesSource! {
         didSet {
-            //nodesSource.migrate()
-           // refreshNode()
+            refreshNode()
         }
     }
     
-    private let manager = SocketManager(socketURL: URL(string: "https://endless.adamant.im")!, config: [.log(true), .compress])
-    private var socket:SocketIOClient?
+    // MARK: - Properties
+    
+    private(set) var node: Node? {
+        didSet {
+            currentUrl = node?.asSocketURL()
+        }
+    }
+    
+    private var currentUrl: URL?
+    
+    private var manager: SocketManager!
+    private var socket: SocketIOClient?
     
     let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility, attributes: [.concurrent])
     
+    // MARK: - Tools
+    
+    func refreshNode() {
+        node = nodesSource?.getSocketNewNode()
+    }
+    
     func connect(address: String) {
+        guard let currentUrl = currentUrl else { return }
+        manager = SocketManager(socketURL: currentUrl, config: [.log(false), .compress])
         socket = manager.defaultSocket
         socket?.on(clientEvent: .connect, callback: {[weak self] _, _ in
             self?.socket?.emit("address", with: [address])
