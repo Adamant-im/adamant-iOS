@@ -532,12 +532,9 @@ class TransferViewControllerBase: FormViewController {
         alert.addAction(cancelAction)
         alert.addAction(sendAction)
         alert.modalPresentationStyle = .overFullScreen
-        if Thread.isMainThread {
-            present(alert, animated: true, completion: nil)
-        } else {
-            DispatchQueue.main.async {
-                self.present(alert, animated: true, completion: nil)
-            }
+        
+        DispatchQueue.onMainAsync {
+            self.present(alert, animated: true, completion: nil)
         }
     }
     

@@ -32,12 +32,9 @@ class AdamantDialogService: DialogService {
 extension AdamantDialogService {
     func present(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
         viewController.modalPresentationStyle = .overFullScreen
-        if Thread.isMainThread {
-            getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
-        } else {
-            DispatchQueue.main.async { [weak self] in
-                self?.getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
-            }
+        
+        DispatchQueue.onMainAsync { [weak self] in
+            self?.getTopmostViewController()?.present(viewController, animated: animated, completion: completion)
         }
     }
     
@@ -86,12 +83,8 @@ extension AdamantDialogService {
     }
     
     func dismissProgress() {
-        if Thread.isMainThread {
+        DispatchQueue.onMainAsync {
             FTIndicator.dismissProgress()
-        } else {
-            DispatchQueue.main.async {
-                FTIndicator.dismissProgress()
-            }
         }
     }
     
@@ -104,12 +97,8 @@ extension AdamantDialogService {
     }
     
     func showError(withMessage message: String, error: Error? = nil) {
-        if Thread.isMainThread {
-            internalShowError(withMessage: message, error: error)
-        } else {
-            DispatchQueue.main.async { [weak self] in
-                self?.internalShowError(withMessage: message, error: error)
-            }
+        DispatchQueue.onMainAsync { [weak self] in
+            self?.internalShowError(withMessage: message, error: error)
         }
     }
     
@@ -372,12 +361,9 @@ extension AdamantDialogService {
         
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
         alert.modalPresentationStyle = .overFullScreen
-        if Thread.isMainThread {
-            present(alert, animated: true, completion: nil)
-        } else {
-            DispatchQueue.main.async { [weak self] in
-                self?.present(alert, animated: true, completion: nil)
-            }
+        
+        DispatchQueue.onMainAsync { [weak self] in
+            self?.present(alert, animated: true, completion: nil)
         }
     }
 }
@@ -504,12 +490,9 @@ extension AdamantDialogService {
             alertVC.alertActionStackViewHeightConstraint.constant = 50
         }
         alertVC.modalPresentationStyle = .overFullScreen
-        if Thread.isMainThread {
-            present(alertVC, animated: true, completion: nil)
-        } else {
-            DispatchQueue.main.async { [weak self] in
-                self?.present(alertVC, animated: true, completion: nil)
-            }
+        
+        DispatchQueue.onMainAsync { [weak self] in
+            self?.present(alertVC, animated: true, completion: nil)
         }
     }
 }

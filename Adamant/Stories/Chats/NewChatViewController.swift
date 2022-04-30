@@ -180,12 +180,8 @@ class NewChatViewController: FormViewController {
                 }
                 
                 if let done = self?.navigationItem.rightBarButtonItem {
-                    if Thread.isMainThread {
+                    DispatchQueue.onMainAsync {
                         done.isEnabled = text.count > 6
-                    } else {
-                        DispatchQueue.main.async {
-                            done.isEnabled = text.count > 6
-                        }
                     }
                 }
             } else {
@@ -375,12 +371,8 @@ extension NewChatViewController {
             AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
                 if granted, let qrReader = self?.qrReader {
                     qrReader.modalPresentationStyle = .overFullScreen
-                    if Thread.isMainThread {
+                    DispatchQueue.onMainAsync {
                         self?.present(qrReader, animated: true, completion: nil)
-                    } else {
-                        DispatchQueue.main.async {
-                            self?.present(qrReader, animated: true, completion: nil)
-                        }
                     }
                 } else {
                     return

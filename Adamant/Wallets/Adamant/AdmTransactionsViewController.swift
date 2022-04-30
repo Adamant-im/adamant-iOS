@@ -64,12 +64,8 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             controller = nil
         }
         
-        if Thread.isMainThread {
-            tableView.reloadData()
-        } else {
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
+        DispatchQueue.onMainAsync {
+            self.tableView.reloadData()
         }
     }
     

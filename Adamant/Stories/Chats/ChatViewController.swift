@@ -889,19 +889,11 @@ extension ChatViewController: TransferViewControllerDelegate, ComplexTransferVie
     private func dismissTransferViewController(andPresent viewController: UIViewController?) {
         fixKeyboardInsets = true
         
-        if Thread.isMainThread {
-            dismiss(animated: true, completion: nil)
+        DispatchQueue.onMainAsync { [weak self] in
+            self?.dismiss(animated: true, completion: nil)
             
-            if let viewController = viewController, let nav = navigationController {
+            if let viewController = viewController, let nav = self?.navigationController {
                 nav.pushViewController(viewController, animated: true)
-            }
-        } else {
-            DispatchQueue.main.async { [weak self] in
-                self?.dismiss(animated: true, completion: nil)
-                
-                if let viewController = viewController, let nav = self?.navigationController {
-                    nav.pushViewController(viewController, animated: true)
-                }
             }
         }
     }
