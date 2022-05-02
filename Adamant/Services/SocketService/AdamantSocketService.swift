@@ -51,6 +51,10 @@ class AdamantSocketService: SocketService {
         socket?.connect()
     }
     
+    func disconnect() {
+        socket?.disconnect()
+    }
+    
     func receiveNewTransaction(completion: ((ApiServiceResult<Transaction>) -> Void)?) {
         socket?.on("newTrans", callback: { [weak self] data, ack in
             guard let data = data.first else { return }

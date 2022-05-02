@@ -18,6 +18,8 @@ protocol SocketService: AnyObject {
     
     func connect(address: String)
     
+    func disconnect()
+    
     // MARK: - Receive New Transaction
     
     func receiveNewTransaction(completion: ((ApiServiceResult<Transaction>) -> Void)?)
