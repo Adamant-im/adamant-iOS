@@ -52,6 +52,8 @@ class AdamantChatsProvider: ChatsProvider {
     
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
     
+    private var previousAppState: UIApplication.State?
+    
     // MARK: Lifecycle
     init() {
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
@@ -108,6 +110,18 @@ class AdamantChatsProvider: ChatsProvider {
                     self?.securedStore.set(removedMessages, for: "removedMessages")
                 }
             }
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
+            if let previousAppState = self?.previousAppState,
+               previousAppState == .background {
+                self?.previousAppState = .active
+                self?.update()
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
+            self?.previousAppState = .background
         }
     }
     
@@ -250,7 +264,6 @@ extension AdamantChatsProvider {
         let processingGroup = DispatchGroup()
         let cms = DispatchSemaphore(value: 1)
         let prevHeight = receivedLastHeight
-        
         getTransactions(senderId: address, privateKey: privateKey, height: receivedLastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
         
         // MARK: 4. Check
@@ -743,7 +756,6 @@ extension AdamantChatsProvider {
         ])
         
         let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-        
         return controller
     }
     
@@ -1057,7 +1069,6 @@ extension AdamantChatsProvider {
                 defer {
                     contextMutatingSemaphore.signal()
                 }
-                
                 contextMutatingSemaphore.wait()
                 
                 try context.save()
@@ -1073,7 +1084,6 @@ extension AdamantChatsProvider {
             }
         }
         
-        
         // MARK 7. Last message height
         highSemaphore.wait()
         if let lastHeight = receivedLastHeight {
@@ -1083,7 +1093,6 @@ extension AdamantChatsProvider {
         } else {
             receivedLastHeight = height
         }
-        
         highSemaphore.signal()
     }
 }

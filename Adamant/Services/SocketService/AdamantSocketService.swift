@@ -59,7 +59,8 @@ class AdamantSocketService: SocketService {
         socket?.on("newTrans", callback: { [weak self] data, ack in
             guard let data = data.first else { return }
             guard let dict = data as? [String: Any] else { return }
-            if let trans = try? JSONDecoder().decode(Transaction.self, from: JSONSerialization.data(withJSONObject: dict)) {
+            if let trans = try? JSONDecoder().decode(Transaction.self, from: JSONSerialization.data(withJSONObject: dict)),
+               trans.asset.chat?.type != .signal {
                 self?.defaultResponseDispatchQueue.async {
                     completion?(.success(trans))
                 }

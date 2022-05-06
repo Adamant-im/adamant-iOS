@@ -265,7 +265,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 // MARK: - Remote notifications
-extension AppDelegate {
+extension AppDelegate: UNUserNotificationCenterDelegate {
     private struct RegistrationPayload: Codable {
         let token: String
         
@@ -284,7 +284,6 @@ extension AppDelegate {
         }
         
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        
         // MARK: 1. Checking, if device token had not changed
         guard let securedStore = container.resolve(SecuredStore.self) else {
             fatalError("can't get secured store to get device token hash")
@@ -337,6 +336,58 @@ extension AppDelegate {
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         if let service = container.resolve(DialogService.self) {
             service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription), error: error)
+        }
+    }
+    
+    //MARK: Open Chat From Notification
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        if let recipientAddress = userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String
+        {
+            if let tabbar = window?.rootViewController as? UITabBarController,
+               let chats = tabbar.viewControllers?.first as? UISplitViewController,
+               let chatList = chats.viewControllers.first as? UINavigationController,
+               let list = chatList.viewControllers.first as? ChatListViewController {
+             
+                guard let room = list.chatsController?.fetchedObjects?.first(where: { room in
+                    return room.lastTransaction?.recipientAddress == recipientAddress
+                }) else { return }
+                
+                switch list.accountService.state {
+                case .loggedIn:
+                    self.openDialog(chatList: chatList, tabbar: tabbar, list: list, chatroom: room)
+                case .notLogged:
+                    break
+                case .isLoggingIn:
+                    break
+                case .updating:
+                    break
+                }
+                
+                // if not logged in
+                list.didLoadedMessages = { [weak self] in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, chatroom: room)
+                    }
+                }
+            }
+            completionHandler(.newData)
+        } else {
+            completionHandler(.noData)
+        }
+    }
+    
+    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, list: ChatListViewController, chatroom: Chatroom) {
+        chatList.popToRootViewController(animated: false)
+        chatList.dismiss(animated: false, completion: nil)
+        tabbar.selectedIndex = 0
+        
+        let vc = list.chatViewController(for: chatroom)
+        
+        if let split = list.splitViewController {
+            let chat = UINavigationController(rootViewController:vc)
+            split.showDetailViewController(chat, sender: self)
+        } else {
+            chatList.pushViewController(vc, animated: true)
         }
     }
 }
@@ -530,9 +581,9 @@ extension AppDelegate {
                     }
                     
                     // if not logged in
-                    list.didLoadedMessages = {
+                    list.didLoadedMessages = { [weak self] in
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                            self.openDialog(chatList: chatList, tabbar: tabbar, router: router, list: list, adamantAdr: adamantAdr)
+                            self?.openDialog(chatList: chatList, tabbar: tabbar, router: router, list: list, adamantAdr: adamantAdr)
                         }
                     }
                 }
@@ -542,7 +593,7 @@ extension AppDelegate {
         return true
     }
     
-    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, router: Router, list: ChatListViewController, adamantAdr: AdamantAddress){
+    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, router: Router, list: ChatListViewController, adamantAdr: AdamantAddress) {
         chatList.popToRootViewController(animated: false)
         chatList.dismiss(animated: false, completion: nil)
         tabbar.selectedIndex = 0
