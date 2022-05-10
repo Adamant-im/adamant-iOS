@@ -8,13 +8,7 @@
 
 import UIKit
 import BitcoinKit
-import BitcoinKit.Private
-
-extension BitcoinKit.Transaction: RawTransaction {
-    var txHash: String? {
-        return txID
-    }
-}
+import BitcoinKitPrivate
 
 extension BtcWalletService: WalletServiceTwoStepSend {
     typealias T = BitcoinKit.Transaction
@@ -144,83 +138,19 @@ extension BtcWalletService: WalletServiceTwoStepSend {
     }
 }
 
-extension BitcoinKit.Transaction: TransactionDetails {
-    var txId: String {
-        return txID
-    }
-    
-    var dateValue: Date? {
-        //      0               Not locked
-        //      < 500000000     Block number at which this transaction is unlocked
-        //      >= 500000000    UNIX timestamp at which this transaction is unlocked
-        switch lockTime {
-        case 1..<500000000:
-//            if let timestamp = timestamp {
-//                return Date(timeIntervalSince1970: TimeInterval(timestamp))
-//            } else {
-                return nil
-//            }
-        case 500000000...:
-            return Date(timeIntervalSince1970: TimeInterval(lockTime))
-        default:
-            return nil
-        }
-    }
-    
-    var amountValue: Decimal {
-        return Decimal(outputs[0].value) / Decimal(100000000)
-    }
-    
-    var feeValue: Decimal? {
-//        if let fee = self.fee {
-//            return Decimal(fee) / Decimal(100000000)
-//        }
-        return nil
-    }
-    
-    var confirmationsValue: String? {
-        return "0"
-    }
-    
-    var blockValue: String? {
-        switch lockTime {
-        case 1..<500000000:
-            return "\(lockTime)"
-        default:
-            return nil
-        }
-    }
-    
-    var isOutgoing: Bool {
-        return true
-    }
-    
-    var transactionStatus: TransactionStatus? {
-        return .pending
-    }
-    
-    var senderAddress: String {
-        return ""//self.from.base58
-    }
-    
-    var recipientAddress: String {
-        return ""//self.to.base58
-    }
-}
-
 public protocol BinaryConvertible {
     static func +(lhs: Data, rhs: Self) -> Data
     static func +=(lhs: inout Data, rhs: Self)
 }
 
 public extension BinaryConvertible {
-    public static func +(lhs: Data, rhs: Self) -> Data {
+    static func +(lhs: Data, rhs: Self) -> Data {
         var value = rhs
         let data = Data(buffer: UnsafeBufferPointer(start: &value, count: 1))
         return lhs + data
     }
     
-    public static func +=(lhs: inout Data, rhs: Self) {
+    static func +=(lhs: inout Data, rhs: Self) {
         lhs = lhs + rhs
     }
 }

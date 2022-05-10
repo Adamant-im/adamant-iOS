@@ -6,7 +6,7 @@
 //  Copyright © 2019 Adamant. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import BitcoinKit
 
 class BtcTransactionsViewController: TransactionsListViewControllerBase {
@@ -17,7 +17,7 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
     var router: Router!
     
     // MARK: - Properties
-    var transactions: [Payment] = []
+    var transactions: [BtcTransaction] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,7 +30,7 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
-        self.btcWalletService.getTransactions({ (result) in
+        self.btcWalletService.getTransactions { (result) in
             switch result {
             case .success(let transactions):
                 self.transactions = transactions
@@ -50,7 +50,7 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
             DispatchQueue.main.async {
                 self.refreshControl.endRefreshing()
             }
-        })
+        }
     }
     
     
@@ -97,7 +97,7 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
         return cell
     }
     
-    func configureCell(_ cell: TransactionTableViewCell, for transaction: Payment) {
+    func configureCell(_ cell: TransactionTableViewCell, for transaction: BtcTransaction) {
         let outgoing = transaction.isOutgoing
         let partnerId = outgoing ? transaction.recipientAddress : transaction.senderAddress
         
@@ -105,65 +105,7 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
                       isOutgoing: outgoing,
                       partnerId: partnerId,
                       partnerName: nil,
-                      amount: transaction.amountValue,
+                      amount: transaction.amountValue ?? 0,
                       date: transaction.dateValue)
-    }
-}
-
-extension Payment: TransactionDetails {
-    var txId: String {
-        return txid
-    }
-    
-    var dateValue: Date? {
-        if timestamp > 0 {
-            return Date(timeIntervalSince1970: TimeInterval(timestamp))
-        }
-        return nil
-    }
-    
-    var amountValue: Decimal {
-        return Decimal(self.amount) / Decimal(100000000)
-    }
-    
-    var feeValue: Decimal? {
-        if let fee = self.fee {
-            return Decimal(fee) / Decimal(100000000)
-        }
-        return nil
-    }
-    
-    var confirmationsValue: String? {
-        if confirmations > 0 {
-            return "\(confirmations)"
-        }
-        return nil
-    }
-    
-    var blockValue: String? {
-        if blockHeight > 0 {
-            return "\(blockHeight)"
-        }
-        return nil
-    }
-    
-    var isOutgoing: Bool {
-        return state == .sent
-    }
-    
-    var transactionStatus: TransactionStatus? {
-        if self.confirmations > 0 {
-            return .success
-        } else {
-            return .pending
-        }
-    }
-    
-    var senderAddress: String {
-        return self.from.base58
-    }
-    
-    var recipientAddress: String {
-        return self.to.base58
     }
 }

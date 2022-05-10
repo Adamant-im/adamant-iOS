@@ -8,10 +8,58 @@
 
 import UIKit
 import Swinject
+import Alamofire
 import BitcoinKit
-import BitcoinKit.Private
+import BitcoinKitPrivate
+
+struct BtcApiCommands {
+
+    static func getHeight() -> String {
+        return "/blocks/tip/height"
+    }
+
+    static func getFeeRate() -> String {
+        return "/fee-estimates" //this._get('').then(estimates => estimates['2'])
+    }
+
+    static func balance(for address: String) -> String {
+        return "/address/\(address)"
+    }
+
+    static func getTransactions(for address: String, toTx: String? = nil) -> String {
+        var url = "/address/\(address)/txs"
+        if let toTx = toTx {
+            url += "/chain/\(toTx)"
+        }
+        return url
+    }
+
+    static func getTransaction(by hash: String) -> String {
+        return "/tx/\(hash)"
+    }
+    
+    static func getUnspentTransactions(for address: String) -> String {
+        return "/address/\(address)/utxo"
+    }
+    
+    static func sendTransaction() -> String {
+        return "/tx"
+    }
+}
 
 class BtcWalletService: WalletService {
+    var tokenSymbol: String {
+        return type(of: self).currencySymbol
+    }
+    
+    var tokenName: String {
+        return ""
+    }
+    
+    var tokenLogo: UIImage {
+        return type(of: self).currencyLogo
+    }
+    
     var wallet: WalletAccount? { return btcWallet }
     
     var walletViewController: WalletViewController {
@@ -38,7 +86,9 @@ class BtcWalletService: WalletService {
     // MARK: - Constants
     static var currencySymbol = "BTC"
     static var currencyLogo = #imageLiteral(resourceName: "wallet_btc")
-    
+
+    static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
+
     static let defaultFee: Int64 = Priority.medium.rawValue
     
     enum Priority: Int64 {
@@ -50,7 +100,6 @@ class BtcWalletService: WalletService {
     private (set) var transactionFee: Decimal = Decimal(BtcWalletService.defaultFee) / Decimal(100000000)
     
     static let kvsAddress = "btc:address"
-    static let kvsCheckpoint = "btc:checkpoint"
     private let walletPath = "m/44'/0'/21'/0/0"
     
     // MARK: - Notifications
@@ -67,17 +116,14 @@ class BtcWalletService: WalletService {
     
     private (set) var enabled = true
     
-    public var network: CustomNetwork
-    
-    private var checkpointSyncer: CheckpointSyncer?
+    public var network: Network
     
     private var initialBalanceCheck = false
     
+    private static let jsonDecoder = JSONDecoder()
+    
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.btcWalletService", qos: .utility, attributes: [.concurrent])
     let stateSemaphore = DispatchSemaphore(value: 1)
-    
-    var peerGroup: PeerGroup?
-    var blockStore: SQLiteBlockStore?
     
     // MARK: - State
     private (set) var state: WalletServiceState = .notInitiated
@@ -97,16 +143,9 @@ class BtcWalletService: WalletService {
     }
     
     init(mainnet: Bool) {
-        self.network = mainnet ? AdmBTCMainnet() : AdmBTCTestnet()
+        self.network = BTCMainnet()
         
         self.setState(.notInitiated)
-        
-        self.checkpointSyncer = CheckpointSyncer(network: self.network)
-        self.checkpointSyncer?.start()
-    }
-    
-    deinit {
-        self.stopSync()
     }
     
     func update() {
@@ -223,70 +262,7 @@ class BtcWalletService: WalletService {
             }
         }
     }
-    
-    func getCheckpoint(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<Checkpoint>) -> Void) {
-        apiService.get(key: BtcWalletService.kvsCheckpoint, sender: address) { (result) in
-            switch result {
-            case .success(let rawValue):
-                guard let value = rawValue else {
-                    completion(.failure(error: .walletNotInitiated))
-                    return
-                }
-                
-                guard let object = value.toDictionary(), let checkpoint = Checkpoint.fromDictionry(object) else {
-                    completion(.failure(error: .internalError(message: "Processing error", error: nil)))
-                    return
-                }
-                
-                completion(.success(result: checkpoint))
-                
-            case .failure(let error):
-                completion(.failure(error: .internalError(message: "BTC Wallet: fail to get Checpoint from KVS", error: error)))
-            }
-        }
-    }
-    
-    func startSync(from checkpoint: Checkpoint) {
-        print("start sync")
-        
-        self.network.customCheckpoint = checkpoint
-        
-        var bdName: String? = nil
-        var dbPassphrase: String? = nil
-        if let privateKey = btcWallet?.privateKey.data.bytes {
-            bdName = "\(privateKey.hexString())-\(self.network.scheme)-\(self.network.alias)".sha256().sha512().md5()
-            dbPassphrase = privateKey.hexString()
-        }
-        
-        let blockStore = SQLiteBlockStore(network: self.network, name: bdName, passphrase: dbPassphrase)
-        let blockChain = BlockChain(network: self.network, blockStore: blockStore)
-        self.peerGroup = PeerGroup(blockChain: blockChain)
-        self.peerGroup?.delegate = self
-        
-        self.blockStore = blockStore
-        
-        if let wallet = self.btcWallet {
-            let address = wallet.publicKey.toCashaddr()
-            
-            if let publicKey = address.publicKey {
-                self.peerGroup?.addFilter(publicKey)
-            }
-            self.peerGroup?.addFilter(address.data)
-        }
-        
-        self.peerGroup?.start()
-        
-        self.initialBalanceCheck = true
-//        self.setState(.upToDate, silent: true)
-//        self.update()
-    }
-    
-    func stopSync() {
-        if let peerGroup = peerGroup {
-            print("stop sync")
-            peerGroup.stop()
-        }
-    }
+
 }
                         
 // MARK: - WalletInitiatedWithPassphrase
@@ -347,30 +323,13 @@ extension BtcWalletService: InitiatedWithPassphraseService {
                         service.save(btcAddress: eWallet.address) { result in
                             service.kvsSaveCompletionRecursion(btcAddress: eWallet.address, result: result)
                         }
-                        
-                        service.checkpointSyncer?.onFinish { checkpoint in
-                            service.save(btcCheckpoint: checkpoint) { result in
-                                service.kvsSaveCompletionRecursion(btcCheckpoint: checkpoint, result: result)
-                            }
-
-                            service.startSync(from: checkpoint)
-                            completion(.success(result: eWallet))
-                        }
                         return
                     }
 
-                    // MARK: 5. Save checkpoint into KVS
-                    service.initChecpoint(for: adamant.address) { result in
-                        switch result {
-                        case .success(let checkpoint):
-                            service.startSync(from: checkpoint)
-                            completion(.success(result: eWallet))
-                        case .failure(let error):
-                            completion(.failure(error: error))
-                            return
-                        }
-                    }
-
+                    service.initialBalanceCheck = true
+                    service.setState(.upToDate, silent: true)
+                    service.update()
+                    
                     completion(.success(result: eWallet))
                     
                 case .failure(let error):
@@ -395,35 +354,7 @@ extension BtcWalletService: InitiatedWithPassphraseService {
             }
         }
     }
-    
-    func initChecpoint(for address: String, completion: @escaping (WalletServiceResult<Checkpoint>) -> Void) {
-        self.getCheckpoint(byAdamantAddress: address) { [weak self]  result in
-            guard let service = self else {
-                return
-            }
-            
-            switch result {
-            case .success(let value):
-                service.checkpointSyncer?.stop()
-                completion(.success(result: value))
-                
-            case .failure(let error):
-                switch error {
-                case .walletNotInitiated:
-                    service.checkpointSyncer?.onFinish { checkpoint in
-                        service.save(btcCheckpoint: checkpoint) { result in
-                            service.kvsSaveCompletionRecursion(btcCheckpoint: checkpoint, result: result)
-                        }
-                        
-                        completion(.success(result: checkpoint))
-                    }
-                    
-                default:
-                    completion(.failure(error: error))
-                }
-            }
-        }
-    }
+
 }
 
 // MARK: - Dependencies
@@ -438,20 +369,43 @@ extension BtcWalletService: SwinjectDependentService {
 
 // MARK: - Balances & addresses
 extension BtcWalletService {
+
     func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
-        if let address = self.btcWallet?.publicKey.toCashaddr(), let blockChain = self.peerGroup?.blockChain {
-            defaultDispatchQueue.async {
-                let balance: Int64 = try! blockChain.calculateBalance(address: address)
-                
-                DispatchQueue.main.async {
-                    let decimal = Decimal(balance)
-                    completion(.success(result: (decimal / Decimal(100000000))))
+        guard let url = AdamantResources.btcServers.randomElement() else {
+            fatalError("Failed to get DOGE endpoint URL")
+        }
+        
+        guard let address = self.btcWallet?.address else {
+            completion(.failure(error: .walletNotInitiated))
+            return
+        }
+        
+        // Headers
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json"
+        ]
+        
+        // Request url
+        let endpoint = url.appendingPathComponent(BtcApiCommands.balance(for: address))
+        
+        // MARK: Sending request
+        AF.request(endpoint, method: .get, headers: headers).responseString(queue: defaultDispatchQueue) { response in
+            
+            switch response.result {
+            case .success(let data):
+                if let raw = Decimal(string: data) {
+                    let balance = raw / BtcWalletService.multiplier
+                    completion(.success(result: balance))
+                } else {
+                    completion(.failure(error: .remoteServiceError(message: "BTC Wallet: \(data)")))
                 }
+                
+            case .failure:
+                completion(.failure(error: .networkError))
             }
-        } else {
-            completion(.failure(error: .internalError(message: "BTC Wallet: not found", error: nil)))
         }
     }
+
 }
 
 // MARK: - KVS
@@ -481,31 +435,7 @@ extension BtcWalletService {
             }
         }
     }
-    
-    private func save(btcCheckpoint: Checkpoint, completion: @escaping (WalletServiceSimpleResult) -> Void) {
-        guard let adamant = accountService.account, let keypair = accountService.keypair else {
-            completion(.failure(error: .notLogged))
-            return
-        }
-        
-        guard adamant.balance >= AdamantApiService.KvsFee else {
-            completion(.failure(error: .notEnoughMoney))
-            return
-        }
-        
-        let value = JSONStringify(value: btcCheckpoint.toDictionry() as AnyObject)
-        
-        apiService.store(key: BtcWalletService.kvsCheckpoint, value: value, type: .keyValue, sender: adamant.address, keypair: keypair) { result in
-            switch result {
-            case .success:
-                completion(.success)
-                
-            case .failure(let error):
-                completion(.failure(error: .apiError(error)))
-            }
-        }
-    }
-    
+
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
     private func kvsSaveCompletionRecursion(btcAddress: String, result: WalletServiceSimpleResult) {
         if let observer = balanceObserver {
@@ -540,7 +470,6 @@ extension BtcWalletService {
         }
     }
     
-    
     private func kvsSaveCompletionRecursion(btcCheckpoint: Checkpoint, result: WalletServiceSimpleResult) {
         if let observer = balanceObserver {
             NotificationCenter.default.removeObserver(observer)
@@ -559,10 +488,6 @@ extension BtcWalletService {
                     guard let balance = self?.accountService.account?.balance, balance > AdamantApiService.KvsFee else {
                         return
                     }
-                    
-                    self?.save(btcCheckpoint: btcCheckpoint) { result in
-                        self?.kvsSaveCompletionRecursion(btcCheckpoint: btcCheckpoint, result: result)
-                    }
                 }
                 
                 // Save referense to unregister it later
@@ -577,33 +502,93 @@ extension BtcWalletService {
 
 // MARK: - Transactions
 extension BtcWalletService {
-    func getTransactions(_ completion: @escaping (ApiServiceResult<[Payment]>) -> Void) {
-        if let address = self.btcWallet?.publicKey.toCashaddr(), let blockStore = self.blockStore {
-            defaultDispatchQueue.async {
-                if let transactions = try? blockStore.transactions(address: address) {
-                     completion(.success(transactions))
-                } else {
-                    completion(.success([Payment]()))
-                }
-            }
-        } else {
-            completion(.failure(.internalError(message: "BTC Wallet: not found", error: nil)))
+    func getTransactions(completion: @escaping (ApiServiceResult<[BtcTransaction]>) -> Void) {
+        guard let address = self.wallet?.address else {
+            completion(.failure(.notLogged))
+            return
         }
-    }
-    
-    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<Payment>) -> Void) {
-        defaultDispatchQueue.async {
-            do {
-                if let transaction = try self.blockStore?.transaction(with: hash) {
-                    completion(.success(transaction))
-                } else {
-                    completion(.failure(.internalError(message: "No transaction", error: nil)))
-                }
-            } catch (let error) {
-                completion(ApiServiceResult.failure(ApiServiceError.networkError(error: AdamantError(message: "Problem with getting BTC transaction", error: error))))
+        
+        getTransactions(for: address) { response in
+            switch response {
+            case .success(let items):
+                let transactions = items.map { $0.asBtcTransaction(BtcTransaction.self, for: address) }
+                completion(.success(transactions))
+            case .failure(let error):
+                completion(.failure(error))
             }
         }
     }
+
+    private func getTransactions(for address: String, completion: @escaping (ApiServiceResult<[BTCRawTransaction]>) -> Void) {
+        guard let url = AdamantResources.btcServers.randomElement() else {
+            fatalError("Failed to get BTC endpoint URL")
+        }
+        
+        // Headers
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json"
+        ]
+        
+        // Request url
+        let endpoint = url.appendingPathComponent(BtcApiCommands.getTransactions(for: address))
+        
+        // MARK: Sending request
+        AF.request(
+            endpoint,
+            method: .get,
+            headers: headers
+        ).responseData(queue: defaultDispatchQueue) { response in
+            switch response.result {
+            case .success(let data):
+                do {
+                    let response = try BtcWalletService.jsonDecoder.decode([BTCRawTransaction].self,
+                                                                           from: data)
+                    completion(.success(response))
+                } catch {
+                    completion(.failure(.internalError(message: "BTC Wallet: not a valid response",
+                                                       error: error)))
+                }
+            case .failure(let error):
+                completion(.failure(.serverError(error: error.localizedDescription)))
+            }
+        }
+    }
+
+    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<BTCRawTransaction>) -> Void) {
+        guard let url = AdamantResources.dogeServers.randomElement() else {
+            fatalError("Failed to get BTC endpoint URL")
+        }
+        
+        // Headers
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json"
+        ]
+        
+        // Request url
+        let endpoint = url.appendingPathComponent(BtcApiCommands.getTransaction(by: hash))
+        
+        // MARK: Sending request
+        AF.request(
+            endpoint,
+            method: .get,
+            headers: headers
+        ).responseData(queue: defaultDispatchQueue) { response in
+            switch response.result {
+            case .success(let data):
+                do {
+                    let transfers = try BtcWalletService.jsonDecoder.decode(BTCRawTransaction.self,
+                                                                            from: data)
+                    completion(.success(transfers))
+                } catch {
+                    completion(.failure(.internalError(message: "Unaviable transaction", error: error)))
+                }
+                
+            case .failure(let error):
+                completion(.failure(.internalError(message: "No transaction", error: error)))
+            }
+        }
+    }
+
 }
 
 extension BtcWalletService: WalletServiceWithTransfers {
@@ -617,166 +602,6 @@ extension BtcWalletService: WalletServiceWithTransfers {
     }
 }
 
-
-// BTC Sync
-extension BtcWalletService: PeerGroupDelegate {
-    func peerGroupDidStop(_ peerGroup: PeerGroup) {
-        peerGroup.delegate = nil
-        self.peerGroup = nil
-    }
-    
-    func peerGroupDidChanged(_ state: PeerState) {
-        switch state {
-        case .notSynced:
-            self.setState(.notInitiated, silent: false)
-        case .syncing(_):
-            self.setState(.updating, silent: false)
-        case .synced:
-            self.initialBalanceCheck = false
-            self.setState(.upToDate, silent: false)
-            self.update()
-        }
-    }
-}
-
-class CustomNetwork: Network {
-    public var customCheckpoint: Checkpoint?
-}
-
-class AdmBTCTestnet: CustomNetwork {
-    
-    public override var name: String {
-        return "testnet"
-    }
-    public override var alias: String {
-        return "testnet"
-    }
-    override public var pubkeyhash: UInt8 {
-        return 0x6f
-    }
-    override public var privatekey: UInt8 {
-        return 0xef
-    }
-    override public var scripthash: UInt8 {
-        return 0xc4
-    }
-    override public var xpubkey: UInt32 {
-        return 0x043587cf
-    }
-    override public var xprivkey: UInt32 {
-        return 0x04358394
-    }
-    public override var port: UInt32 {
-        return 18_333
-    }
-    override public var checkpoints: [Checkpoint] {
-        var value = [
-            Checkpoint(height: 0, hash: genesisBlock, timestamp: 1_376_543_922, target: 0x1d00ffff),
-            Checkpoint(height: 1450248, hash: Data(Data(hex: "000000000000d19bf1c7fdcc2f2d9a917fd837628ce09ed9439771a6d8391210")!.reversed()), timestamp: 1546234270, target: 0x1d00ffff)
-        ]
-        
-        if let checkpoint = customCheckpoint {
-            value.append(checkpoint)
-        }
-        return value
-    }
-    override public var genesisBlock: Data {
-        return Data(Data(hex: "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943")!.reversed())
-    }
-    
-    override var scheme: String {
-        return "bitcoin"
-    }
-
-    override public var magic: UInt32 {
-        return 0x0b110907
-    }
-    override var dnsSeeds: [String] {
-        return [
-//            "testnet-seed.bitcoin.jonasschnelli.ch", // Jonas Schnelli
-            "testnet-seed.bluematt.me",              // Matt Corallo
-            "testnet-seed.bitcoin.petertodd.org",    // Peter Todd
-            "testnet-seed.bitcoin.schildbach.de",    // Andreas Schildbach
-            "bitcoin-testnet.bloqseeds.net"         // Bloq
-        ]
-    }
-}
-
-class AdmBTCMainnet: CustomNetwork {
-    
-    public override var name: String {
-        return "livenet"
-    }
-    public override var alias: String {
-        return "mainnet"
-    }
-    override public var pubkeyhash: UInt8 {
-        return 0x00
-    }
-    override public var privatekey: UInt8 {
-        return 0x80
-    }
-    override public var scripthash: UInt8 {
-        return 0x05
-    }
-    override public var xpubkey: UInt32 {
-        return 0x0488b21e
-    }
-    override public var xprivkey: UInt32 {
-        return 0x0488ade4
-    }
-    public override var port: UInt32 {
-        return 8333
-    }
-    override public var checkpoints: [Checkpoint] {
-        var value = [
-            Checkpoint(height: 0, hash: genesisBlock, timestamp: 1_231_006_505, target: 0x1d00ffff),
-            Checkpoint(height: 564_356, hash: Data(Data(hex: "000000000000000000003d8a4f78cb280e50012872e93c5b5076b4f0419deeb8")!.reversed()), timestamp: 1_550_948_622, target: 0x172e6f88)
-        ]
-        
-        if let checkpoint = customCheckpoint {
-            value.append(checkpoint)
-        }
-        return value
-    }
-    override public var genesisBlock: Data {
-        return Data(Data(hex: "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f")!.reversed())
-    }
-    
-    public override var scheme: String {
-        return "bitcoin"
-    }
-    
-    override public var magic: UInt32 {
-        return 0xf9beb4d9
-    }
-    
-    override var dnsSeeds: [String] {
-        return [
-            "btcnode1.adamant.im"
-        ]
-    }
-}
-
-extension Checkpoint {
-    static func fromDictionry(_ dictionry: [String: Any]) -> Checkpoint? {
-        guard let hashString = dictionry["hash"] as? String else {
-            return nil
-        }
-        
-        guard let height = dictionry["height"] as? Int32 else {
-            return nil
-        }
-        
-        let hash = Data(hex: hashString).map { Data($0.reversed()) } ?? Data()
-        
-        return Checkpoint(height: height, hash: hash)
-    }
-    
-    func toDictionry() -> [String: Any] {
-        return [
-            "hash": hash.reversed().hexString(),
-            "height": height
-        ]
-    }
+class BtcTransaction: BaseBtcTransaction {
+    override class var defaultCurrencySymbol: String? { return BtcWalletService.currencySymbol }
 }
