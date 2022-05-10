@@ -715,6 +715,31 @@ extension BtcWalletService: WalletServiceWithTransfers {
     }
 }
 
+// MARK: - PrivateKey generator
+extension BtcWalletService: PrivateKeyGenerator {
+    var rowTitle: String {
+        return "Bitcoin"
+    }
+    
+    var rowImage: UIImage? {
+        return #imageLiteral(resourceName: "wallet_btc_row")
+    }
+    
+    func generatePrivateKeyFor(passphrase: String) -> String? {
+        guard
+            AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase),
+            let privateKeyData = passphrase.data(using: .utf8)?.sha256()
+        else {
+            return nil
+        }
+
+        let privateKey = PrivateKey(data: privateKeyData,
+                                    network: self.network,
+                                    isPublicKeyCompressed: true)
+        return privateKey.toWIF()
+    }
+}
+
 class BtcTransaction: BaseBtcTransaction {
     override class var defaultCurrencySymbol: String? { return BtcWalletService.currencySymbol }
 }
