@@ -124,30 +124,28 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         ]
         
         // MARK: Sending request
-        AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+        AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseData(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
-                guard let items = data as? [[String: Any]] else {
+                guard
+                    let items = try? Self.jsonDecoder.decode([BtcUnspentTransactionResponse].self,
+                                                             from: data)
+                else {
                     completion(.failure(.internalError(message: "BTC Wallet: not valid response", error: nil)))
                     break
                 }
                 
                 var utxos = [UnspentTransaction]()
                 for item in items {
-                    guard
-                        let txid = item["txid"] as? String,
-                        let confirmations = item["confirmations"] as? NSNumber,
-                        confirmations.intValue > 0,
-                        let vout = item["vout"] as? NSNumber,
-                        let amount = item["amount"] as? NSNumber else {
+                    guard item.status.confirmed else {
                         continue
                     }
                         
-                    let value = NSDecimalNumber(decimal: (amount.decimalValue * BtcWalletService.multiplier)).uint64Value
+                    let value = NSDecimalNumber(decimal: item.value).uint64Value
                     
                     let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
-                    let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
-                    let txIndex = vout.uint32Value
+                    let txHash = Data(hex: item.txId).map { Data($0.reversed()) } ?? Data()
+                    let txIndex = item.vout
                     
                     let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
                     let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)

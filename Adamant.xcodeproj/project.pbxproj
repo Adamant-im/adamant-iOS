@@ -162,6 +162,7 @@
 		A5E04224282A830B0076CD13 /* BtcTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B5736C2201E196005DC968 /* BtcTransactionsViewController.swift */; };
 		A5E04227282A8BDC0076CD13 /* BtcBalanceResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E04226282A8BDC0076CD13 /* BtcBalanceResponse.swift */; };
 		A5E04229282A998C0076CD13 /* BtcTransactionResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E04228282A998C0076CD13 /* BtcTransactionResponse.swift */; };
+		A5E0422B282AB18B0076CD13 /* BtcUnspentTransactionResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E0422A282AB18B0076CD13 /* BtcUnspentTransactionResponse.swift */; };
 		A5F0A04B262C9CA90009672A /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = A5F0A04A262C9CA90009672A /* Swinject */; };
 		A5F92994262C855B00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F92993262C855B00C3E60A /* MarkdownKit */; };
 		A5F929AF262C857D00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F929AE262C857D00C3E60A /* MarkdownKit */; };
@@ -727,6 +728,7 @@
 		A5BBD810262C657300B5C40C /* ByteBackpacker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteBackpacker.swift; sourceTree = "<group>"; };
 		A5E04226282A8BDC0076CD13 /* BtcBalanceResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcBalanceResponse.swift; sourceTree = "<group>"; };
 		A5E04228282A998C0076CD13 /* BtcTransactionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcTransactionResponse.swift; sourceTree = "<group>"; };
+		A5E0422A282AB18B0076CD13 /* BtcUnspentTransactionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcUnspentTransactionResponse.swift; sourceTree = "<group>"; };
 		AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
 		ADDFD2FA17E41CCBD11A1733 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
 		E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
@@ -1227,6 +1229,7 @@
 			children = (
 				A5E04226282A8BDC0076CD13 /* BtcBalanceResponse.swift */,
 				A5E04228282A998C0076CD13 /* BtcTransactionResponse.swift */,
+				A5E0422A282AB18B0076CD13 /* BtcUnspentTransactionResponse.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -2658,6 +2661,7 @@
 				E93D7ABE2052CEE1005D19DC /* NotificationsService.swift in Sources */,
 				E940087D2114EDEE00CD2D67 /* EthWallet.swift in Sources */,
 				6416B1A121AD7D93006089AC /* LskTransferViewController.swift in Sources */,
+				A5E0422B282AB18B0076CD13 /* BtcUnspentTransactionResponse.swift in Sources */,
 				E972206B201F44CA004F2AAD /* TransfersProvider.swift in Sources */,
 				E9FEECA421413659007DD7C8 /* RichMessageProvider.swift in Sources */,
 				6406D74D21CE3AC100196713 /* KeyboardManager.swift in Sources */,
