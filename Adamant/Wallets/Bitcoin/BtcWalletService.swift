@@ -214,8 +214,7 @@ class BtcWalletService: WalletService {
                 return
             }
 
-            let count = transactions.count + 1
-            let fee = Decimal(count * 181 + 78) * feeRate
+            let fee = Decimal(transactions.count * 181 + 78) * feeRate
             self?.transactionFee = fee / BtcWalletService.multiplier
         }
 

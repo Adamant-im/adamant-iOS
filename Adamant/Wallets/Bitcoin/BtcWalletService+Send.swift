@@ -78,13 +78,15 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         
         // MARK: Prepare params
         let txHex = transaction.serialized().hex
-        
-        let parameters: Parameters = [
-            "rawtx": txHex
-        ]
-        
+
         // MARK: Sending request
-        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+        AF.request(
+            endpoint,
+            method: .post,
+            parameters: [:],
+            encoding: txHex,
+            headers: headers
+        ).responseJSON(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
                 if let result = data as? [String: Any], let txid = result["txid"] as? String {
@@ -160,6 +162,16 @@ extension BtcWalletService: WalletServiceTwoStepSend {
                 completion(.failure(.internalError(message: "BTC Wallet: server not response", error: nil)))
             }
         }
+    }
+
+}
+
+extension String: ParameterEncoding {
+
+    public func encode(_ urlRequest: URLRequestConvertible, with parameters: Parameters?) throws -> URLRequest {
+        var request = try urlRequest.asURLRequest()
+        request.httpBody = data(using: .utf8, allowLossyConversion: false)
+        return request
     }
 
 }

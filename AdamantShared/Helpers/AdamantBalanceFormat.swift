@@ -37,7 +37,9 @@ enum AdamantBalanceFormat {
         
         switch format {
         case .full: positiveFormat = "#.########"
-        case .compact: positiveFormat = "#.####"
+        case .compact:
+            formatter.roundingMode = .ceiling
+            positiveFormat = "#.####"
         case .short: positiveFormat = "#.##"
         }
         
