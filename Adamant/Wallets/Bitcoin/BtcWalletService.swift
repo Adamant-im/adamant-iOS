@@ -142,9 +142,8 @@ class BtcWalletService: WalletService {
         }
     }
     
-    init(mainnet: Bool) {
+    init() {
         self.network = BTCMainnet()
-        
         self.setState(.notInitiated)
     }
     
@@ -290,16 +289,8 @@ extension BtcWalletService: InitiatedWithPassphraseService {
         }
         
         defaultDispatchQueue.async { [unowned self] in
-            let mnemonic = passphrase.components(separatedBy: " ")
-            let seed = BitcoinKit.Mnemonic.seed(mnemonic: mnemonic)
-            
-            let keychain = HDKeychain(seed: seed, network: self.network)
-            guard let privateKey = try? keychain.derivedKey(path: self.walletPath).privateKey() else {
-                completion(.failure(error: .accountNotFound))
-                self.stateSemaphore.signal()
-                return
-            }
-            
+            let privateKeyData = passphrase.data(using: .utf8)!.sha256()
+            let privateKey = PrivateKey(data: privateKeyData, network: self.network, isPublicKeyCompressed: true)
             let eWallet = BtcWallet(privateKey: privateKey)
             self.btcWallet = eWallet
             
