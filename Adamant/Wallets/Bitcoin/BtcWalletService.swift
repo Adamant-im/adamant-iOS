@@ -96,6 +96,7 @@ class BtcWalletService: WalletService {
 
     static let multiplier = Decimal(sign: .plus, exponent: 8, significand: 1)
 
+    private (set) var currentHeight: Decimal?
     private var feeRate: Decimal = 1
     private (set) var transactionFee: Decimal = DefaultBtcTransferFee.medium.rawValue / multiplier
     
@@ -216,6 +217,11 @@ class BtcWalletService: WalletService {
             let count = transactions.count + 1
             let fee = Decimal(count * 181 + 78) * feeRate
             self?.transactionFee = fee / BtcWalletService.multiplier
+        }
+
+        getCurrentHeight { [weak self] result in
+            guard case .success(let height) = result else { return }
+            self?.currentHeight = height
         }
     }
     
@@ -456,6 +462,40 @@ extension BtcWalletService {
         }
     }
 
+    func getCurrentHeight(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
+        guard let url = AdamantResources.btcServers.randomElement() else {
+            fatalError("Failed to get BTC endpoint URL")
+        }
+        
+        // Headers
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json"
+        ]
+        
+        // Request url
+        let endpoint = url.appendingPathComponent(BtcApiCommands.getHeight())
+        
+        // MARK: Sending request
+        AF.request(
+            endpoint,
+            method: .get,
+            headers: headers
+        ).responseData(queue: defaultDispatchQueue) { response in
+            switch response.result {
+            case .success(let data):
+                do {
+                    let value = try Self.jsonDecoder.decode(Decimal.self, from: data)
+                    completion(.success(result: value))
+                } catch {
+                    completion(.failure(error: .internalError(message: "BTC Wallet: not a valid response", error: error)))
+                }
+                
+            case .failure:
+                completion(.failure(error: .networkError))
+            }
+        }
+    }
+
 }
 
 // MARK: - KVS
@@ -558,10 +598,18 @@ extension BtcWalletService {
             return
         }
         
-        getTransactions(for: address) { response in
+        getTransactions(for: address) { [weak self] response in
+            guard let self = self else { return }
+
             switch response {
             case .success(let items):
-                let transactions = items.map { $0.asBtcTransaction(BtcTransaction.self, for: address) }
+                let transactions = items.map {
+                    $0.asBtcTransaction(
+                        BtcTransaction.self,
+                        for: address,
+                        height: self.currentHeight
+                    )
+                }
                 completion(.success(transactions))
             case .failure(let error):
                 completion(.failure(error))
@@ -628,14 +676,21 @@ extension BtcWalletService {
             endpoint,
             method: .get,
             headers: headers
-        ).responseData(queue: defaultDispatchQueue) { response in
+        ).responseData(queue: defaultDispatchQueue) { [weak self] response in
+            guard let self = self else { return }
+
             switch response.result {
             case .success(let data):
                 do {
-                    let rawTransaction = try Self.jsonDecoder.decode(RawBtcTransactionResponse.self,
-                                                                     from: data)
-                    let transaction = rawTransaction.asBtcTransaction(BtcTransaction.self,
-                                                                      for: address)
+                    let rawTransaction = try Self.jsonDecoder.decode(
+                        RawBtcTransactionResponse.self,
+                        from: data
+                    )
+                    let transaction = rawTransaction.asBtcTransaction(
+                        BtcTransaction.self,
+                        for: address,
+                        height: self.currentHeight
+                    )
                     completion(.success(transaction))
                 } catch {
                     completion(.failure(.internalError(message: "Unaviable transaction", error: error)))

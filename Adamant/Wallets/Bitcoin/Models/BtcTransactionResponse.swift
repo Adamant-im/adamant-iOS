@@ -161,7 +161,7 @@ extension RawBtcTransactionResponse {
         // MARK: Outputs
         let outputTransaction = T(txId: txId,
                                   dateValue: date,
-                                  blockValue: nil,
+                                  blockValue: status.hash,
                                   senderAddress: sender,
                                   recipientAddress: address,
                                   amountValue: totalOutputsValue,
