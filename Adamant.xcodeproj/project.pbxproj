@@ -101,6 +101,7 @@
 		64A223D820F7A08E005157CB /* LskApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A223D720F7A08E005157CB /* LskApiService.swift */; };
 		64AE84612300012400F38FBD /* DashProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64AE845F2300012200F38FBD /* DashProvider.swift */; };
 		64AE84622300012400F38FBD /* DashProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64AE845F2300012200F38FBD /* DashProvider.swift */; };
+		64B5736F2209B892005DC968 /* BtcTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B5736E2209B892005DC968 /* BtcTransactionDetailsViewController.swift */; };
 		64BD2B7520E2814B00E2CD36 /* EthTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */; };
 		64BD2B7720E2820300E2CD36 /* TransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */; };
 		64C65F4523893C7600DC0425 /* OnboardOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64C65F4423893C7600DC0425 /* OnboardOverlay.swift */; };
@@ -121,7 +122,6 @@
 		A50A41082822F8CE006BDFE1 /* BtcWalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50A41042822F8CE006BDFE1 /* BtcWalletService.swift */; };
 		A50A41092822F8CE006BDFE1 /* BtcWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50A41052822F8CE006BDFE1 /* BtcWalletViewController.swift */; };
 		A50A410A2822F8CE006BDFE1 /* BtcWallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50A41062822F8CE006BDFE1 /* BtcWallet.swift */; };
-		A50A410C2822F953006BDFE1 /* BtcTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50A410B2822F953006BDFE1 /* BtcTransactionsViewController.swift */; };
 		A50A41112822FC35006BDFE1 /* BtcWalletService+RichMessageProviderWithStatusCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50A410D2822FC35006BDFE1 /* BtcWalletService+RichMessageProviderWithStatusCheck.swift */; };
 		A50A41122822FC35006BDFE1 /* BtcWalletService+RichMessageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50A410E2822FC35006BDFE1 /* BtcWalletService+RichMessageProvider.swift */; };
 		A50A41132822FC35006BDFE1 /* BtcWalletService+Send.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50A410F2822FC35006BDFE1 /* BtcWalletService+Send.swift */; };
@@ -159,6 +159,7 @@
 		A5DBBAE7262C72BD004AC028 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAE6262C72BD004AC028 /* CryptoSwift */; };
 		A5DBBAEE262C72EF004AC028 /* BitcoinKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAED262C72EF004AC028 /* BitcoinKit */; };
 		A5DBBAF0262C72EF004AC028 /* LiskKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAEF262C72EF004AC028 /* LiskKit */; };
+		A5E04224282A830B0076CD13 /* BtcTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B5736C2201E196005DC968 /* BtcTransactionsViewController.swift */; };
 		A5F0A04B262C9CA90009672A /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = A5F0A04A262C9CA90009672A /* Swinject */; };
 		A5F92994262C855B00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F92993262C855B00C3E60A /* MarkdownKit */; };
 		A5F929AF262C857D00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F929AE262C857D00C3E60A /* MarkdownKit */; };
@@ -693,6 +694,8 @@
 		64A223D520F760BB005157CB /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		64A223D720F7A08E005157CB /* LskApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LskApiService.swift; sourceTree = "<group>"; };
 		64AE845F2300012200F38FBD /* DashProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashProvider.swift; sourceTree = "<group>"; };
+		64B5736C2201E196005DC968 /* BtcTransactionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcTransactionsViewController.swift; sourceTree = "<group>"; };
+		64B5736E2209B892005DC968 /* BtcTransactionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcTransactionDetailsViewController.swift; sourceTree = "<group>"; };
 		64BD2B7420E2814B00E2CD36 /* EthTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthTransaction.swift; sourceTree = "<group>"; };
 		64BD2B7620E2820300E2CD36 /* TransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetails.swift; sourceTree = "<group>"; };
 		64C65F4423893C7600DC0425 /* OnboardOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardOverlay.swift; sourceTree = "<group>"; };
@@ -714,7 +717,6 @@
 		A50A41042822F8CE006BDFE1 /* BtcWalletService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BtcWalletService.swift; sourceTree = "<group>"; };
 		A50A41052822F8CE006BDFE1 /* BtcWalletViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BtcWalletViewController.swift; sourceTree = "<group>"; };
 		A50A41062822F8CE006BDFE1 /* BtcWallet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BtcWallet.swift; sourceTree = "<group>"; };
-		A50A410B2822F953006BDFE1 /* BtcTransactionsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BtcTransactionsViewController.swift; sourceTree = "<group>"; };
 		A50A410D2822FC35006BDFE1 /* BtcWalletService+RichMessageProviderWithStatusCheck.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BtcWalletService+RichMessageProviderWithStatusCheck.swift"; sourceTree = "<group>"; };
 		A50A410E2822FC35006BDFE1 /* BtcWalletService+RichMessageProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BtcWalletService+RichMessageProvider.swift"; sourceTree = "<group>"; };
 		A50A410F2822FC35006BDFE1 /* BtcWalletService+Send.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BtcWalletService+Send.swift"; sourceTree = "<group>"; };
@@ -1209,7 +1211,8 @@
 				A50A410D2822FC35006BDFE1 /* BtcWalletService+RichMessageProviderWithStatusCheck.swift */,
 				A50A41052822F8CE006BDFE1 /* BtcWalletViewController.swift */,
 				A50A41102822FC35006BDFE1 /* BtcTransferViewController.swift */,
-				A50A410B2822F953006BDFE1 /* BtcTransactionsViewController.swift */,
+				64B5736C2201E196005DC968 /* BtcTransactionsViewController.swift */,
+				64B5736E2209B892005DC968 /* BtcTransactionDetailsViewController.swift */,
 			);
 			path = Bitcoin;
 			sourceTree = "<group>";
@@ -2479,7 +2482,6 @@
 				645FEB34213E72C100D6BA2D /* OnboardViewController.swift in Sources */,
 				E9B3D39A201F90570019EB36 /* AccountsProvider.swift in Sources */,
 				E950652320404C84008352E5 /* AdamantUriTools.swift in Sources */,
-				A50A410C2822F953006BDFE1 /* BtcTransactionsViewController.swift in Sources */,
 				E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */,
 				A50A41082822F8CE006BDFE1 /* BtcWalletService.swift in Sources */,
 				6455E9F121075D3600B2E94C /* AddressBookService.swift in Sources */,
@@ -2586,6 +2588,7 @@
 				648CE3A222999CE70070A2CC /* BTCRawTransaction.swift in Sources */,
 				648DD79E2236A0B500B811FD /* DogeTransactionsViewController.swift in Sources */,
 				E905D39B2048A9BD00DDB504 /* KeychainStore.swift in Sources */,
+				64B5736F2209B892005DC968 /* BtcTransactionDetailsViewController.swift in Sources */,
 				E9AA8BFC212C169200F9249F /* EthWalletService+Transfers.swift in Sources */,
 				E96D64C82295C44400CA5587 /* Data+utilites.swift in Sources */,
 				64E1C82D222E95E2006C4DA7 /* DogeWalletRoutes.swift in Sources */,
@@ -2659,6 +2662,7 @@
 				E957E0EF2299832E0019732A /* Mnemonic.swift in Sources */,
 				E9502740202E257E002C1098 /* RepeaterService.swift in Sources */,
 				E93D7AC02052CF63005D19DC /* AdamantNotificationService.swift in Sources */,
+				A5E04224282A830B0076CD13 /* BtcTransactionsViewController.swift in Sources */,
 				645938942378395E00A2BE7C /* EulaViewController.swift in Sources */,
 				649D6BEC21BD5A53009E727B /* UISuffixTextField.swift in Sources */,
 				E93B0D762028B28E00126346 /* AdamantChatsProvider.swift in Sources */,

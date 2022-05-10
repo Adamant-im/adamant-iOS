@@ -554,7 +554,12 @@ extension BtcWalletService {
         }
     }
 
-    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<BTCRawTransaction>) -> Void) {
+    func getTransaction(by hash: String, completion: @escaping (ApiServiceResult<BtcTransaction>) -> Void) {
+        guard let address = self.wallet?.address else {
+            completion(.failure(.notLogged))
+            return
+        }
+
         guard let url = AdamantResources.dogeServers.randomElement() else {
             fatalError("Failed to get BTC endpoint URL")
         }
@@ -576,9 +581,11 @@ extension BtcWalletService {
             switch response.result {
             case .success(let data):
                 do {
-                    let transfers = try BtcWalletService.jsonDecoder.decode(BTCRawTransaction.self,
-                                                                            from: data)
-                    completion(.success(transfers))
+                    let rawTransaction = try Self.jsonDecoder.decode(BTCRawTransaction.self,
+                                                                     from: data)
+                    let transaction = rawTransaction.asBtcTransaction(BtcTransaction.self,
+                                                                      for: address)
+                    completion(.success(transaction))
                 } catch {
                     completion(.failure(.internalError(message: "Unaviable transaction", error: error)))
                 }
