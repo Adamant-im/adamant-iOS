@@ -380,15 +380,20 @@ extension BtcWalletService {
         let endpoint = url.appendingPathComponent(BtcApiCommands.balance(for: address))
         
         // MARK: Sending request
-        AF.request(endpoint, method: .get, headers: headers).responseString(queue: defaultDispatchQueue) { response in
-            
+        AF.request(
+            endpoint,
+            method: .get,
+            headers: headers
+        ).responseData(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
-                if let raw = Decimal(string: data) {
-                    let balance = raw / BtcWalletService.multiplier
+                do {
+                    let response = try BtcWalletService.jsonDecoder.decode(BtcBalanceResponse.self,
+                                                                           from: data)
+                    let balance = response.value / BtcWalletService.multiplier
                     completion(.success(result: balance))
-                } else {
-                    completion(.failure(error: .remoteServiceError(message: "BTC Wallet: \(data)")))
+                } catch {
+                    completion(.failure(error: .internalError(message: "BTC Wallet: not a valid response", error: error)))
                 }
                 
             case .failure:

@@ -160,6 +160,7 @@
 		A5DBBAEE262C72EF004AC028 /* BitcoinKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAED262C72EF004AC028 /* BitcoinKit */; };
 		A5DBBAF0262C72EF004AC028 /* LiskKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5DBBAEF262C72EF004AC028 /* LiskKit */; };
 		A5E04224282A830B0076CD13 /* BtcTransactionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B5736C2201E196005DC968 /* BtcTransactionsViewController.swift */; };
+		A5E04227282A8BDC0076CD13 /* BtcBalanceResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E04226282A8BDC0076CD13 /* BtcBalanceResponse.swift */; };
 		A5F0A04B262C9CA90009672A /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = A5F0A04A262C9CA90009672A /* Swinject */; };
 		A5F92994262C855B00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F92993262C855B00C3E60A /* MarkdownKit */; };
 		A5F929AF262C857D00C3E60A /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = A5F929AE262C857D00C3E60A /* MarkdownKit */; };
@@ -723,6 +724,7 @@
 		A50A41102822FC35006BDFE1 /* BtcTransferViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BtcTransferViewController.swift; sourceTree = "<group>"; };
 		A578BDE42623051C00090141 /* DashWalletService+Transactions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DashWalletService+Transactions.swift"; sourceTree = "<group>"; };
 		A5BBD810262C657300B5C40C /* ByteBackpacker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteBackpacker.swift; sourceTree = "<group>"; };
+		A5E04226282A8BDC0076CD13 /* BtcBalanceResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcBalanceResponse.swift; sourceTree = "<group>"; };
 		AD258997F050B24C0051CC8D /* Pods-Adamant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.release.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.release.xcconfig"; sourceTree = "<group>"; };
 		ADDFD2FA17E41CCBD11A1733 /* Pods-Adamant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adamant.debug.xcconfig"; path = "Target Support Files/Pods-Adamant/Pods-Adamant.debug.xcconfig"; sourceTree = "<group>"; };
 		E90055F420EBF5DA00D0CB2D /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
@@ -1203,6 +1205,7 @@
 		A50A41022822F8CE006BDFE1 /* Bitcoin */ = {
 			isa = PBXGroup;
 			children = (
+				A5E04225282A8BC70076CD13 /* Models */,
 				A50A41062822F8CE006BDFE1 /* BtcWallet.swift */,
 				A50A41032822F8CE006BDFE1 /* BtcWalletRoutes.swift */,
 				A50A41042822F8CE006BDFE1 /* BtcWalletService.swift */,
@@ -1215,6 +1218,14 @@
 				64B5736E2209B892005DC968 /* BtcTransactionDetailsViewController.swift */,
 			);
 			path = Bitcoin;
+			sourceTree = "<group>";
+		};
+		A5E04225282A8BC70076CD13 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A5E04226282A8BDC0076CD13 /* BtcBalanceResponse.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		B92CFC9A479739E2046C81E9 /* Frameworks */ = {
@@ -2472,6 +2483,7 @@
 				640EFAA42558613A00E9724B /* EthProvider.swift in Sources */,
 				648CE3AC229AD2190070A2CC /* DashTransferViewController.swift in Sources */,
 				640EFA9C2558613200E9724B /* AdamantProvider.swift in Sources */,
+				A5E04227282A8BDC0076CD13 /* BtcBalanceResponse.swift in Sources */,
 				A50A41072822F8CE006BDFE1 /* BtcWalletRoutes.swift in Sources */,
 				64F085D920E2D7600006DE68 /* AdmTransactionsViewController.swift in Sources */,
 				648DD7AA2239150E00B811FD /* DogeWalletService+RichMessageProviderWithStatusCheck.swift in Sources */,
