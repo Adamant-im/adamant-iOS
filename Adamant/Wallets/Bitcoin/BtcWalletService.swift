@@ -372,7 +372,7 @@ extension BtcWalletService {
 
     func getBalance(_ completion: @escaping (WalletServiceResult<Decimal>) -> Void) {
         guard let url = AdamantResources.btcServers.randomElement() else {
-            fatalError("Failed to get DOGE endpoint URL")
+            fatalError("Failed to get BTC endpoint URL")
         }
         
         guard let address = self.btcWallet?.address else {
@@ -560,7 +560,7 @@ extension BtcWalletService {
             return
         }
 
-        guard let url = AdamantResources.dogeServers.randomElement() else {
+        guard let url = AdamantResources.btcServers.randomElement() else {
             fatalError("Failed to get BTC endpoint URL")
         }
         

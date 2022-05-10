@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Alamofire
 import BitcoinKit
 import BitcoinKitPrivate
 
@@ -22,7 +23,6 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         return vc
     }
     
-    
     // MARK: Create & Send
     func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<BitcoinKit.Transaction>) -> Void) {
         // MARK: 1. Prepare
@@ -34,166 +34,134 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         let changeAddress = wallet.publicKey.toCashaddr()
         let key = wallet.privateKey
         
-        guard let toAddress = try? AddressFactory.create(recipient) else {
+        guard let toAddress = try? LegacyAddress(recipient, for: self.network) else {
             completion(.failure(error: .accountNotFound))
             return
         }
         
-        let rawAwount = NSDecimalNumber(decimal: amount * Decimal(100_000_000)).int64Value
+        let rawAmount = NSDecimalNumber(decimal: amount * BtcWalletService.multiplier).uint64Value
+        let fee = NSDecimalNumber(decimal: self.transactionFee * BtcWalletService.multiplier).uint64Value
         
-        // MARK: Go background
-        defaultDispatchQueue.async {
-            
-            let latestBlockHeight = (try? self.blockStore?.latestBlockHeight() ?? 0) ?? 0
-            // MARK: 2. Search for unspent transactions
-            let payments = self.getUnspentTransactions()
-            var utxos: [UnspentTransaction] = []
-            for p in payments {
-                let value = p.amount
-                let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: p.to.data)
-                let txHash = Data(hex: p.txid).map { Data($0.reversed()) } ?? Data()
-                let txIndex = UInt32(p.index)
-                print(p.txid, txIndex, lockScript.hex, value)
+        // MARK: 2. Search for unspent transactions
+        getUnspentTransactions { result in
+            switch result {
+            case .success(let utxos):
+                // MARK: 3. Check if we have enought money
+                let totalAmount: UInt64 = UInt64(utxos.reduce(0) { $0 + $1.output.value })
+                guard totalAmount >= rawAmount + fee else { // This shit can crash BitcoinKit
+                    completion(.failure(error: .notEnoughMoney))
+                    break
+                }
                 
-                let unspentOutput = TransactionOutput(value: UInt64(value), lockingScript: lockScript)
-                let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
-                let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
-                utxos.append(utxo)
+                // MARK: 4. Create local transaction
+                let transaction = BitcoinKit.Transaction.createNewTransaction(toAddress: toAddress, amount: rawAmount, fee: fee, changeAddress: changeAddress, utxos: utxos, keys: [key])
+                completion(.success(result: transaction))
+                
+            case .failure:
+                completion(.failure(error: .notEnoughMoney))
             }
-            
-            // MARK: 3. Create local transaction
-            let unsignedTx = self.createUnsignedTx(toAddress: toAddress, amount: rawAwount, changeAddress: changeAddress, utxos: utxos, lockTime: UInt32(latestBlockHeight+1))
-            let signedTransaction = self.signTx(unsignedTx: unsignedTx, keys: [key])
-            completion(.success(result: signedTransaction))
         }
     }
     
     func sendTransaction(_ transaction: BitcoinKit.Transaction, completion: @escaping (WalletServiceResult<String>) -> Void) {
-        defaultDispatchQueue.async {
-            completion(.success(result: transaction.txID))
-            self.peerGroup?.sendTransaction(transaction: transaction)
-        }
-    }
-    
-    func getUnspentTransactions() -> [Payment] {
-        guard let address = self.btcWallet?.publicKey.toCashaddr() else {
-            return []
+        guard let url = AdamantResources.btcServers.randomElement() else {
+            fatalError("Failed to get BTC endpoint URL")
         }
         
-        return try! blockStore?.unspentTransactions(address: address) ?? []
-    }
-    
-    // TODO: select utxos and decide fee
-    public func selectTx(from utxos: [UnspentTransaction], amount: Int64) -> (utxos: [UnspentTransaction], fee: Int64) {
-        return (utxos, BtcWalletService.defaultFee)
-    }
-    
-    public func createUnsignedTx(toAddress: Address, amount: Int64, changeAddress: Address, utxos: [UnspentTransaction], lockTime: UInt32 = 0) -> UnsignedTransaction {
-        let (utxos, fee) = selectTx(from: utxos, amount: amount)
-        let totalAmount: Int64 = Int64(utxos.reduce(0) { $0 + $1.output.value })
-        let change: Int64 = totalAmount - amount - fee
+        // Request url
+        let endpoint = url.appendingPathComponent(BtcApiCommands.sendTransaction())
         
-        let toPubKeyHash: Data = toAddress.data
-        let changePubkeyHash: Data = changeAddress.data
+        // Headers
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json"
+        ]
         
-        let lockingScriptTo = Script.buildPublicKeyHashOut(pubKeyHash: toPubKeyHash)
-        let lockingScriptChange = Script.buildPublicKeyHashOut(pubKeyHash: changePubkeyHash)
+        // MARK: Prepare params
+        let txHex = transaction.serialized().hex
         
-        let toOutput = TransactionOutput(value: UInt64(amount), lockingScript: lockingScriptTo)
-        let changeOutput = TransactionOutput(value: UInt64(change), lockingScript: lockingScriptChange)
+        let parameters: Parameters = [
+            "rawtx": txHex
+        ]
         
-        let unsignedInputs = utxos.map { TransactionInput(previousOutput: $0.outpoint, signatureScript: Data(), sequence: UInt32.max) }
-        let tx = BitcoinKit.Transaction(version: 2, inputs: unsignedInputs, outputs: [toOutput, changeOutput], lockTime: lockTime)
-        return UnsignedTransaction(tx: tx, utxos: utxos)
-    }
-    
-    public func signTx(unsignedTx: UnsignedTransaction, keys: [PrivateKey]) -> BitcoinKit.Transaction {
-        var inputsToSign = unsignedTx.tx.inputs
-        var transactionToSign: BitcoinKit.Transaction {
-            return BitcoinKit.Transaction(version: unsignedTx.tx.version, inputs: inputsToSign, outputs: unsignedTx.tx.outputs, lockTime: unsignedTx.tx.lockTime)
-        }
-        
-        // Signing
-        let hashType = SighashType.BTC.ALL
-        for (i, utxo) in unsignedTx.utxos.enumerated() {
-            let pubkeyHash: Data = Script.getPublicKeyHash(from: utxo.output.lockingScript)
-            
-            let keysOfUtxo: [PrivateKey] = keys.filter { $0.publicKey().pubkeyHash == pubkeyHash }
-            guard let key = keysOfUtxo.first else {
-                print("No keys to this txout : \(utxo.output.value)")
-                continue
+        // MARK: Sending request
+        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+            switch response.result {
+            case .success(let data):
+                if let result = data as? [String: Any], let txid = result["txid"] as? String {
+                    completion(.success(result: txid))
+                } else {
+                    completion(.failure(error: .internalError(message: "BTC Wallet: not valid response", error: nil)))
+                }
+                
+            case .failure(let error):
+                completion(.failure(error: .remoteServiceError(message: error.localizedDescription)))
             }
-            print("Value of signing txout : \(utxo.output.value)")
-            
-            let sighash: Data = transactionToSign.signatureHash(for: utxo.output, inputIndex: i, hashType: SighashType.BTC.ALL)
-            let signature: Data = try! BitcoinKit.Crypto.sign(sighash, privateKey: key)
-            let txin = inputsToSign[i]
-            let pubkey = key.publicKey()
-            
-            let unlockingScript = Script.buildPublicKeyUnlockingScript(signature: signature, pubkey: pubkey, hashType: hashType)
-            
-            inputsToSign[i] = TransactionInput(previousOutput: txin.previousOutput, signatureScript: unlockingScript, sequence: txin.sequence)
         }
-        return transactionToSign
-    }
-}
-
-public protocol BinaryConvertible {
-    static func +(lhs: Data, rhs: Self) -> Data
-    static func +=(lhs: inout Data, rhs: Self)
-}
-
-public extension BinaryConvertible {
-    static func +(lhs: Data, rhs: Self) -> Data {
-        var value = rhs
-        let data = Data(buffer: UnsafeBufferPointer(start: &value, count: 1))
-        return lhs + data
     }
     
-    static func +=(lhs: inout Data, rhs: Self) {
-        lhs = lhs + rhs
+    func getUnspentTransactions(_ completion: @escaping (ApiServiceResult<[UnspentTransaction]>) -> Void) {
+        guard let url = AdamantResources.btcServers.randomElement() else {
+            fatalError("Failed to get BTC endpoint URL")
+        }
+        
+        guard let wallet = self.btcWallet else {
+            completion(.failure(.notLogged))
+            return
+        }
+        
+        let address = wallet.address
+        
+        // Headers
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json"
+        ]
+        
+        // Request url
+        let endpoint = url.appendingPathComponent(BtcApiCommands.getUnspentTransactions(for: address))
+        
+        let parameters: Parameters = [
+            "noCache": "1"
+        ]
+        
+        // MARK: Sending request
+        AF.request(endpoint, method: .get, parameters: parameters, headers: headers).responseJSON(queue: defaultDispatchQueue) { response in
+            switch response.result {
+            case .success(let data):
+                guard let items = data as? [[String: Any]] else {
+                    completion(.failure(.internalError(message: "BTC Wallet: not valid response", error: nil)))
+                    break
+                }
+                
+                var utxos = [UnspentTransaction]()
+                for item in items {
+                    guard
+                        let txid = item["txid"] as? String,
+                        let confirmations = item["confirmations"] as? NSNumber,
+                        confirmations.intValue > 0,
+                        let vout = item["vout"] as? NSNumber,
+                        let amount = item["amount"] as? NSNumber else {
+                        continue
+                    }
+                        
+                    let value = NSDecimalNumber(decimal: (amount.decimalValue * BtcWalletService.multiplier)).uint64Value
+                    
+                    let lockScript = Script.buildPublicKeyHashOut(pubKeyHash: wallet.publicKey.toCashaddr().data)
+                    let txHash = Data(hex: txid).map { Data($0.reversed()) } ?? Data()
+                    let txIndex = vout.uint32Value
+                    
+                    let unspentOutput = TransactionOutput(value: value, lockingScript: lockScript)
+                    let unspentOutpoint = TransactionOutPoint(hash: txHash, index: txIndex)
+                    let utxo = UnspentTransaction(output: unspentOutput, outpoint: unspentOutpoint)
+                    
+                    utxos.append(utxo)
+                }
+                
+                completion(.success(utxos))
+                
+            case .failure:
+                completion(.failure(.internalError(message: "BTC Wallet: server not response", error: nil)))
+            }
+        }
     }
-}
 
-extension UInt8 : BinaryConvertible {}
-extension UInt16 : BinaryConvertible {}
-extension UInt32 : BinaryConvertible {}
-extension UInt64 : BinaryConvertible {}
-extension Int8 : BinaryConvertible {}
-extension Int16 : BinaryConvertible {}
-extension Int32 : BinaryConvertible {}
-extension Int64 : BinaryConvertible {}
-extension Int : BinaryConvertible {}
-
-extension Bool : BinaryConvertible {
-    public static func +(lhs: Data, rhs: Bool) -> Data {
-        return lhs + (rhs ? UInt8(0x01) : UInt8(0x00)).littleEndian
-    }
-}
-
-extension String : BinaryConvertible {
-    public static func +(lhs: Data, rhs: String) -> Data {
-        guard let data = rhs.data(using: .ascii) else { return lhs}
-        return lhs + data
-    }
-}
-
-extension Data : BinaryConvertible {
-    public static func +(lhs: Data, rhs: Data) -> Data {
-        var data = Data()
-        data.append(lhs)
-        data.append(rhs)
-        return data
-    }
-}
-
-enum SignError: Error {
-    case noPreviousOutput
-    case noPreviousOutputAddress
-    case noPrivateKey
-}
-
-enum SerializationError: Error {
-    case noPreviousOutput
-    case noPreviousTransaction
 }
