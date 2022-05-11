@@ -104,7 +104,6 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         guard let stack = stack else {
             return
         }
-        
         DispatchQueue.global(qos: .utility).async {
             let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
             privateContext.parent = stack.container.viewContext

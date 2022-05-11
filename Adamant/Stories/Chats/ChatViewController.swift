@@ -68,6 +68,7 @@ class ChatViewController: MessagesViewController {
     var account: AdamantAccount?
     var chatroom: Chatroom?
     var messageToShow: MessageTransaction?
+    var forceScrollToBottom: Bool?
     var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -505,6 +506,10 @@ class ChatViewController: MessagesViewController {
         
         scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
         scrollToBottomBtnOffetConstraint?.constant = -20 - self.messageInputBar.bounds.height
+        
+        if forceScrollToBottom ?? false {
+            scrollDown()
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {

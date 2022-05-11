@@ -43,6 +43,8 @@ protocol NodesSource {
     func getNewNode() -> Node
     func getValidNode(completion: @escaping ((Node?) -> Void))
     
+    func getSocketNewNode() -> Node
+    
     func saveNodes()
     func reloadNodes()
 

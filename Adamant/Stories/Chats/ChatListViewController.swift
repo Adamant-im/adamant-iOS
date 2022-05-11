@@ -219,7 +219,7 @@ class ChatListViewController: UIViewController {
     
     
     // MARK: Helpers
-    func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil) -> ChatViewController {
+    func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil, forceScrollToBottom: Bool = false) -> ChatViewController {
         guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
             fatalError("Can't get ChatViewController")
         }
@@ -231,6 +231,8 @@ class ChatListViewController: UIViewController {
         if let message = message {
             vc.messageToShow = message
         }
+        
+        vc.forceScrollToBottom = forceScrollToBottom
         
         vc.hidesBottomBarWhenPushed = true
         vc.chatroom = chatroom
@@ -447,13 +449,14 @@ extension ChatListViewController {
         }
         
         cell.hasUnreadMessages = chatroom.hasUnreadMessages
-        
+
         if let lastTransaction = chatroom.lastTransaction {
+            cell.hasUnreadMessages = lastTransaction.isUnread
             cell.lastMessageLabel.attributedText = shortDescription(for: lastTransaction)
         } else {
             cell.lastMessageLabel.text = nil
         }
-        
+                
         if let date = chatroom.updatedAt as Date?, date != Date.adamantNullDate {
             cell.dateLabel.text = date.humanizedDay()
         } else {
@@ -501,8 +504,8 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
                 
             case .update:
                 if let indexPath = indexPath,
-                    let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
-                    let chatroom = anObject as? Chatroom {
+                   let cell = self.tableView.cellForRow(at: indexPath) as? ChatTableViewCell,
+                   let chatroom = anObject as? Chatroom {
                     configureCell(cell, for: chatroom)
                 }
                 
@@ -524,7 +527,9 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
             }
             
             if let transaction = anObject as? ChatTransaction {
-                showNotification(for: transaction)
+                if self.view.window == nil {
+                    showNotification(for: transaction)
+                }
             }
             
         default:
@@ -814,7 +819,7 @@ extension ChatListViewController {
         more.backgroundColor = UIColor.adamant.primary
         
         // Mark as read
-        if chatroom.hasUnreadMessages {
+        if chatroom.hasUnreadMessages || (chatroom.lastTransaction?.isUnread ?? false) {
             let markAsRead = UIContextualAction(style: .normal, title: nil) { [weak self] (_, _, completionHandler: (Bool) -> Void) in
                 guard let chatroom = self?.chatsController?.object(at: indexPath) else {
                     completionHandler(false)

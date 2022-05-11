@@ -74,6 +74,16 @@ extension Container {
             service.nodesSource = r.resolve(NodesSource.self)
         }.inObjectScope(.container)
         
+        // MARK: SocketService
+        self.register(SocketService.self) { r in
+            let service = AdamantSocketService()
+            service.adamantCore = r.resolve(AdamantCore.self)
+            return service
+        }.initCompleted { (r, c) in    // Weak reference
+            let service = c as! AdamantSocketService
+            service.nodesSource = r.resolve(NodesSource.self)
+        }.inObjectScope(.container)
+        
         // MARK: AccountService
         self.register(AccountService.self) { r in
             let service = AdamantAccountService()
@@ -148,6 +158,7 @@ extension Container {
         self.register(ChatsProvider.self) { r in
             let provider = AdamantChatsProvider()
             provider.apiService = r.resolve(ApiService.self)
+            provider.socketService = r.resolve(SocketService.self)
             provider.stack = r.resolve(CoreDataStack.self)
             provider.adamantCore = r.resolve(AdamantCore.self)
             provider.securedStore = r.resolve(SecuredStore.self)
@@ -183,6 +194,14 @@ extension Container {
             return service
         }.inObjectScope(.container)
         
+        // MARK: SocketService
+        // No need to init AdamantCore
+        self.register(SocketService.self) { r in
+            let service = AdamantSocketService()
+            service.nodesSource = r.resolve(NodesSource.self)
+            return service
+        }.inObjectScope(.container)
+        
         // MARK: Notifications
         self.register(NotificationsService.self) { r in
             let service = AdamantNotificationsService()
@@ -194,6 +213,7 @@ extension Container {
         self.register(ChatsProvider.self) { r in
             let provider = AdamantChatsProvider()
             provider.apiService = r.resolve(ApiService.self)
+            provider.socketService = r.resolve(SocketService.self)
             provider.securedStore = r.resolve(SecuredStore.self)
             return provider
         }.inObjectScope(.container)

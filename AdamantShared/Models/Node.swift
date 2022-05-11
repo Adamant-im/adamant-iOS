@@ -44,10 +44,14 @@ class Node: Equatable, Codable {
         }
     }
     
-    
     /// Builds URL, using specified port, or default scheme's port, if nil
     ///
     /// - Returns: URL, if no errors were thrown
+    
+    func asSocketURL() -> URL? {
+        return asURL(forcePort: false)
+    }
+    
     func asURL() -> URL? {
         return asURL(forcePort: true)
     }

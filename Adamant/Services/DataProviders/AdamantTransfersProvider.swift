@@ -923,7 +923,6 @@ extension AdamantTransfersProvider {
                 self.receivedLastHeight = uH
             }
         }
-        
         // MARK: 5. Unread transactions
         if let unreadedHeight = readedLastHeight {
             let unreadTransactions = transfers.filter { !$0.isOutgoing && $0.height > unreadedHeight }

@@ -55,8 +55,8 @@ extension Transaction: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         self.id = UInt64(try container.decode(String.self, forKey: .id))!
-        self.height = try container.decode(Int64.self, forKey: .height)
-        self.blockId = try container.decode(String.self, forKey: .blockId)
+        self.height = (try? container.decode(Int64.self, forKey: .height)) ?? 0
+        self.blockId = (try? container.decode(String.self, forKey: .blockId)) ?? ""
         self.type = try container.decode(TransactionType.self, forKey: .type)
         self.timestamp = try container.decode(UInt64.self, forKey: .timestamp)
         self.senderPublicKey = try container.decode(String.self, forKey: .senderPublicKey)
@@ -67,7 +67,7 @@ extension Transaction: Codable {
         self.confirmations = (try? container.decode(Int64.self, forKey: .confirmations)) ?? 0
         self.requesterPublicKey = try? container.decode(String.self, forKey: .requesterPublicKey)
         self.signSignature = try? container.decode(String.self, forKey: .signSignature)
-        self.signatures = try container.decode([String].self, forKey: .signatures)
+        self.signatures = (try? container.decode([String].self, forKey: .signatures)) ?? []
         self.asset = try container.decode(TransactionAsset.self, forKey: .asset)
         
         let amount = try container.decode(Decimal.self, forKey: .amount)
@@ -107,6 +107,7 @@ extension Transaction: Codable {
         try container.encode(amount.shiftedToAdamant(), forKey: .amount) // Decimal
         try container.encode(fee.shiftedToAdamant(), forKey: .fee) // Decimal
     }
+    
 }
 
 extension Transaction: WrappableModel {
