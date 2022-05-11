@@ -343,18 +343,19 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         if let recipientAddress = userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String
         {
+            if application.applicationState != .background && application.applicationState != .inactive {
+                completionHandler(.noData)
+                return
+            }
+            
             if let tabbar = window?.rootViewController as? UITabBarController,
                let chats = tabbar.viewControllers?.first as? UISplitViewController,
                let chatList = chats.viewControllers.first as? UINavigationController,
                let list = chatList.viewControllers.first as? ChatListViewController {
-             
-                guard let room = list.chatsController?.fetchedObjects?.first(where: { room in
-                    return room.lastTransaction?.recipientAddress == recipientAddress
-                }) else { return }
                 
                 switch list.accountService.state {
                 case .loggedIn:
-                    self.openDialog(chatList: chatList, tabbar: tabbar, list: list, chatroom: room)
+                    self.openDialog(chatList: chatList, tabbar: tabbar, list: list, recipientAddress: recipientAddress)
                 case .notLogged:
                     break
                 case .isLoggingIn:
@@ -366,7 +367,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                 // if not logged in
                 list.didLoadedMessages = { [weak self] in
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, chatroom: room)
+                        self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, recipientAddress: recipientAddress)
                     }
                 }
             }
@@ -376,18 +377,25 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         }
     }
     
-    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, list: ChatListViewController, chatroom: Chatroom) {
+    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, list: ChatListViewController, recipientAddress: String) {
+        guard let chatroom = list.chatsController?.fetchedObjects?.first(where: { room in
+            return room.lastTransaction?.recipientAddress == recipientAddress
+        }) else { return }
+        
         chatList.popToRootViewController(animated: false)
         chatList.dismiss(animated: false, completion: nil)
         tabbar.selectedIndex = 0
         
-        let vc = list.chatViewController(for: chatroom)
-        
+        let vc = list.chatViewController(for: chatroom, forceScrollToBottom: true)
         if let split = list.splitViewController {
-            let chat = UINavigationController(rootViewController:vc)
-            split.showDetailViewController(chat, sender: self)
+            var timeout = 0.25
+            if #available(iOS 13.0, *) { timeout = 0 }
+            DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
+                let chat = UINavigationController(rootViewController:vc)
+                split.showDetailViewController(chat, sender: self)
+            }
         } else {
-            chatList.pushViewController(vc, animated: true)
+            chatList.pushViewController(vc, animated: false)
         }
     }
 }

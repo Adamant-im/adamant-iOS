@@ -219,7 +219,7 @@ class ChatListViewController: UIViewController {
     
     
     // MARK: Helpers
-    func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil) -> ChatViewController {
+    func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil, forceScrollToBottom: Bool = false) -> ChatViewController {
         guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
             fatalError("Can't get ChatViewController")
         }
@@ -231,6 +231,8 @@ class ChatListViewController: UIViewController {
         if let message = message {
             vc.messageToShow = message
         }
+        
+        vc.forceScrollToBottom = forceScrollToBottom
         
         vc.hidesBottomBarWhenPushed = true
         vc.chatroom = chatroom
