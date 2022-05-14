@@ -155,13 +155,7 @@ extension AdamantNotificationsService {
             }
         }
         
-        if Thread.isMainThread {
-            callback()
-        } else {
-            DispatchQueue.main.sync {
-                callback()
-            }
-        }
+        DispatchQueue.onMainSync(callback)
     }
 }
 
@@ -175,12 +169,8 @@ extension AdamantNotificationsService {
         content.sound = UNNotificationSound(named: UNNotificationSoundName("notification.mp3"))
         
         if let number = type.badge {
-            if Thread.isMainThread {
+            DispatchQueue.onMainSync {
                 content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + backgroundNotifications + number)
-            } else {
-                DispatchQueue.main.sync {
-                    content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + backgroundNotifications + number)
-                }
             }
             
             if isBackgroundSession {
@@ -222,12 +212,8 @@ extension AdamantNotificationsService {
             securedStore.remove(StoreKey.notificationsService.customBadgeNumber)
         }
         
-        if Thread.isMainThread {
+        DispatchQueue.onMainAsync {
             UIApplication.shared.applicationIconBadgeNumber = appIconBadgeNumber
-        } else {
-            DispatchQueue.main.async {
-                UIApplication.shared.applicationIconBadgeNumber = appIconBadgeNumber
-            }
         }
     }
     

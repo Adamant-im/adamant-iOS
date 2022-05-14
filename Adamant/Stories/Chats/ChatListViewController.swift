@@ -306,16 +306,10 @@ class ChatListViewController: UIViewController {
                 return
             }
             
-            if Thread.isMainThread {
-                busyBackgroundView.isHidden = false
-                busyBackgroundView.alpha = 1.0
-                busyIndicatorView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
-            } else {
-                DispatchQueue.main.async {
-                    self.busyBackgroundView.isHidden = false
-                    self.busyBackgroundView.alpha = 1.0
-                    self.busyIndicatorView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
-                }
+            DispatchQueue.onMainAsync {
+                self.busyBackgroundView.isHidden = false
+                self.busyBackgroundView.alpha = 1.0
+                self.busyIndicatorView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
             }
             
             return
@@ -343,14 +337,9 @@ class ChatListViewController: UIViewController {
             self.busyBackgroundView.isHidden = false
         }
         
-        if Thread.isMainThread {
+        DispatchQueue.onMainAsync {
             initialValues()
             UIView.animate(withDuration: 0.2, animations: animations, completion: completion)
-        } else {
-            DispatchQueue.main.async {
-                initialValues()
-                UIView.animate(withDuration: 0.2, animations: animations, completion: completion)
-            }
         }
     }
 }
