@@ -67,12 +67,8 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
     }
     
     override func reloadData() {
-        if Thread.isMainThread {
-            refreshControl.beginRefreshing()
-        } else {
-            DispatchQueue.main.async { [weak self] in
-                self?.refreshControl.beginRefreshing()
-            }
+        DispatchQueue.onMainAsync { [weak self] in
+            self?.refreshControl.beginRefreshing()
         }
         
         handleRefresh(refreshControl)

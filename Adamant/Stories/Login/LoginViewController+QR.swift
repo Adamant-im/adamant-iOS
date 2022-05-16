@@ -24,18 +24,11 @@ extension LoginViewController {
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
                 if granted {
-                    if Thread.isMainThread {
+                    DispatchQueue.onMainAsync {
                         let reader = QRCodeReaderViewController.adamantQrCodeReader()
                         reader.delegate = self
                         reader.modalPresentationStyle = .overFullScreen
                         self?.present(reader, animated: true, completion: nil)
-                    } else {
-                        DispatchQueue.main.async {
-                            let reader = QRCodeReaderViewController.adamantQrCodeReader()
-                            reader.delegate = self
-                            reader.modalPresentationStyle = .overFullScreen
-                            self?.present(reader, animated: true, completion: nil)
-                        }
                     }
                 } else {
                     return

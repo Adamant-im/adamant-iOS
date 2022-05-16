@@ -122,16 +122,10 @@ class NodeEditorViewController: FormViewController {
             let type = testState.accessoryType
             let value = testState.localized
             
-            if Thread.isMainThread {
-                row.baseCell.accessoryType = type
+            DispatchQueue.onMainAsync {
                 row.baseValue = value
                 row.updateCell()
-            } else {
-                DispatchQueue.main.async {
-                    row.baseValue = value
-                    row.updateCell()
-                    row.baseCell.accessoryType = type
-                }
+                row.baseCell.accessoryType = type
             }
         }
     }
@@ -239,7 +233,7 @@ class NodeEditorViewController: FormViewController {
 
 // MARK: - Actions
 extension NodeEditorViewController {
-    func testNode(completion: ((Bool) -> Void)? = nil) {
+    private func testNode(completion: ((Bool) -> Void)? = nil) {
         var components = URLComponents()
         
         // Host
@@ -273,22 +267,29 @@ extension NodeEditorViewController {
         }
         
         dialogService.showProgress(withMessage: String.adamantLocalized.nodesEditor.testInProgressMessage, userInteractionEnable: false)
-        apiService.getNodeVersion(url: url) { result in
-            switch result {
-            case .success(_):
-                self.dialogService.dismissProgress()
-                self.testState = .passed
-                completion?(true)
-                
-            case .failure(let error):
-                self.dialogService.showWarning(withMessage: error.localized)
-                self.testState = .failed
-                completion?(false)
+        apiService.getNodeVersion(url: url) { [self] result in
+            let isSuccess = processApiServiceTestResult(result: result)
+            
+            DispatchQueue.onMainAsync {
+                completion?(isSuccess)
             }
         }
     }
     
-    @objc func done() {
+    private func processApiServiceTestResult(result: ApiServiceResult<NodeVersion>) -> Bool {
+        switch result {
+        case .success(_):
+            dialogService.dismissProgress()
+            testState = .passed
+            return true
+        case .failure(let error):
+            dialogService.showWarning(withMessage: error.localized)
+            testState = .failed
+            return false
+        }
+    }
+    
+    @objc private func done() {
         switch testState {
         case .notTested, .failed:
             testNode { success in
@@ -338,12 +339,12 @@ extension NodeEditorViewController {
         delegate?.nodeEditorViewController(self, didFinishEditingWithResult: result)
     }
     
-    @objc func cancel() {
+    @objc private func cancel() {
         didCallDelegate = true
         delegate?.nodeEditorViewController(self, didFinishEditingWithResult: .cancel)
     }
     
-    func deleteNode() {
+    private func deleteNode() {
         let alert = UIAlertController(title: String.adamantLocalized.nodesEditor.deleteNodeAlert, message: nil, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.delete, style: .destructive, handler: { _ in

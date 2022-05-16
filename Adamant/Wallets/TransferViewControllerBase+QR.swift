@@ -19,24 +19,17 @@ extension TransferViewControllerBase {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             qrReader.modalPresentationStyle = .overFullScreen
-            if Thread.isMainThread {
-                self.present(qrReader, animated: true, completion: nil)
-            } else {
-                DispatchQueue.main.async {
-                    self.present(self.qrReader, animated: true, completion: nil)
-                }
+            
+            DispatchQueue.onMainAsync {
+                self.present(self.qrReader, animated: true, completion: nil)
             }
             
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
                 if granted, let qrReader = self?.qrReader {
                     qrReader.modalPresentationStyle = .overFullScreen
-                    if Thread.isMainThread {
+                    DispatchQueue.onMainAsync {
                         self?.present(qrReader, animated: true, completion: nil)
-                    } else {
-                        DispatchQueue.main.async {
-                            self?.present(qrReader, animated: true, completion: nil)
-                        }
                     }
                 } else {
                     return
@@ -47,12 +40,9 @@ extension TransferViewControllerBase {
             let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
-            if Thread.isMainThread {
+
+            DispatchQueue.onMainAsync {
                 self.present(alert, animated: true, completion: nil)
-            } else {
-                DispatchQueue.main.async {
-                    self.present(alert, animated: true, completion: nil)
-                }
             }
             
         case .denied:
@@ -68,12 +58,9 @@ extension TransferViewControllerBase {
             
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
             alert.modalPresentationStyle = .overFullScreen
-            if Thread.isMainThread {
+            
+            DispatchQueue.onMainAsync {
                 self.present(alert, animated: true, completion: nil)
-            } else {
-                DispatchQueue.main.async {
-                    self.present(alert, animated: true, completion: nil)
-                }
             }
         @unknown default:
             break

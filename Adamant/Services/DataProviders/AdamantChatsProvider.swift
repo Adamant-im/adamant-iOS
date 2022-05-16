@@ -14,6 +14,7 @@ class AdamantChatsProvider: ChatsProvider {
     // MARK: Dependencies
     var accountService: AccountService!
     var apiService: ApiService!
+    var socketService: SocketService!
     var stack: CoreDataStack!
     var adamantCore: AdamantCore!
     var accountsProvider: AccountsProvider!
@@ -51,6 +52,8 @@ class AdamantChatsProvider: ChatsProvider {
     
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
     
+    private var previousAppState: UIApplication.State?
+    
     // MARK: Lifecycle
     init() {
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
@@ -76,8 +79,8 @@ class AdamantChatsProvider: ChatsProvider {
                 self?.dropStateData()
                 store.set(loggedAddress, for: StoreKey.chatProvider.address)
             }
-            
             self?.update()
+            self?.connectToSocket()
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
@@ -89,6 +92,8 @@ class AdamantChatsProvider: ChatsProvider {
             
             self?.blackList = []
             self?.removedMessages = []
+            
+            self?.disconnectFromSocket()
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: nil) { [weak self] notification in
@@ -105,6 +110,18 @@ class AdamantChatsProvider: ChatsProvider {
                     self?.securedStore.set(removedMessages, for: "removedMessages")
                 }
             }
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
+            if let previousAppState = self?.previousAppState,
+               previousAppState == .background {
+                self?.previousAppState = .active
+                self?.update()
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
+            self?.previousAppState = .background
         }
     }
     
@@ -183,6 +200,37 @@ extension AdamantChatsProvider {
         self.update(completion: nil)
     }
     
+    func connectToSocket() {
+        // MARK: 2. Prepare
+        guard let address = accountService.account?.address,
+              let privateKey = accountService.keypair?.privateKey else {
+            return
+        }
+        let cms = DispatchSemaphore(value: 1)
+        // MARK: 3. Get transactions
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = self.stack.container.viewContext
+        self.socketService.connect(address: address)
+        self.socketService.receiveNewTransaction { [weak self] result in
+            switch result {
+            case .success(let trans):
+                self?.processingQueue.async {
+                    self?.process(messageTransactions: [trans],
+                                 senderId: address,
+                                 privateKey: privateKey,
+                                 context: privateContext,
+                                 contextMutatingSemaphore: cms)
+                }
+            case .failure(_):
+                break
+            }
+        }
+    }
+    
+    func disconnectFromSocket() {
+        self.socketService.disconnect()
+    }
+    
     func update(completion: ((ChatsProviderResult?) -> Void)?) {
         if state == .updating {
             completion?(nil)
@@ -216,7 +264,6 @@ extension AdamantChatsProvider {
         let processingGroup = DispatchGroup()
         let cms = DispatchSemaphore(value: 1)
         let prevHeight = receivedLastHeight
-        
         getTransactions(senderId: address, privateKey: privateKey, height: receivedLastHeight, offset: nil, dispatchGroup: processingGroup, context: privateContext, contextMutatingSemaphore: cms)
         
         // MARK: 4. Check
@@ -522,6 +569,7 @@ extension AdamantChatsProvider {
             switch result {
             case .success(let transaction):
                 do {
+                    transaction.statusEnum = MessageStatus.delivered
                     try context.save()
                     completion(.success(transaction: transaction))
                 } catch {
@@ -708,7 +756,6 @@ extension AdamantChatsProvider {
         ])
         
         let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: stack.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-        
         return controller
     }
     
@@ -912,7 +959,6 @@ extension AdamantChatsProvider {
                     if height < h {
                         height = h
                     }
-                    
                     unconfirmedsSemaphore.signal()
                     continue
                 } else {
@@ -931,8 +977,14 @@ extension AdamantChatsProvider {
                         height = chatTransaction.height
                     }
                     
+                    let trans = privateChatroom.transactions?.first(where: { message in
+                        return (message as? ChatTransaction)?.txId == chatTransaction.txId
+                    }) as? ChatTransaction
+                    
                     if !trs.isOut {
-                        newMessageTransactions.append(chatTransaction)
+                        if trans == nil {
+                            newMessageTransactions.append(chatTransaction)
+                        }
                         
                         // Preset messages
                         if account.isSystem, let address = account.address,
@@ -957,22 +1009,36 @@ extension AdamantChatsProvider {
                         }
                     }
                     
-                    messages.insert(chatTransaction)
+                    if trans == nil {
+                        if (chatTransaction.blockId?.isEmpty ?? true) && (chatTransaction.amountValue ?? 0.0 > 0.0) {
+                            chatTransaction.statusEnum = .pending
+                        }
+                        messages.insert(chatTransaction)
+                    } else {
+                        trans?.height = chatTransaction.height
+                        trans?.blockId = chatTransaction.blockId
+                        trans?.confirmations = chatTransaction.confirmations
+                        trans?.statusEnum = .delivered
+                    }
                 }
             }
             
-            privateChatroom.addToTransactions(messages as NSSet)
+            if !messages.isEmpty {
+                privateChatroom.addToTransactions(messages as NSSet)
+            }
+            
             if let address = privateChatroom.partner?.address {
                 chatroom.isHidden = self.blackList.contains(address)
             }
         }
         
-        
         // MARK: 4. Unread messagess
         if let readedLastHeight = readedLastHeight {
-            let unreadTransactions = newMessageTransactions.filter { $0.height > readedLastHeight }
+            var unreadTransactions = newMessageTransactions.filter { $0.height > readedLastHeight }
+            if unreadTransactions.count == 0 {
+                unreadTransactions = newMessageTransactions.filter { $0.height == 0 }
+            }
             let chatrooms = Dictionary(grouping: unreadTransactions, by: ({ (t: ChatTransaction) -> Chatroom in t.chatroom! }))
-            
             for (chatroom, trs) in chatrooms {
                 if let address = chatroom.partner?.address {
                     chatroom.isHidden = self.blackList.contains(address)
@@ -981,7 +1047,6 @@ extension AdamantChatsProvider {
                 trs.forEach { $0.isUnread = true }
             }
         }
-        
         
         // MARK: 5. Dump new transactions
         if privateContext.hasChanges {
@@ -998,14 +1063,12 @@ extension AdamantChatsProvider {
             }
         }
         
-        
         // MARK: 6. Save to main!
         if context.hasChanges {
             do {
                 defer {
                     contextMutatingSemaphore.signal()
                 }
-                
                 contextMutatingSemaphore.wait()
                 
                 try context.save()
@@ -1021,7 +1084,6 @@ extension AdamantChatsProvider {
             }
         }
         
-        
         // MARK 7. Last message height
         highSemaphore.wait()
         if let lastHeight = receivedLastHeight {
@@ -1031,7 +1093,6 @@ extension AdamantChatsProvider {
         } else {
             receivedLastHeight = height
         }
-        
         highSemaphore.signal()
     }
 }
@@ -1177,11 +1238,9 @@ extension AdamantChatsProvider {
             return
         }
         
-        transaction.isConfirmed = true
         transaction.height = height
         transaction.blockId = blockId
         transaction.confirmations = confirmations
-        transaction.statusEnum = .delivered
         self.unconfirmedTransactions.removeValue(forKey: id)
         
         if let lastHeight = receivedLastHeight, lastHeight < height {

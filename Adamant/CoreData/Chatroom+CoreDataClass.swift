@@ -15,13 +15,12 @@ public class Chatroom: NSManagedObject {
     static let entityName = "Chatroom"
     
     func markAsReaded() {
-        if hasUnreadMessages {
-            hasUnreadMessages = false
-        }
-        
+        hasUnreadMessages = false
+       
         if let trs = transactions as? Set<ChatTransaction> {
             trs.filter { $0.isUnread }.forEach { $0.isUnread = false }
         }
+        lastTransaction?.isUnread = false
     }
     
     func getFirstUnread() -> ChatTransaction? {
