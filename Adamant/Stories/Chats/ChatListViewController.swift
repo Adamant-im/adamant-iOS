@@ -402,6 +402,19 @@ extension ChatListViewController {
         if let cell = cell as? ChatTableViewCell, let chat = chatsController?.object(at: indexPath) {
             configureCell(cell, for: chat)
         }
+        
+        if let roomsLoadedCount = chatsProvider.roomsLoadedCount,
+           let roomsMaxCount = chatsProvider.roomsMaxCount,
+           roomsLoadedCount < roomsMaxCount,
+           tableView.numberOfRows(inSection: 0) >= roomsLoadedCount {
+            tableView.addLoading(indexPath) { [weak self] in
+                self?.chatsProvider.getChatRooms(offset: roomsLoadedCount, completion: {
+                    DispatchQueue.main.async {
+                        tableView.stopLoading()
+                    }
+                })
+            }
+        }
     }
     
     private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {

@@ -54,6 +54,9 @@ class AdamantChatsProvider: ChatsProvider {
     
     private var previousAppState: UIApplication.State?
     
+    private(set) var roomsMaxCount: Int?
+    private(set) var roomsLoadedCount: Int?
+    
     // MARK: Lifecycle
     init() {
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: nil) { [weak self] notification in
@@ -79,7 +82,8 @@ class AdamantChatsProvider: ChatsProvider {
                 self?.dropStateData()
                 store.set(loggedAddress, for: StoreKey.chatProvider.address)
             }
-            self?.update()
+            
+            self?.getChatRooms(offset: nil, completion: nil)
             self?.connectToSocket()
         }
         
@@ -121,7 +125,9 @@ class AdamantChatsProvider: ChatsProvider {
         }
         
         NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
-            self?.previousAppState = .background
+            if self?.isInitiallySynced ?? false {
+                self?.previousAppState = .background
+            }
         }
     }
     
@@ -194,6 +200,83 @@ extension AdamantChatsProvider {
         
         // Set State
         setState(.empty, previous: prevState, notify: notify)
+    }
+    
+    func getChatRooms(offset: Int?, completion: (() ->())?) {
+        guard let address = accountService.account?.address,
+              let privateKey = accountService.keypair?.privateKey else {
+                  return
+              }
+        
+        let cms = DispatchSemaphore(value: 1)
+        // MARK: 3. Get transactions
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = self.stack.container.viewContext
+        apiService.getChatRooms(address: address, offset: offset) { [weak self] result in
+            switch result {
+            case .success(let trans):
+                self?.roomsMaxCount = trans.count
+                if let roomsLoadedCount =  self?.roomsLoadedCount {
+                    self?.roomsLoadedCount = roomsLoadedCount + (trans.chats?.count ?? 0)
+                } else {
+                    self?.roomsLoadedCount = trans.chats?.count ?? 0
+                }
+                
+                var array = Array<Transaction>()
+                trans.chats?.forEach({ room in
+                    if let last = room.lastTransaction {
+                        array.append(last)
+                    }
+                })
+                
+                self?.processingQueue.async {
+                    self?.process(messageTransactions: array,
+                                  senderId: address,
+                                  privateKey: privateKey,
+                                  context: privateContext,
+                                  contextMutatingSemaphore: cms)
+                }
+                
+                if let synced = self?.isInitiallySynced, !synced {
+                    self?.processingQueue.asyncAfter(deadline: .now() + 1) {
+                        self?.isInitiallySynced = true
+                    }
+                }
+                completion?()
+            case .failure(_):
+                completion?()
+            }
+        }
+    }
+    
+    func getChatMessages(with addressRecipient: String, offset: Int?, completion: (() ->())?) {
+        guard let address = accountService.account?.address,
+              let privateKey = accountService.keypair?.privateKey else {
+                  return
+              }
+        
+        let cms = DispatchSemaphore(value: 1)
+        // MARK: 3. Get transactions
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = self.stack.container.viewContext
+        
+        apiService.getChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] result in
+            switch result {
+            case .success(let transactions):
+                if let transactions = transactions {
+                    self?.processingQueue.async {
+                        self?.process(messageTransactions: transactions,
+                                      senderId: address,
+                                      privateKey: privateKey,
+                                      context: privateContext,
+                                      contextMutatingSemaphore: cms)
+                    }
+                }
+                completion?()
+            case .failure(_):
+                completion?()
+            }
+        }
     }
     
     func update() {

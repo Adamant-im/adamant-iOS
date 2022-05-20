@@ -196,6 +196,11 @@ class ChatViewController: MessagesViewController {
         return queue
     }()
     
+    // MARK: Busy indicator
+    
+    private var busyBackgroundView: UIView?
+    private var spinner = UIActivityIndicatorView(style: .whiteLarge)
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -422,6 +427,16 @@ class ChatViewController: MessagesViewController {
         UIMenuController.shared.menuItems = [
             UIMenuItem(title: String.adamantLocalized.chat.remove, action: NSSelectorFromString("remove:")),
             UIMenuItem(title: String.adamantLocalized.chat.report, action: NSSelectorFromString("report:"))]
+        
+        setBusyIndicator(state: true)
+        if let address = chatroom.partner?.address {
+            chatsProvider.getChatMessages(with: address, offset: 0) {
+                print("loaded")
+                DispatchQueue.main.async {
+                    self.setBusyIndicator(state: false)
+                }
+            }
+        }
     }
     
     override func canPerformAction(_ action: Selector, withSender sender: Any!) -> Bool {
@@ -1021,6 +1036,28 @@ private class StatusUpdateProcedure: Procedure {
 
             try? privateContext.save()
             self.finish()
+        }
+    }
+}
+
+// MARK: - Busy Indicator View
+extension ChatViewController {
+    func setBusyIndicator(state: Bool) {
+        if busyBackgroundView == nil {
+            busyBackgroundView = UIView()
+            busyBackgroundView?.backgroundColor = UIColor(white: 0, alpha: 0.2)
+            busyBackgroundView?.frame = view.frame
+            view.addSubview(busyBackgroundView!)
+            
+            spinner.translatesAutoresizingMaskIntoConstraints = false
+            spinner.startAnimating()
+            busyBackgroundView?.addSubview(spinner)
+            spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+            spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        }
+        
+        if !state {
+            busyBackgroundView?.removeFromSuperview()
         }
     }
 }
