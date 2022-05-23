@@ -226,6 +226,9 @@
 /* Serious internal error: Failed to sign transaction */
 "ApiService.InternalError.FailedTransactionSigning" = "Transaktion fehlgeschlagen";
 
+/* Node test failure */
+"ApiService.InternalError.NodeTestFailed" = "Fehler beim Knotentest";
+
 /* Serious internal error: Error parsing response */
 "ApiService.InternalError.ParsingFailed" = "Parsing fehlgeschlagen. Bericht senden";
 

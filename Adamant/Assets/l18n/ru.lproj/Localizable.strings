@@ -223,6 +223,9 @@
 /* Serious internal error: Failed to sign transaction */
 "ApiService.InternalError.FailedTransactionSigning" = "Ошибка создания транзакции";
 
+/* Node test failure */
+"ApiService.InternalError.NodeTestFailed" = "Проверка ноды не пройдена";
+
 /* Serious internal error: Error parsing response */
 "ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите разработчикам";
 

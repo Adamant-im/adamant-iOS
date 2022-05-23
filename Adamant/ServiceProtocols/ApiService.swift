@@ -127,6 +127,12 @@ protocol ApiService: AnyObject {
     
     func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void)
     
+    // MARK: - Status
+    
+    func getNodeStatus(
+        url: URL,
+        completion: @escaping (ApiServiceResult<NodeStatus>) -> Void
+    )
     
     // MARK: - Accounts
     
@@ -184,4 +190,24 @@ protocol ApiService: AnyObject {
     
     /// Send vote transaction for delegates
     func voteForDelegates(from address: String, keypair: Keypair, votes: [DelegateVote], completion: @escaping (ApiServiceResult<UInt64>) -> Void)
+    
+    // MARK: - Node testing
+    
+    /// - Parameters:
+    ///     - node: node for testing
+    ///     - completion: ping will be sent if test passes
+    func testNode(
+        node: Node,
+        completion: @escaping (ApiServiceResult<TimeInterval>) -> Void
+    )
+    
+    /// - Parameters:
+    ///     - nodes: array of nodes for health check
+    ///     - firstWorkingNodeHandler: will be called when the first working node is found
+    ///     - allowedNodesHandler: will send array of allowed nodes sorted by ping ascending after health check finish
+    func healthCheck(
+        nodes: [Node],
+        firstWorkingNodeHandler: @escaping (Node) -> Void,
+        allowedNodesHandler: @escaping ([Node]) -> Void
+    )
 }

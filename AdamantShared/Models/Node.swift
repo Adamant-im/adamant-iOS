@@ -35,6 +35,7 @@ class Node: Equatable, Codable {
     var scheme: URLScheme
     var host: String
     var port: Int?
+    var height: Int?
     
     func asString() -> String {
         if let url = asURL(forcePort: scheme != URLScheme.default) {

@@ -25,6 +25,7 @@ class AdamantApiService: ApiService {
         case signTransactionFailed
         case parsingFailed
         case unknownError
+        case nodeTestFailed
         
         func apiServiceErrorWith(error: Error?) -> ApiServiceError {
             return .internalError(message: self.localized, error: error)
@@ -40,6 +41,9 @@ class AdamantApiService: ApiService {
                 
             case .parsingFailed:
                 return NSLocalizedString("ApiService.InternalError.ParsingFailed", comment: "Serious internal error: Error parsing response")
+                
+            case .nodeTestFailed:
+                return NSLocalizedString("ApiService.InternalError.NodeTestFailed", comment: "Node test failure")
                 
             case .unknownError:
                 return String.adamantLocalized.sharedErrors.unknownError
@@ -99,7 +103,7 @@ class AdamantApiService: ApiService {
     // MARK: - Tools
     
     func refreshNode() {
-        node = nodesSource?.getNewNode()
+        node = nodesSource?.bestNode
         
         if let url = currentUrl {
             getNodeVersion(url: url) { result in
@@ -132,6 +136,40 @@ class AdamantApiService: ApiService {
         components.queryItems = queryItems
         
         return try components.asURL()
+    }
+    
+    func sendRequest<T: Decodable>(path: String,
+                                   queryItems: [URLQueryItem]? = nil,
+                                   method: HTTPMethod = .get,
+                                   parameters: [String:Any]? = nil,
+                                   encoding: Encoding = .url,
+                                   headers: [String:String]? = nil,
+                                   completion: @escaping (ApiServiceResult<T>) -> Void) {
+        let url: URL
+        do {
+            url = try buildUrl(path: path, queryItems: queryItems)
+        } catch {
+            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+            completion(.failure(err))
+            return
+        }
+        
+        let completionWrapper: (ApiServiceResult<T>) -> Void = { [weak self] result in
+            if case .failure = result {
+                self?.nodesSource.bestNodeFailed()
+            }
+            
+            completion(result)
+        }
+        
+        sendRequest(
+            url: url,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            headers: headers,
+            completion: completionWrapper
+        )
     }
     
     func sendRequest<T: Decodable>(url: URLConvertible,

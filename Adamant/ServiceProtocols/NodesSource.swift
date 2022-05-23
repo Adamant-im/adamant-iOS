@@ -36,17 +36,14 @@ extension StoreKey {
     }
 }
 
-protocol NodesSource {
+protocol NodesSource: AnyObject {
     var nodes: [Node] { get set }
     var defaultNodes: [Node] { get }
-    
-    func getNewNode() -> Node
-    func getValidNode(completion: @escaping ((Node?) -> Void))
+    var bestNode: Node { get }
     
     func getSocketNewNode() -> Node
     
     func saveNodes()
-    func reloadNodes()
-
     func migrate()
+    func bestNodeFailed()
 }

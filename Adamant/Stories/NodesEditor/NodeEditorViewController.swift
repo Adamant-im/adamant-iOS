@@ -234,11 +234,14 @@ class NodeEditorViewController: FormViewController {
 // MARK: - Actions
 extension NodeEditorViewController {
     private func testNode(completion: ((Bool) -> Void)? = nil) {
-        var components = URLComponents()
-        
         // Host
-        if let row: TextRow = form.rowBy(tag: Rows.host.tag), let host = row.value {
-            components.host = host
+        guard
+            let row: TextRow = form.rowBy(tag: Rows.host.tag),
+            let host: String = row.value
+        else {
+            testState = .failed
+            dialogService.showWarning(withMessage: String.adamantLocalized.nodesEditor.failedToBuildURL)
+            return
         }
         
         // Scheme
@@ -248,26 +251,20 @@ extension NodeEditorViewController {
         } else {
             scheme = URLScheme.default
         }
-        components.scheme = scheme.rawValue
         
         // Port
-        if let row: IntRow = form.rowBy(tag: Rows.port.tag), let port = row.value {
-            components.port = port
+        let port: Int
+        if let row: IntRow = form.rowBy(tag: Rows.port.tag), let prt = row.value {
+            port = prt
         } else {
-            components.port = scheme.defaultPort
+            port = scheme.defaultPort
         }
         
-        let url: URL
-        do {
-            url = try components.asURL()
-        } catch {
-            testState = .failed
-            dialogService.showWarning(withMessage: String.adamantLocalized.nodesEditor.failedToBuildURL)
-            return
-        }
+        let node = Node(scheme: scheme, host: host, port: port)
         
         dialogService.showProgress(withMessage: String.adamantLocalized.nodesEditor.testInProgressMessage, userInteractionEnable: false)
-        apiService.getNodeVersion(url: url) { [self] result in
+        
+        apiService.testNode(node: node) { [self] result in
             let isSuccess = processApiServiceTestResult(result: result)
             
             DispatchQueue.onMainAsync {
@@ -276,9 +273,11 @@ extension NodeEditorViewController {
         }
     }
     
-    private func processApiServiceTestResult(result: ApiServiceResult<NodeVersion>) -> Bool {
+    private func processApiServiceTestResult(
+        result: ApiServiceResult<TimeInterval>
+    ) -> Bool {
         switch result {
-        case .success(_):
+        case .success:
             dialogService.dismissProgress()
             testState = .passed
             return true

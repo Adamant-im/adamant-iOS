@@ -21,17 +21,8 @@ extension AdamantApiService {
     
     /// Create new account with publicKey
     func newAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
-        // MARK: 1. Build endpoint
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Accounts.newAccount)
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
         
-        // MARK: 2. Prepare params
+        // MARK: 1. Prepare params
         let params = [
             "publicKey": publicKey
         ]
@@ -39,8 +30,14 @@ extension AdamantApiService {
             "Content-Type": "application/json"
         ]
         
-        // MARK: 3. Send
-        sendRequest(url: endpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerModelResponse<AdamantAccount>>) in
+        // MARK: 2. Send
+        sendRequest(
+            path: ApiCommands.Accounts.newAccount,
+            method: .post,
+            parameters: params,
+            encoding: .json,
+            headers: headers
+        ) { (serverResponse: ApiServiceResult<ServerModelResponse<AdamantAccount>>) in
             switch serverResponse {
             case .success(let response):
                 if let model = response.model {
@@ -70,18 +67,10 @@ extension AdamantApiService {
     
     /// Get existing account by publicKey
     func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
-        // MARK: 1. Build endpoint
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Accounts.root, queryItems: [URLQueryItem(name: "publicKey", value: publicKey)])
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        // MARK: 2. Send
-        sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerModelResponse<AdamantAccount>>) in
+        sendRequest(
+            path: ApiCommands.Accounts.root,
+            queryItems: [URLQueryItem(name: "publicKey", value: publicKey)]
+        ) { (serverResponse: ApiServiceResult<ServerModelResponse<AdamantAccount>>) in
             switch serverResponse {
             case .success(let response):
                 if let model = response.model {
@@ -98,18 +87,10 @@ extension AdamantApiService {
     }
     
     func getAccount(byAddress address: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
-        // MARK: 1. Build endpoint
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Accounts.root, queryItems: [URLQueryItem(name: "address", value: address)])
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        // MARK: 2. Send
-        sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerModelResponse<AdamantAccount>>) in
+        sendRequest(
+            path: ApiCommands.Accounts.root,
+            queryItems: [URLQueryItem(name: "address", value: address)]
+        ) { (serverResponse: ApiServiceResult<ServerModelResponse<AdamantAccount>>) in
             switch serverResponse {
             case .success(let response):
                 if let model = response.model {
