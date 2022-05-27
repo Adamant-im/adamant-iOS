@@ -200,11 +200,22 @@ class ChatViewController: MessagesViewController {
     
     private var busyBackgroundView: UIView?
     private var spinner = UIActivityIndicatorView(style: .whiteLarge)
+    private var loadedMessages = 0
+    var isBusy = true
+
+    //MARK: Background UI
+    private let amadantLogoImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.image = UIImage(named: "Adamant-logo")
+        return iv
+    }()
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "•••", style: .plain, target: self, action: #selector(properties))
+        
+        setBackgroundUI()
         
         guard let chatroom = chatroom else {
             return
@@ -224,6 +235,8 @@ class ChatViewController: MessagesViewController {
         messagesCollectionView.messageCellDelegate = self
         maintainPositionOnKeyboardFrameChanged = true
         
+        messagesCollectionView.register(HeaderReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader)
+
         if let layout = messagesCollectionView.collectionViewLayout as? MessagesCollectionViewFlowLayout {
             for messageSizeCalculator in layout.messageSizeCalculators() {
                 messageSizeCalculator.outgoingAvatarSize = .zero
@@ -429,11 +442,20 @@ class ChatViewController: MessagesViewController {
             UIMenuItem(title: String.adamantLocalized.chat.report, action: NSSelectorFromString("report:"))]
         
         setBusyIndicator(state: true)
+        messagesCollectionView.alpha = 0.0
+        messageInputBar.isUserInteractionEnabled = false
         if let address = chatroom.partner?.address {
-            chatsProvider.getChatMessages(with: address, offset: 0) {
-                print("loaded")
+            chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] _ in
                 DispatchQueue.main.async {
-                    self.setBusyIndicator(state: false)
+                    self?.messagesCollectionView.reloadData()
+                    self?.messagesCollectionView.scrollToBottom(animated: false)
+                    self?.setBusyIndicator(state: false)
+                    self?.messagesCollectionView.reloadSections(IndexSet(integer: 0))
+                    UIView.animate(withDuration: 0.25) {
+                        self?.messagesCollectionView.alpha = 1.0
+                        self?.amadantLogoImageView.alpha = 0.0
+                    }
+                    self?.messageInputBar.isUserInteractionEnabled = true
                 }
             }
         }
@@ -568,16 +590,17 @@ class ChatViewController: MessagesViewController {
             }
             
             if self.messageToShow == nil {
-                if let offset = self.chatsProvider.chatPositon[address] {
-                    self.chatPositionOffset = CGFloat(offset)
-                    self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
-                    let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom)
-                    
-                    messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
-                    }
-                } else {
-                    messagesCollectionView.scrollToBottom(animated: false)
-                }
+//                if let offset = self.chatsProvider.chatPositon[address] {
+//                    self.chatPositionOffset = CGFloat(offset)
+//                    self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
+//                    let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom)
+//
+//                    messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
+//                    }
+//                } else {
+//                    messagesCollectionView.scrollToBottom(animated: false)
+//                }
+                messagesCollectionView.scrollToBottom(animated: false)
             } else {
                 self.chatsProvider.chatPositon.removeValue(forKey: address)
             }
@@ -806,7 +829,9 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        performBatchChanges(controllerChanges)
+        if !isBusy {
+            performBatchChanges(controllerChanges)
+        }
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -846,6 +871,7 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
         
         chat.performBatchUpdates({
             for change in changes {
+                print(change.type)
                 switch change.type {
                 case .insert:
                     guard let newIndexPath = change.newIndexPath else {
@@ -1043,9 +1069,10 @@ private class StatusUpdateProcedure: Procedure {
 // MARK: - Busy Indicator View
 extension ChatViewController {
     func setBusyIndicator(state: Bool) {
+        isBusy = state
         if busyBackgroundView == nil {
             busyBackgroundView = UIView()
-            busyBackgroundView?.backgroundColor = UIColor(white: 0, alpha: 0.2)
+            busyBackgroundView?.backgroundColor = UIColor(white: 0, alpha: 0.1)
             busyBackgroundView?.frame = view.frame
             view.addSubview(busyBackgroundView!)
             
@@ -1057,7 +1084,46 @@ extension ChatViewController {
         }
         
         if !state {
-            busyBackgroundView?.removeFromSuperview()
+            UIView.animate(withDuration: 0.25) { [weak self] in
+                self?.busyBackgroundView?.backgroundColor = .clear
+            } completion: { [weak self] _ in
+                self?.busyBackgroundView?.removeFromSuperview()
+            }
         }
+    }
+}
+
+//MARK: Load moore message
+extension ChatViewController {
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        try? chatController?.performFetch()
+        if indexPath.section < 2,
+           let count = chatController?.fetchedObjects?.count,
+           let address = chatroom?.partner?.address,
+           !isBusy,
+           loadedMessages != count {
+            isBusy = true
+            loadedMessages = count
+            chatsProvider.getChatMessages(with: address, offset: count) { [weak self] _count in
+                DispatchQueue.main.async {
+                    self?.messagesCollectionView.reloadDataAndKeepOffset()
+                    self?.isBusy = false
+                    self?.messagesCollectionView.reloadSections(IndexSet(integer: 0))
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Background UI
+extension ChatViewController {
+    func setBackgroundUI() {
+        amadantLogoImageView.translatesAutoresizingMaskIntoConstraints = false
+    //    view.insertSubview(amadantLogoImageView, at: 0)
+        view.addSubview(amadantLogoImageView)
+        amadantLogoImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        amadantLogoImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        amadantLogoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        amadantLogoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
 }

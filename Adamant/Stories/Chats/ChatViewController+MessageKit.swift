@@ -288,6 +288,14 @@ extension ChatViewController: MessagesDisplayDelegate {
         let timeIntervalSinceLastMessage = message.sentDate.timeIntervalSince(previousMessage.sentDate)
         return timeIntervalSinceLastMessage >= self.showsDateHeaderAfterTimeInterval
     }
+    
+    func messageHeaderView(for indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageReusableView {
+        let header = messagesCollectionView.dequeueReusableHeaderView(HeaderReusableView.self, for: indexPath)
+        if (indexPath.section == 0 && isBusy) {
+            header.setupLoadAnimating()
+        }
+        return header
+    }
 }
 
 extension ChatViewController: MessageCellDelegate {
@@ -548,6 +556,14 @@ extension ChatViewController: MessagesLayoutDelegate {
             return calculator
         } else {
             return (messagesCollectionView.collectionViewLayout as! MessagesCollectionViewFlowLayout).textMessageSizeCalculator
+        }
+    }
+    
+    func headerViewSize(for section: Int, in messagesCollectionView: MessagesCollectionView) -> CGSize {
+        if (section == 0) {
+            return CGSize(width: messagesCollectionView.bounds.width, height: HeaderReusableView.height)
+        } else {
+            return .zero
         }
     }
 }

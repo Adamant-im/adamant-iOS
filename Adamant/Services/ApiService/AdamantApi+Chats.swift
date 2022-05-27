@@ -167,6 +167,7 @@ extension AdamantApiService {
             // MARK: 1. Prepare params
             var queryItems: [URLQueryItem] = []
             if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
+            queryItems.append(URLQueryItem(name: "limit", value: "50"))
             
             // MARK: 2. Build endpoint
             let endpoint: URL

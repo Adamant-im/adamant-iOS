@@ -221,7 +221,6 @@ extension AdamantChatsProvider {
                 } else {
                     self?.roomsLoadedCount = trans.chats?.count ?? 0
                 }
-                
                 var array = Array<Transaction>()
                 trans.chats?.forEach({ room in
                     if let last = room.lastTransaction {
@@ -234,22 +233,21 @@ extension AdamantChatsProvider {
                                   senderId: address,
                                   privateKey: privateKey,
                                   context: privateContext,
-                                  contextMutatingSemaphore: cms)
+                                  contextMutatingSemaphore: cms,
+                                  completion: {
+                        if let synced = self?.isInitiallySynced, !synced {
+                            self?.isInitiallySynced = true
+                        }
+                        completion?()
+                    })
                 }
-                
-                if let synced = self?.isInitiallySynced, !synced {
-                    self?.processingQueue.asyncAfter(deadline: .now() + 1) {
-                        self?.isInitiallySynced = true
-                    }
-                }
-                completion?()
             case .failure(_):
                 completion?()
             }
         }
     }
     
-    func getChatMessages(with addressRecipient: String, offset: Int?, completion: (() ->())?) {
+    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) ->())?) {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
                   return
@@ -269,12 +267,14 @@ extension AdamantChatsProvider {
                                       senderId: address,
                                       privateKey: privateKey,
                                       context: privateContext,
-                                      contextMutatingSemaphore: cms)
+                                      contextMutatingSemaphore: cms,
+                                      completion: {
+                            completion?(transactions.count)
+                        })
                     }
                 }
-                completion?()
             case .failure(_):
-                completion?()
+                completion?(0)
             }
         }
     }
@@ -872,8 +872,6 @@ extension AdamantChatsProvider {
         
         return controller
     }
-}
-
 
 // MARK: - Processing
 extension AdamantChatsProvider {
@@ -951,7 +949,8 @@ extension AdamantChatsProvider {
                          senderId: String,
                          privateKey: String,
                          context: NSManagedObjectContext,
-                         contextMutatingSemaphore: DispatchSemaphore) {
+                         contextMutatingSemaphore: DispatchSemaphore,
+                         completion: (() -> ())? = nil) {
         struct DirectionedTransaction {
             let transaction: Transaction
             let isOut: Bool
@@ -1177,6 +1176,7 @@ extension AdamantChatsProvider {
             receivedLastHeight = height
         }
         highSemaphore.signal()
+        completion?()
     }
 }
 

@@ -110,7 +110,7 @@ class AdamantTransfersProvider: TransfersProvider {
 extension AdamantTransfersProvider {
     func reload() {
         reset(notify: false)
-        
+      
         update()
     }
     
