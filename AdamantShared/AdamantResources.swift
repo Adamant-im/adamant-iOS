@@ -99,6 +99,8 @@ struct AdamantResources {
     
     static let dogeExplorerAddress = "https://dogechain.info/tx/"
     static let dashExplorerAddress = "https://dashblockexplorer.com/tx/"
+
+    static let btcExplorerAddress = "https://btc.com/btc/transaction/"
     
     private init() {}
 }
