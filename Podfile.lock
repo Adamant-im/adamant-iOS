@@ -12,9 +12,6 @@ PODS:
     - MessageInputBar/Core
   - MyLittlePinpad (0.3)
   - PMAlertController (3.5.0)
-  - Socket.IO-Client-Swift (15.2.0):
-    - Starscream (~> 3.1)
-  - Starscream (3.1.1)
 
 DEPENDENCIES:
   - FreakingSimpleRoundImageView
@@ -22,7 +19,6 @@ DEPENDENCIES:
   - MessageKit (= 2.0.0)
   - MyLittlePinpad
   - PMAlertController
-  - Socket.IO-Client-Swift (~> 15.2.0)
 
 SPEC REPOS:
   trunk:
@@ -32,8 +28,6 @@ SPEC REPOS:
     - MessageKit
     - MyLittlePinpad
     - PMAlertController
-    - Socket.IO-Client-Swift
-    - Starscream
 
 SPEC CHECKSUMS:
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
@@ -42,9 +36,7 @@ SPEC CHECKSUMS:
   MessageKit: 29c1c87e5a396d2ca7a3f712e5171dc9aba42a1e
   MyLittlePinpad: 5d57cb5a092ddbeb5c4e6fa0b46df83bd3e88b0c
   PMAlertController: 06dab8160066fc4ce991c880e3722cd403e2926a
-  Socket.IO-Client-Swift: 1e3e3a1f09f3312a167f0d781eb2f383d477357c
-  Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
 
-PODFILE CHECKSUM: 1d081ac466709ab7ca1f43d0d3bf418f86bd7d6d
+PODFILE CHECKSUM: 080a2c755d62f3318eb98b5950e1786073125f94
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3
