@@ -254,6 +254,10 @@ class BtcWalletService: WalletService {
     }
 
     public func isValid(bitcoinAddress address: String) -> Bool {
+        if isValid(bech32: address) {
+            return true
+        }
+
         guard address.count >= 26 && address.count <= 35,
             address.rangeOfCharacter(from: CharacterSet.alphanumerics.inverted) == nil,
             let decodedAddress = getBase58DecodeAsBytes(address: address, length: 25),
@@ -282,6 +286,23 @@ class BtcWalletService: WalletService {
             case .failure(let error):
                 completion(.failure(error: .internalError(message: "BTC Wallet: fail to get address from KVS", error: error)))
             }
+        }
+    }
+
+    private func isValid(bech32 address: String) -> Bool {
+        guard let decoded = try? SegwitAddrCoder().decode(hrp: "bc", addr: address) else {
+            return false
+        }
+
+        do {
+            let recoded = try SegwitAddrCoder().encode(
+                hrp: "bc",
+                version: decoded.version,
+                program: decoded.program
+            )
+            return !recoded.isEmpty
+        } catch {
+            return false
         }
     }
 
