@@ -185,7 +185,7 @@ class BtcTransferViewController: TransferViewControllerBase {
         }
         
         let parsedAddress: String
-        if address.hasPrefix("btc:"), let firstIndex = address.firstIndex(of: ":") {
+        if address.hasPrefix("bitcoin:"), let firstIndex = address.firstIndex(of: ":") {
             let index = address.index(firstIndex, offsetBy: 1)
             parsedAddress = String(address[index...])
         } else {
