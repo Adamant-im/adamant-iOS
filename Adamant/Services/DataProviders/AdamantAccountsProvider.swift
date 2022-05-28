@@ -162,24 +162,16 @@ class AdamantAccountsProvider: AccountsProvider {
         if let context = context {
             // viewContext only on MainThread
             if context == stack.container.viewContext {
-                if Thread.isMainThread {
+                DispatchQueue.onMainSync {
                     acc = (try? context.fetch(request))?.first
-                } else {
-                    DispatchQueue.main.sync {
-                        acc = (try? context.fetch(request))?.first
-                    }
                 }
             } else {
                 acc = (try? context.fetch(request))?.first
             }
         } else {
             // viewContext only on MainThread
-            if Thread.isMainThread {
+            DispatchQueue.onMainSync {
                 acc = (try? stack.container.viewContext.fetch(request))?.first
-            } else {
-                DispatchQueue.main.sync {
-                    acc = (try? stack.container.viewContext.fetch(request))?.first
-                }
             }
         }
         
@@ -418,32 +410,24 @@ extension AdamantAccountsProvider {
     */
     
     private func createCoreDataAccount(with address: String, publicKey: String) -> CoreDataAccount {
-        let coreAccount: CoreDataAccount
-        if Thread.isMainThread {
-            coreAccount = createCoreDataAccount(with: address, publicKey: publicKey, context: stack.container.viewContext)
-        } else {
-            var acc: CoreDataAccount!
-            DispatchQueue.main.sync {
-                acc = createCoreDataAccount(with: address, publicKey: publicKey, context: stack.container.viewContext)
-            }
-            coreAccount = acc
-        }
+        var coreAccount: CoreDataAccount!
         
+        DispatchQueue.onMainSync {
+            coreAccount = createCoreDataAccount(
+                with: address,
+                publicKey: publicKey,
+                context: stack.container.viewContext
+            )
+        }
         return coreAccount
     }
     
     private func createCoreDataAccount(from account: AdamantAccount) -> CoreDataAccount {
-        let coreAccount: CoreDataAccount
-        if Thread.isMainThread {
-            coreAccount = createCoreDataAccount(from: account, context: stack.container.viewContext)
-        } else {
-            var acc: CoreDataAccount!
-            DispatchQueue.main.sync {
-                acc = createCoreDataAccount(from: account, context: stack.container.viewContext)
-            }
-            coreAccount = acc
-        }
+        var coreAccount: CoreDataAccount!
         
+        DispatchQueue.onMainSync {
+            coreAccount = createCoreDataAccount(from: account, context: stack.container.viewContext)
+        }
         return coreAccount
     }
     

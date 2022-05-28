@@ -148,14 +148,10 @@ class SearchResultsViewController: UITableViewController {
                 cell.avatarImageView.tintColor = UIColor.adamant.primary
             } else {
                 if let address = partner.publicKey {
-                    if Thread.isMainThread {
-                        let image = self.avatarService.avatar(for: address, size: 200)
+                    let image = self.avatarService.avatar(for: address, size: 200)
+                    
+                    DispatchQueue.onMainAsync {
                         cell.avatarImage = image
-                    } else {
-                        let image = self.avatarService.avatar(for: address, size: 200)
-                        DispatchQueue.main.async {
-                            cell.avatarImage = image
-                        }
                     }
                     
                     cell.avatarImageView.roundingMode = .round

@@ -413,31 +413,17 @@ extension DelegatesListViewController {
         let newVotesColor = changes.count > maxVotes ? UIColor.adamant.alert : UIColor.adamant.primary
         let totalVotesColor = totalVoted > maxTotalVotes ? UIColor.adamant.alert : UIColor.adamant.primary
         
-        
-        if Thread.isMainThread {
-            upVotesLabel.text = String(upvoted)
-            downVotesLabel.text = String(downvoted)
-            newVotesLabel.text = "\(changes.count)/\(maxVotes)"
-            totalVotesLabel.text = "\(totalVoted)/\(maxTotalVotes)"
+        DispatchQueue.onMainAsync { [weak self] in
+            guard let self = self else { return }
             
-            voteBtn.isEnabled = votingEnabled
-            newVotesLabel.textColor = newVotesColor
-            totalVotesLabel.textColor = totalVotesColor
-        } else {
-            let changes = changes.count
-            let max = maxVotes
-            let totalMax = maxTotalVotes
+            self.upVotesLabel.text = "\(upvoted)"
+            self.downVotesLabel.text = "\(downvoted)"
+            self.newVotesLabel.text = "\(changes.count)/\(self.maxVotes)"
+            self.totalVotesLabel.text = "\(totalVoted)/\(self.maxTotalVotes)"
             
-            DispatchQueue.main.async { [unowned self] in
-                self.upVotesLabel.text = "\(upvoted)"
-                self.downVotesLabel.text = "\(downvoted)"
-                self.newVotesLabel.text = "\(changes)/\(max)"
-                self.totalVotesLabel.text = "\(totalVoted)/\(totalMax)"
-                
-                self.voteBtn.isEnabled = votingEnabled
-                self.newVotesLabel.textColor = newVotesColor
-                self.totalVotesLabel.textColor = totalVotesColor
-            }
+            self.voteBtn.isEnabled = votingEnabled
+            self.newVotesLabel.textColor = newVotesColor
+            self.totalVotesLabel.textColor = totalVotesColor
         }
     }
 }

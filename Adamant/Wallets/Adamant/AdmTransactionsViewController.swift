@@ -64,12 +64,8 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             controller = nil
         }
         
-        if Thread.isMainThread {
-            tableView.reloadData()
-        } else {
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
+        DispatchQueue.onMainAsync {
+            self.tableView.reloadData()
         }
     }
     
@@ -104,7 +100,6 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         guard let stack = stack else {
             return
         }
-        
         DispatchQueue.global(qos: .utility).async {
             let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
             privateContext.parent = stack.container.viewContext

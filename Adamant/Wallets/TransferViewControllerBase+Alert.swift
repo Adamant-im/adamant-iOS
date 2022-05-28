@@ -31,19 +31,12 @@ extension TransferViewControllerBase {
         view.constrainCentered(indicator)
         indicator.startAnimating()
         
-        if animated {
-            if Thread.isMainThread {
-                view.alpha = 0
-                UIView.animate(withDuration: 0.2) {
-                    view.alpha = 1
-                }
-            } else {
-                DispatchQueue.main.async {
-                    view.alpha = 0
-                    UIView.animate(withDuration: 0.2) {
-                        view.alpha = 1
-                    }
-                }
+        guard animated else { return }
+        
+        DispatchQueue.onMainAsync {
+            view.alpha = 0
+            UIView.animate(withDuration: 0.2) {
+                view.alpha = 1
             }
         }
     }
@@ -90,13 +83,7 @@ extension TransferViewControllerBase {
             }
         }
         
-        if Thread.isMainThread {
-            callback()
-        } else {
-            DispatchQueue.main.async {
-                callback()
-            }
-        }
+        DispatchQueue.onMainAsync(callback)
     }
     
     func hideAlert(animated: Bool) {
@@ -126,12 +113,6 @@ extension TransferViewControllerBase {
             }
         }
         
-        if Thread.isMainThread {
-            callback()
-        } else {
-            DispatchQueue.main.async {
-                callback()
-            }
-        }
+        DispatchQueue.onMainAsync(callback)
     }
 }

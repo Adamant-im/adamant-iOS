@@ -68,6 +68,7 @@ class ChatViewController: MessagesViewController {
     var account: AdamantAccount?
     var chatroom: Chatroom?
     var messageToShow: MessageTransaction?
+    var forceScrollToBottom: Bool?
     var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -505,6 +506,10 @@ class ChatViewController: MessagesViewController {
         
         scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
         scrollToBottomBtnOffetConstraint?.constant = -20 - self.messageInputBar.bounds.height
+        
+        if forceScrollToBottom ?? false {
+            scrollDown()
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -889,19 +894,11 @@ extension ChatViewController: TransferViewControllerDelegate, ComplexTransferVie
     private func dismissTransferViewController(andPresent viewController: UIViewController?) {
         fixKeyboardInsets = true
         
-        if Thread.isMainThread {
-            dismiss(animated: true, completion: nil)
+        DispatchQueue.onMainAsync { [weak self] in
+            self?.dismiss(animated: true, completion: nil)
             
-            if let viewController = viewController, let nav = navigationController {
+            if let viewController = viewController, let nav = self?.navigationController {
                 nav.pushViewController(viewController, animated: true)
-            }
-        } else {
-            DispatchQueue.main.async { [weak self] in
-                self?.dismiss(animated: true, completion: nil)
-                
-                if let viewController = viewController, let nav = self?.navigationController {
-                    nav.pushViewController(viewController, animated: true)
-                }
             }
         }
     }

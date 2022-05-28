@@ -71,6 +71,10 @@ class AdamantNodesSource: NodesSource {
         }
     }
     
+    func getSocketNewNode() -> Node {
+        return nodes[0]
+    }
+    
     // MARK: - Tools
     func saveNodes() {
         do {

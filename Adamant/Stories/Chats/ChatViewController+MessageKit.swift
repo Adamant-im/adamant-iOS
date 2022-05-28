@@ -111,7 +111,14 @@ extension ChatViewController: MessagesDataSource {
             }
         }
         
-        return NSAttributedString(string: humanizedTime.string, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption2), NSAttributedString.Key.foregroundColor: UIColor.adamant.secondary])
+        var dop = ""
+        if let message = message as? MessageTransaction,
+           let blockId = message.blockId,
+           !blockId.isEmpty {
+            dop = "⚭ "
+        }
+        
+        return NSAttributedString(string: dop + humanizedTime.string, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption2), NSAttributedString.Key.foregroundColor: UIColor.adamant.secondary])
     }
     
     func customCell(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell {
