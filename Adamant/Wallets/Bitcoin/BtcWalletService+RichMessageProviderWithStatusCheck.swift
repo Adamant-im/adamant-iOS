@@ -44,7 +44,7 @@ extension BtcWalletService: RichMessageProviderWithStatusCheck {
                 
                 // MARK: Check date
                 let start = date.addingTimeInterval(-60 * 5)
-                let end = date.addingTimeInterval(60 * 5)
+                let end = date.addingTimeInterval(60 * 25)
                 let range = start...end
                 
                 guard let sentDate = btcTransaction.dateValue else {
