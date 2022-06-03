@@ -441,21 +441,29 @@ class ChatViewController: MessagesViewController {
             UIMenuItem(title: String.adamantLocalized.chat.remove, action: NSSelectorFromString("remove:")),
             UIMenuItem(title: String.adamantLocalized.chat.report, action: NSSelectorFromString("report:"))]
         
-        setBusyIndicator(state: true)
-        messagesCollectionView.alpha = 0.0
-        messageInputBar.isUserInteractionEnabled = false
         if let address = chatroom.partner?.address {
+            if let isLoaded = chatsProvider.isChatLoaded[address],
+               isLoaded {
+                setBusyIndicator(state: false)
+                return
+            }
+            if address == AdamantContacts.adamantBountyWallet.name {
+                setBusyIndicator(state: false)
+                return
+            }
+            setBusyIndicator(state: true)
+
             chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] _ in
                 DispatchQueue.main.async {
-                    self?.messagesCollectionView.reloadData()
-                    self?.messagesCollectionView.scrollToBottom(animated: false)
-                    self?.setBusyIndicator(state: false)
-                    self?.messagesCollectionView.reloadSections(IndexSet(integer: 0))
-                    UIView.animate(withDuration: 0.25) {
-                        self?.messagesCollectionView.alpha = 1.0
-                        self?.amadantLogoImageView.alpha = 0.0
-                    }
-                    self?.messageInputBar.isUserInteractionEnabled = true
+                    self?.messagesCollectionView.reloadDataAndKeepOffset()
+                    self?.messagesCollectionView.performBatchUpdates(nil, completion: {
+                        (result) in
+                        DispatchQueue.main.async {
+                            print("scroll to scrollToBottom ViewdidLoad")
+                            self?.setBusyIndicator(state: false)
+                            self?.reloadTopScetionIfNeeded()
+                        }
+                    })
                 }
             }
         }
@@ -544,7 +552,7 @@ class ChatViewController: MessagesViewController {
         scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
         scrollToBottomBtnOffetConstraint?.constant = -20 - self.messageInputBar.bounds.height
         
-        if forceScrollToBottom ?? false {
+        if forceScrollToBottom ?? false && !scrollToBottomBtn.isHidden {
             scrollDown()
         }
     }
@@ -590,17 +598,16 @@ class ChatViewController: MessagesViewController {
             }
             
             if self.messageToShow == nil {
-//                if let offset = self.chatsProvider.chatPositon[address] {
-//                    self.chatPositionOffset = CGFloat(offset)
-//                    self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
-//                    let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom)
-//
-//                    messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
-//                    }
-//                } else {
-//                    messagesCollectionView.scrollToBottom(animated: false)
-//                }
-                messagesCollectionView.scrollToBottom(animated: false)
+                if let offset = self.chatsProvider.chatPositon[address] {
+                    self.chatPositionOffset = CGFloat(offset)
+                    self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
+                    let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom)
+
+                    messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
+                    }
+                } else {
+                    messagesCollectionView.scrollToBottom(animated: false)
+                }
             } else {
                 self.chatsProvider.chatPositon.removeValue(forKey: address)
             }
@@ -871,7 +878,6 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
         
         chat.performBatchUpdates({
             for change in changes {
-                print(change.type)
                 switch change.type {
                 case .insert:
                     guard let newIndexPath = change.newIndexPath else {
@@ -987,6 +993,8 @@ extension ChatViewController {
         var offset = scrollView.contentSize.height - scrollView.bounds.height - scrollView.contentOffset.y + messageInputBar.bounds.height
         offset += self.keyboardHeight
         
+        if self.messageToShow != nil && offset < 0 { offset *= -1 }
+        
         if offset > chatPositionDelata {
             chatPositionOffset = offset
         } else {
@@ -1081,11 +1089,17 @@ extension ChatViewController {
             busyBackgroundView?.addSubview(spinner)
             spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
             spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+            
+            messagesCollectionView.alpha = 0.0
+            messageInputBar.isUserInteractionEnabled = false
         }
         
         if !state {
+            messageInputBar.isUserInteractionEnabled = true
             UIView.animate(withDuration: 0.25) { [weak self] in
                 self?.busyBackgroundView?.backgroundColor = .clear
+                self?.messagesCollectionView.alpha = 1.0
+                self?.amadantLogoImageView.alpha = 0.0
             } completion: { [weak self] _ in
                 self?.busyBackgroundView?.removeFromSuperview()
             }
@@ -1102,15 +1116,24 @@ extension ChatViewController {
            let address = chatroom?.partner?.address,
            !isBusy,
            loadedMessages != count {
+            if address == AdamantContacts.adamantBountyWallet.name { return }
             isBusy = true
             loadedMessages = count
             chatsProvider.getChatMessages(with: address, offset: count) { [weak self] _count in
                 DispatchQueue.main.async {
                     self?.messagesCollectionView.reloadDataAndKeepOffset()
                     self?.isBusy = false
-                    self?.messagesCollectionView.reloadSections(IndexSet(integer: 0))
+                    self?.reloadTopScetionIfNeeded()
                 }
             }
+        }
+    }
+    
+    func reloadTopScetionIfNeeded() {
+        try? chatController?.performFetch()
+        if let count = chatController?.fetchedObjects?.count,
+           count >= 1 {
+            self.messagesCollectionView.reloadSections(IndexSet(integer: 0))
         }
     }
 }
@@ -1119,7 +1142,6 @@ extension ChatViewController {
 extension ChatViewController {
     func setBackgroundUI() {
         amadantLogoImageView.translatesAutoresizingMaskIntoConstraints = false
-    //    view.insertSubview(amadantLogoImageView, at: 0)
         view.addSubview(amadantLogoImageView)
         amadantLogoImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
         amadantLogoImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true

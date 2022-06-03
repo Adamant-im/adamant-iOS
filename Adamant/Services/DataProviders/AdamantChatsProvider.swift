@@ -38,6 +38,8 @@ class AdamantChatsProvider: ChatsProvider {
     private(set) var blackList: [String] = []
     private(set) var removedMessages: [String] = []
     
+    public var isChatLoaded: [String : Bool] = [:]
+    
     private(set) var isInitiallySynced: Bool = false {
         didSet {
             NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: self, userInfo: [AdamantUserInfoKey.ChatProvider.initiallySynced : isInitiallySynced])
@@ -205,8 +207,9 @@ extension AdamantChatsProvider {
     func getChatRooms(offset: Int?, completion: (() ->())?) {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
-                  return
-              }
+            completion?()
+            return
+        }
         
         let cms = DispatchSemaphore(value: 1)
         // MARK: 3. Get transactions
@@ -250,8 +253,9 @@ extension AdamantChatsProvider {
     func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) ->())?) {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
-                  return
-              }
+            completion?(0)
+            return
+        }
         
         let cms = DispatchSemaphore(value: 1)
         // MARK: 3. Get transactions
@@ -262,6 +266,7 @@ extension AdamantChatsProvider {
             switch result {
             case .success(let transactions):
                 if let transactions = transactions {
+                    self?.isChatLoaded[addressRecipient] = true
                     self?.processingQueue.async {
                         self?.process(messageTransactions: transactions,
                                       senderId: address,
@@ -872,6 +877,7 @@ extension AdamantChatsProvider {
         
         return controller
     }
+}
 
 // MARK: - Processing
 extension AdamantChatsProvider {

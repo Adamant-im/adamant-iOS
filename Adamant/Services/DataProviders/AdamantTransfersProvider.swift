@@ -660,6 +660,7 @@ extension AdamantTransfersProvider {
                 }
                 
                 trsfr.confirmations = transaction.confirmations
+                trsfr.blockId = transaction.blockId
                 
                 do {
                     try context.save()
