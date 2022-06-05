@@ -503,12 +503,14 @@ extension BtcWalletService {
         ).responseData(queue: defaultDispatchQueue) { response in
             switch response.result {
             case .success(let data):
-                do {
-                    let value = try Self.jsonDecoder.decode(Decimal.self, from: data)
-                    completion(.success(result: value))
-                } catch {
-                    completion(.failure(error: .internalError(message: "BTC Wallet: not a valid response", error: error)))
+                guard
+                    let raw = String(data: data, encoding: .utf8),
+                    let value = Decimal(string: raw)
+                else {
+                    completion(.failure(error: .internalError(message: "BTC Wallet: not a valid response", error: nil)))
+                    return
                 }
+                completion(.success(result: value))
                 
             case .failure:
                 completion(.failure(error: .networkError))
