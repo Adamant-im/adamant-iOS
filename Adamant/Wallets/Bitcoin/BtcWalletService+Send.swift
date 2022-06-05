@@ -83,18 +83,13 @@ extension BtcWalletService: WalletServiceTwoStepSend {
         AF.request(
             endpoint,
             method: .post,
-            parameters: [:],
-            encoding: txHex,
+            parameters: nil,
+            encoding: BodyStringEncoding(body: txHex),
             headers: headers
-        ).responseJSON(queue: defaultDispatchQueue) { response in
+        ).responseData(queue: defaultDispatchQueue) { response in
             switch response.result {
-            case .success(let data):
-                if let result = data as? [String: Any], let txid = result["txid"] as? String {
-                    completion(.success(result: txid))
-                } else {
-                    completion(.failure(error: .internalError(message: "BTC Wallet: not valid response", error: nil)))
-                }
-                
+            case .success:
+                completion(.success(result: transaction.txId))
             case .failure(let error):
                 completion(.failure(error: .remoteServiceError(message: error.localizedDescription)))
             }
@@ -166,12 +161,32 @@ extension BtcWalletService: WalletServiceTwoStepSend {
 
 }
 
-extension String: ParameterEncoding {
+struct BodyStringEncoding: ParameterEncoding {
 
-    public func encode(_ urlRequest: URLRequestConvertible, with parameters: Parameters?) throws -> URLRequest {
-        var request = try urlRequest.asURLRequest()
-        request.httpBody = data(using: .utf8, allowLossyConversion: false)
-        return request
+    private let body: String
+
+    init(body: String) { self.body = body }
+
+    func encode(_ urlRequest: URLRequestConvertible, with parameters: Parameters?) throws -> URLRequest {
+        guard var urlRequest = urlRequest.urlRequest else { throw Errors.emptyURLRequest }
+        guard let data = body.data(using: .utf8) else { throw Errors.encodingProblem }
+        urlRequest.httpBody = data
+        return urlRequest
     }
+}
 
+extension BodyStringEncoding {
+    enum Errors: Error {
+        case emptyURLRequest
+        case encodingProblem
+    }
+}
+
+extension BodyStringEncoding.Errors: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+            case .emptyURLRequest: return "Empty url request"
+            case .encodingProblem: return "Encoding problem"
+        }
+    }
 }
