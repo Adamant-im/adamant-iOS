@@ -127,6 +127,12 @@ protocol ApiService: AnyObject {
     
     func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void)
     
+    // MARK: - Status
+    
+    func getNodeStatus(
+        url: URL,
+        completion: @escaping (ApiServiceResult<NodeStatus>) -> Void
+    )
     
     // MARK: - Accounts
     

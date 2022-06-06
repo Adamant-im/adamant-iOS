@@ -36,6 +36,10 @@ class Node: Equatable, Codable {
     var host: String
     var port: Int?
     
+    var height: Int?
+    var wsEnabled: Bool?
+    var ping: TimeInterval?
+    
     func asString() -> String {
         if let url = asURL(forcePort: scheme != URLScheme.default) {
             return url.absoluteString

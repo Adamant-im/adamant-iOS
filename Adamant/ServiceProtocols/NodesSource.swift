@@ -11,8 +11,8 @@ import Foundation
 // MARK: - Notifications
 extension Notification.Name {
     struct NodesSource {
-        /// Raised when node list changed
-        static let nodesChanged = Notification.Name("adamant.nodesSource.nodesChanged")
+        /// Raised when best node changed
+        static let bestNodeChanged = Notification.Name("adamant.nodesSource.bestNodeChanged")
         
         private init() {}
     }
@@ -20,8 +20,8 @@ extension Notification.Name {
 
 extension AdamantUserInfoKey {
     struct nodesSource {
-        /// New node list
-        static let nodes = "adamant.nodesSource.nodes"
+        /// New best node
+        static let bestNode = "adamant.nodesSource.bestNode"
         
         private init() {}
     }
@@ -36,17 +36,14 @@ extension StoreKey {
     }
 }
 
-protocol NodesSource {
+protocol NodesSource: AnyObject {
     var nodes: [Node] { get set }
     var defaultNodes: [Node] { get }
-    
-    func getNewNode() -> Node
-    func getValidNode(completion: @escaping ((Node?) -> Void))
+    var bestNode: Node { get }
     
     func getSocketNewNode() -> Node
     
     func saveNodes()
-    func reloadNodes()
-
     func migrate()
+    func bestNodeIsUnavailable()
 }

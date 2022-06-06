@@ -50,7 +50,8 @@ class AdamantApiService: ApiService {
     // MARK: - Dependencies
     
     var adamantCore: AdamantCore!
-    var nodesSource: NodesSource! {
+    
+    weak var nodesSource: NodesSource! {
         didSet {
             nodesSource.migrate()
             refreshNode()
@@ -67,6 +68,7 @@ class AdamantApiService: ApiService {
     
     private var _nodeTimeDelta: TimeInterval?
     private var nodeTimeDeltaSemaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
+    private var connection: AdamantConnection?
     
     private(set) var nodeTimeDelta: TimeInterval? {
         get {
@@ -86,20 +88,38 @@ class AdamantApiService: ApiService {
     
     internal var sendingMsgTaskId: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier.invalid
     
-    let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility, attributes: [.concurrent])
+    let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility)
     
     
     // MARK: - Init
     init() {
-        NotificationCenter.default.addObserver(forName: Notification.Name.NodesSource.nodesChanged, object: nil, queue: nil) { [weak self] _ in
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.NodesSource.bestNodeChanged,
+            object: nil,
+            queue: nil
+        ) { [weak self] _ in
             self?.refreshNode()
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
+            object: nil,
+            queue: nil
+        ) { [weak self] notification in
+            guard let connection = notification
+                    .userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection
+            else {
+                return
+            }
+            
+            self?.connection = connection
         }
     }
     
     // MARK: - Tools
     
     func refreshNode() {
-        node = nodesSource?.getNewNode()
+        node = nodesSource?.bestNode
         
         if let url = currentUrl {
             getNodeVersion(url: url) { result in
@@ -132,6 +152,60 @@ class AdamantApiService: ApiService {
         components.queryItems = queryItems
         
         return try components.asURL()
+    }
+    
+    func sendRequest<T: Decodable>(path: String,
+                                   queryItems: [URLQueryItem]? = nil,
+                                   method: HTTPMethod = .get,
+                                   parameters: [String:Any]? = nil,
+                                   encoding: Encoding = .url,
+                                   headers: [String:String]? = nil,
+                                   completion: @escaping (ApiServiceResult<T>) -> Void) {
+        let url: URL
+        do {
+            url = try buildUrl(path: path, queryItems: queryItems)
+        } catch {
+            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+            completion(.failure(err))
+            return
+        }
+        
+        let completionWrapper: (ApiServiceResult<T>) -> Void = { [weak self] result in
+            switch result {
+            case .success:
+                completion(result)
+            case let .failure(error):
+                switch error {
+                case .networkError:
+                    switch self?.connection {
+                    case .some(.cellular), .some(.wifi):
+                        self?.nodesSource.bestNodeIsUnavailable()
+                        self?.sendRequest(
+                            path: path,
+                            queryItems: queryItems,
+                            method: method,
+                            parameters: parameters,
+                            encoding: encoding,
+                            headers: headers,
+                            completion: completion
+                        )
+                    case nil, .some(.none):
+                        completion(result)
+                    }
+                case .accountNotFound, .internalError, .notLogged, .serverError:
+                    completion(result)
+                }
+            }
+        }
+        
+        sendRequest(
+            url: url,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            headers: headers,
+            completion: completionWrapper
+        )
     }
     
     func sendRequest<T: Decodable>(url: URLConvertible,

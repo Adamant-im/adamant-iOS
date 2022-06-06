@@ -61,6 +61,7 @@ extension Container {
             let service = AdamantNodesSource(defaultNodes: AdamantResources.nodes)
             service.apiService = r.resolve(ApiService.self)!
             service.securedStore = r.resolve(SecuredStore.self)
+            service.healthCheckService = r.resolve(HealthCheckService.self)!
             return service
         }.inObjectScope(.container)
         
@@ -72,6 +73,13 @@ extension Container {
         }.initCompleted { (r, c) in    // Weak reference
             let service = c as! AdamantApiService
             service.nodesSource = r.resolve(NodesSource.self)
+        }.inObjectScope(.container)
+        
+        // MARK: HealthCheckService
+        self.register(HealthCheckService.self) { r in
+            let service = AdamantHealthCheckService()
+            service.apiService = r.resolve(ApiService.self)!
+            return service
         }.inObjectScope(.container)
         
         // MARK: SocketService
