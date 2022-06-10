@@ -39,6 +39,8 @@ class AdamantChatsProvider: ChatsProvider {
     private(set) var removedMessages: [String] = []
     
     public var isChatLoaded: [String : Bool] = [:]
+    public var chatMaxMessages: [String : Int] = [:]
+    public var chatLoadedMessages: [String : Int] = [:]
     
     private(set) var isInitiallySynced: Bool = false {
         didSet {
@@ -180,6 +182,11 @@ extension AdamantChatsProvider {
         // Drop props
         receivedLastHeight = nil
         readedLastHeight = nil
+        roomsMaxCount = nil
+        roomsLoadedCount = nil
+        isChatLoaded.removeAll()
+        chatMaxMessages.removeAll()
+        chatLoadedMessages.removeAll()
         
         // Drop store
         securedStore.remove(StoreKey.chatProvider.address)
@@ -211,21 +218,24 @@ extension AdamantChatsProvider {
             return
         }
         
+        let prevState = state
+        state = .updating
+        
         let cms = DispatchSemaphore(value: 1)
         // MARK: 3. Get transactions
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = self.stack.container.viewContext
         apiService.getChatRooms(address: address, offset: offset) { [weak self] result in
             switch result {
-            case .success(let trans):
-                self?.roomsMaxCount = trans.count
+            case .success(let chatrooms):
+                self?.roomsMaxCount = chatrooms.count
                 if let roomsLoadedCount =  self?.roomsLoadedCount {
-                    self?.roomsLoadedCount = roomsLoadedCount + (trans.chats?.count ?? 0)
+                    self?.roomsLoadedCount = roomsLoadedCount + (chatrooms.chats?.count ?? 0)
                 } else {
-                    self?.roomsLoadedCount = trans.chats?.count ?? 0
+                    self?.roomsLoadedCount = chatrooms.chats?.count ?? 0
                 }
                 var array = Array<Transaction>()
-                trans.chats?.forEach({ room in
+                chatrooms.chats?.forEach({ room in
                     if let last = room.lastTransaction {
                         array.append(last)
                     }
@@ -241,6 +251,7 @@ extension AdamantChatsProvider {
                         if let synced = self?.isInitiallySynced, !synced {
                             self?.isInitiallySynced = true
                         }
+                        self?.setState(.upToDate, previous: prevState)
                         completion?()
                     })
                 }
@@ -264,9 +275,13 @@ extension AdamantChatsProvider {
         
         apiService.getChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] result in
             switch result {
-            case .success(let transactions):
+            case .success(let chatroom):
+                let transactions = chatroom.messages
                 if let transactions = transactions {
                     self?.isChatLoaded[addressRecipient] = true
+                    self?.chatMaxMessages[addressRecipient] = chatroom.count ?? 0
+                    let loadedCount = self?.chatLoadedMessages[addressRecipient] ?? 0
+                    self?.chatLoadedMessages[addressRecipient] = loadedCount + (chatroom.messages?.count ?? 0)
                     self?.processingQueue.async {
                         self?.process(messageTransactions: transactions,
                                       senderId: address,
@@ -996,7 +1011,11 @@ extension AdamantChatsProvider {
             for address in notFound {
                 keysGroup.enter() // Enter 1
                 
-                accountsProvider.getAccount(byAddress: address) { result in
+                let transaction = grouppedTransactions[address]?.first
+                let isOut = transaction?.isOut ?? false
+                let publicKey = isOut ? transaction?.transaction.recipientPublicKey : transaction?.transaction.senderPublicKey
+
+                accountsProvider.getAccount(byAddress: address, publicKey: publicKey ?? "") { result in
                     defer {
                         keysGroup.leave() // Exit 1
                     }

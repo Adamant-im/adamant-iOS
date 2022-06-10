@@ -293,6 +293,8 @@ extension ChatViewController: MessagesDisplayDelegate {
         let header = messagesCollectionView.dequeueReusableHeaderView(HeaderReusableView.self, for: indexPath)
         if (indexPath.section == 0 && isBusy) {
             header.setupLoadAnimating()
+        } else {
+            header.stopLoadAnimating()
         }
         return header
     }
@@ -560,7 +562,7 @@ extension ChatViewController: MessagesLayoutDelegate {
     }
     
     func headerViewSize(for section: Int, in messagesCollectionView: MessagesCollectionView) -> CGSize {
-        if (section == 0) {
+        if (section == 0 && isNeedToLoadMoore()) {
             return CGSize(width: messagesCollectionView.bounds.width, height: HeaderReusableView.height)
         } else {
             return .zero

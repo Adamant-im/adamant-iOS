@@ -215,7 +215,7 @@ extension AdamantAccountsProvider {
         }
     }
     
-    /// Get account info from servier.
+    /// Get account info from server.
     ///
     /// - Parameters:
     ///   - address: address of an account
@@ -227,7 +227,7 @@ extension AdamantAccountsProvider {
             return
         }
         
-        let context = stack.container.viewContext
+        //let context = stack.container.viewContext
         
         // Go background, to not to hang threads (especially main) on semaphores and dispatch groups
         queue.async {
@@ -281,6 +281,7 @@ extension AdamantAccountsProvider {
                         
                         var coreAccount: CoreDataAccount! = nil
                         DispatchQueue.main.sync {
+                            let context = self.stack.container.viewContext
                             coreAccount = self.createCoreDataAccount(from: account,  context: context)
                             
                             if let dummy = dummy {
@@ -344,7 +345,102 @@ extension AdamantAccountsProvider {
         }
     }
     
-    
+    /// Get account info from server or create instantly
+    ///
+    /// - Parameters:
+    ///   - address: address of an account
+    ///   - publicKey: publicKey of an account
+    ///   - completion: returns Account created in viewContext
+    func getAccount(byAddress address: String, publicKey: String, completion: @escaping (AccountsProviderResult) -> Void) {
+        let validation = AdamantUtilities.validateAdamantAddress(address: address)
+        if validation == .invalid {
+            completion(.invalidAddress(address: address))
+            return
+        }
+        
+        if publicKey.isEmpty {
+            getAccount(byAddress: address) { _account in
+                completion(_account)
+            }
+            return
+        }
+        let context = stack.container.viewContext
+        
+        // Go background, to not to hang threads (especially main) on semaphores and dispatch groups
+        queue.async {
+            self.groupsSemaphore.wait() // 1
+            
+            // If there is already request for a this address, wait
+            if let group = self.requestGroups[address] {
+                self.groupsSemaphore.signal() // 1
+                group.wait()
+                self.groupsSemaphore.wait() // 2
+            }
+            
+            // Check if there is an account, that we are looking for
+            let dummy: DummyAccount?
+            switch self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
+            case .core(let account):
+                self.groupsSemaphore.signal() // 1 or 2
+                completion(.success(account))
+                return
+                
+            case .dummy(let account):
+                dummy = account
+                
+            case .notFound:
+                dummy = nil
+            }
+            
+            // No, we need to get one
+            let group = DispatchGroup()
+            self.requestGroups[address] = group
+            group.enter()
+            
+            self.groupsSemaphore.signal() // 1 or 2
+            
+            switch validation {
+            case .valid:
+                var coreAccount: CoreDataAccount! = nil
+                DispatchQueue.main.sync {
+                    coreAccount = self.createCoreDataAccount(with: address, publicKey: publicKey, contextt: context)
+                    if let dummy = dummy {
+                        coreAccount.name = dummy.name
+                        
+                        if let transfers = dummy.transfers {
+                            dummy.removeFromTransfers(transfers)
+                            coreAccount.addToTransfers(transfers)
+                            
+                            if let chatroom = coreAccount.chatroom {
+                                chatroom.addToTransactions(transfers)
+                                chatroom.updateLastTransaction()
+                            }
+                        }
+                        context.delete(dummy)
+                    }
+                    
+                    try? context.save()
+                }
+                self.removeSafeFromRequests(address)
+                group.leave()
+                
+                completion(.success(coreAccount))
+                
+            case .system:
+                let coreAccount = self.createCoreDataAccount(with: address, publicKey: "")
+                self.removeSafeFromRequests(address)
+                group.leave()
+                
+                completion(.success(coreAccount))
+                
+            case .invalid:
+                self.removeSafeFromRequests(address)
+                group.leave()
+                
+                completion(.invalidAddress(address: address))
+            }
+        }
+    }
     
     /*
     
@@ -408,6 +504,19 @@ extension AdamantAccountsProvider {
     }
 
     */
+    
+    private func createCoreDataAccount(with address: String, publicKey: String, contextt: NSManagedObjectContext) -> CoreDataAccount {
+        var coreAccount: CoreDataAccount!
+        
+        DispatchQueue.onMainSync {
+            coreAccount = createCoreDataAccount(
+                with: address,
+                publicKey: publicKey,
+                context: contextt
+            )
+        }
+        return coreAccount
+    }
     
     private func createCoreDataAccount(with address: String, publicKey: String) -> CoreDataAccount {
         var coreAccount: CoreDataAccount!

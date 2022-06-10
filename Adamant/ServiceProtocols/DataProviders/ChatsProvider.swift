@@ -178,6 +178,8 @@ protocol ChatsProvider: DataProvider {
     var roomsLoadedCount: Int? { get }
     
     var isChatLoaded: [String: Bool] { get }
+    var chatMaxMessages: [String: Int] { get }
+    var chatLoadedMessages: [String: Int] { get }
     
     // MARK: - Getting chats and messages
     func getChatroomsController() -> NSFetchedResultsController<Chatroom>

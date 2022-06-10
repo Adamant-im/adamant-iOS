@@ -150,7 +150,7 @@ protocol ApiService: AnyObject {
     // MARK: - Chats Rooms
       
       func getChatRooms(address: String, offset: Int?, completion: @escaping (ApiServiceResult<ChatRooms>) -> Void)
-      func getChatMessages(address: String, addressRecipient: String, offset: Int?, completion: @escaping (ApiServiceResult<[Transaction]?>) -> Void)
+      func getChatMessages(address: String, addressRecipient: String, offset: Int?, completion: @escaping (ApiServiceResult<ChatRooms>) -> Void)
 
     // MARK: - Funds
     

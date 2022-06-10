@@ -200,9 +200,8 @@ class ChatViewController: MessagesViewController {
     
     private var busyBackgroundView: UIView?
     private var spinner = UIActivityIndicatorView(style: .whiteLarge)
-    private var loadedMessages = 0
-    var isBusy = true
-
+    var isBusy = false
+    
     //MARK: Background UI
     private let amadantLogoImageView: UIImageView = {
         let iv = UIImageView()
@@ -214,8 +213,6 @@ class ChatViewController: MessagesViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "•••", style: .plain, target: self, action: #selector(properties))
-        
-        setBackgroundUI()
         
         guard let chatroom = chatroom else {
             return
@@ -416,7 +413,7 @@ class ChatViewController: MessagesViewController {
         scrollToBottomBtn.frame = CGRect.zero
         scrollToBottomBtn.translatesAutoresizingMaskIntoConstraints = false
         scrollToBottomBtn.addTarget(self, action: #selector(scrollDown), for: .touchUpInside)
-        
+        scrollToBottomBtn.isHidden = true
         self.view.addSubview(scrollToBottomBtn)
         
         keyboardManager.on(event: .willChangeFrame) { [weak self] (notification) in
@@ -447,23 +444,31 @@ class ChatViewController: MessagesViewController {
                 setBusyIndicator(state: false)
                 return
             }
+            
             if address == AdamantContacts.adamantBountyWallet.name {
                 setBusyIndicator(state: false)
                 return
             }
+            
             setBusyIndicator(state: true)
 
-            chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] _ in
+            chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] count in
                 DispatchQueue.main.async {
-                    self?.messagesCollectionView.reloadDataAndKeepOffset()
-                    self?.messagesCollectionView.performBatchUpdates(nil, completion: {
-                        (result) in
-                        DispatchQueue.main.async {
-                            print("scroll to scrollToBottom ViewdidLoad")
-                            self?.setBusyIndicator(state: false)
-                            self?.reloadTopScetionIfNeeded()
+                    if #available(iOS 13.0, *) {
+                        self?.messagesCollectionView.reloadDataAndKeepOffset()
+                    } else {
+                        self?.messagesCollectionView.reloadData()
+                        self?.messagesCollectionView.reloadDataAndKeepOffset()
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        if #available(iOS 13.0, *) {
+                            
+                        } else {
+                            self?.messagesCollectionView.reloadDataAndKeepOffset()
                         }
-                    })
+                        self?.setBusyIndicator(state: false)
+                        //self?.reloadTopScetionIfNeeded()
+                    }
                 }
             }
         }
@@ -872,7 +877,7 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
         
         var scrollToBottom = changes.first { $0.type == .insert } != nil
         
-        if !isFirstLayout {
+        if !isFirstLayout && changes.first?.type != nil {
             scrollToBottom = scrollToBottomBtn.isHidden
         }
         
@@ -1078,7 +1083,8 @@ private class StatusUpdateProcedure: Procedure {
 extension ChatViewController {
     func setBusyIndicator(state: Bool) {
         isBusy = state
-        if busyBackgroundView == nil {
+        if busyBackgroundView == nil && state {
+            setBackgroundUI()
             busyBackgroundView = UIView()
             busyBackgroundView?.backgroundColor = UIColor(white: 0, alpha: 0.1)
             busyBackgroundView?.frame = view.frame
@@ -1089,14 +1095,23 @@ extension ChatViewController {
             busyBackgroundView?.addSubview(spinner)
             spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
             spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-            
+
             messagesCollectionView.alpha = 0.0
-            messageInputBar.isUserInteractionEnabled = false
+            messageInputBar.sendButton.isEnabled = false
+            messageInputBar.inputTextView.isEditable = false
+            messageInputBar.leftStackView.isUserInteractionEnabled = false
         }
         
         if !state {
-            messageInputBar.isUserInteractionEnabled = true
-            UIView.animate(withDuration: 0.25) { [weak self] in
+            if busyBackgroundView != nil {
+                reloadTopScetionIfNeeded()
+            }
+            
+            messageInputBar.sendButton.isEnabled = true
+            messageInputBar.inputTextView.isEditable = true
+            messageInputBar.leftStackView.isUserInteractionEnabled = true
+            
+            UIView.animate(withDuration: 0.25, delay: 0.25) { [weak self] in
                 self?.busyBackgroundView?.backgroundColor = .clear
                 self?.messagesCollectionView.alpha = 1.0
                 self?.amadantLogoImageView.alpha = 0.0
@@ -1110,16 +1125,14 @@ extension ChatViewController {
 //MARK: Load moore message
 extension ChatViewController {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        try? chatController?.performFetch()
         if indexPath.section < 2,
-           let count = chatController?.fetchedObjects?.count,
            let address = chatroom?.partner?.address,
            !isBusy,
-           loadedMessages != count {
+           isNeedToLoadMoore() {
             if address == AdamantContacts.adamantBountyWallet.name { return }
             isBusy = true
-            loadedMessages = count
-            chatsProvider.getChatMessages(with: address, offset: count) { [weak self] _count in
+            let mcount = chatsProvider.chatLoadedMessages[address] ?? 0
+            chatsProvider.getChatMessages(with: address, offset: mcount) { [weak self] _count in
                 DispatchQueue.main.async {
                     self?.messagesCollectionView.reloadDataAndKeepOffset()
                     self?.isBusy = false
@@ -1135,6 +1148,14 @@ extension ChatViewController {
            count >= 1 {
             self.messagesCollectionView.reloadSections(IndexSet(integer: 0))
         }
+    }
+    
+    func isNeedToLoadMoore() -> Bool {
+        if let address = chatroom?.partner?.address,
+           chatsProvider.chatLoadedMessages[address] ?? 0 < chatsProvider.chatMaxMessages[address] ?? 0 {
+            return true
+        }
+        return false
     }
 }
 
