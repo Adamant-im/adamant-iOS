@@ -13,59 +13,93 @@ class AdamantSocketService: SocketService {
 
     // MARK: - Dependencies
     
-    var adamantCore: AdamantCore!
-    var nodesSource: NodesSource! {
+    weak var nodesSource: NodesSource! {
         didSet {
-            refreshNode()
+            refreshURL()
         }
     }
     
     // MARK: - Properties
     
-    private(set) var node: Node? {
+    private var currentUrl: URL? {
         didSet {
-            currentUrl = node?.asSocketURL()
+            guard
+                oldValue != currentUrl,
+                let address = currentAddress,
+                let handler = currentHandler
+            else {
+                return
+            }
+            
+            connect(address: address, handler: handler)
         }
     }
     
-    private var currentUrl: URL?
-    
-    private var manager: SocketManager!
     private var socket: SocketIOClient?
+    private var currentAddress: String?
+    private var currentHandler: ((ApiServiceResult<Transaction>) -> Void)?
     
-    let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility, attributes: [.concurrent])
+    let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility)
+    
+    init() {
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.NodesSource.bestNodeChanged,
+            object: nil,
+            queue: nil
+        ) { [weak self] _ in
+            self?.refreshURL()
+        }
+    }
     
     // MARK: - Tools
     
-    func refreshNode() {
-        node = nodesSource?.getSocketNewNode()
-    }
-    
-    func connect(address: String) {
+    func connect(address: String, handler: @escaping (ApiServiceResult<Transaction>) -> Void) {
+        disconnect()
+        currentAddress = address
+        currentHandler = handler
+        
         guard let currentUrl = currentUrl else { return }
-        manager = SocketManager(socketURL: currentUrl, config: [.log(false), .compress])
-        socket = manager.defaultSocket
-        socket?.on(clientEvent: .connect, callback: {[weak self] _, _ in
+
+        socket = SocketManager(
+            socketURL: currentUrl,
+            config: [.log(false), .compress]
+        ).defaultSocket
+        
+        socket?.on(clientEvent: .connect) { [weak self] _, _ in
             self?.socket?.emit("address", with: [address])
-        })
+        }
+        
+        socket?.on("newTrans") { [weak self] data, _ in
+            self?.handleTransaction(data: data)
+        }
+        
         socket?.connect()
     }
     
     func disconnect() {
         socket?.disconnect()
+        socket = nil
     }
     
-    func receiveNewTransaction(completion: ((ApiServiceResult<Transaction>) -> Void)?) {
-        socket?.on("newTrans", callback: { [weak self] data, ack in
-            guard let data = data.first else { return }
-            guard let dict = data as? [String: Any] else { return }
-            if let trans = try? JSONDecoder().decode(Transaction.self, from: JSONSerialization.data(withJSONObject: dict)),
-               trans.asset.chat?.type != .signal {
-                self?.defaultResponseDispatchQueue.async {
-                    completion?(.success(trans))
-                }
-            }
-        })
+    private func refreshURL() {
+        currentUrl = nodesSource?.bestNode.asSocketURL()
     }
     
+    private func handleTransaction(data: [Any]) {
+        guard
+            let data = data.first,
+            let dict = data as? [String: Any],
+            let trans = try? JSONDecoder().decode(
+                Transaction.self,
+                from: JSONSerialization.data(withJSONObject: dict)
+            ),
+            trans.asset.chat?.type != .signal
+        else {
+            return
+        }
+        
+        defaultResponseDispatchQueue.async { [currentHandler] in
+            currentHandler?(.success(trans))
+        }
+    }
 }

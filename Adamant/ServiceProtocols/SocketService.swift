@@ -16,11 +16,7 @@ protocol SocketService: AnyObject {
     
     // MARK: - Connection
     
-    func connect(address: String)
+    func connect(address: String, handler: @escaping (ApiServiceResult<Transaction>) -> Void)
     
     func disconnect()
-    
-    // MARK: - Receive New Transaction
-    
-    func receiveNewTransaction(completion: ((ApiServiceResult<Transaction>) -> Void)?)
 }

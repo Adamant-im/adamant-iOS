@@ -85,7 +85,6 @@ extension Container {
         // MARK: SocketService
         self.register(SocketService.self) { r in
             let service = AdamantSocketService()
-            service.adamantCore = r.resolve(AdamantCore.self)
             return service
         }.initCompleted { (r, c) in    // Weak reference
             let service = c as! AdamantSocketService
