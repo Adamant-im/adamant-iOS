@@ -62,21 +62,25 @@ struct RawBtcStatus: Decodable {
     }
     
     let confirmed: Bool
-    let height: Decimal
-    let hash: String
-    let time: Decimal
+    let height: Decimal?
+    let hash: String?
+    let time: Decimal?
 }
 
 extension RawBtcTransactionResponse {
     func asBtcTransaction<T: BaseBtcTransaction>(_ as:T.Type, for address: String, height: Decimal? = nil) -> T {
         let transactionStatus: TransactionStatus = status.confirmed ? .success : .pending
 
-        let date = Date(timeIntervalSince1970: status.time.doubleValue)
+        var date: Date?
+        if let time = status.time {
+            date = Date(timeIntervalSince1970: time.doubleValue)
+        }
+        
         let fee = fee / BtcWalletService.multiplier
 
         let confirmationsValue: String?
-        if let height = height {
-            confirmationsValue = "\(height - status.height)"
+        if let height = height, let transactionHeight = status.height {
+            confirmationsValue = "\(height - transactionHeight)"
         } else {
             confirmationsValue = nil
         }
@@ -140,8 +144,28 @@ extension RawBtcTransactionResponse {
                 recipient = String.adamantLocalized.dogeTransaction.recipients(recipients.count)
             }
         }
-        
-        
+
+        // Fix self-to-self transfer zero value issue
+        if myOutputs.count >= 2 {
+            let value = outputs.first?.value ?? 0
+            let isIncome = myInputs.count > 0
+
+            let transaction = T(
+                txId: txId,
+                dateValue: date,
+                blockValue: status.hash,
+                senderAddress: isIncome ? address : sender,
+                recipientAddress: isIncome ? recipient : address,
+                amountValue: value,
+                feeValue: fee,
+                confirmationsValue: confirmationsValue,
+                isOutgoing: isIncome,
+                transactionStatus: transactionStatus
+            )
+            
+            return transaction
+        }
+
         // MARK: Inputs
         if myInputs.count > 0 {
             let inputTransaction =  T(txId: txId,
