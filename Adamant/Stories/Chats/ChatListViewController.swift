@@ -71,6 +71,8 @@ class ChatListViewController: UIViewController {
         return parser
     }()
     
+    private var defaultSeparatorInstets: UIEdgeInsets?
+    
     // MARK: Busy indicator
     
     @IBOutlet weak var busyBackgroundView: UIView!
@@ -375,7 +377,15 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let chatroom = chatsController?.object(at: indexPath) {
+        if isBusy,
+           indexPath.row == lastSystemChatPositionRow,
+           let cell = tableView.cellForRow(at: indexPath),
+           let _ = cell as? LoadingTableViewCell {
+            tableView.deselectRow(at: indexPath, animated: true)
+            return
+        }
+        let nIndexPath = isBusy && indexPath.row >= (lastSystemChatPositionRow ?? 0) ? IndexPath(row: indexPath.row - 1, section: 0) : indexPath
+        if let chatroom = chatsController?.object(at: nIndexPath) {
             let vc = chatViewController(for: chatroom)
             
             if let split = self.splitViewController {
@@ -425,6 +435,16 @@ extension ChatListViewController {
             if let chat = chatsController?.object(at: nIndexPath) {
                 configureCell(cell, for: chat)
             }
+            if isBusy,
+               indexPath.row == (lastSystemChatPositionRow ?? 0) - 1 {
+                cell.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
+            } else {
+                if let defaultSeparatorInstets = defaultSeparatorInstets {
+                    cell.separatorInset = defaultSeparatorInstets
+                } else {
+                    defaultSeparatorInstets = cell.separatorInset
+                }
+            }
         }
         
         if let roomsLoadedCount = chatsProvider.roomsLoadedCount,
@@ -433,20 +453,22 @@ extension ChatListViewController {
            roomsMaxCount > 0,
            !isBusy,
            tableView.numberOfRows(inSection: 0) >= roomsLoadedCount,
-           let lastVisibleIndexPath = tableView.indexPathsForVisibleRows?.last,
-           indexPath == lastVisibleIndexPath,
-           indexPath.row == tableView.numberOfRows(inSection: 0) - 1 {
+           let lastVisibleIndexPath = tableView.indexPathsForVisibleRows,
+           lastVisibleIndexPath.contains(IndexPath(row: tableView.numberOfRows(inSection: 0) - 3, section: 0)) {
             isBusy = true
-
             lastSystemChatPositionRow = getBottomSystemChatIndex()
             DispatchQueue.main.async { [weak self] in
                 if #available(iOS 11.0, *) {
                     tableView.performBatchUpdates {
-                        tableView.insertRows(at: [IndexPath(row: self?.lastSystemChatPositionRow ?? 0, section: 0)], with: .none)
+                        tableView.insertRows(at: [
+                            IndexPath(row: self?.lastSystemChatPositionRow ?? 0, section: 0)
+                        ], with: .none)
+                        tableView.reloadRows(at: [IndexPath(row: (self?.lastSystemChatPositionRow ?? 0) - 1, section: 0)], with: .none)
                     }
                 } else {
                     tableView.beginUpdates()
                     tableView.insertRows(at: [IndexPath(row: self?.lastSystemChatPositionRow ?? 0, section: 0)], with: .none)
+                    tableView.reloadRows(at: [IndexPath(row: (self?.lastSystemChatPositionRow ?? 0) - 1, section: 0)], with: .none)
                     tableView.endUpdates()
                 }
             }
@@ -477,6 +499,9 @@ extension ChatListViewController {
                 cell.accountLabel.text = title
             } else if let name = partner.name {
                 cell.accountLabel.text = name
+            } else if let address = partner.address,
+                      let name = self.addressBook.addressBook[address] {
+                cell.accountLabel.text = name.checkAndReplaceSystemWallets()
             } else {
                 cell.accountLabel.text = partner.address
             }

@@ -105,6 +105,7 @@ class ChatViewController: MessagesViewController {
     internal var showsDateHeaderAfterTimeInterval: TimeInterval = 3600
     
     private var isFirstLayout = true
+    private var didLoaded = false
     
     // Content insets are broken after modal view dissapears
     private var fixKeyboardInsets = false
@@ -444,30 +445,24 @@ class ChatViewController: MessagesViewController {
                 setBusyIndicator(state: false)
                 return
             }
-            
+
             if address == AdamantContacts.adamantBountyWallet.name {
                 setBusyIndicator(state: false)
                 return
             }
-            
+
             setBusyIndicator(state: true)
 
             chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] count in
                 DispatchQueue.main.async {
-                    if #available(iOS 13.0, *) {
-                        self?.messagesCollectionView.reloadDataAndKeepOffset()
-                    } else {
-                        self?.messagesCollectionView.reloadData()
-                        self?.messagesCollectionView.reloadDataAndKeepOffset()
-                    }
+                    self?.messagesCollectionView.reloadDataAndKeepOffset()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         if #available(iOS 13.0, *) {
-                            
+
                         } else {
-                            self?.messagesCollectionView.reloadDataAndKeepOffset()
+                            self?.messagesCollectionView.scrollToItem(at: IndexPath(row: 0, section: count - 1), at: .top, animated: false)
                         }
                         self?.setBusyIndicator(state: false)
-                        //self?.reloadTopScetionIfNeeded()
                     }
                 }
             }
@@ -560,6 +555,8 @@ class ChatViewController: MessagesViewController {
         if forceScrollToBottom ?? false && !scrollToBottomBtn.isHidden {
             scrollDown()
         }
+        
+        didLoaded = true
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -580,7 +577,6 @@ class ChatViewController: MessagesViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
         guard let address = chatroom?.partner?.address else { return }
         
         // MARK: 4.2 Scroll to message
@@ -605,8 +601,9 @@ class ChatViewController: MessagesViewController {
             if self.messageToShow == nil {
                 if let offset = self.chatsProvider.chatPositon[address] {
                     self.chatPositionOffset = CGFloat(offset)
+                    print("chatPositionOffset=", offset)
                     self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
-                    let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom)
+                    let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom) + 38
 
                     messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
                     }
@@ -910,8 +907,10 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
                     guard let section = change.indexPath?.row else {
                         continue
                     }
-                    
-                    chat.reloadItems(at: [IndexPath(row: 0, section: section)])
+                    if chat.indexPathsForVisibleItems.contains(IndexPath(row: 0, section: section)) {
+                        chat.reloadItems(at: [IndexPath(row: 0, section: section)])
+                    }
+                    scrollToBottom = false
                 @unknown default:
                     break
                 }
@@ -997,8 +996,6 @@ extension ChatViewController {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         var offset = scrollView.contentSize.height - scrollView.bounds.height - scrollView.contentOffset.y + messageInputBar.bounds.height
         offset += self.keyboardHeight
-        
-        if self.messageToShow != nil && offset < 0 { offset *= -1 }
         
         if offset > chatPositionDelata {
             chatPositionOffset = offset
@@ -1128,11 +1125,12 @@ extension ChatViewController {
         if indexPath.section < 2,
            let address = chatroom?.partner?.address,
            !isBusy,
-           isNeedToLoadMoore() {
+           isNeedToLoadMoore(),
+           didLoaded {
             if address == AdamantContacts.adamantBountyWallet.name { return }
             isBusy = true
-            let mcount = chatsProvider.chatLoadedMessages[address] ?? 0
-            chatsProvider.getChatMessages(with: address, offset: mcount) { [weak self] _count in
+            let offset = chatsProvider.chatLoadedMessages[address] ?? 0
+            chatsProvider.getChatMessages(with: address, offset: offset) { [weak self] _count in
                 DispatchQueue.main.async {
                     self?.messagesCollectionView.reloadDataAndKeepOffset()
                     self?.isBusy = false

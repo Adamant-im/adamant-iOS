@@ -873,7 +873,7 @@ extension AdamantTransfersProvider {
             } else {
                 unconfirmedsSemaphore.signal()
             }
-            
+            print("transfer=", String(t.id))
             let transfer = TransferTransaction(context: context)
             transfer.amount = t.amount as NSDecimalNumber
             transfer.date = t.date as NSDate
@@ -896,9 +896,9 @@ extension AdamantTransfersProvider {
             if let partner = partners[partnerId] {
                 transfer.partner = partner
                 
-                if let chatroom = (partner as? CoreDataAccount)?.chatroom {
-                    transfer.chatroom = chatroom
-                }
+//                if let chatroom = (partner as? CoreDataAccount)?.chatroom {
+//                    transfer.chatroom = chatroom
+//                }
             }
             
             if t.height > height {
@@ -940,12 +940,12 @@ extension AdamantTransfersProvider {
         if context.hasChanges {
             do {
                 try context.save()
-                
-                // MARK: 7. Update lastTransactions
-                let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
-                DispatchQueue.main.async {
-                    viewContextChatrooms.forEach { $0.updateLastTransaction() }
-                }
+
+//                // MARK: 7. Update lastTransactions
+//                let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
+//                DispatchQueue.main.async {
+//                    viewContextChatrooms.forEach { $0.updateLastTransaction() }
+//                }
             } catch {
                 print("TransferProvider: Failed to save changes to CoreData: \(error.localizedDescription)")
             }

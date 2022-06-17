@@ -254,6 +254,11 @@ extension AdamantChatsProvider {
                         self?.setState(.upToDate, previous: prevState)
                         completion?()
                     })
+                    if let synced = self?.isInitiallySynced, !synced {
+                        self?.isInitiallySynced = true
+                    }
+                    self?.setState(.upToDate, previous: prevState)
+                    completion?()
                 }
             case .failure(_):
                 completion?()
@@ -892,6 +897,23 @@ extension AdamantChatsProvider {
         
         return controller
     }
+    
+    /// Search transaction in local storage
+    ///
+    /// - Parameter id: Transacton ID
+    /// - Returns: Transaction, if found
+    func getTransfer(id: String, context: NSManagedObjectContext) -> TransferTransaction? {
+        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        
+        do {
+            let result = try context.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
 }
 
 // MARK: - Processing
@@ -1084,12 +1106,12 @@ extension AdamantChatsProvider {
                         height = chatTransaction.height
                     }
                     
-                    let trans = privateChatroom.transactions?.first(where: { message in
+                    let transactionExist = privateChatroom.transactions?.first(where: { message in
                         return (message as? ChatTransaction)?.txId == chatTransaction.txId
                     }) as? ChatTransaction
                     
                     if !trs.isOut {
-                        if trans == nil {
+                        if transactionExist == nil {
                             newMessageTransactions.append(chatTransaction)
                         }
                         
@@ -1116,16 +1138,16 @@ extension AdamantChatsProvider {
                         }
                     }
                     
-                    if trans == nil {
+                    if transactionExist == nil {
                         if (chatTransaction.blockId?.isEmpty ?? true) && (chatTransaction.amountValue ?? 0.0 > 0.0) {
                             chatTransaction.statusEnum = .pending
                         }
                         messages.insert(chatTransaction)
                     } else {
-                        trans?.height = chatTransaction.height
-                        trans?.blockId = chatTransaction.blockId
-                        trans?.confirmations = chatTransaction.confirmations
-                        trans?.statusEnum = .delivered
+                        transactionExist?.height = chatTransaction.height
+                        transactionExist?.blockId = chatTransaction.blockId
+                        transactionExist?.confirmations = chatTransaction.confirmations
+                        transactionExist?.statusEnum = .delivered
                     }
                 }
             }
@@ -1256,11 +1278,36 @@ extension AdamantChatsProvider {
     ///   - context: context to insert parsed transaction to
     /// - Returns: New parsed transaction
     private func chatTransaction(from transaction: Transaction, isOutgoing: Bool, publicKey: String, privateKey: String, partner: BaseAccount, context: NSManagedObjectContext) -> ChatTransaction? {
+        let messageTransaction: ChatTransaction
         guard let chat = transaction.asset.chat else {
+            if transaction.type == .send {
+                if let trs = getTransfer(id: String(transaction.id), context: context) {
+                    messageTransaction = trs
+                } else {
+                    messageTransaction = TransferTransaction(context: context)
+                }
+                messageTransaction.amount = transaction.amount as NSDecimalNumber
+                messageTransaction.date = transaction.date as NSDate
+                messageTransaction.recipientId = transaction.recipientId
+                messageTransaction.senderId = transaction.senderId
+                messageTransaction.transactionId = String(transaction.id)
+                messageTransaction.type = Int16(TransactionType.chatMessage.rawValue)
+                messageTransaction.showsChatroom = true
+                messageTransaction.height = Int64(transaction.height)
+                messageTransaction.isConfirmed = true
+                messageTransaction.isOutgoing = isOutgoing
+                messageTransaction.blockId = transaction.blockId
+                messageTransaction.confirmations = transaction.confirmations
+                messageTransaction.chatMessageId = UUID().uuidString
+                messageTransaction.fee = transaction.fee as NSDecimalNumber
+                messageTransaction.statusEnum = MessageStatus.delivered
+                messageTransaction.partner = partner
+                return messageTransaction
+            }
             return nil
         }
         
-        let messageTransaction: ChatTransaction
+        
         // MARK: Decode message, message must contain data
         if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)?.trimmingCharacters(in: .whitespacesAndNewlines) {
             if (decodedMessage.isEmpty && transaction.amount > 0) || !decodedMessage.isEmpty {
@@ -1268,9 +1315,13 @@ extension AdamantChatsProvider {
                 // MARK: Text message
                 case .message, .messageOld, .signal, .unknown:
                     if transaction.amount > 0 {
-                        let trs = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
-                        trs.comment = decodedMessage
-                        messageTransaction = trs
+                        if let trs = getTransfer(id: String(transaction.id), context: context) {
+                            messageTransaction = trs
+                        } else {
+                            let trs = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
+                            trs.comment = decodedMessage
+                            messageTransaction = trs
+                        }
                     } else {
                         let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                         trs.message = decodedMessage
