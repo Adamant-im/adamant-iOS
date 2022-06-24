@@ -157,6 +157,8 @@ class ChatViewController: MessagesViewController {
         return richMessageStatusUpdating.contains(id)
     }
     
+    private let averageVisibleCount = 8
+    
     // MARK: Fee label
     private var feeIsVisible: Bool = false
     private var feeTimer: Timer?
@@ -446,7 +448,7 @@ class ChatViewController: MessagesViewController {
                 return
             }
 
-            if address == AdamantContacts.adamantBountyWallet.name {
+            if address == AdamantContacts.adamantWelcomeWallet.name {
                 setBusyIndicator(state: false)
                 return
             }
@@ -460,7 +462,9 @@ class ChatViewController: MessagesViewController {
                         if #available(iOS 13.0, *) {
 
                         } else {
-                            self?.messagesCollectionView.scrollToItem(at: IndexPath(row: 0, section: count - 1), at: .top, animated: false)
+                            if count > 0 {
+                                self?.messagesCollectionView.scrollToItem(at: IndexPath(row: 0, section: count - 1), at: .top, animated: false)
+                            }
                         }
                         self?.setBusyIndicator(state: false)
                     }
@@ -586,6 +590,12 @@ class ChatViewController: MessagesViewController {
                 isFirstLayout = false
                 self.chatsProvider.chatPositon.removeValue(forKey: address)
                 self.messageToShow = nil
+
+                didLoaded = true
+                if indexPath.row >= 0 && indexPath.row <= averageVisibleCount {
+                    self.loadMooreMessagesIfNeeded(indexPath: IndexPath(row: 0, section: 2))
+                    self.reloadTopScetionIfNeeded()
+                }
                 return
             }
         }
@@ -1104,9 +1114,16 @@ extension ChatViewController {
                 reloadTopScetionIfNeeded()
             }
             
-            messageInputBar.sendButton.isEnabled = true
-            messageInputBar.inputTextView.isEditable = true
-            messageInputBar.leftStackView.isUserInteractionEnabled = true
+            if chatroom?.isReadonly ?? false {
+                messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
+                messageInputBar.inputTextView.isEditable = false
+                messageInputBar.sendButton.isEnabled = false
+                attachmentButton.isEnabled = false
+            } else {
+                messageInputBar.sendButton.isEnabled = true
+                messageInputBar.inputTextView.isEditable = true
+                messageInputBar.leftStackView.isUserInteractionEnabled = true
+            }
             
             UIView.animate(withDuration: 0.25, delay: 0.25) { [weak self] in
                 self?.busyBackgroundView?.backgroundColor = .clear
@@ -1122,12 +1139,17 @@ extension ChatViewController {
 //MARK: Load moore message
 extension ChatViewController {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        if indexPath.section < 2,
+       loadMooreMessagesIfNeeded(indexPath: indexPath)
+    }
+    
+    func loadMooreMessagesIfNeeded(indexPath: IndexPath) {
+        if indexPath.section < 4,
            let address = chatroom?.partner?.address,
            !isBusy,
            isNeedToLoadMoore(),
            didLoaded {
-            if address == AdamantContacts.adamantBountyWallet.name { return }
+            if address == AdamantContacts.adamantWelcomeWallet.name { return }
+            print("loadMooreMessagesIfNeeded")
             isBusy = true
             let offset = chatsProvider.chatLoadedMessages[address] ?? 0
             chatsProvider.getChatMessages(with: address, offset: offset) { [weak self] _count in

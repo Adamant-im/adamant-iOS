@@ -624,7 +624,22 @@ extension AdamantTransfersProvider {
         }
     }
     
-    
+    /// Search transaction in local storage
+    ///
+    /// - Parameter id: Transacton ID, context: NSManagedObjectContext
+    /// - Returns: Transaction, if found
+    func getTransfer(id: String, context: NSManagedObjectContext) -> TransferTransaction? {
+        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        
+        do {
+            let result = try context.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
     /// Call Server, check if transaction updated
     ///
     /// - Parameters:
@@ -873,8 +888,13 @@ extension AdamantTransfersProvider {
             } else {
                 unconfirmedsSemaphore.signal()
             }
-            print("transfer=", String(t.id))
-            let transfer = TransferTransaction(context: context)
+            let transfer: TransferTransaction
+            if let trs = getTransfer(id: String(t.id), context: context) {
+                transfer = trs
+            } else {
+                transfer = TransferTransaction(context: context)
+            }
+           // let transfer = TransferTransaction(context: context)
             transfer.amount = t.amount as NSDecimalNumber
             transfer.date = t.date as NSDate
             transfer.fee = t.fee as NSDecimalNumber

@@ -505,7 +505,6 @@ extension ChatListViewController {
             } else {
                 cell.accountLabel.text = partner.address
             }
-            
             if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
                 cell.avatarImage = avatar
                 cell.avatarImageView.tintColor = UIColor.adamant.primary

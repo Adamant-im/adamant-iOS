@@ -41,6 +41,9 @@ class AdamantChatsProvider: ChatsProvider {
     public var isChatLoaded: [String : Bool] = [:]
     public var chatMaxMessages: [String : Int] = [:]
     public var chatLoadedMessages: [String : Int] = [:]
+    private var connection: AdamantConnection?
+    private var isConnectedToTheInthernet = true
+    private var isRestoredConnectionToTheInthernet: (() ->())?
     
     private(set) var isInitiallySynced: Bool = false {
         didSet {
@@ -131,6 +134,28 @@ class AdamantChatsProvider: ChatsProvider {
         NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
             if self?.isInitiallySynced ?? false {
                 self?.previousAppState = .background
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
+            object: nil,
+            queue: nil
+        ) { [weak self] notification in
+            guard let connection = notification
+                .userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection
+            else {
+                return
+            }
+            self?.connection = connection
+            switch self?.connection {
+            case .some(.cellular), .some(.wifi):
+                if self?.isConnectedToTheInthernet == false {
+                    self?.isRestoredConnectionToTheInthernet?()
+                }
+                self?.isConnectedToTheInthernet = true
+            case nil, .some(.none):
+                self?.isConnectedToTheInthernet = false
             }
         }
     }
@@ -225,43 +250,71 @@ extension AdamantChatsProvider {
         // MARK: 3. Get transactions
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = self.stack.container.viewContext
-        apiService.getChatRooms(address: address, offset: offset) { [weak self] result in
-            switch result {
-            case .success(let chatrooms):
-                self?.roomsMaxCount = chatrooms.count
-                if let roomsLoadedCount =  self?.roomsLoadedCount {
-                    self?.roomsLoadedCount = roomsLoadedCount + (chatrooms.chats?.count ?? 0)
-                } else {
-                    self?.roomsLoadedCount = chatrooms.chats?.count ?? 0
+        
+        apiGetChatrooms(address: address, offset: offset) { [weak self] chatrooms in
+            guard let chatrooms = chatrooms else {
+                if let synced = self?.isInitiallySynced, !synced {
+                    self?.isInitiallySynced = true
                 }
-                var array = Array<Transaction>()
-                chatrooms.chats?.forEach({ room in
-                    if let last = room.lastTransaction {
-                        array.append(last)
-                    }
-                })
-                
-                self?.processingQueue.async {
-                    self?.process(messageTransactions: array,
-                                  senderId: address,
-                                  privateKey: privateKey,
-                                  context: privateContext,
-                                  contextMutatingSemaphore: cms,
-                                  completion: {
-                        if let synced = self?.isInitiallySynced, !synced {
-                            self?.isInitiallySynced = true
-                        }
-                        self?.setState(.upToDate, previous: prevState)
-                        completion?()
-                    })
+                self?.setState(.upToDate, previous: prevState)
+                completion?()
+                return
+            }
+            
+            self?.roomsMaxCount = chatrooms.count
+            
+            if let roomsLoadedCount =  self?.roomsLoadedCount {
+                self?.roomsLoadedCount = roomsLoadedCount + (chatrooms.chats?.count ?? 0)
+            } else {
+                self?.roomsLoadedCount = chatrooms.chats?.count ?? 0
+            }
+            
+            var array = Array<Transaction>()
+            chatrooms.chats?.forEach({ room in
+                if let last = room.lastTransaction {
+                    array.append(last)
+                }
+            })
+            
+            self?.processingQueue.async {
+                self?.process(messageTransactions: array,
+                              senderId: address,
+                              privateKey: privateKey,
+                              context: privateContext,
+                              contextMutatingSemaphore: cms,
+                              completion: {
                     if let synced = self?.isInitiallySynced, !synced {
                         self?.isInitiallySynced = true
                     }
                     self?.setState(.upToDate, previous: prevState)
                     completion?()
+                })
+            }
+        }
+    }
+    
+    func apiGetChatrooms(address: String, offset: Int?, completion: ((ChatRooms?) ->())?) {
+        apiService.getChatRooms(address: address, offset: offset) { [weak self] result in
+            switch result {
+            case .success(let chatrooms):
+                completion?(chatrooms)
+            case .failure(let error):
+                switch error {
+                case .networkError:
+                    if self?.isConnectedToTheInthernet ?? false {
+                        self?.apiGetChatrooms(address: address, offset: offset) { result in
+                            completion?(result)
+                        }
+                    } else {
+                        self?.isRestoredConnectionToTheInthernet = {
+                            self?.apiGetChatrooms(address: address, offset: offset) { result in
+                                completion?(result)
+                            }
+                        }
+                    }
+                default:
+                    completion?(nil)
                 }
-            case .failure(_):
-                completion?()
             }
         }
     }
@@ -277,29 +330,52 @@ extension AdamantChatsProvider {
         // MARK: 3. Get transactions
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = self.stack.container.viewContext
-        
+      
+        apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] chatroom in
+            self?.processingQueue.async {
+                self?.isChatLoaded[addressRecipient] = true
+                self?.chatMaxMessages[addressRecipient] = chatroom?.count ?? 0
+                let loadedCount = self?.chatLoadedMessages[addressRecipient] ?? 0
+                self?.chatLoadedMessages[addressRecipient] = loadedCount + (chatroom?.messages?.count ?? 0)
+                guard let transactions = chatroom?.messages,
+                      transactions.count > 0 else {
+                    completion?(0)
+                    return
+                }
+                self?.process(messageTransactions: transactions,
+                              senderId: address,
+                              privateKey: privateKey,
+                              context: privateContext,
+                              contextMutatingSemaphore: cms,
+                              completion: {
+                    completion?(transactions.count)
+                })
+            }
+        }
+    }
+    
+    func apiGetChatMessages(address: String, addressRecipient: String, offset: Int?, completion: ((ChatRooms?) ->())?) {
         apiService.getChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] result in
             switch result {
             case .success(let chatroom):
-                let transactions = chatroom.messages
-                if let transactions = transactions {
-                    self?.isChatLoaded[addressRecipient] = true
-                    self?.chatMaxMessages[addressRecipient] = chatroom.count ?? 0
-                    let loadedCount = self?.chatLoadedMessages[addressRecipient] ?? 0
-                    self?.chatLoadedMessages[addressRecipient] = loadedCount + (chatroom.messages?.count ?? 0)
-                    self?.processingQueue.async {
-                        self?.process(messageTransactions: transactions,
-                                      senderId: address,
-                                      privateKey: privateKey,
-                                      context: privateContext,
-                                      contextMutatingSemaphore: cms,
-                                      completion: {
-                            completion?(transactions.count)
-                        })
+                completion?(chatroom)
+            case .failure(let error):
+                switch error {
+                case .networkError:
+                    if self?.isConnectedToTheInthernet ?? false {
+                        self?.apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { result in
+                            completion?(result)
+                        }
+                    } else {
+                        self?.isRestoredConnectionToTheInthernet = {
+                            self?.apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { result in
+                                completion?(result)
+                            }
+                        }
                     }
+                default:
+                    completion?(nil)
                 }
-            case .failure(_):
-                completion?(0)
             }
         }
     }

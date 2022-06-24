@@ -170,11 +170,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 
                 switch connection {
                 case .cellular, .wifi:
-                    self?.dialogService.dissmisNoConnectionNotification()
+                    DispatchQueue.onMainSync {
+                        self?.dialogService.dissmisNoConnectionNotification()
+                    }
                     repeater.resumeAll()
                     
                 case .none:
-                    self?.dialogService.showNoConnectionNotification()
+                    DispatchQueue.onMainSync {
+                        self?.dialogService.showNoConnectionNotification()
+                    }
                     repeater.pauseAll()
                 }
             }
@@ -341,7 +345,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     
     //MARK: Open Chat From Notification
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        if let recipientAddress = userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String
+        if let transactionID = userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
+           let recipientAddress = userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String
         {
             if application.applicationState != .background && application.applicationState != .inactive {
                 completionHandler(.noData)
@@ -355,7 +360,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                 
                 switch list.accountService.state {
                 case .loggedIn:
-                    self.openDialog(chatList: chatList, tabbar: tabbar, list: list, recipientAddress: recipientAddress)
+                    self.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, recipientAddress: recipientAddress)
                 case .notLogged:
                     break
                 case .isLoggingIn:
@@ -367,7 +372,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                 // if not logged in
                 list.didLoadedMessages = { [weak self] in
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, recipientAddress: recipientAddress)
+                        self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, recipientAddress: recipientAddress)
                     }
                 }
             }
@@ -377,9 +382,19 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         }
     }
     
-    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, list: ChatListViewController, recipientAddress: String) {
+    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, list: ChatListViewController, transactionID: String, recipientAddress: String) {
+        if let chatVCNav = chatList.viewControllers.last as? UINavigationController,
+           let chatVC = chatVCNav.viewControllers.first as? ChatViewController,
+           chatVC.chatroom?.partner?.address == recipientAddress {
+            chatVC.scrollDown()
+            return
+        }
+        
         guard let chatroom = list.chatsController?.fetchedObjects?.first(where: { room in
-            return room.lastTransaction?.recipientAddress == recipientAddress
+            let transactionExist = room.transactions?.first(where: { message in
+                return (message as? ChatTransaction)?.txId == transactionID
+            })
+            return transactionExist != nil
         }) else { return }
         
         chatList.popToRootViewController(animated: false)
@@ -480,7 +495,6 @@ extension AppDelegate {
         } else {
             unread = true
         }
-        
         if let exchenge = AdamantContacts.adamantExchange.messages["chats.welcome_message"] {
             chatProvider.fakeReceived(message: exchenge.message,
                                       senderId: AdamantContacts.adamantExchange.address,
@@ -531,7 +545,7 @@ extension AppDelegate {
         
         if let welcome = AdamantContacts.adamantBountyWallet.messages["chats.welcome_message"] {
             chatProvider.fakeReceived(message: welcome.message,
-                                      senderId: AdamantContacts.adamantBountyWallet.name,
+                                      senderId: AdamantContacts.adamantWelcomeWallet.name,
                                       date: Date.adamantNullDate,
                                       unread: unread,
                                       silent: welcome.silentNotification,
