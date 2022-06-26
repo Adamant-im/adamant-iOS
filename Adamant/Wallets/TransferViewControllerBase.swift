@@ -485,7 +485,11 @@ class TransferViewControllerBase: FormViewController {
     // MARK: - Send Actions
     
     private func confirmSendFunds() {
-        guard let recipientAddress = recipientAddress, let amount = amount else {
+        guard
+            let recipientAddress = recipientAddress,
+            recipientAddressIsValid,
+            let amount = amount
+        else {
             return
         }
         
