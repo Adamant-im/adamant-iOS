@@ -42,7 +42,10 @@ extension AdamantChatsProvider {
     }
     
     func isTransactionUnique(_ transaction: RichMessageTransaction) -> Bool {
-        guard let type = transaction.richType, let hash = transaction.richContent?[RichContentKeys.transfer.hash], let date = transaction.date else {
+        guard
+            let type = transaction.richType,
+            let hash = transaction.richContent?[RichContentKeys.transfer.hash]
+        else {
             return false
         }
         
@@ -50,8 +53,7 @@ extension AdamantChatsProvider {
         
         request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSPredicate(format: "richType == %@", type),
-            NSPredicate(format: "richContent.hash CONTAINS[cd] %@", hash),
-            NSPredicate(format: "date < %@", date)
+            NSPredicate(format: "richContent.hash CONTAINS[cd] %@", hash)
         ])
         
         
