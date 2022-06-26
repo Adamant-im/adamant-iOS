@@ -48,6 +48,7 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
                 break
             }
             DispatchQueue.main.async {
+                self.emptyLabel.isHidden = self.transactions.count > 0
                 self.refreshControl.endRefreshing()
             }
         }
