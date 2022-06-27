@@ -10,87 +10,150 @@ import Foundation
 
 class AdamantNodesSource: NodesSource {
     // MARK: - Dependencies
+    
     var apiService: ApiService!
+    
+    var healthCheckService: HealthCheckService! {
+        didSet {
+            healthCheckService?.delegate = self
+            healthCheckService?.nodes = nodes
+            setHealthCheckTimer()
+        }
+    }
+    
     var securedStore: SecuredStore! {
         didSet {
-            reloadNodes()
+            loadNodes()
         }
     }
-    
     
     // MARK: - Properties
+    
     var nodes: [Node] {
         didSet {
-            if nodes.count == 0 {
+            if nodes.isEmpty {
                 nodes = defaultNodes
-                currentNodes = nodes
             }
             
-            NotificationCenter.default.post(name: Notification.Name.NodesSource.nodesChanged, object: self, userInfo: [AdamantUserInfoKey.nodesSource.nodes: nodes])
+            healthCheckService.nodes = nodes
+            nodesChanged()
         }
     }
     
-    var defaultNodes: [Node]
+    var preferTheFastestNode = preferTheFastestNodeDefault {
+        didSet {
+            savePreferTheFastestNode(preferTheFastestNode)
+            
+            guard preferTheFastestNode else { return }
+            sendNodesChangedNotification()
+        }
+    }
     
-    private var currentNodes: [Node] = [Node]()
-    
+    private let defaultNodes: [Node]
+    private var timer: Timer?
     
     // MARK: - Ctor
     
     init(defaultNodes: [Node]) {
         self.defaultNodes = defaultNodes
         self.nodes = defaultNodes
-        self.currentNodes = defaultNodes
-    }
-    
-    
-    // MARK: - Functions
-    
-    func getNewNode() -> Node {
-        let index = Int(arc4random_uniform(UInt32(nodes.count)))
-        return nodes[index]
-    }
-    
-    func getValidNode(completion: @escaping ((Node?) -> Void)) {
-        if let node = currentNodes.first {
-            testNode(node: node) { (result) in
-                switch result {
-                case .passed:
-                    completion(node)
-                    break
-                case .failed, .notTested:
-                    if let index = self.currentNodes.firstIndex(of: node) {
-                        self.currentNodes.remove(at: index)
-                    }
-                    self.getValidNode(completion: completion)
-                    break
-                }
+        
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
+            object: nil,
+            queue: nil
+        ) { [weak healthCheckService] notification in
+            let connection = notification.userInfo?[
+                AdamantUserInfoKey.ReachabilityMonitor.connection
+            ] as? AdamantConnection
+            
+            switch connection {
+            case .wifi, .cellular:
+                healthCheckService?.healthCheck()
+            case nil, .some(.none):
+                break
             }
-        } else {
-            completion(nil)
         }
+        
+        guard
+            let preferTheFastestNode = UserDefaults.standard.object(
+                forKey: UserDefaults.NodesSource.preferTheFastestNodeKey
+            ) as? Bool
+        else {
+            savePreferTheFastestNode(preferTheFastestNodeDefault)
+            return
+        }
+        
+        self.preferTheFastestNode = preferTheFastestNode
     }
     
-    func getSocketNewNode() -> Node {
-        return nodes[0]
+    deinit {
+        timer?.invalidate()
     }
     
     // MARK: - Tools
-    func saveNodes() {
+    
+    func setDefaultNodes() {
+        nodes = defaultNodes
+    }
+    
+    func getPreferredNode(needWS: Bool) -> Node? {
+        healthCheckService?.getPreferredNode(fastest: preferTheFastestNode, needWS: needWS)
+    }
+    
+    func nodesChanged() {
+        if !nodes.contains(where: { $0.isEnabled }) {
+            nodes.forEach { $0.isEnabled = true }
+        }
+        
+        migrate()
+        healthCheckService.healthCheck()
+        saveNodes()
+        sendNodesChangedNotification()
+    }
+    
+    func healthCheck() {
+        healthCheckService.healthCheck()
+    }
+    
+    private func savePreferTheFastestNode(_ newValue: Bool) {
+        UserDefaults.standard.set(
+            newValue,
+            forKey: UserDefaults.NodesSource.preferTheFastestNodeKey
+        )
+    }
+    
+    private func sendNodesChangedNotification() {
+        NotificationCenter.default.post(
+            name: Notification.Name.NodesSource.nodesChanged,
+            object: self,
+            userInfo: [:]
+        )
+    }
+    
+    private func migrate() {
+        nodes.forEach { node in
+            if node.host == "185.231.245.26", node.port == 36666 {
+                node.host = "23.226.231.225"
+            }
+        }
+    }
+    
+    private func saveNodes() {
         do {
             let data = try JSONEncoder().encode(nodes)
             guard let raw = String(data: data, encoding: String.Encoding.utf8) else {
                 return
             }
             
-            securedStore.set(raw, for: StoreKey.nodesSource.nodes)
+            securedStore.set(raw, for: StoreKey.NodesSource.nodes)
         } catch {
             print(error.localizedDescription)
         }
     }
     
-    func reloadNodes() {
-        guard let raw = securedStore.get(StoreKey.nodesSource.nodes), let data = raw.data(using: String.Encoding.utf8) else {
+    private func loadNodes() {
+        guard let raw = securedStore.get(StoreKey.NodesSource.nodes), let data = raw.data(using: String.Encoding.utf8) else {
             nodes = defaultNodes
             return
         }
@@ -103,49 +166,21 @@ class AdamantNodesSource: NodesSource {
         }
     }
     
-    func migrate() {
-        reloadNodes()
-        nodes.forEach { node in
-            if node.host == "185.231.245.26", node.port == 36666 {
-                node.host = "23.226.231.225"
-            }
-        }
-        saveNodes()
-    }
-    
-    private func testNode(node: Node, completion: @escaping ((NodeEditorViewController.TestState) -> Void)) {
-        var components = URLComponents()
-        
-        components.host = node.host
-        components.scheme = node.scheme.rawValue
-        
-        var testState: NodeEditorViewController.TestState = .notTested
-        
-        if let port = node.port {
-            components.port = port
-        } else {
-            components.port = node.scheme.defaultPort
-        }
-        
-        let url: URL
-        do {
-            url = try components.asURL()
-        } catch {
-            testState = .failed
-            completion(testState)
-            return
-        }
-        
-        self.apiService.getNodeVersion(url: url) { result in
-            switch result {
-            case .success(_):
-                testState = .passed
-                
-            case .failure(let error):
-                print(error)
-                testState = .failed
-            }
-            completion(testState)
+    private func setHealthCheckTimer() {
+        timer = Timer.scheduledTimer(
+            withTimeInterval: regularHealthCheckTimeInteval,
+            repeats: true
+        ) { [weak healthCheckService] _ in
+            healthCheckService?.healthCheck()
         }
     }
 }
+
+extension AdamantNodesSource: HealthCheckDelegate {
+    func healthCheckFinished() {
+        sendNodesChangedNotification()
+    }
+}
+
+private let regularHealthCheckTimeInteval: TimeInterval = 300
+private let preferTheFastestNodeDefault = true

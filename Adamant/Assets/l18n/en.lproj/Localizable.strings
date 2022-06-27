@@ -226,6 +226,9 @@
 /* Serious internal error: Error parsing response */
 "ApiService.InternalError.ParsingFailed" = "Parsing failed. Report a bug";
 
+/* Serious internal error: No nodes available */
+"ApiService.InternalError.NoNodesAvailable" = "No nodes available. Report a bug";
+
 /* Eureka forms Cancel button */
 "Cancel" = "Cancel";
 
@@ -538,6 +541,9 @@
 /* NodesList: 'Reset' button */
 "NodesList.ResetButton" = "Reset";
 
+/* NodesList: 'Prefer the fastest node' switch */
+"NodesList.PreferTheFastestNode" = "Prefer the fastest node";
+
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "Default nodes list was loaded";
 
@@ -559,14 +565,14 @@
 /* NodesEditor: Host row */
 "NodesEditor.HostRow" = "Host";
 
-/* NodesEditor: Test button */
-"NodesEditor.TestButton" = "Test node";
+/* NodesEditor: Web sockets */
+"NodesEditor.WebSockets" = "Web sockets";
 
-/* NodesEditor: Test passed */
-"NodesEditor.NodeTestPassed" = "Passed";
+/* NodesEditor: Web sockets on */
+"NodesEditor.WebSocketsOn" = "On";
 
-/* NodesEditor: Test failed */
-"NodesEditor.NodeTestFailed" = "Failed";
+/* NodesEditor: Web sockets off */
+"NodesEditor.WebSocketsOff" = "Off";
 
 /* NodesEditor: Delete node button */
 "NodesEditor.DeleteNodeButton" = "Delete";

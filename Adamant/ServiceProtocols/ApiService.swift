@@ -111,22 +111,20 @@ protocol ApiService: AnyObject {
     /// Default is async queue with .utilities priority.
     var defaultResponseDispatchQueue: DispatchQueue { get }
     
-    // MARK: - Servers list
-    
-    /// Current node
-    var node: Node? { get }
-    
     /// Time interval between node (lhs) and client (rhs)
     /// Substract this from client time to get server time
-    var nodeTimeDelta: TimeInterval? { get }
-    
-    /// Request new node from source
-    func refreshNode()
+    var lastRequestTimeDelta: TimeInterval? { get }
     
     // MARK: - Peers
     
     func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void)
     
+    // MARK: - Status
+    
+    func getNodeStatus(
+        url: URL,
+        completion: @escaping (ApiServiceResult<NodeStatus>) -> Void
+    )
     
     // MARK: - Accounts
     

@@ -229,6 +229,9 @@
 /* Serious internal error: Error parsing response */
 "ApiService.InternalError.ParsingFailed" = "Parsing fehlgeschlagen. Bericht senden";
 
+/* Serious internal error: No nodes available */
+"ApiService.InternalError.NoNodesAvailable" = "No nodes available. Report a bug";
+
 /* Eureka forms Cancel button */
 "Cancel" = "Abbrechen";
 

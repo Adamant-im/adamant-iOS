@@ -210,8 +210,8 @@ extension AdamantChatsProvider {
         // MARK: 3. Get transactions
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = self.stack.container.viewContext
-        self.socketService.connect(address: address)
-        self.socketService.receiveNewTransaction { [weak self] result in
+        
+        socketService.connect(address: address) { [weak self] result in
             switch result {
             case .success(let trans):
                 self?.processingQueue.async {

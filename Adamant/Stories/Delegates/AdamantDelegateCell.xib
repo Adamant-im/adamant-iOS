@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -16,38 +14,19 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="48"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="47.5"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="48"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wwq-Oq-wET">
-                        <rect key="frame" x="2" y="2" width="43.5" height="43.5"/>
-                        <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="G7c-oY-5kn">
-                                <rect key="frame" x="10" y="10" width="24" height="24"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="24" id="1jS-RI-Pvv"/>
-                                    <constraint firstAttribute="width" secondItem="G7c-oY-5kn" secondAttribute="height" multiplier="1:1" id="IOR-UZ-iSH"/>
-                                </constraints>
-                            </view>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Upvote" translatesAutoresizingMaskIntoConstraints="NO" id="Sab-AY-rzp">
-                                <rect key="frame" x="10" y="10" width="24" height="24"/>
-                            </imageView>
-                        </subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wwq-Oq-wET" userLabel="Checkmark" customClass="CheckmarkView" customModule="Adamant" customModuleProvider="target">
+                        <rect key="frame" x="2" y="2" width="44" height="44"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <gestureRecognizers/>
                         <constraints>
-                            <constraint firstItem="G7c-oY-5kn" firstAttribute="centerY" secondItem="wwq-Oq-wET" secondAttribute="centerY" id="2Xh-p1-Cyz"/>
-                            <constraint firstItem="G7c-oY-5kn" firstAttribute="centerX" secondItem="wwq-Oq-wET" secondAttribute="centerX" id="8YA-PE-r77"/>
                             <constraint firstAttribute="width" secondItem="wwq-Oq-wET" secondAttribute="height" multiplier="1:1" id="9DF-hI-dtU"/>
-                            <constraint firstItem="Sab-AY-rzp" firstAttribute="centerX" secondItem="G7c-oY-5kn" secondAttribute="centerX" id="FdZ-yP-MVp"/>
-                            <constraint firstItem="Sab-AY-rzp" firstAttribute="centerY" secondItem="G7c-oY-5kn" secondAttribute="centerY" id="P0E-BI-xxd"/>
-                            <constraint firstItem="Sab-AY-rzp" firstAttribute="width" secondItem="G7c-oY-5kn" secondAttribute="width" id="gf8-9n-mDJ"/>
-                            <constraint firstItem="Sab-AY-rzp" firstAttribute="height" secondItem="G7c-oY-5kn" secondAttribute="height" id="xo7-5A-AEo"/>
                         </constraints>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="999" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ifk-Jp-eUp">
-                        <rect key="frame" x="51.5" y="4" width="32" height="20.5"/>
+                        <rect key="frame" x="52" y="4" width="32" height="20.5"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="32" id="7UG-qE-v2a"/>
                         </constraints>
@@ -56,25 +35,25 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="delegate label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wDJ-jW-F39">
-                        <rect key="frame" x="95.5" y="3.5" width="107.5" height="21"/>
+                        <rect key="frame" x="96" y="3.5" width="107" height="21"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="○" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Twt-VT-UQZ">
-                        <rect key="frame" x="68.5" y="23.5" width="15" height="21"/>
+                        <rect key="frame" x="69" y="23" width="15" height="21"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="U12345678901234567890" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pGm-UP-A4U">
-                        <rect key="frame" x="95.5" y="26.5" width="154.5" height="14.5"/>
+                        <rect key="frame" x="96" y="26.5" width="143" height="13.5"/>
                         <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="○" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E6f-1V-fbU">
-                        <rect key="frame" x="50" y="23.5" width="15" height="21"/>
+                        <rect key="frame" x="50.5" y="23" width="15" height="21"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
@@ -101,17 +80,13 @@
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="addressLabel" destination="pGm-UP-A4U" id="AvR-oD-jQh"/>
-                <outlet property="checkboxExpander" destination="wwq-Oq-wET" id="Nal-Wi-Dwt"/>
-                <outlet property="checkmarkBackgroundView" destination="G7c-oY-5kn" id="olu-ha-U7V"/>
-                <outlet property="checkmarkImageView" destination="Sab-AY-rzp" id="NW0-Dq-MhG"/>
+                <outlet property="checkmarkView" destination="wwq-Oq-wET" id="Bag-Ih-VPO"/>
                 <outlet property="nameLabel" destination="wDJ-jW-F39" id="fUF-BM-8o1"/>
                 <outlet property="rankLabel" destination="Ifk-Jp-eUp" id="mQd-T8-DuX"/>
                 <outlet property="statusLabel" destination="Twt-VT-UQZ" id="iw2-vT-0eh"/>
                 <outlet property="votedLabel" destination="E6f-1V-fbU" id="SIH-BG-ev1"/>
             </connections>
+            <point key="canvasLocation" x="139" y="102"/>
         </tableViewCell>
     </objects>
-    <resources>
-        <image name="Upvote" width="24" height="24"/>
-    </resources>
 </document>

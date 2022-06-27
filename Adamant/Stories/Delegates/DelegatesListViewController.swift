@@ -261,7 +261,7 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
         
         cell.isUpvoted = delegate.voted
         
-        cell.setIsChecked(checkedDelegate.isChecked, animated: false)
+        cell.isChecked = checkedDelegate.isChecked
         
         return cell
     }
