@@ -8,6 +8,7 @@
 
 import Foundation
 import Alamofire
+import UIKit
 
 extension StoreKey {
     struct CoinInfo {
@@ -54,6 +55,8 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
         }
     }
     
+    private var observerActive: NSObjectProtocol?
+    
     // MARK: - Dependencies
     var accountService: AccountService! {
         didSet {
@@ -72,6 +75,28 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
             } else {
                 currentCurrency = Currency.default
             }
+        }
+    }
+    
+    // MARK: - Init
+    init() {
+        addObservers()
+    }
+    
+    deinit {
+        removeObservers()
+    }
+    
+    // MARK: - Observers
+    func addObservers() {
+        observerActive = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
+            self?.update()
+        }
+    }
+    
+    func removeObservers() {
+        if let observerActive = observerActive {
+            NotificationCenter.default.removeObserver(observerActive)
         }
     }
     

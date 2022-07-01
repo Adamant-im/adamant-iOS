@@ -175,7 +175,7 @@
 		E9079A7D229DEF9C0022CA0D /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E957E112229B04280019732A /* UserNotificationsUI.framework */; };
 		E9079A80229DEF9C0022CA0D /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9079A7F229DEF9C0022CA0D /* NotificationViewController.swift */; };
 		E9079A83229DEF9C0022CA0D /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9079A81229DEF9C0022CA0D /* MainInterface.storyboard */; };
-		E9079A87229DEF9C0022CA0D /* MessageNotificationContentExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E9079A7B229DEF9C0022CA0D /* MessageNotificationContentExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E9079A87229DEF9C0022CA0D /* MessageNotificationContentExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E9079A7B229DEF9C0022CA0D /* MessageNotificationContentExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E9079A8C229DF19A0022CA0D /* AdamantAvatarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648BCA6A213D37A800875EB5 /* AdamantAvatarService.swift */; };
 		E9079A8D229DF19A0022CA0D /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39A2048A9BD00DDB504 /* KeychainStore.swift */; };
 		E9079A8E229DF1A40022CA0D /* NativeAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96D64D52295C9CA00CA5587 /* NativeAdamantCore.swift */; };
@@ -325,7 +325,7 @@
 		E957E12F229B10F80019732A /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E957E112229B04280019732A /* UserNotificationsUI.framework */; };
 		E957E132229B10F80019732A /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E131229B10F80019732A /* NotificationViewController.swift */; };
 		E957E135229B10F80019732A /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E957E133229B10F80019732A /* MainInterface.storyboard */; };
-		E957E139229B10F80019732A /* TransferNotificationContentExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E957E12D229B10F80019732A /* TransferNotificationContentExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E957E139229B10F80019732A /* TransferNotificationContentExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E957E12D229B10F80019732A /* TransferNotificationContentExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E957E13E229BFEB60019732A /* AdamantNotificationKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E123229B0C330019732A /* AdamantNotificationKeys.swift */; };
 		E957E13F229BFEBB0019732A /* AdamantNotificationKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957E123229B0C330019732A /* AdamantNotificationKeys.swift */; };
 		E957E140229BFF210019732A /* AdamantBalanceFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = E940086F2114EA6800CD2D67 /* AdamantBalanceFormat.swift */; };
@@ -411,7 +411,7 @@
 		E96D64D22295C82B00CA5587 /* TransactionSend.json in Resources */ = {isa = PBXBuildFile; fileRef = E95F85B9200A4DC90070534A /* TransactionSend.json */; };
 		E96D64D62295C9CB00CA5587 /* NativeAdamantCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96D64D52295C9CA00CA5587 /* NativeAdamantCore.swift */; };
 		E96D64DE2295CD4700CA5587 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96D64DD2295CD4700CA5587 /* NotificationService.swift */; };
-		E96D64E22295CD4700CA5587 /* NotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E96D64DB2295CD4700CA5587 /* NotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E96D64E22295CD4700CA5587 /* NotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E96D64DB2295CD4700CA5587 /* NotificationServiceExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E96D64E72295CF4600CA5587 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E905D39A2048A9BD00DDB504 /* KeychainStore.swift */; };
 		E96E86B821679C120061F80A /* EthTransactionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96E86B721679C120061F80A /* EthTransactionDetailsViewController.swift */; };
 		E971591A21681D6900A5F904 /* TransactionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E971591921681D6900A5F904 /* TransactionStatus.swift */; };
@@ -2830,16 +2830,19 @@
 /* Begin PBXTargetDependency section */
 		E9079A86229DEF9C0022CA0D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = E9079A7A229DEF9C0022CA0D /* MessageNotificationContentExtension */;
 			targetProxy = E9079A85229DEF9C0022CA0D /* PBXContainerItemProxy */;
 		};
 		E957E138229B10F80019732A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = E957E12C229B10F80019732A /* TransferNotificationContentExtension */;
 			targetProxy = E957E137229B10F80019732A /* PBXContainerItemProxy */;
 		};
 		E96D64E12295CD4700CA5587 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = E96D64DA2295CD4700CA5587 /* NotificationServiceExtension */;
 			targetProxy = E96D64E02295CD4700CA5587 /* PBXContainerItemProxy */;
 		};
@@ -2916,8 +2919,9 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/Debug.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 190;
+				CURRENT_PROJECT_VERSION = 194;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -2932,7 +2936,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.MessageNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev ext MessageNotification";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "ADAMANT Messenger Dev ext MessageNotification Mac";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2945,8 +2951,9 @@
 				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 190;
+				CURRENT_PROJECT_VERSION = 194;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -2960,7 +2967,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.MessageNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger ext MessageNotification";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "ADAMANT Messenger ext MessageNotification Mac";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
@@ -3092,8 +3101,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Debug;
 				CODE_SIGN_ENTITLEMENTS = Adamant/Debug.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 190;
+				CURRENT_PROJECT_VERSION = 194;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = ADM.Dev;
 				EXCLUDED_SOURCE_FILE_NAMES = "";
@@ -3108,6 +3118,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "e4233bbf-3705-44fe-95b0-e77475672c60";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "ADAMANT Messenger Dev Mac";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -3121,8 +3133,9 @@
 				CODE_SIGN_ENTITLEMENTS = Adamant/Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 190;
+				CURRENT_PROJECT_VERSION = 194;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = Adamant;
 				EXCLUDED_SOURCE_FILE_NAMES = Debug.xcassets;
@@ -3137,6 +3150,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "bedd1b75-2f23-4a85-a0b2-14c424fcff42";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "ADAMANT Messenger Mac";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3149,8 +3164,9 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = TransferNotificationContentExtension/Debug.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 190;
+				CURRENT_PROJECT_VERSION = 194;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3165,7 +3181,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.TransferNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev ext TransferNotification";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "ADAMANT Messenger Dev ext TransferNotification Mac";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -3178,8 +3196,9 @@
 				CODE_SIGN_ENTITLEMENTS = TransferNotificationContentExtension/Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 190;
+				CURRENT_PROJECT_VERSION = 194;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3193,7 +3212,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.TransferNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger dist ext TransferNotification NE";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "ADAMANT Messenger dist ext TransferNotification Ma";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
@@ -3207,8 +3228,9 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/Debug.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 190;
+				CURRENT_PROJECT_VERSION = 194;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3223,7 +3245,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.NotificationServiceExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev ext NotificationService";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "ADAMANT Messenger Dev ext NotificationService Maco";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -3236,8 +3260,9 @@
 				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 190;
+				CURRENT_PROJECT_VERSION = 194;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3251,7 +3276,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.NotificationServiceExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger ext NotificationService";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "ADAMANT Messenger ext NotificationService Mac";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;

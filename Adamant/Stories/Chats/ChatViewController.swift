@@ -123,6 +123,18 @@ class ChatViewController: MessagesViewController {
     
     var feeUpdateTimer: Timer?
     
+    private var isMacOS: Bool = {
+        #if targetEnvironment(macCatalyst)
+            return true
+        #else
+        if #available(iOS 14.0, *) {
+            return ProcessInfo.processInfo.isiOSAppOnMac
+        } else {
+            return false
+        }
+        #endif
+    }()
+    
     // MARK: Rich Messages
     var richMessageProviders = [String:RichMessageProvider]()
     var cellCalculators = [String:CellSizeCalculator]()
@@ -314,8 +326,11 @@ class ChatViewController: MessagesViewController {
                 let keyboardHeight = notification.endFrame.height
                 let tabBarHeight = self?.tabBarController?.tabBar.bounds.height ?? 0
                 
-                self?.messagesCollectionView.contentInset.bottom = barHeight + keyboardHeight
-                self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight + keyboardHeight - tabBarHeight
+                if !(self?.isMacOS ?? false) {
+                    self?.messagesCollectionView.contentInset.bottom = barHeight + keyboardHeight
+                    self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight + keyboardHeight - tabBarHeight
+                }
+                
                 DispatchQueue.main.async {
                     self?.messagesCollectionView.scrollToBottom(animated: false)
                 }
@@ -471,6 +486,8 @@ class ChatViewController: MessagesViewController {
                 }
             }
         }
+        
+        messageInputBar.inputTextView.autocorrectionType = .no
     }
     
     override func canPerformAction(_ action: Selector, withSender sender: Any!) -> Bool {
@@ -1189,4 +1206,32 @@ extension ChatViewController {
         amadantLogoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         amadantLogoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
+}
+
+// MARK: Mac OS HotKeys
+extension InputTextView {
+    open override var keyCommands: [UIKeyCommand]? {
+        let commands = [UIKeyCommand(input: "\r", modifierFlags: [], action: #selector(sendKey(sender:))),
+                        UIKeyCommand(input: "\r", modifierFlags: .alternate, action: #selector(newLineKey(sender:))),
+                        UIKeyCommand(input: "\r", modifierFlags: .control, action: #selector(newLineKey(sender:)))]
+        if #available(iOS 15, *) {
+            commands.forEach { $0.wantsPriorityOverSystemBehavior = true }
+        }
+        return commands
+    }
+
+    @objc func sendKey(sender: UIKeyCommand) {
+        print("controlcontrol s")
+        if sender.modifierFlags == .control || sender.modifierFlags == .alternate {
+            newLineKey(sender: sender)
+        } else {
+            messageInputBar?.didSelectSendButton()
+        }
+    }
+    
+    @objc func newLineKey(sender: UIKeyCommand) {
+        print("controlcontrol f")
+        messageInputBar?.inputTextView.text += "\n"
+    }
+
 }

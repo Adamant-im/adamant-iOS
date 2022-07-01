@@ -891,25 +891,27 @@ extension AdamantTransfersProvider {
             let transfer: TransferTransaction
             if let trs = getTransfer(id: String(t.id), context: context) {
                 transfer = trs
+                transfer.confirmations = t.confirmations
+                transfer.statusEnum = .delivered
+                transfer.blockId = t.blockId
             } else {
                 transfer = TransferTransaction(context: context)
+                transfer.amount = t.amount as NSDecimalNumber
+                transfer.date = t.date as NSDate
+                transfer.fee = t.fee as NSDecimalNumber
+                transfer.height = Int64(t.height)
+                transfer.recipientId = t.recipientId
+                transfer.senderId = t.senderId
+                transfer.transactionId = String(t.id)
+                transfer.type = Int16(t.type.rawValue)
+                transfer.blockId = t.blockId
+                transfer.confirmations = t.confirmations
+                transfer.statusEnum = .delivered
+                transfer.showsChatroom = false
+                transfer.isConfirmed = true
+                transfer.chatMessageId = UUID().uuidString
             }
-           // let transfer = TransferTransaction(context: context)
-            transfer.amount = t.amount as NSDecimalNumber
-            transfer.date = t.date as NSDate
-            transfer.fee = t.fee as NSDecimalNumber
-            transfer.height = Int64(t.height)
-            transfer.recipientId = t.recipientId
-            transfer.senderId = t.senderId
-            transfer.transactionId = String(t.id)
-            transfer.type = Int16(t.type.rawValue)
-            transfer.blockId = t.blockId
-            transfer.confirmations = t.confirmations
-            transfer.statusEnum = .delivered
-            transfer.showsChatroom = false
-            transfer.isConfirmed = true
-            transfer.chatMessageId = UUID().uuidString
-            
+           
             transfer.isOutgoing = t.senderId == address
             let partnerId = transfer.isOutgoing ? t.recipientId : t.senderId
             
@@ -962,10 +964,10 @@ extension AdamantTransfersProvider {
                 try context.save()
 
 //                // MARK: 7. Update lastTransactions
-//                let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
-//                DispatchQueue.main.async {
-//                    viewContextChatrooms.forEach { $0.updateLastTransaction() }
-//                }
+                let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
+                DispatchQueue.main.async {
+                    viewContextChatrooms.forEach { $0.updateLastTransaction() }
+                }
             } catch {
                 print("TransferProvider: Failed to save changes to CoreData: \(error.localizedDescription)")
             }

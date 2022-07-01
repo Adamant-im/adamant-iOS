@@ -1141,7 +1141,6 @@ extension AdamantChatsProvider {
             print("Failed to get all accounts: Needed keys:\n\(grouppedTransactions.keys.joined(separator: "\n"))\nFounded Addresses: \(partners.keys.compactMap { $0.address }.joined(separator: "\n"))")
         }
         
-        
         // MARK: 3. Process Chatrooms and Transactions
         var height: Int64 = 0
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)

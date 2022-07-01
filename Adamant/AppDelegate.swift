@@ -346,53 +346,56 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     //MARK: Open Chat From Notification
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         if let transactionID = userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
-           let recipientAddress = userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String
-        {
+           let transactionRaw = userInfo[AdamantNotificationUserInfoKeys.transaction] as? String,
+           let data = transactionRaw.data(using: .utf8),
+           let trs = try? JSONDecoder().decode(Transaction.self, from: data) {
             if application.applicationState != .background && application.applicationState != .inactive {
                 completionHandler(.noData)
                 return
             }
+            
+            let senderAddress = trs.senderId
             
             if let tabbar = window?.rootViewController as? UITabBarController,
                let chats = tabbar.viewControllers?.first as? UISplitViewController,
                let chatList = chats.viewControllers.first as? UINavigationController,
                let list = chatList.viewControllers.first as? ChatListViewController {
                 
-                switch list.accountService.state {
-                case .loggedIn:
-                    self.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, recipientAddress: recipientAddress)
-                case .notLogged:
-                    break
-                case .isLoggingIn:
-                    break
-                case .updating:
-                    break
+                if case .loggedIn = list.accountService.state {
+                    self.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: senderAddress)
                 }
                 
                 // if not logged in
                 list.didLoadedMessages = { [weak self] in
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, recipientAddress: recipientAddress)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        self?.dialogService.dismissProgress()
+                        self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: senderAddress)
                     }
                 }
             }
             completionHandler(.newData)
-        } else {
+        } else { // for tests
+            if let jsonData = try? JSONSerialization.data(withJSONObject: userInfo, options: []),
+               let decoded = String(data: jsonData, encoding: .utf8) {
+                dialogService.showWarning(withMessage: decoded)
+            } else if let _ = userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String {
+                dialogService.showWarning(withMessage: userInfo.description)
+            }
             completionHandler(.noData)
         }
     }
     
-    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, list: ChatListViewController, transactionID: String, recipientAddress: String) {
+    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, list: ChatListViewController, transactionID: String, senderAddress: String) {
         if let chatVCNav = chatList.viewControllers.last as? UINavigationController,
            let chatVC = chatVCNav.viewControllers.first as? ChatViewController,
-           chatVC.chatroom?.partner?.address == recipientAddress {
+           chatVC.chatroom?.partner?.address == senderAddress {
             chatVC.scrollDown()
             return
         }
         
         guard let chatroom = list.chatsController?.fetchedObjects?.first(where: { room in
             let transactionExist = room.transactions?.first(where: { message in
-                return (message as? ChatTransaction)?.txId == transactionID
+                return (message as? ChatTransaction)?.senderAddress == senderAddress
             })
             return transactionExist != nil
         }) else { return }
@@ -591,15 +594,8 @@ extension AppDelegate {
                    let router = container.resolve(Router.self),
                    let list = chatList.viewControllers.first as? ChatListViewController {
                  
-                    switch list.accountService.state {
-                    case .loggedIn:
+                    if case .loggedIn = list.accountService.state {
                         self.openDialog(chatList: chatList, tabbar: tabbar, router: router, list: list, adamantAdr: adamantAdr)
-                    case .notLogged:
-                        break
-                    case .isLoggingIn:
-                        break
-                    case .updating:
-                        break
                     }
                     
                     // if not logged in
