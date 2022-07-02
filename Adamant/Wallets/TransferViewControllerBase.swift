@@ -386,10 +386,10 @@ class TransferViewControllerBase: FormViewController {
         if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
             if let address = row.value, validateRecipient(address) {
                 recipientAddress = address
-                markRow(row, valid: true)
+                markAddres(isValid: true)
                 recipientAddressIsValid = true
             } else {
-                markRow(row, valid: false)
+                markAddres(isValid: false)
                 recipientAddressIsValid = false
             }
         } else {
@@ -458,7 +458,19 @@ class TransferViewControllerBase: FormViewController {
     func markRow(_ row: BaseRowType, valid: Bool) {
         row.baseCell.textLabel?.textColor = valid ? UIColor.adamant.primary : UIColor.adamant.alert
     }
-    
+
+    func markAddres(isValid: Bool) {
+        guard let row: TextRow = form.rowBy(tag: BaseRows.address.tag) else {
+            return
+        }
+
+        row.cell.textField.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.alert
+        row.cell.textField.leftView?.subviews.forEach { view in
+            guard let label = view as? UILabel else { return }
+            label.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.alert
+        }
+    }
+
     func reloadFormData() {
         if let fee = service?.transactionFee, let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
             row.value = fee.doubleValue

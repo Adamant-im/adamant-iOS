@@ -155,7 +155,7 @@ class LskTransferViewController: TransferViewControllerBase {
     }
     
     override func recipientRow() -> BaseRow {
-        let row = SuffixTextRow() {
+        let row = TextRow() {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
             $0.cell.textField.keyboardType = UIKeyboardType.alphabet
