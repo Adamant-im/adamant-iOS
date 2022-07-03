@@ -190,17 +190,17 @@ class DashTransferViewController: TransferViewControllerBase {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
             }
-            }.onChange { [weak self] row in
-                if let text = row.value {
-                    self?._recipient = text
-                }
-                
-                if let skip = self?.skipValueChange, skip {
-                    self?.skipValueChange = false
-                    return
-                }
-                
-                self?.validateForm()
+        }.onChange { [weak self] row in
+            if let text = row.value {
+                self?._recipient = text
+            }
+
+            if let skip = self?.skipValueChange, skip {
+                self?.skipValueChange = false
+                return
+            }
+
+            self?.validateForm()
         }.onCellSelection { [weak self] (cell, row) in
             if let recipient = self?.recipientAddress {
                 let text = recipient

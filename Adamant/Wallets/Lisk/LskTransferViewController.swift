@@ -159,42 +159,33 @@ class LskTransferViewController: TransferViewControllerBase {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
             $0.cell.textField.keyboardType = UIKeyboardType.alphabet
-            
+
             if let recipient = recipientAddress {
                 $0.value = recipient
             }
-            
+
             if recipientIsReadonly {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
             }
-            }.cellUpdate { (cell, row) in
-                if let text = cell.textField.text {
-                    cell.textField.text = text
-                }
-            }.onChange { [weak self] row in
-                if let skip = self?.skipValueChange, skip {
-                    self?.skipValueChange = false
-                    return
-                }
-                
-                if let text = row.value {
-                    self?.skipValueChange = true
-                    
-                    DispatchQueue.main.async {
-                        row.value = text
-                        row.updateCell()
-                    }
-                }
-                
-                self?.validateForm()
-            }.onCellSelection { [weak self] (cell, row) in
-                if let recipient = self?.recipientAddress {
-                    let text = recipient
-                    self?.shareValue(text, from: cell)
-                }
+        }.onChange { [weak self] row in
+            if let text = row.value {
+                self?._recipient = text
             }
-        
+
+            if let skip = self?.skipValueChange, skip {
+                self?.skipValueChange = false
+                return
+            }
+
+            self?.validateForm()
+        }.onCellSelection { [weak self] (cell, row) in
+            if let recipient = self?.recipientAddress {
+                let text = recipient
+                self?.shareValue(text, from: cell)
+            }
+        }
+
         return row
     }
     
