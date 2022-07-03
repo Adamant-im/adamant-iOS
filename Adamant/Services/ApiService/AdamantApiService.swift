@@ -54,13 +54,25 @@ class AdamantApiService: ApiService {
     // MARK: - Dependencies
     
     var adamantCore: AdamantCore!
-    weak var nodesSource: NodesSource!
+    
+    weak var nodesSource: NodesSource? {
+        didSet {
+            updateCurrentNode()
+        }
+    }
     
     // MARK: - Properties
     
     private var _lastRequestTimeDelta: TimeInterval?
     private var lastRequestTimeDeltaSemaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
     private var connection: AdamantConnection?
+    
+    private(set) var currentNode: Node? {
+        didSet {
+            guard oldValue !== currentNode else { return }
+            sendCurrentNodeUpdateNotification()
+        }
+    }
     
     private(set) var lastRequestTimeDelta: TimeInterval? {
         get {
@@ -74,10 +86,6 @@ class AdamantApiService: ApiService {
             _lastRequestTimeDelta = newValue
             lastRequestTimeDeltaSemaphore.signal()
         }
-    }
-    
-    private var preferredNode: Node? {
-        nodesSource.getPreferredNode(needWS: false)
     }
     
     var sendingMsgTaskId: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier.invalid
@@ -102,6 +110,14 @@ class AdamantApiService: ApiService {
             }
             
             self?.connection = connection
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.NodesSource.nodesUpdate,
+            object: nil,
+            queue: nil
+        ) { [weak self] _ in
+            self?.updateCurrentNode()
         }
     }
     
@@ -132,7 +148,7 @@ class AdamantApiService: ApiService {
         headers: [String: String]? = nil,
         completion: @escaping (ApiServiceResult<T>) -> Void
     ) {
-        guard let node = preferredNode else {
+        guard let node = currentNode else {
             let error = InternalError.endpointBuildFailed.apiServiceErrorWith(
                 error: InternalError.noNodesAvailable
             )
@@ -168,6 +184,8 @@ class AdamantApiService: ApiService {
             headers: headers,
             completion: completionWrapper
         )
+        
+        updateCurrentNode()
     }
     
     private func makePreferredNodeRequestCompletionWrapper<T: Decodable>(
@@ -190,7 +208,7 @@ class AdamantApiService: ApiService {
                     switch self?.connection {
                     case .some(.cellular), .some(.wifi):
                         node.connectionStatus = .offline
-                        self?.nodesSource.nodesUpdate()
+                        self?.nodesSource?.nodesUpdate()
                         self?.sendRequest(
                             path: path,
                             queryItems: queryItems,
@@ -268,5 +286,17 @@ class AdamantApiService: ApiService {
         default:
             return .serverError(error: error)
         }
+    }
+    
+    private func updateCurrentNode() {
+        currentNode = nodesSource?.getPreferredNode(needWS: false)
+    }
+    
+    private func sendCurrentNodeUpdateNotification() {
+        NotificationCenter.default.post(
+            name: Notification.Name.ApiService.currentNodeUpdate,
+            object: self,
+            userInfo: nil
+        )
     }
 }

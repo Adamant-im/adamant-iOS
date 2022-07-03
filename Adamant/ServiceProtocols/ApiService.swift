@@ -104,6 +104,12 @@ extension ApiServiceError: Equatable {
     }
 }
 
+// MARK: - Notifications
+extension Notification.Name {
+    enum ApiService {
+        static let currentNodeUpdate = Notification.Name("adamant.apiService.currentNodeUpdate")
+    }
+}
 
 // - MARK: ApiService
 protocol ApiService: AnyObject {
@@ -114,6 +120,8 @@ protocol ApiService: AnyObject {
     /// Time interval between node (lhs) and client (rhs)
     /// Substract this from client time to get server time
     var lastRequestTimeDelta: TimeInterval? { get }
+    
+    var currentNode: Node? { get }
     
     // MARK: - Peers
     
