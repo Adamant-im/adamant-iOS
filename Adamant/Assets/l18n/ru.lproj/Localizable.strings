@@ -544,6 +544,21 @@
 /* NodesList: 'Prefer the fastest node' switch */
 "NodesList.PreferTheFastestNode" = "Выбирать самую быструю ноду";
 
+/* NodesList.NodeCell: Node ping */
+"NodesList.NodeCell.Ping" = "Пинг";
+
+/* NodesList.NodeCell: Milliseconds */
+"NodesList.NodeCell.Milliseconds" = "мс";
+
+/* NodesList.NodeCell: Node is synchronizing */
+"NodesList.NodeCell.Synchronizing" = "Синхронизируется";
+
+/* NodesList.NodeCell: Node is offline */
+"NodesList.NodeCell.Offline" = "Офлайн";
+
+/* NodesList.NodeCell: Node version */
+"NodesList.NodeCell.Version" = "версия";
+
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "Был загружен список нод по умолчанию";
 
@@ -568,11 +583,11 @@
 /* NodesEditor: Web sockets */
 "NodesEditor.WebSockets" = "Веб сокеты";
 
-/* NodesEditor: Web sockets on */
-"NodesEditor.WebSocketsOn" = "Вкл.";
+/* NodesEditor: Web sockets are supported */
+"NodesEditor.WebSocketsSupported" = "Поддерживаются";
 
-/* NodesEditor: Web sockets off */
-"NodesEditor.WebSocketsOff" = "Выкл.";
+/* NodesEditor: Web sockets aren't supported */
+"NodesEditor.WebSocketsNotSupported" = "Не поддерживаются";
 
 /* NodesEditor: Delete node button */
 "NodesEditor.DeleteNodeButton" = "Удалить ноду";

@@ -47,7 +47,7 @@ class AdamantSocketService: SocketService {
     
     init() {
         NotificationCenter.default.addObserver(
-            forName: Notification.Name.NodesSource.nodesChanged,
+            forName: Notification.Name.NodesSource.nodesUpdate,
             object: nil,
             queue: nil
         ) { [weak self] _ in

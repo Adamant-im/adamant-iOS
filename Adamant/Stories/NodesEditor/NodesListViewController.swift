@@ -96,7 +96,7 @@ class NodesListViewController: FormViewController {
     
     private func setup() {
         NotificationCenter.default.addObserver(
-            forName: Notification.Name.NodesSource.nodesChanged,
+            forName: Notification.Name.NodesSource.nodesUpdate,
             object: nil,
             queue: nil
         ) { [weak self] _ in
@@ -138,6 +138,8 @@ class NodesListViewController: FormViewController {
             $0.value = preferTheFastestNode
         }.onChange { [weak nodesSource] in
             nodesSource?.preferTheFastestNode = $0.value ?? true
+        }.cellUpdate { cell, _ in
+            cell.switchControl.onTintColor = .adamant.active
         }
         
         // MARK: Buttons
@@ -267,7 +269,7 @@ extension NodesListViewController: NodeEditorDelegate {
             removeNode(node: editorNode)
         
         case .nodeUpdated:
-            nodesSource.nodesChanged()
+            nodesSource.nodesUpdate()
         
         case .cancel:
             break
@@ -375,14 +377,8 @@ extension NodesListViewController {
     private func makeNodeCellModel(node: Node) -> NodeCell.Model {
         NodeCell.Model(
             node: node,
-            setIsEnabled: { [weak nodesSource] isEnabled in
-                guard
-                    let nodes = nodesSource?.nodes,
-                    isEnabled || nodes.filter({ $0.isEnabled }).count > 1
-                else { return }
-                
-                node.isEnabled = isEnabled
-                nodesSource?.nodesChanged()
+            nodeUpdate: { [weak nodesSource] in
+                nodesSource?.nodesUpdate()
             }
         )
     }

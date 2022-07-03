@@ -15,8 +15,8 @@ class AdamantNodesSource: NodesSource {
     
     var healthCheckService: HealthCheckService! {
         didSet {
-            healthCheckService?.delegate = self
-            healthCheckService?.nodes = nodes
+            healthCheckService.delegate = self
+            healthCheckService.nodes = nodes
             setHealthCheckTimer()
         }
     }
@@ -29,14 +29,14 @@ class AdamantNodesSource: NodesSource {
     
     // MARK: - Properties
     
-    var nodes: [Node] {
+    var nodes: [Node] = [] {
         didSet {
             if nodes.isEmpty {
-                nodes = defaultNodes
+                nodes = defaultNodesGetter()
             }
             
             healthCheckService.nodes = nodes
-            nodesChanged()
+            nodesUpdate()
         }
     }
     
@@ -45,18 +45,17 @@ class AdamantNodesSource: NodesSource {
             savePreferTheFastestNode(preferTheFastestNode)
             
             guard preferTheFastestNode else { return }
-            sendNodesChangedNotification()
+            sendNodesUpdateNotification()
         }
     }
     
-    private let defaultNodes: [Node]
+    private let defaultNodesGetter: () -> [Node]
     private var timer: Timer?
     
     // MARK: - Ctor
     
-    init(defaultNodes: [Node]) {
-        self.defaultNodes = defaultNodes
-        self.nodes = defaultNodes
+    init(defaultNodesGetter: @escaping () -> [Node]) {
+        self.defaultNodesGetter = defaultNodesGetter
         
         NotificationCenter.default.addObserver(
             forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
@@ -94,22 +93,18 @@ class AdamantNodesSource: NodesSource {
     // MARK: - Tools
     
     func setDefaultNodes() {
-        nodes = defaultNodes
+        nodes = defaultNodesGetter()
     }
     
     func getPreferredNode(needWS: Bool) -> Node? {
         healthCheckService?.getPreferredNode(fastest: preferTheFastestNode, needWS: needWS)
     }
     
-    func nodesChanged() {
-        if !nodes.contains(where: { $0.isEnabled }) {
-            nodes.forEach { $0.isEnabled = true }
-        }
-        
+    func nodesUpdate() {
         migrate()
         healthCheckService.healthCheck()
         saveNodes()
-        sendNodesChangedNotification()
+        sendNodesUpdateNotification()
     }
     
     func healthCheck() {
@@ -123,9 +118,9 @@ class AdamantNodesSource: NodesSource {
         )
     }
     
-    private func sendNodesChangedNotification() {
+    private func sendNodesUpdateNotification() {
         NotificationCenter.default.post(
-            name: Notification.Name.NodesSource.nodesChanged,
+            name: Notification.Name.NodesSource.nodesUpdate,
             object: self,
             userInfo: [:]
         )
@@ -154,14 +149,14 @@ class AdamantNodesSource: NodesSource {
     
     private func loadNodes() {
         guard let raw = securedStore.get(StoreKey.NodesSource.nodes), let data = raw.data(using: String.Encoding.utf8) else {
-            nodes = defaultNodes
+            nodes = defaultNodesGetter()
             return
         }
         
         do {
             nodes = try JSONDecoder().decode([Node].self, from: data)
         } catch {
-            nodes = defaultNodes
+            nodes = defaultNodesGetter()
             print(error.localizedDescription)
         }
     }
@@ -178,7 +173,7 @@ class AdamantNodesSource: NodesSource {
 
 extension AdamantNodesSource: HealthCheckDelegate {
     func healthCheckFinished() {
-        sendNodesChangedNotification()
+        sendNodesUpdateNotification()
     }
 }
 

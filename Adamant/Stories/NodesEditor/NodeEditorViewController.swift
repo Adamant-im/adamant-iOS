@@ -75,13 +75,13 @@ class NodeEditorViewController: FormViewController {
     }
     
     private enum WebSocketsState {
-        case on
-        case off
+        case supported
+        case notSupported
         
         var localized: String {
             switch self {
-            case .on: return NSLocalizedString("NodesEditor.WebSocketsOn", comment: "NodesEditor: Web sockets on")
-            case .off: return NSLocalizedString("NodesEditor.WebSocketsOff", comment: "NodesEditor: Web sockets off")
+            case .supported: return NSLocalizedString("NodesEditor.WebSocketsSupported", comment: "NodesEditor: Web sockets are supported")
+            case .notSupported: return NSLocalizedString("NodesEditor.WebSocketsNotSupported", comment: "NodesEditor: Web sockets aren't supported")
             }
         }
     }
@@ -171,8 +171,8 @@ class NodeEditorViewController: FormViewController {
                 $0.title = Rows.webSockets.localized
                 $0.tag = Rows.webSockets.tag
                 $0.baseValue = wsEnabled
-                    ? WebSocketsState.on.localized
-                    : WebSocketsState.off.localized
+                    ? WebSocketsState.supported.localized
+                    : WebSocketsState.notSupported.localized
             }
         }
         

@@ -11,8 +11,8 @@ import Foundation
 // MARK: - Notifications
 extension Notification.Name {
     struct NodesSource {
-        /// Raised when node list changed
-        static let nodesChanged = Notification.Name("adamant.nodesSource.nodesChanged")
+        /// Raised by NodesSource when need to update current node or list of nodes
+        static let nodesUpdate = Notification.Name("adamant.nodesSource.nodesUpdate")
         
         private init() {}
     }
@@ -41,5 +41,5 @@ protocol NodesSource: AnyObject {
     func setDefaultNodes()
     func getPreferredNode(needWS: Bool) -> Node?
     func healthCheck()
-    func nodesChanged()
+    func nodesUpdate()
 }

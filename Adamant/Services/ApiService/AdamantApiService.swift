@@ -190,7 +190,7 @@ class AdamantApiService: ApiService {
                     switch self?.connection {
                     case .some(.cellular), .some(.wifi):
                         node.connectionStatus = .offline
-                        self?.nodesSource.nodesChanged()
+                        self?.nodesSource.nodesUpdate()
                         self?.sendRequest(
                             path: path,
                             queryItems: queryItems,
