@@ -374,13 +374,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                 }
             }
             completionHandler(.newData)
-        } else { // for tests
-            if let jsonData = try? JSONSerialization.data(withJSONObject: userInfo, options: []),
-               let decoded = String(data: jsonData, encoding: .utf8) {
-                dialogService.showWarning(withMessage: decoded)
-            } else if let _ = userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String {
-                dialogService.showWarning(withMessage: userInfo.description)
-            }
+        } else {
             completionHandler(.noData)
         }
     }

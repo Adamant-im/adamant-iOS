@@ -34,8 +34,8 @@ class AdamantReachability: ReachabilityMonitor {
     private var cellularStatus: NWPath.Status = .satisfied
 
     var connection: AdamantConnection {
-        if wifiStatus == .satisfied     { return AdamantConnection.wifi     }
-        if cellularStatus == .satisfied { return AdamantConnection.cellular }
+        if wifiStatus     == .satisfied     { return AdamantConnection.wifi     }
+        if cellularStatus == .satisfied     { return AdamantConnection.cellular }
         return AdamantConnection.none
     }
     

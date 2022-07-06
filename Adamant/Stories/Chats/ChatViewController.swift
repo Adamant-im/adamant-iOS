@@ -435,6 +435,7 @@ class ChatViewController: MessagesViewController {
         self.view.addSubview(scrollToBottomBtn)
         
         keyboardManager.on(event: .willChangeFrame) { [weak self] (notification) in
+            if self?.isMacOS ?? false { return }
             let barHeight = self?.messageInputBar.bounds.height ?? 0
             let keyboardHeight = notification.endFrame.height
             
@@ -474,9 +475,7 @@ class ChatViewController: MessagesViewController {
                 DispatchQueue.main.async {
                     self?.messagesCollectionView.reloadDataAndKeepOffset()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        if #available(iOS 13.0, *) {
-
-                        } else {
+                        if #unavailable(iOS 13.0) {
                             if count > 0 {
                                 self?.messagesCollectionView.scrollToItem(at: IndexPath(row: 0, section: count - 1), at: .top, animated: false)
                             }
@@ -628,7 +627,6 @@ class ChatViewController: MessagesViewController {
             if self.messageToShow == nil {
                 if let offset = self.chatsProvider.chatPositon[address] {
                     self.chatPositionOffset = CGFloat(offset)
-                    print("chatPositionOffset=", offset)
                     self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
                     let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom) + 38
 
@@ -1221,7 +1219,6 @@ extension InputTextView {
     }
 
     @objc func sendKey(sender: UIKeyCommand) {
-        print("controlcontrol s")
         if sender.modifierFlags == .control || sender.modifierFlags == .alternate {
             newLineKey(sender: sender)
         } else {
@@ -1230,7 +1227,6 @@ extension InputTextView {
     }
     
     @objc func newLineKey(sender: UIKeyCommand) {
-        print("controlcontrol f")
         messageInputBar?.inputTextView.text += "\n"
     }
 
