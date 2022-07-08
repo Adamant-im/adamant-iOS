@@ -123,18 +123,6 @@ class ChatViewController: MessagesViewController {
     
     var feeUpdateTimer: Timer?
     
-    private var isMacOS: Bool = {
-        #if targetEnvironment(macCatalyst)
-            return true
-        #else
-        if #available(iOS 14.0, *) {
-            return ProcessInfo.processInfo.isiOSAppOnMac
-        } else {
-            return false
-        }
-        #endif
-    }()
-    
     // MARK: Rich Messages
     var richMessageProviders = [String:RichMessageProvider]()
     var cellCalculators = [String:CellSizeCalculator]()
@@ -326,7 +314,7 @@ class ChatViewController: MessagesViewController {
                 let keyboardHeight = notification.endFrame.height
                 let tabBarHeight = self?.tabBarController?.tabBar.bounds.height ?? 0
                 
-                if !(self?.isMacOS ?? false) {
+                if !isMacOS {
                     self?.messagesCollectionView.contentInset.bottom = barHeight + keyboardHeight
                     self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight + keyboardHeight - tabBarHeight
                 }
@@ -435,7 +423,7 @@ class ChatViewController: MessagesViewController {
         self.view.addSubview(scrollToBottomBtn)
         
         keyboardManager.on(event: .willChangeFrame) { [weak self] (notification) in
-            if self?.isMacOS ?? false { return }
+            if isMacOS { return }
             let barHeight = self?.messageInputBar.bounds.height ?? 0
             let keyboardHeight = notification.endFrame.height
             

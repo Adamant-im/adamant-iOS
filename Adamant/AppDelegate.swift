@@ -403,7 +403,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             var timeout = 0.25
             if #available(iOS 13.0, *) { timeout = 0 }
             DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
-                let chat = UINavigationController(rootViewController:vc)
+                let chat = UINavigationController(rootViewController: vc)
                 split.showDetailViewController(chat, sender: self)
             }
         } else {
