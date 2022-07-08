@@ -1152,7 +1152,6 @@ extension ChatViewController {
            isNeedToLoadMoore(),
            didLoaded {
             if address == AdamantContacts.adamantWelcomeWallet.name { return }
-            print("loadMooreMessagesIfNeeded")
             isBusy = true
             let offset = chatsProvider.chatLoadedMessages[address] ?? 0
             chatsProvider.getChatMessages(with: address, offset: offset) { [weak self] _count in

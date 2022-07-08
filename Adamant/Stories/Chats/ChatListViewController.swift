@@ -368,7 +368,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         return cellHeight
     }
     
-    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat { // fix jump bug in ios 12
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return cellHeight
     }
     

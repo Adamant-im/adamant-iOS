@@ -231,8 +231,6 @@ extension AdamantAccountsProvider {
             return
         }
         
-        //let context = stack.container.viewContext
-        
         // Go background, to not to hang threads (especially main) on semaphores and dispatch groups
         queue.async {
             self.groupsSemaphore.wait() // 1
