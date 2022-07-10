@@ -95,7 +95,7 @@ class DelegatesListViewController: UIViewController {
         
         // MARK: Initial
         navigationItem.title = String.adamantLocalized.delegates.title
-        tableView.register(UINib.init(nibName: "AdamantDelegateCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
+        tableView.register(AdamantDelegateCell.self, forCellReuseIdentifier: cellIdentifier)
         tableView.rowHeight = 50
         tableView.addSubview(self.refreshControl)
         
@@ -244,23 +244,17 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
     // MARK: Cells
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? AdamantDelegateCell else {
-            return UITableViewCell(style: .default, reuseIdentifier: "cell")
+            return UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
         }
         
         let checkedDelegate = checkedDelegateFor(indexPath: indexPath)
         let delegate = checkedDelegate.delegate
         
-        cell.nameLabel.text = delegate.username
-        cell.rankLabel.text = String(delegate.rank)
-        cell.addressLabel.text = delegate.address
+        cell.title = [String(delegate.rank), delegate.username].joined(separator: " ")
+        cell.subtitle = delegate.address
         cell.delegateIsActive = delegate.rank <= activeDelegates
-        cell.accessoryType = .disclosureIndicator
         cell.delegate = self
-        cell.checkmarkColor = UIColor.adamant.primary
-        cell.checkmarkBorderColor = UIColor.adamant.secondary
-        
         cell.isUpvoted = delegate.voted
-        
         cell.isChecked = checkedDelegate.isChecked
         
         return cell

@@ -11,7 +11,7 @@ import Eureka
 import FreakingSimpleRoundImageView
 import CoreData
 import Parchment
-
+import SnapKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -229,8 +229,12 @@ class AccountViewController: FormViewController {
         pagingViewController.dataSource = self
         pagingViewController.delegate = self
         pagingViewController.select(index: 0)
+        
         accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
-        accountHeaderView.walletViewContainer.constrainToEdges(pagingViewController.view)
+        pagingViewController.view.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
+        
         addChild(pagingViewController)
         
         pagingViewController.borderColor = UIColor.clear

@@ -8,6 +8,7 @@
 
 import UIKit
 import Parchment
+import SnapKit
 
 protocol ComplexTransferViewControllerDelegate: AnyObject {
     func complexTransferViewController(_ viewController: ComplexTransferViewController, didFinishWithTransfer: TransactionDetails?, detailsViewController: UIViewController?)
@@ -59,7 +60,14 @@ class ComplexTransferViewController: UIViewController {
         pagingViewController.borderColor = UIColor.clear
         
         view.addSubview(pagingViewController.view)
-        view.constrainToEdges(pagingViewController.view, relativeToSafeArea: true)
+        pagingViewController.view.snp.makeConstraints {
+            if #available(iOS 11, *) {
+                $0.directionalEdges.equalTo(view.safeAreaLayoutGuide)
+            } else {
+                $0.directionalEdges.equalToSuperview()
+            }
+        }
+        
         addChild(pagingViewController)
     }
     

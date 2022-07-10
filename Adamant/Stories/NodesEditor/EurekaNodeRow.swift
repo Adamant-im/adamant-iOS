@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SnapKit
 import Eureka
 
 class NodeCell: Cell<NodeCell.Model>, CellType {
@@ -25,21 +26,24 @@ class NodeCell: Cell<NodeCell.Model>, CellType {
         }
     }
     
-    @IBOutlet weak var indicatorView: UILabel!
-    @IBOutlet weak var checkmarkView: CheckmarkView!
-    @IBOutlet weak var descriptionView: UILabel!
-    @IBOutlet weak var titleView: UILabel!
-    
+    private let checkmarkRowView = CheckmarkRowView()
     private var model: NodeCell.Model? { row.value }
     
+    required init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupView()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupView()
+    }
+    
     public override func update() {
-        indicatorView.tintColor = .green
-        checkmarkView.image = #imageLiteral(resourceName: "status_success")
-        checkmarkView.imageColor = .adamant.primary
-        checkmarkView.borderColor = .adamant.secondary
-        checkmarkView.setIsChecked(model?.node.isEnabled ?? false, animated: true)
-        checkmarkView.onCheckmarkTap = { [weak self] in
-            guard let newValue = (self?.checkmarkView?.isChecked).map({ !$0 }) else {
+        checkmarkRowView.checkmarkImage = #imageLiteral(resourceName: "status_success")
+        checkmarkRowView.setIsChecked(model?.node.isEnabled ?? false, animated: true)
+        checkmarkRowView.onCheckmarkTap = { [weak self] in
+            guard let newValue = (self?.checkmarkRowView.isChecked).map({ !$0 }) else {
                 return
             }
             
@@ -47,9 +51,9 @@ class NodeCell: Cell<NodeCell.Model>, CellType {
             self?.model?.nodeUpdate()
         }
         
-        titleView.text = model?.node.asString()
-        indicatorView.textColor = getIndicatorColor(status: model?.node.connectionStatus)
-        indicatorView.text = ["●", makeActivitiesString()]
+        checkmarkRowView.title = model?.node.asString()
+        checkmarkRowView.captionColor = getIndicatorColor(status: model?.node.connectionStatus)
+        checkmarkRowView.caption = ["●", makeActivitiesString()]
             .compactMap { $0 }
             .joined(separator: " ")
         
@@ -58,7 +62,7 @@ class NodeCell: Cell<NodeCell.Model>, CellType {
             model?.node.status?.version.map { "(\(NodeCell.Strings.version): \($0))" }
         ]
         
-        descriptionView.text = descriptionStrings.compactMap { $0 }.joined(separator: " ")
+        checkmarkRowView.subtitle = descriptionStrings.compactMap { $0 }.joined(separator: " ")
     }
     
     private func makeActivitiesString() -> String? {
@@ -76,12 +80,19 @@ class NodeCell: Cell<NodeCell.Model>, CellType {
             }
         }.sorted().joined(separator: ", ")
     }
+    
+    private func setupView() {
+        contentView.addSubview(checkmarkRowView)
+        checkmarkRowView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
+    }
 }
 
 final class NodeRow: Row<NodeCell>, RowType {
     required public init(tag: String?) {
         super.init(tag: tag)
-        cellProvider = CellProvider<NodeCell>(nibName: "NodeCell")
+        cellProvider = .init()
     }
 }
 
