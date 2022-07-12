@@ -68,9 +68,8 @@ extension ChatViewController: MessagesDataSource {
             switch transaction.statusEnum {
             case .failed:
                 return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.adamant.primary])
-                
             case .pending:
-                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.adamant.primary])
+                return nil
                 
             case .delivered:
                 return nil
@@ -87,6 +86,21 @@ extension ChatViewController: MessagesDataSource {
         
         if let message = message as? MessageTransaction, message.statusEnum == .failed {
             return nil
+        }
+        
+        if isFromCurrentSender(message: message),
+           let transaction = message as? ChatTransaction {
+            if case .pending = transaction.statusEnum {
+                let attachment = NSTextAttachment()
+                attachment.image = UIImage(named: "status_pending")
+                attachment.bounds = CGRect(x: 0, y: -1, width: 7, height: 7)
+                let attachmentStr = NSAttributedString(attachment: attachment)
+                
+                let mutableAttributedString = NSMutableAttributedString()
+                mutableAttributedString.append(attachmentStr)
+
+                return mutableAttributedString
+            }
         }
         
         let humanizedTime = message.sentDate.humanizedTime()
@@ -510,12 +524,12 @@ extension ChatViewController: MessagesLayoutDelegate {
             guard let transaction = message as? ChatTransaction else {
                 return 0
             }
-            
+
             switch transaction.statusEnum {
-            case .failed, .pending:
+            case .failed:
                 return 16
                 
-            case .delivered:
+            case .delivered, .pending:
                 return 0
             }
         } else {
@@ -534,10 +548,10 @@ extension ChatViewController: MessagesLayoutDelegate {
             }
             
             switch transaction.statusEnum {
-            case .failed, .pending:
+            case .failed:
                 return 0
                 
-            case .delivered:
+            case .delivered, .pending:
                 return 16
             }
         } else {

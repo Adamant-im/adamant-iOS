@@ -207,9 +207,7 @@ class ChatViewController: MessagesViewController {
     
     //MARK: Background UI
     private let amadantLogoImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.image = UIImage(named: "Adamant-logo")
-        return iv
+        return UIImageView(image: UIImage(named: "Adamant-logo"))
     }()
     
     // MARK: - Lifecycle
@@ -299,6 +297,8 @@ class ChatViewController: MessagesViewController {
             $0.image = #imageLiteral(resourceName: "Arrow")
             $0.setImage(#imageLiteral(resourceName: "Arrow_innactive"), for: UIControl.State.disabled)
         }
+        
+        messageInputBar.inputTextView.autocorrectionType = .no
         
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             self.edgesForExtendedLayout = UIRectEdge.top
@@ -445,36 +445,7 @@ class ChatViewController: MessagesViewController {
             UIMenuItem(title: String.adamantLocalized.chat.remove, action: NSSelectorFromString("remove:")),
             UIMenuItem(title: String.adamantLocalized.chat.report, action: NSSelectorFromString("report:"))]
         
-        if let address = chatroom.partner?.address {
-            if let isLoaded = chatsProvider.isChatLoaded[address],
-               isLoaded {
-                setBusyIndicator(state: false)
-                return
-            }
-
-            if address == AdamantContacts.adamantWelcomeWallet.name {
-                setBusyIndicator(state: false)
-                return
-            }
-
-            setBusyIndicator(state: true)
-
-            chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] count in
-                DispatchQueue.main.async {
-                    self?.messagesCollectionView.reloadDataAndKeepOffset()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        if #unavailable(iOS 13.0) {
-                            if count > 0 {
-                                self?.messagesCollectionView.scrollToItem(at: IndexPath(row: 0, section: count - 1), at: .top, animated: false)
-                            }
-                        }
-                        self?.setBusyIndicator(state: false)
-                    }
-                }
-            }
-        }
-        
-        messageInputBar.inputTextView.autocorrectionType = .no
+        loadFirstMessagesIfNeeded()
     }
     
     override func canPerformAction(_ action: Selector, withSender sender: Any!) -> Bool {
@@ -598,7 +569,7 @@ class ChatViewController: MessagesViewController {
                 didLoaded = true
                 if indexPath.row >= 0 && indexPath.row <= averageVisibleCount {
                     self.loadMooreMessagesIfNeeded(indexPath: IndexPath(row: 0, section: 2))
-                    self.reloadTopScetionIfNeeded()
+                    self.reloadTopSectionIfNeeded()
                 }
                 return
             }
@@ -886,9 +857,15 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
         let chat = messagesCollectionView
         
         var scrollToBottom = changes.first { $0.type == .insert } != nil
+        var forceScrollToBottom = false
         
         if !isFirstLayout && changes.first?.type != nil {
-            scrollToBottom = scrollToBottomBtn.isHidden
+            if self.forceScrollToBottom ?? false {
+                scrollToBottom = true
+                self.forceScrollToBottom = false
+            } else {
+                scrollToBottom = scrollToBottomBtn.isHidden
+            }
         }
         
         chat.performBatchUpdates({
@@ -902,6 +879,7 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
                     chat.insertSections(IndexSet(integer: newIndexPath.row))
                     if scrollToBottom {
                         chat.scrollToBottom(animated: true)
+                        forceScrollToBottom = true
                     }
                     
                 case .delete:
@@ -929,7 +907,7 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
                 }
             }
         }, completion: { animationSuccess in
-            if scrollToBottom {
+            if scrollToBottom || forceScrollToBottom {
                 chat.scrollToBottom(animated: animationSuccess)
             }
         })
@@ -1091,21 +1069,24 @@ private class StatusUpdateProcedure: Procedure {
 
 // MARK: - Busy Indicator View
 extension ChatViewController {
+    func setupBusyBackgroundView() {
+        busyBackgroundView = UIView()
+        busyBackgroundView?.backgroundColor = UIColor(white: 0, alpha: 0.1)
+        busyBackgroundView?.frame = view.frame
+        view.addSubview(busyBackgroundView!)
+        
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        spinner.startAnimating()
+        busyBackgroundView?.addSubview(spinner)
+        spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    }
+    
     func setBusyIndicator(state: Bool) {
         isBusy = state
         if busyBackgroundView == nil && state {
             setBackgroundUI()
-            busyBackgroundView = UIView()
-            busyBackgroundView?.backgroundColor = UIColor(white: 0, alpha: 0.1)
-            busyBackgroundView?.frame = view.frame
-            view.addSubview(busyBackgroundView!)
-            
-            spinner.translatesAutoresizingMaskIntoConstraints = false
-            spinner.startAnimating()
-            busyBackgroundView?.addSubview(spinner)
-            spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-            spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-
+            setupBusyBackgroundView()
             messagesCollectionView.alpha = 0.0
             messageInputBar.sendButton.isEnabled = false
             messageInputBar.inputTextView.isEditable = false
@@ -1114,7 +1095,7 @@ extension ChatViewController {
         
         if !state {
             if busyBackgroundView != nil {
-                reloadTopScetionIfNeeded()
+                reloadTopSectionIfNeeded()
             }
             
             if chatroom?.isReadonly ?? false {
@@ -1145,26 +1126,58 @@ extension ChatViewController {
        loadMooreMessagesIfNeeded(indexPath: indexPath)
     }
     
-    func loadMooreMessagesIfNeeded(indexPath: IndexPath) {
-        if indexPath.section < 4,
-           let address = chatroom?.partner?.address,
-           !isBusy,
-           isNeedToLoadMoore(),
-           didLoaded {
-            if address == AdamantContacts.adamantWelcomeWallet.name { return }
-            isBusy = true
-            let offset = chatsProvider.chatLoadedMessages[address] ?? 0
-            chatsProvider.getChatMessages(with: address, offset: offset) { [weak self] _count in
-                DispatchQueue.main.async {
-                    self?.messagesCollectionView.reloadDataAndKeepOffset()
-                    self?.isBusy = false
-                    self?.reloadTopScetionIfNeeded()
+    func loadFirstMessagesIfNeeded() {
+        guard let address = chatroom?.partner?.address  else { return }
+        
+        if let isLoaded = chatsProvider.isChatLoaded[address],
+           isLoaded {
+            setBusyIndicator(state: false)
+            return
+        }
+        
+        if address == AdamantContacts.adamantWelcomeWallet.name {
+            setBusyIndicator(state: false)
+            return
+        }
+        
+        setBusyIndicator(state: true)
+        
+        chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] count in
+            DispatchQueue.main.async {
+                self?.messagesCollectionView.reloadDataAndKeepOffset()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    if count > 0 {
+                        self?.messagesCollectionView.scrollToItem(at: IndexPath(row: 0, section: count - 1), at: .top, animated: false)
+                    }
+                    self?.setBusyIndicator(state: false)
                 }
             }
         }
     }
     
-    func reloadTopScetionIfNeeded() {
+    func loadMooreMessagesIfNeeded(indexPath: IndexPath) {
+        guard indexPath.section < 4,
+              let address = chatroom?.partner?.address,
+              !isBusy,
+              isNeedToLoadMoore(),
+              didLoaded
+        else {
+            return
+        }
+        
+        if address == AdamantContacts.adamantWelcomeWallet.name { return }
+        isBusy = true
+        let offset = chatsProvider.chatLoadedMessages[address] ?? 0
+        chatsProvider.getChatMessages(with: address, offset: offset) { [weak self] _count in
+            DispatchQueue.main.async {
+                self?.messagesCollectionView.reloadDataAndKeepOffset()
+                self?.isBusy = false
+                self?.reloadTopSectionIfNeeded()
+            }
+        }
+    }
+    
+    func reloadTopSectionIfNeeded() {
         try? chatController?.performFetch()
         if let count = chatController?.fetchedObjects?.count,
            count >= 1 {
@@ -1216,5 +1229,4 @@ extension InputTextView {
     @objc func newLineKey(sender: UIKeyCommand) {
         messageInputBar?.inputTextView.text += "\n"
     }
-
 }

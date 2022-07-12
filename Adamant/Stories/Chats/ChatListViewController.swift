@@ -447,46 +447,21 @@ extension ChatListViewController {
             }
         }
         
-        if let roomsLoadedCount = chatsProvider.roomsLoadedCount,
-           let roomsMaxCount = chatsProvider.roomsMaxCount,
-           roomsLoadedCount < roomsMaxCount,
-           roomsMaxCount > 0,
-           !isBusy,
-           tableView.numberOfRows(inSection: 0) >= roomsLoadedCount,
-           let lastVisibleIndexPath = tableView.indexPathsForVisibleRows,
-           lastVisibleIndexPath.contains(IndexPath(row: tableView.numberOfRows(inSection: 0) - 3, section: 0)) {
-            isBusy = true
-            lastSystemChatPositionRow = getBottomSystemChatIndex()
-            DispatchQueue.main.async { [weak self] in
-                if #available(iOS 11.0, *) {
-                    tableView.performBatchUpdates {
-                        tableView.insertRows(at: [
-                            IndexPath(row: self?.lastSystemChatPositionRow ?? 0, section: 0)
-                        ], with: .none)
-                        tableView.reloadRows(at: [IndexPath(row: (self?.lastSystemChatPositionRow ?? 0) - 1, section: 0)], with: .none)
-                    }
-                } else {
-                    tableView.beginUpdates()
-                    tableView.insertRows(at: [IndexPath(row: self?.lastSystemChatPositionRow ?? 0, section: 0)], with: .none)
-                    tableView.reloadRows(at: [IndexPath(row: (self?.lastSystemChatPositionRow ?? 0) - 1, section: 0)], with: .none)
-                    tableView.endUpdates()
-                }
-            }
-            
-            chatsProvider.getChatRooms(offset: roomsLoadedCount, completion: { [weak self] in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
-                    self?.isBusy = false
-                    if #available(iOS 13.0, *) {
-                        tableView.reloadData()
-                    } else {                       
-                        let oldTableViewHeight = tableView.contentSize.height;
-                        tableView.reloadData()
-                        let newTableViewHeight = tableView.contentSize.height;
-                        tableView.contentOffset = CGPoint(x: 0, y: newTableViewHeight - oldTableViewHeight);
-                    }
-                })
-            })
+        guard let roomsLoadedCount = chatsProvider.roomsLoadedCount,
+              let roomsMaxCount = chatsProvider.roomsMaxCount,
+              roomsLoadedCount < roomsMaxCount,
+              roomsMaxCount > 0,
+              !isBusy,
+              tableView.numberOfRows(inSection: 0) >= roomsLoadedCount,
+              let lastVisibleIndexPath = tableView.indexPathsForVisibleRows,
+              lastVisibleIndexPath.contains(IndexPath(row: tableView.numberOfRows(inSection: 0) - 3, section: 0))
+        else {
+            return
         }
+        
+        isBusy = true
+        insertReloadRow()
+        loadNewChats(offset: roomsLoadedCount)
     }
     
     private func configureCell(_ cell: LoadingTableViewCell) {
@@ -542,6 +517,34 @@ extension ChatListViewController {
         } else {
             cell.dateLabel.text = nil
         }
+    }
+    
+    private func insertReloadRow() {
+        lastSystemChatPositionRow = getBottomSystemChatIndex()
+        DispatchQueue.main.async { [weak self] in
+            if #available(iOS 11.0, *) {
+                self?.tableView.performBatchUpdates {
+                    self?.tableView.insertRows(at: [
+                        IndexPath(row: self?.lastSystemChatPositionRow ?? 0, section: 0)
+                    ], with: .none)
+                    self?.tableView.reloadRows(at: [IndexPath(row: (self?.lastSystemChatPositionRow ?? 0) - 1, section: 0)], with: .none)
+                }
+            } else {
+                self?.tableView.beginUpdates()
+                self?.tableView.insertRows(at: [IndexPath(row: self?.lastSystemChatPositionRow ?? 0, section: 0)], with: .none)
+                self?.tableView.reloadRows(at: [IndexPath(row: (self?.lastSystemChatPositionRow ?? 0) - 1, section: 0)], with: .none)
+                self?.tableView.endUpdates()
+            }
+        }
+    }
+    
+    private func loadNewChats(offset: Int) {
+        chatsProvider.getChatRooms(offset: offset, completion: { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+                self?.isBusy = false
+                self?.tableView.reloadData()
+            })
+        })
     }
 }
 
@@ -984,12 +987,15 @@ extension ChatListViewController {
         var index = 0
         try? chatsController?.performFetch()
         chatsController?.fetchedObjects?.enumerated().forEach({ (i, room) in
-            if index == 0,
-               let date = room.updatedAt as? Date,
-               date == Date.adamantNullDate {
-                index = i
+            guard index == 0,
+                  let date = room.updatedAt as? Date,
+                  date == Date.adamantNullDate
+            else {
+                return
             }
+            index = i
         })
+
         return index
     }
 }
