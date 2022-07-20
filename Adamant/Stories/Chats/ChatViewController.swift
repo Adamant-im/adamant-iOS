@@ -123,6 +123,8 @@ class ChatViewController: MessagesViewController {
     
     var feeUpdateTimer: Timer?
     
+    private let headerHeight: CGFloat = 38
+    
     // MARK: Rich Messages
     var richMessageProviders = [String:RichMessageProvider]()
     var cellCalculators = [String:CellSizeCalculator]()
@@ -587,7 +589,7 @@ class ChatViewController: MessagesViewController {
                 if let offset = self.chatsProvider.chatPositon[address] {
                     self.chatPositionOffset = CGFloat(offset)
                     self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
-                    let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom) + 38
+                    let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom) + headerHeight
 
                     messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
                     }
@@ -1127,7 +1129,7 @@ extension ChatViewController {
     }
     
     func loadFirstMessagesIfNeeded() {
-        guard let address = chatroom?.partner?.address  else { return }
+        guard let address = chatroom?.partner?.address else { return }
         
         if let isLoaded = chatsProvider.isChatLoaded[address],
            isLoaded {
