@@ -89,7 +89,7 @@ public struct Crypto {
     }
 
     internal static func convertUIntArray(_ array: [UInt], _ from: UInt, _ to: UInt) -> [UInt] {
-        let maxValue: UInt = (1 << to) - 1;
+        let maxValue: UInt = (1 << to) - 1
         var accumulator: UInt = 0
         var bits: UInt = 0
         var result = [UInt]()
@@ -152,7 +152,6 @@ public struct Crypto {
         let signature = signature.hexBytes()
         let message = message.hexBytes()
         let publicKey = publicKey.hexBytes()
-        
         
         guard .SUCCESS == crypto_sign_verify_detached(
             signature,
@@ -296,7 +295,7 @@ public class KeyPair {
     public func sign(_ message: [UInt8]) -> [UInt8] {
         var signature = [UInt8](repeating: 0, count: Int(crypto_sign_bytes()))
         
-        guard .SUCCESS == crypto_sign_detached (
+        guard .SUCCESS == crypto_sign_detached(
             &signature,
             nil,
             message, UInt64(message.count),

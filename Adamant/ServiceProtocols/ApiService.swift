@@ -104,7 +104,6 @@ extension ApiServiceError: Equatable {
     }
 }
 
-
 // - MARK: ApiService
 protocol ApiService: AnyObject {
     
@@ -127,7 +126,6 @@ protocol ApiService: AnyObject {
     
     func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void)
     
-    
     // MARK: - Accounts
     
     func newAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
@@ -135,17 +133,14 @@ protocol ApiService: AnyObject {
     func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
     func getAccount(byAddress address: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
     
-    
     // MARK: - Keys
     
     func getPublicKey(byAddress address: String, completion: @escaping (ApiServiceResult<String>) -> Void)
-    
     
     // MARK: - Transactions
     
     func getTransaction(id: UInt64, completion: @escaping (ApiServiceResult<Transaction>) -> Void)
     func getTransactions(forAccount: String, type: TransactionType, fromHeight: Int64?, offset: Int?, limit: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
-    
     
     // MARK: - Chats Rooms
       
@@ -155,7 +150,6 @@ protocol ApiService: AnyObject {
     // MARK: - Funds
     
     func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
-    
     
     // MARK: - States
     

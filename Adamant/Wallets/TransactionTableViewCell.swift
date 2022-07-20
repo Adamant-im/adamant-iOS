@@ -34,12 +34,10 @@ class TransactionTableViewCell: UITableViewCell {
         }
     }
     
-    
     // MARK: - Constants
     
     static let cellHeightCompact: CGFloat = 90.0
     static let cellHeightFull: CGFloat = 100.0
-    
     
     // MARK: - IBOutlets
     
@@ -50,7 +48,6 @@ class TransactionTableViewCell: UITableViewCell {
     @IBOutlet weak var ammountLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
     
-    
     // MARK: - Properties
     
     var transactionType: TransactionType = .income {
@@ -60,7 +57,6 @@ class TransactionTableViewCell: UITableViewCell {
             bottomImageView.tintColor = transactionType.bottomTintColor
         }
     }
-    
     
     // MARK: - Initializers
     

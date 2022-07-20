@@ -43,7 +43,7 @@ class AdamantChatsProvider: ChatsProvider {
     public var chatLoadedMessages: [String : Int] = [:]
     private var connection: AdamantConnection?
     private var isConnectedToTheInthernet = true
-    private var isRestoredConnectionToTheInthernet: (() ->())?
+    private var isRestoredConnectionToTheInthernet: (() ->Void)?
     
     private(set) var isInitiallySynced: Bool = false {
         didSet {
@@ -123,7 +123,7 @@ class AdamantChatsProvider: ChatsProvider {
             }
         }
         
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
             if let previousAppState = self?.previousAppState,
                previousAppState == .background {
                 self?.previousAppState = .active
@@ -131,7 +131,7 @@ class AdamantChatsProvider: ChatsProvider {
             }
         }
         
-        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
             if self?.isInitiallySynced ?? false {
                 self?.previousAppState = .background
             }
@@ -173,7 +173,7 @@ class AdamantChatsProvider: ChatsProvider {
         
         if notify {
             switch prevState {
-            case .failedToUpdate(_):
+            case .failedToUpdate:
                 NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: self, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
                                                                                                                     AdamantUserInfoKey.TransfersProvider.prevState: prevState])
                 
@@ -186,7 +186,6 @@ class AdamantChatsProvider: ChatsProvider {
         }
     }
 }
-
 
 // MARK: - DataProvider
 extension AdamantChatsProvider {
@@ -236,7 +235,7 @@ extension AdamantChatsProvider {
         setState(.empty, previous: prevState, notify: notify)
     }
     
-    func getChatRooms(offset: Int?, completion: (() ->())?) {
+    func getChatRooms(offset: Int?, completion: (() ->Void)?) {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
             completion?()
@@ -269,7 +268,7 @@ extension AdamantChatsProvider {
                 self?.roomsLoadedCount = chatrooms.chats?.count ?? 0
             }
             
-            var array = Array<Transaction>()
+            var array = [Transaction]()
             chatrooms.chats?.forEach({ room in
                 if let last = room.lastTransaction {
                     array.append(last)
@@ -293,7 +292,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    func apiGetChatrooms(address: String, offset: Int?, completion: ((ChatRooms?) ->())?) {
+    func apiGetChatrooms(address: String, offset: Int?, completion: ((ChatRooms?) ->Void)?) {
         apiService.getChatRooms(address: address, offset: offset) { [weak self] result in
             switch result {
             case .success(let chatrooms):
@@ -319,7 +318,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) ->())?) {
+    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) ->Void)?) {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
             completion?(0)
@@ -354,7 +353,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    func apiGetChatMessages(address: String, addressRecipient: String, offset: Int?, completion: ((ChatRooms?) ->())?) {
+    func apiGetChatMessages(address: String, addressRecipient: String, offset: Int?, completion: ((ChatRooms?) ->Void)?) {
         apiService.getChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] result in
             switch result {
             case .success(let chatroom):
@@ -405,7 +404,7 @@ extension AdamantChatsProvider {
                                  context: privateContext,
                                  contextMutatingSemaphore: cms)
                 }
-            case .failure(_):
+            case .failure:
                 break
             }
         }
@@ -501,13 +500,13 @@ extension AdamantChatsProvider {
                     case .accountNotFound:
                         err = .accountNotFound(address)
                         
-                    case .serverError(_):
+                    case .serverError:
                         err = .serverError(error)
                         
                     case .internalError(let message, _):
                         err = .dependencyError(message)
                         
-                    case .networkError(_):
+                    case .networkError:
                         err = .networkError
                     }
                     
@@ -520,7 +519,6 @@ extension AdamantChatsProvider {
         }
     }
 }
-
 
 // MARK: - Sending messages {
 extension AdamantChatsProvider {
@@ -670,7 +668,6 @@ extension AdamantChatsProvider {
         prepareAndSendChatTransaction(transaction, in: context, recipientId: recipientId, type: type, keypair: keypair, from: chatroom, completion: completion)
     }
     
-    
     /// Transaction must be in passed context
     private func prepareAndSendChatTransaction(_ transaction: ChatTransaction, in context: NSManagedObjectContext, recipientId: String, type: ChatType, keypair: Keypair, from chatroom: Chatroom? = nil, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         // MARK: 1. Get account
@@ -694,7 +691,7 @@ extension AdamantChatsProvider {
             completion(.failure(.accountNotFound(recipientId)))
             return
             
-        case .notInitiated(_), .dummy(_):
+        case .notInitiated, .dummy:
             completion(.failure(.accountNotInitiated(recipientId)))
             return
             
@@ -702,7 +699,7 @@ extension AdamantChatsProvider {
             completion(.failure(.serverError(error)))
             return
             
-        case .networkError(_):
+        case .networkError:
             completion(.failure(ChatsProviderError.networkError))
             return
         }
@@ -816,7 +813,6 @@ extension AdamantChatsProvider {
         
         try? privateContext.save()
         
-        
         // MARK: 3. Send
         sendTransaction(transaction, type: .message, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
             switch result {
@@ -863,7 +859,6 @@ extension AdamantChatsProvider {
         }
     }
     
-    
     // MARK: - Logic
     
     /// Send transaction.
@@ -904,7 +899,7 @@ extension AdamantChatsProvider {
                 
                 let serviceError: ChatsProviderError
                 switch error {
-                case .networkError(_):
+                case .networkError:
                     serviceError = .networkError
                     
                 case .accountNotFound:
@@ -925,7 +920,6 @@ extension AdamantChatsProvider {
         }
     }
 }
-
 
 // MARK: - Getting messages
 extension AdamantChatsProvider {
@@ -1062,14 +1056,13 @@ extension AdamantChatsProvider {
         }
     }
     
-    
     /// - Returns: New unread messagess ids
     private func process(messageTransactions: [Transaction],
                          senderId: String,
                          privateKey: String,
                          context: NSManagedObjectContext,
                          contextMutatingSemaphore: DispatchSemaphore,
-                         completion: (() -> ())? = nil) {
+                         completion: (() -> Void)? = nil) {
         struct DirectionedTransaction {
             let transaction: Transaction
             let isOut: Bool
@@ -1078,7 +1071,6 @@ extension AdamantChatsProvider {
         // MARK: 1. Gather partner keys
         let mapped = messageTransactions.map({ DirectionedTransaction(transaction: $0, isOut: $0.senderId == senderId) })
         let grouppedTransactions = Dictionary(grouping: mapped, by: { $0.isOut ? $0.transaction.recipientId : $0.transaction.senderId })
-        
         
         // MARK: 2. Gather Accounts
         var partners: [CoreDataAccount:[DirectionedTransaction]] = [:]
@@ -1288,7 +1280,7 @@ extension AdamantChatsProvider {
             }
         }
         
-        // MARK 7. Last message height
+        // MARK: 7. Last message height
         highSemaphore.wait()
         if let lastHeight = receivedLastHeight {
             if lastHeight < height {
@@ -1301,7 +1293,6 @@ extension AdamantChatsProvider {
         completion?()
     }
 }
-
 
 // MARK: - Tools
 extension AdamantChatsProvider {
@@ -1382,7 +1373,6 @@ extension AdamantChatsProvider {
             return nil
         }
         
-        
         // MARK: Decode message, message must contain data
         if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)?.trimmingCharacters(in: .whitespacesAndNewlines) {
             if (decodedMessage.isEmpty && transaction.amount > 0) || !decodedMessage.isEmpty {
@@ -1460,7 +1450,6 @@ extension AdamantChatsProvider {
         
         return messageTransaction
     }
-    
     
     /// Confirm transactions
     ///

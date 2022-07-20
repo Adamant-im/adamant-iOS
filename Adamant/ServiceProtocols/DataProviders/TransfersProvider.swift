@@ -79,7 +79,6 @@ extension TransfersProviderError: RichError {
         }
     }
     
-    
 }
 
 extension Notification.Name {
@@ -91,7 +90,6 @@ extension Notification.Name {
         static let stateChanged = Notification.Name("adamant.transfersProvider.stateChanged")
         
         static let initialSyncFinished = Notification.Name("adamant.transfersProvider.initialSyncFinished")
-        
         
         private init() {}
     }

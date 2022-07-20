@@ -33,8 +33,8 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         if showToChat {
             let haveChatroom: Bool
             
-            if let transfer = transaction as? TransferTransaction, let partner = transfer.partner as? CoreDataAccount, let chatroom = partner.chatroom, let transactions = chatroom.transactions  {
-                let messeges = transactions.first (where: { (object) -> Bool in
+            if let transfer = transaction as? TransferTransaction, let partner = transfer.partner as? CoreDataAccount, let chatroom = partner.chatroom, let transactions = chatroom.transactions {
+                let messeges = transactions.first(where: { (object) -> Bool in
                     return !(object is TransferTransaction)
                 })
                 
@@ -47,7 +47,7 @@ class AdmTransactionDetailsViewController: TransactionDetailsViewControllerBase 
             
             // MARK: Open chat
             if let trs = transaction as? TransferTransaction, trs.chatroom != nil, let section = form.sectionBy(tag: Sections.actions.tag) {
-                let row = LabelRow() {
+                let row = LabelRow {
                     $0.tag = Rows.openChat.tag
                     $0.title = chatLabel
                     $0.cell.imageView?.image = Rows.openChat.image

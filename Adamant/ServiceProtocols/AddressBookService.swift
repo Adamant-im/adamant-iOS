@@ -35,7 +35,6 @@ extension AdamantUserInfoKey {
     }
 }
 
-
 // MARK: - Result and Errors
 
 enum AddressBookServiceResult {
@@ -80,7 +79,6 @@ extension AddressBookServiceError: RichError {
         }
     }
 }
-
 
 // MARK: -
 protocol AddressBookService: AnyObject {

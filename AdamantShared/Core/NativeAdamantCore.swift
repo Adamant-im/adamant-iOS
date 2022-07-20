@@ -67,7 +67,6 @@ class NativeAdamantCore {
         return decrepted.utf8String
     }
     
-    
     // MARK: - Values
     
     func encodeValue(_ value: [String: Any], privateKey privateKeyHex: String) -> (message: String, nonce: String)? {

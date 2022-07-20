@@ -48,7 +48,7 @@ class ServerResponse: Decodable {
     }
 }
 
-class ServerModelResponse<T: WrappableModel>: ServerResponse  {
+class ServerModelResponse<T: WrappableModel>: ServerResponse {
     let model: T?
     
     required init(from decoder: Decoder) throws {
@@ -62,7 +62,7 @@ class ServerModelResponse<T: WrappableModel>: ServerResponse  {
     }
 }
 
-class ServerCollectionResponse<T: WrappableCollection>: ServerResponse  {
+class ServerCollectionResponse<T: WrappableCollection>: ServerResponse {
     let collection: [T]?
     
     required init(from decoder: Decoder) throws {
@@ -75,7 +75,6 @@ class ServerCollectionResponse<T: WrappableCollection>: ServerResponse  {
         super.init(success: success, error: error, nodeTimestamp: nodeTimestamp)
     }
 }
-
 
 // MARK: - JSON
 /*

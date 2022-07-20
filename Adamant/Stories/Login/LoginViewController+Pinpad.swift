@@ -24,7 +24,6 @@ extension LoginViewController {
         }
     }
     
-    
     /// Request user biometry authentication
     func loginWithBiometry() {
         let biometry = localAuth.biometryType
@@ -88,7 +87,6 @@ extension LoginViewController {
         }
     }
 }
-
 
 // MARK: - PinpadViewControllerDelegate
 extension LoginViewController: PinpadViewControllerDelegate {

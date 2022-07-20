@@ -21,7 +21,7 @@ public protocol SwiftyOnboardDataSource: AnyObject {
 
 public extension SwiftyOnboardDataSource {
     
-    func swiftyOnboardBackgroundColorFor(_ swiftyOnboard: SwiftyOnboard,atIndex index: Int)->UIColor?{
+    func swiftyOnboardBackgroundColorFor(_ swiftyOnboard: SwiftyOnboard,atIndex index: Int) -> UIColor? {
         return nil
     }
     
@@ -54,7 +54,7 @@ public class SwiftyOnboard: UIView, UIScrollViewDelegate {
     
     open weak var dataSource: SwiftyOnboardDataSource? {
         didSet {
-            if let color = dataSource?.swiftyOnboardBackgroundColorFor(self, atIndex: 0){
+            if let color = dataSource?.swiftyOnboardBackgroundColorFor(self, atIndex: 0) {
                 backgroundColor = color
             }
             dataSourceSet = true
@@ -83,7 +83,6 @@ public class SwiftyOnboard: UIView, UIScrollViewDelegate {
     open var style: SwiftyOnboardStyle = .dark
     open var shouldSwipe: Bool = true
     open var fadePages: Bool = true
-    
     
     public init(frame: CGRect, style: SwiftyOnboardStyle = .dark) {
         super.init(frame: frame)
@@ -130,7 +129,7 @@ public class SwiftyOnboard: UIView, UIScrollViewDelegate {
     fileprivate func setUpPages() {
         if let dataSource = dataSource {
             pageCount = dataSource.swiftyOnboardNumberOfPages(self)
-            for index in 0..<pageCount{
+            for index in 0..<pageCount {
                 if let view = dataSource.swiftyOnboardPageForIndex(self, index: index) {
                     self.contentMode = .scaleAspectFit
                     view.set(style: style)
@@ -172,25 +171,25 @@ public class SwiftyOnboard: UIView, UIScrollViewDelegate {
         return currentPosition
     }
     
-    fileprivate func colorForPosition(_ pos: CGFloat)->UIColor?{
+    fileprivate func colorForPosition(_ pos: CGFloat) -> UIColor? {
         let percentage: CGFloat = pos - CGFloat(Int(pos))
         
         let currentIndex = Int(pos - percentage)
         
-        if currentIndex < pageCount - 1{
+        if currentIndex < pageCount - 1 {
             let color1 = dataSource?.swiftyOnboardBackgroundColorFor(self, atIndex: currentIndex)
             let color2 = dataSource?.swiftyOnboardBackgroundColorFor(self, atIndex: currentIndex + 1)
             
             if let color1 = color1,
-                let color2 = color2{
+                let color2 = color2 {
                 return colorFrom(start: color1, end: color2, percent: percentage)
             }
         }
         return nil
     }
     
-    fileprivate func colorFrom(start color1: UIColor, end color2: UIColor, percent: CGFloat)->UIColor{
-        func cofd(_ color1: CGFloat,_ color2: CGFloat,_ percent: CGFloat)-> CGFloat{
+    fileprivate func colorFrom(start color1: UIColor, end color2: UIColor, percent: CGFloat) -> UIColor {
+        func cofd(_ color1: CGFloat,_ color2: CGFloat,_ percent: CGFloat) -> CGFloat {
             let c1 = CGFloat(color1)
             let c2 = CGFloat(color2)
             return (c1 + ((c2 - c1) * percent))
@@ -219,7 +218,7 @@ public class SwiftyOnboard: UIView, UIScrollViewDelegate {
         self.goToPage(index: page, animated: true)
     }
     
-    open var currentPage: Int{
+    open var currentPage: Int {
         return Int(getCurrentPosition())
     }
     

@@ -17,7 +17,6 @@ class AdamantNodesSource: NodesSource {
         }
     }
     
-    
     // MARK: - Properties
     var nodes: [Node] {
         didSet {
@@ -34,7 +33,6 @@ class AdamantNodesSource: NodesSource {
     
     private var currentNodes: [Node] = [Node]()
     
-    
     // MARK: - Ctor
     
     init(defaultNodes: [Node]) {
@@ -42,7 +40,6 @@ class AdamantNodesSource: NodesSource {
         self.nodes = defaultNodes
         self.currentNodes = defaultNodes
     }
-    
     
     // MARK: - Functions
     
@@ -138,7 +135,7 @@ class AdamantNodesSource: NodesSource {
         
         self.apiService.getNodeVersion(url: url) { result in
             switch result {
-            case .success(_):
+            case .success:
                 testState = .passed
                 
             case .failure(let error):

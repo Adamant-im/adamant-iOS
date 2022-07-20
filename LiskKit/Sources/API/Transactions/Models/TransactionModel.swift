@@ -65,7 +65,7 @@ extension Transactions {
             hasher.combine(id)
         }
         
-        public mutating func updateConfirmations(value: UInt64){
+        public mutating func updateConfirmations(value: UInt64) {
             confirmations = value
         }
     }

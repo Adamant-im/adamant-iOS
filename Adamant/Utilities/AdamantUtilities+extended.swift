@@ -34,7 +34,6 @@ extension AdamantUtilities {
     }
 }
 
-
 // MARK: - Validating Addresses and Passphrases
 extension AdamantUtilities {
     static let addressRegexString = "^U([0-9]{6,20})$"
@@ -92,7 +91,6 @@ extension AdamantUtilities {
         return matches.count == 1
     }
 }
-
 
 // MARK: - Hex
 extension AdamantUtilities {

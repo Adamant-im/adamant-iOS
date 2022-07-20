@@ -9,7 +9,6 @@
 import UIKit
 import Swinject
 
-
 // MARK: - Adamant Scene
 struct AdamantScene {
     let identifier: String
@@ -20,7 +19,6 @@ struct AdamantScene {
         self.factory = factory
     }
 }
-
 
 // MARK: - Adamant Router
 protocol Router: AnyObject {

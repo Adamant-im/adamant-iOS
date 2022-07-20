@@ -9,7 +9,6 @@
 import UIKit
 import Eureka
 
-
 // MARK: - Localization
 extension String.adamantLocalized {
     struct nodesList {
@@ -23,7 +22,6 @@ extension String.adamantLocalized {
         private init() {}
     }
 }
-
 
 // MARK: - NodesListViewController
 class NodesListViewController: FormViewController {
@@ -62,7 +60,6 @@ class NodesListViewController: FormViewController {
         }
     }
     
-    
     // MARK: Dependencies
     var dialogService: DialogService!
     var securedStore: SecuredStore!
@@ -70,12 +67,10 @@ class NodesListViewController: FormViewController {
     var router: Router!
     var nodesSource: NodesSource!
     
-    
     // Properties
     
     private var nodes = [Node]()
     private var didResetNodesOnDissapear = false
-    
     
     // MARK: - Lifecycle
     
@@ -93,10 +88,9 @@ class NodesListViewController: FormViewController {
             navigationItem.rightBarButtonItem = done
         }
         
-        
         // MARK: Nodes
         
-        let section = Section() {
+        let section = Section {
             $0.tag = Sections.nodes.tag
         }
         
@@ -105,15 +99,14 @@ class NodesListViewController: FormViewController {
         
         form +++ section
         
-        
         // MARK: Buttons
         
-        +++ Section() {
+        +++ Section {
             $0.tag = Sections.buttons.tag
         }
         
         // Add node
-        <<< ButtonRow() {
+        <<< ButtonRow {
             $0.title = Rows.addNode.localized
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
@@ -123,11 +116,11 @@ class NodesListViewController: FormViewController {
             
         // MARK: Reset
             
-        +++ Section() {
+        +++ Section {
             $0.tag = Sections.reset.tag
         }
             
-        <<< ButtonRow() {
+        <<< ButtonRow {
             $0.title = Rows.reset.localized
         }.onCellSelection { [weak self] (_, _) in
             self?.resetToDefault()
@@ -164,7 +157,6 @@ class NodesListViewController: FormViewController {
     }
     */
 }
-
 
 // MARK: - Manipulating node list
 extension NodesListViewController {
@@ -230,7 +222,6 @@ extension NodesListViewController {
     }
 }
 
-
 // MARK: - NodeEditorDelegate
 extension NodesListViewController: NodeEditorDelegate {
     func nodeEditorViewController(_ editor: NodeEditorViewController, didFinishEditingWithResult result: NodeEditorResult) {
@@ -292,7 +283,6 @@ extension NodesListViewController: NodeEditorDelegate {
     }
 }
 
-
 // MARK: - Loading & Saving nodes
 extension NodesListViewController {
     func saveNodes() {
@@ -315,15 +305,14 @@ extension NodesListViewController {
     }
 }
 
-
 // MARK: - Tools
 extension NodesListViewController {
     private func createRowFor(node: Node, tag: String) -> BaseRow {
-        let row = NodeRow() {
+        let row = NodeRow {
             $0.value = node
             $0.tag = tag
             
-            let deleteAction = SwipeAction(style: .destructive, title: "Delete") { [weak self] (action, row, completionHandler) in
+            let deleteAction = SwipeAction(style: .destructive, title: "Delete") { [weak self] (_, row, completionHandler) in
                 if let node = row.baseValue as? Node, let index = self?.nodes.firstIndex(of: node) {
                     self?.nodes.remove(at: index)
                     self?.saveNodes()

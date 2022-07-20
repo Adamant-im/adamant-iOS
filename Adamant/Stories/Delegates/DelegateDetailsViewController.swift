@@ -17,7 +17,6 @@ extension String.adamantLocalized {
     }
 }
 
-
 // MARK: -
 class DelegateDetailsViewController: UIViewController {
     
@@ -105,12 +104,11 @@ class DelegateDetailsViewController: UIViewController {
         return formatter
     }()
     
-    private var forged: Decimal? = nil
-    private var forgingTime: TimeInterval? = nil
+    private var forged: Decimal?
+    private var forgingTime: TimeInterval?
     
     // Double error fix
-    private var prevApiError: (date: Date, error: ApiServiceError)? = nil
-    
+    private var prevApiError: (date: Date, error: ApiServiceError)?
     
     // MARK: - Lifecycle
     
@@ -133,7 +131,6 @@ class DelegateDetailsViewController: UIViewController {
         }
     }
 }
-
 
 // MARK: - TableView data & delegate
 extension DelegateDetailsViewController: UITableViewDelegate, UITableViewDataSource {
@@ -190,7 +187,6 @@ extension DelegateDetailsViewController: UITableViewDelegate, UITableViewDataSou
         }
     }
 }
-
 
 // MARK: - Cells
 extension DelegateDetailsViewController {
@@ -265,7 +261,6 @@ extension DelegateDetailsViewController {
         return cell
     }
 }
-
 
 // MARK: - Tools
 extension DelegateDetailsViewController {

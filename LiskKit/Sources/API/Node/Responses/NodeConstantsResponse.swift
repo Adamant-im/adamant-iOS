@@ -14,4 +14,3 @@ extension Node {
         public let data: NodeStatusModel
     }
 }
-

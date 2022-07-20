@@ -56,7 +56,7 @@ class AdamantSocketService: SocketService {
     }
     
     func receiveNewTransaction(completion: ((ApiServiceResult<Transaction>) -> Void)?) {
-        socket?.on("newTrans", callback: { [weak self] data, ack in
+        socket?.on("newTrans", callback: { [weak self] data, _ in
             guard let data = data.first else { return }
             guard let dict = data as? [String: Any] else { return }
             if let trans = try? JSONDecoder().decode(Transaction.self, from: JSONSerialization.data(withJSONObject: dict)),

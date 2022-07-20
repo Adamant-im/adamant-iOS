@@ -88,7 +88,6 @@ class AdamantApiService: ApiService {
     
     let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility, attributes: [.concurrent])
     
-    
     // MARK: - Init
     init() {
         NotificationCenter.default.addObserver(forName: Notification.Name.NodesSource.nodesChanged, object: nil, queue: nil) { [weak self] _ in

@@ -74,7 +74,6 @@ class KeychainStore: SecuredStore {
         NotificationCenter.default.post(name: Notification.Name.SecuredStore.securedStorePurged, object: self)
     }
     
-    
     // MARK: - Tools
     
     private static func encrypt(string: String, password: String, encoding: String.Encoding = .utf8) -> String? {

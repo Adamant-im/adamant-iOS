@@ -79,7 +79,7 @@ class NotificationsViewController: FormViewController {
         
         // MARK: Notifications
         // Type
-        let nType = ActionSheetRow<NotificationsMode>() {
+        let nType = ActionSheetRow<NotificationsMode> {
             $0.tag = Rows.notificationsMode.tag
             $0.title = Rows.notificationsMode.localized
             $0.selectorTitle = Rows.notificationsMode.localized
@@ -100,10 +100,9 @@ class NotificationsViewController: FormViewController {
         notificationsSection.append(nType)
         form.append(notificationsSection)
         
-        
         // MARK: ANS Description
         // Description
-        let descriptionRow = TextAreaRow() {
+        let descriptionRow = TextAreaRow {
             $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
             $0.tag = Rows.description.tag
         }.cellUpdate { [weak self] (cell, _) in
@@ -118,7 +117,7 @@ class NotificationsViewController: FormViewController {
         }
         
         // Github readme
-        let githubRow = LabelRow() {
+        let githubRow = LabelRow {
             $0.tag = Rows.github.tag
             $0.title = Rows.github.localized
             $0.cell.imageView?.image = #imageLiteral(resourceName: "row_github")
@@ -127,7 +126,7 @@ class NotificationsViewController: FormViewController {
             cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (_, _) in
             guard let url = URL(string: AdamantResources.ansReadmeUrl) else {
                 fatalError("Failed to build ANS URL")
             }
@@ -144,7 +143,6 @@ class NotificationsViewController: FormViewController {
         
         ansSection.append(contentsOf: [descriptionRow, githubRow])
         form.append(ansSection)
-        
         
         // MARK: Notifications
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.notificationsModeChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in

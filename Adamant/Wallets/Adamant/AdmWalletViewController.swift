@@ -83,7 +83,7 @@ class AdmWalletViewController: WalletViewControllerBase {
         
         // MARK: Rows
         
-        let buyTokensRow = LabelRow() {
+        let buyTokensRow = LabelRow {
             $0.tag = Rows.buyTokens.tag
             $0.title = Rows.buyTokens.localized
             $0.cell.imageView?.image = Rows.buyTokens.image
@@ -109,7 +109,7 @@ class AdmWalletViewController: WalletViewControllerBase {
             }
         }
         
-        let freeTokensRow = LabelRow() {
+        let freeTokensRow = LabelRow {
             $0.tag = Rows.freeTokens.tag
             $0.title = Rows.freeTokens.localized
             $0.cell.imageView?.image = Rows.freeTokens.image
@@ -163,7 +163,7 @@ class AdmWalletViewController: WalletViewControllerBase {
     }
     
     override func adressRow() -> LabelRow {
-        let addressRow = LabelRow() {
+        let addressRow = LabelRow {
             $0.tag = BaseRows.address.tag
             $0.title = BaseRows.address.localized
             $0.cell.selectionStyle = .gray
