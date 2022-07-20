@@ -68,9 +68,8 @@ extension ChatViewController: MessagesDataSource {
             switch transaction.statusEnum {
             case .failed:
                 return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.adamant.primary])
-                
             case .pending:
-                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.adamant.primary])
+                return nil
                 
             case .delivered:
                 return nil
@@ -87,6 +86,21 @@ extension ChatViewController: MessagesDataSource {
         
         if let message = message as? MessageTransaction, message.statusEnum == .failed {
             return nil
+        }
+        
+        if isFromCurrentSender(message: message),
+           let transaction = message as? ChatTransaction {
+            if case .pending = transaction.statusEnum {
+                let attachment = NSTextAttachment()
+                attachment.image = UIImage(named: "status_pending")
+                attachment.bounds = CGRect(x: 0, y: -1, width: 7, height: 7)
+                let attachmentStr = NSAttributedString(attachment: attachment)
+                
+                let mutableAttributedString = NSMutableAttributedString()
+                mutableAttributedString.append(attachmentStr)
+
+                return mutableAttributedString
+            }
         }
         
         let humanizedTime = message.sentDate.humanizedTime()
@@ -287,6 +301,16 @@ extension ChatViewController: MessagesDisplayDelegate {
         let previousMessage = dataSource.messageForItem(at: previousIndexPath, in: messagesCollectionView)
         let timeIntervalSinceLastMessage = message.sentDate.timeIntervalSince(previousMessage.sentDate)
         return timeIntervalSinceLastMessage >= self.showsDateHeaderAfterTimeInterval
+    }
+    
+    func messageHeaderView(for indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageReusableView {
+        let header = messagesCollectionView.dequeueReusableHeaderView(HeaderReusableView.self, for: indexPath)
+        if (indexPath.section == 0 && isBusy) {
+            header.setupLoadAnimating()
+        } else {
+            header.stopLoadAnimating()
+        }
+        return header
     }
 }
 
@@ -500,12 +524,12 @@ extension ChatViewController: MessagesLayoutDelegate {
             guard let transaction = message as? ChatTransaction else {
                 return 0
             }
-            
+
             switch transaction.statusEnum {
-            case .failed, .pending:
+            case .failed:
                 return 16
                 
-            case .delivered:
+            case .delivered, .pending:
                 return 0
             }
         } else {
@@ -524,10 +548,10 @@ extension ChatViewController: MessagesLayoutDelegate {
             }
             
             switch transaction.statusEnum {
-            case .failed, .pending:
+            case .failed:
                 return 0
                 
-            case .delivered:
+            case .delivered, .pending:
                 return 16
             }
         } else {
@@ -548,6 +572,14 @@ extension ChatViewController: MessagesLayoutDelegate {
             return calculator
         } else {
             return (messagesCollectionView.collectionViewLayout as! MessagesCollectionViewFlowLayout).textMessageSizeCalculator
+        }
+    }
+    
+    func headerViewSize(for section: Int, in messagesCollectionView: MessagesCollectionView) -> CGSize {
+        if (section == 0 && isNeedToLoadMoore()) {
+            return CGSize(width: messagesCollectionView.bounds.width, height: HeaderReusableView.height)
+        } else {
+            return .zero
         }
     }
 }
