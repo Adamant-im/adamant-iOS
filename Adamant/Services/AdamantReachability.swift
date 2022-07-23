@@ -8,6 +8,7 @@
 
 import Foundation
 import Reachability
+import Network
 
 // MAKR: - Convinients
 extension Reachability.Connection {
@@ -27,51 +28,39 @@ extension Reachability.Connection {
 
 // MARK: - AdamantReachability wrapper
 class AdamantReachability: ReachabilityMonitor {
-    let reachability: Reachability
-    
-    private(set) var isActive = false
-    
-    var connection: AdamantConnection {
-        return reachability.connection.adamantConnection
-    }
-    
-    init() {
-        reachability = try! Reachability() // TODO: remove force try and make safe init
-        reachability.whenReachable = { [weak self] reachability in
-            let userInfo: [String:Any] = [AdamantUserInfoKey.ReachabilityMonitor.connection:reachability.connection.adamantConnection]
-            NotificationCenter.default.post(name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: self, userInfo: userInfo)
-        }
-        
-        reachability.whenUnreachable = { [weak self] reachability in
-            let userInfo: [String:Any] = [AdamantUserInfoKey.ReachabilityMonitor.connection:reachability.connection.adamantConnection]
-            NotificationCenter.default.post(name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: self, userInfo: userInfo)
-        }
-    }
-    
-    deinit {
-        stop()
-    }
+    let monitorForWifi = NWPathMonitor(requiredInterfaceType: .wifi)
+    let monitorForCellular = NWPathMonitor(requiredInterfaceType: .cellular)
+    private var wifiStatus: NWPath.Status = .satisfied
+    private var cellularStatus: NWPath.Status = .satisfied
 
+    var connection: AdamantConnection {
+        if wifiStatus     == .satisfied     { return AdamantConnection.wifi     }
+        if cellularStatus == .satisfied     { return AdamantConnection.cellular }
+        return AdamantConnection.none
+    }
+    
     func start() {
-        guard !isActive else {
-            return
+        monitorForWifi.pathUpdateHandler = { [weak self] path in
+            self?.wifiStatus = path.status
+            let status = path.status == .satisfied ? AdamantConnection.wifi : AdamantConnection.none
+            let userInfo: [String:Any] = [AdamantUserInfoKey.ReachabilityMonitor.connection: status]
+            NotificationCenter.default.post(name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: self, userInfo: userInfo)
         }
-        
-        do {
-            try reachability.startNotifier()
-            isActive = true
-        } catch {
-            isActive = false
+        monitorForCellular.pathUpdateHandler = { [weak self] path in
+            self?.cellularStatus = path.status
+            let status = path.status == .satisfied ? AdamantConnection.cellular : AdamantConnection.none
+            let userInfo: [String:Any] = [AdamantUserInfoKey.ReachabilityMonitor.connection: status]
+            NotificationCenter.default.post(name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: self, userInfo: userInfo)
         }
+
+        let queue = DispatchQueue(label: "NetworkMonitor")
+        monitorForCellular.start(queue: queue)
+        monitorForWifi.start(queue: queue)
     }
 
     func stop() {
-        guard isActive else {
-            return
-        }
-
-        NotificationCenter.default.removeObserver(self)
-        reachability.stopNotifier()
-        isActive = false
+        monitorForWifi.cancel()
+        monitorForCellular.cancel()
     }
+    
 }

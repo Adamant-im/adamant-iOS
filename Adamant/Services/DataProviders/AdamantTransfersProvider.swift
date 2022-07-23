@@ -110,7 +110,7 @@ class AdamantTransfersProvider: TransfersProvider {
 extension AdamantTransfersProvider {
     func reload() {
         reset(notify: false)
-        
+      
         update()
     }
     
@@ -624,7 +624,22 @@ extension AdamantTransfersProvider {
         }
     }
     
-    
+    /// Search transaction in local storage
+    ///
+    /// - Parameter id: Transacton ID, context: NSManagedObjectContext
+    /// - Returns: Transaction, if found
+    func getTransfer(id: String, context: NSManagedObjectContext) -> TransferTransaction? {
+        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        
+        do {
+            let result = try context.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
     /// Call Server, check if transaction updated
     ///
     /// - Parameters:
@@ -660,6 +675,7 @@ extension AdamantTransfersProvider {
                 }
                 
                 trsfr.confirmations = transaction.confirmations
+                trsfr.blockId = transaction.blockId
                 
                 do {
                     try context.save()
@@ -872,32 +888,35 @@ extension AdamantTransfersProvider {
             } else {
                 unconfirmedsSemaphore.signal()
             }
-            
-            let transfer = TransferTransaction(context: context)
-            transfer.amount = t.amount as NSDecimalNumber
-            transfer.date = t.date as NSDate
-            transfer.fee = t.fee as NSDecimalNumber
-            transfer.height = Int64(t.height)
-            transfer.recipientId = t.recipientId
-            transfer.senderId = t.senderId
-            transfer.transactionId = String(t.id)
-            transfer.type = Int16(t.type.rawValue)
-            transfer.blockId = t.blockId
-            transfer.confirmations = t.confirmations
-            transfer.statusEnum = .delivered
-            transfer.showsChatroom = false
-            transfer.isConfirmed = true
-            transfer.chatMessageId = UUID().uuidString
-            
+            let transfer: TransferTransaction
+            if let trs = getTransfer(id: String(t.id), context: context) {
+                transfer = trs
+                transfer.confirmations = t.confirmations
+                transfer.statusEnum = .delivered
+                transfer.blockId = t.blockId
+            } else {
+                transfer = TransferTransaction(context: context)
+                transfer.amount = t.amount as NSDecimalNumber
+                transfer.date = t.date as NSDate
+                transfer.fee = t.fee as NSDecimalNumber
+                transfer.height = Int64(t.height)
+                transfer.recipientId = t.recipientId
+                transfer.senderId = t.senderId
+                transfer.transactionId = String(t.id)
+                transfer.type = Int16(t.type.rawValue)
+                transfer.blockId = t.blockId
+                transfer.confirmations = t.confirmations
+                transfer.statusEnum = .delivered
+                transfer.showsChatroom = false
+                transfer.isConfirmed = true
+                transfer.chatMessageId = UUID().uuidString
+            }
+           
             transfer.isOutgoing = t.senderId == address
             let partnerId = transfer.isOutgoing ? t.recipientId : t.senderId
             
             if let partner = partners[partnerId] {
                 transfer.partner = partner
-                
-                if let chatroom = (partner as? CoreDataAccount)?.chatroom {
-                    transfer.chatroom = chatroom
-                }
             }
             
             if t.height > height {
@@ -939,7 +958,7 @@ extension AdamantTransfersProvider {
         if context.hasChanges {
             do {
                 try context.save()
-                
+
                 // MARK: 7. Update lastTransactions
                 let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
                 DispatchQueue.main.async {
