@@ -38,6 +38,13 @@ class AdamantChatsProvider: ChatsProvider {
     private(set) var blackList: [String] = []
     private(set) var removedMessages: [String] = []
     
+    public var isChatLoaded: [String : Bool] = [:]
+    public var chatMaxMessages: [String : Int] = [:]
+    public var chatLoadedMessages: [String : Int] = [:]
+    private var connection: AdamantConnection?
+    private var isConnectedToTheInthernet = true
+    private var isRestoredConnectionToTheInthernet: (() ->())?
+    
     private(set) var isInitiallySynced: Bool = false {
         didSet {
             NotificationCenter.default.post(name: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: self, userInfo: [AdamantUserInfoKey.ChatProvider.initiallySynced : isInitiallySynced])
@@ -53,6 +60,9 @@ class AdamantChatsProvider: ChatsProvider {
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
     
     private var previousAppState: UIApplication.State?
+    
+    private(set) var roomsMaxCount: Int?
+    private(set) var roomsLoadedCount: Int?
     
     // MARK: Lifecycle
     init() {
@@ -79,7 +89,8 @@ class AdamantChatsProvider: ChatsProvider {
                 self?.dropStateData()
                 store.set(loggedAddress, for: StoreKey.chatProvider.address)
             }
-            self?.update()
+            
+            self?.getChatRooms(offset: nil, completion: nil)
             self?.connectToSocket()
         }
         
@@ -121,7 +132,31 @@ class AdamantChatsProvider: ChatsProvider {
         }
         
         NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
-            self?.previousAppState = .background
+            if self?.isInitiallySynced ?? false {
+                self?.previousAppState = .background
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
+            object: nil,
+            queue: nil
+        ) { [weak self] notification in
+            guard let connection = notification
+                .userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection
+            else {
+                return
+            }
+            self?.connection = connection
+            switch self?.connection {
+            case .some(.cellular), .some(.wifi):
+                if self?.isConnectedToTheInthernet == false {
+                    self?.isRestoredConnectionToTheInthernet?()
+                }
+                self?.isConnectedToTheInthernet = true
+            case nil, .some(.none):
+                self?.isConnectedToTheInthernet = false
+            }
         }
     }
     
@@ -172,6 +207,11 @@ extension AdamantChatsProvider {
         // Drop props
         receivedLastHeight = nil
         readedLastHeight = nil
+        roomsMaxCount = nil
+        roomsLoadedCount = nil
+        isChatLoaded.removeAll()
+        chatMaxMessages.removeAll()
+        chatLoadedMessages.removeAll()
         
         // Drop store
         securedStore.remove(StoreKey.chatProvider.address)
@@ -194,6 +234,150 @@ extension AdamantChatsProvider {
         
         // Set State
         setState(.empty, previous: prevState, notify: notify)
+    }
+    
+    func getChatRooms(offset: Int?, completion: (() ->())?) {
+        guard let address = accountService.account?.address,
+              let privateKey = accountService.keypair?.privateKey else {
+            completion?()
+            return
+        }
+        
+        let prevState = state
+        state = .updating
+        
+        let cms = DispatchSemaphore(value: 1)
+        // MARK: 3. Get transactions
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = self.stack.container.viewContext
+        
+        apiGetChatrooms(address: address, offset: offset) { [weak self] chatrooms in
+            guard let chatrooms = chatrooms else {
+                if let synced = self?.isInitiallySynced, !synced {
+                    self?.isInitiallySynced = true
+                }
+                self?.setState(.upToDate, previous: prevState)
+                completion?()
+                return
+            }
+            
+            self?.roomsMaxCount = chatrooms.count
+            
+            if let roomsLoadedCount =  self?.roomsLoadedCount {
+                self?.roomsLoadedCount = roomsLoadedCount + (chatrooms.chats?.count ?? 0)
+            } else {
+                self?.roomsLoadedCount = chatrooms.chats?.count ?? 0
+            }
+            
+            var array = Array<Transaction>()
+            chatrooms.chats?.forEach({ room in
+                if let last = room.lastTransaction {
+                    array.append(last)
+                }
+            })
+            
+            self?.processingQueue.async {
+                self?.process(messageTransactions: array,
+                              senderId: address,
+                              privateKey: privateKey,
+                              context: privateContext,
+                              contextMutatingSemaphore: cms,
+                              completion: {
+                    if let synced = self?.isInitiallySynced, !synced {
+                        self?.isInitiallySynced = true
+                    }
+                    self?.setState(.upToDate, previous: prevState)
+                    completion?()
+                })
+            }
+        }
+    }
+    
+    func apiGetChatrooms(address: String, offset: Int?, completion: ((ChatRooms?) ->())?) {
+        apiService.getChatRooms(address: address, offset: offset) { [weak self] result in
+            switch result {
+            case .success(let chatrooms):
+                completion?(chatrooms)
+            case .failure(let error):
+                switch error {
+                case .networkError:
+                    if self?.isConnectedToTheInthernet ?? false {
+                        self?.apiGetChatrooms(address: address, offset: offset) { result in
+                            completion?(result)
+                        }
+                    } else {
+                        self?.isRestoredConnectionToTheInthernet = {
+                            self?.apiGetChatrooms(address: address, offset: offset) { result in
+                                completion?(result)
+                            }
+                        }
+                    }
+                default:
+                    completion?(nil)
+                }
+            }
+        }
+    }
+    
+    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) ->())?) {
+        guard let address = accountService.account?.address,
+              let privateKey = accountService.keypair?.privateKey else {
+            completion?(0)
+            return
+        }
+        
+        let cms = DispatchSemaphore(value: 1)
+        // MARK: 3. Get transactions
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = self.stack.container.viewContext
+      
+        apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] chatroom in
+            self?.processingQueue.async {
+                self?.isChatLoaded[addressRecipient] = true
+                self?.chatMaxMessages[addressRecipient] = chatroom?.count ?? 0
+                let loadedCount = self?.chatLoadedMessages[addressRecipient] ?? 0
+                self?.chatLoadedMessages[addressRecipient] = loadedCount + (chatroom?.messages?.count ?? 0)
+                guard let transactions = chatroom?.messages,
+                      transactions.count > 0 else {
+                    completion?(0)
+                    return
+                }
+                self?.process(messageTransactions: transactions,
+                              senderId: address,
+                              privateKey: privateKey,
+                              context: privateContext,
+                              contextMutatingSemaphore: cms,
+                              completion: {
+                    completion?(transactions.count)
+                })
+            }
+        }
+    }
+    
+    func apiGetChatMessages(address: String, addressRecipient: String, offset: Int?, completion: ((ChatRooms?) ->())?) {
+        apiService.getChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] result in
+            switch result {
+            case .success(let chatroom):
+                completion?(chatroom)
+            case .failure(let error):
+                switch error {
+                case .networkError:
+                    if self?.isConnectedToTheInthernet ?? false {
+                        self?.apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { result in
+                            completion?(result)
+                        }
+                    } else {
+                        self?.isRestoredConnectionToTheInthernet = {
+                            self?.apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { result in
+                                completion?(result)
+                            }
+                        }
+                    }
+                default:
+                    completion?(nil)
+                }
+            }
+        }
     }
     
     func update() {
@@ -789,8 +973,24 @@ extension AdamantChatsProvider {
         
         return controller
     }
+    
+    /// Search transaction in local storage
+    ///
+    /// - Parameter id: Transacton ID
+    /// - Returns: Transaction, if found
+    func getTransfer(id: String, context: NSManagedObjectContext) -> TransferTransaction? {
+        let request = NSFetchRequest<TransferTransaction>(entityName: TransferTransaction.entityName)
+        request.predicate = NSPredicate(format: "transactionId == %@", String(id))
+        request.fetchLimit = 1
+        
+        do {
+            let result = try context.fetch(request)
+            return result.first
+        } catch {
+            return nil
+        }
+    }
 }
-
 
 // MARK: - Processing
 extension AdamantChatsProvider {
@@ -868,7 +1068,8 @@ extension AdamantChatsProvider {
                          senderId: String,
                          privateKey: String,
                          context: NSManagedObjectContext,
-                         contextMutatingSemaphore: DispatchSemaphore) {
+                         contextMutatingSemaphore: DispatchSemaphore,
+                         completion: (() -> ())? = nil) {
         struct DirectionedTransaction {
             let transaction: Transaction
             let isOut: Bool
@@ -908,7 +1109,11 @@ extension AdamantChatsProvider {
             for address in notFound {
                 keysGroup.enter() // Enter 1
                 
-                accountsProvider.getAccount(byAddress: address) { result in
+                let transaction = grouppedTransactions[address]?.first
+                let isOut = transaction?.isOut ?? false
+                let publicKey = isOut ? transaction?.transaction.recipientPublicKey : transaction?.transaction.senderPublicKey
+
+                accountsProvider.getAccount(byAddress: address, publicKey: publicKey ?? "") { result in
                     defer {
                         keysGroup.leave() // Exit 1
                     }
@@ -935,7 +1140,6 @@ extension AdamantChatsProvider {
             // TODO: Log this strange thing
             print("Failed to get all accounts: Needed keys:\n\(grouppedTransactions.keys.joined(separator: "\n"))\nFounded Addresses: \(partners.keys.compactMap { $0.address }.joined(separator: "\n"))")
         }
-        
         
         // MARK: 3. Process Chatrooms and Transactions
         var height: Int64 = 0
@@ -977,12 +1181,12 @@ extension AdamantChatsProvider {
                         height = chatTransaction.height
                     }
                     
-                    let trans = privateChatroom.transactions?.first(where: { message in
+                    let transactionExist = privateChatroom.transactions?.first(where: { message in
                         return (message as? ChatTransaction)?.txId == chatTransaction.txId
                     }) as? ChatTransaction
                     
                     if !trs.isOut {
-                        if trans == nil {
+                        if transactionExist == nil {
                             newMessageTransactions.append(chatTransaction)
                         }
                         
@@ -1009,16 +1213,16 @@ extension AdamantChatsProvider {
                         }
                     }
                     
-                    if trans == nil {
+                    if transactionExist == nil {
                         if (chatTransaction.blockId?.isEmpty ?? true) && (chatTransaction.amountValue ?? 0.0 > 0.0) {
                             chatTransaction.statusEnum = .pending
                         }
                         messages.insert(chatTransaction)
                     } else {
-                        trans?.height = chatTransaction.height
-                        trans?.blockId = chatTransaction.blockId
-                        trans?.confirmations = chatTransaction.confirmations
-                        trans?.statusEnum = .delivered
+                        transactionExist?.height = chatTransaction.height
+                        transactionExist?.blockId = chatTransaction.blockId
+                        transactionExist?.confirmations = chatTransaction.confirmations
+                        transactionExist?.statusEnum = .delivered
                     }
                 }
             }
@@ -1094,6 +1298,7 @@ extension AdamantChatsProvider {
             receivedLastHeight = height
         }
         highSemaphore.signal()
+        completion?()
     }
 }
 
@@ -1148,11 +1353,36 @@ extension AdamantChatsProvider {
     ///   - context: context to insert parsed transaction to
     /// - Returns: New parsed transaction
     private func chatTransaction(from transaction: Transaction, isOutgoing: Bool, publicKey: String, privateKey: String, partner: BaseAccount, context: NSManagedObjectContext) -> ChatTransaction? {
+        let messageTransaction: ChatTransaction
         guard let chat = transaction.asset.chat else {
+            if transaction.type == .send {
+                if let trs = getTransfer(id: String(transaction.id), context: context) {
+                    messageTransaction = trs
+                } else {
+                    messageTransaction = TransferTransaction(context: context)
+                }
+                messageTransaction.amount = transaction.amount as NSDecimalNumber
+                messageTransaction.date = transaction.date as NSDate
+                messageTransaction.recipientId = transaction.recipientId
+                messageTransaction.senderId = transaction.senderId
+                messageTransaction.transactionId = String(transaction.id)
+                messageTransaction.type = Int16(TransactionType.chatMessage.rawValue)
+                messageTransaction.showsChatroom = true
+                messageTransaction.height = Int64(transaction.height)
+                messageTransaction.isConfirmed = true
+                messageTransaction.isOutgoing = isOutgoing
+                messageTransaction.blockId = transaction.blockId
+                messageTransaction.confirmations = transaction.confirmations
+                messageTransaction.chatMessageId = UUID().uuidString
+                messageTransaction.fee = transaction.fee as NSDecimalNumber
+                messageTransaction.statusEnum = MessageStatus.delivered
+                messageTransaction.partner = partner
+                return messageTransaction
+            }
             return nil
         }
         
-        let messageTransaction: ChatTransaction
+        
         // MARK: Decode message, message must contain data
         if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)?.trimmingCharacters(in: .whitespacesAndNewlines) {
             if (decodedMessage.isEmpty && transaction.amount > 0) || !decodedMessage.isEmpty {
@@ -1160,9 +1390,13 @@ extension AdamantChatsProvider {
                 // MARK: Text message
                 case .message, .messageOld, .signal, .unknown:
                     if transaction.amount > 0 {
-                        let trs = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
-                        trs.comment = decodedMessage
-                        messageTransaction = trs
+                        if let trs = getTransfer(id: String(transaction.id), context: context) {
+                            messageTransaction = trs
+                        } else {
+                            let trs = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
+                            trs.comment = decodedMessage
+                            messageTransaction = trs
+                        }
                     } else {
                         let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
                         trs.message = decodedMessage

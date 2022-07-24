@@ -186,7 +186,7 @@ class AdmTransferViewController: TransferViewControllerBase {
             view.frame = prefix.frame
             $0.cell.textField.leftView = view
             $0.cell.textField.leftViewMode = .always
-            
+            $0.cell.textField.autocorrectionType = .no
             if recipientIsReadonly {
                 $0.disabled = true
 //                prefix.isEnabled = false

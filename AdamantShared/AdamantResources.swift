@@ -57,6 +57,8 @@ struct AdamantResources {
     
     // MARK: Contacts
     struct contacts {
+        static let adamantWelcomeWallet = "U00000000000000000001"
+        
         static let adamantBountyWallet = "U15423595369615486571"
         static let adamantBountyWalletPK = "cdab95b082b9774bd975677c868261618c7ce7bea97d02e0f56d483e30c077b6"
         

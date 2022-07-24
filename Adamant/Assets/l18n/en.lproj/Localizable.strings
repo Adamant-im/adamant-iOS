@@ -76,6 +76,9 @@
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Welcome to ADAMANT";
 
+/* System accounts: ADAMANT Bounty */
+"Accounts.AdamantBounty" = "ADAMANT Bounty Wallet";
+
 /* System accounts: ADAMANT iOS Support */
 "Accounts.iOSSupport" = "ADAMANT iOS Support";
 

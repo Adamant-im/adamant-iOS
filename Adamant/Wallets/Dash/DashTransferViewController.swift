@@ -181,6 +181,7 @@ class DashTransferViewController: TransferViewControllerBase {
         let row = TextRow() {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
+            $0.cell.textField.autocorrectionType = .no
             
             if let recipient = recipientAddress {
                 $0.value = recipient

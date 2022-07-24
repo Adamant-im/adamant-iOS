@@ -204,7 +204,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             if let transaction = transaction {
                 if transaction.senderAddress.count == 0 {
                     $0.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
-                } else if let senderName = self?.senderName {
+                } else if let senderName = self?.senderName?.checkAndReplaceSystemWallets() {
                     $0.value = DoubleDetail(first: senderName, second: transaction.senderAddress)
                 } else {
                     $0.value = DoubleDetail(first: transaction.senderAddress, second: nil)
@@ -236,7 +236,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             if let transaction = self?.transaction {
                 if transaction.senderAddress.count == 0 {
                     row.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
-                } else if let senderName = self?.senderName {
+                } else if let senderName = self?.senderName?.checkAndReplaceSystemWallets() {
                     row.value = DoubleDetail(first: senderName, second: transaction.senderAddress)
                 } else {
                     row.value = DoubleDetail(first: transaction.senderAddress, second: nil)
@@ -255,7 +255,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.cell.titleLabel.text = Rows.to.localized
             
             if let transaction = transaction {
-                if let recipientName = self?.recipientName {
+                if let recipientName = self?.recipientName?.checkAndReplaceSystemWallets() {
                     $0.value = DoubleDetail(first: recipientName, second: transaction.recipientAddress)
                 } else {
                     $0.value = DoubleDetail(first: transaction.recipientAddress, second: nil)

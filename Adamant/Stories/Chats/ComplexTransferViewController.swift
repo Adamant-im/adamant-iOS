@@ -38,7 +38,7 @@ class ComplexTransferViewController: UIViewController {
         view.backgroundColor = UIColor.white
         
         if let partner = partner {
-            navigationItem.title = partner.name ?? partner.address
+            navigationItem.title = partner.name?.checkAndReplaceSystemWallets() ?? partner.address
         }
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
@@ -96,7 +96,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         let vc = service.transferViewController()
         if let v = vc as? TransferViewControllerBase {
             if let address = partner?.address {
-                let name = partner?.name
+                let name = partner?.name?.checkAndReplaceSystemWallets()
                 v.admReportRecipient = address
                 v.recipientIsReadonly = true
                 v.commentsEnabled = service.commentsEnabledForRichMessages
