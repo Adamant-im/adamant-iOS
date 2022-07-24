@@ -101,7 +101,6 @@ class AdamantNodesSource: NodesSource {
     }
     
     func nodesUpdate() {
-        migrate()
         healthCheckService.healthCheck()
         saveNodes()
         sendNodesUpdateNotification()
@@ -124,14 +123,6 @@ class AdamantNodesSource: NodesSource {
             object: self,
             userInfo: [:]
         )
-    }
-    
-    private func migrate() {
-        nodes.forEach { node in
-            if node.host == "185.231.245.26", node.port == 36666 {
-                node.host = "23.226.231.225"
-            }
-        }
     }
     
     private func saveNodes() {

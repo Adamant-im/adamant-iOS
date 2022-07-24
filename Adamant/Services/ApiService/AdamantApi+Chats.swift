@@ -131,18 +131,11 @@ extension AdamantApiService {
         if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
         queryItems.append(URLQueryItem(name: "limit", value: "20"))
         
-        // MARK: 2. Build endpoint
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Chats.getChatRooms + "/\(address)", queryItems: queryItems)
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        // MARK: 3. Send
-        sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ChatRooms>) in
+        // MARK: 2. Send
+        sendRequest(
+            path: ApiCommands.Chats.getChatRooms + "/\(address)",
+            queryItems: queryItems
+        ) { (serverResponse: ApiServiceResult<ChatRooms>) in
             switch serverResponse {
             case .success(let response):
                 completion(.success(response))
@@ -159,18 +152,11 @@ extension AdamantApiService {
         if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
         queryItems.append(URLQueryItem(name: "limit", value: "50"))
         
-        // MARK: 2. Build endpoint
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Chats.getChatRooms + "/\(address)/\(addressRecipient)", queryItems: queryItems)
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        // MARK: 3. Send
-        sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ChatRooms>) in
+        // MARK: 2. Send
+        sendRequest(
+            path: ApiCommands.Chats.getChatRooms + "/\(address)/\(addressRecipient)",
+            queryItems: queryItems
+        ) { (serverResponse: ApiServiceResult<ChatRooms>) in
             switch serverResponse {
             case .success(let response):
                 completion(.success(response))
