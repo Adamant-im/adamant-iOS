@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "Alamofire",
-        "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
-        "state": {
-          "branch": null,
-          "revision": "d120af1e8638c7da36c8481fd61a66c0c08dc4fc",
-          "version": "5.4.4"
-        }
-      },
-      {
         "package": "BigInt",
         "repositoryURL": "https://github.com/attaswift/BigInt.git",
         "state": {
@@ -47,57 +38,12 @@
         }
       },
       {
-        "package": "DateToolsSwift",
-        "repositoryURL": "https://github.com/maniramezan/DateTools.git",
-        "state": {
-          "branch": "mani_swiftpm_5_3",
-          "revision": "b7f0415ecb9a2b684fc53a2e4093fc09d368356a",
-          "version": null
-        }
-      },
-      {
         "package": "Debugging",
         "repositoryURL": "https://github.com/vapor/debugging.git",
         "state": {
           "branch": null,
           "revision": "fc5a27d6eb236141dc24e5f14eedaa2e035ae7b3",
           "version": "1.1.1"
-        }
-      },
-      {
-        "package": "EFQRCode",
-        "repositoryURL": "https://github.com/EFPrefix/EFQRCode.git",
-        "state": {
-          "branch": null,
-          "revision": "4a72d79f9cae6d2f189f768178cc8594b427c190",
-          "version": "6.1.0"
-        }
-      },
-      {
-        "package": "Eureka",
-        "repositoryURL": "https://github.com/xmartlabs/Eureka.git",
-        "state": {
-          "branch": null,
-          "revision": "975e8d5e0ea3c86aff828537b2d4abe4430d6312",
-          "version": "5.3.4"
-        }
-      },
-      {
-        "package": "KeychainAccess",
-        "repositoryURL": "https://github.com/kishikawakatsumi/KeychainAccess.git",
-        "state": {
-          "branch": null,
-          "revision": "84e546727d66f1adc5439debad16270d0fdd04e7",
-          "version": "4.2.2"
-        }
-      },
-      {
-        "package": "MarkdownKit",
-        "repositoryURL": "https://github.com/bmoliveira/MarkdownKit.git",
-        "state": {
-          "branch": null,
-          "revision": "5056f3305d3499f44d8815530d560b87082e0cf5",
-          "version": "1.7.1"
         }
       },
       {
@@ -110,24 +56,6 @@
         }
       },
       {
-        "package": "Parchment",
-        "repositoryURL": "https://github.com/rechsteiner/Parchment",
-        "state": {
-          "branch": "main",
-          "revision": "cad6924f8a292eecaedc1bdefb57006f7979b9eb",
-          "version": null
-        }
-      },
-      {
-        "package": "ProcedureKit",
-        "repositoryURL": "https://github.com/ProcedureKit/ProcedureKit.git",
-        "state": {
-          "branch": null,
-          "revision": "a7fa565e648d90083c7f10c0c6be9bf249dcdbde",
-          "version": "5.2.0"
-        }
-      },
-      {
         "package": "PromiseKit",
         "repositoryURL": "https://github.com/mxcl/PromiseKit.git",
         "state": {
@@ -137,39 +65,12 @@
         }
       },
       {
-        "package": "QRCodeReader",
-        "repositoryURL": "https://github.com/yannickl/QRCodeReader.swift.git",
-        "state": {
-          "branch": null,
-          "revision": "5020b5a47199d8ba80c83a4b4fafd70e9dc9dc7f",
-          "version": "10.1.1"
-        }
-      },
-      {
         "package": "Random",
         "repositoryURL": "https://github.com/vapor-community/random.git",
         "state": {
           "branch": null,
           "revision": "d7c4397d125caba795d14d956efacfe2a27a63d0",
           "version": "1.2.0"
-        }
-      },
-      {
-        "package": "Reachability",
-        "repositoryURL": "https://github.com/ashleymills/Reachability.swift",
-        "state": {
-          "branch": null,
-          "revision": "c01bbdf2d633cf049ae1ed1a68a2020a8bda32e2",
-          "version": "5.1.0"
-        }
-      },
-      {
-        "package": "RNCryptor",
-        "repositoryURL": "https://github.com/RNCryptor/RNCryptor.git",
-        "state": {
-          "branch": null,
-          "revision": "5e3bbf44f08bf90049537cb8902d8f4fa911a79a",
-          "version": "5.1.0"
         }
       },
       {
@@ -206,24 +107,6 @@
           "branch": null,
           "revision": "4f9164a0a2c9a6a7ff53a2833d54a5c79c957342",
           "version": "0.9.1"
-        }
-      },
-      {
-        "package": "swift_qrcodejs",
-        "repositoryURL": "https://github.com/ApolloZhu/swift_qrcodejs.git",
-        "state": {
-          "branch": null,
-          "revision": "374dc7f7b9e76c6aeb393f6a84590c6d387e1ecb",
-          "version": "2.2.2"
-        }
-      },
-      {
-        "package": "Swinject",
-        "repositoryURL": "https://github.com/Swinject/Swinject.git",
-        "state": {
-          "branch": null,
-          "revision": "8a76d2c74bafbb455763487cc6a08e91bad1f78b",
-          "version": "2.7.1"
         }
       },
       {
