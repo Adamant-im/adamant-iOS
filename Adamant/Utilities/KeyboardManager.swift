@@ -141,7 +141,7 @@ open class KeyboardManager: NSObject, UIGestureRecognizerDelegate {
         guard let superview = inputAccessoryView.superview else {
             fatalError("`inputAccessoryView` must have a superview")
         }
-        let tabBarHeight = tabBar?.bounds.size.height ?? 0
+        let tabBarHeight = isMacOS ? 0 : tabBar?.bounds.size.height ?? 0
         self.inputAccessoryView = inputAccessoryView
         inputAccessoryView.translatesAutoresizingMaskIntoConstraints = false
         constraints = NSLayoutConstraintSet(

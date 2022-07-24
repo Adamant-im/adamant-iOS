@@ -25,6 +25,7 @@ extension String.adamantLocalized {
 
 class ChatListViewController: UIViewController {
     let cellIdentifier = "cell"
+    let loadingCellIdentifier = "loadingCell"
     let cellHeight: CGFloat = 76.0
     
     // MARK: Dependencies
@@ -70,6 +71,8 @@ class ChatListViewController: UIViewController {
         return parser
     }()
     
+    private var defaultSeparatorInstets: UIEdgeInsets?
+    
     // MARK: Busy indicator
     
     @IBOutlet weak var busyBackgroundView: UIView!
@@ -77,6 +80,7 @@ class ChatListViewController: UIViewController {
     @IBOutlet weak var busyIndicatorLabel: UILabel!
     
     private(set) var isBusy: Bool = true
+    private var lastSystemChatPositionRow: Int?
     
     // MARK: Keyboard
     // SplitView sends double notifications about keyboard.
@@ -104,6 +108,7 @@ class ChatListViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
+        tableView.register(LoadingTableViewCell.self, forCellReuseIdentifier: loadingCellIdentifier)
         tableView.refreshControl = refreshControl
         
         if self.accountService.account != nil {
@@ -157,6 +162,7 @@ class ChatListViewController: UIViewController {
             if let synced = notification.userInfo?[AdamantUserInfoKey.ChatProvider.initiallySynced] as? Bool {
                 self?.didLoadedMessages?()
                 self?.setIsBusy(!synced)
+                self?.tableView.reloadData()
             } else if let synced = self?.chatsProvider.isInitiallySynced {
                 self?.setIsBusy(!synced)
             } else {
@@ -349,6 +355,9 @@ class ChatListViewController: UIViewController {
 extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let f = chatsController?.fetchedObjects {
+            if f.count > 0 {
+                return isBusy ? f.count + 1 : f.count
+            }
             return f.count
         } else {
             return 0
@@ -359,12 +368,24 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         return cellHeight
     }
     
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return cellHeight
+    }
+    
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         return UIView()
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let chatroom = chatsController?.object(at: indexPath) {
+        if isBusy,
+           indexPath.row == lastSystemChatPositionRow,
+           let cell = tableView.cellForRow(at: indexPath),
+           let _ = cell as? LoadingTableViewCell {
+            tableView.deselectRow(at: indexPath, animated: true)
+            return
+        }
+        let nIndexPath = isBusy && indexPath.row >= (lastSystemChatPositionRow ?? 0) ? IndexPath(row: indexPath.row - 1, section: 0) : indexPath
+        if let chatroom = chatsController?.object(at: nIndexPath) {
             let vc = chatViewController(for: chatroom)
             
             if let split = self.splitViewController {
@@ -384,6 +405,12 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
 // MARK: - UITableView Cells
 extension ChatListViewController {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if isBusy && indexPath.row == lastSystemChatPositionRow {
+            let cell = tableView.dequeueReusableCell(withIdentifier: loadingCellIdentifier, for: indexPath) as! LoadingTableViewCell
+            cell.startLoadAnimating()
+            return cell
+        }
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! ChatTableViewCell
         
         cell.accessoryType = .disclosureIndicator
@@ -399,9 +426,46 @@ extension ChatListViewController {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if let cell = cell as? ChatTableViewCell, let chat = chatsController?.object(at: indexPath) {
-            configureCell(cell, for: chat)
+        if isBusy,
+           indexPath.row == lastSystemChatPositionRow,
+           let cell = cell as? LoadingTableViewCell {
+            configureCell(cell)
+        } else if let cell = cell as? ChatTableViewCell {
+            let nIndexPath = isBusy && indexPath.row >= (lastSystemChatPositionRow ?? 0) ? IndexPath(row: indexPath.row - 1, section: 0) : indexPath
+            if let chat = chatsController?.object(at: nIndexPath) {
+                configureCell(cell, for: chat)
+            }
+            if isBusy,
+               indexPath.row == (lastSystemChatPositionRow ?? 0) - 1 {
+                cell.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0)
+            } else {
+                if let defaultSeparatorInstets = defaultSeparatorInstets {
+                    cell.separatorInset = defaultSeparatorInstets
+                } else {
+                    defaultSeparatorInstets = cell.separatorInset
+                }
+            }
         }
+        
+        guard let roomsLoadedCount = chatsProvider.roomsLoadedCount,
+              let roomsMaxCount = chatsProvider.roomsMaxCount,
+              roomsLoadedCount < roomsMaxCount,
+              roomsMaxCount > 0,
+              !isBusy,
+              tableView.numberOfRows(inSection: 0) >= roomsLoadedCount,
+              let lastVisibleIndexPath = tableView.indexPathsForVisibleRows,
+              lastVisibleIndexPath.contains(IndexPath(row: tableView.numberOfRows(inSection: 0) - 3, section: 0))
+        else {
+            return
+        }
+        
+        isBusy = true
+        insertReloadRow()
+        loadNewChats(offset: roomsLoadedCount)
+    }
+    
+    private func configureCell(_ cell: LoadingTableViewCell) {
+        cell.startLoadAnimating()
     }
     
     private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
@@ -410,10 +474,12 @@ extension ChatListViewController {
                 cell.accountLabel.text = title
             } else if let name = partner.name {
                 cell.accountLabel.text = name
+            } else if let address = partner.address,
+                      let name = self.addressBook.addressBook[address] {
+                cell.accountLabel.text = name.checkAndReplaceSystemWallets()
             } else {
                 cell.accountLabel.text = partner.address
             }
-            
             if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
                 cell.avatarImage = avatar
                 cell.avatarImageView.tintColor = UIColor.adamant.primary
@@ -452,18 +518,48 @@ extension ChatListViewController {
             cell.dateLabel.text = nil
         }
     }
+    
+    private func insertReloadRow() {
+        lastSystemChatPositionRow = getBottomSystemChatIndex()
+        DispatchQueue.main.async { [weak self] in
+            if #available(iOS 11.0, *) {
+                self?.tableView.performBatchUpdates {
+                    self?.tableView.insertRows(at: [
+                        IndexPath(row: self?.lastSystemChatPositionRow ?? 0, section: 0)
+                    ], with: .none)
+                    self?.tableView.reloadRows(at: [IndexPath(row: (self?.lastSystemChatPositionRow ?? 0) - 1, section: 0)], with: .none)
+                }
+            } else {
+                self?.tableView.beginUpdates()
+                self?.tableView.insertRows(at: [IndexPath(row: self?.lastSystemChatPositionRow ?? 0, section: 0)], with: .none)
+                self?.tableView.reloadRows(at: [IndexPath(row: (self?.lastSystemChatPositionRow ?? 0) - 1, section: 0)], with: .none)
+                self?.tableView.endUpdates()
+            }
+        }
+    }
+    
+    private func loadNewChats(offset: Int) {
+        chatsProvider.getChatRooms(offset: offset, completion: { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+                self?.isBusy = false
+                self?.tableView.reloadData()
+            })
+        })
+    }
 }
 
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension ChatListViewController: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        if isBusy { return }
         if controller == chatsController {
             tableView.beginUpdates()
         }
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        if isBusy { return }
         switch controller {
         case let c where c == chatsController:
             tableView.endUpdates()
@@ -477,6 +573,7 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        if isBusy { return }
         switch controller {
         // MARK: Chats controller
         case let c where c == chatsController:
@@ -883,6 +980,23 @@ extension ChatListViewController {
         }
         
         return vc.chatroom
+    }
+    
+    /// First system botoom chat index
+    func getBottomSystemChatIndex() -> Int {
+        var index = 0
+        try? chatsController?.performFetch()
+        chatsController?.fetchedObjects?.enumerated().forEach({ (i, room) in
+            guard index == 0,
+                  let date = room.updatedAt as? Date,
+                  date == Date.adamantNullDate
+            else {
+                return
+            }
+            index = i
+        })
+
+        return index
     }
 }
 

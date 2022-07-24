@@ -680,6 +680,9 @@ class AccountViewController: FormViewController {
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !initiated {
             layoutTableHeaderView()
             layoutTableFooterView()
+            if !initiated {
+                initiated = true
+            }
         }
         
         pagingViewController?.indicatorColor = UIColor.adamant.primary

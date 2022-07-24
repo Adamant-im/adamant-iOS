@@ -63,7 +63,7 @@ extension Transaction: Codable {
         self.senderId = try container.decode(String.self, forKey: .senderId)
         self.recipientId = (try? container.decode(String.self, forKey: .recipientId)) ?? ""
         self.recipientPublicKey = try? container.decode(String.self, forKey: .recipientPublicKey)
-        self.signature = try container.decode(String.self, forKey: .signature)
+        self.signature = (try? container.decode(String.self, forKey: .signature)) ?? ""
         self.confirmations = (try? container.decode(Int64.self, forKey: .confirmations)) ?? 0
         self.requesterPublicKey = try? container.decode(String.self, forKey: .requesterPublicKey)
         self.signSignature = try? container.decode(String.self, forKey: .signSignature)
