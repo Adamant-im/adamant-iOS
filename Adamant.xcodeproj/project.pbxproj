@@ -14,13 +14,13 @@
 		3AE89DD92837F5BF0051D3A9 /* ChatRooms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE89DD82837F5BF0051D3A9 /* ChatRooms.swift */; };
 		3AE89DDB2837F5D30051D3A9 /* ChatRoomsChats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE89DDA2837F5D30051D3A9 /* ChatRoomsChats.swift */; };
 		3C06931576393125C61FB8F6 /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */; };
-		550066C5284D65DB0044C0B1 /* HealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C4284D65DB0044C0B1 /* HealthCheckService.swift */; };
-		550066C7284D682D0044C0B1 /* AdamantHealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */; };
 		41935848287841E20083363B /* MacOSDeterminer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41935847287841E20083363B /* MacOSDeterminer.swift */; };
 		41E857A42847ADA200BC0783 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E857A32847ADA200BC0783 /* AdamantSecret.swift */; };
 		41E857A52847ADA200BC0783 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E857A32847ADA200BC0783 /* AdamantSecret.swift */; };
 		41E857A62847ADA200BC0783 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E857A32847ADA200BC0783 /* AdamantSecret.swift */; };
 		41E857A72847ADA200BC0783 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E857A32847ADA200BC0783 /* AdamantSecret.swift */; };
+		550066C5284D65DB0044C0B1 /* HealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C4284D65DB0044C0B1 /* HealthCheckService.swift */; };
+		550066C7284D682D0044C0B1 /* AdamantHealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */; };
 		553B1284281C6EE100FFF24C /* GCDUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 553B1283281C6EE100FFF24C /* GCDUtilites.swift */; };
 		5558A436282AAFCC0024DDD6 /* AdamantApi+Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */; };
 		5558A438282AB9390024DDD6 /* NodeStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5558A437282AB9390024DDD6 /* NodeStatus.swift */; };
@@ -28,6 +28,8 @@
 		557AC308287B1365004699D7 /* CheckmarkRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557AC307287B1365004699D7 /* CheckmarkRowView.swift */; };
 		55D1D84F287B78F200F94A4E /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 55D1D84E287B78F200F94A4E /* SnapKit */; };
 		55D1D851287B78FC00F94A4E /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 55D1D850287B78FC00F94A4E /* SnapKit */; };
+		55D1D853287B88BD00F94A4E /* AddressGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D1D852287B88BD00F94A4E /* AddressGenerator.swift */; };
+		55D1D855287B890300F94A4E /* AddressGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D1D854287B890300F94A4E /* AddressGeneratorTests.swift */; };
 		55E69E172868D7920025D82E /* CheckmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55E69E162868D7920025D82E /* CheckmarkView.swift */; };
 		6403F5DB2272389800D58779 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		6403F5DE22723C6800D58779 /* DashMainnet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5DD22723C6800D58779 /* DashMainnet.swift */; };
@@ -631,6 +633,8 @@
 		5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Status.swift"; sourceTree = "<group>"; };
 		5558A437282AB9390024DDD6 /* NodeStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeStatus.swift; sourceTree = "<group>"; };
 		557AC307287B1365004699D7 /* CheckmarkRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckmarkRowView.swift; sourceTree = "<group>"; };
+		55D1D852287B88BD00F94A4E /* AddressGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressGenerator.swift; sourceTree = "<group>"; };
+		55D1D854287B890300F94A4E /* AddressGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressGeneratorTests.swift; sourceTree = "<group>"; };
 		55E69E162868D7920025D82E /* CheckmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckmarkView.swift; sourceTree = "<group>"; };
 		6403F5DD22723C6800D58779 /* DashMainnet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashMainnet.swift; sourceTree = "<group>"; };
 		6403F5DF22723F6400D58779 /* DashWalletRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashWalletRouter.swift; sourceTree = "<group>"; };
@@ -1561,6 +1565,7 @@
 				6406D74C21CE3AC100196713 /* KeyboardManager.swift */,
 				649E9A142111B3C200686B01 /* Mnemonic+extended.swift */,
 				E96D64C92295C4A800CA5587 /* WordList.swift */,
+				55D1D852287B88BD00F94A4E /* AddressGenerator.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -1949,6 +1954,7 @@
 				E9C51ECE200E2D1100385EB7 /* FeeTests.swift */,
 				E95F85742007E4790070534A /* HexAndBytesUtilitiesTest.swift */,
 				E95F85B6200A4D8F0070534A /* TestTools.swift */,
+				55D1D854287B890300F94A4E /* AddressGeneratorTests.swift */,
 				E9EC344820066D4A00C0E546 /* Info.plist */,
 			);
 			path = AdamantTests;
@@ -2646,6 +2652,7 @@
 				E9240BF5215D686500187B09 /* AdmWalletService+RichMessageProvider.swift in Sources */,
 				648C697122915CB8006645F5 /* BTCRPCServerResponce.swift in Sources */,
 				E9A174B32057EC47003667CD /* BackgroundFetchService.swift in Sources */,
+				55D1D853287B88BD00F94A4E /* AddressGenerator.swift in Sources */,
 				649D6BE821B95DB7009E727B /* LskWalletService+RichMessageProvider.swift in Sources */,
 				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
 				E923222621135F9000A7E5AF /* EthAccount.swift in Sources */,
@@ -2837,6 +2844,7 @@
 				E96D64BE2295C06400CA5587 /* JSAdamantCore.swift in Sources */,
 				E95F85752007E4790070534A /* HexAndBytesUtilitiesTest.swift in Sources */,
 				E95F85712007D98D0070534A /* CurrencyFormatterTests.swift in Sources */,
+				55D1D855287B890300F94A4E /* AddressGeneratorTests.swift in Sources */,
 				E96D64C12295C06400CA5587 /* JSAdamantCoreTests.swift in Sources */,
 				E96D64C22295C06400CA5587 /* NativeCoreTests.swift in Sources */,
 				E950652120404BF0008352E5 /* AdamantUriBuilding.swift in Sources */,
@@ -2936,9 +2944,9 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/Debug.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 202;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
@@ -2953,7 +2961,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.MessageNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev ext MessageNotification";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "ADAMANT Messenger Dev ext MessageNotification Mac";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
@@ -3118,9 +3126,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Debug;
 				CODE_SIGN_ENTITLEMENTS = Adamant/Debug.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 202;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = ADM.Dev;
@@ -3135,7 +3143,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "e4233bbf-3705-44fe-95b0-e77475672c60";
-				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "ADAMANT Messenger Dev Mac";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
@@ -3181,9 +3189,9 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = TransferNotificationContentExtension/Debug.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 202;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
@@ -3198,7 +3206,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.TransferNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev ext TransferNotification";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "ADAMANT Messenger Dev ext TransferNotification Mac";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
@@ -3245,9 +3253,9 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/Debug.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 202;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
@@ -3262,7 +3270,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.NotificationServiceExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "ADAMANT Messenger Dev ext NotificationService";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "ADAMANT Messenger Dev ext NotificationService Maco";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;

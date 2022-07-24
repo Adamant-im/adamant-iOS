@@ -161,9 +161,6 @@ protocol AccountService: AnyObject {
     func update()
     func update(_ completion: ((AccountServiceResult) -> Void)?)
     
-    /// Create new account with passphrase.
-    func createAccountWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
-    
     /// Login into Adamant using passphrase.
     func loginWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
     
