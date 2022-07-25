@@ -126,11 +126,13 @@ private extension Node.Status {
     }
 }
 
+private struct NodeHeightsInterval {
+    let range: ClosedRange<Int>
+    var count: Int
+}
+
 private func getActualNodeHeightsRange(heights: [Int]) -> ClosedRange<Int>? {
-    struct NodeHeightsInterval {
-        let range: ClosedRange<Int>
-        var count: Int
-    }
+    guard heights.count > 2 else { return heights.max().map { $0...$0 } }
     
     let heights = heights.sorted()
     var bestInterval: NodeHeightsInterval?
