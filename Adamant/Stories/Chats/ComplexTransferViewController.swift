@@ -34,8 +34,6 @@ class ComplexTransferViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.white
-        
         if let partner = partner {
             navigationItem.title = partner.name?.checkAndReplaceSystemWallets() ?? partner.address
         }
@@ -61,10 +59,22 @@ class ComplexTransferViewController: UIViewController {
         view.addSubview(pagingViewController.view)
         view.constrainToEdges(pagingViewController.view, relativeToSafeArea: true)
         addChild(pagingViewController)
+        
+        updateTheme()
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateTheme()
+    }
+    
+    func updateTheme() {
+        view.backgroundColor = UIColor.adamant.backgroundColor
+        pagingViewController.backgroundColor = UIColor.adamant.backgroundColor
+        pagingViewController.menuBackgroundColor = UIColor.adamant.backgroundColor
     }
     
     @objc

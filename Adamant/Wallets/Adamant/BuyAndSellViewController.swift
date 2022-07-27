@@ -88,6 +88,12 @@ class BuyAndSellViewController: FormViewController {
         section.append(coinRow)
         
         form.append(section)
+        
+        updateTheme()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateTheme()
     }
     
     // MARK: - Tools
@@ -151,5 +157,10 @@ class BuyAndSellViewController: FormViewController {
                 }
             }
         }
+    }
+    
+    func updateTheme() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }

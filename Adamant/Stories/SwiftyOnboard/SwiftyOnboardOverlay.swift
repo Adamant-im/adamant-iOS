@@ -14,6 +14,7 @@ open class SwiftyOnboardOverlay: UIView {
         let pageControl = UIPageControl()
         pageControl.currentPage = 0
         pageControl.pageIndicatorTintColor = UIColor.lightGray
+        pageControl.currentPageIndicatorTintColor = UIColor.adamant.textColor
         return pageControl
     }()
     
@@ -21,6 +22,7 @@ open class SwiftyOnboardOverlay: UIView {
         let button = UIButton(type: .system)
         button.setTitle("Continue", for: .normal)
         button.contentHorizontalAlignment = .center
+        button.setTitleColor(UIColor.adamant.active, for: .normal)
         return button
     }()
     
@@ -28,6 +30,7 @@ open class SwiftyOnboardOverlay: UIView {
         let button = UIButton(type: .system)
         button.setTitle("Skip", for: .normal)
         button.contentHorizontalAlignment = .right
+        button.setTitleColor(UIColor.adamant.active, for: .normal)
         return button
     }()
     
@@ -50,9 +53,9 @@ open class SwiftyOnboardOverlay: UIView {
     }
     
     open func set(style: SwiftyOnboardStyle) {
-        continueButton.setTitleColor(style.color, for: .normal)
-        skipButton.setTitleColor(style.color, for: .normal)
-        pageControl.currentPageIndicatorTintColor = style.color
+//        continueButton.setTitleColor(style.color, for: .normal)
+//        skipButton.setTitleColor(style.color, for: .normal)
+//        pageControl.currentPageIndicatorTintColor = style.color
     }
     
     open func page(count: Int) {

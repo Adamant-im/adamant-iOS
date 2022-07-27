@@ -331,6 +331,17 @@ class LoginViewController: FormViewController {
             vc.loginWithBiometry()
             vc.firstTimeActive = false
         }
+        
+        updateTheme()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateTheme()
+    }
+    
+    private func updateTheme() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }
 

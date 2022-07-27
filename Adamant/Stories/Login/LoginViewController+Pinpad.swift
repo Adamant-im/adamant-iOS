@@ -20,6 +20,16 @@ extension LoginViewController {
             pinpad.commentLabel.isHidden = false
             pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
+            pinpad.backgroundView.backgroundColor = UIColor.adamant.backgroundColor
+            pinpad.buttonsBackgroundColor = UIColor.adamant.backgroundColor
+            pinpad.view.subviews.forEach { view in
+                view.subviews.forEach { _view in
+                    if _view.backgroundColor == .white {
+                        _view.backgroundColor = UIColor.adamant.backgroundColor
+                    }
+                }
+            }
+            pinpad.commentLabel.backgroundColor = UIColor.adamant.backgroundColor
             self?.present(pinpad, animated: true, completion: nil)
         }
     }

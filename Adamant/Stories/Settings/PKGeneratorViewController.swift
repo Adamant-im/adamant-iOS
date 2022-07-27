@@ -127,6 +127,17 @@ class PKGeneratorViewController: FormViewController {
         passphraseSection.append(contentsOf: [alertRow, passphraseRow, generateButton])
         
         form.append(contentsOf: [pkSection, passphraseSection])
+        
+        updateTheme()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateTheme()
+    }
+    
+    func updateTheme() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
     
     // MARK: - PrivateKey tools

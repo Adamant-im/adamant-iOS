@@ -10,15 +10,26 @@ import UIKit
 
 class EulaViewController: UIViewController {
     
+    // MARK: Outlets
+    @IBOutlet weak var eulaTextView: UITextView!
+    @IBOutlet var buttons: [UIButton]!
+    
     var onAccept: (()->Void)?
     var onDecline: (()->Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         title = NSLocalizedString("EULA.Title", comment: "")
 
-        view.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "stripeBg"))
+        updateTheme()
+    }
+    
+    private func updateTheme() {
+        buttons.forEach { btn in
+            btn.setTitleColor(UIColor.adamant.textColor, for: .normal)
+        }
+        eulaTextView.textColor = UIColor.adamant.textColor
+        view.backgroundColor = UIColor.adamant.welcomeBackgroundColor
     }
     
     @IBAction func handleAccept() {

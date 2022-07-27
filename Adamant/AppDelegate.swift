@@ -120,8 +120,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 tabBarAppearance.configureWithDefaultBackground()
                 UITabBar.appearance().standardAppearance = tabBarAppearance
 
+                let navigationBarAppearance = UINavigationBarAppearance()
+                navigationBarAppearance.configureWithDefaultBackground()
+                UINavigationBar.appearance().standardAppearance = navigationBarAppearance
+                        
                 if #available(iOS 15.0, *) {
                     UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+                    UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
                 }
             }
             

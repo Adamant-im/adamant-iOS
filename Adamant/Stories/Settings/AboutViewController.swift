@@ -320,6 +320,12 @@ class AboutViewController: FormViewController {
                         url: Rows.twitter.localizedUrl,
                         image: Rows.twitter.image)
         */
+        
+        updateTheme()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateTheme()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -328,6 +334,11 @@ class AboutViewController: FormViewController {
         if let indexPath = tableView.indexPathForSelectedRow {
             tableView.deselectRow(at: indexPath, animated: animated)
         }
+    }
+    
+    private func updateTheme() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }
 

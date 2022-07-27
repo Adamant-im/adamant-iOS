@@ -64,7 +64,13 @@ class OnboardViewController: UIViewController {
         
         onboarding.delegate = self
         onboarding.dataSource = self
-        onboarding.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "stripeBg"))//UIColor.adamant.background
+        updateTheme()
+    }
+    
+    private func updateTheme() {
+        agreeSwitch?.onTintColor = UIColor.adamant.switchColor
+        onboarding.backgroundColor = UIColor.adamant.welcomeBackgroundColor
+        view.backgroundColor = UIColor.adamant.welcomeBackgroundColor
     }
     
     @objc func handleSkip() {

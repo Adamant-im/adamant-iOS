@@ -123,6 +123,12 @@ class DelegateDetailsViewController: UIViewController {
         } else {
             navigationItem.title = String.adamantLocalized.delegateDetails.title
         }
+        
+        updateTheme()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateTheme()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -131,6 +137,11 @@ class DelegateDetailsViewController: UIViewController {
         if let indexPath = tableView.indexPathForSelectedRow {
             tableView.deselectRow(at: indexPath, animated: true)
         }
+    }
+    
+    private func updateTheme() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }
 
@@ -206,7 +217,7 @@ extension DelegateDetailsViewController {
         } else {
             cell = UITableViewCell(style: .value1, reuseIdentifier: cellIdentifier)
         }
-        
+        cell.backgroundColor = UIColor.adamant.cellColor
         cell.textLabel?.text = row.localized
         cell.accessoryType = .none
         cell.imageView?.image = row.image

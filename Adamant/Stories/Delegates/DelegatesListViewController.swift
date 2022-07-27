@@ -127,6 +127,12 @@ class DelegatesListViewController: UIViewController {
         // Keyboard
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        updateTheme()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateTheme()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -210,6 +216,11 @@ class DelegatesListViewController: UIViewController {
             bar.becomeFirstResponder()
         }
     }
+    
+    private func updateTheme() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
+    }
 }
 
 
@@ -249,6 +260,7 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
         
         let checkedDelegate = checkedDelegateFor(indexPath: indexPath)
         let delegate = checkedDelegate.delegate
+        cell.backgroundColor = UIColor.adamant.cellColor
         
         cell.nameLabel.text = delegate.username
         cell.rankLabel.text = String(delegate.rank)

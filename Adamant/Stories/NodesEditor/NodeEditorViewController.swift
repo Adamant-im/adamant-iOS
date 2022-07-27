@@ -219,6 +219,12 @@ class NodeEditorViewController: FormViewController {
                 self?.deleteNode()
             }
         }
+        
+        updateTheme()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateTheme()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -227,6 +233,11 @@ class NodeEditorViewController: FormViewController {
         if !didCallDelegate {
             done()
         }
+    }
+    
+    private func updateTheme() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }
 

@@ -46,6 +46,15 @@ class SearchResultsViewController: UITableViewController {
         }
         
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: "resultCell")
+        updateTheme()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateTheme()
+    }
+    
+    func updateTheme() {
+        view.backgroundColor = UIColor.adamant.backgroundColor
     }
     
     func updateResult(contacts: [Chatroom]?, messages: [MessageTransaction]?, searchText: String) {

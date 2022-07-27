@@ -110,6 +110,7 @@ class ChatListViewController: UIViewController {
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         tableView.register(LoadingTableViewCell.self, forCellReuseIdentifier: loadingCellIdentifier)
         tableView.refreshControl = refreshControl
+        tableView.backgroundColor = .clear
         
         if self.accountService.account != nil {
             initFetchedRequestControllers(provider: chatsProvider)
@@ -173,10 +174,16 @@ class ChatListViewController: UIViewController {
         // Keyboard
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        updateTheme()
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateTheme()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -348,6 +355,10 @@ class ChatListViewController: UIViewController {
             UIView.animate(withDuration: 0.2, animations: animations, completion: completion)
         }
     }
+    
+    func updateTheme() {
+        view.backgroundColor = UIColor.adamant.backgroundColor
+    }
 }
 
 
@@ -466,9 +477,11 @@ extension ChatListViewController {
     
     private func configureCell(_ cell: LoadingTableViewCell) {
         cell.startLoadAnimating()
+        cell.backgroundColor = .clear
     }
     
     private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
+        cell.backgroundColor = .clear
         if let partner = chatroom.partner {
             if let title = chatroom.title {
                 cell.accountLabel.text = title

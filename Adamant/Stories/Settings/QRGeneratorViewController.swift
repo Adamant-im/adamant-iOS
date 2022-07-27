@@ -147,6 +147,12 @@ class QRGeneratorViewController: FormViewController {
         }.onCellSelection { [weak self] (cell, row) in
             self?.generateQr()
         }
+        
+        updateTheme()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateTheme()
     }
     
     override func insertAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
@@ -163,6 +169,11 @@ class QRGeneratorViewController: FormViewController {
         } else {
             dialogService.showSuccess(withMessage: String.adamantLocalized.alert.done)
         }
+    }
+    
+    private func updateTheme() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }
 

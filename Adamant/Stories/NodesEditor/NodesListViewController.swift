@@ -132,6 +132,12 @@ class NodesListViewController: FormViewController {
         }.onCellSelection { [weak self] (_, _) in
             self?.resetToDefault()
         }
+        
+        updateTheme()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateTheme()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -149,6 +155,11 @@ class NodesListViewController: FormViewController {
         if navigationController == nil && nodes.count == 0 && !didResetNodesOnDissapear {
             loadDefaultNodes(showAlert: true)
         }
+    }
+    
+    private func updateTheme() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
     
     /*

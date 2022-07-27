@@ -305,9 +305,20 @@ class TransferViewControllerBase: FormViewController {
                                                     row.updateCell()
                                                 }
         })
+        
+        updateTheme()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateTheme()
     }
     
     // MARK: - Form constructors
+    
+    func updateTheme() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
+    }
     
     func walletSection() -> Section {
         let section = Section(Sections.wallet.localized) {
