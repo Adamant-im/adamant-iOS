@@ -62,7 +62,7 @@ final class AdamantHealthCheckService: HealthCheckService {
         }
     }
     
-    private func updateNodesAvailability() {
+    func updateNodesAvailability() {
         let workingNodes = nodes.filter { $0.isWorking }
         
         let actualHeightsRange = getActualNodeHeightsRange(
@@ -164,10 +164,6 @@ private func getActualNodeHeightsRange(heights: [Int]) -> ClosedRange<Int>? {
         
         if currentInterval.count >= bestInterval?.count ?? 0 {
             bestInterval = currentInterval
-        }
-        
-        if bestInterval?.count ?? 0 >= heights.count - i {
-            break
         }
     }
     

@@ -22,6 +22,7 @@
 		550066C5284D65DB0044C0B1 /* HealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C4284D65DB0044C0B1 /* HealthCheckService.swift */; };
 		550066C7284D682D0044C0B1 /* AdamantHealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */; };
 		551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E528959A5200DE5D69 /* LoadingView.swift */; };
+		551F66E82895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */; };
 		553B1284281C6EE100FFF24C /* GCDUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 553B1283281C6EE100FFF24C /* GCDUtilites.swift */; };
 		5558A436282AAFCC0024DDD6 /* AdamantApi+Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */; };
 		5558A438282AB9390024DDD6 /* NodeStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5558A437282AB9390024DDD6 /* NodeStatus.swift */; };
@@ -631,6 +632,7 @@
 		550066C4284D65DB0044C0B1 /* HealthCheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthCheckService.swift; sourceTree = "<group>"; };
 		550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantHealthCheckService.swift; sourceTree = "<group>"; };
 		551F66E528959A5200DE5D69 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantHealthCheckServiceTests.swift; sourceTree = "<group>"; };
 		553B1283281C6EE100FFF24C /* GCDUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCDUtilites.swift; sourceTree = "<group>"; };
 		5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Status.swift"; sourceTree = "<group>"; };
 		5558A437282AB9390024DDD6 /* NodeStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeStatus.swift; sourceTree = "<group>"; };
@@ -1958,6 +1960,7 @@
 				E95F85742007E4790070534A /* HexAndBytesUtilitiesTest.swift */,
 				E95F85B6200A4D8F0070534A /* TestTools.swift */,
 				55D1D854287B890300F94A4E /* AddressGeneratorTests.swift */,
+				551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */,
 				E9EC344820066D4A00C0E546 /* Info.plist */,
 			);
 			path = AdamantTests;
@@ -2849,6 +2852,7 @@
 				E95F85752007E4790070534A /* HexAndBytesUtilitiesTest.swift in Sources */,
 				E95F85712007D98D0070534A /* CurrencyFormatterTests.swift in Sources */,
 				55D1D855287B890300F94A4E /* AddressGeneratorTests.swift in Sources */,
+				551F66E82895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift in Sources */,
 				E96D64C12295C06400CA5587 /* JSAdamantCoreTests.swift in Sources */,
 				E96D64C22295C06400CA5587 /* NativeCoreTests.swift in Sources */,
 				E950652120404BF0008352E5 /* AdamantUriBuilding.swift in Sources */,
@@ -2960,7 +2964,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.6.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.MessageNotificationContentExtension";
@@ -2992,7 +2996,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.6.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.MessageNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3143,7 +3147,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "e4233bbf-3705-44fe-95b0-e77475672c60";
@@ -3175,7 +3179,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "bedd1b75-2f23-4a85-a0b2-14c424fcff42";
@@ -3205,7 +3209,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.6.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.TransferNotificationContentExtension";
@@ -3237,7 +3241,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.6.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.TransferNotificationContentExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3269,7 +3273,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.6.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger-dev.NotificationServiceExtension";
@@ -3301,7 +3305,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.6.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "im.adamant.adamant-messenger.NotificationServiceExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3324,6 +3328,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = AdamantTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3346,6 +3351,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = AdamantTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
