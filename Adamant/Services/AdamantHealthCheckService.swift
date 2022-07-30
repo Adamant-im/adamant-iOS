@@ -24,10 +24,14 @@ final class AdamantHealthCheckService: HealthCheckService {
     
     weak var delegate: HealthCheckDelegate?
     private var healthCheckIndex = 0
+    private let semaphore = DispatchSemaphore(value: 1)
     
     // MARK: - Tools
     
     func getPreferredNode(fastest: Bool, needWS: Bool) -> Node? {
+        defer { semaphore.signal() }
+        semaphore.wait()
+        
         let allowedNodes = nodes.filter {
             $0.connectionStatus == .allowed
                 && (!needWS || $0.status?.wsEnabled ?? false)
@@ -46,6 +50,9 @@ final class AdamantHealthCheckService: HealthCheckService {
     }
     
     func healthCheck() {
+        defer { semaphore.signal() }
+        semaphore.wait()
+        
         let healthCheckIndex = healthCheckIndex + 1
         self.healthCheckIndex = healthCheckIndex
         updateNodesAvailability()
@@ -70,7 +77,9 @@ final class AdamantHealthCheckService: HealthCheckService {
             } ?? .synchronizing
         }
         
-        delegate?.healthCheckUpdate()
+        DispatchQueue.global().async { [weak delegate] in
+            delegate?.healthCheckUpdate()
+        }
     }
     
     private func updateNodeStatus(node: Node, healthCheckIndex: Int) {

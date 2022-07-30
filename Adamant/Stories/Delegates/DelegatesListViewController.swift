@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SnapKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -66,7 +67,7 @@ class DelegatesListViewController: UIViewController {
     private var forcedUpdateTimer: Timer? = nil
     
     private var searchController: UISearchController?
-    
+    private var loadingView: LoadingView?
     private var originalInsets: UIEdgeInsets?
     private var didShow: Bool = false
 
@@ -122,6 +123,7 @@ class DelegatesListViewController: UIViewController {
         
         // MARK: Load data
 //        refreshControl.beginRefreshing() // Nasty glitches
+        setupLoadingView()
         handleRefresh(refreshControl)
         
         // Keyboard
@@ -201,6 +203,7 @@ class DelegatesListViewController: UIViewController {
             DispatchQueue.main.async {
                 refreshControl.endRefreshing()
                 self.updateVotePanel()
+                self.removeLoadingView()
             }
         }
     }
@@ -419,6 +422,30 @@ extension DelegatesListViewController {
             self.newVotesLabel.textColor = newVotesColor
             self.totalVotesLabel.textColor = totalVotesColor
         }
+    }
+    
+    private func setupLoadingView() {
+        let loadingView = LoadingView()
+        view.addSubview(loadingView)
+        loadingView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
+        loadingView.startAnimating()
+        
+        self.loadingView = loadingView
+    }
+    
+    private func removeLoadingView() {
+        guard loadingView != nil else { return }
+        
+        UIView.animate(
+            withDuration: 0.25,
+            animations: { [weak loadingView] in loadingView?.alpha = .zero },
+            completion: { [weak loadingView] _ in
+                loadingView?.removeFromSuperview()
+                loadingView = nil
+            }
+        )
     }
 }
 
