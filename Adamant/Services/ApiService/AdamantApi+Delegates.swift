@@ -178,12 +178,7 @@ extension AdamantApiService {
         ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Delegate>>) in
             switch serverResponse {
             case .success(let delegates):
-                if let delegates = delegates.collection {
-                    completion(.success(delegates))
-                } else {
-                    completion(.failure(.serverError(error: "No delegates")))
-                }
-                
+                completion(.success(delegates.collection ?? []))
             case .failure(let error):
                 completion(.failure(.networkError(error: error)))
             }

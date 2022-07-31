@@ -12,6 +12,7 @@ import MessageInputBar
 import CoreData
 import SafariServices
 import ProcedureKit
+import SnapKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -203,14 +204,8 @@ class ChatViewController: MessagesViewController {
     
     // MARK: Busy indicator
     
-    private var busyBackgroundView: UIView?
-    private var spinner = UIActivityIndicatorView(style: .whiteLarge)
-    var isBusy = false
-    
-    //MARK: Background UI
-    private let amadantLogoImageView: UIImageView = {
-        return UIImageView(image: UIImage(named: "Adamant-logo"))
-    }()
+    private(set) var isBusy = false
+    private var loadingView: LoadingView?
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -1071,24 +1066,21 @@ private class StatusUpdateProcedure: Procedure {
 
 // MARK: - Busy Indicator View
 extension ChatViewController {
-    func setupBusyBackgroundView() {
-        busyBackgroundView = UIView()
-        busyBackgroundView?.backgroundColor = UIColor(white: 0, alpha: 0.1)
-        busyBackgroundView?.frame = view.frame
-        view.addSubview(busyBackgroundView!)
+    func setupLoadingView() {
+        let loadingView = LoadingView()
+        view.addSubview(loadingView)
+        loadingView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
         
-        spinner.translatesAutoresizingMaskIntoConstraints = false
-        spinner.startAnimating()
-        busyBackgroundView?.addSubview(spinner)
-        spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        loadingView.startAnimating()
+        self.loadingView = loadingView
     }
     
     func setBusyIndicator(state: Bool) {
         isBusy = state
-        if busyBackgroundView == nil && state {
-            setBackgroundUI()
-            setupBusyBackgroundView()
+        if loadingView == nil && state {
+            setupLoadingView()
             messagesCollectionView.alpha = 0.0
             messageInputBar.sendButton.isEnabled = false
             messageInputBar.inputTextView.isEditable = false
@@ -1096,7 +1088,7 @@ extension ChatViewController {
         }
         
         if !state {
-            if busyBackgroundView != nil {
+            if loadingView != nil {
                 reloadTopSectionIfNeeded()
             }
             
@@ -1112,11 +1104,10 @@ extension ChatViewController {
             }
             
             UIView.animate(withDuration: 0.25, delay: 0.25) { [weak self] in
-                self?.busyBackgroundView?.backgroundColor = .clear
                 self?.messagesCollectionView.alpha = 1.0
-                self?.amadantLogoImageView.alpha = 0.0
+                self?.loadingView?.alpha = 0.0
             } completion: { [weak self] _ in
-                self?.busyBackgroundView?.removeFromSuperview()
+                self?.loadingView?.removeFromSuperview()
             }
         }
     }
@@ -1193,18 +1184,6 @@ extension ChatViewController {
             return true
         }
         return false
-    }
-}
-
-// MARK: - Background UI
-extension ChatViewController {
-    func setBackgroundUI() {
-        amadantLogoImageView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(amadantLogoImageView)
-        amadantLogoImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        amadantLogoImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
-        amadantLogoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        amadantLogoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
 }
 

@@ -21,6 +21,7 @@
 		41E857A72847ADA200BC0783 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E857A32847ADA200BC0783 /* AdamantSecret.swift */; };
 		550066C5284D65DB0044C0B1 /* HealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C4284D65DB0044C0B1 /* HealthCheckService.swift */; };
 		550066C7284D682D0044C0B1 /* AdamantHealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */; };
+		551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E528959A5200DE5D69 /* LoadingView.swift */; };
 		553B1284281C6EE100FFF24C /* GCDUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 553B1283281C6EE100FFF24C /* GCDUtilites.swift */; };
 		5558A436282AAFCC0024DDD6 /* AdamantApi+Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */; };
 		5558A438282AB9390024DDD6 /* NodeStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5558A437282AB9390024DDD6 /* NodeStatus.swift */; };
@@ -629,6 +630,7 @@
 		4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.release.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.release.xcconfig"; sourceTree = "<group>"; };
 		550066C4284D65DB0044C0B1 /* HealthCheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthCheckService.swift; sourceTree = "<group>"; };
 		550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantHealthCheckService.swift; sourceTree = "<group>"; };
+		551F66E528959A5200DE5D69 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		553B1283281C6EE100FFF24C /* GCDUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCDUtilites.swift; sourceTree = "<group>"; };
 		5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Status.swift"; sourceTree = "<group>"; };
 		5558A437282AB9390024DDD6 /* NodeStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeStatus.swift; sourceTree = "<group>"; };
@@ -1938,6 +1940,7 @@
 				649D6BEB21BD5A53009E727B /* UISuffixTextField.swift */,
 				55E69E162868D7920025D82E /* CheckmarkView.swift */,
 				557AC307287B1365004699D7 /* CheckmarkRowView.swift */,
+				551F66E528959A5200DE5D69 /* LoadingView.swift */,
 			);
 			path = SharedViews;
 			sourceTree = "<group>";
@@ -2671,6 +2674,7 @@
 				644EC34F20EFA77A00F40C73 /* Delegate.swift in Sources */,
 				64EAB37622463F680018D9B2 /* AdamantCurrencyInfoService.swift in Sources */,
 				E9722068201F42CC004F2AAD /* InMemoryCoreDataStack.swift in Sources */,
+				551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */,
 				E98FC34420F920BD00032D65 /* UIFont+adamant.swift in Sources */,
 				644EC35720EFAAB700F40C73 /* DelegatesListViewController.swift in Sources */,
 				E9C51EF12013F18000385EB7 /* NewChatViewController.swift in Sources */,
