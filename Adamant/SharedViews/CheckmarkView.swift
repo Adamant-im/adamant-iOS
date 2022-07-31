@@ -7,18 +7,9 @@
 //
 
 import UIKit
+import SnapKit
 
 final class CheckmarkView: UIView {
-    var borderColor: UIColor? {
-        get { imageBackgroundView.layer.borderColor.map { UIColor(cgColor: $0) } }
-        set { imageBackgroundView.layer.borderColor = newValue?.cgColor }
-    }
-    
-    var imageColor: UIColor {
-        get { imageView.tintColor }
-        set { imageView.tintColor = newValue }
-    }
-    
     var image: UIImage? {
         get { imageView.image }
         set { imageView.image = newValue }
@@ -31,10 +22,16 @@ final class CheckmarkView: UIView {
         let view = UIView()
         view.layer.borderWidth = 1
         view.layer.cornerRadius = checkmarkSize / 2
+        view.layer.borderColor = UIColor.adamant.secondary.cgColor
         return view
     }()
     
-    private lazy var imageView = UIImageView()
+    private lazy var imageView: UIImageView = {
+        let view = UIImageView()
+        view.tintColor = .adamant.primary
+        return view
+    }()
+    
     private lazy var checkmarkContainer = UIView()
     
     override init(frame: CGRect) {
@@ -45,20 +42,6 @@ final class CheckmarkView: UIView {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupView()
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        checkmarkContainer.frame = CGRect(
-            x: (bounds.width - checkmarkSize) / 2,
-            y: (bounds.height - checkmarkSize) / 2,
-            width: checkmarkSize,
-            height: checkmarkSize
-        )
-        
-        imageBackgroundView.frame = checkmarkContainer.bounds
-        imageView.frame = checkmarkContainer.bounds
     }
     
     override func draw(_ rect: CGRect) {
@@ -74,11 +57,23 @@ final class CheckmarkView: UIView {
     }
     
     private func setupView() {
-        backgroundColor = .clear
-        addSubview(checkmarkContainer)
-        checkmarkContainer.addSubview(imageBackgroundView)
-        checkmarkContainer.addSubview(imageView)
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap)))
+        
+        addSubview(checkmarkContainer)
+        checkmarkContainer.snp.makeConstraints {
+            $0.size.equalTo(checkmarkSize)
+            $0.center.equalToSuperview()
+        }
+        
+        checkmarkContainer.addSubview(imageBackgroundView)
+        imageBackgroundView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
+        
+        checkmarkContainer.addSubview(imageView)
+        imageView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
     }
     
     @objc private func onTap() {
@@ -106,7 +101,6 @@ final class CheckmarkView: UIView {
             delay: .zero,
             options: [.allowAnimatedContent],
             animations: { [self] in
-                guard isChecked else { return }
                 imageView.transform = CGAffineTransform.identity
                 imageBackgroundView.alpha = .zero
             }
@@ -125,7 +119,6 @@ final class CheckmarkView: UIView {
             delay: .zero,
             options: [.allowAnimatedContent],
             animations: { [self] in
-                guard !isChecked else { return }
                 imageView.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
                 imageBackgroundView.alpha = 1
             },
