@@ -31,10 +31,6 @@ class AdamantNodesSource: NodesSource {
     
     var nodes: [Node] = [] {
         didSet {
-            if nodes.isEmpty {
-                nodes = defaultNodesGetter()
-            }
-            
             healthCheckService.nodes = nodes
             nodesUpdate()
         }
@@ -103,7 +99,6 @@ class AdamantNodesSource: NodesSource {
     func nodesUpdate() {
         healthCheckService.healthCheck()
         saveNodes()
-        sendNodesUpdateNotification()
     }
     
     func healthCheck() {
@@ -163,7 +158,7 @@ class AdamantNodesSource: NodesSource {
 }
 
 extension AdamantNodesSource: HealthCheckDelegate {
-    func healthCheckFinished() {
+    func healthCheckUpdate() {
         sendNodesUpdateNotification()
     }
 }

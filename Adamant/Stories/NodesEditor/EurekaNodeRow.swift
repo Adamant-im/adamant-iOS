@@ -11,8 +11,14 @@ import Eureka
 
 class NodeCell: Cell<NodeCell.Model>, CellType {
     struct Model: Equatable {
+        enum NodeActivity {
+            case webSockets
+            case rest
+        }
+        
         let node: Node
         let nodeUpdate: () -> Void
+        let nodeActivity: (Node) -> Set<NodeActivity>
         
         static func == (lhs: Self, rhs: Self) -> Bool {
             lhs.node == rhs.node
@@ -24,26 +30,28 @@ class NodeCell: Cell<NodeCell.Model>, CellType {
     @IBOutlet weak var descriptionView: UILabel!
     @IBOutlet weak var titleView: UILabel!
     
+    private var model: NodeCell.Model? { row.value }
+    
     public override func update() {
         indicatorView.tintColor = .green
         checkmarkView.image = #imageLiteral(resourceName: "status_success")
         checkmarkView.imageColor = .adamant.primary
         checkmarkView.borderColor = .adamant.secondary
-        
-        let model = row.value
-        
         checkmarkView.setIsChecked(model?.node.isEnabled ?? false, animated: true)
-        checkmarkView.onCheckmarkTap = { [weak checkmarkView] in
-            guard let newValue = (checkmarkView?.isChecked).map({ !$0 }) else {
+        checkmarkView.onCheckmarkTap = { [weak self] in
+            guard let newValue = (self?.checkmarkView?.isChecked).map({ !$0 }) else {
                 return
             }
             
-            model?.node.isEnabled = newValue
-            model?.nodeUpdate()
+            self?.model?.node.isEnabled = newValue
+            self?.model?.nodeUpdate()
         }
         
         titleView.text = model?.node.asString()
         indicatorView.textColor = getIndicatorColor(status: model?.node.connectionStatus)
+        indicatorView.text = ["●", makeActivitiesString()]
+            .compactMap { $0 }
+            .joined(separator: " ")
         
         let descriptionStrings = [
             model?.node.statusString,
@@ -51,6 +59,22 @@ class NodeCell: Cell<NodeCell.Model>, CellType {
         ]
         
         descriptionView.text = descriptionStrings.compactMap { $0 }.joined(separator: " ")
+    }
+    
+    private func makeActivitiesString() -> String? {
+        guard let model = model else { return nil }
+        let activities = model.nodeActivity(model.node)
+        
+        guard !activities.isEmpty else { return nil }
+        
+        return activities.map { activity in
+            switch activity {
+            case .webSockets:
+                return "ws"
+            case .rest:
+                return model.node.scheme.rawValue
+            }
+        }.sorted().joined(separator: ", ")
     }
 }
 

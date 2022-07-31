@@ -15,11 +15,20 @@ class AdamantSocketService: SocketService {
     
     weak var nodesSource: NodesSource! {
         didSet {
-            refreshURL()
+            refreshNode()
         }
     }
     
     // MARK: - Properties
+    
+    private(set) var currentNode: Node? {
+        didSet {
+            currentUrl = currentNode?.asSocketURL()
+            
+            guard oldValue !== currentNode else { return }
+            sendCurrentNodeUpdateNotification()
+        }
+    }
     
     private var currentUrl: URL? {
         didSet {
@@ -51,7 +60,7 @@ class AdamantSocketService: SocketService {
             object: nil,
             queue: nil
         ) { [weak self] _ in
-            self?.refreshURL()
+            self?.refreshNode()
         }
     }
     
@@ -87,8 +96,8 @@ class AdamantSocketService: SocketService {
         manager = nil
     }
     
-    private func refreshURL() {
-        currentUrl = nodesSource?.getPreferredNode(needWS: true)?.asSocketURL()
+    private func refreshNode() {
+        currentNode = nodesSource.getPreferredNode(needWS: true)
     }
     
     private func handleTransaction(data: [Any]) {
@@ -107,5 +116,13 @@ class AdamantSocketService: SocketService {
         defaultResponseDispatchQueue.async { [currentHandler] in
             currentHandler?(.success(trans))
         }
+    }
+    
+    private func sendCurrentNodeUpdateNotification() {
+        NotificationCenter.default.post(
+            name: Notification.Name.SocketService.currentNodeUpdate,
+            object: self,
+            userInfo: nil
+        )
     }
 }

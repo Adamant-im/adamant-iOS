@@ -70,13 +70,36 @@ class NodesListViewController: FormViewController {
     
     var dialogService: DialogService!
     var securedStore: SecuredStore!
-    var apiService: ApiService!
     var router: Router!
     var nodesSource: NodesSource!
+    
+    var apiService: ApiService! {
+        didSet {
+            currentRestNode = apiService.currentNode
+        }
+    }
+    
+    var socketService: SocketService! {
+        didSet {
+            currentSocketsNode = socketService.currentNode
+        }
+    }
     
     // Properties
     
     private var timer: Timer?
+    
+    private var currentSocketsNode: Node? {
+        didSet {
+            updateNodesRows()
+        }
+    }
+    
+    private var currentRestNode: Node? {
+        didSet {
+            updateNodesRows()
+        }
+    }
     
     // MARK: - Lifecycle
     
@@ -102,6 +125,26 @@ class NodesListViewController: FormViewController {
         ) { [weak self] _ in
             DispatchQueue.onMainAsync {
                 self?.updateNodesRows()
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.ApiService.currentNodeUpdate,
+            object: nil,
+            queue: nil
+        ) { [weak self] notification in
+            DispatchQueue.onMainAsync {
+                self?.currentRestNode = self?.apiService.currentNode
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.SocketService.currentNodeUpdate,
+            object: nil,
+            queue: nil
+        ) { [weak self] notification in
+            DispatchQueue.onMainAsync {
+                self?.currentSocketsNode = self?.socketService.currentNode
             }
         }
     }
@@ -379,6 +422,19 @@ extension NodesListViewController {
             node: node,
             nodeUpdate: { [weak nodesSource] in
                 nodesSource?.nodesUpdate()
+            },
+            nodeActivity: { [weak self] node in
+                var activities = Set<NodeCell.Model.NodeActivity>()
+                
+                if self?.currentRestNode === node {
+                    activities.insert(.rest)
+                }
+                
+                if self?.currentSocketsNode === node {
+                    activities.insert(.webSockets)
+                }
+                
+                return activities
             }
         )
     }

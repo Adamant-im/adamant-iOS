@@ -9,7 +9,7 @@
 import Foundation
 
 protocol HealthCheckDelegate: AnyObject {
-    func healthCheckFinished()
+    func healthCheckUpdate()
 }
 
 protocol HealthCheckService: AnyObject {

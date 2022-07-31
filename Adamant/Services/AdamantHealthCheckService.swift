@@ -48,59 +48,41 @@ final class AdamantHealthCheckService: HealthCheckService {
     func healthCheck() {
         let healthCheckIndex = healthCheckIndex + 1
         self.healthCheckIndex = healthCheckIndex
-        
         updateNodesAvailability()
-        let group = DispatchGroup()
 
         nodes.filter { $0.isEnabled }.forEach { node in
-            group.enter()
-            updateNodeStatus(
-                node: node,
-                healthCheckIndex: healthCheckIndex,
-                completion: group.leave
-            )
-        }
-
-        group.notify(queue: .global(qos: .utility)) { [weak self] in
-            guard healthCheckIndex == self?.healthCheckIndex else { return }
-            self?.delegate?.healthCheckFinished()
+            updateNodeStatus(node: node, healthCheckIndex: healthCheckIndex)
         }
     }
     
     private func updateNodesAvailability() {
         let workingNodes = nodes.filter { $0.isWorking }
         
-        guard let actualHeightsRange = getActualNodeHeightsRange(
+        let actualHeightsRange = getActualNodeHeightsRange(
             heights: workingNodes.compactMap { $0.status?.height }
-        ) else {
-            return
-        }
+        )
         
         for node in workingNodes {
             node.connectionStatus = node.status?.height.map { height in
-                actualHeightsRange.contains(height)
+                actualHeightsRange?.contains(height) ?? false
                     ? .allowed
                     : .synchronizing
             } ?? .synchronizing
         }
+        
+        delegate?.healthCheckUpdate()
     }
     
-    private func updateNodeStatus(
-        node: Node,
-        healthCheckIndex: Int,
-        completion: @escaping () -> Void
-    ) {
+    private func updateNodeStatus(node: Node, healthCheckIndex: Int) {
         guard let nodeURL = node.asURL() else {
             node.connectionStatus = .offline
             node.status = nil
-            completion()
             return
         }
         
         let startTimestamp = Date().timeIntervalSince1970
         
         apiService.getNodeStatus(url: nodeURL) { [weak self] result in
-            defer { completion() }
             guard healthCheckIndex == self?.healthCheckIndex else { return }
             
             switch result {
@@ -144,11 +126,13 @@ private extension Node.Status {
     }
 }
 
+private struct NodeHeightsInterval {
+    let range: ClosedRange<Int>
+    var count: Int
+}
+
 private func getActualNodeHeightsRange(heights: [Int]) -> ClosedRange<Int>? {
-    struct NodeHeightsInterval {
-        let range: ClosedRange<Int>
-        var count: Int
-    }
+    guard heights.count > 2 else { return heights.max().map { $0...$0 } }
     
     let heights = heights.sorted()
     var bestInterval: NodeHeightsInterval?
