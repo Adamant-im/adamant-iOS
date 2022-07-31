@@ -34,8 +34,8 @@ extension String {
 
     func getLegacyAdamantAddress() -> AdamantAddress? {
         let address: String?
-        var name: String? = nil
-        var message: String? = nil
+        var name: String?
+        var message: String?
         
         if let uri = AdamantUriTools.decode(uri: self) {
             switch uri {
@@ -54,7 +54,7 @@ extension String {
                     }
                 }
                 
-            case .passphrase(_):
+            case .passphrase:
                 address = nil
             }
         } else {

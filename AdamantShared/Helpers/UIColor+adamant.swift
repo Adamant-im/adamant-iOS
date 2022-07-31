@@ -46,11 +46,9 @@ extension UIColor {
         /// Partner chat bubble background, ~8% gray
         static let chatSenderBackground = UIColor(red: 0.925, green: 0.925, blue: 0.925, alpha: 1)
         
-        
         // MARK: Pinpad
         /// Pinpad highligh button background, 12% gray
         static let pinpadHighlightButton = UIColor(red: 0.88, green: 0.88, blue: 0.88, alpha: 1)
-        
         
         // MARK: Transfers
         /// Income transfer icon background, light green

@@ -9,7 +9,6 @@
 import Foundation
 import CoreData
 
-
 // MARK: - Provider
 class AdamantAccountsProvider: AccountsProvider {
     struct KnownContact {
@@ -43,10 +42,8 @@ class AdamantAccountsProvider: AccountsProvider {
     var apiService: ApiService!
     var addressBookService: AddressBookService!
     
-    
     // MARK: Properties
     private let knownContacts: [String:KnownContact]
-    
     
     // MARK: Lifecycle
     init() {
@@ -78,7 +75,7 @@ class AdamantAccountsProvider: AccountsProvider {
             AdamantContacts.donate.address: donate,
             
             AdamantContacts.adamantWelcomeWallet.address: welcome,
-            AdamantContacts.adamantWelcomeWallet.name: welcome,
+            AdamantContacts.adamantWelcomeWallet.name: welcome
         ]
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.addressBookUpdated, object: nil, queue: nil) { [weak self] notification in
@@ -130,7 +127,6 @@ class AdamantAccountsProvider: AccountsProvider {
         }
     }
     
-    
     // MARK: Threading
     private let queue = DispatchQueue(label: "im.adamant.accounts.getAccount", qos: .utility, attributes: [.concurrent])
     
@@ -161,7 +157,7 @@ class AdamantAccountsProvider: AccountsProvider {
         request.fetchLimit = 1
         request.predicate = predicate
         
-        var acc: BaseAccount? = nil
+        var acc: BaseAccount?
         
         if let context = context {
             // viewContext only on MainThread
@@ -186,12 +182,11 @@ class AdamantAccountsProvider: AccountsProvider {
         case let dummy as DummyAccount:
             return .dummy(dummy)
             
-        case .some(_), nil:
+        case .some, nil:
             return .notFound
         }
     }
 }
-
 
 // MARK: - Getting account info from API
 extension AdamantAccountsProvider {
@@ -213,7 +208,7 @@ extension AdamantAccountsProvider {
             let account = self.getAccount(byPredicate: NSPredicate(format: "address == %@", address))
             
             switch account {
-            case .core(_), .dummy(_): completion(true)
+            case .core, .dummy: completion(true)
             case .notFound: return completion(false)
             }
         }
@@ -552,7 +547,6 @@ extension AdamantAccountsProvider {
         
         coreAccount.chatroom = chatroom
         
-        
         if let acc = knownContacts[account.address] {
             coreAccount.name = acc.name
             coreAccount.avatar = acc.avatar
@@ -595,7 +589,6 @@ extension AdamantAccountsProvider {
         return coreAccount
     }
 }
-
 
 // MARK: - Dummy
 extension AdamantAccountsProvider {

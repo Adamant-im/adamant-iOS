@@ -30,4 +30,3 @@ extension AdamantScene {
         private init() {}
     }
 }
-

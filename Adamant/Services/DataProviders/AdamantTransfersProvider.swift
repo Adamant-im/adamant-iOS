@@ -48,7 +48,7 @@ class AdamantTransfersProvider: TransfersProvider {
         
         if notify {
             switch prevState {
-            case .failedToUpdate(_):
+            case .failedToUpdate:
                 NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
                                                                                                                      AdamantUserInfoKey.TransfersProvider.prevState: prevState])
                 
@@ -60,7 +60,6 @@ class AdamantTransfersProvider: TransfersProvider {
             }
         }
     }
-    
     
     // MARK: Lifecycle
     init() {
@@ -104,7 +103,6 @@ class AdamantTransfersProvider: TransfersProvider {
         NotificationCenter.default.removeObserver(self)
     }
 }
-
 
 // MARK: - DataProvider
 extension AdamantTransfersProvider {
@@ -199,7 +197,6 @@ extension AdamantTransfersProvider {
                 
                 completion?(.success)
                 
-                
             case .failedToUpdate(let error): // Processing failed
                 let err: TransfersProviderError
                 
@@ -212,13 +209,13 @@ extension AdamantTransfersProvider {
                     case .accountNotFound:
                         err = .accountNotFound(address: address)
                         
-                    case .serverError(_):
+                    case .serverError:
                         err = .serverError(error)
                         
                     case .internalError(let message, _):
                         err = .dependencyError(message: message)
                         
-                    case .networkError(_):
+                    case .networkError:
                         err = .networkError
                     }
                     
@@ -267,7 +264,6 @@ extension AdamantTransfersProvider {
         setState(.empty, previous: prevState, notify: notify)
     }
 }
-
 
 // MARK: - TransfersProvider
 extension AdamantTransfersProvider {
@@ -346,7 +342,7 @@ extension AdamantTransfersProvider {
         case .success(let account):
             recipientAccount = account
             
-        case .notFound, .invalidAddress, .notInitiated, .dummy(_):
+        case .notFound, .invalidAddress, .notInitiated, .dummy:
             completion(.failure(.accountNotFound(address: recipient)))
             return
             
@@ -354,7 +350,7 @@ extension AdamantTransfersProvider {
             completion(.failure(.serverError(error)))
             return
             
-        case .networkError(_):
+        case .networkError:
             completion(.failure(.networkError))
             return
         }
@@ -467,8 +463,8 @@ extension AdamantTransfersProvider {
         let accountsGroup = DispatchGroup()
         accountsGroup.enter() // Enter 1
         
-        var recipientAccount: BaseAccount? = nil
-        var providerError: TransfersProviderError? = nil
+        var recipientAccount: BaseAccount?
+        var providerError: TransfersProviderError?
         
         accountsProvider.getAccount(byAddress: recipient) { result in
             defer {
@@ -510,7 +506,7 @@ extension AdamantTransfersProvider {
             case .serverError(let error):
                 providerError = .serverError(error)
                 
-            case .networkError(_):
+            case .networkError:
                 providerError = .networkError
             }
         }
@@ -529,7 +525,6 @@ extension AdamantTransfersProvider {
             
             return
         }
-        
         
         // MARK: 2. Create transaction
         let transaction = TransferTransaction(context: context)
@@ -691,7 +686,6 @@ extension AdamantTransfersProvider {
     }
 }
 
-
 // MARK: - Data processing
 extension AdamantTransfersProvider {
     private enum ProcessingResult {
@@ -800,17 +794,17 @@ extension AdamantTransfersProvider {
             
             accountsProvider.getAccount(byAddress: id) { result in
                 switch result {
-                case .success(_), .dummy(_):
+                case .success, .dummy:
                     partnersGroup.leave() // Leave 1
                     
-                case .notFound, .invalidAddress, .notInitiated(_):
+                case .notFound, .invalidAddress, .notInitiated:
                     self.accountsProvider.getDummyAccount(for: id) { result in
                         defer {
                             partnersGroup.leave() // Leave 1
                         }
                         
                         switch result {
-                        case .success(_), .foundRealAccount(_):
+                        case .success, .foundRealAccount:
                             break
                         
                         case .invalidAddress(let address):
@@ -925,7 +919,6 @@ extension AdamantTransfersProvider {
             
             transfers.append(transfer)
         }
-        
         
         // MARK: 4. Check lastHeight
         // API returns transactions from lastHeight INCLUDING transaction with height == lastHeight, so +1

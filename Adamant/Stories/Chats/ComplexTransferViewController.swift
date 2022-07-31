@@ -18,7 +18,6 @@ class ComplexTransferViewController: UIViewController {
     
     var accountService: AccountService!
     
-    
     // MARK: - Properties
     var pagingViewController: PagingViewController!
     
@@ -44,7 +43,6 @@ class ComplexTransferViewController: UIViewController {
         
         // MARK: Services
         services = accountService.wallets.compactMap { $0 as? WalletServiceWithSend }
-        
         
         // MARK: PagingViewController
         pagingViewController = PagingViewController()

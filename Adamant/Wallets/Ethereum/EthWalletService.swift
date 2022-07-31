@@ -89,13 +89,11 @@ class EthWalletService: WalletService {
     var dialogService: DialogService!
     var router: Router!
     
-    
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.ethWallet.walletUpdated")
     let serviceEnabledChanged = Notification.Name("adamant.ethWallet.enabledChanged")
     let transactionFeeUpdated = Notification.Name("adamant.ethWallet.feeUpdated")
     let serviceStateChanged = Notification.Name("adamant.ethWallet.stateChanged")
-    
     
     // MARK: RichMessageProvider properties
     static let richMessageType = "eth_transaction"
@@ -152,13 +150,13 @@ class EthWalletService: WalletService {
         }
     }
     
-    private (set) var ethWallet: EthWallet? = nil
+    private (set) var ethWallet: EthWallet?
     private var waletStorage: EthWalletStorage?
     
     var wallet: WalletAccount? { return ethWallet }
     
     // MARK: - Delayed KVS save
-    private var balanceObserver: NSObjectProtocol? = nil
+    private var balanceObserver: NSObjectProtocol?
     
     // MARK: - Logic
     init() {
@@ -221,7 +219,7 @@ class EthWalletService: WalletService {
         stateSemaphore.wait()
         
         switch state {
-        case .notInitiated, .updating, .initiationFailed(_):
+        case .notInitiated, .updating, .initiationFailed:
             return
             
         case .upToDate:
@@ -325,7 +323,6 @@ class EthWalletService: WalletService {
     }
 }
 
-
 // MARK: - WalletInitiatedWithPassphrase
 extension EthWalletService: InitiatedWithPassphraseService {
     func initWallet(withPassphrase passphrase: String, completion: @escaping (WalletServiceResult<WalletAccount>) -> Void) {
@@ -424,7 +421,6 @@ extension EthWalletService: InitiatedWithPassphraseService {
         stateSemaphore.signal()
     }
     
-    
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
     private func kvsSaveCompletionRecursion(ethAddress: String, result: WalletServiceSimpleResult) {
         if let observer = balanceObserver {
@@ -460,7 +456,6 @@ extension EthWalletService: InitiatedWithPassphraseService {
     }
 }
 
-
 // MARK: - Dependencies
 extension EthWalletService: SwinjectDependentService {
     func injectDependencies(from container: Container) {
@@ -470,7 +465,6 @@ extension EthWalletService: SwinjectDependentService {
         router = container.resolve(Router.self)
     }
 }
-
 
 // MARK: - Balances & addresses
 extension EthWalletService {
@@ -489,7 +483,6 @@ extension EthWalletService {
 		}
 	}
 	
-	
 	func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
 		apiService.get(key: EthWalletService.kvsAddress, sender: address) { (result) in
 			switch result {
@@ -506,7 +499,6 @@ extension EthWalletService {
 		}
 	}
 }
-
 
 // MARK: - KVS
 extension EthWalletService {
@@ -536,7 +528,6 @@ extension EthWalletService {
         }
     }
 }
-
 
 // MARK: - Transactions
 extension EthWalletService {
@@ -660,7 +651,7 @@ extension EthWalletService {
         // MARK: Sending requests
         
         let dispatchGroup = DispatchGroup()
-        var error: WalletServiceError? = nil
+        var error: WalletServiceError?
         
         var transactions = [EthTransactionShort]()
         let semaphore = DispatchSemaphore(value: 1)
@@ -727,7 +718,6 @@ extension EthWalletService {
         }
     }
     
-    
     /// Transaction history for Ropsten testnet
     func getTransactionsHistoryRopsten(address: String, page: Int = 1, size: Int = 50, completion: @escaping (WalletServiceResult<[EthTransaction]>) -> Void) {
         let queryItems: [URLQueryItem] = [URLQueryItem(name: "module", value: "account"),
@@ -786,7 +776,6 @@ extension EthWalletService: PrivateKeyGenerator {
     var rowImage: UIImage? {
         return #imageLiteral(resourceName: "wallet_eth_row")
     }
-    
     
     func generatePrivateKeyFor(passphrase: String) -> String? {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {

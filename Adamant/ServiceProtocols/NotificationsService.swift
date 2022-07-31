@@ -50,7 +50,6 @@ enum NotificationsMode: Int {
     }
 }
 
-
 /// Supported notification types
 ///
 /// - message: text message
@@ -98,7 +97,6 @@ extension Notification.Name {
     }
 }
 
-
 extension AdamantUserInfoKey {
     struct NotificationsService {
         static let newNotificationsMode = "adamant.notificationsService.notificationsMode"
@@ -106,7 +104,6 @@ extension AdamantUserInfoKey {
         private init() {}
     }
 }
-
 
 // MARK: - Protocol
 enum NotificationsServiceResult {

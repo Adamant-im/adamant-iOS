@@ -32,7 +32,6 @@ import JavaScriptCore
     }
 }
 
-
 // MARK: - Transaction Asset
 
 @objc protocol JSAssetProtocol: JSExport {
@@ -46,7 +45,6 @@ import JavaScriptCore
     dynamic var state: JSState?
     dynamic var votes: [String]?
 }
-
 
 // MARK: - Chat
 
@@ -68,7 +66,6 @@ import JavaScriptCore
     }
 }
 
-
 // MARK: - Store
 
 @objc protocol JSStateProtocol: JSExport {
@@ -88,7 +85,6 @@ import JavaScriptCore
         self.type = type
     }
 }
-
 
 // MARK: - Transaction
 

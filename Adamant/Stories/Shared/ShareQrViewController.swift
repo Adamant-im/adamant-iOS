@@ -18,7 +18,6 @@ class ShareQrViewController: FormViewController {
     // MARK: - Dependencies
     var dialogService: DialogService!
     
-    
     // MARK: - Rows
     private enum Rows {
         case qr
@@ -86,7 +85,7 @@ class ShareQrViewController: FormViewController {
         // MARK: QR code
         let qrSection = Section()
         
-        let qrRow = QrRow() {
+        let qrRow = QrRow {
             $0.value = qrCode
             $0.tag = Rows.qr.tag
             $0.cell.selectionStyle = .none
@@ -108,10 +107,10 @@ class ShareQrViewController: FormViewController {
         let buttonsSection = Section()
             
         // Photolibrary
-        let photolibraryRow = ButtonRow() {
+        let photolibraryRow = ButtonRow {
             $0.tag = Rows.saveToPhotos.tag
             $0.title = Rows.saveToPhotos.localized
-        }.onCellSelection { [weak self] (cell, row) in
+        }.onCellSelection { [weak self] (_, row) in
             guard let row: QrRow = self?.form.rowBy(tag: Rows.qr.tag), let qrCode = row.value else {
                 return
             }
@@ -131,7 +130,7 @@ class ShareQrViewController: FormViewController {
         }
             
         // Share
-        let shareRow = ButtonRow() {
+        let shareRow = ButtonRow {
             $0.tag = Rows.shareButton.tag
             $0.title = Rows.shareButton.localized
         }.onCellSelection { [weak self] (cell, row) in
@@ -149,7 +148,7 @@ class ShareQrViewController: FormViewController {
                 c.sourceRect = cell.bounds
             }
             
-            vc.completionWithItemsHandler = { [weak self] (type: UIActivity.ActivityType?, completed: Bool, _, error: Error?) in
+            vc.completionWithItemsHandler = { [weak self] (_: UIActivity.ActivityType?, completed: Bool, _, error: Error?) in
                 if completed {
                     if let error = error {
                         self?.dialogService.showWarning(withMessage: error.localizedDescription)
@@ -163,10 +162,10 @@ class ShareQrViewController: FormViewController {
             self?.present(vc, animated: true, completion: nil)
         }
         
-        let cancelRow = ButtonRow() {
+        let cancelRow = ButtonRow {
             $0.tag = Rows.cancelButton.tag
             $0.title = Rows.cancelButton.localized
-        }.onCellSelection { [weak self] (cell, row) in
+        }.onCellSelection { [weak self] (_, _) in
             self?.close()
         }
         

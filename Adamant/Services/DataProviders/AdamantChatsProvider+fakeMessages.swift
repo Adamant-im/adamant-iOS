@@ -76,7 +76,7 @@ extension AdamantChatsProvider {
             return
         }
         
-        // MARK 3. Save changes
+        // MARK: 3. Save changes
         if privateContext.hasChanges {
             do {
                 try privateContext.save()
@@ -208,10 +208,10 @@ extension AdamantChatsProvider {
             case .success(let account):
                 completion(.success(loggedAccount: loggedAddress, partner: account))
                 
-            case .notFound, .invalidAddress, .notInitiated, .dummy(_):
+            case .notFound, .invalidAddress, .notInitiated, .dummy:
                 completion(.failure(.accountNotFound(partnerId)))
                 
-            case .networkError(_):
+            case .networkError:
                 completion(.failure(.networkError))
                 
             case .serverError(let error):
@@ -219,7 +219,6 @@ extension AdamantChatsProvider {
             }
         }
     }
-    
     
     // MARK: - Tools
     

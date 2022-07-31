@@ -64,7 +64,7 @@ public struct APIClient {
             "User-Agent": options.nethash.userAgent,
             "nethash": options.nethash.nethash,
             "version": options.nethash.version,
-            "minVersion": options.nethash.minVersion,
+            "minVersion": options.nethash.minVersion
         ]
     }
 

@@ -81,8 +81,8 @@ class AdamantAvatarService {
         let fillTriangle = triangleColors(0, key, Int(lines))
         let transparent = UIColor.clear
         
-        let isLeft: (Int)->Bool = { (v: Int) -> Bool in return (v % 2) == 0 }
-        let isRight: (Int)->Bool = { (v: Int) -> Bool in return (v % 2) != 0 }
+        let isLeft: (Int) -> Bool = { (v: Int) -> Bool in return (v % 2) == 0 }
+        let isRight: (Int) -> Bool = { (v: Int) -> Bool in return (v % 2) != 0 }
         
         let L = Int(lines)
         let hL = L / 2
@@ -372,7 +372,7 @@ class AdamantAvatarService {
     
     // canFill returns a fill svg string given position. the fill is computed to be a rotation of the
     // triangle 0 with the 'fills' array given as param.
-    func canFill(_ x: Int, _ y: Int, _ fills: [UIColor], _ isLeft: (Int)->Bool, _ isRight: (Int)->Bool) -> UIColor? {
+    func canFill(_ x: Int, _ y: Int, _ fills: [UIColor], _ isLeft: (Int) -> Bool, _ isRight: (Int) -> Bool) -> UIColor? {
         let l = Triangle(x, y, .left)
         let r = Triangle(x, y, .right)
         
@@ -387,7 +387,7 @@ class AdamantAvatarService {
     }
 }
 
-fileprivate struct Triangle {
+private struct Triangle {
     let x: Int
     let y: Int
     let direction: Direction
@@ -514,7 +514,7 @@ fileprivate struct Triangle {
             5: [5, 7, 6, 3, 1, 2],
             6: [6, 3, 1, 2, 5, 7],
             7: [7, 5, 4, 1, 3, 4],
-            8: [8, 8, 2, 0, 0, 6],
+            8: [8, 8, 2, 0, 0, 6]
             ]
         return m[lookforSubTriangleID]
     }
@@ -536,7 +536,7 @@ fileprivate struct Triangle {
     }
 }
 
-fileprivate enum Direction: Int {
+private enum Direction: Int {
     case left = 0
     case right
 }

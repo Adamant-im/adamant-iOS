@@ -257,7 +257,7 @@ class SearchResultsViewController: UITableViewController {
     
     private func defineSection(for section: Int) -> Section {
         if self.contacts.count > 0, self.messages.count > 0 {
-            if section == 0  {
+            if section == 0 {
                 return .contacts
             } else {
                 return .messages

@@ -44,13 +44,11 @@ extension String.adamantLocalized {
     }
 }
 
-
 // MARK: - Delegate
 protocol ChatViewControllerDelegate: AnyObject {
     func preserveMessage(_ message: String, forAddress address: String)
     func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String?
 }
-
 
 // MARK: -
 class ChatViewController: MessagesViewController {
@@ -207,7 +205,7 @@ class ChatViewController: MessagesViewController {
     private var spinner = UIActivityIndicatorView(style: .whiteLarge)
     var isBusy = false
     
-    //MARK: Background UI
+    // MARK: Background UI
     private let amadantLogoImageView: UIImageView = {
         return UIImageView(image: UIImage(named: "Adamant-logo"))
     }()
@@ -246,7 +244,6 @@ class ChatViewController: MessagesViewController {
                 messageSizeCalculator.outgoingMessageTopLabelAlignment = LabelAlignment(textAlignment: .right, textInsets: UIEdgeInsets(top: 2, left: 0, bottom: 0, right: 16))
             }
         }
-        
         
         // MARK: 2. InputBar configuration
         
@@ -655,7 +652,7 @@ class ChatViewController: MessagesViewController {
     }
     
     func close() {
-        if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController, let nav = selectedView.children.first as? UINavigationController  {
+        if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController, let nav = selectedView.children.first as? UINavigationController {
                 nav.popToRootViewController(animated: true)
         } else {
             self.navigationController?.popViewController(animated: true)
@@ -705,7 +702,7 @@ class ChatViewController: MessagesViewController {
             })], from: nil)
         }
         
-        let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
+        let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] _ in
             self?.dialogService.presentShareAlertFor(string: address,
                                                      types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
                                                      excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
@@ -714,7 +711,7 @@ class ChatViewController: MessagesViewController {
                                                      completion: nil)
         }
         
-        let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] action in
+        let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] _ in
             let alert = UIAlertController(title: String(format: String.adamantLocalized.chat.actionsBody, address), message: nil, preferredStyle: .alert)
             
             alert.addTextField { (textField) in
@@ -743,7 +740,6 @@ class ChatViewController: MessagesViewController {
         dialogService?.showAlert(title: nil, message: nil, style: .actionSheet, actions: [block, share, rename, cancel], from: sender)
     }
     
-    
     // MARK: Tools
     private func messageKind(for richMessage: RichMessageTransaction) -> MessageKind {
         guard let type = richMessage.richType else {
@@ -771,8 +767,6 @@ class ChatViewController: MessagesViewController {
         }
     }
 }
-
-
 
 // MARK: - EstimatedFee label
 extension ChatViewController {
@@ -815,7 +809,6 @@ extension ChatViewController {
         }
     }
 }
-
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension ChatViewController: NSFetchedResultsControllerDelegate {
@@ -1122,7 +1115,7 @@ extension ChatViewController {
     }
 }
 
-//MARK: Load moore message
+// MARK: Load moore message
 extension ChatViewController {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
        loadMooreMessagesIfNeeded(indexPath: indexPath)
@@ -1170,7 +1163,7 @@ extension ChatViewController {
         if address == AdamantContacts.adamantWelcomeWallet.name { return }
         isBusy = true
         let offset = chatsProvider.chatLoadedMessages[address] ?? 0
-        chatsProvider.getChatMessages(with: address, offset: offset) { [weak self] _count in
+        chatsProvider.getChatMessages(with: address, offset: offset) { [weak self] _ in
             DispatchQueue.main.async {
                 self?.messagesCollectionView.reloadDataAndKeepOffset()
                 self?.isBusy = false

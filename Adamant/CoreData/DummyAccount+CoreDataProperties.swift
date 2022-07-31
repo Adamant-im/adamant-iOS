@@ -10,12 +10,10 @@
 import Foundation
 import CoreData
 
-
 extension DummyAccount {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<DummyAccount> {
         return NSFetchRequest<DummyAccount>(entityName: "DummyAccount")
     }
-
 
 }

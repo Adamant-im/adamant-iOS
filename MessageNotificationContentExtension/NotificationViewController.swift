@@ -40,10 +40,10 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     func didReceive(_ notification: UNNotification) {
         // MARK: 0. Necessary services
         let avatarService = AdamantAvatarService()
-        var keychainStore: KeychainStore? = nil
-        var extensionApi: ExtensionsApi? = nil
-        var nativeCore: NativeAdamantCore? = nil
-        var keypair: Keypair? = nil
+        var keychainStore: KeychainStore?
+        var extensionApi: ExtensionsApi?
+        var nativeCore: NativeAdamantCore?
+        var keypair: Keypair?
         
         // MARK: 1. Get the transaction
         let trs: Transaction?

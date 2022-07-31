@@ -74,11 +74,9 @@ class NodeEditorViewController: FormViewController {
         }
     }
     
-    
     // MARK: - Dependencies
     var dialogService: DialogService!
     var apiService: ApiService!
-    
     
     // MARK: - Properties
     var node: Node?
@@ -148,7 +146,7 @@ class NodeEditorViewController: FormViewController {
         form +++ Section()
             
         // URL
-        <<< TextRow() {
+        <<< TextRow {
             $0.title = Rows.host.localized
             $0.tag = Rows.host.tag
             $0.placeholder = Rows.host.placeholder
@@ -159,7 +157,7 @@ class NodeEditorViewController: FormViewController {
             }
             
         // Port
-        <<< IntRow() {
+        <<< IntRow {
             $0.title = Rows.port.localized
             $0.tag = Rows.port.tag
             
@@ -174,7 +172,7 @@ class NodeEditorViewController: FormViewController {
         }
         
         // Scheme
-        <<< PickerInlineRow<URLScheme>() {
+        <<< PickerInlineRow<URLScheme> {
             $0.title = Rows.scheme.localized
             $0.tag = Rows.scheme.tag
             $0.value = node?.scheme ?? URLScheme.default
@@ -200,7 +198,7 @@ class NodeEditorViewController: FormViewController {
         +++ Section()
         
         // Test
-        <<< LabelRow() {
+        <<< LabelRow {
             $0.title = Rows.testButton.localized
             $0.tag = Rows.testButton.tag
         }.cellUpdate { (cell, _) in
@@ -212,7 +210,7 @@ class NodeEditorViewController: FormViewController {
         // Delete
         if node != nil {
             form +++ Section()
-            <<< ButtonRow() {
+            <<< ButtonRow {
                 $0.title = Rows.deleteButton.localized
                 $0.tag = Rows.deleteButton.tag
             }.onCellSelection { [weak self] (_, _) in
@@ -229,7 +227,6 @@ class NodeEditorViewController: FormViewController {
         }
     }
 }
-
 
 // MARK: - Actions
 extension NodeEditorViewController {
@@ -278,7 +275,7 @@ extension NodeEditorViewController {
     
     private func processApiServiceTestResult(result: ApiServiceResult<NodeVersion>) -> Bool {
         switch result {
-        case .success(_):
+        case .success:
             dialogService.dismissProgress()
             testState = .passed
             return true

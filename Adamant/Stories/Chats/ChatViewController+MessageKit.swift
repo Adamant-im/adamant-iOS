@@ -12,7 +12,6 @@ import MessageInputBar
 import SafariServices
 import MarkdownKit
 
-
 // MARK: - Tools
 extension ChatViewController {
     private func getRichMessageType(of message: MessageType) -> String? {
@@ -23,7 +22,6 @@ extension ChatViewController {
         return transfer.type
     }
 }
-
 
 // MARK: - MessagesDataSource
 extension ChatViewController: MessagesDataSource {
@@ -219,7 +217,6 @@ extension ChatViewController: MessagesDataSource {
     }
 }
 
-
 // MARK: - MessagesDisplayDelegate
 extension ChatViewController: MessagesDisplayDelegate {
     func messageStyle(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageStyle {
@@ -329,7 +326,7 @@ extension ChatViewController: MessageCellDelegate {
                 break
             }
             
-            let retry = UIAlertAction(title: String.adamantLocalized.alert.retry, style: .default, handler: { [weak self] action in
+            let retry = UIAlertAction(title: String.adamantLocalized.alert.retry, style: .default, handler: { [weak self] _ in
                 self?.chatsProvider.retrySendMessage(message) { result in
                     switch result {
                     case .success: break
@@ -337,13 +334,13 @@ extension ChatViewController: MessageCellDelegate {
                     case .failure(let error):
                         self?.dialogService.showRichError(error: error)
                         
-                    case .invalidTransactionStatus(_):
+                    case .invalidTransactionStatus:
                         break
                     }
                 }
             })
             
-            let cancelMessage = UIAlertAction(title: String.adamantLocalized.alert.delete, style: .default, handler: { [weak self] action in
+            let cancelMessage = UIAlertAction(title: String.adamantLocalized.alert.delete, style: .default, handler: { [weak self] _ in
                 self?.chatsProvider.cancelMessage(message) { result in
                     switch result {
                     case .success:
@@ -351,7 +348,7 @@ extension ChatViewController: MessageCellDelegate {
                             self?.messagesCollectionView.reloadDataAndKeepOffset()
                         }
                         
-                    case .invalidTransactionStatus(_):
+                    case .invalidTransactionStatus:
                         self?.dialogService.showWarning(withMessage: String.adamantLocalized.chat.cancelError)
                         
                     case .failure(let error):
@@ -363,7 +360,6 @@ extension ChatViewController: MessageCellDelegate {
             let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
             
             dialogService?.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, style: .actionSheet, actions: [retry, cancelMessage, cancel], from: cell)
-            
             
         // MARK: Show ADM transfer details
         case let transfer as TransferTransaction:
@@ -386,7 +382,6 @@ extension ChatViewController: MessageCellDelegate {
             } else {
                 provider.richMessageTapped(for: richMessage, at: indexPath, in: self)
             }
-            
             
         default:
             break
@@ -584,7 +579,6 @@ extension ChatViewController: MessagesLayoutDelegate {
     }
 }
 
-
 // MARK: - MessageInputBarDelegate
 extension ChatViewController: MessageInputBarDelegate {
     private static let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
@@ -623,7 +617,6 @@ extension ChatViewController: MessageInputBarDelegate {
                 DispatchQueue.main.async {
                     self?.scrollDown()
                 }
-                break
                 
             case .failure(let error):
                 var showFreeToken = false
@@ -695,7 +688,6 @@ extension ChatViewController: MessageInputBarDelegate {
         present(alert, animated: true, completion: nil)
     }
 }
-
 
 // MARK: - MessageType
 // MARK: MessageTransaction

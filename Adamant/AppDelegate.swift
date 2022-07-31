@@ -35,7 +35,6 @@ extension StoreKey {
     }
 }
 
-
 // MARK: - Application
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -217,7 +216,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", error: nil)
         }
         
-        
         // MARK: 6. Logout reset
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
             // On logout, pop all navigators to root.
@@ -343,7 +341,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         }
     }
     
-    //MARK: Open Chat From Notification
+    // MARK: Open Chat From Notification
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         guard let transactionID = userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
               let transactionRaw = userInfo[AdamantNotificationUserInfoKeys.transaction] as? String,
@@ -410,7 +408,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
 }
 
-
 // MARK: - Background Fetch
 extension AppDelegate {
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
@@ -469,7 +466,6 @@ extension AppDelegate {
         }
     }
 }
-
 
 // MARK: - Welcome messages
 extension AppDelegate {

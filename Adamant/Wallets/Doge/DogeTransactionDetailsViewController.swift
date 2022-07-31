@@ -16,7 +16,7 @@ class DogeTransactionDetailsViewController: TransactionDetailsViewControllerBase
     
     // MARK: - Properties
     
-    private var cachedBlockInfo: (hash: String, height: String)? = nil
+    private var cachedBlockInfo: (hash: String, height: String)?
     
     private let autoupdateInterval: TimeInterval = 5.0
     weak var timer: Timer?

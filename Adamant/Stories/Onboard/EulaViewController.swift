@@ -10,8 +10,8 @@ import UIKit
 
 class EulaViewController: UIViewController {
     
-    var onAccept: (()->Void)?
-    var onDecline: (()->Void)?
+    var onAccept: (() -> Void)?
+    var onDecline: (() -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()

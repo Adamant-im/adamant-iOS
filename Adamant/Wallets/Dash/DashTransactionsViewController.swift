@@ -184,7 +184,7 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
     private func loadMoreTransactions() {
         let procedure = LoadMoreDashTransactionsProcedure(service: walletService)
 
-        procedure.addDidFinishBlockObserver { [weak self] (procedure, error) in
+        procedure.addDidFinishBlockObserver { [weak self] (procedure, _) in
             guard let vc = self, let result = procedure.result else {
                 return
             }
@@ -214,11 +214,10 @@ class DashTransactionsViewController: TransactionsListViewControllerBase {
     }
 }
 
-
 private class LoadMoreDashTransactionsProcedure: Procedure {
     let service: DashWalletService
     
-    private(set) var result: DashTransactionsPointer? = nil
+    private(set) var result: DashTransactionsPointer?
     
     init(service: DashWalletService) {
         self.service = service

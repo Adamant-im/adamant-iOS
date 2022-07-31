@@ -8,7 +8,6 @@
 
 import UIKit
 
-
 // MARK: Cell's Delegate
 protocol AdamantDelegateCellDelegate: AnyObject {
     func delegateCell(_ cell: AdamantDelegateCell, didChangeCheckedStateTo state: Bool)
@@ -107,7 +106,6 @@ class AdamantDelegateCell: UITableViewCell {
             checkmarkBackgroundView.layer.borderColor = newValue?.cgColor
         }
     }
-    
     
     // MARK: Lifecycle
     

@@ -27,7 +27,6 @@ class AdamantDialogService: DialogService {
     }
 }
 
-
 // MARK: - Modal dialogs
 extension AdamantDialogService {
     func present(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
@@ -63,7 +62,6 @@ extension AdamantDialogService {
     }
 }
 
-
 // MARK: - Toast
 extension AdamantDialogService {
     func showToastMessage(_ message: String) {
@@ -74,7 +72,6 @@ extension AdamantDialogService {
         FTIndicator.dismissToast()
     }
 }
-
 
 // MARK: - Indicators
 extension AdamantDialogService {
@@ -195,7 +192,6 @@ extension AdamantDialogService {
     }
 }
 
-
 // MARK: - Notifications
 extension AdamantDialogService {
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?) {
@@ -210,7 +206,6 @@ extension AdamantDialogService {
         FTIndicator.dismissNotification()
     }
 }
-
 
 // MAKR: - Activity controllers
 extension AdamantDialogService {
@@ -368,7 +363,6 @@ extension AdamantDialogService {
     }
 }
 
-
 // MARK: - Alerts
 fileprivate extension UIAlertAction.Style {
     func asPMAlertAction() -> PMAlertActionStyle {
@@ -497,7 +491,7 @@ extension AdamantDialogService {
     }
 }
 
-fileprivate class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
+private class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true, completion: nil)
     }
