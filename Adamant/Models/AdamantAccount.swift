@@ -53,6 +53,20 @@ extension AdamantAccount: Decodable {
 
 extension AdamantAccount: WrappableModel {
     static let ModelKey = "account"
+    
+    static func makeEmptyAccount(publicKey: String) -> Self {
+        .init(
+            address: AddressGenerator.generateAddress(publicKey: publicKey),
+            unconfirmedBalance: .zero,
+            balance: .zero,
+            publicKey: publicKey,
+            unconfirmedSignature: .zero,
+            secondSignature: .zero,
+            secondPublicKey: nil,
+            multisignatures: nil,
+            uMultisignatures: nil
+        )
+    }
 }
 
 // MARK: - JSON
