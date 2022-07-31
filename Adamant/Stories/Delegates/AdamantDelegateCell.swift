@@ -24,52 +24,27 @@ class AdamantDelegateCell: UITableViewCell {
     @IBOutlet weak var addressLabel: UILabel!
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var votedLabel: UILabel!
-    
-    @IBOutlet weak var checkmarkBackgroundView: UIView!
-    @IBOutlet weak var checkmarkImageView: UIImageView!
-
-    @IBOutlet weak var checkboxExpander: UIView!
+    @IBOutlet weak var checkmarkView: CheckmarkView!
     
     // MARK: Properties
     
-    weak var delegate: AdamantDelegateCellDelegate?
-    
-    private var _isChecked: Bool = false
-    
-    var isChecked: Bool {
-        get {
-            return _isChecked
-        }
-        set {
-            setIsChecked(newValue, animated: false)
+    weak var delegate: AdamantDelegateCellDelegate? {
+        didSet {
+            checkmarkView.onCheckmarkTap = { [weak self] in
+                guard let self = self else { return }
+                let newState = !self.checkmarkView.isChecked
+                self.checkmarkView.setIsChecked(newState, animated: true)
+                self.delegate?.delegateCell(self, didChangeCheckedStateTo: newState)
+            }
         }
     }
     
-    func setIsChecked(_ checked: Bool, animated: Bool) {
-        _isChecked = checked
-        let view = checkmarkImageView!
-        
-        if animated {
-            if checked {
-                view.isHidden = false
-                UIView.animate(withDuration: 0.15, animations: {
-                    view.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
-                }, completion: { _ in
-                    UIView.animate(withDuration: 0.1) {
-                        view.transform = CGAffineTransform.identity
-                    }
-                })
-            } else {
-                UIView.animate(withDuration: 0.15, animations: {
-                    view.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
-                }, completion: { _ in
-                    view.transform = CGAffineTransform(scaleX: 0.0, y: 0.0)
-                    view.isHidden = true
-                })
-            }
-        } else {
-            view.isHidden = !checked
-            view.transform = checked ? CGAffineTransform.identity : CGAffineTransform(scaleX: 0.0, y: 0.0)
+    var isChecked: Bool {
+        get {
+            return checkmarkView.isChecked
+        }
+        set {
+            checkmarkView.setIsChecked(newValue, animated: false)
         }
     }
     
@@ -82,46 +57,25 @@ class AdamantDelegateCell: UITableViewCell {
     var isUpvoted: Bool = false {
         didSet {
             votedLabel.text = isUpvoted ? "⬆︎" : ""
-            checkmarkImageView.image = isUpvoted ? #imageLiteral(resourceName: "Downvote") : #imageLiteral(resourceName: "Upvote")
+            checkmarkView.image = isUpvoted ? #imageLiteral(resourceName: "Downvote") : #imageLiteral(resourceName: "Upvote")
         }
     }
     
     var checkmarkColor: UIColor {
         get {
-            return checkmarkImageView.tintColor
+            checkmarkView.imageColor
         }
         set {
-            checkmarkImageView.tintColor = newValue
+            checkmarkView.imageColor = newValue
         }
     }
     
     var checkmarkBorderColor: UIColor? {
         get {
-            if let color = checkmarkBackgroundView.layer.borderColor {
-                return UIColor(cgColor: color)
-            } else {
-                return nil
-            }
+            checkmarkView.borderColor
         }
         set {
-            checkmarkBackgroundView.layer.borderColor = newValue?.cgColor
+            checkmarkView.borderColor = newValue
         }
-    }
-    
-    
-    // MARK: Lifecycle
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        
-        checkboxExpander.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onExpanderTap)))
-        checkmarkBackgroundView.layer.borderWidth = 1
-        checkmarkBackgroundView.layer.cornerRadius = checkmarkBackgroundView.frame.height / 2
-    }
-    
-    @objc func onExpanderTap() {
-        let state = !isChecked
-        setIsChecked(state, animated: true)
-        delegate?.delegateCell(self, didChangeCheckedStateTo: state)
     }
 }

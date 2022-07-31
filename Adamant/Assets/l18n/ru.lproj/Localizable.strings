@@ -229,6 +229,9 @@
 /* Serious internal error: Error parsing response */
 "ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите разработчикам";
 
+/* Serious internal error: No nodes available */
+"ApiService.InternalError.NoNodesAvailable" = "Нет доступных нод. Сообщите разработчикам";
+
 /* Eureka forms Cancel button */
 "Cancel" = "Отмена";
 
@@ -541,6 +544,24 @@
 /* NodesList: 'Reset' button */
 "NodesList.ResetButton" = "Сбросить";
 
+/* NodesList: 'Prefer the fastest node' switch */
+"NodesList.PreferTheFastestNode" = "Выбирать самую быструю ноду";
+
+/* NodesList.NodeCell: Node ping */
+"NodesList.NodeCell.Ping" = "Пинг";
+
+/* NodesList.NodeCell: Milliseconds */
+"NodesList.NodeCell.Milliseconds" = "мс";
+
+/* NodesList.NodeCell: Node is synchronizing */
+"NodesList.NodeCell.Synchronizing" = "Синхронизируется";
+
+/* NodesList.NodeCell: Node is offline */
+"NodesList.NodeCell.Offline" = "Офлайн";
+
+/* NodesList.NodeCell: Node version */
+"NodesList.NodeCell.Version" = "версия";
+
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "Был загружен список нод по умолчанию";
 
@@ -562,14 +583,14 @@
 /* NodesEditor: Host row */
 "NodesEditor.HostRow" = "Хост";
 
-/* NodesEditor: Test button */
-"NodesEditor.TestButton" = "Тест ноды";
+/* NodesEditor: Web sockets */
+"NodesEditor.WebSockets" = "Веб сокеты";
 
-/* NodesEditor: Test passed */
-"NodesEditor.NodeTestPassed" = "Пройден";
+/* NodesEditor: Web sockets are supported */
+"NodesEditor.WebSocketsSupported" = "Поддерживаются";
 
-/* NodesEditor: Test failed */
-"NodesEditor.NodeTestFailed" = "Ошибка";
+/* NodesEditor: Web sockets aren't supported */
+"NodesEditor.WebSocketsNotSupported" = "Не поддерживаются";
 
 /* NodesEditor: Delete node button */
 "NodesEditor.DeleteNodeButton" = "Удалить ноду";

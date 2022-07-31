@@ -25,6 +25,7 @@ class AdamantApiService: ApiService {
         case signTransactionFailed
         case parsingFailed
         case unknownError
+        case noNodesAvailable
         
         func apiServiceErrorWith(error: Error?) -> ApiServiceError {
             return .internalError(message: self.localized, error: error)
@@ -43,6 +44,9 @@ class AdamantApiService: ApiService {
                 
             case .unknownError:
                 return String.adamantLocalized.sharedErrors.unknownError
+            
+            case .noNodesAvailable:
+                return NSLocalizedString("ApiService.InternalError.NoNodesAvailable", comment: "Serious internal error: No nodes available")
             }
         }
     }
@@ -50,71 +54,67 @@ class AdamantApiService: ApiService {
     // MARK: - Dependencies
     
     var adamantCore: AdamantCore!
-    var nodesSource: NodesSource! {
-        didSet {
-            nodesSource.migrate()
-            refreshNode()
-        }
-    }
+    weak var nodesSource: NodesSource!
     
     // MARK: - Properties
     
-    private(set) var node: Node? {
-        didSet {
-            currentUrl = node?.asURL()
-        }
-    }
+    private var _lastRequestTimeDelta: TimeInterval?
+    private var lastRequestTimeDeltaSemaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
+    private var connection: AdamantConnection?
     
-    private var _nodeTimeDelta: TimeInterval?
-    private var nodeTimeDeltaSemaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
-    
-    private(set) var nodeTimeDelta: TimeInterval? {
+    private(set) var lastRequestTimeDelta: TimeInterval? {
         get {
-            defer { nodeTimeDeltaSemaphore.signal() }
-            nodeTimeDeltaSemaphore.wait()
+            defer { lastRequestTimeDeltaSemaphore.signal() }
+            lastRequestTimeDeltaSemaphore.wait()
             
-            return _nodeTimeDelta
+            return _lastRequestTimeDelta
         }
         set {
-            nodeTimeDeltaSemaphore.wait()
-            _nodeTimeDelta = newValue
-            nodeTimeDeltaSemaphore.signal()
+            lastRequestTimeDeltaSemaphore.wait()
+            _lastRequestTimeDelta = newValue
+            lastRequestTimeDeltaSemaphore.signal()
         }
     }
     
-    private var currentUrl: URL?
+    private var preferredNode: Node? {
+        nodesSource.getPreferredNode(needWS: false)
+    }
     
-    internal var sendingMsgTaskId: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier.invalid
+    var sendingMsgTaskId: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier.invalid
     
-    let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.response-queue", qos: .utility, attributes: [.concurrent])
-    
+    let defaultResponseDispatchQueue = DispatchQueue(
+        label: "com.adamant.response-queue",
+        qos: .userInteractive
+    )
     
     // MARK: - Init
+    
     init() {
-        NotificationCenter.default.addObserver(forName: Notification.Name.NodesSource.nodesChanged, object: nil, queue: nil) { [weak self] _ in
-            self?.refreshNode()
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
+            object: nil,
+            queue: nil
+        ) { [weak self] notification in
+            guard let connection = notification.userInfo?[
+                AdamantUserInfoKey.ReachabilityMonitor.connection
+            ] as? AdamantConnection else {
+                return
+            }
+            
+            self?.connection = connection
         }
     }
     
     // MARK: - Tools
     
-    func refreshNode() {
-        node = nodesSource?.getNewNode()
-        
-        if let url = currentUrl {
-            getNodeVersion(url: url) { result in
-                guard case let .success(version) = result else {
-                    return
-                }
-                
-                self.nodeTimeDelta = Date().timeIntervalSince(version.nodeDate)
-            }
-        }
+    func buildUrl(node: Node, path: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
+        guard let url = node.asURL() else { throw InternalError.endpointBuildFailed }
+        return try buildUrl(url: url, path: path, queryItems: queryItems)
     }
     
-    func buildUrl(path: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
-        guard let url = currentUrl, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            throw InternalError.endpointBuildFailed
+    func buildUrl(url: URL, path: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
+        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            throw ApiServiceError.internalError(message: "Failed to build URL from \(url)", error: nil)
         }
         
         components.path = path
@@ -123,23 +123,101 @@ class AdamantApiService: ApiService {
         return try components.asURL()
     }
     
-    func buildUrl(url: URL, subpath: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
-        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            throw ApiServiceError.internalError(message: "Failed to build URL from \(url)", error: nil)
+    func sendRequest<T: Decodable>(
+        path: String,
+        queryItems: [URLQueryItem]? = nil,
+        method: HTTPMethod = .get,
+        parameters: [String: Any]? = nil,
+        encoding: Encoding = .url,
+        headers: [String: String]? = nil,
+        completion: @escaping (ApiServiceResult<T>) -> Void
+    ) {
+        guard let node = preferredNode else {
+            let error = InternalError.endpointBuildFailed.apiServiceErrorWith(
+                error: InternalError.noNodesAvailable
+            )
+            completion(.failure(error))
+            return
         }
         
-        components.path = subpath
-        components.queryItems = queryItems
+        let url: URL
+        do {
+            url = try buildUrl(node: node, path: path, queryItems: queryItems)
+        } catch {
+            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+            completion(.failure(err))
+            return
+        }
         
-        return try components.asURL()
+        let completionWrapper = makePreferredNodeRequestCompletionWrapper(
+            node: node,
+            path: path,
+            queryItems: queryItems,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            headers: headers,
+            completion: completion
+        )
+        
+        sendRequest(
+            url: url,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            headers: headers,
+            completion: completionWrapper
+        )
     }
     
-    func sendRequest<T: Decodable>(url: URLConvertible,
-                                   method: HTTPMethod = .get,
-                                   parameters: [String:Any]? = nil,
-                                   encoding enc: Encoding = .url,
-                                   headers: [String:String]? = nil,
-                                   completion: @escaping (ApiServiceResult<T>) -> Void) {
+    private func makePreferredNodeRequestCompletionWrapper<T: Decodable>(
+        node: Node,
+        path: String,
+        queryItems: [URLQueryItem]?,
+        method: HTTPMethod,
+        parameters: [String: Any]?,
+        encoding: Encoding,
+        headers: [String: String]?,
+        completion: @escaping (ApiServiceResult<T>) -> Void
+    ) -> (ApiServiceResult<T>) -> Void {
+        { [weak self] result in
+            switch result {
+            case .success:
+                completion(result)
+            case let .failure(error):
+                switch error {
+                case .networkError:
+                    switch self?.connection {
+                    case .some(.cellular), .some(.wifi):
+                        node.connectionStatus = .offline
+                        self?.nodesSource.nodesUpdate()
+                        self?.sendRequest(
+                            path: path,
+                            queryItems: queryItems,
+                            method: method,
+                            parameters: parameters,
+                            encoding: encoding,
+                            headers: headers,
+                            completion: completion
+                        )
+                    case nil, .some(.none):
+                        completion(result)
+                    }
+                case .accountNotFound, .internalError, .notLogged, .serverError:
+                    completion(result)
+                }
+            }
+        }
+    }
+    
+    func sendRequest<T: Decodable>(
+        url: URLConvertible,
+        method: HTTPMethod = .get,
+        parameters: [String: Any]? = nil,
+        encoding enc: Encoding = .url,
+        headers: [String: String]? = nil,
+        completion: @escaping (ApiServiceResult<T>) -> Void
+    ) {
         let encoding: ParameterEncoding
         switch enc {
         case .url:
@@ -150,26 +228,31 @@ class AdamantApiService: ApiService {
         
         let headers: HTTPHeaders = HTTPHeaders(headers ?? [:])
         
-        AF.request(url, method: method, parameters: parameters, encoding: encoding, headers: headers)
-            .responseData(queue: defaultResponseDispatchQueue) { [weak self] response in
-                switch response.result {
-                case .success(let data):
-                    do {
-                        let model: T = try JSONDecoder().decode(T.self, from: data)
-                        
-                        if let timestampResponse = model as? ServerResponseWithTimestamp {
-                            let nodeDate = AdamantUtilities.decodeAdamant(timestamp: timestampResponse.nodeTimestamp)
-                            self?.nodeTimeDelta = Date().timeIntervalSince(nodeDate)
-                        }
-                        
-                        completion(.success(model))
-                    } catch {
-                        completion(.failure(InternalError.parsingFailed.apiServiceErrorWith(error: error)))
+        AF.request(
+            url,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            headers: headers
+        ).responseData(queue: defaultResponseDispatchQueue) { [weak self] response in
+            switch response.result {
+            case .success(let data):
+                do {
+                    let model: T = try JSONDecoder().decode(T.self, from: data)
+                    
+                    if let timestampResponse = model as? ServerResponseWithTimestamp {
+                        let nodeDate = AdamantUtilities.decodeAdamant(timestamp: timestampResponse.nodeTimestamp)
+                        self?.lastRequestTimeDelta = Date().timeIntervalSince(nodeDate)
                     }
                     
-                case .failure(let error):
-                    completion(.failure(.networkError(error: error)))
+                    completion(.success(model))
+                } catch {
+                    completion(.failure(InternalError.parsingFailed.apiServiceErrorWith(error: error)))
                 }
+                
+            case .failure(let error):
+                completion(.failure(.networkError(error: error)))
+            }
         }
     }
     

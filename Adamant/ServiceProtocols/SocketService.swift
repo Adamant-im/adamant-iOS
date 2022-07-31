@@ -9,18 +9,8 @@
 import Foundation
 
 // - MARK: SocketService
+
 protocol SocketService: AnyObject {
-    
-    /// Default is async queue with .utilities priority.
-    var defaultResponseDispatchQueue: DispatchQueue { get }
-    
-    // MARK: - Connection
-    
-    func connect(address: String)
-    
+    func connect(address: String, handler: @escaping (ApiServiceResult<Transaction>) -> Void)
     func disconnect()
-    
-    // MARK: - Receive New Transaction
-    
-    func receiveNewTransaction(completion: ((ApiServiceResult<Transaction>) -> Void)?)
 }

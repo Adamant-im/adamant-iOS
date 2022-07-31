@@ -1,28 +1,26 @@
 //
-//  AdamantApi+Peers.swift
+//  AdamantApi+Status.swift
 //  Adamant
 //
-//  Created by Anokhov Pavel on 21.06.2018.
-//  Copyright © 2018 Adamant. All rights reserved.
+//  Created by Андрей on 10.05.2022.
+//  Copyright © 2022 Adamant. All rights reserved.
 //
 
 import Foundation
 
 extension AdamantApiService.ApiCommands {
-    static let Peers = (
-        root: "/api/peers",
-        version: "/api/peers/version"
-    )
+    static let status = "/api/node/status"
 }
 
-
-// MARK: - Peers
 extension AdamantApiService {
-    func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void) {
+    func getNodeStatus(
+        url: URL,
+        completion: @escaping (ApiServiceResult<NodeStatus>) -> Void
+    ) {
         // MARK: 1. Prepare
         let endpoint: URL
         do {
-            endpoint = try buildUrl(url: url, path: ApiCommands.Peers.version)
+            endpoint = try buildUrl(url: url, path: ApiCommands.status)
         } catch {
             let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
             completion(.failure(err))
@@ -34,10 +32,15 @@ extension AdamantApiService {
         ]
         
         // MARK: 2. Make request
-        sendRequest(url: endpoint, method: .get, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<NodeVersion>) in
+        sendRequest(
+            url: endpoint,
+            method: .get,
+            encoding: .json,
+            headers: headers
+        ) { (serverResponse: ApiServiceResult<NodeStatus>) in
             switch serverResponse {
-            case .success(let version):
-                completion(.success(version))
+            case .success(let status):
+                completion(.success(status))
                 
             case .failure(let error):
                 completion(.failure(.networkError(error: error)))

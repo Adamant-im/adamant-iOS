@@ -18,6 +18,9 @@ extension UIColor {
         static let active = UIColor(hex: "#179cec")
         static let background = UIColor(hex: "#f2f6fa")
         static let alert = UIColor(hex: "#faa05a")
+        static let good = UIColor(hex: "#32d296")
+        static let danger = UIColor(hex: "#f0506e")
+        static let inactive = UIColor(hex: "#6d6f72")
         
         // MARK: Global colors
         
@@ -32,9 +35,6 @@ extension UIColor {
         
         /// Table row icons color, ~45% gray
         static let tableRowIcons = UIColor(red: 0.45, green: 0.45, blue: 0.45, alpha: 1)
-        
-        /// Switch onTintColor
-        static let switchColor = UIColor(hex: "#179cec")
         
         // MARK: Chat colors
         
