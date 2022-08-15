@@ -220,6 +220,9 @@ extension AdamantTransfersProvider {
                         
                     case .networkError(_):
                         err = .networkError
+                        
+                    case .requestCancelled:
+                        err = .requestCancelled
                     }
                     
                 default:

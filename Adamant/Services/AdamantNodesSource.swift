@@ -57,14 +57,14 @@ class AdamantNodesSource: NodesSource {
             forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
             object: nil,
             queue: nil
-        ) { [weak healthCheckService] notification in
+        ) { [weak self] notification in
             let connection = notification.userInfo?[
                 AdamantUserInfoKey.ReachabilityMonitor.connection
             ] as? AdamantConnection
             
             switch connection {
             case .wifi, .cellular:
-                healthCheckService?.healthCheck()
+                self?.healthCheckService.healthCheck()
             case nil, .some(.none):
                 break
             }

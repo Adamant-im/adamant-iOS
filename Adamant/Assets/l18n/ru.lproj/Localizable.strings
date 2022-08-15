@@ -439,6 +439,9 @@
 /* Shared error: Network problems. In most cases - no connection */
 "Error.NoNetwork" = "Нет соединения с сетью";
 
+/* Shared error: Request cancelled */
+"Error.RequestCancelled" = "Запрос отменён";
+
 /* Shared error: Remote error format, %@ for message */
 "Error.RemoteServerErrorFormat" = "Ошибка на узле блокчейна: %@";
 

@@ -56,7 +56,7 @@ extension AdamantAccount: WrappableModel {
     
     static func makeEmptyAccount(publicKey: String) -> Self {
         .init(
-            address: AddressGenerator.generateAddress(publicKey: publicKey),
+            address: AdamantUtilities.generateAddress(publicKey: publicKey),
             unconfirmedBalance: .zero,
             balance: .zero,
             publicKey: publicKey,

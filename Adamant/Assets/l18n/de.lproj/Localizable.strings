@@ -445,6 +445,9 @@
 /* Shared error: Network problems. In most cases - no connection */
 "Error.NoNetwork" = "Keine Verbindung";
 
+/* Shared error: Request cancelled */
+"Error.RequestCancelled" = "Request cancelled";
+
 /* Shared error: Remote error format, %@ for message */
 "Error.RemoteServerErrorFormat" = "Blockchain-Node Fehler: %@";
 

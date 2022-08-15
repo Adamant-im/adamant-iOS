@@ -15,6 +15,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
     override func setUp() {
         super.setUp()
         service = .init()
+        service.apiService = ApiServiceStub()
     }
     
     override func tearDown() {
@@ -111,7 +112,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         let node = makeTestNode()
         
         service.nodes = [node]
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(node.connectionStatus, .synchronizing)
     }
@@ -121,7 +122,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         node.status = .init(ping: .zero, wsEnabled: false, height: .zero, version: nil)
         
         service.nodes = [node]
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(node.connectionStatus, .allowed)
     }
@@ -132,7 +133,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         nodes[1].status = .init(ping: .zero, wsEnabled: false, height: 1000, version: nil)
         
         service.nodes = nodes
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(nodes[0].connectionStatus, .allowed)
         XCTAssertEqual(nodes[1].connectionStatus, .allowed)
@@ -144,7 +145,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         nodes[1].status = .init(ping: .zero, wsEnabled: false, height: 1001, version: nil)
         
         service.nodes = nodes
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(nodes[0].connectionStatus, .synchronizing)
         XCTAssertEqual(nodes[1].connectionStatus, .allowed)
@@ -157,7 +158,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         nodes[2].status = .init(ping: .zero, wsEnabled: false, height: 20, version: nil)
         
         service.nodes = nodes
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(nodes[0].connectionStatus, .allowed)
         XCTAssertEqual(nodes[1].connectionStatus, .allowed)
@@ -171,7 +172,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         nodes[2].status = .init(ping: .zero, wsEnabled: false, height: 22, version: nil)
         
         service.nodes = nodes
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(nodes[0].connectionStatus, .synchronizing)
         XCTAssertEqual(nodes[1].connectionStatus, .synchronizing)
@@ -187,7 +188,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         nodes[4].status = .init(ping: .zero, wsEnabled: false, height: 40, version: nil)
         
         service.nodes = nodes
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(nodes[0].connectionStatus, .synchronizing)
         XCTAssertEqual(nodes[1].connectionStatus, .synchronizing)

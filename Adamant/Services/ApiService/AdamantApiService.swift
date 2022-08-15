@@ -221,13 +221,14 @@ class AdamantApiService: ApiService {
                     case nil, .some(.none):
                         completion(result)
                     }
-                case .accountNotFound, .internalError, .notLogged, .serverError:
+                case .accountNotFound, .internalError, .notLogged, .serverError, .requestCancelled:
                     completion(result)
                 }
             }
         }
     }
     
+    @discardableResult
     func sendRequest<T: Decodable>(
         url: URLConvertible,
         method: HTTPMethod = .get,
@@ -235,7 +236,7 @@ class AdamantApiService: ApiService {
         encoding enc: Encoding = .url,
         headers: [String: String]? = nil,
         completion: @escaping (ApiServiceResult<T>) -> Void
-    ) {
+    ) -> DataRequest {
         let encoding: ParameterEncoding
         switch enc {
         case .url:
@@ -246,7 +247,7 @@ class AdamantApiService: ApiService {
         
         let headers: HTTPHeaders = HTTPHeaders(headers ?? [:])
         
-        AF.request(
+        return AF.request(
             url,
             method: method,
             parameters: parameters,
@@ -269,7 +270,7 @@ class AdamantApiService: ApiService {
                 }
                 
             case .failure(let error):
-                completion(.failure(.networkError(error: error)))
+                completion(.failure(.init(error: error)))
             }
         }
     }
@@ -298,5 +299,18 @@ class AdamantApiService: ApiService {
             object: self,
             userInfo: nil
         )
+    }
+}
+
+private extension ApiServiceError {
+    init(error: Error) {
+        let afError = error as? AFError
+        
+        switch afError {
+        case .explicitlyCancelled:
+            self = .requestCancelled
+        default:
+            self = .networkError(error: error)
+        }
     }
 }

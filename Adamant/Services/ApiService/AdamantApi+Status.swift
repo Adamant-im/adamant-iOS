@@ -7,16 +7,18 @@
 //
 
 import Foundation
+import Alamofire
 
 extension AdamantApiService.ApiCommands {
     static let status = "/api/node/status"
 }
 
 extension AdamantApiService {
+    @discardableResult
     func getNodeStatus(
         url: URL,
         completion: @escaping (ApiServiceResult<NodeStatus>) -> Void
-    ) {
+    ) -> DataRequest? {
         // MARK: 1. Prepare
         let endpoint: URL
         do {
@@ -24,7 +26,7 @@ extension AdamantApiService {
         } catch {
             let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
             completion(.failure(err))
-            return
+            return nil
         }
         
         let headers = [
@@ -32,19 +34,12 @@ extension AdamantApiService {
         ]
         
         // MARK: 2. Make request
-        sendRequest(
+        return sendRequest(
             url: endpoint,
             method: .get,
             encoding: .json,
-            headers: headers
-        ) { (serverResponse: ApiServiceResult<NodeStatus>) in
-            switch serverResponse {
-            case .success(let status):
-                completion(.success(status))
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
-            }
-        }
+            headers: headers,
+            completion: completion
+        )
     }
 }
