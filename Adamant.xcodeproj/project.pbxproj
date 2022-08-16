@@ -15,10 +15,10 @@
 		3AE89DDB2837F5D30051D3A9 /* ChatRoomsChats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE89DDA2837F5D30051D3A9 /* ChatRoomsChats.swift */; };
 		3C06931576393125C61FB8F6 /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */; };
 		41935848287841E20083363B /* MacOSDeterminer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41935847287841E20083363B /* MacOSDeterminer.swift */; };
-		41E857A42847ADA200BC0783 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E857A32847ADA200BC0783 /* AdamantSecret.swift */; };
-		41E857A52847ADA200BC0783 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E857A32847ADA200BC0783 /* AdamantSecret.swift */; };
-		41E857A62847ADA200BC0783 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E857A32847ADA200BC0783 /* AdamantSecret.swift */; };
-		41E857A72847ADA200BC0783 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E857A32847ADA200BC0783 /* AdamantSecret.swift */; };
+		41E142F2289E60EB002EE8D7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */; };
+		41E142F3289E60EB002EE8D7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */; };
+		41E142F4289E60EB002EE8D7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */; };
+		41E142F5289E60EB002EE8D7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */; };
 		550066C5284D65DB0044C0B1 /* HealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C4284D65DB0044C0B1 /* HealthCheckService.swift */; };
 		550066C7284D682D0044C0B1 /* AdamantHealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */; };
 		551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E528959A5200DE5D69 /* LoadingView.swift */; };
@@ -627,7 +627,7 @@
 		3AE89DD82837F5BF0051D3A9 /* ChatRooms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRooms.swift; sourceTree = "<group>"; };
 		3AE89DDA2837F5D30051D3A9 /* ChatRoomsChats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRoomsChats.swift; sourceTree = "<group>"; };
 		41935847287841E20083363B /* MacOSDeterminer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacOSDeterminer.swift; sourceTree = "<group>"; };
-		41E857A32847ADA200BC0783 /* AdamantSecret.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdamantSecret.swift; sourceTree = "<group>"; };
+		41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantSecret.swift; sourceTree = "<group>"; };
 		4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.release.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.release.xcconfig"; sourceTree = "<group>"; };
 		550066C4284D65DB0044C0B1 /* HealthCheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthCheckService.swift; sourceTree = "<group>"; };
 		550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantHealthCheckService.swift; sourceTree = "<group>"; };
@@ -1745,7 +1745,7 @@
 				E9D664C222A0037600733F8A /* View */,
 				E957E123229B0C330019732A /* AdamantNotificationKeys.swift */,
 				E9771D802299602D0099AAC7 /* AdamantResources.swift */,
-				41E857A32847ADA200BC0783 /* AdamantSecret.swift */,
+				41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */,
 				E957E170229C56EE0019732A /* Shared.xcassets */,
 			);
 			path = AdamantShared;
@@ -2397,13 +2397,13 @@
 				E9079A92229DF1B80022CA0D /* UIColor+hex.swift in Sources */,
 				E9079A8D229DF19A0022CA0D /* KeychainStore.swift in Sources */,
 				E9079AA4229DF6850022CA0D /* AdamantUtilities.swift in Sources */,
-				41E857A72847ADA200BC0783 /* AdamantSecret.swift in Sources */,
 				E951466C22A691EF007564D7 /* String+utilites.swift in Sources */,
 				E9079A8F229DF1A40022CA0D /* Crypto.swift in Sources */,
 				E9079A90229DF1A40022CA0D /* Mnemonic.swift in Sources */,
 				E9079AA0229DF2380022CA0D /* AdamantNotificationKeys.swift in Sources */,
 				E9079A95229DF1DA0022CA0D /* Keypair.swift in Sources */,
 				E951467122A697F8007564D7 /* ContactDescription.swift in Sources */,
+				41E142F5289E60EB002EE8D7 /* AdamantSecret.swift in Sources */,
 				E9079A9F229DF1DA0022CA0D /* VotesAsset.swift in Sources */,
 				E9079A99229DF1DA0022CA0D /* Node.swift in Sources */,
 				E9D664D122A009AB00733F8A /* AdamantLocalized.swift in Sources */,
@@ -2437,7 +2437,6 @@
 				E9256F5F2034C21100DE86E9 /* String+localized.swift in Sources */,
 				6414C18E217DF43100373FA6 /* String+adamant.swift in Sources */,
 				E908472A2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift in Sources */,
-				41E857A42847ADA200BC0783 /* AdamantSecret.swift in Sources */,
 				64A223D620F760BB005157CB /* Localization.swift in Sources */,
 				64E1C82F222E95F6006C4DA7 /* DogeWallet.swift in Sources */,
 				E9484B7D2285BAD9008E10F0 /* PrivateKeyGenerator.swift in Sources */,
@@ -2651,6 +2650,7 @@
 				3AD95B96284121E100767396 /* HeaderReusableView.swift in Sources */,
 				E9FAE5DA203DBFEF008D3A6B /* Comparable+clamped.swift in Sources */,
 				E94008802114EE2000CD2D67 /* AdmWallet.swift in Sources */,
+				41E142F2289E60EB002EE8D7 /* AdamantSecret.swift in Sources */,
 				E9A03FDA20DC0B14007653A1 /* NodesSource.swift in Sources */,
 				E926E02E213EAABF005E536B /* TransferViewControllerBase+Alert.swift in Sources */,
 				E9B1AA572121ACC000080A2A /* AdmWalletViewController.swift in Sources */,
@@ -2757,6 +2757,7 @@
 				E957E162229C4BEA0019732A /* Mnemonic.swift in Sources */,
 				E957E159229C405F0019732A /* AdamantResources.swift in Sources */,
 				E957E16E229C53CB0019732A /* RichMessageNotificationProvider.swift in Sources */,
+				41E142F4289E60EB002EE8D7 /* AdamantSecret.swift in Sources */,
 				E957E158229C3F840019732A /* ExtensionsApi.swift in Sources */,
 				E957E15E229C43EE0019732A /* Decimal+adamant.swift in Sources */,
 				E957E141229BFF920019732A /* Date+adamant.swift in Sources */,
@@ -2786,7 +2787,6 @@
 				64AE84622300012400F38FBD /* DashProvider.swift in Sources */,
 				E957E16C229C53980019732A /* LskProvider.swift in Sources */,
 				E9D664D022A009AB00733F8A /* AdamantLocalized.swift in Sources */,
-				41E857A62847ADA200BC0783 /* AdamantSecret.swift in Sources */,
 				E957E14D229C3E530019732A /* Node.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2829,7 +2829,7 @@
 				E957E0ED229982FF0019732A /* Keypair.swift in Sources */,
 				6423038324B26CAF004CF3FE /* ERC20Token.swift in Sources */,
 				E957E0FB229AB9310019732A /* AdamantProvider.swift in Sources */,
-				41E857A52847ADA200BC0783 /* AdamantSecret.swift in Sources */,
+				41E142F3289E60EB002EE8D7 /* AdamantSecret.swift in Sources */,
 				E957E157229C3F840019732A /* ExtensionsApi.swift in Sources */,
 				E957E0F722999BD50019732A /* TransferBaseProvider.swift in Sources */,
 				E9771D9622996FEB0099AAC7 /* StateType.swift in Sources */,
@@ -2955,7 +2955,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202;
+				CURRENT_PROJECT_VERSION = 210;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -2987,7 +2987,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 202;
+				CURRENT_PROJECT_VERSION = 210;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3137,7 +3137,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202;
+				CURRENT_PROJECT_VERSION = 210;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = ADM.Dev;
 				EXCLUDED_SOURCE_FILE_NAMES = "";
@@ -3169,7 +3169,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 202;
+				CURRENT_PROJECT_VERSION = 210;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = Adamant;
 				EXCLUDED_SOURCE_FILE_NAMES = Debug.xcassets;
@@ -3200,7 +3200,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202;
+				CURRENT_PROJECT_VERSION = 210;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3232,7 +3232,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 202;
+				CURRENT_PROJECT_VERSION = 210;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3264,7 +3264,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202;
+				CURRENT_PROJECT_VERSION = 210;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3296,7 +3296,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 202;
+				CURRENT_PROJECT_VERSION = 210;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;

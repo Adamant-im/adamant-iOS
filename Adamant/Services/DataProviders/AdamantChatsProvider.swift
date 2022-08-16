@@ -1159,6 +1159,7 @@ extension AdamantChatsProvider {
                 unconfirmedsSemaphore.wait()
                 if let objectId = unconfirmedTransactions[trs.transaction.id], let unconfirmed = context.object(with: objectId) as? ChatTransaction {
                     confirmTransaction(unconfirmed, id: trs.transaction.id, height: Int64(trs.transaction.height), blockId: trs.transaction.blockId, confirmations: trs.transaction.confirmations)
+                    
                     let h = Int64(trs.transaction.height)
                     if height < h {
                         height = h
@@ -1479,6 +1480,8 @@ extension AdamantChatsProvider {
         
         if let lastHeight = receivedLastHeight, lastHeight < height {
             self.receivedLastHeight = height
+            transaction.statusEnum = .delivered
+            transaction.isConfirmed = true
         }
     }
     

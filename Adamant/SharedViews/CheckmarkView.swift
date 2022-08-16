@@ -17,6 +17,23 @@ final class CheckmarkView: UIView {
     
     var onCheckmarkTap: (() -> Void)?
     private(set) var isChecked = false
+    private(set) var isChecking = false
+    
+    var imageBorderColor: CGColor? {
+        get { imageBackgroundView.layer.borderColor }
+        set { imageBackgroundView.layer.borderColor = newValue }
+    }
+    
+    var imageTintColor: UIColor? {
+        get { imageView.tintColor }
+        set { imageView.tintColor = newValue }
+    }
+    
+    private lazy var spinner: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .gray)
+        view.alpha = 0.0
+        return view
+    }()
     
     private lazy var imageBackgroundView: UIView = {
         let view = UIView()
@@ -50,10 +67,21 @@ final class CheckmarkView: UIView {
     }
     
     func setIsChecked(_ isChecked: Bool, animated: Bool) {
-        guard self.isChecked != isChecked else { return }
-        
         self.isChecked = isChecked
         updateImage(animated: animated)
+    }
+    
+    func setIsChecking(_ isChecking: Bool, animated: Bool) {
+        self.isChecking = isChecking
+        if isChecking {
+            imageBackgroundView.alpha = .zero
+            spinner.alpha = 1.0
+            startAnimating()
+        } else {
+            imageBackgroundView.alpha = 1.0
+            spinner.alpha = 0.0
+            stopAnimating()
+        }
     }
     
     private func setupView() {
@@ -72,6 +100,11 @@ final class CheckmarkView: UIView {
         
         checkmarkContainer.addSubview(imageView)
         imageView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
+        
+        checkmarkContainer.addSubview(spinner)
+        spinner.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
         }
     }
@@ -128,6 +161,14 @@ final class CheckmarkView: UIView {
                 imageView.isHidden = true
             }
         )
+    }
+    
+    private func startAnimating() {
+        spinner.startAnimating()
+    }
+    
+    private func stopAnimating() {
+        spinner.stopAnimating()
     }
 }
 

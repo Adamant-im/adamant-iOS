@@ -103,6 +103,7 @@ final class AdamantHealthCheckService: HealthCheckService {
                 if !node.isWorking {
                     node.connectionStatus = .synchronizing
                 }
+                node.wsPort = status.wsClient?.port
             case .failure:
                 node.connectionStatus = .offline
                 node.status = nil
