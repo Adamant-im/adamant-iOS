@@ -57,7 +57,7 @@ class AdamantApiService: ApiService {
     
     weak var nodesSource: NodesSource? {
         didSet {
-            updateCurrentNode()
+            updateCurrentNodes()
         }
     }
     
@@ -65,11 +65,10 @@ class AdamantApiService: ApiService {
     
     private var _lastRequestTimeDelta: TimeInterval?
     private var lastRequestTimeDeltaSemaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
-    private var connection: AdamantConnection?
     
-    private(set) var currentNode: Node? {
+    private(set) var currentNodes: [Node] = [] {
         didSet {
-            guard oldValue !== currentNode else { return }
+            guard oldValue != currentNodes else { return }
             sendCurrentNodeUpdateNotification()
         }
     }
@@ -99,25 +98,11 @@ class AdamantApiService: ApiService {
     
     init() {
         NotificationCenter.default.addObserver(
-            forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
-            object: nil,
-            queue: nil
-        ) { [weak self] notification in
-            guard let connection = notification.userInfo?[
-                AdamantUserInfoKey.ReachabilityMonitor.connection
-            ] as? AdamantConnection else {
-                return
-            }
-            
-            self?.connection = connection
-        }
-        
-        NotificationCenter.default.addObserver(
             forName: Notification.Name.NodesSource.nodesUpdate,
             object: nil,
             queue: nil
         ) { [weak self] _ in
-            self?.updateCurrentNode()
+            self?.updateCurrentNodes()
         }
     }
     
@@ -148,9 +133,47 @@ class AdamantApiService: ApiService {
         headers: [String: String]? = nil,
         completion: @escaping (ApiServiceResult<T>) -> Void
     ) {
-        guard let node = currentNode else {
+        guard !currentNodes.isEmpty else {
             let error = InternalError.endpointBuildFailed.apiServiceErrorWith(
                 error: InternalError.noNodesAvailable
+            )
+            completion(.failure(error))
+            return
+        }
+        
+        sendSafeRequest(
+            nodes: currentNodes,
+            path: path,
+            queryItems: queryItems,
+            method: method,
+            parameters: parameters,
+            encoding: encoding,
+            headers: headers,
+            onFailure: { [weak self] node in
+                node.connectionStatus = .offline
+                self?.nodesSource?.nodesUpdate()
+            },
+            completion: completion
+        )
+        
+        updateCurrentNodes()
+    }
+    
+    /// On failure this method doesn't call completion, it just goes to next node. Completion called on success or on last node failure.
+    private func sendSafeRequest<T: Decodable>(
+        nodes: [Node],
+        path: String,
+        queryItems: [URLQueryItem]?,
+        method: HTTPMethod,
+        parameters: [String: Any]?,
+        encoding: Encoding,
+        headers: [String: String]?,
+        onFailure: @escaping (Node) -> Void,
+        completion: @escaping (ApiServiceResult<T>) -> Void
+    ) {
+        guard let node = nodes.first else {
+            let error = InternalError.endpointBuildFailed.apiServiceErrorWith(
+                error: InternalError.unknownError
             )
             completion(.failure(error))
             return
@@ -165,16 +188,32 @@ class AdamantApiService: ApiService {
             return
         }
         
-        let completionWrapper = makePreferredNodeRequestCompletionWrapper(
-            node: node,
-            path: path,
-            queryItems: queryItems,
-            method: method,
-            parameters: parameters,
-            encoding: encoding,
-            headers: headers,
-            completion: completion
-        )
+        let completion: (ApiServiceResult<T>) -> Void = { [weak self] result in
+            switch result {
+            case .success:
+                completion(result)
+            case let .failure(error):
+                switch error {
+                case .networkError:
+                    onFailure(node)
+                    var nodes = nodes
+                    nodes.removeFirst()
+                    self?.sendSafeRequest(
+                        nodes: nodes,
+                        path: path,
+                        queryItems: queryItems,
+                        method: method,
+                        parameters: parameters,
+                        encoding: encoding,
+                        headers: headers,
+                        onFailure: onFailure,
+                        completion: completion
+                    )
+                case .accountNotFound, .internalError, .notLogged, .serverError, .requestCancelled:
+                    completion(result)
+                }
+            }
+        }
         
         sendRequest(
             url: url,
@@ -182,52 +221,11 @@ class AdamantApiService: ApiService {
             parameters: parameters,
             encoding: encoding,
             headers: headers,
-            completion: completionWrapper
+            completion: completion
         )
-        
-        updateCurrentNode()
     }
     
-    private func makePreferredNodeRequestCompletionWrapper<T: Decodable>(
-        node: Node,
-        path: String,
-        queryItems: [URLQueryItem]?,
-        method: HTTPMethod,
-        parameters: [String: Any]?,
-        encoding: Encoding,
-        headers: [String: String]?,
-        completion: @escaping (ApiServiceResult<T>) -> Void
-    ) -> (ApiServiceResult<T>) -> Void {
-        { [weak self] result in
-            switch result {
-            case .success:
-                completion(result)
-            case let .failure(error):
-                switch error {
-                case .networkError:
-                    switch self?.connection {
-                    case .some(.cellular), .some(.wifi):
-                        node.connectionStatus = .offline
-                        self?.nodesSource?.nodesUpdate()
-                        self?.sendRequest(
-                            path: path,
-                            queryItems: queryItems,
-                            method: method,
-                            parameters: parameters,
-                            encoding: encoding,
-                            headers: headers,
-                            completion: completion
-                        )
-                    case nil, .some(.none):
-                        completion(result)
-                    }
-                case .accountNotFound, .internalError, .notLogged, .serverError:
-                    completion(result)
-                }
-            }
-        }
-    }
-    
+    @discardableResult
     func sendRequest<T: Decodable>(
         url: URLConvertible,
         method: HTTPMethod = .get,
@@ -235,7 +233,7 @@ class AdamantApiService: ApiService {
         encoding enc: Encoding = .url,
         headers: [String: String]? = nil,
         completion: @escaping (ApiServiceResult<T>) -> Void
-    ) {
+    ) -> DataRequest {
         let encoding: ParameterEncoding
         switch enc {
         case .url:
@@ -246,7 +244,7 @@ class AdamantApiService: ApiService {
         
         let headers: HTTPHeaders = HTTPHeaders(headers ?? [:])
         
-        AF.request(
+        return AF.request(
             url,
             method: method,
             parameters: parameters,
@@ -269,7 +267,7 @@ class AdamantApiService: ApiService {
                 }
                 
             case .failure(let error):
-                completion(.failure(.networkError(error: error)))
+                completion(.failure(.init(error: error)))
             }
         }
     }
@@ -288,8 +286,8 @@ class AdamantApiService: ApiService {
         }
     }
     
-    private func updateCurrentNode() {
-        currentNode = nodesSource?.getPreferredNode(needWS: false)
+    private func updateCurrentNodes() {
+        currentNodes = nodesSource?.getAllowedNodes(needWS: false) ?? []
     }
     
     private func sendCurrentNodeUpdateNotification() {
@@ -298,5 +296,18 @@ class AdamantApiService: ApiService {
             object: self,
             userInfo: nil
         )
+    }
+}
+
+private extension ApiServiceError {
+    init(error: Error) {
+        let afError = error as? AFError
+        
+        switch afError {
+        case .explicitlyCancelled:
+            self = .requestCancelled
+        default:
+            self = .networkError(error: error)
+        }
     }
 }

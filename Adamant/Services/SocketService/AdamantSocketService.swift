@@ -97,7 +97,7 @@ class AdamantSocketService: SocketService {
     }
     
     private func refreshNode() {
-        currentNode = nodesSource.getPreferredNode(needWS: true)
+        currentNode = nodesSource.getAllowedNodes(needWS: true).first
     }
     
     private func handleTransaction(data: [Any]) {
