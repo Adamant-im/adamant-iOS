@@ -75,7 +75,7 @@ class NodesListViewController: FormViewController {
     
     var apiService: ApiService! {
         didSet {
-            currentRestNode = apiService.currentNode
+            currentRestNode = apiService.currentNodes.first
         }
     }
     
@@ -134,7 +134,7 @@ class NodesListViewController: FormViewController {
             queue: nil
         ) { [weak self] notification in
             DispatchQueue.onMainAsync {
-                self?.currentRestNode = self?.apiService.currentNode
+                self?.currentRestNode = self?.apiService.currentNodes.first
             }
         }
         

@@ -39,7 +39,7 @@ protocol NodesSource: AnyObject {
     var preferTheFastestNode: Bool { get set }
     
     func setDefaultNodes()
-    func getPreferredNode(needWS: Bool) -> Node?
+    func getAllowedNodes(needWS: Bool) -> [Node]
     func healthCheck()
     func nodesUpdate()
 }

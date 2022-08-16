@@ -28,25 +28,24 @@ final class AdamantHealthCheckService: HealthCheckService {
     
     // MARK: - Tools
     
-    func getPreferredNode(fastest: Bool, needWS: Bool) -> Node? {
+    func getAllowedNodes(sortedBySpeedDescending: Bool, needWS: Bool) -> [Node] {
         defer { semaphore.signal() }
         semaphore.wait()
         
-        let allowedNodes = nodes.filter {
+        var allowedNodes = nodes.filter {
             $0.connectionStatus == .allowed
                 && (!needWS || $0.status?.wsEnabled ?? false)
         }
         
-        let nodesForChoosing = allowedNodes.isEmpty && !needWS
-            ? nodes.filter { $0.isEnabled && $0.connectionStatus != .offline }
-            : allowedNodes
+        if allowedNodes.isEmpty && !needWS {
+            allowedNodes = nodes.filter { $0.isEnabled }
+        }
         
-        return fastest
-            ? nodesForChoosing.min {
-                $0.status?.ping ?? .greatestFiniteMagnitude
-                    < $1.status?.ping ?? .greatestFiniteMagnitude
+        return sortedBySpeedDescending
+            ? allowedNodes.sorted {
+                $0.status?.ping ?? .greatestFiniteMagnitude < $1.status?.ping ?? .greatestFiniteMagnitude
             }
-            : nodesForChoosing.random
+            : allowedNodes.shuffled()
     }
     
     func healthCheck() {

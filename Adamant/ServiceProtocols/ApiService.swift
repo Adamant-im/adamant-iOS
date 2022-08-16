@@ -126,7 +126,7 @@ protocol ApiService: AnyObject {
     /// Substract this from client time to get server time
     var lastRequestTimeDelta: TimeInterval? { get }
     
-    var currentNode: Node? { get }
+    var currentNodes: [Node] { get }
     
     // MARK: - Peers
     

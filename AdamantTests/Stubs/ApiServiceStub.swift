@@ -13,7 +13,7 @@ import Alamofire
 final class ApiServiceStub: ApiService {
     let defaultResponseDispatchQueue: DispatchQueue = .default
     let lastRequestTimeDelta: TimeInterval? = nil
-    let currentNode: Node? = nil
+    let currentNodes: [Node] = []
     
     func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void) {}
     
