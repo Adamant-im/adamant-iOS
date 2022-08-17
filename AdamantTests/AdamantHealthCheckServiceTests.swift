@@ -15,6 +15,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
     override func setUp() {
         super.setUp()
         service = .init()
+        service.apiService = ApiServiceStub()
     }
     
     override func tearDown() {
@@ -22,87 +23,85 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         service = nil
     }
     
-    // MARK: - Preferred node tests without WS support
+    // MARK: - Allowed nodes tests without WS support
     
-    func testOneAllowedNodeIsPreferred() {
+    func testOneAllowedNode() {
         let node = makeTestNode(connectionStatus: .allowed)
         service.nodes = [node]
         
-        XCTAssertEqual(node, preferredNode(ws: false))
+        XCTAssertEqual([node], allowedNodes(ws: false))
     }
     
-    func testOneNodeWithoutConnectionStatusIsPreferred() {
+    func testOneNodeWithoutConnectionStatusIsAllowed() {
         let node = makeTestNode()
         service.nodes = [node]
         
-        XCTAssertEqual(node, preferredNode(ws: false))
+        XCTAssertEqual([node], allowedNodes(ws: false))
     }
     
-    func testOneDisabledNodeIsNotPreferred() {
+    func testOneDisabledNodeIsNotAllowed() {
         let node = makeTestNode()
         node.isEnabled = false
         service.nodes = [node]
         
-        XCTAssertNil(preferredNode(ws: false))
+        XCTAssert(allowedNodes(ws: false).isEmpty)
     }
     
-    func testOneOfflineNodeIsNotPreferred() {
+    func testOneOfflineNodeIsAllowed() {
         let node = makeTestNode(connectionStatus: .offline)
         service.nodes = [node]
         
-        XCTAssertNil(preferredNode(ws: false))
+        XCTAssertEqual([node], allowedNodes(ws: false))
     }
     
-    func testManyAllowedNodesFastestIsPreferred() {
-        let nodes: [Node] = (0 ..< 100).map { _ in
+    func testManyAllowedNodesSortedBySpeedDescending() {
+        let nodes: [Node] = (0 ..< 100).map { ping in
             let node = makeTestNode(connectionStatus: .allowed)
-            node.status = .init(ping: 100, wsEnabled: false, height: nil, version: nil)
+            node.status = .init(ping: TimeInterval(ping), wsEnabled: false, height: nil, version: nil)
             return node
         }
         
-        nodes[10].status = .init(ping: 99, wsEnabled: false, height: nil, version: nil)
-        service.nodes = nodes
+        service.nodes = nodes.shuffled()
         
-        XCTAssertEqual(nodes[10], preferredNode(ws: false))
+        XCTAssertEqual(nodes, allowedNodes(ws: false))
     }
     
-    // MARK: - Preferred node tests with WS support
+    // MARK: - Allowed nodes tests with WS support
     
-    func testOneAllowedNodeWithoutWSIsNotPreferredWS() {
+    func testOneAllowedNodeWithoutWSIsNotAllowedWS() {
         let node = makeTestNode(connectionStatus: .allowed)
         node.status = .init(ping: .zero, wsEnabled: false, height: nil, version: nil)
         service.nodes = [node]
         
-        XCTAssertNil(preferredNode(ws: true))
+        XCTAssert(allowedNodes(ws: true).isEmpty)
     }
     
-    func testOneAllowedWSNodeIsPreferredWS() {
+    func testOneAllowedWSNodeIsAllowedWS() {
         let node = makeTestNode(connectionStatus: .allowed)
         node.status = .init(ping: .zero, wsEnabled: true, height: nil, version: nil)
         service.nodes = [node]
         
-        XCTAssertEqual(node, preferredNode(ws: true))
+        XCTAssertEqual([node], allowedNodes(ws: true))
     }
     
-    func testOneWSNodeWithoutConnectionStatusIsNotPreferredWS() {
+    func testOneWSNodeWithoutConnectionStatusIsNotAllowedWS() {
         let node = makeTestNode()
         node.status = .init(ping: .zero, wsEnabled: true, height: nil, version: nil)
         service.nodes = [node]
         
-        XCTAssertNil(preferredNode(ws: true))
+        XCTAssert(allowedNodes(ws: true).isEmpty)
     }
     
-    func testManyAllowedWSNodesFastestIsPreferredWS() {
-        let nodes: [Node] = (0 ..< 100).map { _ in
+    func testManyAllowedNodesSortedBySpeedDescendingWS() {
+        let nodes: [Node] = (0 ..< 100).map { ping in
             let node = makeTestNode(connectionStatus: .allowed)
-            node.status = .init(ping: 100, wsEnabled: true, height: nil, version: nil)
+            node.status = .init(ping: TimeInterval(ping), wsEnabled: true, height: nil, version: nil)
             return node
         }
         
-        nodes[10].status = .init(ping: 99, wsEnabled: true, height: nil, version: nil)
-        service.nodes = nodes
+        service.nodes = nodes.shuffled()
         
-        XCTAssertEqual(nodes[10], preferredNode(ws: true))
+        XCTAssertEqual(nodes, allowedNodes(ws: true))
     }
     
     // MARK: - Health check tests
@@ -111,7 +110,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         let node = makeTestNode()
         
         service.nodes = [node]
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(node.connectionStatus, .synchronizing)
     }
@@ -121,7 +120,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         node.status = .init(ping: .zero, wsEnabled: false, height: .zero, version: nil)
         
         service.nodes = [node]
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(node.connectionStatus, .allowed)
     }
@@ -132,7 +131,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         nodes[1].status = .init(ping: .zero, wsEnabled: false, height: 1000, version: nil)
         
         service.nodes = nodes
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(nodes[0].connectionStatus, .allowed)
         XCTAssertEqual(nodes[1].connectionStatus, .allowed)
@@ -144,7 +143,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         nodes[1].status = .init(ping: .zero, wsEnabled: false, height: 1001, version: nil)
         
         service.nodes = nodes
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(nodes[0].connectionStatus, .synchronizing)
         XCTAssertEqual(nodes[1].connectionStatus, .allowed)
@@ -157,7 +156,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         nodes[2].status = .init(ping: .zero, wsEnabled: false, height: 20, version: nil)
         
         service.nodes = nodes
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(nodes[0].connectionStatus, .allowed)
         XCTAssertEqual(nodes[1].connectionStatus, .allowed)
@@ -171,7 +170,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         nodes[2].status = .init(ping: .zero, wsEnabled: false, height: 22, version: nil)
         
         service.nodes = nodes
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(nodes[0].connectionStatus, .synchronizing)
         XCTAssertEqual(nodes[1].connectionStatus, .synchronizing)
@@ -187,7 +186,7 @@ class AdamantHealthCheckServiceTests: XCTestCase {
         nodes[4].status = .init(ping: .zero, wsEnabled: false, height: 40, version: nil)
         
         service.nodes = nodes
-        service.updateNodesAvailability()
+        service.healthCheck()
         
         XCTAssertEqual(nodes[0].connectionStatus, .synchronizing)
         XCTAssertEqual(nodes[1].connectionStatus, .synchronizing)
@@ -198,8 +197,8 @@ class AdamantHealthCheckServiceTests: XCTestCase {
     
     // MARK: - Helpers
     
-    private func preferredNode(ws: Bool) -> Node? {
-        service.getPreferredNode(fastest: true, needWS: ws)
+    private func allowedNodes(ws: Bool) -> [Node] {
+        service.getAllowedNodes(sortedBySpeedDescending: true, needWS: ws)
     }
     
     private func makeTestNode(connectionStatus: Node.ConnectionStatus = .synchronizing) -> Node {

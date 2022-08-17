@@ -39,6 +39,7 @@ enum ChatsProviderError: Error {
     case dependencyError(String)
     case transactionNotFound(id: String)
     case internalError(Error)
+    case requestCancelled
 }
 
 extension ChatsProviderError: RichError {
@@ -73,6 +74,9 @@ extension ChatsProviderError: RichError {
             
         case .accountNotInitiated(_):
             return String.adamantLocalized.sharedErrors.accountNotInitiated
+        
+        case .requestCancelled:
+            return String.adamantLocalized.sharedErrors.requestCancelled
         }
     }
     
@@ -93,6 +97,7 @@ extension ChatsProviderError: RichError {
                  .networkError,
                  .notEnoughMoneyToSend,
                  .accountNotInitiated,
+                 .requestCancelled,
                  .notLogged:
             return .warning
             

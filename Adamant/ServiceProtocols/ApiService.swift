@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Alamofire
 
 enum ApiServiceResult<T> {
     case success(T)
@@ -20,6 +21,7 @@ enum ApiServiceError: Error {
     case serverError(error: String)
     case internalError(message: String, error: Error?)
     case networkError(error: Error)
+    case requestCancelled
     
     var localized: String {
         switch self {
@@ -47,6 +49,9 @@ enum ApiServiceError: Error {
             
         case .networkError(error: _):
             return String.adamantLocalized.sharedErrors.networkError
+            
+        case .requestCancelled:
+            return String.adamantLocalized.sharedErrors.requestCancelled
         }
     }
 }
@@ -58,7 +63,7 @@ extension ApiServiceError: RichError {
     
     var level: ErrorLevel {
         switch self {
-        case .accountNotFound, .notLogged, .networkError:
+        case .accountNotFound, .notLogged, .networkError, .requestCancelled:
             return .warning
             
         case .internalError, .serverError:
@@ -68,7 +73,7 @@ extension ApiServiceError: RichError {
     
     var internalError: Error? {
         switch self {
-        case .accountNotFound, .notLogged, .serverError:
+        case .accountNotFound, .notLogged, .serverError, .requestCancelled:
             return nil
             
         case .internalError(_, let error):
@@ -121,7 +126,7 @@ protocol ApiService: AnyObject {
     /// Substract this from client time to get server time
     var lastRequestTimeDelta: TimeInterval? { get }
     
-    var currentNode: Node? { get }
+    var currentNodes: [Node] { get }
     
     // MARK: - Peers
     
@@ -129,10 +134,11 @@ protocol ApiService: AnyObject {
     
     // MARK: - Status
     
+    @discardableResult
     func getNodeStatus(
         url: URL,
         completion: @escaping (ApiServiceResult<NodeStatus>) -> Void
-    )
+    ) -> DataRequest?
     
     // MARK: - Accounts
     

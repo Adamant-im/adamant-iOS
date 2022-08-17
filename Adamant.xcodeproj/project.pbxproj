@@ -24,13 +24,13 @@
 		551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E528959A5200DE5D69 /* LoadingView.swift */; };
 		551F66E82895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */; };
 		553B1284281C6EE100FFF24C /* GCDUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 553B1283281C6EE100FFF24C /* GCDUtilites.swift */; };
+		5551CC8F28A8B75300B52AD0 /* ApiServiceStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5551CC8E28A8B75300B52AD0 /* ApiServiceStub.swift */; };
 		5558A436282AAFCC0024DDD6 /* AdamantApi+Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */; };
 		5558A438282AB9390024DDD6 /* NodeStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5558A437282AB9390024DDD6 /* NodeStatus.swift */; };
 		557AC306287B10D8004699D7 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 557AC305287B10D8004699D7 /* SnapKit */; };
 		557AC308287B1365004699D7 /* CheckmarkRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557AC307287B1365004699D7 /* CheckmarkRowView.swift */; };
 		55D1D84F287B78F200F94A4E /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 55D1D84E287B78F200F94A4E /* SnapKit */; };
 		55D1D851287B78FC00F94A4E /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 55D1D850287B78FC00F94A4E /* SnapKit */; };
-		55D1D853287B88BD00F94A4E /* AddressGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D1D852287B88BD00F94A4E /* AddressGenerator.swift */; };
 		55D1D855287B890300F94A4E /* AddressGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D1D854287B890300F94A4E /* AddressGeneratorTests.swift */; };
 		55E69E172868D7920025D82E /* CheckmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55E69E162868D7920025D82E /* CheckmarkView.swift */; };
 		6403F5DB2272389800D58779 /* (null) in Sources */ = {isa = PBXBuildFile; };
@@ -634,10 +634,10 @@
 		551F66E528959A5200DE5D69 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantHealthCheckServiceTests.swift; sourceTree = "<group>"; };
 		553B1283281C6EE100FFF24C /* GCDUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCDUtilites.swift; sourceTree = "<group>"; };
+		5551CC8E28A8B75300B52AD0 /* ApiServiceStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiServiceStub.swift; sourceTree = "<group>"; };
 		5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Status.swift"; sourceTree = "<group>"; };
 		5558A437282AB9390024DDD6 /* NodeStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeStatus.swift; sourceTree = "<group>"; };
 		557AC307287B1365004699D7 /* CheckmarkRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckmarkRowView.swift; sourceTree = "<group>"; };
-		55D1D852287B88BD00F94A4E /* AddressGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressGenerator.swift; sourceTree = "<group>"; };
 		55D1D854287B890300F94A4E /* AddressGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressGeneratorTests.swift; sourceTree = "<group>"; };
 		55E69E162868D7920025D82E /* CheckmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckmarkView.swift; sourceTree = "<group>"; };
 		6403F5DD22723C6800D58779 /* DashMainnet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashMainnet.swift; sourceTree = "<group>"; };
@@ -1141,6 +1141,14 @@
 			path = SocketService;
 			sourceTree = "<group>";
 		};
+		5551CC8D28A8B72D00B52AD0 /* Stubs */ = {
+			isa = PBXGroup;
+			children = (
+				5551CC8E28A8B75300B52AD0 /* ApiServiceStub.swift */,
+			);
+			path = Stubs;
+			sourceTree = "<group>";
+		};
 		6403F5DC22723C2800D58779 /* Dash */ = {
 			isa = PBXGroup;
 			children = (
@@ -1569,7 +1577,6 @@
 				6406D74C21CE3AC100196713 /* KeyboardManager.swift */,
 				649E9A142111B3C200686B01 /* Mnemonic+extended.swift */,
 				E96D64C92295C4A800CA5587 /* WordList.swift */,
-				55D1D852287B88BD00F94A4E /* AddressGenerator.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -1950,6 +1957,7 @@
 		E9EC344520066D4A00C0E546 /* AdamantTests */ = {
 			isa = PBXGroup;
 			children = (
+				5551CC8D28A8B72D00B52AD0 /* Stubs */,
 				E95F85B8200A4D9C0070534A /* Parsing */,
 				E96D64C42295C0AF00CA5587 /* Core */,
 				E950652020404BF0008352E5 /* AdamantUriBuilding.swift */,
@@ -2658,7 +2666,6 @@
 				E9240BF5215D686500187B09 /* AdmWalletService+RichMessageProvider.swift in Sources */,
 				648C697122915CB8006645F5 /* BTCRPCServerResponce.swift in Sources */,
 				E9A174B32057EC47003667CD /* BackgroundFetchService.swift in Sources */,
-				55D1D853287B88BD00F94A4E /* AddressGenerator.swift in Sources */,
 				649D6BE821B95DB7009E727B /* LskWalletService+RichMessageProvider.swift in Sources */,
 				E9E7CDBE2003AEFB00DFC4DB /* CellFactory.swift in Sources */,
 				E923222621135F9000A7E5AF /* EthAccount.swift in Sources */,
@@ -2843,6 +2850,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9C51ECF200E2D1100385EB7 /* FeeTests.swift in Sources */,
+				5551CC8F28A8B75300B52AD0 /* ApiServiceStub.swift in Sources */,
 				E9EC344720066D4A00C0E546 /* AddressValidationTests.swift in Sources */,
 				E94883E7203F07CD00F6E1B0 /* PassphraseValidation.swift in Sources */,
 				E95F85B7200A4D8F0070534A /* TestTools.swift in Sources */,

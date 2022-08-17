@@ -128,7 +128,7 @@ extension AccountServiceError: RichError {
             
         case .apiError(let error):
             switch error {
-            case .accountNotFound, .notLogged, .networkError:
+            case .accountNotFound, .notLogged, .networkError, .requestCancelled:
                 return .warning
                 
             case .serverError, .internalError:

@@ -57,17 +57,8 @@ class AdamantNodesSource: NodesSource {
             forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
             object: nil,
             queue: nil
-        ) { [weak healthCheckService] notification in
-            let connection = notification.userInfo?[
-                AdamantUserInfoKey.ReachabilityMonitor.connection
-            ] as? AdamantConnection
-            
-            switch connection {
-            case .wifi, .cellular:
-                healthCheckService?.healthCheck()
-            case nil, .some(.none):
-                break
-            }
+        ) { [weak self] _ in
+            self?.healthCheckService.healthCheck()
         }
         
         guard
@@ -92,8 +83,11 @@ class AdamantNodesSource: NodesSource {
         nodes = defaultNodesGetter()
     }
     
-    func getPreferredNode(needWS: Bool) -> Node? {
-        healthCheckService?.getPreferredNode(fastest: preferTheFastestNode, needWS: needWS)
+    func getAllowedNodes(needWS: Bool) -> [Node] {
+        healthCheckService.getAllowedNodes(
+            sortedBySpeedDescending: preferTheFastestNode,
+            needWS: needWS
+        )
     }
     
     func nodesUpdate() {

@@ -509,6 +509,9 @@ extension AdamantChatsProvider {
                         
                     case .networkError(_):
                         err = .networkError
+                        
+                    case .requestCancelled:
+                        err = .requestCancelled
                     }
                     
                 default:
@@ -918,6 +921,9 @@ extension AdamantChatsProvider {
                     
                 case .internalError(let message, let e):
                     serviceError = ChatsProviderError.internalError(AdamantError(message: message, error: e))
+                    
+                case .requestCancelled:
+                    serviceError = .requestCancelled
                 }
                 
                 completion(.failure(serviceError))

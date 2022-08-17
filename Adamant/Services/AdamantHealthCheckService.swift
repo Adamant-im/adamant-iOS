@@ -18,51 +18,50 @@ final class AdamantHealthCheckService: HealthCheckService {
     
     var nodes = [Node]() {
         didSet {
-            healthCheckIndex += 1
+            resetRequests()
         }
     }
     
     weak var delegate: HealthCheckDelegate?
-    private var healthCheckIndex = 0
+    private var currentRequests = Set<DataRequest>()
     private let semaphore = DispatchSemaphore(value: 1)
     
     // MARK: - Tools
     
-    func getPreferredNode(fastest: Bool, needWS: Bool) -> Node? {
+    func getAllowedNodes(sortedBySpeedDescending: Bool, needWS: Bool) -> [Node] {
         defer { semaphore.signal() }
         semaphore.wait()
         
-        let allowedNodes = nodes.filter {
+        var allowedNodes = nodes.filter {
             $0.connectionStatus == .allowed
                 && (!needWS || $0.status?.wsEnabled ?? false)
         }
         
-        let nodesForChoosing = allowedNodes.isEmpty && !needWS
-            ? nodes.filter { $0.isEnabled && $0.connectionStatus != .offline }
-            : allowedNodes
+        if allowedNodes.isEmpty && !needWS {
+            allowedNodes = nodes.filter { $0.isEnabled }
+        }
         
-        return fastest
-            ? nodesForChoosing.min {
-                $0.status?.ping ?? .greatestFiniteMagnitude
-                    < $1.status?.ping ?? .greatestFiniteMagnitude
+        return sortedBySpeedDescending
+            ? allowedNodes.sorted {
+                $0.status?.ping ?? .greatestFiniteMagnitude < $1.status?.ping ?? .greatestFiniteMagnitude
             }
-            : nodesForChoosing.random
+            : allowedNodes.shuffled()
     }
     
     func healthCheck() {
         defer { semaphore.signal() }
         semaphore.wait()
         
-        let healthCheckIndex = healthCheckIndex + 1
-        self.healthCheckIndex = healthCheckIndex
+        resetRequests()
         updateNodesAvailability()
 
         nodes.filter { $0.isEnabled }.forEach { node in
-            updateNodeStatus(node: node, healthCheckIndex: healthCheckIndex)
+            guard let request = updateNodeStatus(node: node) else { return }
+            currentRequests.insert(request)
         }
     }
     
-    func updateNodesAvailability() {
+    private func updateNodesAvailability() {
         let workingNodes = nodes.filter { $0.isWorking }
         
         let actualHeightsRange = getActualNodeHeightsRange(
@@ -82,18 +81,16 @@ final class AdamantHealthCheckService: HealthCheckService {
         }
     }
     
-    private func updateNodeStatus(node: Node, healthCheckIndex: Int) {
+    private func updateNodeStatus(node: Node) -> DataRequest? {
         guard let nodeURL = node.asURL() else {
             node.connectionStatus = .offline
             node.status = nil
-            return
+            return nil
         }
         
         let startTimestamp = Date().timeIntervalSince1970
         
-        apiService.getNodeStatus(url: nodeURL) { [weak self] result in
-            guard healthCheckIndex == self?.healthCheckIndex else { return }
-            
+        return apiService.getNodeStatus(url: nodeURL) { [weak self] result in
             switch result {
             case let .success(status):
                 node.status = Node.Status(
@@ -104,13 +101,27 @@ final class AdamantHealthCheckService: HealthCheckService {
                     node.connectionStatus = .synchronizing
                 }
                 node.wsPort = status.wsClient?.port
-            case .failure:
-                node.connectionStatus = .offline
-                node.status = nil
+                self?.updateNodesAvailability()
+            case let .failure(error):
+                self?.processError(error: error, node: node)
             }
-            
-            self?.updateNodesAvailability()
         }
+    }
+    
+    private func processError(error: ApiServiceError, node: Node) {
+        switch error {
+        case .requestCancelled:
+            break
+        case .networkError, .serverError, .internalError, .notLogged, .accountNotFound:
+            node.connectionStatus = .offline
+            node.status = nil
+            updateNodesAvailability()
+        }
+    }
+    
+    private func resetRequests() {
+        currentRequests.forEach { $0.cancel() }
+        currentRequests = []
     }
 }
 

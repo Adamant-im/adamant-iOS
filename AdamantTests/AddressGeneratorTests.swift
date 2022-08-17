@@ -60,7 +60,7 @@ private func test(index: Int) {
     let testData = testDataList[index]
     XCTAssertEqual(
         testData.address,
-        AddressGenerator.generateAddress(publicKey: testData.publicKey)
+        AdamantUtilities.generateAddress(publicKey: testData.publicKey)
     )
 }
 
@@ -102,7 +102,7 @@ private let testDataList: [PublicKeyAndAddress] = [
         address: "U15771801756709905143"
     ),
     .init(
-        publicKey: "76053fc313a82d2e539f5c5fe5865f74324a332b0b3ce3b1191c1ed027e261c8",
-        address: "U12415637227124713497"
+        publicKey: "0",
+        address: "U1449310910991872227"
     )
 ]
