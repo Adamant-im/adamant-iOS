@@ -50,9 +50,9 @@ class AdamantDelegateCell: UITableViewCell {
         }
     }
     
-    var isChecking: Bool {
-        get { checkmarkRowView.isChecking }
-        set { checkmarkRowView.setIsChecking(newValue, animated: false) }
+    var isUpdating: Bool {
+        get { checkmarkRowView.isUpdating }
+        set { checkmarkRowView.setIsUpdating(newValue, animated: false) }
     }
     
     var isUpvoted: Bool = false {

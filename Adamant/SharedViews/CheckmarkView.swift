@@ -17,7 +17,7 @@ final class CheckmarkView: UIView {
     
     var onCheckmarkTap: (() -> Void)?
     private(set) var isChecked = false
-    private(set) var isChecking = false
+    private(set) var isUpdating = false
     
     var imageBorderColor: CGColor? {
         get { imageBackgroundView.layer.borderColor }
@@ -31,7 +31,7 @@ final class CheckmarkView: UIView {
     
     private lazy var spinner: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .gray)
-        view.alpha = 0.0
+        view.isHidden = true
         return view
     }()
     
@@ -71,15 +71,15 @@ final class CheckmarkView: UIView {
         updateImage(animated: animated)
     }
     
-    func setIsChecking(_ isChecking: Bool, animated: Bool) {
-        self.isChecking = isChecking
-        if isChecking {
+    func setIsUpdating(_ isUpdating: Bool, animated: Bool) {
+        self.isUpdating = isUpdating
+        if isUpdating {
             imageBackgroundView.alpha = .zero
-            spinner.alpha = 1.0
+            spinner.isHidden = false
             startAnimating()
         } else {
             imageBackgroundView.alpha = 1.0
-            spinner.alpha = 0.0
+            spinner.isHidden = true
             stopAnimating()
         }
     }

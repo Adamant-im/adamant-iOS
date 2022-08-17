@@ -57,8 +57,8 @@ final class CheckmarkRowView: UIView {
         checkmarkView.isChecked
     }
     
-    var isChecking: Bool {
-        checkmarkView.isChecking
+    var isUpdating: Bool {
+        checkmarkView.isUpdating
     }
     
     var checkmarkImageBorderColor: CGColor? {
@@ -85,8 +85,8 @@ final class CheckmarkRowView: UIView {
         checkmarkView.setIsChecked(isChecked, animated: animated)
     }
     
-    func setIsChecking(_ isChecking: Bool, animated: Bool) {
-        checkmarkView.setIsChecking(isChecking, animated: animated)
+    func setIsUpdating(_ isUpdating: Bool, animated: Bool) {
+        checkmarkView.setIsUpdating(isUpdating, animated: animated)
     }
     
     private func setupView() {

@@ -30,7 +30,7 @@ class DelegatesListViewController: UIViewController {
     class CheckedDelegate {
         var delegate: Delegate
         var isChecked: Bool = false
-        var isChecking: Bool = false
+        var isUpdating: Bool = false
         
         init(delegate: Delegate) {
             self.delegate = delegate
@@ -260,7 +260,7 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
         cell.delegate = self
         cell.isUpvoted = delegate.voted
         cell.isChecked = checkedDelegate.isChecked
-        cell.isChecking = checkedDelegate.isChecking
+        cell.isUpdating = checkedDelegate.isUpdating
         
         return cell
     }
@@ -327,7 +327,7 @@ extension DelegatesListViewController {
                 checkedDelegates.forEach {
                     $1.isChecked = false
                     $1.delegate.voted = !$1.delegate.voted
-                    $1.isChecking = true
+                    $1.isUpdating = true
                 }
                 
                 DispatchQueue.main.async {
