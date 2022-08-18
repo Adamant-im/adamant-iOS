@@ -49,10 +49,10 @@ class AdmTransferViewController: TransferViewControllerBase {
         // Check recipient
         accountsProvider.getAccount(byAddress: recipient) { result in
             switch result {
-            case .success:
+            case .success(_):
                 self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
                 
-            case .notFound, .notInitiated, .dummy:
+            case .notFound(_), .notInitiated(_), .dummy(_):
                 let alert = UIAlertController(title: String.adamantLocalized.transferAdm.accountNotFoundAlertTitle(for: recipient),
                                               message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
                                               preferredStyle: .alert)
@@ -85,7 +85,7 @@ class AdmTransferViewController: TransferViewControllerBase {
                     self.dialogService.dismissProgress()
                 }
                 
-            case .invalidAddress, .serverError, .networkError:
+            case .invalidAddress(_), .serverError(_), .networkError(_):
                 self.dialogService.showWarning(withMessage: result.localized)
             }
         }
@@ -102,34 +102,8 @@ class AdmTransferViewController: TransferViewControllerBase {
                 }
                 
                 vc.dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                
-                let detailsVC = self?.router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? AdmTransactionDetailsViewController
-                detailsVC?.transaction = result
-                
-                if comments.count > 0 {
-                    detailsVC?.comment = comments
-                }
-                
-                // MARK: Sender, you
-                detailsVC?.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                
-                // MARK: Get recipient
-                if let recipientName = self?.recipientName {
-                    detailsVC?.recipientName = recipientName
-                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
-                } else if let accountsProvider = self?.accountsProvider {
-                    accountsProvider.getAccount(byAddress: recipient) { accResult in
-                        switch accResult {
-                        case .success(let account):
-                            detailsVC?.recipientName = account.name
-                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
-                            
-                        default:
-                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
-                        }
-                    }
-                } else {
-                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                DispatchQueue.onMainAsync {
+                    self?.openDetailVC(result: result, vc: vc, recipient: recipient, comments: comments)
                 }
                 
             case .failure(let error):
@@ -140,6 +114,37 @@ class AdmTransferViewController: TransferViewControllerBase {
                 dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
+        }
+    }
+    
+    private func openDetailVC(result: TransactionDetails, vc: AdmTransferViewController, recipient: String, comments: String) {
+        let detailsVC = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? AdmTransactionDetailsViewController
+        detailsVC?.transaction = result
+        
+        if comments.count > 0 {
+            detailsVC?.comment = comments
+        }
+        
+        // MARK: Sender, you
+        detailsVC?.senderName = String.adamantLocalized.transactionDetails.yourAddress
+        
+        // MARK: Get recipient
+        if let recipientName = recipientName {
+            detailsVC?.recipientName = recipientName
+            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+        } else if let accountsProvider = accountsProvider {
+            accountsProvider.getAccount(byAddress: recipient) { accResult in
+                switch accResult {
+                case .success(let account):
+                    detailsVC?.recipientName = account.name
+                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                    
+                default:
+                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                }
+            }
+        } else {
+            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
         }
     }
     
@@ -166,7 +171,7 @@ class AdmTransferViewController: TransferViewControllerBase {
     }
     
     override func recipientRow() -> BaseRow {
-        let row = TextRow {
+        let row = TextRow() {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
             $0.cell.textField.keyboardType = .numberPad
@@ -190,7 +195,7 @@ class AdmTransferViewController: TransferViewControllerBase {
                 $0.disabled = true
 //                prefix.isEnabled = false
             }
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { (cell, row) in
             if let text = cell.textField.text {
                 cell.textField.text = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
             }
@@ -204,7 +209,7 @@ class AdmTransferViewController: TransferViewControllerBase {
                 var trimmed = ""
                 if let admAddress = text.getAdamantAddress() {
                     trimmed = admAddress.address.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
-                } else if let admAddress = text.getLegacyAdamantAddress() {
+                }  else if let admAddress = text.getLegacyAdamantAddress() {
                     trimmed = admAddress.address.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
                 } else {
                     trimmed = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
@@ -221,7 +226,7 @@ class AdmTransferViewController: TransferViewControllerBase {
             }
             
             self?.validateForm()
-        }.onCellSelection { [weak self] (cell, _) in
+        }.onCellSelection { [weak self] (cell, row) in
             if let recipient = self?.recipientAddress {
                 let text = recipient
                 self?.shareValue(text, from: cell)

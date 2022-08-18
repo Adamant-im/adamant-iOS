@@ -35,6 +35,7 @@ class Node: Equatable, Codable {
     var scheme: URLScheme
     var host: String
     var port: Int?
+    var wsPort: Int?
     
     func asString() -> String {
         if let url = asURL(forcePort: scheme != URLScheme.default) {
@@ -49,22 +50,24 @@ class Node: Equatable, Codable {
     /// - Returns: URL, if no errors were thrown
     
     func asSocketURL() -> URL? {
-        return asURL(forcePort: false)
+        return asURL(forcePort: false, useWsPort: true)
     }
     
     func asURL() -> URL? {
         return asURL(forcePort: true)
     }
     
-    private func asURL(forcePort: Bool) -> URL? {
+    private func asURL(forcePort: Bool, useWsPort: Bool = false) -> URL? {
         var components = URLComponents()
         components.scheme = scheme.rawValue
         components.host = host
         
-        if let port = port {
+        let usePort = useWsPort ? wsPort : port
+        
+        if let port = usePort {
             components.port = port
         } else if forcePort {
-            components.port = port ?? scheme.defaultPort
+            components.port = usePort ?? scheme.defaultPort
         }
         
         return components.url
