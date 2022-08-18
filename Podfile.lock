@@ -15,6 +15,7 @@ PODS:
   - Socket.IO-Client-Swift (15.2.0):
     - Starscream (~> 3.1)
   - Starscream (3.1.1)
+  - SwiftLint (0.48.0)
 
 DEPENDENCIES:
   - FreakingSimpleRoundImageView
@@ -23,6 +24,7 @@ DEPENDENCIES:
   - MyLittlePinpad
   - PMAlertController
   - Socket.IO-Client-Swift (~> 15.2.0)
+  - SwiftLint
 
 SPEC REPOS:
   trunk:
@@ -34,6 +36,7 @@ SPEC REPOS:
     - PMAlertController
     - Socket.IO-Client-Swift
     - Starscream
+    - SwiftLint
 
 SPEC CHECKSUMS:
   FreakingSimpleRoundImageView: 0d687cb05da8684e85c4c2ae9945bafcbe89d2a2
@@ -44,7 +47,8 @@ SPEC CHECKSUMS:
   PMAlertController: 06dab8160066fc4ce991c880e3722cd403e2926a
   Socket.IO-Client-Swift: 1e3e3a1f09f3312a167f0d781eb2f383d477357c
   Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
+  SwiftLint: 284cea64b6187c5d6bd83e9a548a64104d546447
 
-PODFILE CHECKSUM: 1d081ac466709ab7ca1f43d0d3bf418f86bd7d6d
+PODFILE CHECKSUM: 9697eeedc87ea0c7ff6fb2ec067c0e8ac674c957
 
 COCOAPODS: 1.11.3

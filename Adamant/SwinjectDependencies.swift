@@ -82,7 +82,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: SocketService
-        self.register(SocketService.self) { r in
+        self.register(SocketService.self) { _ in
             let service = AdamantSocketService()
             return service
         }.initCompleted { (r, c) in    // Weak reference

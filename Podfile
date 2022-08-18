@@ -12,6 +12,7 @@ target 'Adamant' do
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
   pod 'Socket.IO-Client-Swift', '~> 15.2.0'
+  pod 'SwiftLint'
 end
 
 post_install do |installer|

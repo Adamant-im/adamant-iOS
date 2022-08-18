@@ -87,7 +87,7 @@ class ChatListViewController: UIViewController {
     private var originalInsets: UIEdgeInsets?
     private var didShow: Bool = false
     
-    var didLoadedMessages: (() ->Void)?
+    var didLoadedMessages: (() -> Void)?
     
     // MARK: Lifecycle
     override func viewDidLoad() {

@@ -49,10 +49,10 @@ class AdmTransferViewController: TransferViewControllerBase {
         // Check recipient
         accountsProvider.getAccount(byAddress: recipient) { result in
             switch result {
-            case .success(_):
+            case .success:
                 self.sendFundsInternal(service: service, recipient: recipient, amount: amount, comments: comments)
                 
-            case .notFound(_), .notInitiated(_), .dummy(_):
+            case .notFound, .notInitiated, .dummy:
                 let alert = UIAlertController(title: String.adamantLocalized.transferAdm.accountNotFoundAlertTitle(for: recipient),
                                               message: String.adamantLocalized.transferAdm.accountNotFoundAlertBody,
                                               preferredStyle: .alert)
@@ -85,7 +85,7 @@ class AdmTransferViewController: TransferViewControllerBase {
                     self.dialogService.dismissProgress()
                 }
                 
-            case .invalidAddress(_), .serverError(_), .networkError(_):
+            case .invalidAddress, .serverError, .networkError:
                 self.dialogService.showWarning(withMessage: result.localized)
             }
         }
@@ -171,7 +171,7 @@ class AdmTransferViewController: TransferViewControllerBase {
     }
     
     override func recipientRow() -> BaseRow {
-        let row = TextRow() {
+        let row = TextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
             $0.cell.textField.keyboardType = .numberPad
@@ -195,7 +195,7 @@ class AdmTransferViewController: TransferViewControllerBase {
                 $0.disabled = true
 //                prefix.isEnabled = false
             }
-        }.cellUpdate { (cell, row) in
+        }.cellUpdate { (cell, _) in
             if let text = cell.textField.text {
                 cell.textField.text = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
             }
@@ -209,7 +209,7 @@ class AdmTransferViewController: TransferViewControllerBase {
                 var trimmed = ""
                 if let admAddress = text.getAdamantAddress() {
                     trimmed = admAddress.address.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
-                }  else if let admAddress = text.getLegacyAdamantAddress() {
+                } else if let admAddress = text.getLegacyAdamantAddress() {
                     trimmed = admAddress.address.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
                 } else {
                     trimmed = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
@@ -226,7 +226,7 @@ class AdmTransferViewController: TransferViewControllerBase {
             }
             
             self?.validateForm()
-        }.onCellSelection { [weak self] (cell, row) in
+        }.onCellSelection { [weak self] (cell, _) in
             if let recipient = self?.recipientAddress {
                 let text = recipient
                 self?.shareValue(text, from: cell)

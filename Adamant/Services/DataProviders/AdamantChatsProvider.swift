@@ -43,7 +43,7 @@ class AdamantChatsProvider: ChatsProvider {
     public var chatLoadedMessages: [String : Int] = [:]
     private var connection: AdamantConnection?
     private var isConnectedToTheInthernet = true
-    private var isRestoredConnectionToTheInthernet: (() ->Void)?
+    private var isRestoredConnectionToTheInthernet: (() -> Void)?
     
     private(set) var isInitiallySynced: Bool = false {
         didSet {
@@ -235,7 +235,7 @@ extension AdamantChatsProvider {
         setState(.empty, previous: prevState, notify: notify)
     }
     
-    func getChatRooms(offset: Int?, completion: (() ->Void)?) {
+    func getChatRooms(offset: Int?, completion: (() -> Void)?) {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
             completion?()
@@ -292,7 +292,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    func apiGetChatrooms(address: String, offset: Int?, completion: ((ChatRooms?) ->Void)?) {
+    func apiGetChatrooms(address: String, offset: Int?, completion: ((ChatRooms?) -> Void)?) {
         apiService.getChatRooms(address: address, offset: offset) { [weak self] result in
             switch result {
             case .success(let chatrooms):
@@ -318,7 +318,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) ->Void)?) {
+    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) -> Void)?) {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
             completion?(0)
@@ -353,7 +353,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    func apiGetChatMessages(address: String, addressRecipient: String, offset: Int?, completion: ((ChatRooms?) ->Void)?) {
+    func apiGetChatMessages(address: String, addressRecipient: String, offset: Int?, completion: ((ChatRooms?) -> Void)?) {
         apiService.getChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] result in
             switch result {
             case .success(let chatroom):

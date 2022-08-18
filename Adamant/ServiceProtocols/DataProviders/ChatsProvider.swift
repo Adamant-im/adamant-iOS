@@ -184,8 +184,8 @@ protocol ChatsProvider: DataProvider {
     // MARK: - Getting chats and messages
     func getChatroomsController() -> NSFetchedResultsController<Chatroom>
     func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
-    func getChatRooms(offset: Int?, completion: (() ->Void)?)
-    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) ->Void)?)
+    func getChatRooms(offset: Int?, completion: (() -> Void)?)
+    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) -> Void)?)
     
     /// Unread messages controller. Sections by chatroom.
     func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>
