@@ -148,6 +148,7 @@ class NodeEditorViewController: FormViewController {
             $0.tag = Rows.scheme.tag
             $0.value = node?.scheme ?? URLScheme.default
             $0.options = [.https, .http]
+            $0.baseCell.detailTextLabel?.textColor = .black
         }.onExpandInlineRow { (cell, _, inlineRow) in
             inlineRow.cell.height = { 100 }
         }.onChange { [weak self] row in

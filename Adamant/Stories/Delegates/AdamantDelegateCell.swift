@@ -50,9 +50,16 @@ class AdamantDelegateCell: UITableViewCell {
         }
     }
     
+    var isUpdating: Bool {
+        get { checkmarkRowView.isUpdating }
+        set { checkmarkRowView.setIsUpdating(newValue, animated: false) }
+    }
+    
     var isUpvoted: Bool = false {
         didSet {
             checkmarkRowView.checkmarkImage = isUpvoted ? #imageLiteral(resourceName: "Downvote") : #imageLiteral(resourceName: "Upvote")
+            checkmarkRowView.checkmarkImageBorderColor = isUpvoted ? UIColor.adamant.good.cgColor : UIColor.adamant.secondary.cgColor
+            checkmarkRowView.checkmarkImageTintColor = isUpvoted ? .adamant.danger : .adamant.good
         }
     }
     

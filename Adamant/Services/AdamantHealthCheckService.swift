@@ -100,6 +100,7 @@ final class AdamantHealthCheckService: HealthCheckService {
                 if !node.isWorking {
                     node.connectionStatus = .synchronizing
                 }
+                node.wsPort = status.wsClient?.port
                 self?.updateNodesAvailability()
             case let .failure(error):
                 self?.processError(error: error, node: node)
