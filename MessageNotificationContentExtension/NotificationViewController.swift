@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SnapKit
 import UserNotifications
 import UserNotificationsUI
 import MarkdownKit
@@ -172,7 +173,9 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         }
         
         view.addSubview(warningView)
-        view.constrainToEdges(warningView)
+        warningView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
     }
     
     private func checkName(of sender: String, for recipient: String, api: ExtensionsApi, core: NativeAdamantCore, keypair: Keypair) {

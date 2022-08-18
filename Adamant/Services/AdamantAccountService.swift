@@ -58,6 +58,7 @@ class AdamantAccountService: AccountService {
         }
     }
     
+    
     // MARK: Properties
     
     private(set) var state: AccountServiceState = .notLogged
@@ -114,6 +115,7 @@ class AdamantAccountService: AccountService {
         let erc20WalletServices = ERC20Token.supportedTokens.map { ERC20WalletService(token: $0) }
         wallets.append(contentsOf: erc20WalletServices)
         
+        
         //LskWalletService(mainnet: false)
         // Testnet
        // wallets.append(contentsOf: LskWalletService(mainnet: false))
@@ -161,7 +163,7 @@ class AdamantAccountService: AccountService {
                         }
                     }
                     
-                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount:
+                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount, .requestCancelled:
                     break
                     
                 case .remoteServiceError, .apiError, .internalError:
@@ -246,6 +248,7 @@ extension AdamantAccountService {
     }
 }
 
+
 // MARK: - AccountService
 extension AdamantAccountService {
     // MARK: Update logged account info
@@ -302,44 +305,6 @@ extension AdamantAccountService {
         
         for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
             wallet.update()
-        }
-    }
-}
-
-// MARK: - Creating account
-extension AdamantAccountService {
-    // MARK: passphrase
-    func createAccountWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void) {
-        guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
-            completion(.failure(.invalidPassphrase))
-            return
-        }
-        
-        guard let publicKey = adamantCore.createKeypairFor(passphrase: passphrase)?.publicKey else {
-            completion(.failure(.internalError(message: "Can't create key for passphrase", error: nil)))
-            return
-        }
-        
-        self.apiService.getAccount(byPublicKey: publicKey) { [weak self] result in
-            switch result {
-            case .success:
-                completion(.failure(.wrongPassphrase))
-                
-            case .failure:
-                if let apiService = self?.apiService {
-                    apiService.newAccount(byPublicKey: publicKey) { result in
-                        switch result {
-                        case .success(let account):
-                            completion(.success(account: account, alert: nil))
-                            
-                        case .failure(let error):
-                            completion(.failure(.apiError(error: error)))
-                        }
-                    }
-                } else {
-                    completion(.failure(.internalError(message: "A bad thing happened", error: nil)))
-                }
-            }
         }
     }
 }
@@ -440,6 +405,7 @@ extension AdamantAccountService {
         completion(.failure(.invalidPassphrase))
     }
     
+    
     // MARK: Keypair
     private func loginWith(keypair: Keypair, completion: @escaping (AccountServiceResult) -> Void) {
         stateSemaphore.wait()
@@ -500,6 +466,7 @@ extension AdamantAccountService {
     }
 }
 
+
 // MARK: - Log Out
 extension AdamantAccountService {
     func logout() {
@@ -530,6 +497,7 @@ extension AdamantAccountService {
     }
 }
 
+
 // MARK: - Secured Store
 extension StoreKey {
     fileprivate struct accountService {
@@ -544,7 +512,7 @@ extension StoreKey {
     }
 }
 
-private enum Key {
+fileprivate enum Key {
     case publicKey
     case privateKey
     case pin

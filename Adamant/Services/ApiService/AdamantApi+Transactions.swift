@@ -19,16 +19,10 @@ extension AdamantApiService.ApiCommands {
 
 extension AdamantApiService {
     func getTransaction(id: UInt64, completion: @escaping (ApiServiceResult<Transaction>) -> Void) {
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Transactions.getTransaction, queryItems: [URLQueryItem(name: "id", value: String(id))])
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerModelResponse<Transaction>>) in
+        sendRequest(
+            path: ApiCommands.Transactions.getTransaction,
+            queryItems: [URLQueryItem(name: "id", value: String(id))]
+        ) { (serverResponse: ApiServiceResult<ServerModelResponse<Transaction>>) in
             switch serverResponse {
             case .success(let response):
                 if let model = response.model {
@@ -58,16 +52,10 @@ extension AdamantApiService {
             queryItems.append(URLQueryItem(name: "and:fromHeight", value: String(fromHeight)))
         }
         
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Transactions.root, queryItems: queryItems)
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
+        sendRequest(
+            path: ApiCommands.Transactions.root,
+            queryItems: queryItems
+        ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
             switch serverResponse {
             case .success(let response):
                 if let collection = response.collection {

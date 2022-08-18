@@ -22,21 +22,14 @@ extension AdamantApiService {
             "Content-Type": "application/json"
         ]
         
-        // MARK: 2. Build endpoints
-        let normalizeEndpoint: URL
-        let processEndpoin: URL
-        
-        do {
-            normalizeEndpoint = try buildUrl(path: ApiCommands.Transactions.normalizeTransaction)
-            processEndpoin = try buildUrl(path: ApiCommands.Transactions.processTransaction)
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        // MARK: 3. Normalize transaction
-        sendRequest(url: normalizeEndpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerModelResponse<NormalizedTransaction>>) in
+        // MARK: 2. Normalize transaction
+        sendRequest(
+            path: ApiCommands.Transactions.normalizeTransaction,
+            method: .post,
+            parameters: params,
+            encoding: .json,
+            headers: headers
+        ) { (serverResponse: ApiServiceResult<ServerModelResponse<NormalizedTransaction>>) in
             switch serverResponse {
             case .success(let response):
                 guard let normalizedTransaction = response.model else {
@@ -45,13 +38,13 @@ extension AdamantApiService {
                     return
                 }
                 
-                // MARK: 4.1. Sign transaction
+                // MARK: 3.1. Sign transaction
                 guard let signature = self.adamantCore.sign(transaction: normalizedTransaction, senderId: sender, keypair: keypair) else {
                     completion(.failure(InternalError.signTransactionFailed.apiServiceErrorWith(error: nil)))
                     return
                 }
                 
-                // MARK: 4.2. Create transaction
+                // MARK: 3.2. Create transaction
                 let transaction: [String: Any] = [
                     "type": normalizedTransaction.type.rawValue,
                     "amount": (normalizedTransaction.amount.shiftedToAdamant() as NSDecimalNumber).uint64Value,
@@ -67,8 +60,14 @@ extension AdamantApiService {
                     "transaction": transaction
                 ]
                 
-                // MARK: 5. Send
-                self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: .json, headers: headers) { (response: ApiServiceResult<TransactionIdResponse>) in
+                // MARK: 4. Send
+                self.sendRequest(
+                    path: ApiCommands.Transactions.processTransaction,
+                    method: .post,
+                    parameters: params,
+                    encoding: .json,
+                    headers: headers
+                ) { (response: ApiServiceResult<TransactionIdResponse>) in
                     switch response {
                     case .success(let result):
                         if let id = result.transactionId {

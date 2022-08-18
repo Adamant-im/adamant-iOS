@@ -53,6 +53,8 @@ extension TransfersProviderError {
             return .internalError(message: message, error: error)
         case .notEnoughMoney:
             return .notEnoughMoney
+        case .requestCancelled:
+            return .requestCancelled
         }
     }
 }

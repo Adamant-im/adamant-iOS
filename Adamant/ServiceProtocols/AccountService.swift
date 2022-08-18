@@ -125,7 +125,7 @@ extension AccountServiceError: RichError {
             
         case .apiError(let error):
             switch error {
-            case .accountNotFound, .notLogged, .networkError:
+            case .accountNotFound, .notLogged, .networkError, .requestCancelled:
                 return .warning
                 
             case .serverError, .internalError:
@@ -154,9 +154,6 @@ protocol AccountService: AnyObject {
     /// Update logged account info
     func update()
     func update(_ completion: ((AccountServiceResult) -> Void)?)
-    
-    /// Create new account with passphrase.
-    func createAccountWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
     
     /// Login into Adamant using passphrase.
     func loginWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void)

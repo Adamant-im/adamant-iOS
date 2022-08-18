@@ -18,6 +18,7 @@ enum TransfersProviderError: Error {
     case dependencyError(message: String)
     case networkError
     case notEnoughMoney
+    case requestCancelled
 }
 
 enum TransfersProviderResult {
@@ -56,6 +57,9 @@ extension TransfersProviderError: RichError {
             
         case .notEnoughMoney:
             return String.adamantLocalized.sharedErrors.notEnoughMoney
+            
+        case .requestCancelled:
+            return String.adamantLocalized.sharedErrors.requestCancelled
         }
     }
     
@@ -71,7 +75,7 @@ extension TransfersProviderError: RichError {
     
     var level: ErrorLevel {
         switch self {
-        case .notLogged, .accountNotFound, .transactionNotFound, .networkError, .notEnoughMoney:
+        case .notLogged, .accountNotFound, .transactionNotFound, .networkError, .notEnoughMoney, .requestCancelled:
             return .warning
             
         case .serverError, .internalError, .dependencyError:

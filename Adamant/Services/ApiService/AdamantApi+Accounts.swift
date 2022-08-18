@@ -18,45 +18,7 @@ extension AdamantApiService.ApiCommands {
 
 // MARK: - Accounts
 extension AdamantApiService {
-    
-    /// Create new account with publicKey
-    func newAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
-        // MARK: 1. Build endpoint
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Accounts.newAccount)
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        // MARK: 2. Prepare params
-        let params = [
-            "publicKey": publicKey
-        ]
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
-        // MARK: 3. Send
-        sendRequest(url: endpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerModelResponse<AdamantAccount>>) in
-            switch serverResponse {
-            case .success(let response):
-                if let model = response.model {
-                    completion(.success(model))
-                } else {
-                    let error = AdamantApiService.translateServerError(response.error)
-                    completion(.failure(error))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
-            }
-        }
-    }
-    
-    /// Get existing account by passphrase.
+    /// Get account by passphrase.
     func getAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
         // MARK: 1. Get keypair from passphrase
         guard let keypair = adamantCore.createKeypairFor(passphrase: passphrase) else {
@@ -68,60 +30,45 @@ extension AdamantApiService {
         getAccount(byPublicKey: keypair.publicKey, completion: completion)
     }
     
-    /// Get existing account by publicKey
+    /// Get account by publicKey
     func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
-        // MARK: 1. Build endpoint
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Accounts.root, queryItems: [URLQueryItem(name: "publicKey", value: publicKey)])
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        // MARK: 2. Send
-        sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerModelResponse<AdamantAccount>>) in
-            switch serverResponse {
-            case .success(let response):
-                if let model = response.model {
-                    completion(.success(model))
-                } else {
-                    let err = AdamantApiService.translateServerError(response.error)
-                    completion(.failure(err))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
-            }
-        }
+        sendRequest(
+            path: ApiCommands.Accounts.root,
+            queryItems: [URLQueryItem(name: "publicKey", value: publicKey)],
+            completion: makeCompletionWrapper(publicKey: publicKey, completion: completion)
+        )
     }
     
     func getAccount(byAddress address: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void) {
-        // MARK: 1. Build endpoint
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Accounts.root, queryItems: [URLQueryItem(name: "address", value: address)])
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        // MARK: 2. Send
-        sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerModelResponse<AdamantAccount>>) in
-            switch serverResponse {
-            case .success(let response):
-                if let model = response.model {
-                    completion(.success(model))
-                } else {
-                    let error = AdamantApiService.translateServerError(response.error)
-                    completion(.failure(error))
-                }
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
+        sendRequest(
+            path: ApiCommands.Accounts.root,
+            queryItems: [URLQueryItem(name: "address", value: address)],
+            completion: makeCompletionWrapper(publicKey: nil, completion: completion)
+        )
+    }
+}
+
+private func makeCompletionWrapper(
+    publicKey: String?,
+    completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void
+) -> (ApiServiceResult<ServerModelResponse<AdamantAccount>>) -> Void {
+    { serverResponse in
+        switch serverResponse {
+        case .success(let response):
+            if let model = response.model {
+                completion(.success(model))
+                return
             }
+            
+            let error = AdamantApiService.translateServerError(response.error)
+            guard let publicKey = publicKey, error == .accountNotFound else {
+                completion(.failure(error))
+                return
+            }
+            
+            completion(.success(.makeEmptyAccount(publicKey: publicKey)))
+        case .failure(let error):
+            completion(.failure(.networkError(error: error)))
         }
     }
 }

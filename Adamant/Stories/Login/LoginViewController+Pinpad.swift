@@ -53,36 +53,40 @@ extension LoginViewController {
         dialogService.showProgress(withMessage: String.adamantLocalized.login.loggingInProgressMessage, userInteractionEnable: false)
         
         accountService.loginWithStoredAccount { [weak self] result in
-            switch result {
-            case .success(_, let alert):
-                self?.dialogService.dismissProgress()
-                
-                let alertVc: UIAlertController?
-                if let alert = alert {
-                    alertVc = UIAlertController(title: alert.title, message: alert.message, preferredStyle: .alert)
-                    alertVc!.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default))
-                } else {
-                    alertVc = nil
-                }
-                
-                DispatchQueue.main.async {
-                    guard let presenter = self?.presentingViewController else {
-                        return
-                    }
-                    presenter.dismiss(animated: true, completion: nil)
-                    
-                    if let alertVc = alertVc {
-                        alertVc.modalPresentationStyle = .overFullScreen
-                        presenter.present(alertVc, animated: true, completion: nil)
-                    }
-                }
-                
-            case .failure(let error):
-                self?.dialogService.showRichError(error: error)
-                
-                if let pinpad = self?.presentedViewController as? PinpadViewController {
-                    pinpad.clearPin()
-                }
+            DispatchQueue.onMainAsync {
+                self?.handleSavedAccountLoginResult(result)
+            }
+        }
+    }
+    
+    private func handleSavedAccountLoginResult(_ result: AccountServiceResult) {
+        switch result {
+        case .success(_, let alert):
+            dialogService.dismissProgress()
+            
+            let alertVc: UIAlertController?
+            if let alert = alert {
+                alertVc = UIAlertController(title: alert.title, message: alert.message, preferredStyle: .alert)
+                alertVc!.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default))
+            } else {
+                alertVc = nil
+            }
+            
+            guard let presenter = presentingViewController else {
+                return
+            }
+            presenter.dismiss(animated: true, completion: nil)
+            
+            if let alertVc = alertVc {
+                alertVc.modalPresentationStyle = .overFullScreen
+                presenter.present(alertVc, animated: true, completion: nil)
+            }
+            
+        case .failure(let error):
+            dialogService.showRichError(error: error)
+            
+            if let pinpad = presentedViewController as? PinpadViewController {
+                pinpad.clearPin()
             }
         }
     }

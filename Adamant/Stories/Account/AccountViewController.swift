@@ -11,6 +11,7 @@ import Eureka
 import FreakingSimpleRoundImageView
 import CoreData
 import Parchment
+import SnapKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -195,6 +196,7 @@ class AccountViewController: FormViewController {
         } catch {
             dialogService.showError(withMessage: "Error fetching transfers: report a bug", error: error)
         }
+
         
         // MARK: Header&Footer
         guard let header = UINib(nibName: "AccountHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? AccountHeaderView else {
@@ -227,8 +229,12 @@ class AccountViewController: FormViewController {
         pagingViewController.dataSource = self
         pagingViewController.delegate = self
         pagingViewController.select(index: 0)
+        
         accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
-        accountHeaderView.walletViewContainer.constrainToEdges(pagingViewController.view)
+        pagingViewController.view.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
+        
         addChild(pagingViewController)
         
         pagingViewController.borderColor = UIColor.clear
@@ -249,7 +255,7 @@ class AccountViewController: FormViewController {
         }
 
         // Node list
-        let nodesRow = LabelRow {
+        let nodesRow = LabelRow() {
             $0.title = Rows.nodes.localized
             $0.tag = Rows.nodes.tag
             $0.cell.imageView?.image = Rows.nodes.image
@@ -277,7 +283,7 @@ class AccountViewController: FormViewController {
         appSection.append(nodesRow)
 
         // Currency select
-        let currencyRow = ActionSheetRow<Currency> {
+        let currencyRow = ActionSheetRow<Currency>() {
             $0.title = Rows.currency.localized
             $0.tag = Rows.currency.tag
             $0.cell.imageView?.image = Rows.currency.image
@@ -302,7 +308,7 @@ class AccountViewController: FormViewController {
         appSection.append(currencyRow)
 
         // About
-        let aboutRow = LabelRow {
+        let aboutRow = LabelRow() {
             $0.title = Rows.about.localized
             $0.tag = Rows.about.tag
             $0.cell.imageView?.image = Rows.about.image
@@ -335,14 +341,14 @@ class AccountViewController: FormViewController {
         }
         
         // Delegates
-        let delegatesRow = LabelRow {
+        let delegatesRow = LabelRow() {
             $0.tag = Rows.voteForDelegates.tag
             $0.title = Rows.voteForDelegates.localized
             $0.cell.imageView?.image = Rows.voteForDelegates.image
             $0.cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-        }.onCellSelection { [weak self] (_, _) in
+        }.onCellSelection { [weak self] (_, row) in
             guard let vc = self?.router.get(scene: AdamantScene.Delegates.delegates) else {
                 return
             }
@@ -364,7 +370,7 @@ class AccountViewController: FormViewController {
         actionsSection.append(delegatesRow)
             
         // Generate passphrase QR
-        let generateQrRow = LabelRow {
+        let generateQrRow = LabelRow() {
             $0.title = Rows.generateQr.localized
             $0.tag = Rows.generateQr.tag
             $0.cell.imageView?.image = Rows.generateQr.image
@@ -392,7 +398,7 @@ class AccountViewController: FormViewController {
         actionsSection.append(generateQrRow)
         
         // Generatte private keys
-        let generatePkRow = LabelRow {
+        let generatePkRow = LabelRow() {
             $0.title = Rows.generatePk.localized
             $0.tag = Rows.generatePk.tag
             $0.cell.imageView?.image = Rows.generatePk.image
@@ -419,8 +425,9 @@ class AccountViewController: FormViewController {
         
         actionsSection.append(generatePkRow)
         
+        
         // Logout
-        let logoutRow = LabelRow {
+        let logoutRow = LabelRow() {
             $0.title = Rows.logout.localized
             $0.tag = Rows.logout.tag
             $0.cell.imageView?.image = Rows.logout.image
@@ -464,13 +471,13 @@ class AccountViewController: FormViewController {
         
         // Stay in
         
-        let stayInRow = SwitchRow {
+        let stayInRow = SwitchRow() {
             $0.tag = Rows.stayIn.tag
             $0.title = Rows.stayIn.localized
             $0.cell.imageView?.image = Rows.stayIn.image
             $0.value = accountService.hasStayInAccount
         }.cellUpdate { (cell, _) in
-            cell.switchControl.onTintColor = UIColor.adamant.switchColor
+            cell.switchControl.onTintColor = UIColor.adamant.active
         }.onChange { [weak self] row in
             guard let enabled = row.value else {
                 return
@@ -482,7 +489,7 @@ class AccountViewController: FormViewController {
         securitySection.append(stayInRow)
         
         // Biometry
-        let biometryRow = SwitchRow { [weak self] in
+        let biometryRow = SwitchRow() { [weak self] in
             $0.tag = Rows.biometry.tag
             $0.title = localAuth.biometryType.localized
             $0.value = accountService.useBiometry
@@ -503,7 +510,7 @@ class AccountViewController: FormViewController {
                 return !showBiometry
             })
         }.cellUpdate { (cell, _) in
-            cell.switchControl.onTintColor = UIColor.adamant.switchColor
+            cell.switchControl.onTintColor = UIColor.adamant.active
         }.onChange { [weak self] row in
             let value = row.value ?? false
             self?.setBiometry(enabled: value)
@@ -512,7 +519,7 @@ class AccountViewController: FormViewController {
         securitySection.append(biometryRow)
         
         // Notifications
-        let notificationsRow = LabelRow { [weak self] in
+        let notificationsRow = LabelRow() { [weak self] in
             $0.tag = Rows.notifications.tag
             $0.title = Rows.notifications.localized
             $0.cell.selectionStyle = .gray
@@ -555,6 +562,7 @@ class AccountViewController: FormViewController {
         
         form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamant.tableRowIcons }
         
+        
         // MARK: Notification Center
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.updateAccountInfo()
@@ -573,7 +581,7 @@ class AccountViewController: FormViewController {
             self?.updateAccountInfo()
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
             guard let form = self?.form, let accountService = self?.accountService else {
                 return
             }
@@ -688,6 +696,7 @@ class AccountViewController: FormViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
+    
     // MARK: TableView configuration
     
     override func insertAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
@@ -697,6 +706,7 @@ class AccountViewController: FormViewController {
     override func deleteAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
         return .fade
     }
+    
     
     // MARK: Other
     func updateAccountInfo() {
@@ -734,7 +744,7 @@ class AccountViewController: FormViewController {
         guard let view = tableView.tableFooterView else { return }
         view.translatesAutoresizingMaskIntoConstraints = false
 
-        let width = view.bounds.size.width
+        let width = view.bounds.size.width;
         let temporaryWidthConstraints = NSLayoutConstraint.constraints(withVisualFormat: "[footerView(width)]", options: NSLayoutConstraint.FormatOptions(rawValue: UInt(0)), metrics: ["width": width], views: ["footerView": view])
 
         view.addConstraints(temporaryWidthConstraints)
@@ -776,6 +786,7 @@ class AccountViewController: FormViewController {
     }
 }
 
+
 // MARK: - AccountHeaderViewDelegate
 extension AccountViewController: AccountHeaderViewDelegate {
     func addressLabelTapped(from: UIView) {
@@ -798,6 +809,7 @@ extension AccountViewController: AccountHeaderViewDelegate {
     }
 }
 
+
 // MARK: - NSFetchedResultsControllerDelegate
 extension AccountViewController: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -811,6 +823,7 @@ extension AccountViewController: NSFetchedResultsControllerDelegate {
         }
     }
 }
+
 
 // MARK: - PagingViewControllerDataSource
 extension AccountViewController: PagingViewControllerDataSource, PagingViewControllerDelegate {
