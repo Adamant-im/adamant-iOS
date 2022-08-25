@@ -324,10 +324,10 @@ extension AdamantChatsProvider {
         }
     }
     
-    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) ->())?) {
+    func getChatMessages(with addressRecipient: String, offset: Int?, completion: (() -> Void)?) {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
-            completion?(0)
+            completion?()
             return
         }
         
@@ -344,7 +344,7 @@ extension AdamantChatsProvider {
                 self?.chatLoadedMessages[addressRecipient] = loadedCount + (chatroom?.messages?.count ?? 0)
                 guard let transactions = chatroom?.messages,
                       transactions.count > 0 else {
-                    completion?(0)
+                    completion?()
                     return
                 }
                 self?.process(messageTransactions: transactions,
@@ -353,7 +353,7 @@ extension AdamantChatsProvider {
                               context: privateContext,
                               contextMutatingSemaphore: cms,
                               completion: {
-                    completion?(transactions.count)
+                    completion?()
                 })
             }
         }

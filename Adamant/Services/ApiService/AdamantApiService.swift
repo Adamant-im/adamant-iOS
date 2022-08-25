@@ -64,7 +64,7 @@ class AdamantApiService: ApiService {
     // MARK: - Properties
     
     private var _lastRequestTimeDelta: TimeInterval?
-    private var lastRequestTimeDeltaSemaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
+    private var semaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
     
     private(set) var currentNodes: [Node] = [] {
         didSet {
@@ -75,15 +75,15 @@ class AdamantApiService: ApiService {
     
     private(set) var lastRequestTimeDelta: TimeInterval? {
         get {
-            defer { lastRequestTimeDeltaSemaphore.signal() }
-            lastRequestTimeDeltaSemaphore.wait()
+            defer { semaphore.signal() }
+            semaphore.wait()
             
             return _lastRequestTimeDelta
         }
         set {
-            lastRequestTimeDeltaSemaphore.wait()
+            semaphore.wait()
             _lastRequestTimeDelta = newValue
-            lastRequestTimeDeltaSemaphore.signal()
+            semaphore.signal()
         }
     }
     
@@ -102,7 +102,9 @@ class AdamantApiService: ApiService {
             object: nil,
             queue: nil
         ) { [weak self] _ in
+            self?.semaphore.wait()
             self?.updateCurrentNodes()
+            self?.semaphore.signal()
         }
     }
     

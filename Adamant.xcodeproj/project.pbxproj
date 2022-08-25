@@ -23,6 +23,7 @@
 		550066C7284D682D0044C0B1 /* AdamantHealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */; };
 		551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E528959A5200DE5D69 /* LoadingView.swift */; };
 		551F66E82895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */; };
+		5522A44028B758530029B543 /* UIKitUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5522A43F28B758530029B543 /* UIKitUtilites.swift */; };
 		553B1284281C6EE100FFF24C /* GCDUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 553B1283281C6EE100FFF24C /* GCDUtilites.swift */; };
 		5551CC8F28A8B75300B52AD0 /* ApiServiceStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5551CC8E28A8B75300B52AD0 /* ApiServiceStub.swift */; };
 		5558A436282AAFCC0024DDD6 /* AdamantApi+Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */; };
@@ -633,6 +634,7 @@
 		550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantHealthCheckService.swift; sourceTree = "<group>"; };
 		551F66E528959A5200DE5D69 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantHealthCheckServiceTests.swift; sourceTree = "<group>"; };
+		5522A43F28B758530029B543 /* UIKitUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIKitUtilites.swift; sourceTree = "<group>"; };
 		553B1283281C6EE100FFF24C /* GCDUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCDUtilites.swift; sourceTree = "<group>"; };
 		5551CC8E28A8B75300B52AD0 /* ApiServiceStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiServiceStub.swift; sourceTree = "<group>"; };
 		5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Status.swift"; sourceTree = "<group>"; };
@@ -1814,6 +1816,7 @@
 				E927171D20C04613002BB9A6 /* UIColor+hex.swift */,
 				E935C84C22AC06E500A8CA2F /* RichMessageTools.swift */,
 				553B1283281C6EE100FFF24C /* GCDUtilites.swift */,
+				5522A43F28B758530029B543 /* UIKitUtilites.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2447,6 +2450,7 @@
 				E908472A2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift in Sources */,
 				64A223D620F760BB005157CB /* Localization.swift in Sources */,
 				64E1C82F222E95F6006C4DA7 /* DogeWallet.swift in Sources */,
+				5522A44028B758530029B543 /* UIKitUtilites.swift in Sources */,
 				E9484B7D2285BAD9008E10F0 /* PrivateKeyGenerator.swift in Sources */,
 				E94E7B08205D4CB80042B639 /* SharedRoutes.swift in Sources */,
 				E9960B3621F5154300C840A8 /* DummyAccount+CoreDataProperties.swift in Sources */,

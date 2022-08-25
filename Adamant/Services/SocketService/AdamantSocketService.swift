@@ -48,6 +48,7 @@ class AdamantSocketService: SocketService {
     private var socket: SocketIOClient?
     private var currentAddress: String?
     private var currentHandler: ((ApiServiceResult<Transaction>) -> Void)?
+    private let semaphore = DispatchSemaphore(value: 1)
     
     let defaultResponseDispatchQueue = DispatchQueue(
         label: "com.adamant.response-queue",
@@ -67,7 +68,10 @@ class AdamantSocketService: SocketService {
     // MARK: - Tools
     
     func connect(address: String, handler: @escaping (ApiServiceResult<Transaction>) -> Void) {
-        disconnect()
+        semaphore.wait()
+        defer { semaphore.signal() }
+        
+        _disconnect()
         currentAddress = address
         currentHandler = handler
         
@@ -91,6 +95,12 @@ class AdamantSocketService: SocketService {
     }
     
     func disconnect() {
+        semaphore.wait()
+        _disconnect()
+        semaphore.signal()
+    }
+    
+    private func _disconnect() {
         socket?.disconnect()
         socket = nil
         manager = nil
