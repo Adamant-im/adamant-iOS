@@ -302,7 +302,7 @@ extension AdamantChatsProvider {
             case .failure(let error):
                 switch error {
                 case .networkError:
-                    let getChatMessages: () -> Void = {
+                    let getChatrooms: () -> Void = {
                         self?.apiGetChatrooms(
                             address: address,
                             offset: offset,
@@ -312,10 +312,10 @@ extension AdamantChatsProvider {
                     if self?.isConnectedToTheInternet == true {
                         DispatchQueue.global().asyncAfter(
                             deadline: .now() + requestRepeatDelay,
-                            execute: getChatMessages
+                            execute: getChatrooms
                         )
                     } else {
-                        self?.addOnConnectionToTheInternetRestored(task: getChatMessages)
+                        self?.addOnConnectionToTheInternetRestored(task: getChatrooms)
                     }
                 default:
                     completion?(nil)
