@@ -13,18 +13,20 @@ struct AdamantResources {
     
     // MARK: Nodes
     
-    static let nodes: [Node] = [
-        Node(scheme: .https, host: "endless.adamant.im", port: nil),
-        Node(scheme: .https, host: "clown.adamant.im", port: nil),
-        Node(scheme: .https, host: "lake.adamant.im", port: nil),
-        Node(scheme: .https, host: "debate.adamant.im", port: nil),
-        Node(scheme: .https, host: "bid.adamant.im", port: nil),
-        Node(scheme: .https, host: "unusual.adamant.im", port: nil),
-        Node(scheme: .http, host: "23.226.231.225", port: 36666),
-//        Node(scheme: .http, host: "80.211.177.181", port: 36666),
-//        Node(scheme: .http, host: "80.211.177.181", port: nil), // Bugged one
-//        Node(scheme: .http, host: "163.172.132.38", port: 36667) // Testnet
-    ]
+    static var nodes: [Node] {
+        [
+            Node(scheme: .https, host: "endless.adamant.im", port: nil),
+            Node(scheme: .https, host: "clown.adamant.im", port: nil),
+            Node(scheme: .https, host: "lake.adamant.im", port: nil),
+            Node(scheme: .https, host: "debate.adamant.im", port: nil),
+            Node(scheme: .https, host: "bid.adamant.im", port: nil),
+            Node(scheme: .https, host: "unusual.adamant.im", port: nil),
+            Node(scheme: .http, host: "23.226.231.225", port: 36666)
+//            Node(scheme: .http, host: "80.211.177.181", port: 36666),
+//            Node(scheme: .http, host: "80.211.177.181", port: nil), // Bugged one
+//            Node(scheme: .http, host: "163.172.132.38", port: 36667) // Testnet
+        ]
+    }
     
     static let ethServers = [
         "https://ethnode1.adamant.im/"
@@ -59,6 +61,8 @@ struct AdamantResources {
     
     // MARK: Contacts
     struct contacts {
+        static let adamantWelcomeWallet = "U00000000000000000001"
+        
         static let adamantBountyWallet = "U15423595369615486571"
         static let adamantBountyWalletPK = "cdab95b082b9774bd975677c868261618c7ce7bea97d02e0f56d483e30c077b6"
         

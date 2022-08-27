@@ -107,7 +107,13 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             let height = $0.value?.fiat != nil ? BalanceTableViewCell.fullHeight : BalanceTableViewCell.compactHeight
             
             $0.cell.height = { height }
-        }.cellUpdate { (cell, row) in
+        }.cellUpdate { [weak self] (cell, row) in
+            let symbol = self?.service?.tokenSymbol ?? ""
+            if let service = self?.service, let wallet = service.wallet {
+                row.value = self?.balanceRowValueFor(balance: wallet.balance, symbol: symbol, alert: wallet.notifications)
+            } else {
+                row.value = self?.balanceRowValueFor(balance: 0, symbol: symbol, alert: 0)
+            }
             let height = row.value?.fiat != nil ? BalanceTableViewCell.fullHeight : BalanceTableViewCell.compactHeight
             
             cell.height = { height }

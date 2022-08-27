@@ -76,6 +76,9 @@
 /* System accounts: ADAMANT Tokens */
 "Accounts.AdamantTokens" = "Welcome to ADAMANT";
 
+/* System accounts: ADAMANT Bounty */
+"Accounts.AdamantBounty" = "ADAMANT Bounty Wallet";
+
 /* System accounts: ADAMANT iOS Support */
 "Accounts.iOSSupport" = "ADAMANT iOS Support";
 
@@ -231,6 +234,9 @@
 
 /* Serious internal error: Error parsing response */
 "ApiService.InternalError.ParsingFailed" = "Parsing failed. Report a bug";
+
+/* Serious internal error: No nodes available */
+"ApiService.InternalError.NoNodesAvailable" = "No nodes available. Report a bug";
 
 /* Eureka forms Cancel button */
 "Cancel" = "Cancel";
@@ -439,6 +445,9 @@
 /* Shared error: Network problems. In most cases - no connection */
 "Error.NoNetwork" = "No connection";
 
+/* Shared error: Request cancelled */
+"Error.RequestCancelled" = "Request cancelled";
+
 /* Shared error: Remote error format, %@ for message */
 "Error.RemoteServerErrorFormat" = "Blockchain node error: %@";
 
@@ -544,6 +553,24 @@
 /* NodesList: 'Reset' button */
 "NodesList.ResetButton" = "Reset";
 
+/* NodesList: 'Prefer the fastest node' switch */
+"NodesList.PreferTheFastestNode" = "Prefer the fastest node";
+
+/* NodesList.NodeCell: Node ping */
+"NodesList.NodeCell.Ping" = "Ping";
+
+/* NodesList.NodeCell: Milliseconds */
+"NodesList.NodeCell.Milliseconds" = "ms";
+
+/* NodesList.NodeCell: Node is synchronizing */
+"NodesList.NodeCell.Synchronizing" = "Synchronizing";
+
+/* NodesList.NodeCell: Node is offline */
+"NodesList.NodeCell.Offline" = "Offline";
+
+/* NodesList.NodeCell: Node version */
+"NodesList.NodeCell.Version" = "version";
+
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "Default nodes list was loaded";
 
@@ -565,14 +592,14 @@
 /* NodesEditor: Host row */
 "NodesEditor.HostRow" = "Host";
 
-/* NodesEditor: Test button */
-"NodesEditor.TestButton" = "Test node";
+/* NodesEditor: Web sockets */
+"NodesEditor.WebSockets" = "Web sockets";
 
-/* NodesEditor: Test passed */
-"NodesEditor.NodeTestPassed" = "Passed";
+/* NodesEditor: Web sockets are supported */
+"NodesEditor.WebSocketsSupported" = "Supported";
 
-/* NodesEditor: Test failed */
-"NodesEditor.NodeTestFailed" = "Failed";
+/* NodesEditor: Web sockets aren't supported */
+"NodesEditor.WebSocketsNotSupported" = "Not supported";
 
 /* NodesEditor: Delete node button */
 "NodesEditor.DeleteNodeButton" = "Delete";

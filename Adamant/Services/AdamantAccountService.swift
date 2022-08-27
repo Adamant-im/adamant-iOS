@@ -164,7 +164,7 @@ class AdamantAccountService: AccountService {
                         }
                     }
                     
-                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount:
+                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount, .requestCancelled:
                     break
                     
                 case .remoteServiceError, .apiError, .internalError:
@@ -306,45 +306,6 @@ extension AdamantAccountService {
         
         for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
             wallet.update()
-        }
-    }
-}
-
-
-// MARK: - Creating account
-extension AdamantAccountService {
-    // MARK: passphrase
-    func createAccountWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void) {
-        guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
-            completion(.failure(.invalidPassphrase))
-            return
-        }
-        
-        guard let publicKey = adamantCore.createKeypairFor(passphrase: passphrase)?.publicKey else {
-            completion(.failure(.internalError(message: "Can't create key for passphrase", error: nil)))
-            return
-        }
-        
-        self.apiService.getAccount(byPublicKey: publicKey) { [weak self] result in
-            switch result {
-            case .success(_):
-                completion(.failure(.wrongPassphrase))
-                
-            case .failure(_):
-                if let apiService = self?.apiService {
-                    apiService.newAccount(byPublicKey: publicKey) { result in
-                        switch result {
-                        case .success(let account):
-                            completion(.success(account: account, alert: nil))
-                            
-                        case .failure(let error):
-                            completion(.failure(.apiError(error: error)))
-                        }
-                    }
-                } else {
-                    completion(.failure(.internalError(message: "A bad thing happened", error: nil)))
-                }
-            }
         }
     }
 }

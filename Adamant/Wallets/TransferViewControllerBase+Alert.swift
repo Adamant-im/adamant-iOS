@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SnapKit
 
 extension TransferViewControllerBase {
     
@@ -23,12 +24,18 @@ extension TransferViewControllerBase {
         let view = UIView()
         progressView = view
         view.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.6)
+        
         self.view.addSubview(view)
-        self.view.constrainToEdges(view)
+        view.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
         
         let indicator = UIActivityIndicatorView(style: .whiteLarge)
         view.addSubview(indicator)
-        view.constrainCentered(indicator)
+        indicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
+        
         indicator.startAnimating()
         
         guard animated else { return }
@@ -70,7 +77,9 @@ extension TransferViewControllerBase {
             alert.message = message
             
             self.view.addSubview(alert)
-            self.view.constrainToEdges(alert)
+            alert.snp.makeConstraints {
+                $0.directionalEdges.equalToSuperview()
+            }
             
             if animated {
                 alert.alpha = 0

@@ -8,6 +8,7 @@
 
 import UIKit
 import Parchment
+import SnapKit
 
 protocol ComplexTransferViewControllerDelegate: AnyObject {
     func complexTransferViewController(_ viewController: ComplexTransferViewController, didFinishWithTransfer: TransactionDetails?, detailsViewController: UIViewController?)
@@ -37,7 +38,7 @@ class ComplexTransferViewController: UIViewController {
         view.backgroundColor = UIColor.white
         
         if let partner = partner {
-            navigationItem.title = partner.name ?? partner.address
+            navigationItem.title = partner.name?.checkAndReplaceSystemWallets() ?? partner.address
         }
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
@@ -59,7 +60,14 @@ class ComplexTransferViewController: UIViewController {
         pagingViewController.borderColor = UIColor.clear
         
         view.addSubview(pagingViewController.view)
-        view.constrainToEdges(pagingViewController.view, relativeToSafeArea: true)
+        pagingViewController.view.snp.makeConstraints {
+            if #available(iOS 11, *) {
+                $0.directionalEdges.equalTo(view.safeAreaLayoutGuide)
+            } else {
+                $0.directionalEdges.equalToSuperview()
+            }
+        }
+        
         addChild(pagingViewController)
     }
     
@@ -88,7 +96,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         let vc = service.transferViewController()
         if let v = vc as? TransferViewControllerBase {
             if let address = partner?.address {
-                let name = partner?.name
+                let name = partner?.name?.checkAndReplaceSystemWallets()
                 v.admReportRecipient = address
                 v.recipientIsReadonly = true
                 v.commentsEnabled = service.commentsEnabledForRichMessages

@@ -94,10 +94,8 @@ class AdamantUriBuilding: XCTestCase {
             switch label {
             case .label(let valueDecoded):
                 XCTAssertEqual(value, valueDecoded)
-            case .address(_):
-                break
-            case .message(_):
-                break
+            case .address, .message:
+                XCTFail("Incorrect case")
             }
             
         default:

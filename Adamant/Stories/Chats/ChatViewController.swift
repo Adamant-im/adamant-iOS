@@ -12,6 +12,7 @@ import MessageInputBar
 import CoreData
 import SafariServices
 import ProcedureKit
+import SnapKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -105,6 +106,7 @@ class ChatViewController: MessagesViewController {
     internal var showsDateHeaderAfterTimeInterval: TimeInterval = 3600
     
     private var isFirstLayout = true
+    private var didLoaded = false
     
     // Content insets are broken after modal view dissapears
     private var fixKeyboardInsets = false
@@ -121,6 +123,8 @@ class ChatViewController: MessagesViewController {
     let scrollToBottomBtn = UIButton(type: .custom)
     
     var feeUpdateTimer: Timer?
+    
+    private let headerHeight: CGFloat = 38
     
     // MARK: Rich Messages
     var richMessageProviders = [String:RichMessageProvider]()
@@ -155,6 +159,8 @@ class ChatViewController: MessagesViewController {
         
         return richMessageStatusUpdating.contains(id)
     }
+    
+    private let averageVisibleCount = 8
     
     // MARK: Fee label
     private var feeIsVisible: Bool = false
@@ -196,6 +202,11 @@ class ChatViewController: MessagesViewController {
         return queue
     }()
     
+    // MARK: Busy indicator
+    
+    private(set) var isBusy = false
+    private var loadingView: LoadingView?
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -219,6 +230,8 @@ class ChatViewController: MessagesViewController {
         messagesCollectionView.messageCellDelegate = self
         maintainPositionOnKeyboardFrameChanged = true
         
+        messagesCollectionView.register(HeaderReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader)
+
         if let layout = messagesCollectionView.collectionViewLayout as? MessagesCollectionViewFlowLayout {
             for messageSizeCalculator in layout.messageSizeCalculators() {
                 messageSizeCalculator.outgoingAvatarSize = .zero
@@ -282,6 +295,8 @@ class ChatViewController: MessagesViewController {
             $0.setImage(#imageLiteral(resourceName: "Arrow_innactive"), for: UIControl.State.disabled)
         }
         
+        messageInputBar.inputTextView.autocorrectionType = .no
+        
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             self.edgesForExtendedLayout = UIRectEdge.top
             
@@ -296,8 +311,11 @@ class ChatViewController: MessagesViewController {
                 let keyboardHeight = notification.endFrame.height
                 let tabBarHeight = self?.tabBarController?.tabBar.bounds.height ?? 0
                 
-                self?.messagesCollectionView.contentInset.bottom = barHeight + keyboardHeight
-                self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight + keyboardHeight - tabBarHeight
+                if !isMacOS {
+                    self?.messagesCollectionView.contentInset.bottom = barHeight + keyboardHeight
+                    self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight + keyboardHeight - tabBarHeight
+                }
+                
                 DispatchQueue.main.async {
                     self?.messagesCollectionView.scrollToBottom(animated: false)
                 }
@@ -398,10 +416,11 @@ class ChatViewController: MessagesViewController {
         scrollToBottomBtn.frame = CGRect.zero
         scrollToBottomBtn.translatesAutoresizingMaskIntoConstraints = false
         scrollToBottomBtn.addTarget(self, action: #selector(scrollDown), for: .touchUpInside)
-        
+        scrollToBottomBtn.isHidden = true
         self.view.addSubview(scrollToBottomBtn)
         
         keyboardManager.on(event: .willChangeFrame) { [weak self] (notification) in
+            if isMacOS { return }
             let barHeight = self?.messageInputBar.bounds.height ?? 0
             let keyboardHeight = notification.endFrame.height
             
@@ -422,6 +441,8 @@ class ChatViewController: MessagesViewController {
         UIMenuController.shared.menuItems = [
             UIMenuItem(title: String.adamantLocalized.chat.remove, action: NSSelectorFromString("remove:")),
             UIMenuItem(title: String.adamantLocalized.chat.report, action: NSSelectorFromString("report:"))]
+        
+        loadFirstMessagesIfNeeded()
     }
     
     override func canPerformAction(_ action: Selector, withSender sender: Any!) -> Bool {
@@ -507,9 +528,11 @@ class ChatViewController: MessagesViewController {
         scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
         scrollToBottomBtnOffetConstraint?.constant = -20 - self.messageInputBar.bounds.height
         
-        if forceScrollToBottom ?? false {
+        if forceScrollToBottom ?? false && !scrollToBottomBtn.isHidden {
             scrollDown()
         }
+        
+        didLoaded = true
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -530,7 +553,6 @@ class ChatViewController: MessagesViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
         guard let address = chatroom?.partner?.address else { return }
         
         // MARK: 4.2 Scroll to message
@@ -540,6 +562,12 @@ class ChatViewController: MessagesViewController {
                 isFirstLayout = false
                 self.chatsProvider.chatPositon.removeValue(forKey: address)
                 self.messageToShow = nil
+
+                didLoaded = true
+                if indexPath.row >= 0 && indexPath.row <= averageVisibleCount {
+                    self.loadMooreMessagesIfNeeded(indexPath: IndexPath(row: 0, section: 2))
+                    self.reloadTopSectionIfNeeded()
+                }
                 return
             }
         }
@@ -556,8 +584,8 @@ class ChatViewController: MessagesViewController {
                 if let offset = self.chatsProvider.chatPositon[address] {
                     self.chatPositionOffset = CGFloat(offset)
                     self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
-                    let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom)
-                    
+                    let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom) + headerHeight
+
                     messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
                     }
                 } else {
@@ -791,7 +819,9 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        performBatchChanges(controllerChanges)
+        if !isBusy {
+            performBatchChanges(controllerChanges)
+        }
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -824,9 +854,15 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
         let chat = messagesCollectionView
         
         var scrollToBottom = changes.first { $0.type == .insert } != nil
+        var forceScrollToBottom = false
         
-        if !isFirstLayout {
-            scrollToBottom = scrollToBottomBtn.isHidden
+        if !isFirstLayout && changes.first?.type != nil {
+            if self.forceScrollToBottom ?? false {
+                scrollToBottom = true
+                self.forceScrollToBottom = false
+            } else {
+                scrollToBottom = scrollToBottomBtn.isHidden
+            }
         }
         
         chat.performBatchUpdates({
@@ -840,6 +876,7 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
                     chat.insertSections(IndexSet(integer: newIndexPath.row))
                     if scrollToBottom {
                         chat.scrollToBottom(animated: true)
+                        forceScrollToBottom = true
                     }
                     
                 case .delete:
@@ -858,14 +895,16 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
                     guard let section = change.indexPath?.row else {
                         continue
                     }
-                    
-                    chat.reloadItems(at: [IndexPath(row: 0, section: section)])
+                    if chat.indexPathsForVisibleItems.contains(IndexPath(row: 0, section: section)) {
+                        chat.reloadItems(at: [IndexPath(row: 0, section: section)])
+                    }
+                    scrollToBottom = false
                 @unknown default:
                     break
                 }
             }
         }, completion: { animationSuccess in
-            if scrollToBottom {
+            if scrollToBottom || forceScrollToBottom {
                 chat.scrollToBottom(animated: animationSuccess)
             }
         })
@@ -1022,5 +1061,153 @@ private class StatusUpdateProcedure: Procedure {
             try? privateContext.save()
             self.finish()
         }
+    }
+}
+
+// MARK: - Busy Indicator View
+extension ChatViewController {
+    func setupLoadingView() {
+        let loadingView = LoadingView()
+        view.addSubview(loadingView)
+        loadingView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
+        
+        loadingView.startAnimating()
+        self.loadingView = loadingView
+    }
+    
+    func setBusyIndicator(state: Bool) {
+        isBusy = state
+        if loadingView == nil && state {
+            setupLoadingView()
+            messagesCollectionView.alpha = 0.0
+            messageInputBar.sendButton.isEnabled = false
+            messageInputBar.inputTextView.isEditable = false
+            messageInputBar.leftStackView.isUserInteractionEnabled = false
+        }
+        
+        if !state {
+            if loadingView != nil {
+                reloadTopSectionIfNeeded()
+            }
+            
+            if chatroom?.isReadonly ?? false {
+                messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
+                messageInputBar.inputTextView.isEditable = false
+                messageInputBar.sendButton.isEnabled = false
+                attachmentButton.isEnabled = false
+            } else {
+                messageInputBar.sendButton.isEnabled = true
+                messageInputBar.inputTextView.isEditable = true
+                messageInputBar.leftStackView.isUserInteractionEnabled = true
+            }
+            
+            UIView.animate(withDuration: 0.25, delay: 0.25) { [weak self] in
+                self?.messagesCollectionView.alpha = 1.0
+                self?.loadingView?.alpha = 0.0
+            } completion: { [weak self] _ in
+                self?.loadingView?.removeFromSuperview()
+            }
+        }
+    }
+}
+
+//MARK: Load moore message
+extension ChatViewController {
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+       loadMooreMessagesIfNeeded(indexPath: indexPath)
+    }
+    
+    func loadFirstMessagesIfNeeded() {
+        guard let address = chatroom?.partner?.address else { return }
+        
+        if let isLoaded = chatsProvider.isChatLoaded[address],
+           isLoaded {
+            setBusyIndicator(state: false)
+            return
+        }
+        
+        if address == AdamantContacts.adamantWelcomeWallet.name {
+            setBusyIndicator(state: false)
+            return
+        }
+        
+        setBusyIndicator(state: true)
+        
+        chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] count in
+            DispatchQueue.main.async {
+                self?.messagesCollectionView.reloadDataAndKeepOffset()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    if count > 0 {
+                        self?.messagesCollectionView.scrollToItem(at: IndexPath(row: 0, section: count - 1), at: .top, animated: false)
+                    }
+                    self?.setBusyIndicator(state: false)
+                }
+            }
+        }
+    }
+    
+    func loadMooreMessagesIfNeeded(indexPath: IndexPath) {
+        guard indexPath.section < 4,
+              let address = chatroom?.partner?.address,
+              !isBusy,
+              isNeedToLoadMoore(),
+              didLoaded
+        else {
+            return
+        }
+        
+        if address == AdamantContacts.adamantWelcomeWallet.name { return }
+        isBusy = true
+        let offset = chatsProvider.chatLoadedMessages[address] ?? 0
+        chatsProvider.getChatMessages(with: address, offset: offset) { [weak self] _count in
+            DispatchQueue.main.async {
+                self?.messagesCollectionView.reloadDataAndKeepOffset()
+                self?.isBusy = false
+                self?.reloadTopSectionIfNeeded()
+            }
+        }
+    }
+    
+    func reloadTopSectionIfNeeded() {
+        try? chatController?.performFetch()
+        if let count = chatController?.fetchedObjects?.count,
+           count >= 1 {
+            self.messagesCollectionView.reloadSections(IndexSet(integer: 0))
+        }
+    }
+    
+    func isNeedToLoadMoore() -> Bool {
+        if let address = chatroom?.partner?.address,
+           chatsProvider.chatLoadedMessages[address] ?? 0 < chatsProvider.chatMaxMessages[address] ?? 0 {
+            return true
+        }
+        return false
+    }
+}
+
+// MARK: Mac OS HotKeys
+extension InputTextView {
+    open override var keyCommands: [UIKeyCommand]? {
+        let commands = [UIKeyCommand(input: "\r", modifierFlags: [], action: #selector(sendKey(sender:))),
+                        UIKeyCommand(input: "\r", modifierFlags: .alternate, action: #selector(newLineKey(sender:))),
+                        UIKeyCommand(input: "\r", modifierFlags: .control, action: #selector(newLineKey(sender:)))]
+        if #available(iOS 15, *) {
+            commands.forEach { $0.wantsPriorityOverSystemBehavior = true }
+        }
+        return commands
+    }
+
+    @objc func sendKey(sender: UIKeyCommand) {
+        if sender.modifierFlags == .control || sender.modifierFlags == .alternate {
+            newLineKey(sender: sender)
+        } else {
+            messageInputBar?.didSelectSendButton()
+        }
+    }
+    
+    @objc func newLineKey(sender: UIKeyCommand) {
+        messageInputBar?.inputTextView.text += "\n"
     }
 }

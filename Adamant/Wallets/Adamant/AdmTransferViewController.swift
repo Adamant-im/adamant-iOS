@@ -102,34 +102,8 @@ class AdmTransferViewController: TransferViewControllerBase {
                 }
                 
                 vc.dialogService?.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                
-                let detailsVC = self?.router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? AdmTransactionDetailsViewController
-                detailsVC?.transaction = result
-                
-                if comments.count > 0 {
-                    detailsVC?.comment = comments
-                }
-                
-                // MARK: Sender, you
-                detailsVC?.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                
-                // MARK: Get recipient
-                if let recipientName = self?.recipientName {
-                    detailsVC?.recipientName = recipientName
-                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
-                } else if let accountsProvider = self?.accountsProvider {
-                    accountsProvider.getAccount(byAddress: recipient) { accResult in
-                        switch accResult {
-                        case .success(let account):
-                            detailsVC?.recipientName = account.name
-                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
-                            
-                        default:
-                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
-                        }
-                    }
-                } else {
-                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                DispatchQueue.onMainAsync {
+                    self?.openDetailVC(result: result, vc: vc, recipient: recipient, comments: comments)
                 }
                 
             case .failure(let error):
@@ -143,6 +117,36 @@ class AdmTransferViewController: TransferViewControllerBase {
         }
     }
     
+    private func openDetailVC(result: TransactionDetails, vc: AdmTransferViewController, recipient: String, comments: String) {
+        let detailsVC = router.get(scene: AdamantScene.Wallets.Adamant.transactionDetails) as? AdmTransactionDetailsViewController
+        detailsVC?.transaction = result
+        
+        if comments.count > 0 {
+            detailsVC?.comment = comments
+        }
+        
+        // MARK: Sender, you
+        detailsVC?.senderName = String.adamantLocalized.transactionDetails.yourAddress
+        
+        // MARK: Get recipient
+        if let recipientName = recipientName {
+            detailsVC?.recipientName = recipientName
+            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+        } else if let accountsProvider = accountsProvider {
+            accountsProvider.getAccount(byAddress: recipient) { accResult in
+                switch accResult {
+                case .success(let account):
+                    detailsVC?.recipientName = account.name
+                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                    
+                default:
+                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+                }
+            }
+        } else {
+            vc.delegate?.transferViewController(vc, didFinishWithTransfer: result, detailsViewController: detailsVC)
+        }
+    }
     
     // MARK: Overrides
     
@@ -186,7 +190,7 @@ class AdmTransferViewController: TransferViewControllerBase {
             view.frame = prefix.frame
             $0.cell.textField.leftView = view
             $0.cell.textField.leftViewMode = .always
-            
+            $0.cell.textField.autocorrectionType = .no
             if recipientIsReadonly {
                 $0.disabled = true
 //                prefix.isEnabled = false

@@ -11,17 +11,8 @@ import Foundation
 // MARK: - Notifications
 extension Notification.Name {
     struct NodesSource {
-        /// Raised when node list changed
-        static let nodesChanged = Notification.Name("adamant.nodesSource.nodesChanged")
-        
-        private init() {}
-    }
-}
-
-extension AdamantUserInfoKey {
-    struct nodesSource {
-        /// New node list
-        static let nodes = "adamant.nodesSource.nodes"
+        /// Raised by NodesSource when need to update current node or list of nodes
+        static let nodesUpdate = Notification.Name("adamant.nodesSource.nodesUpdate")
         
         private init() {}
     }
@@ -29,24 +20,26 @@ extension AdamantUserInfoKey {
 
 // MARK: - SecuredStore keys
 extension StoreKey {
-    struct nodesSource {
+    struct NodesSource {
         static let nodes = "nodesSource.nodes"
         
         private init() {}
     }
 }
 
-protocol NodesSource {
-    var nodes: [Node] { get set }
-    var defaultNodes: [Node] { get }
-    
-    func getNewNode() -> Node
-    func getValidNode(completion: @escaping ((Node?) -> Void))
-    
-    func getSocketNewNode() -> Node
-    
-    func saveNodes()
-    func reloadNodes()
+// MARK: - UserDefaults
+extension UserDefaults {
+    enum NodesSource {
+        static let preferTheFastestNodeKey = "nodesSource.preferTheFastestNode"
+    }
+}
 
-    func migrate()
+protocol NodesSource: AnyObject {
+    var nodes: [Node] { get set }
+    var preferTheFastestNode: Bool { get set }
+    
+    func setDefaultNodes()
+    func getAllowedNodes(needWS: Bool) -> [Node]
+    func healthCheck()
+    func nodesUpdate()
 }

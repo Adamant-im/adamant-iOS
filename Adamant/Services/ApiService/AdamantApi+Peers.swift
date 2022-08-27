@@ -22,7 +22,7 @@ extension AdamantApiService {
         // MARK: 1. Prepare
         let endpoint: URL
         do {
-            endpoint = try buildUrl(url: url, subpath: ApiCommands.Peers.version)
+            endpoint = try buildUrl(url: url, path: ApiCommands.Peers.version)
         } catch {
             let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
             completion(.failure(err))
