@@ -62,7 +62,7 @@ extension AdamantChatsProvider {
         
         do {
             let results = try stack.container.viewContext.fetch(request)
-            return results.count == 0
+            return results.count <= 1
         } catch let error{
             print(error)
             return false
