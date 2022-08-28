@@ -185,6 +185,8 @@ class LskTransferViewController: TransferViewControllerBase {
                 let text = recipient
                 self?.shareValue(text, from: cell)
             }
+        }.cellUpdate { [weak self] _, _ in
+            self?.validateForm()
         }
 
         return row

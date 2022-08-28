@@ -195,10 +195,11 @@ class AdmTransferViewController: TransferViewControllerBase {
                 $0.disabled = true
 //                prefix.isEnabled = false
             }
-        }.cellUpdate { (cell, row) in
+        }.cellUpdate { [weak self] cell, _ in
             if let text = cell.textField.text {
                 cell.textField.text = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
             }
+            self?.validateForm()
         }.onChange { [weak self] row in
             if let skip = self?.skipValueChange, skip {
                 self?.skipValueChange = false

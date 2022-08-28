@@ -751,6 +751,8 @@ extension TransferViewControllerBase {
                 }
                 
                 self?.validateForm()
+            }.cellUpdate { [weak self] _, _ in
+                self?.validateForm()
             }
             
         case .fiat:
