@@ -55,7 +55,7 @@ class EthTransferViewController: TransferViewControllerBase {
             switch result {
             case .success(let transaction):
                 // MARK: 1. Send adm report
-                if let reportRecipient = vc.admReportRecipient, let hash = transaction.txhash {
+                if let reportRecipient = vc.admReportRecipient, let hash = transaction.txHash {
                     self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
                 }
                 

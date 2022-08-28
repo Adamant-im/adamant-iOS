@@ -10,7 +10,6 @@ import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit
-import BitcoinKitPrivate
 
 enum DefaultBtcTransferFee: Decimal {
     case high = 24000

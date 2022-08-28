@@ -13,7 +13,7 @@ import PromiseKit
 
 extension EthereumTransaction: RawTransaction {
     var txHash: String? {
-        return txhash
+        return hash?.hex
     }
 }
 

@@ -9,7 +9,6 @@
 import UIKit
 import Alamofire
 import BitcoinKit
-import BitcoinKitPrivate
 
 extension BtcWalletService: WalletServiceTwoStepSend {
     typealias T = BitcoinKit.Transaction

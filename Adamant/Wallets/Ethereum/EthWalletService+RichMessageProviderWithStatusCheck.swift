@@ -86,10 +86,7 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
         }
         
         // MARK: Compare amounts
-        guard let realAmount = eth.value?.asDecimal(exponent: EthWalletService.currencyExponent) else {
-            completion(.success(result: .warning))
-            return
-        }
+        let realAmount = eth.value.asDecimal(exponent: EthWalletService.currencyExponent)
 
         guard let raw = transaction.richContent?[RichContentKeys.transfer.amount], let reported = AdamantBalanceFormat.deserializeBalance(from: raw) else {
             completion(.success(result: .warning))

@@ -9,7 +9,6 @@
 import Foundation
 import Alamofire
 import BitcoinKit
-import BitcoinKitPrivate
 
 struct DashTransactionsPointer {
     let total: Int
