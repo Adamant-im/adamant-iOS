@@ -840,7 +840,14 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
             return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm"))
         }
         
-        let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo)
+        var network = ""
+        if ERC20Token.supportedTokens.contains(where: { token in
+            return token.symbol == service.tokenSymbol
+        }) {
+           network = "ERC20"
+        }
+        
+        let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo, currencyNetwork: network)
         
         if let wallet = service.wallet {
             item.balance = wallet.balance
