@@ -172,10 +172,7 @@ class AdamantApiService: ApiService {
         completion: @escaping (ApiServiceResult<T>) -> Void
     ) {
         guard let node = nodes.first else {
-            let error = InternalError.endpointBuildFailed.apiServiceErrorWith(
-                error: InternalError.unknownError
-            )
-            completion(.failure(error))
+            completion(.failure(.networkError(error: InternalError.unknownError)))
             return
         }
         

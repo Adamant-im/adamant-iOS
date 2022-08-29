@@ -42,8 +42,8 @@ class AdamantChatsProvider: ChatsProvider {
     public var chatMaxMessages: [String : Int] = [:]
     public var chatLoadedMessages: [String : Int] = [:]
     private var connection: AdamantConnection?
-    private var isConnectedToTheInthernet = true
-    private var isRestoredConnectionToTheInthernet: (() ->())?
+    private var isConnectedToTheInternet = true
+    private var onConnectionToTheInternetRestored: (() -> Void)?
     
     private(set) var isInitiallySynced: Bool = false {
         didSet {
@@ -150,12 +150,13 @@ class AdamantChatsProvider: ChatsProvider {
             self?.connection = connection
             switch self?.connection {
             case .some(.cellular), .some(.wifi):
-                if self?.isConnectedToTheInthernet == false {
-                    self?.isRestoredConnectionToTheInthernet?()
+                if self?.isConnectedToTheInternet == false {
+                    self?.onConnectionToTheInternetRestored?()
+                    self?.onConnectionToTheInternetRestored = nil
                 }
-                self?.isConnectedToTheInthernet = true
+                self?.isConnectedToTheInternet = true
             case nil, .some(.none):
-                self?.isConnectedToTheInthernet = false
+                self?.isConnectedToTheInternet = false
             }
         }
     }
@@ -301,16 +302,20 @@ extension AdamantChatsProvider {
             case .failure(let error):
                 switch error {
                 case .networkError:
-                    if self?.isConnectedToTheInthernet ?? false {
-                        self?.apiGetChatrooms(address: address, offset: offset) { result in
-                            completion?(result)
-                        }
+                    let getChatrooms: () -> Void = {
+                        self?.apiGetChatrooms(
+                            address: address,
+                            offset: offset,
+                            completion: completion
+                        )
+                    }
+                    if self?.isConnectedToTheInternet == true {
+                        DispatchQueue.global().asyncAfter(
+                            deadline: .now() + requestRepeatDelay,
+                            execute: getChatrooms
+                        )
                     } else {
-                        self?.isRestoredConnectionToTheInthernet = {
-                            self?.apiGetChatrooms(address: address, offset: offset) { result in
-                                completion?(result)
-                            }
-                        }
+                        self?.addOnConnectionToTheInternetRestored(task: getChatrooms)
                     }
                 default:
                     completion?(nil)
@@ -362,16 +367,21 @@ extension AdamantChatsProvider {
             case .failure(let error):
                 switch error {
                 case .networkError:
-                    if self?.isConnectedToTheInthernet ?? false {
-                        self?.apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { result in
-                            completion?(result)
-                        }
+                    let getChatMessages: () -> Void = {
+                        self?.apiGetChatMessages(
+                            address: address,
+                            addressRecipient: addressRecipient,
+                            offset: offset,
+                            completion: completion
+                        )
+                    }
+                    if self?.isConnectedToTheInternet == true {
+                        DispatchQueue.global().asyncAfter(
+                            deadline: .now() + requestRepeatDelay,
+                            execute: getChatMessages
+                        )
                     } else {
-                        self?.isRestoredConnectionToTheInthernet = {
-                            self?.apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { result in
-                                completion?(result)
-                            }
-                        }
+                        self?.addOnConnectionToTheInternetRestored(task: getChatMessages)
                     }
                 default:
                     completion?(nil)
@@ -1510,4 +1520,13 @@ extension AdamantChatsProvider {
             }
         }
     }
+    
+    private func addOnConnectionToTheInternetRestored(task: @escaping () -> Void) {
+        onConnectionToTheInternetRestored = { [onConnectionToTheInternetRestored] in
+            onConnectionToTheInternetRestored?()
+            task()
+        }
+    }
 }
+
+private let requestRepeatDelay: TimeInterval = 2
