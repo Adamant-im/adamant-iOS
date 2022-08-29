@@ -42,6 +42,8 @@ class AdamantChatsProvider: ChatsProvider {
     public var chatMaxMessages: [String : Int] = [:]
     public var chatLoadedMessages: [String : Int] = [:]
     private var connection: AdamantConnection?
+    private var chatsLoading: [String] = []
+    private let preLoadChatsCount = 5
     private var isConnectedToTheInternet = true
     private var onConnectionToTheInternetRestored: (() -> Void)?
     
@@ -291,6 +293,12 @@ extension AdamantChatsProvider {
                     completion?()
                 })
             }
+            
+            let preLoadChatsCount = self?.preLoadChatsCount ?? 0
+            array.prefix(preLoadChatsCount).forEach { transaction in
+                let recipientAddress = transaction.recipientId == address ? transaction.senderId : transaction.recipientId
+                self?.getChatMessages(with: recipientAddress, offset: nil, completion: nil)
+            }
         }
     }
     
@@ -336,12 +344,18 @@ extension AdamantChatsProvider {
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = self.stack.container.viewContext
       
+        if !isChatLoaded.keys.contains(addressRecipient) {
+            chatsLoading.append(addressRecipient)
+        }
         apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] chatroom in
             self?.processingQueue.async {
                 self?.isChatLoaded[addressRecipient] = true
                 self?.chatMaxMessages[addressRecipient] = chatroom?.count ?? 0
                 let loadedCount = self?.chatLoadedMessages[addressRecipient] ?? 0
                 self?.chatLoadedMessages[addressRecipient] = loadedCount + (chatroom?.messages?.count ?? 0)
+                if let index = self?.chatsLoading.firstIndex(of: addressRecipient) {
+                    self?.chatsLoading.remove(at: index)
+                }
                 guard let transactions = chatroom?.messages,
                       transactions.count > 0 else {
                     completion?(0)
@@ -354,6 +368,7 @@ extension AdamantChatsProvider {
                               contextMutatingSemaphore: cms,
                               completion: {
                     completion?(transactions.count)
+                    NotificationCenter.default.post(name: .AdamantChatsProvider.initiallyLoadedMessages, object: [addressRecipient, transactions.count])
                 })
             }
         }
@@ -531,6 +546,10 @@ extension AdamantChatsProvider {
                 completion?(.failure(err))
             }
         }
+    }
+    
+    func isChatLoading(with addressRecipient: String) -> Bool {
+        return chatsLoading.contains(addressRecipient)
     }
 }
 

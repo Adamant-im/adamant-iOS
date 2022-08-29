@@ -137,6 +137,8 @@ extension Notification.Name {
 
         static let initiallySyncedChanged = Notification.Name("adamant.chatsProvider.initialSyncChanged")
 
+        static let initiallyLoadedMessages = Notification.Name("adamant.chatsProvider.initiallyLoadedMessages")
+        
         private init() {}
     }
 }
@@ -191,6 +193,7 @@ protocol ChatsProvider: DataProvider {
     func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
     func getChatRooms(offset: Int?, completion: (() ->())?)
     func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) ->())?)
+    func isChatLoading(with addressRecipient: String) -> Bool
     
     /// Unread messages controller. Sections by chatroom.
     func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>

@@ -77,6 +77,8 @@ class ChatViewController: MessagesViewController {
         return formatter
     }
     
+    private var chatsLoadedNotificationObserver: NSObjectProtocol?
+    
     private var keyboardManager = KeyboardManager()
     
     private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
@@ -633,6 +635,10 @@ class ChatViewController: MessagesViewController {
             
             try? privateContext.save()
         }
+        
+        if let chatsLoadedNotificationObserver = chatsLoadedNotificationObserver {
+            NotificationCenter.default.removeObserver(chatsLoadedNotificationObserver)
+        }
     }
     
     func updateTitle() {
@@ -654,6 +660,18 @@ class ChatViewController: MessagesViewController {
                 nav.popToRootViewController(animated: true)
         } else {
             self.navigationController?.popViewController(animated: true)
+        }
+    }
+    
+    func addChatLoadedObserver() {
+        chatsLoadedNotificationObserver = NotificationCenter.default.addObserver(forName: .AdamantChatsProvider.initiallyLoadedMessages, object: nil, queue: .main) { [weak self] notification in
+            guard let dataArray = notification.object as? [Any],
+                  let recipientAddress = dataArray.first as? String,
+                  recipientAddress == self?.chatroom?.partner?.address,
+                  let count = dataArray.last as? Int
+            else { return }
+            print("chatsLoadedNotificationObserver=", recipientAddress)
+            self?.updateMessageData(count: count)
         }
     }
     
@@ -1135,15 +1153,24 @@ extension ChatViewController {
         
         setBusyIndicator(state: true)
         
+        if chatsProvider.isChatLoading(with: address) {
+            addChatLoadedObserver()
+            return
+        }
+        
         chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] count in
-            DispatchQueue.main.async {
-                self?.messagesCollectionView.reloadDataAndKeepOffset()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    if count > 0 {
-                        self?.messagesCollectionView.scrollToItem(at: IndexPath(row: 0, section: count - 1), at: .top, animated: false)
-                    }
-                    self?.setBusyIndicator(state: false)
+            self?.updateMessageData(count: count)
+        }
+    }
+    
+    func updateMessageData(count: Int) {
+        DispatchQueue.main.async {
+            self.messagesCollectionView.reloadDataAndKeepOffset()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                if count > 0 {
+                    self.messagesCollectionView.scrollToItem(at: IndexPath(row: 0, section: count - 1), at: .top, animated: false)
                 }
+                self.setBusyIndicator(state: false)
             }
         }
     }
