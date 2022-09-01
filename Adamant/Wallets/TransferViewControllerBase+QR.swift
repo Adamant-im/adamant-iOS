@@ -26,16 +26,13 @@ extension TransferViewControllerBase {
             
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] (granted: Bool) in
-                if granted, let qrReader = self?.qrReader {
-                    qrReader.modalPresentationStyle = .overFullScreen
-                    DispatchQueue.onMainAsync {
+                DispatchQueue.onMainAsync {
+                    if granted, let qrReader = self?.qrReader {
+                        qrReader.modalPresentationStyle = .overFullScreen
                         self?.present(qrReader, animated: true, completion: nil)
                     }
-                } else {
-                    return
                 }
             }
-            
         case .restricted:
             let alert = UIAlertController(title: nil, message: String.adamantLocalized.login.cameraNotSupported, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
