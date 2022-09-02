@@ -22,15 +22,6 @@ extension String.adamantLocalized.notifications {
     private init() {}
 }
 
-extension StoreKey {
-    struct notificationsService {
-        static let notificationsMode = "notifications.mode"
-        static let customBadgeNumber = "notifications.number"
-        
-        private init() {}
-    }
-}
-
 enum NotificationsMode: Int {
     case disabled
     case backgroundFetch
@@ -50,6 +41,44 @@ enum NotificationsMode: Int {
     }
 }
 
+enum NotificationSound: String {
+    case none
+    case noteDefault
+    case inputDefault
+    
+    var tag: String {
+        switch self {
+        case .none: return "none"
+        case .noteDefault: return "def"
+        case .inputDefault: return "ct"
+        }
+    }
+    
+    var fileName: String {
+        switch self {
+        case .none: return ""
+        case .noteDefault: return "default"
+        case .inputDefault: return "notification.mp3"
+        }
+    }
+    
+    var localized: String {
+        switch self {
+        case .none: return "None"
+        case .noteDefault: return "Tri-tone (iOS Default)"
+        case .inputDefault: return "Input"
+        }
+    }
+    
+    init?(fileName: String) {
+        switch fileName {
+        case "notification.mp3": self = .inputDefault
+        case "default": self = .noteDefault
+        case "": self = .none
+        default: self = .inputDefault
+        }
+    }
+}
 
 /// Supported notification types
 ///
@@ -93,7 +122,7 @@ extension Notification.Name {
     struct AdamantNotificationService {
         /// Raised when user has logged out.
         static let notificationsModeChanged = Notification.Name("adamant.notificationService.notificationsMode")
-        
+        static let notificationsSoundChanged = Notification.Name("adamant.notificationService.notificationsSound")
         private init() {}
     }
 }
@@ -144,7 +173,9 @@ extension NotificationsServiceError: RichError {
 
 protocol NotificationsService: AnyObject {
     var notificationsMode: NotificationsMode { get }
+    var notificationsSound: NotificationSound { get }
     
+    func setNotificationSound(_ sound: NotificationSound)
     func setNotificationsMode(_ mode: NotificationsMode, completion: ((NotificationsServiceResult) -> Void)?)
     
     func showNotification(title: String, body: String, type: AdamantNotificationType)
