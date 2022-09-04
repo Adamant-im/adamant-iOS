@@ -16,37 +16,26 @@ final class AdamantHealthCheckService: HealthCheckService {
     
     // MARK: - Properties
     
-    var nodes = [Node]() {
-        didSet {
-            resetRequests()
-        }
-    }
-    
-    weak var delegate: HealthCheckDelegate?
+    private var _nodes = [Node]()
     private var currentRequests = Set<DataRequest>()
     private let semaphore = DispatchSemaphore(value: 1)
     
-    // MARK: - Tools
+    weak var delegate: HealthCheckDelegate?
     
-    func getAllowedNodes(sortedBySpeedDescending: Bool, needWS: Bool) -> [Node] {
-        defer { semaphore.signal() }
-        semaphore.wait()
-        
-        var allowedNodes = nodes.filter {
-            $0.connectionStatus == .allowed
-                && (!needWS || $0.status?.wsEnabled ?? false)
+    var nodes: [Node] {
+        get {
+            defer { semaphore.signal() }
+            semaphore.wait()
+            return _nodes
         }
-        
-        if allowedNodes.isEmpty && !needWS {
-            allowedNodes = nodes.filter { $0.isEnabled }
+        set {
+            defer { semaphore.signal() }
+            semaphore.wait()
+            _nodes = newValue
         }
-        
-        return sortedBySpeedDescending
-            ? allowedNodes.sorted {
-                $0.status?.ping ?? .greatestFiniteMagnitude < $1.status?.ping ?? .greatestFiniteMagnitude
-            }
-            : allowedNodes.shuffled()
     }
+    
+    // MARK: - Tools
     
     func healthCheck() {
         defer { semaphore.signal() }
@@ -55,14 +44,14 @@ final class AdamantHealthCheckService: HealthCheckService {
         resetRequests()
         updateNodesAvailability()
 
-        nodes.filter { $0.isEnabled }.forEach { node in
+        _nodes.filter { $0.isEnabled }.forEach { node in
             guard let request = updateNodeStatus(node: node) else { return }
             currentRequests.insert(request)
         }
     }
     
     private func updateNodesAvailability() {
-        let workingNodes = nodes.filter { $0.isWorking }
+        let workingNodes = _nodes.filter { $0.isWorking }
         
         let actualHeightsRange = getActualNodeHeightsRange(
             heights: workingNodes.compactMap { $0.status?.height }
