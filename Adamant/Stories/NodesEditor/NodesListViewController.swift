@@ -286,7 +286,7 @@ extension NodesListViewController {
     func updateNodesRows() {
         guard let nodesSection = getNodesSection() else { return }
 
-        guard displayedNodes != nodesSource.nodes else {
+        guard !displayedNodes.hasTheSameReferences(as: nodesSource.nodes) else {
             nodesSection.allRows.forEach { $0.updateCell() }
             return
         }

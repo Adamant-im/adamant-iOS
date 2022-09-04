@@ -21,6 +21,7 @@
 		41E142F5289E60EB002EE8D7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */; };
 		550066C5284D65DB0044C0B1 /* HealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C4284D65DB0044C0B1 /* HealthCheckService.swift */; };
 		550066C7284D682D0044C0B1 /* AdamantHealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */; };
+		550698B628C00AED000E8A2B /* CollectionUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550698B528C00AED000E8A2B /* CollectionUtilites.swift */; };
 		551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E528959A5200DE5D69 /* LoadingView.swift */; };
 		551F66E82895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */; };
 		5522A44028B758530029B543 /* UIKitUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5522A43F28B758530029B543 /* UIKitUtilites.swift */; };
@@ -632,6 +633,7 @@
 		4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.release.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.release.xcconfig"; sourceTree = "<group>"; };
 		550066C4284D65DB0044C0B1 /* HealthCheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthCheckService.swift; sourceTree = "<group>"; };
 		550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantHealthCheckService.swift; sourceTree = "<group>"; };
+		550698B528C00AED000E8A2B /* CollectionUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionUtilites.swift; sourceTree = "<group>"; };
 		551F66E528959A5200DE5D69 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantHealthCheckServiceTests.swift; sourceTree = "<group>"; };
 		5522A43F28B758530029B543 /* UIKitUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIKitUtilites.swift; sourceTree = "<group>"; };
@@ -1817,6 +1819,7 @@
 				E935C84C22AC06E500A8CA2F /* RichMessageTools.swift */,
 				553B1283281C6EE100FFF24C /* GCDUtilites.swift */,
 				5522A43F28B758530029B543 /* UIKitUtilites.swift */,
+				550698B528C00AED000E8A2B /* CollectionUtilites.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2607,6 +2610,7 @@
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
 				646DF92422C29F6E00DCC864 /* ERC20Token.swift in Sources */,
 				E9DFB71C21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift in Sources */,
+				550698B628C00AED000E8A2B /* CollectionUtilites.swift in Sources */,
 				6403F5E022723F6400D58779 /* DashWalletRouter.swift in Sources */,
 				E94008722114EACF00CD2D67 /* WalletAccount.swift in Sources */,
 				640EFA9E2558613700E9724B /* DashProvider.swift in Sources */,
