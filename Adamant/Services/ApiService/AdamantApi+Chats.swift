@@ -155,15 +155,8 @@ extension AdamantApiService {
         // MARK: 2. Send
         sendRequest(
             path: ApiCommands.Chats.getChatRooms + "/\(address)/\(addressRecipient)",
-            queryItems: queryItems
-        ) { (serverResponse: ApiServiceResult<ChatRooms>) in
-            switch serverResponse {
-            case .success(let response):
-                completion(.success(response))
-                
-            case .failure(let error):
-                completion(.failure(.networkError(error: error)))
-            }
-        }
+            queryItems: queryItems,
+            completion: completion
+        )
     }
 }

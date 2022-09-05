@@ -58,7 +58,7 @@ class AdamantNodesSource: NodesSource {
             object: nil,
             queue: nil
         ) { [weak self] _ in
-            self?.healthCheckService.healthCheck()
+            self?.healthCheck()
         }
         
         guard
@@ -84,14 +84,14 @@ class AdamantNodesSource: NodesSource {
     }
     
     func getAllowedNodes(needWS: Bool) -> [Node] {
-        healthCheckService.getAllowedNodes(
+        healthCheckService.nodes.getAllowedNodes(
             sortedBySpeedDescending: preferTheFastestNode,
             needWS: needWS
         )
     }
     
     func nodesUpdate() {
-        healthCheckService.healthCheck()
+        healthCheck()
         saveNodes()
     }
     
@@ -154,6 +154,7 @@ class AdamantNodesSource: NodesSource {
 extension AdamantNodesSource: HealthCheckDelegate {
     func healthCheckUpdate() {
         sendNodesUpdateNotification()
+        saveNodes()
     }
 }
 

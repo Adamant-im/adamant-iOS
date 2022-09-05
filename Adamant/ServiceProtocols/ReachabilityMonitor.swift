@@ -25,12 +25,8 @@ extension AdamantUserInfoKey {
     }
 }
 
-enum AdamantConnection {
-    case none, wifi, cellular
-}
-
 protocol ReachabilityMonitor {
-    var connection: AdamantConnection { get }
+    var connection: Bool { get }
     
     func start()
     func stop()

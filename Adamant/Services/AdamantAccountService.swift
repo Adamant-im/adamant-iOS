@@ -141,25 +141,24 @@ class AdamantAccountService: AccountService {
             case .failure(let error):
                 switch error {
                 case .networkError:
-                    NotificationCenter.default.addObserver(forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: nil, queue: nil) { notification in
-                        guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection else {
-                            return
-                        }
+                    NotificationCenter.default.addObserver(
+                        forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
+                        object: nil, queue: nil
+                    ) { notification in
+                        guard (notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool) == true
+                        else { return }
                         
-                        switch connection {
-                        case .none:
-                            break
-                            
-                        case .wifi, .cellular:
-                            ethWallet.initiateNetwork(apiUrl: url) { result in
-                                switch result {
-                                case .success:
-                                    NotificationCenter.default.removeObserver(self, name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: nil)
-                                    
-                                case .failure(let error):
-//                                    self.dialogService.showRichError(error: error)
-                                    print(error)
-                                }
+                        ethWallet.initiateNetwork(apiUrl: url) { result in
+                            switch result {
+                            case .success:
+                                NotificationCenter.default.removeObserver(
+                                    self,
+                                    name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
+                                    object: nil
+                                )
+                                
+                            case .failure(let error):
+                                print(error)
                             }
                         }
                     }

@@ -21,8 +21,10 @@
 		41E142F5289E60EB002EE8D7 /* AdamantSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E142F1289E60EB002EE8D7 /* AdamantSecret.swift */; };
 		550066C5284D65DB0044C0B1 /* HealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C4284D65DB0044C0B1 /* HealthCheckService.swift */; };
 		550066C7284D682D0044C0B1 /* AdamantHealthCheckService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */; };
+		550698B628C00AED000E8A2B /* CollectionUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550698B528C00AED000E8A2B /* CollectionUtilites.swift */; };
 		551F66E628959A5300DE5D69 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E528959A5200DE5D69 /* LoadingView.swift */; };
 		551F66E82895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */; };
+		5522A44028B758530029B543 /* UIKitUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5522A43F28B758530029B543 /* UIKitUtilites.swift */; };
 		553B1284281C6EE100FFF24C /* GCDUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 553B1283281C6EE100FFF24C /* GCDUtilites.swift */; };
 		5551CC8F28A8B75300B52AD0 /* ApiServiceStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5551CC8E28A8B75300B52AD0 /* ApiServiceStub.swift */; };
 		5558A436282AAFCC0024DDD6 /* AdamantApi+Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */; };
@@ -33,6 +35,11 @@
 		55D1D851287B78FC00F94A4E /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 55D1D850287B78FC00F94A4E /* SnapKit */; };
 		55D1D855287B890300F94A4E /* AddressGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D1D854287B890300F94A4E /* AddressGeneratorTests.swift */; };
 		55E69E172868D7920025D82E /* CheckmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55E69E162868D7920025D82E /* CheckmarkView.swift */; };
+		55FBAAF528C54B230066E629 /* Nodes+Allowance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FBAAF428C54B230066E629 /* Nodes+Allowance.swift */; };
+		55FBAAF628C54B2F0066E629 /* Nodes+Allowance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FBAAF428C54B230066E629 /* Nodes+Allowance.swift */; };
+		55FBAAF728C54B2F0066E629 /* Nodes+Allowance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FBAAF428C54B230066E629 /* Nodes+Allowance.swift */; };
+		55FBAAF828C54B300066E629 /* Nodes+Allowance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FBAAF428C54B230066E629 /* Nodes+Allowance.swift */; };
+		55FBAAFB28C550920066E629 /* NodesAllowanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FBAAFA28C550920066E629 /* NodesAllowanceTests.swift */; };
 		6403F5DB2272389800D58779 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		6403F5DE22723C6800D58779 /* DashMainnet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5DD22723C6800D58779 /* DashMainnet.swift */; };
 		6403F5E022723F6400D58779 /* DashWalletRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6403F5DF22723F6400D58779 /* DashWalletRouter.swift */; };
@@ -644,8 +651,10 @@
 		4A4D67BD3DC89C07D1351248 /* Pods-AdmCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdmCore.release.xcconfig"; path = "Target Support Files/Pods-AdmCore/Pods-AdmCore.release.xcconfig"; sourceTree = "<group>"; };
 		550066C4284D65DB0044C0B1 /* HealthCheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthCheckService.swift; sourceTree = "<group>"; };
 		550066C6284D682D0044C0B1 /* AdamantHealthCheckService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantHealthCheckService.swift; sourceTree = "<group>"; };
+		550698B528C00AED000E8A2B /* CollectionUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionUtilites.swift; sourceTree = "<group>"; };
 		551F66E528959A5200DE5D69 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantHealthCheckServiceTests.swift; sourceTree = "<group>"; };
+		5522A43F28B758530029B543 /* UIKitUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIKitUtilites.swift; sourceTree = "<group>"; };
 		553B1283281C6EE100FFF24C /* GCDUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCDUtilites.swift; sourceTree = "<group>"; };
 		5551CC8E28A8B75300B52AD0 /* ApiServiceStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiServiceStub.swift; sourceTree = "<group>"; };
 		5558A435282AAFCC0024DDD6 /* AdamantApi+Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdamantApi+Status.swift"; sourceTree = "<group>"; };
@@ -653,6 +662,8 @@
 		557AC307287B1365004699D7 /* CheckmarkRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckmarkRowView.swift; sourceTree = "<group>"; };
 		55D1D854287B890300F94A4E /* AddressGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressGeneratorTests.swift; sourceTree = "<group>"; };
 		55E69E162868D7920025D82E /* CheckmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckmarkView.swift; sourceTree = "<group>"; };
+		55FBAAF428C54B230066E629 /* Nodes+Allowance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Nodes+Allowance.swift"; sourceTree = "<group>"; };
+		55FBAAFA28C550920066E629 /* NodesAllowanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodesAllowanceTests.swift; sourceTree = "<group>"; };
 		6403F5DD22723C6800D58779 /* DashMainnet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashMainnet.swift; sourceTree = "<group>"; };
 		6403F5DF22723F6400D58779 /* DashWalletRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashWalletRouter.swift; sourceTree = "<group>"; };
 		6403F5E122723F7500D58779 /* DashWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashWallet.swift; sourceTree = "<group>"; };
@@ -1869,6 +1880,9 @@
 				E927171D20C04613002BB9A6 /* UIColor+hex.swift */,
 				E935C84C22AC06E500A8CA2F /* RichMessageTools.swift */,
 				553B1283281C6EE100FFF24C /* GCDUtilites.swift */,
+				5522A43F28B758530029B543 /* UIKitUtilites.swift */,
+				550698B528C00AED000E8A2B /* CollectionUtilites.swift */,
+				55FBAAF428C54B230066E629 /* Nodes+Allowance.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2024,6 +2038,7 @@
 				E95F85B6200A4D8F0070534A /* TestTools.swift */,
 				55D1D854287B890300F94A4E /* AddressGeneratorTests.swift */,
 				551F66E72895B3DA00DE5D69 /* AdamantHealthCheckServiceTests.swift */,
+				55FBAAFA28C550920066E629 /* NodesAllowanceTests.swift */,
 				E9EC344820066D4A00C0E546 /* Info.plist */,
 			);
 			path = AdamantTests;
@@ -2478,6 +2493,7 @@
 				E9079A91229DF1AC0022CA0D /* Date+adamant.swift in Sources */,
 				E9079A8C229DF19A0022CA0D /* AdamantAvatarService.swift in Sources */,
 				E9079A93229DF1CB0022CA0D /* ExtensionsApi.swift in Sources */,
+				55FBAAF828C54B300066E629 /* Nodes+Allowance.swift in Sources */,
 				E9D664C822A003B800733F8A /* WarningView.swift in Sources */,
 				E9079A96229DF1DA0022CA0D /* ChatAsset.swift in Sources */,
 				E9079A9A229DF1DA0022CA0D /* StateAsset.swift in Sources */,
@@ -2502,6 +2518,7 @@
 				E908472A2196FEA80095825D /* RichMessageTransaction+CoreDataClass.swift in Sources */,
 				64A223D620F760BB005157CB /* Localization.swift in Sources */,
 				64E1C82F222E95F6006C4DA7 /* DogeWallet.swift in Sources */,
+				5522A44028B758530029B543 /* UIKitUtilites.swift in Sources */,
 				E9484B7D2285BAD9008E10F0 /* PrivateKeyGenerator.swift in Sources */,
 				E94E7B08205D4CB80042B639 /* SharedRoutes.swift in Sources */,
 				E9960B3621F5154300C840A8 /* DummyAccount+CoreDataProperties.swift in Sources */,
@@ -2642,6 +2659,7 @@
 				E9E7CDB32002B9FB00DFC4DB /* LoginRoutes.swift in Sources */,
 				E9771DA022997D320099AAC7 /* AdamantUtilities.swift in Sources */,
 				E941CCDE20E7B70200C96220 /* WalletCollectionViewCell.swift in Sources */,
+				55FBAAF528C54B230066E629 /* Nodes+Allowance.swift in Sources */,
 				E9AA8BFA212C166600F9249F /* EthWalletService+Send.swift in Sources */,
 				6449BA68235CA0930033B936 /* ERC20WalletService.swift in Sources */,
 				644793C32166314A00FC4CF5 /* OnboardPage.swift in Sources */,
@@ -2664,6 +2682,7 @@
 				E9E7CDC02003AF6D00DFC4DB /* AdamantCellFactory.swift in Sources */,
 				646DF92422C29F6E00DCC864 /* ERC20Token.swift in Sources */,
 				E9DFB71C21624C9200CF8C7C /* AdmTransactionDetailsViewController.swift in Sources */,
+				550698B628C00AED000E8A2B /* CollectionUtilites.swift in Sources */,
 				6403F5E022723F6400D58779 /* DashWalletRouter.swift in Sources */,
 				E94008722114EACF00CD2D67 /* WalletAccount.swift in Sources */,
 				640EFA9E2558613700E9724B /* DashProvider.swift in Sources */,
@@ -2844,6 +2863,7 @@
 				E957E161229C4BEA0019732A /* Crypto.swift in Sources */,
 				64E3D52624B258F800660641 /* ERC20Provider.swift in Sources */,
 				E957E16A229C53980019732A /* DogeProvider.swift in Sources */,
+				55FBAAF728C54B2F0066E629 /* Nodes+Allowance.swift in Sources */,
 				E957E15B229C42B20019732A /* KeychainStore.swift in Sources */,
 				E957E16F229C564B0019732A /* NotificationContent.swift in Sources */,
 				E957E169229C53980019732A /* AdamantProvider.swift in Sources */,
@@ -2910,6 +2930,7 @@
 				E9771D9622996FEB0099AAC7 /* StateType.swift in Sources */,
 				E9771D9522996FEB0099AAC7 /* StateAsset.swift in Sources */,
 				E9771D9222996FEB0099AAC7 /* TransactionAsset.swift in Sources */,
+				55FBAAF628C54B2F0066E629 /* Nodes+Allowance.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2923,6 +2944,7 @@
 				E94883E7203F07CD00F6E1B0 /* PassphraseValidation.swift in Sources */,
 				E95F85B7200A4D8F0070534A /* TestTools.swift in Sources */,
 				E95F85BC200A4E670070534A /* ParsingModelsTests.swift in Sources */,
+				55FBAAFB28C550920066E629 /* NodesAllowanceTests.swift in Sources */,
 				E96D64C02295C06400CA5587 /* JSModels.swift in Sources */,
 				E96D64BE2295C06400CA5587 /* JSAdamantCore.swift in Sources */,
 				E95F85752007E4790070534A /* HexAndBytesUtilitiesTest.swift in Sources */,

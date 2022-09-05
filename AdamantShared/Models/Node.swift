@@ -92,7 +92,7 @@ class Node: Equatable, Codable {
         
         let usePort = useWsPort ? wsPort : port
         
-        if let port = usePort {
+        if let port = usePort, scheme == .http {
             components.port = port
         } else if forcePort {
             components.port = usePort ?? scheme.defaultPort
