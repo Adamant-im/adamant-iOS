@@ -75,6 +75,10 @@ class EthWalletService: WalletService {
         return type(of: self).currencyLogo
     }
 	
+    var tokenNetworkSymbol: String {
+        return "ERC20"
+    }
+    
 	private (set) var transactionFee: Decimal = 0.0
 	
 	static let transferGas: Decimal = 21000

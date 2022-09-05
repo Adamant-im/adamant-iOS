@@ -129,8 +129,15 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 		guard let wallet = service.wallet else {
 			return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm"))
 		}
+        
+        var network = ""
+        if ERC20Token.supportedTokens.contains(where: { token in
+            return token.symbol == service.tokenSymbol
+        }) {
+            network = service.tokenNetworkSymbol
+        }
 		
-		let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo)
+		let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo, currencyNetwork: network)
 		item.balance = wallet.balance
 		
 		return item

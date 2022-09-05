@@ -844,7 +844,7 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
         if ERC20Token.supportedTokens.contains(where: { token in
             return token.symbol == service.tokenSymbol
         }) {
-           network = "ERC20"
+            network = service.tokenNetworkSymbol
         }
         
         let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo, currencyNetwork: network)
