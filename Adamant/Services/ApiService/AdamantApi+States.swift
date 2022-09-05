@@ -64,19 +64,14 @@ extension AdamantApiService {
             "Content-Type": "application/json"
         ]
         
-        // MARK: 2. Build endpoints
-        let endpoint: URL
-        
-        do {
-            endpoint = try buildUrl(path: ApiCommands.States.store)
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        // MARK: 3. Send
-        sendRequest(url: endpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<TransactionIdResponse>) in
+        // MARK: 2. Send
+        sendRequest(
+            path: ApiCommands.States.store,
+            method: .post,
+            parameters: params,
+            encoding: .json,
+            headers: headers
+        ) { (serverResponse: ApiServiceResult<TransactionIdResponse>) in
             switch serverResponse {
             case .success(let response):
                 if let id = response.transactionId {
@@ -102,19 +97,11 @@ extension AdamantApiService {
                           URLQueryItem(name: "orderBy", value: "timestamp:desc"),
                           URLQueryItem(name: "key", value: key)]
         
-        // MARK: 2. Build endpoints
-        let endpoint: URL
-        
-        do {
-            endpoint = try buildUrl(path: ApiCommands.States.get, queryItems: queryItems)
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        // MARK: 3. Send
-        sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
+        // MARK: 2. Send
+        sendRequest(
+            path: ApiCommands.States.get,
+            queryItems: queryItems
+        ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
             switch serverResponse {
             case .success(let response):
                 if let collection = response.collection {
