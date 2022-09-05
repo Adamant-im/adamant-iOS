@@ -122,7 +122,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
             
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
-                row.updateCell()
+                row.reload()
             }
         }
         get {
@@ -234,7 +234,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
         case .valid:
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = parsedAddress
-                row.updateCell()
+                row.reload()
             }
             
             return true

@@ -141,7 +141,7 @@ class DogeTransferViewController: TransferViewControllerBase {
             
             if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
-                row.updateCell()
+                row.reload()
             }
         }
         get {
@@ -217,7 +217,7 @@ class DogeTransferViewController: TransferViewControllerBase {
         case .valid:
             if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = parsedAddress
-                row.updateCell()
+                row.reload()
             }
             
             return true

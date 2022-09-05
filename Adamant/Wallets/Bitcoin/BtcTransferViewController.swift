@@ -139,7 +139,7 @@ class BtcTransferViewController: TransferViewControllerBase {
             
             if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
-                row.updateCell()
+                row.reload()
             }
         }
         get {

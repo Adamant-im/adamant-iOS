@@ -117,7 +117,7 @@ class EthTransferViewController: TransferViewControllerBase {
             
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
-                row.updateCell()
+                row.reload()
             }
         }
         get {
@@ -194,7 +194,7 @@ class EthTransferViewController: TransferViewControllerBase {
                     
                     DispatchQueue.main.async {
                         row.value = trimmed
-                        row.updateCell()
+                        row.reload()
                     }
                 }
             }

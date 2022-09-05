@@ -162,7 +162,7 @@ class AdmTransferViewController: TransferViewControllerBase {
             
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
-                row.updateCell()
+                row.reload()
             }
         }
         get {
@@ -258,19 +258,19 @@ class AdmTransferViewController: TransferViewControllerBase {
         if let admAddress = address.getAdamantAddress() {
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = admAddress.address
-                row.updateCell()
+                row.reload()
             }
             
             if let row: DecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
                 row.value = admAddress.amount
-                row.updateCell()
+                row.reload()
                 reloadFormData()
             }
             return true
         } else if let admAddress = address.getLegacyAdamantAddress() {
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = admAddress.address
-                row.updateCell()
+                row.reload()
             }
             return true
         }
