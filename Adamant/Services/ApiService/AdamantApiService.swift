@@ -102,9 +102,7 @@ class AdamantApiService: ApiService {
             object: nil,
             queue: nil
         ) { [weak self] _ in
-            self?.semaphore.wait()
             self?.updateCurrentNodes()
-            self?.semaphore.signal()
         }
     }
     
@@ -286,7 +284,9 @@ class AdamantApiService: ApiService {
     }
     
     private func updateCurrentNodes() {
+        semaphore.wait()
         currentNodes = nodesSource?.getAllowedNodes(needWS: false) ?? []
+        semaphore.signal()
     }
     
     private func sendCurrentNodeUpdateNotification() {

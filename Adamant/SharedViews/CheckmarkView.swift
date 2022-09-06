@@ -67,6 +67,8 @@ final class CheckmarkView: UIView {
     }
     
     func setIsChecked(_ isChecked: Bool, animated: Bool) {
+        guard self.isChecked != isChecked else { return }
+        
         self.isChecked = isChecked
         updateImage(animated: animated)
     }
