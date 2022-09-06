@@ -259,6 +259,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     $0.value = DoubleDetail(first: recipientName, second: transaction.recipientAddress)
                 } else {
                     $0.value = DoubleDetail(first: transaction.recipientAddress, second: nil)
+                    if transaction.recipientAddress.isEmpty {
+                        $0.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
+                    }
                 }
             } else {
                 $0.value = nil
@@ -281,8 +284,21 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
             
             self?.shareValue(text, from: cell)
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] (cell, row) in
             cell.textLabel?.textColor = .black
+            
+            if let transaction = self?.transaction {
+                if let recipientName = self?.recipientName?.checkAndReplaceSystemWallets() {
+                    row.value = DoubleDetail(first: recipientName, second: transaction.recipientAddress)
+                } else {
+                    row.value = DoubleDetail(first: transaction.recipientAddress, second: nil)
+                    if transaction.recipientAddress.isEmpty {
+                        row.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
+                    }
+                }
+            } else {
+                row.value = nil
+            }
         }
         
         detailsSection.append(recipientRow)

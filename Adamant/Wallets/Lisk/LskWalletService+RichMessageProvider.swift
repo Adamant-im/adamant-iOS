@@ -67,8 +67,8 @@ extension LskWalletService: RichMessageProvider {
         // MARK: 2. Go go transaction
         
         getTransaction(by: hash) { [weak self] result in
-            dialogService.dismissProgress()
             guard let vc = self?.router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController else {
+                dialogService.dismissProgress()
                 return
             }
             
@@ -80,29 +80,41 @@ extension LskWalletService: RichMessageProvider {
             switch result {
             case .success(let transaction):
                 vc.transaction = transaction
+                DispatchQueue.main.async {
+                    dialogService.dismissProgress()
+                    chat.navigationController?.pushViewController(vc, animated: true)
+                }
                 
             case .failure(let error):
                 switch error {
-                case .internalError(let message, _) where message == "No transaction":
-                    let amount: Decimal
-                    if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
-                        amount = decimal
-                    } else {
-                        amount = 0
+                case .internalError(let message, _) where message.contains("does not exist"):
+                    var recipientAddress = ""
+                    var senderAddress = ""
+                    let group = DispatchGroup()
+                    group.enter()
+                    self?.getWalletAddress(byAdamantAddress: transaction.senderAddress) { result in
+                        guard case let .success(senderLskAddress) = result else {
+                            group.leave()
+                            return
+                        }
+                        senderAddress = senderLskAddress
+                        group.leave()
                     }
-
-                    let failedTransaction = SimpleTransactionDetails(txId: hash,
-                                                                     senderAddress: transaction.senderAddress,
-                                                                     recipientAddress: transaction.recipientAddress,
-                                                                     dateValue: nil,
-                                                                     amountValue: amount,
-                                                                     feeValue: nil,
-                                                                     confirmationsValue: nil,
-                                                                     blockValue: nil,
-                                                                     isOutgoing: transaction.isOutgoing,
-                                                                     transactionStatus: TransactionStatus.failed)
-
-                    vc.transaction = failedTransaction
+                    
+                    group.enter()
+                    self?.getWalletAddress(byAdamantAddress: transaction.recipientAddress) { result in
+                        guard case let .success(recipientLskAddress) = result else {
+                            group.leave()
+                            return
+                        }
+                        recipientAddress = recipientLskAddress
+                        group.leave()
+                    }
+                    
+                    group.notify(queue: .main) {
+                        dialogService.dismissProgress()
+                        self?.openEmptyTransactionDetail(hash: hash, vc: vc, senderAddress: senderAddress, recipientAddress: recipientAddress, transaction: transaction, in: chat)
+                    }
 
                 default:
                     self?.dialogService.showRichError(error: error)
@@ -110,11 +122,30 @@ extension LskWalletService: RichMessageProvider {
                 }
                 break
             }
-            
-            DispatchQueue.main.async {
-                chat.navigationController?.pushViewController(vc, animated: true)
-            }
         }
+    }
+    
+    func openEmptyTransactionDetail(hash: String, vc: LskTransactionDetailsViewController, senderAddress: String, recipientAddress: String, transaction: RichMessageTransaction, in chat: ChatViewController) {
+        let amount: Decimal
+        if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
+            amount = decimal
+        } else {
+            amount = 0
+        }
+        
+        let failedTransaction = SimpleTransactionDetails(txId: hash,
+                                                         senderAddress: senderAddress,
+                                                         recipientAddress: recipientAddress,
+                                                         dateValue: nil,
+                                                         amountValue: amount,
+                                                         feeValue: nil,
+                                                         confirmationsValue: nil,
+                                                         blockValue: nil,
+                                                         isOutgoing: transaction.isOutgoing,
+                                                         transactionStatus: TransactionStatus.pending)
+
+        vc.transaction = failedTransaction
+        chat.navigationController?.pushViewController(vc, animated: true)
     }
     
     // MARK: Cells
