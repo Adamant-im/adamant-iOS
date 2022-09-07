@@ -77,7 +77,7 @@ class ChatViewController: MessagesViewController {
         return formatter
     }
     
-    private var chatsLoadedNotificationObserver: NSObjectProtocol?
+    private var chatLoadNotificationObserver: NSObjectProtocol?
     
     private var keyboardManager = KeyboardManager()
     
@@ -636,8 +636,8 @@ class ChatViewController: MessagesViewController {
             try? privateContext.save()
         }
         
-        if let chatsLoadedNotificationObserver = chatsLoadedNotificationObserver {
-            NotificationCenter.default.removeObserver(chatsLoadedNotificationObserver)
+        if let chatLoadNotificationObserver = chatLoadNotificationObserver {
+            NotificationCenter.default.removeObserver(chatLoadNotificationObserver)
         }
     }
     
@@ -663,15 +663,12 @@ class ChatViewController: MessagesViewController {
         }
     }
     
-    func addChatLoadedObserver() {
-        chatsLoadedNotificationObserver = NotificationCenter.default.addObserver(forName: .AdamantChatsProvider.initiallyLoadedMessages, object: nil, queue: .main) { [weak self] notification in
-            guard let dataArray = notification.object as? [Any],
-                  let recipientAddress = dataArray.first as? String,
-                  recipientAddress == self?.chatroom?.partner?.address,
-                  let count = dataArray.last as? Int
+    func addChatLoadObserver() {
+        chatLoadNotificationObserver = NotificationCenter.default.addObserver(forName: .AdamantChatsProvider.initiallyLoadedMessages, object: nil, queue: .main) { [weak self] notification in
+            guard let recipientAddress = notification.object as? String,
+                  recipientAddress == self?.chatroom?.partner?.address
             else { return }
-            print("chatsLoadedNotificationObserver=", recipientAddress)
-            self?.updateMessageData(count: count)
+            self?.updateChatMessages()
         }
     }
     
@@ -1153,13 +1150,22 @@ extension ChatViewController {
         
         setBusyIndicator(state: true)
         
+        if chatsProvider.isChatLoading(with: address) {
+            addChatLoadObserver()
+            return
+        }
+        
         chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] in
             DispatchQueue.main.async {
-                self?.messagesCollectionView.reloadDataAndKeepOffset()
-                self?.messagesCollectionView.scrollToLastItem(animated: false)
-                self?.setBusyIndicator(state: false)
+                self?.updateChatMessages()
             }
         }
+    }
+    
+    func updateChatMessages() {
+        messagesCollectionView.reloadDataAndKeepOffset()
+        messagesCollectionView.scrollToLastItem(animated: false)
+        setBusyIndicator(state: false)
     }
     
     func loadMooreMessagesIfNeeded(indexPath: IndexPath) {

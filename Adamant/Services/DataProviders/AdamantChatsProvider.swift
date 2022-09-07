@@ -367,7 +367,7 @@ extension AdamantChatsProvider {
                               contextMutatingSemaphore: cms,
                               completion: {
                     completion?()
-                    NotificationCenter.default.post(name: .AdamantChatsProvider.initiallyLoadedMessages, object: [addressRecipient, transactions.count])
+                    NotificationCenter.default.post(name: .AdamantChatsProvider.initiallyLoadedMessages, object: addressRecipient)
                 })
             }
         }
