@@ -192,7 +192,7 @@ protocol ChatsProvider: DataProvider {
     func getChatroomsController() -> NSFetchedResultsController<Chatroom>
     func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
     func getChatRooms(offset: Int?, completion: (() ->())?)
-    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) ->())?)
+    func getChatMessages(with addressRecipient: String, offset: Int?, completion: (() -> Void)?)
     func isChatLoading(with addressRecipient: String) -> Bool
     
     /// Unread messages controller. Sections by chatroom.

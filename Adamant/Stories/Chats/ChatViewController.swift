@@ -1153,24 +1153,11 @@ extension ChatViewController {
         
         setBusyIndicator(state: true)
         
-        if chatsProvider.isChatLoading(with: address) {
-            addChatLoadedObserver()
-            return
-        }
-        
-        chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] count in
-            self?.updateMessageData(count: count)
-        }
-    }
-    
-    func updateMessageData(count: Int) {
-        DispatchQueue.main.async {
-            self.messagesCollectionView.reloadDataAndKeepOffset()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                if count > 0 {
-                    self.messagesCollectionView.scrollToItem(at: IndexPath(row: 0, section: count - 1), at: .top, animated: false)
-                }
-                self.setBusyIndicator(state: false)
+        chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] in
+            DispatchQueue.main.async {
+                self?.messagesCollectionView.reloadDataAndKeepOffset()
+                self?.messagesCollectionView.scrollToLastItem(animated: false)
+                self?.setBusyIndicator(state: false)
             }
         }
     }
@@ -1188,7 +1175,7 @@ extension ChatViewController {
         if address == AdamantContacts.adamantWelcomeWallet.name { return }
         isBusy = true
         let offset = chatsProvider.chatLoadedMessages[address] ?? 0
-        chatsProvider.getChatMessages(with: address, offset: offset) { [weak self] _count in
+        chatsProvider.getChatMessages(with: address, offset: offset) { [weak self] in
             DispatchQueue.main.async {
                 self?.messagesCollectionView.reloadDataAndKeepOffset()
                 self?.isBusy = false

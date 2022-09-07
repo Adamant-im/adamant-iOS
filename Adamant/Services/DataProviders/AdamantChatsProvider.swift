@@ -41,7 +41,6 @@ class AdamantChatsProvider: ChatsProvider {
     public var isChatLoaded: [String : Bool] = [:]
     public var chatMaxMessages: [String : Int] = [:]
     public var chatLoadedMessages: [String : Int] = [:]
-    private var connection: AdamantConnection?
     private var chatsLoading: [String] = []
     private let preLoadChatsCount = 5
     private var isConnectedToTheInternet = true
@@ -145,21 +144,21 @@ class AdamantChatsProvider: ChatsProvider {
             queue: nil
         ) { [weak self] notification in
             guard let connection = notification
-                .userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection
+                .userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool
             else {
                 return
             }
-            self?.connection = connection
-            switch self?.connection {
-            case .some(.cellular), .some(.wifi):
-                if self?.isConnectedToTheInternet == false {
-                    self?.onConnectionToTheInternetRestored?()
-                    self?.onConnectionToTheInternetRestored = nil
-                }
-                self?.isConnectedToTheInternet = true
-            case nil, .some(.none):
+            
+            guard connection == true else {
                 self?.isConnectedToTheInternet = false
+                return
             }
+            
+            if self?.isConnectedToTheInternet == false {
+                self?.onConnectionToTheInternetRestored?()
+                self?.onConnectionToTheInternetRestored = nil
+            }
+            self?.isConnectedToTheInternet = true
         }
     }
     
@@ -332,10 +331,10 @@ extension AdamantChatsProvider {
         }
     }
     
-    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) ->())?) {
+    func getChatMessages(with addressRecipient: String, offset: Int?, completion: (() -> Void)?) {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
-            completion?(0)
+            completion?()
             return
         }
         
@@ -358,7 +357,7 @@ extension AdamantChatsProvider {
                 }
                 guard let transactions = chatroom?.messages,
                       transactions.count > 0 else {
-                    completion?(0)
+                    completion?()
                     return
                 }
                 self?.process(messageTransactions: transactions,
@@ -367,7 +366,7 @@ extension AdamantChatsProvider {
                               context: privateContext,
                               contextMutatingSemaphore: cms,
                               completion: {
-                    completion?(transactions.count)
+                    completion?()
                     NotificationCenter.default.post(name: .AdamantChatsProvider.initiallyLoadedMessages, object: [addressRecipient, transactions.count])
                 })
             }

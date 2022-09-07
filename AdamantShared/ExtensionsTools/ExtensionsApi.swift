@@ -15,18 +15,21 @@ class ExtensionsApi {
     let keychainStore: KeychainStore
     
     private(set) lazy var nodes: [Node] = {
+        let nodes: [Node]
         if let raw = keychainStore.get(nodesStoreKey), let data = raw.data(using: String.Encoding.utf8) {
             do {
-                return try JSONDecoder().decode([Node].self, from: data)
+                nodes = try JSONDecoder().decode([Node].self, from: data)
             } catch {
-                return AdamantResources.nodes
+                nodes = AdamantResources.nodes
             }
         } else {
-            return AdamantResources.nodes
+            nodes = AdamantResources.nodes
         }
+        
+        return nodes.getAllowedNodes(sortedBySpeedDescending: true, needWS: false).reversed()
     }()
     
-    private var currentNode: Node? = nil
+    private var currentNode: Node?
     
     private func selectNewNode() {
         currentNode = nodes.popLast()
