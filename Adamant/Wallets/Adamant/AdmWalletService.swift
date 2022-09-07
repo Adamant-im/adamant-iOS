@@ -33,6 +33,10 @@ class AdmWalletService: NSObject, WalletService {
         return type(of: self).currencyLogo
     }
 	
+    var tokenNetworkSymbol: String {
+        return "ADM"
+    }
+    
 	// MARK: - Dependencies
 	weak var accountService: AccountService!
 	var apiService: ApiService!

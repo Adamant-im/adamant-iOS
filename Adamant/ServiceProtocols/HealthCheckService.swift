@@ -17,5 +17,4 @@ protocol HealthCheckService: AnyObject {
     var delegate: HealthCheckDelegate? { get set }
     
     func healthCheck()
-    func getAllowedNodes(sortedBySpeedDescending: Bool, needWS: Bool) -> [Node]
 }
