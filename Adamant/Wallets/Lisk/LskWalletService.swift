@@ -73,6 +73,10 @@ class LskWalletService: WalletService {
         return type(of: self).currencyLogo
     }
 	
+    var tokenNetworkSymbol: String {
+        return "LSK"
+    }
+    
 	// MARK: - Properties
 	let transferAvailable: Bool = true
     private var initialBalanceCheck = false
