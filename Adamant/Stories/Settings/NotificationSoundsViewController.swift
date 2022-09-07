@@ -12,19 +12,38 @@ import AudioToolbox
 import AVFoundation
 
 class NotificationSoundsViewController: FormViewController {
-
+    
+    // MARK: Sections & Rows
+    enum Sections {
+        case alerts
+        
+        var tag: String {
+            switch self {
+            case .alerts: return "al"
+            }
+        }
+        
+        var localized: String {
+            switch self {
+            case .alerts: return NSLocalizedString("Notifications.Alert.Tones", comment: "Notifications: Select Alert Tones")
+            }
+        }
+    }
+    
     var notificationsService: NotificationsService!
     private var selectSound:NotificationSound = .inputDefault
     private var section = SelectableSection<ListCheckRow<NotificationSound>>()
     var audioPlayer: AVAudioPlayer!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "Sounds"
+        self.title = NSLocalizedString("Notifications.Sounds.Name", comment: "Notifications: Select Sounds")
+        
         selectSound = notificationsService.notificationsSound
         
-        section = SelectableSection<ListCheckRow<NotificationSound>>("ALERT TONES", selectionType: .singleSelection(enableDeselection: false))
+        section = SelectableSection<ListCheckRow<NotificationSound>>(Sections.alerts.localized, selectionType: .singleSelection(enableDeselection: false))
 
-        let sounds = [NotificationSound.none, NotificationSound.noteDefault, NotificationSound.inputDefault]
+        let sounds: [NotificationSound] = [.none, .noteDefault, .inputDefault, .proud, .relax, .success]
         for sound in sounds {
             section <<< ListCheckRow<NotificationSound> { listRow in
                 listRow.title = sound.localized
@@ -48,8 +67,8 @@ class NotificationSoundsViewController: FormViewController {
     }
     
     private func addBtns() {
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(save))
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancle", style: .done, target: self, action: #selector(close))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Notifications.Alert.Save", comment: "Notifications: Select Alert Save"), style: .done, target: self, action: #selector(save))
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Notifications.Alert.Cancel", comment: "Notifications: Alerts Cancel"), style: .done, target: self, action: #selector(close))
     }
     
     @objc private func save() {
@@ -70,8 +89,6 @@ class NotificationSoundsViewController: FormViewController {
         switch sound {
         case .none:
             break
-        case .noteDefault:
-            AudioServicesPlaySystemSound(SystemSoundID(1002))
         default:
             playSound(by: sound.fileName)
         }

@@ -34,8 +34,8 @@ class NotificationsViewController: FormViewController {
             switch self {
             case .notifications: return NSLocalizedString("SecurityPage.Section.NotificationsType", comment: "Security: Selected notifications types")
             case .aboutNotificationTypes: return NSLocalizedString("SecurityPage.Section.AboutNotificationTypes", comment: "Security: About Notification types")
-            case .messages: return "Messages"
-            case .settings: return "Settings"
+            case .messages: return NSLocalizedString("SecurityPage.Section.Messages", comment: "Security: Messages Notification sound")
+            case .settings: return NSLocalizedString("SecurityPage.Section.Settings", comment: "Security: Settings Notification")
             }
         }
     }
@@ -61,8 +61,8 @@ class NotificationsViewController: FormViewController {
             case .notificationsMode: return NSLocalizedString("SecurityPage.Row.Notifications", comment: "Security: Show notifications")
             case .description: return NSLocalizedString("SecurityPage.Row.Notifications.ModesDescription", comment: "Security: Notification modes description. Markdown supported.")
             case .github: return NSLocalizedString("SecurityPage.Row.VisitGithub", comment: "Security: Visit Github")
-            case .systemSettings: return "System Settings"
-            case .sound: return "Sound"
+            case .systemSettings: return NSLocalizedString("Notifications.Settings.System", comment: "Notifications: Open system Settings")
+            case .sound: return NSLocalizedString("Notifications.Sound.Name", comment: "Notifications: Select Sound")
             }
         }
     }
