@@ -45,13 +45,17 @@ class AdamantNotificationsService: NotificationsService {
             UNUserNotificationCenter.current().removeAllDeliveredNotifications()
             UIApplication.shared.applicationIconBadgeNumber = 0
             
-            if let securedStore = self?.securedStore, let raw = securedStore.get(StoreKey.notificationsService.notificationsMode), let mode = NotificationsMode(string: raw) {
+            if let securedStore = self?.securedStore,
+                let raw = securedStore.get(StoreKey.notificationsService.notificationsMode),
+                let mode = NotificationsMode(string: raw) {
                 self?.setNotificationsMode(mode, completion: nil)
             } else {
                 self?.setNotificationsMode(.disabled, completion: nil)
             }
             
-            if let securedStore = self?.securedStore, let raw = securedStore.get(StoreKey.notificationsService.notificationsSound), let sound = NotificationSound(fileName: raw) {
+            if let securedStore = self?.securedStore,
+                let raw = securedStore.get(StoreKey.notificationsService.notificationsSound),
+                let sound = NotificationSound(fileName: raw) {
                 self?.setNotificationSound(sound)
             } else {
                 self?.setNotificationsMode(.disabled, completion: nil)

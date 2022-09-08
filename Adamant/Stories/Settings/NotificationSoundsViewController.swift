@@ -67,8 +67,18 @@ class NotificationSoundsViewController: FormViewController {
     }
     
     private func addBtns() {
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Notifications.Alert.Save", comment: "Notifications: Select Alert Save"), style: .done, target: self, action: #selector(save))
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Notifications.Alert.Cancel", comment: "Notifications: Alerts Cancel"), style: .done, target: self, action: #selector(close))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: NSLocalizedString("Notifications.Alert.Save", comment: "Notifications: Select Alert Save"),
+            style: .done,
+            target: self,
+            action: #selector(save)
+        )
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(
+            title: NSLocalizedString("Notifications.Alert.Cancel", comment: "Notifications: Alerts Cancel"),
+            style: .done,
+            target: self,
+            action: #selector(close)
+        )
     }
     
     @objc private func save() {
