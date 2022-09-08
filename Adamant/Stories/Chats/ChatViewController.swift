@@ -77,6 +77,8 @@ class ChatViewController: MessagesViewController {
         return formatter
     }
     
+    private var chatLoadNotificationObserver: NSObjectProtocol?
+    
     private var keyboardManager = KeyboardManager()
     
     private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
@@ -633,6 +635,10 @@ class ChatViewController: MessagesViewController {
             
             try? privateContext.save()
         }
+        
+        if let chatLoadNotificationObserver = chatLoadNotificationObserver {
+            NotificationCenter.default.removeObserver(chatLoadNotificationObserver)
+        }
     }
     
     func updateTitle() {
@@ -654,6 +660,15 @@ class ChatViewController: MessagesViewController {
                 nav.popToRootViewController(animated: true)
         } else {
             self.navigationController?.popViewController(animated: true)
+        }
+    }
+    
+    func addChatLoadObserver() {
+        chatLoadNotificationObserver = NotificationCenter.default.addObserver(forName: .AdamantChatsProvider.initiallyLoadedMessages, object: nil, queue: .main) { [weak self] notification in
+            guard let recipientAddress = notification.object as? String,
+                  recipientAddress == self?.chatroom?.partner?.address
+            else { return }
+            self?.updateChatMessages()
         }
     }
     
@@ -1127,13 +1142,22 @@ extension ChatViewController {
         
         setBusyIndicator(state: true)
         
+        if chatsProvider.isChatLoading(with: address) {
+            addChatLoadObserver()
+            return
+        }
+        
         chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] in
             DispatchQueue.main.async {
-                self?.messagesCollectionView.reloadDataAndKeepOffset()
-                self?.messagesCollectionView.scrollToLastItem(animated: false)
-                self?.setBusyIndicator(state: false)
+                self?.updateChatMessages()
             }
         }
+    }
+    
+    func updateChatMessages() {
+        messagesCollectionView.reloadDataAndKeepOffset()
+        messagesCollectionView.scrollToLastItem(animated: false)
+        setBusyIndicator(state: false)
     }
     
     func loadMooreMessagesIfNeeded(indexPath: IndexPath) {
