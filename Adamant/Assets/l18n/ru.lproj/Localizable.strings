@@ -613,6 +613,12 @@
 /* Security: About ANS */
 "SecurityPage.Section.AboutNotificationTypes" = "О режимах уведомлений";
 
+/* Security: Messages Notification sound */
+"SecurityPage.Section.Messages" = "Сообщения";
+
+/* Security: Settings Notification */
+"SecurityPage.Section.Settings" = "Настройки";
+
 /* Notifications: Disable notifications */
 "Notifications.Mode.NotificationsDisabled" = "Отключено";
 
@@ -624,6 +630,21 @@
 
 /* Security: Visit Github */
 "SecurityPage.Row.VisitGithub" = "Посетить Github";
+
+/* Notifications: Open system Settings */
+"Notifications.Settings.System" = "Системные настройки";
+
+/* Notifications: Select Sound */
+"Notifications.Sound.Name" = "Звук";
+
+/* Notifications: Select Sounds */
+"Notifications.Sounds.Name" = "Звуки";
+
+/* Notifications: Select Alert Save */
+"Notifications.Alert.Save" = "Сохранить";
+
+/* Notifications: Alerts Cancel */
+"Notifications.Alert.Cancel" = "Отмена";
 
 /* Notifications: Something went wrong while registering remote notifications. %@ for description */
 "NotificationsService.Error.RegistrationRemotesFormat" = "Произошла ошибка при регистрации в ANS, попробуйте позже. Причина: %@";
