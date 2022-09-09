@@ -139,6 +139,8 @@ class DelegateDetailsViewController: UIViewController {
         }
     }
     
+    // MARK: - Other
+    
     private func updateTheme() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear

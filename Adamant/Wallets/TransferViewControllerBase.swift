@@ -313,12 +313,14 @@ class TransferViewControllerBase: FormViewController {
         updateTheme()
     }
     
-    // MARK: - Form constructors
+    // MARK: - Other
     
-    func updateTheme() {
+    private func updateTheme() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }
+    
+    // MARK: - Form constructors
     
     func walletSection() -> Section {
         let section = Section(Sections.wallet.localized) {

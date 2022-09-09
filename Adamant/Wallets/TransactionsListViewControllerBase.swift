@@ -92,7 +92,9 @@ class TransactionsListViewControllerBase: UIViewController {
         }
     }
     
-    func updateTheme() {
+    // MARK: - Other
+    
+    private func updateTheme() {
         view.backgroundColor = UIColor.adamant.backgroundColor
         tableView.backgroundColor = .clear
     }

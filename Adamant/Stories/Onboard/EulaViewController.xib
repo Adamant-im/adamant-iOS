@@ -48,6 +48,7 @@
                         <userDefinedRuntimeAttribute type="string" keyPath="xibLocKey" value="EULA.Accept"/>
                     </userDefinedRuntimeAttributes>
                     <connections>
+                        <action selector="handleAccept" destination="-1" eventType="touchUpInside" id="IB9-Y5-JjE"/>
                         <action selector="handleAccept" destination="-2" eventType="touchUpInside" id="v0x-oJ-7zB"/>
                     </connections>
                 </button>

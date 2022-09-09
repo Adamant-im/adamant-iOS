@@ -716,7 +716,7 @@ class AccountViewController: FormViewController {
     
     // MARK: Other
     
-    func updateTheme() {
+    private func updateTheme() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         pagingViewController.backgroundColor = UIColor.adamant.backgroundColor
         pagingViewController.menuBackgroundColor = UIColor.adamant.backgroundColor

@@ -395,6 +395,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         return value
     }
     
+    // MARK: - Other
+    
     func updateTheme() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear

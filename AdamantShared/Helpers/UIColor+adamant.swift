@@ -14,7 +14,7 @@ extension UIColor {
         static func returnColorByTheme(colorWhiteTheme: UIColor, colorDarkTheme: UIColor) -> UIColor {
             var color = colorWhiteTheme
             if #available(iOS 13.0, *) {
-                color = UIColor { (traits) -> UIColor in
+                color = UIColor { traits -> UIColor in
                     return traits.userInterfaceStyle == .dark ? colorDarkTheme : colorWhiteTheme
                 }
             }
@@ -26,11 +26,16 @@ extension UIColor {
         static let fourth = UIColor(hex: "#eeeeee")
 
         static let active = UIColor(red: 0.0901961, green: 0.611765, blue: 0.92549, alpha: 1)
-        static let background = UIColor(hex: "#f2f6fa")
         static let alert = UIColor(hex: "#faa05a")
         static let good = UIColor(hex: "#32d296")
         static let danger = UIColor(hex: "#f0506e")
         static let inactive = UIColor(hex: "#6d6f72")
+        
+        static var background: UIColor {
+            let colorWhiteTheme  = UIColor(hex: "#f2f6fa")
+            let colorDarkTheme   = UIColor(hex: "#1c1c1c")
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
         
         // MARK: Global colors
         
@@ -92,7 +97,6 @@ extension UIColor {
         /// Table row icons color, ~45% gray
         static var tableRowIcons: UIColor {
             let colorWhiteTheme = UIColor(red: 0.45, green: 0.45, blue: 0.45, alpha: 1)
-            //let colorDarkTheme  = UIColor(red: 0.278, green: 0.278, blue: 0.278, alpha: 1)
             let colorDarkTheme  = UIColor(red: 0.878, green: 0.878, blue: 0.878, alpha: 1)
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
@@ -109,31 +113,36 @@ extension UIColor {
         /// User chat bubble background, ~4% gray
         static var chatRecipientBackground: UIColor {
             let colorWhiteTheme  = UIColor(red: 0.965, green: 0.973, blue: 0.981, alpha: 1)
-            let colorDarkTheme   = UIColor(red: 0.27, green: 0.27, blue: 0.27, alpha: 1) //UIColor(red: 0.36, green: 0.36, blue: 0.36, alpha: 1)
+            let colorDarkTheme   = UIColor(red: 0.27, green: 0.27, blue: 0.27, alpha: 1)
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
+        
         static var pendingChatBackground: UIColor {
             let colorWhiteTheme  = UIColor(white: 0.98, alpha: 1.0)
             let colorDarkTheme   = UIColor(red: 0.42, green: 0.42, blue: 0.42, alpha: 1)
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
+        
         static var failChatBackground: UIColor {
             let colorWhiteTheme  = UIColor(white: 0.8, alpha: 1.0)
             let colorDarkTheme   = UIColor(red: 0.46, green: 0.46, blue: 0.46, alpha: 1)
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
+        
         /// Partner chat bubble background, ~8% gray
         static var chatSenderBackground: UIColor {
             let colorWhiteTheme  = UIColor(red: 0.925, green: 0.925, blue: 0.925, alpha: 1)
-            let colorDarkTheme   = UIColor(red: 0.21, green: 0.21, blue: 0.21, alpha: 1) //UIColor(red: 0.33, green: 0.33, blue: 0.33, alpha: 1)
+            let colorDarkTheme   = UIColor(red: 0.21, green: 0.21, blue: 0.21, alpha: 1)
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
+        
         /// Partner chat bubble background, ~8% gray
         static var chatInputBarBackground: UIColor {
             let colorWhiteTheme  = UIColor(red: 247/255, green: 247/255, blue: 247/255, alpha: 1.0)
             let colorDarkTheme   = UIColor(red: 0.20, green: 0.20, blue: 0.20, alpha: 1)
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
+        
         /// InputBar field background, ~8% gray
         static var chatInputFieldBarBackground: UIColor {
             let colorWhiteTheme  = UIColor.white

@@ -645,7 +645,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }
     }
     
-    func updateTheme() {
+    // MARK: - Other
+    
+    private func updateTheme() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }

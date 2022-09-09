@@ -52,12 +52,6 @@ open class SwiftyOnboardOverlay: UIView {
         return false
     }
     
-    open func set(style: SwiftyOnboardStyle) {
-//        continueButton.setTitleColor(style.color, for: .normal)
-//        skipButton.setTitleColor(style.color, for: .normal)
-//        pageControl.currentPageIndicatorTintColor = style.color
-    }
-    
     open func page(count: Int) {
         pageControl.numberOfPages = count
     }

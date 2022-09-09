@@ -171,6 +171,8 @@ class QRGeneratorViewController: FormViewController {
         }
     }
     
+    // MARK: - Other
+    
     private func updateTheme() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear

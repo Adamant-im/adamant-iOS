@@ -79,14 +79,15 @@ class ComplexTransferViewController: UIViewController {
         updateTheme()
     }
     
+    // MARK: - Other
+    
     func updateTheme() {
         view.backgroundColor = UIColor.adamant.backgroundColor
         pagingViewController.backgroundColor = UIColor.adamant.backgroundColor
         pagingViewController.menuBackgroundColor = UIColor.adamant.backgroundColor
     }
     
-    @objc
-    func cancel() {
+    @objc func cancel() {
         transferDelegate?.complexTransferViewController(self, didFinishWithTransfer: nil, detailsViewController: nil)
     }
 }

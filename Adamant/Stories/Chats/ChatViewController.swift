@@ -659,13 +659,14 @@ class ChatViewController: MessagesViewController {
         }
     }
 
-func addChatLoadObserver() {
+    func addChatLoadObserver() {
         chatLoadNotificationObserver = NotificationCenter.default.addObserver(forName: .AdamantChatsProvider.initiallyLoadedMessages, object: nil, queue: .main) { [weak self] notification in
             guard let recipientAddress = notification.object as? String,
                   recipientAddress == self?.chatroom?.partner?.address
             else { return }
             self?.updateChatMessages()
-}
+        }
+    }
     
     func updateTheme() {
         view.backgroundColor = UIColor.adamant.backgroundColor

@@ -53,6 +53,8 @@ class SearchResultsViewController: UITableViewController {
         updateTheme()
     }
     
+    // MARK: - Other
+    
     func updateTheme() {
         view.backgroundColor = UIColor.adamant.backgroundColor
     }

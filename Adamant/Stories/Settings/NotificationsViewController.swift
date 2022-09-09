@@ -239,6 +239,8 @@ class NotificationsViewController: FormViewController {
         updateTheme()
     }
     
+    // MARK: - Other
+    
     func updateTheme() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear

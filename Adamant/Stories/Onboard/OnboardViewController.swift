@@ -67,11 +67,15 @@ class OnboardViewController: UIViewController {
         updateTheme()
     }
     
+    // MARK: - Other
+    
     private func updateTheme() {
         agreeSwitch?.onTintColor = UIColor.adamant.switchColor
         onboarding.backgroundColor = UIColor.adamant.welcomeBackgroundColor
         view.backgroundColor = UIColor.adamant.welcomeBackgroundColor
     }
+    
+    // MARK: - Actions
     
     @objc func handleSkip() {
         guard self.agreeSwitch?.isOn == true else {

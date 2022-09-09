@@ -24,6 +24,8 @@ class EulaViewController: UIViewController {
         updateTheme()
     }
     
+    // MARK: - Other
+    
     private func updateTheme() {
         buttons.forEach { btn in
             btn.setTitleColor(UIColor.adamant.textColor, for: .normal)
@@ -31,6 +33,8 @@ class EulaViewController: UIViewController {
         eulaTextView.textColor = UIColor.adamant.textColor
         view.backgroundColor = UIColor.adamant.welcomeBackgroundColor
     }
+    
+    // MARK: - Actions
     
     @IBAction func handleAccept() {
         DispatchQueue.main.async { [weak self] in

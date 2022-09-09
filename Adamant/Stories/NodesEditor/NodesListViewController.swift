@@ -220,14 +220,17 @@ class NodesListViewController: FormViewController {
         nodesSource.healthCheck()
         setHealthCheckTimer()
     }
-    private func updateTheme() {
-        view.backgroundColor = UIColor.adamant.secondBackgroundColor
-        tableView.backgroundColor = .clear
-    }
-
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         timer?.invalidate()
+    }
+    
+    // MARK: - Other
+    
+    private func updateTheme() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }
 
