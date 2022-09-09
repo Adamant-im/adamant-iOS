@@ -27,22 +27,20 @@ extension AdamantApiService {
     }
     
     func getDelegates(limit: Int, offset: Int, currentDelegates: [Delegate], completion: @escaping (ApiServiceResult<[Delegate]>) -> Void) {
-        // MARK: 1. Prepare
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Delegates.getDelegates, queryItems: [URLQueryItem(name: "limit", value: String(limit)),URLQueryItem(name: "offset", value: String(offset))])
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
         let headers = [
             "Content-Type": "application/json"
         ]
         
-        // MARK: 2. Make request
-        sendRequest(url: endpoint, method: .get, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Delegate>>) in
+        sendRequest(
+            path: ApiCommands.Delegates.getDelegates,
+            queryItems: [
+                URLQueryItem(name: "limit", value: String(limit)),
+                URLQueryItem(name: "offset", value: String(offset))
+            ],
+            method: .get,
+            encoding: .json,
+            headers: headers
+        ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Delegate>>) in
             switch serverResponse {
             case .success(let delegates):
                 if let delegates = delegates.collection {
@@ -95,22 +93,17 @@ extension AdamantApiService {
     }
     
     func getForgedByAccount(publicKey: String, completion: @escaping (ApiServiceResult<DelegateForgeDetails>) -> Void) {
-        // MARK: 1. Prepare
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Delegates.getForgedByAccount, queryItems: [URLQueryItem(name: "generatorPublicKey", value: publicKey)])
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
         let headers = [
             "Content-Type": "application/json"
         ]
         
-        // MARK: 2. Make request
-        sendRequest(url: endpoint, method: .get, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<DelegateForgeDetails>) in
+        sendRequest(
+            path: ApiCommands.Delegates.getForgedByAccount,
+            queryItems: [URLQueryItem(name: "generatorPublicKey", value: publicKey)],
+            method: .get,
+            encoding: .json,
+            headers: headers
+        ) { (serverResponse: ApiServiceResult<DelegateForgeDetails>) in
             switch serverResponse {
             case .success(let details):
                 completion(.success(details))
@@ -141,72 +134,51 @@ extension AdamantApiService {
     }
     
     private func getDelegatesCount(completion: @escaping (ApiServiceResult<DelegatesCountResult>) -> Void) {
-        // MARK: 1. Prepare
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Delegates.getDelegatesCount)
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
         let headers = [
             "Content-Type": "application/json"
         ]
         
-        // MARK: 2. Make request
-        sendRequest(url: endpoint, method: .get, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<DelegatesCountResult>) in
+        sendRequest(
+            path: ApiCommands.Delegates.getDelegatesCount,
+            method: .get,
+            encoding: .json,
+            headers: headers
+        ) { (serverResponse: ApiServiceResult<DelegatesCountResult>) in
             completion(serverResponse)
         }
     }
     
     private func getNextForgers(completion: @escaping (ApiServiceResult<NextForgersResult>) -> Void) {
-        // MARK: 1. Prepare
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Delegates.getNextForgers, queryItems: [URLQueryItem(name: "limit", value: "\(101)")])
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
         let headers = [
             "Content-Type": "application/json"
         ]
         
-        // MARK: 2. Make request
-        sendRequest(url: endpoint, method: .get, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<NextForgersResult>) in
+        sendRequest(
+            path: ApiCommands.Delegates.getNextForgers,
+            queryItems: [URLQueryItem(name: "limit", value: "\(101)")],
+            method: .get,
+            encoding: .json,
+            headers: headers
+        ) { (serverResponse: ApiServiceResult<NextForgersResult>) in
             completion(serverResponse)
         }
     }
     
     func getVotes(for address: String, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void) {
-        // MARK: 1. Prepare
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Delegates.votes, queryItems: [URLQueryItem(name: "address", value: address)])
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
         let headers = [
             "Content-Type": "application/json"
         ]
         
-        // MARK: 2. Make request
-        sendRequest(url: endpoint, method: .get, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Delegate>>) in
+        sendRequest(
+            path: ApiCommands.Delegates.votes,
+            queryItems: [URLQueryItem(name: "address", value: address)],
+            method: .get,
+            encoding: .json,
+            headers: headers
+        ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Delegate>>) in
             switch serverResponse {
             case .success(let delegates):
-                if let delegates = delegates.collection {
-                    completion(.success(delegates))
-                } else {
-                    completion(.failure(.serverError(error: "No delegates")))
-                }
-                
+                completion(.success(delegates.collection ?? []))
             case .failure(let error):
                 completion(.failure(.networkError(error: error)))
             }
@@ -262,18 +234,14 @@ extension AdamantApiService {
             "Content-Type": "application/json"
         ]
         
-        // MARK: 3. Build endpoints
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Delegates.votes)
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        // MARK: 4. Send
-        sendRequest(url: endpoint, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerResponse>) in
+        // MARK: 3. Send
+        sendRequest(
+            path: ApiCommands.Delegates.votes,
+            method: .post,
+            parameters: params,
+            encoding: .json,
+            headers: headers
+        ) { (serverResponse: ApiServiceResult<ServerResponse>) in
             switch serverResponse {
             case .success(let response):
                 if response.success {
@@ -296,24 +264,20 @@ extension AdamantApiService {
     // MARK: - Private methods
     
     private func getBlocks(completion: @escaping (ApiServiceResult<[Block]>) -> Void) {
-        // MARK: 1. Prepare
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Delegates.getBlocks, queryItems:
-                [URLQueryItem(name: "orderBy", value: "height:desc"),
-                URLQueryItem(name: "limit", value: "\(101)")])
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
         let headers = [
             "Content-Type": "application/json"
         ]
         
-        // MARK: 2. Make request
-        sendRequest(url: endpoint, method: .get, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Block>>) in
+        sendRequest(
+            path: ApiCommands.Delegates.getBlocks,
+            queryItems: [
+                URLQueryItem(name: "orderBy", value: "height:desc"),
+                URLQueryItem(name: "limit", value: "\(101)")
+            ],
+            method: .get,
+            encoding: .json,
+            headers: headers
+        ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Block>>) in
             switch serverResponse {
             case .success(let blocks):
                 if let blocks = blocks.collection {

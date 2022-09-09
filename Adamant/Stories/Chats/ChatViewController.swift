@@ -12,6 +12,7 @@ import MessageInputBar
 import CoreData
 import SafariServices
 import ProcedureKit
+import SnapKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -75,6 +76,8 @@ class ChatViewController: MessagesViewController {
         formatter.timeStyle = .short
         return formatter
     }
+    
+    private var chatLoadNotificationObserver: NSObjectProtocol?
     
     private var keyboardManager = KeyboardManager()
     
@@ -203,14 +206,8 @@ class ChatViewController: MessagesViewController {
     
     // MARK: Busy indicator
     
-    private var busyBackgroundView: UIView?
-    private var spinner = UIActivityIndicatorView(style: .whiteLarge)
-    var isBusy = false
-    
-    //MARK: Background UI
-    private let amadantLogoImageView: UIImageView = {
-        return UIImageView(image: UIImage(named: "Adamant-logo"))
-    }()
+    private(set) var isBusy = false
+    private var loadingView: LoadingView?
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -634,6 +631,10 @@ class ChatViewController: MessagesViewController {
             
             try? privateContext.save()
         }
+        
+        if let chatLoadNotificationObserver = chatLoadNotificationObserver {
+            NotificationCenter.default.removeObserver(chatLoadNotificationObserver)
+        }
     }
     
     func updateTitle() {
@@ -657,6 +658,14 @@ class ChatViewController: MessagesViewController {
             self.navigationController?.popViewController(animated: true)
         }
     }
+
+func addChatLoadObserver() {
+        chatLoadNotificationObserver = NotificationCenter.default.addObserver(forName: .AdamantChatsProvider.initiallyLoadedMessages, object: nil, queue: .main) { [weak self] notification in
+            guard let recipientAddress = notification.object as? String,
+                  recipientAddress == self?.chatroom?.partner?.address
+            else { return }
+            self?.updateChatMessages()
+}
     
     func updateTheme() {
         view.backgroundColor = UIColor.adamant.backgroundColor
@@ -1042,14 +1051,6 @@ private class StatusUpdateProcedure: Procedure {
             return
         }
         
-        guard controller?.chatsProvider.isTransactionUnique(transaction) ?? true else {
-            transaction.transactionStatus = .dublicate
-            self.controller?.removeRichMessageStatusUpdating(id: self.objectId)
-            try? privateContext.save()
-            self.finish()
-            return
-        }
-        
         provider.statusFor(transaction: transaction) { result in
             switch result {
             case .success(let status):
@@ -1089,31 +1090,28 @@ private class StatusUpdateProcedure: Procedure {
 
 // MARK: - Busy Indicator View
 extension ChatViewController {
-    func setupBusyBackgroundView() {
-        busyBackgroundView = UIView()
-        busyBackgroundView?.backgroundColor = UIColor(white: 0, alpha: 0.1)
-        busyBackgroundView?.frame = view.frame
-        view.addSubview(busyBackgroundView!)
+    func setupLoadingView() {
+        let loadingView = LoadingView()
+        view.addSubview(loadingView)
+        loadingView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
         
-        spinner.translatesAutoresizingMaskIntoConstraints = false
-        spinner.startAnimating()
-        busyBackgroundView?.addSubview(spinner)
-        spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        loadingView.startAnimating()
+        self.loadingView = loadingView
     }
     
     func setBusyIndicator(state: Bool) {
         isBusy = state
-        if busyBackgroundView == nil && state {
-            setBackgroundUI()
-            setupBusyBackgroundView()
+        if loadingView == nil && state {
+            setupLoadingView()
             messagesCollectionView.alpha = 0.0
             messageInputBar.inputTextView.isEditable = false
             messageInputBar.leftStackView.isUserInteractionEnabled = false
         }
         
         if !state {
-            if busyBackgroundView != nil {
+            if loadingView != nil {
                 reloadTopSectionIfNeeded()
             }
             
@@ -1124,20 +1122,11 @@ extension ChatViewController {
                 messageInputBar.leftStackView.isUserInteractionEnabled = true
             }
             
-            var delay: TimeInterval = 0.25
-            var duration: TimeInterval = 0.25
-            if #unavailable(iOS 13) {
-                messagesCollectionView.alpha = 0.0
-                delay = 0.25
-                duration = 0.5
-            }
-            
-            UIView.animate(withDuration: delay, delay: duration) { [weak self] in
-                self?.busyBackgroundView?.backgroundColor = .clear
+            UIView.animate(withDuration: 0.25, delay: 0.25) { [weak self] in
                 self?.messagesCollectionView.alpha = 1.0
-                self?.amadantLogoImageView.alpha = 0.0
+                self?.loadingView?.alpha = 0.0
             } completion: { [weak self] _ in
-                self?.busyBackgroundView?.removeFromSuperview()
+                self?.loadingView?.removeFromSuperview()
             }
         }
     }
@@ -1165,17 +1154,22 @@ extension ChatViewController {
         
         setBusyIndicator(state: true)
         
-        chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] count in
+        if chatsProvider.isChatLoading(with: address) {
+            addChatLoadObserver()
+            return
+        }
+        
+        chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] in
             DispatchQueue.main.async {
-                self?.messagesCollectionView.reloadDataAndKeepOffset()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    if count > 0 {
-                        self?.messagesCollectionView.scrollToItem(at: IndexPath(row: 0, section: count - 1), at: .top, animated: false)
-                    }
-                    self?.setBusyIndicator(state: false)
-                }
+                self?.updateChatMessages()
             }
         }
+    }
+    
+    func updateChatMessages() {
+        messagesCollectionView.reloadDataAndKeepOffset()
+        messagesCollectionView.scrollToLastItem(animated: false)
+        setBusyIndicator(state: false)
     }
     
     func loadMooreMessagesIfNeeded(indexPath: IndexPath) {
@@ -1191,7 +1185,7 @@ extension ChatViewController {
         if address == AdamantContacts.adamantWelcomeWallet.name { return }
         isBusy = true
         let offset = chatsProvider.chatLoadedMessages[address] ?? 0
-        chatsProvider.getChatMessages(with: address, offset: offset) { [weak self] _count in
+        chatsProvider.getChatMessages(with: address, offset: offset) { [weak self] in
             DispatchQueue.main.async {
                 self?.messagesCollectionView.reloadDataAndKeepOffset()
                 self?.isBusy = false
@@ -1214,18 +1208,6 @@ extension ChatViewController {
             return true
         }
         return false
-    }
-}
-
-// MARK: - Background UI
-extension ChatViewController {
-    func setBackgroundUI() {
-        amadantLogoImageView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(amadantLogoImageView)
-        amadantLogoImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        amadantLogoImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
-        amadantLogoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        amadantLogoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
 }
 

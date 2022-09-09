@@ -356,13 +356,13 @@ extension LoginViewController {
         
         dialogService.showProgress(withMessage: String.adamantLocalized.login.loggingInProgressMessage, userInteractionEnable: false)
         
-        apiService.getAccount(byPassphrase: passphrase) { result in
+        apiService.getAccount(byPassphrase: passphrase) { [weak self] result in
             switch result {
             case .success(_):
-                self.loginIntoExistingAccount(passphrase: passphrase)
+                self?.loginIntoExistingAccount(passphrase: passphrase)
                 
-            case .failure(_):
-                self.createAccountAndLogin(passphrase: passphrase)
+            case .failure(let error):
+                self?.dialogService.showRichError(error: error)
             }
         }
     }
@@ -383,19 +383,6 @@ extension LoginViewController {
         if let row = form.rowBy(tag: Rows.generateNewPassphraseButton.tag), let indexPath = row.indexPath {
             tableView.scrollToRow(at: indexPath, at: .none, animated: true)
         }
-    }
-    
-    // MARK: Login helpers
-    private func createAccountAndLogin(passphrase: String) {
-        accountService.createAccountWith(passphrase: passphrase, completion: { [weak self] result in
-            switch result {
-            case .success:
-                self?.loginIntoExistingAccount(passphrase: passphrase)
-                
-            case .failure(let error):
-                self?.dialogService.showRichError(error: error)
-            }
-        })
     }
     
     private func loginIntoExistingAccount(passphrase: String) {

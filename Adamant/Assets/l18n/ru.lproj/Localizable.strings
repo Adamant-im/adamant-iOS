@@ -229,6 +229,9 @@
 /* Serious internal error: Error parsing response */
 "ApiService.InternalError.ParsingFailed" = "Не удалось разобрать ответ узла блокчена. Сообщите разработчикам";
 
+/* Serious internal error: No nodes available */
+"ApiService.InternalError.NoNodesAvailable" = "Нет доступных нод. Сообщите разработчикам";
+
 /* Eureka forms Cancel button */
 "Cancel" = "Отмена";
 
@@ -436,6 +439,9 @@
 /* Shared error: Network problems. In most cases - no connection */
 "Error.NoNetwork" = "Нет соединения с сетью";
 
+/* Shared error: Request cancelled */
+"Error.RequestCancelled" = "Запрос отменён";
+
 /* Shared error: Remote error format, %@ for message */
 "Error.RemoteServerErrorFormat" = "Ошибка на узле блокчейна: %@";
 
@@ -541,6 +547,24 @@
 /* NodesList: 'Reset' button */
 "NodesList.ResetButton" = "Сбросить";
 
+/* NodesList: 'Prefer the fastest node' switch */
+"NodesList.PreferTheFastestNode" = "Выбирать самую быструю ноду";
+
+/* NodesList.NodeCell: Node ping */
+"NodesList.NodeCell.Ping" = "Пинг";
+
+/* NodesList.NodeCell: Milliseconds */
+"NodesList.NodeCell.Milliseconds" = "мс";
+
+/* NodesList.NodeCell: Node is synchronizing */
+"NodesList.NodeCell.Synchronizing" = "Синхронизируется";
+
+/* NodesList.NodeCell: Node is offline */
+"NodesList.NodeCell.Offline" = "Офлайн";
+
+/* NodesList.NodeCell: Node version */
+"NodesList.NodeCell.Version" = "версия";
+
 /* NodeList: Inform that default nodes was loaded, if user deleted all nodes */
 "NodeList.DefaultNodesLoaded" = "Был загружен список нод по умолчанию";
 
@@ -562,14 +586,14 @@
 /* NodesEditor: Host row */
 "NodesEditor.HostRow" = "Хост";
 
-/* NodesEditor: Test button */
-"NodesEditor.TestButton" = "Тест ноды";
+/* NodesEditor: Web sockets */
+"NodesEditor.WebSockets" = "Веб сокеты";
 
-/* NodesEditor: Test passed */
-"NodesEditor.NodeTestPassed" = "Пройден";
+/* NodesEditor: Web sockets are supported */
+"NodesEditor.WebSocketsSupported" = "Поддерживаются";
 
-/* NodesEditor: Test failed */
-"NodesEditor.NodeTestFailed" = "Ошибка";
+/* NodesEditor: Web sockets aren't supported */
+"NodesEditor.WebSocketsNotSupported" = "Не поддерживаются";
 
 /* NodesEditor: Delete node button */
 "NodesEditor.DeleteNodeButton" = "Удалить ноду";
@@ -589,6 +613,12 @@
 /* Security: About ANS */
 "SecurityPage.Section.AboutNotificationTypes" = "О режимах уведомлений";
 
+/* Security: Messages Notification sound */
+"SecurityPage.Section.Messages" = "Сообщения";
+
+/* Security: Settings Notification */
+"SecurityPage.Section.Settings" = "Настройки";
+
 /* Notifications: Disable notifications */
 "Notifications.Mode.NotificationsDisabled" = "Отключено";
 
@@ -600,6 +630,21 @@
 
 /* Security: Visit Github */
 "SecurityPage.Row.VisitGithub" = "Посетить Github";
+
+/* Notifications: Open system Settings */
+"Notifications.Settings.System" = "Системные настройки";
+
+/* Notifications: Select Sound */
+"Notifications.Sound.Name" = "Звук";
+
+/* Notifications: Select Sounds */
+"Notifications.Sounds.Name" = "Звуки";
+
+/* Notifications: Select Alert Save */
+"Notifications.Alert.Save" = "Сохранить";
+
+/* Notifications: Alerts Cancel */
+"Notifications.Alert.Cancel" = "Отмена";
 
 /* Notifications: Something went wrong while registering remote notifications. %@ for description */
 "NotificationsService.Error.RegistrationRemotesFormat" = "Произошла ошибка при регистрации в ANS, попробуйте позже. Причина: %@";

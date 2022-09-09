@@ -39,6 +39,7 @@ enum ChatsProviderError: Error {
     case dependencyError(String)
     case transactionNotFound(id: String)
     case internalError(Error)
+    case requestCancelled
 }
 
 extension ChatsProviderError: RichError {
@@ -73,6 +74,9 @@ extension ChatsProviderError: RichError {
             
         case .accountNotInitiated(_):
             return String.adamantLocalized.sharedErrors.accountNotInitiated
+        
+        case .requestCancelled:
+            return String.adamantLocalized.sharedErrors.requestCancelled
         }
     }
     
@@ -93,6 +97,7 @@ extension ChatsProviderError: RichError {
                  .networkError,
                  .notEnoughMoneyToSend,
                  .accountNotInitiated,
+                 .requestCancelled,
                  .notLogged:
             return .warning
             
@@ -132,6 +137,8 @@ extension Notification.Name {
 
         static let initiallySyncedChanged = Notification.Name("adamant.chatsProvider.initialSyncChanged")
 
+        static let initiallyLoadedMessages = Notification.Name("adamant.chatsProvider.initiallyLoadedMessages")
+        
         private init() {}
     }
 }
@@ -185,7 +192,8 @@ protocol ChatsProvider: DataProvider {
     func getChatroomsController() -> NSFetchedResultsController<Chatroom>
     func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
     func getChatRooms(offset: Int?, completion: (() ->())?)
-    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) ->())?)
+    func getChatMessages(with addressRecipient: String, offset: Int?, completion: (() -> Void)?)
+    func isChatLoading(with addressRecipient: String) -> Bool
     
     /// Unread messages controller. Sections by chatroom.
     func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>

@@ -8,6 +8,7 @@
 
 import UIKit
 import Parchment
+import SnapKit
 
 protocol ComplexTransferViewControllerDelegate: AnyObject {
     func complexTransferViewController(_ viewController: ComplexTransferViewController, didFinishWithTransfer: TransactionDetails?, detailsViewController: UIViewController?)
@@ -57,7 +58,14 @@ class ComplexTransferViewController: UIViewController {
         pagingViewController.borderColor = UIColor.clear
         
         view.addSubview(pagingViewController.view)
-        view.constrainToEdges(pagingViewController.view, relativeToSafeArea: true)
+        pagingViewController.view.snp.makeConstraints {
+            if #available(iOS 11, *) {
+                $0.directionalEdges.equalTo(view.safeAreaLayoutGuide)
+            } else {
+                $0.directionalEdges.equalToSuperview()
+            }
+        }
+        
         addChild(pagingViewController)
         
         updateTheme()
@@ -131,8 +139,15 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 		guard let wallet = service.wallet else {
 			return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm"))
 		}
+        
+        var network = ""
+        if ERC20Token.supportedTokens.contains(where: { token in
+            return token.symbol == service.tokenSymbol
+        }) {
+            network = service.tokenNetworkSymbol
+        }
 		
-		let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo)
+		let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo, currencyNetwork: network)
 		item.balance = wallet.balance
 		
 		return item

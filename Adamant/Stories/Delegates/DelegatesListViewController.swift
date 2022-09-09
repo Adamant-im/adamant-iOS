@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SnapKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -29,6 +30,7 @@ class DelegatesListViewController: UIViewController {
     class CheckedDelegate {
         var delegate: Delegate
         var isChecked: Bool = false
+        var isUpdating: Bool = false
         
         init(delegate: Delegate) {
             self.delegate = delegate
@@ -66,7 +68,7 @@ class DelegatesListViewController: UIViewController {
     private var forcedUpdateTimer: Timer? = nil
     
     private var searchController: UISearchController?
-    
+    private var loadingView: LoadingView?
     private var originalInsets: UIEdgeInsets?
     private var didShow: Bool = false
 
@@ -95,7 +97,7 @@ class DelegatesListViewController: UIViewController {
         
         // MARK: Initial
         navigationItem.title = String.adamantLocalized.delegates.title
-        tableView.register(UINib.init(nibName: "AdamantDelegateCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
+        tableView.register(AdamantDelegateCell.self, forCellReuseIdentifier: cellIdentifier)
         tableView.rowHeight = 50
         tableView.addSubview(self.refreshControl)
         
@@ -122,6 +124,7 @@ class DelegatesListViewController: UIViewController {
         
         // MARK: Load data
 //        refreshControl.beginRefreshing() // Nasty glitches
+        setupLoadingView()
         handleRefresh(refreshControl)
         
         // Keyboard
@@ -207,6 +210,7 @@ class DelegatesListViewController: UIViewController {
             DispatchQueue.main.async {
                 refreshControl.endRefreshing()
                 self.updateVotePanel()
+                self.removeLoadingView()
             }
         }
     }
@@ -255,25 +259,20 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
     // MARK: Cells
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? AdamantDelegateCell else {
-            return UITableViewCell(style: .default, reuseIdentifier: "cell")
+            return UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
         }
         
         let checkedDelegate = checkedDelegateFor(indexPath: indexPath)
         let delegate = checkedDelegate.delegate
         cell.backgroundColor = UIColor.adamant.cellColor
         
-        cell.nameLabel.text = delegate.username
-        cell.rankLabel.text = String(delegate.rank)
-        cell.addressLabel.text = delegate.address
+        cell.title = [String(delegate.rank), delegate.username].joined(separator: " ")
+        cell.subtitle = delegate.address
         cell.delegateIsActive = delegate.rank <= activeDelegates
-        cell.accessoryType = .disclosureIndicator
         cell.delegate = self
-        cell.checkmarkColor = UIColor.adamant.primary
-        cell.checkmarkBorderColor = UIColor.adamant.secondary
-        
         cell.isUpvoted = delegate.voted
-        
-        cell.setIsChecked(checkedDelegate.isChecked, animated: false)
+        cell.isChecked = checkedDelegate.isChecked
+        cell.isUpdating = checkedDelegate.isUpdating
         
         return cell
     }
@@ -340,6 +339,7 @@ extension DelegatesListViewController {
                 checkedDelegates.forEach {
                     $1.isChecked = false
                     $1.delegate.voted = !$1.delegate.voted
+                    $1.isUpdating = true
                 }
                 
                 DispatchQueue.main.async {
@@ -437,6 +437,30 @@ extension DelegatesListViewController {
             self.newVotesLabel.textColor = newVotesColor
             self.totalVotesLabel.textColor = totalVotesColor
         }
+    }
+    
+    private func setupLoadingView() {
+        let loadingView = LoadingView()
+        view.addSubview(loadingView)
+        loadingView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
+        loadingView.startAnimating()
+        
+        self.loadingView = loadingView
+    }
+    
+    private func removeLoadingView() {
+        guard loadingView != nil else { return }
+        
+        UIView.animate(
+            withDuration: 0.25,
+            animations: { [weak loadingView] in loadingView?.alpha = .zero },
+            completion: { [weak loadingView] _ in
+                loadingView?.removeFromSuperview()
+                loadingView = nil
+            }
+        )
     }
 }
 

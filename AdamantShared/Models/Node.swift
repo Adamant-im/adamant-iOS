@@ -22,8 +22,26 @@ enum URLScheme: String, Codable {
 }
 
 class Node: Equatable, Codable {
+    struct Status: Equatable, Codable {
+        let ping: TimeInterval
+        let wsEnabled: Bool
+        let height: Int?
+        let version: String?
+    }
+    
+    enum ConnectionStatus: Equatable, Codable {
+        case offline
+        case synchronizing
+        case allowed
+    }
+    
     static func == (lhs: Node, rhs: Node) -> Bool {
-        return lhs.host == rhs.host && lhs.port == rhs.port && lhs.scheme == rhs.scheme
+        lhs.scheme == rhs.scheme
+            && lhs.host == rhs.host
+            && lhs.port == rhs.port
+            && lhs.status == rhs.status
+            && lhs.isEnabled == rhs.isEnabled
+            && lhs._connectionStatus == rhs._connectionStatus
     }
     
     init(scheme: URLScheme, host: String, port: Int?) {
@@ -35,6 +53,17 @@ class Node: Equatable, Codable {
     var scheme: URLScheme
     var host: String
     var port: Int?
+    var wsPort: Int?
+    
+    var status: Status?
+    var isEnabled = true
+    
+    private var _connectionStatus: ConnectionStatus?
+    
+    var connectionStatus: ConnectionStatus? {
+        get { isEnabled ? _connectionStatus : nil }
+        set { _connectionStatus = newValue }
+    }
     
     func asString() -> String {
         if let url = asURL(forcePort: scheme != URLScheme.default) {
@@ -49,22 +78,24 @@ class Node: Equatable, Codable {
     /// - Returns: URL, if no errors were thrown
     
     func asSocketURL() -> URL? {
-        return asURL(forcePort: false)
+        return asURL(forcePort: false, useWsPort: true)
     }
     
     func asURL() -> URL? {
         return asURL(forcePort: true)
     }
     
-    private func asURL(forcePort: Bool) -> URL? {
+    private func asURL(forcePort: Bool, useWsPort: Bool = false) -> URL? {
         var components = URLComponents()
         components.scheme = scheme.rawValue
         components.host = host
         
-        if let port = port {
+        let usePort = useWsPort ? wsPort : port
+        
+        if let port = usePort, scheme == .http {
             components.port = port
         } else if forcePort {
-            components.port = port ?? scheme.defaultPort
+            components.port = usePort ?? scheme.defaultPort
         }
         
         return components.url

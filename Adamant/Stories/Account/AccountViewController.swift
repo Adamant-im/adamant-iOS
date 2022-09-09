@@ -11,7 +11,7 @@ import Eureka
 import FreakingSimpleRoundImageView
 import CoreData
 import Parchment
-
+import SnapKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -229,8 +229,12 @@ class AccountViewController: FormViewController {
         pagingViewController.dataSource = self
         pagingViewController.delegate = self
         pagingViewController.select(index: 0)
+        
         accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
-        accountHeaderView.walletViewContainer.constrainToEdges(pagingViewController.view)
+        pagingViewController.view.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
+        
         addChild(pagingViewController)
         
         pagingViewController.borderColor = UIColor.clear
@@ -473,7 +477,7 @@ class AccountViewController: FormViewController {
             $0.cell.imageView?.image = Rows.stayIn.image
             $0.value = accountService.hasStayInAccount
         }.cellUpdate { (cell, _) in
-            cell.switchControl.onTintColor = UIColor.adamant.switchColor
+            cell.switchControl.onTintColor = UIColor.adamant.active
         }.onChange { [weak self] row in
             guard let enabled = row.value else {
                 return
@@ -506,7 +510,7 @@ class AccountViewController: FormViewController {
                 return !showBiometry
             })
         }.cellUpdate { (cell, _) in
-            cell.switchControl.onTintColor = UIColor.adamant.switchColor
+            cell.switchControl.onTintColor = UIColor.adamant.active
         }.onChange { [weak self] row in
             let value = row.value ?? false
             self?.setBiometry(enabled: value)
@@ -852,7 +856,14 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
             return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm"))
         }
         
-        let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo)
+        var network = ""
+        if ERC20Token.supportedTokens.contains(where: { token in
+            return token.symbol == service.tokenSymbol
+        }) {
+            network = service.tokenNetworkSymbol
+        }
+        
+        let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo, currencyNetwork: network)
         
         if let wallet = service.wallet {
             item.balance = wallet.balance

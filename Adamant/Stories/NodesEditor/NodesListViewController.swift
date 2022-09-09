@@ -32,13 +32,13 @@ class NodesListViewController: FormViewController {
     private enum Sections {
         case nodes
         case buttons
-        case reset
+        case preferTheFastestNode
         
         var tag: String {
             switch self {
             case .nodes: return "nds"
             case .buttons: return "bttns"
-            case .reset: return "reset"
+            case .preferTheFastestNode: return "preferTheFastestNode"
             }
         }
     }
@@ -47,6 +47,7 @@ class NodesListViewController: FormViewController {
         case addNode
         case save
         case reset
+        case preferTheFastestNode
         
         var localized: String {
             switch self {
@@ -58,26 +59,95 @@ class NodesListViewController: FormViewController {
                 
             case .reset:
                 return NSLocalizedString("NodesList.ResetButton", comment: "NodesList: 'Reset' button")
+                
+            case .preferTheFastestNode:
+                return NSLocalizedString("NodesList.PreferTheFastestNode", comment: "NodesList: 'Prefer the fastest node' switch")
             }
         }
     }
     
-    
     // MARK: Dependencies
+    
     var dialogService: DialogService!
     var securedStore: SecuredStore!
-    var apiService: ApiService!
     var router: Router!
     var nodesSource: NodesSource!
     
+    var apiService: ApiService! {
+        didSet {
+            currentRestNode = apiService.currentNodes.first
+        }
+    }
+    
+    var socketService: SocketService! {
+        didSet {
+            currentSocketsNode = socketService.currentNode
+        }
+    }
     
     // Properties
     
-    private var nodes = [Node]()
-    private var didResetNodesOnDissapear = false
+    private var timer: Timer?
     
+    private var currentSocketsNode: Node? {
+        didSet {
+            updateNodesRows()
+        }
+    }
+    
+    private var currentRestNode: Node? {
+        didSet {
+            updateNodesRows()
+        }
+    }
     
     // MARK: - Lifecycle
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        setup()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        setup()
+    }
+    
+    deinit {
+        timer?.invalidate()
+    }
+    
+    private func setup() {
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.NodesSource.nodesUpdate,
+            object: nil,
+            queue: nil
+        ) { [weak self] _ in
+            DispatchQueue.onMainAsync {
+                self?.updateNodesRows()
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.ApiService.currentNodeUpdate,
+            object: nil,
+            queue: nil
+        ) { [weak self] notification in
+            DispatchQueue.onMainAsync {
+                self?.currentRestNode = self?.apiService.currentNodes.first
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name.SocketService.currentNodeUpdate,
+            object: nil,
+            queue: nil
+        ) { [weak self] notification in
+            DispatchQueue.onMainAsync {
+                self?.currentSocketsNode = self?.socketService.currentNode
+            }
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -96,15 +166,24 @@ class NodesListViewController: FormViewController {
         
         // MARK: Nodes
         
-        let section = Section() {
+        form +++ Section() {
             $0.tag = Sections.nodes.tag
         }
         
-        nodes = nodesSource.nodes
-        nodes.forEach { section <<< createRowFor(node: $0, tag: generateRandomTag()) }
+        // MARK: Prefer the fastest node
         
-        form +++ section
+        +++ Section() {
+            $0.tag = Sections.preferTheFastestNode.tag
+        }
         
+        <<< SwitchRow() { [preferTheFastestNode = nodesSource.preferTheFastestNode] in
+            $0.title = Rows.preferTheFastestNode.localized
+            $0.value = preferTheFastestNode
+        }.onChange { [weak nodesSource] in
+            nodesSource?.preferTheFastestNode = $0.value ?? true
+        }.cellUpdate { cell, _ in
+            cell.switchControl.onTintColor = .adamant.active
+        }
         
         // MARK: Buttons
         
@@ -121,12 +200,7 @@ class NodesListViewController: FormViewController {
             self?.createNewNode()
         }
             
-        // MARK: Reset
-            
-        +++ Section() {
-            $0.tag = Sections.reset.tag
-        }
-            
+        // Reset
         <<< ButtonRow() {
             $0.title = Rows.reset.localized
         }.onCellSelection { [weak self] (_, _) in
@@ -140,59 +214,58 @@ class NodesListViewController: FormViewController {
         updateTheme()
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        if let top = navigationController?.topViewController, top == self && presentedViewController == nil && nodes.count == 0 {
-            didResetNodesOnDissapear = true
-            loadDefaultNodes(showAlert: true)
-        }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateNodesRows()
+        nodesSource.healthCheck()
+        setHealthCheckTimer()
     }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        if navigationController == nil && nodes.count == 0 && !didResetNodesOnDissapear {
-            loadDefaultNodes(showAlert: true)
-        }
-    }
-    
     private func updateTheme() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }
-    
-    /*
-    Ячейки, удаляемые в режиме редактирования, никак не обрабатываются
-    @objc func editModeStart() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(editModeStop))
-        tableView.setEditing(true, animated: true)
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        timer?.invalidate()
     }
-    
-    @objc func editModeStop() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editModeStart))
-        tableView.setEditing(false, animated: true)
-    }
-    */
 }
 
 
 // MARK: - Manipulating node list
 extension NodesListViewController {
     func createNewNode() {
-        presentEditor(forNode: nil, tag: nil)
+        presentEditor(forNode: nil)
     }
     
-    func removeNode(at index: Int) {
-        nodes.remove(at: index)
+    func addNode(node: Node) {
+        getNodesSection()?.append(createRowFor(node: node, tag: generateRandomTag()))
+        nodesSource.nodes.append(node)
+    }
+    
+    func removeNode(node: Node) {
+        guard let index = getNodeIndex(node: node) else { return }
         
-        if let section = form.sectionBy(tag: Sections.nodes.tag) {
-            section.remove(at: index)
-        }
+        getNodesSection()?.remove(at: index)
+        nodesSource.nodes.remove(at: index)
     }
     
-    func editNode(_ node: Node, tag: String) {
-        presentEditor(forNode: node, tag: tag)
+    func getNodeIndex(node: Node) -> Int? {
+        nodesSource.nodes.firstIndex { $0 === node }
+    }
+    
+    func getNodesSection() -> Section? {
+        form.sectionBy(tag: Sections.nodes.tag)
+    }
+    
+    var displayedNodes: [Node] {
+        getNodesSection()?.allRows.compactMap {
+            ($0.baseValue as? NodeCell.Model)?.node
+        } ?? []
+    }
+    
+    func editNode(_ node: Node) {
+        presentEditor(forNode: node)
     }
     
     @objc func close() {
@@ -205,39 +278,35 @@ extension NodesListViewController {
     
     func resetToDefault(silent: Bool = false) {
         if silent {
-            let nodes = nodesSource.defaultNodes
-            setNodes(nodes: nodes)
+            nodesSource.setDefaultNodes()
             return
         }
         
         let alert = UIAlertController(title: String.adamantLocalized.nodesList.resetAlertTitle, message: nil, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: Rows.reset.localized, style: .destructive, handler: { [weak self] (_) in
-            guard let nodes = self?.nodesSource.defaultNodes else {
-                return
-            }
-            
-            self?.setNodes(nodes: nodes)
-            self?.nodesSource.saveNodes()
-        }))
+        alert.addAction(UIAlertAction(
+            title: Rows.reset.localized,
+            style: .destructive,
+            handler: { [weak self] _ in self?.nodesSource.setDefaultNodes() }
+        ))
         alert.modalPresentationStyle = .overFullScreen
         present(alert, animated: true, completion: nil)
     }
     
-    func setNodes(nodes: [Node]) {
-        guard let section = form.sectionBy(tag: Sections.nodes.tag) else {
+    func updateNodesRows() {
+        guard let nodesSection = getNodesSection() else { return }
+
+        guard !displayedNodes.hasTheSameReferences(as: nodesSource.nodes) else {
+            nodesSection.allRows.forEach { $0.updateCell() }
             return
         }
         
-        section.removeAll()
+        nodesSection.removeAll()
         
-        for node in nodes {
+        for node in nodesSource.nodes {
             let row = createRowFor(node: node, tag: generateRandomTag())
-            section.append(row)
+            nodesSection.append(row)
         }
-        
-        self.nodes = nodes
-        nodesSource.nodes = nodes
     }
 }
 
@@ -247,48 +316,14 @@ extension NodesListViewController: NodeEditorDelegate {
     func nodeEditorViewController(_ editor: NodeEditorViewController, didFinishEditingWithResult result: NodeEditorResult) {
         switch result {
         case .new(let node):
-            guard let section = form.sectionBy(tag: Sections.nodes.tag) else {
-                return
-            }
+            addNode(node: node)
             
-            nodes.append(node)
-            
-            let row = createRowFor(node: node, tag: generateRandomTag())
-            section <<< row
-            
-            saveNodes()
-            
-        case .done(let node, let tag):
-            guard let row: NodeRow = form.rowBy(tag: tag) else {
-                return
-            }
-            
-            if let prevNode = row.value, let index = nodes.firstIndex(of: prevNode) {
-                nodes.remove(at: index)
-            }
-            
-            nodes.append(node)
-            row.value = node
-            
-            saveNodes()
-            
-        case .delete(let editorNode, let tag):
-            guard let row: NodeRow = form.rowBy(tag: tag), let node = row.value else {
-                return
-            }
-            
-            if let index = nodes.firstIndex(of: node) {
-                nodes.remove(at: index)
-            } else if let index = nodes.firstIndex(of: editorNode) {
-                nodes.remove(at:index)
-            }
-            
-            if let section = form.sectionBy(tag: Sections.nodes.tag), let index = section.firstIndex(of: row) {
-                section.remove(at: index)
-            }
-            
-            saveNodes()
-            
+        case .delete(let editorNode):
+            removeNode(node: editorNode)
+        
+        case .nodeUpdated:
+            nodesSource.nodesUpdate()
+        
         case .cancel:
             break
         }
@@ -304,21 +339,11 @@ extension NodesListViewController: NodeEditorDelegate {
 }
 
 
-// MARK: - Loading & Saving nodes
+// MARK: - Loading nodes
+
 extension NodesListViewController {
-    func saveNodes() {
-        guard nodes.count > 0 else {
-            return
-        }
-        
-        nodesSource.nodes = nodes
-        nodesSource.saveNodes()
-    }
-    
     func loadDefaultNodes(showAlert: Bool) {
-        let nodes = nodesSource.defaultNodes
-        nodesSource.nodes = nodes
-        nodesSource.saveNodes()
+        nodesSource.setDefaultNodes()
         
         if showAlert {
             dialogService.showSuccess(withMessage: String.adamantLocalized.nodesList.defaultNodesWasLoaded)
@@ -331,15 +356,17 @@ extension NodesListViewController {
 extension NodesListViewController {
     private func createRowFor(node: Node, tag: String) -> BaseRow {
         let row = NodeRow() {
-            $0.value = node
+            $0.value = makeNodeCellModel(node: node)
             $0.tag = tag
             
-            let deleteAction = SwipeAction(style: .destructive, title: "Delete") { [weak self] (action, row, completionHandler) in
-                if let node = row.baseValue as? Node, let index = self?.nodes.firstIndex(of: node) {
-                    self?.nodes.remove(at: index)
-                    self?.saveNodes()
-                }
-                completionHandler?(true)
+            let deleteAction = SwipeAction(
+                style: .destructive,
+                title: "Delete"
+            ) { [weak self] _, row, completionHandler in
+                defer { completionHandler?(true) }
+                
+                guard let model = row.baseValue as? NodeCell.Model else { return }
+                self?.removeNode(node: model.node)
             }
             
             $0.trailingSwipe.actions = [deleteAction]
@@ -351,27 +378,25 @@ extension NodesListViewController {
             if let label = cell.textLabel {
                 label.textColor = UIColor.adamant.primary
             }
-            
-            cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, row) in
-            guard let node = row.value, let tag = row.tag else {
+            defer { row.deselect(animated: true) }
+            guard let node = row.value?.node else {
                 return
             }
             
-            self?.editNode(node, tag: tag)
+            self?.editNode(node)
         }
         
         return row
     }
     
-    private func presentEditor(forNode node: Node?, tag: String?) {
+    private func presentEditor(forNode node: Node?) {
         guard let editor = router.get(scene: AdamantScene.NodesEditor.nodeEditor) as? NodeEditorViewController else {
             fatalError("Failed to get editor")
         }
         
         editor.delegate = self
         editor.node = node
-        editor.nodeTag = tag
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             self.navigationController?.pushViewController(editor, animated: true)
         } else {
@@ -392,4 +417,37 @@ extension NodesListViewController {
         
         return nums.compactMap { String($0) }.joined()
     }
+    
+    private func setHealthCheckTimer() {
+        timer = Timer.scheduledTimer(
+            withTimeInterval: regularHealthCheckTimeInteval,
+            repeats: true
+        ) { [weak nodesSource] _ in
+            nodesSource?.healthCheck()
+        }
+    }
+    
+    private func makeNodeCellModel(node: Node) -> NodeCell.Model {
+        NodeCell.Model(
+            node: node,
+            nodeUpdate: { [weak nodesSource] in
+                nodesSource?.nodesUpdate()
+            },
+            nodeActivity: { [weak self] node in
+                var activities = Set<NodeCell.Model.NodeActivity>()
+                
+                if self?.currentRestNode === node {
+                    activities.insert(.rest)
+                }
+                
+                if self?.currentSocketsNode === node {
+                    activities.insert(.webSockets)
+                }
+                
+                return activities
+            }
+        )
+    }
 }
+
+private let regularHealthCheckTimeInteval: TimeInterval = 10

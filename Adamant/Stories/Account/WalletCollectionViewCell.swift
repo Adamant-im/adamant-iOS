@@ -22,7 +22,19 @@ class WalletCollectionViewCell: PagingCell {
         }
         
         currencyImageView.image = item.currencyImage
-        currencySymbolLabel.text = item.currencySymbol
+        if item.currencyNetwork.isEmpty {
+            currencySymbolLabel.text = item.currencySymbol
+        } else {
+            let currencyFont = currencySymbolLabel.font ?? .systemFont(ofSize: 12)
+            let networkFont = currencyFont.withSize(8)
+            let currencyAttributes: [NSAttributedString.Key: Any] = [.font: currencyFont]
+            let networkAttributes: [NSAttributedString.Key: Any] = [.font: networkFont]
+          
+            let defaultString = NSMutableAttributedString(string: item.currencySymbol, attributes: currencyAttributes)
+            let underlineString = NSAttributedString(string: " \(item.currencyNetwork)", attributes: networkAttributes)
+            defaultString.append(underlineString)
+            currencySymbolLabel.attributedText = defaultString
+        }
         
         if let balance = item.balance {
             if balance < 1 {

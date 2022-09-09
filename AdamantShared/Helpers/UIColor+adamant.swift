@@ -28,6 +28,9 @@ extension UIColor {
         static let active = UIColor(red: 0.0901961, green: 0.611765, blue: 0.92549, alpha: 1)
         static let background = UIColor(hex: "#f2f6fa")
         static let alert = UIColor(hex: "#faa05a")
+        static let good = UIColor(hex: "#32d296")
+        static let danger = UIColor(hex: "#f0506e")
+        static let inactive = UIColor(hex: "#6d6f72")
         
         // MARK: Global colors
         

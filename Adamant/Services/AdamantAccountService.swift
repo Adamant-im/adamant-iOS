@@ -140,30 +140,29 @@ class AdamantAccountService: AccountService {
             case .failure(let error):
                 switch error {
                 case .networkError:
-                    NotificationCenter.default.addObserver(forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: nil, queue: nil) { notification in
-                        guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection else {
-                            return
-                        }
+                    NotificationCenter.default.addObserver(
+                        forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
+                        object: nil, queue: nil
+                    ) { notification in
+                        guard (notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool) == true
+                        else { return }
                         
-                        switch connection {
-                        case .none:
-                            break
-                            
-                        case .wifi, .cellular:
-                            ethWallet.initiateNetwork(apiUrl: url) { result in
-                                switch result {
-                                case .success:
-                                    NotificationCenter.default.removeObserver(self, name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: nil)
-                                    
-                                case .failure(let error):
-//                                    self.dialogService.showRichError(error: error)
-                                    print(error)
-                                }
+                        ethWallet.initiateNetwork(apiUrl: url) { result in
+                            switch result {
+                            case .success:
+                                NotificationCenter.default.removeObserver(
+                                    self,
+                                    name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
+                                    object: nil
+                                )
+                                
+                            case .failure(let error):
+                                print(error)
                             }
                         }
                     }
                     
-                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount:
+                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount, .requestCancelled:
                     break
                     
                 case .remoteServiceError, .apiError, .internalError:
@@ -305,45 +304,6 @@ extension AdamantAccountService {
         
         for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
             wallet.update()
-        }
-    }
-}
-
-
-// MARK: - Creating account
-extension AdamantAccountService {
-    // MARK: passphrase
-    func createAccountWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void) {
-        guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
-            completion(.failure(.invalidPassphrase))
-            return
-        }
-        
-        guard let publicKey = adamantCore.createKeypairFor(passphrase: passphrase)?.publicKey else {
-            completion(.failure(.internalError(message: "Can't create key for passphrase", error: nil)))
-            return
-        }
-        
-        self.apiService.getAccount(byPublicKey: publicKey) { [weak self] result in
-            switch result {
-            case .success(_):
-                completion(.failure(.wrongPassphrase))
-                
-            case .failure(_):
-                if let apiService = self?.apiService {
-                    apiService.newAccount(byPublicKey: publicKey) { result in
-                        switch result {
-                        case .success(let account):
-                            completion(.success(account: account, alert: nil))
-                            
-                        case .failure(let error):
-                            completion(.failure(.apiError(error: error)))
-                        }
-                    }
-                } else {
-                    completion(.failure(.internalError(message: "A bad thing happened", error: nil)))
-                }
-            }
         }
     }
 }
