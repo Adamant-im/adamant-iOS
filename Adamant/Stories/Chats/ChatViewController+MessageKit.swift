@@ -37,7 +37,11 @@ extension ChatViewController: MessagesDataSource {
     }
     
     func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
-        guard let message = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) as? MessageType else {
+        var newIndexPath = indexPath
+        if indexPath.count == 0 {
+            newIndexPath = IndexPath(row: 0, section: messagesCollectionView.numberOfSections - 1)
+        }
+        guard let message = chatController?.object(at: IndexPath(row: newIndexPath.section, section: 0)) as? MessageType else {
             fatalError("Data not synced")
         }
         
