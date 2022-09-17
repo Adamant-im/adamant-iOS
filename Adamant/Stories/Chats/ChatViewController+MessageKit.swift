@@ -619,12 +619,12 @@ extension ChatViewController: MessageInputBarDelegate {
         
         chatsProvider.sendMessage(message, recipientId: partner, from: chatroom, completion: { [weak self] result in
             switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    self?.scrollDown()
+            case .success(let transaction):
+                if transaction.statusEnum == .pending {
+                    DispatchQueue.main.async {
+                        self?.scrollDown()
+                    }
                 }
-                break
-                
             case .failure(let error):
                 var showFreeToken = false
                 switch error {
