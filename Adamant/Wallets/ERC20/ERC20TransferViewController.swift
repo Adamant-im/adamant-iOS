@@ -155,7 +155,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
         let row = TextRow() {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = UIKeyboardType.namePhonePad
+            $0.cell.textField.setPopupKeyboardType(.namePhonePad)
             $0.cell.textField.autocorrectionType = .no
             
             if let recipient = recipientAddress {

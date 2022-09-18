@@ -130,7 +130,7 @@ class LskTransferViewController: TransferViewControllerBase {
         let row = SuffixTextRow() {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = UIKeyboardType.alphabet
+            $0.cell.textField.setPopupKeyboardType(.alphabet)
             $0.cell.textField.autocorrectionType = .no
             
             if let recipient = recipientAddress {
