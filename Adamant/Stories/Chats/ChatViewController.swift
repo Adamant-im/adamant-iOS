@@ -110,9 +110,6 @@ class ChatViewController: MessagesViewController {
     private var isFirstLayout = true
     private var didLoaded = false
     
-    // Content insets are broken after modal view dissapears
-    private var fixKeyboardInsets = false
-    
     private var keyboardHeight: CGFloat = 0
     private let chatPositionDelata: CGFloat = 150
     private var chatPositionOffset: CGFloat = 0 {
@@ -379,12 +376,7 @@ class ChatViewController: MessagesViewController {
         self.view.addSubview(scrollToBottomBtn)
         
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !isMacOS {
-            keyboardManager.on(event: .willChangeFrame) { [weak self] (notification) in
-                let keyboardHeight = notification.endFrame.height
-                let tabBarHeight = self?.tabBarController?.tabBar.frame.height ?? .zero
-                self?.scrollToBottomBtnOffetConstraint?.constant = -20 - keyboardHeight
-                self?.keyboardHeight = keyboardHeight - tabBarHeight
-            }
+            setKeyboardObserver()
         }
         
         scrollToBottomBtnOffetConstraint = scrollToBottomBtn.bottomAnchor.constraint(equalTo: messagesCollectionView.bottomAnchor, constant: (-20 - h))
@@ -736,6 +728,23 @@ class ChatViewController: MessagesViewController {
             } catch {
                 return MessageKind.text("Failed to read rich message: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    private func setKeyboardObserver() {
+        let keyboardObserver: (_ height: CGFloat) -> Void = { [weak self] height in
+            self?.scrollToBottomBtnOffetConstraint?.constant = -20 - height
+            self?.keyboardHeight = height
+        }
+        
+        keyboardManager.on(event: .willChangeFrame) { [weak self] notification in
+            let tabBarHeight = self?.tabBarController?.tabBar.frame.height ?? .zero
+            let keyboardHeight = notification.endFrame.height - tabBarHeight
+            keyboardObserver(keyboardHeight)
+        }
+        
+        keyboardManager.on(event: .willHide) { _ in
+            keyboardObserver(.zero)
         }
     }
 }

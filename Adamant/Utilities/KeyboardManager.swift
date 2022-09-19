@@ -271,6 +271,7 @@ open class KeyboardManager: NSObject, UIGestureRecognizerDelegate {
     @objc
     open func handlePanGestureRecognizer(recognizer: UIPanGestureRecognizer) {
         guard
+            !isKeyboardHidden,
             var keyboardNotification = cachedNotification,
             case .changed = recognizer.state,
             let view = recognizer.view,
