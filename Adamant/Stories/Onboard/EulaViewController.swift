@@ -21,12 +21,12 @@ class EulaViewController: UIViewController {
         super.viewDidLoad()
         title = NSLocalizedString("EULA.Title", comment: "")
 
-        updateTheme()
+        setColors()
     }
     
     // MARK: - Other
     
-    private func updateTheme() {
+    private func setColors() {
         buttons.forEach { btn in
             btn.setTitleColor(UIColor.adamant.textColor, for: .normal)
         }

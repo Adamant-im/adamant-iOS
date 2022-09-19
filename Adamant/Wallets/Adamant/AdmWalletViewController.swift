@@ -155,7 +155,7 @@ class AdmWalletViewController: WalletViewControllerBase {
             self?.tableView.reloadData()
         }
         
-        updateTheme()
+        setColors()
     }
     
     override func sendRowLocalizedLabel() -> String {

@@ -221,7 +221,7 @@ class NewChatViewController: FormViewController {
             form.append(myQrSection)
         }
         
-        updateTheme()
+        setColors()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -264,7 +264,7 @@ class NewChatViewController: FormViewController {
     
     // MARK: - Other
     
-    func updateTheme() {
+    func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }

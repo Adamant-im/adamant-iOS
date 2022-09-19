@@ -131,7 +131,7 @@ class DelegatesListViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         
-        updateTheme()
+        setColors()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -219,7 +219,7 @@ class DelegatesListViewController: UIViewController {
     
     // MARK: - Other
     
-    private func updateTheme() {
+    private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }

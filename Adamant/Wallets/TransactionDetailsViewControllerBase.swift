@@ -608,7 +608,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         // Get fiat value
         self.updateFiat()
         
-        updateTheme()
+        setColors()
     }
     
     func updateFiat() {
@@ -643,7 +643,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Other
     
-    private func updateTheme() {
+    private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }

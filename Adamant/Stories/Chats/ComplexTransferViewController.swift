@@ -68,7 +68,7 @@ class ComplexTransferViewController: UIViewController {
         
         addChild(pagingViewController)
         
-        updateTheme()
+        setColors()
     }
     
     deinit {
@@ -77,7 +77,7 @@ class ComplexTransferViewController: UIViewController {
     
     // MARK: - Other
     
-    func updateTheme() {
+    func setColors() {
         view.backgroundColor = UIColor.adamant.backgroundColor
         pagingViewController.backgroundColor = UIColor.adamant.backgroundColor
         pagingViewController.menuBackgroundColor = UIColor.adamant.backgroundColor

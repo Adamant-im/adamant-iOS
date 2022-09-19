@@ -207,7 +207,7 @@ class NodesListViewController: FormViewController {
             self?.resetToDefault()
         }
         
-        updateTheme()
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -224,7 +224,7 @@ class NodesListViewController: FormViewController {
     
     // MARK: - Other
     
-    private func updateTheme() {
+    private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }

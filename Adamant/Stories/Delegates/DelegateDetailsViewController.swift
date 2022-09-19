@@ -124,7 +124,7 @@ class DelegateDetailsViewController: UIViewController {
             navigationItem.title = String.adamantLocalized.delegateDetails.title
         }
         
-        updateTheme()
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -137,7 +137,7 @@ class DelegateDetailsViewController: UIViewController {
     
     // MARK: - Other
     
-    private func updateTheme() {
+    private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }

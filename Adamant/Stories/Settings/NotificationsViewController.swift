@@ -224,7 +224,6 @@ class NotificationsViewController: FormViewController {
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.notificationsSoundChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
-
             guard let row: LabelRow = self?.form.rowBy(tag: Rows.sound.tag) else {
                 return
             }
@@ -232,12 +231,12 @@ class NotificationsViewController: FormViewController {
             row.value = self?.notificationsService.notificationsSound.localized
             row.updateCell()
         }
-            updateTheme()
+        setColors()
     }
     
     // MARK: - Other
     
-    func updateTheme() {
+    func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }

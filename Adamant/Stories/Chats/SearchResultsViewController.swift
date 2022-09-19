@@ -46,12 +46,12 @@ class SearchResultsViewController: UITableViewController {
         }
         
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: "resultCell")
-        updateTheme()
+        setColors()
     }
     
     // MARK: - Other
     
-    func updateTheme() {
+    func setColors() {
         view.backgroundColor = UIColor.adamant.backgroundColor
     }
     

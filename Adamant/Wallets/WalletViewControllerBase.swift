@@ -251,7 +251,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             setUiToWalletServiceState(.notInitiated)
         }
         
-        updateTheme()
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -393,7 +393,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     // MARK: - Other
     
-    func updateTheme() {
+    func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }

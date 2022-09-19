@@ -89,7 +89,7 @@ class BuyAndSellViewController: FormViewController {
         
         form.append(section)
         
-        updateTheme()
+        setColors()
     }
     
     // MARK: - Tools
@@ -157,7 +157,7 @@ class BuyAndSellViewController: FormViewController {
     
     // MARK: - Other
     
-    private func updateTheme() {
+    private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }

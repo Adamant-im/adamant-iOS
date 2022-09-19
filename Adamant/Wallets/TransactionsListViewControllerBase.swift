@@ -72,7 +72,7 @@ class TransactionsListViewControllerBase: UIViewController {
             self?.reloadData()
         }
         
-        updateTheme()
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -90,7 +90,7 @@ class TransactionsListViewControllerBase: UIViewController {
     
     // MARK: - Other
     
-    private func updateTheme() {
+    private func setColors() {
         view.backgroundColor = UIColor.adamant.backgroundColor
         tableView.backgroundColor = .clear
     }

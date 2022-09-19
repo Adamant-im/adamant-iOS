@@ -306,12 +306,12 @@ class TransferViewControllerBase: FormViewController {
                                                 }
         })
         
-        updateTheme()
+        setColors()
     }
     
     // MARK: - Other
     
-    private func updateTheme() {
+    private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }

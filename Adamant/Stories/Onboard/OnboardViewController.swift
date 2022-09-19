@@ -64,12 +64,12 @@ class OnboardViewController: UIViewController {
         
         onboarding.delegate = self
         onboarding.dataSource = self
-        updateTheme()
+        setColors()
     }
     
     // MARK: - Other
     
-    private func updateTheme() {
+    private func setColors() {
         agreeSwitch?.onTintColor = UIColor.adamant.switchColor
         onboarding.backgroundColor = UIColor.adamant.welcomeBackgroundColor
         view.backgroundColor = UIColor.adamant.welcomeBackgroundColor

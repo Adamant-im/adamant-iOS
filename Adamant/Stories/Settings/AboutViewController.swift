@@ -321,7 +321,7 @@ class AboutViewController: FormViewController {
                         image: Rows.twitter.image)
         */
         
-        updateTheme()
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -334,7 +334,7 @@ class AboutViewController: FormViewController {
     
     // MARK: - Other
     
-    private func updateTheme() {
+    private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }

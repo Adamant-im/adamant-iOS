@@ -148,7 +148,7 @@ class QRGeneratorViewController: FormViewController {
             self?.generateQr()
         }
         
-        updateTheme()
+        setColors()
     }
     
     override func insertAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
@@ -169,7 +169,7 @@ class QRGeneratorViewController: FormViewController {
     
     // MARK: - Other
     
-    private func updateTheme() {
+    private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }

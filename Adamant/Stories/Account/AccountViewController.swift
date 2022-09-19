@@ -647,7 +647,7 @@ class AccountViewController: FormViewController {
             layoutTableHeaderView()
         }
         
-        updateTheme()
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -712,7 +712,7 @@ class AccountViewController: FormViewController {
     
     // MARK: Other
     
-    private func updateTheme() {
+    private func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         pagingViewController.backgroundColor = UIColor.adamant.backgroundColor
         pagingViewController.menuBackgroundColor = UIColor.adamant.backgroundColor

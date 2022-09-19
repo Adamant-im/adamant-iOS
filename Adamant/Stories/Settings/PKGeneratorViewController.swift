@@ -128,12 +128,12 @@ class PKGeneratorViewController: FormViewController {
         
         form.append(contentsOf: [pkSection, passphraseSection])
         
-        updateTheme()
+        setColors()
     }
     
     // MARK: - Other
     
-    func updateTheme() {
+    func setColors() {
         view.backgroundColor = UIColor.adamant.secondBackgroundColor
         tableView.backgroundColor = .clear
     }
