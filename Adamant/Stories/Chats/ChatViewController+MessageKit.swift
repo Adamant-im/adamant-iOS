@@ -738,9 +738,8 @@ extension MessageTransaction: MessageType {
     
     private static let markdownParser: MarkdownParser = {
         let parser = MarkdownParser(font: UIFont.adamantChatDefault,
-                                    color: UIColor.adamant.primary)
-        parser.link.color = UIColor.adamant.active
-        parser.automaticLink.color = UIColor.adamant.active
+                                    color: UIColor.adamant.primary,
+                                    enabledElements: .disabledAutomaticLink)
         return parser
     }()
 }

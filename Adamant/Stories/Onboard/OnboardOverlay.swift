@@ -13,6 +13,7 @@ class OnboardOverlay: SwiftyOnboardOverlay {
     lazy var agreeSwitch: UISwitch = {
         let view = UISwitch()
         view.isOn = false
+        view.onTintColor = UIColor.adamant.switchColor
         return view
     }()
     
@@ -20,7 +21,7 @@ class OnboardOverlay: SwiftyOnboardOverlay {
         let view = UILabel()
         view.text = "  I accept"
         view.font = UIFont.adamantPrimary(ofSize: 18)//UIFont(name: "Exo2-Regular", size: 18)
-        view.textColor = UIColor.black
+        view.textColor = UIColor.adamant.textColor
         return view
     }()
     
@@ -30,9 +31,9 @@ class OnboardOverlay: SwiftyOnboardOverlay {
         
         let attrs = NSAttributedString(string: "Terms of Service",
                        attributes:
-            [NSAttributedString.Key.foregroundColor: UIColor.black,
+            [NSAttributedString.Key.foregroundColor: UIColor.adamant.textColor,
          NSAttributedString.Key.font: UIFont(name: "Exo2-Regular", size: 18) ?? UIFont.adamantPrimary(ofSize: 18),
-         NSAttributedString.Key.underlineColor: UIColor.black,
+         NSAttributedString.Key.underlineColor: UIColor.adamant.textColor,
          NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue])
 
         button.setAttributedTitle(attrs, for: .normal)

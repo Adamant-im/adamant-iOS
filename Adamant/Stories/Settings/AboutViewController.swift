@@ -320,6 +320,8 @@ class AboutViewController: FormViewController {
                         url: Rows.twitter.localizedUrl,
                         image: Rows.twitter.image)
         */
+        
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -328,6 +330,13 @@ class AboutViewController: FormViewController {
         if let indexPath = tableView.indexPathForSelectedRow {
             tableView.deselectRow(at: indexPath, animated: animated)
         }
+    }
+    
+    // MARK: - Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }
 

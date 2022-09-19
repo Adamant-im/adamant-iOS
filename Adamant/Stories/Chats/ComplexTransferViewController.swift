@@ -35,8 +35,6 @@ class ComplexTransferViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.white
-        
         if let partner = partner {
             navigationItem.title = partner.name?.checkAndReplaceSystemWallets() ?? partner.address
         }
@@ -69,14 +67,23 @@ class ComplexTransferViewController: UIViewController {
         }
         
         addChild(pagingViewController)
+        
+        setColors()
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
     
-    @objc
-    func cancel() {
+    // MARK: - Other
+    
+    func setColors() {
+        view.backgroundColor = UIColor.adamant.backgroundColor
+        pagingViewController.backgroundColor = UIColor.adamant.backgroundColor
+        pagingViewController.menuBackgroundColor = UIColor.adamant.backgroundColor
+    }
+    
+    @objc func cancel() {
         transferDelegate?.complexTransferViewController(self, didFinishWithTransfer: nil, detailsViewController: nil)
     }
 }

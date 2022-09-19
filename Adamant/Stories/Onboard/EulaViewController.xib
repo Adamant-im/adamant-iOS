@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,7 +15,10 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="EulaViewController" customModule="Adamant" customModuleProvider="target">
             <connections>
+                <outlet property="eulaTextView" destination="u9T-NN-FZw" id="va7-1m-MM9"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+                <outletCollection property="buttons" destination="yEd-IT-sBf" collectionClass="NSMutableArray" id="MkV-e5-y3g"/>
+                <outletCollection property="buttons" destination="okW-9c-qaM" collectionClass="NSMutableArray" id="yTn-qk-aDx"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -45,6 +48,7 @@
                         <userDefinedRuntimeAttribute type="string" keyPath="xibLocKey" value="EULA.Accept"/>
                     </userDefinedRuntimeAttributes>
                     <connections>
+                        <action selector="handleAccept" destination="-1" eventType="touchUpInside" id="IB9-Y5-JjE"/>
                         <action selector="handleAccept" destination="-2" eventType="touchUpInside" id="v0x-oJ-7zB"/>
                     </connections>
                 </button>
@@ -62,6 +66,7 @@
                     </connections>
                 </button>
             </subviews>
+            <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="okW-9c-qaM" firstAttribute="bottom" secondItem="fnl-2z-Ty3" secondAttribute="bottom" id="Bb4-c2-n3a"/>
@@ -76,7 +81,6 @@
                 <constraint firstItem="okW-9c-qaM" firstAttribute="top" secondItem="u9T-NN-FZw" secondAttribute="bottom" constant="8" id="uEh-iI-J1g"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="okW-9c-qaM" secondAttribute="trailing" constant="20" id="vi5-Kr-WS2"/>
             </constraints>
-            <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <point key="canvasLocation" x="131.8840579710145" y="81.696428571428569"/>
         </view>
     </objects>

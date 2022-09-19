@@ -73,7 +73,7 @@ class NotificationsViewController: FormViewController {
     var notificationsService: NotificationsService!
     
     private lazy var markdownParser: MarkdownParser = {
-        let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
+        let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize), color: UIColor.adamant.textColor)
         parser.link.color = UIColor.adamant.secondary
         return parser
     }()
@@ -173,7 +173,6 @@ class NotificationsViewController: FormViewController {
         }.cellUpdate { [weak self] (cell, _) in
             cell.textView.isSelectable = false
             cell.textView.isEditable = false
-            
             if let parser = self?.markdownParser {
                 cell.textView.attributedText = parser.parse(Rows.description.localized)
             } else {
@@ -225,7 +224,6 @@ class NotificationsViewController: FormViewController {
         }
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.notificationsSoundChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
-
             guard let row: LabelRow = self?.form.rowBy(tag: Rows.sound.tag) else {
                 return
             }
@@ -233,6 +231,14 @@ class NotificationsViewController: FormViewController {
             row.value = self?.notificationsService.notificationsSound.localized
             row.updateCell()
         }
+        setColors()
+    }
+    
+    // MARK: - Other
+    
+    func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
     
     func setNotificationMode(_ mode: NotificationsMode) {

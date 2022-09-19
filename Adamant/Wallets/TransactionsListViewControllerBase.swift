@@ -71,6 +71,8 @@ class TransactionsListViewControllerBase: UIViewController {
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.addressBookUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.reloadData()
         }
+        
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -86,6 +88,12 @@ class TransactionsListViewControllerBase: UIViewController {
         }
     }
     
+    // MARK: - Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.backgroundColor
+        tableView.backgroundColor = .clear
+    }
     
     // MARK: - To override
     
@@ -130,6 +138,7 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
                        partnerName: String?,
                        amount: Decimal,
                        date: Date?) {
+        cell.backgroundColor = .clear
         cell.accountLabel.tintColor = UIColor.adamant.primary
         cell.ammountLabel.tintColor = UIColor.adamant.primary
         cell.dateLabel.tintColor = UIColor.adamant.secondary
