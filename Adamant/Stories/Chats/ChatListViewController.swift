@@ -182,10 +182,6 @@ class ChatListViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        updateTheme()
-    }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if let indexPath = tableView.indexPathForSelectedRow {

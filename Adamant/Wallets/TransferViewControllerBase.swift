@@ -309,10 +309,6 @@ class TransferViewControllerBase: FormViewController {
         updateTheme()
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        updateTheme()
-    }
-    
     // MARK: - Other
     
     private func updateTheme() {

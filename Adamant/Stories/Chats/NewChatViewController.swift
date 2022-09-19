@@ -224,10 +224,6 @@ class NewChatViewController: FormViewController {
         updateTheme()
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        updateTheme()
-    }
-    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         

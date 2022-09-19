@@ -131,10 +131,6 @@ class PKGeneratorViewController: FormViewController {
         updateTheme()
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        updateTheme()
-    }
-    
     // MARK: - Other
     
     func updateTheme() {

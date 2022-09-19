@@ -75,10 +75,6 @@ class ComplexTransferViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        updateTheme()
-    }
-    
     // MARK: - Other
     
     func updateTheme() {

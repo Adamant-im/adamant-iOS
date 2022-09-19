@@ -92,10 +92,6 @@ class BuyAndSellViewController: FormViewController {
         updateTheme()
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        updateTheme()
-    }
-    
     // MARK: - Tools
     
     private func buildUrlRow(for row: Rows) -> LabelRow {

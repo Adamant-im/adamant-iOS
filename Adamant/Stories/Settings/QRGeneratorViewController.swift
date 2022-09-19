@@ -151,10 +151,6 @@ class QRGeneratorViewController: FormViewController {
         updateTheme()
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        updateTheme()
-    }
-    
     override func insertAnimation(forSections sections: [Section]) -> UITableView.RowAnimation {
         return .top
     }

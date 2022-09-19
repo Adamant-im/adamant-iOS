@@ -158,10 +158,6 @@ class AdmWalletViewController: WalletViewControllerBase {
         updateTheme()
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        updateTheme()
-    }
-    
     override func sendRowLocalizedLabel() -> String {
         return String.adamantLocalized.wallets.sendAdm
     }

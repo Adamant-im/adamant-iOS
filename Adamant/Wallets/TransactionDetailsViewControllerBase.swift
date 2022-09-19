@@ -611,10 +611,6 @@ class TransactionDetailsViewControllerBase: FormViewController {
         updateTheme()
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        updateTheme()
-    }
-    
     func updateFiat() {
         if let date = transaction?.dateValue, let currencySymbol = currencySymbol, let amount = transaction?.amountValue {
             self.isFiatSet = true

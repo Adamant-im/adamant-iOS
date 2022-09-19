@@ -225,7 +225,7 @@ class ChatViewController: MessagesViewController {
         // MARK: 1. Initial configuration
         
         updateTitle()
-        updateTheme()
+        updateUI()
         
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesDisplayDelegate = self
@@ -437,10 +437,6 @@ class ChatViewController: MessagesViewController {
             UIMenuItem(title: String.adamantLocalized.chat.report, action: NSSelectorFromString("report:"))]
         
         loadFirstMessagesIfNeeded()
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        updateTheme()
     }
     
     override func canPerformAction(_ action: Selector, withSender sender: Any!) -> Bool {
@@ -668,7 +664,7 @@ class ChatViewController: MessagesViewController {
         }
     }
     
-    func updateTheme() {
+    func updateUI() {
         view.backgroundColor = UIColor.adamant.backgroundColor
         messagesCollectionView.backgroundColor = UIColor.adamant.backgroundColor
         messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatInputFieldBarBackground
@@ -1117,7 +1113,7 @@ extension ChatViewController {
             }
             
             if chatroom?.isReadonly ?? false {
-                updateTheme()
+                updateUI()
             } else {
                 messageInputBar.inputTextView.isEditable = true
                 messageInputBar.leftStackView.isUserInteractionEnabled = true
