@@ -183,7 +183,7 @@ class AccountViewController: FormViewController {
         
         // MARK: Status Bar
         let statusBarView = UIView(frame: UIApplication.shared.statusBarFrame)
-        statusBarView.backgroundColor = UIColor.white
+        statusBarView.backgroundColor = UIColor.adamant.backgroundColor
         view.addSubview(statusBarView)
         
         // MARK: Transfers controller
@@ -501,7 +501,7 @@ class AccountViewController: FormViewController {
                 case .faceID: $0.cell.imageView?.image = #imageLiteral(resourceName: "row_faceid.png")
                 }
             }
-            
+            $0.cell.backgroundColor = UIColor.adamant.cellColor
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 guard let showBiometry = self?.showBiometryOptions else {
                     return true
@@ -646,6 +646,8 @@ class AccountViewController: FormViewController {
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             layoutTableHeaderView()
         }
+        
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -709,6 +711,16 @@ class AccountViewController: FormViewController {
     
     
     // MARK: Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        pagingViewController.backgroundColor = UIColor.adamant.backgroundColor
+        pagingViewController.menuBackgroundColor = UIColor.adamant.backgroundColor
+        pagingViewController.reloadData()
+        tableView.backgroundColor = .clear
+        accountHeaderView.backgroundColor = UIColor.adamant.backgroundColor
+    }
+    
     func updateAccountInfo() {
         let address: String
         

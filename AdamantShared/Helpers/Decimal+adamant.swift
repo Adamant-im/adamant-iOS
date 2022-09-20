@@ -18,6 +18,11 @@ extension Decimal {
     }
     
     var doubleValue: Double {
-        return NSDecimalNumber(decimal: self).doubleValue
+        // NSDecimalNumber loses decimal precision when deserializing numbers by doubleValue.
+        // Try to get string value and deserialize it
+        let decimalValue = NSDecimalNumber(decimal: self)
+        let stringValue = decimalValue.stringValue
+        guard let doubleValue = Double(stringValue) else { return Double(truncating: decimalValue) }
+        return doubleValue
     }
 }

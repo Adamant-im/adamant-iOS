@@ -206,6 +206,8 @@ class NodesListViewController: FormViewController {
         }.onCellSelection { [weak self] (_, _) in
             self?.resetToDefault()
         }
+        
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -218,6 +220,13 @@ class NodesListViewController: FormViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         timer?.invalidate()
+    }
+    
+    // MARK: - Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }
 

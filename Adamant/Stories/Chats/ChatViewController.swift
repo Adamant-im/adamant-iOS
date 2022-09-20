@@ -222,6 +222,7 @@ class ChatViewController: MessagesViewController {
         // MARK: 1. Initial configuration
         
         updateTitle()
+        updateUI()
         
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesDisplayDelegate = self
@@ -291,7 +292,6 @@ class ChatViewController: MessagesViewController {
             $0.setSize(CGSize(width: buttonWidth, height: buttonHeight), animated: false)
             $0.title = nil
             $0.image = #imageLiteral(resourceName: "Arrow")
-            $0.setImage(#imageLiteral(resourceName: "Arrow_innactive"), for: UIControl.State.disabled)
         }
         
         messageInputBar.inputTextView.autocorrectionType = .no
@@ -319,15 +319,7 @@ class ChatViewController: MessagesViewController {
             setEstimatedFee(AdamantMessage.text(message).fee)
         }
         
-        // MARK: Readonly chat
-        if chatroom.isReadonly {
-            messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
-            messageInputBar.inputTextView.isEditable = false
-            messageInputBar.sendButton.isEnabled = false
-            attachmentButton.isEnabled = false
-        }
-        
-        // MARK: Data
+        // MARK: 3. Data
         let controller = chatsProvider.getChatController(for: chatroom)
         chatController = controller
         controller.delegate = self
@@ -612,13 +604,35 @@ class ChatViewController: MessagesViewController {
             self.navigationController?.popViewController(animated: true)
         }
     }
-    
+
     func addChatLoadObserver() {
         chatLoadNotificationObserver = NotificationCenter.default.addObserver(forName: .AdamantChatsProvider.initiallyLoadedMessages, object: nil, queue: .main) { [weak self] notification in
             guard let recipientAddress = notification.object as? String,
                   recipientAddress == self?.chatroom?.partner?.address
             else { return }
             self?.updateChatMessages()
+        }
+    }
+    
+    func updateUI() {
+        view.backgroundColor = UIColor.adamant.backgroundColor
+        messagesCollectionView.backgroundColor = UIColor.adamant.backgroundColor
+        messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatInputFieldBarBackground
+        messageInputBar.backgroundView.backgroundColor = UIColor.adamant.chatInputBarBackground
+        
+        if messageInputBar.inputTextView.text.isEmpty {
+            messageInputBar.sendButton.isEnabled = false
+        }
+        
+        if chatroom?.isReadonly ?? false {
+            messageInputBar.inputTextView.placeholder = ""
+            messageInputBar.inputTextView.isEditable = false
+            messageInputBar.sendButton.isEnabled = false
+            attachmentButton.isEnabled = false
+            messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatInputBarBackground
+            messageInputBar.inputTextView.layer.borderColor = UIColor.adamant.disableBorderColor.cgColor
+            messageInputBar.sendButton.layer.borderColor = UIColor.adamant.disableBorderColor.cgColor
+            attachmentButton.layer.borderColor = UIColor.adamant.disableBorderColor.cgColor
         }
     }
     
@@ -1054,7 +1068,6 @@ extension ChatViewController {
         if loadingView == nil && state {
             setupLoadingView()
             messagesCollectionView.alpha = 0.0
-            messageInputBar.sendButton.isEnabled = false
             messageInputBar.inputTextView.isEditable = false
             messageInputBar.leftStackView.isUserInteractionEnabled = false
         }
@@ -1065,12 +1078,8 @@ extension ChatViewController {
             }
             
             if chatroom?.isReadonly ?? false {
-                messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
-                messageInputBar.inputTextView.isEditable = false
-                messageInputBar.sendButton.isEnabled = false
-                attachmentButton.isEnabled = false
+                updateUI()
             } else {
-                messageInputBar.sendButton.isEnabled = true
                 messageInputBar.inputTextView.isEditable = true
                 messageInputBar.leftStackView.isUserInteractionEnabled = true
             }

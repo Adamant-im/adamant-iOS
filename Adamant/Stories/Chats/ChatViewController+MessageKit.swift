@@ -37,7 +37,11 @@ extension ChatViewController: MessagesDataSource {
     }
     
     func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
-        guard let message = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) as? MessageType else {
+        var newIndexPath = indexPath
+        if indexPath.count == 0 {
+            newIndexPath = IndexPath(row: 0, section: messagesCollectionView.numberOfSections - 1)
+        }
+        guard let message = chatController?.object(at: IndexPath(row: newIndexPath.section, section: 0)) as? MessageType else {
             fatalError("Data not synced")
         }
         
@@ -619,12 +623,12 @@ extension ChatViewController: MessageInputBarDelegate {
         
         chatsProvider.sendMessage(message, recipientId: partner, from: chatroom, completion: { [weak self] result in
             switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    self?.scrollDown()
+            case .success(let transaction):
+                if transaction.statusEnum == .pending {
+                    DispatchQueue.main.async {
+                        self?.scrollDown()
+                    }
                 }
-                break
-                
             case .failure(let error):
                 var showFreeToken = false
                 switch error {
@@ -734,9 +738,8 @@ extension MessageTransaction: MessageType {
     
     private static let markdownParser: MarkdownParser = {
         let parser = MarkdownParser(font: UIFont.adamantChatDefault,
-                                    color: UIColor.adamant.primary)
-        parser.link.color = UIColor.adamant.active
-        parser.automaticLink.color = UIColor.adamant.active
+                                    color: UIColor.adamant.primary,
+                                    enabledElements: .disabledAutomaticLink)
         return parser
     }()
 }

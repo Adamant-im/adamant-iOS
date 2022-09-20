@@ -31,7 +31,8 @@ class ERC20WalletViewController: WalletViewControllerBase {
     }
     
     override func sendRowLocalizedLabel() -> String {
-        return String.adamantLocalized.wallets.erc20.sendToken(service?.tokenSymbol ?? "")
+        let networkSymbol = service?.tokenNetworkSymbol ?? "ERC20"
+        return String.adamantLocalized.wallets.erc20.sendToken(service?.tokenSymbol ?? "") + " (\(networkSymbol))"
     }
     
     override func encodeForQr(address: String) -> String? {

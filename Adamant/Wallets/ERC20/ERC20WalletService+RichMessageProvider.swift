@@ -131,7 +131,7 @@ extension ERC20WalletService: RichMessageProvider {
         }
         
         cell.currencyLogoImageView.image = self.tokenLogo
-        cell.currencySymbolLabel.text = self.tokenSymbol
+        cell.currencySymbolLabel.text = self.tokenSymbol + " (\(self.tokenNetworkSymbol))"
         
         cell.amountLabel.text = AdamantBalanceFormat.full.format(transfer.amount)
         cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)

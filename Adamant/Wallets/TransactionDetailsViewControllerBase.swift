@@ -179,13 +179,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
                 self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.txId {
                 row.value = value
             } else {
@@ -217,6 +217,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.cell.height = { height }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             guard let value = row.value else {
                 return
@@ -231,8 +232,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             self?.shareValue(text, from: cell)
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let transaction = self?.transaction {
                 if transaction.senderAddress.count == 0 {
                     row.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
@@ -271,6 +271,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.cell.height = { height }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             guard let value = row.value else {
                 return
@@ -285,7 +286,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             self?.shareValue(text, from: cell)
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             
             if let transaction = self?.transaction {
                 if let recipientName = self?.recipientName?.checkAndReplaceSystemWallets() {
@@ -316,14 +317,14 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let value = self?.transaction?.dateValue {
                 let text = value.humanizedDateTimeFull()
                 self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let raw = self?.transaction?.dateValue, let value = self?.dateFormatter.string(from: raw) {
                 row.value = value
             } else {
@@ -345,13 +346,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let value = row.value {
                 self?.shareValue(value, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.amountValue, let formatter = self?.currencyFormatter {
                 row.value = formatter.string(from: value)
             } else {
@@ -374,13 +375,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let value = row.value {
                 self?.shareValue(value, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.feeValue, let formatter = self?.feeFormatter {
                 row.value = formatter.string(from: value)
             } else {
@@ -405,13 +406,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
                 self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.confirmationsValue, value != "0" {
                 row.value = value
             } else {
@@ -435,13 +436,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
                 self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.blockValue,
                !value.isEmpty {
                 row.value = value
@@ -463,12 +464,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
             })
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
                 self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             row.value = self?.transaction?.transactionStatus?.localized
         }
         
@@ -488,13 +490,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
                 self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let amount = self?.transaction?.amountValue,
                let symbol = self?.currencySymbol,
                let rate = self?.currencyInfo.getRate(for: symbol),
@@ -516,14 +518,15 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.title = Rows.historyFiat.localized
             
             $0.value = TransactionDetailsViewControllerBase.awaitingValueString
-            }.cellSetup { (cell, _) in
-                cell.selectionStyle = .gray
-            }.onCellSelection { [weak self] (cell, row) in
-                if let text = row.value {
-                    self?.shareValue(text, from: cell)
-                }
-            }.cellUpdate { (cell, _) in
-                cell.textLabel?.textColor = .black
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+        }.onCellSelection { [weak self] (cell, row) in
+            if let text = row.value {
+                self?.shareValue(text, from: cell)
+            }
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }
         
         detailsSection.append(fiatRow)
@@ -540,6 +543,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 $0.value = comment
             }.cellSetup { (cell, _) in
                 cell.selectionStyle = .gray
+                cell.textLabel?.textColor = UIColor.adamant.textColor
             }.cellUpdate { (cell, _) in
                 cell.textView?.backgroundColor = UIColor.clear
                 cell.textView.isSelectable = false
@@ -578,7 +582,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.cell.imageView?.image = Rows.openInExplorer.image
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
             guard let transaction = self?.transaction, let url = self?.explorerUrl(for: transaction) else {
@@ -601,6 +607,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         // Get fiat value
         self.updateFiat()
+        
+        setColors()
     }
     
     func updateFiat() {
@@ -631,6 +639,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 }
             }
         }
+    }
+    
+    // MARK: - Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
     
     // MARK: - Actions

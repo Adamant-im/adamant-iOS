@@ -188,6 +188,8 @@ class NodeEditorViewController: FormViewController {
                 self?.deleteNode()
             }
         }
+        
+        setColors()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -196,6 +198,13 @@ class NodeEditorViewController: FormViewController {
         if !didCallDelegate {
             saveNode()
         }
+    }
+    
+    // MARK: - Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }
 
