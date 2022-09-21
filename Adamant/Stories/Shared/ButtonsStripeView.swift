@@ -90,7 +90,7 @@ class ButtonsStripeView: UIView {
                 button.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
                 
                 button.setImage(aButton.image, for: .normal)
-                
+                button.imageView?.tintColor = UIColor.adamant.tableRowIcons
                 button.imageView!.contentMode = .scaleAspectFit
                 button.clipsToBounds = true
                 
@@ -184,7 +184,7 @@ extension ButtonsStripeView {
         view.buttonsHighlightedColor = UIColor.adamant.pinpadHighlightButton
         view.buttonsNormalColor = .white
         view.stripeStackView.spacing = 15
-        
+        view.buttonsNormalColor = UIColor.adamant.cellColor
         return view
     }
 }

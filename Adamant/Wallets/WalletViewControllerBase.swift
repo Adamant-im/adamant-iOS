@@ -95,7 +95,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             
             $0.alertBackgroundColor = UIColor.adamant.primary
             $0.alertTextColor = UIColor.white
-            
+            $0.cell.backgroundColor = UIColor.adamant.cellColor
             let symbol = self?.service?.tokenSymbol ?? ""
             
             if let service = self?.service, let wallet = service.wallet {
@@ -152,6 +152,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 $0.tag = BaseRows.send.tag
                 $0.title = label
                 $0.cell.selectionStyle = .gray
+                $0.cell.backgroundColor = UIColor.adamant.cellColor
             }.cellUpdate { (cell, _) in
                 cell.accessoryType = .disclosureIndicator
             }.onCellSelection { [weak self] (_, row) in
@@ -249,6 +250,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         } else {
             setUiToWalletServiceState(.notInitiated)
         }
+        
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -287,7 +290,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             $0.tag = BaseRows.address.tag
             $0.title = BaseRows.address.localized
             $0.cell.selectionStyle = .gray
-            
+            $0.cell.backgroundColor = UIColor.adamant.cellColor
             if let wallet = service?.wallet {
                 $0.value = wallet.address
             }
@@ -386,6 +389,13 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         }
         
         return value
+    }
+    
+    // MARK: - Other
+    
+    func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }
 

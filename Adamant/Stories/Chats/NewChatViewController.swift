@@ -220,6 +220,8 @@ class NewChatViewController: FormViewController {
             myQrSection.append(button)
             form.append(myQrSection)
         }
+        
+        setColors()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -261,6 +263,11 @@ class NewChatViewController: FormViewController {
     
     
     // MARK: - Other
+    
+    func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
+    }
     
     func startNewChat(with address: String, name: String? = nil, message: String?) {
         switch AdamantUtilities.validateAdamantAddress(address: address) {

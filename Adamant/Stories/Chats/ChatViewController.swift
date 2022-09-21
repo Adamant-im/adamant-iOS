@@ -77,6 +77,8 @@ class ChatViewController: MessagesViewController {
         return formatter
     }
     
+    private var chatLoadNotificationObserver: NSObjectProtocol?
+    
     private var keyboardManager = KeyboardManager()
     
     private(set) var chatController: NSFetchedResultsController<ChatTransaction>?
@@ -223,6 +225,7 @@ class ChatViewController: MessagesViewController {
         // MARK: 1. Initial configuration
         
         updateTitle()
+        updateUI()
         
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesDisplayDelegate = self
@@ -292,7 +295,6 @@ class ChatViewController: MessagesViewController {
             $0.setSize(CGSize(width: buttonWidth, height: buttonHeight), animated: false)
             $0.title = nil
             $0.image = #imageLiteral(resourceName: "Arrow")
-            $0.setImage(#imageLiteral(resourceName: "Arrow_innactive"), for: UIControl.State.disabled)
         }
         
         messageInputBar.inputTextView.autocorrectionType = .no
@@ -334,15 +336,7 @@ class ChatViewController: MessagesViewController {
             setEstimatedFee(AdamantMessage.text(message).fee)
         }
         
-        // MARK: 3. Readonly chat
-        if chatroom.isReadonly {
-            messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
-            messageInputBar.inputTextView.isEditable = false
-            messageInputBar.sendButton.isEnabled = false
-            attachmentButton.isEnabled = false
-        }
-        
-        // MARK: 4. Data
+        // MARK: 3. Data
         let controller = chatsProvider.getChatController(for: chatroom)
         chatController = controller
         controller.delegate = self
@@ -353,7 +347,7 @@ class ChatViewController: MessagesViewController {
             print("There was an error performing fetch: \(error)")
         }
         
-        // MARK: 4.1 Rich messages
+        // MARK: 3.1 Rich messages
         if let fetched = controller.fetchedObjects {
             for case let rich as RichMessageTransaction in fetched {
                 rich.kind = messageKind(for: rich)
@@ -364,7 +358,7 @@ class ChatViewController: MessagesViewController {
             }
         }
         
-        // MARK: 5. Notifications
+        // MARK: 4. Notifications
         // Fixing content insets after modal window
         NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
             if #available(iOS 13, *) {
@@ -393,7 +387,7 @@ class ChatViewController: MessagesViewController {
             self?.fixKeyboardInsets = false
         }
         
-        // MARK: 6. RichMessage handlers
+        // MARK: 5. RichMessage handlers
         for handler in richMessageProviders.values {
             if let source = handler.cellSource {
                 switch source {
@@ -633,6 +627,10 @@ class ChatViewController: MessagesViewController {
             
             try? privateContext.save()
         }
+        
+        if let chatLoadNotificationObserver = chatLoadNotificationObserver {
+            NotificationCenter.default.removeObserver(chatLoadNotificationObserver)
+        }
     }
     
     func updateTitle() {
@@ -654,6 +652,37 @@ class ChatViewController: MessagesViewController {
                 nav.popToRootViewController(animated: true)
         } else {
             self.navigationController?.popViewController(animated: true)
+        }
+    }
+
+    func addChatLoadObserver() {
+        chatLoadNotificationObserver = NotificationCenter.default.addObserver(forName: .AdamantChatsProvider.initiallyLoadedMessages, object: nil, queue: .main) { [weak self] notification in
+            guard let recipientAddress = notification.object as? String,
+                  recipientAddress == self?.chatroom?.partner?.address
+            else { return }
+            self?.updateChatMessages()
+        }
+    }
+    
+    func updateUI() {
+        view.backgroundColor = UIColor.adamant.backgroundColor
+        messagesCollectionView.backgroundColor = UIColor.adamant.backgroundColor
+        messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatInputFieldBarBackground
+        messageInputBar.backgroundView.backgroundColor = UIColor.adamant.chatInputBarBackground
+        
+        if messageInputBar.inputTextView.text.isEmpty {
+            messageInputBar.sendButton.isEnabled = false
+        }
+        
+        if chatroom?.isReadonly ?? false {
+            messageInputBar.inputTextView.placeholder = ""
+            messageInputBar.inputTextView.isEditable = false
+            messageInputBar.sendButton.isEnabled = false
+            attachmentButton.isEnabled = false
+            messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatInputBarBackground
+            messageInputBar.inputTextView.layer.borderColor = UIColor.adamant.disableBorderColor.cgColor
+            messageInputBar.sendButton.layer.borderColor = UIColor.adamant.disableBorderColor.cgColor
+            attachmentButton.layer.borderColor = UIColor.adamant.disableBorderColor.cgColor
         }
     }
     
@@ -1019,14 +1048,6 @@ private class StatusUpdateProcedure: Procedure {
             return
         }
         
-        guard controller?.chatsProvider.isTransactionUnique(transaction) ?? true else {
-            transaction.transactionStatus = .dublicate
-            self.controller?.removeRichMessageStatusUpdating(id: self.objectId)
-            try? privateContext.save()
-            self.finish()
-            return
-        }
-        
         provider.statusFor(transaction: transaction) { result in
             switch result {
             case .success(let status):
@@ -1082,7 +1103,6 @@ extension ChatViewController {
         if loadingView == nil && state {
             setupLoadingView()
             messagesCollectionView.alpha = 0.0
-            messageInputBar.sendButton.isEnabled = false
             messageInputBar.inputTextView.isEditable = false
             messageInputBar.leftStackView.isUserInteractionEnabled = false
         }
@@ -1093,12 +1113,8 @@ extension ChatViewController {
             }
             
             if chatroom?.isReadonly ?? false {
-                messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
-                messageInputBar.inputTextView.isEditable = false
-                messageInputBar.sendButton.isEnabled = false
-                attachmentButton.isEnabled = false
+                updateUI()
             } else {
-                messageInputBar.sendButton.isEnabled = true
                 messageInputBar.inputTextView.isEditable = true
                 messageInputBar.leftStackView.isUserInteractionEnabled = true
             }
@@ -1135,13 +1151,22 @@ extension ChatViewController {
         
         setBusyIndicator(state: true)
         
+        if chatsProvider.isChatLoading(with: address) {
+            addChatLoadObserver()
+            return
+        }
+        
         chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] in
             DispatchQueue.main.async {
-                self?.messagesCollectionView.reloadDataAndKeepOffset()
-                self?.messagesCollectionView.scrollToLastItem(animated: false)
-                self?.setBusyIndicator(state: false)
+                self?.updateChatMessages()
             }
         }
+    }
+    
+    func updateChatMessages() {
+        messagesCollectionView.reloadDataAndKeepOffset()
+        messagesCollectionView.scrollToLastItem(animated: false)
+        setBusyIndicator(state: false)
     }
     
     func loadMooreMessagesIfNeeded(indexPath: IndexPath) {

@@ -10,6 +10,7 @@ import UIKit
 import Eureka
 import SafariServices
 import MarkdownKit
+import ProcedureKit
 
 class NotificationsViewController: FormViewController {
 
@@ -17,11 +18,15 @@ class NotificationsViewController: FormViewController {
     enum Sections {
         case notifications
         case aboutNotificationTypes
+        case messages
+        case settings
         
         var tag: String {
             switch self {
             case .notifications: return "st"
             case .aboutNotificationTypes: return "ans"
+            case .messages: return "ms"
+            case .settings: return "settings"
             }
         }
         
@@ -29,6 +34,8 @@ class NotificationsViewController: FormViewController {
             switch self {
             case .notifications: return NSLocalizedString("SecurityPage.Section.NotificationsType", comment: "Security: Selected notifications types")
             case .aboutNotificationTypes: return NSLocalizedString("SecurityPage.Section.AboutNotificationTypes", comment: "Security: About Notification types")
+            case .messages: return NSLocalizedString("SecurityPage.Section.Messages", comment: "Security: Messages Notification sound")
+            case .settings: return NSLocalizedString("SecurityPage.Section.Settings", comment: "Security: Settings Notification")
             }
         }
     }
@@ -36,12 +43,16 @@ class NotificationsViewController: FormViewController {
     enum Rows {
         case notificationsMode
         case description, github
+        case systemSettings
+        case sound
         
         var tag: String {
             switch self {
             case .notificationsMode: return "rn"
             case .description: return "rd"
             case .github: return "git"
+            case .systemSettings: return "ss"
+            case .sound: return "sd"
             }
         }
         
@@ -50,6 +61,8 @@ class NotificationsViewController: FormViewController {
             case .notificationsMode: return NSLocalizedString("SecurityPage.Row.Notifications", comment: "Security: Show notifications")
             case .description: return NSLocalizedString("SecurityPage.Row.Notifications.ModesDescription", comment: "Security: Notification modes description. Markdown supported.")
             case .github: return NSLocalizedString("SecurityPage.Row.VisitGithub", comment: "Security: Visit Github")
+            case .systemSettings: return NSLocalizedString("Notifications.Settings.System", comment: "Notifications: Open system Settings")
+            case .sound: return NSLocalizedString("Notifications.Sound.Name", comment: "Notifications: Select Sound")
             }
         }
     }
@@ -60,7 +73,7 @@ class NotificationsViewController: FormViewController {
     var notificationsService: NotificationsService!
     
     private lazy var markdownParser: MarkdownParser = {
-        let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
+        let parser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize), color: UIColor.adamant.textColor)
         parser.link.color = UIColor.adamant.secondary
         return parser
     }()
@@ -100,6 +113,57 @@ class NotificationsViewController: FormViewController {
         notificationsSection.append(nType)
         form.append(notificationsSection)
         
+        // MARK: Messages
+        // Sound
+        let soundRow = LabelRow() {
+            $0.tag = Rows.sound.tag
+            $0.title = Rows.sound.localized
+            $0.value = notificationsService.notificationsSound.localized
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { [weak self] _, row in
+            guard let self = self else { return }
+            row.deselect()
+            let soundsVC = NotificationSoundsViewController()
+            soundsVC.notificationsService = self.notificationsService
+            let navigationController = UINavigationController(rootViewController: soundsVC)
+            self.present(navigationController, animated: true)
+        }
+        
+        // Section
+        let messagesSection = Section(Sections.messages.localized) {
+            $0.tag = Sections.messages.tag
+        }
+        
+        messagesSection.append(soundRow)
+        form.append(messagesSection)
+        
+        // MARK: Settings
+        // System Settings
+        let settingsRow = LabelRow() {
+            $0.tag = Rows.systemSettings.tag
+            $0.title = Rows.systemSettings.localized
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+        }.cellUpdate { (cell, _) in
+            cell.accessoryType = .disclosureIndicator
+        }.onCellSelection { _, row in
+            guard let url = URL(string: UIApplication.openSettingsURLString) else {
+                return
+            }
+            row.deselect()
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
+        
+        // Section
+        let settingsSection = Section(Sections.settings.localized) {
+            $0.tag = Sections.settings.tag
+        }
+        
+        settingsSection.append(settingsRow)
+        form.append(settingsSection)
         
         // MARK: ANS Description
         // Description
@@ -109,7 +173,6 @@ class NotificationsViewController: FormViewController {
         }.cellUpdate { [weak self] (cell, _) in
             cell.textView.isSelectable = false
             cell.textView.isEditable = false
-            
             if let parser = self?.markdownParser {
                 cell.textView.attributedText = parser.parse(Rows.description.localized)
             } else {
@@ -159,6 +222,23 @@ class NotificationsViewController: FormViewController {
             row.value = newMode
             row.updateCell()
         }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantNotificationService.notificationsSoundChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
+            guard let row: LabelRow = self?.form.rowBy(tag: Rows.sound.tag) else {
+                return
+            }
+            
+            row.value = self?.notificationsService.notificationsSound.localized
+            row.updateCell()
+        }
+        setColors()
+    }
+    
+    // MARK: - Other
+    
+    func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
     
     func setNotificationMode(_ mode: NotificationsMode) {

@@ -97,5 +97,8 @@ class LoadingTableViewCell: UITableViewCell {
         addSubview(spinner)
         spinner.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
         spinner.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+        if #available(iOS 13.0, *) {
+            spinner.style = .medium
+        }
     }
 }

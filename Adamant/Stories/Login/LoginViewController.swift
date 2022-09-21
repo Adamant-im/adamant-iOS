@@ -331,6 +331,15 @@ class LoginViewController: FormViewController {
             vc.loginWithBiometry()
             vc.firstTimeActive = false
         }
+        
+        setColors()
+    }
+    
+    // MARK: - Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }
 

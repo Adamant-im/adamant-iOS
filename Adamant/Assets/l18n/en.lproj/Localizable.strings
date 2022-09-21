@@ -619,6 +619,12 @@
 /* Security: About Notification types */
 "SecurityPage.Section.AboutNotificationTypes" = "About ANS";
 
+/* Security: Messages Notification sound */
+"SecurityPage.Section.Messages" = "Messages";
+
+/* Security: Settings Notification */
+"SecurityPage.Section.Settings" = "Settings";
+
 /* Notifications: Disable notifications */
 "Notifications.Mode.NotificationsDisabled" = "Disabled";
 
@@ -630,6 +636,24 @@
 
 /* Security: Visit Github */
 "SecurityPage.Row.VisitGithub" = "Visit Github";
+
+/* Notifications: Open system Settings */
+"Notifications.Settings.System" = "System Settings";
+
+/* Notifications: Select Sound */
+"Notifications.Sound.Name" = "Sound";
+
+/* Notifications: Select Sounds */
+"Notifications.Sounds.Name" = "Sounds";
+
+/* Notifications: Select Alert Tones */
+"Notifications.Alert.Tones" = "ALERT TONES";
+
+/* Notifications: Select Alert Save */
+"Notifications.Alert.Save" = "Save";
+
+/* Notifications: Alerts Cancel */
+"Notifications.Alert.Cancel" = "Cancel";
 
 /* Notifications: Something went wrong while registering remote notifications. %@ for description */
 "NotificationsService.Error.RegistrationRemotesFormat" = "Registration in ANS failed. Please, try again later. Reason %@";

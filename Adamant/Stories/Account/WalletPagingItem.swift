@@ -13,14 +13,16 @@ class WalletPagingItem: PagingItem, Hashable, Comparable {
     let index: Int
     let currencySymbol: String
     let currencyImage: UIImage
+    let currencyNetwork: String
     
     var balance: Decimal? = 0
     var notifications: Int = 0
     
-    init(index: Int, currencySymbol symbol: String, currencyImage image: UIImage) {
+    init(index: Int, currencySymbol symbol: String, currencyImage image: UIImage, currencyNetwork network: String = "") {
         self.index = index
         currencySymbol = symbol
         currencyImage = image
+        currencyNetwork = network
     }
     
     // MARK: Hashable, Comparable

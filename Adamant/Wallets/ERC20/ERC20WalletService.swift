@@ -33,6 +33,10 @@ class ERC20WalletService: WalletService {
         return token?.logo ?? UIImage()
     }
     
+    var tokenNetworkSymbol: String {
+        return "ERC20"
+    }
+    
     private (set) var transactionFee: Decimal = 0.0
     private (set) var diplayTransactionFee: Decimal = 0.0
     

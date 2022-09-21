@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -21,7 +18,7 @@
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="wallet_adm" translatesAutoresizingMaskIntoConstraints="NO" id="xZc-UL-00v">
-                        <rect key="frame" x="28" y="0.0" width="55" height="55"/>
+                        <rect key="frame" x="27.5" y="0.0" width="55" height="55"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="55" id="BYW-hx-Hql"/>
                             <constraint firstAttribute="width" secondItem="xZc-UL-00v" secondAttribute="height" multiplier="1:1" id="CwR-kR-kjO"/>
@@ -31,23 +28,24 @@
                         <rect key="frame" x="27.5" y="0.0" width="55" height="55"/>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ADM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Via-ei-IpM">
-                        <rect key="frame" x="36.5" y="84" width="37.5" height="20.5"/>
+                        <rect key="frame" x="36.5" y="79" width="37.5" height="20.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100000000" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NTG-ad-tJQ">
-                        <rect key="frame" x="10" y="65" width="90.5" height="20.5"/>
+                        <rect key="frame" x="10" y="60" width="90" height="20.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
             </view>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <constraints>
                 <constraint firstItem="Via-ei-IpM" firstAttribute="centerX" secondItem="NTG-ad-tJQ" secondAttribute="centerX" id="Amy-2k-tDl"/>
                 <constraint firstItem="1Vy-Ac-hig" firstAttribute="width" secondItem="xZc-UL-00v" secondAttribute="width" id="HtU-AB-LDY"/>
-                <constraint firstItem="NTG-ad-tJQ" firstAttribute="top" secondItem="xZc-UL-00v" secondAttribute="bottom" constant="10" id="Oty-s9-Se5"/>
+                <constraint firstItem="NTG-ad-tJQ" firstAttribute="top" secondItem="xZc-UL-00v" secondAttribute="bottom" constant="5" id="Oty-s9-Se5"/>
                 <constraint firstItem="Via-ei-IpM" firstAttribute="top" secondItem="NTG-ad-tJQ" secondAttribute="bottom" constant="-1.5" id="RwR-QC-WVd"/>
                 <constraint firstItem="1Vy-Ac-hig" firstAttribute="centerY" secondItem="xZc-UL-00v" secondAttribute="centerY" id="UwT-ig-FG9"/>
                 <constraint firstItem="1Vy-Ac-hig" firstAttribute="centerX" secondItem="xZc-UL-00v" secondAttribute="centerX" id="WH1-1C-whk"/>
@@ -56,7 +54,6 @@
                 <constraint firstItem="xZc-UL-00v" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="kLt-9y-aHy"/>
                 <constraint firstItem="1Vy-Ac-hig" firstAttribute="height" secondItem="xZc-UL-00v" secondAttribute="height" id="rIy-ts-KAr"/>
             </constraints>
-            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <size key="customSize" width="110" height="120"/>
             <connections>
                 <outlet property="accessoryContainerView" destination="1Vy-Ac-hig" id="leG-zZ-To4"/>

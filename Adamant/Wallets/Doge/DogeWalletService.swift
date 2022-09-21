@@ -80,6 +80,10 @@ class DogeWalletService: WalletService {
         return type(of: self).currencyLogo
     }
     
+    var tokenNetworkSymbol: String {
+        return "DOGE"
+    }
+    
     private (set) var transactionFee: Decimal = 1.0 // 1 DOGE per transaction
     
     static let kvsAddress = "doge:address"
