@@ -172,7 +172,6 @@ class BtcTransferViewController: TransferViewControllerBase {
             
             if recipientIsReadonly {
                 $0.disabled = true
-                $0.cell.textField.isEnabled = false
             }
         }.onChange { [weak self] row in
             if let text = row.value {

@@ -195,9 +195,16 @@ class AdmTransferViewController: TransferViewControllerBase {
                 $0.disabled = true
                 prefix.textColor = UIColor.lightGray
             }
-        }.cellUpdate { cell, _ in
+        }.cellUpdate { [weak self] cell, _ in
             if let text = cell.textField.text {
                 cell.textField.text = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
+
+                guard self?.recipientIsReadonly == false else { return }
+        
+                cell.textField.leftView?.subviews.forEach { view in
+                    guard let label = view as? UILabel else { return }
+                    label.textColor = UIColor.adamant.primary
+                }
             }
         }.onChange { [weak self] row in
             if let skip = self?.skipValueChange, skip {

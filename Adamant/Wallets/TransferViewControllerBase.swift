@@ -268,17 +268,9 @@ class TransferViewControllerBase: FormViewController {
         
         // MARK: Button section
         form +++ Section()
-        <<< ButtonRow() { [weak self] in
+        <<< ButtonRow() {
             $0.title = BaseRows.sendButton.localized
             $0.tag = BaseRows.sendButton.tag
-            
-//            $0.disabled = Condition.function([BaseRows.address.tag, BaseRows.amount.tag]) { [weak self] form -> Bool in
-//                guard let isValid = self?.formIsValid() else {
-//                    return true
-//                }
-//
-//                return !isValid
-//            }
         }.onCellSelection { [weak self] (cell, row) in
             self?.confirmSendFunds()
         }
@@ -396,7 +388,7 @@ class TransferViewControllerBase: FormViewController {
         }
     }
     
-    func validateForm() {
+    func validateForm(force: Bool = false) {
         guard let service = service, let wallet = service.wallet else {
             return
         }
@@ -413,6 +405,10 @@ class TransferViewControllerBase: FormViewController {
             // Eureka looses decimal precision when deserializing numbers by itself.
             // Try to get raw value and deserialize it
             if let input = row.cell.textInput as? UITextField, let raw = input.text {
+                if raw.isEmpty && force {
+                    markRow(row, valid: false)
+                    return
+                }
                 // NumberFormatter.number(from: string).decimalValue loses precision.
                 // Creating decimal with Decimal(string: "") drops decimal part, if wrong locale used
                 var gotValue = false
@@ -461,10 +457,6 @@ class TransferViewControllerBase: FormViewController {
                 row.updateCell()
             }
         }
-        
-//        if let row: ButtonRow = form.rowBy(tag: BaseRows.sendButton.tag) {
-//            row.evaluateDisabled()
-//        }
     }
     
     func markRow(_ row: BaseRowType, valid: Bool) {
@@ -472,7 +464,10 @@ class TransferViewControllerBase: FormViewController {
     }
 
     func markAddres(isValid: Bool) {
-        guard let row: TextRow = form.rowBy(tag: BaseRows.address.tag) else {
+        guard
+            let row: TextRow = form.rowBy(tag: BaseRows.address.tag),
+            !recipientIsReadonly
+        else {
             return
         }
 
@@ -510,7 +505,7 @@ class TransferViewControllerBase: FormViewController {
     
     private func confirmSendFunds() {
         validateAddress()
-        validateForm()
+        validateForm(force: true)
 
         guard
             let recipientAddress = recipientAddress,
@@ -837,17 +832,9 @@ extension TransferViewControllerBase {
             return row
             
         case .sendButton:
-            return ButtonRow() { [weak self] in
+            return ButtonRow() {
                 $0.title = BaseRows.sendButton.localized
                 $0.tag = BaseRows.sendButton.tag
-                
-//                $0.disabled = Condition.function([BaseRows.address.tag, BaseRows.amount.tag]) { [weak self] form -> Bool in
-//                    guard let isValid = self?.formIsValid() else {
-//                        return true
-//                    }
-//
-//                    return !isValid
-//                }
             }.onCellSelection { [weak self] (cell, row) in
                 self?.confirmSendFunds()
             }
