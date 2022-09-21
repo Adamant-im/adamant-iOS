@@ -122,7 +122,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
             
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
-                row.reload()
+                row.updateCell()
             }
         }
         get {
@@ -175,7 +175,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
             
             if recipientIsReadonly {
                 $0.disabled = true
-                //                prefix.isEnabled = false
+                prefix.textColor = UIColor.lightGray
             }
             }.cellUpdate { (cell, row) in
                 if let text = cell.textField.text {
@@ -203,15 +203,8 @@ class ERC20TransferViewController: TransferViewControllerBase {
                         }
                     }
                 }
-                
-                self?.validateForm()
-        }.onCellSelection { [weak self] (cell, row) in
-            if let recipient = self?.recipientAddress {
-                let text = recipient
-                self?.shareValue(text, from: cell)
-            }
-        }.cellUpdate { [weak self] _, _ in
-            self?.validateForm()
+        }.onCellSelection { [weak self] (cell, _) in
+            self?.shareValue(self?.recipientAddress, from: cell)
         }
         
         return row
@@ -234,7 +227,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
         case .valid:
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = parsedAddress
-                row.reload()
+                row.updateCell()
             }
             
             return true

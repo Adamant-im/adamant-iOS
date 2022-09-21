@@ -139,7 +139,7 @@ class BtcTransferViewController: TransferViewControllerBase {
             
             if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
-                row.reload()
+                row.updateCell()
             }
         }
         get {
@@ -183,15 +183,8 @@ class BtcTransferViewController: TransferViewControllerBase {
                 self?.skipValueChange = false
                 return
             }
-
-            self?.validateForm()
-        }.onCellSelection { [weak self] (cell, row) in
-            if let recipient = self?.recipientAddress {
-                let text = recipient
-                self?.shareValue(text, from: cell)
-            }
-        }.cellUpdate { [weak self] _, _ in
-            self?.validateForm()
+        }.onCellSelection { [weak self] (cell, _) in
+            self?.shareValue(self?.recipientAddress, from: cell)
         }
         
         return row

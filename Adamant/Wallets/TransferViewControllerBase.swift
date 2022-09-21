@@ -179,6 +179,7 @@ class TransferViewControllerBase: FormViewController {
             if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = recipientAddress
                 row.updateCell()
+                validateForm()
             }
         }
     }
@@ -271,17 +272,13 @@ class TransferViewControllerBase: FormViewController {
             $0.title = BaseRows.sendButton.localized
             $0.tag = BaseRows.sendButton.tag
             
-            $0.disabled = Condition.function([BaseRows.address.tag, BaseRows.amount.tag]) { [weak self] form -> Bool in
-                guard let service = self?.service, let wallet = service.wallet, wallet.balance > service.transactionFee else {
-                    return true
-                }
-                
-                guard let isValid = self?.formIsValid() else {
-                    return true
-                }
-                
-                return !isValid
-            }
+//            $0.disabled = Condition.function([BaseRows.address.tag, BaseRows.amount.tag]) { [weak self] form -> Bool in
+//                guard let isValid = self?.formIsValid() else {
+//                    return true
+//                }
+//
+//                return !isValid
+//            }
         }.onCellSelection { [weak self] (cell, row) in
             self?.confirmSendFunds()
         }
@@ -369,6 +366,26 @@ class TransferViewControllerBase: FormViewController {
     
 
     // MARK: - Tools
+
+    @discardableResult
+    func validateAddress() -> Bool {
+        guard let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) else {
+            recipientAddress = nil
+            recipientAddressIsValid = false
+            return false
+        }
+
+        if let address = row.value, validateRecipient(address) {
+            recipientAddress = address
+            markAddres(isValid: true)
+            recipientAddressIsValid = true
+            return true
+        } else {
+            markAddres(isValid: false)
+            recipientAddressIsValid = false
+            return false
+        }
+    }
     
     func validateForm() {
         guard let service = service, let wallet = service.wallet else {
@@ -381,20 +398,6 @@ class TransferViewControllerBase: FormViewController {
         
         if let row: DecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
             markRow(row, valid: wallet.balance > service.transactionFee)
-        }
-        
-        if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
-            if let address = row.value, validateRecipient(address) {
-                recipientAddress = address
-                markAddres(isValid: true)
-                recipientAddressIsValid = true
-            } else {
-                markAddres(isValid: false)
-                recipientAddressIsValid = false
-            }
-        } else {
-            recipientAddress = nil
-            recipientAddressIsValid = false
         }
         
         if let row: DecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
@@ -450,9 +453,9 @@ class TransferViewControllerBase: FormViewController {
             }
         }
         
-        if let row: ButtonRow = form.rowBy(tag: BaseRows.sendButton.tag) {
-            row.evaluateDisabled()
-        }
+//        if let row: ButtonRow = form.rowBy(tag: BaseRows.sendButton.tag) {
+//            row.evaluateDisabled()
+//        }
     }
     
     func markRow(_ row: BaseRowType, valid: Bool) {
@@ -497,6 +500,9 @@ class TransferViewControllerBase: FormViewController {
     // MARK: - Send Actions
     
     private func confirmSendFunds() {
+        validateAddress()
+        validateForm()
+
         guard
             let recipientAddress = recipientAddress,
             recipientAddressIsValid,
@@ -598,14 +604,24 @@ class TransferViewControllerBase: FormViewController {
     }
     
     func formIsValid() -> Bool {
-        if let recipient = recipientAddress, validateRecipient(recipient),
-           let amount = amount, validateAmount(amount),
-           recipientAddressIsValid,
-           service?.isTransactionFeeValid ?? true {
-            return true
-        } else {
+        guard
+            let service = service,
+            let wallet = service.wallet,
+            wallet.balance > service.transactionFee
+        else {
             return false
         }
+
+        guard
+            let recipient = recipientAddress, validateRecipient(recipient),
+            let amount = amount, validateAmount(amount),
+            recipientAddressIsValid,
+            service.isTransactionFeeValid
+        else {
+            return false
+        }
+
+        return true
     }
     
     /// Recipient section footer. You can override this to provide custom set of elements.
@@ -816,17 +832,13 @@ extension TransferViewControllerBase {
                 $0.title = BaseRows.sendButton.localized
                 $0.tag = BaseRows.sendButton.tag
                 
-                $0.disabled = Condition.function([BaseRows.address.tag, BaseRows.amount.tag]) { [weak self] form -> Bool in
-                    guard let service = self?.service, let wallet = service.wallet, wallet.balance > service.transactionFee else {
-                        return true
-                    }
-                    
-                    guard let isValid = self?.formIsValid() else {
-                        return true
-                    }
-                    
-                    return !isValid
-                }
+//                $0.disabled = Condition.function([BaseRows.address.tag, BaseRows.amount.tag]) { [weak self] form -> Bool in
+//                    guard let isValid = self?.formIsValid() else {
+//                        return true
+//                    }
+//
+//                    return !isValid
+//                }
             }.onCellSelection { [weak self] (cell, row) in
                 self?.confirmSendFunds()
             }
@@ -835,11 +847,17 @@ extension TransferViewControllerBase {
     
     // MARK: - Tools
     
-    func shareValue(_ value: String, from: UIView) {
+    func shareValue(_ value: String?, from: UIView) {
+        guard
+            let value = value,
+            !value.isEmpty,
+            recipientIsReadonly
+        else {
+            return
+        }
+
         dialogService.presentShareAlertFor(string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: from) { [weak self] in
-            guard let tableView = self?.tableView else {
-                return
-            }
+            guard let tableView = self?.tableView else { return }
             
             if let indexPath = tableView.indexPathForSelectedRow {
                 tableView.deselectRow(at: indexPath, animated: true)

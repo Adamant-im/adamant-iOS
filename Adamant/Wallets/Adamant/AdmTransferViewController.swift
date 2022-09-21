@@ -162,7 +162,7 @@ class AdmTransferViewController: TransferViewControllerBase {
             
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = _recipient
-                row.reload()
+                row.updateCell()
             }
         }
         get {
@@ -193,13 +193,12 @@ class AdmTransferViewController: TransferViewControllerBase {
             $0.cell.textField.autocorrectionType = .no
             if recipientIsReadonly {
                 $0.disabled = true
-//                prefix.isEnabled = false
+                prefix.textColor = UIColor.lightGray
             }
-        }.cellUpdate { [weak self] cell, _ in
+        }.cellUpdate { cell, _ in
             if let text = cell.textField.text {
                 cell.textField.text = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
             }
-            self?.validateForm()
         }.onChange { [weak self] row in
             if let skip = self?.skipValueChange, skip {
                 self?.skipValueChange = false
@@ -225,13 +224,8 @@ class AdmTransferViewController: TransferViewControllerBase {
                     }
                 }
             }
-            
-            self?.validateForm()
-        }.onCellSelection { [weak self] (cell, row) in
-            if let recipient = self?.recipientAddress {
-                let text = recipient
-                self?.shareValue(text, from: cell)
-            }
+        }.onCellSelection { [weak self] (cell, _) in
+            self?.shareValue(self?.recipientAddress, from: cell)
         }
         
         return row
@@ -258,19 +252,19 @@ class AdmTransferViewController: TransferViewControllerBase {
         if let admAddress = address.getAdamantAddress() {
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = admAddress.address
-                row.reload()
+                row.updateCell()
             }
             
             if let row: DecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
                 row.value = admAddress.amount
-                row.reload()
+                row.updateCell()
                 reloadFormData()
             }
             return true
         } else if let admAddress = address.getLegacyAdamantAddress() {
             if let row: TextRow = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = admAddress.address
-                row.reload()
+                row.updateCell()
             }
             return true
         }
