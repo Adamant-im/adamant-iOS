@@ -65,6 +65,10 @@ class BtcWalletService: WalletService {
     var tokenLogo: UIImage {
         return type(of: self).currencyLogo
     }
+
+    var tokenNetworkSymbol: String {
+        return "BTC"
+    }
     
     var wallet: WalletAccount? { return btcWallet }
     
