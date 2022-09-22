@@ -161,6 +161,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 $0.cell.backgroundColor = UIColor.adamant.cellColor
             }.cellUpdate { (cell, _) in
                 cell.accessoryType = .disclosureIndicator
+                if #unavailable(iOS 14.0) {
+                    cell.textLabel?.attributedText = label
+                }
             }.onCellSelection { [weak self] (_, row) in
                 guard let service = self?.service as? WalletServiceWithSend else {
                     return
