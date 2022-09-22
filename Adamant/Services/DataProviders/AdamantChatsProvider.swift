@@ -289,15 +289,19 @@ extension AdamantChatsProvider {
                         self?.isInitiallySynced = true
                     }
                     self?.setState(.upToDate, previous: prevState)
+                    self?.preLoadChats(array, address: address)
                     completion?()
                 })
             }
             
-            let preLoadChatsCount = self?.preLoadChatsCount ?? 0
-            array.prefix(preLoadChatsCount).forEach { transaction in
-                let recipientAddress = transaction.recipientId == address ? transaction.senderId : transaction.recipientId
-                self?.getChatMessages(with: recipientAddress, offset: nil, completion: nil)
-            }
+        }
+    }
+    
+    func preLoadChats(_ array: [Transaction], address: String) {
+        let preLoadChatsCount = preLoadChatsCount
+        array.prefix(preLoadChatsCount).forEach { transaction in
+            let recipientAddress = transaction.recipientId == address ? transaction.senderId : transaction.recipientId
+            getChatMessages(with: recipientAddress, offset: nil, completion: nil)
         }
     }
     
@@ -1510,7 +1514,12 @@ extension AdamantChatsProvider {
         transaction.height = height
         transaction.blockId = blockId
         transaction.confirmations = confirmations
-        self.unconfirmedTransactions.removeValue(forKey: id)
+        
+        if blockId.isEmpty {
+            transaction.statusEnum = .delivered
+        } else {
+            self.unconfirmedTransactions.removeValue(forKey: id)
+        }
         
         if let lastHeight = receivedLastHeight, lastHeight < height {
             self.receivedLastHeight = height
