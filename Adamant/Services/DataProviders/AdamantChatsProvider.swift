@@ -41,9 +41,10 @@ class AdamantChatsProvider: ChatsProvider {
     public var isChatLoaded: [String : Bool] = [:]
     public var chatMaxMessages: [String : Int] = [:]
     public var chatLoadedMessages: [String : Int] = [:]
-    private var connection: AdamantConnection?
-    private var isConnectedToTheInthernet = true
-    private var isRestoredConnectionToTheInthernet: (() -> Void)?
+    private var chatsLoading: [String] = []
+    private let preLoadChatsCount = 5
+    private var isConnectedToTheInternet = true
+    private var onConnectionToTheInternetRestored: (() -> Void)?
     
     private(set) var isInitiallySynced: Bool = false {
         didSet {
@@ -123,7 +124,7 @@ class AdamantChatsProvider: ChatsProvider {
             }
         }
         
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
             if let previousAppState = self?.previousAppState,
                previousAppState == .background {
                 self?.previousAppState = .active
@@ -131,7 +132,7 @@ class AdamantChatsProvider: ChatsProvider {
             }
         }
         
-        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
             if self?.isInitiallySynced ?? false {
                 self?.previousAppState = .background
             }
@@ -143,20 +144,21 @@ class AdamantChatsProvider: ChatsProvider {
             queue: nil
         ) { [weak self] notification in
             guard let connection = notification
-                .userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection
+                .userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool
             else {
                 return
             }
-            self?.connection = connection
-            switch self?.connection {
-            case .some(.cellular), .some(.wifi):
-                if self?.isConnectedToTheInthernet == false {
-                    self?.isRestoredConnectionToTheInthernet?()
-                }
-                self?.isConnectedToTheInthernet = true
-            case nil, .some(.none):
-                self?.isConnectedToTheInthernet = false
+            
+            guard connection == true else {
+                self?.isConnectedToTheInternet = false
+                return
             }
+            
+            if self?.isConnectedToTheInternet == false {
+                self?.onConnectionToTheInternetRestored?()
+                self?.onConnectionToTheInternetRestored = nil
+            }
+            self?.isConnectedToTheInternet = true
         }
     }
     
@@ -173,7 +175,7 @@ class AdamantChatsProvider: ChatsProvider {
         
         if notify {
             switch prevState {
-            case .failedToUpdate:
+            case .failedToUpdate(_):
                 NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: self, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
                                                                                                                     AdamantUserInfoKey.TransfersProvider.prevState: prevState])
                 
@@ -186,6 +188,7 @@ class AdamantChatsProvider: ChatsProvider {
         }
     }
 }
+
 
 // MARK: - DataProvider
 extension AdamantChatsProvider {
@@ -235,7 +238,7 @@ extension AdamantChatsProvider {
         setState(.empty, previous: prevState, notify: notify)
     }
     
-    func getChatRooms(offset: Int?, completion: (() -> Void)?) {
+    func getChatRooms(offset: Int?, completion: (() ->())?) {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
             completion?()
@@ -268,7 +271,7 @@ extension AdamantChatsProvider {
                 self?.roomsLoadedCount = chatrooms.chats?.count ?? 0
             }
             
-            var array = [Transaction]()
+            var array = Array<Transaction>()
             chatrooms.chats?.forEach({ room in
                 if let last = room.lastTransaction {
                     array.append(last)
@@ -289,10 +292,16 @@ extension AdamantChatsProvider {
                     completion?()
                 })
             }
+            
+            let preLoadChatsCount = self?.preLoadChatsCount ?? 0
+            array.prefix(preLoadChatsCount).forEach { transaction in
+                let recipientAddress = transaction.recipientId == address ? transaction.senderId : transaction.recipientId
+                self?.getChatMessages(with: recipientAddress, offset: nil, completion: nil)
+            }
         }
     }
     
-    func apiGetChatrooms(address: String, offset: Int?, completion: ((ChatRooms?) -> Void)?) {
+    func apiGetChatrooms(address: String, offset: Int?, completion: ((ChatRooms?) ->())?) {
         apiService.getChatRooms(address: address, offset: offset) { [weak self] result in
             switch result {
             case .success(let chatrooms):
@@ -300,16 +309,20 @@ extension AdamantChatsProvider {
             case .failure(let error):
                 switch error {
                 case .networkError:
-                    if self?.isConnectedToTheInthernet ?? false {
-                        self?.apiGetChatrooms(address: address, offset: offset) { result in
-                            completion?(result)
-                        }
+                    let getChatrooms: () -> Void = {
+                        self?.apiGetChatrooms(
+                            address: address,
+                            offset: offset,
+                            completion: completion
+                        )
+                    }
+                    if self?.isConnectedToTheInternet == true {
+                        DispatchQueue.global().asyncAfter(
+                            deadline: .now() + requestRepeatDelay,
+                            execute: getChatrooms
+                        )
                     } else {
-                        self?.isRestoredConnectionToTheInthernet = {
-                            self?.apiGetChatrooms(address: address, offset: offset) { result in
-                                completion?(result)
-                            }
-                        }
+                        self?.addOnConnectionToTheInternetRestored(task: getChatrooms)
                     }
                 default:
                     completion?(nil)
@@ -318,10 +331,10 @@ extension AdamantChatsProvider {
         }
     }
     
-    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) -> Void)?) {
+    func getChatMessages(with addressRecipient: String, offset: Int?, completion: (() -> Void)?) {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
-            completion?(0)
+            completion?()
             return
         }
         
@@ -330,15 +343,21 @@ extension AdamantChatsProvider {
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = self.stack.container.viewContext
       
+        if !isChatLoaded.keys.contains(addressRecipient) {
+            chatsLoading.append(addressRecipient)
+        }
         apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] chatroom in
             self?.processingQueue.async {
                 self?.isChatLoaded[addressRecipient] = true
                 self?.chatMaxMessages[addressRecipient] = chatroom?.count ?? 0
                 let loadedCount = self?.chatLoadedMessages[addressRecipient] ?? 0
                 self?.chatLoadedMessages[addressRecipient] = loadedCount + (chatroom?.messages?.count ?? 0)
+                if let index = self?.chatsLoading.firstIndex(of: addressRecipient) {
+                    self?.chatsLoading.remove(at: index)
+                }
                 guard let transactions = chatroom?.messages,
                       transactions.count > 0 else {
-                    completion?(0)
+                    completion?()
                     return
                 }
                 self?.process(messageTransactions: transactions,
@@ -347,13 +366,14 @@ extension AdamantChatsProvider {
                               context: privateContext,
                               contextMutatingSemaphore: cms,
                               completion: {
-                    completion?(transactions.count)
+                    completion?()
+                    NotificationCenter.default.post(name: .AdamantChatsProvider.initiallyLoadedMessages, object: addressRecipient)
                 })
             }
         }
     }
     
-    func apiGetChatMessages(address: String, addressRecipient: String, offset: Int?, completion: ((ChatRooms?) -> Void)?) {
+    func apiGetChatMessages(address: String, addressRecipient: String, offset: Int?, completion: ((ChatRooms?) ->())?) {
         apiService.getChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] result in
             switch result {
             case .success(let chatroom):
@@ -361,16 +381,21 @@ extension AdamantChatsProvider {
             case .failure(let error):
                 switch error {
                 case .networkError:
-                    if self?.isConnectedToTheInthernet ?? false {
-                        self?.apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { result in
-                            completion?(result)
-                        }
+                    let getChatMessages: () -> Void = {
+                        self?.apiGetChatMessages(
+                            address: address,
+                            addressRecipient: addressRecipient,
+                            offset: offset,
+                            completion: completion
+                        )
+                    }
+                    if self?.isConnectedToTheInternet == true {
+                        DispatchQueue.global().asyncAfter(
+                            deadline: .now() + requestRepeatDelay,
+                            execute: getChatMessages
+                        )
                     } else {
-                        self?.isRestoredConnectionToTheInthernet = {
-                            self?.apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { result in
-                                completion?(result)
-                            }
-                        }
+                        self?.addOnConnectionToTheInternetRestored(task: getChatMessages)
                     }
                 default:
                     completion?(nil)
@@ -404,7 +429,7 @@ extension AdamantChatsProvider {
                                  context: privateContext,
                                  contextMutatingSemaphore: cms)
                 }
-            case .failure:
+            case .failure(_):
                 break
             }
         }
@@ -500,13 +525,13 @@ extension AdamantChatsProvider {
                     case .accountNotFound:
                         err = .accountNotFound(address)
                         
-                    case .serverError:
+                    case .serverError(_):
                         err = .serverError(error)
                         
                     case .internalError(let message, _):
                         err = .dependencyError(message)
                         
-                    case .networkError:
+                    case .networkError(_):
                         err = .networkError
                         
                     case .requestCancelled:
@@ -521,7 +546,12 @@ extension AdamantChatsProvider {
             }
         }
     }
+    
+    func isChatLoading(with addressRecipient: String) -> Bool {
+        return chatsLoading.contains(addressRecipient)
+    }
 }
+
 
 // MARK: - Sending messages {
 extension AdamantChatsProvider {
@@ -671,6 +701,7 @@ extension AdamantChatsProvider {
         prepareAndSendChatTransaction(transaction, in: context, recipientId: recipientId, type: type, keypair: keypair, from: chatroom, completion: completion)
     }
     
+    
     /// Transaction must be in passed context
     private func prepareAndSendChatTransaction(_ transaction: ChatTransaction, in context: NSManagedObjectContext, recipientId: String, type: ChatType, keypair: Keypair, from chatroom: Chatroom? = nil, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         // MARK: 1. Get account
@@ -694,7 +725,7 @@ extension AdamantChatsProvider {
             completion(.failure(.accountNotFound(recipientId)))
             return
             
-        case .notInitiated, .dummy:
+        case .notInitiated(_), .dummy(_):
             completion(.failure(.accountNotInitiated(recipientId)))
             return
             
@@ -702,7 +733,7 @@ extension AdamantChatsProvider {
             completion(.failure(.serverError(error)))
             return
             
-        case .networkError:
+        case .networkError(_):
             completion(.failure(ChatsProviderError.networkError))
             return
         }
@@ -816,6 +847,7 @@ extension AdamantChatsProvider {
         
         try? privateContext.save()
         
+        
         // MARK: 3. Send
         sendTransaction(transaction, type: .message, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
             switch result {
@@ -862,6 +894,7 @@ extension AdamantChatsProvider {
         }
     }
     
+    
     // MARK: - Logic
     
     /// Send transaction.
@@ -902,7 +935,7 @@ extension AdamantChatsProvider {
                 
                 let serviceError: ChatsProviderError
                 switch error {
-                case .networkError:
+                case .networkError(_):
                     serviceError = .networkError
                     
                 case .accountNotFound:
@@ -926,6 +959,7 @@ extension AdamantChatsProvider {
         }
     }
 }
+
 
 // MARK: - Getting messages
 extension AdamantChatsProvider {
@@ -1062,13 +1096,14 @@ extension AdamantChatsProvider {
         }
     }
     
+    
     /// - Returns: New unread messagess ids
     private func process(messageTransactions: [Transaction],
                          senderId: String,
                          privateKey: String,
                          context: NSManagedObjectContext,
                          contextMutatingSemaphore: DispatchSemaphore,
-                         completion: (() -> Void)? = nil) {
+                         completion: (() -> ())? = nil) {
         struct DirectionedTransaction {
             let transaction: Transaction
             let isOut: Bool
@@ -1077,6 +1112,7 @@ extension AdamantChatsProvider {
         // MARK: 1. Gather partner keys
         let mapped = messageTransactions.map({ DirectionedTransaction(transaction: $0, isOut: $0.senderId == senderId) })
         let grouppedTransactions = Dictionary(grouping: mapped, by: { $0.isOut ? $0.transaction.recipientId : $0.transaction.senderId })
+        
         
         // MARK: 2. Gather Accounts
         var partners: [CoreDataAccount:[DirectionedTransaction]] = [:]
@@ -1287,7 +1323,7 @@ extension AdamantChatsProvider {
             }
         }
         
-        // MARK: 7. Last message height
+        // MARK 7. Last message height
         highSemaphore.wait()
         if let lastHeight = receivedLastHeight {
             if lastHeight < height {
@@ -1300,6 +1336,7 @@ extension AdamantChatsProvider {
         completion?()
     }
 }
+
 
 // MARK: - Tools
 extension AdamantChatsProvider {
@@ -1380,6 +1417,7 @@ extension AdamantChatsProvider {
             return nil
         }
         
+        
         // MARK: Decode message, message must contain data
         if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)?.trimmingCharacters(in: .whitespacesAndNewlines) {
             if (decodedMessage.isEmpty && transaction.amount > 0) || !decodedMessage.isEmpty {
@@ -1458,6 +1496,7 @@ extension AdamantChatsProvider {
         return messageTransaction
     }
     
+    
     /// Confirm transactions
     ///
     /// - Parameters:
@@ -1499,4 +1538,13 @@ extension AdamantChatsProvider {
             }
         }
     }
+    
+    private func addOnConnectionToTheInternetRestored(task: @escaping () -> Void) {
+        onConnectionToTheInternetRestored = { [onConnectionToTheInternetRestored] in
+            onConnectionToTheInternetRestored?()
+            task()
+        }
+    }
 }
+
+private let requestRepeatDelay: TimeInterval = 2

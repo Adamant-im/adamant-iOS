@@ -202,6 +202,7 @@ protocol WalletService: AnyObject {
     var tokenSymbol: String { get }
     var tokenName: String { get }
     var tokenLogo: UIImage { get }
+    var tokenNetworkSymbol: String { get }
 	
 	// MARK: Notifications
 	

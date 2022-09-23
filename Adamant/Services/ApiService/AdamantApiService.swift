@@ -64,7 +64,7 @@ class AdamantApiService: ApiService {
     // MARK: - Properties
     
     private var _lastRequestTimeDelta: TimeInterval?
-    private var lastRequestTimeDeltaSemaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
+    private var semaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
     
     private(set) var currentNodes: [Node] = [] {
         didSet {
@@ -75,15 +75,15 @@ class AdamantApiService: ApiService {
     
     private(set) var lastRequestTimeDelta: TimeInterval? {
         get {
-            defer { lastRequestTimeDeltaSemaphore.signal() }
-            lastRequestTimeDeltaSemaphore.wait()
+            defer { semaphore.signal() }
+            semaphore.wait()
             
             return _lastRequestTimeDelta
         }
         set {
-            lastRequestTimeDeltaSemaphore.wait()
+            semaphore.wait()
             _lastRequestTimeDelta = newValue
-            lastRequestTimeDeltaSemaphore.signal()
+            semaphore.signal()
         }
     }
     
@@ -172,10 +172,7 @@ class AdamantApiService: ApiService {
         completion: @escaping (ApiServiceResult<T>) -> Void
     ) {
         guard let node = nodes.first else {
-            let error = InternalError.endpointBuildFailed.apiServiceErrorWith(
-                error: InternalError.unknownError
-            )
-            completion(.failure(error))
+            completion(.failure(.networkError(error: InternalError.unknownError)))
             return
         }
         
@@ -287,7 +284,9 @@ class AdamantApiService: ApiService {
     }
     
     private func updateCurrentNodes() {
+        semaphore.wait()
         currentNodes = nodesSource?.getAllowedNodes(needWS: false) ?? []
+        semaphore.signal()
     }
     
     private func sendCurrentNodeUpdateNotification() {

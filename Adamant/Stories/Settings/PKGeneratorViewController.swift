@@ -127,6 +127,15 @@ class PKGeneratorViewController: FormViewController {
         passphraseSection.append(contentsOf: [alertRow, passphraseRow, generateButton])
         
         form.append(contentsOf: [pkSection, passphraseSection])
+        
+        setColors()
+    }
+    
+    // MARK: - Other
+    
+    func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
     
     // MARK: - PrivateKey tools

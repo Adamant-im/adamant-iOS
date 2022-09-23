@@ -25,6 +25,10 @@ class DashWalletService: WalletService {
         return type(of: self).currencyLogo
     }
     
+    var tokenNetworkSymbol: String {
+        return "DASH"
+    }
+    
     var wallet: WalletAccount? { return dashWallet }
     
     var walletViewController: WalletViewController {

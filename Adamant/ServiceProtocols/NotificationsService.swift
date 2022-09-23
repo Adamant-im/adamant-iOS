@@ -22,15 +22,6 @@ extension String.adamantLocalized.notifications {
     private init() {}
 }
 
-extension StoreKey {
-    struct notificationsService {
-        static let notificationsMode = "notifications.mode"
-        static let customBadgeNumber = "notifications.number"
-        
-        private init() {}
-    }
-}
-
 enum NotificationsMode: Int {
     case disabled
     case backgroundFetch
@@ -46,6 +37,60 @@ enum NotificationsMode: Int {
             
         case .push:
             return NSLocalizedString("Notifications.Mode.ApplePush", comment: "Notifications: Use Apple Push notifications")
+        }
+    }
+}
+
+enum NotificationSound: String {
+    case none
+    case noteDefault
+    case inputDefault
+    case proud
+    case relax
+    case success
+    
+    var tag: String {
+        switch self {
+        case .none: return "none"
+        case .noteDefault: return "def"
+        case .inputDefault: return "ct"
+        case .proud: return "pr"
+        case .relax: return "rl"
+        case .success: return "sh"
+        }
+    }
+    
+    var fileName: String {
+        switch self {
+        case .none: return ""
+        case .noteDefault: return "default.mp3"
+        case .inputDefault: return "notification.mp3"
+        case .proud: return "so-proud-notification.mp3"
+        case .relax: return "relax-message-tone.mp3"
+        case .success: return "short-success.mp3"
+        }
+    }
+    
+    var localized: String {
+        switch self {
+        case .none: return "None"
+        case .noteDefault: return "Tri-tone (iOS Default)"
+        case .inputDefault: return "Input"
+        case .proud: return "Proud"
+        case .relax: return "Relax"
+        case .success: return "Success"
+        }
+    }
+    
+    init?(fileName: String) {
+        switch fileName {
+        case "notification.mp3": self = .inputDefault
+        case "default.mp3": self = .noteDefault
+        case "so-proud-notification.mp3": self = .proud
+        case "relax-message-tone.mp3": self = .relax
+        case "short-success.mp3": self = .success
+        case "": self = .none
+        default: self = .inputDefault
         }
     }
 }
@@ -92,10 +137,11 @@ extension Notification.Name {
     struct AdamantNotificationService {
         /// Raised when user has logged out.
         static let notificationsModeChanged = Notification.Name("adamant.notificationService.notificationsMode")
-        
+        static let notificationsSoundChanged = Notification.Name("adamant.notificationService.notificationsSound")
         private init() {}
     }
 }
+
 
 extension AdamantUserInfoKey {
     struct NotificationsService {
@@ -104,6 +150,7 @@ extension AdamantUserInfoKey {
         private init() {}
     }
 }
+
 
 // MARK: - Protocol
 enum NotificationsServiceResult {
@@ -141,7 +188,9 @@ extension NotificationsServiceError: RichError {
 
 protocol NotificationsService: AnyObject {
     var notificationsMode: NotificationsMode { get }
+    var notificationsSound: NotificationSound { get }
     
+    func setNotificationSound(_ sound: NotificationSound)
     func setNotificationsMode(_ mode: NotificationsMode, completion: ((NotificationsServiceResult) -> Void)?)
     
     func showNotification(title: String, body: String, type: AdamantNotificationType)

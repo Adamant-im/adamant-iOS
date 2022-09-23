@@ -63,8 +63,18 @@ class OnboardViewController: UIViewController {
         
         onboarding.delegate = self
         onboarding.dataSource = self
-        onboarding.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "stripeBg"))//UIColor.adamant.background
+        setColors()
     }
+    
+    // MARK: - Other
+    
+    private func setColors() {
+        agreeSwitch?.onTintColor = UIColor.adamant.switchColor
+        onboarding.backgroundColor = UIColor.adamant.welcomeBackgroundColor
+        view.backgroundColor = UIColor.adamant.welcomeBackgroundColor
+    }
+    
+    // MARK: - Actions
     
     @objc func handleSkip() {
         guard self.agreeSwitch?.isOn == true else {

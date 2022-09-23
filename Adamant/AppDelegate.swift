@@ -119,8 +119,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 tabBarAppearance.configureWithDefaultBackground()
                 UITabBar.appearance().standardAppearance = tabBarAppearance
 
+                let navigationBarAppearance = UINavigationBarAppearance()
+                navigationBarAppearance.configureWithDefaultBackground()
+                UINavigationBar.appearance().standardAppearance = navigationBarAppearance
+                        
                 if #available(iOS 15.0, *) {
                     UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+                    UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
                 }
             }
             
@@ -151,30 +156,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let reachability = container.resolve(ReachabilityMonitor.self) {
             reachability.start()
             
-            switch reachability.connection {
-            case .cellular, .wifi:
+            if reachability.connection {
                 dialogService.dissmisNoConnectionNotification()
-                break
-                
-            case .none:
+            } else {
                 dialogService.showNoConnectionNotification()
                 repeater.pauseAll()
             }
             
             NotificationCenter.default.addObserver(forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: reachability, queue: nil) { [weak self] notification in
-                guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection,
+                guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool,
                     let repeater = self?.repeater else {
                         return
                 }
                 
-                switch connection {
-                case .cellular, .wifi:
+                if connection {
                     DispatchQueue.onMainSync {
                         self?.dialogService.dissmisNoConnectionNotification()
                     }
                     repeater.resumeAll()
-                    
-                case .none:
+                } else {
                     DispatchQueue.onMainSync {
                         self?.dialogService.showNoConnectionNotification()
                     }
@@ -252,17 +252,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             notificationService.removeAllDeliveredNotifications()
         }
         
-        if let connection = container.resolve(ReachabilityMonitor.self)?.connection {
-            switch connection {
-            case .wifi, .cellular:
-                repeater.resumeAll()
-                
-            case .none:
-                break
-            }
-        } else {
-            repeater.resumeAll()
-        }
+        guard container.resolve(ReachabilityMonitor.self)?.connection == true
+        else { return }
+        
+        repeater.resumeAll()
     }
 }
 

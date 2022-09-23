@@ -88,6 +88,8 @@ class BuyAndSellViewController: FormViewController {
         section.append(coinRow)
         
         form.append(section)
+        
+        setColors()
     }
     
     // MARK: - Tools
@@ -151,5 +153,12 @@ class BuyAndSellViewController: FormViewController {
                 }
             }
         }
+    }
+    
+    // MARK: - Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }

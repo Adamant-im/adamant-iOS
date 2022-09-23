@@ -89,6 +89,7 @@ class AdmWalletViewController: WalletViewControllerBase {
             $0.cell.imageView?.image = Rows.buyTokens.image
             $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons
             $0.cell.selectionStyle = .gray
+            $0.cell.backgroundColor = UIColor.adamant.cellColor
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
             if self.hideFreeTokensRow {
@@ -118,6 +119,7 @@ class AdmWalletViewController: WalletViewControllerBase {
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 return self?.hideFreeTokensRow ?? true
             })
+            $0.cell.backgroundColor = UIColor.adamant.cellColor
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
@@ -152,6 +154,8 @@ class AdmWalletViewController: WalletViewControllerBase {
             self?.updateRows()
             self?.tableView.reloadData()
         }
+        
+        setColors()
     }
     
     override func sendRowLocalizedLabel() -> String {
@@ -167,7 +171,7 @@ class AdmWalletViewController: WalletViewControllerBase {
             $0.tag = BaseRows.address.tag
             $0.title = BaseRows.address.localized
             $0.cell.selectionStyle = .gray
-
+            $0.cell.backgroundColor = UIColor.adamant.cellColor
             if let wallet = service?.wallet {
                 $0.value = wallet.address
             }

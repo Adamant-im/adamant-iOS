@@ -84,7 +84,7 @@ public extension NSMutableAttributedString {
 
         let stringRange = NSRange(location: 0, length: self.length)
         self.setBaseFont(baseFont: font)
-        self.addAttributes([.paragraphStyle: paragraphStyle], range: stringRange)
+        self.addAttributes([.paragraphStyle: paragraphStyle, .foregroundColor: UIColor.adamant.textColor], range: stringRange)
     }
     
     /// Replaces the base font with the given font while preserving traits like bold and italic

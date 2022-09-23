@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 
+
 // MARK: - Callbacks
 
 enum ChatsProviderResult {
@@ -71,7 +72,7 @@ extension ChatsProviderError: RichError {
         case .internalError(let error):
             return String.adamantLocalized.sharedErrors.internalError(message: error.localizedDescription)
             
-        case .accountNotInitiated:
+        case .accountNotInitiated(_):
             return String.adamantLocalized.sharedErrors.accountNotInitiated
         
         case .requestCancelled:
@@ -127,6 +128,7 @@ enum ValidateMessageResult {
     }
 }
 
+
 // MARK: - Notifications
 extension Notification.Name {
     struct AdamantChatsProvider {
@@ -135,9 +137,12 @@ extension Notification.Name {
 
         static let initiallySyncedChanged = Notification.Name("adamant.chatsProvider.initialSyncChanged")
 
+        static let initiallyLoadedMessages = Notification.Name("adamant.chatsProvider.initiallyLoadedMessages")
+        
         private init() {}
     }
 }
+
 
 // MARK: - Notification UserInfo keys
 extension AdamantUserInfoKey {
@@ -153,6 +158,7 @@ extension AdamantUserInfoKey {
     }
 }
 
+
 // MARK: - SecuredStore keys
 extension StoreKey {
     struct chatProvider {
@@ -163,6 +169,7 @@ extension StoreKey {
         static let notifiedMessagesCount = "chatProvider.notifiedCount"
     }
 }
+
 
 // MARK: - Protocol
 protocol ChatsProvider: DataProvider {
@@ -184,8 +191,9 @@ protocol ChatsProvider: DataProvider {
     // MARK: - Getting chats and messages
     func getChatroomsController() -> NSFetchedResultsController<Chatroom>
     func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
-    func getChatRooms(offset: Int?, completion: (() -> Void)?)
-    func getChatMessages(with addressRecipient: String, offset: Int?, completion: ((Int) -> Void)?)
+    func getChatRooms(offset: Int?, completion: (() ->())?)
+    func getChatMessages(with addressRecipient: String, offset: Int?, completion: (() -> Void)?)
+    func isChatLoading(with addressRecipient: String) -> Bool
     
     /// Unread messages controller. Sections by chatroom.
     func getUnreadMessagesController() -> NSFetchedResultsController<ChatTransaction>

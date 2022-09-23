@@ -55,6 +55,14 @@ class NotificationService: UNNotificationServiceExtension {
         let core = NativeAdamantCore()
         let api = ExtensionsApi(keychainStore: securedStore)
         
+        if let sound = securedStore.get(StoreKey.notificationsService.notificationsSound) {
+            if sound.isEmpty {
+                bestAttemptContent.sound = nil
+            } else {
+                bestAttemptContent.sound = UNNotificationSound(named: UNNotificationSoundName(sound))
+            }
+        }
+        
         // No passphrase - no point of trying to get and decode
         guard let passphrase = securedStore.get(passphraseStoreKey),
             let keypair = core.createKeypairFor(passphrase: passphrase) else {
