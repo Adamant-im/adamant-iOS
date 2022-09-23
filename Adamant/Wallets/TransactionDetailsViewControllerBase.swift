@@ -118,7 +118,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Properties
     
-    var transaction: TransactionDetails? = nil {
+    var transaction: TransactionDetails? {
         didSet {
             if !isFiatSet {
                 self.updateFiat()
@@ -167,7 +167,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }
             
         // MARK: Transaction number
-        let idRow = LabelRow() {
+        let idRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.transactionNumber.tag
             $0.title = Rows.transactionNumber.localized
@@ -196,7 +196,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(idRow)
         
         // MARK: Sender
-        let senderRow = DoubleDetailsRow() { [weak self] in
+        let senderRow = DoubleDetailsRow { [weak self] in
             $0.disabled = true
             $0.tag = Rows.from.tag
             $0.cell.titleLabel.text = Rows.from.localized
@@ -249,7 +249,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(senderRow)
         
         // MARK: Recipient
-        let recipientRow = DoubleDetailsRow() { [weak self] in
+        let recipientRow = DoubleDetailsRow { [weak self] in
             $0.disabled = true
             $0.tag = Rows.to.tag
             $0.cell.titleLabel.text = Rows.to.localized
@@ -305,7 +305,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(recipientRow)
         
         // MARK: Date
-        let dateRow = LabelRow() { [weak self] in
+        let dateRow = LabelRow { [weak self] in
             $0.disabled = true
             $0.tag = Rows.date.tag
             $0.title = Rows.date.localized
@@ -318,7 +318,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
             cell.textLabel?.textColor = UIColor.adamant.textColor
-        }.onCellSelection { [weak self] (cell, row) in
+        }.onCellSelection { [weak self] (cell, _) in
             if let value = self?.transaction?.dateValue {
                 let text = value.humanizedDateTimeFull()
                 self?.shareValue(text, from: cell)
@@ -335,7 +335,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(dateRow)
         
         // MARK: Amount
-        let amountRow = LabelRow() {
+        let amountRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.amount.tag
             $0.title = Rows.amount.localized
@@ -363,7 +363,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(amountRow)
         
         // MARK: Fee
-        let feeRow = LabelRow() {
+        let feeRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.fee.tag
             $0.title = Rows.fee.localized
@@ -392,7 +392,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(feeRow)
         
         // MARK: Confirmations
-        let confirmationsRow = LabelRow() {
+        let confirmationsRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.confirmations.tag
             $0.title = Rows.confirmations.localized
@@ -402,7 +402,6 @@ class TransactionDetailsViewControllerBase: FormViewController {
             } else {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
-            
             
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
@@ -423,7 +422,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(confirmationsRow)
         
         // MARK: Block
-        let blockRow = LabelRow() {
+        let blockRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.block.tag
             $0.title = Rows.block.localized
@@ -454,7 +453,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(blockRow)
             
         // MARK: Status
-        let statusRow = LabelRow() {
+        let statusRow = LabelRow {
             $0.tag = Rows.status.tag
             $0.title = Rows.status.localized
             $0.value = transaction?.transactionStatus?.localized
@@ -477,7 +476,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(statusRow)
         
         // MARK: Current Fiat
-        let currentFiatRow = LabelRow() {
+        let currentFiatRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.currentFiat.tag
             $0.title = Rows.currentFiat.localized
@@ -512,7 +511,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         form.append(detailsSection)
         
         // MARK: History Fiat
-        let fiatRow = LabelRow() {
+        let fiatRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.historyFiat.tag
             $0.title = Rows.historyFiat.localized
@@ -696,12 +695,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - To override
     
-    var currencySymbol: String? = nil
+    var currencySymbol: String?
     
     // MARK: - Fix this later
-    var senderName: String? = nil
-    var recipientName: String? = nil
-    var comment: String? = nil
+    var senderName: String?
+    var recipientName: String?
+    var comment: String?
     
     func explorerUrl(for transaction: TransactionDetails) -> URL? {
         return nil

@@ -14,8 +14,8 @@ class EulaViewController: UIViewController {
     @IBOutlet weak var eulaTextView: UITextView!
     @IBOutlet var buttons: [UIButton]!
     
-    var onAccept: (()->Void)?
-    var onDecline: (()->Void)?
+    var onAccept: (() -> Void)?
+    var onDecline: (() -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
