@@ -124,7 +124,6 @@ extension AdamantApiService {
                 }
                 completion(.success(forgingTime))
                 
-                
                 break
                 
             case .failure(let error):

@@ -37,14 +37,12 @@ class DelegatesListViewController: UIViewController {
         }
     }
     
-    
     // MARK: - Dependencies
     
     var apiService: ApiService!
     var accountService: AccountService!
     var dialogService: DialogService!
     var router: Router!
-    
     
     // MARK: - Constants
     
@@ -57,7 +55,7 @@ class DelegatesListViewController: UIViewController {
     // MARK: - Properties
     
     private (set) var delegates: [CheckedDelegate] = [CheckedDelegate]()
-    private var filteredDelegates: [Int]? = nil
+    private var filteredDelegates: [Int]?
     
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -65,7 +63,7 @@ class DelegatesListViewController: UIViewController {
         return refreshControl
     }()
     
-    private var forcedUpdateTimer: Timer? = nil
+    private var forcedUpdateTimer: Timer?
     
     private var searchController: UISearchController?
     private var loadingView: LoadingView?
@@ -76,7 +74,6 @@ class DelegatesListViewController: UIViewController {
     
     // Can start with 'u' or 'U', then 1-20 digits
     private let possibleAddressRegEx = try! NSRegularExpression(pattern: "^[uU]{0,1}\\d{1,20}$", options: [])
-    
     
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
@@ -225,7 +222,6 @@ class DelegatesListViewController: UIViewController {
     }
 }
 
-
 // MARK: - UITableView
 extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -276,7 +272,6 @@ extension DelegatesListViewController: UITableViewDataSource, UITableViewDelegat
     }
 }
 
-
 // MARK: - AdamantDelegateCellDelegate
 extension DelegatesListViewController: AdamantDelegateCellDelegate {
     func delegateCell(_ cell: AdamantDelegateCell, didChangeCheckedStateTo state: Bool) {
@@ -288,7 +283,6 @@ extension DelegatesListViewController: AdamantDelegateCellDelegate {
         updateVotePanel()
     }
 }
-
 
 // MARK: - Voting
 extension DelegatesListViewController {
@@ -313,7 +307,6 @@ extension DelegatesListViewController {
             self.dialogService.showWarning(withMessage: String.adamantLocalized.delegates.notEnoughtTokensForVote)
             return
         }
-        
         
         // MARK: Build request and update UI
         
@@ -353,14 +346,11 @@ extension DelegatesListViewController {
     }
 }
 
-
 // MARK: - UISearchResultsUpdating
 extension DelegatesListViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         if let search = searchController.searchBar.text?.lowercased(), search.count > 0 {
             let searchAddress = possibleAddressRegEx.matches(in: search, options: [], range: NSRange(location: 0, length: search.count)).count == 1
-            
-            
             
             let filter: ((Int, CheckedDelegate) -> Bool)
             if searchAddress {
@@ -377,7 +367,6 @@ extension DelegatesListViewController: UISearchResultsUpdating {
         tableView.reloadData()
     }
 }
-
 
 // MARK: - Private
 extension DelegatesListViewController {

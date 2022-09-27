@@ -15,7 +15,6 @@ extension AdamantApiService.ApiCommands {
     )
 }
 
-
 // MARK: - Peers
 extension AdamantApiService {
     func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void) {

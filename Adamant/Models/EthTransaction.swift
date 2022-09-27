@@ -38,7 +38,6 @@ extension EthResponse: Decodable {
     }
 }
 
-
 // MARK: - Eth Transaction
 
 struct EthTransaction {
@@ -56,7 +55,6 @@ struct EthTransaction {
     
     var isOutgoing: Bool = false
 }
-
 
 // MARK: Decodable
 extension EthTransaction: Decodable {
@@ -131,7 +129,6 @@ extension EthTransaction: Decodable {
     }
 }
 
-
 // MARK: - TransactionDetails
 extension EthTransaction: TransactionDetails {
     static var defaultCurrencySymbol: String? { return EthWalletService.currencySymbol }
@@ -201,7 +198,6 @@ extension EthereumTransaction {
                               isOutgoing: isOutgoing)
     }
 }
-
 
 // MARK: Sample JSON
 /*

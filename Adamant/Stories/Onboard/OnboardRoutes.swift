@@ -10,12 +10,12 @@ import Foundation
 
 extension AdamantScene {
     struct Onboard {
-        static let welcome = AdamantScene(identifier: "OnboardViewController") { r in
+        static let welcome = AdamantScene(identifier: "OnboardViewController") { _ in
             let c = OnboardViewController(nibName: "OnboardViewController", bundle: nil)
             return c
         }
         
-        static let eula = AdamantScene(identifier: "EulaViewController") { r in
+        static let eula = AdamantScene(identifier: "EulaViewController") { _ in
             let c = EulaViewController(nibName: "EulaViewController", bundle: nil)
             return c
         }

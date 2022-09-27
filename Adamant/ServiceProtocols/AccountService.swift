@@ -29,7 +29,6 @@ extension Notification.Name {
         /// - Adamant.AccountService.newStayInState with new state
         static let stayInChanged = Notification.Name("adamant.accountService.stayInChanged")
         
-        
         /// Raised when wallets collection updated
         ///
         /// UserInfo:
@@ -41,7 +40,6 @@ extension Notification.Name {
     }
 }
 
-
 // MARK: - Localization
 extension String.adamantLocalized {
     struct accountService {
@@ -50,7 +48,6 @@ extension String.adamantLocalized {
         static let reloginToInitiateWallets = NSLocalizedString("AccountService.reloginToInitiateWallets", comment: "AccountService: User must relogin into app to initiate wallets")
     }
 }
-
 
 /// - loggedAccountAddress: Newly logged account's address
 extension AdamantUserInfoKey {
@@ -141,7 +138,6 @@ extension AccountServiceError: RichError {
     }
 }
 
-
 // MARK: - Protocol
 protocol AccountService: AnyObject {
     // MARK: State
@@ -150,10 +146,8 @@ protocol AccountService: AnyObject {
     var account: AdamantAccount? { get }
     var keypair: Keypair? { get }
     
-    
     // MARK: Wallets
     var wallets: [WalletService] { get }
-    
     
     // MARK: Account functions
     
@@ -164,7 +158,6 @@ protocol AccountService: AnyObject {
     /// Login into Adamant using passphrase.
     func loginWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void)
     
-    
     /// Login into Adamant using previously logged account
     func loginWithStoredAccount(completion: @escaping (AccountServiceResult) -> Void)
     
@@ -174,7 +167,6 @@ protocol AccountService: AnyObject {
     /// Reload current wallets state
     func reloadWallets()
     
-    
     // MARK: Stay in functions
     
     /// There is a stored account information in secured store
@@ -183,14 +175,12 @@ protocol AccountService: AnyObject {
     /// Use TouchID or FaceID to log in
     var useBiometry: Bool { get set }
     
-    
     /// Save account data and use pincode to login
     ///
     /// - Parameters:
     ///   - pin: pincode to login
     ///   - completion: completion handler
     func setStayLoggedIn(pin: String, completion: @escaping (AccountServiceResult) -> Void)
-    
     
     /// Remove stored data
     func dropSavedAccount()

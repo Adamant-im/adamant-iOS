@@ -10,7 +10,6 @@
 import Foundation
 import CoreData
 
-
 extension ChatTransaction {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<ChatTransaction> {

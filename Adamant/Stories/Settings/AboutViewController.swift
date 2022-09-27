@@ -20,7 +20,6 @@ extension String.adamantLocalized {
     }
 }
 
-
 // MARK: - AboutViewController
 class AboutViewController: FormViewController {
     // MARK: Section & Rows
@@ -113,7 +112,6 @@ class AboutViewController: FormViewController {
         }
     }
     
-    
     // MARK: Dependencies
     var accountService: AccountService!
     var accountsProvider: AccountsProvider!
@@ -122,7 +120,6 @@ class AboutViewController: FormViewController {
     
     // MARK: Properties
     private var storedIOSSupportMessage: String?
-    
     
     // MARK: Lifecycle
     
@@ -151,7 +148,6 @@ class AboutViewController: FormViewController {
                 tableView.tableFooterView = footer
             }
         }
-        
         
         // MARK: About
         form +++ Section(Sections.about.localized) {
@@ -187,7 +183,7 @@ class AboutViewController: FormViewController {
                         image: Rows.github.image)
 
         // Welcome screens
-        <<< LabelRow() {
+        <<< LabelRow {
             $0.title = Rows.welcomeScreens.localized
             $0.tag = Rows.welcomeScreens.tag
             $0.cell.imageView?.image = Rows.welcomeScreens.image
@@ -212,7 +208,7 @@ class AboutViewController: FormViewController {
         }
             
         // Adamant
-        <<< LabelRow() {
+        <<< LabelRow {
             $0.title = Rows.adm.localized
             $0.tag = Rows.adm.tag
             $0.cell.imageView?.image = Rows.adm.image
@@ -249,7 +245,7 @@ class AboutViewController: FormViewController {
                         dialogService?.dismissProgress()
                     }
                     
-                case .invalidAddress, .notFound, .notInitiated(_), .networkError, .dummy(_):
+                case .invalidAddress, .notFound, .notInitiated, .networkError, .dummy:
                     dialogService?.showWarning(withMessage: String.adamantLocalized.sharedErrors.networkError)
                     
                 case .serverError(let error):
@@ -259,7 +255,7 @@ class AboutViewController: FormViewController {
         }
             
         // E-mail
-        <<< LabelRow() {
+        <<< LabelRow {
             $0.title = Rows.email.localized
             $0.value = AdamantResources.supportEmail
             $0.tag = Rows.email.tag
@@ -282,7 +278,6 @@ class AboutViewController: FormViewController {
             mailVC.modalPresentationStyle = .overFullScreen
             self?.present(mailVC, animated: true, completion: nil)
         }
-        
             
         /*
         // Bitcointalk
@@ -340,11 +335,10 @@ class AboutViewController: FormViewController {
     }
 }
 
-
 // MARK: - Tools
 extension AboutViewController {
     fileprivate func buildUrlRow(title: String, value: String?, tag: String, url urlRaw: String, image: UIImage?) -> LabelRow {
-        let row = LabelRow() {
+        let row = LabelRow {
             $0.tag = tag
             $0.title = title
             $0.value = value
@@ -368,14 +362,12 @@ extension AboutViewController {
     }
 }
 
-
 // MARK: - MFMailComposeViewControllerDelegate
 extension AboutViewController: MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true, completion: nil)
     }
 }
-
 
 // MARK: - ChatViewControllerDelegate
 extension AboutViewController: ChatViewControllerDelegate {

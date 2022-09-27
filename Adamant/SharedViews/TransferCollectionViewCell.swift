@@ -48,7 +48,7 @@ class TransferCollectionViewCell: UICollectionViewCell, ChatCell, TapRecognizerT
     @IBOutlet weak var statusLeadingConstraint: NSLayoutConstraint?
     @IBOutlet weak var statusTrailingConstraint: NSLayoutConstraint?
     
-    weak var delegate: TransferCellDelegate? = nil
+    weak var delegate: TransferCellDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()

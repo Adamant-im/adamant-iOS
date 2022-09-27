@@ -75,7 +75,6 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
         }
     }
     
-    
     // MARK: - UITableView
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -188,7 +187,7 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     private func loadMoreTransactions(from: Int) {
         let procedure = LoadMoreDogeTransactionsProcedure(service: walletService, from: from)
         
-        procedure.addDidFinishBlockObserver { [weak self] (procedure, error) in
+        procedure.addDidFinishBlockObserver { [weak self] (procedure, _) in
             guard let vc = self, let result = procedure.result else {
                 return
             }
@@ -216,12 +215,11 @@ class DogeTransactionsViewController: TransactionsListViewControllerBase {
     }
 }
 
-
 private class LoadMoreDogeTransactionsProcedure: Procedure {
     let from: Int
     let service: DogeWalletService
     
-    private(set) var result: (transactions: [DogeTransaction], hasMore: Bool)? = nil
+    private(set) var result: (transactions: [DogeTransaction], hasMore: Bool)?
     
     init(service: DogeWalletService, from: Int) {
         self.from = from

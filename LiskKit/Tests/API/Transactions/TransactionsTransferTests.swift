@@ -18,6 +18,6 @@ class TransactionsTransferTests: LiskTestCase {
 
     func testTestnetSendWithFunds() {
         let transactions = Transactions(client: testNetClient)
-        let _ = tryRequest { transactions.transfer(lsk: 0.1, to: exampleAddress, passphrase: testSecret, completionHandler: $0) }
+        _ = tryRequest { transactions.transfer(lsk: 0.1, to: exampleAddress, passphrase: testSecret, completionHandler: $0) }
     }
 }

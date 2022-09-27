@@ -33,11 +33,9 @@ class TransactionsListViewControllerBase: UIViewController {
         return refreshControl
     }()
     
-    
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var emptyLabel: UILabel!
-    
     
     // MARK: - Lifecycle
     
@@ -60,7 +58,7 @@ class TransactionsListViewControllerBase: UIViewController {
         tableView.refreshControl = refreshControl
         
         // MARK: Notifications
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.reloadData()
         }
         
@@ -121,7 +119,7 @@ class TransactionsListViewControllerBase: UIViewController {
         
     }
     
-    var currencySymbol: String? = nil
+    var currencySymbol: String?
 }
 
 // MARK: - UITableViewDataSource, UITableViewDelegate
