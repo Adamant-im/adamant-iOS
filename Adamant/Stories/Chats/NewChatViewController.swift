@@ -139,7 +139,7 @@ class NewChatViewController: FormViewController {
         <<< TextRow() {
             $0.tag = Rows.addressField.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = .numberPad
+            $0.cell.textField.setPopupKeyboardType(.numberPad)
             
             let prefix = UILabel()
             prefix.text = "U"
