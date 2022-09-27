@@ -174,7 +174,7 @@ class AdmTransferViewController: TransferViewControllerBase {
         let row = TextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = .numberPad
+            $0.cell.textField.setPopupKeyboardType(.numberPad)
             
             if let recipient = recipientAddress {
                 let trimmed = recipient.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
@@ -260,7 +260,7 @@ class AdmTransferViewController: TransferViewControllerBase {
                 row.updateCell()
             }
             
-            if let row: DecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
+            if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
                 row.value = admAddress.amount
                 row.updateCell()
                 reloadFormData()

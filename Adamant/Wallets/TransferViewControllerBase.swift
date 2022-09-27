@@ -146,12 +146,12 @@ class TransferViewControllerBase: FormViewController {
                         return
                     }
                     
-                    if let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
+                    if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
                         row.value = fee.doubleValue
                         row.updateCell()
                     }
                     
-                    if let row: DecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
+                    if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
                         row.updateCell()
                     }
                     
@@ -287,7 +287,7 @@ class TransferViewControllerBase: FormViewController {
                                                 
                                                 vc.rate = vc.currencyInfoService.getRate(for: vc.currencyCode)
                                                 
-                                                if let row: DecimalRow = vc.form.rowBy(tag: BaseRows.fiat.tag) {
+                                                if let row: SafeDecimalRow = vc.form.rowBy(tag: BaseRows.fiat.tag) {
                                                     if let formatter = row.formatter as? NumberFormatter {
                                                         formatter.currencyCode = vc.currencyInfoService.currentCurrency.rawValue
                                                     }
@@ -373,11 +373,11 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
-        if let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
+        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
             markRow(row, valid: service.isTransactionFeeValid)
         }
         
-        if let row: DecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
+        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
             markRow(row, valid: wallet.balance > service.transactionFee)
         }
         
@@ -395,7 +395,7 @@ class TransferViewControllerBase: FormViewController {
             recipientAddressIsValid = false
         }
         
-        if let row: DecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
+        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
             // Eureka looses decimal precision when deserializing numbers by itself.
             // Try to get raw value and deserialize it
             if let input = row.cell.textInput as? UITextField, let raw = input.text {
@@ -436,7 +436,7 @@ class TransferViewControllerBase: FormViewController {
             amount = nil
         }
         
-        if let row: DecimalRow = form.rowBy(tag: BaseRows.total.tag) {
+        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.total.tag) {
             if let amount = amount {
                 row.value = (amount + service.transactionFee).doubleValue
                 row.updateCell()
@@ -458,16 +458,16 @@ class TransferViewControllerBase: FormViewController {
     }
     
     func reloadFormData() {
-        if let fee = service?.transactionFee, let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
+        if let fee = service?.transactionFee, let row: SafeDecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
             row.value = fee.doubleValue
             row.updateCell()
         }
         
-        if let row: DecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
+        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
             row.updateCell()
         }
         
-        if let row: DecimalRow = form.rowBy(tag: BaseRows.balance.tag) {
+        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.balance.tag) {
             if let wallet = service?.wallet {
                 row.value = wallet.balance.doubleValue
             } else {
@@ -635,7 +635,7 @@ extension TransferViewControllerBase {
     func defaultRowFor(baseRow: BaseRows) -> BaseRow {
         switch baseRow {
         case .balance:
-            return DecimalRow { [weak self] in
+            return SafeDecimalRow { [weak self] in
                 $0.title = BaseRows.balance.localized
                 $0.tag = BaseRows.balance.tag
                 $0.disabled = true
@@ -668,7 +668,7 @@ extension TransferViewControllerBase {
             return recipientRow()
             
         case .maxToTransfer:
-            let row = DecimalRow { [weak self] in
+            let row = SafeDecimalRow { [weak self] in
                 $0.title = BaseRows.maxToTransfer.localized
                 $0.tag = BaseRows.maxToTransfer.tag
                 $0.disabled = true
@@ -687,7 +687,7 @@ extension TransferViewControllerBase {
                 let alert = UIAlertController(title: String.adamantLocalized.transfer.useMaxToTransfer, message: nil, preferredStyle: .alert)
                 let cancelAction = UIAlertAction(title: String.adamantLocalized.alert.cancel , style: .cancel, handler: nil)
                 let confirmAction = UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default) { [weak self] _ in
-                    guard let amountRow: DecimalRow = self?.form.rowBy(tag: BaseRows.amount.tag) else {
+                    guard let amountRow: SafeDecimalRow = self?.form.rowBy(tag: BaseRows.amount.tag) else {
                         return
                     }
                     amountRow.value = value
@@ -706,7 +706,7 @@ extension TransferViewControllerBase {
             return row
             
         case .amount:
-            return DecimalRow { [weak self] row in
+            return SafeDecimalRow { [weak self] row in
                 row.title = BaseRows.amount.localized
                 row.placeholder = String.adamantLocalized.transfer.amountPlaceholder
                 row.tag = BaseRows.amount.tag
@@ -716,7 +716,7 @@ extension TransferViewControllerBase {
                     row.value = amount.doubleValue
                 }
             }.onChange { [weak self] (row) in
-                if let rate = self?.rate, let fiatRow: DecimalRow = self?.form.rowBy(tag: BaseRows.fiat.tag) {
+                if let rate = self?.rate, let fiatRow: SafeDecimalRow = self?.form.rowBy(tag: BaseRows.fiat.tag) {
                     if let value = row.value {
                         fiatRow.value = value * rate.doubleValue
                     } else {
@@ -730,7 +730,7 @@ extension TransferViewControllerBase {
             }
             
         case .fiat:
-            return DecimalRow { [weak self] in
+            return SafeDecimalRow { [weak self] in
                 $0.title = BaseRows.fiat.localized
                 $0.tag = BaseRows.fiat.tag
                 $0.disabled = true
@@ -749,7 +749,7 @@ extension TransferViewControllerBase {
             }
         
         case .fee:
-            return DecimalRow { [weak self] in
+            return SafeDecimalRow { [weak self] in
                 $0.tag = BaseRows.fee.tag
                 $0.title = BaseRows.fee.localized
                 $0.disabled = true
@@ -763,7 +763,7 @@ extension TransferViewControllerBase {
             }
             
         case .total:
-            return DecimalRow { [weak self] in
+            return SafeDecimalRow { [weak self] in
                 $0.tag = BaseRows.total.tag
                 $0.title = BaseRows.total.localized
                 $0.value = nil
