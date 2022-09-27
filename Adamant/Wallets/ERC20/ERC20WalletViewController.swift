@@ -44,9 +44,10 @@ class ERC20WalletViewController: WalletViewControllerBase {
         )
         let underlineString = NSAttributedString(
             string: " \(networkSymbol)",
-            attributes: networkAttributes)
-        defaultString.append(underlineString
+            attributes: networkAttributes
         )
+        
+        defaultString.append(underlineString)
         
         return defaultString
     }

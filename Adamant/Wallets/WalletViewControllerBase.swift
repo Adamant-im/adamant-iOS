@@ -164,7 +164,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
                 if #unavailable(iOS 14.0) {
                     cell.textLabel?.attributedText = label
                 }
-            }.onCellSelection { [weak self] (_, row) in
+            }.onCellSelection { [weak self] (_, _) in
                 guard let service = self?.service as? WalletServiceWithSend else {
                     return
                 }
