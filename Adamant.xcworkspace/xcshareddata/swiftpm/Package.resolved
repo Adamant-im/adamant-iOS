@@ -182,21 +182,21 @@
         }
       },
       {
-        "package": "SocketIO",
-        "repositoryURL": "https://github.com/socketio/socket.io-client-swift",
-        "state": {
-          "branch": null,
-          "revision": "36db2ff0ebc7239187f9b382fd318e122da71caa",
-          "version": "15.2.0"
-        }
-      },
-      {
         "package": "SnapKit",
         "repositoryURL": "https://github.com/SnapKit/SnapKit.git",
         "state": {
           "branch": null,
           "revision": "f222cbdf325885926566172f6f5f06af95473158",
           "version": "5.6.0"
+        }
+      },
+      {
+        "package": "SocketIO",
+        "repositoryURL": "https://github.com/socketio/socket.io-client-swift",
+        "state": {
+          "branch": null,
+          "revision": "36db2ff0ebc7239187f9b382fd318e122da71caa",
+          "version": "15.2.0"
         }
       },
       {

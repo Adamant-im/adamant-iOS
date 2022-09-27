@@ -2239,23 +2239,23 @@
 			);
 			mainGroup = E913C8E51FFFA51D001A83F7;
 			packageReferences = (
-				A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift.git" */,
-				A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */,
-				A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */,
-				A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode.git" */,
-				A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift.git" */,
-				A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire.git" */,
-				A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */,
-				A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */,
-				A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */,
-				A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */,
-				A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka.git" */,
-				A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject.git" */,
-				A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability.swift" */,
-				A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit.git" */,
+				A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */,
+				A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */,
+				A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
+				A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode" */,
+				A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift" */,
+				A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */,
+				A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */,
+				A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */,
+				A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka" */,
+				A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject" */,
+				A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */,
+				A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit" */,
 				A5AC8DFD262E0B030053A7E2 /* XCRemoteSwiftPackageReference "SipHash" */,
 				3A8875ED27BBF38D00436195 /* XCRemoteSwiftPackageReference "Parchment" */,
-				A530B0D62842110D003F0210 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */,
+				A530B0D62842110D003F0210 /* XCRemoteSwiftPackageReference "socket" */,
 				557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
@@ -2595,7 +2595,7 @@
 				E96BBE3121F70F5E009AA738 /* ReadonlyTextView.swift in Sources */,
 				E926E032213EC43B005E536B /* FullscreenAlertView.swift in Sources */,
 				644EC35B20EFB8E900F40C73 /* AdamantDelegateCell.swift in Sources */,
-				6403F5DB2272389800D58779 /* BuildFile in Sources */,
+				6403F5DB2272389800D58779 /* (null) in Sources */,
 				6416B1A521AEE157006089AC /* LskWalletService+Transfers.swift in Sources */,
 				648DD7A62237DC4000B811FD /* DogeTransferViewController.swift in Sources */,
 				E9960B3421F5154300C840A8 /* BaseAccount+CoreDataProperties.swift in Sources */,
@@ -3522,7 +3522,7 @@
 				minimumVersion = 6.1.0;
 			};
 		};
-		A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift.git" */ = {
+		A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/yannickl/QRCodeReader.swift.git";
 			requirement = {
@@ -3530,7 +3530,7 @@
 				minimumVersion = 10.1.1;
 			};
 		};
-		A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire.git" */ = {
+		A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
 			requirement = {
@@ -3538,7 +3538,7 @@
 				minimumVersion = 5.4.2;
 			};
 		};
-		A530B0D62842110D003F0210 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */ = {
+		A530B0D62842110D003F0210 /* XCRemoteSwiftPackageReference "socket" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
 			requirement = {
@@ -3546,7 +3546,7 @@
 				minimumVersion = 15.2.0;
 			};
 		};
-		A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka.git" */ = {
+		A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/xmartlabs/Eureka.git";
 			requirement = {
@@ -3554,7 +3554,7 @@
 				minimumVersion = 5.3.3;
 			};
 		};
-		A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */ = {
+		A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/maniramezan/DateTools.git";
 			requirement = {
@@ -3562,7 +3562,7 @@
 				kind = branch;
 			};
 		};
-		A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */ = {
+		A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
 			requirement = {
@@ -3570,7 +3570,7 @@
 				minimumVersion = 4.2.2;
 			};
 		};
-		A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */ = {
+		A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/RNCryptor/RNCryptor.git";
 			requirement = {
@@ -3578,7 +3578,7 @@
 				minimumVersion = 5.1.0;
 			};
 		};
-		A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift.git" */ = {
+		A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/skywinder/web3swift.git";
 			requirement = {
@@ -3594,7 +3594,7 @@
 				minimumVersion = 1.2.2;
 			};
 		};
-		A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability.swift" */ = {
+		A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ashleymills/Reachability.swift";
 			requirement = {
@@ -3602,7 +3602,7 @@
 				minimumVersion = 5.1.0;
 			};
 		};
-		A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit.git" */ = {
+		A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ProcedureKit/ProcedureKit.git";
 			requirement = {
@@ -3610,7 +3610,7 @@
 				minimumVersion = 5.2.0;
 			};
 		};
-		A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */ = {
+		A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jedisct1/swift-sodium.git";
 			requirement = {
@@ -3618,7 +3618,7 @@
 				minimumVersion = 0.9.1;
 			};
 		};
-		A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */ = {
+		A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/krzyzanowskim/CryptoSwift.git";
 			requirement = {
@@ -3626,7 +3626,7 @@
 				minimumVersion = 1.3.8;
 			};
 		};
-		A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject.git" */ = {
+		A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Swinject/Swinject.git";
 			requirement = {
@@ -3634,7 +3634,7 @@
 				minimumVersion = 2.7.1;
 			};
 		};
-		A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */ = {
+		A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bmoliveira/MarkdownKit.git";
 			requirement = {
@@ -3667,107 +3667,107 @@
 		};
 		A50AEB03262C815200B37C22 /* EFQRCode */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode.git" */;
+			package = A50AEB02262C815200B37C22 /* XCRemoteSwiftPackageReference "EFQRCode" */;
 			productName = EFQRCode;
 		};
 		A50AEB0B262C81E300B37C22 /* QRCodeReader */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift.git" */;
+			package = A50AEB0A262C81E300B37C22 /* XCRemoteSwiftPackageReference "QRCodeReader.swift" */;
 			productName = QRCodeReader;
 		};
 		A50AEB13262C837900B37C22 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire.git" */;
+			package = A50AEB12262C837900B37C22 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
 		};
 		A5241B6F262DEDE1009FA43E /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Clibsodium;
 		};
 		A5241B76262DEDEF009FA43E /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Clibsodium;
 		};
 		A5241B7D262DEDFE009FA43E /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Clibsodium;
 		};
 		A530B0D72842110D003F0210 /* SocketIO */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A530B0D62842110D003F0210 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */;
+			package = A530B0D62842110D003F0210 /* XCRemoteSwiftPackageReference "socket" */;
 			productName = SocketIO;
 		};
 		A544F0D3262C9878001F1A6D /* Eureka */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka.git" */;
+			package = A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka" */;
 			productName = Eureka;
 		};
 		A57282C9262C94CD00C96FA8 /* DateToolsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */;
+			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */;
 			productName = DateToolsSwift;
 		};
 		A57282D0262C94DA00C96FA8 /* DateToolsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */;
+			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */;
 			productName = DateToolsSwift;
 		};
 		A57282D2262C94DF00C96FA8 /* DateToolsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */;
+			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */;
 			productName = DateToolsSwift;
 		};
 		A57282D4262C94E500C96FA8 /* DateToolsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools.git" */;
+			package = A57282C8262C94CD00C96FA8 /* XCRemoteSwiftPackageReference "DateTools" */;
 			productName = DateToolsSwift;
 		};
 		A57839FA262C95BF00428183 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */;
+			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
 		};
 		A5783A01262C95CA00428183 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */;
+			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
 		};
 		A5783A08262C95D000428183 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */;
+			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
 		};
 		A5783A0A262C95D500428183 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess.git" */;
+			package = A57839F9262C95BF00428183 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
 		};
 		A5783A0D262C964500428183 /* RNCryptor */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */;
+			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */;
 			productName = RNCryptor;
 		};
 		A5783A14262C965000428183 /* RNCryptor */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */;
+			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */;
 			productName = RNCryptor;
 		};
 		A5783A1B262C965600428183 /* RNCryptor */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */;
+			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */;
 			productName = RNCryptor;
 		};
 		A5783A1D262C965D00428183 /* RNCryptor */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor.git" */;
+			package = A5783A0C262C964500428183 /* XCRemoteSwiftPackageReference "RNCryptor" */;
 			productName = RNCryptor;
 		};
 		A5785ADE262C63580001BC66 /* web3swift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift.git" */;
+			package = A5785ADD262C63580001BC66 /* XCRemoteSwiftPackageReference "web3swift" */;
 			productName = web3swift;
 		};
 		A5AC8DFE262E0B030053A7E2 /* SipHash */ = {
@@ -3777,37 +3777,37 @@
 		};
 		A5C99E0D262C9E3A00F7B1B7 /* Reachability */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability.swift" */;
+			package = A5C99E0C262C9E3A00F7B1B7 /* XCRemoteSwiftPackageReference "Reachability" */;
 			productName = Reachability;
 		};
 		A5D87BA2262CA01D00DC28F0 /* ProcedureKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit.git" */;
+			package = A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit" */;
 			productName = ProcedureKit;
 		};
 		A5DBBABC262C7221004AC028 /* Clibsodium */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium.git" */;
+			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Clibsodium;
 		};
 		A5DBBADB262C729B004AC028 /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
 		};
 		A5DBBAE2262C72B0004AC028 /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
 		};
 		A5DBBAE4262C72B7004AC028 /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
 		};
 		A5DBBAE6262C72BD004AC028 /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift.git" */;
+			package = A5DBBADA262C729B004AC028 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
 		};
 		A5DBBAED262C72EF004AC028 /* BitcoinKit */ = {
@@ -3820,27 +3820,27 @@
 		};
 		A5F0A04A262C9CA90009672A /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject.git" */;
+			package = A5F0A049262C9CA90009672A /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
 		};
 		A5F92993262C855B00C3E60A /* MarkdownKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */;
+			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
 			productName = MarkdownKit;
 		};
 		A5F929AE262C857D00C3E60A /* MarkdownKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */;
+			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
 			productName = MarkdownKit;
 		};
 		A5F929B5262C858700C3E60A /* MarkdownKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */;
+			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
 			productName = MarkdownKit;
 		};
 		A5F929B7262C858F00C3E60A /* MarkdownKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit.git" */;
+			package = A5F92992262C855A00C3E60A /* XCRemoteSwiftPackageReference "MarkdownKit" */;
 			productName = MarkdownKit;
 		};
 /* End XCSwiftPackageProductDependency section */
