@@ -41,7 +41,6 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
         handleRefresh(self.refreshControl)
     }
     
-    
     // MARK: - Overrides
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
@@ -152,7 +151,6 @@ class ERC20TransactionsViewController: TransactionsListViewControllerBase {
                       date: transaction.date)
     }
 }
-
 
 // MARK: - Tools
 extension ERC20TransactionsViewController {

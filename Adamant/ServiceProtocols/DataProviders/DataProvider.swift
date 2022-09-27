@@ -24,7 +24,6 @@ protocol DataProvider: AnyObject {
     func reset()
 }
 
-
 // MARK: - Status Equatable
 extension State: Equatable {
     
@@ -35,7 +34,7 @@ extension State: Equatable {
         case (.updating, .updating): return true
         case (.upToDate, .upToDate): return true
         
-        case (.failedToUpdate(_), .failedToUpdate(_)): return true
+        case (.failedToUpdate, .failedToUpdate): return true
             
         default: return false
         }

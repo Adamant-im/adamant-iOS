@@ -35,7 +35,6 @@ class AdamantUriBuilding: XCTestCase {
         }
     }
     
-    
     // MARK: - Addresses
     func testEncodeAddress() {
         let address = "U123456789012345"
@@ -94,6 +93,8 @@ class AdamantUriBuilding: XCTestCase {
             switch label {
             case .label(let valueDecoded):
                 XCTAssertEqual(value, valueDecoded)
+            case .address, .message:
+                XCTFail("Incorrect case")
             }
             
         default:

@@ -14,7 +14,8 @@ extension AdamantApiService.ApiCommands {
         root: "/api/chats",
         get: "/api/chats/get",
         normalizeTransaction: "/api/chats/normalize",
-        processTransaction: "/api/chats/process"
+        processTransaction: "/api/chats/process",
+        getChatRooms: "/api/chatrooms"
     )
 }
 
@@ -26,18 +27,11 @@ extension AdamantApiService {
         if let height = height, height > 0 { queryItems.append(URLQueryItem(name: "fromHeight", value: String(height))) }
         if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
         
-        // MARK: 2. Build endpoint
-        let endpoint: URL
-        do {
-            endpoint = try buildUrl(path: ApiCommands.Chats.get, queryItems: queryItems)
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        // MARK: 3. Send
-        sendRequest(url: endpoint) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
+        // MARK: 2. Send
+        sendRequest(
+            path: ApiCommands.Chats.get,
+            queryItems: queryItems
+        ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Transaction>>) in
             switch serverResponse {
             case .success(let response):
                 if let collection = response.collection {
@@ -57,20 +51,10 @@ extension AdamantApiService {
         
         // MARK: 0. Prepare
         let date: Date
-        if let delta = nodeTimeDelta {
+        if let delta = lastRequestTimeDelta {
             date = Date().addingTimeInterval(-delta)
         } else {
             date = Date()
-        }
-        
-        let processEndpoin: URL
-        
-        do {
-            processEndpoin = try buildUrl(path: ApiCommands.Chats.processTransaction)
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
         }
         
         // MARK: 1. Create transaction and sign it
@@ -118,7 +102,13 @@ extension AdamantApiService {
         
         // MARK: 3. Send request
         
-        self.sendRequest(url: processEndpoin, method: .post, parameters: params, encoding: .json, headers: headers) { (serverResponse: ApiServiceResult<TransactionIdResponse>) in
+        self.sendRequest(
+            path: ApiCommands.Chats.processTransaction,
+            method: .post,
+            parameters: params,
+            encoding: .json,
+            headers: headers
+        ) { (serverResponse: ApiServiceResult<TransactionIdResponse>) in
             switch serverResponse {
             case .success(let response):
                 if let id = response.transactionId {
@@ -132,5 +122,41 @@ extension AdamantApiService {
                 completion(.failure(.networkError(error: error)))
             }
         }
+    }
+    
+    // new api
+    func getChatRooms(address: String, offset: Int?, completion: @escaping (ApiServiceResult<ChatRooms>) -> Void) {
+        // MARK: 1. Prepare params
+        var queryItems: [URLQueryItem] = []
+        if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
+        queryItems.append(URLQueryItem(name: "limit", value: "20"))
+        
+        // MARK: 2. Send
+        sendRequest(
+            path: ApiCommands.Chats.getChatRooms + "/\(address)",
+            queryItems: queryItems
+        ) { (serverResponse: ApiServiceResult<ChatRooms>) in
+            switch serverResponse {
+            case .success(let response):
+                completion(.success(response))
+                
+            case .failure(let error):
+                completion(.failure(.networkError(error: error)))
+            }
+        }
+    }
+    
+    func getChatMessages(address: String, addressRecipient: String, offset: Int?, completion: @escaping (ApiServiceResult<ChatRooms>) -> Void) {
+        // MARK: 1. Prepare params
+        var queryItems: [URLQueryItem] = []
+        if let offset = offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
+        queryItems.append(URLQueryItem(name: "limit", value: "50"))
+        
+        // MARK: 2. Send
+        sendRequest(
+            path: ApiCommands.Chats.getChatRooms + "/\(address)/\(addressRecipient)",
+            queryItems: queryItems,
+            completion: completion
+        )
     }
 }

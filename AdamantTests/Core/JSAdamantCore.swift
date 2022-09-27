@@ -24,14 +24,12 @@ private enum JsFunction: String {
     }
 }
 
-
 // MARK: - AdamantCoreError
 enum AdamantCoreError: Error {
     case errorLoadingJS(reason: String)
     case errorGettingCoreFunction(function: String)
     case errorCallingFunction(function: String, jsError: String)
 }
-
 
 // MARK: - AdamantCore
 
@@ -75,8 +73,8 @@ class JSAdamantCore : AdamantCore {
                 }
                 
                 // MARK: 3. Catch JS errors
-                var jsError: JSValue? = nil
-                context.exceptionHandler = { context, value in
+                var jsError: JSValue?
+                context.exceptionHandler = { _, value in
                     print("JSError: \(String(describing: value?.toString()))")
                     jsError = value
                 }
@@ -95,7 +93,6 @@ class JSAdamantCore : AdamantCore {
                     let buffer = JSObjectGetTypedArrayBuffer(contextRef, array, nil)!
                     let bytes = JSObjectGetArrayBufferBytesPtr(contextRef, buffer, nil)!
                     _ = SecRandomCopyBytes(kSecRandomDefault, count, bytes)
-                    
                     
                     return JSValue(jsValueRef: array, in: context)
                 }
@@ -118,7 +115,6 @@ class JSAdamantCore : AdamantCore {
     }
 }
 
-
 // MARK: - Working with JS runtime
 extension JSAdamantCore {
     private func get(function: JsFunction) -> JSValue? {
@@ -131,8 +127,8 @@ extension JSAdamantCore {
             return nil
         }
         
-        var jsError: JSValue? = nil
-        context.exceptionHandler = { context, value in
+        var jsError: JSValue?
+        context.exceptionHandler = { _, value in
             print("JSError: \(String(describing: value?.toString()))")
             jsError = value
         }
@@ -165,7 +161,7 @@ extension JSAdamantCore {
         }
 
 //        var jsError: JSValue? = nil
-        context.exceptionHandler = { ctx, exc in
+        context.exceptionHandler = { _, exc in
             print("JSError: \(String(describing: exc?.toString()))")
 //            jsError = exc
         }
@@ -176,7 +172,6 @@ extension JSAdamantCore {
         return jsValue
     }
 }
-
 
 // MARK: - Hash converters
 extension JSAdamantCore {
@@ -208,7 +203,6 @@ extension JSAdamantCore {
         return jsHash.toArray() as? [UInt8]
     }
 }
-
 
 // MARK: - Keys
 extension JSAdamantCore {
@@ -261,8 +255,6 @@ extension JSAdamantCore {
     }
 }
 
-
-
 // MARK: - Transactions
 extension JSAdamantCore {
     func sign(transaction t: SignableTransaction, senderId: String, keypair: Keypair) -> String? {
@@ -305,7 +297,6 @@ extension JSAdamantCore {
         return signature
     }
 }
-
 
 // MARK: - Messages
 extension JSAdamantCore {

@@ -15,18 +15,21 @@ class ExtensionsApi {
     let keychainStore: KeychainStore
     
     private(set) lazy var nodes: [Node] = {
+        let nodes: [Node]
         if let raw = keychainStore.get(nodesStoreKey), let data = raw.data(using: String.Encoding.utf8) {
             do {
-                return try JSONDecoder().decode([Node].self, from: data)
+                nodes = try JSONDecoder().decode([Node].self, from: data)
             } catch {
-                return AdamantResources.nodes
+                nodes = AdamantResources.nodes
             }
         } else {
-            return AdamantResources.nodes
+            nodes = AdamantResources.nodes
         }
+        
+        return nodes.getAllowedNodes(sortedBySpeedDescending: true, needWS: false).reversed()
     }()
     
-    private var currentNode: Node? = nil
+    private var currentNode: Node?
     
     private func selectNewNode() {
         currentNode = nodes.popLast()
@@ -42,7 +45,7 @@ class ExtensionsApi {
     // MARK: Transactions
     func getTransaction(by id: UInt64) -> Transaction? {
         // MARK: 1. Getting Transaction
-        var response: ServerModelResponse<Transaction>? = nil
+        var response: ServerModelResponse<Transaction>?
         var nodeUrl: URL! = nil
         if currentNode == nil {
             selectNewNode()
@@ -115,7 +118,7 @@ class ExtensionsApi {
     // MARK: Address book
     
     func getAddressBook(for address: String, core: NativeAdamantCore, keypair: Keypair) -> [String:ContactDescription]? {
-        var response: ServerCollectionResponse<Transaction>? = nil
+        var response: ServerCollectionResponse<Transaction>?
         
         // Getting transaction
         repeat {

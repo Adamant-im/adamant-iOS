@@ -9,7 +9,6 @@
 import Foundation
 import CoreData
 
-
 // MARK: - Provider
 class AdamantAccountsProvider: AccountsProvider {
     struct KnownContact {
@@ -43,15 +42,14 @@ class AdamantAccountsProvider: AccountsProvider {
     var apiService: ApiService!
     var addressBookService: AddressBookService!
     
-    
     // MARK: Properties
     private let knownContacts: [String:KnownContact]
-    
     
     // MARK: Lifecycle
     init() {
         let ico = KnownContact(contact: AdamantContacts.adamantIco)
         let bounty = KnownContact(contact: AdamantContacts.adamantBountyWallet)
+        let welcome = KnownContact(contact: AdamantContacts.adamantWelcomeWallet)
         let newBounty = KnownContact(contact: AdamantContacts.adamantNewBountyWallet)
         let iosSupport = KnownContact(contact: AdamantContacts.iosSupport)
         
@@ -74,7 +72,10 @@ class AdamantAccountsProvider: AccountsProvider {
             AdamantContacts.betOnBitcoin.address: betOnBitcoin,
             AdamantContacts.betOnBitcoin.name: betOnBitcoin,
             
-            AdamantContacts.donate.address: donate
+            AdamantContacts.donate.address: donate,
+            
+            AdamantContacts.adamantWelcomeWallet.address: welcome,
+            AdamantContacts.adamantWelcomeWallet.name: welcome
         ]
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.addressBookUpdated, object: nil, queue: nil) { [weak self] notification in
@@ -126,7 +127,6 @@ class AdamantAccountsProvider: AccountsProvider {
         }
     }
     
-    
     // MARK: Threading
     private let queue = DispatchQueue(label: "im.adamant.accounts.getAccount", qos: .utility, attributes: [.concurrent])
     
@@ -157,7 +157,7 @@ class AdamantAccountsProvider: AccountsProvider {
         request.fetchLimit = 1
         request.predicate = predicate
         
-        var acc: BaseAccount? = nil
+        var acc: BaseAccount?
         
         if let context = context {
             // viewContext only on MainThread
@@ -182,12 +182,11 @@ class AdamantAccountsProvider: AccountsProvider {
         case let dummy as DummyAccount:
             return .dummy(dummy)
             
-        case .some(_), nil:
+        case .some, nil:
             return .notFound
         }
     }
 }
-
 
 // MARK: - Getting account info from API
 extension AdamantAccountsProvider {
@@ -209,13 +208,13 @@ extension AdamantAccountsProvider {
             let account = self.getAccount(byPredicate: NSPredicate(format: "address == %@", address))
             
             switch account {
-            case .core(_), .dummy(_): completion(true)
+            case .core, .dummy: completion(true)
             case .notFound: return completion(false)
             }
         }
     }
     
-    /// Get account info from servier.
+    /// Get account info from server.
     ///
     /// - Parameters:
     ///   - address: address of an account
@@ -226,8 +225,6 @@ extension AdamantAccountsProvider {
             completion(.invalidAddress(address: address))
             return
         }
-        
-        let context = stack.container.viewContext
         
         // Go background, to not to hang threads (especially main) on semaphores and dispatch groups
         queue.async {
@@ -281,6 +278,7 @@ extension AdamantAccountsProvider {
                         
                         var coreAccount: CoreDataAccount! = nil
                         DispatchQueue.main.sync {
+                            let context = self.stack.container.viewContext
                             coreAccount = self.createCoreDataAccount(from: account,  context: context)
                             
                             if let dummy = dummy {
@@ -344,7 +342,102 @@ extension AdamantAccountsProvider {
         }
     }
     
-    
+    /// Get account info from server or create instantly
+    ///
+    /// - Parameters:
+    ///   - address: address of an account
+    ///   - publicKey: publicKey of an account
+    ///   - completion: returns Account created in viewContext
+    func getAccount(byAddress address: String, publicKey: String, completion: @escaping (AccountsProviderResult) -> Void) {
+        let validation = AdamantUtilities.validateAdamantAddress(address: address)
+        if validation == .invalid {
+            completion(.invalidAddress(address: address))
+            return
+        }
+        
+        if publicKey.isEmpty {
+            getAccount(byAddress: address) { _account in
+                completion(_account)
+            }
+            return
+        }
+        let context = stack.container.viewContext
+        
+        // Go background, to not to hang threads (especially main) on semaphores and dispatch groups
+        queue.async {
+            self.groupsSemaphore.wait() // 1
+            
+            // If there is already request for a this address, wait
+            if let group = self.requestGroups[address] {
+                self.groupsSemaphore.signal() // 1
+                group.wait()
+                self.groupsSemaphore.wait() // 2
+            }
+            
+            // Check if there is an account, that we are looking for
+            let dummy: DummyAccount?
+            switch self.getAccount(byPredicate: NSPredicate(format: "address == %@", address)) {
+            case .core(let account):
+                self.groupsSemaphore.signal() // 1 or 2
+                completion(.success(account))
+                return
+                
+            case .dummy(let account):
+                dummy = account
+                
+            case .notFound:
+                dummy = nil
+            }
+            
+            // No, we need to get one
+            let group = DispatchGroup()
+            self.requestGroups[address] = group
+            group.enter()
+            
+            self.groupsSemaphore.signal() // 1 or 2
+            
+            switch validation {
+            case .valid:
+                var coreAccount: CoreDataAccount! = nil
+                DispatchQueue.main.sync {
+                    coreAccount = self.createCoreDataAccount(with: address, publicKey: publicKey, contextt: context)
+                    if let dummy = dummy {
+                        coreAccount.name = dummy.name
+                        
+                        if let transfers = dummy.transfers {
+                            dummy.removeFromTransfers(transfers)
+                            coreAccount.addToTransfers(transfers)
+                            
+                            if let chatroom = coreAccount.chatroom {
+                                chatroom.addToTransactions(transfers)
+                                chatroom.updateLastTransaction()
+                            }
+                        }
+                        context.delete(dummy)
+                    }
+                    
+                    try? context.save()
+                }
+                self.removeSafeFromRequests(address)
+                group.leave()
+                
+                completion(.success(coreAccount))
+                
+            case .system:
+                let coreAccount = self.createCoreDataAccount(with: address, publicKey: "")
+                self.removeSafeFromRequests(address)
+                group.leave()
+                
+                completion(.success(coreAccount))
+                
+            case .invalid:
+                self.removeSafeFromRequests(address)
+                group.leave()
+                
+                completion(.invalidAddress(address: address))
+            }
+        }
+    }
     
     /*
     
@@ -409,6 +502,19 @@ extension AdamantAccountsProvider {
 
     */
     
+    private func createCoreDataAccount(with address: String, publicKey: String, contextt: NSManagedObjectContext) -> CoreDataAccount {
+        var coreAccount: CoreDataAccount!
+        
+        DispatchQueue.onMainSync {
+            coreAccount = createCoreDataAccount(
+                with: address,
+                publicKey: publicKey,
+                context: contextt
+            )
+        }
+        return coreAccount
+    }
+    
     private func createCoreDataAccount(with address: String, publicKey: String) -> CoreDataAccount {
         var coreAccount: CoreDataAccount!
         
@@ -440,7 +546,6 @@ extension AdamantAccountsProvider {
         chatroom.updatedAt = NSDate()
         
         coreAccount.chatroom = chatroom
-        
         
         if let acc = knownContacts[account.address] {
             coreAccount.name = acc.name
@@ -484,7 +589,6 @@ extension AdamantAccountsProvider {
         return coreAccount
     }
 }
-
 
 // MARK: - Dummy
 extension AdamantAccountsProvider {

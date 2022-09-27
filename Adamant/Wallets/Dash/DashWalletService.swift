@@ -25,6 +25,10 @@ class DashWalletService: WalletService {
         return type(of: self).currencyLogo
     }
     
+    var tokenNetworkSymbol: String {
+        return "DASH"
+    }
+    
     var wallet: WalletAccount? { return dashWallet }
     
     var walletViewController: WalletViewController {
@@ -96,10 +100,10 @@ class DashWalletService: WalletService {
     let transactionFeeUpdated = Notification.Name("adamant.dashWallet.feeUpdated")
     
     // MARK: - Delayed KVS save
-    private var balanceObserver: NSObjectProtocol? = nil
+    private var balanceObserver: NSObjectProtocol?
     
     // MARK: - Properties
-    private (set) var dashWallet: DashWallet? = nil
+    private (set) var dashWallet: DashWallet?
     
     private (set) var enabled = true
     
@@ -144,7 +148,7 @@ class DashWalletService: WalletService {
         stateSemaphore.wait()
         
         switch state {
-        case .notInitiated, .updating, .initiationFailed(_):
+        case .notInitiated, .updating, .initiationFailed:
             return
             
         case .upToDate:

@@ -12,7 +12,6 @@ import MessageInputBar
 import SafariServices
 import MarkdownKit
 
-
 // MARK: - Tools
 extension ChatViewController {
     private func getRichMessageType(of message: MessageType) -> String? {
@@ -23,7 +22,6 @@ extension ChatViewController {
         return transfer.type
     }
 }
-
 
 // MARK: - MessagesDataSource
 extension ChatViewController: MessagesDataSource {
@@ -37,7 +35,11 @@ extension ChatViewController: MessagesDataSource {
     }
     
     func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
-        guard let message = chatController?.object(at: IndexPath(row: indexPath.section, section: 0)) as? MessageType else {
+        var newIndexPath = indexPath
+        if indexPath.count == 0 {
+            newIndexPath = IndexPath(row: 0, section: messagesCollectionView.numberOfSections - 1)
+        }
+        guard let message = chatController?.object(at: IndexPath(row: newIndexPath.section, section: 0)) as? MessageType else {
             fatalError("Data not synced")
         }
         
@@ -68,9 +70,8 @@ extension ChatViewController: MessagesDataSource {
             switch transaction.statusEnum {
             case .failed:
                 return NSAttributedString(string: String.adamantLocalized.chat.failToSend, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.adamant.primary])
-                
             case .pending:
-                return NSAttributedString(string: String.adamantLocalized.chat.pending, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.adamant.primary])
+                return nil
                 
             case .delivered:
                 return nil
@@ -87,6 +88,21 @@ extension ChatViewController: MessagesDataSource {
         
         if let message = message as? MessageTransaction, message.statusEnum == .failed {
             return nil
+        }
+        
+        if isFromCurrentSender(message: message),
+           let transaction = message as? ChatTransaction {
+            if case .pending = transaction.statusEnum {
+                let attachment = NSTextAttachment()
+                attachment.image = UIImage(named: "status_pending")
+                attachment.bounds = CGRect(x: 0, y: -1, width: 7, height: 7)
+                let attachmentStr = NSAttributedString(attachment: attachment)
+                
+                let mutableAttributedString = NSMutableAttributedString()
+                mutableAttributedString.append(attachmentStr)
+
+                return mutableAttributedString
+            }
         }
         
         let humanizedTime = message.sentDate.humanizedTime()
@@ -205,7 +221,6 @@ extension ChatViewController: MessagesDataSource {
     }
 }
 
-
 // MARK: - MessagesDisplayDelegate
 extension ChatViewController: MessagesDisplayDelegate {
     func messageStyle(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageStyle {
@@ -288,6 +303,16 @@ extension ChatViewController: MessagesDisplayDelegate {
         let timeIntervalSinceLastMessage = message.sentDate.timeIntervalSince(previousMessage.sentDate)
         return timeIntervalSinceLastMessage >= self.showsDateHeaderAfterTimeInterval
     }
+    
+    func messageHeaderView(for indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageReusableView {
+        let header = messagesCollectionView.dequeueReusableHeaderView(HeaderReusableView.self, for: indexPath)
+        if (indexPath.section == 0 && isBusy) {
+            header.setupLoadAnimating()
+        } else {
+            header.stopLoadAnimating()
+        }
+        return header
+    }
 }
 
 extension ChatViewController: MessageCellDelegate {
@@ -305,7 +330,7 @@ extension ChatViewController: MessageCellDelegate {
                 break
             }
             
-            let retry = UIAlertAction(title: String.adamantLocalized.alert.retry, style: .default, handler: { [weak self] action in
+            let retry = UIAlertAction(title: String.adamantLocalized.alert.retry, style: .default, handler: { [weak self] _ in
                 self?.chatsProvider.retrySendMessage(message) { result in
                     switch result {
                     case .success: break
@@ -313,13 +338,13 @@ extension ChatViewController: MessageCellDelegate {
                     case .failure(let error):
                         self?.dialogService.showRichError(error: error)
                         
-                    case .invalidTransactionStatus(_):
+                    case .invalidTransactionStatus:
                         break
                     }
                 }
             })
             
-            let cancelMessage = UIAlertAction(title: String.adamantLocalized.alert.delete, style: .default, handler: { [weak self] action in
+            let cancelMessage = UIAlertAction(title: String.adamantLocalized.alert.delete, style: .default, handler: { [weak self] _ in
                 self?.chatsProvider.cancelMessage(message) { result in
                     switch result {
                     case .success:
@@ -327,7 +352,7 @@ extension ChatViewController: MessageCellDelegate {
                             self?.messagesCollectionView.reloadDataAndKeepOffset()
                         }
                         
-                    case .invalidTransactionStatus(_):
+                    case .invalidTransactionStatus:
                         self?.dialogService.showWarning(withMessage: String.adamantLocalized.chat.cancelError)
                         
                     case .failure(let error):
@@ -339,7 +364,6 @@ extension ChatViewController: MessageCellDelegate {
             let cancel = UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel)
             
             dialogService?.showAlert(title: String.adamantLocalized.alert.retryOrDeleteTitle, message: String.adamantLocalized.alert.retryOrDeleteBody, style: .actionSheet, actions: [retry, cancelMessage, cancel], from: cell)
-            
             
         // MARK: Show ADM transfer details
         case let transfer as TransferTransaction:
@@ -362,7 +386,6 @@ extension ChatViewController: MessageCellDelegate {
             } else {
                 provider.richMessageTapped(for: richMessage, at: indexPath, in: self)
             }
-            
             
         default:
             break
@@ -500,12 +523,12 @@ extension ChatViewController: MessagesLayoutDelegate {
             guard let transaction = message as? ChatTransaction else {
                 return 0
             }
-            
+
             switch transaction.statusEnum {
-            case .failed, .pending:
+            case .failed:
                 return 16
                 
-            case .delivered:
+            case .delivered, .pending:
                 return 0
             }
         } else {
@@ -524,10 +547,10 @@ extension ChatViewController: MessagesLayoutDelegate {
             }
             
             switch transaction.statusEnum {
-            case .failed, .pending:
+            case .failed:
                 return 0
                 
-            case .delivered:
+            case .delivered, .pending:
                 return 16
             }
         } else {
@@ -550,8 +573,15 @@ extension ChatViewController: MessagesLayoutDelegate {
             return (messagesCollectionView.collectionViewLayout as! MessagesCollectionViewFlowLayout).textMessageSizeCalculator
         }
     }
+    
+    func headerViewSize(for section: Int, in messagesCollectionView: MessagesCollectionView) -> CGSize {
+        if (section == 0 && isNeedToLoadMoore()) {
+            return CGSize(width: messagesCollectionView.bounds.width, height: HeaderReusableView.height)
+        } else {
+            return .zero
+        }
+    }
 }
-
 
 // MARK: - MessageInputBarDelegate
 extension ChatViewController: MessageInputBarDelegate {
@@ -587,12 +617,12 @@ extension ChatViewController: MessageInputBarDelegate {
         
         chatsProvider.sendMessage(message, recipientId: partner, from: chatroom, completion: { [weak self] result in
             switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    self?.scrollDown()
+            case .success(let transaction):
+                if transaction.statusEnum == .pending {
+                    DispatchQueue.main.async {
+                        self?.scrollDown()
+                    }
                 }
-                break
-                
             case .failure(let error):
                 var showFreeToken = false
                 switch error {
@@ -664,7 +694,6 @@ extension ChatViewController: MessageInputBarDelegate {
     }
 }
 
-
 // MARK: - MessageType
 // MARK: MessageTransaction
 extension MessageTransaction: MessageType {
@@ -702,9 +731,8 @@ extension MessageTransaction: MessageType {
     
     private static let markdownParser: MarkdownParser = {
         let parser = MarkdownParser(font: UIFont.adamantChatDefault,
-                                    color: UIColor.adamant.primary)
-        parser.link.color = UIColor.adamant.active
-        parser.automaticLink.color = UIColor.adamant.active
+                                    color: UIColor.adamant.primary,
+                                    enabledElements: .disabledAutomaticLink)
         return parser
     }()
 }

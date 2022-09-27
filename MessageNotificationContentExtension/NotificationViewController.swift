@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SnapKit
 import UserNotifications
 import UserNotificationsUI
 import MarkdownKit
@@ -40,10 +41,10 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     func didReceive(_ notification: UNNotification) {
         // MARK: 0. Necessary services
         let avatarService = AdamantAvatarService()
-        var keychainStore: KeychainStore? = nil
-        var extensionApi: ExtensionsApi? = nil
-        var nativeCore: NativeAdamantCore? = nil
-        var keypair: Keypair? = nil
+        var keychainStore: KeychainStore?
+        var extensionApi: ExtensionsApi?
+        var nativeCore: NativeAdamantCore?
+        var keypair: Keypair?
         
         // MARK: 1. Get the transaction
         let trs: Transaction?
@@ -172,7 +173,9 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         }
         
         view.addSubview(warningView)
-        view.constrainToEdges(warningView)
+        warningView.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
     }
     
     private func checkName(of sender: String, for recipient: String, api: ExtensionsApi, core: NativeAdamantCore, keypair: Keypair) {

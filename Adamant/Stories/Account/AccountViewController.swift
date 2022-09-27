@@ -11,7 +11,7 @@ import Eureka
 import FreakingSimpleRoundImageView
 import CoreData
 import Parchment
-
+import SnapKit
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -183,7 +183,7 @@ class AccountViewController: FormViewController {
         
         // MARK: Status Bar
         let statusBarView = UIView(frame: UIApplication.shared.statusBarFrame)
-        statusBarView.backgroundColor = UIColor.white
+        statusBarView.backgroundColor = UIColor.adamant.backgroundColor
         view.addSubview(statusBarView)
         
         // MARK: Transfers controller
@@ -196,7 +196,6 @@ class AccountViewController: FormViewController {
         } catch {
             dialogService.showError(withMessage: "Error fetching transfers: report a bug", error: error)
         }
-
         
         // MARK: Header&Footer
         guard let header = UINib(nibName: "AccountHeader", bundle: nil).instantiate(withOwner: nil, options: nil).first as? AccountHeaderView else {
@@ -229,8 +228,12 @@ class AccountViewController: FormViewController {
         pagingViewController.dataSource = self
         pagingViewController.delegate = self
         pagingViewController.select(index: 0)
+        
         accountHeaderView.walletViewContainer.addSubview(pagingViewController.view)
-        accountHeaderView.walletViewContainer.constrainToEdges(pagingViewController.view)
+        pagingViewController.view.snp.makeConstraints {
+            $0.directionalEdges.equalToSuperview()
+        }
+        
         addChild(pagingViewController)
         
         pagingViewController.borderColor = UIColor.clear
@@ -251,7 +254,7 @@ class AccountViewController: FormViewController {
         }
 
         // Node list
-        let nodesRow = LabelRow() {
+        let nodesRow = LabelRow {
             $0.title = Rows.nodes.localized
             $0.tag = Rows.nodes.tag
             $0.cell.imageView?.image = Rows.nodes.image
@@ -279,7 +282,7 @@ class AccountViewController: FormViewController {
         appSection.append(nodesRow)
 
         // Currency select
-        let currencyRow = ActionSheetRow<Currency>() {
+        let currencyRow = ActionSheetRow<Currency> {
             $0.title = Rows.currency.localized
             $0.tag = Rows.currency.tag
             $0.cell.imageView?.image = Rows.currency.image
@@ -304,7 +307,7 @@ class AccountViewController: FormViewController {
         appSection.append(currencyRow)
 
         // About
-        let aboutRow = LabelRow() {
+        let aboutRow = LabelRow {
             $0.title = Rows.about.localized
             $0.tag = Rows.about.tag
             $0.cell.imageView?.image = Rows.about.image
@@ -337,14 +340,14 @@ class AccountViewController: FormViewController {
         }
         
         // Delegates
-        let delegatesRow = LabelRow() {
+        let delegatesRow = LabelRow {
             $0.tag = Rows.voteForDelegates.tag
             $0.title = Rows.voteForDelegates.localized
             $0.cell.imageView?.image = Rows.voteForDelegates.image
             $0.cell.selectionStyle = .gray
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
-        }.onCellSelection { [weak self] (_, row) in
+        }.onCellSelection { [weak self] (_, _) in
             guard let vc = self?.router.get(scene: AdamantScene.Delegates.delegates) else {
                 return
             }
@@ -366,7 +369,7 @@ class AccountViewController: FormViewController {
         actionsSection.append(delegatesRow)
             
         // Generate passphrase QR
-        let generateQrRow = LabelRow() {
+        let generateQrRow = LabelRow {
             $0.title = Rows.generateQr.localized
             $0.tag = Rows.generateQr.tag
             $0.cell.imageView?.image = Rows.generateQr.image
@@ -394,7 +397,7 @@ class AccountViewController: FormViewController {
         actionsSection.append(generateQrRow)
         
         // Generatte private keys
-        let generatePkRow = LabelRow() {
+        let generatePkRow = LabelRow {
             $0.title = Rows.generatePk.localized
             $0.tag = Rows.generatePk.tag
             $0.cell.imageView?.image = Rows.generatePk.image
@@ -421,9 +424,8 @@ class AccountViewController: FormViewController {
         
         actionsSection.append(generatePkRow)
         
-        
         // Logout
-        let logoutRow = LabelRow() {
+        let logoutRow = LabelRow {
             $0.title = Rows.logout.localized
             $0.tag = Rows.logout.tag
             $0.cell.imageView?.image = Rows.logout.image
@@ -467,13 +469,13 @@ class AccountViewController: FormViewController {
         
         // Stay in
         
-        let stayInRow = SwitchRow() {
+        let stayInRow = SwitchRow {
             $0.tag = Rows.stayIn.tag
             $0.title = Rows.stayIn.localized
             $0.cell.imageView?.image = Rows.stayIn.image
             $0.value = accountService.hasStayInAccount
         }.cellUpdate { (cell, _) in
-            cell.switchControl.onTintColor = UIColor.adamant.switchColor
+            cell.switchControl.onTintColor = UIColor.adamant.active
         }.onChange { [weak self] row in
             guard let enabled = row.value else {
                 return
@@ -485,7 +487,7 @@ class AccountViewController: FormViewController {
         securitySection.append(stayInRow)
         
         // Biometry
-        let biometryRow = SwitchRow() { [weak self] in
+        let biometryRow = SwitchRow { [weak self] in
             $0.tag = Rows.biometry.tag
             $0.title = localAuth.biometryType.localized
             $0.value = accountService.useBiometry
@@ -497,7 +499,7 @@ class AccountViewController: FormViewController {
                 case .faceID: $0.cell.imageView?.image = #imageLiteral(resourceName: "row_faceid.png")
                 }
             }
-            
+            $0.cell.backgroundColor = UIColor.adamant.cellColor
             $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 guard let showBiometry = self?.showBiometryOptions else {
                     return true
@@ -506,7 +508,7 @@ class AccountViewController: FormViewController {
                 return !showBiometry
             })
         }.cellUpdate { (cell, _) in
-            cell.switchControl.onTintColor = UIColor.adamant.switchColor
+            cell.switchControl.onTintColor = UIColor.adamant.active
         }.onChange { [weak self] row in
             let value = row.value ?? false
             self?.setBiometry(enabled: value)
@@ -515,7 +517,7 @@ class AccountViewController: FormViewController {
         securitySection.append(biometryRow)
         
         // Notifications
-        let notificationsRow = LabelRow() { [weak self] in
+        let notificationsRow = LabelRow { [weak self] in
             $0.tag = Rows.notifications.tag
             $0.title = Rows.notifications.localized
             $0.cell.selectionStyle = .gray
@@ -558,7 +560,6 @@ class AccountViewController: FormViewController {
         
         form.allRows.forEach { $0.baseCell.imageView?.tintColor = UIColor.adamant.tableRowIcons }
         
-        
         // MARK: Notification Center
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.updateAccountInfo()
@@ -577,7 +578,7 @@ class AccountViewController: FormViewController {
             self?.updateAccountInfo()
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
             guard let form = self?.form, let accountService = self?.accountService else {
                 return
             }
@@ -642,6 +643,8 @@ class AccountViewController: FormViewController {
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             layoutTableHeaderView()
         }
+        
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -680,6 +683,9 @@ class AccountViewController: FormViewController {
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !initiated {
             layoutTableHeaderView()
             layoutTableFooterView()
+            if !initiated {
+                initiated = true
+            }
         }
         
         pagingViewController?.indicatorColor = UIColor.adamant.primary
@@ -688,7 +694,6 @@ class AccountViewController: FormViewController {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    
     
     // MARK: TableView configuration
     
@@ -700,8 +705,17 @@ class AccountViewController: FormViewController {
         return .fade
     }
     
-    
     // MARK: Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        pagingViewController.backgroundColor = UIColor.adamant.backgroundColor
+        pagingViewController.menuBackgroundColor = UIColor.adamant.backgroundColor
+        pagingViewController.reloadData()
+        tableView.backgroundColor = .clear
+        accountHeaderView.backgroundColor = UIColor.adamant.backgroundColor
+    }
+    
     func updateAccountInfo() {
         let address: String
         
@@ -737,7 +751,7 @@ class AccountViewController: FormViewController {
         guard let view = tableView.tableFooterView else { return }
         view.translatesAutoresizingMaskIntoConstraints = false
 
-        let width = view.bounds.size.width;
+        let width = view.bounds.size.width
         let temporaryWidthConstraints = NSLayoutConstraint.constraints(withVisualFormat: "[footerView(width)]", options: NSLayoutConstraint.FormatOptions(rawValue: UInt(0)), metrics: ["width": width], views: ["footerView": view])
 
         view.addConstraints(temporaryWidthConstraints)
@@ -779,7 +793,6 @@ class AccountViewController: FormViewController {
     }
 }
 
-
 // MARK: - AccountHeaderViewDelegate
 extension AccountViewController: AccountHeaderViewDelegate {
     func addressLabelTapped(from: UIView) {
@@ -802,7 +815,6 @@ extension AccountViewController: AccountHeaderViewDelegate {
     }
 }
 
-
 // MARK: - NSFetchedResultsControllerDelegate
 extension AccountViewController: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -816,7 +828,6 @@ extension AccountViewController: NSFetchedResultsControllerDelegate {
         }
     }
 }
-
 
 // MARK: - PagingViewControllerDataSource
 extension AccountViewController: PagingViewControllerDataSource, PagingViewControllerDelegate {
@@ -833,7 +844,14 @@ extension AccountViewController: PagingViewControllerDataSource, PagingViewContr
             return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm"))
         }
         
-        let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo)
+        var network = ""
+        if ERC20Token.supportedTokens.contains(where: { token in
+            return token.symbol == service.tokenSymbol
+        }) {
+            network = service.tokenNetworkSymbol
+        }
+        
+        let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo, currencyNetwork: network)
         
         if let wallet = service.wallet {
             item.balance = wallet.balance

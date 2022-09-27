@@ -54,7 +54,7 @@ extension AdamantTransfersProvider: BackgroundFetchService {
                     completion(.noData)
                 }
                 
-            case .failure(_):
+            case .failure:
                 completion(.failed)
             }
         }

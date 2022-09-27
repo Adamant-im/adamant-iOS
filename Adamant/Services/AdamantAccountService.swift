@@ -58,7 +58,6 @@ class AdamantAccountService: AccountService {
         }
     }
     
-    
     // MARK: Properties
     
     private(set) var state: AccountServiceState = .notLogged
@@ -115,7 +114,6 @@ class AdamantAccountService: AccountService {
         let erc20WalletServices = ERC20Token.supportedTokens.map { ERC20WalletService(token: $0) }
         wallets.append(contentsOf: erc20WalletServices)
         
-        
         //LskWalletService(mainnet: false)
         // Testnet
        // wallets.append(contentsOf: LskWalletService(mainnet: false))
@@ -140,30 +138,29 @@ class AdamantAccountService: AccountService {
             case .failure(let error):
                 switch error {
                 case .networkError:
-                    NotificationCenter.default.addObserver(forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: nil, queue: nil) { notification in
-                        guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection else {
-                            return
-                        }
+                    NotificationCenter.default.addObserver(
+                        forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
+                        object: nil, queue: nil
+                    ) { notification in
+                        guard (notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool) == true
+                        else { return }
                         
-                        switch connection {
-                        case .none:
-                            break
-                            
-                        case .wifi, .cellular:
-                            ethWallet.initiateNetwork(apiUrl: url) { result in
-                                switch result {
-                                case .success:
-                                    NotificationCenter.default.removeObserver(self, name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: nil)
-                                    
-                                case .failure(let error):
-//                                    self.dialogService.showRichError(error: error)
-                                    print(error)
-                                }
+                        ethWallet.initiateNetwork(apiUrl: url) { result in
+                            switch result {
+                            case .success:
+                                NotificationCenter.default.removeObserver(
+                                    self,
+                                    name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
+                                    object: nil
+                                )
+                                
+                            case .failure(let error):
+                                print(error)
                             }
                         }
                     }
                     
-                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount:
+                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount, .requestCancelled:
                     break
                     
                 case .remoteServiceError, .apiError, .internalError:
@@ -248,7 +245,6 @@ extension AdamantAccountService {
     }
 }
 
-
 // MARK: - AccountService
 extension AdamantAccountService {
     // MARK: Update logged account info
@@ -305,45 +301,6 @@ extension AdamantAccountService {
         
         for wallet in wallets.filter({ !($0 is AdmWalletService) }) {
             wallet.update()
-        }
-    }
-}
-
-
-// MARK: - Creating account
-extension AdamantAccountService {
-    // MARK: passphrase
-    func createAccountWith(passphrase: String, completion: @escaping (AccountServiceResult) -> Void) {
-        guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase) else {
-            completion(.failure(.invalidPassphrase))
-            return
-        }
-        
-        guard let publicKey = adamantCore.createKeypairFor(passphrase: passphrase)?.publicKey else {
-            completion(.failure(.internalError(message: "Can't create key for passphrase", error: nil)))
-            return
-        }
-        
-        self.apiService.getAccount(byPublicKey: publicKey) { [weak self] result in
-            switch result {
-            case .success(_):
-                completion(.failure(.wrongPassphrase))
-                
-            case .failure(_):
-                if let apiService = self?.apiService {
-                    apiService.newAccount(byPublicKey: publicKey) { result in
-                        switch result {
-                        case .success(let account):
-                            completion(.success(account: account, alert: nil))
-                            
-                        case .failure(let error):
-                            completion(.failure(.apiError(error: error)))
-                        }
-                    }
-                } else {
-                    completion(.failure(.internalError(message: "A bad thing happened", error: nil)))
-                }
-            }
         }
     }
 }
@@ -444,7 +401,6 @@ extension AdamantAccountService {
         completion(.failure(.invalidPassphrase))
     }
     
-    
     // MARK: Keypair
     private func loginWith(keypair: Keypair, completion: @escaping (AccountServiceResult) -> Void) {
         stateSemaphore.wait()
@@ -505,7 +461,6 @@ extension AdamantAccountService {
     }
 }
 
-
 // MARK: - Log Out
 extension AdamantAccountService {
     func logout() {
@@ -536,7 +491,6 @@ extension AdamantAccountService {
     }
 }
 
-
 // MARK: - Secured Store
 extension StoreKey {
     fileprivate struct accountService {
@@ -551,7 +505,7 @@ extension StoreKey {
     }
 }
 
-fileprivate enum Key {
+private enum Key {
     case publicKey
     case privateKey
     case pin

@@ -24,6 +24,16 @@ extension Notification.Name {
     }
 }
 
+extension StoreKey {
+    struct notificationsService {
+        static let notificationsMode = "notifications.mode"
+        static let customBadgeNumber = "notifications.number"
+        static let notificationsSound = "notifications.sound"
+        
+        private init() {}
+    }
+}
+
 protocol SecuredStore: AnyObject {
     func get(_ key: String) -> String?
     func getArray(_ key: String) -> [String]?

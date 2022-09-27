@@ -37,6 +37,7 @@ enum WalletServiceError: Error {
     case apiError(ApiServiceError)
     case internalError(message: String, error: Error?)
     case transactionNotFound(reason: String)
+    case requestCancelled
 }
 
 extension WalletServiceError: RichError {
@@ -71,6 +72,9 @@ extension WalletServiceError: RichError {
             
         case .transactionNotFound:
             return NSLocalizedString("WalletServices.SharedErrors.TransactionNotFound", comment: "Wallet Services: Shared error, transaction not found")
+            
+        case .requestCancelled:
+            return String.adamantLocalized.sharedErrors.requestCancelled
         }
     }
     
@@ -83,7 +87,7 @@ extension WalletServiceError: RichError {
     
     var level: ErrorLevel {
         switch self {
-        case .notLogged, .notEnoughMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated, .transactionNotFound:
+        case .notLogged, .notEnoughMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated, .transactionNotFound, .requestCancelled:
             return .warning
             
         case .remoteServiceError, .internalError:
@@ -91,7 +95,7 @@ extension WalletServiceError: RichError {
             
         case .apiError(let error):
             switch error {
-            case .accountNotFound, .notLogged, .networkError:
+            case .accountNotFound, .notLogged, .networkError, .requestCancelled:
                 return .warning
                 
             case .serverError, .internalError:
@@ -113,6 +117,9 @@ extension ApiServiceError {
         case .notLogged:
             return .notLogged
             
+        case .requestCancelled:
+            return .requestCancelled
+            
         case .serverError, .internalError:
             return .apiError(self)
         }
@@ -125,7 +132,7 @@ extension ChatsProviderError {
         case .notLogged:
             return .notLogged
             
-        case .messageNotValid(_):
+        case .messageNotValid:
             return .notLogged
             
         case .notEnoughMoneyToSend:
@@ -140,7 +147,7 @@ extension ChatsProviderError {
         case .serverError(let e):
             return .internalError(message: self.message, error: e)
             
-        case .accountNotFound(_):
+        case .accountNotFound:
             return .accountNotFound
             
         case .dependencyError(let message):
@@ -152,12 +159,14 @@ extension ChatsProviderError {
         case .internalError(let error):
             return .internalError(message: self.message, error: error)
             
-        case .accountNotInitiated(_):
+        case .accountNotInitiated:
             return .walletNotInitiated
+            
+        case .requestCancelled:
+            return .requestCancelled
         }
     }
 }
-
 
 // MARK: - Notifications
 extension AdamantUserInfoKey {
@@ -168,7 +177,6 @@ extension AdamantUserInfoKey {
         private init() {}
     }
 }
-
 
 // MARK: - UI
 extension Notification.Name {
@@ -185,7 +193,6 @@ protocol WalletViewController {
     var service: WalletService? { get }
 }
 
-
 // MARK: - Wallet Service
 protocol WalletService: AnyObject {
 	// MARK: Currency
@@ -195,6 +202,7 @@ protocol WalletService: AnyObject {
     var tokenSymbol: String { get }
     var tokenName: String { get }
     var tokenLogo: UIImage { get }
+    var tokenNetworkSymbol: String { get }
 	
 	// MARK: Notifications
 	

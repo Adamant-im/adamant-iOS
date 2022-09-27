@@ -34,7 +34,6 @@ extension AdamantUtilities {
     }
 }
 
-
 // MARK: - Validating Addresses and Passphrases
 extension AdamantUtilities {
     static let addressRegexString = "^U([0-9]{6,20})$"
@@ -93,7 +92,6 @@ extension AdamantUtilities {
     }
 }
 
-
 // MARK: - Hex
 extension AdamantUtilities {
     static func getHexString(from bytes: [UInt8]) -> String {
@@ -131,5 +129,17 @@ extension AdamantUtilities {
             }
         }
         return nil
+    }
+}
+
+// MARK: - Address generation
+extension AdamantUtilities {
+    /// Address generation algorithm:
+    ///  https://github.com/Adamant-im/adamant/wiki/Generating-ADAMANT-account-and-key-pair#3-a-users-adm-wallet-address-is-generated-from-the-publickeys-sha-256-hash
+    static func generateAddress(publicKey: String) -> String {
+        let publicKeyHashBytes = publicKey.hexBytes().sha256()
+        let data = Data(publicKeyHashBytes)
+        let number = data.withUnsafeBytes { $0.load(as: UInt64.self) }
+        return "U\(number)"
     }
 }

@@ -29,15 +29,14 @@ class AdamantNotificationsService: NotificationsService {
     var securedStore: SecuredStore!
     weak var accountService: AccountService?
     
-    
     // MARK: Properties
     private(set) var notificationsMode: NotificationsMode = .disabled
     private(set) var customBadgeNumber = 0
-    
+    private(set) var notificationsSound: NotificationSound = .inputDefault
     private var isBackgroundSession = false
     private var backgroundNotifications = 0
     
-    private var preservedBadgeNumber: Int? = nil
+    private var preservedBadgeNumber: Int?
     
     // MARK: Lifecycle
     init() {
@@ -45,8 +44,18 @@ class AdamantNotificationsService: NotificationsService {
             UNUserNotificationCenter.current().removeAllDeliveredNotifications()
             UIApplication.shared.applicationIconBadgeNumber = 0
             
-            if let securedStore = self?.securedStore, let raw = securedStore.get(StoreKey.notificationsService.notificationsMode), let mode = NotificationsMode(string: raw) {
+            if let securedStore = self?.securedStore,
+                let raw = securedStore.get(StoreKey.notificationsService.notificationsMode),
+                let mode = NotificationsMode(string: raw) {
                 self?.setNotificationsMode(mode, completion: nil)
+            } else {
+                self?.setNotificationsMode(.disabled, completion: nil)
+            }
+            
+            if let securedStore = self?.securedStore,
+                let raw = securedStore.get(StoreKey.notificationsService.notificationsSound),
+                let sound = NotificationSound(fileName: raw) {
+                self?.setNotificationSound(sound)
             } else {
                 self?.setNotificationsMode(.disabled, completion: nil)
             }
@@ -56,7 +65,9 @@ class AdamantNotificationsService: NotificationsService {
         
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: nil) { [weak self] _ in
             self?.setNotificationsMode(.disabled, completion: nil)
+            self?.setNotificationSound(.inputDefault)
             self?.securedStore.remove(StoreKey.notificationsService.notificationsMode)
+            self?.securedStore.remove(StoreKey.notificationsService.notificationsSound)
             self?.preservedBadgeNumber = nil
         }
         
@@ -76,6 +87,16 @@ class AdamantNotificationsService: NotificationsService {
     }
 }
 
+// MARK: - Notifications Sound {
+extension AdamantNotificationsService {
+    func setNotificationSound(_ sound: NotificationSound) {
+        notificationsSound = sound
+        securedStore.set(sound.fileName, for: StoreKey.notificationsService.notificationsSound)
+        NotificationCenter.default.post(name: Notification.Name.AdamantNotificationService.notificationsSoundChanged,
+                                        object: self,
+                                        userInfo: nil)
+    }
+}
 
 // MARK: - Notifications mode {
 extension AdamantNotificationsService {
@@ -159,28 +180,32 @@ extension AdamantNotificationsService {
     }
 }
 
-
 // MARK: - Posting & removing Notifications
 extension AdamantNotificationsService {
     func showNotification(title: String, body: String, type: AdamantNotificationType) {
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
-        content.sound = UNNotificationSound(named: UNNotificationSoundName("notification.mp3"))
-        
+
+        if notificationsSound == .none {
+            content.sound = nil
+        } else {
+            content.sound = UNNotificationSound(named: UNNotificationSoundName(notificationsSound.fileName))
+        }
+
         if let number = type.badge {
             DispatchQueue.onMainSync {
                 content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + backgroundNotifications + number)
             }
-            
+
             if isBackgroundSession {
                 backgroundNotifications += number
             }
         }
-        
+
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         let request = UNNotificationRequest(identifier: type.identifier, content: content, trigger: trigger)
-        
+
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
                 print(error)
@@ -227,7 +252,6 @@ extension AdamantNotificationsService {
         UIApplication.shared.applicationIconBadgeNumber = customBadgeNumber
     }
 }
-
 
 // MARK: - Background batch notifications
 extension AdamantNotificationsService {

@@ -8,7 +8,6 @@
 
 import Swinject
 
-
 // MARK: - Services
 extension Container {
     func registerAdamantServices() {
@@ -27,16 +26,16 @@ extension Container {
         self.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
         
         // MARK: Secured Store
-        self.register(SecuredStore.self) { r in KeychainStore() }.inObjectScope(.container)
+        self.register(SecuredStore.self) { _ in KeychainStore() }.inObjectScope(.container)
         
         // MARK: LocalAuthentication
-        self.register(LocalAuthentication.self) { r in AdamantAuthentication() }.inObjectScope(.container)
+        self.register(LocalAuthentication.self) { _ in AdamantAuthentication() }.inObjectScope(.container)
         
         // MARK: Reachability
-        self.register(ReachabilityMonitor.self) { r in AdamantReachability() }.inObjectScope(.container)
+        self.register(ReachabilityMonitor.self) { _ in AdamantReachability() }.inObjectScope(.container)
         
         // MARK: AdamantAvatarService
-        self.register(AvatarService.self) { r in AdamantAvatarService() }.inObjectScope(.container)
+        self.register(AvatarService.self) { _ in AdamantAvatarService() }.inObjectScope(.container)
         
         // MARK: - Services with dependencies
         // MARK: DialogService
@@ -58,8 +57,9 @@ extension Container {
         
         // MARK: NodesSource
         self.register(NodesSource.self) { r in
-            let service = AdamantNodesSource(defaultNodes: AdamantResources.nodes)
+            let service = AdamantNodesSource(defaultNodesGetter: { AdamantResources.nodes })
             service.apiService = r.resolve(ApiService.self)!
+            service.healthCheckService = r.resolve(HealthCheckService.self)!
             service.securedStore = r.resolve(SecuredStore.self)
             return service
         }.inObjectScope(.container)
@@ -74,10 +74,16 @@ extension Container {
             service.nodesSource = r.resolve(NodesSource.self)
         }.inObjectScope(.container)
         
+        // MARK: HealthCheckService
+        self.register(HealthCheckService.self) { r in
+            let service = AdamantHealthCheckService()
+            service.apiService = r.resolve(ApiService.self)!
+            return service
+        }.inObjectScope(.container)
+        
         // MARK: SocketService
-        self.register(SocketService.self) { r in
+        self.register(SocketService.self) { _ in
             let service = AdamantSocketService()
-            service.adamantCore = r.resolve(AdamantCore.self)
             return service
         }.initCompleted { (r, c) in    // Weak reference
             let service = c as! AdamantSocketService
@@ -177,11 +183,11 @@ extension Container {
     
     func registerAdamantBackgroundFetchServices() {
         // MARK: Secured store
-        self.register(SecuredStore.self) { r in KeychainStore() }.inObjectScope(.container)
+        self.register(SecuredStore.self) { _ in KeychainStore() }.inObjectScope(.container)
         
         // MARK: NodesSource
         self.register(NodesSource.self) { r in
-            let service = AdamantNodesSource(defaultNodes: AdamantResources.nodes)
+            let service = AdamantNodesSource(defaultNodesGetter: { AdamantResources.nodes })
             service.securedStore = r.resolve(SecuredStore.self)
             return service
         }.inObjectScope(.container)

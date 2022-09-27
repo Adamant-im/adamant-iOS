@@ -15,7 +15,6 @@ class EthTransferViewController: TransferViewControllerBase {
     
     var chatsProvider: ChatsProvider!
     
-    
     // MARK: Properties
     
     private var skipValueChange: Bool = false
@@ -23,7 +22,6 @@ class EthTransferViewController: TransferViewControllerBase {
     static let invalidCharacters: CharacterSet = {
         CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789").inverted
     }()
-    
     
     // MARK: Send
     
@@ -102,7 +100,6 @@ class EthTransferViewController: TransferViewControllerBase {
         }
     }
     
-    
     // MARK: Overrides
     
     private var _recipient: String?
@@ -147,10 +144,11 @@ class EthTransferViewController: TransferViewControllerBase {
     }
     
     override func recipientRow() -> BaseRow {
-        let row = TextRow() {
+        let row = TextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = UIKeyboardType.namePhonePad
+            $0.cell.textField.setPopupKeyboardType(.namePhonePad)
+            $0.cell.textField.autocorrectionType = .no
             
             if let recipient = recipientAddress {
                 let trimmed = recipient.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
@@ -171,7 +169,7 @@ class EthTransferViewController: TransferViewControllerBase {
                 $0.disabled = true
 //                prefix.isEnabled = false
             }
-        }.cellUpdate { (cell, row) in
+        }.cellUpdate { (cell, _) in
             if let text = cell.textField.text {
                 cell.textField.text = text.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
             }
@@ -199,7 +197,7 @@ class EthTransferViewController: TransferViewControllerBase {
             }
             
             self?.validateForm()
-        }.onCellSelection { [weak self] (cell, row) in
+        }.onCellSelection { [weak self] (cell, _) in
             if let recipient = self?.recipientAddress {
                 let text = recipient
                 self?.shareValue(text, from: cell)

@@ -11,6 +11,7 @@ target 'Adamant' do
   pod 'MessageKit', '2.0.0' # Chat UI
   pod 'MyLittlePinpad' # Pinpad
   pod 'PMAlertController' # Custom alert controller
+  pod 'SwiftLint'
 end
 
 post_install do |installer|

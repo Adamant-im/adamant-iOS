@@ -18,7 +18,6 @@ enum AdamantMessage {
     case richMessage(payload: RichMessage)
 }
 
-
 // MARK: - Fee
 extension AdamantMessage {
     static private let textFee = Decimal(sign: .plus, exponent: -3, significand: 1)
@@ -37,7 +36,6 @@ extension AdamantMessage {
         return Decimal(ceil(Double(text.count) / 255.0)) * AdamantMessage.textFee
     }
 }
-
 
 // MARK: - ChatType
 extension AdamantMessage {

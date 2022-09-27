@@ -32,7 +32,6 @@ extension String.adamantLocalized {
     }
 }
 
-
 // MARK: - ViewController
 class LoginViewController: FormViewController {
     
@@ -117,7 +116,6 @@ class LoginViewController: FormViewController {
         }
     }
     
-    
     // MARK: Dependencies
     
     var accountService: AccountService!
@@ -131,7 +129,6 @@ class LoginViewController: FormViewController {
     private var hideNewPassphrase: Bool = true
     private var firstTimeActive: Bool = true
     internal var hidingImagePicker: Bool = false
-    
     
     /// On launch, request user biometry (TouchID/FaceID) if has an account with biometry active
     var requestBiometryOnFirstTimeActive: Bool = true
@@ -159,7 +156,6 @@ class LoginViewController: FormViewController {
                 tableView.tableFooterView = footer
             }
         }
-        
         
         // MARK: Login section
         form +++ Section(Sections.login.localized) {
@@ -192,7 +188,7 @@ class LoginViewController: FormViewController {
         }
         
         // Passphrase row
-        <<< PasswordRow() {
+        <<< PasswordRow {
             $0.tag = Rows.passphrase.tag
             $0.placeholder = Rows.passphrase.localized
             $0.placeholderColor = UIColor.adamant.secondary
@@ -200,7 +196,7 @@ class LoginViewController: FormViewController {
             }
             
         // Login with passphrase row
-        <<< ButtonRow() {
+        <<< ButtonRow {
             $0.tag = Rows.loginButton.tag
             $0.title = Rows.loginButton.localized
             $0.disabled = Condition.function([Rows.passphrase.tag], { form -> Bool in
@@ -209,7 +205,7 @@ class LoginViewController: FormViewController {
                 }
                 return false
             })
-        }.onCellSelection { [weak self] (cell, row) in
+        }.onCellSelection { [weak self] (_, row) in
             guard let row: PasswordRow = self?.form.rowBy(tag: Rows.passphrase.tag), let passphrase = row.value else {
                 return
             }
@@ -217,17 +213,16 @@ class LoginViewController: FormViewController {
             self?.loginWith(passphrase: passphrase)
         }
         
-        
         // MARK: New account section
         form +++ Section(Sections.newAccount.localized) {
             $0.tag = Sections.newAccount.tag
         }
         
         // Alert
-        <<< TextAreaRow() {
+        <<< TextAreaRow {
             $0.tag = Rows.saveYourPassphraseAlert.tag
             $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
-            $0.hidden = Condition.function([], { [weak self] form -> Bool in
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 return self?.hideNewPassphrase ?? false
             })
         }.cellUpdate { (cell, _) in
@@ -247,14 +242,14 @@ class LoginViewController: FormViewController {
         }
         
         // New genegated passphrase
-        <<< PassphraseRow() {
+        <<< PassphraseRow {
             $0.tag = Rows.newPassphrase.tag
             $0.cell.tip = Rows.tapToSaveHint.localized
             $0.cell.height = {96.0}
-            $0.hidden = Condition.function([], { [weak self] form -> Bool in
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 return self?.hideNewPassphrase ?? true
             })
-        }.cellUpdate({ (cell, row) in
+        }.cellUpdate({ (cell, _) in
             cell.passphraseLabel.font = UIFont.systemFont(ofSize: 19)
             cell.passphraseLabel.textColor = UIColor.adamant.primary
             cell.passphraseLabel.textAlignment = .center
@@ -279,16 +274,16 @@ class LoginViewController: FormViewController {
                                                completion: nil)
         })
         
-        <<< ButtonRow() {
+        <<< ButtonRow {
             $0.tag = Rows.generateNewPassphraseButton.tag
             $0.title = Rows.generateNewPassphraseButton.localized
-        }.onCellSelection { [weak self] (cell, row) in
+        }.onCellSelection { [weak self] (_, _) in
             self?.generateNewPassphrase()
         }
         
         // MARK: Nodes list settings
         form +++ Section()
-        <<< ButtonRow() {
+        <<< ButtonRow {
             $0.title = Rows.nodes.localized
             $0.tag = Rows.nodes.tag
         }.cellSetup { (cell, _) in
@@ -331,9 +326,17 @@ class LoginViewController: FormViewController {
             vc.loginWithBiometry()
             vc.firstTimeActive = false
         }
+        
+        setColors()
+    }
+    
+    // MARK: - Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
 }
-
 
 // MARK: - Login functions
 extension LoginViewController {
@@ -345,13 +348,13 @@ extension LoginViewController {
         
         dialogService.showProgress(withMessage: String.adamantLocalized.login.loggingInProgressMessage, userInteractionEnable: false)
         
-        apiService.getAccount(byPassphrase: passphrase) { result in
+        apiService.getAccount(byPassphrase: passphrase) { [weak self] result in
             switch result {
-            case .success(_):
-                self.loginIntoExistingAccount(passphrase: passphrase)
+            case .success:
+                self?.loginIntoExistingAccount(passphrase: passphrase)
                 
-            case .failure(_):
-                self.createAccountAndLogin(passphrase: passphrase)
+            case .failure(let error):
+                self?.dialogService.showRichError(error: error)
             }
         }
     }
@@ -372,19 +375,6 @@ extension LoginViewController {
         if let row = form.rowBy(tag: Rows.generateNewPassphraseButton.tag), let indexPath = row.indexPath {
             tableView.scrollToRow(at: indexPath, at: .none, animated: true)
         }
-    }
-    
-    // MARK: Login helpers
-    private func createAccountAndLogin(passphrase: String) {
-        accountService.createAccountWith(passphrase: passphrase, completion: { [weak self] result in
-            switch result {
-            case .success:
-                self?.loginIntoExistingAccount(passphrase: passphrase)
-                
-            case .failure(let error):
-                self?.dialogService.showRichError(error: error)
-            }
-        })
     }
     
     private func loginIntoExistingAccount(passphrase: String) {
@@ -411,7 +401,6 @@ extension LoginViewController {
         })
     }
 }
-
 
 // MARK: - Button stripe
 extension LoginViewController: ButtonsStripeViewDelegate {

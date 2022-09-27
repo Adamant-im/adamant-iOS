@@ -91,7 +91,6 @@ public final class BalanceTableViewCell: Cell<BalanceRowValue>, CellType {
     }
 }
 
-
 // MARK: - Row
 public final class BalanceRow: Row<BalanceTableViewCell>, RowType {
     var alertBackgroundColor: UIColor?

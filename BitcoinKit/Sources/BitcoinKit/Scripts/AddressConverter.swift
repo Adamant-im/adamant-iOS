@@ -15,7 +15,6 @@ class AddressConverter {
         case wrongAddressPrefix
     }
     
-    
     public static func extract(from signatureScript: Data, with network: Network) -> Address? {
         var payload: Data?
         var validScriptType: ScriptType = ScriptType.unknown

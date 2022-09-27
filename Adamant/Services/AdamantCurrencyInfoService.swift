@@ -8,13 +8,13 @@
 
 import Foundation
 import Alamofire
+import UIKit
 
 extension StoreKey {
     struct CoinInfo {
         static let selectedCurrency = "coinInfo.selectedCurrency"
     }
 }
-
 
 // MARK: - Service
 class AdamantCurrencyInfoService: CurrencyInfoService {
@@ -42,7 +42,7 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     // MARK: - Properties
     private static let historyThreshold = Double(exactly: 60*60*24)!
     
-    private var rateCoins: [String]? = nil
+    private var rateCoins: [String]?
     private var rates = [String: Decimal]()
     
     private let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.info-coins-response-queue", qos: .utility, attributes: [.concurrent])
@@ -53,6 +53,8 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
             NotificationCenter.default.post(name: Notification.Name.AdamantCurrencyInfoService.currencyRatesUpdated, object: nil)
         }
     }
+    
+    private var observerActive: NSObjectProtocol?
     
     // MARK: - Dependencies
     var accountService: AccountService! {
@@ -72,6 +74,28 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
             } else {
                 currentCurrency = Currency.default
             }
+        }
+    }
+    
+    // MARK: - Init
+    init() {
+        addObservers()
+    }
+    
+    deinit {
+        removeObservers()
+    }
+    
+    // MARK: - Observers
+    func addObservers() {
+        observerActive = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.update()
+        }
+    }
+    
+    func removeObservers() {
+        if let observerActive = observerActive {
+            NotificationCenter.default.removeObserver(observerActive)
         }
     }
     
@@ -161,7 +185,6 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
         }
     }
 }
-
 
 // MARK: - Server responses
 struct CoinInfoServiceResponseGet: Decodable {

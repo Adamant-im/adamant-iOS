@@ -35,7 +35,6 @@ protocol RichMessageProvider: AnyObject {
     func cell(for message: MessageType, isFromCurrentSender: Bool, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UICollectionViewCell
 }
 
-
 protocol RichMessageProviderWithStatusCheck: RichMessageProvider {
     func statusFor(transaction: RichMessageTransaction, completion: @escaping (WalletServiceResult<TransactionStatus>) -> Void)
     

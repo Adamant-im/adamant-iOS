@@ -35,7 +35,6 @@ extension StoreKey {
     }
 }
 
-
 // MARK: - Application
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -120,8 +119,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 tabBarAppearance.configureWithDefaultBackground()
                 UITabBar.appearance().standardAppearance = tabBarAppearance
 
+                let navigationBarAppearance = UINavigationBarAppearance()
+                navigationBarAppearance.configureWithDefaultBackground()
+                UINavigationBar.appearance().standardAppearance = navigationBarAppearance
+                        
                 if #available(iOS 15.0, *) {
                     UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+                    UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
                 }
             }
             
@@ -152,29 +156,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let reachability = container.resolve(ReachabilityMonitor.self) {
             reachability.start()
             
-            switch reachability.connection {
-            case .cellular, .wifi:
+            if reachability.connection {
                 dialogService.dissmisNoConnectionNotification()
-                break
-                
-            case .none:
+            } else {
                 dialogService.showNoConnectionNotification()
                 repeater.pauseAll()
             }
             
             NotificationCenter.default.addObserver(forName: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: reachability, queue: nil) { [weak self] notification in
-                guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? AdamantConnection,
+                guard let connection = notification.userInfo?[AdamantUserInfoKey.ReachabilityMonitor.connection] as? Bool,
                     let repeater = self?.repeater else {
                         return
                 }
                 
-                switch connection {
-                case .cellular, .wifi:
-                    self?.dialogService.dissmisNoConnectionNotification()
+                if connection {
+                    DispatchQueue.onMainSync {
+                        self?.dialogService.dissmisNoConnectionNotification()
+                    }
                     repeater.resumeAll()
-                    
-                case .none:
-                    self?.dialogService.showNoConnectionNotification()
+                } else {
+                    DispatchQueue.onMainSync {
+                        self?.dialogService.showNoConnectionNotification()
+                    }
                     repeater.pauseAll()
                 }
             }
@@ -213,7 +216,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", error: nil)
         }
         
-        
         // MARK: 6. Logout reset
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
             // On logout, pop all navigators to root.
@@ -250,17 +252,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             notificationService.removeAllDeliveredNotifications()
         }
         
-        if let connection = container.resolve(ReachabilityMonitor.self)?.connection {
-            switch connection {
-            case .wifi, .cellular:
-                repeater.resumeAll()
-                
-            case .none:
-                break
-            }
-        } else {
-            repeater.resumeAll()
-        }
+        guard container.resolve(ReachabilityMonitor.self)?.connection == true
+        else { return }
+        
+        repeater.resumeAll()
     }
 }
 
@@ -339,47 +334,53 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         }
     }
     
-    //MARK: Open Chat From Notification
+    // MARK: Open Chat From Notification
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        if let recipientAddress = userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String
-        {
-            if application.applicationState != .background && application.applicationState != .inactive {
-                completionHandler(.noData)
-                return
-            }
-            
-            if let tabbar = window?.rootViewController as? UITabBarController,
-               let chats = tabbar.viewControllers?.first as? UISplitViewController,
-               let chatList = chats.viewControllers.first as? UINavigationController,
-               let list = chatList.viewControllers.first as? ChatListViewController {
-                
-                switch list.accountService.state {
-                case .loggedIn:
-                    self.openDialog(chatList: chatList, tabbar: tabbar, list: list, recipientAddress: recipientAddress)
-                case .notLogged:
-                    break
-                case .isLoggingIn:
-                    break
-                case .updating:
-                    break
-                }
-                
-                // if not logged in
-                list.didLoadedMessages = { [weak self] in
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, recipientAddress: recipientAddress)
-                    }
-                }
-            }
-            completionHandler(.newData)
-        } else {
+        guard let transactionID = userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
+              let transactionRaw = userInfo[AdamantNotificationUserInfoKeys.transaction] as? String,
+              let data = transactionRaw.data(using: .utf8),
+              let trs = try? JSONDecoder().decode(Transaction.self, from: data),
+              let tabbar = window?.rootViewController as? UITabBarController,
+              let chats = tabbar.viewControllers?.first as? UISplitViewController,
+              let chatList = chats.viewControllers.first as? UINavigationController,
+              let list = chatList.viewControllers.first as? ChatListViewController,
+              (application.applicationState != .active)
+        else {
             completionHandler(.noData)
+            return
         }
+        
+        if case .loggedIn = list.accountService.state {
+            self.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: trs.senderId)
+        }
+
+        // if not logged in
+        list.didLoadedMessages = { [weak self] in
+            var timeout = 2.0
+            if #available(iOS 13.0, *) { timeout = 0.5 }
+            DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
+                self?.dialogService.dismissProgress()
+                self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: trs.senderId)
+            }
+        }
+        
+        completionHandler(.newData)
     }
     
-    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, list: ChatListViewController, recipientAddress: String) {
+    func openDialog(chatList: UINavigationController, tabbar: UITabBarController, list: ChatListViewController, transactionID: String, senderAddress: String) {
+        if let chatVCNav = chatList.viewControllers.last as? UINavigationController,
+           let chatVC = chatVCNav.viewControllers.first as? ChatViewController,
+           chatVC.chatroom?.partner?.address == senderAddress {
+            chatVC.forceScrollToBottom = true
+            chatVC.scrollDown()
+            return
+        }
+        
         guard let chatroom = list.chatsController?.fetchedObjects?.first(where: { room in
-            return room.lastTransaction?.recipientAddress == recipientAddress
+            let transactionExist = room.transactions?.first(where: { message in
+                return (message as? ChatTransaction)?.senderAddress == senderAddress
+            })
+            return transactionExist != nil
         }) else { return }
         
         chatList.popToRootViewController(animated: false)
@@ -391,15 +392,14 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             var timeout = 0.25
             if #available(iOS 13.0, *) { timeout = 0 }
             DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
-                let chat = UINavigationController(rootViewController:vc)
-                split.showDetailViewController(chat, sender: self)
+                let chat = UINavigationController(rootViewController: vc)
+                split.showDetailViewController(chat, sender: list)
             }
         } else {
             chatList.pushViewController(vc, animated: false)
         }
     }
 }
-
 
 // MARK: - Background Fetch
 extension AppDelegate {
@@ -460,7 +460,6 @@ extension AppDelegate {
     }
 }
 
-
 // MARK: - Welcome messages
 extension AppDelegate {
     private func handleWelcomeMessages(notification: Notification) {
@@ -480,7 +479,6 @@ extension AppDelegate {
         } else {
             unread = true
         }
-        
         if let exchenge = AdamantContacts.adamantExchange.messages["chats.welcome_message"] {
             chatProvider.fakeReceived(message: exchenge.message,
                                       senderId: AdamantContacts.adamantExchange.address,
@@ -529,9 +527,9 @@ extension AppDelegate {
             })
         }
         
-        if let welcome = AdamantContacts.adamantBountyWallet.messages["chats.welcome_message"] {
+        if let welcome = AdamantContacts.adamantWelcomeWallet.messages["chats.welcome_message"] {
             chatProvider.fakeReceived(message: welcome.message,
-                                      senderId: AdamantContacts.adamantBountyWallet.name,
+                                      senderId: AdamantContacts.adamantWelcomeWallet.name,
                                       date: Date.adamantNullDate,
                                       unread: unread,
                                       silent: welcome.silentNotification,
@@ -577,15 +575,8 @@ extension AppDelegate {
                    let router = container.resolve(Router.self),
                    let list = chatList.viewControllers.first as? ChatListViewController {
                  
-                    switch list.accountService.state {
-                    case .loggedIn:
+                    if case .loggedIn = list.accountService.state {
                         self.openDialog(chatList: chatList, tabbar: tabbar, router: router, list: list, adamantAdr: adamantAdr)
-                    case .notLogged:
-                        break
-                    case .isLoggingIn:
-                        break
-                    case .updating:
-                        break
                     }
                     
                     // if not logged in

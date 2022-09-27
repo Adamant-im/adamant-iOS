@@ -33,11 +33,9 @@ class TransactionsListViewControllerBase: UIViewController {
         return refreshControl
     }()
     
-    
     // MARK: - IBOutlets
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var emptyLabel: UILabel!
-    
     
     // MARK: - Lifecycle
     
@@ -60,7 +58,7 @@ class TransactionsListViewControllerBase: UIViewController {
         tableView.refreshControl = refreshControl
         
         // MARK: Notifications
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.reloadData()
         }
         
@@ -71,6 +69,8 @@ class TransactionsListViewControllerBase: UIViewController {
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAddressBookService.addressBookUpdated, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.reloadData()
         }
+        
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -86,6 +86,12 @@ class TransactionsListViewControllerBase: UIViewController {
         }
     }
     
+    // MARK: - Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.backgroundColor
+        tableView.backgroundColor = .clear
+    }
     
     // MARK: - To override
     
@@ -113,7 +119,7 @@ class TransactionsListViewControllerBase: UIViewController {
         
     }
     
-    var currencySymbol: String? = nil
+    var currencySymbol: String?
 }
 
 // MARK: - UITableViewDataSource, UITableViewDelegate
@@ -130,6 +136,7 @@ extension TransactionsListViewControllerBase: UITableViewDataSource, UITableView
                        partnerName: String?,
                        amount: Decimal,
                        date: Date?) {
+        cell.backgroundColor = .clear
         cell.accountLabel.tintColor = UIColor.adamant.primary
         cell.ammountLabel.tintColor = UIColor.adamant.primary
         cell.dateLabel.tintColor = UIColor.adamant.secondary

@@ -59,6 +59,10 @@ extension UITextField {
         applyClearButtonTint()
     }
     
+    func setPopupKeyboardType(_ type: UIKeyboardType) {
+        guard !isMacOS else { return }
+        keyboardType = type
+    }
 }
 
 class Wrapper<T> {

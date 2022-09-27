@@ -73,6 +73,10 @@ class LskWalletService: WalletService {
         return type(of: self).currencyLogo
     }
 	
+    var tokenNetworkSymbol: String {
+        return "LSK"
+    }
+    
 	// MARK: - Properties
 	let transferAvailable: Bool = true
     private var initialBalanceCheck = false
@@ -83,7 +87,7 @@ class LskWalletService: WalletService {
     internal var nodeApi: LiskKit.Node!
     internal var netHash: String = ""
     
-    private (set) var lskWallet: LskWallet? = nil
+    private (set) var lskWallet: LskWallet?
     
     let defaultDispatchQueue = DispatchQueue(label: "im.adamant.lskWalletService", qos: .utility, attributes: [.concurrent])
     
@@ -110,8 +114,7 @@ class LskWalletService: WalletService {
     let stateSemaphore = DispatchSemaphore(value: 1)
     
     // MARK: - Delayed KVS save
-    private var balanceObserver: NSObjectProtocol? = nil
-    
+    private var balanceObserver: NSObjectProtocol?
     
     // MARK: - Logic
     convenience init(mainnet: Bool = true) {
@@ -161,7 +164,7 @@ class LskWalletService: WalletService {
         stateSemaphore.wait()
         
         switch state {
-        case .notInitiated, .updating, .initiationFailed(_):
+        case .notInitiated, .updating, .initiationFailed:
             return
             
         case .upToDate:
@@ -302,7 +305,7 @@ extension LskWalletService {
             let group = DispatchGroup()
             group.enter()
             
-            initiateNodes { result in
+            initiateNodes { _ in
                 group.leave()
             }
             
@@ -415,7 +418,6 @@ extension LskWalletService: InitiatedWithPassphraseService {
         stateSemaphore.signal()
     }
     
-    
     /// New accounts doesn't have enought money to save KVS. We need to wait for balance update, and then - retry save
     private func kvsSaveCompletionRecursion(lskAddress: String, result: WalletServiceSimpleResult) {
         if let observer = balanceObserver {
@@ -516,7 +518,6 @@ extension LskWalletService {
     }
 }
 
-
 // MARK: - KVS
 extension LskWalletService {
     /// - Parameters:
@@ -601,7 +602,6 @@ extension LskWalletService: PrivateKeyGenerator {
     var rowImage: UIImage? {
         return #imageLiteral(resourceName: "wallet_lsk_row")
     }
-    
     
     func generatePrivateKeyFor(passphrase: String) -> String? {
         guard AdamantUtilities.validateAdamantPassphrase(passphrase: passphrase), let keypair = try? LiskKit.Crypto.keyPair(fromPassphrase: passphrase, salt: "adm") else {

@@ -99,7 +99,6 @@ protocol DialogService: AnyObject {
     /// Present view controller modally
     func present(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
     
-    
     // MARK: - Toast messages
     /// Show pop-up message
     func showToastMessage(_ message: String)

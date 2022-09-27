@@ -31,7 +31,7 @@ import UIKit
 open class KeyboardManager: NSObject, UIGestureRecognizerDelegate {
     
     /// A callback that passes a `KeyboardNotification` as an input
-    public typealias EventCallback = (KeyboardNotification)->Void
+    public typealias EventCallback = (KeyboardNotification) -> Void
     
     // MARK: - Properties [Public]
     
@@ -141,7 +141,7 @@ open class KeyboardManager: NSObject, UIGestureRecognizerDelegate {
         guard let superview = inputAccessoryView.superview else {
             fatalError("`inputAccessoryView` must have a superview")
         }
-        let tabBarHeight = tabBar?.bounds.size.height ?? 0
+        let tabBarHeight = isMacOS ? 0 : tabBar?.bounds.size.height ?? 0
         self.inputAccessoryView = inputAccessoryView
         inputAccessoryView.translatesAutoresizingMaskIntoConstraints = false
         constraints = NSLayoutConstraintSet(
@@ -258,7 +258,7 @@ open class KeyboardManager: NSObject, UIGestureRecognizerDelegate {
     
     // MARK: - Helper Methods
     
-    private func animateAlongside(_ notification: KeyboardNotification, animations: @escaping ()->Void) {
+    private func animateAlongside(_ notification: KeyboardNotification, animations: @escaping () -> Void) {
         UIView.animate(withDuration: notification.timeInterval, delay: 0, options: [notification.animationOptions, .allowAnimatedContent, .beginFromCurrentState], animations: animations, completion: nil)
     }
     
@@ -271,6 +271,7 @@ open class KeyboardManager: NSObject, UIGestureRecognizerDelegate {
     @objc
     open func handlePanGestureRecognizer(recognizer: UIPanGestureRecognizer) {
         guard
+            !isKeyboardHidden,
             var keyboardNotification = cachedNotification,
             case .changed = recognizer.state,
             let view = recognizer.view,
@@ -502,7 +503,6 @@ class NSLayoutConstraintSet {
     }
 }
 
-
 //
 //  NSNotification+Extensions.swift
 //  InputBarAccessoryView
@@ -593,4 +593,3 @@ internal extension NSNotification {
     }
     
 }
-

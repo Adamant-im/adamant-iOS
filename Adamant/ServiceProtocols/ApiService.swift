@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Alamofire
 
 enum ApiServiceResult<T> {
     case success(T)
@@ -20,6 +21,7 @@ enum ApiServiceError: Error {
     case serverError(error: String)
     case internalError(message: String, error: Error?)
     case networkError(error: Error)
+    case requestCancelled
     
     var localized: String {
         switch self {
@@ -47,6 +49,9 @@ enum ApiServiceError: Error {
             
         case .networkError(error: _):
             return String.adamantLocalized.sharedErrors.networkError
+            
+        case .requestCancelled:
+            return String.adamantLocalized.sharedErrors.requestCancelled
         }
     }
 }
@@ -58,7 +63,7 @@ extension ApiServiceError: RichError {
     
     var level: ErrorLevel {
         switch self {
-        case .accountNotFound, .notLogged, .networkError:
+        case .accountNotFound, .notLogged, .networkError, .requestCancelled:
             return .warning
             
         case .internalError, .serverError:
@@ -68,7 +73,7 @@ extension ApiServiceError: RichError {
     
     var internalError: Error? {
         switch self {
-        case .accountNotFound, .notLogged, .serverError:
+        case .accountNotFound, .notLogged, .serverError, .requestCancelled:
             return nil
             
         case .internalError(_, let error):
@@ -104,6 +109,12 @@ extension ApiServiceError: Equatable {
     }
 }
 
+// MARK: - Notifications
+extension Notification.Name {
+    enum ApiService {
+        static let currentNodeUpdate = Notification.Name("adamant.apiService.currentNodeUpdate")
+    }
+}
 
 // - MARK: ApiService
 protocol ApiService: AnyObject {
@@ -111,46 +122,47 @@ protocol ApiService: AnyObject {
     /// Default is async queue with .utilities priority.
     var defaultResponseDispatchQueue: DispatchQueue { get }
     
-    // MARK: - Servers list
-    
-    /// Current node
-    var node: Node? { get }
-    
     /// Time interval between node (lhs) and client (rhs)
     /// Substract this from client time to get server time
-    var nodeTimeDelta: TimeInterval? { get }
+    var lastRequestTimeDelta: TimeInterval? { get }
     
-    /// Request new node from source
-    func refreshNode()
+    var currentNodes: [Node] { get }
     
     // MARK: - Peers
     
     func getNodeVersion(url: URL, completion: @escaping (ApiServiceResult<NodeVersion>) -> Void)
     
+    // MARK: - Status
+    
+    @discardableResult
+    func getNodeStatus(
+        url: URL,
+        completion: @escaping (ApiServiceResult<NodeStatus>) -> Void
+    ) -> DataRequest?
     
     // MARK: - Accounts
     
-    func newAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
     func getAccount(byPassphrase passphrase: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
     func getAccount(byPublicKey publicKey: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
     func getAccount(byAddress address: String, completion: @escaping (ApiServiceResult<AdamantAccount>) -> Void)
     
-    
     // MARK: - Keys
     
     func getPublicKey(byAddress address: String, completion: @escaping (ApiServiceResult<String>) -> Void)
-    
     
     // MARK: - Transactions
     
     func getTransaction(id: UInt64, completion: @escaping (ApiServiceResult<Transaction>) -> Void)
     func getTransactions(forAccount: String, type: TransactionType, fromHeight: Int64?, offset: Int?, limit: Int?, completion: @escaping (ApiServiceResult<[Transaction]>) -> Void)
     
-    
+    // MARK: - Chats Rooms
+      
+      func getChatRooms(address: String, offset: Int?, completion: @escaping (ApiServiceResult<ChatRooms>) -> Void)
+      func getChatMessages(address: String, addressRecipient: String, offset: Int?, completion: @escaping (ApiServiceResult<ChatRooms>) -> Void)
+
     // MARK: - Funds
     
     func transferFunds(sender: String, recipient: String, amount: Decimal, keypair: Keypair, completion: @escaping (ApiServiceResult<UInt64>) -> Void)
-    
     
     // MARK: - States
     

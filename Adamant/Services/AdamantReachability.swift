@@ -8,70 +8,45 @@
 
 import Foundation
 import Reachability
-
-// MAKR: - Convinients
-extension Reachability.Connection {
-    var adamantConnection: AdamantConnection {
-        switch self {
-        case .none, .unavailable:
-            return .none
-        
-        case .wifi:
-            return .wifi
-            
-        case .cellular:
-            return .cellular
-        }
-    }
-}
+import Network
 
 // MARK: - AdamantReachability wrapper
 class AdamantReachability: ReachabilityMonitor {
-    let reachability: Reachability
+    private let monitor = NWPathMonitor()
+    private(set) var connection = true
     
-    private(set) var isActive = false
-    
-    var connection: AdamantConnection {
-        return reachability.connection.adamantConnection
-    }
-    
-    init() {
-        reachability = try! Reachability() // TODO: remove force try and make safe init
-        reachability.whenReachable = { [weak self] reachability in
-            let userInfo: [String:Any] = [AdamantUserInfoKey.ReachabilityMonitor.connection:reachability.connection.adamantConnection]
-            NotificationCenter.default.post(name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: self, userInfo: userInfo)
-        }
-        
-        reachability.whenUnreachable = { [weak self] reachability in
-            let userInfo: [String:Any] = [AdamantUserInfoKey.ReachabilityMonitor.connection:reachability.connection.adamantConnection]
-            NotificationCenter.default.post(name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged, object: self, userInfo: userInfo)
-        }
-    }
-    
-    deinit {
-        stop()
-    }
-
     func start() {
-        guard !isActive else {
-            return
+        monitor.pathUpdateHandler = { [weak self] _ in
+            guard let self = self else { return }
+            self.updateConnection()
+            
+            let userInfo: [String: Any] = [
+                AdamantUserInfoKey.ReachabilityMonitor.connection: self.connection
+            ]
+            
+            NotificationCenter.default.post(
+                name: Notification.Name.AdamantReachabilityMonitor.reachabilityChanged,
+                object: self,
+                userInfo: userInfo
+            )
         }
-        
-        do {
-            try reachability.startNotifier()
-            isActive = true
-        } catch {
-            isActive = false
-        }
+
+        let queue = DispatchQueue(label: "NetworkMonitor")
+        monitor.start(queue: queue)
     }
 
     func stop() {
-        guard isActive else {
-            return
+        monitor.cancel()
+    }
+    
+    private func updateConnection() {
+        switch monitor.currentPath.status {
+        case .satisfied:
+            connection = true
+        case .unsatisfied, .requiresConnection:
+            connection = false
+        @unknown default:
+            connection = false
         }
-
-        NotificationCenter.default.removeObserver(self)
-        reachability.stopNotifier()
-        isActive = false
     }
 }
