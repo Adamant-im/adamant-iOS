@@ -158,8 +158,8 @@ class AdmWalletViewController: WalletViewControllerBase {
         setColors()
     }
     
-    override func sendRowLocalizedLabel() -> String {
-        return String.adamantLocalized.wallets.sendAdm
+    override func sendRowLocalizedLabel() -> NSAttributedString {
+        return NSAttributedString(string: String.adamantLocalized.wallets.sendAdm)
     }
     
     override func encodeForQr(address: String) -> String? {

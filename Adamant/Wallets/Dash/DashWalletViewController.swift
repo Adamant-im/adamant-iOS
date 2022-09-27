@@ -24,8 +24,8 @@ class DashWalletViewController: WalletViewControllerBase {
         walletTitleLabel.text = String.adamantLocalized.dash
     }
     
-    override func sendRowLocalizedLabel() -> String {
-        return String.adamantLocalized.sendDash
+    override func sendRowLocalizedLabel() -> NSAttributedString {
+        return NSAttributedString(string: String.adamantLocalized.sendDash)
     }
     
     override func encodeForQr(address: String) -> String? {

@@ -148,11 +148,20 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             
             let sendRow = LabelRow {
                 $0.tag = BaseRows.send.tag
-                $0.title = label
+                if #available(iOS 14.0, *) {
+                    var content = $0.cell.defaultContentConfiguration()
+                    content.attributedText = label
+                    $0.cell.contentConfiguration = content
+                } else {
+                    $0.cell.textLabel?.attributedText = label
+                }
                 $0.cell.selectionStyle = .gray
                 $0.cell.backgroundColor = UIColor.adamant.cellColor
             }.cellUpdate { (cell, _) in
                 cell.accessoryType = .disclosureIndicator
+                if #unavailable(iOS 14.0) {
+                    cell.textLabel?.attributedText = label
+                }
             }.onCellSelection { [weak self] (_, _) in
                 guard let service = self?.service as? WalletServiceWithSend else {
                     return
@@ -270,8 +279,8 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     // MARK: - To override
     
-    func sendRowLocalizedLabel() -> String {
-        return BaseRows.send.localized
+    func sendRowLocalizedLabel() -> NSAttributedString {
+        return NSAttributedString(string: BaseRows.send.localized)
     }
     
     func encodeForQr(address: String) -> String? {
