@@ -78,8 +78,8 @@
         "repositoryURL": "https://github.com/xmartlabs/Eureka.git",
         "state": {
           "branch": null,
-          "revision": "975e8d5e0ea3c86aff828537b2d4abe4430d6312",
-          "version": "5.3.4"
+          "revision": "a7523afdfe38478c6d5706a8ac01d26590835493",
+          "version": "5.3.6"
         }
       },
       {
@@ -105,8 +105,8 @@
         "repositoryURL": "https://github.com/krzyzanowskim/OpenSSL.git",
         "state": {
           "branch": null,
-          "revision": "4ae145c1446851cda62fa4b09c7b5e5c540d7b20",
-          "version": "1.1.1300"
+          "revision": "df45574d009dae57daca9ad0941de3c33be19365",
+          "version": "1.1.1500"
         }
       },
       {
@@ -132,8 +132,8 @@
         "repositoryURL": "https://github.com/mxcl/PromiseKit.git",
         "state": {
           "branch": null,
-          "revision": "7b07b214dacecb22ca4b680531c7e981d52483f9",
-          "version": "6.16.3"
+          "revision": "c946b7561fbe11379a874e59faa2c5f8077ae0e1",
+          "version": "6.17.1"
         }
       },
       {
@@ -188,6 +188,15 @@
           "branch": null,
           "revision": "f222cbdf325885926566172f6f5f06af95473158",
           "version": "5.6.0"
+        }
+      },
+      {
+        "package": "SocketIO",
+        "repositoryURL": "https://github.com/socketio/socket.io-client-swift",
+        "state": {
+          "branch": null,
+          "revision": "36db2ff0ebc7239187f9b382fd318e122da71caa",
+          "version": "15.2.0"
         }
       },
       {

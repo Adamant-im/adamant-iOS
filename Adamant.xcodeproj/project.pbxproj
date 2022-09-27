@@ -155,6 +155,7 @@
 		A5241B70262DEDE1009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B6F262DEDE1009FA43E /* Clibsodium */; };
 		A5241B77262DEDEF009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B76262DEDEF009FA43E /* Clibsodium */; };
 		A5241B7E262DEDFE009FA43E /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = A5241B7D262DEDFE009FA43E /* Clibsodium */; };
+		A530B0D82842110D003F0210 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = A530B0D72842110D003F0210 /* SocketIO */; };
 		A544F0D4262C9878001F1A6D /* Eureka in Frameworks */ = {isa = PBXBuildFile; productRef = A544F0D3262C9878001F1A6D /* Eureka */; };
 		A57282CA262C94CD00C96FA8 /* DateToolsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A57282C9262C94CD00C96FA8 /* DateToolsSwift */; };
 		A57282D1262C94DA00C96FA8 /* DateToolsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A57282D0262C94DA00C96FA8 /* DateToolsSwift */; };
@@ -1097,6 +1098,7 @@
 				A57839FB262C95BF00428183 /* KeychainAccess in Frameworks */,
 				A5DBBABD262C7221004AC028 /* Clibsodium in Frameworks */,
 				A50AEB14262C837900B37C22 /* Alamofire in Frameworks */,
+				A530B0D82842110D003F0210 /* SocketIO in Frameworks */,
 				A5DBBADC262C729B004AC028 /* CryptoSwift in Frameworks */,
 				A5D87BA3262CA01D00DC28F0 /* ProcedureKit in Frameworks */,
 				A5C99E0E262C9E3A00F7B1B7 /* Reachability in Frameworks */,
@@ -2089,6 +2091,7 @@
 				A5D87BA2262CA01D00DC28F0 /* ProcedureKit */,
 				A5AC8DFE262E0B030053A7E2 /* SipHash */,
 				3A8875EE27BBF38D00436195 /* Parchment */,
+				A530B0D72842110D003F0210 /* SocketIO */,
 				557AC305287B10D8004699D7 /* SnapKit */,
 			);
 			productName = Adamant;
@@ -2252,6 +2255,7 @@
 				A5D87BA1262CA01D00DC28F0 /* XCRemoteSwiftPackageReference "ProcedureKit" */,
 				A5AC8DFD262E0B030053A7E2 /* XCRemoteSwiftPackageReference "SipHash" */,
 				3A8875ED27BBF38D00436195 /* XCRemoteSwiftPackageReference "Parchment" */,
+				A530B0D62842110D003F0210 /* XCRemoteSwiftPackageReference "socket" */,
 				557AC304287B10D8004699D7 /* XCRemoteSwiftPackageReference "SnapKit" */,
 			);
 			productRefGroup = E913C8EF1FFFA51D001A83F7 /* Products */;
@@ -2430,8 +2434,6 @@
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
 				"${BUILT_PRODUCTS_DIR}/MyLittlePinpad/MyLittlePinpad.framework",
 				"${BUILT_PRODUCTS_DIR}/PMAlertController/PMAlertController.framework",
-				"${BUILT_PRODUCTS_DIR}/Socket.IO-Client-Swift/SocketIO.framework",
-				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -2441,8 +2443,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MyLittlePinpad.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PMAlertController.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SocketIO.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3538,6 +3538,14 @@
 				minimumVersion = 5.4.2;
 			};
 		};
+		A530B0D62842110D003F0210 /* XCRemoteSwiftPackageReference "socket" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 15.2.0;
+			};
+		};
 		A544F0D2262C9878001F1A6D /* XCRemoteSwiftPackageReference "Eureka" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/xmartlabs/Eureka.git";
@@ -3686,6 +3694,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A5DBBABB262C7221004AC028 /* XCRemoteSwiftPackageReference "swift-sodium" */;
 			productName = Clibsodium;
+		};
+		A530B0D72842110D003F0210 /* SocketIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A530B0D62842110D003F0210 /* XCRemoteSwiftPackageReference "socket" */;
+			productName = SocketIO;
 		};
 		A544F0D3262C9878001F1A6D /* Eureka */ = {
 			isa = XCSwiftPackageProductDependency;
