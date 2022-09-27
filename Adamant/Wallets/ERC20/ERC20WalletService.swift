@@ -122,12 +122,11 @@ class ERC20WalletService: WalletService {
         }
     }
     
-    private (set) var ethWallet: EthWallet? = nil
+    private (set) var ethWallet: EthWallet?
     var wallet: WalletAccount? { return ethWallet }
     
-    
     private (set) var contract: web3.web3contract?
-    private var balanceObserver: NSObjectProtocol? = nil
+    private var balanceObserver: NSObjectProtocol?
     
     init(token: ERC20Token) {
         self.token = token
@@ -195,7 +194,7 @@ class ERC20WalletService: WalletService {
         stateSemaphore.wait()
         
         switch state {
-        case .notInitiated, .updating, .initiationFailed(_):
+        case .notInitiated, .updating, .initiationFailed:
             return
             
         case .upToDate:
@@ -478,7 +477,6 @@ extension ERC20WalletService {
         }
     }
     
-    
     func getWalletAddress(byAdamantAddress address: String, completion: @escaping (WalletServiceResult<String>) -> Void) {
         apiService.get(key: EthWalletService.kvsAddress, sender: address) { (result) in
             switch result {
@@ -534,7 +532,7 @@ extension ERC20WalletService {
         // MARK: Sending requests
         
         let dispatchGroup = DispatchGroup()
-        var error: WalletServiceError? = nil
+        var error: WalletServiceError?
         
         var transactions = [EthTransactionShort]()
         let semaphore = DispatchSemaphore(value: 1)

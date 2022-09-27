@@ -10,7 +10,6 @@
 import Foundation
 import CoreData
 
-
 extension TransferTransaction {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<TransferTransaction> {

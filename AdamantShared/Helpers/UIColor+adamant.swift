@@ -161,7 +161,6 @@ extension UIColor {
         /// Pinpad highligh button background, 12% gray
         static let pinpadHighlightButton = UIColor(red: 0.88, green: 0.88, blue: 0.88, alpha: 1)
         
-        
         // MARK: Transfers
         /// Income transfer icon background, light green
         static let transferIncomeIconBackground = UIColor(red: 0.7, green: 0.93, blue: 0.55, alpha: 1)

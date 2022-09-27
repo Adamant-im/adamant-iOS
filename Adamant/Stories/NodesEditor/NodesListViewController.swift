@@ -9,7 +9,6 @@
 import UIKit
 import Eureka
 
-
 // MARK: - Localization
 extension String.adamantLocalized {
     struct nodesList {
@@ -23,7 +22,6 @@ extension String.adamantLocalized {
         private init() {}
     }
 }
-
 
 // MARK: - NodesListViewController
 class NodesListViewController: FormViewController {
@@ -132,7 +130,7 @@ class NodesListViewController: FormViewController {
             forName: Notification.Name.ApiService.currentNodeUpdate,
             object: nil,
             queue: nil
-        ) { [weak self] notification in
+        ) { [weak self] _ in
             DispatchQueue.onMainAsync {
                 self?.currentRestNode = self?.apiService.currentNodes.first
             }
@@ -142,7 +140,7 @@ class NodesListViewController: FormViewController {
             forName: Notification.Name.SocketService.currentNodeUpdate,
             object: nil,
             queue: nil
-        ) { [weak self] notification in
+        ) { [weak self] _ in
             DispatchQueue.onMainAsync {
                 self?.currentSocketsNode = self?.socketService.currentNode
             }
@@ -163,20 +161,19 @@ class NodesListViewController: FormViewController {
             navigationItem.rightBarButtonItem = done
         }
         
-        
         // MARK: Nodes
         
-        form +++ Section() {
+        form +++ Section {
             $0.tag = Sections.nodes.tag
         }
         
         // MARK: Prefer the fastest node
         
-        +++ Section() {
+        +++ Section {
             $0.tag = Sections.preferTheFastestNode.tag
         }
         
-        <<< SwitchRow() { [preferTheFastestNode = nodesSource.preferTheFastestNode] in
+        <<< SwitchRow { [preferTheFastestNode = nodesSource.preferTheFastestNode] in
             $0.title = Rows.preferTheFastestNode.localized
             $0.value = preferTheFastestNode
         }.onChange { [weak nodesSource] in
@@ -187,12 +184,12 @@ class NodesListViewController: FormViewController {
         
         // MARK: Buttons
         
-        +++ Section() {
+        +++ Section {
             $0.tag = Sections.buttons.tag
         }
         
         // Add node
-        <<< ButtonRow() {
+        <<< ButtonRow {
             $0.title = Rows.addNode.localized
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
@@ -201,7 +198,7 @@ class NodesListViewController: FormViewController {
         }
             
         // Reset
-        <<< ButtonRow() {
+        <<< ButtonRow {
             $0.title = Rows.reset.localized
         }.onCellSelection { [weak self] (_, _) in
             self?.resetToDefault()
@@ -229,7 +226,6 @@ class NodesListViewController: FormViewController {
         tableView.backgroundColor = .clear
     }
 }
-
 
 // MARK: - Manipulating node list
 extension NodesListViewController {
@@ -309,7 +305,6 @@ extension NodesListViewController {
     }
 }
 
-
 // MARK: - NodeEditorDelegate
 extension NodesListViewController: NodeEditorDelegate {
     func nodeEditorViewController(_ editor: NodeEditorViewController, didFinishEditingWithResult result: NodeEditorResult) {
@@ -337,7 +332,6 @@ extension NodesListViewController: NodeEditorDelegate {
     }
 }
 
-
 // MARK: - Loading nodes
 
 extension NodesListViewController {
@@ -350,11 +344,10 @@ extension NodesListViewController {
     }
 }
 
-
 // MARK: - Tools
 extension NodesListViewController {
     private func createRowFor(node: Node, tag: String) -> BaseRow {
-        let row = NodeRow() {
+        let row = NodeRow {
             $0.value = makeNodeCellModel(node: node)
             $0.tag = tag
             

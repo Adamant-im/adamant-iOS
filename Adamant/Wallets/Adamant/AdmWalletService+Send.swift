@@ -21,7 +21,6 @@ extension AdmWalletService: WalletServiceSimpleSend {
         return vc
     }
     
-    
     func sendMoney(recipient: String, amount: Decimal, comments: String, completion: @escaping (WalletServiceResult<TransactionDetails>) -> Void) {
         transfersProvider.transferFunds(toAddress: recipient, amount: amount, comment: comments) { result in
             switch result {

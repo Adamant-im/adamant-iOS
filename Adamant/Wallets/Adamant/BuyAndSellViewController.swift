@@ -99,7 +99,7 @@ class BuyAndSellViewController: FormViewController {
     }
     
     private func buildUrlRow(title: String, value: String?, tag: String, urlRaw: String, image: UIImage?) -> LabelRow {
-        let row = LabelRow() {
+        let row = LabelRow {
             $0.tag = tag
             $0.title = title
             $0.value = value

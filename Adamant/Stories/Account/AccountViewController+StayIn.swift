@@ -97,7 +97,6 @@ extension AccountViewController {
     }
 }
 
-
 // MARK: - PinpadViewControllerDelegate
 extension AccountViewController: PinpadViewControllerDelegate {
     func pinpad(_ pinpad: PinpadViewController, didEnterPin pin: String) {
@@ -109,7 +108,6 @@ extension AccountViewController: PinpadViewControllerDelegate {
             pinpad.commentLabel.text = String.adamantLocalized.pinpad.reenterPin
             pinpad.clearPin()
             return
-            
             
         // MARK: User has reentered pin. Save pin.
         case .reenterPin(let pinToVerify)?:
@@ -142,7 +140,6 @@ extension AccountViewController: PinpadViewControllerDelegate {
                 }
             }
             
-            
         // MARK: Users want to turn off the pin. Validate and turn off.
         case .turnOffPin?:
             guard accountService.validatePin(pin) else {
@@ -155,7 +152,6 @@ extension AccountViewController: PinpadViewControllerDelegate {
             
             pinpad.dismiss(animated: true, completion: nil)
             
-            
         // MARK: User wants to turn on biometry
         case .turnOnBiometry?:
             guard accountService.validatePin(pin) else {
@@ -166,7 +162,6 @@ extension AccountViewController: PinpadViewControllerDelegate {
             
             accountService.useBiometry = true
             pinpad.dismiss(animated: true, completion: nil)
-            
             
         // MARK: User wants to turn off biometry
         case .turnOffBiometry?:

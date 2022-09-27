@@ -43,7 +43,6 @@ class AdmWalletService: NSObject, WalletService {
 	var transfersProvider: TransfersProvider!
     var router: Router!
     
-    
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.admWallet.updated")
     let serviceEnabledChanged = Notification.Name("adamant.admWallet.enabledChanged")
@@ -72,8 +71,7 @@ class AdmWalletService: NSObject, WalletService {
     
     // MARK: - State
     private (set) var state: WalletServiceState = .upToDate
-    private (set) var wallet: WalletAccount? = nil
-    
+    private (set) var wallet: WalletAccount?
     
     // MARK: - Logic
     override init() {
@@ -120,7 +118,6 @@ class AdmWalletService: NSObject, WalletService {
         }
     }
     
-    
     // MARK: - Tools
     func validate(address: String) -> AddressValidationResult {
         guard !AdamantContacts.systemAddresses.contains(address) else {
@@ -145,7 +142,6 @@ extension AdmWalletService: WalletServiceWithTransfers {
     }
 }
 
-
 // MARK: - NSFetchedResultsControllerDelegate
 extension AdmWalletService: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -159,7 +155,6 @@ extension AdmWalletService: NSFetchedResultsControllerDelegate {
         }
     }
 }
-
 
 // MARK: - Dependencies
 extension AdmWalletService: SwinjectDependentService {

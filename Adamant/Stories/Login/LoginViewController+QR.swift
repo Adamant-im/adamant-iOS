@@ -80,7 +80,6 @@ extension LoginViewController {
     }
 }
 
-
 // MARK: - QRCodeReaderViewControllerDelegate
 extension LoginViewController: QRCodeReaderViewControllerDelegate {
     func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {

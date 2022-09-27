@@ -13,14 +13,12 @@ class AdamantAddressBookService: AddressBookService {
     let addressBookKey = "contact_list"
     let waitTime: TimeInterval = 20.0 // in sec
     
-    
     // MARK: - Dependencies
     
     var apiService: ApiService!
     var adamantCore: AdamantCore!
     var accountService: AccountService!
     var dialogService: DialogService!
-    
     
     // MARK: - Properties
     
@@ -140,7 +138,6 @@ class AdamantAddressBookService: AddressBookService {
                                         userInfo: [AdamantUserInfoKey.AddressBook.changes: changes])
     }
     
-    
     // MARK: - Updating
     
     func update() {
@@ -204,7 +201,6 @@ class AdamantAddressBookService: AddressBookService {
         }
     }
     
-    
     // MARK: - Saving
     
     func saveIfNeeded() {
@@ -227,7 +223,6 @@ class AdamantAddressBookService: AddressBookService {
             return
         }
         isChangingSemaphore.signal()
-        
         
         // Background task
         savingBookTaskId = UIApplication.shared.beginBackgroundTask {
@@ -312,7 +307,6 @@ class AdamantAddressBookService: AddressBookService {
         }
     }
     
-    
     // MARK: - Getting address book
     private enum GetAddressBookResult {
         case success([String:String])
@@ -358,7 +352,6 @@ class AdamantAddressBookService: AddressBookService {
         }
     }
 }
-
 
 // MARK: - Tools
 extension AdamantAddressBookService {

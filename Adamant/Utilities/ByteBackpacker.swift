@@ -4,9 +4,7 @@ This file is part of ByteBackpacker Project. It is subject to the license terms 
 
 import Foundation
 
-
 public typealias Byte = UInt8
-
 
 /// ByteOrder
 ///
@@ -18,7 +16,6 @@ public enum ByteOrder {
     /// Machine specific byte order
     public static let nativeByteOrder: ByteOrder = (Int(CFByteOrderGetCurrent()) == Int(CFByteOrderLittleEndian.rawValue)) ? .littleEndian : .bigEndian
 }
-
 
 open class ByteBackpacker {
     
@@ -33,7 +30,6 @@ open class ByteBackpacker {
     open class func unpack<T: Any>(_ valueByteArray: [Byte], byteOrder: ByteOrder = .nativeByteOrder) -> T {
         return ByteBackpacker.unpack(valueByteArray, toType: T.self, byteOrder: byteOrder)
     }
-    
     
     /// Unpack a byte array into type `T` for type inference
     ///
@@ -52,7 +48,6 @@ open class ByteBackpacker {
         }
     }
     
-    
     /// Pack method convinience method
     ///
     /// - Parameters:
@@ -63,12 +58,11 @@ open class ByteBackpacker {
         assert(!(T.self is AnyClass), ByteBackpacker.referenceTypeErrorString)
         var value = value // inout works only for var not let types
         let valueByteArray = withUnsafePointer(to: &value) {
-            Array(UnsafeBufferPointer(start: $0.withMemoryRebound(to: Byte.self, capacity: 1){$0}, count: MemoryLayout<T>.size))
+            Array(UnsafeBufferPointer(start: $0.withMemoryRebound(to: Byte.self, capacity: 1) {$0}, count: MemoryLayout<T>.size))
         }
         return (byteOrder == ByteOrder.nativeByteOrder) ? valueByteArray : valueByteArray.reversed()
     }
 }
-
 
 public extension Data {
     
@@ -82,5 +76,3 @@ public extension Data {
         return array
     }
 }
-
-

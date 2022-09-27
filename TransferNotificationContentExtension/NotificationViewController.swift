@@ -104,7 +104,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         let keychain = KeychainStore()
         let core = NativeAdamantCore()
         let avatarService = AdamantAvatarService()
-        var api: ExtensionsApi? = nil
+        var api: ExtensionsApi?
         
         guard let passphrase = keychain.get(passphraseStoreKey), let keypair = core.createKeypairFor(passphrase: passphrase) else {
             showError()

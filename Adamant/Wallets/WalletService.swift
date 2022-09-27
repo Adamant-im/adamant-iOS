@@ -132,7 +132,7 @@ extension ChatsProviderError {
         case .notLogged:
             return .notLogged
             
-        case .messageNotValid(_):
+        case .messageNotValid:
             return .notLogged
             
         case .notEnoughMoneyToSend:
@@ -147,7 +147,7 @@ extension ChatsProviderError {
         case .serverError(let e):
             return .internalError(message: self.message, error: e)
             
-        case .accountNotFound(_):
+        case .accountNotFound:
             return .accountNotFound
             
         case .dependencyError(let message):
@@ -159,7 +159,7 @@ extension ChatsProviderError {
         case .internalError(let error):
             return .internalError(message: self.message, error: error)
             
-        case .accountNotInitiated(_):
+        case .accountNotInitiated:
             return .walletNotInitiated
             
         case .requestCancelled:
@@ -167,7 +167,6 @@ extension ChatsProviderError {
         }
     }
 }
-
 
 // MARK: - Notifications
 extension AdamantUserInfoKey {
@@ -178,7 +177,6 @@ extension AdamantUserInfoKey {
         private init() {}
     }
 }
-
 
 // MARK: - UI
 extension Notification.Name {
@@ -194,7 +192,6 @@ protocol WalletViewController {
     var height: CGFloat { get }
     var service: WalletService? { get }
 }
-
 
 // MARK: - Wallet Service
 protocol WalletService: AnyObject {

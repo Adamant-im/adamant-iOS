@@ -56,7 +56,6 @@ extension TransferViewControllerBase {
         hideView(progressView, animated: animated)
     }
     
-    
     // MARK: - Alert view
     
     func showAlertView(title: String?, message: String, animated: Bool) {
@@ -103,7 +102,6 @@ extension TransferViewControllerBase {
         hideView(alertView, animated: animated)
     }
     
-    
     // MARK: - Tools
     private func hideView(_ view: UIView, animated: Bool) {
         let callback: () -> Void
@@ -112,7 +110,7 @@ extension TransferViewControllerBase {
             callback = {
                 UIView.animate(withDuration: 0.2, animations: {
                     view.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0)
-                }, completion: { success in
+                }, completion: { _ in
                     view.removeFromSuperview()
                 })
             }

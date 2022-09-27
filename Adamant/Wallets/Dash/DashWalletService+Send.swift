@@ -23,7 +23,6 @@ extension DashWalletService: WalletServiceTwoStepSend {
         return vc
     }
     
-    
     // MARK: Create & Send
     func create(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<DashWalletService.T>) -> Void) {
         if let lastTransaction = self.lastTransactionId {

@@ -28,7 +28,6 @@ class TransferBaseProvider: TransferNotificationContentProvider {
         return notificationContent(partnerAddress: partnerAddress, partnerName: partnerName, amount: amount, comment: comment)
     }
     
-    
     /// Create notification content for rich transfers with comments, such as ADM transfer
     func notificationContent(partnerAddress: String, partnerName: String?, amount: Decimal, comment: String?) -> NotificationContent? {
         let amountFormated = AdamantBalanceFormat.full.format(amount, withCurrencySymbol: currencySymbol)
@@ -92,4 +91,3 @@ class TransferBaseProvider: TransferNotificationContentProvider {
         return url
     }
 }
-

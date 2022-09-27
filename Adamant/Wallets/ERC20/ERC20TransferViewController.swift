@@ -15,7 +15,6 @@ class ERC20TransferViewController: TransferViewControllerBase {
     
     var chatsProvider: ChatsProvider!
     
-    
     // MARK: Properties
     
     private var skipValueChange: Bool = false
@@ -107,7 +106,6 @@ class ERC20TransferViewController: TransferViewControllerBase {
         }
     }
     
-    
     // MARK: Overrides
     
     private var _recipient: String?
@@ -152,10 +150,10 @@ class ERC20TransferViewController: TransferViewControllerBase {
     }
     
     override func recipientRow() -> BaseRow {
-        let row = TextRow() {
+        let row = TextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = UIKeyboardType.namePhonePad
+            $0.cell.textField.setPopupKeyboardType(.namePhonePad)
             $0.cell.textField.autocorrectionType = .no
             
             if let recipient = recipientAddress {
@@ -177,7 +175,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
                 $0.disabled = true
                 //                prefix.isEnabled = false
             }
-            }.cellUpdate { (cell, row) in
+            }.cellUpdate { (cell, _) in
                 if let text = cell.textField.text {
                     cell.textField.text = text.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
                 }
@@ -205,7 +203,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
                 }
                 
                 self?.validateForm()
-        }.onCellSelection { [weak self] (cell, row) in
+        }.onCellSelection { [weak self] (cell, _) in
             if let recipient = self?.recipientAddress {
                 let text = recipient
                 self?.shareValue(text, from: cell)

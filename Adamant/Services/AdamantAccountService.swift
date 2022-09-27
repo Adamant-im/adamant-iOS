@@ -58,7 +58,6 @@ class AdamantAccountService: AccountService {
         }
     }
     
-    
     // MARK: Properties
     
     private(set) var state: AccountServiceState = .notLogged
@@ -114,7 +113,6 @@ class AdamantAccountService: AccountService {
         ]
         let erc20WalletServices = ERC20Token.supportedTokens.map { ERC20WalletService(token: $0) }
         wallets.append(contentsOf: erc20WalletServices)
-        
         
         //LskWalletService(mainnet: false)
         // Testnet
@@ -246,7 +244,6 @@ extension AdamantAccountService {
         notificationsService.setNotificationsMode(.disabled, completion: nil)
     }
 }
-
 
 // MARK: - AccountService
 extension AdamantAccountService {
@@ -404,7 +401,6 @@ extension AdamantAccountService {
         completion(.failure(.invalidPassphrase))
     }
     
-    
     // MARK: Keypair
     private func loginWith(keypair: Keypair, completion: @escaping (AccountServiceResult) -> Void) {
         stateSemaphore.wait()
@@ -465,7 +461,6 @@ extension AdamantAccountService {
     }
 }
 
-
 // MARK: - Log Out
 extension AdamantAccountService {
     func logout() {
@@ -496,7 +491,6 @@ extension AdamantAccountService {
     }
 }
 
-
 // MARK: - Secured Store
 extension StoreKey {
     fileprivate struct accountService {
@@ -511,7 +505,7 @@ extension StoreKey {
     }
 }
 
-fileprivate enum Key {
+private enum Key {
     case publicKey
     case privateKey
     case pin

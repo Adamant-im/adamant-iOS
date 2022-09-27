@@ -29,7 +29,6 @@ class JSAdamantCoreTests: XCTestCase {
         self.core = core
     }
     
-    
     func testHashForPassphrase() {
         let passphrase = "process gospel angry height between flat always clock suit refuse shove verb"
         let hash = "9001490b166816af75a15a3e2b0174bfe3be3dfaa63147b4f780ed3ab90ffeab"
@@ -103,7 +102,6 @@ class JSAdamantCoreTests: XCTestCase {
         
         XCTAssertEqual(freshMessage, decodedMessage)
     }
-    
     
     // MARK: - Performance
     

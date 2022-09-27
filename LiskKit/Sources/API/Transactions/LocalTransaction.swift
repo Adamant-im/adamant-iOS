@@ -35,7 +35,7 @@ internal func writeUInt32(_ value: UInt32) -> [UInt8] {
 
     result.append(UInt8(value))
     return result
-};
+}
 
 internal func writeUInt64(_ value: UInt64) -> [UInt8] {
     var result = [UInt8]()
@@ -49,10 +49,10 @@ internal func writeUInt64(_ value: UInt64) -> [UInt8] {
 
     result.append(UInt8(value))
     return result
-};
+}
 
 extension Data {
-    var bytes: Array<UInt8> {
+    var bytes: [UInt8] {
         let count = self.count / MemoryLayout<UInt8>.size
          var byteArray = [UInt8](repeating: 0, count: count)
         self.copyBytes(to: &byteArray, count:count)
@@ -440,7 +440,6 @@ extension LocalTransaction {
         return options
     }
 }
-
 
 protocol BinaryConvertible {
     static func +(lhs: Data, rhs: Self) -> Data

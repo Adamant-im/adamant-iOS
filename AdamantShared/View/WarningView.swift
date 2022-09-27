@@ -22,7 +22,7 @@ class WarningView: UIView {
         "😯",
         "😣",
         "😖",
-        "🤕",
+        "🤕"
     ]
     
     func setRandomEmoji() {

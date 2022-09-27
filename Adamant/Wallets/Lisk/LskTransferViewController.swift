@@ -15,11 +15,9 @@ class LskTransferViewController: TransferViewControllerBase {
     
     var chatsProvider: ChatsProvider!
     
-    
     // MARK: Properties
     
     private var skipValueChange: Bool = false
-    
     
     // MARK: Send
     
@@ -93,7 +91,6 @@ class LskTransferViewController: TransferViewControllerBase {
         }
     }
     
-    
     // MARK: Overrides
     
     private var _recipient: String?
@@ -127,10 +124,10 @@ class LskTransferViewController: TransferViewControllerBase {
     }
     
     override func recipientRow() -> BaseRow {
-        let row = SuffixTextRow() {
+        let row = SuffixTextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = UIKeyboardType.alphabet
+            $0.cell.textField.setPopupKeyboardType(.alphabet)
             $0.cell.textField.autocorrectionType = .no
             
             if let recipient = recipientAddress {
@@ -141,7 +138,7 @@ class LskTransferViewController: TransferViewControllerBase {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
             }
-            }.cellUpdate { (cell, row) in
+            }.cellUpdate { (cell, _) in
                 if let text = cell.textField.text {
                     cell.textField.text = text
                 }
@@ -161,7 +158,7 @@ class LskTransferViewController: TransferViewControllerBase {
                 }
                 
                 self?.validateForm()
-            }.onCellSelection { [weak self] (cell, row) in
+            }.onCellSelection { [weak self] (cell, _) in
                 if let recipient = self?.recipientAddress {
                     let text = recipient
                     self?.shareValue(text, from: cell)

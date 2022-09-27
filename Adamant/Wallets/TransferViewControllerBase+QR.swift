@@ -12,7 +12,6 @@ import EFQRCode
 import AVFoundation
 import Photos
 
-
 // MARK: - QR
 extension TransferViewControllerBase {
     func scanQr() {

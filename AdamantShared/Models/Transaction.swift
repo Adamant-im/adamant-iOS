@@ -118,7 +118,6 @@ extension Transaction: WrappableCollection {
     static let CollectionKey = "transactions"
 }
 
-
 // MARK: - JSON
 /* Fund transfers
 {
