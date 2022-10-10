@@ -302,9 +302,10 @@ class ChatViewController: MessagesViewController {
             
             self.scrollsToBottomOnKeyboardBeginsEditing = true
             
-            keyboardManager.on(event: .didChangeFrame) { [weak self] (notification) in
+            keyboardManager.on(event: .didChangeFrame) { [weak self] _ in
                 DispatchQueue.main.async {
                     self?.messagesCollectionView.scrollToBottom(animated: false)
+                    self?.view.setNeedsLayout()
                 }
             }
         }
@@ -382,10 +383,6 @@ class ChatViewController: MessagesViewController {
             UIMenuItem(title: String.adamantLocalized.chat.report, action: NSSelectorFromString("report:"))]
         
         loadFirstMessagesIfNeeded()
-    }
-    
-    override func canPerformAction(_ action: Selector, withSender sender: Any!) -> Bool {
-        return false
     }
     
     override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
@@ -1167,26 +1164,22 @@ extension ChatViewController {
 }
 
 // MARK: Mac OS HotKeys
-extension InputTextView {
+extension ChatViewController {
     open override var keyCommands: [UIKeyCommand]? {
-        let commands = [UIKeyCommand(input: "\r", modifierFlags: [], action: #selector(sendKey(sender:))),
-                        UIKeyCommand(input: "\r", modifierFlags: .alternate, action: #selector(newLineKey(sender:))),
-                        UIKeyCommand(input: "\r", modifierFlags: .control, action: #selector(newLineKey(sender:)))]
+        let commands = [
+            UIKeyCommand(input: "\r", modifierFlags: [], action: #selector(processEnter))
+        ]
         if #available(iOS 15, *) {
             commands.forEach { $0.wantsPriorityOverSystemBehavior = true }
         }
         return commands
     }
-
-    @objc func sendKey(sender: UIKeyCommand) {
-        if sender.modifierFlags == .control || sender.modifierFlags == .alternate {
-            newLineKey(sender: sender)
-        } else {
-            messageInputBar?.didSelectSendButton()
-        }
-    }
     
-    @objc func newLineKey(sender: UIKeyCommand) {
-        messageInputBar?.inputTextView.text += "\n"
+    @objc private func processEnter() {
+        if messageInputBar.inputTextView.isFirstResponder {
+            messageInputBar.didSelectSendButton()
+        } else {
+            messageInputBar.inputTextView.becomeFirstResponder()
+        }
     }
 }
