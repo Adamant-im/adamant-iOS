@@ -66,6 +66,13 @@ extension UIColor {
             return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
         }
         
+        /// Default cell alert text color
+        static var cellAlertTextColor: UIColor {
+            let colorWhiteTheme  = UIColor.white
+            let colorDarkTheme   = UIColor(hex: "#212121")
+            return returnColorByTheme(colorWhiteTheme: colorWhiteTheme, colorDarkTheme: colorDarkTheme)
+        }
+        
         /// Default cell color
         static var cellColor: UIColor {
             let colorWhiteTheme  = UIColor.white

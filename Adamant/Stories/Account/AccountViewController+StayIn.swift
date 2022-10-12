@@ -23,6 +23,16 @@ extension AccountViewController {
             pinpad.commentLabel.isHidden = false
             pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
+            pinpad.backgroundView.backgroundColor = UIColor.adamant.backgroundColor
+            pinpad.buttonsBackgroundColor = UIColor.adamant.backgroundColor
+            pinpad.view.subviews.forEach { view in
+                view.subviews.forEach { _view in
+                    if _view.backgroundColor == .white {
+                        _view.backgroundColor = UIColor.adamant.backgroundColor
+                    }
+                }
+            }
+            pinpad.commentLabel.backgroundColor = UIColor.adamant.backgroundColor
             present(pinpad, animated: true, completion: nil)
         } else { // Validate pin and turn off Stay In
             pinpadRequest = .turnOffPin
@@ -32,6 +42,16 @@ extension AccountViewController {
             pinpad.commentLabel.isHidden = false
             pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
+            pinpad.backgroundView.backgroundColor = UIColor.adamant.backgroundColor
+            pinpad.buttonsBackgroundColor = UIColor.adamant.backgroundColor
+            pinpad.view.subviews.forEach { view in
+                view.subviews.forEach { _view in
+                    if _view.backgroundColor == .white {
+                        _view.backgroundColor = UIColor.adamant.backgroundColor
+                    }
+                }
+            }
+            pinpad.commentLabel.backgroundColor = UIColor.adamant.backgroundColor
             present(pinpad, animated: true, completion: nil)
         }
     }
@@ -58,20 +78,30 @@ extension AccountViewController {
                 }
                 
             case .fallback:
-                let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
-                
-                if enabled {
-                    pinpad.commentLabel.text = String.adamantLocalized.security.biometryOnReason
-                    self?.pinpadRequest = .turnOnBiometry
-                } else {
-                    pinpad.commentLabel.text = String.adamantLocalized.security.biometryOffReason
-                    self?.pinpadRequest = .turnOffBiometry
-                }
-                
-                pinpad.commentLabel.isHidden = false
-                pinpad.delegate = self
-                pinpad.modalPresentationStyle = .overFullScreen
                 DispatchQueue.main.async {
+                    let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
+                    
+                    if enabled {
+                        pinpad.commentLabel.text = String.adamantLocalized.security.biometryOnReason
+                        self?.pinpadRequest = .turnOnBiometry
+                    } else {
+                        pinpad.commentLabel.text = String.adamantLocalized.security.biometryOffReason
+                        self?.pinpadRequest = .turnOffBiometry
+                    }
+                    
+                    pinpad.commentLabel.isHidden = false
+                    pinpad.delegate = self
+                    pinpad.modalPresentationStyle = .overFullScreen
+                    pinpad.backgroundView.backgroundColor = UIColor.adamant.backgroundColor
+                    pinpad.buttonsBackgroundColor = UIColor.adamant.backgroundColor
+                    pinpad.view.subviews.forEach { view in
+                        view.subviews.forEach { _view in
+                            if _view.backgroundColor == .white {
+                                _view.backgroundColor = UIColor.adamant.backgroundColor
+                            }
+                        }
+                    }
+                    pinpad.commentLabel.backgroundColor = UIColor.adamant.backgroundColor
                     self?.present(pinpad, animated: true, completion: nil)
                 }
                 
