@@ -17,6 +17,7 @@ class AdamantTransfersProvider: TransfersProvider {
     var accountService: AccountService!
     var accountsProvider: AccountsProvider!
     var securedStore: SecuredStore!
+    var transactionService: ChatTransactionService!
     weak var chatsProvider: ChatsProvider?
     
     // MARK: Properties
@@ -108,7 +109,6 @@ class AdamantTransfersProvider: TransfersProvider {
 extension AdamantTransfersProvider {
     func reload() {
         reset(notify: false)
-      
         update()
     }
     
@@ -774,6 +774,7 @@ extension AdamantTransfersProvider {
         
         // MARK: 1. Collect all partners
         var partnerIds: Set<String> = []
+        var partnerPublicKey: [String: String] = [:]
         
         for t in transactions {
             if t.recipientPublicKey == nil {
@@ -781,8 +782,10 @@ extension AdamantTransfersProvider {
             }
             if t.senderId == address {
                 partnerIds.insert(t.recipientId)
+                partnerPublicKey[t.recipientId] = t.recipientPublicKey ?? ""
             } else {
                 partnerIds.insert(t.senderId)
+                partnerPublicKey[t.senderId] = t.senderPublicKey
             }
         }
         
@@ -794,8 +797,8 @@ extension AdamantTransfersProvider {
         
         for id in partnerIds {
             partnersGroup.enter() // Enter 1
-            
-            accountsProvider.getAccount(byAddress: id) { result in
+            let publicKey = partnerPublicKey[id] ?? ""
+            accountsProvider.getAccount(byAddress: id, publicKey: publicKey) { result in
                 switch result {
                 case .success, .dummy:
                     partnersGroup.leave() // Leave 1
@@ -885,29 +888,11 @@ extension AdamantTransfersProvider {
             } else {
                 unconfirmedsSemaphore.signal()
             }
-            let transfer: TransferTransaction
-            if let trs = getTransfer(id: String(t.id), context: context) {
-                transfer = trs
-                transfer.confirmations = t.confirmations
-                transfer.statusEnum = .delivered
-                transfer.blockId = t.blockId
-            } else {
-                transfer = TransferTransaction(context: context)
-                transfer.amount = t.amount as NSDecimalNumber
-                transfer.date = t.date as NSDate
-                transfer.fee = t.fee as NSDecimalNumber
-                transfer.height = Int64(t.height)
-                transfer.recipientId = t.recipientId
-                transfer.senderId = t.senderId
-                transfer.transactionId = String(t.id)
-                transfer.type = Int16(t.type.rawValue)
-                transfer.blockId = t.blockId
-                transfer.confirmations = t.confirmations
-                transfer.statusEnum = .delivered
-                transfer.showsChatroom = false
-                transfer.isConfirmed = true
-                transfer.chatMessageId = UUID().uuidString
-            }
+            
+            let partner = partners[String(t.id)]
+            let isOut = t.senderId == address
+            
+            let transfer = transactionService.transferTransaction(from: t, isOut: isOut, partner: partner, context: context)
            
             transfer.isOutgoing = t.senderId == address
             let partnerId = transfer.isOutgoing ? t.recipientId : t.senderId

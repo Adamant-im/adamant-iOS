@@ -623,7 +623,11 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
                     showNotification(for: transaction)
                 }
             }
-            
+            if let _ = anObject as? TransferTransaction {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                    NotificationCenter.default.post(name: .AdamantAccountService.forceUpdateBalance, object: nil)
+                }
+            }
         default:
             break
         }

@@ -154,6 +154,7 @@ extension Container {
             provider.accountsProvider = r.resolve(AccountsProvider.self)
             provider.securedStore = r.resolve(SecuredStore.self)
             provider.adamantCore = r.resolve(AdamantCore.self)
+            provider.transactionService = r.resolve(ChatTransactionService.self)
             return provider
         }.inObjectScope(.container).initCompleted { (r, c) in
             let provider = c as! AdamantTransfersProvider
@@ -169,9 +170,24 @@ extension Container {
             provider.adamantCore = r.resolve(AdamantCore.self)
             provider.securedStore = r.resolve(SecuredStore.self)
             provider.accountsProvider = r.resolve(AccountsProvider.self)
+            provider.transactionService = r.resolve(ChatTransactionService.self)
             
             let accountService = r.resolve(AccountService.self)!
             provider.accountService = accountService
+            var richProviders = [String: RichMessageProviderWithStatusCheck]()
+            for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
+                richProviders[provider.dynamicRichMessageType] = provider
+            }
+            provider.richProviders = richProviders
+            return provider
+        }.inObjectScope(.container)
+        
+        // MARK: Chat Transaction Service
+        self.register(ChatTransactionService.self) { r in
+            let provider = AdamantChatTransactionService()
+            provider.adamantCore = r.resolve(AdamantCore.self)
+            
+            let accountService = r.resolve(AccountService.self)!
             var richProviders = [String: RichMessageProviderWithStatusCheck]()
             for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
                 richProviders[provider.dynamicRichMessageType] = provider

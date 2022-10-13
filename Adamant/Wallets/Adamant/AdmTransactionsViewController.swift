@@ -166,11 +166,14 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         let partnerId = (transaction.isOutgoing ? transaction.recipientId : transaction.senderId) ?? ""
         
         let amount: Decimal = transaction.amount as Decimal? ?? 0
-        
+        var name = transaction.chatroom?.partner?.name
+        if name == nil {
+            name = transaction.partner?.name
+        }
         configureCell(cell,
                       isOutgoing: transaction.isOutgoing,
                       partnerId: partnerId,
-                      partnerName: transaction.chatroom?.partner?.name,
+                      partnerName: name,
                       amount: amount,
                       date: transaction.date as Date?)
     }

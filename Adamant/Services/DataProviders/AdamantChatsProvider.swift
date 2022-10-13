@@ -18,6 +18,7 @@ class AdamantChatsProvider: ChatsProvider {
     var stack: CoreDataStack!
     var adamantCore: AdamantCore!
     var accountsProvider: AccountsProvider!
+    var transactionService: ChatTransactionService!
     var securedStore: SecuredStore! {
         didSet {
             self.blackList = self.securedStore.getArray("blackList") ?? []
@@ -33,6 +34,7 @@ class AdamantChatsProvider: ChatsProvider {
     private(set) var readedLastHeight: Int64?
     private let apiTransactions = 100
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
+    private var unconfirmedTransactionsBySignature: [String] = []
     
     public var chatPositon: [String : Double] = [:]
     private(set) var blackList: [String] = []
@@ -237,7 +239,7 @@ extension AdamantChatsProvider {
         setState(.empty, previous: prevState, notify: notify)
     }
     
-    func getChatRooms(offset: Int?, completion: (() ->Void)?) {
+    func getChatRooms(offset: Int?, completion: (() -> Void)?) {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
             completion?()
@@ -304,7 +306,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    func apiGetChatrooms(address: String, offset: Int?, completion: ((ChatRooms?) ->Void)?) {
+    func apiGetChatrooms(address: String, offset: Int?, completion: ((ChatRooms?) -> Void)?) {
         apiService.getChatRooms(address: address, offset: offset) { [weak self] result in
             switch result {
             case .success(let chatrooms):
@@ -914,7 +916,32 @@ extension AdamantChatsProvider {
             return
         }
         
-        // MARK: 2. Send
+        // MARK: 2. Create transaction and sign it
+        let date: Date
+        if let delta = apiService.lastRequestTimeDelta {
+            date = Date().addingTimeInterval(-delta)
+        } else {
+            date = Date()
+        }
+        
+        let normalizedTransaction = NormalizedTransaction(type: .chatMessage,
+                                                amount: 0,
+                                                senderPublicKey: keypair.publicKey,
+                                                requesterPublicKey: nil,
+                                                date: date,
+                                                recipientId: recipientId,
+                                                asset: TransactionAsset(chat: ChatAsset(message: encodedMessage.message, ownMessage: encodedMessage.nonce, type: type),
+                                                                        state: nil,
+                                                                        votes: nil))
+        
+        guard let signature = adamantCore.sign(transaction: normalizedTransaction, senderId: senderId, keypair: keypair) else {
+            let error = AdamantApiService.InternalError.signTransactionFailed.apiServiceErrorWith(error: nil)
+            completion(.failure(ChatsProviderError.internalError(AdamantError(message: error.message, error: error))))
+            return
+        }
+        unconfirmedTransactionsBySignature.append(signature)
+        
+        // MARK: 3. Send
         apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, type: type, nonce: encodedMessage.nonce, amount: nil) { result in
             switch result {
             case .success(let id):
@@ -922,6 +949,9 @@ extension AdamantChatsProvider {
                 transaction.transactionId = String(id)
                 
                 self.unconfirmedsSemaphore.wait()
+                if let index = self.unconfirmedTransactionsBySignature.firstIndex(of: signature) {
+                    self.unconfirmedTransactionsBySignature.remove(at: index)
+                }
                 DispatchQueue.main.sync {
                     self.unconfirmedTransactions[id] = transaction.objectID
                 }
@@ -1200,6 +1230,15 @@ extension AdamantChatsProvider {
                     unconfirmedsSemaphore.signal()
                 }
                 
+                unconfirmedsSemaphore.wait()
+                // if transaction in pending status then ignore it
+                if unconfirmedTransactionsBySignature.contains(trs.transaction.signature) {
+                    unconfirmedsSemaphore.signal()
+                    continue
+                } else {
+                    unconfirmedsSemaphore.signal()
+                }
+                
                 let publicKey: String
                 if trs.isOut {
                     publicKey = account.publicKey ?? ""
@@ -1207,7 +1246,7 @@ extension AdamantChatsProvider {
                     publicKey = trs.transaction.senderPublicKey
                 }
                 
-                if let partner = privateContext.object(with: account.objectID) as? BaseAccount, let chatTransaction = chatTransaction(from: trs.transaction, isOutgoing: trs.isOut, publicKey: publicKey, privateKey: privateKey, partner: partner, context: privateContext) {
+                if let partner = privateContext.object(with: account.objectID) as? BaseAccount, let chatTransaction = transactionService.chatTransaction(from: trs.transaction, isOutgoing: trs.isOut, publicKey: publicKey, privateKey: privateKey, partner: partner, removedMessages: self.removedMessages, context: privateContext) {
                     if height < chatTransaction.height {
                         height = chatTransaction.height
                     }
@@ -1372,122 +1411,6 @@ extension AdamantChatsProvider {
             
             return .isValid
         }
-    }
-    
-    /// Parse raw transaction into CoreData chat transaction
-    ///
-    /// - Parameters:
-    ///   - transaction: Raw transaction
-    ///   - currentAddress: logged account address
-    ///   - privateKey: logged account private key
-    ///   - context: context to insert parsed transaction to
-    /// - Returns: New parsed transaction
-    private func chatTransaction(from transaction: Transaction, isOutgoing: Bool, publicKey: String, privateKey: String, partner: BaseAccount, context: NSManagedObjectContext) -> ChatTransaction? {
-        let messageTransaction: ChatTransaction
-        guard let chat = transaction.asset.chat else {
-            if transaction.type == .send {
-                if let trs = getTransfer(id: String(transaction.id), context: context) {
-                    messageTransaction = trs
-                } else {
-                    messageTransaction = TransferTransaction(context: context)
-                }
-                messageTransaction.amount = transaction.amount as NSDecimalNumber
-                messageTransaction.date = transaction.date as NSDate
-                messageTransaction.recipientId = transaction.recipientId
-                messageTransaction.senderId = transaction.senderId
-                messageTransaction.transactionId = String(transaction.id)
-                messageTransaction.type = Int16(TransactionType.chatMessage.rawValue)
-                messageTransaction.showsChatroom = true
-                messageTransaction.height = Int64(transaction.height)
-                messageTransaction.isConfirmed = true
-                messageTransaction.isOutgoing = isOutgoing
-                messageTransaction.blockId = transaction.blockId
-                messageTransaction.confirmations = transaction.confirmations
-                messageTransaction.chatMessageId = UUID().uuidString
-                messageTransaction.fee = transaction.fee as NSDecimalNumber
-                messageTransaction.statusEnum = MessageStatus.delivered
-                messageTransaction.partner = partner
-                return messageTransaction
-            }
-            return nil
-        }
-        
-        // MARK: Decode message, message must contain data
-        if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)?.trimmingCharacters(in: .whitespacesAndNewlines) {
-            if (decodedMessage.isEmpty && transaction.amount > 0) || !decodedMessage.isEmpty {
-                switch chat.type {
-                // MARK: Text message
-                case .message, .messageOld, .signal, .unknown:
-                    if transaction.amount > 0 {
-                        if let trs = getTransfer(id: String(transaction.id), context: context) {
-                            messageTransaction = trs
-                        } else {
-                            let trs = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
-                            trs.comment = decodedMessage
-                            messageTransaction = trs
-                        }
-                    } else {
-                        let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                        trs.message = decodedMessage
-                        messageTransaction = trs
-                        
-                        let markdown = markdownParser.parse(decodedMessage)
-                        
-                        trs.isMarkdown = markdown.length != decodedMessage.count
-                    }
-                    
-                // MARK: Rich message
-                case .richMessage:
-                    if let data = decodedMessage.data(using: String.Encoding.utf8),
-                        let richContent = RichMessageTools.richContent(from: data),
-                        let type = richContent[RichContentKeys.type] {
-                        let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
-                        trs.richContent = richContent
-                        trs.richType = type
-                        trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
-                        messageTransaction = trs
-                    } else {
-                        let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                        trs.message = decodedMessage
-                        messageTransaction = trs
-                    }
-                }
-            } else {
-                let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                trs.message = ""
-                trs.isHidden = true
-                messageTransaction = trs
-            }
-        }
-        // MARK: Failed to decode, or message was empty
-        else {
-            let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-            trs.message = ""
-            trs.isHidden = true
-            messageTransaction = trs
-        }
-        
-        messageTransaction.amount = transaction.amount as NSDecimalNumber
-        messageTransaction.date = transaction.date as NSDate
-        messageTransaction.recipientId = transaction.recipientId
-        messageTransaction.senderId = transaction.senderId
-        messageTransaction.transactionId = String(transaction.id)
-        messageTransaction.type = Int16(chat.type.rawValue)
-        messageTransaction.height = Int64(transaction.height)
-        messageTransaction.isConfirmed = true
-        messageTransaction.isOutgoing = isOutgoing
-        messageTransaction.blockId = transaction.blockId
-        messageTransaction.confirmations = transaction.confirmations
-        messageTransaction.chatMessageId = UUID().uuidString
-        messageTransaction.fee = transaction.fee as NSDecimalNumber
-        messageTransaction.statusEnum = MessageStatus.delivered
-        messageTransaction.partner = partner
-        
-        if let transactionId = messageTransaction.transactionId {
-            messageTransaction.isHidden = self.removedMessages.contains(transactionId)
-        }
-        
-        return messageTransaction
     }
     
     /// Confirm transactions
