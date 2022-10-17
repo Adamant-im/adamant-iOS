@@ -115,7 +115,7 @@ class ChatViewController: MessagesViewController {
             self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
         }
     }
-    var scrollToBottomBtnOffetConstraint: NSLayoutConstraint?
+    var scrollToBottomBtnOffsetConstraint: NSLayoutConstraint?
     
     let scrollToBottomBtn = UIButton(type: .custom)
     
@@ -299,15 +299,7 @@ class ChatViewController: MessagesViewController {
             view.addSubview(messageInputBar)
             keyboardManager.bind(inputAccessoryView: messageInputBar, usingTabBar: self.tabBarController?.tabBar)
             keyboardManager.bind(to: messagesCollectionView)
-            
-            self.scrollsToBottomOnKeyboardBeginsEditing = true
-            
-            keyboardManager.on(event: .didChangeFrame) { [weak self] _ in
-                DispatchQueue.main.async {
-                    self?.messagesCollectionView.scrollToBottom(animated: false)
-                    self?.view.setNeedsLayout()
-                }
-            }
+            scrollsToBottomOnKeyboardBeginsEditing = true
         }
         
         if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
@@ -366,16 +358,16 @@ class ChatViewController: MessagesViewController {
         self.view.addSubview(scrollToBottomBtn)
         
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !isMacOS {
-            setKeyboardObserver()
+            setKeyboardObservers()
         }
         
-        scrollToBottomBtnOffetConstraint = scrollToBottomBtn.bottomAnchor.constraint(equalTo: messagesCollectionView.bottomAnchor, constant: (-20 - h))
+        scrollToBottomBtnOffsetConstraint = scrollToBottomBtn.bottomAnchor.constraint(equalTo: messagesCollectionView.bottomAnchor, constant: (-20 - h))
         
         NSLayoutConstraint.activate([
             scrollToBottomBtn.heightAnchor.constraint(equalToConstant: 30),
             scrollToBottomBtn.widthAnchor.constraint(equalToConstant: 30),
             scrollToBottomBtn.rightAnchor.constraint(equalTo: messagesCollectionView.rightAnchor, constant: -20),
-            scrollToBottomBtnOffetConstraint!
+            scrollToBottomBtnOffsetConstraint!
         ])
         
         UIMenuController.shared.menuItems = [
@@ -462,7 +454,7 @@ class ChatViewController: MessagesViewController {
         chatroom?.markAsReaded()
         
         scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
-        scrollToBottomBtnOffetConstraint?.constant = -20 - self.messageInputBar.bounds.height
+        updateScrollToBottomBtnOffsetConstraint()
         
         if forceScrollToBottom ?? false && !scrollToBottomBtn.isHidden {
             scrollDown()
@@ -494,8 +486,7 @@ class ChatViewController: MessagesViewController {
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             let barHeight = messageInputBar.frame.height
             messageInputBar.frame.origin.y = view.bounds.maxY - keyboardHeight - barHeight
-            messagesCollectionView.contentInset.bottom = barHeight + keyboardHeight
-            messagesCollectionView.scrollIndicatorInsets.bottom = barHeight + keyboardHeight
+            additionalBottomInset = barHeight
         }
         
         // MARK: Scroll to message
@@ -738,21 +729,26 @@ class ChatViewController: MessagesViewController {
         }
     }
     
-    private func setKeyboardObserver() {
+    private func setKeyboardObservers() {
         let keyboardObserver: (_ height: CGFloat) -> Void = { [weak self] height in
-            self?.scrollToBottomBtnOffetConstraint?.constant = -20 - height
             self?.keyboardHeight = height
+            self?.updateScrollToBottomBtnOffsetConstraint()
         }
         
         keyboardManager.on(event: .willChangeFrame) { [weak self] notification in
             let tabBarHeight = self?.tabBarController?.tabBar.frame.height ?? .zero
             let keyboardHeight = notification.endFrame.height - tabBarHeight
             keyboardObserver(keyboardHeight)
+            self?.view.setNeedsLayout()
         }
         
         keyboardManager.on(event: .willHide) { _ in
             keyboardObserver(.zero)
         }
+    }
+    
+    private func updateScrollToBottomBtnOffsetConstraint() {
+        scrollToBottomBtnOffsetConstraint?.constant = -20 - keyboardHeight - messageInputBar.frame.height
     }
 }
 
