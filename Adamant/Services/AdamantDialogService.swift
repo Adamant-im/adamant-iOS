@@ -123,33 +123,28 @@ extension AdamantDialogService {
                     presenter = vc
                 }
                 
-                if !MFMailComposeViewController.canSendMail() {
-                    print("Mail services are not available")
-                    dialogService.showWarning(withMessage: String.adamantLocalized.alert.noMailService)
-                    return
-                }
-                
-                let mailVC = MFMailComposeViewController()
-                mailVC.mailComposeDelegate = dialogService.mailDelegate
-                mailVC.setToRecipients([AdamantResources.supportEmail])
-                mailVC.setSubject(String.adamantLocalized.alert.emailErrorMessageTitle)
-                
-                let systemVersion = UIDevice.current.systemVersion
-                let model = AdamantUtilities.deviceModelCode
-                let deviceInfo = "Model: \(model)\n" + "iOS: \(systemVersion)\n" + "App version: \(AdamantUtilities.applicationVersion)"
-                
                 let body: String
                 
                 if let error = error {
                     let errorDescription = String(describing: error)
-                    body = String(format: String.adamantLocalized.alert.emailErrorMessageBodyWithDescription, message, errorDescription, deviceInfo)
+                    body = String(format: String.adamantLocalized.alert.emailErrorMessageBodyWithDescription, message,
+                        errorDescription,
+                        AdamantUtilities.deviceInfo
+                    )
                 } else {
-                    body = String(format: String.adamantLocalized.alert.emailErrorMessageBody, message, deviceInfo)
+                    body = String(
+                        format: String.adamantLocalized.alert.emailErrorMessageBody,
+                        message,
+                        AdamantUtilities.deviceInfo
+                    )
                 }
                 
-                mailVC.setMessageBody(body, isHTML: false)
-                mailVC.modalPresentationStyle = .overFullScreen
-                presenter.present(mailVC, animated: true, completion: nil)
+                presenter.openEmailScreen(
+                    recipient: AdamantResources.supportEmail,
+                    subject: .adamantLocalized.alert.emailErrorMessageTitle,
+                    body: body,
+                    delegate: dialogService.mailDelegate
+                )
             }
         }
         

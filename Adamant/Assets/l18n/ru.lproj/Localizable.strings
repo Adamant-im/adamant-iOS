@@ -748,9 +748,6 @@
 /* Shared alert notification: body message for no internet connection. */
 "Shared.NoInternet.Body" = "Проверьте соединение и повторите попытку";
 
-/* Shared alert notification: message for no Mail services. */
-"Shared.NoMail" = "Отправка почты недоступна";
-
 /* Shared alert 'Ok' button. Used anywhere */
 "Shared.Ok" = "OK";
 
