@@ -12,8 +12,8 @@ import UIKit
 extension UIViewController {
     func openEmailScreen(
         recipient: String,
-        subject: String,
-        body: String,
+        subject: String?,
+        body: String?,
         delegate: MFMailComposeViewControllerDelegate?
     ) {
         if MFMailComposeViewController.canSendMail() {
@@ -27,16 +27,20 @@ extension UIViewController {
 private extension UIViewController {
     func showEmailVC(
         recipient: String,
-        subject: String,
-        body: String,
+        subject: String?,
+        body: String?,
         delegate: MFMailComposeViewControllerDelegate?
     ) {
-        let html = body.replacingOccurrences(of: "\n", with: "<br>")
         let mailVC = MFMailComposeViewController()
+        subject.map { mailVC.setSubject($0) }
+        
+        if let body = body {
+            let html = body.replacingOccurrences(of: "\n", with: "<br>")
+            mailVC.setMessageBody(html, isHTML: true)
+        }
+        
         mailVC.mailComposeDelegate = delegate
         mailVC.setToRecipients([recipient])
-        mailVC.setSubject(subject)
-        mailVC.setMessageBody(html, isHTML: true)
         mailVC.modalPresentationStyle = .overFullScreen
         present(mailVC, animated: true, completion: nil)
     }
