@@ -925,14 +925,21 @@ extension AdamantChatsProvider {
         }
         
         let normalizedTransaction = NormalizedTransaction(type: .chatMessage,
-                                                amount: 0,
-                                                senderPublicKey: keypair.publicKey,
-                                                requesterPublicKey: nil,
-                                                date: date,
-                                                recipientId: recipientId,
-                                                asset: TransactionAsset(chat: ChatAsset(message: encodedMessage.message, ownMessage: encodedMessage.nonce, type: type),
-                                                                        state: nil,
-                                                                        votes: nil))
+                                                          amount: 0,
+                                                          senderPublicKey: keypair.publicKey,
+                                                          requesterPublicKey: nil,
+                                                          date: date,
+                                                          recipientId: recipientId,
+                                                          asset: TransactionAsset(
+                                                            chat: ChatAsset(
+                                                                message: encodedMessage.message,
+                                                                ownMessage: encodedMessage.nonce,
+                                                                type: type
+                                                            ),
+                                                            state: nil,
+                                                            votes: nil
+                                                          )
+        )
         
         guard let signature = adamantCore.sign(transaction: normalizedTransaction, senderId: senderId, keypair: keypair) else {
             let error = AdamantApiService.InternalError.signTransactionFailed.apiServiceErrorWith(error: nil)
