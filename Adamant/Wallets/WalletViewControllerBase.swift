@@ -92,7 +92,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             $0.cell.titleLabel.text = BaseRows.balance.localized
             
             $0.alertBackgroundColor = UIColor.adamant.primary
-            $0.alertTextColor = UIColor.white
+            $0.alertTextColor = UIColor.adamant.cellAlertTextColor
             $0.cell.backgroundColor = UIColor.adamant.cellColor
             let symbol = self?.service?.tokenSymbol ?? ""
             
