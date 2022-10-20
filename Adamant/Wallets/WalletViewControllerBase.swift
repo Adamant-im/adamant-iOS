@@ -44,12 +44,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     
     private let cellIdentifier = "cell"
     
-    
     // MARK: - Dependencies
     
     var dialogService: DialogService!
     var currencyInfoService: CurrencyInfoService!
-    
     
     // MARK: - Properties, WalletViewController
     
@@ -89,12 +87,12 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         section.append(addressRow)
         
         // MARK: Balance
-        let balanceRow = BalanceRow() { [weak self] in
+        let balanceRow = BalanceRow { [weak self] in
             $0.tag = BaseRows.balance.tag
             $0.cell.titleLabel.text = BaseRows.balance.localized
             
             $0.alertBackgroundColor = UIColor.adamant.primary
-            $0.alertTextColor = UIColor.white
+            $0.alertTextColor = UIColor.adamant.cellAlertTextColor
             $0.cell.backgroundColor = UIColor.adamant.cellColor
             let symbol = self?.service?.tokenSymbol ?? ""
             
@@ -123,7 +121,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
             balanceRow.cell.selectionStyle = .gray
             balanceRow.cellUpdate { (cell, _) in
                 cell.accessoryType = .disclosureIndicator
-            }.onCellSelection { [weak self] (_, row) in
+            }.onCellSelection { [weak self] (_, _) in
                 guard let service = self?.service as? WalletServiceWithTransfers else {
                     return
                 }
@@ -148,14 +146,23 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         if service is WalletServiceWithSend {
             let label = sendRowLocalizedLabel()
             
-            let sendRow = LabelRow() {
+            let sendRow = LabelRow {
                 $0.tag = BaseRows.send.tag
-                $0.title = label
+                if #available(iOS 14.0, *) {
+                    var content = $0.cell.defaultContentConfiguration()
+                    content.attributedText = label
+                    $0.cell.contentConfiguration = content
+                } else {
+                    $0.cell.textLabel?.attributedText = label
+                }
                 $0.cell.selectionStyle = .gray
                 $0.cell.backgroundColor = UIColor.adamant.cellColor
             }.cellUpdate { (cell, _) in
                 cell.accessoryType = .disclosureIndicator
-            }.onCellSelection { [weak self] (_, row) in
+                if #unavailable(iOS 14.0) {
+                    cell.textLabel?.attributedText = label
+                }
+            }.onCellSelection { [weak self] (_, _) in
                 guard let service = self?.service as? WalletServiceWithSend else {
                     return
                 }
@@ -190,7 +197,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         // MARK: Notification
         if let service = service {
             // MARK: Wallet updated
-            let walletUpdatedCallback = { [weak self] (notification: Notification) in
+            let walletUpdatedCallback = { [weak self] (_: Notification) in
                 if let row: LabelRow = self?.form.rowBy(tag: BaseRows.address.tag) {
                     if let wallet = service.wallet {
                         row.value = wallet.address
@@ -270,11 +277,10 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         return UIView()
     }
     
-    
     // MARK: - To override
     
-    func sendRowLocalizedLabel() -> String {
-        return BaseRows.send.localized
+    func sendRowLocalizedLabel() -> NSAttributedString {
+        return NSAttributedString(string: BaseRows.send.localized)
     }
     
     func encodeForQr(address: String) -> String? {
@@ -286,7 +292,7 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
     }
     
     func adressRow() -> LabelRow {
-        let addressRow = LabelRow() {
+        let addressRow = LabelRow {
             $0.tag = BaseRows.address.tag
             $0.title = BaseRows.address.localized
             $0.cell.selectionStyle = .gray
@@ -398,7 +404,6 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
         tableView.backgroundColor = .clear
     }
 }
-
 
 // MARK: - TransferViewControllerDelegate
 extension WalletViewControllerBase: TransferViewControllerDelegate {

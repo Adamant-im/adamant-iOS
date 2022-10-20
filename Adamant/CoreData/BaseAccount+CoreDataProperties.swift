@@ -10,7 +10,6 @@
 import Foundation
 import CoreData
 
-
 extension BaseAccount {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<BaseAccount> {

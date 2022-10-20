@@ -12,7 +12,7 @@ class RepeaterService {
     private class Client {
         let interval: TimeInterval
         let queue: DispatchQueue?
-        var timer: Timer? = nil
+        var timer: Timer?
         let callback: () -> Void
         
         init(interval: TimeInterval, queue: DispatchQueue?, callback: @escaping () -> Void) {

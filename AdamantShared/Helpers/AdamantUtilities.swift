@@ -30,7 +30,6 @@ class AdamantUtilities {
         return components.date!.timeIntervalSince1970
     }()
     
-    
     // MARK: - JSON
     
     static func JSONStringify(value: AnyObject, prettyPrinted: Bool = false) -> String {

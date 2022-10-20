@@ -19,7 +19,6 @@ extension NativeAdamantCore: AdamantCore {
         return ""
     }
     
-    
     // MARK: - Signing transactions
     
     func sign(transaction: SignableTransaction, senderId: String, keypair: Keypair) -> String? {

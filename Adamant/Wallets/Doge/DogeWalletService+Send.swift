@@ -28,7 +28,6 @@ extension DogeWalletService: WalletServiceTwoStepSend {
         return vc
     }
     
-    
     // MARK: Create & Send
     func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<BitcoinKit.Transaction>) -> Void) {
         // MARK: 1. Prepare

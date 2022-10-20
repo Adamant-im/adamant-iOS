@@ -20,7 +20,7 @@ enum AccountsProviderResult {
     
     var localized: String {
         switch self {
-        case .success(_), .dummy(_):
+        case .success, .dummy:
             return ""
             
         case .notFound(let address):
@@ -29,7 +29,7 @@ enum AccountsProviderResult {
         case .invalidAddress(let address):
             return String.localizedStringWithFormat(NSLocalizedString("AccountsProvider.Error.AddressNotValidFormat", comment: "AccountsProvider: Address not valid error, %@ for address"), address)
             
-        case .notInitiated(_):
+        case .notInitiated:
             return String.adamantLocalized.sharedErrors.accountNotInitiated
             
         case .serverError(let error):
@@ -68,7 +68,6 @@ protocol AccountsProvider {
     
     /// Check locally if has account with specified address
     func hasAccount(address: String, completion: @escaping (Bool) -> Void)
-    
     
     /// Request Dummy account, if account wasn't found or initiated
     func getDummyAccount(for address: String, completion: @escaping (AccountsProviderDummyAccountResult) -> Void)

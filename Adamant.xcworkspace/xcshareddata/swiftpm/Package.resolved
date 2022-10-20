@@ -191,6 +191,15 @@
         }
       },
       {
+        "package": "SocketIO",
+        "repositoryURL": "https://github.com/socketio/socket.io-client-swift",
+        "state": {
+          "branch": "master",
+          "revision": "a1ed825835a2d8c2555938e96557ccc05e4bebf3",
+          "version": null
+        }
+      },
+      {
         "package": "Starscream",
         "repositoryURL": "https://github.com/daltoniam/Starscream.git",
         "state": {

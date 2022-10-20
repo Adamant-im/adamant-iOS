@@ -45,7 +45,7 @@ class ExtensionsApi {
     // MARK: Transactions
     func getTransaction(by id: UInt64) -> Transaction? {
         // MARK: 1. Getting Transaction
-        var response: ServerModelResponse<Transaction>? = nil
+        var response: ServerModelResponse<Transaction>?
         var nodeUrl: URL! = nil
         if currentNode == nil {
             selectNewNode()
@@ -118,7 +118,7 @@ class ExtensionsApi {
     // MARK: Address book
     
     func getAddressBook(for address: String, core: NativeAdamantCore, keypair: Keypair) -> [String:ContactDescription]? {
-        var response: ServerCollectionResponse<Transaction>? = nil
+        var response: ServerCollectionResponse<Transaction>?
         
         // Getting transaction
         repeat {

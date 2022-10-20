@@ -31,7 +31,6 @@ extension NotificationsMode: CustomStringConvertible {
     }
 }
 
-
 // MARK: - SecurityViewController
 class SecurityViewController: FormViewController {
     
@@ -95,7 +94,6 @@ class SecurityViewController: FormViewController {
         }
     }
     
-    
     // MARK: - Dependencies
     
     var accountService: AccountService!
@@ -103,7 +101,6 @@ class SecurityViewController: FormViewController {
     var notificationsService: NotificationsService!
     var localAuth: LocalAuthentication!
     var router: Router!
-    
     
     // MARK: - Properties
     var showLoggedInOptions: Bool {
@@ -122,7 +119,6 @@ class SecurityViewController: FormViewController {
     
     var pinpadRequest: SecurityViewController.PinpadRequest?
     
-    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -133,7 +129,7 @@ class SecurityViewController: FormViewController {
         
         // MARK: StayIn
         // Generate QR
-        let qrRow = LabelRow() {
+        let qrRow = LabelRow {
             $0.title = Rows.generateQr.localized
             $0.tag = Rows.generateQr.tag
             $0.cell.selectionStyle = .gray
@@ -148,7 +144,7 @@ class SecurityViewController: FormViewController {
         }
         
         // Stay logged in
-        let stayInRow = SwitchRow() {
+        let stayInRow = SwitchRow {
             $0.tag = Rows.stayIn.tag
             $0.title = Rows.stayIn.localized
             $0.value = accountService.hasStayInAccount
@@ -163,7 +159,7 @@ class SecurityViewController: FormViewController {
         })
         
         // Biometry
-        let biometryRow = SwitchRow() {
+        let biometryRow = SwitchRow {
             $0.tag = Rows.biometry.tag
             $0.title = localAuth.biometryType.localized
             $0.value = accountService.useBiometry
@@ -189,10 +185,9 @@ class SecurityViewController: FormViewController {
         stayInSection.append(contentsOf: [qrRow, stayInRow, biometryRow])
         form.append(stayInSection)
         
-        
         // MARK: Notifications
         // Type
-        let nType = ActionSheetRow<NotificationsMode>() {
+        let nType = ActionSheetRow<NotificationsMode> {
             $0.tag = Rows.notificationsMode.tag
             $0.title = Rows.notificationsMode.localized
             $0.selectorTitle = Rows.notificationsMode.localized
@@ -220,10 +215,9 @@ class SecurityViewController: FormViewController {
         notificationsSection.append(nType)
         form.append(notificationsSection)
         
-        
         // MARK: ANS Description
         // Description
-        let descriptionRow = TextAreaRow() {
+        let descriptionRow = TextAreaRow {
             $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
             $0.tag = Rows.description.tag
         }.cellUpdate { (cell, _) in
@@ -235,7 +229,7 @@ class SecurityViewController: FormViewController {
         }
         
         // Github readme
-        let githubRow = LabelRow() {
+        let githubRow = LabelRow {
             $0.tag = Rows.github.tag
             $0.title = Rows.github.localized
             $0.cell.imageView?.image = #imageLiteral(resourceName: "row_github")
@@ -244,7 +238,7 @@ class SecurityViewController: FormViewController {
             cell.selectionStyle = .gray
         }.cellUpdate({ (cell, _) in
             cell.accessoryType = .disclosureIndicator
-        }).onCellSelection { [weak self] (_, row) in
+        }).onCellSelection { [weak self] (_, _) in
             guard let url = URL(string: AdamantResources.ansReadmeUrl) else {
                 fatalError("Failed to build ANS URL")
             }
@@ -269,13 +263,12 @@ class SecurityViewController: FormViewController {
         ansSection.append(contentsOf: [descriptionRow, githubRow])
         form.append(ansSection)
         
-        
         // MARK: Notifications
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedIn, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.reloadForm()
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.stayInChanged, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.reloadForm()
         }
         

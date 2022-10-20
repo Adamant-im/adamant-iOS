@@ -23,8 +23,8 @@ class BtcWalletViewController: WalletViewControllerBase {
         walletTitleLabel.text = String.adamantLocalized.bitcoin
     }
     
-    override func sendRowLocalizedLabel() -> String {
-        return String.adamantLocalized.sendBtc
+    override func sendRowLocalizedLabel() -> NSAttributedString {
+        return NSAttributedString(string: String.adamantLocalized.sendBtc)
     }
     
     override func encodeForQr(address: String) -> String? {

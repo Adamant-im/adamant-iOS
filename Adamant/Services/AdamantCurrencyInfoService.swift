@@ -16,7 +16,6 @@ extension StoreKey {
     }
 }
 
-
 // MARK: - Service
 class AdamantCurrencyInfoService: CurrencyInfoService {
     // MARK: - API
@@ -43,7 +42,7 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     // MARK: - Properties
     private static let historyThreshold = Double(exactly: 60*60*24)!
     
-    private var rateCoins: [String]? = nil
+    private var rateCoins: [String]?
     private var rates = [String: Decimal]()
     
     private let defaultResponseDispatchQueue = DispatchQueue(label: "com.adamant.info-coins-response-queue", qos: .utility, attributes: [.concurrent])
@@ -89,7 +88,7 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
     
     // MARK: - Observers
     func addObservers() {
-        observerActive = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
+        observerActive = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.update()
         }
     }
@@ -186,7 +185,6 @@ class AdamantCurrencyInfoService: CurrencyInfoService {
         }
     }
 }
-
 
 // MARK: - Server responses
 struct CoinInfoServiceResponseGet: Decodable {

@@ -87,7 +87,7 @@ class ChatListViewController: UIViewController {
     private var originalInsets: UIEdgeInsets?
     private var didShow: Bool = false
     
-    var didLoadedMessages: (() ->())?
+    var didLoadedMessages: (() -> Void)?
     
     // MARK: Lifecycle
     override func viewDidLoad() {
@@ -226,7 +226,6 @@ class ChatListViewController: UIViewController {
         }
     }
     
-    
     // MARK: Helpers
     func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil, forceScrollToBottom: Bool = false) -> ChatViewController {
         guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
@@ -249,7 +248,6 @@ class ChatListViewController: UIViewController {
         
         return vc
     }
-    
     
     /// - Parameter provider: nil to drop controllers and reset table
     private func initFetchedRequestControllers(provider: ChatsProvider?) {
@@ -359,7 +357,6 @@ class ChatListViewController: UIViewController {
     }
 }
 
-
 // MARK: - UITableView
 extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -409,7 +406,6 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
 }
-
 
 // MARK: - UITableView Cells
 extension ChatListViewController {
@@ -559,7 +555,6 @@ extension ChatListViewController {
     }
 }
 
-
 // MARK: - NSFetchedResultsControllerDelegate
 extension ChatListViewController: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
@@ -635,7 +630,6 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
     }
 }
 
-
 // MARK: - NewChatViewControllerDelegate
 extension ChatListViewController: NewChatViewControllerDelegate {
     func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount, preMessage: String?) {
@@ -697,7 +691,6 @@ extension ChatListViewController: NewChatViewControllerDelegate {
     }
 }
 
-
 // MARK: - ChatViewControllerDelegate
 extension ChatListViewController: ChatViewControllerDelegate {
     func preserveMessage(_ message: String, forAddress address: String) {
@@ -716,7 +709,6 @@ extension ChatListViewController: ChatViewControllerDelegate {
         return message
     }
 }
-
 
 // MARK: - Working with in-app notifications
 extension ChatListViewController {
@@ -838,7 +830,6 @@ extension ChatListViewController {
     }
 }
 
-
 // MARK: - Swipe actions
 extension ChatListViewController {
     @available(iOS 11.0, *)
@@ -873,7 +864,7 @@ extension ChatListViewController {
                                                          from: view,
                                                          completion: nil)
             } else {
-                let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
+                let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] _ in
                     self?.dialogService.presentShareAlertFor(string: address,
                                                              types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
                                                              excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
@@ -881,7 +872,7 @@ extension ChatListViewController {
                                                              completion: nil)
                 }
                 
-                let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] action in
+                let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] _ in
                     let alert = UIAlertController(title: String(format: String.adamantLocalized.chat.actionsBody, address), message: nil, preferredStyle: .alert)
                     
                     alert.addTextField { (textField) in
@@ -936,7 +927,7 @@ extension ChatListViewController {
             actions = [more]
         }
         
-        let block = UIContextualAction(style: .destructive, title: "Block") { [weak self] (action, view, completionHandler) in
+        let block = UIContextualAction(style: .destructive, title: "Block") { [weak self] (_, _, completionHandler) in
             guard let chatroom = self?.chatsController?.object(at: indexPath), let address = chatroom.partner?.address else {
                 completionHandler(false)
                 return
@@ -962,7 +953,6 @@ extension ChatListViewController {
         return UISwipeActionsConfiguration(actions: actions)
     }
 }
-
 
 // MARK: - Tools
 extension ChatListViewController {

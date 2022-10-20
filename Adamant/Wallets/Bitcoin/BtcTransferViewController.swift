@@ -15,7 +15,6 @@ class BtcTransferViewController: TransferViewControllerBase {
     
     var chatsProvider: ChatsProvider!
     
-    
     // MARK: Properties
     
     override var balanceFormatter: NumberFormatter {
@@ -29,7 +28,6 @@ class BtcTransferViewController: TransferViewControllerBase {
     private var skipValueChange: Bool = false
     
     static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
-    
     
     // MARK: Send
     
@@ -128,7 +126,6 @@ class BtcTransferViewController: TransferViewControllerBase {
         }
     }
     
-    
     // MARK: Overrides
     
     private var _recipient: String?
@@ -162,7 +159,7 @@ class BtcTransferViewController: TransferViewControllerBase {
     }
     
     override func recipientRow() -> BaseRow {
-        let row = TextRow() {
+        let row = TextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
             

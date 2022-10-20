@@ -38,7 +38,6 @@ extension EthResponse: Decodable {
     }
 }
 
-
 // MARK: - Eth Transaction
 
 struct EthTransaction {
@@ -56,7 +55,6 @@ struct EthTransaction {
     
     var isOutgoing: Bool = false
 }
-
 
 // MARK: Decodable
 extension EthTransaction: Decodable {
@@ -130,7 +128,6 @@ extension EthTransaction: Decodable {
         }
     }
 }
-
 
 // MARK: - TransactionDetails
 extension EthTransaction: TransactionDetails {
@@ -208,7 +205,6 @@ extension EthereumTransaction {
                               isOutgoing: isOutgoing)
     }
 }
-
 
 // MARK: Sample JSON
 /*

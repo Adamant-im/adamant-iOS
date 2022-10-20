@@ -23,7 +23,6 @@ extension ERC20WalletService: WalletServiceTwoStepSend {
         return vc
     }
     
-    
     // MARK: Create & Send
     func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<EthereumTransaction>) -> Void) {
         // MARK: 1. Prepare

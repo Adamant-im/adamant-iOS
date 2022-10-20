@@ -90,7 +90,6 @@ class NodeEditorViewController: FormViewController {
     var dialogService: DialogService!
     var apiService: ApiService!
     
-    
     // MARK: - Properties
     var node: Node?
     
@@ -121,7 +120,7 @@ class NodeEditorViewController: FormViewController {
         form +++ Section()
             
         // URL
-        <<< TextRow() {
+        <<< TextRow {
             $0.title = Rows.host.localized
             $0.tag = Rows.host.tag
             $0.placeholder = Rows.host.placeholder
@@ -130,7 +129,7 @@ class NodeEditorViewController: FormViewController {
         }
             
         // Port
-        <<< IntRow() {
+        <<< IntRow {
             $0.title = Rows.port.localized
             $0.tag = Rows.port.tag
             
@@ -143,12 +142,12 @@ class NodeEditorViewController: FormViewController {
         }
         
         // Scheme
-        <<< PickerInlineRow<URLScheme>() {
+        <<< PickerInlineRow<URLScheme> {
             $0.title = Rows.scheme.localized
             $0.tag = Rows.scheme.tag
             $0.value = node?.scheme ?? URLScheme.default
             $0.options = [.https, .http]
-            $0.baseCell.detailTextLabel?.textColor = .black
+            $0.baseCell.detailTextLabel?.textColor = .adamant.textColor
         }.onExpandInlineRow { (cell, _, inlineRow) in
             inlineRow.cell.height = { 100 }
         }.onChange { [weak self] row in
@@ -168,7 +167,7 @@ class NodeEditorViewController: FormViewController {
         if let wsEnabled = node?.status?.wsEnabled {
             form +++ Section()
 
-            <<< LabelRow() {
+            <<< LabelRow {
                 $0.title = Rows.webSockets.localized
                 $0.tag = Rows.webSockets.tag
                 $0.baseValue = wsEnabled
@@ -181,7 +180,7 @@ class NodeEditorViewController: FormViewController {
             
         if node != nil {
             form +++ Section()
-            <<< ButtonRow() {
+            <<< ButtonRow {
                 $0.title = Rows.deleteButton.localized
                 $0.tag = Rows.deleteButton.tag
             }.onCellSelection { [weak self] (_, _) in
@@ -207,7 +206,6 @@ class NodeEditorViewController: FormViewController {
         tableView.backgroundColor = .clear
     }
 }
-
 
 // MARK: - Actions
 extension NodeEditorViewController {

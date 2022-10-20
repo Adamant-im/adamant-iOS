@@ -35,7 +35,6 @@ class AdamantUriBuilding: XCTestCase {
         }
     }
     
-    
     // MARK: - Addresses
     func testEncodeAddress() {
         let address = "U123456789012345"

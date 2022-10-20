@@ -67,7 +67,6 @@ public class _Key {
         }
         let group = EC_KEY_get0_group(key)
         
-        
         let prv = BN_new()
         defer {
             BN_free(prv)
@@ -87,7 +86,7 @@ public class _Key {
         
         if compression {
             EC_KEY_set_conv_form(key, POINT_CONVERSION_COMPRESSED)
-            var ptr: UnsafeMutablePointer<UInt8>? = nil
+            var ptr: UnsafeMutablePointer<UInt8>?
             let length = i2o_ECPublicKey(key, &ptr)
             return Data(bytes: ptr!, count: Int(length))
         } else {
@@ -285,7 +284,7 @@ public class _Crypto {
             throw CryptoError.publicKeyParseFailed
         }
         
-        guard message.withUnsafeBytes ({ secp256k1_ecdsa_verify(ctx, signaturePointer, $0, pubkeyPointer) }) == 1 else {
+        guard message.withUnsafeBytes({ secp256k1_ecdsa_verify(ctx, signaturePointer, $0, pubkeyPointer) }) == 1 else {
             return false
         }
         

@@ -80,7 +80,7 @@ class NotificationService: UNNotificationServiceExtension {
         let partnerAddress: String
         let partnerPublicKey: String
         let partnerName: String?
-        var decodedMessage: String? = nil
+        var decodedMessage: String?
         
         if transaction.senderId == pushRecipient {
             partnerAddress = transaction.recipientId
@@ -175,8 +175,6 @@ class NotificationService: UNNotificationServiceExtension {
             bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.transaction] = transactionRaw
         }
         bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.decodedMessage] = decodedMessage
-        
-        
         
         contentHandler(bestAttemptContent)
     }

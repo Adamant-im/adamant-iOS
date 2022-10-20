@@ -14,7 +14,6 @@ extension Notification.Name {
     }
 }
 
-
 // MARK: - Currencies
 enum Currency: String {
     case RUB = "RUB"
@@ -36,7 +35,6 @@ enum Currency: String {
     static var `default` = Currency.USD
 }
 
-
 // MARK: - protocol
 protocol CurrencyInfoService: AnyObject {
     var currentCurrency: Currency { get set }
@@ -49,7 +47,6 @@ protocol CurrencyInfoService: AnyObject {
     
     func getHistory(for coin: String, timestamp: Date, completion: @escaping (ApiServiceResult<[String:Decimal]?>) -> Void)
 }
-
 
 // MARK: - AdamantBalanceFormat fiat formatter
 extension AdamantBalanceFormat {

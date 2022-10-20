@@ -10,7 +10,7 @@ import Foundation
 import Clibsodium
 import CryptoSwift
 
-public typealias Bytes = Array<UInt8>
+public typealias Bytes = [UInt8]
 
 struct Crypto {
     static let sign = Sign()
@@ -39,9 +39,9 @@ struct Sign {
     
     func signature(message: Bytes, secretKey: Bytes) -> Bytes? {
         guard secretKey.count == SecretKeyBytes else { return nil }
-        var signature = Array<UInt8>(count: SignBytes)
+        var signature = [UInt8](count: SignBytes)
         
-        guard .SUCCESS == crypto_sign_detached (
+        guard .SUCCESS == crypto_sign_detached(
             &signature,
             nil,
             message, UInt64(message.count),
@@ -135,7 +135,7 @@ struct SecretBox: NonceGenerator {
         var authenticatedCipherText = Bytes(count: message.count + MacBytes)
         let nonce = self.nonce()
         
-        guard .SUCCESS == crypto_secretbox_easy (
+        guard .SUCCESS == crypto_secretbox_easy(
             &authenticatedCipherText,
             message, UInt64(message.count),
             nonce,
@@ -149,7 +149,7 @@ struct SecretBox: NonceGenerator {
         guard authenticatedCipherText.count >= MacBytes else { return nil }
         var message = Bytes(count: authenticatedCipherText.count - MacBytes)
         
-        guard .SUCCESS == crypto_secretbox_open_easy (
+        guard .SUCCESS == crypto_secretbox_open_easy(
             &message,
             authenticatedCipherText, UInt64(authenticatedCipherText.count),
             nonce,
@@ -191,7 +191,7 @@ extension ArraySlice where Element == UInt8 {
     var bytes: Bytes { return Bytes(self) }
 }
 
-fileprivate enum ExitCode {
+private enum ExitCode {
     case SUCCESS
     case FAILURE
     

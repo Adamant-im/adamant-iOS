@@ -23,8 +23,8 @@ class LskWalletViewController: WalletViewControllerBase {
         walletTitleLabel.text = String.adamantLocalized.lisk
     }
     
-    override func sendRowLocalizedLabel() -> String {
-        return String.adamantLocalized.sendLsk
+    override func sendRowLocalizedLabel() -> NSAttributedString {
+        return NSAttributedString(string: String.adamantLocalized.sendLsk)
     }
     
     override func encodeForQr(address: String) -> String? {

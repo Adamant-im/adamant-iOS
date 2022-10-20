@@ -34,7 +34,6 @@ extension LskWalletService: WalletServiceTwoStepSend {
         return vc
     }
     
-    
     // MARK: Create & Send
     func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<TransactionEntity>) -> Void) {
         // MARK: 1. Prepare

@@ -29,7 +29,6 @@ class AdamantNotificationsService: NotificationsService {
     var securedStore: SecuredStore!
     weak var accountService: AccountService?
     
-    
     // MARK: Properties
     private(set) var notificationsMode: NotificationsMode = .disabled
     private(set) var customBadgeNumber = 0
@@ -37,7 +36,7 @@ class AdamantNotificationsService: NotificationsService {
     private var isBackgroundSession = false
     private var backgroundNotifications = 0
     
-    private var preservedBadgeNumber: Int? = nil
+    private var preservedBadgeNumber: Int?
     
     // MARK: Lifecycle
     init() {
@@ -181,7 +180,6 @@ extension AdamantNotificationsService {
     }
 }
 
-
 // MARK: - Posting & removing Notifications
 extension AdamantNotificationsService {
     func showNotification(title: String, body: String, type: AdamantNotificationType) {
@@ -254,7 +252,6 @@ extension AdamantNotificationsService {
         UIApplication.shared.applicationIconBadgeNumber = customBadgeNumber
     }
 }
-
 
 // MARK: - Background batch notifications
 extension AdamantNotificationsService {

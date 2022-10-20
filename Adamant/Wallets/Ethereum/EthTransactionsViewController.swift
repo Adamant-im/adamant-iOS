@@ -34,7 +34,6 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
         handleRefresh(self.refreshControl)
     }
     
-    
     // MARK: - Overrides
     
     override func handleRefresh(_ refreshControl: UIRefreshControl) {
@@ -146,7 +145,6 @@ class EthTransactionsViewController: TransactionsListViewControllerBase {
                       date: transaction.date)
     }
 }
-
 
 // MARK: - Tools
 extension EthTransactionsViewController {

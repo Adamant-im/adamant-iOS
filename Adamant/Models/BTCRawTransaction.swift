@@ -68,8 +68,8 @@ struct BTCRawTransaction {
             }
         }
         
-        let senders = Set(inputs.map { $0.sender } )
-        let recipients = Set(outputs.compactMap { $0.addresses.first } )
+        let senders = Set(inputs.map { $0.sender })
+        let recipients = Set(outputs.compactMap { $0.addresses.first })
         
         let sender: String
         let recipient: String
@@ -97,7 +97,6 @@ struct BTCRawTransaction {
                 recipient = String.adamantLocalized.dogeTransaction.recipients(recipients.count)
             }
         }
-        
         
         // MARK: Inputs
         if myInputs.count > 0 {
@@ -277,7 +276,7 @@ struct BTCOutput: Decodable {
             self.value = value
         } else if let raw = try? container.decode(Decimal.self, forKey: .value) {
             self.value = raw
-        } else  {
+        } else {
             self.value = 0
         }
         

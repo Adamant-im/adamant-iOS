@@ -1,0 +1,22 @@
+disabled_rules:
+  - colon
+  - comma
+  - control_statement
+  - identifier_name
+  - line_length
+  - force_try
+  - type_name
+  - cyclomatic_complexity
+  - force_cast
+  - type_body_length
+  - trailing_whitespace
+  - function_body_length
+  - comment_spacing
+  - file_length
+  - large_tuple
+  - function_parameter_count
+  - shorthand_operator
+  - operator_whitespace
+  - no_fallthrough_only
+  - computed_accessors_order
+  - xctfail_message
