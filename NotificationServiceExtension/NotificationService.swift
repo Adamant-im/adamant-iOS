@@ -8,6 +8,7 @@
 
 import UserNotifications
 import MarkdownKit
+import os
 
 class NotificationService: UNNotificationServiceExtension {
     private let passphraseStoreKey = "accountService.passphrase"
@@ -39,13 +40,44 @@ class NotificationService: UNNotificationServiceExtension {
     var bestAttemptContent: UNMutableNotificationContent?
 
     override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
+        os_log("adamant-push-debug push received:\n\n%{public}@", request.content.userInfo.debugDescription)
+        
+        let contentHandler: (UNNotificationContent) -> Void = { notification in
+            os_log("adamant-push-debug contentHandler:\n\n%{public}@", notification.userInfo.debugDescription)
+            contentHandler(notification)
+        }
+        
         self.contentHandler = contentHandler
         bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
         
-        guard let bestAttemptContent = bestAttemptContent,
-            let raw = bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
-            let id = UInt64(raw),
-            let pushRecipient = bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String else {
+//        guard let bestAttemptContent = bestAttemptContent,
+//            let raw = bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
+//            let id = UInt64(raw),
+//            let pushRecipient = bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String else {
+//            contentHandler(request.content)
+//            return
+//        }
+        
+        guard let bestAttemptContent = bestAttemptContent else {
+            os_log("adamant-push-debug bestAttemptContent is nil")
+            contentHandler(request.content)
+            return
+        }
+        
+        guard let raw = bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String else {
+            os_log("adamant-push-debug raw is nil")
+            contentHandler(request.content)
+            return
+        }
+        
+        guard let id = UInt64(raw) else {
+            os_log("adamant-push-debug id is nil")
+            contentHandler(request.content)
+            return
+        }
+        
+        guard let pushRecipient = bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.pushRecipient] as? String else {
+            os_log("adamant-push-debug pushRecipient is nil")
             contentHandler(request.content)
             return
         }
@@ -55,6 +87,7 @@ class NotificationService: UNNotificationServiceExtension {
         let core = NativeAdamantCore()
         let api = ExtensionsApi(keychainStore: securedStore)
         
+        os_log("adamant-push-debug getting sound")
         if let sound = securedStore.get(StoreKey.notificationsService.notificationsSound) {
             if sound.isEmpty {
                 bestAttemptContent.sound = nil
@@ -62,19 +95,36 @@ class NotificationService: UNNotificationServiceExtension {
                 bestAttemptContent.sound = UNNotificationSound(named: UNNotificationSoundName(sound))
             }
         }
+        os_log("adamant-push-debug sound installed successfully")
         
         // No passphrase - no point of trying to get and decode
-        guard let passphrase = securedStore.get(passphraseStoreKey),
-            let keypair = core.createKeypairFor(passphrase: passphrase) else {
-                contentHandler(bestAttemptContent)
-                return
-        }
+//        guard let passphrase = securedStore.get(passphraseStoreKey),
+//            let keypair = core.createKeypairFor(passphrase: passphrase) else {
+//                contentHandler(bestAttemptContent)
+//                return
+//        }
         
-        // MARK: 2. Get transaction
-        guard let transaction = api.getTransaction(by: id) else {
+        guard let passphrase = securedStore.get(passphraseStoreKey) else {
+            os_log("adamant-push-debug passphrase is nil")
             contentHandler(bestAttemptContent)
             return
         }
+        os_log("adamant-push-debug passphrase received")
+        
+        guard let keypair = core.createKeypairFor(passphrase: passphrase) else {
+            os_log("adamant-push-debug keypair is nil")
+            contentHandler(bestAttemptContent)
+            return
+        }
+        os_log("adamant-push-debug keypair received")
+        
+        // MARK: 2. Get transaction
+        guard let transaction = api.getTransaction(by: id) else {
+            os_log("adamant-push-debug transaction is nil")
+            contentHandler(bestAttemptContent)
+            return
+        }
+        os_log("adamant-push-debug transaction received")
         
         // MARK: 3. Working on transaction
         let partnerAddress: String
@@ -92,8 +142,10 @@ class NotificationService: UNNotificationServiceExtension {
         
         let blackList = securedStore.getArray("blackList") ?? []
         if blackList.contains(partnerAddress) {
+            os_log("adamant-push-debug black list")
             return
         }
+        os_log("adamant-push-debug not in black list")
         
         // MARK: 4. Address book
         if let addressBook = api.getAddressBook(for: pushRecipient, core: core, keypair: keypair),
@@ -104,6 +156,7 @@ class NotificationService: UNNotificationServiceExtension {
             partnerName = nil
             bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.partnerNoDislpayNameKey] = AdamantNotificationUserInfoKeys.partnerNoDisplayNameValue
         }
+        os_log("adamant-push-debug address book processing success")
         
         // MARK: 5. Content
         switch transaction.type {
@@ -176,6 +229,7 @@ class NotificationService: UNNotificationServiceExtension {
         }
         bestAttemptContent.userInfo[AdamantNotificationUserInfoKeys.decodedMessage] = decodedMessage
         
+        os_log("adamant-push-debug finish")
         contentHandler(bestAttemptContent)
     }
     

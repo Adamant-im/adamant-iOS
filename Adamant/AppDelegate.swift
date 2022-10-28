@@ -10,6 +10,7 @@ import UIKit
 import Swinject
 import CryptoSwift
 import CoreData
+import os
 
 // MARK: - Constants
 extension String.adamantLocalized {
@@ -272,6 +273,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        os_log("adamant-push-debug didRegisterForRemoteNotificationsWithDeviceToken")
         guard let address = accountService.account?.address, let keypair = accountService.keypair else {
             print("Trying to register with no user logged")
             UIApplication.shared.unregisterForRemoteNotifications()
@@ -279,6 +281,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         }
         
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        os_log("adamant-push-debug token %{public}@", token)
         // MARK: 1. Checking, if device token had not changed
         guard let securedStore = container.resolve(SecuredStore.self) else {
             fatalError("can't get secured store to get device token hash")
@@ -287,7 +290,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         let tokenHash = token.md5()
         
         if let savedHash = securedStore.get(StoreKey.application.deviceTokenHash), tokenHash == savedHash {
-            return
+            os_log("adamant-push-debug token already saved")
         } else {
             securedStore.set(tokenHash, for: StoreKey.application.deviceTokenHash)
         }
@@ -316,12 +319,15 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             fatalError("can't get api service to register device token")
         }
         
+        os_log("adamant-push-debug token sending")
         apiService.sendMessage(senderId: address, recipientId: AdamantResources.contacts.ansAddress, keypair: keypair, message: encodedPayload.message, type: ChatType.signal, nonce: encodedPayload.nonce, amount: nil) { [unowned self] result in
             switch result {
             case .success:
+                os_log("adamant-push-debug token sent (success)")
                 return
                 
             case .failure(let error):
+                os_log("adamant-push-debug token sent (failure): %{public}@", error.localizedDescription)
                 self.notificationService?.setNotificationsMode(.disabled, completion: nil)
                 self.dialogService.showRichError(error: error)
             }
