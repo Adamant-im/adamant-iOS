@@ -103,25 +103,22 @@ class ChatViewController: MessagesViewController {
     var cellUpdateTimers: [Timer] = [Timer]()
     var cellsUpdating: [IndexPath] = [IndexPath]()
     
-    internal var showsDateHeaderAfterTimeInterval: TimeInterval = 3600
+    let showsDateHeaderAfterTimeInterval: TimeInterval = 3600
     
     private var isFirstLayout = true
     private var didLoaded = false
     
     private var keyboardHeight: CGFloat = 0
-    private let chatPositionDelata: CGFloat = 150
     private var chatPositionOffset: CGFloat = 0 {
         didSet {
-            self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
+            self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelta
         }
     }
-    var scrollToBottomBtnOffetConstraint: NSLayoutConstraint?
+    var scrollToBottomBtnOffsetConstraint: NSLayoutConstraint?
     
     let scrollToBottomBtn = UIButton(type: .custom)
     
     var feeUpdateTimer: Timer?
-    
-    private let headerHeight: CGFloat = 38
     
     // MARK: Rich Messages
     var richMessageProviders = [String:RichMessageProvider]()
@@ -165,13 +162,10 @@ class ChatViewController: MessagesViewController {
     private var feeLabel: InputBarButtonItem?
     private var prevFee: Decimal = 0
     
-    // MARK: Attachment button
-    static let attachmentButtonSize: CGFloat = 36.0
-    
     lazy var attachmentButton: InputBarButtonItem = {
         return InputBarButtonItem()
             .configure {
-                $0.setSize(CGSize(width: ChatViewController.attachmentButtonSize, height: ChatViewController.attachmentButtonSize), animated: false)
+                $0.setSize(CGSize(width: attachmentButtonSize, height: attachmentButtonSize), animated: false)
                 $0.image = #imageLiteral(resourceName: "Attachment")
                 $0.tintColor = UIColor.adamant.primary
             }.onTouchUpInside { [weak self] _ in
@@ -277,7 +271,7 @@ class ChatViewController: MessagesViewController {
         
         // Add spacing between leftStackView (attachment button) and message input field
         messageInputBar.leftStackView.alignment = .bottom
-        messageInputBar.setLeftStackViewWidthConstant(to: ChatViewController.attachmentButtonSize + size*2, animated: false)
+        messageInputBar.setLeftStackViewWidthConstant(to: attachmentButtonSize + size*2, animated: false)
         messageInputBar.leftStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: size*2)
         messageInputBar.leftStackView.isLayoutMarginsRelativeArrangement = true
         
@@ -299,15 +293,7 @@ class ChatViewController: MessagesViewController {
             view.addSubview(messageInputBar)
             keyboardManager.bind(inputAccessoryView: messageInputBar, usingTabBar: self.tabBarController?.tabBar)
             keyboardManager.bind(to: messagesCollectionView)
-            
-            self.scrollsToBottomOnKeyboardBeginsEditing = true
-            
-            keyboardManager.on(event: .didChangeFrame) { [weak self] _ in
-                DispatchQueue.main.async {
-                    self?.messagesCollectionView.scrollToBottom(animated: false)
-                    self?.view.setNeedsLayout()
-                }
-            }
+            scrollsToBottomOnKeyboardBeginsEditing = true
         }
         
         if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
@@ -354,8 +340,6 @@ class ChatViewController: MessagesViewController {
             }
         }
         
-        let h = messageInputBar.bounds.height
-        
         scrollToBottomBtn.backgroundColor = .clear
         scrollToBottomBtn.setImage(#imageLiteral(resourceName: "ScrollDown"), for: .normal)
         scrollToBottomBtn.alpha = 0.5
@@ -366,16 +350,19 @@ class ChatViewController: MessagesViewController {
         self.view.addSubview(scrollToBottomBtn)
         
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !isMacOS {
-            setKeyboardObserver()
+            setKeyboardObservers()
         }
         
-        scrollToBottomBtnOffetConstraint = scrollToBottomBtn.bottomAnchor.constraint(equalTo: messagesCollectionView.bottomAnchor, constant: (-20 - h))
+        scrollToBottomBtnOffsetConstraint = scrollToBottomBtn.bottomAnchor.constraint(
+            equalTo: messagesCollectionView.bottomAnchor,
+            constant: .zero
+        )
         
         NSLayoutConstraint.activate([
-            scrollToBottomBtn.heightAnchor.constraint(equalToConstant: 30),
-            scrollToBottomBtn.widthAnchor.constraint(equalToConstant: 30),
-            scrollToBottomBtn.rightAnchor.constraint(equalTo: messagesCollectionView.rightAnchor, constant: -20),
-            scrollToBottomBtnOffetConstraint!
+            scrollToBottomBtn.heightAnchor.constraint(equalToConstant: scrollToBottomButtonSize),
+            scrollToBottomBtn.widthAnchor.constraint(equalToConstant: scrollToBottomButtonSize),
+            scrollToBottomBtn.rightAnchor.constraint(equalTo: messagesCollectionView.rightAnchor, constant: -scrollToBottomButtonRightInset),
+            scrollToBottomBtnOffsetConstraint!
         ])
         
         UIMenuController.shared.menuItems = [
@@ -461,8 +448,8 @@ class ChatViewController: MessagesViewController {
         isOnTop = true
         chatroom?.markAsReaded()
         
-        scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
-        scrollToBottomBtnOffetConstraint?.constant = -20 - self.messageInputBar.bounds.height
+        scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelta
+        updateScrollToBottomBtnOffsetConstraint()
         
         if forceScrollToBottom ?? false && !scrollToBottomBtn.isHidden {
             scrollDown()
@@ -494,8 +481,7 @@ class ChatViewController: MessagesViewController {
         if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
             let barHeight = messageInputBar.frame.height
             messageInputBar.frame.origin.y = view.bounds.maxY - keyboardHeight - barHeight
-            messagesCollectionView.contentInset.bottom = barHeight + keyboardHeight
-            messagesCollectionView.scrollIndicatorInsets.bottom = barHeight + keyboardHeight
+            additionalBottomInset = barHeight
         }
         
         // MARK: Scroll to message
@@ -521,7 +507,7 @@ class ChatViewController: MessagesViewController {
             if self.messageToShow == nil {
                 if let offset = self.chatsProvider.chatPositon[address] {
                     self.chatPositionOffset = CGFloat(offset)
-                    self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
+                    self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelta
                     let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom) + headerHeight
 
                     messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
@@ -738,21 +724,28 @@ class ChatViewController: MessagesViewController {
         }
     }
     
-    private func setKeyboardObserver() {
+    private func setKeyboardObservers() {
         let keyboardObserver: (_ height: CGFloat) -> Void = { [weak self] height in
-            self?.scrollToBottomBtnOffetConstraint?.constant = -20 - height
             self?.keyboardHeight = height
+            self?.updateScrollToBottomBtnOffsetConstraint()
         }
         
         keyboardManager.on(event: .willChangeFrame) { [weak self] notification in
             let tabBarHeight = self?.tabBarController?.tabBar.frame.height ?? .zero
             let keyboardHeight = notification.endFrame.height - tabBarHeight
             keyboardObserver(keyboardHeight)
+            self?.view.setNeedsLayout()
         }
         
         keyboardManager.on(event: .willHide) { _ in
             keyboardObserver(.zero)
         }
+    }
+    
+    private func updateScrollToBottomBtnOffsetConstraint() {
+        scrollToBottomBtnOffsetConstraint?.constant = -scrollToBottomButtonBottomInset
+            - keyboardHeight
+            - messageInputBar.frame.height
     }
 }
 
@@ -969,7 +962,7 @@ extension ChatViewController {
         var offset = scrollView.contentSize.height - scrollView.bounds.height - scrollView.contentOffset.y + messageInputBar.bounds.height
         offset += self.keyboardHeight
         
-        if offset > chatPositionDelata {
+        if offset > chatPositionDelta {
             chatPositionOffset = offset
         } else {
             chatPositionOffset = 0
@@ -1183,3 +1176,12 @@ extension ChatViewController {
         }
     }
 }
+
+// MARK: Constants
+
+private let headerHeight: CGFloat = 38
+private let chatPositionDelta: CGFloat = 150
+private let scrollToBottomButtonBottomInset: CGFloat = 20
+private let scrollToBottomButtonRightInset: CGFloat = 20
+private let scrollToBottomButtonSize: CGFloat = 30
+private let attachmentButtonSize: CGFloat = 36
