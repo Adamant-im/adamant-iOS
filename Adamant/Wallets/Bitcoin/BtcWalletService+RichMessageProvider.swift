@@ -148,6 +148,8 @@ extension BtcWalletService: RichMessageProvider {
             cell.isAlignedRight = isFromCurrentSender
         }
         
+        cell.isFromCurrentSender = isFromCurrentSender
+        
         return cell
     }
     

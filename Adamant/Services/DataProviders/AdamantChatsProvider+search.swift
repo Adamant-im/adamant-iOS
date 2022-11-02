@@ -56,14 +56,13 @@ extension AdamantChatsProvider {
             NSPredicate(format: "richContent.hash CONTAINS[cd] %@", hash)
         ])
         
-        
         request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
                                    NSSortDescriptor(key: "transactionId", ascending: false)]
         
         do {
             let results = try stack.container.viewContext.fetch(request)
             return results.count <= 1
-        } catch let error{
+        } catch let error {
             print(error)
             return false
         }

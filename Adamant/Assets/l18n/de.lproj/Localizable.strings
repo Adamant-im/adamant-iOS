@@ -331,6 +331,9 @@
 /* Chat: 'Sent funds' bubble title */
 "ChatScene.Sent" = "Versendet";
 
+/* Chat: 'Received funds' bubble title */
+"ChatScene.Received" = "Erhalten";
+
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Tap for details";
 
