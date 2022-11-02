@@ -76,7 +76,8 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
         if let address = btcWalletService.wallet?.address {
             if transaction.senderAddress.caseInsensitiveCompare(address) == .orderedSame {
                 controller.senderName = String.adamantLocalized.transactionDetails.yourAddress
-            } else if transaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
+            }
+            if transaction.recipientAddress.caseInsensitiveCompare(address) == .orderedSame {
                 controller.recipientName = String.adamantLocalized.transactionDetails.yourAddress
             }
         }
@@ -102,10 +103,17 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
         let outgoing = transaction.isOutgoing
         let partnerId = outgoing ? transaction.recipientAddress : transaction.senderAddress
         
+        let partnerName: String?
+        if let address = btcWalletService.wallet?.address, partnerId == address {
+            partnerName = String.adamantLocalized.transactionDetails.yourAddress
+        } else {
+            partnerName = nil
+        }
+        
         configureCell(cell,
                       isOutgoing: outgoing,
                       partnerId: partnerId,
-                      partnerName: nil,
+                      partnerName: partnerName,
                       amount: transaction.amountValue ?? 0,
                       date: transaction.dateValue)
     }

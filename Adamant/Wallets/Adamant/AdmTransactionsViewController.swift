@@ -167,10 +167,17 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         let amount: Decimal = transaction.amount as Decimal? ?? 0
         
+        var partnerName = transaction.chatroom?.partner?.name
+        if let address = accountService.account?.address, partnerId == address {
+            partnerName = String.adamantLocalized.transactionDetails.yourAddress
+        } else {
+            partnerName = nil
+        }
+        
         configureCell(cell,
                       isOutgoing: transaction.isOutgoing,
                       partnerId: partnerId,
-                      partnerName: transaction.chatroom?.partner?.name,
+                      partnerName: partnerName,
                       amount: amount,
                       date: transaction.date as Date?)
     }
