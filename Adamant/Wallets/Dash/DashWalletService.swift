@@ -110,7 +110,7 @@ class DashWalletService: WalletService {
     
     private var initialBalanceCheck = false
     
-    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .utility, attributes: [.concurrent])
+    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .userInteractive, attributes: [.concurrent])
     let stateSemaphore = DispatchSemaphore(value: 1)
     
     static let jsonDecoder = JSONDecoder()

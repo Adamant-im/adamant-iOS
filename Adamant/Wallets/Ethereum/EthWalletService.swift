@@ -579,7 +579,7 @@ extension EthWalletService {
                 let block = try eth.getBlockByNumberPromise(blockNumber).wait()
                 let confirmations = currentBlock - blockNumber
                 
-                let transaction = details.transaction.asEthTransaction(date: block.timestamp, gasUsed: receipt.gasUsed, blockNumber: String(blockNumber), confirmations: String(confirmations), receiptStatus: receipt.status, isOutgoing: isOutgoing)
+                let transaction = details.transaction.asEthTransaction(date: block.timestamp, gasUsed: receipt.gasUsed, blockNumber: String(blockNumber), confirmations: String(confirmations), receiptStatus: receipt.status, isOutgoing: isOutgoing, hash: details.transaction.txHash)
                 
                 completion(.success(result: transaction))
             } catch let error as Web3Error {

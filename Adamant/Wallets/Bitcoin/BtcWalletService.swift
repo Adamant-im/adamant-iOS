@@ -126,7 +126,7 @@ class BtcWalletService: WalletService {
     
     static let jsonDecoder = JSONDecoder()
     
-    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.btcWalletService", qos: .utility, attributes: [.concurrent])
+    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.btcWalletService", qos: .userInteractive, attributes: [.concurrent])
     let stateSemaphore = DispatchSemaphore(value: 1)
     
     // MARK: - State

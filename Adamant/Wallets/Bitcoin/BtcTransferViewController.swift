@@ -73,43 +73,12 @@ class BtcTransferViewController: TransferViewControllerBase {
                         service.getTransaction(by: hash) { result in
                             switch result {
                             case .success(let localTransaction):
-                                vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-
-                                if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController {
-                                    detailsVc.transaction = localTransaction
-                                    detailsVc.service = service
-                                    detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                                    detailsVc.recipientName = self?.recipientName
-
-                                    if comments.count > 0 {
-                                        detailsVc.comment = comments
-                                    }
-
-                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-                                } else {
-                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
+                                DispatchQueue.onMainAsync {
+                                    self?.processSuccessTransaction(vc, localTransaction: localTransaction, service: service, comments: comments, transaction: transaction)
                                 }
-
                             case .failure(let error):
-                                if case let .internalError(message, _) = error, message == "No transaction" {
-                                    vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                                    if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController {
-                                        detailsVc.transaction = transaction
-                                        detailsVc.service = service
-                                        detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                                        detailsVc.recipientName = self?.recipientName
-
-                                        if comments.count > 0 {
-                                            detailsVc.comment = comments
-                                        }
-
-                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-                                    } else {
-                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-                                    }
-                                } else {
-                                    vc.dialogService.showRichError(error: error)
-                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
+                                DispatchQueue.onMainAsync {
+                                    self?.processFailureTransaction(vc, service: service, comments: comments, transaction: transaction, error: error)
                                 }
                             }
                         }
@@ -123,6 +92,59 @@ class BtcTransferViewController: TransferViewControllerBase {
                 dialogService.dismissProgress()
                 dialogService.showRichError(error: error)
             }
+        }
+    }
+    
+    private func processSuccessTransaction(_ vc: BtcTransferViewController, localTransaction: BtcTransaction, service: BtcWalletService, comments: String, transaction: TransactionDetails) {
+        vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+        
+        if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController {
+            detailsVc.transaction = localTransaction
+            detailsVc.service = service
+            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+            
+            if transaction.recipientAddress == transaction.senderAddress {
+                detailsVc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                detailsVc.recipientName = self.recipientName
+            }
+            
+            if comments.count > 0 {
+                detailsVc.comment = comments
+            }
+            
+            vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+        } else {
+            vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
+        }
+    }
+    
+    private func processFailureTransaction(_ vc: BtcTransferViewController, service: BtcWalletService, comments: String, transaction: TransactionDetails, error: ApiServiceError) {
+        if case let .internalError(message, _) = error, message == "No transaction" {
+            vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+            
+            if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Bitcoin.transactionDetails) as? BtcTransactionDetailsViewController {
+                detailsVc.transaction = transaction
+                detailsVc.service = service
+                detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+
+                if transaction.recipientAddress == transaction.senderAddress {
+                    detailsVc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
+                } else {
+                    detailsVc.recipientName = self.recipientName
+                }
+                
+                if comments.count > 0 {
+                    detailsVc.comment = comments
+                }
+
+                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+            } else {
+                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
+            }
+        } else {
+            vc.dialogService.showRichError(error: error)
+            vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
         }
     }
     
