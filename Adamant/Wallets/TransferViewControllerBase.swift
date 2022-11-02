@@ -171,7 +171,6 @@ class TransferViewControllerBase: FormViewController {
         }
     }
     
-    
     weak var delegate: TransferViewControllerDelegate?
     
     var recipientAddress: String? = nil {
@@ -224,7 +223,6 @@ class TransferViewControllerBase: FormViewController {
         accessory.tintColor = UIColor.adamant.primary
         return accessory
     }
-    
     
     // MARK: - QR Reader
     
@@ -322,6 +320,22 @@ class TransferViewControllerBase: FormViewController {
         let section = Section(Sections.recipient.localized) {
             $0.tag = Sections.recipient.tag
         }
+        
+        section.header = {
+            var header = HeaderFooterView<UILabel>(.callback({
+                let font = UIFont.preferredFont(forTextStyle: .footnote)
+                let label = UILabel()
+                label.text = "    \(Sections.recipient.localized.uppercased())"
+                label.font = font
+                label.textColor = .adamant.primary
+                return label
+            }))
+            
+            header.height = {
+                33
+            }
+            return header
+        }()
         
         // Address row
         section.append(defaultRowFor(baseRow: BaseRows.address))
@@ -465,14 +479,19 @@ class TransferViewControllerBase: FormViewController {
 
     func markAddres(isValid: Bool) {
         guard
-            let row: TextRow = form.rowBy(tag: BaseRows.address.tag),
+            let recipientRow: TextRow = form.rowBy(tag: BaseRows.address.tag),
+            let recipientSection = form.sectionBy(tag: Sections.recipient.tag),
             !recipientIsReadonly
         else {
             return
         }
-
-        row.cell.textField.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.alert
-        row.cell.textField.leftView?.subviews.forEach { view in
+        
+        if let label = recipientSection.header?.viewForSection(recipientSection, type: .header), let label = label as? UILabel {
+            label.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.alert
+        }
+        
+        recipientRow.cell.textField.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.alert
+        recipientRow.cell.textField.leftView?.subviews.forEach { view in
             guard let label = view as? UILabel else { return }
             label.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.alert
         }

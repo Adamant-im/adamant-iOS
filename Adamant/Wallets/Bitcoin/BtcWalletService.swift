@@ -262,10 +262,12 @@ class BtcWalletService: WalletService {
         }
 
         guard address.count >= 26 && address.count <= 35,
-            address.rangeOfCharacter(from: CharacterSet.alphanumerics.inverted) == nil,
-            let decodedAddress = getBase58DecodeAsBytes(address: address, length: 25),
-            decodedAddress.count >= 4
-            else { return false }
+              address.isAlphanumeric,
+              let decodedAddress = getBase58DecodeAsBytes(address: address, length: 25),
+              decodedAddress.count >= 4
+        else {
+            return false
+        }
 
         let decodedAddressNoCheckSum = Array(decodedAddress.prefix(decodedAddress.count - 4))
         let hashedSum = decodedAddressNoCheckSum.sha256().sha256()
