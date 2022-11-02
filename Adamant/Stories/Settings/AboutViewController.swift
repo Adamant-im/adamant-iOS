@@ -265,18 +265,12 @@ class AboutViewController: FormViewController {
         }.cellUpdate { (cell, _) in
             cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
-            let mailVC = MFMailComposeViewController()
-            mailVC.mailComposeDelegate = self
-            mailVC.setToRecipients([AdamantResources.supportEmail])
-            
-            let systemVersion = UIDevice.current.systemVersion
-            let model = AdamantUtilities.deviceModelCode
-            let deviceInfo = "\n\n\nModel: \(model)\n" + "iOS: \(systemVersion)\n" + "App version: \(AdamantUtilities.applicationVersion)"
-            
-            mailVC.setSubject("ADAMANT iOS")
-            mailVC.setMessageBody(deviceInfo, isHTML: false)
-            mailVC.modalPresentationStyle = .overFullScreen
-            self?.present(mailVC, animated: true, completion: nil)
+            self?.openEmailScreen(
+                recipient: AdamantResources.supportEmail,
+                subject: "ADAMANT Support",
+                body: "\n\n\n" + AdamantUtilities.deviceInfo,
+                delegate: self
+            )
         }
             
         /*
