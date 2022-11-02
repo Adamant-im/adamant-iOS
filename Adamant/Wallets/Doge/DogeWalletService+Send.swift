@@ -99,6 +99,15 @@ extension DogeWalletService: WalletServiceTwoStepSend {
                 }
                 
             case .failure(let error):
+                guard let data = response.data else {
+                    completion(.failure(error: .remoteServiceError(message: error.localizedDescription)))
+                    return
+                }
+                let result = String(decoding: data, as: UTF8.self)
+                if result.contains("dust") && result.contains("-26") {
+                    completion(.failure(error: .dustAmountError))
+                    return
+                }
                 completion(.failure(error: .remoteServiceError(message: error.localizedDescription)))
             }
         }

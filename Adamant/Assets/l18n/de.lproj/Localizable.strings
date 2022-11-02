@@ -988,6 +988,9 @@
 /* Tranfser: Confirm using maximum available for transfer tokens as amount to transfer. */
 "TransferScene.UseMaxToTransfer" = "Alle verfügbaren Tokens versenden?";
 
+/* Tranfser: Dust error. */
+"TransferScene.Dust.Error" = "Staubmenge – Senden Sie mehr Token";
+
 /* Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
 "TransferScene.SendConfirmFormat" = "%1$@ zu %2$@? senden";
 

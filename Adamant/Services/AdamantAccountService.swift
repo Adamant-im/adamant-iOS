@@ -161,7 +161,7 @@ class AdamantAccountService: AccountService {
                         }
                     }
                     
-                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount, .requestCancelled:
+                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount, .requestCancelled, .dustAmountError:
                     break
                     
                 case .remoteServiceError, .apiError, .internalError:

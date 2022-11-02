@@ -38,6 +38,7 @@ enum WalletServiceError: Error {
     case internalError(message: String, error: Error?)
     case transactionNotFound(reason: String)
     case requestCancelled
+    case dustAmountError
 }
 
 extension WalletServiceError: RichError {
@@ -75,6 +76,8 @@ extension WalletServiceError: RichError {
             
         case .requestCancelled:
             return String.adamantLocalized.sharedErrors.requestCancelled
+        case .dustAmountError:
+            return String.adamantLocalized.sharedErrors.dustError
         }
     }
     
@@ -90,7 +93,7 @@ extension WalletServiceError: RichError {
         case .notLogged, .notEnoughMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated, .transactionNotFound, .requestCancelled:
             return .warning
             
-        case .remoteServiceError, .internalError:
+        case .remoteServiceError, .internalError, .dustAmountError:
             return .error
             
         case .apiError(let error):
