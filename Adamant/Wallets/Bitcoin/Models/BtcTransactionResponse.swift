@@ -80,7 +80,7 @@ extension RawBtcTransactionResponse {
 
         let confirmationsValue: String?
         if let height = height, let transactionHeight = status.height {
-            confirmationsValue = "\(height - transactionHeight)"
+            confirmationsValue = "\(height - transactionHeight + 1)"
         } else {
             confirmationsValue = nil
         }

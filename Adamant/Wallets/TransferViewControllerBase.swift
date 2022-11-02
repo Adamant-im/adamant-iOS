@@ -218,6 +218,16 @@ class TransferViewControllerBase: FormViewController {
         return max >= 0 ? max : 0
     }
     
+    var minToTransfer: Decimal {
+        guard
+            let service = service,
+            let minBalance = service.wallet?.minAmount else {
+            return 0
+        }
+        
+        return minBalance
+    }
+    
     override var customNavigationAccessoryView: (UIView & NavigationAccessory)? {
         let accessory = NavigationAccessoryView()
         accessory.tintColor = UIColor.adamant.primary
@@ -549,6 +559,11 @@ class TransferViewControllerBase: FormViewController {
             return
         }
 
+        guard amount >= minToTransfer else {
+            dialogService.showWarning(withMessage: String.adamantLocalized.transfer.amountZeroError)
+            return
+        }
+        
         guard service?.isTransactionFeeValid ?? true else {
             return
         }
@@ -617,7 +632,14 @@ class TransferViewControllerBase: FormViewController {
             return false
         }
         
-        guard let service = service, let balance = service.wallet?.balance else {
+        guard let service = service,
+              let balance = service.wallet?.balance,
+              let minAmount = service.wallet?.minAmount
+        else {
+            return false
+        }
+        
+        guard minAmount <= amount else {
             return false
         }
         

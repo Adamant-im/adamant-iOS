@@ -20,6 +20,7 @@ class DogeWallet: WalletAccount {
     var balance: Decimal = 0.0
     var notifications: Int = 0
     var minBalance: Decimal = 0
+    var minAmount: Decimal = 0
     
     init(privateKey: PrivateKey) {
         self.privateKey = privateKey

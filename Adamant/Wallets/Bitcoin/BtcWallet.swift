@@ -19,7 +19,8 @@ class BtcWallet: WalletAccount {
     }()
     var balance: Decimal = 0.0
     var notifications: Int = 0
-    var minBalance: Decimal = 0
+    var minBalance: Decimal = 0.00001
+    var minAmount: Decimal = 546e-8
     
     init(privateKey: PrivateKey) {
         self.privateKey = privateKey
