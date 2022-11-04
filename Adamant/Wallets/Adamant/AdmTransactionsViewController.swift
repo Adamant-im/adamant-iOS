@@ -170,10 +170,12 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         var partnerName = transaction.chatroom?.partner?.name
         if let address = accountService.account?.address, partnerId == address {
             partnerName = String.adamantLocalized.transactionDetails.yourAddress
-        } else {
-            partnerName = nil
         }
         
+        if partnerName == nil {
+            partnerName = transaction.partner?.name
+        }
+
         configureCell(cell,
                       isOutgoing: transaction.isOutgoing,
                       partnerId: partnerId,

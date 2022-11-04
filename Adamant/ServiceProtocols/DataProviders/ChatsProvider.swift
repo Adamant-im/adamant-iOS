@@ -186,7 +186,7 @@ protocol ChatsProvider: DataProvider {
     // MARK: - Getting chats and messages
     func getChatroomsController() -> NSFetchedResultsController<Chatroom>
     func getChatController(for chatroom: Chatroom) -> NSFetchedResultsController<ChatTransaction>
-    func getChatRooms(offset: Int?, completion: (() ->Void)?)
+    func getChatRooms(offset: Int?, completion: (() -> Void)?)
     func getChatMessages(with addressRecipient: String, offset: Int?, completion: (() -> Void)?)
     func isChatLoading(with addressRecipient: String) -> Bool
     

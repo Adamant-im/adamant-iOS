@@ -170,6 +170,10 @@ class AdamantAccountService: AccountService {
                 }
             }
         }
+        
+        NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.update()
+        }
     }
 }
 
