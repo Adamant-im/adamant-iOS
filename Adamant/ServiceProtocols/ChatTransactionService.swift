@@ -40,4 +40,11 @@ protocol ChatTransactionService: AnyObject {
     ///   - context: context to insert parsed transaction to
     /// - Returns: Transaction
     func transferTransaction(from transaction: Transaction, isOut: Bool, partner: BaseAccount?, context: NSManagedObjectContext) -> TransferTransaction
+    
+    /// Complete processing transactions
+    ///
+    /// - Parameters:
+    ///   - transactions: Transaction
+    /// - Returns: Transaction
+    func processingComplete(_ transactions: [UInt64])
 }

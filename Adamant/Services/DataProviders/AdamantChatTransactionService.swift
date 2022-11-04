@@ -18,9 +18,9 @@ class AdamantChatTransactionService: ChatTransactionService {
     var richProviders: [String:RichMessageProviderWithStatusCheck]!
     
     private let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
-    private var transactionInProgress: [String] = []
+    private var transactionInProgress: [UInt64] = []
     private var onTransactionSaved: (() -> Void)?
-    
+    private let processSemaphore = DispatchSemaphore(value: 1)
     /// Search transaction in local storage
     ///
     /// - Parameter id: Transacton ID
@@ -144,7 +144,11 @@ class AdamantChatTransactionService: ChatTransactionService {
             transfer.confirmations = transaction.confirmations
             transfer.statusEnum = .delivered
             transfer.blockId = transaction.blockId
+        } else if transactionInProgress.contains(transaction.id) {
+            processSemaphore.wait()
+            return transferTransaction(from: transaction, isOut: isOut, partner: partner, context: context)
         } else {
+            transactionInProgress.append(transaction.id)
             transfer = TransferTransaction(context: context)
             transfer.amount = transaction.amount as NSDecimalNumber
             transfer.date = transaction.date as NSDate
@@ -167,5 +171,12 @@ class AdamantChatTransactionService: ChatTransactionService {
         transfer.isOutgoing = isOut
         transfer.partner = partner
         return transfer
+    }
+    
+    func processingComplete(_ transactions: [UInt64]) {
+        transactionInProgress.removeAll { trs in
+            return transactions.contains(trs)
+        }
+        processSemaphore.signal()
     }
 }

@@ -1213,6 +1213,7 @@ extension AdamantChatsProvider {
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = context
         var newMessageTransactions = [ChatTransaction]()
+        var transactionInProgress: [UInt64] = []
         
         for (account, transactions) in partners {
             // We can't save whole context while we are mass creating MessageTransactions.
@@ -1224,6 +1225,9 @@ extension AdamantChatsProvider {
             
             for trs in transactions {
                 unconfirmedsSemaphore.wait()
+                defer { unconfirmedsSemaphore.signal() }
+                
+                transactionInProgress.append(trs.transaction.id)
                 if let objectId = unconfirmedTransactions[trs.transaction.id], let unconfirmed = context.object(with: objectId) as? ChatTransaction {
                     confirmTransaction(unconfirmed, id: trs.transaction.id, height: Int64(trs.transaction.height), blockId: trs.transaction.blockId, confirmations: trs.transaction.confirmations)
                     
@@ -1231,19 +1235,12 @@ extension AdamantChatsProvider {
                     if height < h {
                         height = h
                     }
-                    unconfirmedsSemaphore.signal()
                     continue
-                } else {
-                    unconfirmedsSemaphore.signal()
                 }
                 
-                unconfirmedsSemaphore.wait()
                 // if transaction in pending status then ignore it
                 if unconfirmedTransactionsBySignature.contains(trs.transaction.signature) {
-                    unconfirmedsSemaphore.signal()
                     continue
-                } else {
-                    unconfirmedsSemaphore.signal()
                 }
                 
                 let publicKey: String
@@ -1359,6 +1356,7 @@ extension AdamantChatsProvider {
                 
                 DispatchQueue.main.async {
                     viewContextChatrooms.forEach { $0.updateLastTransaction() }
+                    self.transactionService.processingComplete(transactionInProgress)
                 }
             } catch {
                 print(error)

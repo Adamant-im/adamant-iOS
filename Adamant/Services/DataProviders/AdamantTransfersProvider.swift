@@ -858,6 +858,8 @@ extension AdamantTransfersProvider {
         
         var transfers = [TransferTransaction]()
         var height: Int64 = 0
+        var transactionInProgress: [UInt64] = []
+        
         for t in transactions {
             if t.recipientPublicKey == nil {
                 continue
@@ -867,6 +869,7 @@ extension AdamantTransfersProvider {
                 continue
             }
             
+            transactionInProgress.append(t.id)
             unconfirmedsSemaphore.wait()
             if let objectId = unconfirmedTransactions[t.id], let transaction = context.object(with: objectId) as? TransferTransaction {
                 transaction.isConfirmed = true
@@ -944,6 +947,7 @@ extension AdamantTransfersProvider {
                 let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
                 DispatchQueue.main.async {
                     viewContextChatrooms.forEach { $0.updateLastTransaction() }
+                    self.transactionService.processingComplete(transactionInProgress)
                 }
             } catch {
                 print("TransferProvider: Failed to save changes to CoreData: \(error.localizedDescription)")
