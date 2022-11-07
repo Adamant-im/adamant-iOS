@@ -10,8 +10,7 @@ import Foundation
 import CoreData
 
 extension AdamantChatsProvider {
-    func getMessages(containing text: String, in chatroom: Chatroom?) -> [MessageTransaction]?
-    {
+    func getMessages(containing text: String, in chatroom: Chatroom?) -> [MessageTransaction]? {
         let request = NSFetchRequest<MessageTransaction>(entityName: "MessageTransaction")
         
         if let chatroom = chatroom {
@@ -27,14 +26,13 @@ extension AdamantChatsProvider {
                 NSPredicate(format: "isHidden == false")])
         }
         
-        
         request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
                                    NSSortDescriptor(key: "transactionId", ascending: false)]
         
         do {
             let results = try stack.container.viewContext.fetch(request)
             return results
-        } catch let error{
+        } catch let error {
             print(error)
         }
         

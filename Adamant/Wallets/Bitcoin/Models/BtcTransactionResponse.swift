@@ -115,8 +115,8 @@ extension RawBtcTransactionResponse {
             }
         }
         
-        let senders = Set(inputs.map { $0.prevout.address } )
-        let recipients = Set(outputs.map { $0.address } )
+        let senders = Set(inputs.map { $0.prevout.address })
+        let recipients = Set(outputs.map { $0.address })
         
         let sender: String
         let recipient: String

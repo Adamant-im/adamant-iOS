@@ -113,10 +113,10 @@ class BtcWalletService: WalletService {
     let transactionFeeUpdated = Notification.Name("adamant.btcWallet.feeUpdated")
     
     // MARK: - Delayed KVS save
-    private var balanceObserver: NSObjectProtocol? = nil
+    private var balanceObserver: NSObjectProtocol?
     
     // MARK: - Properties
-    private (set) var btcWallet: BtcWallet? = nil
+    private (set) var btcWallet: BtcWallet?
     
     private (set) var enabled = true
     
@@ -160,7 +160,7 @@ class BtcWalletService: WalletService {
         stateSemaphore.wait()
         
         switch state {
-        case .notInitiated, .updating, .initiationFailed(_):
+        case .notInitiated, .updating, .initiationFailed:
             return
             
         case .upToDate:

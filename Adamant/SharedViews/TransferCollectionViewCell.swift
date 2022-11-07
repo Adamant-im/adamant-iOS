@@ -18,7 +18,6 @@ extension String.adamantLocalized {
     }
 }
 
-
 class TransferCollectionViewCell: UICollectionViewCell, ChatCell, TapRecognizerTransferCell {
     
     // MARK: Hacks&Helpers

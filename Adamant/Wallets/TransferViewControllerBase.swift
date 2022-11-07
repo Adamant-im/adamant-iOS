@@ -10,13 +10,11 @@ import UIKit
 import Eureka
 import QRCodeReader
 
-
 // MARK: - Transfer Delegate Protocol
 
 protocol TransferViewControllerDelegate: AnyObject {
     func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?)
 }
-
 
 // MARK: - Localization
 extension String.adamantLocalized {
@@ -49,8 +47,6 @@ fileprivate extension String.adamantLocalized.alert {
     }
     static let send = NSLocalizedString("TransferScene.Send", comment: "Transfer: Confirm transfer alert: Send tokens button")
 }
-
-
 
 // MARK: -
 class TransferViewControllerBase: FormViewController {
@@ -125,7 +121,6 @@ class TransferViewControllerBase: FormViewController {
         }
     }
     
-    
     // MARK: - Dependencies
     
     var accountService: AccountService!
@@ -133,7 +128,6 @@ class TransferViewControllerBase: FormViewController {
     var dialogService: DialogService!
     var router: Router!
     var currencyInfoService: CurrencyInfoService!
-    
     
     // MARK: - Properties
     
@@ -173,7 +167,7 @@ class TransferViewControllerBase: FormViewController {
     
     weak var delegate: TransferViewControllerDelegate?
     
-    var recipientAddress: String? = nil {
+    var recipientAddress: String? {
         didSet {
             if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = recipientAddress
@@ -185,7 +179,7 @@ class TransferViewControllerBase: FormViewController {
     
     private var recipientAddressIsValid = false
     
-    var recipientName: String? = nil {
+    var recipientName: String? {
         didSet {
             guard let row: RowOf<String> = form.rowBy(tag: BaseRows.name.tag) else {
                 return
@@ -197,12 +191,12 @@ class TransferViewControllerBase: FormViewController {
         }
     }
     
-    var admReportRecipient: String? = nil
-    var amount: Decimal? = nil
+    var admReportRecipient: String?
+    var amount: Decimal?
     
     var recipientIsReadonly = false
     
-    var rate: Decimal? = nil
+    var rate: Decimal?
     
     var maxToTransfer: Decimal {
         guard
@@ -248,11 +242,9 @@ class TransferViewControllerBase: FormViewController {
         return vc
     }()
     
-    
     // MARK: - Alert
-    var progressView: UIView? = nil
-    var alertView: UIView? = nil
-    
+    var progressView: UIView?
+    var alertView: UIView?
     
     // MARK: - Lifecycle
     
@@ -276,10 +268,10 @@ class TransferViewControllerBase: FormViewController {
         
         // MARK: Button section
         form +++ Section()
-        <<< ButtonRow() {
+        <<< ButtonRow {
             $0.title = BaseRows.sendButton.localized
             $0.tag = BaseRows.sendButton.tag
-        }.onCellSelection { [weak self] (cell, row) in
+        }.onCellSelection { [weak self] (_, _) in
             self?.confirmSendFunds()
         }
         
@@ -388,7 +380,6 @@ class TransferViewControllerBase: FormViewController {
         
         return section
     }
-    
 
     // MARK: - Tools
 
@@ -598,8 +589,6 @@ class TransferViewControllerBase: FormViewController {
         }
     }
     
-    
-    
     // MARK: - 'Virtual' methods with basic implementation
     
     /// Currency code, used to get fiat rates
@@ -680,8 +669,7 @@ class TransferViewControllerBase: FormViewController {
         return WalletViewControllerBase.BaseRows.send.localized
     }
     
-    
-    /// MARK: - Abstract
+    // MARK: - Abstract
     
     /// Send funds to recipient after validations
     /// You must override this method
@@ -699,13 +687,11 @@ class TransferViewControllerBase: FormViewController {
         fatalError("You must implement raw address handling")
     }
     
-    
     /// Build recipient address row
     /// You must override this method
     func recipientRow() -> BaseRow {
         fatalError("You must implement recipient row")
     }
-    
     
     /// Validate recipient's address
     /// You must override this method
@@ -714,13 +700,12 @@ class TransferViewControllerBase: FormViewController {
     }
 }
 
-
 // MARK: - Default rows
 extension TransferViewControllerBase {
     func defaultRowFor(baseRow: BaseRows) -> BaseRow {
         switch baseRow {
         case .balance:
-            return DecimalRow() { [weak self] in
+            return DecimalRow { [weak self] in
                 $0.title = BaseRows.balance.localized
                 $0.tag = BaseRows.balance.tag
                 $0.disabled = true
@@ -734,7 +719,7 @@ extension TransferViewControllerBase {
             }
             
         case .name:
-            let row = LabelRow() { [weak self] in
+            let row = LabelRow { [weak self] in
                 $0.title = BaseRows.name.localized
                 $0.tag = BaseRows.name.tag
                 $0.value = self?.recipientName
@@ -753,7 +738,7 @@ extension TransferViewControllerBase {
             return recipientRow()
             
         case .maxToTransfer:
-            let row = DecimalRow() { [weak self] in
+            let row = DecimalRow { [weak self] in
                 $0.title = BaseRows.maxToTransfer.localized
                 $0.tag = BaseRows.maxToTransfer.tag
                 $0.disabled = true
@@ -763,7 +748,7 @@ extension TransferViewControllerBase {
                 if let maxToTransfer = self?.maxToTransfer {
                     $0.value = maxToTransfer.doubleValue
                 }
-            }.onCellSelection { [weak self] (cell, row) in
+            }.onCellSelection { [weak self] (_, row) in
                 guard let value = row.value, value > 0, let presenter = self else {
                     row.deselect(animated: true)
                     return
@@ -836,7 +821,7 @@ extension TransferViewControllerBase {
             }
         
         case .fee:
-            return DecimalRow() { [weak self] in
+            return DecimalRow { [weak self] in
                 $0.tag = BaseRows.fee.tag
                 $0.title = BaseRows.fee.localized
                 $0.disabled = true
@@ -850,7 +835,7 @@ extension TransferViewControllerBase {
             }
             
         case .total:
-            return DecimalRow() { [weak self] in
+            return DecimalRow { [weak self] in
                 $0.tag = BaseRows.total.tag
                 $0.title = BaseRows.total.localized
                 $0.value = nil
@@ -863,7 +848,7 @@ extension TransferViewControllerBase {
             }
         
         case .comments:
-            let row = TextAreaRow() {
+            let row = TextAreaRow {
                 $0.tag = BaseRows.comments.tag
                 $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
             }.cellUpdate { (cell, _) in
@@ -873,10 +858,10 @@ extension TransferViewControllerBase {
             return row
             
         case .sendButton:
-            return ButtonRow() {
+            return ButtonRow {
                 $0.title = BaseRows.sendButton.localized
                 $0.tag = BaseRows.sendButton.tag
-            }.onCellSelection { [weak self] (cell, row) in
+            }.onCellSelection { [weak self] (_, _) in
                 self?.confirmSendFunds()
             }
         }

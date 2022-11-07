@@ -19,11 +19,9 @@ class DashTransferViewController: TransferViewControllerBase {
     
     var chatsProvider: ChatsProvider!
     
-    
     // MARK: Properties
     
     static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
-    
     
     // MARK: Send
     
@@ -142,7 +140,6 @@ class DashTransferViewController: TransferViewControllerBase {
         }
     }
     
-    
     // MARK: Overrides
     
     private var _recipient: String?
@@ -176,7 +173,7 @@ class DashTransferViewController: TransferViewControllerBase {
     }
     
     override func recipientRow() -> BaseRow {
-        let row = TextRow() {
+        let row = TextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
             $0.cell.textField.autocorrectionType = .no

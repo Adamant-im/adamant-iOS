@@ -54,7 +54,6 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
         }
     }
     
-    
     // MARK: - UITableView
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
