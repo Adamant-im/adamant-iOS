@@ -10,11 +10,9 @@ import UIKit
 //import MessageKit
 
 extension String.adamantLocalized {
-    struct transferBubble {
+    enum transferBubble {
         static let sent = NSLocalizedString("ChatScene.Sent", comment: "Chat: 'Sent funds' bubble title")
         static let received = NSLocalizedString("ChatScene.Received", comment: "Chat: 'Received funds' bubble title")
-        
-        private init() {}
     }
 }
 

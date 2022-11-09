@@ -262,7 +262,7 @@ class BtcWalletService: WalletService {
         }
 
         guard address.count >= 26 && address.count <= 35,
-              address.isAlphanumeric,
+              address.range(of: "[^a-zA-Z0-9]", options: .regularExpression) == nil,
               let decodedAddress = getBase58DecodeAsBytes(address: address, length: 25),
               decodedAddress.count >= 4
         else {

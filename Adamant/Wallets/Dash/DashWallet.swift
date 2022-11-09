@@ -14,9 +14,7 @@ class DashWallet: WalletAccount {
         return publicKey.toCashaddr().base58
     }()
     let privateKey: PrivateKey
-    lazy var publicKey: PublicKey = {
-        return privateKey.publicKey()
-    }()
+    let publicKey: PublicKey
     var balance: Decimal = 0.0
     var notifications: Int = 0
     var minBalance: Decimal = 0.0001
@@ -24,5 +22,6 @@ class DashWallet: WalletAccount {
     
     init(privateKey: PrivateKey) {
         self.privateKey = privateKey
+        self.publicKey = privateKey.publicKey()
     }
 }
