@@ -15,6 +15,7 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
     var btcWalletService: BtcWalletService!
     var dialogService: DialogService!
     var router: Router!
+    var addressBook: AddressBookService!
     
     // MARK: - Properties
     var transactions: [BtcTransaction] = []
@@ -101,12 +102,14 @@ class BtcTransactionsViewController: TransactionsListViewControllerBase {
     func configureCell(_ cell: TransactionTableViewCell, for transaction: BtcTransaction) {
         let outgoing = transaction.isOutgoing
         let partnerId = outgoing ? transaction.recipientAddress : transaction.senderAddress
-        
-        let partnerName: String?
-        if let address = btcWalletService.wallet?.address, partnerId == address {
-            partnerName = String.adamantLocalized.transactionDetails.yourAddress
-        } else {
-            partnerName = nil
+   
+        var partnerName: String?
+        if let address = btcWalletService.wallet?.address {
+            if partnerId == address {
+                partnerName = String.adamantLocalized.transactionDetails.yourAddress
+            } else {
+                partnerName = addressBook.addressBook[address]
+            }
         }
         
         configureCell(cell,

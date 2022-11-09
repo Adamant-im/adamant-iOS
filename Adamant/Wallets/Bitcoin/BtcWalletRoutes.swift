@@ -35,6 +35,7 @@ extension AdamantScene.Wallets {
             let c = BtcTransactionsViewController(nibName: "TransactionsListViewControllerBase", bundle: nil)
             c.dialogService = r.resolve(DialogService.self)
             c.router = r.resolve(Router.self)
+            c.addressBook = r.resolve(AddressBookService.self)
             return c
         }
 

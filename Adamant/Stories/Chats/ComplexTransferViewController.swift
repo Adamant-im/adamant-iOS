@@ -101,7 +101,14 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         let vc = service.transferViewController()
         if let v = vc as? TransferViewControllerBase {
             if let address = partner?.address {
-                let name = partner?.name?.checkAndReplaceSystemWallets()
+                var name: String?
+                if let title = partner?.chatroom?.title {
+                    name = title
+                } else if let partnerName = partner?.name {
+                    name = partnerName
+                }
+                name = name?.checkAndReplaceSystemWallets()
+
                 v.admReportRecipient = address
                 v.recipientIsReadonly = true
                 v.commentsEnabled = service.commentsEnabledForRichMessages
@@ -115,7 +122,6 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                             v.recipientName = name
 							v.hideProgress(animated: true)
 						}
-						
 					case .failure(let error):
 						v.showAlertView(title: nil, message: error.message, animated: true)
 					}

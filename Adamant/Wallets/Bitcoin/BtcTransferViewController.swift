@@ -103,7 +103,7 @@ class BtcTransferViewController: TransferViewControllerBase {
             detailsVc.service = service
             detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
             
-            if transaction.recipientAddress == transaction.senderAddress {
+            if recipientAddress == service.wallet?.address {
                 detailsVc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
             } else {
                 detailsVc.recipientName = self.recipientName
@@ -127,8 +127,8 @@ class BtcTransferViewController: TransferViewControllerBase {
                 detailsVc.transaction = transaction
                 detailsVc.service = service
                 detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-
-                if transaction.recipientAddress == transaction.senderAddress {
+                
+                if recipientAddress == service.wallet?.address {
                     detailsVc.recipientName = String.adamantLocalized.transactionDetails.yourAddress
                 } else {
                     detailsVc.recipientName = self.recipientName
