@@ -10,9 +10,7 @@ import Foundation
 import BitcoinKit
 
 class BtcWallet: WalletAccount {
-    lazy var address: String = {
-        return publicKey.toCashaddr().base58
-    }()
+    let address: String
     let privateKey: PrivateKey
     let publicKey: PublicKey
     var balance: Decimal = 0.0
@@ -23,6 +21,7 @@ class BtcWallet: WalletAccount {
     init(privateKey: PrivateKey) {
         self.privateKey = privateKey
         self.publicKey = privateKey.publicKey()
+        self.address = publicKey.toCashaddr().base58
     }
 
 }
