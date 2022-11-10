@@ -77,6 +77,10 @@ class LskWalletService: WalletService {
         return "LSK"
     }
     
+    var consistencyMaxTime: Double {
+        return 60
+    }
+   
 	// MARK: - Properties
 	let transferAvailable: Bool = true
     private var initialBalanceCheck = false

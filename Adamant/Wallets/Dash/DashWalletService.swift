@@ -28,6 +28,10 @@ class DashWalletService: WalletService {
         return "DASH"
     }
     
+    var consistencyMaxTime: Double {
+        return 800
+    }
+   
     var wallet: WalletAccount? { return dashWallet }
     
     var walletViewController: WalletViewController {

@@ -70,6 +70,10 @@ class BtcWalletService: WalletService {
         return "BTC"
     }
     
+    var consistencyMaxTime: Double {
+        return 10800
+    }
+    
     var wallet: WalletAccount? { return btcWallet }
     
     var walletViewController: WalletViewController {

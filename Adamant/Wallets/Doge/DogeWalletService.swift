@@ -84,6 +84,10 @@ class DogeWalletService: WalletService {
         return "DOGE"
     }
     
+    var consistencyMaxTime: Double {
+        return 900
+    }
+   
     private (set) var transactionFee: Decimal = 1.0 // 1 DOGE per transaction
     
     static let kvsAddress = "doge:address"

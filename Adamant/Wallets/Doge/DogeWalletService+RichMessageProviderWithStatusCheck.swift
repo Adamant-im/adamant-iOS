@@ -34,8 +34,8 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
                     let timeAgo = -1 * date.timeIntervalSinceNow
                     
                     let result: TransactionStatus
-                    if timeAgo > 60 * 10 {
-                        // 10m waiting for pending status
+                    if timeAgo > self.consistencyMaxTime {
+                        // max time waiting for pending status
                         result = .failed
                     } else {
                         // Note: No info about processing transactions
@@ -101,8 +101,8 @@ extension DogeWalletService: RichMessageProviderWithStatusCheck {
                     let timeAgo = -1 * date.timeIntervalSinceNow
                     
                     let result: TransactionStatus
-                    if timeAgo > 60 * 10 {
-                        // 10m waiting for pending status
+                    if timeAgo > self.consistencyMaxTime {
+                        // max time waiting for pending status
                         result = .failed
                     } else {
                         // Note: No info about processing transactions

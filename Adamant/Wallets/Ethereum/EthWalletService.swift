@@ -79,6 +79,10 @@ class EthWalletService: WalletService {
         return "ERC20"
     }
     
+    var consistencyMaxTime: Double {
+        return 1200
+    }
+    
 	private (set) var transactionFee: Decimal = 0.0
 	
 	static let transferGas: Decimal = 21000

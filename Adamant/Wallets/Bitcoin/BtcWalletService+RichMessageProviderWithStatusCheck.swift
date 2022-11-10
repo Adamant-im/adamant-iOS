@@ -44,7 +44,7 @@ extension BtcWalletService: RichMessageProviderWithStatusCheck {
                 
                 // MARK: Check date
                 let start = date.addingTimeInterval(-60 * 5)
-                let end = date.addingTimeInterval(60 * 25)
+                let end = date.addingTimeInterval(self.consistencyMaxTime)
                 let range = start...end
                 
                 guard let sentDate = btcTransaction.dateValue else {
@@ -72,8 +72,8 @@ extension BtcWalletService: RichMessageProviderWithStatusCheck {
                     let timeAgo = -1 * date.timeIntervalSinceNow
                     
                     let result: TransactionStatus
-                    if timeAgo > 60 * 60 * 6 {
-                        // 6h waiting for pending status
+                    if timeAgo > self.consistencyMaxTime {
+                        // max time waiting for pending status
                         result = .failed
                     } else {
                         // Note: No info about processing transactions

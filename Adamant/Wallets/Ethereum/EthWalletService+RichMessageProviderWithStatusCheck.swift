@@ -62,7 +62,7 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
         }
         
         let start = transactionDate.addingTimeInterval(-60 * 5)
-        let end = transactionDate.addingTimeInterval(60 * 5)
+        let end = transactionDate.addingTimeInterval(self.consistencyMaxTime)
         let range = start...end
         let eth = details.transaction
         
