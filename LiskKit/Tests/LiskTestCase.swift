@@ -40,7 +40,7 @@ class LiskTestCase: XCTestCase {
 
         var result: R?
 
-        block() { response in
+        block { response in
             switch response {
             case .success(let r):
                 result = r
@@ -57,7 +57,7 @@ class LiskTestCase: XCTestCase {
     func tryRequestError<R>(_ block: (@escaping (Response<R>) -> Void) -> Void) -> APIError {
         let expectation = XCTestExpectation()
         var error: APIError?
-        block() { response in
+        block { response in
             switch response {
             case .success:
                 XCTFail("Expected an error response, request was succeeded")

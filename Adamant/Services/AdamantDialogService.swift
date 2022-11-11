@@ -27,7 +27,6 @@ class AdamantDialogService: DialogService {
     }
 }
 
-
 // MARK: - Modal dialogs
 extension AdamantDialogService {
     func present(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
@@ -63,7 +62,6 @@ extension AdamantDialogService {
     }
 }
 
-
 // MARK: - Toast
 extension AdamantDialogService {
     func showToastMessage(_ message: String) {
@@ -74,7 +72,6 @@ extension AdamantDialogService {
         FTIndicator.dismissToast()
     }
 }
-
 
 // MARK: - Indicators
 extension AdamantDialogService {
@@ -126,33 +123,28 @@ extension AdamantDialogService {
                     presenter = vc
                 }
                 
-                if !MFMailComposeViewController.canSendMail() {
-                    print("Mail services are not available")
-                    dialogService.showWarning(withMessage: String.adamantLocalized.alert.noMailService)
-                    return
-                }
-                
-                let mailVC = MFMailComposeViewController()
-                mailVC.mailComposeDelegate = dialogService.mailDelegate
-                mailVC.setToRecipients([AdamantResources.supportEmail])
-                mailVC.setSubject(String.adamantLocalized.alert.emailErrorMessageTitle)
-                
-                let systemVersion = UIDevice.current.systemVersion
-                let model = AdamantUtilities.deviceModelCode
-                let deviceInfo = "Model: \(model)\n" + "iOS: \(systemVersion)\n" + "App version: \(AdamantUtilities.applicationVersion)"
-                
                 let body: String
                 
                 if let error = error {
                     let errorDescription = String(describing: error)
-                    body = String(format: String.adamantLocalized.alert.emailErrorMessageBodyWithDescription, message, errorDescription, deviceInfo)
+                    body = String(format: String.adamantLocalized.alert.emailErrorMessageBodyWithDescription, message,
+                        errorDescription,
+                        AdamantUtilities.deviceInfo
+                    )
                 } else {
-                    body = String(format: String.adamantLocalized.alert.emailErrorMessageBody, message, deviceInfo)
+                    body = String(
+                        format: String.adamantLocalized.alert.emailErrorMessageBody,
+                        message,
+                        AdamantUtilities.deviceInfo
+                    )
                 }
                 
-                mailVC.setMessageBody(body, isHTML: false)
-                mailVC.modalPresentationStyle = .overFullScreen
-                presenter.present(mailVC, animated: true, completion: nil)
+                presenter.openEmailScreen(
+                    recipient: AdamantResources.supportEmail,
+                    subject: .adamantLocalized.alert.emailErrorMessageTitle,
+                    body: body,
+                    delegate: dialogService.mailDelegate
+                )
             }
         }
         
@@ -195,7 +187,6 @@ extension AdamantDialogService {
     }
 }
 
-
 // MARK: - Notifications
 extension AdamantDialogService {
     func showNotification(title: String?, message: String?, image: UIImage?, tapHandler: (() -> Void)?) {
@@ -210,7 +201,6 @@ extension AdamantDialogService {
         FTIndicator.dismissNotification()
     }
 }
-
 
 // MAKR: - Activity controllers
 extension AdamantDialogService {
@@ -368,7 +358,6 @@ extension AdamantDialogService {
     }
 }
 
-
 // MARK: - Alerts
 fileprivate extension UIAlertAction.Style {
     func asPMAlertAction() -> PMAlertActionStyle {
@@ -497,7 +486,7 @@ extension AdamantDialogService {
     }
 }
 
-fileprivate class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
+private class MailDelegate: NSObject, MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true, completion: nil)
     }

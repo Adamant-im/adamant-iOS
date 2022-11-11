@@ -148,6 +148,9 @@
 /* Account tab: 'Send LSK tokens' button */
 "AccountTab.Row.SendLsk" = "LSK senden";
 
+/* Account tab: 'Send BTC tokens' button */
+"AccountTab.Row.SendBtc" = "BTC ";
+
 /* Account tab: 'Send DOGE tokens' button */
 "AccountTab.Row.SendDoge" = "DOGE senden";
 
@@ -198,6 +201,9 @@
 
 /* Account tab: Lisk wallet */
 "AccountTab.Wallets.lisk_wallet" = "Lisk Wallet";
+
+/* Account tab: Bitcoin wallet */
+"AccountTab.Wallets.bitcoin_wallet" = "Bitcoin Wallet";
 
 /* Account tab: Doge wallet */
 "AccountTab.Wallets.doge_wallet" = "Doge Wallet";
@@ -324,6 +330,9 @@
 
 /* Chat: 'Sent funds' bubble title */
 "ChatScene.Sent" = "Versendet";
+
+/* Chat: 'Received funds' bubble title */
+"ChatScene.Received" = "Erhalten";
 
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Tap for details";
@@ -625,6 +634,12 @@
 /* Security: About Notification types */
 "SecurityPage.Section.AboutNotificationTypes" = "Über Benachrichtigungsoptionen";
 
+/* Security: Messages Notification sound */
+"SecurityPage.Section.Messages" = "Mitteilungen";
+
+/* Security: Settings Notification */
+"SecurityPage.Section.Settings" = "Einstellungen";
+
 /* Notifications: Disable notifications */
 "Notifications.Mode.NotificationsDisabled" = "Deaktiviert";
 
@@ -636,6 +651,21 @@
 
 /* Security: Visit Github */
 "SecurityPage.Row.VisitGithub" = "Zu GitHub";
+
+/* Notifications: Open system Settings */
+"Notifications.Settings.System" = "Systemeinstellungen";
+
+/* Notifications: Select Sound */
+"Notifications.Sound.Name" = "Klang";
+
+/* Notifications: Select Sounds */
+"Notifications.Sounds.Name" = "Geräusche";
+
+/* Notifications: Select Alert Save */
+"Notifications.Alert.Save" = "Speichern";
+
+/* Notifications: Alerts Cancel */
+"Notifications.Alert.Cancel" = "Absagen";
 
 /* Notifications: Something went wrong while registering remote notifications. %@ for description */
 "NotificationsService.Error.RegistrationRemotesFormat" = "Registrierung in ANS fehlgeschlagen. Bitte erneut versuchen. Ursache %@";
@@ -741,9 +771,6 @@
 
 /* Shared alert notification: body message for no internet connection. */
 "Shared.NoInternet.Body" = "Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut";
-
-/* Shared alert notification: message for no Mail services. */
-"Shared.NoMail" = "Mail services are not available";
 
 /* Shared alert 'Ok' button. Used anywhere */
 "Shared.Ok" = "Ok";
@@ -957,6 +984,9 @@
 
 /* Tranfser: Confirm using maximum available for transfer tokens as amount to transfer. */
 "TransferScene.UseMaxToTransfer" = "Alle verfügbaren Tokens versenden?";
+
+/* Tranfser: Dust error. */
+"TransferScene.Dust.Error" = "Staubmenge – Senden Sie mehr Token";
 
 /* Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
 "TransferScene.SendConfirmFormat" = "%1$@ zu %2$@? senden";

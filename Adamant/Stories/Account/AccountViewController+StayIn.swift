@@ -23,6 +23,8 @@ extension AccountViewController {
             pinpad.commentLabel.isHidden = false
             pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
+            pinpad.backgroundView.backgroundColor = UIColor.adamant.backgroundColor
+            setColors(for: pinpad)
             present(pinpad, animated: true, completion: nil)
         } else { // Validate pin and turn off Stay In
             pinpadRequest = .turnOffPin
@@ -32,6 +34,7 @@ extension AccountViewController {
             pinpad.commentLabel.isHidden = false
             pinpad.delegate = self
             pinpad.modalPresentationStyle = .overFullScreen
+            setColors(for: pinpad)
             present(pinpad, animated: true, completion: nil)
         }
     }
@@ -58,20 +61,21 @@ extension AccountViewController {
                 }
                 
             case .fallback:
-                let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
-                
-                if enabled {
-                    pinpad.commentLabel.text = String.adamantLocalized.security.biometryOnReason
-                    self?.pinpadRequest = .turnOnBiometry
-                } else {
-                    pinpad.commentLabel.text = String.adamantLocalized.security.biometryOffReason
-                    self?.pinpadRequest = .turnOffBiometry
-                }
-                
-                pinpad.commentLabel.isHidden = false
-                pinpad.delegate = self
-                pinpad.modalPresentationStyle = .overFullScreen
                 DispatchQueue.main.async {
+                    let pinpad = PinpadViewController.adamantPinpad(biometryButton: .hidden)
+                    
+                    if enabled {
+                        pinpad.commentLabel.text = String.adamantLocalized.security.biometryOnReason
+                        self?.pinpadRequest = .turnOnBiometry
+                    } else {
+                        pinpad.commentLabel.text = String.adamantLocalized.security.biometryOffReason
+                        self?.pinpadRequest = .turnOffBiometry
+                    }
+                    
+                    pinpad.commentLabel.isHidden = false
+                    pinpad.delegate = self
+                    pinpad.modalPresentationStyle = .overFullScreen
+                    self?.setColors(for: pinpad)
                     self?.present(pinpad, animated: true, completion: nil)
                 }
                 
@@ -95,8 +99,20 @@ extension AccountViewController {
             }
         }
     }
+    
+    func setColors(for pinpad: PinpadViewController) {
+        pinpad.backgroundView.backgroundColor = UIColor.adamant.backgroundColor
+        pinpad.buttonsBackgroundColor = UIColor.adamant.backgroundColor
+        pinpad.view.subviews.forEach { view in
+            view.subviews.forEach { _view in
+                if _view.backgroundColor == .white {
+                    _view.backgroundColor = UIColor.adamant.backgroundColor
+                }
+            }
+        }
+        pinpad.commentLabel.backgroundColor = UIColor.adamant.backgroundColor
+    }
 }
-
 
 // MARK: - PinpadViewControllerDelegate
 extension AccountViewController: PinpadViewControllerDelegate {
@@ -109,7 +125,6 @@ extension AccountViewController: PinpadViewControllerDelegate {
             pinpad.commentLabel.text = String.adamantLocalized.pinpad.reenterPin
             pinpad.clearPin()
             return
-            
             
         // MARK: User has reentered pin. Save pin.
         case .reenterPin(let pinToVerify)?:
@@ -142,7 +157,6 @@ extension AccountViewController: PinpadViewControllerDelegate {
                 }
             }
             
-            
         // MARK: Users want to turn off the pin. Validate and turn off.
         case .turnOffPin?:
             guard accountService.validatePin(pin) else {
@@ -155,7 +169,6 @@ extension AccountViewController: PinpadViewControllerDelegate {
             
             pinpad.dismiss(animated: true, completion: nil)
             
-            
         // MARK: User wants to turn on biometry
         case .turnOnBiometry?:
             guard accountService.validatePin(pin) else {
@@ -166,7 +179,6 @@ extension AccountViewController: PinpadViewControllerDelegate {
             
             accountService.useBiometry = true
             pinpad.dismiss(animated: true, completion: nil)
-            
             
         // MARK: User wants to turn off biometry
         case .turnOffBiometry?:

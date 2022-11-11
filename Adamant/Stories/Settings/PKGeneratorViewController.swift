@@ -74,9 +74,9 @@ class PKGeneratorViewController: FormViewController {
         tableView.showsHorizontalScrollIndicator = false
         
         // MARK: PrivateKeys section
-        let pkSection = Section() {
+        let pkSection = Section {
             $0.tag = Sections.privateKeys.tag
-            $0.hidden = Condition.function([], { [weak self] form -> Bool in
+            $0.hidden = Condition.function([], { [weak self] _ -> Bool in
                 guard let show = self?.showKeysSection else {
                     return true
                 }
@@ -86,9 +86,9 @@ class PKGeneratorViewController: FormViewController {
         }
         
         // MARK: Passphrase section
-        let passphraseSection = Section() { $0.tag = Sections.passphrase.tag }
+        let passphraseSection = Section { $0.tag = Sections.passphrase.tag }
         
-        let alertRow = TextAreaRow() {
+        let alertRow = TextAreaRow {
             $0.tag = Rows.alert.tag
             $0.textAreaHeight = .dynamic(initialTextViewHeight: 44)
         }.cellUpdate { (cell, _) in
@@ -107,16 +107,16 @@ class PKGeneratorViewController: FormViewController {
             cell.textView.attributedText = mutableText
         }
         
-        let passphraseRow = TextAreaRow() {
+        let passphraseRow = TextAreaRow {
             $0.placeholder = String.adamantLocalized.qrGenerator.passphrasePlaceholder
             $0.tag = Rows.passphrase.tag
             $0.textAreaHeight = .dynamic(initialTextViewHeight: 28.0) // 28 for textView and 8+8 for insets
         }
             
-        let generateButton = ButtonRow() {
+        let generateButton = ButtonRow {
             $0.title = String.adamantLocalized.pkGenerator.generateButton
             $0.tag = Rows.generateButton.tag
-        }.onCellSelection { [weak self] (cell, row) in
+        }.onCellSelection { [weak self] (_, row) in
             guard let row: TextAreaRow = self?.form.rowBy(tag: Rows.passphrase.tag), let passphrase = row.value else {
                 return
             }
@@ -127,6 +127,15 @@ class PKGeneratorViewController: FormViewController {
         passphraseSection.append(contentsOf: [alertRow, passphraseRow, generateButton])
         
         form.append(contentsOf: [pkSection, passphraseSection])
+        
+        setColors()
+    }
+    
+    // MARK: - Other
+    
+    func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
     
     // MARK: - PrivateKey tools
@@ -151,7 +160,7 @@ class PKGeneratorViewController: FormViewController {
                 continue
             }
             
-            let row = LabelRow() {
+            let row = LabelRow {
                 $0.tag = "row\(index)"
                 index += 1
                 $0.cell.imageView?.tintColor = UIColor.adamant.tableRowIcons

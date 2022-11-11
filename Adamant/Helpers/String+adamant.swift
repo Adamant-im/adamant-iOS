@@ -34,8 +34,8 @@ extension String {
 
     func getLegacyAdamantAddress() -> AdamantAddress? {
         let address: String?
-        var name: String? = nil
-        var message: String? = nil
+        var name: String?
+        var message: String?
         
         if let uri = AdamantUriTools.decode(uri: self) {
             switch uri {
@@ -54,7 +54,7 @@ extension String {
                     }
                 }
                 
-            case .passphrase(_):
+            case .passphrase:
                 address = nil
             }
         } else {
@@ -84,7 +84,7 @@ public extension NSMutableAttributedString {
 
         let stringRange = NSRange(location: 0, length: self.length)
         self.setBaseFont(baseFont: font)
-        self.addAttributes([.paragraphStyle: paragraphStyle], range: stringRange)
+        self.addAttributes([.paragraphStyle: paragraphStyle, .foregroundColor: UIColor.adamant.textColor], range: stringRange)
     }
     
     /// Replaces the base font with the given font while preserving traits like bold and italic

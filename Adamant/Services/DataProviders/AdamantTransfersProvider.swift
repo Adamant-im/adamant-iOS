@@ -17,6 +17,7 @@ class AdamantTransfersProvider: TransfersProvider {
     var accountService: AccountService!
     var accountsProvider: AccountsProvider!
     var securedStore: SecuredStore!
+    var transactionService: ChatTransactionService!
     weak var chatsProvider: ChatsProvider?
     
     // MARK: Properties
@@ -48,7 +49,7 @@ class AdamantTransfersProvider: TransfersProvider {
         
         if notify {
             switch prevState {
-            case .failedToUpdate(_):
+            case .failedToUpdate:
                 NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: nil, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
                                                                                                                      AdamantUserInfoKey.TransfersProvider.prevState: prevState])
                 
@@ -60,7 +61,6 @@ class AdamantTransfersProvider: TransfersProvider {
             }
         }
     }
-    
     
     // MARK: Lifecycle
     init() {
@@ -105,12 +105,10 @@ class AdamantTransfersProvider: TransfersProvider {
     }
 }
 
-
 // MARK: - DataProvider
 extension AdamantTransfersProvider {
     func reload() {
         reset(notify: false)
-      
         update()
     }
     
@@ -199,7 +197,6 @@ extension AdamantTransfersProvider {
                 
                 completion?(.success)
                 
-                
             case .failedToUpdate(let error): // Processing failed
                 let err: TransfersProviderError
                 
@@ -212,13 +209,13 @@ extension AdamantTransfersProvider {
                     case .accountNotFound:
                         err = .accountNotFound(address: address)
                         
-                    case .serverError(_):
+                    case .serverError:
                         err = .serverError(error)
                         
                     case .internalError(let message, _):
                         err = .dependencyError(message: message)
                         
-                    case .networkError(_):
+                    case .networkError:
                         err = .networkError
                         
                     case .requestCancelled:
@@ -270,7 +267,6 @@ extension AdamantTransfersProvider {
         setState(.empty, previous: prevState, notify: notify)
     }
 }
-
 
 // MARK: - TransfersProvider
 extension AdamantTransfersProvider {
@@ -349,7 +345,7 @@ extension AdamantTransfersProvider {
         case .success(let account):
             recipientAccount = account
             
-        case .notFound, .invalidAddress, .notInitiated, .dummy(_):
+        case .notFound, .invalidAddress, .notInitiated, .dummy:
             completion(.failure(.accountNotFound(address: recipient)))
             return
             
@@ -357,7 +353,7 @@ extension AdamantTransfersProvider {
             completion(.failure(.serverError(error)))
             return
             
-        case .networkError(_):
+        case .networkError:
             completion(.failure(.networkError))
             return
         }
@@ -470,8 +466,8 @@ extension AdamantTransfersProvider {
         let accountsGroup = DispatchGroup()
         accountsGroup.enter() // Enter 1
         
-        var recipientAccount: BaseAccount? = nil
-        var providerError: TransfersProviderError? = nil
+        var recipientAccount: BaseAccount?
+        var providerError: TransfersProviderError?
         
         accountsProvider.getAccount(byAddress: recipient) { result in
             defer {
@@ -513,7 +509,7 @@ extension AdamantTransfersProvider {
             case .serverError(let error):
                 providerError = .serverError(error)
                 
-            case .networkError(_):
+            case .networkError:
                 providerError = .networkError
             }
         }
@@ -532,7 +528,6 @@ extension AdamantTransfersProvider {
             
             return
         }
-        
         
         // MARK: 2. Create transaction
         let transaction = TransferTransaction(context: context)
@@ -694,7 +689,6 @@ extension AdamantTransfersProvider {
     }
 }
 
-
 // MARK: - Data processing
 extension AdamantTransfersProvider {
     private enum ProcessingResult {
@@ -780,6 +774,7 @@ extension AdamantTransfersProvider {
         
         // MARK: 1. Collect all partners
         var partnerIds: Set<String> = []
+        var partnerPublicKey: [String: String] = [:]
         
         for t in transactions {
             if t.recipientPublicKey == nil {
@@ -787,8 +782,10 @@ extension AdamantTransfersProvider {
             }
             if t.senderId == address {
                 partnerIds.insert(t.recipientId)
+                partnerPublicKey[t.recipientId] = t.recipientPublicKey ?? ""
             } else {
                 partnerIds.insert(t.senderId)
+                partnerPublicKey[t.senderId] = t.senderPublicKey
             }
         }
         
@@ -800,20 +797,20 @@ extension AdamantTransfersProvider {
         
         for id in partnerIds {
             partnersGroup.enter() // Enter 1
-            
-            accountsProvider.getAccount(byAddress: id) { result in
+            let publicKey = partnerPublicKey[id] ?? ""
+            accountsProvider.getAccount(byAddress: id, publicKey: publicKey) { result in
                 switch result {
-                case .success(_), .dummy(_):
+                case .success, .dummy:
                     partnersGroup.leave() // Leave 1
                     
-                case .notFound, .invalidAddress, .notInitiated(_):
+                case .notFound, .invalidAddress, .notInitiated:
                     self.accountsProvider.getDummyAccount(for: id) { result in
                         defer {
                             partnersGroup.leave() // Leave 1
                         }
                         
                         switch result {
-                        case .success(_), .foundRealAccount(_):
+                        case .success, .foundRealAccount:
                             break
                         
                         case .invalidAddress(let address):
@@ -861,6 +858,8 @@ extension AdamantTransfersProvider {
         
         var transfers = [TransferTransaction]()
         var height: Int64 = 0
+        var transactionInProgress: [UInt64] = []
+        
         for t in transactions {
             if t.recipientPublicKey == nil {
                 continue
@@ -870,6 +869,7 @@ extension AdamantTransfersProvider {
                 continue
             }
             
+            transactionInProgress.append(t.id)
             unconfirmedsSemaphore.wait()
             if let objectId = unconfirmedTransactions[t.id], let transaction = context.object(with: objectId) as? TransferTransaction {
                 transaction.isConfirmed = true
@@ -891,29 +891,11 @@ extension AdamantTransfersProvider {
             } else {
                 unconfirmedsSemaphore.signal()
             }
-            let transfer: TransferTransaction
-            if let trs = getTransfer(id: String(t.id), context: context) {
-                transfer = trs
-                transfer.confirmations = t.confirmations
-                transfer.statusEnum = .delivered
-                transfer.blockId = t.blockId
-            } else {
-                transfer = TransferTransaction(context: context)
-                transfer.amount = t.amount as NSDecimalNumber
-                transfer.date = t.date as NSDate
-                transfer.fee = t.fee as NSDecimalNumber
-                transfer.height = Int64(t.height)
-                transfer.recipientId = t.recipientId
-                transfer.senderId = t.senderId
-                transfer.transactionId = String(t.id)
-                transfer.type = Int16(t.type.rawValue)
-                transfer.blockId = t.blockId
-                transfer.confirmations = t.confirmations
-                transfer.statusEnum = .delivered
-                transfer.showsChatroom = false
-                transfer.isConfirmed = true
-                transfer.chatMessageId = UUID().uuidString
-            }
+            
+            let partner = partners[String(t.id)]
+            let isOut = t.senderId == address
+            
+            let transfer = transactionService.transferTransaction(from: t, isOut: isOut, partner: partner, context: context)
            
             transfer.isOutgoing = t.senderId == address
             let partnerId = transfer.isOutgoing ? t.recipientId : t.senderId
@@ -928,7 +910,6 @@ extension AdamantTransfersProvider {
             
             transfers.append(transfer)
         }
-        
         
         // MARK: 4. Check lastHeight
         // API returns transactions from lastHeight INCLUDING transaction with height == lastHeight, so +1
@@ -966,6 +947,7 @@ extension AdamantTransfersProvider {
                 let viewContextChatrooms = Set<Chatroom>(transfers.compactMap { $0.chatroom }).compactMap { self.stack.container.viewContext.object(with: $0.objectID) as? Chatroom }
                 DispatchQueue.main.async {
                     viewContextChatrooms.forEach { $0.updateLastTransaction() }
+                    self.transactionService.processingComplete(transactionInProgress)
                 }
             } catch {
                 print("TransferProvider: Failed to save changes to CoreData: \(error.localizedDescription)")

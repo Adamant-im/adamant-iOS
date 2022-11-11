@@ -17,7 +17,6 @@ extension String.adamantLocalized {
     }
 }
 
-
 // MARK: -
 class DelegateDetailsViewController: UIViewController {
     
@@ -105,12 +104,11 @@ class DelegateDetailsViewController: UIViewController {
         return formatter
     }()
     
-    private var forged: Decimal? = nil
-    private var forgingTime: TimeInterval? = nil
+    private var forged: Decimal?
+    private var forgingTime: TimeInterval?
     
     // Double error fix
-    private var prevApiError: (date: Date, error: ApiServiceError)? = nil
-    
+    private var prevApiError: (date: Date, error: ApiServiceError)?
     
     // MARK: - Lifecycle
     
@@ -123,6 +121,8 @@ class DelegateDetailsViewController: UIViewController {
         } else {
             navigationItem.title = String.adamantLocalized.delegateDetails.title
         }
+        
+        setColors()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -132,8 +132,14 @@ class DelegateDetailsViewController: UIViewController {
             tableView.deselectRow(at: indexPath, animated: true)
         }
     }
+    
+    // MARK: - Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
+    }
 }
-
 
 // MARK: - TableView data & delegate
 extension DelegateDetailsViewController: UITableViewDelegate, UITableViewDataSource {
@@ -191,7 +197,6 @@ extension DelegateDetailsViewController: UITableViewDelegate, UITableViewDataSou
     }
 }
 
-
 // MARK: - Cells
 extension DelegateDetailsViewController {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -206,7 +211,7 @@ extension DelegateDetailsViewController {
         } else {
             cell = UITableViewCell(style: .value1, reuseIdentifier: cellIdentifier)
         }
-        
+        cell.backgroundColor = UIColor.adamant.cellColor
         cell.textLabel?.text = row.localized
         cell.accessoryType = .none
         cell.imageView?.image = row.image
@@ -265,7 +270,6 @@ extension DelegateDetailsViewController {
         return cell
     }
 }
-
 
 // MARK: - Tools
 extension DelegateDetailsViewController {

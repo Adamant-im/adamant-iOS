@@ -92,7 +92,7 @@ class LskTransactionDetailsViewController: TransactionDetailsViewControllerBase 
         timer?.invalidate()
     }
     
-    func update(){
+    func update() {
         guard let id = self.transaction?.txId, let service = self.service else {
             return
         }

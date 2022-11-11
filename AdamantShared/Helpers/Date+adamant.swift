@@ -44,7 +44,6 @@ extension Date {
         return DateFormatter.localizedString(from: self, dateStyle: .long, timeStyle: .short)
     }
     
-    
     /// Returns readable day string. "Today, Yesterday, etc"
     func humanizedDay() -> String {
         let dateString: String
@@ -64,13 +63,11 @@ extension Date {
         return dateString
     }
     
-    
     /// Returns readable time string. "Just now, minutes ago, 11:30, etc"
     /// - Returns: Readable string, and time when string will be expired and needs an update
     func humanizedTime() -> (string: String, expireIn: TimeInterval?) {
         let timeString: String
         let expire: TimeInterval?
-        
         
         let seconds = secondsAgo
         if seconds < 30 {
@@ -90,7 +87,6 @@ extension Date {
         
         return (timeString, expire)
     }
-    
     
     // MARK: Formatters
     

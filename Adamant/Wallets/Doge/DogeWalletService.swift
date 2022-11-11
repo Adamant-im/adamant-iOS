@@ -10,7 +10,6 @@ import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit
-import BitcoinKitPrivate
 
 struct DogeApiCommands {
     static func balance(for address: String) -> String {
@@ -81,6 +80,14 @@ class DogeWalletService: WalletService {
         return type(of: self).currencyLogo
     }
     
+    var tokenNetworkSymbol: String {
+        return "DOGE"
+    }
+    
+    var consistencyMaxTime: Double {
+        return 900
+    }
+   
     private (set) var transactionFee: Decimal = 1.0 // 1 DOGE per transaction
     
     static let kvsAddress = "doge:address"
@@ -92,10 +99,10 @@ class DogeWalletService: WalletService {
     let transactionFeeUpdated = Notification.Name("adamant.dogeWallet.feeUpdated")
     
     // MARK: - Delayed KVS save
-    private var balanceObserver: NSObjectProtocol? = nil
+    private var balanceObserver: NSObjectProtocol?
     
     // MARK: - Properties
-    private (set) var dogeWallet: DogeWallet? = nil
+    private (set) var dogeWallet: DogeWallet?
     
     private (set) var enabled = true
     
@@ -103,7 +110,7 @@ class DogeWalletService: WalletService {
     
     private var initialBalanceCheck = false
     
-    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dogeWalletService", qos: .utility, attributes: [.concurrent])
+    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dogeWalletService", qos: .userInteractive, attributes: [.concurrent])
     let stateSemaphore = DispatchSemaphore(value: 1)
     
     private static let jsonDecoder = JSONDecoder()
@@ -158,7 +165,7 @@ class DogeWalletService: WalletService {
         stateSemaphore.wait()
         
         switch state {
-        case .notInitiated, .updating, .initiationFailed(_):
+        case .notInitiated, .updating, .initiationFailed:
             return
             
         case .upToDate:

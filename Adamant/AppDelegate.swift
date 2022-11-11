@@ -35,7 +35,6 @@ extension StoreKey {
     }
 }
 
-
 // MARK: - Application
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -120,8 +119,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 tabBarAppearance.configureWithDefaultBackground()
                 UITabBar.appearance().standardAppearance = tabBarAppearance
 
+                let navigationBarAppearance = UINavigationBarAppearance()
+                navigationBarAppearance.configureWithDefaultBackground()
+                UINavigationBar.appearance().standardAppearance = navigationBarAppearance
+                        
                 if #available(iOS 15.0, *) {
                     UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+                    UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
                 }
             }
             
@@ -211,7 +215,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             dialogService.showError(withMessage: "Failed to register CurrencyInfoService autoupdate. Please, report a bug", error: nil)
         }
-        
         
         // MARK: 6. Logout reset
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantAccountService.userLoggedOut, object: nil, queue: OperationQueue.main) { [weak self] _ in
@@ -331,7 +334,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         }
     }
     
-    //MARK: Open Chat From Notification
+    // MARK: Open Chat From Notification
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         guard let transactionID = userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
               let transactionRaw = userInfo[AdamantNotificationUserInfoKeys.transaction] as? String,
@@ -398,7 +401,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
 }
 
-
 // MARK: - Background Fetch
 extension AppDelegate {
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
@@ -457,7 +459,6 @@ extension AppDelegate {
         }
     }
 }
-
 
 // MARK: - Welcome messages
 extension AppDelegate {

@@ -54,12 +54,10 @@ extension BiometryType {
 
 typealias Stripe = [StripeButtonType]
 
-
 // MARK: - Delegate
 protocol ButtonsStripeViewDelegate: AnyObject {
     func buttonsStripe(_ stripe: ButtonsStripeView, didTapButton button: StripeButtonType)
 }
-
 
 // MARK: - View
 class ButtonsStripeView: UIView {
@@ -68,9 +66,9 @@ class ButtonsStripeView: UIView {
     
     // MARK: Properties
     weak var delegate: ButtonsStripeViewDelegate?
-    private var buttons: [RoundedButton]? = nil
+    private var buttons: [RoundedButton]?
     
-    var stripe: Stripe? = nil {
+    var stripe: Stripe? {
         didSet {
             for aView in stripeStackView.subviews {
                 aView.removeFromSuperview()
@@ -90,7 +88,7 @@ class ButtonsStripeView: UIView {
                 button.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
                 
                 button.setImage(aButton.image, for: .normal)
-                
+                button.imageView?.tintColor = UIColor.adamant.tableRowIcons
                 button.imageView!.contentMode = .scaleAspectFit
                 button.clipsToBounds = true
                 
@@ -113,7 +111,7 @@ class ButtonsStripeView: UIView {
     }
     
     // MARK: Buttons properties
-    var buttonsBorderColor: UIColor? = nil {
+    var buttonsBorderColor: UIColor? {
         didSet {
             if let buttons = buttons {
                 buttons.forEach { $0.borderColor = buttonsBorderColor }
@@ -137,7 +135,7 @@ class ButtonsStripeView: UIView {
         }
     }
     
-    var buttonsNormalColor: UIColor? = nil {
+    var buttonsNormalColor: UIColor? {
         didSet {
             if let buttons = buttons {
                 buttons.forEach { $0.normalBackgroundColor = buttonsNormalColor }
@@ -145,7 +143,7 @@ class ButtonsStripeView: UIView {
         }
     }
     
-    var buttonsHighlightedColor: UIColor? = nil {
+    var buttonsHighlightedColor: UIColor? {
         didSet {
             if let buttons = buttons {
                 buttons.forEach { $0.highlightedBackgroundColor = buttonsHighlightedColor }
@@ -167,7 +165,6 @@ class ButtonsStripeView: UIView {
     }
 }
 
-
 // MARK: Adamant config
 extension ButtonsStripeView {
     static let adamantDefaultHeight: CGFloat = 85
@@ -184,7 +181,7 @@ extension ButtonsStripeView {
         view.buttonsHighlightedColor = UIColor.adamant.pinpadHighlightButton
         view.buttonsNormalColor = .white
         view.stripeStackView.spacing = 15
-        
+        view.buttonsNormalColor = UIColor.adamant.cellColor
         return view
     }
 }

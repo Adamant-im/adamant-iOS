@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SafariServices
 
 extension AdamantUtilities {
     // MARK: Application version
@@ -22,18 +23,23 @@ extension AdamantUtilities {
     
     // MARK: Device model
     static var deviceModelCode: String {
-        var systemInfo = utsname()
-        uname(&systemInfo)
-        let modelCode = withUnsafePointer(to: &systemInfo.machine) {
-            $0.withMemoryRebound(to: CChar.self, capacity: 1) {
-                ptr in String.init(validatingUTF8: ptr)
-                
-            }
-        }
-        return modelCode ?? "Unknown"
+        isMacOS
+            ? macModelCode
+            : phoneModelCode
     }
+    
+    // MARK: Device info
+    static var deviceInfo: String = {
+        [
+            "Model": deviceModelCode,
+            "System name": UIDevice.current.systemName,
+            "System version": UIDevice.current.systemVersion,
+            "App version": AdamantUtilities.applicationVersion
+        ]
+        .map { "\($0): \($1)" }
+        .joined(separator: "\n")
+    }()
 }
-
 
 // MARK: - Validating Addresses and Passphrases
 extension AdamantUtilities {
@@ -93,7 +99,6 @@ extension AdamantUtilities {
     }
 }
 
-
 // MARK: - Hex
 extension AdamantUtilities {
     static func getHexString(from bytes: [UInt8]) -> String {
@@ -143,5 +148,42 @@ extension AdamantUtilities {
         let data = Data(publicKeyHashBytes)
         let number = data.withUnsafeBytes { $0.load(as: UInt64.self) }
         return "U\(number)"
+    }
+}
+
+// MARK: - Email deeplink
+extension AdamantUtilities {
+    static func openEmailApp(recipient: String, subject: String?, body: String?) {
+        guard var urlComponents = URLComponents(string: "mailto:\(recipient)") else { return }
+        
+        urlComponents.queryItems = [
+            .init(name: "subject", value: subject),
+            .init(name: "body", value: body)
+        ]
+        
+        urlComponents.url.map { UIApplication.shared.open($0) }
+    }
+}
+
+private extension AdamantUtilities {
+    static var phoneModelCode: String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let modelCode = withUnsafePointer(to: &systemInfo.machine) {
+            $0.withMemoryRebound(to: CChar.self, capacity: 1) { ptr in
+                String.init(validatingUTF8: ptr)
+            }
+        }
+        return modelCode ?? "Unknown"
+    }
+    
+    static var macModelCode: String {
+        var size = 0
+        sysctlbyname("hw.model", nil, &size, nil, 0)
+
+        var modelIdentifier: [CChar] = Array(repeating: 0, count: size)
+        sysctlbyname("hw.model", &modelIdentifier, &size, nil, 0)
+
+        return String(cString: modelIdentifier)
     }
 }

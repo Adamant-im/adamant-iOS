@@ -9,7 +9,7 @@
 import UIKit
 import SafariServices
 
-fileprivate class OnboardingPageItem {
+private class OnboardingPageItem {
     var image: UIImage
     var text: String
     
@@ -35,7 +35,6 @@ class OnboardViewController: UIViewController {
     private static let titleFont = UIFont.adamantPrimary(ofSize: 18)
     private static let buttonsFont = UIFont.adamantPrimary(ofSize: 16, weight: .bold)
     private static let themeColor = UIColor.adamant.primary
-    
     
     // MARK: Outlets
     @IBOutlet weak var onboarding: SwiftyOnboard!
@@ -64,8 +63,18 @@ class OnboardViewController: UIViewController {
         
         onboarding.delegate = self
         onboarding.dataSource = self
-        onboarding.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "stripeBg"))//UIColor.adamant.background
+        setColors()
     }
+    
+    // MARK: - Other
+    
+    private func setColors() {
+        agreeSwitch?.onTintColor = UIColor.adamant.switchColor
+        onboarding.backgroundColor = UIColor.adamant.welcomeBackgroundColor
+        view.backgroundColor = UIColor.adamant.welcomeBackgroundColor
+    }
+    
+    // MARK: - Actions
     
     @objc func handleSkip() {
         guard self.agreeSwitch?.isOn == true else {
@@ -172,7 +181,6 @@ extension OnboardViewController: SwiftyOnboardDelegate, SwiftyOnboardDataSource 
         }
     }
 }
-
 
 // MARK: - UITextViewDelegate
 extension OnboardViewController: UITextViewDelegate {

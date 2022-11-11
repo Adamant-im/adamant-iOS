@@ -8,7 +8,6 @@
 
 import UIKit
 import BitcoinKit
-import BitcoinKitPrivate
 import Alamofire
 
 extension DashWalletService: WalletServiceTwoStepSend {
@@ -22,7 +21,6 @@ extension DashWalletService: WalletServiceTwoStepSend {
         vc.service = self
         return vc
     }
-    
     
     // MARK: Create & Send
     func create(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<DashWalletService.T>) -> Void) {

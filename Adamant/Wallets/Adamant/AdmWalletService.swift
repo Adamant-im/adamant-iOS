@@ -32,13 +32,20 @@ class AdmWalletService: NSObject, WalletService {
     var tokenLogo: UIImage {
         return type(of: self).currencyLogo
     }
-	
+    
+    var tokenNetworkSymbol: String {
+        return "ADM"
+    }
+    
+    var consistencyMaxTime: Double {
+        return 0
+    }
+    
 	// MARK: - Dependencies
 	weak var accountService: AccountService!
 	var apiService: ApiService!
 	var transfersProvider: TransfersProvider!
     var router: Router!
-    
     
     // MARK: - Notifications
     let walletUpdatedNotification = Notification.Name("adamant.admWallet.updated")
@@ -68,8 +75,7 @@ class AdmWalletService: NSObject, WalletService {
     
     // MARK: - State
     private (set) var state: WalletServiceState = .upToDate
-    private (set) var wallet: WalletAccount? = nil
-    
+    private (set) var wallet: WalletAccount?
     
     // MARK: - Logic
     override init() {
@@ -116,7 +122,6 @@ class AdmWalletService: NSObject, WalletService {
         }
     }
     
-    
     // MARK: - Tools
     func validate(address: String) -> AddressValidationResult {
         guard !AdamantContacts.systemAddresses.contains(address) else {
@@ -141,7 +146,6 @@ extension AdmWalletService: WalletServiceWithTransfers {
     }
 }
 
-
 // MARK: - NSFetchedResultsControllerDelegate
 extension AdmWalletService: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -155,7 +159,6 @@ extension AdmWalletService: NSFetchedResultsControllerDelegate {
         }
     }
 }
-
 
 // MARK: - Dependencies
 extension AdmWalletService: SwinjectDependentService {

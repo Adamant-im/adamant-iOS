@@ -19,7 +19,6 @@ class ComplexTransferViewController: UIViewController {
     
     var accountService: AccountService!
     
-    
     // MARK: - Properties
     var pagingViewController: PagingViewController!
     
@@ -35,8 +34,6 @@ class ComplexTransferViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.white
-        
         if let partner = partner {
             navigationItem.title = partner.name?.checkAndReplaceSystemWallets() ?? partner.address
         }
@@ -45,7 +42,6 @@ class ComplexTransferViewController: UIViewController {
         
         // MARK: Services
         services = accountService.wallets.compactMap { $0 as? WalletServiceWithSend }
-        
         
         // MARK: PagingViewController
         pagingViewController = PagingViewController()
@@ -69,14 +65,23 @@ class ComplexTransferViewController: UIViewController {
         }
         
         addChild(pagingViewController)
+        
+        setColors()
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
     
-    @objc
-    func cancel() {
+    // MARK: - Other
+    
+    func setColors() {
+        view.backgroundColor = UIColor.adamant.backgroundColor
+        pagingViewController.backgroundColor = UIColor.adamant.backgroundColor
+        pagingViewController.menuBackgroundColor = UIColor.adamant.backgroundColor
+    }
+    
+    @objc func cancel() {
         transferDelegate?.complexTransferViewController(self, didFinishWithTransfer: nil, detailsViewController: nil)
     }
 }
@@ -96,7 +101,14 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
         let vc = service.transferViewController()
         if let v = vc as? TransferViewControllerBase {
             if let address = partner?.address {
-                let name = partner?.name?.checkAndReplaceSystemWallets()
+                var name: String?
+                if let title = partner?.chatroom?.title {
+                    name = title
+                } else if let partnerName = partner?.name {
+                    name = partnerName
+                }
+                name = name?.checkAndReplaceSystemWallets()
+
                 v.admReportRecipient = address
                 v.recipientIsReadonly = true
                 v.commentsEnabled = service.commentsEnabledForRichMessages
@@ -110,7 +122,6 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                             v.recipientName = name
 							v.hideProgress(animated: true)
 						}
-						
 					case .failure(let error):
 						v.showAlertView(title: nil, message: error.message, animated: true)
 					}
@@ -129,8 +140,15 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
 		guard let wallet = service.wallet else {
 			return WalletPagingItem(index: index, currencySymbol: "", currencyImage: #imageLiteral(resourceName: "wallet_adm"))
 		}
+        
+        var network = ""
+        if ERC20Token.supportedTokens.contains(where: { token in
+            return token.symbol == service.tokenSymbol
+        }) {
+            network = service.tokenNetworkSymbol
+        }
 		
-		let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo)
+		let item = WalletPagingItem(index: index, currencySymbol: service.tokenSymbol, currencyImage: service.tokenLogo, currencyNetwork: network)
 		item.balance = wallet.balance
 		
 		return item

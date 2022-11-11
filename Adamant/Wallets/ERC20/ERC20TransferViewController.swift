@@ -15,7 +15,6 @@ class ERC20TransferViewController: TransferViewControllerBase {
     
     var chatsProvider: ChatsProvider!
     
-    
     // MARK: Properties
     
     private var skipValueChange: Bool = false
@@ -58,7 +57,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
             switch result {
             case .success(let transaction):
                 // MARK: 1. Send adm report
-                if let reportRecipient = vc.admReportRecipient, let hash = transaction.txhash {
+                if let reportRecipient = vc.admReportRecipient, let hash = transaction.txHash {
                     self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
                 }
 
@@ -107,7 +106,6 @@ class ERC20TransferViewController: TransferViewControllerBase {
         }
     }
     
-    
     // MARK: Overrides
     
     private var _recipient: String?
@@ -152,7 +150,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
     }
     
     override func recipientRow() -> BaseRow {
-        let row = TextRow() {
+        let row = TextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
             $0.cell.textField.keyboardType = UIKeyboardType.namePhonePad
@@ -175,11 +173,18 @@ class ERC20TransferViewController: TransferViewControllerBase {
             
             if recipientIsReadonly {
                 $0.disabled = true
-                //                prefix.isEnabled = false
+                prefix.textColor = UIColor.lightGray
             }
-            }.cellUpdate { (cell, row) in
+            }.cellUpdate { [weak self] (cell, _) in
                 if let text = cell.textField.text {
                     cell.textField.text = text.components(separatedBy: EthTransferViewController.invalidCharacters).joined()
+                    
+                    guard self?.recipientIsReadonly == false else { return }
+                    
+                    cell.textField.leftView?.subviews.forEach { view in
+                        guard let label = view as? UILabel else { return }
+                        label.textColor = UIColor.adamant.primary
+                    }
                 }
             }.onChange { [weak self] row in
                 if let skip = self?.skipValueChange, skip {
@@ -203,13 +208,8 @@ class ERC20TransferViewController: TransferViewControllerBase {
                         }
                     }
                 }
-                
-                self?.validateForm()
-        }.onCellSelection { [weak self] (cell, row) in
-            if let recipient = self?.recipientAddress {
-                let text = recipient
-                self?.shareValue(text, from: cell)
-            }
+        }.onCellSelection { [weak self] (cell, _) in
+            self?.shareValue(self?.recipientAddress, from: cell)
         }
         
         return row
@@ -258,6 +258,7 @@ class ERC20TransferViewController: TransferViewControllerBase {
     }
     
     override func defaultSceneTitle() -> String? {
-        return String.adamantLocalized.wallets.erc20.sendToken(service?.tokenSymbol ?? "ERC20")
+        let networkSymbol = service?.tokenNetworkSymbol ?? "ERC20"
+        return String.adamantLocalized.wallets.erc20.sendToken(service?.tokenSymbol ?? "ERC20") + " (\(networkSymbol))"
     }
 }

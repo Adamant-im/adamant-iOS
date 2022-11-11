@@ -23,8 +23,8 @@ class EthWalletViewController: WalletViewControllerBase {
         walletTitleLabel.text = String.adamantLocalized.wallets.ethereum
     }
     
-    override func sendRowLocalizedLabel() -> String {
-        return String.adamantLocalized.wallets.sendEth
+    override func sendRowLocalizedLabel() -> NSAttributedString {
+        return NSAttributedString(string: String.adamantLocalized.wallets.sendEth)
     }
     
     override func encodeForQr(address: String) -> String? {

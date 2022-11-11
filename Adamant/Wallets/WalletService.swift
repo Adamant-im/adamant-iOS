@@ -38,6 +38,7 @@ enum WalletServiceError: Error {
     case internalError(message: String, error: Error?)
     case transactionNotFound(reason: String)
     case requestCancelled
+    case dustAmountError
 }
 
 extension WalletServiceError: RichError {
@@ -75,6 +76,8 @@ extension WalletServiceError: RichError {
             
         case .requestCancelled:
             return String.adamantLocalized.sharedErrors.requestCancelled
+        case .dustAmountError:
+            return String.adamantLocalized.sharedErrors.dustError
         }
     }
     
@@ -90,7 +93,7 @@ extension WalletServiceError: RichError {
         case .notLogged, .notEnoughMoney, .networkError, .accountNotFound, .invalidAmount, .walletNotInitiated, .transactionNotFound, .requestCancelled:
             return .warning
             
-        case .remoteServiceError, .internalError:
+        case .remoteServiceError, .internalError, .dustAmountError:
             return .error
             
         case .apiError(let error):
@@ -132,7 +135,7 @@ extension ChatsProviderError {
         case .notLogged:
             return .notLogged
             
-        case .messageNotValid(_):
+        case .messageNotValid:
             return .notLogged
             
         case .notEnoughMoneyToSend:
@@ -147,7 +150,7 @@ extension ChatsProviderError {
         case .serverError(let e):
             return .internalError(message: self.message, error: e)
             
-        case .accountNotFound(_):
+        case .accountNotFound:
             return .accountNotFound
             
         case .dependencyError(let message):
@@ -159,7 +162,7 @@ extension ChatsProviderError {
         case .internalError(let error):
             return .internalError(message: self.message, error: error)
             
-        case .accountNotInitiated(_):
+        case .accountNotInitiated:
             return .walletNotInitiated
             
         case .requestCancelled:
@@ -167,7 +170,6 @@ extension ChatsProviderError {
         }
     }
 }
-
 
 // MARK: - Notifications
 extension AdamantUserInfoKey {
@@ -178,7 +180,6 @@ extension AdamantUserInfoKey {
         private init() {}
     }
 }
-
 
 // MARK: - UI
 extension Notification.Name {
@@ -195,7 +196,6 @@ protocol WalletViewController {
     var service: WalletService? { get }
 }
 
-
 // MARK: - Wallet Service
 protocol WalletService: AnyObject {
 	// MARK: Currency
@@ -205,7 +205,9 @@ protocol WalletService: AnyObject {
     var tokenSymbol: String { get }
     var tokenName: String { get }
     var tokenLogo: UIImage { get }
-	
+    var tokenNetworkSymbol: String { get }
+    var consistencyMaxTime: Double { get }
+    
 	// MARK: Notifications
 	
 	/// Wallet updated.

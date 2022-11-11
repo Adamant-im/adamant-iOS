@@ -34,7 +34,7 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
                 transactionDate = date
                 
                 let start = transactionDate.addingTimeInterval(-60 * 5)
-                let end = transactionDate.addingTimeInterval(60 * 5)
+                let end = transactionDate.addingTimeInterval(self.consistencyMaxTime)
                 let range = start...end
                 
                 // MARK: Check addresses

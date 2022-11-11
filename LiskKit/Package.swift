@@ -6,13 +6,13 @@ import PackageDescription
 let package = Package(
     name: "LiskKit",
     platforms: [
-        .iOS(.v10),
+        .iOS(.v12),
         .macOS(.v10_12)
     ],
     products: [
         .library(
             name: "LiskKit",
-            targets: ["LiskKit"]),
+            targets: ["LiskKit"])
     ],
     dependencies: [
         .package(name: "Sodium", url: "https://github.com/jedisct1/swift-sodium.git", from: "0.9.1"),

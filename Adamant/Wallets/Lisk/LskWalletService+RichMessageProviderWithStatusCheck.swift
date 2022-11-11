@@ -46,7 +46,7 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
                 
                 // MARK: Check date
                 let start = date.addingTimeInterval(-60 * 5)
-                let end = date.addingTimeInterval(60 * 5)
+                let end = date.addingTimeInterval(self.consistencyMaxTime)
                 let range = start...end
                 
                 guard range.contains(lskTransaction.sentDate) else {
@@ -72,8 +72,8 @@ extension LskWalletService: RichMessageProviderWithStatusCheck {
                     let timeAgo = -1 * date.timeIntervalSinceNow
                     
                     let result: TransactionStatus
-                    if timeAgo > 60 * 60 * 3 {
-                        // 3h waiting for pending status
+                    if timeAgo > self.consistencyMaxTime {
+                        // max time waiting for pending status
                         result = .failed
                     } else {
                         // Note: No info about processing transactions

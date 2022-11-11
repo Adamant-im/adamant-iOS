@@ -118,7 +118,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - Properties
     
-    var transaction: TransactionDetails? = nil {
+    var transaction: TransactionDetails? {
         didSet {
             if !isFiatSet {
                 self.updateFiat()
@@ -167,7 +167,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         }
             
         // MARK: Transaction number
-        let idRow = LabelRow() {
+        let idRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.transactionNumber.tag
             $0.title = Rows.transactionNumber.localized
@@ -179,13 +179,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
                 self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.txId {
                 row.value = value
             } else {
@@ -196,7 +196,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(idRow)
         
         // MARK: Sender
-        let senderRow = DoubleDetailsRow() { [weak self] in
+        let senderRow = DoubleDetailsRow { [weak self] in
             $0.disabled = true
             $0.tag = Rows.from.tag
             $0.cell.titleLabel.text = Rows.from.localized
@@ -217,6 +217,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.cell.height = { height }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             guard let value = row.value else {
                 return
@@ -231,8 +232,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             
             self?.shareValue(text, from: cell)
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let transaction = self?.transaction {
                 if transaction.senderAddress.count == 0 {
                     row.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
@@ -249,7 +249,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(senderRow)
         
         // MARK: Recipient
-        let recipientRow = DoubleDetailsRow() { [weak self] in
+        let recipientRow = DoubleDetailsRow { [weak self] in
             $0.disabled = true
             $0.tag = Rows.to.tag
             $0.cell.titleLabel.text = Rows.to.localized
@@ -259,6 +259,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
                     $0.value = DoubleDetail(first: recipientName, second: transaction.recipientAddress)
                 } else {
                     $0.value = DoubleDetail(first: transaction.recipientAddress, second: nil)
+                    if transaction.recipientAddress.isEmpty {
+                        $0.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
+                    }
                 }
             } else {
                 $0.value = nil
@@ -268,6 +271,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.cell.height = { height }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             guard let value = row.value else {
                 return
@@ -281,14 +285,27 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
             
             self?.shareValue(text, from: cell)
-        }.cellUpdate { (cell, _) in
-            cell.textLabel?.textColor = .black
+        }.cellUpdate { [weak self] (cell, row) in
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+            
+            if let transaction = self?.transaction {
+                if let recipientName = self?.recipientName?.checkAndReplaceSystemWallets() {
+                    row.value = DoubleDetail(first: recipientName, second: transaction.recipientAddress)
+                } else {
+                    row.value = DoubleDetail(first: transaction.recipientAddress, second: nil)
+                    if transaction.recipientAddress.isEmpty {
+                        row.value = DoubleDetail(first: TransactionDetailsViewControllerBase.awaitingValueString, second: nil)
+                    }
+                }
+            } else {
+                row.value = nil
+            }
         }
         
         detailsSection.append(recipientRow)
         
         // MARK: Date
-        let dateRow = LabelRow() { [weak self] in
+        let dateRow = LabelRow { [weak self] in
             $0.disabled = true
             $0.tag = Rows.date.tag
             $0.title = Rows.date.localized
@@ -300,14 +317,14 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
-        }.onCellSelection { [weak self] (cell, row) in
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+        }.onCellSelection { [weak self] (cell, _) in
             if let value = self?.transaction?.dateValue {
                 let text = value.humanizedDateTimeFull()
                 self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let raw = self?.transaction?.dateValue, let value = self?.dateFormatter.string(from: raw) {
                 row.value = value
             } else {
@@ -318,7 +335,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(dateRow)
         
         // MARK: Amount
-        let amountRow = LabelRow() {
+        let amountRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.amount.tag
             $0.title = Rows.amount.localized
@@ -329,13 +346,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let value = row.value {
                 self?.shareValue(value, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.amountValue, let formatter = self?.currencyFormatter {
                 row.value = formatter.string(from: value)
             } else {
@@ -346,7 +363,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(amountRow)
         
         // MARK: Fee
-        let feeRow = LabelRow() {
+        let feeRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.fee.tag
             $0.title = Rows.fee.localized
@@ -358,13 +375,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let value = row.value {
                 self?.shareValue(value, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.feeValue, let formatter = self?.feeFormatter {
                 row.value = formatter.string(from: value)
             } else {
@@ -375,7 +392,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(feeRow)
         
         // MARK: Confirmations
-        let confirmationsRow = LabelRow() {
+        let confirmationsRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.confirmations.tag
             $0.title = Rows.confirmations.localized
@@ -386,16 +403,15 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 $0.value = TransactionDetailsViewControllerBase.awaitingValueString
             }
             
-            
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
                 self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.confirmationsValue, value != "0" {
                 row.value = value
             } else {
@@ -406,7 +422,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(confirmationsRow)
         
         // MARK: Block
-        let blockRow = LabelRow() {
+        let blockRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.block.tag
             $0.title = Rows.block.localized
@@ -419,13 +435,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
                 self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let value = self?.transaction?.blockValue,
                !value.isEmpty {
                 row.value = value
@@ -437,7 +453,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
         detailsSection.append(blockRow)
             
         // MARK: Status
-        let statusRow = LabelRow() {
+        let statusRow = LabelRow {
             $0.tag = Rows.status.tag
             $0.title = Rows.status.localized
             $0.value = transaction?.transactionStatus?.localized
@@ -447,19 +463,20 @@ class TransactionDetailsViewControllerBase: FormViewController {
             })
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
                 self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             row.value = self?.transaction?.transactionStatus?.localized
         }
         
         detailsSection.append(statusRow)
         
         // MARK: Current Fiat
-        let currentFiatRow = LabelRow() {
+        let currentFiatRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.currentFiat.tag
             $0.title = Rows.currentFiat.localized
@@ -472,13 +489,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
             }
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.onCellSelection { [weak self] (cell, row) in
             if let text = row.value {
                 self?.shareValue(text, from: cell)
             }
         }.cellUpdate { [weak self] (cell, row) in
-            cell.textLabel?.textColor = .black
-            
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             if let amount = self?.transaction?.amountValue,
                let symbol = self?.currencySymbol,
                let rate = self?.currencyInfo.getRate(for: symbol),
@@ -494,20 +511,21 @@ class TransactionDetailsViewControllerBase: FormViewController {
         form.append(detailsSection)
         
         // MARK: History Fiat
-        let fiatRow = LabelRow() {
+        let fiatRow = LabelRow {
             $0.disabled = true
             $0.tag = Rows.historyFiat.tag
             $0.title = Rows.historyFiat.localized
             
             $0.value = TransactionDetailsViewControllerBase.awaitingValueString
-            }.cellSetup { (cell, _) in
-                cell.selectionStyle = .gray
-            }.onCellSelection { [weak self] (cell, row) in
-                if let text = row.value {
-                    self?.shareValue(text, from: cell)
-                }
-            }.cellUpdate { (cell, _) in
-                cell.textLabel?.textColor = .black
+        }.cellSetup { (cell, _) in
+            cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
+        }.onCellSelection { [weak self] (cell, row) in
+            if let text = row.value {
+                self?.shareValue(text, from: cell)
+            }
+        }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }
         
         detailsSection.append(fiatRow)
@@ -524,6 +542,7 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 $0.value = comment
             }.cellSetup { (cell, _) in
                 cell.selectionStyle = .gray
+                cell.textLabel?.textColor = UIColor.adamant.textColor
             }.cellUpdate { (cell, _) in
                 cell.textView?.backgroundColor = UIColor.clear
                 cell.textView.isSelectable = false
@@ -562,7 +581,9 @@ class TransactionDetailsViewControllerBase: FormViewController {
             $0.cell.imageView?.image = Rows.openInExplorer.image
         }.cellSetup { (cell, _) in
             cell.selectionStyle = .gray
+            cell.textLabel?.textColor = UIColor.adamant.textColor
         }.cellUpdate { (cell, _) in
+            cell.textLabel?.textColor = UIColor.adamant.textColor
             cell.accessoryType = .disclosureIndicator
         }.onCellSelection { [weak self] (_, _) in
             guard let transaction = self?.transaction, let url = self?.explorerUrl(for: transaction) else {
@@ -585,6 +606,8 @@ class TransactionDetailsViewControllerBase: FormViewController {
         
         // Get fiat value
         self.updateFiat()
+        
+        setColors()
     }
     
     func updateFiat() {
@@ -615,6 +638,13 @@ class TransactionDetailsViewControllerBase: FormViewController {
                 }
             }
         }
+    }
+    
+    // MARK: - Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
     }
     
     // MARK: - Actions
@@ -665,12 +695,12 @@ class TransactionDetailsViewControllerBase: FormViewController {
     
     // MARK: - To override
     
-    var currencySymbol: String? = nil
+    var currencySymbol: String?
     
     // MARK: - Fix this later
-    var senderName: String? = nil
-    var recipientName: String? = nil
-    var comment: String? = nil
+    var senderName: String?
+    var recipientName: String?
+    var comment: String?
     
     func explorerUrl(for transaction: TransactionDetails) -> URL? {
         return nil

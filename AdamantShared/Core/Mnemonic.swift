@@ -17,7 +17,7 @@ class Mnemonic {
         let password = passphrase.decomposedStringWithCompatibilityMapping
         let salt = salt.decomposedStringWithCompatibilityMapping
         
-        if let seed = try? PKCS5.PBKDF2(password: password.bytes, salt: salt.bytes, iterations: 2048, keyLength: 64, variant: HMAC.Variant.sha512).calculate() {
+        if let seed = try? PKCS5.PBKDF2(password: password.bytes, salt: salt.bytes, iterations: 2048, keyLength: 64, variant: HMAC.Variant.sha2(.sha512)).calculate() {
             return seed
         } else {
             return nil

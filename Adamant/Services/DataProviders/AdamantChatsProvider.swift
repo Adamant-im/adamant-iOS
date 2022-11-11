@@ -18,6 +18,7 @@ class AdamantChatsProvider: ChatsProvider {
     var stack: CoreDataStack!
     var adamantCore: AdamantCore!
     var accountsProvider: AccountsProvider!
+    var transactionService: ChatTransactionService!
     var securedStore: SecuredStore! {
         didSet {
             self.blackList = self.securedStore.getArray("blackList") ?? []
@@ -33,6 +34,7 @@ class AdamantChatsProvider: ChatsProvider {
     private(set) var readedLastHeight: Int64?
     private let apiTransactions = 100
     private var unconfirmedTransactions: [UInt64:NSManagedObjectID] = [:]
+    private var unconfirmedTransactionsBySignature: [String] = []
     
     public var chatPositon: [String : Double] = [:]
     private(set) var blackList: [String] = []
@@ -41,6 +43,8 @@ class AdamantChatsProvider: ChatsProvider {
     public var isChatLoaded: [String : Bool] = [:]
     public var chatMaxMessages: [String : Int] = [:]
     public var chatLoadedMessages: [String : Int] = [:]
+    private var chatsLoading: [String] = []
+    private let preLoadChatsCount = 5
     private var isConnectedToTheInternet = true
     private var onConnectionToTheInternetRestored: (() -> Void)?
     
@@ -122,7 +126,7 @@ class AdamantChatsProvider: ChatsProvider {
             }
         }
         
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
             if let previousAppState = self?.previousAppState,
                previousAppState == .background {
                 self?.previousAppState = .active
@@ -130,7 +134,7 @@ class AdamantChatsProvider: ChatsProvider {
             }
         }
         
-        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
             if self?.isInitiallySynced ?? false {
                 self?.previousAppState = .background
             }
@@ -173,7 +177,7 @@ class AdamantChatsProvider: ChatsProvider {
         
         if notify {
             switch prevState {
-            case .failedToUpdate(_):
+            case .failedToUpdate:
                 NotificationCenter.default.post(name: Notification.Name.AdamantTransfersProvider.stateChanged, object: self, userInfo: [AdamantUserInfoKey.TransfersProvider.newState: state,
                                                                                                                     AdamantUserInfoKey.TransfersProvider.prevState: prevState])
                 
@@ -186,7 +190,6 @@ class AdamantChatsProvider: ChatsProvider {
         }
     }
 }
-
 
 // MARK: - DataProvider
 extension AdamantChatsProvider {
@@ -236,7 +239,7 @@ extension AdamantChatsProvider {
         setState(.empty, previous: prevState, notify: notify)
     }
     
-    func getChatRooms(offset: Int?, completion: (() ->())?) {
+    func getChatRooms(offset: Int?, completion: (() -> Void)?) {
         guard let address = accountService.account?.address,
               let privateKey = accountService.keypair?.privateKey else {
             completion?()
@@ -269,7 +272,7 @@ extension AdamantChatsProvider {
                 self?.roomsLoadedCount = chatrooms.chats?.count ?? 0
             }
             
-            var array = Array<Transaction>()
+            var array = [Transaction]()
             chatrooms.chats?.forEach({ room in
                 if let last = room.lastTransaction {
                     array.append(last)
@@ -287,13 +290,23 @@ extension AdamantChatsProvider {
                         self?.isInitiallySynced = true
                     }
                     self?.setState(.upToDate, previous: prevState)
+                    self?.preLoadChats(array, address: address)
                     completion?()
                 })
             }
+            
         }
     }
     
-    func apiGetChatrooms(address: String, offset: Int?, completion: ((ChatRooms?) ->())?) {
+    func preLoadChats(_ array: [Transaction], address: String) {
+        let preLoadChatsCount = preLoadChatsCount
+        array.prefix(preLoadChatsCount).forEach { transaction in
+            let recipientAddress = transaction.recipientId == address ? transaction.senderId : transaction.recipientId
+            getChatMessages(with: recipientAddress, offset: nil, completion: nil)
+        }
+    }
+    
+    func apiGetChatrooms(address: String, offset: Int?, completion: ((ChatRooms?) -> Void)?) {
         apiService.getChatRooms(address: address, offset: offset) { [weak self] result in
             switch result {
             case .success(let chatrooms):
@@ -335,12 +348,18 @@ extension AdamantChatsProvider {
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = self.stack.container.viewContext
       
+        if !isChatLoaded.keys.contains(addressRecipient) {
+            chatsLoading.append(addressRecipient)
+        }
         apiGetChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] chatroom in
             self?.processingQueue.async {
                 self?.isChatLoaded[addressRecipient] = true
                 self?.chatMaxMessages[addressRecipient] = chatroom?.count ?? 0
                 let loadedCount = self?.chatLoadedMessages[addressRecipient] ?? 0
                 self?.chatLoadedMessages[addressRecipient] = loadedCount + (chatroom?.messages?.count ?? 0)
+                if let index = self?.chatsLoading.firstIndex(of: addressRecipient) {
+                    self?.chatsLoading.remove(at: index)
+                }
                 guard let transactions = chatroom?.messages,
                       transactions.count > 0 else {
                     completion?()
@@ -353,12 +372,13 @@ extension AdamantChatsProvider {
                               contextMutatingSemaphore: cms,
                               completion: {
                     completion?()
+                    NotificationCenter.default.post(name: .AdamantChatsProvider.initiallyLoadedMessages, object: addressRecipient)
                 })
             }
         }
     }
     
-    func apiGetChatMessages(address: String, addressRecipient: String, offset: Int?, completion: ((ChatRooms?) ->())?) {
+    func apiGetChatMessages(address: String, addressRecipient: String, offset: Int?, completion: ((ChatRooms?) -> Void)?) {
         apiService.getChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] result in
             switch result {
             case .success(let chatroom):
@@ -414,7 +434,7 @@ extension AdamantChatsProvider {
                                  context: privateContext,
                                  contextMutatingSemaphore: cms)
                 }
-            case .failure(_):
+            case .failure:
                 break
             }
         }
@@ -510,13 +530,13 @@ extension AdamantChatsProvider {
                     case .accountNotFound:
                         err = .accountNotFound(address)
                         
-                    case .serverError(_):
+                    case .serverError:
                         err = .serverError(error)
                         
                     case .internalError(let message, _):
                         err = .dependencyError(message)
                         
-                    case .networkError(_):
+                    case .networkError:
                         err = .networkError
                         
                     case .requestCancelled:
@@ -531,8 +551,11 @@ extension AdamantChatsProvider {
             }
         }
     }
+    
+    func isChatLoading(with addressRecipient: String) -> Bool {
+        return chatsLoading.contains(addressRecipient)
+    }
 }
-
 
 // MARK: - Sending messages {
 extension AdamantChatsProvider {
@@ -682,7 +705,6 @@ extension AdamantChatsProvider {
         prepareAndSendChatTransaction(transaction, in: context, recipientId: recipientId, type: type, keypair: keypair, from: chatroom, completion: completion)
     }
     
-    
     /// Transaction must be in passed context
     private func prepareAndSendChatTransaction(_ transaction: ChatTransaction, in context: NSManagedObjectContext, recipientId: String, type: ChatType, keypair: Keypair, from chatroom: Chatroom? = nil, completion: @escaping (ChatsProviderResultWithTransaction) -> Void) {
         // MARK: 1. Get account
@@ -706,7 +728,7 @@ extension AdamantChatsProvider {
             completion(.failure(.accountNotFound(recipientId)))
             return
             
-        case .notInitiated(_), .dummy(_):
+        case .notInitiated, .dummy:
             completion(.failure(.accountNotInitiated(recipientId)))
             return
             
@@ -714,7 +736,7 @@ extension AdamantChatsProvider {
             completion(.failure(.serverError(error)))
             return
             
-        case .networkError(_):
+        case .networkError:
             completion(.failure(ChatsProviderError.networkError))
             return
         }
@@ -828,7 +850,6 @@ extension AdamantChatsProvider {
         
         try? privateContext.save()
         
-        
         // MARK: 3. Send
         sendTransaction(transaction, type: .message, keypair: keypair, recipientPublicKey: recipientPublicKey) { result in
             switch result {
@@ -875,7 +896,6 @@ extension AdamantChatsProvider {
         }
     }
     
-    
     // MARK: - Logic
     
     /// Send transaction.
@@ -896,7 +916,39 @@ extension AdamantChatsProvider {
             return
         }
         
-        // MARK: 2. Send
+        // MARK: 2. Create transaction and sign it
+        let date: Date
+        if let delta = apiService.lastRequestTimeDelta {
+            date = Date().addingTimeInterval(-delta)
+        } else {
+            date = Date()
+        }
+        
+        let normalizedTransaction = NormalizedTransaction(type: .chatMessage,
+                                                          amount: 0,
+                                                          senderPublicKey: keypair.publicKey,
+                                                          requesterPublicKey: nil,
+                                                          date: date,
+                                                          recipientId: recipientId,
+                                                          asset: TransactionAsset(
+                                                            chat: ChatAsset(
+                                                                message: encodedMessage.message,
+                                                                ownMessage: encodedMessage.nonce,
+                                                                type: type
+                                                            ),
+                                                            state: nil,
+                                                            votes: nil
+                                                          )
+        )
+        
+        guard let signature = adamantCore.sign(transaction: normalizedTransaction, senderId: senderId, keypair: keypair) else {
+            let error = AdamantApiService.InternalError.signTransactionFailed.apiServiceErrorWith(error: nil)
+            completion(.failure(ChatsProviderError.internalError(AdamantError(message: error.message, error: error))))
+            return
+        }
+        unconfirmedTransactionsBySignature.append(signature)
+        
+        // MARK: 3. Send
         apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, type: type, nonce: encodedMessage.nonce, amount: nil) { result in
             switch result {
             case .success(let id):
@@ -904,6 +956,9 @@ extension AdamantChatsProvider {
                 transaction.transactionId = String(id)
                 
                 self.unconfirmedsSemaphore.wait()
+                if let index = self.unconfirmedTransactionsBySignature.firstIndex(of: signature) {
+                    self.unconfirmedTransactionsBySignature.remove(at: index)
+                }
                 DispatchQueue.main.sync {
                     self.unconfirmedTransactions[id] = transaction.objectID
                 }
@@ -916,7 +971,7 @@ extension AdamantChatsProvider {
                 
                 let serviceError: ChatsProviderError
                 switch error {
-                case .networkError(_):
+                case .networkError:
                     serviceError = .networkError
                     
                 case .accountNotFound:
@@ -940,7 +995,6 @@ extension AdamantChatsProvider {
         }
     }
 }
-
 
 // MARK: - Getting messages
 extension AdamantChatsProvider {
@@ -1077,14 +1131,13 @@ extension AdamantChatsProvider {
         }
     }
     
-    
     /// - Returns: New unread messagess ids
     private func process(messageTransactions: [Transaction],
                          senderId: String,
                          privateKey: String,
                          context: NSManagedObjectContext,
                          contextMutatingSemaphore: DispatchSemaphore,
-                         completion: (() -> ())? = nil) {
+                         completion: (() -> Void)? = nil) {
         struct DirectionedTransaction {
             let transaction: Transaction
             let isOut: Bool
@@ -1093,7 +1146,6 @@ extension AdamantChatsProvider {
         // MARK: 1. Gather partner keys
         let mapped = messageTransactions.map({ DirectionedTransaction(transaction: $0, isOut: $0.senderId == senderId) })
         let grouppedTransactions = Dictionary(grouping: mapped, by: { $0.isOut ? $0.transaction.recipientId : $0.transaction.senderId })
-        
         
         // MARK: 2. Gather Accounts
         var partners: [CoreDataAccount:[DirectionedTransaction]] = [:]
@@ -1161,6 +1213,7 @@ extension AdamantChatsProvider {
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         privateContext.parent = context
         var newMessageTransactions = [ChatTransaction]()
+        var transactionInProgress: [UInt64] = []
         
         for (account, transactions) in partners {
             // We can't save whole context while we are mass creating MessageTransactions.
@@ -1172,6 +1225,9 @@ extension AdamantChatsProvider {
             
             for trs in transactions {
                 unconfirmedsSemaphore.wait()
+                defer { unconfirmedsSemaphore.signal() }
+                
+                transactionInProgress.append(trs.transaction.id)
                 if let objectId = unconfirmedTransactions[trs.transaction.id], let unconfirmed = context.object(with: objectId) as? ChatTransaction {
                     confirmTransaction(unconfirmed, id: trs.transaction.id, height: Int64(trs.transaction.height), blockId: trs.transaction.blockId, confirmations: trs.transaction.confirmations)
                     
@@ -1179,10 +1235,12 @@ extension AdamantChatsProvider {
                     if height < h {
                         height = h
                     }
-                    unconfirmedsSemaphore.signal()
                     continue
-                } else {
-                    unconfirmedsSemaphore.signal()
+                }
+                
+                // if transaction in pending status then ignore it
+                if unconfirmedTransactionsBySignature.contains(trs.transaction.signature) {
+                    continue
                 }
                 
                 let publicKey: String
@@ -1192,7 +1250,7 @@ extension AdamantChatsProvider {
                     publicKey = trs.transaction.senderPublicKey
                 }
                 
-                if let partner = privateContext.object(with: account.objectID) as? BaseAccount, let chatTransaction = chatTransaction(from: trs.transaction, isOutgoing: trs.isOut, publicKey: publicKey, privateKey: privateKey, partner: partner, context: privateContext) {
+                if let partner = privateContext.object(with: account.objectID) as? BaseAccount, let chatTransaction = transactionService.chatTransaction(from: trs.transaction, isOutgoing: trs.isOut, publicKey: publicKey, privateKey: privateKey, partner: partner, removedMessages: self.removedMessages, context: privateContext) {
                     if height < chatTransaction.height {
                         height = chatTransaction.height
                     }
@@ -1298,13 +1356,14 @@ extension AdamantChatsProvider {
                 
                 DispatchQueue.main.async {
                     viewContextChatrooms.forEach { $0.updateLastTransaction() }
+                    self.transactionService.processingComplete(transactionInProgress)
                 }
             } catch {
                 print(error)
             }
         }
         
-        // MARK 7. Last message height
+        // MARK: 7. Last message height
         highSemaphore.wait()
         if let lastHeight = receivedLastHeight {
             if lastHeight < height {
@@ -1317,7 +1376,6 @@ extension AdamantChatsProvider {
         completion?()
     }
 }
-
 
 // MARK: - Tools
 extension AdamantChatsProvider {
@@ -1360,124 +1418,6 @@ extension AdamantChatsProvider {
         }
     }
     
-    /// Parse raw transaction into CoreData chat transaction
-    ///
-    /// - Parameters:
-    ///   - transaction: Raw transaction
-    ///   - currentAddress: logged account address
-    ///   - privateKey: logged account private key
-    ///   - context: context to insert parsed transaction to
-    /// - Returns: New parsed transaction
-    private func chatTransaction(from transaction: Transaction, isOutgoing: Bool, publicKey: String, privateKey: String, partner: BaseAccount, context: NSManagedObjectContext) -> ChatTransaction? {
-        let messageTransaction: ChatTransaction
-        guard let chat = transaction.asset.chat else {
-            if transaction.type == .send {
-                if let trs = getTransfer(id: String(transaction.id), context: context) {
-                    messageTransaction = trs
-                } else {
-                    messageTransaction = TransferTransaction(context: context)
-                }
-                messageTransaction.amount = transaction.amount as NSDecimalNumber
-                messageTransaction.date = transaction.date as NSDate
-                messageTransaction.recipientId = transaction.recipientId
-                messageTransaction.senderId = transaction.senderId
-                messageTransaction.transactionId = String(transaction.id)
-                messageTransaction.type = Int16(TransactionType.chatMessage.rawValue)
-                messageTransaction.showsChatroom = true
-                messageTransaction.height = Int64(transaction.height)
-                messageTransaction.isConfirmed = true
-                messageTransaction.isOutgoing = isOutgoing
-                messageTransaction.blockId = transaction.blockId
-                messageTransaction.confirmations = transaction.confirmations
-                messageTransaction.chatMessageId = UUID().uuidString
-                messageTransaction.fee = transaction.fee as NSDecimalNumber
-                messageTransaction.statusEnum = MessageStatus.delivered
-                messageTransaction.partner = partner
-                return messageTransaction
-            }
-            return nil
-        }
-        
-        
-        // MARK: Decode message, message must contain data
-        if let decodedMessage = adamantCore.decodeMessage(rawMessage: chat.message, rawNonce: chat.ownMessage, senderPublicKey: publicKey, privateKey: privateKey)?.trimmingCharacters(in: .whitespacesAndNewlines) {
-            if (decodedMessage.isEmpty && transaction.amount > 0) || !decodedMessage.isEmpty {
-                switch chat.type {
-                // MARK: Text message
-                case .message, .messageOld, .signal, .unknown:
-                    if transaction.amount > 0 {
-                        if let trs = getTransfer(id: String(transaction.id), context: context) {
-                            messageTransaction = trs
-                        } else {
-                            let trs = TransferTransaction(entity: TransferTransaction.entity(), insertInto: context)
-                            trs.comment = decodedMessage
-                            messageTransaction = trs
-                        }
-                    } else {
-                        let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                        trs.message = decodedMessage
-                        messageTransaction = trs
-                        
-                        let markdown = markdownParser.parse(decodedMessage)
-                        
-                        trs.isMarkdown = markdown.length != decodedMessage.count
-                    }
-                    
-                // MARK: Rich message
-                case .richMessage:
-                    if let data = decodedMessage.data(using: String.Encoding.utf8),
-                        let richContent = RichMessageTools.richContent(from: data),
-                        let type = richContent[RichContentKeys.type] {
-                        let trs = RichMessageTransaction(entity: RichMessageTransaction.entity(), insertInto: context)
-                        trs.richContent = richContent
-                        trs.richType = type
-                        trs.transactionStatus = richProviders[type] != nil ? .notInitiated : nil
-                        messageTransaction = trs
-                    } else {
-                        let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                        trs.message = decodedMessage
-                        messageTransaction = trs
-                    }
-                }
-            } else {
-                let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-                trs.message = ""
-                trs.isHidden = true
-                messageTransaction = trs
-            }
-        }
-        // MARK: Failed to decode, or message was empty
-        else {
-            let trs = MessageTransaction(entity: MessageTransaction.entity(), insertInto: context)
-            trs.message = ""
-            trs.isHidden = true
-            messageTransaction = trs
-        }
-        
-        messageTransaction.amount = transaction.amount as NSDecimalNumber
-        messageTransaction.date = transaction.date as NSDate
-        messageTransaction.recipientId = transaction.recipientId
-        messageTransaction.senderId = transaction.senderId
-        messageTransaction.transactionId = String(transaction.id)
-        messageTransaction.type = Int16(chat.type.rawValue)
-        messageTransaction.height = Int64(transaction.height)
-        messageTransaction.isConfirmed = true
-        messageTransaction.isOutgoing = isOutgoing
-        messageTransaction.blockId = transaction.blockId
-        messageTransaction.confirmations = transaction.confirmations
-        messageTransaction.chatMessageId = UUID().uuidString
-        messageTransaction.fee = transaction.fee as NSDecimalNumber
-        messageTransaction.statusEnum = MessageStatus.delivered
-        messageTransaction.partner = partner
-        
-        if let transactionId = messageTransaction.transactionId {
-            messageTransaction.isHidden = self.removedMessages.contains(transactionId)
-        }
-        
-        return messageTransaction
-    }
-    
-    
     /// Confirm transactions
     ///
     /// - Parameters:
@@ -1491,7 +1431,12 @@ extension AdamantChatsProvider {
         transaction.height = height
         transaction.blockId = blockId
         transaction.confirmations = confirmations
-        self.unconfirmedTransactions.removeValue(forKey: id)
+        
+        if blockId.isEmpty {
+            transaction.statusEnum = .delivered
+        } else {
+            self.unconfirmedTransactions.removeValue(forKey: id)
+        }
         
         if let lastHeight = receivedLastHeight, lastHeight < height {
             self.receivedLastHeight = height

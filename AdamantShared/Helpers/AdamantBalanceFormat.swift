@@ -24,7 +24,6 @@ enum AdamantBalanceFormat {
     /// 2 digits after the decimal point
     case short
     
-    
     // MARK: Formatters
     
     static func currencyFormatter(for format: AdamantBalanceFormat, currencySymbol symbol: String?) -> NumberFormatter {
@@ -37,7 +36,9 @@ enum AdamantBalanceFormat {
         
         switch format {
         case .full: positiveFormat = "#.########"
-        case .compact: positiveFormat = "#.####"
+        case .compact:
+            formatter.roundingMode = .ceiling
+            positiveFormat = "#.####"
         case .short: positiveFormat = "#.##"
         }
         
@@ -128,7 +129,6 @@ enum AdamantBalanceFormat {
         }
     }
 }
-
 
 // MARK: - Helper
 extension NumberFormatter {

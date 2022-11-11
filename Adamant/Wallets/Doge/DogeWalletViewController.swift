@@ -23,8 +23,8 @@ class DogeWalletViewController: WalletViewControllerBase {
         walletTitleLabel.text = String.adamantLocalized.doge
     }
     
-    override func sendRowLocalizedLabel() -> String {
-        return String.adamantLocalized.sendDoge
+    override func sendRowLocalizedLabel() -> NSAttributedString {
+        return NSAttributedString(string: String.adamantLocalized.sendDoge)
     }
     
     override func encodeForQr(address: String) -> String? {

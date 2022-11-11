@@ -16,7 +16,7 @@ class AdamantReachability: ReachabilityMonitor {
     private(set) var connection = true
     
     func start() {
-        monitor.pathUpdateHandler = { [weak self] path in
+        monitor.pathUpdateHandler = { [weak self] _ in
             guard let self = self else { return }
             self.updateConnection()
             

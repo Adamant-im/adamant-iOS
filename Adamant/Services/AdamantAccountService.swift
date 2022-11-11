@@ -58,7 +58,6 @@ class AdamantAccountService: AccountService {
         }
     }
     
-    
     // MARK: Properties
     
     private(set) var state: AccountServiceState = .notLogged
@@ -107,6 +106,7 @@ class AdamantAccountService: AccountService {
     var wallets: [WalletService] = {
         var wallets: [WalletService] = [
             AdmWalletService(),
+            BtcWalletService(),
             EthWalletService(),
             LskWalletService(mainnet: true, nodes: AdamantResources.lskServers, services: AdamantResources.lskServiceServers),
             DogeWalletService(),
@@ -114,7 +114,6 @@ class AdamantAccountService: AccountService {
         ]
         let erc20WalletServices = ERC20Token.supportedTokens.map { ERC20WalletService(token: $0) }
         wallets.append(contentsOf: erc20WalletServices)
-        
         
         //LskWalletService(mainnet: false)
         // Testnet
@@ -124,7 +123,7 @@ class AdamantAccountService: AccountService {
     }()
     
     init() {
-        guard let ethWallet = wallets[1] as? EthWalletService else {
+        guard let ethWallet = wallets[2] as? EthWalletService else {
             fatalError("Failed to get EthWalletService")
         }
         
@@ -162,7 +161,7 @@ class AdamantAccountService: AccountService {
                         }
                     }
                     
-                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount, .requestCancelled:
+                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount, .requestCancelled, .dustAmountError:
                     break
                     
                 case .remoteServiceError, .apiError, .internalError:
@@ -170,6 +169,10 @@ class AdamantAccountService: AccountService {
                     self.wallets.remove(at: 1)
                 }
             }
+        }
+        
+        NotificationCenter.default.addObserver(forName: .AdamantAccountService.forceUpdateBalance, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.update()
         }
     }
 }
@@ -246,7 +249,6 @@ extension AdamantAccountService {
         notificationsService.setNotificationsMode(.disabled, completion: nil)
     }
 }
-
 
 // MARK: - AccountService
 extension AdamantAccountService {
@@ -404,7 +406,6 @@ extension AdamantAccountService {
         completion(.failure(.invalidPassphrase))
     }
     
-    
     // MARK: Keypair
     private func loginWith(keypair: Keypair, completion: @escaping (AccountServiceResult) -> Void) {
         stateSemaphore.wait()
@@ -465,7 +466,6 @@ extension AdamantAccountService {
     }
 }
 
-
 // MARK: - Log Out
 extension AdamantAccountService {
     func logout() {
@@ -496,7 +496,6 @@ extension AdamantAccountService {
     }
 }
 
-
 // MARK: - Secured Store
 extension StoreKey {
     fileprivate struct accountService {
@@ -511,7 +510,7 @@ extension StoreKey {
     }
 }
 
-fileprivate enum Key {
+private enum Key {
     case publicKey
     case privateKey
     case pin

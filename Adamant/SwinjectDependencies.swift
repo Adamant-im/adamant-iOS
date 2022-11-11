@@ -8,7 +8,6 @@
 
 import Swinject
 
-
 // MARK: - Services
 extension Container {
     func registerAdamantServices() {
@@ -27,16 +26,16 @@ extension Container {
         self.register(CellFactory.self) { _ in AdamantCellFactory() }.inObjectScope(.container)
         
         // MARK: Secured Store
-        self.register(SecuredStore.self) { r in KeychainStore() }.inObjectScope(.container)
+        self.register(SecuredStore.self) { _ in KeychainStore() }.inObjectScope(.container)
         
         // MARK: LocalAuthentication
-        self.register(LocalAuthentication.self) { r in AdamantAuthentication() }.inObjectScope(.container)
+        self.register(LocalAuthentication.self) { _ in AdamantAuthentication() }.inObjectScope(.container)
         
         // MARK: Reachability
-        self.register(ReachabilityMonitor.self) { r in AdamantReachability() }.inObjectScope(.container)
+        self.register(ReachabilityMonitor.self) { _ in AdamantReachability() }.inObjectScope(.container)
         
         // MARK: AdamantAvatarService
-        self.register(AvatarService.self) { r in AdamantAvatarService() }.inObjectScope(.container)
+        self.register(AvatarService.self) { _ in AdamantAvatarService() }.inObjectScope(.container)
         
         // MARK: - Services with dependencies
         // MARK: DialogService
@@ -83,7 +82,7 @@ extension Container {
         }.inObjectScope(.container)
         
         // MARK: SocketService
-        self.register(SocketService.self) { r in
+        self.register(SocketService.self) { _ in
             let service = AdamantSocketService()
             return service
         }.initCompleted { (r, c) in    // Weak reference
@@ -155,6 +154,7 @@ extension Container {
             provider.accountsProvider = r.resolve(AccountsProvider.self)
             provider.securedStore = r.resolve(SecuredStore.self)
             provider.adamantCore = r.resolve(AdamantCore.self)
+            provider.transactionService = r.resolve(ChatTransactionService.self)
             return provider
         }.inObjectScope(.container).initCompleted { (r, c) in
             let provider = c as! AdamantTransfersProvider
@@ -170,9 +170,24 @@ extension Container {
             provider.adamantCore = r.resolve(AdamantCore.self)
             provider.securedStore = r.resolve(SecuredStore.self)
             provider.accountsProvider = r.resolve(AccountsProvider.self)
+            provider.transactionService = r.resolve(ChatTransactionService.self)
             
             let accountService = r.resolve(AccountService.self)!
             provider.accountService = accountService
+            var richProviders = [String: RichMessageProviderWithStatusCheck]()
+            for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
+                richProviders[provider.dynamicRichMessageType] = provider
+            }
+            provider.richProviders = richProviders
+            return provider
+        }.inObjectScope(.container)
+        
+        // MARK: Chat Transaction Service
+        self.register(ChatTransactionService.self) { r in
+            let provider = AdamantChatTransactionService()
+            provider.adamantCore = r.resolve(AdamantCore.self)
+            
+            let accountService = r.resolve(AccountService.self)!
             var richProviders = [String: RichMessageProviderWithStatusCheck]()
             for case let provider as RichMessageProviderWithStatusCheck in accountService.wallets {
                 richProviders[provider.dynamicRichMessageType] = provider
@@ -184,7 +199,7 @@ extension Container {
     
     func registerAdamantBackgroundFetchServices() {
         // MARK: Secured store
-        self.register(SecuredStore.self) { r in KeychainStore() }.inObjectScope(.container)
+        self.register(SecuredStore.self) { _ in KeychainStore() }.inObjectScope(.container)
         
         // MARK: NodesSource
         self.register(NodesSource.self) { r in

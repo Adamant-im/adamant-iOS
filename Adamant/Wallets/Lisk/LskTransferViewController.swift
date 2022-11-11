@@ -15,12 +15,6 @@ class LskTransferViewController: TransferViewControllerBase {
     
     var chatsProvider: ChatsProvider!
     
-    
-    // MARK: Properties
-    
-    private var skipValueChange: Bool = false
-    
-    
     // MARK: Send
     
     override func sendFunds() {
@@ -49,61 +43,33 @@ class LskTransferViewController: TransferViewControllerBase {
             }
             
             switch result {
-            case .success(let transaction):
+            case .success(var transaction):
                 // MARK: Send LSK transaction
                 service.sendTransaction(transaction) { result in
                     switch result {
-                    case .success(let hash):
+                    case .success(let transactionId):
                         // MARK: Send adm report
                         if let reportRecipient = vc.admReportRecipient {
-                            self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: hash)
+                            self?.reportTransferTo(admAddress: reportRecipient, amount: amount, comments: comments, hash: transactionId)
                         }
                         service.update()
                         
-                        service.getTransaction(by: hash) { result in
-                            switch result {
-                            case .success(var transaction):
-                                vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                                transaction.updateConfirmations(value: service.lastHeight)
-                                if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController {
-                                    detailsVc.transaction = transaction
-                                    detailsVc.service = service
-                                    detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                                    detailsVc.recipientName = self?.recipientName
-
-                                    if comments.count > 0 {
-                                        detailsVc.comment = comments
-                                    }
-
-                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-                                } else {
-                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-                                }
-
-                            case .failure(let error):
-                                if error.message.contains("does not exist") {
-                                    vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                                    if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController {
-                                        detailsVc.transaction = transaction
-                                        detailsVc.service = service
-                                        detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                                        detailsVc.recipientName = self?.recipientName
-                                        
-                                        if comments.count > 0 {
-                                            detailsVc.comment = comments
-                                        }
-                                        
-                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-                                    } else {
-                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-                                    }
-                                } else {
-                                    vc.dialogService.showRichError(error: error)
-                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
-                                }
+                        vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                        if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Lisk.transactionDetails) as? LskTransactionDetailsViewController {
+                            transaction.id = transactionId
+                            detailsVc.transaction = transaction
+                            detailsVc.service = service
+                            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                            detailsVc.recipientName = self?.recipientName
+                            
+                            if comments.count > 0 {
+                                detailsVc.comment = comments
                             }
+                            
+                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+                        } else {
+                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
                         }
-                        
                     case .failure(let error):
                         if error.message.contains("does not meet the minimum remaining balance requirement") {
                             let localizedErrorMessage = NSLocalizedString("TransactionSend.Minimum.Balance", comment: "Transaction send: recipient minimum remaining balance requirement")
@@ -120,7 +86,6 @@ class LskTransferViewController: TransferViewControllerBase {
             }
         }
     }
-    
     
     // MARK: Overrides
     
@@ -155,7 +120,7 @@ class LskTransferViewController: TransferViewControllerBase {
     }
     
     override func recipientRow() -> BaseRow {
-        let row = SuffixTextRow() {
+        let row = TextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
             $0.cell.textField.keyboardType = UIKeyboardType.alphabet
@@ -164,38 +129,19 @@ class LskTransferViewController: TransferViewControllerBase {
             if let recipient = recipientAddress {
                 $0.value = recipient
             }
-            
+
             if recipientIsReadonly {
                 $0.disabled = true
                 $0.cell.textField.isEnabled = false
             }
-            }.cellUpdate { (cell, row) in
-                if let text = cell.textField.text {
-                    cell.textField.text = text
-                }
-            }.onChange { [weak self] row in
-                if let skip = self?.skipValueChange, skip {
-                    self?.skipValueChange = false
-                    return
-                }
-                
-                if let text = row.value {
-                    self?.skipValueChange = true
-                    
-                    DispatchQueue.main.async {
-                        row.value = text
-                        row.updateCell()
-                    }
-                }
-                
-                self?.validateForm()
-            }.onCellSelection { [weak self] (cell, row) in
-                if let recipient = self?.recipientAddress {
-                    let text = recipient
-                    self?.shareValue(text, from: cell)
-                }
+        }.onChange { [weak self] row in
+            if let text = row.value {
+                self?._recipient = text
             }
-        
+        }.onCellSelection { [weak self] (cell, _) in
+            self?.shareValue(self?.recipientAddress, from: cell)
+        }
+
         return row
     }
     

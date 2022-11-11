@@ -33,7 +33,6 @@ struct RichContentKeys {
     private init() {}
 }
 
-
 // MARK: - RichMessageTransfer
 
 struct RichMessageTransfer: RichMessage {

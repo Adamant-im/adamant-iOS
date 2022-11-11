@@ -8,7 +8,6 @@
 
 import UIKit
 import BitcoinKit
-import BitcoinKitPrivate
 import Alamofire
 
 extension BitcoinKit.Transaction: RawTransaction {
@@ -28,7 +27,6 @@ extension DogeWalletService: WalletServiceTwoStepSend {
         vc.service = self
         return vc
     }
-    
     
     // MARK: Create & Send
     func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<BitcoinKit.Transaction>) -> Void) {
@@ -101,6 +99,15 @@ extension DogeWalletService: WalletServiceTwoStepSend {
                 }
                 
             case .failure(let error):
+                guard let data = response.data else {
+                    completion(.failure(error: .remoteServiceError(message: error.localizedDescription)))
+                    return
+                }
+                let result = String(decoding: data, as: UTF8.self)
+                if result.contains("dust") && result.contains("-26") {
+                    completion(.failure(error: .dustAmountError))
+                    return
+                }
                 completion(.failure(error: .remoteServiceError(message: error.localizedDescription)))
             }
         }

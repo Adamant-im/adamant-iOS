@@ -15,13 +15,9 @@ class DogeTransferViewController: TransferViewControllerBase {
     
     var chatsProvider: ChatsProvider!
     
-    
     // MARK: Properties
-    
-    private var skipValueChange: Bool = false
-    
+
     static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
-    
     
     // MARK: Send
     
@@ -130,7 +126,6 @@ class DogeTransferViewController: TransferViewControllerBase {
         }
     }
     
-    
     // MARK: Overrides
     
     private var _recipient: String?
@@ -164,7 +159,7 @@ class DogeTransferViewController: TransferViewControllerBase {
     }
     
     override func recipientRow() -> BaseRow {
-        let row = TextRow() {
+        let row = TextRow {
             $0.tag = BaseRows.address.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
             $0.cell.textField.autocorrectionType = .no
@@ -181,18 +176,8 @@ class DogeTransferViewController: TransferViewControllerBase {
             if let text = row.value {
                 self?._recipient = text
             }
-            
-            if let skip = self?.skipValueChange, skip {
-                self?.skipValueChange = false
-                return
-            }
-            
-            self?.validateForm()
-        }.onCellSelection { [weak self] (cell, row) in
-            if let recipient = self?.recipientAddress {
-                let text = recipient
-                self?.shareValue(text, from: cell)
-            }
+        }.onCellSelection { [weak self] (cell, _) in
+            self?.shareValue(self?.recipientAddress, from: cell)
         }
         
         return row

@@ -45,13 +45,11 @@ extension String.adamantLocalized {
     }
 }
 
-
 // MARK: - Delegate
 protocol ChatViewControllerDelegate: AnyObject {
     func preserveMessage(_ message: String, forAddress address: String)
     func getPreservedMessageFor(address: String, thenRemoveIt: Bool) -> String?
 }
-
 
 // MARK: -
 class ChatViewController: MessagesViewController {
@@ -76,6 +74,8 @@ class ChatViewController: MessagesViewController {
         formatter.timeStyle = .short
         return formatter
     }
+    
+    private var chatLoadNotificationObserver: NSObjectProtocol?
     
     private var keyboardManager = KeyboardManager()
     
@@ -103,28 +103,22 @@ class ChatViewController: MessagesViewController {
     var cellUpdateTimers: [Timer] = [Timer]()
     var cellsUpdating: [IndexPath] = [IndexPath]()
     
-    internal var showsDateHeaderAfterTimeInterval: TimeInterval = 3600
+    let showsDateHeaderAfterTimeInterval: TimeInterval = 3600
     
     private var isFirstLayout = true
     private var didLoaded = false
     
-    // Content insets are broken after modal view dissapears
-    private var fixKeyboardInsets = false
-    
     private var keyboardHeight: CGFloat = 0
-    private let chatPositionDelata: CGFloat = 150
     private var chatPositionOffset: CGFloat = 0 {
         didSet {
-            self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
+            self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelta
         }
     }
-    var scrollToBottomBtnOffetConstraint: NSLayoutConstraint?
+    var scrollToBottomBtnOffsetConstraint: NSLayoutConstraint?
     
     let scrollToBottomBtn = UIButton(type: .custom)
     
     var feeUpdateTimer: Timer?
-    
-    private let headerHeight: CGFloat = 38
     
     // MARK: Rich Messages
     var richMessageProviders = [String:RichMessageProvider]()
@@ -168,13 +162,10 @@ class ChatViewController: MessagesViewController {
     private var feeLabel: InputBarButtonItem?
     private var prevFee: Decimal = 0
     
-    // MARK: Attachment button
-    static let attachmentButtonSize: CGFloat = 36.0
-    
     lazy var attachmentButton: InputBarButtonItem = {
         return InputBarButtonItem()
             .configure {
-                $0.setSize(CGSize(width: ChatViewController.attachmentButtonSize, height: ChatViewController.attachmentButtonSize), animated: false)
+                $0.setSize(CGSize(width: attachmentButtonSize, height: attachmentButtonSize), animated: false)
                 $0.image = #imageLiteral(resourceName: "Attachment")
                 $0.tintColor = UIColor.adamant.primary
             }.onTouchUpInside { [weak self] _ in
@@ -223,6 +214,7 @@ class ChatViewController: MessagesViewController {
         // MARK: 1. Initial configuration
         
         updateTitle()
+        updateUI()
         
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesDisplayDelegate = self
@@ -241,7 +233,6 @@ class ChatViewController: MessagesViewController {
                 messageSizeCalculator.outgoingMessageTopLabelAlignment = LabelAlignment(textAlignment: .right, textInsets: UIEdgeInsets(top: 2, left: 0, bottom: 0, right: 16))
             }
         }
-        
         
         // MARK: 2. InputBar configuration
         
@@ -280,7 +271,7 @@ class ChatViewController: MessagesViewController {
         
         // Add spacing between leftStackView (attachment button) and message input field
         messageInputBar.leftStackView.alignment = .bottom
-        messageInputBar.setLeftStackViewWidthConstant(to: ChatViewController.attachmentButtonSize + size*2, animated: false)
+        messageInputBar.setLeftStackViewWidthConstant(to: attachmentButtonSize + size*2, animated: false)
         messageInputBar.leftStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: size*2)
         messageInputBar.leftStackView.isLayoutMarginsRelativeArrangement = true
         
@@ -292,7 +283,6 @@ class ChatViewController: MessagesViewController {
             $0.setSize(CGSize(width: buttonWidth, height: buttonHeight), animated: false)
             $0.title = nil
             $0.image = #imageLiteral(resourceName: "Arrow")
-            $0.setImage(#imageLiteral(resourceName: "Arrow_innactive"), for: UIControl.State.disabled)
         }
         
         messageInputBar.inputTextView.autocorrectionType = .no
@@ -303,28 +293,7 @@ class ChatViewController: MessagesViewController {
             view.addSubview(messageInputBar)
             keyboardManager.bind(inputAccessoryView: messageInputBar, usingTabBar: self.tabBarController?.tabBar)
             keyboardManager.bind(to: messagesCollectionView)
-            
-            self.scrollsToBottomOnKeyboardBeginsEditing = true
-            
-            keyboardManager.on(event: .didChangeFrame) { [weak self] (notification) in
-                let barHeight = self?.messageInputBar.bounds.height ?? 0
-                let keyboardHeight = notification.endFrame.height
-                let tabBarHeight = self?.tabBarController?.tabBar.bounds.height ?? 0
-                
-                if !isMacOS {
-                    self?.messagesCollectionView.contentInset.bottom = barHeight + keyboardHeight
-                    self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight + keyboardHeight - tabBarHeight
-                }
-                
-                DispatchQueue.main.async {
-                    self?.messagesCollectionView.scrollToBottom(animated: false)
-                }
-                }.on(event: .didHide) { [weak self] _ in
-                    let barHeight = self?.messageInputBar.bounds.height ?? 0
-                    let tabBarHeight = self?.tabBarController?.tabBar.bounds.height ?? 0
-                    self?.messagesCollectionView.contentInset.bottom = barHeight
-                    self?.messagesCollectionView.scrollIndicatorInsets.bottom = barHeight - tabBarHeight
-            }
+            scrollsToBottomOnKeyboardBeginsEditing = true
         }
         
         if let delegate = delegate, let address = chatroom.partner?.address, let message = delegate.getPreservedMessageFor(address: address, thenRemoveIt: true) {
@@ -334,15 +303,7 @@ class ChatViewController: MessagesViewController {
             setEstimatedFee(AdamantMessage.text(message).fee)
         }
         
-        // MARK: 3. Readonly chat
-        if chatroom.isReadonly {
-            messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
-            messageInputBar.inputTextView.isEditable = false
-            messageInputBar.sendButton.isEnabled = false
-            attachmentButton.isEnabled = false
-        }
-        
-        // MARK: 4. Data
+        // MARK: 3. Data
         let controller = chatsProvider.getChatController(for: chatroom)
         chatController = controller
         controller.delegate = self
@@ -353,7 +314,7 @@ class ChatViewController: MessagesViewController {
             print("There was an error performing fetch: \(error)")
         }
         
-        // MARK: 4.1 Rich messages
+        // MARK: Rich messages
         if let fetched = controller.fetchedObjects {
             for case let rich as RichMessageTransaction in fetched {
                 rich.kind = messageKind(for: rich)
@@ -364,36 +325,7 @@ class ChatViewController: MessagesViewController {
             }
         }
         
-        // MARK: 5. Notifications
-        // Fixing content insets after modal window
-        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
-            if #available(iOS 13, *) {
-                self?.fixKeyboardInsets = false
-            }
-            
-            guard let fixIt = self?.fixKeyboardInsets, fixIt else {
-                return
-            }
-            
-            guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
-                let scrollView = self?.messagesCollectionView else {
-                return
-            }
-            
-            var contentInsets = scrollView.contentInset
-            contentInsets.bottom = frame.size.height
-            scrollView.contentInset = contentInsets
-            
-            var scrollIndicatorInsets = scrollView.scrollIndicatorInsets
-            scrollIndicatorInsets.bottom = frame.size.height
-            scrollView.scrollIndicatorInsets = scrollIndicatorInsets
-            
-//            scrollView.scrollToBottom(animated: true)
-            
-            self?.fixKeyboardInsets = false
-        }
-        
-        // MARK: 6. RichMessage handlers
+        // MARK: RichMessage handlers
         for handler in richMessageProviders.values {
             if let source = handler.cellSource {
                 switch source {
@@ -408,8 +340,6 @@ class ChatViewController: MessagesViewController {
             }
         }
         
-        let h = messageInputBar.bounds.height
-        
         scrollToBottomBtn.backgroundColor = .clear
         scrollToBottomBtn.setImage(#imageLiteral(resourceName: "ScrollDown"), for: .normal)
         scrollToBottomBtn.alpha = 0.5
@@ -419,23 +349,20 @@ class ChatViewController: MessagesViewController {
         scrollToBottomBtn.isHidden = true
         self.view.addSubview(scrollToBottomBtn)
         
-        keyboardManager.on(event: .willChangeFrame) { [weak self] (notification) in
-            if isMacOS { return }
-            let barHeight = self?.messageInputBar.bounds.height ?? 0
-            let keyboardHeight = notification.endFrame.height
-            
-            self?.scrollToBottomBtnOffetConstraint?.constant = -20 - keyboardHeight
-            
-            self?.keyboardHeight = keyboardHeight - barHeight
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad, !isMacOS {
+            setKeyboardObservers()
         }
         
-        scrollToBottomBtnOffetConstraint = scrollToBottomBtn.bottomAnchor.constraint(equalTo: messagesCollectionView.bottomAnchor, constant: (-20 - h))
+        scrollToBottomBtnOffsetConstraint = scrollToBottomBtn.bottomAnchor.constraint(
+            equalTo: messagesCollectionView.bottomAnchor,
+            constant: .zero
+        )
         
         NSLayoutConstraint.activate([
-            scrollToBottomBtn.heightAnchor.constraint(equalToConstant: 30),
-            scrollToBottomBtn.widthAnchor.constraint(equalToConstant: 30),
-            scrollToBottomBtn.rightAnchor.constraint(equalTo: messagesCollectionView.rightAnchor, constant: -20),
-            scrollToBottomBtnOffetConstraint!
+            scrollToBottomBtn.heightAnchor.constraint(equalToConstant: scrollToBottomButtonSize),
+            scrollToBottomBtn.widthAnchor.constraint(equalToConstant: scrollToBottomButtonSize),
+            scrollToBottomBtn.rightAnchor.constraint(equalTo: messagesCollectionView.rightAnchor, constant: -scrollToBottomButtonRightInset),
+            scrollToBottomBtnOffsetConstraint!
         ])
         
         UIMenuController.shared.menuItems = [
@@ -443,10 +370,6 @@ class ChatViewController: MessagesViewController {
             UIMenuItem(title: String.adamantLocalized.chat.report, action: NSSelectorFromString("report:"))]
         
         loadFirstMessagesIfNeeded()
-    }
-    
-    override func canPerformAction(_ action: Selector, withSender sender: Any!) -> Bool {
-        return false
     }
     
     override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
@@ -525,8 +448,8 @@ class ChatViewController: MessagesViewController {
         isOnTop = true
         chatroom?.markAsReaded()
         
-        scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
-        scrollToBottomBtnOffetConstraint?.constant = -20 - self.messageInputBar.bounds.height
+        scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelta
+        updateScrollToBottomBtnOffsetConstraint()
         
         if forceScrollToBottom ?? false && !scrollToBottomBtn.isHidden {
             scrollDown()
@@ -555,7 +478,13 @@ class ChatViewController: MessagesViewController {
         super.viewDidLayoutSubviews()
         guard let address = chatroom?.partner?.address else { return }
         
-        // MARK: 4.2 Scroll to message
+        if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
+            let barHeight = messageInputBar.frame.height
+            messageInputBar.frame.origin.y = view.bounds.maxY - keyboardHeight - barHeight
+            additionalBottomInset = barHeight
+        }
+        
+        // MARK: Scroll to message
         if let messageToShow = self.messageToShow {
             if let indexPath = chatController?.indexPath(forObject: messageToShow) {
                 self.messagesCollectionView.scrollToItem(at: IndexPath(item: 0, section: indexPath.row), at: [.centeredVertically, .centeredHorizontally], animated: false)
@@ -574,16 +503,11 @@ class ChatViewController: MessagesViewController {
         
         if isFirstLayout {
             isFirstLayout = false
-            if UIScreen.main.traitCollection.userInterfaceIdiom == .pad {
-                let barHeight = self.messageInputBar.bounds.height
-                messagesCollectionView.contentInset.bottom = barHeight
-                messagesCollectionView.scrollIndicatorInsets.bottom = barHeight - (tabBarController?.tabBar.bounds.height ?? 0)
-            }
             
             if self.messageToShow == nil {
                 if let offset = self.chatsProvider.chatPositon[address] {
                     self.chatPositionOffset = CGFloat(offset)
-                    self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelata
+                    self.scrollToBottomBtn.isHidden = chatPositionOffset < chatPositionDelta
                     let collectionViewContentHeight = messagesCollectionView.collectionViewLayout.collectionViewContentSize.height - CGFloat(offset) - (messagesCollectionView.scrollIndicatorInsets.bottom + messagesCollectionView.contentInset.bottom) + headerHeight
 
                     messagesCollectionView.performBatchUpdates(nil) { _ in self.messagesCollectionView.scrollRectToVisible(CGRect(x: 0.0, y: collectionViewContentHeight - 1.0, width: 1.0, height: 1.0), animated: false)
@@ -633,6 +557,10 @@ class ChatViewController: MessagesViewController {
             
             try? privateContext.save()
         }
+        
+        if let chatLoadNotificationObserver = chatLoadNotificationObserver {
+            NotificationCenter.default.removeObserver(chatLoadNotificationObserver)
+        }
     }
     
     func updateTitle() {
@@ -650,10 +578,41 @@ class ChatViewController: MessagesViewController {
     }
     
     func close() {
-        if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController, let nav = selectedView.children.first as? UINavigationController  {
+        if let tabVC = tabBarController, let selectedView = tabVC.selectedViewController, let nav = selectedView.children.first as? UINavigationController {
                 nav.popToRootViewController(animated: true)
         } else {
             self.navigationController?.popViewController(animated: true)
+        }
+    }
+
+    func addChatLoadObserver() {
+        chatLoadNotificationObserver = NotificationCenter.default.addObserver(forName: .AdamantChatsProvider.initiallyLoadedMessages, object: nil, queue: .main) { [weak self] notification in
+            guard let recipientAddress = notification.object as? String,
+                  recipientAddress == self?.chatroom?.partner?.address
+            else { return }
+            self?.updateChatMessages()
+        }
+    }
+    
+    func updateUI() {
+        view.backgroundColor = UIColor.adamant.backgroundColor
+        messagesCollectionView.backgroundColor = UIColor.adamant.backgroundColor
+        messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatInputFieldBarBackground
+        messageInputBar.backgroundView.backgroundColor = UIColor.adamant.chatInputBarBackground
+        
+        if messageInputBar.inputTextView.text.isEmpty {
+            messageInputBar.sendButton.isEnabled = false
+        }
+        
+        if chatroom?.isReadonly ?? false {
+            messageInputBar.inputTextView.placeholder = ""
+            messageInputBar.inputTextView.isEditable = false
+            messageInputBar.sendButton.isEnabled = false
+            attachmentButton.isEnabled = false
+            messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatInputBarBackground
+            messageInputBar.inputTextView.layer.borderColor = UIColor.adamant.disableBorderColor.cgColor
+            messageInputBar.sendButton.layer.borderColor = UIColor.adamant.disableBorderColor.cgColor
+            attachmentButton.layer.borderColor = UIColor.adamant.disableBorderColor.cgColor
         }
     }
     
@@ -700,7 +659,7 @@ class ChatViewController: MessagesViewController {
             })], from: nil)
         }
         
-        let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
+        let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] _ in
             self?.dialogService.presentShareAlertFor(string: address,
                                                      types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
                                                      excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
@@ -709,7 +668,7 @@ class ChatViewController: MessagesViewController {
                                                      completion: nil)
         }
         
-        let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] action in
+        let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] _ in
             let alert = UIAlertController(title: String(format: String.adamantLocalized.chat.actionsBody, address), message: nil, preferredStyle: .alert)
             
             alert.addTextField { (textField) in
@@ -738,7 +697,6 @@ class ChatViewController: MessagesViewController {
         dialogService?.showAlert(title: nil, message: nil, style: .actionSheet, actions: [block, share, rename, cancel], from: sender)
     }
     
-    
     // MARK: Tools
     private func messageKind(for richMessage: RichMessageTransaction) -> MessageKind {
         guard let type = richMessage.richType else {
@@ -765,9 +723,31 @@ class ChatViewController: MessagesViewController {
             }
         }
     }
+    
+    private func setKeyboardObservers() {
+        let keyboardObserver: (_ height: CGFloat) -> Void = { [weak self] height in
+            self?.keyboardHeight = height
+            self?.updateScrollToBottomBtnOffsetConstraint()
+        }
+        
+        keyboardManager.on(event: .willChangeFrame) { [weak self] notification in
+            let tabBarHeight = self?.tabBarController?.tabBar.frame.height ?? .zero
+            let keyboardHeight = notification.endFrame.height - tabBarHeight
+            keyboardObserver(keyboardHeight)
+            self?.view.setNeedsLayout()
+        }
+        
+        keyboardManager.on(event: .willHide) { _ in
+            keyboardObserver(.zero)
+        }
+    }
+    
+    private func updateScrollToBottomBtnOffsetConstraint() {
+        scrollToBottomBtnOffsetConstraint?.constant = -scrollToBottomButtonBottomInset
+            - keyboardHeight
+            - messageInputBar.frame.height
+    }
 }
-
-
 
 // MARK: - EstimatedFee label
 extension ChatViewController {
@@ -810,7 +790,6 @@ extension ChatViewController {
         }
     }
 }
-
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension ChatViewController: NSFetchedResultsControllerDelegate {
@@ -931,8 +910,6 @@ extension ChatViewController: TransferViewControllerDelegate, ComplexTransferVie
     }
     
     private func dismissTransferViewController(andPresent viewController: UIViewController?) {
-        fixKeyboardInsets = true
-        
         DispatchQueue.onMainAsync { [weak self] in
             self?.dismiss(animated: true, completion: nil)
             
@@ -985,7 +962,7 @@ extension ChatViewController {
         var offset = scrollView.contentSize.height - scrollView.bounds.height - scrollView.contentOffset.y + messageInputBar.bounds.height
         offset += self.keyboardHeight
         
-        if offset > chatPositionDelata {
+        if offset > chatPositionDelta {
             chatPositionOffset = offset
         } else {
             chatPositionOffset = 0
@@ -1016,14 +993,6 @@ private class StatusUpdateProcedure: Procedure {
         privateContext.parent = parentContext
         
         guard let transaction = privateContext.object(with: objectId) as? RichMessageTransaction else {
-            return
-        }
-        
-        guard controller?.chatsProvider.isTransactionUnique(transaction) ?? true else {
-            transaction.transactionStatus = .dublicate
-            self.controller?.removeRichMessageStatusUpdating(id: self.objectId)
-            try? privateContext.save()
-            self.finish()
             return
         }
         
@@ -1082,7 +1051,6 @@ extension ChatViewController {
         if loadingView == nil && state {
             setupLoadingView()
             messagesCollectionView.alpha = 0.0
-            messageInputBar.sendButton.isEnabled = false
             messageInputBar.inputTextView.isEditable = false
             messageInputBar.leftStackView.isUserInteractionEnabled = false
         }
@@ -1093,12 +1061,8 @@ extension ChatViewController {
             }
             
             if chatroom?.isReadonly ?? false {
-                messageInputBar.inputTextView.backgroundColor = UIColor.adamant.chatSenderBackground
-                messageInputBar.inputTextView.isEditable = false
-                messageInputBar.sendButton.isEnabled = false
-                attachmentButton.isEnabled = false
+                updateUI()
             } else {
-                messageInputBar.sendButton.isEnabled = true
                 messageInputBar.inputTextView.isEditable = true
                 messageInputBar.leftStackView.isUserInteractionEnabled = true
             }
@@ -1113,7 +1077,7 @@ extension ChatViewController {
     }
 }
 
-//MARK: Load moore message
+// MARK: Load moore message
 extension ChatViewController {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
        loadMooreMessagesIfNeeded(indexPath: indexPath)
@@ -1135,13 +1099,22 @@ extension ChatViewController {
         
         setBusyIndicator(state: true)
         
+        if chatsProvider.isChatLoading(with: address) {
+            addChatLoadObserver()
+            return
+        }
+        
         chatsProvider.getChatMessages(with: address, offset: 0) { [weak self] in
             DispatchQueue.main.async {
-                self?.messagesCollectionView.reloadDataAndKeepOffset()
-                self?.messagesCollectionView.scrollToLastItem(animated: false)
-                self?.setBusyIndicator(state: false)
+                self?.updateChatMessages()
             }
         }
+    }
+    
+    func updateChatMessages() {
+        messagesCollectionView.reloadDataAndKeepOffset()
+        messagesCollectionView.scrollToLastItem(animated: false)
+        setBusyIndicator(state: false)
     }
     
     func loadMooreMessagesIfNeeded(indexPath: IndexPath) {
@@ -1184,26 +1157,31 @@ extension ChatViewController {
 }
 
 // MARK: Mac OS HotKeys
-extension InputTextView {
+extension ChatViewController {
     open override var keyCommands: [UIKeyCommand]? {
-        let commands = [UIKeyCommand(input: "\r", modifierFlags: [], action: #selector(sendKey(sender:))),
-                        UIKeyCommand(input: "\r", modifierFlags: .alternate, action: #selector(newLineKey(sender:))),
-                        UIKeyCommand(input: "\r", modifierFlags: .control, action: #selector(newLineKey(sender:)))]
+        let commands = [
+            UIKeyCommand(input: "\r", modifierFlags: [], action: #selector(processEnter))
+        ]
         if #available(iOS 15, *) {
             commands.forEach { $0.wantsPriorityOverSystemBehavior = true }
         }
         return commands
     }
-
-    @objc func sendKey(sender: UIKeyCommand) {
-        if sender.modifierFlags == .control || sender.modifierFlags == .alternate {
-            newLineKey(sender: sender)
+    
+    @objc private func processEnter() {
+        if messageInputBar.inputTextView.isFirstResponder {
+            messageInputBar.didSelectSendButton()
         } else {
-            messageInputBar?.didSelectSendButton()
+            messageInputBar.inputTextView.becomeFirstResponder()
         }
     }
-    
-    @objc func newLineKey(sender: UIKeyCommand) {
-        messageInputBar?.inputTextView.text += "\n"
-    }
 }
+
+// MARK: Constants
+
+private let headerHeight: CGFloat = 38
+private let chatPositionDelta: CGFloat = 150
+private let scrollToBottomButtonBottomInset: CGFloat = 20
+private let scrollToBottomButtonRightInset: CGFloat = 20
+private let scrollToBottomButtonSize: CGFloat = 30
+private let attachmentButtonSize: CGFloat = 36

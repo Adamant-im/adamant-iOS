@@ -32,12 +32,10 @@ extension String.adamantLocalized {
     }
 }
 
-
 // MARK: - Delegate
 protocol NewChatViewControllerDelegate: AnyObject {
     func newChatController(_ controller: NewChatViewController, didSelectAccount account: CoreDataAccount, preMessage: String?)
 }
-
 
 // MARK: -
 class NewChatViewController: FormViewController {
@@ -121,7 +119,7 @@ class NewChatViewController: FormViewController {
         
         navigationOptions = .Disabled
         
-        form +++ Section() {
+        form +++ Section {
             $0.footer = { [weak self] in
                 var footer = HeaderFooterView<UIView>(.callback {
                     let view = ButtonsStripeView.adamantConfigured()
@@ -136,10 +134,10 @@ class NewChatViewController: FormViewController {
             }()
         }
         
-        <<< TextRow() {
+        <<< TextRow {
             $0.tag = Rows.addressField.tag
             $0.cell.textField.placeholder = String.adamantLocalized.newChat.addressPlaceholder
-            $0.cell.textField.keyboardType = .numberPad
+            $0.cell.textField.setPopupKeyboardType(.numberPad)
             
             let prefix = UILabel()
             prefix.text = "U"
@@ -150,7 +148,7 @@ class NewChatViewController: FormViewController {
             view.frame = prefix.frame
             $0.cell.textField.leftView = view
             $0.cell.textField.leftViewMode = .always
-        }.cellUpdate { (cell, row) in
+        }.cellUpdate { (cell, _) in
             if let text = cell.textField.text {
                 cell.textField.text = text.components(separatedBy: NewChatViewController.invalidCharacters).joined()
             }
@@ -164,7 +162,7 @@ class NewChatViewController: FormViewController {
                 var trimmed = ""
                 if let admAddress = text.getAdamantAddress() {
                     trimmed = admAddress.address.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
-                }  else if let admAddress = text.getLegacyAdamantAddress() {
+                } else if let admAddress = text.getLegacyAdamantAddress() {
                     trimmed = admAddress.address.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
                 } else {
                     trimmed = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
@@ -193,12 +191,12 @@ class NewChatViewController: FormViewController {
         if let address = accountService.account?.address {
             let myQrSection = Section()
             
-            let button = ButtonRow() {
+            let button = ButtonRow {
                 $0.tag = Rows.myQr.tag
                 $0.title = Rows.myQr.localized
             }.cellUpdate { (cell, _) in
                 cell.textLabel?.textColor = UIColor.adamant.primary
-            }.onCellSelection { [weak self] (cell, row) in
+            }.onCellSelection { [weak self] (_, _) in
                 let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: address, params: nil))
                 switch AdamantQRTools.generateQrFrom(string: encodedAddress, withLogo: true) {
                 case .success(let qr):
@@ -220,6 +218,8 @@ class NewChatViewController: FormViewController {
             myQrSection.append(button)
             form.append(myQrSection)
         }
+        
+        setColors()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -237,7 +237,6 @@ class NewChatViewController: FormViewController {
             row.cell.textField.becomeFirstResponder()
         }
     }
-    
     
     // MARK: - IBActions
     
@@ -259,8 +258,12 @@ class NewChatViewController: FormViewController {
         dismiss(animated: true)
     }
     
-    
     // MARK: - Other
+    
+    func setColors() {
+        view.backgroundColor = UIColor.adamant.secondBackgroundColor
+        tableView.backgroundColor = .clear
+    }
     
     func startNewChat(with address: String, name: String? = nil, message: String?) {
         switch AdamantUtilities.validateAdamantAddress(address: address) {
@@ -296,7 +299,7 @@ class NewChatViewController: FormViewController {
                     self.dialogService.dismissProgress()
                 }
                 
-            case .dummy(_):
+            case .dummy:
                 self.dialogService.dismissProgress()
                 
                 let alert = UIAlertController(title: nil, message: AccountsProviderResult.notInitiated(address: address).localized, preferredStyle: .alert)
@@ -320,7 +323,7 @@ class NewChatViewController: FormViewController {
                     self.present(alert, animated: true, completion: nil)
                 }
                 
-            case .notFound, .invalidAddress, .notInitiated(_), .networkError(_):
+            case .notFound, .invalidAddress, .notInitiated, .networkError:
                 self.dialogService.showWarning(withMessage: result.localized)
                 
             case .serverError(let error):
@@ -343,7 +346,7 @@ class NewChatViewController: FormViewController {
                     break
                 case .label(label: let label):
                     startNewChat(with: addr, name: label, message: nil)
-                case .message(_):
+                case .message:
                     break
                 }
             } else {
@@ -357,7 +360,6 @@ class NewChatViewController: FormViewController {
         }
     }
 }
-
 
 // MARK: - QR
 extension NewChatViewController {
@@ -438,14 +440,13 @@ extension NewChatViewController {
     }
 }
 
-
 // MARK: - QRCodeReaderViewControllerDelegate
 extension NewChatViewController: QRCodeReaderViewControllerDelegate {
     func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
         if let admAddress = result.value.getAdamantAddress() {
             startNewChat(with: admAddress.address, name: admAddress.name, message: admAddress.message)
             dismiss(animated: true, completion: nil)
-        }  else if let admAddress = result.value.getLegacyAdamantAddress() {
+        } else if let admAddress = result.value.getLegacyAdamantAddress() {
             startNewChat(with: admAddress.address, name: admAddress.name, message: admAddress.message)
             dismiss(animated: true, completion: nil)
         } else {
@@ -460,7 +461,6 @@ extension NewChatViewController: QRCodeReaderViewControllerDelegate {
         reader.dismiss(animated: true, completion: nil)
     }
 }
-
 
 // MARK: - UIImagePickerControllerDelegate
 extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
@@ -490,7 +490,6 @@ extension NewChatViewController: UINavigationControllerDelegate, UIImagePickerCo
         }
     }
 }
-
 
 // MARK: - ButtonsStripe
 extension NewChatViewController: ButtonsStripeViewDelegate {

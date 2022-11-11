@@ -46,6 +46,13 @@ class SearchResultsViewController: UITableViewController {
         }
         
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: "resultCell")
+        setColors()
+    }
+    
+    // MARK: - Other
+    
+    func setColors() {
+        view.backgroundColor = UIColor.adamant.backgroundColor
     }
     
     func updateResult(contacts: [Chatroom]?, messages: [MessageTransaction]?, searchText: String) {
@@ -257,7 +264,7 @@ class SearchResultsViewController: UITableViewController {
     
     private func defineSection(for section: Int) -> Section {
         if self.contacts.count > 0, self.messages.count > 0 {
-            if section == 0  {
+            if section == 0 {
                 return .contacts
             } else {
                 return .messages

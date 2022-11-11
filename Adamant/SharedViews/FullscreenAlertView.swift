@@ -39,7 +39,6 @@ class FullscreenAlertView: UIView {
         }
     }
     
-    
     // MARK: Lifecycle
     
     override func awakeFromNib() {

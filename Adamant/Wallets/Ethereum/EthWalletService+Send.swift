@@ -13,7 +13,8 @@ import PromiseKit
 
 extension EthereumTransaction: RawTransaction {
     var txHash: String? {
-        return txhash
+        guard let hash = hash?.hex else { return nil }
+        return "0x\(hash)"
     }
 }
 
@@ -28,7 +29,6 @@ extension EthWalletService: WalletServiceTwoStepSend {
 		vc.service = self
 		return vc
 	}
-	
 	
 	// MARK: Create & Send
 	func createTransaction(recipient: String, amount: Decimal, completion: @escaping (WalletServiceResult<EthereumTransaction>) -> Void) {

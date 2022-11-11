@@ -182,7 +182,7 @@ public final class SHA256 {
     }
 }
 
-// MARK:- Helpers
+// MARK: - Helpers
 
 private extension UInt64 {
     /// Converts the 64 bit integer into an array of single byte integers.

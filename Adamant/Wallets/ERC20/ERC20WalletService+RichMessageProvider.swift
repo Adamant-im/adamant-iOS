@@ -131,7 +131,15 @@ extension ERC20WalletService: RichMessageProvider {
         }
         
         cell.currencyLogoImageView.image = self.tokenLogo
-        cell.currencySymbolLabel.text = self.tokenSymbol
+        let currencyFont = cell.currencySymbolLabel.font ?? .systemFont(ofSize: 12)
+        let networkFont = currencyFont.withSize(8)
+        let currencyAttributes: [NSAttributedString.Key: Any] = [.font: currencyFont]
+        let networkAttributes: [NSAttributedString.Key: Any] = [.font: networkFont]
+      
+        let defaultString = NSMutableAttributedString(string: self.tokenSymbol, attributes: currencyAttributes)
+        let underlineString = NSAttributedString(string: " \(self.tokenNetworkSymbol)", attributes: networkAttributes)
+        defaultString.append(underlineString)
+        cell.currencySymbolLabel.attributedText = defaultString
         
         cell.amountLabel.text = AdamantBalanceFormat.full.format(transfer.amount)
         cell.dateLabel.text = message.sentDate.humanizedDateTime(withWeekday: false)
@@ -142,6 +150,8 @@ extension ERC20WalletService: RichMessageProvider {
         if cell.isAlignedRight != isFromCurrentSender {
             cell.isAlignedRight = isFromCurrentSender
         }
+        
+        cell.isFromCurrentSender = isFromCurrentSender
         
         return cell
     }

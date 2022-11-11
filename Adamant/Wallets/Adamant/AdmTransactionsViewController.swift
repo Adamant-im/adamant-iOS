@@ -117,7 +117,6 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             }
         }
     }
-
     
     // MARK: - UITableView
 
@@ -168,10 +167,19 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
         
         let amount: Decimal = transaction.amount as Decimal? ?? 0
         
+        var partnerName = transaction.chatroom?.partner?.name
+        if let address = accountService.account?.address, partnerId == address {
+            partnerName = String.adamantLocalized.transactionDetails.yourAddress
+        }
+        
+        if partnerName == nil {
+            partnerName = transaction.partner?.name
+        }
+
         configureCell(cell,
                       isOutgoing: transaction.isOutgoing,
                       partnerId: partnerId,
-                      partnerName: transaction.chatroom?.partner?.name,
+                      partnerName: partnerName,
                       amount: amount,
                       date: transaction.date as Date?)
     }
@@ -198,13 +206,13 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             return nil
         }
         
-        let messeges = transactions.first (where: { (object) -> Bool in
+        let messeges = transactions.first(where: { (object) -> Bool in
             return !(object is TransferTransaction)
         })
         
         let title = (messeges != nil) ? String.adamantLocalized.transactionList.toChat : String.adamantLocalized.transactionList.startChat
         
-        let toChat = UITableViewRowAction(style: .normal, title: title) { action, index in
+        let toChat = UITableViewRowAction(style: .normal, title: title) { _, _ in
             guard let vc = self.router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
                 // TODO: Log this
                 return
@@ -245,7 +253,7 @@ class AdmTransactionsViewController: TransactionsListViewControllerBase {
             return nil
         }
         
-        let messeges = transactions.first (where: { (object) -> Bool in
+        let messeges = transactions.first(where: { (object) -> Bool in
             return !(object is TransferTransaction)
         })
         

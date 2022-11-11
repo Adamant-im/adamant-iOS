@@ -87,7 +87,7 @@ class ChatListViewController: UIViewController {
     private var originalInsets: UIEdgeInsets?
     private var didShow: Bool = false
     
-    var didLoadedMessages: (() ->())?
+    var didLoadedMessages: (() -> Void)?
     
     // MARK: Lifecycle
     override func viewDidLoad() {
@@ -110,6 +110,7 @@ class ChatListViewController: UIViewController {
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         tableView.register(LoadingTableViewCell.self, forCellReuseIdentifier: loadingCellIdentifier)
         tableView.refreshControl = refreshControl
+        tableView.backgroundColor = .clear
         
         if self.accountService.account != nil {
             initFetchedRequestControllers(provider: chatsProvider)
@@ -173,6 +174,8 @@ class ChatListViewController: UIViewController {
         // Keyboard
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        setColors()
     }
     
     deinit {
@@ -223,7 +226,6 @@ class ChatListViewController: UIViewController {
         }
     }
     
-    
     // MARK: Helpers
     func chatViewController(for chatroom: Chatroom, with message: MessageTransaction? = nil, forceScrollToBottom: Bool = false) -> ChatViewController {
         guard let vc = router.get(scene: AdamantScene.Chats.chat) as? ChatViewController else {
@@ -246,7 +248,6 @@ class ChatListViewController: UIViewController {
         
         return vc
     }
-    
     
     /// - Parameter provider: nil to drop controllers and reset table
     private func initFetchedRequestControllers(provider: ChatsProvider?) {
@@ -348,8 +349,13 @@ class ChatListViewController: UIViewController {
             UIView.animate(withDuration: 0.2, animations: animations, completion: completion)
         }
     }
+    
+    // MARK: - Other
+    
+    private func setColors() {
+        view.backgroundColor = UIColor.adamant.backgroundColor
+    }
 }
-
 
 // MARK: - UITableView
 extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
@@ -400,7 +406,6 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
 }
-
 
 // MARK: - UITableView Cells
 extension ChatListViewController {
@@ -466,9 +471,11 @@ extension ChatListViewController {
     
     private func configureCell(_ cell: LoadingTableViewCell) {
         cell.startLoadAnimating()
+        cell.backgroundColor = .clear
     }
     
     private func configureCell(_ cell: ChatTableViewCell, for chatroom: Chatroom) {
+        cell.backgroundColor = .clear
         if let partner = chatroom.partner {
             if let title = chatroom.title {
                 cell.accountLabel.text = title
@@ -476,10 +483,12 @@ extension ChatListViewController {
                 cell.accountLabel.text = name
             } else if let address = partner.address,
                       let name = self.addressBook.addressBook[address] {
-                cell.accountLabel.text = name.checkAndReplaceSystemWallets()
+                cell.accountLabel.text = name
             } else {
                 cell.accountLabel.text = partner.address
             }
+            cell.accountLabel.text = cell.accountLabel.text?.checkAndReplaceSystemWallets()
+            
             if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
                 cell.avatarImage = avatar
                 cell.avatarImageView.tintColor = UIColor.adamant.primary
@@ -547,7 +556,6 @@ extension ChatListViewController {
         })
     }
 }
-
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension ChatListViewController: NSFetchedResultsControllerDelegate {
@@ -617,13 +625,16 @@ extension ChatListViewController: NSFetchedResultsControllerDelegate {
                     showNotification(for: transaction)
                 }
             }
-            
+            if let _ = anObject as? TransferTransaction {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                    NotificationCenter.default.post(name: .AdamantAccountService.forceUpdateBalance, object: nil)
+                }
+            }
         default:
             break
         }
     }
 }
-
 
 // MARK: - NewChatViewControllerDelegate
 extension ChatListViewController: NewChatViewControllerDelegate {
@@ -686,7 +697,6 @@ extension ChatListViewController: NewChatViewControllerDelegate {
     }
 }
 
-
 // MARK: - ChatViewControllerDelegate
 extension ChatListViewController: ChatViewControllerDelegate {
     func preserveMessage(_ message: String, forAddress address: String) {
@@ -705,7 +715,6 @@ extension ChatListViewController: ChatViewControllerDelegate {
         return message
     }
 }
-
 
 // MARK: - Working with in-app notifications
 extension ChatListViewController {
@@ -827,7 +836,6 @@ extension ChatListViewController {
     }
 }
 
-
 // MARK: - Swipe actions
 extension ChatListViewController {
     @available(iOS 11.0, *)
@@ -862,7 +870,7 @@ extension ChatListViewController {
                                                          from: view,
                                                          completion: nil)
             } else {
-                let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] action in
+                let share = UIAlertAction(title: ShareType.share.localized, style: .default) { [weak self] _ in
                     self?.dialogService.presentShareAlertFor(string: address,
                                                              types: [.copyToPasteboard, .share, .generateQr(encodedContent: encodedAddress, sharingTip: address, withLogo: true)],
                                                              excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
@@ -870,7 +878,7 @@ extension ChatListViewController {
                                                              completion: nil)
                 }
                 
-                let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] action in
+                let rename = UIAlertAction(title: String.adamantLocalized.chat.rename, style: .default) { [weak self] _ in
                     let alert = UIAlertController(title: String(format: String.adamantLocalized.chat.actionsBody, address), message: nil, preferredStyle: .alert)
                     
                     alert.addTextField { (textField) in
@@ -925,7 +933,7 @@ extension ChatListViewController {
             actions = [more]
         }
         
-        let block = UIContextualAction(style: .destructive, title: "Block") { [weak self] (action, view, completionHandler) in
+        let block = UIContextualAction(style: .destructive, title: "Block") { [weak self] (_, _, completionHandler) in
             guard let chatroom = self?.chatsController?.object(at: indexPath), let address = chatroom.partner?.address else {
                 completionHandler(false)
                 return
@@ -951,7 +959,6 @@ extension ChatListViewController {
         return UISwipeActionsConfiguration(actions: actions)
     }
 }
-
 
 // MARK: - Tools
 extension ChatListViewController {

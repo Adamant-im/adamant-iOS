@@ -10,7 +10,6 @@ import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit
-import BitcoinKitPrivate
 
 class DashWalletService: WalletService {
     var tokenSymbol: String {
@@ -25,6 +24,14 @@ class DashWalletService: WalletService {
         return type(of: self).currencyLogo
     }
     
+    var tokenNetworkSymbol: String {
+        return "DASH"
+    }
+    
+    var consistencyMaxTime: Double {
+        return 800
+    }
+   
     var wallet: WalletAccount? { return dashWallet }
     
     var walletViewController: WalletViewController {
@@ -96,10 +103,10 @@ class DashWalletService: WalletService {
     let transactionFeeUpdated = Notification.Name("adamant.dashWallet.feeUpdated")
     
     // MARK: - Delayed KVS save
-    private var balanceObserver: NSObjectProtocol? = nil
+    private var balanceObserver: NSObjectProtocol?
     
     // MARK: - Properties
-    private (set) var dashWallet: DashWallet? = nil
+    private (set) var dashWallet: DashWallet?
     
     private (set) var enabled = true
     
@@ -107,7 +114,7 @@ class DashWalletService: WalletService {
     
     private var initialBalanceCheck = false
     
-    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .utility, attributes: [.concurrent])
+    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .userInteractive, attributes: [.concurrent])
     let stateSemaphore = DispatchSemaphore(value: 1)
     
     static let jsonDecoder = JSONDecoder()
@@ -144,7 +151,7 @@ class DashWalletService: WalletService {
         stateSemaphore.wait()
         
         switch state {
-        case .notInitiated, .updating, .initiationFailed(_):
+        case .notInitiated, .updating, .initiationFailed:
             return
             
         case .upToDate:
