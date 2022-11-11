@@ -112,7 +112,6 @@ extension DogeWalletService: RichMessageProvider {
                 case .internalError(let message, _) where message == "Unaviable transaction":
                     dialogService.dismissProgress()
                     dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.transactionUnavailable, style: AdamantAlertStyle.alert, actions: nil, from: nil)
-                    break
                 case .internalError(let message, _) where message == "No transaction":
                     let amount: Decimal
                     if let amountRaw = transaction.richContent?[RichContentKeys.transfer.amount], let decimal = Decimal(string: amountRaw) {
@@ -178,6 +177,8 @@ extension DogeWalletService: RichMessageProvider {
         if cell.isAlignedRight != isFromCurrentSender {
             cell.isAlignedRight = isFromCurrentSender
         }
+        
+        cell.isFromCurrentSender = isFromCurrentSender
         
         return cell
     }

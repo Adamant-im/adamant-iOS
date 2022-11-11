@@ -37,6 +37,10 @@ class ERC20WalletService: WalletService {
         return "ERC20"
     }
     
+    var consistencyMaxTime: Double {
+        return 1200
+    }
+   
     private (set) var transactionFee: Decimal = 0.0
     private (set) var diplayTransactionFee: Decimal = 0.0
     

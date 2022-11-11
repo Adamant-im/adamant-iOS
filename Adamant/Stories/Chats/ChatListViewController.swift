@@ -483,10 +483,12 @@ extension ChatListViewController {
                 cell.accountLabel.text = name
             } else if let address = partner.address,
                       let name = self.addressBook.addressBook[address] {
-                cell.accountLabel.text = name.checkAndReplaceSystemWallets()
+                cell.accountLabel.text = name
             } else {
                 cell.accountLabel.text = partner.address
             }
+            cell.accountLabel.text = cell.accountLabel.text?.checkAndReplaceSystemWallets()
+            
             if let avatarName = partner.avatar, let avatar = UIImage.init(named: avatarName) {
                 cell.avatarImage = avatar
                 cell.avatarImageView.tintColor = UIColor.adamant.primary

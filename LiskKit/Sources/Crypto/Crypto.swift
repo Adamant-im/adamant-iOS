@@ -32,7 +32,6 @@ public struct Crypto {
     private static func seed(passphrase: String, salt: String = "mnemonic") throws -> [UInt8] {
         let password = passphrase.decomposedStringWithCompatibilityMapping
         let salt = salt.decomposedStringWithCompatibilityMapping
-        
         return try PKCS5.PBKDF2(password: password.bytes, salt: salt.bytes, iterations: 2048, keyLength: 32, variant: HMAC.Variant.sha256).calculate()
     }
 

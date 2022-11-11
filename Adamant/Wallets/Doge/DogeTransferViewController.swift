@@ -16,9 +16,7 @@ class DogeTransferViewController: TransferViewControllerBase {
     var chatsProvider: ChatsProvider!
     
     // MARK: Properties
-    
-    private var skipValueChange: Bool = false
-    
+
     static let invalidCharacters: CharacterSet = CharacterSet.decimalDigits.inverted
     
     // MARK: Send
@@ -178,18 +176,8 @@ class DogeTransferViewController: TransferViewControllerBase {
             if let text = row.value {
                 self?._recipient = text
             }
-            
-            if let skip = self?.skipValueChange, skip {
-                self?.skipValueChange = false
-                return
-            }
-            
-            self?.validateForm()
         }.onCellSelection { [weak self] (cell, _) in
-            if let recipient = self?.recipientAddress {
-                let text = recipient
-                self?.shareValue(text, from: cell)
-            }
+            self?.shareValue(self?.recipientAddress, from: cell)
         }
         
         return row

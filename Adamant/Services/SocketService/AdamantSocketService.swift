@@ -84,7 +84,7 @@ class AdamantSocketService: SocketService {
         
         socket = manager?.defaultSocket
         socket?.on(clientEvent: .connect) { [weak self] _, _ in
-            self?.socket?.emit("address", with: [address])
+            self?.socket?.emit("address", with: [address], completion: nil)
         }
         
         socket?.on("newTrans") { [weak self] data, _ in

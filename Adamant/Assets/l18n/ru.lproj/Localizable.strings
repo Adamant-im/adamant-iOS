@@ -142,6 +142,9 @@
 /* Account tab: 'Send LSK tokens' button */
 "AccountTab.Row.SendLsk" = "Отправить LSK";
 
+/* Account tab: 'Send BTC tokens' button */
+"AccountTab.Row.SendBtc" = "Отправить BTC";
+
 /* Account tab: 'Send DOGE tokens' button */
 "AccountTab.Row.SendDoge" = "Отправить DOGE";
 
@@ -195,6 +198,9 @@
 
 /* Account tab: Lisk wallet */
 "AccountTab.Wallets.lisk_wallet" = "Кошелек Lisk";
+
+/* Account tab: Bitcoin wallet */
+"AccountTab.Wallets.bitcoin_wallet" = "Кошелек Bitcoin";
 
 /* Account tab: Doge wallet */
 "AccountTab.Wallets.doge_wallet" = "Кошелек Doge";
@@ -320,7 +326,10 @@
 "ChatScene.Send" = "Отправить";
 
 /* Chat: 'Sent funds' bubble title */
-"ChatScene.Sent" = "Отправлено";
+"ChatScene.Sent" = "Отправили";
+
+/* Chat: 'Received funds' bubble title */
+"ChatScene.Received" = "Получили";
 
 /* Chat: status message for failed to send chat transaction */
 "ChatScene.MessageStatus.FailToSend" = "Не удалось отправить";
@@ -948,6 +957,9 @@
 
 /* Tranfser: Confirm using maximum available for transfer tokens as amount to transfer. */
 "TransferScene.UseMaxToTransfer" = "Использовать все доступные токены как количество для перевода?";
+
+/* Tranfser: Dust error. */
+"TransferScene.Dust.Error" = "Мелочь — Отправьте больше токенов";
 
 /* Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
 "TransferScene.SendConfirmFormat" = "Отправить %1$@ получателю %2$@?";

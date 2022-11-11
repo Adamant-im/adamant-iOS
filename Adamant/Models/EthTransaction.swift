@@ -184,13 +184,20 @@ extension EthereumTransaction {
             txValue = nil
         }
         
+        let feePrice: BigUInt
+        if type == .eip1559 {
+            feePrice = (parameters.maxFeePerGas ?? BigUInt(0)) + (parameters.maxPriorityFeePerGas ?? BigUInt(0))
+        } else {
+            feePrice = parameters.gasPrice ?? BigUInt(0)
+        }
+
         return EthTransaction(date: date,
-                              hash: hash ?? txhash ?? "",
+                              hash: hash ?? txHash ?? "",
                               value: txValue?.asDecimal(exponent: exponent),
                               from: sender?.address ?? "",
                               to: recipient.address,
                               gasUsed: gasUsed?.asDecimal(exponent: 0),
-                              gasPrice: gasPrice.asDecimal(exponent: EthWalletService.currencyExponent),
+                              gasPrice: feePrice.asDecimal(exponent: EthWalletService.currencyExponent),
                               confirmations: confirmations,
                               isError: receiptStatus != .failed,
                               receiptStatus: receiptStatus,

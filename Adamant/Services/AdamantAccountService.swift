@@ -106,6 +106,7 @@ class AdamantAccountService: AccountService {
     var wallets: [WalletService] = {
         var wallets: [WalletService] = [
             AdmWalletService(),
+            BtcWalletService(),
             EthWalletService(),
             LskWalletService(mainnet: true, nodes: AdamantResources.lskServers, services: AdamantResources.lskServiceServers),
             DogeWalletService(),
@@ -122,7 +123,7 @@ class AdamantAccountService: AccountService {
     }()
     
     init() {
-        guard let ethWallet = wallets[1] as? EthWalletService else {
+        guard let ethWallet = wallets[2] as? EthWalletService else {
             fatalError("Failed to get EthWalletService")
         }
         
@@ -160,7 +161,7 @@ class AdamantAccountService: AccountService {
                         }
                     }
                     
-                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount, .requestCancelled:
+                case .notLogged, .transactionNotFound, .notEnoughMoney, .accountNotFound, .walletNotInitiated, .invalidAmount, .requestCancelled, .dustAmountError:
                     break
                     
                 case .remoteServiceError, .apiError, .internalError:

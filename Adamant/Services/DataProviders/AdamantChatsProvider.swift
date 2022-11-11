@@ -378,7 +378,7 @@ extension AdamantChatsProvider {
         }
     }
     
-    func apiGetChatMessages(address: String, addressRecipient: String, offset: Int?, completion: ((ChatRooms?) ->Void)?) {
+    func apiGetChatMessages(address: String, addressRecipient: String, offset: Int?, completion: ((ChatRooms?) -> Void)?) {
         apiService.getChatMessages(address: address, addressRecipient: addressRecipient, offset: offset) { [weak self] result in
             switch result {
             case .success(let chatroom):

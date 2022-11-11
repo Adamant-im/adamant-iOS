@@ -148,6 +148,9 @@
 /* Account tab: 'Send LSK tokens' button */
 "AccountTab.Row.SendLsk" = "LSK senden";
 
+/* Account tab: 'Send BTC tokens' button */
+"AccountTab.Row.SendBtc" = "BTC ";
+
 /* Account tab: 'Send DOGE tokens' button */
 "AccountTab.Row.SendDoge" = "DOGE senden";
 
@@ -198,6 +201,9 @@
 
 /* Account tab: Lisk wallet */
 "AccountTab.Wallets.lisk_wallet" = "Lisk Wallet";
+
+/* Account tab: Bitcoin wallet */
+"AccountTab.Wallets.bitcoin_wallet" = "Bitcoin Wallet";
 
 /* Account tab: Doge wallet */
 "AccountTab.Wallets.doge_wallet" = "Doge Wallet";
@@ -324,6 +330,9 @@
 
 /* Chat: 'Sent funds' bubble title */
 "ChatScene.Sent" = "Versendet";
+
+/* Chat: 'Received funds' bubble title */
+"ChatScene.Received" = "Erhalten";
 
 /* Chat: 'Sent funds' buble 'Tap for details' tip */
 "ChatScene.tapForDetails" = "Tap for details";
@@ -975,6 +984,9 @@
 
 /* Tranfser: Confirm using maximum available for transfer tokens as amount to transfer. */
 "TransferScene.UseMaxToTransfer" = "Alle verfügbaren Tokens versenden?";
+
+/* Tranfser: Dust error. */
+"TransferScene.Dust.Error" = "Staubmenge – Senden Sie mehr Token";
 
 /* Transfer: Confirm transfer %1$@ tokens to %2$@ message. Note two variables: at runtime %1$@ will be amount (with ADM suffix), and %2$@ will be recipient address. You can use address before amount with this so called 'position tokens'. */
 "TransferScene.SendConfirmFormat" = "%1$@ zu %2$@? senden";

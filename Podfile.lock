@@ -10,9 +10,9 @@ PODS:
   - MessageInputBar/Core (0.4.1)
   - MessageKit (2.0.0):
     - MessageInputBar/Core
-  - MyLittlePinpad (0.3)
-  - PMAlertController (3.5.0)
-  - SwiftLint (0.48.0)
+  - MyLittlePinpad (0.3.1)
+  - PMAlertController (4.0.1)
+  - SwiftLint (0.49.1)
 
 DEPENDENCIES:
   - FreakingSimpleRoundImageView
@@ -37,9 +37,9 @@ SPEC CHECKSUMS:
   FTIndicator: f7f071fd159e5befa1d040a9ef2e3ab53fa9322c
   MessageInputBar: e81c7535347f1f7b923de7080409a535a004b6e4
   MessageKit: 29c1c87e5a396d2ca7a3f712e5171dc9aba42a1e
-  MyLittlePinpad: 5d57cb5a092ddbeb5c4e6fa0b46df83bd3e88b0c
-  PMAlertController: 06dab8160066fc4ce991c880e3722cd403e2926a
-  SwiftLint: 284cea64b6187c5d6bd83e9a548a64104d546447
+  MyLittlePinpad: d75682f2d817b490c49acc70a9ebd37da752281b
+  PMAlertController: ab5fcf4d085b7878c9451466d701449c4bf6efb8
+  SwiftLint: 32ee33ded0636d0905ef6911b2b67bbaeeedafa5
 
 PODFILE CHECKSUM: 1f922c15b0493d5364bfac4f081f68c4170351b9
 

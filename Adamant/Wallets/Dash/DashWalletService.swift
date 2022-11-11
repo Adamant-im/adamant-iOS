@@ -10,7 +10,6 @@ import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit
-import BitcoinKitPrivate
 
 class DashWalletService: WalletService {
     var tokenSymbol: String {
@@ -29,6 +28,10 @@ class DashWalletService: WalletService {
         return "DASH"
     }
     
+    var consistencyMaxTime: Double {
+        return 800
+    }
+   
     var wallet: WalletAccount? { return dashWallet }
     
     var walletViewController: WalletViewController {
@@ -111,7 +114,7 @@ class DashWalletService: WalletService {
     
     private var initialBalanceCheck = false
     
-    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .utility, attributes: [.concurrent])
+    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dashWalletService", qos: .userInteractive, attributes: [.concurrent])
     let stateSemaphore = DispatchSemaphore(value: 1)
     
     static let jsonDecoder = JSONDecoder()

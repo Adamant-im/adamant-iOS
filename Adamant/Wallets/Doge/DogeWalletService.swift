@@ -10,7 +10,6 @@ import UIKit
 import Swinject
 import Alamofire
 import BitcoinKit
-import BitcoinKitPrivate
 
 struct DogeApiCommands {
     static func balance(for address: String) -> String {
@@ -85,6 +84,10 @@ class DogeWalletService: WalletService {
         return "DOGE"
     }
     
+    var consistencyMaxTime: Double {
+        return 900
+    }
+   
     private (set) var transactionFee: Decimal = 1.0 // 1 DOGE per transaction
     
     static let kvsAddress = "doge:address"
@@ -107,7 +110,7 @@ class DogeWalletService: WalletService {
     
     private var initialBalanceCheck = false
     
-    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dogeWalletService", qos: .utility, attributes: [.concurrent])
+    let defaultDispatchQueue = DispatchQueue(label: "im.adamant.dogeWalletService", qos: .userInteractive, attributes: [.concurrent])
     let stateSemaphore = DispatchSemaphore(value: 1)
     
     private static let jsonDecoder = JSONDecoder()

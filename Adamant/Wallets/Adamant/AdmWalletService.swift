@@ -32,9 +32,13 @@ class AdmWalletService: NSObject, WalletService {
     var tokenLogo: UIImage {
         return type(of: self).currencyLogo
     }
-	
+    
     var tokenNetworkSymbol: String {
         return "ADM"
+    }
+    
+    var consistencyMaxTime: Double {
+        return 0
     }
     
 	// MARK: - Dependencies

@@ -151,6 +151,8 @@ extension ERC20WalletService: RichMessageProvider {
             cell.isAlignedRight = isFromCurrentSender
         }
         
+        cell.isFromCurrentSender = isFromCurrentSender
+        
         return cell
     }
     

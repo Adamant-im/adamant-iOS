@@ -193,11 +193,18 @@ class AdmTransferViewController: TransferViewControllerBase {
             $0.cell.textField.autocorrectionType = .no
             if recipientIsReadonly {
                 $0.disabled = true
-//                prefix.isEnabled = false
+                prefix.textColor = UIColor.lightGray
             }
-        }.cellUpdate { (cell, _) in
+        }.cellUpdate { [weak self] cell, _ in
             if let text = cell.textField.text {
                 cell.textField.text = text.components(separatedBy: AdmTransferViewController.invalidCharactersSet).joined()
+
+                guard self?.recipientIsReadonly == false else { return }
+        
+                cell.textField.leftView?.subviews.forEach { view in
+                    guard let label = view as? UILabel else { return }
+                    label.textColor = UIColor.adamant.primary
+                }
             }
         }.onChange { [weak self] row in
             if let skip = self?.skipValueChange, skip {
@@ -224,13 +231,8 @@ class AdmTransferViewController: TransferViewControllerBase {
                     }
                 }
             }
-            
-            self?.validateForm()
         }.onCellSelection { [weak self] (cell, _) in
-            if let recipient = self?.recipientAddress {
-                let text = recipient
-                self?.shareValue(text, from: cell)
-            }
+            self?.shareValue(self?.recipientAddress, from: cell)
         }
         
         return row

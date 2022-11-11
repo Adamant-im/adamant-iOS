@@ -14,6 +14,7 @@ protocol WalletAccount {
     var address: String { get }
     var balance: Decimal { get }
     var minBalance: Decimal { get }
+    var minAmount: Decimal { get }
     
     var notifications: Int { get }
 }

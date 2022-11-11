@@ -146,12 +146,12 @@ class TransferViewControllerBase: FormViewController {
                         return
                     }
                     
-                    if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
+                    if let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
                         row.value = fee.doubleValue
                         row.updateCell()
                     }
                     
-                    if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
+                    if let row: DecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
                         row.updateCell()
                     }
                     
@@ -172,6 +172,7 @@ class TransferViewControllerBase: FormViewController {
             if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
                 row.value = recipientAddress
                 row.updateCell()
+                validateForm()
             }
         }
     }
@@ -209,6 +210,16 @@ class TransferViewControllerBase: FormViewController {
         let max = balance - service.transactionFee - minBalance
         
         return max >= 0 ? max : 0
+    }
+    
+    var minToTransfer: Decimal {
+        guard
+            let service = service,
+            let minBalance = service.wallet?.minAmount else {
+            return 0
+        }
+        
+        return minBalance
     }
     
     override var customNavigationAccessoryView: (UIView & NavigationAccessory)? {
@@ -257,21 +268,9 @@ class TransferViewControllerBase: FormViewController {
         
         // MARK: Button section
         form +++ Section()
-        <<< ButtonRow { [weak self] in
+        <<< ButtonRow {
             $0.title = BaseRows.sendButton.localized
             $0.tag = BaseRows.sendButton.tag
-            
-            $0.disabled = Condition.function([BaseRows.address.tag, BaseRows.amount.tag]) { [weak self] _ -> Bool in
-                guard let service = self?.service, let wallet = service.wallet, wallet.balance > service.transactionFee else {
-                    return true
-                }
-                
-                guard let isValid = self?.formIsValid() else {
-                    return true
-                }
-                
-                return !isValid
-            }
         }.onCellSelection { [weak self] (_, _) in
             self?.confirmSendFunds()
         }
@@ -287,7 +286,7 @@ class TransferViewControllerBase: FormViewController {
                                                 
                                                 vc.rate = vc.currencyInfoService.getRate(for: vc.currencyCode)
                                                 
-                                                if let row: SafeDecimalRow = vc.form.rowBy(tag: BaseRows.fiat.tag) {
+                                                if let row: DecimalRow = vc.form.rowBy(tag: BaseRows.fiat.tag) {
                                                     if let formatter = row.formatter as? NumberFormatter {
                                                         formatter.currencyCode = vc.currencyInfoService.currentCurrency.rawValue
                                                     }
@@ -323,6 +322,22 @@ class TransferViewControllerBase: FormViewController {
         let section = Section(Sections.recipient.localized) {
             $0.tag = Sections.recipient.tag
         }
+        
+        section.header = {
+            var header = HeaderFooterView<UILabel>(.callback({
+                let font = UIFont.preferredFont(forTextStyle: .footnote)
+                let label = UILabel()
+                label.text = "    \(Sections.recipient.localized.uppercased())"
+                label.font = font
+                label.textColor = .adamant.primary
+                return label
+            }))
+            
+            header.height = {
+                33
+            }
+            return header
+        }()
         
         // Address row
         section.append(defaultRowFor(baseRow: BaseRows.address))
@@ -367,38 +382,48 @@ class TransferViewControllerBase: FormViewController {
     }
 
     // MARK: - Tools
+
+    @discardableResult
+    func validateAddress() -> Bool {
+        guard let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) else {
+            recipientAddress = nil
+            recipientAddressIsValid = false
+            return false
+        }
+
+        if let address = row.value, validateRecipient(address) {
+            recipientAddress = address
+            markAddres(isValid: true)
+            recipientAddressIsValid = true
+            return true
+        } else {
+            markAddres(isValid: false)
+            recipientAddressIsValid = false
+            return false
+        }
+    }
     
-    func validateForm() {
+    func validateForm(force: Bool = false) {
         guard let service = service, let wallet = service.wallet else {
             return
         }
         
-        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
+        if let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
             markRow(row, valid: service.isTransactionFeeValid)
         }
         
-        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
+        if let row: DecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
             markRow(row, valid: wallet.balance > service.transactionFee)
         }
         
-        if let row: RowOf<String> = form.rowBy(tag: BaseRows.address.tag) {
-            if let address = row.value, validateRecipient(address) {
-                recipientAddress = address
-                markRow(row, valid: true)
-                recipientAddressIsValid = true
-            } else {
-                markRow(row, valid: false)
-                recipientAddressIsValid = false
-            }
-        } else {
-            recipientAddress = nil
-            recipientAddressIsValid = false
-        }
-        
-        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
+        if let row: DecimalRow = form.rowBy(tag: BaseRows.amount.tag) {
             // Eureka looses decimal precision when deserializing numbers by itself.
             // Try to get raw value and deserialize it
             if let input = row.cell.textInput as? UITextField, let raw = input.text {
+                if raw.isEmpty && force {
+                    markRow(row, valid: false)
+                    return
+                }
                 // NumberFormatter.number(from: string).decimalValue loses precision.
                 // Creating decimal with Decimal(string: "") drops decimal part, if wrong locale used
                 var gotValue = false
@@ -436,7 +461,7 @@ class TransferViewControllerBase: FormViewController {
             amount = nil
         }
         
-        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.total.tag) {
+        if let row: DecimalRow = form.rowBy(tag: BaseRows.total.tag) {
             if let amount = amount {
                 row.value = (amount + service.transactionFee).doubleValue
                 row.updateCell()
@@ -447,27 +472,43 @@ class TransferViewControllerBase: FormViewController {
                 row.updateCell()
             }
         }
-        
-        if let row: ButtonRow = form.rowBy(tag: BaseRows.sendButton.tag) {
-            row.evaluateDisabled()
-        }
     }
     
     func markRow(_ row: BaseRowType, valid: Bool) {
         row.baseCell.textLabel?.textColor = valid ? UIColor.adamant.primary : UIColor.adamant.alert
     }
-    
+
+    func markAddres(isValid: Bool) {
+        guard
+            let recipientRow: TextRow = form.rowBy(tag: BaseRows.address.tag),
+            let recipientSection = form.sectionBy(tag: Sections.recipient.tag),
+            !recipientIsReadonly
+        else {
+            return
+        }
+        
+        if let label = recipientSection.header?.viewForSection(recipientSection, type: .header), let label = label as? UILabel {
+            label.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.alert
+        }
+        
+        recipientRow.cell.textField.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.alert
+        recipientRow.cell.textField.leftView?.subviews.forEach { view in
+            guard let label = view as? UILabel else { return }
+            label.textColor = isValid ? UIColor.adamant.primary : UIColor.adamant.alert
+        }
+    }
+
     func reloadFormData() {
-        if let fee = service?.transactionFee, let row: SafeDecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
+        if let fee = service?.transactionFee, let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
             row.value = fee.doubleValue
             row.updateCell()
         }
         
-        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
+        if let row: DecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
             row.updateCell()
         }
         
-        if let row: SafeDecimalRow = form.rowBy(tag: BaseRows.balance.tag) {
+        if let row: DecimalRow = form.rowBy(tag: BaseRows.balance.tag) {
             if let wallet = service?.wallet {
                 row.value = wallet.balance.doubleValue
             } else {
@@ -483,7 +524,14 @@ class TransferViewControllerBase: FormViewController {
     // MARK: - Send Actions
     
     private func confirmSendFunds() {
-        guard let recipientAddress = recipientAddress, let amount = amount else {
+        validateAddress()
+        validateForm(force: true)
+
+        guard
+            let recipientAddress = recipientAddress,
+            recipientAddressIsValid,
+            let amount = amount
+        else {
             return
         }
         
@@ -502,6 +550,11 @@ class TransferViewControllerBase: FormViewController {
             return
         }
 
+        guard amount >= minToTransfer else {
+            dialogService.showWarning(withMessage: String.adamantLocalized.transfer.amountZeroError)
+            return
+        }
+        
         guard service?.isTransactionFeeValid ?? true else {
             return
         }
@@ -568,7 +621,14 @@ class TransferViewControllerBase: FormViewController {
             return false
         }
         
-        guard let service = service, let balance = service.wallet?.balance else {
+        guard let service = service,
+              let balance = service.wallet?.balance,
+              let minAmount = service.wallet?.minAmount
+        else {
+            return false
+        }
+        
+        guard minAmount <= amount else {
             return false
         }
         
@@ -578,14 +638,24 @@ class TransferViewControllerBase: FormViewController {
     }
     
     func formIsValid() -> Bool {
-        if let recipient = recipientAddress, validateRecipient(recipient),
-           let amount = amount, validateAmount(amount),
-           recipientAddressIsValid,
-           service?.isTransactionFeeValid ?? true {
-            return true
-        } else {
+        guard
+            let service = service,
+            let wallet = service.wallet,
+            wallet.balance > service.transactionFee
+        else {
             return false
         }
+
+        guard
+            let recipient = recipientAddress, validateRecipient(recipient),
+            let amount = amount, validateAmount(amount),
+            recipientAddressIsValid,
+            service.isTransactionFeeValid
+        else {
+            return false
+        }
+
+        return true
     }
     
     /// Recipient section footer. You can override this to provide custom set of elements.
@@ -635,7 +705,7 @@ extension TransferViewControllerBase {
     func defaultRowFor(baseRow: BaseRows) -> BaseRow {
         switch baseRow {
         case .balance:
-            return SafeDecimalRow { [weak self] in
+            return DecimalRow { [weak self] in
                 $0.title = BaseRows.balance.localized
                 $0.tag = BaseRows.balance.tag
                 $0.disabled = true
@@ -668,7 +738,7 @@ extension TransferViewControllerBase {
             return recipientRow()
             
         case .maxToTransfer:
-            let row = SafeDecimalRow { [weak self] in
+            let row = DecimalRow { [weak self] in
                 $0.title = BaseRows.maxToTransfer.localized
                 $0.tag = BaseRows.maxToTransfer.tag
                 $0.disabled = true
@@ -687,7 +757,7 @@ extension TransferViewControllerBase {
                 let alert = UIAlertController(title: String.adamantLocalized.transfer.useMaxToTransfer, message: nil, preferredStyle: .alert)
                 let cancelAction = UIAlertAction(title: String.adamantLocalized.alert.cancel , style: .cancel, handler: nil)
                 let confirmAction = UIAlertAction(title: String.adamantLocalized.alert.ok, style: .default) { [weak self] _ in
-                    guard let amountRow: SafeDecimalRow = self?.form.rowBy(tag: BaseRows.amount.tag) else {
+                    guard let amountRow: DecimalRow = self?.form.rowBy(tag: BaseRows.amount.tag) else {
                         return
                     }
                     amountRow.value = value
@@ -706,7 +776,7 @@ extension TransferViewControllerBase {
             return row
             
         case .amount:
-            return SafeDecimalRow { [weak self] row in
+            return DecimalRow { [weak self] row in
                 row.title = BaseRows.amount.localized
                 row.placeholder = String.adamantLocalized.transfer.amountPlaceholder
                 row.tag = BaseRows.amount.tag
@@ -716,7 +786,7 @@ extension TransferViewControllerBase {
                     row.value = amount.doubleValue
                 }
             }.onChange { [weak self] (row) in
-                if let rate = self?.rate, let fiatRow: SafeDecimalRow = self?.form.rowBy(tag: BaseRows.fiat.tag) {
+                if let rate = self?.rate, let fiatRow: DecimalRow = self?.form.rowBy(tag: BaseRows.fiat.tag) {
                     if let value = row.value {
                         fiatRow.value = value * rate.doubleValue
                     } else {
@@ -727,10 +797,12 @@ extension TransferViewControllerBase {
                 }
                 
                 self?.validateForm()
+            }.cellUpdate { [weak self] _, _ in
+                self?.validateForm()
             }
             
         case .fiat:
-            return SafeDecimalRow { [weak self] in
+            return DecimalRow { [weak self] in
                 $0.title = BaseRows.fiat.localized
                 $0.tag = BaseRows.fiat.tag
                 $0.disabled = true
@@ -749,7 +821,7 @@ extension TransferViewControllerBase {
             }
         
         case .fee:
-            return SafeDecimalRow { [weak self] in
+            return DecimalRow { [weak self] in
                 $0.tag = BaseRows.fee.tag
                 $0.title = BaseRows.fee.localized
                 $0.disabled = true
@@ -763,7 +835,7 @@ extension TransferViewControllerBase {
             }
             
         case .total:
-            return SafeDecimalRow { [weak self] in
+            return DecimalRow { [weak self] in
                 $0.tag = BaseRows.total.tag
                 $0.title = BaseRows.total.localized
                 $0.value = nil
@@ -786,21 +858,9 @@ extension TransferViewControllerBase {
             return row
             
         case .sendButton:
-            return ButtonRow { [weak self] in
+            return ButtonRow {
                 $0.title = BaseRows.sendButton.localized
                 $0.tag = BaseRows.sendButton.tag
-                
-                $0.disabled = Condition.function([BaseRows.address.tag, BaseRows.amount.tag]) { [weak self] _ -> Bool in
-                    guard let service = self?.service, let wallet = service.wallet, wallet.balance > service.transactionFee else {
-                        return true
-                    }
-                    
-                    guard let isValid = self?.formIsValid() else {
-                        return true
-                    }
-                    
-                    return !isValid
-                }
             }.onCellSelection { [weak self] (_, _) in
                 self?.confirmSendFunds()
             }
@@ -809,11 +869,17 @@ extension TransferViewControllerBase {
     
     // MARK: - Tools
     
-    func shareValue(_ value: String, from: UIView) {
+    func shareValue(_ value: String?, from: UIView) {
+        guard
+            let value = value,
+            !value.isEmpty,
+            recipientIsReadonly
+        else {
+            return
+        }
+
         dialogService.presentShareAlertFor(string: value, types: [.copyToPasteboard, .share], excludedActivityTypes: nil, animated: true, from: from) { [weak self] in
-            guard let tableView = self?.tableView else {
-                return
-            }
+            guard let tableView = self?.tableView else { return }
             
             if let indexPath = tableView.indexPathForSelectedRow {
                 tableView.deselectRow(at: indexPath, animated: true)

@@ -40,7 +40,10 @@ extension AdamantChatsProvider {
     }
     
     func isTransactionUnique(_ transaction: RichMessageTransaction) -> Bool {
-        guard let type = transaction.richType, let hash = transaction.richContent?[RichContentKeys.transfer.hash], let date = transaction.date else {
+        guard
+            let type = transaction.richType,
+            let hash = transaction.richContent?[RichContentKeys.transfer.hash]
+        else {
             return false
         }
         
@@ -48,8 +51,7 @@ extension AdamantChatsProvider {
         
         request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
             NSPredicate(format: "richType == %@", type),
-            NSPredicate(format: "richContent.hash CONTAINS[cd] %@", hash),
-            NSPredicate(format: "date < %@", date)
+            NSPredicate(format: "richContent.hash CONTAINS[cd] %@", hash)
         ])
         
         request.sortDescriptors = [NSSortDescriptor.init(key: "date", ascending: false),
@@ -57,7 +59,7 @@ extension AdamantChatsProvider {
         
         do {
             let results = try stack.container.viewContext.fetch(request)
-            return results.count == 0
+            return results.count <= 1
         } catch let error {
             print(error)
             return false

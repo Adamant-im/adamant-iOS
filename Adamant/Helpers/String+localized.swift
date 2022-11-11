@@ -56,6 +56,8 @@ extension String.adamantLocalized {
         
         static let notEnoughMoney = NSLocalizedString("WalletServices.SharedErrors.notEnoughMoney", comment: "Wallet Services: Shared error, user do not have enought money.")
         
+        static let dustError = NSLocalizedString("TransferScene.Dust.Error", comment: "Tranfser: Dust error.")
+        
         static let transactionUnavailable = NSLocalizedString("WalletServices.SharedErrors.transactionUnavailable", comment: "Wallet Services: Transaction unavailable")
         
         static let duplicatedTransaction = NSLocalizedString("WalletServices.SharedErrors.duplicatedTransaction", comment: "Wallet Services: Duplicated transaction")

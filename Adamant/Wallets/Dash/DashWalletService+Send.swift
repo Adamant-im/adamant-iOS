@@ -8,7 +8,6 @@
 
 import UIKit
 import BitcoinKit
-import BitcoinKitPrivate
 import Alamofire
 
 extension DashWalletService: WalletServiceTwoStepSend {

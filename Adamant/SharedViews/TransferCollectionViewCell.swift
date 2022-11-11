@@ -9,6 +9,13 @@
 import UIKit
 //import MessageKit
 
+extension String.adamantLocalized {
+    enum transferBubble {
+        static let sent = NSLocalizedString("ChatScene.Sent", comment: "Chat: 'Sent funds' bubble title")
+        static let received = NSLocalizedString("ChatScene.Received", comment: "Chat: 'Received funds' bubble title")
+    }
+}
+
 class TransferCollectionViewCell: UICollectionViewCell, ChatCell, TapRecognizerTransferCell {
     
     // MARK: Hacks&Helpers
@@ -87,6 +94,12 @@ class TransferCollectionViewCell: UICollectionViewCell, ChatCell, TapRecognizerT
     var bubbleBackgroundColor: UIColor? {
         get { return bubbleView.backgroundColor }
         set { bubbleView.backgroundColor = newValue }
+    }
+    
+    var isFromCurrentSender: Bool = false {
+        didSet {
+            sentLabel.text = isFromCurrentSender ? String.adamantLocalized.transferBubble.sent : String.adamantLocalized.transferBubble.received
+        }
     }
     
     var isAlignedRight: Bool = false {

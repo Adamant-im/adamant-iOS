@@ -40,6 +40,10 @@ struct AdamantResources {
     static let lskServiceServers = [
         "https://liskservice3.adamant.im"
     ]
+
+    static let btcServers: [URL] = [
+        URL(string: "https://btcnode2.adamant.im")!
+    ]
     
     static let dogeServers: [URL] = [
         URL(string: "https://dogenode1.adamant.im/api")!
@@ -99,6 +103,8 @@ struct AdamantResources {
     
     static let dogeExplorerAddress = "https://dogechain.info/tx/"
     static let dashExplorerAddress = "https://dashblockexplorer.com/tx/"
+
+    static let btcExplorerAddress = "https://btc.com/btc/transaction/"
     
     private init() {}
 }

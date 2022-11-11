@@ -474,7 +474,7 @@ extension ChatViewController: TransferCellDelegate {
             
             if richTransaction.transactionStatus == .dublicate {
                 dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.duplicatedTransaction, style: AdamantAlertStyle.alert, actions: nil, from: nil)
-            } else  if richTransaction.transactionStatus == .failed {
+            } else if richTransaction.transactionStatus == .failed {
                 dialogService.showAlert(title: nil, message: String.adamantLocalized.sharedErrors.inconsistentTransaction, style: AdamantAlertStyle.alert, actions: nil, from: nil)
             } else {
                 provider.richMessageTapped(for: richTransaction, at: indexPath, in: self)

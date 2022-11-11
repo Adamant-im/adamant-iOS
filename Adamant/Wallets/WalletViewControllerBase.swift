@@ -408,9 +408,9 @@ class WalletViewControllerBase: FormViewController, WalletViewController {
 // MARK: - TransferViewControllerDelegate
 extension WalletViewControllerBase: TransferViewControllerDelegate {
     func transferViewController(_ viewController: TransferViewControllerBase, didFinishWithTransfer transfer: TransactionDetails?, detailsViewController: UIViewController?) {
-        if let split = splitViewController {
-            if let nav = split.viewControllers.last as? UINavigationController {
-                DispatchQueue.main.async { [weak self] in
+        DispatchQueue.onMainAsync { [weak self] in
+            if let split = self?.splitViewController {
+                if let nav = split.viewControllers.last as? UINavigationController {
                     if let detailsViewController = detailsViewController {
                         var viewControllers = nav.viewControllers
                         viewControllers.removeLast()
@@ -424,14 +424,10 @@ extension WalletViewControllerBase: TransferViewControllerDelegate {
                     } else {
                         nav.popViewController(animated: true)
                     }
-                }
-            } else {
-                DispatchQueue.main.async {
+                } else {
                     split.showDetailViewController(viewController, sender: nil)
                 }
-            }
-        } else if let nav = navigationController {
-            DispatchQueue.main.async {
+            } else if let nav = self?.navigationController {
                 if let detailsViewController = detailsViewController {
                     var viewControllers = nav.viewControllers
                     viewControllers.removeLast()
@@ -440,9 +436,7 @@ extension WalletViewControllerBase: TransferViewControllerDelegate {
                 } else {
                     nav.popViewController(animated: true)
                 }
-            }
-        } else if presentedViewController == viewController {
-            DispatchQueue.main.async { [weak self] in
+            } else if self?.presentedViewController == viewController {
                 self?.dismiss(animated: true, completion: nil)
                 
                 if let detailsViewController = detailsViewController {
