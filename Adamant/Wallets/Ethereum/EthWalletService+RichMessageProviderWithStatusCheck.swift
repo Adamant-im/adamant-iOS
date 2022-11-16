@@ -22,7 +22,13 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
         do {
             details = try web3.eth.getTransactionDetailsPromise(hash).wait()
         } catch let error as Web3Error {
-            completion(.failure(error: error.asWalletServiceError()))
+            guard case let .remoteServiceError(message) = error.asWalletServiceError(),
+                  message == "Invalid value from Ethereum node"
+            else {
+                completion(.failure(error: error.asWalletServiceError()))
+                return
+            }
+            completion(.success(result: .pending))
             return
         } catch {
             completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: error)))

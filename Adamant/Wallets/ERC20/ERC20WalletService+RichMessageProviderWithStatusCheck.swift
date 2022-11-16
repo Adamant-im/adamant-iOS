@@ -73,7 +73,13 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
                 completion(.success(result: .success))
                 
             case .failure(error: let error):
-                completion(.failure(error: error))
+                guard case let .remoteServiceError(message) = error,
+                      message == "Invalid value from Ethereum node"
+                else {
+                    completion(.failure(error: error))
+                    return
+                }
+                completion(.success(result: .pending))
             }
         }
     }

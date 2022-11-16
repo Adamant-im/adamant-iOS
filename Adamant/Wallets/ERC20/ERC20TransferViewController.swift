@@ -66,34 +66,24 @@ class ERC20TransferViewController: TransferViewControllerBase {
                     switch result {
                     case .success(let hash):
                         service.update()
-                        service.getTransaction(by: hash) { result in
-                            switch result {
-                            case .success(let transaction):
-                                vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                        vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                        let transaction = SimpleTransactionDetails(txId: hash, senderAddress: transaction.sender?.address ?? "", recipientAddress: recipient, isOutgoing: true)
+                        DispatchQueue.main.async {
+                            if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController {
+                                detailsVc.transaction = transaction
+                                detailsVc.service = service
+                                detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                                detailsVc.recipientName = self?.recipientName
 
-                                DispatchQueue.main.async {
-                                    if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController {
-                                        detailsVc.transaction = transaction
-                                        detailsVc.service = service
-                                        detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                                        detailsVc.recipientName = self?.recipientName
-
-                                        if comments.count > 0 {
-                                            detailsVc.comment = comments
-                                        }
-
-                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-                                    } else {
-                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-                                    }
+                                if comments.count > 0 {
+                                    detailsVc.comment = comments
                                 }
 
-                            case .failure(let error):
-                                vc.dialogService.showRichError(error: error)
-                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
+                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+                            } else {
+                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
                             }
                         }
-
                     case .failure(let error):
                         vc.dialogService.showRichError(error: error)
                     }
