@@ -24,6 +24,7 @@ extension String.adamantLocalized {
         
         static let addressValidationError = NSLocalizedString("TransferScene.Error.InvalidAddress", comment: "Transfer: Address validation error")
         static let amountZeroError = NSLocalizedString("TransferScene.Error.TooLittleMoney", comment: "Transfer: Amount is zero, or even negative notification")
+        static let notEnoughFeeError = NSLocalizedString("TransferScene.Error.TooLittleFee", comment: "Transfer: Not enough fee for send a transaction")
         static let amountTooHigh = NSLocalizedString("TransferScene.Error.notEnoughMoney", comment: "Transfer: Amount is hiegher that user's total money notification")
         static let accountNotFound = NSLocalizedString("TransferScene.Error.AddressNotFound", comment: "Transfer: Address not found error")
         
@@ -132,6 +133,8 @@ class TransferViewControllerBase: FormViewController {
     // MARK: - Properties
     
     var commentsEnabled: Bool = false
+    var rootCoinBalance: Decimal?
+    var fee: Decimal?
     
     var service: WalletServiceWithSend? {
         didSet {
@@ -145,7 +148,7 @@ class TransferViewControllerBase: FormViewController {
                     guard let fee = self?.service?.diplayTransactionFee, let form = self?.form else {
                         return
                     }
-                    
+                    self?.fee = fee
                     if let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
                         row.value = fee.doubleValue
                         row.updateCell()
@@ -409,7 +412,7 @@ class TransferViewControllerBase: FormViewController {
         }
         
         if let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
-            markRow(row, valid: service.isTransactionFeeValid)
+            markRow(row, valid: isEnoughFee())
         }
         
         if let row: DecimalRow = form.rowBy(tag: BaseRows.maxToTransfer.tag) {
@@ -555,6 +558,11 @@ class TransferViewControllerBase: FormViewController {
             return
         }
         
+        guard isEnoughFee() else {
+            dialogService.showWarning(withMessage: String.adamantLocalized.transfer.notEnoughFeeError)
+            return
+        }
+        
         guard service?.isTransactionFeeValid ?? true else {
             return
         }
@@ -650,12 +658,23 @@ class TransferViewControllerBase: FormViewController {
             let recipient = recipientAddress, validateRecipient(recipient),
             let amount = amount, validateAmount(amount),
             recipientAddressIsValid,
-            service.isTransactionFeeValid
+            service.isTransactionFeeValid,
+            isEnoughFee()
         else {
             return false
         }
 
         return true
+    }
+    
+    func isEnoughFee() -> Bool {
+        guard let amount = amount,
+              let fee = fee,
+              let service = service
+        else {
+            return false
+        }
+        return amount > fee && service.isTransactionFeeValid
     }
     
     /// Recipient section footer. You can override this to provide custom set of elements.

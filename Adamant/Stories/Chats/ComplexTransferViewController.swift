@@ -121,6 +121,14 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                             v.recipientAddress = walletAddress
                             v.recipientName = name
 							v.hideProgress(animated: true)
+                            if ERC20Token.supportedTokens.contains(where: { token in
+                                return token.symbol == self.services[index].tokenSymbol
+                            }) {
+                                let ethWallet = self.accountService.wallets.first { wallet in
+                                    return wallet.tokenSymbol == "ETH"
+                                }
+                                v.rootCoinBalance = ethWallet?.wallet?.balance
+                            }
 						}
 					case .failure(let error):
 						v.showAlertView(title: nil, message: error.message, animated: true)

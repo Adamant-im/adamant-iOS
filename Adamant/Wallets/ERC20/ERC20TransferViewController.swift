@@ -251,4 +251,36 @@ class ERC20TransferViewController: TransferViewControllerBase {
         let networkSymbol = service?.tokenNetworkSymbol ?? "ERC20"
         return String.adamantLocalized.wallets.erc20.sendToken(service?.tokenSymbol ?? "ERC20") + " (\(networkSymbol))"
     }
+    
+    override func validateAmount(_ amount: Decimal, withFee: Bool = true) -> Bool {
+        guard amount > 0 else {
+            return false
+        }
+        
+        guard let service = service,
+              let balance = service.wallet?.balance,
+              let minAmount = service.wallet?.minAmount
+        else {
+            return false
+        }
+        
+        guard minAmount <= amount else {
+            return false
+        }
+        
+        let isEnoughBalance = balance >= amount
+        let isEnoughFee = isEnoughFee()
+        
+        return isEnoughBalance && isEnoughFee
+    }
+    
+    override func isEnoughFee() -> Bool {
+        guard let service = service,
+              let rootCoinBalance = rootCoinBalance,
+              let fee = fee
+        else {
+            return false
+        }
+        return rootCoinBalance >= fee && service.isTransactionFeeValid
+    }
 }
