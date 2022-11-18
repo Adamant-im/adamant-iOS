@@ -134,7 +134,6 @@ class TransferViewControllerBase: FormViewController {
     
     var commentsEnabled: Bool = false
     var rootCoinBalance: Decimal?
-    var fee: Decimal?
     
     var service: WalletServiceWithSend? {
         didSet {
@@ -148,7 +147,7 @@ class TransferViewControllerBase: FormViewController {
                     guard let fee = self?.service?.diplayTransactionFee, let form = self?.form else {
                         return
                     }
-                    self?.fee = fee
+                    
                     if let row: DecimalRow = form.rowBy(tag: BaseRows.fee.tag) {
                         row.value = fee.doubleValue
                         row.updateCell()
