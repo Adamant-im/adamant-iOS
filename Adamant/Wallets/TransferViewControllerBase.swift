@@ -668,13 +668,14 @@ class TransferViewControllerBase: FormViewController {
     }
     
     func isEnoughFee() -> Bool {
-        guard let amount = amount,
-              let fee = fee,
-              let service = service
+        guard let service = service,
+              let wallet = service.wallet,
+              wallet.balance > service.transactionFee,
+              service.isTransactionFeeValid
         else {
             return false
         }
-        return amount > fee && service.isTransactionFeeValid
+        return true
     }
     
     /// Recipient section footer. You can override this to provide custom set of elements.

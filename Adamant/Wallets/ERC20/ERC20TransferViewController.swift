@@ -277,10 +277,11 @@ class ERC20TransferViewController: TransferViewControllerBase {
     override func isEnoughFee() -> Bool {
         guard let service = service,
               let rootCoinBalance = rootCoinBalance,
-              let fee = fee
+              rootCoinBalance >= service.diplayTransactionFee,
+              service.isTransactionFeeValid
         else {
             return false
         }
-        return rootCoinBalance >= fee && service.isTransactionFeeValid
+        return true
     }
 }
