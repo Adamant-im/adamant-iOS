@@ -120,7 +120,7 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                         DispatchQueue.main.async {
                             v.recipientAddress = walletAddress
                             v.recipientName = name
-							v.hideProgress(animated: true)
+                            v.hideProgress(animated: true)
                             if ERC20Token.supportedTokens.contains(where: { token in
                                 return token.symbol == self.services[index].tokenSymbol
                             }) {
@@ -129,10 +129,10 @@ extension ComplexTransferViewController: PagingViewControllerDataSource {
                                 }
                                 v.rootCoinBalance = ethWallet?.wallet?.balance
                             }
-						}
-					case .failure(let error):
-						v.showAlertView(title: nil, message: error.message, animated: true)
-					}
+                        }
+                    case .failure(let error):
+                        v.showAlertView(title: nil, message: error.message, animated: true)
+                    }
 				}
 			}
 			
