@@ -923,18 +923,18 @@ extension ChatViewController: TransferViewControllerDelegate, ComplexTransferVie
 // MARK: - RichTransfers status update
 extension ChatViewController {
     func updateStatus(for transaction: RichMessageTransaction, provider: RichMessageProviderWithStatusCheck, delay: TimeInterval? = nil) {
-        guard transaction.transactionStatus != .updating else {
+
+        let objectID = transaction.objectID
+        guard !isUpdatingRichMessageStatus(id: objectID) else {
             return
         }
-        
+        richMessageStatusUpdating.append(objectID)
         if transaction.transactionStatus == nil || transaction.transactionStatus == .notInitiated {
             skipRichInitialUpdate.append(transaction.messageId)
+            transaction.transactionStatus = .notInitiated
+        } else {
+            transaction.transactionStatus = .updating
         }
-        
-        transaction.transactionStatus = .updating
-        let objectID = transaction.objectID
-        
-        richMessageStatusUpdating.append(objectID)
         
         let operation = StatusUpdateProcedure(parentContext: stack.container.viewContext,
                                               objectId: objectID,
@@ -1016,6 +1016,7 @@ private class StatusUpdateProcedure: Procedure {
                             return
                         }
                         
+                        controller.removeRichMessageStatusUpdating(id: transaction.objectID)
                         controller.updateStatus(for: trs, provider: provider, delay: 2.0)
                     }
                 } else {

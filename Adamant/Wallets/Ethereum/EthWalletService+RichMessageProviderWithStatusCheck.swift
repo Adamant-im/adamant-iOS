@@ -22,7 +22,11 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
         do {
             details = try web3.eth.getTransactionDetailsPromise(hash).wait()
         } catch let error as Web3Error {
-            completion(.failure(error: error.asWalletServiceError()))
+            guard transaction.transactionStatus == .notInitiated else {
+                completion(.failure(error: error.asWalletServiceError()))
+                return
+            }
+            completion(.success(result: .pending))
             return
         } catch {
             completion(.failure(error: WalletServiceError.internalError(message: "Failed to get transaction", error: error)))
@@ -34,6 +38,10 @@ extension EthWalletService: RichMessageProviderWithStatusCheck {
         do {
             let receipt = try web3.eth.getTransactionReceiptPromise(hash).wait()
             status = receipt.status.asTransactionStatus()
+            guard status != .pending else {
+                completion(.success(result: .pending))
+                return
+            }
             
             guard status == .success, let blockNumber = details.blockNumber, let date = transaction.date as Date? else {
                 completion(.success(result: status))

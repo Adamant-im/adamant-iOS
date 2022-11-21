@@ -66,34 +66,24 @@ class ERC20TransferViewController: TransferViewControllerBase {
                     switch result {
                     case .success(let hash):
                         service.update()
-                        service.getTransaction(by: hash) { result in
-                            switch result {
-                            case .success(let transaction):
-                                vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                        vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                        let transaction = SimpleTransactionDetails(txId: hash, senderAddress: transaction.sender?.address ?? "", recipientAddress: recipient, isOutgoing: true)
+                        DispatchQueue.main.async {
+                            if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController {
+                                detailsVc.transaction = transaction
+                                detailsVc.service = service
+                                detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                                detailsVc.recipientName = self?.recipientName
 
-                                DispatchQueue.main.async {
-                                    if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.ERC20.transactionDetails) as? ERC20TransactionDetailsViewController {
-                                        detailsVc.transaction = transaction
-                                        detailsVc.service = service
-                                        detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                                        detailsVc.recipientName = self?.recipientName
-
-                                        if comments.count > 0 {
-                                            detailsVc.comment = comments
-                                        }
-
-                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-                                    } else {
-                                        vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-                                    }
+                                if comments.count > 0 {
+                                    detailsVc.comment = comments
                                 }
 
-                            case .failure(let error):
-                                vc.dialogService.showRichError(error: error)
-                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
+                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+                            } else {
+                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
                             }
                         }
-
                     case .failure(let error):
                         vc.dialogService.showRichError(error: error)
                     }
@@ -260,5 +250,38 @@ class ERC20TransferViewController: TransferViewControllerBase {
     override func defaultSceneTitle() -> String? {
         let networkSymbol = service?.tokenNetworkSymbol ?? "ERC20"
         return String.adamantLocalized.wallets.erc20.sendToken(service?.tokenSymbol ?? "ERC20") + " (\(networkSymbol))"
+    }
+    
+    override func validateAmount(_ amount: Decimal, withFee: Bool = true) -> Bool {
+        guard amount > 0 else {
+            return false
+        }
+        
+        guard let service = service,
+              let balance = service.wallet?.balance,
+              let minAmount = service.wallet?.minAmount
+        else {
+            return false
+        }
+        
+        guard minAmount <= amount else {
+            return false
+        }
+        
+        let isEnoughBalance = balance >= amount
+        let isEnoughFee = isEnoughFee()
+        
+        return isEnoughBalance && isEnoughFee
+    }
+    
+    override func isEnoughFee() -> Bool {
+        guard let service = service,
+              let rootCoinBalance = rootCoinBalance,
+              rootCoinBalance >= service.diplayTransactionFee,
+              service.isTransactionFeeValid
+        else {
+            return false
+        }
+        return true
     }
 }

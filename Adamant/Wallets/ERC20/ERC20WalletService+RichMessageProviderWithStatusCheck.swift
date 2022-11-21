@@ -73,7 +73,11 @@ extension ERC20WalletService: RichMessageProviderWithStatusCheck {
                 completion(.success(result: .success))
                 
             case .failure(error: let error):
-                completion(.failure(error: error))
+                guard transaction.transactionStatus == .notInitiated else {
+                    completion(.failure(error: error))
+                    return
+                }
+                completion(.success(result: .pending))
             }
         }
     }

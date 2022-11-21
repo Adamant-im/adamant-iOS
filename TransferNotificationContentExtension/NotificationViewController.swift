@@ -27,7 +27,8 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             EthProvider.richMessageType: EthProvider(),
             LskProvider.richMessageType: LskProvider(),
             DogeProvider.richMessageType: DogeProvider(),
-            DashProvider.richMessageType: DashProvider()
+            DashProvider.richMessageType: DashProvider(),
+            BtcProvider.richMessageType: BtcProvider()
         ]
         
         for token in ERC20Token.supportedTokens {
