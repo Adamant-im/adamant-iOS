@@ -21,8 +21,8 @@ class AdamantChatsProvider: ChatsProvider {
     var transactionService: ChatTransactionService!
     var securedStore: SecuredStore! {
         didSet {
-            self.blackList = self.securedStore.getArray("blackList") ?? []
-            self.removedMessages = self.securedStore.getArray("removedMessages") ?? []
+            self.blackList = self.securedStore.getArray(StoreKey.accountService.blackList) ?? []
+            self.removedMessages = self.securedStore.getArray(StoreKey.accountService.removedMessages) ?? []
         }
     }
     
@@ -117,11 +117,11 @@ class AdamantChatsProvider: ChatsProvider {
             
             if state {
                 if let blackList = self?.blackList {
-                    self?.securedStore.set(blackList, for: "blackList")
+                    self?.securedStore.set(blackList, for: StoreKey.accountService.blackList)
                 }
                 
                 if let removedMessages = self?.removedMessages {
-                    self?.securedStore.set(removedMessages, for: "removedMessages")
+                    self?.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
                 }
             }
         }
@@ -1450,7 +1450,7 @@ extension AdamantChatsProvider {
             self.blackList.append(address)
             
             if self.accountService.hasStayInAccount {
-                self.securedStore.set(blackList, for: "blackList")
+                self.securedStore.set(blackList, for: StoreKey.accountService.blackList)
             }
         }
     }
@@ -1460,7 +1460,7 @@ extension AdamantChatsProvider {
             self.removedMessages.append(id)
             
             if self.accountService.hasStayInAccount {
-                self.securedStore.set(removedMessages, for: "removedMessages")
+                self.securedStore.set(removedMessages, for: StoreKey.accountService.removedMessages)
             }
         }
     }

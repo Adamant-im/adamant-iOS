@@ -190,4 +190,7 @@ protocol AccountService: AnyObject {
     
     /// If we have stored data with pin, validate it. If no data saved, always returns false.
     func validatePin(_ pin: String) -> Bool
+    
+    /// Device token for push notifications
+    func setPushNotificationsToken(_ token: Data)
 }

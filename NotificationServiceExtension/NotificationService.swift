@@ -90,7 +90,7 @@ class NotificationService: UNNotificationServiceExtension {
             partnerPublicKey = transaction.senderPublicKey
         }
         
-        let blackList = securedStore.getArray("blackList") ?? []
+        let blackList = securedStore.getArray(StoreKey.accountService.blackList) ?? []
         if blackList.contains(partnerAddress) {
             return
         }
