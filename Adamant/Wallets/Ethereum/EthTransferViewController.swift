@@ -62,32 +62,22 @@ class EthTransferViewController: TransferViewControllerBase {
                     switch result {
                     case .success(let hash):
                         service.update()
-                        service.getTransaction(by: hash) { result in
-                            switch result {
-                            case .success(let transaction):
-                                vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
-                                
-                                if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController {
-                                    detailsVc.transaction = transaction
-                                    detailsVc.service = service
-                                    detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
-                                    detailsVc.recipientName = self?.recipientName
-                                    
-                                    if comments.count > 0 {
-                                        detailsVc.comment = comments
-                                    }
-                                    
-                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
-                                } else {
-                                    vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
-                                }
-                                
-                            case .failure(let error):
-                                vc.dialogService.showRichError(error: error)
-                                vc.delegate?.transferViewController(vc, didFinishWithTransfer: nil, detailsViewController: nil)
+                        vc.dialogService.showSuccess(withMessage: String.adamantLocalized.transfer.transferSuccess)
+                        let transaction = SimpleTransactionDetails(txId: hash, senderAddress: transaction.sender?.address ?? "", recipientAddress: recipient, isOutgoing: true)
+                        if let detailsVc = vc.router.get(scene: AdamantScene.Wallets.Ethereum.transactionDetails) as? EthTransactionDetailsViewController {
+                            detailsVc.transaction = transaction
+                            detailsVc.service = service
+                            detailsVc.senderName = String.adamantLocalized.transactionDetails.yourAddress
+                            detailsVc.recipientName = self?.recipientName
+                            
+                            if comments.count > 0 {
+                                detailsVc.comment = comments
                             }
+                            
+                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: detailsVc)
+                        } else {
+                            vc.delegate?.transferViewController(vc, didFinishWithTransfer: transaction, detailsViewController: nil)
                         }
-                        
                     case .failure(let error):
                         vc.dialogService.showRichError(error: error)
                     }
