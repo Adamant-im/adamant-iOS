@@ -3154,15 +3154,8 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = MessageNotificationContentExtension/Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-<<<<<<< HEAD
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 228;
-=======
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 231;
->>>>>>> develop
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3337,15 +3330,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Adamant/Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-<<<<<<< HEAD
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 228;
-=======
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 231;
->>>>>>> develop
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = Adamant;
 				EXCLUDED_SOURCE_FILE_NAMES = Debug.xcassets;
@@ -3401,15 +3387,8 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = TransferNotificationContentExtension/Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-<<<<<<< HEAD
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 228;
-=======
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 231;
->>>>>>> develop
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3467,15 +3446,8 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-<<<<<<< HEAD
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 228;
-=======
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 231;
->>>>>>> develop
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
