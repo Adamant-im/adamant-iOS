@@ -15,6 +15,7 @@ extension AdamantScene.Wallets {
             let c = ERC20WalletViewController(nibName: "WalletViewControllerBase", bundle: nil)
             c.dialogService = r.resolve(DialogService.self)
             c.currencyInfoService = r.resolve(CurrencyInfoService.self)
+            c.accountService = r.resolve(AccountService.self)
             return c
         }
         

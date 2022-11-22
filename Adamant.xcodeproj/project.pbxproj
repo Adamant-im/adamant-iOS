@@ -15,6 +15,11 @@
 		3AE89DDB2837F5D30051D3A9 /* ChatRoomsChats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE89DDA2837F5D30051D3A9 /* ChatRoomsChats.swift */; };
 		3C06931576393125C61FB8F6 /* Pods_Adamant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33975C0D891698AA7E74EBCC /* Pods_Adamant.framework */; };
 		412C0ED929124A3400DE2C5E /* dash_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = 412C0ED829124A3400DE2C5E /* dash_notificationContent.png */; };
+		415441372923AB3700824478 /* BtcProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 415441362923AB3700824478 /* BtcProvider.swift */; };
+		415441382923AB3700824478 /* BtcProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 415441362923AB3700824478 /* BtcProvider.swift */; };
+		415441392923AB3700824478 /* BtcProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 415441362923AB3700824478 /* BtcProvider.swift */; };
+		4154413B2923AED000824478 /* btc_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = 4154413A2923AED000824478 /* btc_notificationContent.png */; };
+		4154413C2923AED000824478 /* btc_notificationContent.png in Resources */ = {isa = PBXBuildFile; fileRef = 4154413A2923AED000824478 /* btc_notificationContent.png */; };
 		4164A9D728F17D4000EEF16D /* ChatTransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4164A9D628F17D4000EEF16D /* ChatTransactionService.swift */; };
 		4164A9D928F17DA700EEF16D /* AdamantChatTransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */; };
 		416F5EA4290162EB00EF0400 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 416F5EA3290162EB00EF0400 /* SocketIO */; };
@@ -659,6 +664,8 @@
 		3AE89DD82837F5BF0051D3A9 /* ChatRooms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRooms.swift; sourceTree = "<group>"; };
 		3AE89DDA2837F5D30051D3A9 /* ChatRoomsChats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRoomsChats.swift; sourceTree = "<group>"; };
 		412C0ED829124A3400DE2C5E /* dash_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dash_notificationContent.png; sourceTree = "<group>"; };
+		415441362923AB3700824478 /* BtcProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcProvider.swift; sourceTree = "<group>"; };
+		4154413A2923AED000824478 /* btc_notificationContent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = btc_notificationContent.png; sourceTree = "<group>"; };
 		4164A9D628F17D4000EEF16D /* ChatTransactionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTransactionService.swift; sourceTree = "<group>"; };
 		4164A9D828F17DA700EEF16D /* AdamantChatTransactionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdamantChatTransactionService.swift; sourceTree = "<group>"; };
 		417BA7F328BF894F00DF94C5 /* NotificationSoundsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSoundsViewController.swift; sourceTree = "<group>"; };
@@ -1686,6 +1693,7 @@
 				E957E106229AF7CB0019732A /* eth_notificationContent.png */,
 				E957E105229AF7CA0019732A /* lsk_notificationContent.png */,
 				412C0ED829124A3400DE2C5E /* dash_notificationContent.png */,
+				4154413A2923AED000824478 /* btc_notificationContent.png */,
 			);
 			path = WalletImages;
 			sourceTree = "<group>";
@@ -1719,6 +1727,7 @@
 				E957E100229AC2050019732A /* EthProvider.swift */,
 				64E3D52424B258F800660641 /* ERC20Provider.swift */,
 				E957E0FE229AC1C80019732A /* LskProvider.swift */,
+				415441362923AB3700824478 /* BtcProvider.swift */,
 				E957E0F622999BD50019732A /* TransferBaseProvider.swift */,
 			);
 			path = RichMessageProviders;
@@ -2417,6 +2426,7 @@
 			files = (
 				E957E135229B10F80019732A /* MainInterface.storyboard in Resources */,
 				E9D664D722A00E2800733F8A /* notificationContent.strings in Resources */,
+				4154413C2923AED000824478 /* btc_notificationContent.png in Resources */,
 				E957E172229C56EE0019732A /* Shared.xcassets in Resources */,
 				E9D664CA22A003D900733F8A /* Warning.xib in Resources */,
 			);
@@ -2426,6 +2436,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4154413B2923AED000824478 /* btc_notificationContent.png in Resources */,
 				E957E107229AF7CB0019732A /* adm_notificationContent.png in Resources */,
 				E957E108229AF7CB0019732A /* doge_notificationContent.png in Resources */,
 				E957E10A229AF7CB0019732A /* eth_notificationContent.png in Resources */,
@@ -2644,6 +2655,7 @@
 				E9B3D39A201F90570019EB36 /* AccountsProvider.swift in Sources */,
 				417BA7F428BF894F00DF94C5 /* NotificationSoundsViewController.swift in Sources */,
 				E950652320404C84008352E5 /* AdamantUriTools.swift in Sources */,
+				415441372923AB3700824478 /* BtcProvider.swift in Sources */,
 				E95F85C7200A9B070070534A /* ChatTableViewCell.swift in Sources */,
 				A50A41082822F8CE006BDFE1 /* BtcWalletService.swift in Sources */,
 				6455E9F121075D3600B2E94C /* AddressBookService.swift in Sources */,
@@ -2903,6 +2915,7 @@
 				E957E14E229C3E530019732A /* StateAsset.swift in Sources */,
 				E957E145229C040E0019732A /* AdamantAvatarService.swift in Sources */,
 				E957E149229C3E530019732A /* Keypair.swift in Sources */,
+				415441392923AB3700824478 /* BtcProvider.swift in Sources */,
 				E957E150229C3E530019732A /* Transaction.swift in Sources */,
 				E951467022A697F7007564D7 /* ContactDescription.swift in Sources */,
 				E957E151229C3E530019732A /* TransactionAsset.swift in Sources */,
@@ -2978,6 +2991,7 @@
 				E9EF7A8022A02DBC00F2E1C2 /* AdamantLocalized.swift in Sources */,
 				E9771D9722996FEB0099AAC7 /* TransactionType.swift in Sources */,
 				E957E128229B0CF10019732A /* NotificationContent.swift in Sources */,
+				415441382923AB3700824478 /* BtcProvider.swift in Sources */,
 				E935C84E22AC079D00A8CA2F /* RichMessageTools.swift in Sources */,
 				E957E124229B0C330019732A /* AdamantNotificationKeys.swift in Sources */,
 				64E3D52524B258F800660641 /* ERC20Provider.swift in Sources */,
@@ -3113,7 +3127,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 228;
+				CURRENT_PROJECT_VERSION = 231;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3145,7 +3159,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 228;
+				CURRENT_PROJECT_VERSION = 231;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = MessageNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3296,7 +3310,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 228;
+				CURRENT_PROJECT_VERSION = 231;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = J2L77FMN46;
 				DISPLAY_NAME = ADM.Dev;
@@ -3329,7 +3343,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 228;
+				CURRENT_PROJECT_VERSION = 231;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				DISPLAY_NAME = Adamant;
 				EXCLUDED_SOURCE_FILE_NAMES = Debug.xcassets;
@@ -3360,7 +3374,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 228;
+				CURRENT_PROJECT_VERSION = 231;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3392,7 +3406,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 228;
+				CURRENT_PROJECT_VERSION = 231;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = TransferNotificationContentExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3424,7 +3438,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 228;
+				CURRENT_PROJECT_VERSION = 231;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -3456,7 +3470,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 228;
+				CURRENT_PROJECT_VERSION = 231;
 				DEVELOPMENT_TEAM = J2L77FMN46;
 				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
