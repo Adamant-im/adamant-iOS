@@ -904,6 +904,9 @@
 /* Transfer: Amount is zero, or even negative notification */
 "TransferScene.Error.TooLittleMoney" = "You should send more tokens";
 
+/* Transfer: Not enough fee for send a transaction */
+"TransferScene.Error.TooLittleFee" = "Not enough fee";
+
 /* Transfer: Alert title: Account not found or not initiated. Alert user that he still can send money, but need to double ckeck address */
 "TransferScene.unsafeTransferAlert.title" = "Can't verify %@";
 

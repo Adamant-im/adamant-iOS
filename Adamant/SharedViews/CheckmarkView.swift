@@ -32,6 +32,7 @@ final class CheckmarkView: UIView {
     private lazy var spinner: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .gray)
         view.isHidden = true
+        view.color = .adamant.textColor
         return view
     }()
     

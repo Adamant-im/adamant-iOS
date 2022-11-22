@@ -925,6 +925,9 @@
 /* Transfer: Amount is zero, or even negative notification */
 "TransferScene.Error.TooLittleMoney" = "Sie müssen mehr Tokens senden";
 
+/* Transfer: Not enough fee for send a transaction */
+"TransferScene.Error.TooLittleFee" = "Nicht genug Gebühr";
+
 /* Transfer: Minimal transaction amount is 0.00001 */
 "TransferScene.Error.MinAmount" = "Der Mindesttransaktionsbetrag beträgt 0,00001";
 
