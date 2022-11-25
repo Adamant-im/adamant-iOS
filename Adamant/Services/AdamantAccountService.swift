@@ -14,8 +14,9 @@ class AdamantAccountService: AccountService {
     
     var apiService: ApiService!
     var adamantCore: AdamantCore!
-    weak var notificationsService: NotificationsService!
-    weak var currencyInfoService: CurrencyInfoService!
+    weak var notificationsService: NotificationsService?
+    weak var currencyInfoService: CurrencyInfoService?
+    weak var pushNotificationsTokenService: PushNotificationsTokenService?
     var dialogService: DialogService!
     var securedStore: SecuredStore! {
         didSet {
@@ -236,11 +237,12 @@ extension AdamantAccountService {
         }
         
         _useBiometry = false
+        pushNotificationsTokenService?.removeCurrentToken()
         Key.allCases.forEach(securedStore.remove)
         
         hasStayInAccount = false
         NotificationCenter.default.post(name: Notification.Name.AdamantAccountService.stayInChanged, object: self, userInfo: [AdamantUserInfoKey.AccountService.newStayInState : false])
-        notificationsService.setNotificationsMode(.disabled, completion: nil)
+        notificationsService?.setNotificationsMode(.disabled, completion: nil)
     }
 }
 
@@ -490,97 +492,6 @@ extension AdamantAccountService {
     }
 }
 
-// MARK: - APNS Token
-extension AdamantAccountService {
-    private struct RegistrationPayload: Codable {
-        let token: String
-        
-        #if DEBUG
-            var provider: String = "apns-sandbox"
-        #else
-            var provider: String = "apns"
-        #endif
-    }
-    
-    func setPushNotificationsToken(_ token: Data) {
-        guard let address = account?.address, let keypair = keypair else {
-            assertionFailure("Trying to register with no user logged")
-            return
-        }
-        
-        let token = token.map { String(format: "%02.2hhx", $0) }.joined()
-        
-        // Checking, if device token had not changed
-        let tokenHash = token.md5()
-        
-        if let savedHash = securedStore.get(.pushTokenHash), tokenHash == savedHash {
-            return
-        } else {
-            securedStore.set(tokenHash, for: .pushTokenHash)
-        }
-        
-        guard let encodedPayload = makePayload(token: token, keypair: keypair) else { return }
-        
-        sendTokenToANS(
-            senderId: address,
-            keypair: keypair,
-            message: encodedPayload.message,
-            nonce: encodedPayload.nonce,
-            tokenHash: tokenHash
-        )
-    }
-    
-    private func makePayload(token: String, keypair: Keypair) -> (message: String, nonce: String)? {
-        guard
-            let data = try? JSONEncoder().encode(RegistrationPayload(token: token)),
-            let payload = String(data: data, encoding: String.Encoding.utf8)
-        else {
-            dialogService.showError(withMessage: "Failed to prepare ANS signal payload", error: nil)
-            return nil
-        }
-        
-        guard
-            let payload = String(data: data, encoding: String.Encoding.utf8),
-            let encodedPayload = adamantCore.encodeMessage(
-                payload,
-                recipientPublicKey: AdamantResources.contacts.ansPublicKey, privateKey: keypair.privateKey
-            )
-        else {
-            dialogService.showError(withMessage: "Failed to encode ANS signal. Payload: \(payload)", error: nil)
-            return nil
-        }
-        
-        return encodedPayload
-    }
-    
-    private func sendTokenToANS(
-        senderId: String,
-        keypair: Keypair,
-        message: String,
-        nonce: String,
-        tokenHash: String
-    ) {
-        apiService.sendMessage(
-            senderId: senderId,
-            recipientId: AdamantResources.contacts.ansAddress,
-            keypair: keypair,
-            message: message,
-            type: ChatType.signal,
-            nonce: nonce,
-            amount: nil
-        ) { [weak self] result in
-            switch result {
-            case .success:
-                self?.securedStore.set(tokenHash, for: .pushTokenHash)
-                
-            case .failure(let error):
-                self?.notificationsService.setNotificationsMode(.disabled, completion: nil)
-                self?.dialogService.showRichError(error: error)
-            }
-        }
-    }
-}
-
 private enum Key: CaseIterable {
     case publicKey
     case privateKey
@@ -588,7 +499,6 @@ private enum Key: CaseIterable {
     case useBiometry
     case passphrase
     case showedV12
-    case pushTokenHash
     case blackListKey
     case removedMessages
     
@@ -600,7 +510,6 @@ private enum Key: CaseIterable {
         case .useBiometry: return StoreKey.accountService.useBiometry
         case .passphrase: return StoreKey.accountService.passphrase
         case .showedV12: return StoreKey.accountService.showedV12
-        case .pushTokenHash: return StoreKey.accountService.pushTokenHash
         case .blackListKey: return StoreKey.accountService.blackList
         case .removedMessages: return StoreKey.accountService.removedMessages
         }

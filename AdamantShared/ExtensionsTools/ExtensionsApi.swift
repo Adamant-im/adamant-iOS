@@ -15,17 +15,7 @@ class ExtensionsApi {
     let keychainStore: KeychainStore
     
     private(set) lazy var nodes: [Node] = {
-        let nodes: [Node]
-        if let raw = keychainStore.get(nodesStoreKey), let data = raw.data(using: String.Encoding.utf8) {
-            do {
-                nodes = try JSONDecoder().decode([Node].self, from: data)
-            } catch {
-                nodes = AdamantResources.nodes
-            }
-        } else {
-            nodes = AdamantResources.nodes
-        }
-        
+        let nodes = keychainStore.get(nodesStoreKey) ?? AdamantResources.nodes
         return nodes.getAllowedNodes(sortedBySpeedDescending: true, needWS: false).reversed()
     }()
     

@@ -71,7 +71,11 @@ class DashWalletService: WalletService {
     
     internal var lastTransactionId: String? {
         get {
-            guard let hash = self.securedStore.get("lastDashTransactionId"), let timestampString = self.securedStore.get("lastDashTransactionTime"), let timestamp = Double(string: timestampString) else { return nil }
+            guard
+                let hash: String = self.securedStore.get("lastDashTransactionId"),
+                let timestampString: String = self.securedStore.get("lastDashTransactionTime"),
+                let timestamp = Double(string: timestampString)
+            else { return nil }
             
             let date = Date(timeIntervalSince1970: TimeInterval(timestamp))
             let timeAgo = -1 * date.timeIntervalSinceNow

@@ -29,45 +29,28 @@ extension AdamantApiService {
             parameters: params,
             encoding: .json,
             headers: headers
-        ) { (serverResponse: ApiServiceResult<ServerModelResponse<NormalizedTransaction>>) in
+        ) { [weak self] (serverResponse: ApiServiceResult<ServerModelResponse<NormalizedTransaction>>) in
             switch serverResponse {
             case .success(let response):
-                guard let normalizedTransaction = response.model else {
+                guard let self = self, let normalizedTransaction = response.model else {
                     let error = AdamantApiService.translateServerError(response.error)
                     completion(.failure(error))
                     return
                 }
                 
-                // MARK: 3.1. Sign transaction
-                guard let signature = self.adamantCore.sign(transaction: normalizedTransaction, senderId: sender, keypair: keypair) else {
+                guard let transaction = self.adamantCore.makeSignedTransaction(
+                    transaction: normalizedTransaction,
+                    senderId: sender,
+                    keypair: keypair
+                ) else {
                     completion(.failure(InternalError.signTransactionFailed.apiServiceErrorWith(error: nil)))
                     return
                 }
                 
-                // MARK: 3.2. Create transaction
-                let transaction: [String: Any] = [
-                    "type": normalizedTransaction.type.rawValue,
-                    "amount": (normalizedTransaction.amount.shiftedToAdamant() as NSDecimalNumber).uint64Value,
-                    "senderPublicKey": normalizedTransaction.senderPublicKey,
-                    "requesterPublicKey": normalizedTransaction.requesterPublicKey ?? NSNull(),
-                    "timestamp": normalizedTransaction.timestamp,
-                    "recipientId": normalizedTransaction.recipientId ?? NSNull(),
-                    "senderId": sender,
-                    "signature": signature
-                ]
-                
-                let params: [String: Any] = [
-                    "transaction": transaction
-                ]
-                
-                // MARK: 4. Send
-                self.sendRequest(
+                self.sendTransaction(
                     path: ApiCommands.Transactions.processTransaction,
-                    method: .post,
-                    parameters: params,
-                    encoding: .json,
-                    headers: headers
-                ) { (response: ApiServiceResult<TransactionIdResponse>) in
+                    transaction: transaction
+                ) { response in
                     switch response {
                     case .success(let result):
                         if let id = result.transactionId {

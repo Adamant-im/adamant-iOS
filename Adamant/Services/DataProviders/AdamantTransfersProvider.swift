@@ -77,8 +77,8 @@ class AdamantTransfersProvider: TransfersProvider {
                 return
             }
             
-            if let savedAddress = store.get(StoreKey.transfersProvider.address), savedAddress == loggedAddress {
-                if let raw = store.get(StoreKey.transfersProvider.readedLastHeight), let h = Int64(raw) {
+            if let savedAddress: String = store.get(StoreKey.transfersProvider.address), savedAddress == loggedAddress {
+                if let raw: String = store.get(StoreKey.transfersProvider.readedLastHeight), let h = Int64(raw) {
                     self?.readedLastHeight = h
                 }
             } else {
@@ -169,7 +169,10 @@ extension AdamantTransfersProvider {
                 if let store = self?.securedStore {
                     // Received
                     if let h = self?.receivedLastHeight {
-                        if let raw = store.get(StoreKey.transfersProvider.receivedLastHeight), let prev = Int64(raw) {
+                        if
+                            let raw: String = store.get(StoreKey.transfersProvider.receivedLastHeight),
+                            let prev = Int64(raw)
+                        {
                             if h > prev {
                                 store.set(String(h), for: StoreKey.transfersProvider.receivedLastHeight)
                             }
@@ -180,7 +183,10 @@ extension AdamantTransfersProvider {
                     
                     // Readed
                     if let h = self?.readedLastHeight {
-                        if let raw = store.get(StoreKey.transfersProvider.readedLastHeight), let prev = Int64(raw) {
+                        if
+                            let raw: String = store.get(StoreKey.transfersProvider.readedLastHeight),
+                            let prev = Int64(raw)
+                        {
                             if h > prev {
                                 store.set(String(h), for: StoreKey.transfersProvider.readedLastHeight)
                             }

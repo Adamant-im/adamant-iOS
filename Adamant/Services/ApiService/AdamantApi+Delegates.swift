@@ -202,45 +202,26 @@ extension AdamantApiService {
         let votesAsset = VotesAsset(votes: votesOrdered)
         
         // MARK: 1. Create and sign transaction
-        let asset = TransactionAsset(votes: votesAsset)
-        let transaction = NormalizedTransaction(type: .vote,
-                                                amount: 0,
-                                                senderPublicKey: keypair.publicKey,
-                                                requesterPublicKey: nil,
-                                                date: Date(),
-                                                recipientId: address,
-                                                asset: asset)
-        guard let signature = adamantCore.sign(transaction: transaction, senderId: address, keypair: keypair) else {
+        let transaction = NormalizedTransaction(
+            type: .vote,
+            amount: 0,
+            senderPublicKey: keypair.publicKey,
+            requesterPublicKey: nil,
+            date: Date(),
+            recipientId: address,
+            asset: TransactionAsset(votes: votesAsset)
+        )
+        
+        guard let transaction = adamantCore.makeSignedTransaction(
+            transaction: transaction,
+            senderId: address,
+            keypair: keypair
+        ) else {
             completion(.failure(.internalError(message: "Failed to sign transaction", error: nil)))
             return
         }
         
-        // MARK: 2. Prepare params
-        let params: [String: Any] = [
-            "type": transaction.type.rawValue,
-            "amount": 0,
-            "senderPublicKey": transaction.senderPublicKey,
-            "senderId": transaction.recipientId ?? NSNull(),
-            "timestamp": transaction.timestamp,
-            "signature": signature,
-            "recipientId": transaction.recipientId ?? NSNull(),
-            "asset": [
-                "votes": votesAsset.votes
-            ]
-        ]
-        
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
-        // MARK: 3. Send
-        sendRequest(
-            path: ApiCommands.Delegates.votes,
-            method: .post,
-            parameters: params,
-            encoding: .json,
-            headers: headers
-        ) { (serverResponse: ApiServiceResult<ServerResponse>) in
+        sendTransaction(path: ApiCommands.Delegates.votes, transaction: transaction) { [weak self] serverResponse in
             switch serverResponse {
             case .success(let response):
                 if response.success {
@@ -253,10 +234,9 @@ extension AdamantApiService {
                 completion(.failure(.networkError(error: error)))
             }
             
-            do {
-                UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
-                self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
-            }
+            guard let self = self else { return }
+            UIApplication.shared.endBackgroundTask(self.sendingMsgTaskId)
+            self.sendingMsgTaskId = UIBackgroundTaskIdentifier.invalid
         }
     }
     

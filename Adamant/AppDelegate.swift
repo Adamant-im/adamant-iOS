@@ -46,6 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var notificationService: NotificationsService!
     var dialogService: DialogService!
     var addressBookService: AddressBookService!
+    var pushNotificationsTokenService: PushNotificationsTokenService!
 
     // MARK: - Lifecycle
     
@@ -60,6 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         notificationService = container.resolve(NotificationsService.self)
         dialogService = container.resolve(DialogService.self)
         addressBookService = container.resolve(AddressBookService.self)
+        pushNotificationsTokenService = container.resolve(PushNotificationsTokenService.self)
         
         // MARK: 1.1. First run flag
         let firstRun = UserDefaults.standard.bool(forKey: StoreKey.application.firstRun)
@@ -230,6 +232,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // MARK: 7. Welcome messages
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: nil, queue: OperationQueue.main, using: handleWelcomeMessages)
         
+        // MARK: 8. Remove obsolete APNS tokens
+        pushNotificationsTokenService.sendTokenDeletionTransactions()
+        
         return true
     }
     
@@ -264,7 +269,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
-        accountService.setPushNotificationsToken(deviceToken)
+        pushNotificationsTokenService.setToken(deviceToken)
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {

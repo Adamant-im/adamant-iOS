@@ -21,8 +21,8 @@ class AdamantChatsProvider: ChatsProvider {
     var transactionService: ChatTransactionService!
     var securedStore: SecuredStore! {
         didSet {
-            self.blackList = self.securedStore.getArray(StoreKey.accountService.blackList) ?? []
-            self.removedMessages = self.securedStore.getArray(StoreKey.accountService.removedMessages) ?? []
+            self.blackList = self.securedStore.get(StoreKey.accountService.blackList) ?? []
+            self.removedMessages = self.securedStore.get(StoreKey.accountService.removedMessages) ?? []
         }
     }
     
@@ -82,8 +82,8 @@ class AdamantChatsProvider: ChatsProvider {
                 return
             }
             
-            if let savedAddress = store.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
-                if let raw = store.get(StoreKey.chatProvider.readedLastHeight), let h = Int64(raw) {
+            if let savedAddress: String = store.get(StoreKey.chatProvider.address), savedAddress == loggedAddress {
+                if let raw: String = store.get(StoreKey.chatProvider.readedLastHeight), let h = Int64(raw) {
                     self?.readedLastHeight = h
                 }
             } else {
@@ -916,53 +916,35 @@ extension AdamantChatsProvider {
             return
         }
         
-        // MARK: 2. Create transaction and sign it
-        let date: Date
-        if let delta = apiService.lastRequestTimeDelta {
-            date = Date().addingTimeInterval(-delta)
-        } else {
-            date = Date()
-        }
-        
-        let normalizedTransaction = NormalizedTransaction(type: .chatMessage,
-                                                          amount: 0,
-                                                          senderPublicKey: keypair.publicKey,
-                                                          requesterPublicKey: nil,
-                                                          date: date,
-                                                          recipientId: recipientId,
-                                                          asset: TransactionAsset(
-                                                            chat: ChatAsset(
-                                                                message: encodedMessage.message,
-                                                                ownMessage: encodedMessage.nonce,
-                                                                type: type
-                                                            ),
-                                                            state: nil,
-                                                            votes: nil
-                                                          )
-        )
-        
-        guard let signature = adamantCore.sign(transaction: normalizedTransaction, senderId: senderId, keypair: keypair) else {
-            let error = AdamantApiService.InternalError.signTransactionFailed.apiServiceErrorWith(error: nil)
-            completion(.failure(ChatsProviderError.internalError(AdamantError(message: error.message, error: error))))
-            return
-        }
-        unconfirmedTransactionsBySignature.append(signature)
-        
         // MARK: 3. Send
-        apiService.sendMessage(senderId: senderId, recipientId: recipientId, keypair: keypair, message: encodedMessage.message, type: type, nonce: encodedMessage.nonce, amount: nil) { result in
+        var signedTransaction: UnregisteredTransaction?
+        signedTransaction = apiService.sendMessage(
+            senderId: senderId,
+            recipientId: recipientId,
+            keypair: keypair,
+            message: encodedMessage.message,
+            type: type,
+            nonce: encodedMessage.nonce,
+            amount: nil
+        ) { [weak self] result in
             switch result {
             case .success(let id):
                 // Update ID with recieved, add to unconfirmed transactions.
                 transaction.transactionId = String(id)
                 
-                self.unconfirmedsSemaphore.wait()
-                if let index = self.unconfirmedTransactionsBySignature.firstIndex(of: signature) {
-                    self.unconfirmedTransactionsBySignature.remove(at: index)
+                self?.unconfirmedsSemaphore.wait()
+                if
+                    let signedTransaction = signedTransaction,
+                    let index = self?.unconfirmedTransactionsBySignature.firstIndex(
+                        of: signedTransaction.signature
+                    )
+                {
+                    self?.unconfirmedTransactionsBySignature.remove(at: index)
                 }
                 DispatchQueue.main.sync {
-                    self.unconfirmedTransactions[id] = transaction.objectID
+                    self?.unconfirmedTransactions[id] = transaction.objectID
                 }
-                self.unconfirmedsSemaphore.signal()
+                self?.unconfirmedsSemaphore.signal()
                 
                 completion(.success(transaction: transaction))
                 
@@ -983,8 +965,8 @@ extension AdamantChatsProvider {
                 case .serverError(let e):
                     serviceError = .serverError(AdamantError(message: e))
                     
-                case .internalError(let message, let e):
-                    serviceError = ChatsProviderError.internalError(AdamantError(message: message, error: e))
+                case .internalError(let message, _):
+                    serviceError = ChatsProviderError.internalError(AdamantError(message: message))
                     
                 case .requestCancelled:
                     serviceError = .requestCancelled
@@ -993,6 +975,8 @@ extension AdamantChatsProvider {
                 completion(.failure(serviceError))
             }
         }
+        
+        signedTransaction.map { unconfirmedTransactionsBySignature.append($0.signature) }
     }
 }
 

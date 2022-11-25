@@ -56,7 +56,7 @@ class NotificationService: UNNotificationServiceExtension {
         let core = NativeAdamantCore()
         let api = ExtensionsApi(keychainStore: securedStore)
         
-        if let sound = securedStore.get(StoreKey.notificationsService.notificationsSound) {
+        if let sound: String = securedStore.get(StoreKey.notificationsService.notificationsSound) {
             if sound.isEmpty {
                 bestAttemptContent.sound = nil
             } else {
@@ -65,11 +65,11 @@ class NotificationService: UNNotificationServiceExtension {
         }
         
         // No passphrase - no point of trying to get and decode
-        guard let passphrase = securedStore.get(passphraseStoreKey),
-            let keypair = core.createKeypairFor(passphrase: passphrase) else {
-                contentHandler(bestAttemptContent)
-                return
-        }
+        guard
+            let passphrase: String = securedStore.get(passphraseStoreKey),
+            let keypair = core.createKeypairFor(passphrase: passphrase),
+            AdamantUtilities.generateAddress(publicKey: keypair.publicKey) == pushRecipient
+        else { return }
         
         // MARK: 2. Get transaction
         guard let transaction = api.getTransaction(by: id) else {
@@ -91,7 +91,7 @@ class NotificationService: UNNotificationServiceExtension {
             partnerPublicKey = transaction.senderPublicKey
         }
         
-        let blackList = securedStore.getArray(StoreKey.accountService.blackList) ?? []
+        let blackList: [String] = securedStore.get(StoreKey.accountService.blackList) ?? []
         if blackList.contains(partnerAddress) {
             return
         }

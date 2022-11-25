@@ -98,7 +98,7 @@ enum AccountServiceError: Error {
             return NSLocalizedString("AccountServiceError.WrongPassphrase", comment: "Login: user typed in wrong passphrase")
         
         case .apiError(let error):
-            return error.localized
+            return error.localizedDescription
         
         case .internalError(let message, _):
             return String.adamantLocalized.sharedErrors.internalError(message: message)
@@ -190,7 +190,4 @@ protocol AccountService: AnyObject {
     
     /// If we have stored data with pin, validate it. If no data saved, always returns false.
     func validatePin(_ pin: String) -> Bool
-    
-    /// Device token for push notifications
-    func setPushNotificationsToken(_ token: Data)
 }

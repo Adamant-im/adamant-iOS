@@ -33,7 +33,8 @@ enum AccountsProviderResult {
             return String.adamantLocalized.sharedErrors.accountNotInitiated
             
         case .serverError(let error):
-            return ApiServiceError.serverError(error: error.localizedDescription).localized
+            return ApiServiceError.serverError(error: error.localizedDescription)
+                .localizedDescription
             
         case .networkError:
             return String.adamantLocalized.sharedErrors.networkError
