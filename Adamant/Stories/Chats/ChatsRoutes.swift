@@ -41,6 +41,7 @@ extension AdamantScene {
             c.addressBookService = r.resolve(AddressBookService.self)
             c.stack = r.resolve(CoreDataStack.self)
             c.securedStore = r.resolve(SecuredStore.self)
+            c.accountsProvider = r.resolve(AccountsProvider.self)
             
             // MARK: RichMessage handlers
             // Transfer handlers from accountService' wallet services

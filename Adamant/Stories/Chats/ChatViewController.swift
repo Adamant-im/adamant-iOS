@@ -61,6 +61,7 @@ class ChatViewController: MessagesViewController {
     var addressBookService: AddressBookService!
     var stack: CoreDataStack!
     var securedStore: SecuredStore!
+    var accountsProvider: AccountsProvider!
     
     // MARK: Properties
     weak var delegate: ChatViewControllerDelegate?

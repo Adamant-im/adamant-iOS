@@ -204,6 +204,26 @@ extension AdamantDialogService {
 
 // MAKR: - Activity controllers
 extension AdamantDialogService {
+    func presentShareAlertFor(adm: String, types: [AddressChatShareType], animated: Bool, from: UIView?, completion: (() -> Void)?, didSelect: ((AddressChatShareType) -> Void)?) {
+        let alert = UIAlertController(title: adm, message: nil, preferredStyle: .actionSheet)
+        
+        for type in types {
+            alert.addAction(UIAlertAction(title: type.localized + adm, style: .default) { _ in
+                didSelect?(type)
+            })
+        }
+        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        
+        if let sourceView = from {
+            alert.popoverPresentationController?.sourceView = sourceView
+            alert.popoverPresentationController?.sourceRect = sourceView.bounds
+            alert.popoverPresentationController?.canOverlapSourceViewRect = false
+        }
+        
+        alert.modalPresentationStyle = .overFullScreen
+        present(alert, animated: animated, completion: completion)
+    }
+    
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?) {
         let source: ViewSource?
         if let from = from {

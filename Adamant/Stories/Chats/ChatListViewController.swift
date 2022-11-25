@@ -249,6 +249,20 @@ class ChatListViewController: UIViewController {
         return vc
     }
     
+    func presentChatViewController(for chatroom: Chatroom) {
+        let vc = chatViewController(for: chatroom)
+        
+        if let split = self.splitViewController {
+            let chat = UINavigationController(rootViewController:vc)
+            split.showDetailViewController(chat, sender: self)
+        } else if let nav = navigationController {
+            nav.pushViewController(vc, animated: true)
+        } else {
+            vc.modalPresentationStyle = .overFullScreen
+            present(vc, animated: true)
+        }
+    }
+    
     /// - Parameter provider: nil to drop controllers and reset table
     private func initFetchedRequestControllers(provider: ChatsProvider?) {
         guard let provider = provider else {
@@ -392,17 +406,7 @@ extension ChatListViewController: UITableViewDelegate, UITableViewDataSource {
         }
         let nIndexPath = isBusy && indexPath.row >= (lastSystemChatPositionRow ?? 0) ? IndexPath(row: indexPath.row - 1, section: 0) : indexPath
         if let chatroom = chatsController?.object(at: nIndexPath) {
-            let vc = chatViewController(for: chatroom)
-            
-            if let split = self.splitViewController {
-                let chat = UINavigationController(rootViewController:vc)
-                split.showDetailViewController(chat, sender: self)
-            } else if let nav = navigationController {
-                nav.pushViewController(vc, animated: true)
-            } else {
-                vc.modalPresentationStyle = .overFullScreen
-                present(vc, animated: true)
-            }
+            presentChatViewController(for: chatroom)
         }
     }
 }

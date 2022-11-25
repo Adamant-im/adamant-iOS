@@ -393,6 +393,13 @@ extension ChatViewController: MessageCellDelegate {
     }
     
     func didSelectURL(_ url: URL) {
+        if url.scheme == "adm" {
+            guard let adm = url.absoluteString.getLegacyAdamantAddress() else {
+                return
+            }
+            didSelectAdmAddress(adm)
+            return
+        }
         if url.absoluteString.starts(with: "http") {
             let safari = SFSafariViewController(url: url)
             safari.preferredControlTintColor = UIColor.adamant.primary
@@ -585,7 +592,25 @@ extension ChatViewController: MessagesLayoutDelegate {
 
 // MARK: - MessageInputBarDelegate
 extension ChatViewController: MessageInputBarDelegate {
-    private static let markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: UIFont.systemFontSize))
+    static let markdownParser = MarkdownParser(font: UIFont.adamantChatDefault,
+                                               color: UIColor.adamant.primary,
+                                               enabledElements: [
+                                                .header,
+                                                .list,
+                                                .quote,
+                                                .bold,
+                                                .italic,
+                                                .code,
+                                                .strikethrough
+                                               ],
+                                               customElements: [
+                                                MarkdownAdvancedAdm(
+                                                    font: UIFont.adamantChatDefault,
+                                                    color: UIColor.adamant.active
+                                                ),
+                                                MarkdownSimpleAdm()
+                                               ]
+    )
     
     func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
         let parsedText = ChatViewController.markdownParser.parse(text)
@@ -717,12 +742,8 @@ extension MessageTransaction: MessageType {
             return MessageKind.text("")
         }
         
-        if isMarkdown {
-            let markdown = MessageTransaction.markdownParser.parse(message)
-            return MessageKind.attributedText(markdown)
-        } else {
-            return MessageKind.text(message)
-        }
+        let markdown = MessageTransaction.markdownParser.parse(message)
+        return MessageKind.attributedText(markdown)
     }
     
     public var messageStatus: MessageStatus {
@@ -730,10 +751,7 @@ extension MessageTransaction: MessageType {
     }
     
     private static let markdownParser: MarkdownParser = {
-        let parser = MarkdownParser(font: UIFont.adamantChatDefault,
-                                    color: UIColor.adamant.primary,
-                                    enabledElements: .disabledAutomaticLink)
-        return parser
+        return ChatViewController.markdownParser
     }()
 }
 
@@ -773,5 +791,144 @@ extension TransferTransaction: MessageType {
                                                       amount: amount as Decimal? ?? 0,
                                                       hash: "",
                                                       comments: comment ?? ""))
+    }
+}
+
+// MARK: ADM Address selection
+extension ChatViewController {
+    private func didSelectAdmAddress(_ adm: AdamantAddress) {
+        let shareTypes: [AddressChatShareType] = adm.address == chatroom?.partner?.address ? [.send] : [.chat, .send]
+        dialogService.presentShareAlertFor(adm: adm.address, types: shareTypes, animated: true, from: self.view, completion: nil) { [weak self] action in
+            guard let self = self else { return }
+            DispatchQueue.onMainAsync {
+                if case .invalid = AdamantUtilities.validateAdamantAddress(address: adm.address) {
+                    self.dialogService.showToastMessage(String.adamantLocalized.newChat.specifyValidAddressMessage)
+                    return
+                }
+                
+                if let loggedAccount = self.account, loggedAccount.address == adm.address {
+                    self.dialogService.showToastMessage(String.adamantLocalized.newChat.loggedUserAddressMessage)
+                    return
+                }
+                
+                guard let room = self.chatsProvider.getChatroom(for: adm.address),
+                      let partner = room.partner
+                else {
+                    self.findAccount(with: adm.address, name: adm.name, message: adm.message, action: action)
+                    return
+                }
+                switch action {
+                case .send:
+                    self.sendFunds(to: partner)
+                case .chat:
+                    self.startNewChat(with: room, name: adm.name, message: adm.message)
+                }
+            }
+        }
+    }
+    
+    private func sendFunds(to partner: CoreDataAccount) {
+        guard let vc = router.get(scene: AdamantScene.Chats.complexTransfer) as? ComplexTransferViewController else {
+            return
+        }
+        
+        vc.partner = partner
+        vc.transferDelegate = self
+        
+        let navigator = UINavigationController(rootViewController: vc)
+        navigator.modalPresentationStyle = .overFullScreen
+        self.present(navigator, animated: true, completion: nil)
+    }
+    
+    private func startNewChat(with chatroom: Chatroom, name: String? = nil, message: String? = nil) {
+        guard let split = splitViewController?.viewControllers.first as? UINavigationController,
+              let chatlistVC = split.viewControllers.first as? ChatListViewController
+        else {
+            return
+        }
+        
+        if let account = chatroom.partner,
+           let name = name,
+           account.name == nil {
+            account.name = name
+            
+            if chatroom.title == nil {
+                chatroom.title = name
+            }
+        }
+        
+        let vc = chatlistVC.chatViewController(for: chatroom)
+        if let count = vc.chatroom?.transactions?.count, count == 0 {
+            vc.messageInputBar.inputTextView.becomeFirstResponder()
+        }
+        
+        if let message = message {
+            vc.messageInputBar.inputTextView.text = message
+        }
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    private func findAccount(with address: String, name: String?, message: String?, action: AddressChatShareType) {
+        dialogService.showProgress(withMessage: nil, userInteractionEnable: false)
+      
+        accountsProvider.getAccount(byAddress: address) { result in
+            switch result {
+            case .success(let account):
+                DispatchQueue.main.async {
+                    guard let chatroom = account.chatroom else { return }
+                    
+                    if let name = name, account.name == nil {
+                        account.name = name
+                        
+                        if let chatroom = account.chatroom, chatroom.title == nil {
+                            chatroom.title = name
+                        }
+                    }
+                    
+                    account.chatroom?.isForcedVisible = true
+                    if action == .chat {
+                        self.startNewChat(with: chatroom, message: message)
+                    }
+                    if action == .send {
+                        self.sendFunds(to: account)
+                    }
+                    self.dialogService.dismissProgress()
+                }
+            case .dummy:
+                self.dialogService.dismissProgress()
+                
+                let alert = UIAlertController(title: nil, message: AccountsProviderResult.notInitiated(address: address).localized, preferredStyle: .alert)
+                
+                let faq = UIAlertAction(title: String.adamantLocalized.newChat.whatDoesItMean, style: .default, handler: { [weak self] _ in
+                    guard let url = URL(string: NewChatViewController.faqUrl) else {
+                        return
+                    }
+                    
+                    let safari = SFSafariViewController(url: url)
+                    safari.preferredControlTintColor = UIColor.adamant.primary
+                    safari.modalPresentationStyle = .overFullScreen
+                    self?.present(safari, animated: true, completion: nil)
+                })
+                
+                alert.addAction(faq)
+                alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.ok, style: .cancel, handler: nil))
+                
+                DispatchQueue.main.async {
+                    alert.modalPresentationStyle = .overFullScreen
+                    self.present(alert, animated: true, completion: nil)
+                }
+                
+            case .notFound, .invalidAddress, .notInitiated, .networkError:
+                self.dialogService.showWarning(withMessage: result.localized)
+                
+            case .serverError(let error):
+                if let apiError = error as? ApiServiceError, case .internalError(let message, _) = apiError, message == String.adamantLocalized.sharedErrors.unknownError {
+                    self.dialogService.showWarning(withMessage: AccountsProviderResult.notFound(address: address).localized)
+                    return
+                }
+                
+                self.dialogService.showError(withMessage: result.localized, error: error)
+            }
+        }
     }
 }

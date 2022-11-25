@@ -15,6 +15,20 @@ extension String.adamantLocalized.alert {
     static let saveToPhotolibrary = NSLocalizedString("Shared.SaveToPhotolibrary", comment: "Shared alert 'Save to Photos'. Used with saving images to photolibrary")
 }
 
+enum AddressChatShareType {
+    case chat
+    case send
+    
+    var localized: String {
+        switch self {
+        case .chat:
+            return "Chat with "
+        case .send:
+            return "Send ADM to "
+        }
+    }
+}
+
 enum ShareType {
     case copyToPasteboard
     case share
@@ -117,6 +131,7 @@ protocol DialogService: AnyObject {
     func dismissNotification()
     
     // MARK: - ActivityControllers
+    func presentShareAlertFor(adm: String, types: [AddressChatShareType], animated: Bool, from: UIView?, completion: (() -> Void)?, didSelect: ((AddressChatShareType) -> Void)?)
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?)
     func presentShareAlertFor(stringForPasteboard: String, stringForShare: String, stringForQR: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIView?, completion: (() -> Void)?)
     func presentShareAlertFor(string: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: UIBarButtonItem?, completion: (() -> Void)?)
