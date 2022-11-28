@@ -27,19 +27,13 @@ extension AdamantApiService {
     }
     
     func getDelegates(limit: Int, offset: Int, currentDelegates: [Delegate], completion: @escaping (ApiServiceResult<[Delegate]>) -> Void) {
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         sendRequest(
             path: ApiCommands.Delegates.getDelegates,
             queryItems: [
                 URLQueryItem(name: "limit", value: String(limit)),
                 URLQueryItem(name: "offset", value: String(offset))
             ],
-            method: .get,
-            encoding: .json,
-            headers: headers
+            method: .get
         ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Delegate>>) in
             switch serverResponse {
             case .success(let delegates):
@@ -80,7 +74,6 @@ extension AdamantApiService {
                         })
                         
                         completion(.success(delegatesWithVotes))
-                        break
                     case .failure(let error):
                         completion(.failure(.networkError(error: error)))
                     }
@@ -93,16 +86,10 @@ extension AdamantApiService {
     }
     
     func getForgedByAccount(publicKey: String, completion: @escaping (ApiServiceResult<DelegateForgeDetails>) -> Void) {
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         sendRequest(
             path: ApiCommands.Delegates.getForgedByAccount,
             queryItems: [URLQueryItem(name: "generatorPublicKey", value: publicKey)],
-            method: .get,
-            encoding: .json,
-            headers: headers
+            method: .get
         ) { (serverResponse: ApiServiceResult<DelegateForgeDetails>) in
             switch serverResponse {
             case .success(let details):
@@ -124,8 +111,6 @@ extension AdamantApiService {
                 }
                 completion(.success(forgingTime))
                 
-                break
-                
             case .failure(let error):
                 completion(.failure(.networkError(error: error)))
             }
@@ -133,47 +118,29 @@ extension AdamantApiService {
     }
     
     private func getDelegatesCount(completion: @escaping (ApiServiceResult<DelegatesCountResult>) -> Void) {
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         sendRequest(
             path: ApiCommands.Delegates.getDelegatesCount,
-            method: .get,
-            encoding: .json,
-            headers: headers
+            method: .get
         ) { (serverResponse: ApiServiceResult<DelegatesCountResult>) in
             completion(serverResponse)
         }
     }
     
     private func getNextForgers(completion: @escaping (ApiServiceResult<NextForgersResult>) -> Void) {
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         sendRequest(
             path: ApiCommands.Delegates.getNextForgers,
             queryItems: [URLQueryItem(name: "limit", value: "\(101)")],
-            method: .get,
-            encoding: .json,
-            headers: headers
+            method: .get
         ) { (serverResponse: ApiServiceResult<NextForgersResult>) in
             completion(serverResponse)
         }
     }
     
     func getVotes(for address: String, completion: @escaping (ApiServiceResult<[Delegate]>) -> Void) {
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         sendRequest(
             path: ApiCommands.Delegates.votes,
             queryItems: [URLQueryItem(name: "address", value: address)],
-            method: .get,
-            encoding: .json,
-            headers: headers
+            method: .get
         ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Delegate>>) in
             switch serverResponse {
             case .success(let delegates):
@@ -243,19 +210,13 @@ extension AdamantApiService {
     // MARK: - Private methods
     
     private func getBlocks(completion: @escaping (ApiServiceResult<[Block]>) -> Void) {
-        let headers = [
-            "Content-Type": "application/json"
-        ]
-        
         sendRequest(
             path: ApiCommands.Delegates.getBlocks,
             queryItems: [
                 URLQueryItem(name: "orderBy", value: "height:desc"),
                 URLQueryItem(name: "limit", value: "\(101)")
             ],
-            method: .get,
-            encoding: .json,
-            headers: headers
+            method: .get
         ) { (serverResponse: ApiServiceResult<ServerCollectionResponse<Block>>) in
             switch serverResponse {
             case .success(let blocks):

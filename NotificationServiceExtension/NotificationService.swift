@@ -91,10 +91,8 @@ class NotificationService: UNNotificationServiceExtension {
             partnerPublicKey = transaction.senderPublicKey
         }
         
-        let blackList: [String] = securedStore.get(StoreKey.accountService.blackList) ?? []
-        if blackList.contains(partnerAddress) {
-            return
-        }
+        let contactsBlackList: [String] = securedStore.get(StoreKey.accountService.blackList) ?? []
+        guard !contactsBlackList.contains(partnerAddress) else { return }
         
         // MARK: 4. Address book
         if let addressBook = api.getAddressBook(for: pushRecipient, core: core, keypair: keypair),

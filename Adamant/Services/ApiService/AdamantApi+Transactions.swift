@@ -26,9 +26,7 @@ extension AdamantApiService {
         sendRequest(
             path: path,
             method: .post,
-            parameters: ["transaction": transaction],
-            encoding: .json,
-            headers: ["Content-Type": "application/json"],
+            body: ["transaction": transaction],
             completion: completion
         )
     }

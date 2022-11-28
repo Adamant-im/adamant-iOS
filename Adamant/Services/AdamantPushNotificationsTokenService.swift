@@ -47,7 +47,7 @@ final class AdamantPushNotificationsTokenService: PushNotificationsTokenService 
             return
         }
         
-        removeCurrentToken(keypair: keypair)
+        removeCurrentToken(keypair: keypair, completion: {})
     }
     
     func sendTokenDeletionTransactions() {
@@ -87,14 +87,15 @@ private extension AdamantPushNotificationsTokenService {
             return
         }
         
-        sendMessageToANS(keypair: keypair, encodedPayload: encodedPayload) { [weak self] success in
-            guard success, let self = self else { return }
-            self.removeCurrentToken(keypair: keypair)
-            self.setToken(newToken)
+        removeCurrentToken(keypair: keypair) { [weak self] in
+            self?.sendMessageToANS(keypair: keypair, encodedPayload: encodedPayload) { success in
+                guard success else { return }
+                self?.setToken(newToken)
+            }
         }
     }
     
-    func removeCurrentToken(keypair: Keypair) {
+    func removeCurrentToken(keypair: Keypair, completion: @escaping () -> Void) {
         guard
             let token = getToken(),
             let encodedPayload = makeEncodedPayload(
@@ -102,12 +103,14 @@ private extension AdamantPushNotificationsTokenService {
                 keypair: keypair,
                 action: .remove
             )
-        else { return }
+        else { return completion() }
         
+        setToken(nil)
         var transaction: UnregisteredTransaction?
         transaction = sendMessageToANS(keypair: keypair, encodedPayload: encodedPayload) { [weak self] success in
             guard !success, let self = self, let transaction = transaction else { return }
             self.addTokenDeletionTransaction(transaction)
+            completion()
         }
     }
     
@@ -159,8 +162,12 @@ private extension AdamantPushNotificationsTokenService {
 // MARK: - SecuredStore
 
 private extension AdamantPushNotificationsTokenService {
-    func setToken(_ token: String) {
-        securedStore.set(token, for: StoreKey.PushNotificationsTokenService.token)
+    func setToken(_ token: String?) {
+        if let token = token {
+            securedStore.set(token, for: StoreKey.PushNotificationsTokenService.token)
+        } else {
+            securedStore.remove(StoreKey.PushNotificationsTokenService.token)
+        }
     }
     
     func getToken() -> String? {

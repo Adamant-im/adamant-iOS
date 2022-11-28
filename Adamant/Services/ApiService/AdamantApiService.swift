@@ -9,15 +9,11 @@
 import UIKit
 import Alamofire
 
-class AdamantApiService: ApiService {
+final class AdamantApiService: ApiService {
     // MARK: - Shared constants
     
     struct ApiCommands {
         private init() {}
-    }
-    
-    enum Encoding {
-        case url, json
     }
     
     enum InternalError: Error {
@@ -108,11 +104,6 @@ class AdamantApiService: ApiService {
     
     // MARK: - Tools
     
-    func buildUrl(node: Node, path: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
-        guard let url = node.asURL() else { throw InternalError.endpointBuildFailed }
-        return try buildUrl(url: url, path: path, queryItems: queryItems)
-    }
-    
     func buildUrl(url: URL, path: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
         guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             throw ApiServiceError.internalError(message: "Failed to build URL from \(url)", error: nil)
@@ -124,14 +115,27 @@ class AdamantApiService: ApiService {
         return try components.asURL()
     }
     
-    func sendRequest<T: Decodable>(
+    func sendRequest<Output: Decodable>(
         path: String,
         queryItems: [URLQueryItem]? = nil,
         method: HTTPMethod = .get,
-        parameters: [String: Any]? = nil,
-        encoding: Encoding = .url,
-        headers: [String: String]? = nil,
-        completion: @escaping (ApiServiceResult<T>) -> Void
+        completion: @escaping (ApiServiceResult<Output>) -> Void
+    ) {
+        sendRequest(
+            path: path,
+            queryItems: queryItems,
+            method: method,
+            body: Optional<Bool>.none,
+            completion: completion
+        )
+    }
+    
+    func sendRequest<Body: Encodable, Output: Decodable>(
+        path: String,
+        queryItems: [URLQueryItem]? = nil,
+        method: HTTPMethod = .get,
+        body: Body? = nil,
+        completion: @escaping (ApiServiceResult<Output>) -> Void
     ) {
         guard !currentNodes.isEmpty else {
             let error = InternalError.endpointBuildFailed.apiServiceErrorWith(
@@ -146,9 +150,7 @@ class AdamantApiService: ApiService {
             path: path,
             queryItems: queryItems,
             method: method,
-            parameters: parameters,
-            encoding: encoding,
-            headers: headers,
+            body: body,
             onFailure: { [weak self] node in
                 node.connectionStatus = .offline
                 self?.nodesSource?.nodesUpdate()
@@ -159,99 +161,33 @@ class AdamantApiService: ApiService {
         updateCurrentNodes()
     }
     
-    /// On failure this method doesn't call completion, it just goes to next node. Completion called on success or on last node failure.
-    private func sendSafeRequest<T: Decodable>(
-        nodes: [Node],
-        path: String,
-        queryItems: [URLQueryItem]?,
-        method: HTTPMethod,
-        parameters: [String: Any]?,
-        encoding: Encoding,
-        headers: [String: String]?,
-        onFailure: @escaping (Node) -> Void,
-        completion: @escaping (ApiServiceResult<T>) -> Void
-    ) {
-        guard let node = nodes.first else {
-            completion(.failure(.networkError(error: InternalError.unknownError)))
-            return
-        }
-        
-        let url: URL
-        do {
-            url = try buildUrl(node: node, path: path, queryItems: queryItems)
-        } catch {
-            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
-            completion(.failure(err))
-            return
-        }
-        
-        let completion: (ApiServiceResult<T>) -> Void = { [weak self] result in
-            switch result {
-            case .success:
-                completion(result)
-            case let .failure(error):
-                switch error {
-                case .networkError:
-                    onFailure(node)
-                    var nodes = nodes
-                    nodes.removeFirst()
-                    self?.sendSafeRequest(
-                        nodes: nodes,
-                        path: path,
-                        queryItems: queryItems,
-                        method: method,
-                        parameters: parameters,
-                        encoding: encoding,
-                        headers: headers,
-                        onFailure: onFailure,
-                        completion: completion
-                    )
-                case .accountNotFound, .internalError, .notLogged, .serverError, .requestCancelled:
-                    completion(result)
-                }
-            }
-        }
-        
-        sendRequest(
-            url: url,
-            method: method,
-            parameters: parameters,
-            encoding: encoding,
-            headers: headers,
-            completion: completion
-        )
+    @discardableResult
+    func sendRequest<Output: Decodable>(
+        url: URLConvertible,
+        method: HTTPMethod = .get,
+        completion: @escaping (ApiServiceResult<Output>) -> Void
+    ) -> DataRequest {
+        sendRequest(url: url, method: method, body: Optional<Bool>.none, completion: completion)
     }
     
     @discardableResult
-    func sendRequest<T: Decodable>(
+    func sendRequest<Body: Encodable, Output: Decodable>(
         url: URLConvertible,
         method: HTTPMethod = .get,
-        parameters: [String: Any]? = nil,
-        encoding enc: Encoding = .url,
-        headers: [String: String]? = nil,
-        completion: @escaping (ApiServiceResult<T>) -> Void
+        body: Body? = nil,
+        completion: @escaping (ApiServiceResult<Output>) -> Void
     ) -> DataRequest {
-        let encoding: ParameterEncoding
-        switch enc {
-        case .url:
-            encoding = URLEncoding.default
-        case .json:
-            encoding = JSONEncoding.default
-        }
-        
-        let headers: HTTPHeaders = HTTPHeaders(headers ?? [:])
-        
-        return AF.request(
+        AF.request(
             url,
             method: method,
-            parameters: parameters,
-            encoding: encoding,
-            headers: headers
+            parameters: body?.asDictionary,
+            encoding: JSONEncoding.default,
+            headers: HTTPHeaders(["Content-Type": "application/json"])
         ).responseData(queue: defaultResponseDispatchQueue) { [weak self] response in
             switch response.result {
             case .success(let data):
                 do {
-                    let model: T = try JSONDecoder().decode(T.self, from: data)
+                    let model = try JSONDecoder().decode(Output.self, from: data)
                     
                     if let timestampResponse = model as? ServerResponseWithTimestamp {
                         let nodeDate = AdamantUtilities.decodeAdamant(timestamp: timestampResponse.nodeTimestamp)
@@ -282,6 +218,82 @@ class AdamantApiService: ApiService {
             return .serverError(error: error)
         }
     }
+}
+
+private extension AdamantApiService {
+    /// On failure this method doesn't call completion, it just goes to next node. Completion called on success or on last node failure.
+    private func sendSafeRequest<Body: Encodable, Output: Decodable>(
+        nodes: [Node],
+        path: String,
+        queryItems: [URLQueryItem]?,
+        method: HTTPMethod,
+        body: Body?,
+        onFailure: @escaping (Node) -> Void,
+        completion: @escaping (ApiServiceResult<Output>) -> Void
+    ) {
+        guard let node = nodes.first else {
+            completion(.failure(.networkError(error: InternalError.unknownError)))
+            return
+        }
+        
+        let url: URL
+        do {
+            url = try buildUrl(node: node, path: path, queryItems: queryItems)
+        } catch {
+            let err = InternalError.endpointBuildFailed.apiServiceErrorWith(error: error)
+            completion(.failure(err))
+            return
+        }
+        
+        sendRequest(
+            url: url,
+            method: method,
+            body: body,
+            completion: makeSafeRequestCompletion(
+                nodes: nodes,
+                path: path,
+                queryItems: queryItems,
+                method: method,
+                body: body,
+                onFailure: onFailure,
+                completion: completion
+            )
+        )
+    }
+    
+    private func makeSafeRequestCompletion<Body: Encodable, Output: Decodable>(
+        nodes: [Node],
+        path: String,
+        queryItems: [URLQueryItem]?,
+        method: HTTPMethod,
+        body: Body?,
+        onFailure: @escaping (Node) -> Void,
+        completion: @escaping (ApiServiceResult<Output>) -> Void
+    ) -> (ApiServiceResult<Output>) -> Void {
+        { [weak self] result in
+            switch result {
+            case .success:
+                completion(result)
+            case let .failure(error):
+                switch error {
+                case .networkError:
+                    var nodes = nodes
+                    onFailure(nodes.removeFirst())
+                    self?.sendSafeRequest(
+                        nodes: nodes,
+                        path: path,
+                        queryItems: queryItems,
+                        method: method,
+                        body: body,
+                        onFailure: onFailure,
+                        completion: completion
+                    )
+                case .accountNotFound, .internalError, .notLogged, .serverError, .requestCancelled:
+                    completion(result)
+                }
+            }
+        }
+    }
     
     private func updateCurrentNodes() {
         semaphore.wait()
@@ -295,6 +307,11 @@ class AdamantApiService: ApiService {
             object: self,
             userInfo: nil
         )
+    }
+    
+    private func buildUrl(node: Node, path: String, queryItems: [URLQueryItem]? = nil) throws -> URL {
+        guard let url = node.asURL() else { throw InternalError.endpointBuildFailed }
+        return try buildUrl(url: url, path: path, queryItems: queryItems)
     }
 }
 
