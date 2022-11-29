@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os
 
 final class AdamantPushNotificationsTokenService: PushNotificationsTokenService {
     private let securedStore: SecuredStore
@@ -14,6 +15,8 @@ final class AdamantPushNotificationsTokenService: PushNotificationsTokenService 
     private let adamantCore: AdamantCore
     private let accountService: AccountService
     
+    private let tokenProcessingQueue = DispatchQueue(label: "com.adamant.push-token-processing-queue")
+    private let tokenProcessingSemaphore = DispatchSemaphore(value: 1)
     private let securedStoreSemaphore = DispatchSemaphore(value: 1)
     
     init(
@@ -29,25 +32,15 @@ final class AdamantPushNotificationsTokenService: PushNotificationsTokenService 
     }
     
     func setToken(_ token: Data) {
-        guard let keypair = accountService.keypair else {
-            assertionFailure("Trying to register with no user logged")
-            return
+        tokenProcessingQueue.async { [weak self] in
+            self?._setToken(token)
         }
-        
-        let token = mapToken(token)
-        print("APNS token:", token)
-        
-        guard token != getToken() else { return }
-        updateCurrentToken(newToken: token, keypair: keypair)
     }
     
     func removeCurrentToken() {
-        guard let keypair = accountService.keypair else {
-            assertionFailure("Trying to unregister with no user logged")
-            return
+        tokenProcessingQueue.async { [weak self] in
+            self?._removeCurrentToken()
         }
-        
-        removeCurrentToken(keypair: keypair, completion: {})
     }
     
     func sendTokenDeletionTransactions() {
@@ -78,19 +71,54 @@ private extension AdamantPushNotificationsTokenService {
         #endif
     }
     
-    func mapToken(_ token: Data) -> String {
-        token.map { String(format: "%02.2hhx", $0) }.joined()
+    func _setToken(_ token: Data) {
+        tokenProcessingSemaphore.wait()
+        guard let keypair = accountService.keypair else {
+            assertionFailure("Trying to register with no user logged")
+            tokenProcessingSemaphore.signal()
+            return
+        }
+        
+        let token = mapToken(token)
+        os_log("APNS token: %{public}@", token)
+        
+        guard token != getToken() else {
+            tokenProcessingSemaphore.signal()
+            return
+        }
+        
+        updateCurrentToken(newToken: token, keypair: keypair) { [weak self] in
+            self?.tokenProcessingSemaphore.signal()
+        }
     }
     
-    func updateCurrentToken(newToken: String, keypair: Keypair) {
-        guard let encodedPayload = makeEncodedPayload(token: newToken, keypair: keypair, action: .add) else {
+    func _removeCurrentToken() {
+        tokenProcessingSemaphore.wait()
+        guard let keypair = accountService.keypair else {
+            assertionFailure("Trying to unregister with no user logged")
+            tokenProcessingSemaphore.signal()
             return
         }
         
         removeCurrentToken(keypair: keypair) { [weak self] in
+            self?.tokenProcessingSemaphore.signal()
+        }
+    }
+    
+    func mapToken(_ token: Data) -> String {
+        token.map { String(format: "%02.2hhx", $0) }.joined()
+    }
+    
+    func updateCurrentToken(newToken: String, keypair: Keypair, completion: @escaping () -> Void) {
+        guard let encodedPayload = makeEncodedPayload(token: newToken, keypair: keypair, action: .add) else {
+            return completion()
+        }
+        
+        removeCurrentToken(keypair: keypair) { [weak self] in
             self?.sendMessageToANS(keypair: keypair, encodedPayload: encodedPayload) { success in
+                defer { completion() }
                 guard success else { return }
-                self?.setToken(newToken)
+                self?.setTokenToStorage(newToken)
             }
         }
     }
@@ -105,12 +133,12 @@ private extension AdamantPushNotificationsTokenService {
             )
         else { return completion() }
         
-        setToken(nil)
+        setTokenToStorage(nil)
         var transaction: UnregisteredTransaction?
         transaction = sendMessageToANS(keypair: keypair, encodedPayload: encodedPayload) { [weak self] success in
+            defer { completion() }
             guard !success, let self = self, let transaction = transaction else { return }
             self.addTokenDeletionTransaction(transaction)
-            completion()
         }
     }
     
@@ -162,7 +190,7 @@ private extension AdamantPushNotificationsTokenService {
 // MARK: - SecuredStore
 
 private extension AdamantPushNotificationsTokenService {
-    func setToken(_ token: String?) {
+    func setTokenToStorage(_ token: String?) {
         if let token = token {
             securedStore.set(token, for: StoreKey.PushNotificationsTokenService.token)
         } else {
