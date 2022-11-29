@@ -604,11 +604,12 @@ extension ChatViewController: MessageInputBarDelegate {
                                                 .strikethrough
                                                ],
                                                customElements: [
+                                                MarkdownSimpleAdm(),
+                                                MarkdownLinkAdm(),
                                                 MarkdownAdvancedAdm(
                                                     font: UIFont.adamantChatDefault,
                                                     color: UIColor.adamant.active
-                                                ),
-                                                MarkdownSimpleAdm()
+                                                )
                                                ]
     )
     
@@ -798,7 +799,8 @@ extension TransferTransaction: MessageType {
 extension ChatViewController {
     private func didSelectAdmAddress(_ adm: AdamantAddress) {
         let shareTypes: [AddressChatShareType] = adm.address == chatroom?.partner?.address ? [.send] : [.chat, .send]
-        dialogService.presentShareAlertFor(adm: adm.address, types: shareTypes, animated: true, from: self.view, completion: nil) { [weak self] action in
+        let name = adm.name ?? adm.address
+        dialogService.presentShareAlertFor(adm: adm.address, name: name, types: shareTypes, animated: true, from: self.view, completion: nil) { [weak self] action in
             guard let self = self else { return }
             DispatchQueue.onMainAsync {
                 if case .invalid = AdamantUtilities.validateAdamantAddress(address: adm.address) {

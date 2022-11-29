@@ -23,9 +23,10 @@ class MarkdownSimpleAdm: MarkdownElement {
     }
 
     open func match(_ match: NSTextCheckingResult, attributedString: NSMutableAttributedString) {
-        let attributesColor = [
+        let attributesColor: [NSAttributedString.Key : Any] = [
             NSAttributedString.Key.foregroundColor: UIColor.adamant.active,
-            NSAttributedString.Key.underlineColor: UIColor.adamant.active
+            NSAttributedString.Key.underlineStyle: 0,
+            NSAttributedString.Key.underlineColor: UIColor.clear
         ]
         
         let nsString = (attributedString.string as NSString)
@@ -45,6 +46,19 @@ class MarkdownAdvancedAdm: MarkdownLink {
     
     override var regex: String {
         return MarkdownAdvancedAdm.regex
+    }
+    
+    var attributes: [NSAttributedString.Key: AnyObject] {
+        var attributes = [NSAttributedString.Key: AnyObject]()
+        if let font = font {
+            attributes[NSAttributedString.Key.font] = font
+        }
+        if let color = color {
+            attributes[NSAttributedString.Key.foregroundColor] = UIColor.red
+        }
+        attributes[NSAttributedString.Key.underlineStyle] = 0 as AnyObject
+        attributes[NSAttributedString.Key.underlineColor] = UIColor.clear
+        return attributes
     }
     
     override func match(_ match: NSTextCheckingResult, attributedString: NSMutableAttributedString) {
@@ -99,5 +113,65 @@ class MarkdownAdvancedAdm: MarkdownLink {
         
         formatText(attributedString, range: formatRange, link: linkURLString)
         addAttributes(attributedString, range: formatRange, link: linkURLString)
+    }
+    
+    override func addAttributes(_ attributedString: NSMutableAttributedString, range: NSRange, link: String) {
+        attributedString.addAttributes(attributes, range: range)
+    }
+}
+
+// MARK: Detect link ADM address
+// - ex: https://anydomainOrIP?address=U9821606738809290000&label=John+Doe
+class MarkdownLinkAdm: MarkdownLink {
+    private static let regex = "(?i)\\b((?:https?://|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+(\\?address=U([0-9]{6,20}))[^\\s()<>]+)+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))"
+
+    open override var regex: String {
+        return MarkdownLinkAdm.regex
+    }
+
+    var attributes: [NSAttributedString.Key: AnyObject] {
+        var attributes = [NSAttributedString.Key: AnyObject]()
+        if let font = font {
+            attributes[NSAttributedString.Key.font] = font
+        }
+        if let color = color {
+            attributes[NSAttributedString.Key.foregroundColor] = color
+        }
+        attributes[NSAttributedString.Key.underlineStyle] = 0 as AnyObject
+        attributes[NSAttributedString.Key.underlineColor] = UIColor.clear
+        return attributes
+    }
+    
+    override func match(_ match: NSTextCheckingResult, attributedString: NSMutableAttributedString) {
+        let nsString = (attributedString.string as NSString)
+        let urlString = nsString.substring(with: match.range)
+        
+        guard let adm = urlString.string.getAdamantAddress(),
+              var urlComponents = URLComponents(string: "adm:\(adm.address)")
+        else {
+            return
+        }
+        
+        var queryItems: [URLQueryItem] = []
+        if let name = adm.name {
+            queryItems.append(URLQueryItem(name: "label", value: name))
+        }
+        if let message = adm.message {
+            queryItems.append(URLQueryItem(name: "message", value: message))
+        }
+        urlComponents.queryItems = queryItems
+        guard let url = urlComponents.url else { return }
+        
+        // replace url with adm address
+        attributedString.replaceCharacters(in: match.range, with: adm.address)
+        
+        let formatRange = NSRange(location: match.range.location,
+                                  length: adm.address.count)
+        formatText(attributedString, range: formatRange, link: url.absoluteString)
+        addAttributes(attributedString, range: formatRange, link: url.absoluteString)
+    }
+    
+    override func addAttributes(_ attributedString: NSMutableAttributedString, range: NSRange, link: String) {
+        attributedString.addAttributes(attributes, range: range)
     }
 }
