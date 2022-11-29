@@ -204,14 +204,31 @@ extension AdamantDialogService {
 
 // MAKR: - Activity controllers
 extension AdamantDialogService {
-    func presentShareAlertFor(adm: String, types: [AddressChatShareType], animated: Bool, from: UIView?, completion: (() -> Void)?, didSelect: ((AddressChatShareType) -> Void)?) {
+    func presentShareAlertFor(adm: String, name: String, types: [AddressChatShareType], animated: Bool, from: UIView?, completion: (() -> Void)?, didSelect: ((AddressChatShareType) -> Void)?) {
         let alert = UIAlertController(title: adm, message: nil, preferredStyle: .actionSheet)
         
         for type in types {
-            alert.addAction(UIAlertAction(title: type.localized + adm, style: .default) { _ in
+            alert.addAction(UIAlertAction(title: type.localized + name, style: .default) { _ in
                 didSelect?(type)
             })
         }
+        let encodedAddress = AdamantUriTools.encode(request: AdamantUri.address(address: adm, params: nil))
+        addActions(to: alert,
+                   stringForPasteboard: adm,
+                   stringForShare: adm,
+                   stringForQR: adm,
+                   types: [
+                    .copyToPasteboard,
+                    .share,
+                        .generateQr(encodedContent: encodedAddress,
+                                    sharingTip: adm,
+                                    withLogo: true
+                                   )
+                   ],
+                   excludedActivityTypes: ShareContentType.address.excludedActivityTypes,
+                   from: nil,
+                   completion: nil
+        )
         alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
         
         if let sourceView = from {
@@ -288,6 +305,21 @@ extension AdamantDialogService {
     private func createShareAlertFor(stringForPasteboard: String, stringForShare: String, stringForQR: String, types: [ShareType], excludedActivityTypes: [UIActivity.ActivityType]?, animated: Bool, from: ViewSource?, completion: (() -> Void)?) -> UIAlertController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
+        addActions(to: alert, stringForPasteboard: stringForPasteboard, stringForShare: stringForShare, stringForQR: stringForQR, types: types, excludedActivityTypes: excludedActivityTypes, from: from, completion: completion)
+        
+        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
+        
+        return alert
+    }
+    
+    private func addActions(to alert: UIAlertController,
+                            stringForPasteboard: String,
+                            stringForShare: String,
+                            stringForQR: String,
+                            types: [ShareType],
+                            excludedActivityTypes: [UIActivity.ActivityType]?,
+                            from: ViewSource?,
+                            completion: (() -> Void)?) {
         for type in types {
             switch type {
             case .copyToPasteboard:
@@ -344,10 +376,6 @@ extension AdamantDialogService {
                 alert.addAction(action)
             }
         }
-        
-        alert.addAction(UIAlertAction(title: String.adamantLocalized.alert.cancel, style: .cancel, handler: nil))
-        
-        return alert
     }
     
     @objc private func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
