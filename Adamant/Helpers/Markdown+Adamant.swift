@@ -54,7 +54,7 @@ class MarkdownAdvancedAdm: MarkdownLink {
             attributes[NSAttributedString.Key.font] = font
         }
         if let color = color {
-            attributes[NSAttributedString.Key.foregroundColor] = UIColor.red
+            attributes[NSAttributedString.Key.foregroundColor] = color
         }
         attributes[NSAttributedString.Key.underlineStyle] = 0 as AnyObject
         attributes[NSAttributedString.Key.underlineColor] = UIColor.clear
