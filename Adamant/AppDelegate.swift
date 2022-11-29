@@ -232,8 +232,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // MARK: 7. Welcome messages
         NotificationCenter.default.addObserver(forName: Notification.Name.AdamantChatsProvider.initiallySyncedChanged, object: nil, queue: OperationQueue.main, using: handleWelcomeMessages)
         
-        // MARK: 8. Remove obsolete APNS tokens
+        // MARK: 8. Notifications
         pushNotificationsTokenService.sendTokenDeletionTransactions()
+        UNUserNotificationCenter.current().delegate = self
         
         return true
     }
@@ -264,7 +265,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 // MARK: - Remote notifications
-extension AppDelegate: UNUserNotificationCenterDelegate {
+extension AppDelegate {
     func application(
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
@@ -276,39 +277,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         if let service = container.resolve(DialogService.self) {
             service.showError(withMessage: String.localizedStringWithFormat(String.adamantLocalized.notifications.registerRemotesError, error.localizedDescription), error: error)
         }
-    }
-    
-    // MARK: Open Chat From Notification
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        guard let transactionID = userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
-              let transactionRaw = userInfo[AdamantNotificationUserInfoKeys.transaction] as? String,
-              let data = transactionRaw.data(using: .utf8),
-              let trs = try? JSONDecoder().decode(Transaction.self, from: data),
-              let tabbar = window?.rootViewController as? UITabBarController,
-              let chats = tabbar.viewControllers?.first as? UISplitViewController,
-              let chatList = chats.viewControllers.first as? UINavigationController,
-              let list = chatList.viewControllers.first as? ChatListViewController,
-              (application.applicationState != .active)
-        else {
-            completionHandler(.noData)
-            return
-        }
-        
-        if case .loggedIn = list.accountService.state {
-            self.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: trs.senderId)
-        }
-
-        // if not logged in
-        list.didLoadedMessages = { [weak self] in
-            var timeout = 2.0
-            if #available(iOS 13.0, *) { timeout = 0.5 }
-            DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
-                self?.dialogService.dismissProgress()
-                self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: trs.senderId)
-            }
-        }
-        
-        completionHandler(.newData)
     }
     
     func openDialog(chatList: UINavigationController, tabbar: UITabBarController, list: ChatListViewController, transactionID: String, senderAddress: String) {
@@ -342,6 +310,44 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         } else {
             chatList.pushViewController(vc, animated: false)
         }
+    }
+}
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        let userInfo = response.notification.request.content.userInfo
+        guard let transactionID = userInfo[AdamantNotificationUserInfoKeys.transactionId] as? String,
+              let transactionRaw = userInfo[AdamantNotificationUserInfoKeys.transaction] as? String,
+              let data = transactionRaw.data(using: .utf8),
+              let trs = try? JSONDecoder().decode(Transaction.self, from: data),
+              let tabbar = window?.rootViewController as? UITabBarController,
+              let chats = tabbar.viewControllers?.first as? UISplitViewController,
+              let chatList = chats.viewControllers.first as? UINavigationController,
+              let list = chatList.viewControllers.first as? ChatListViewController
+        else {
+            completionHandler()
+            return
+        }
+        
+        if case .loggedIn = list.accountService.state {
+            self.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: trs.senderId)
+        }
+
+        // if not logged in
+        list.didLoadedMessages = { [weak self] in
+            var timeout = 2.0
+            if #available(iOS 13.0, *) { timeout = 0.5 }
+            DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
+                self?.dialogService.dismissProgress()
+                self?.openDialog(chatList: chatList, tabbar: tabbar, list: list, transactionID: transactionID, senderAddress: trs.senderId)
+            }
+        }
+        
+        completionHandler()
     }
 }
 
